@@ -102,12 +102,12 @@ angular.module('nxCommon')
                         return self.unauthorizedCallBack(error).then(function(){
                             return self._wrapRequest(method, url, data, true);
                         },function(){
-                            $rootScope.$broadcast("unauthirosed_" + self.systemId);
+                            $rootScope.$broadcast("unauthorized_" + self.systemId);
                             return $q.reject(error);
                         });
                     }
                     // Not authorised request - we lost connection to the system, broadcast this for active controller to handle the situation if needed
-                    $rootScope.$broadcast("unauthirosed_" + self.systemId);
+                    $rootScope.$broadcast("unauthorized_" + self.systemId);
                 }
                 if(!repeat && error.status == 503){ // Repeat the request once again for 503 error
                     return self._wrapRequest(method, url, data, true);

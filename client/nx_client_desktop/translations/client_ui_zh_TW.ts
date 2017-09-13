@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>重置所有警告</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation type="unfinished">Disable blur</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -873,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>保持登入</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正確的電子郵件或密碼</translation>
     </message>
   </context>
   <context>
@@ -1873,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>保持登入</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正確的電子郵件或密碼</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2056,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>警告: 具有相同名稱的檔案已存在!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>更新伺服器</translation>
     </message>
   </context>
   <context>

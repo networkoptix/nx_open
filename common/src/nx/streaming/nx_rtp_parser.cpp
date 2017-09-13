@@ -81,9 +81,11 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                     return false;
                 }
             }
-            else if (dataType == QnAbstractMediaData::META_V1)
+            else if (dataType == QnAbstractMediaData::META_V1
+                || dataType == QnAbstractMediaData::GENERIC_METADATA)
             {
-                if (dataSize != Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
+                if (dataType == QnAbstractMediaData::META_V1
+                    && dataSize != Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 + RTSP_FFMPEG_METADATA_HEADER_SIZE)
                 {
                     qWarning() << "Unexpected data size for metadata. got" << dataSize << "expected" << Qn::kMotionGridWidth*Qn::kMotionGridHeight/8 << "bytes. Packet ignored.";
                     return false;
@@ -91,14 +93,29 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
                     return false;
 
-                QnMetaDataV1 *metadata = new QnMetaDataV1();
+                auto duration = ntohl(*((quint32*)payload)) * 1000;
+                auto metadataType = static_cast<MetadataType>(htonl(*((quint32*)(payload) + 1)));
+
+                QnAbstractCompressedMetadata* metadata = nullptr;
+
+                if (dataType == QnAbstractMediaData::META_V1)
+                {
+                    metadata = new QnMetaDataV1();
+                    metadata->metadataType = MetadataType::Motion;
+                }
+                else
+                {
+                    metadata = new QnCompressedMetadata(metadataType);
+                    metadata->metadataType = metadataType;
+                }
+
                 metadata->m_data.clear();
                 context.reset();
-                metadata->m_duration = ntohl(*((quint32*)payload))*1000;
+                metadata->m_duration = duration;
                 dataSize -= RTSP_FFMPEG_METADATA_HEADER_SIZE;
                 payload += RTSP_FFMPEG_METADATA_HEADER_SIZE; // deserialize video flags
 
-                m_nextDataPacket = QnMetaDataV1Ptr(metadata);
+                m_nextDataPacket = QnAbstractCompressedMetadataPtr(metadata);
                 m_nextDataPacketBuffer = &metadata->m_data;
             }
             else if (context && context->getCodecType() == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)

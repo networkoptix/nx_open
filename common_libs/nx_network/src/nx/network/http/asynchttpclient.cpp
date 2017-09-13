@@ -229,9 +229,9 @@ StringType AsyncHttpClient::contentType() const
     return m_delegate.contentType();
 }
 
-bool AsyncHttpClient::hasRequestSuccesed() const
+bool AsyncHttpClient::hasRequestSucceeded() const
 {
-    return m_delegate.hasRequestSuccesed();
+    return m_delegate.hasRequestSucceeded();
 }
 
 BufferType AsyncHttpClient::fetchMessageBodyBuffer()

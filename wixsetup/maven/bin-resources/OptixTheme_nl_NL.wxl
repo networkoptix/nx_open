@@ -4,70 +4,69 @@
   <String Id="Caption">[WixBundleName] Setup - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
-   creates a complete local copy of the bundle in directory. Install is the default.
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - Installeert, repareert, de-installeert of creëert een lokale kopie van de bundel in de map. De installatie is default.  
 
-/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
-   no prompts. By default UI and all prompts are displayed.
+/passive | /quiet -  toont een minimale UI zonder prompts of toont geen UI en 
+   geen prompts. Default UI en alle prompts worden getoond.
 
-/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
-/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
-  <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
-  <String Id="ClientAndServer">Client and Server</String>
-  <String Id="ClientOnly">Client only</String>
-  <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
-  <String Id="ServerOnly">Server only</String>
-  <String Id="ServerOnlyDesc">The Server application is used to to store System information and archives</String>
+/norestart   - onderdrukt alle pogingen om te herstarten. De default UI prompt voor de herstart.
+/log log.txt - logged naar specifiek bestand. Default word er een logbestand gecreëerd in %TEMP%.</String>
+  <String Id="ConfirmCancelMessage">Weet je zeker dat je dit wilt annuleren?</String>
+  <String Id="ClientAndServer">Client en Server</String>
+  <String Id="ClientOnly">Alleen client</String>
+  <String Id="ClientOnlyDesc">De client applicatie wordt gebruikt om video te bekijken en het systeem te beheren</String>
+  <String Id="ServerOnly">Alleen server</String>
+  <String Id="ServerOnlyDesc">De server applicatie is gebruikt om systeeminformatie en archieven op te slaan</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Sluiten</String>
-  <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
+  <String Id="InstallAcceptCheckbox">Ik ga akkoord met de licentievoorwaarden</String>
   <String Id="InstallOptionsButton">Opties</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">Installeren</String>
   <String Id="InstallCloseButton">Sluiten</String>
-  <String Id="OptionsHeader">Setup Options</String>
-  <String Id="OptionsLocationLabel">Install location:</String>
-  <String Id="OptionsBrowseButton">Browse</String>
+  <String Id="OptionsHeader">Setup-opties</String>
+  <String Id="OptionsLocationLabel">Installatie locatie:</String>
+  <String Id="OptionsBrowseButton">Doorzoeken</String>
   <String Id="OptionsOkButton">Oké</String>
   <String Id="OptionsCancelButton">Annuleren</String>
   <String Id="ProgressHeader">Voortgang van de installatie</String>
-  <String Id="ProgressLabel">Processing...</String>
-  <String Id="OverallProgressPackageText">Initializing...</String>
+  <String Id="ProgressLabel">Verwerken...</String>
+  <String Id="OverallProgressPackageText">Initialiseren...</String>
   <String Id="ProgressCancelButton">Annuleren</String>
-  <String Id="ModifyHeader">Modify Setup</String>
-  <String Id="ModifyRepairButton">Repair</String>
-  <String Id="ModifyUninstallButton">Uninstall</String>
+  <String Id="ModifyHeader">Instellingen wijzigen</String>
+  <String Id="ModifyRepairButton">Herstellen</String>
+  <String Id="ModifyUninstallButton">Deïnstalleren</String>
   <String Id="ModifyCloseButton">Sluiten</String>
-  <String Id="SuccessHeader">Setup Successful</String>
-  <String Id="SuccessUninstallHeader">Uninstall Successfully Completed</String>
-  <String Id="SuccessInstallHeader">Installation Successfully Completed</String>
-  <String Id="SuccessLaunchButton">Launch</String>
-  <String Id="SuccessRestartText">You must restart your computer before you can use the software</String>
+  <String Id="SuccessHeader">Setup succesvol</String>
+  <String Id="SuccessUninstallHeader">Deinstallatie succesvol afgerond</String>
+  <String Id="SuccessInstallHeader">Installatie succesvol afgerond</String>
+  <String Id="SuccessLaunchButton">Start</String>
+  <String Id="SuccessRestartText">U moet uw computer opnieuw opstarten voordat u de software kunt gebruiken</String>
   <String Id="SuccessRestartButton">Herstarten</String>
   <String Id="SuccessCloseButton">Sluiten</String>
-  <String Id="FailureHeader">Setup Failed</String>
-  <String Id="FailureHyperlinkLogText">One or more issues caused the setup to fail. Please fix the issues and then retry setup. For more information see the</String>
-  <String Id="FailureHyperlinkLogTextLink">log file</String>
-  <String Id="FailureRestartText">You must restart your computer to complete the rollback of the software</String>
+  <String Id="FailureHeader">Configuratie mislukt</String>
+  <String Id="FailureHyperlinkLogText">Een of meer problemen veroorzaken dat de installatie mislukt. Los alstublieft de problemen op en probeer de installatie opnieuw. Voor meer informatie zie de</String>
+  <String Id="FailureHyperlinkLogTextLink">log bestand</String>
+  <String Id="FailureRestartText">U moet uw computer opnieuw starten om de de-installatie van de software te voltooien</String>
   <String Id="FailureRestartButton">Herstarten</String>
   <String Id="FailureCloseButton">Sluiten</String>
-  <String Id="WillInstall">[WixBundleName] will be installed on your device</String>
+  <String Id="WillInstall">[WixBundleName] zal worden geïnstalleerd op uw apparaat</String>
   <String Id="InstallLicenseLinkText">Eindgebruiker licentieovereenkomst</String>
-  <String Id="FilesInUseHeader">Files In Use</String>
-  <String Id="FilesInUseLabel">The following applications should be stopped to continue the installation:</String>
-  <String Id="FilesInUseCloseRadioButton">Close the applications and attempt to restart them</String>
-  <String Id="FilesInUseDontCloseRadioButton">Do not close applications. A reboot will be required</String>
+  <String Id="FilesInUseHeader">Bestanden in gebruik</String>
+  <String Id="FilesInUseLabel">De volgende toepassingen moeten worden gestopt om de installatie voort te zetten:</String>
+  <String Id="FilesInUseCloseRadioButton">Sluit de applicaties en probeer ze opnieuw te starten</String>
+  <String Id="FilesInUseDontCloseRadioButton">Sluit de applicaties niet af. Een herstart zal nodig zijn</String>
   <String Id="FilesInUseOkButton">Oké</String>
   <String Id="FilesInUseCancelButton">Annuleren</String>
-  <String Id="InstallLicenseText">By clicking \"Accept and Install\" you agree to</String>
+  <String Id="InstallLicenseText">Door te klikken op \"Accepteren en installeren\" u gaat ermee akkoord te</String>
   <String Id="Options">Opties</String>
-  <String Id="SelectApps">Select applications to be installed:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="SelectApps">Selecteer toepassingen die moeten worden geïnstalleerd:</String>
+  <String Id="msierrFirewallCannotConnect">Kan geen verbinding maken met de Windows Firewall. ([2] [3] [4] [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Windows Firewall configureren</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Windows Firewall configureren</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">De Windows Firewall configuratie terugzetten</String>
+  <String Id="WixExecFirewallExceptionsInstall">Installatie van Windows Firewall configureren</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">De Windows Firewall configuratie terugzetten</String>
+  <String Id="WixExecFirewallExceptionsUninstall">De Windows Firewall configuratie verwijderen</String>
+  <String Id="Product_ArchMismatch_x86">Dit pakket is ontworpen voor een 32-bits besturingssysteem. Setup zal nu worden afgesloten.</String>
+  <String Id="Product_ArchMismatch_x64">Dit pakket is ontworpen voor een 64-bits besturingssysteem. Setup zal nu worden afgesloten.</String>
 </WixLocalization>

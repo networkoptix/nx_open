@@ -30,7 +30,6 @@
 #include <nx/network/http/http_types.h>
 
 #include <api/app_server_connection.h>
-#include <event_log/events_serializer.h>
 
 #include <recording/time_period_list.h>
 
@@ -86,7 +85,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (CameraSearchStatusObject, "manualCamera/status")
     (CameraSearchStopObject, "manualCamera/stop")
     (CameraAddObject, "manualCamera/add")
-    (EventLogObject, "events")
     (checkCamerasObject, "checkDiscovery")
     (CameraDiagnosticsObject, "doCameraDiagnosticsStep")
     (GetSystemIdObject, "getSystemId")
@@ -245,14 +243,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
         case CameraSearchStopObject:
             processJsonReply<QnManualCameraSearchReply>(this, response, handle);
             break;
-        case EventLogObject:
-        {
-            vms::event::ActionDataListPtr events(new vms::event::ActionDataList);
-            if (response.status == 0)
-                QnEventSerializer::deserialize(events, response.msgBody);
-            emitFinished(this, response.status, events, handle);
-            break;
-        }
         case checkCamerasObject:
             processJsonReply<QnCameraListReply>(this, response, handle);
             break;
@@ -927,31 +917,6 @@ int QnMediaServerConnection::getStatisticsAsync(QObject* target, const char* slo
 {
     return sendAsyncGetRequestLogged(StatisticsObject,
         QnRequestParamList(), QN_STRINGIZE_TYPE(QnStatisticsReply), target, slot);
-}
-
-int QnMediaServerConnection::getEventLogAsync(
-    qint64 dateFrom, qint64 dateTo, QnResourceList camList, vms::event::EventType eventType,
-    vms::event::ActionType actionType, QnUuid businessRuleId, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params << QnRequestParam("from", dateFrom);
-    if (dateTo != DATETIME_NOW)
-        params << QnRequestParam("to", dateTo);
-    for (const QnResourcePtr& res: camList)
-    {
-        QnNetworkResourcePtr camera = res.dynamicCast<QnNetworkResource>();
-        if (camera)
-            params << QnRequestParam( "cameraId", camera->getId());
-    }
-    if (!businessRuleId.isNull())
-        params << QnRequestParam("brule_id", businessRuleId);
-    if (eventType != vms::event::undefinedEvent)
-        params << QnRequestParam("event", (int) eventType);
-    if (actionType != vms::event::undefinedAction)
-        params << QnRequestParam("action", (int) actionType);
-
-    return sendAsyncGetRequestLogged(EventLogObject,
-        params, QN_STRINGIZE_TYPE(nx::vms::event::ActionDataListPtr), target, slot);
 }
 
 int QnMediaServerConnection::installUpdate(

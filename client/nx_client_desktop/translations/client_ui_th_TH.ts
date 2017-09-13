@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation type="unfinished">Reset All Warnings</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>จอแสดงผล Intel HD Graphics อาจประสบปัญหาหากมีการเปิดใช้การเบลอ เราขอแนะนำให้ออกจากตัวเลือกตามที่เป็นอยู่</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>ปิดใช้งานการเบลอ</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -437,7 +447,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>ทดสอบ</translation>
     </message>
   </context>
   <context>
@@ -874,11 +884,6 @@
       <source>Stay logged in</source>
       <translation type="unfinished">Stay logged in</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
-    </message>
   </context>
   <context>
     <name>ConnectionNameDialog</name>
@@ -1211,7 +1216,7 @@
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>ไม่มีภาพ</translation>
     </message>
   </context>
   <context>
@@ -1866,17 +1871,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>ลงชื่อเข้าสู่ระบบ</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
       <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -2056,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation type="unfinished">Warning: file with the same name already exists!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation type="unfinished">Update Servers</translation>
     </message>
   </context>
   <context>

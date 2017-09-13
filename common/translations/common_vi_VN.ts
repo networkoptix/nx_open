@@ -13,74 +13,83 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>Mật khẩu hoặc tên người dùng không hợp lệ.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
+      <translation>Người dùng này không có quyền cho thao tác được yêu cầu.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation type="unfinished">Cannot create database backup.</translation>
+      <translation>Không thể tạo bản sao lưu cơ sở dữ liệu.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation type="unfinished">System name is not configured yet.</translation>
+      <translation>Tên hệ thống chưa được định cấu hình.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Lỗi không rõ.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with Starter licenses.</translation>
+      <translation>Bạn đang hợp nhất hệ thống với bản quyền khởi đầu.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Chỉ cho phép bản quyền khởi đầu cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation type="unfinished">Merge anyway?</translation>
+      <translation>Hợp nhất bằng mọi cách?</translation>
     </message>
     <message>
       <source>System was not found.</source>
-      <translation type="unfinished">System was not found.</translation>
+      <translation>Không tìm thấy hệ thống.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
+      <translation>Hệ thống đã phát hiện %1 có phiên bản không tương thích %2.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to the other System because current System is already connected to %1.</translation>
+      <translation>Không thể kết nối với Hệ thống khác vì hiện tại Hệ thống đã được kết nối với %1.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is in safe mode.</translation>
+      <translation>Hệ thống đã phát hiện %1 đang ở chế độ an toàn.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">Could not configure the remote System %1.</translation>
+      <translation>Không thể định cấu hình Hệ thống từ xa %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
+      <translation>Cả hai Hệ thống đều được kết nối với %1. Hợp nhất không được phép.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">These Systems are built with different %1 URL. Merge is not allowed.</translation>
+      <translation>Các Hệ thống này được xây dựng với URL %1 khác nhau. Hợp nhất không được phép.</translation>
     </message>
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
+      <translation>Hệ thống điện toán đám mây chỉ có thể được hợp nhất với hệ thống không sử dụng điện toán đám mây. Tên và mật khẩu hệ thống được lấy từ hệ thống điện toán đám mây.</translation>
+    </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
     </message>
   </context>
   <context>
@@ -88,7 +97,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Sự kiện hệ thống</translation>
     </message>
   </context>
   <context>
@@ -123,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>Đã nhận phản hồi xấu từ Máy chủ %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -147,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Đã xảy ra lỗi đầu vào / đầu ra. Thông điệp của hệ điều hành: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -171,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Yêu cầu thiết bị &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Yêu cầu của Camera &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -215,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Yêu cầu mô-đun I / O &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -247,63 +256,63 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings.</translation>
+      <translation>Trước tiên, hãy thử bật ghi (nếu nó tắt) hảy giảm fps trong cài đặt thiết bị.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings.</translation>
+      <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</translation>
+      <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt mô-đun I / O.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>Nếu nó không giúp đỡ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web của thiết bị.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>Nếu nó không giúp đỡ, khôi phục các giá trị mặc định của camera trên trang web.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>Nếu nó không hỗ trợ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web I / O module.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>Không thể mở phương tiện từ URL %1. Không thể kết nối với cổng phương tiện %2.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>Không thể mở phương tiện truyền thông URL %1. Kết nối đến cổng %2 đã tình cờ bị đóng.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>Không thể phân tích phản hồi thiết bị. URL %1, tên yêu cầu %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>Không thể phân tích phản hồi từ camera. URL %1, tên yêu cầu %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>Không thể phân tích phản hồi I/O module. URL %1, tên yêu cầu %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>Không hỗ trợ phương tiện truyền thông theo dõi tại URL %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>Không được phép. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
+      <translation>Không thể mở media URL %1. Phương tiện truyền thông không hỗ trợ giao thức %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Camera đã được khôi phục lưu trữ. Xóa camera và thêm lại để xem Video trực tiếp.</translation>
     </message>
   </context>
   <context>
@@ -330,23 +339,23 @@
     </message>
     <message>
       <source>Could not initialize resampling context, error code: %1</source>
-      <translation type="unfinished">Could not initialize resampling context, error code: %1</translation>
+      <translation>Không thể khởi cài đặt lấy nội dung mẫu, mã lỗi: %1</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers, error code: %1</source>
-      <translation type="unfinished">Could not allocate sample buffers, error code: %1</translation>
+      <translation>Không thể cấp phát bộ đệm mẫu, mã lỗi: %1</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not send audio frame to encoder, Error code: %1.</translation>
+      <translation>Không thể gửi khung âm thanh tới bộ mã hóa, Mã lỗi: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio packet from encoder, Error code: %1.</translation>
+      <translation>Không thể nhận gói tin âm thanh từ bộ mã hóa, Mã lỗi: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio frame from decoder, Error code: %1.</translation>
+      <translation>Không thể nhận gói tin âm thanh từ bộ mã hóa, Mã lỗi: %1.</translation>
     </message>
   </context>
   <context>
@@ -399,11 +408,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Cạnh</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>V-Max</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -411,11 +420,11 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/o Module</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Bắt đầu</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -463,11 +472,11 @@
     </message>
     <message>
       <source>Free</source>
-      <translation type="unfinished">Free</translation>
+      <translation>Còn trống</translation>
     </message>
     <message>
       <source>Free license</source>
-      <translation type="unfinished">Free license</translation>
+      <translation>Bản quyền miễn phí</translation>
     </message>
     <message>
       <source>Time</source>
@@ -475,7 +484,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Bản quyền theo thời gian</translation>
     </message>
   </context>
   <context>
@@ -494,14 +503,14 @@
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
-        <numerusform>Activate %n more %1.</numerusform>
+      <translation>
+        <numerusform>Kích hoạt %n khác %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
+      <translation>
+        <numerusform>%n thêm %1 sẽ được sử dụng.</numerusform>
       </translation>
     </message>
   </context>
@@ -517,7 +526,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>Bản quyền hết hạn</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -529,7 +538,7 @@
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>Bản quyền này yêu cầu phiên bản phần mềm cao hơn</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -537,14 +546,14 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Không tìm thấy Máy chủ với Id phần cứng phù hợp</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Máy chủ mới</translation>
     </message>
   </context>
   <context>
@@ -607,31 +616,31 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module(s)</numerusform>
+      <translation>
+        <numerusform>%n Mô-đun I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O module(s)</numerusform>
+      <translation>
+        <numerusform>%n mô-đun I/O</numerusform>
       </translation>
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation type="unfinished">I/O Modules</translation>
+      <translation>I/o Module</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation type="unfinished">I/O modules</translation>
+      <translation>I/o Module</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/o Module</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation type="unfinished">I/O module</translation>
+      <translation>I/o Module</translation>
     </message>
   </context>
   <context>
@@ -646,19 +655,19 @@
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation type="unfinished">Licensed To: %1</translation>
+      <translation>Bản quyền đã cấp cho</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation type="unfinished">Watermark: %1</translation>
+      <translation>Hình mờ: %1</translation>
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Id Phần cứng: %1</translation>
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Bản quyền theo thời gian</translation>
     </message>
   </context>
   <context>
@@ -685,7 +694,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Đặt trước</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -754,14 +763,14 @@
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Loại tài nguyên không hợp lệ để xuất dữ liệu.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>Hệ thống Chưa Đặt tên</translation>
     </message>
   </context>
   <context>
@@ -784,7 +793,7 @@
     </message>
     <message>
       <source>Internal Server Error</source>
-      <translation type="unfinished">Internal Server Error</translation>
+      <translation>Lỗi Máy chủ Nội bộ</translation>
     </message>
     <message>
       <source>Invalid Parameter</source>
@@ -796,7 +805,7 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
@@ -806,78 +815,78 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>giây</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>phút</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>giờ</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>ngày</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>tuần</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>tháng</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>năm</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>mili giây</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -890,43 +899,43 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>phút</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>giờ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>ngày</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>tuần</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>tháng</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>năm</numerusform>
       </translation>
     </message>
   </context>
@@ -961,58 +970,58 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>Trình xem nâng cao</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Người xem</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Xem trực tiếp</translation>
     </message>
     <message>
       <source>Custom Role</source>
-      <translation type="unfinished">Custom Role</translation>
+      <translation>Tùy chỉnh role</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Tùy chỉnh</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation type="unfinished">Can manage all cameras and bookmarks.</translation>
+      <translation>Có thể quản lý tất cả camea và bookmark.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation type="unfinished">Can view all cameras and export video.</translation>
+      <translation>Có thể xem tất cả các camera và xuất video.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation type="unfinished">Can view live video from all cameras.</translation>
+      <translation>Có thể xem video trực tiếp từ tất cả các camera.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation type="unfinished">Custom user role.</translation>
+      <translation>Vai trò người dùng.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation type="unfinished">Custom permissions.</translation>
+      <translation>Cho phép tùy chỉnh.</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation type="unfinished">Has access to whole System and can do everything.</translation>
+      <translation>Có quyền truy cập vào toàn bộ Hệ thống và có thể làm tất cả mọi thứ.</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+      <translation>Có quyền truy cập vào toàn bộ Hệ thống và có thể quản lý nó. Có thể tạo người dùng.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bookmark</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1076,8 +1085,8 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
+      <translation>
+        <numerusform>Chuyển động trên camera</numerusform>
       </translation>
     </message>
     <message>
@@ -1118,38 +1127,38 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Devices</numerusform>
+      <translation>
+        <numerusform>Tín hiệu đầu vào trên thiết bị</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Cameras</numerusform>
+      <translation>
+        <numerusform>Tín hiệu đầu vào trên camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Devices Disconnected</numerusform>
+      <translation>
+        <numerusform>Thiết bị ngắt kết nối</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Cameras Disconnected</numerusform>
+      <translation>
+        <numerusform>Camera Ngắt kết nối</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Devices IP Conflict</numerusform>
+      <translation>
+        <numerusform>Thiết bị xung đột IP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Cameras IP Conflict</numerusform>
+      <translation>
+        <numerusform>Camera xung đột IP</numerusform>
       </translation>
     </message>
     <message>
@@ -1194,7 +1203,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Máy chủ &quot;%1&quot; Lỗi</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1208,19 +1217,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Máy chủ &quot;%1&quot; Xung đột</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Máy chủ &quot;%1&quot; đã bắt đầu</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Máy chủ &quot;%1&quot; có vấn đề về bản quyền</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>Máy chủ &quot;%1&quot; đã hoàn tất sao lưu dữ liệu</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1232,7 +1241,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Nhiều %1 sự kiện đã xảy ra</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1274,7 +1283,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Kích hoạt: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1284,8 +1293,8 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n lần, lần đầu tiên: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1328,7 +1337,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Thiết bị không đáp ứng yêu cầu mạng.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -1336,7 +1345,7 @@
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Máy chủ dừng bất ngờ.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
@@ -1348,11 +1357,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>Ổ đĩa HDD / SSD &quot;%1&quot; đã đầy. Đĩa chứa quá nhiều dữ liệu không được quản lý bởi VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Đĩa hệ thống &quot;%1&quot; gần như đầy.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1376,7 +1385,7 @@
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
+      <translation>Lưu trữ sao lưu đã hoàn thành, nhưng không hoàn thành đầy đủ vì thời gian sao lưu đã kết thúc. Dữ liệu được sao lưu đến %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
@@ -1388,15 +1397,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các thiết bị sau:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các camera sau:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các moudle I/O sau:</translation>
     </message>
     <message>
       <source>start</source>
@@ -1416,27 +1425,27 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Tên kích hoạt</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Vai trò</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Người dùng</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
+      <translation>
+        <numerusform>%n Vai trò</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Tất cả Quản trị viên</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1448,23 +1457,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Kích hoạt mềm</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Trình kích hoạt mềm %1 tại %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Trình kích hoạt mềm %1 đã được kích hoạt nhiều lần</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>Gửi email</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Công nhận</translation>
     </message>
   </context>
   <context>

@@ -44,8 +44,6 @@ extern "C"
 
 #include <plugins/resource/avi/avi_resource.h>
 
-#include <redass/redass_controller.h>
-
 #include <server/server_storage_manager.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -1483,7 +1481,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
-    if (!m_pausedOverride)
+    const auto buffering = widgetLoaded
+        && m_currentMediaWidget->display()->camDisplay()->isBuffering();
+
+    if (!m_pausedOverride && !buffering)
     {
         // TODO: #GDM #vkutin #refactor logic in 3.1
         auto usecTimeForWidget = [isSearch, this](QnMediaResourceWidget *mediaWidget) -> qint64
@@ -1493,9 +1494,21 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
+            {
                 timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
+            }
+            else if (mediaWidget->resource()->toResource()->flags().testFlag(Qn::local_media))
+            {
+                // #vkutin Workaround for local files doing seek after quite a delay
+                // which caused time marker to jump back and forth.
+                // It happened even before QnCamDisplay::isBuffering became true.
+                // So for local files we use position of next frame, it seems working.
+                timeUSec = mediaWidget->display()->camDisplay()->getNextTime();
+            }
             else
+            {
                 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+            }
 
             if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
@@ -2148,8 +2161,6 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value)
                 {
                     reader->jumpTo(value * 1000, 0);
                 }
-                //else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
-                //    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                 else
                 {
                     reader->setSkipFramesToTime(value * 1000); /* Precise seek. */

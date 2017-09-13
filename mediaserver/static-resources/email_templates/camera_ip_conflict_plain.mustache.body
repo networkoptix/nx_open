@@ -1,8 +1,8 @@
-{{event}}{{#source}} on {{source}}{{/source}}
+{{&event}}{{#source}} on {{&source}}{{/source}}
 
 {{#aggregated}}
-Conflict detected at {{timestampDate}} {{timestampTime}} for IP address {{cameraConflictAddress}}:
-Number: {{number}}
-Physical ID: {{mac}}
-{{timestampDate}} {{timestampTime}}
+Conflict detected at {{&timestampDate}} {{&timestampTime}} for IP address {{&cameraConflictAddress}}:
+Number: {{&number}}
+Physical ID: {{&mac}}
+{{&timestampDate}} {{&timestampTime}}
 {{/aggregated}}

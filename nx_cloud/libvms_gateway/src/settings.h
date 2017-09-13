@@ -9,6 +9,7 @@
 #include <nx/utils/basic_service_settings.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
+#include <nx/cloud/relay/settings.h>
 
 namespace nx {
 namespace cloud {
@@ -99,6 +100,7 @@ public:
     const Tcp& tcp() const;
     const Http& http() const;
     const CloudConnect& cloudConnect() const;
+    const relay::conf::ListeningPeer listeningPeer() const;
 
 protected:
     virtual void loadSettings() override;
@@ -110,6 +112,7 @@ private:
     Tcp m_tcp;
     Http m_http;
     CloudConnect m_cloudConnect;
+    relay::conf::ListeningPeer m_listeningPeer;
 };
 
 } // namespace conf

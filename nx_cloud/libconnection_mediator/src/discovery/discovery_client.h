@@ -1,9 +1,9 @@
 #pragma once
 
+#include <deque>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <queue>
 
 #include <QtCore/QUrl>
 
@@ -38,9 +38,9 @@ enum class PeerStatus
     offline,
 };
 
-} // namespace nx
-} // namespace cloud
 } // namespace discovery
+} // namespace cloud
+} // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::cloud::discovery::ResultCode)(nx::cloud::discovery::PeerStatus),
@@ -55,7 +55,6 @@ struct BasicInstanceInformation
     std::string type;
     std::string id;
     QUrl apiUrl;
-    //PeerStatus status = PeerStatus::offline;
 
     BasicInstanceInformation(std::string type):
         type(type)
@@ -63,7 +62,9 @@ struct BasicInstanceInformation
     }
 };
 
-#define BasicInstanceInformation_Fields (type)(id)(apiUrl)/*(status)*/
+bool operator==(const BasicInstanceInformation& left, const BasicInstanceInformation& right);
+
+#define BasicInstanceInformation_Fields (type)(id)(apiUrl)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (BasicInstanceInformation),
@@ -73,7 +74,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 /**
  * @param InstanceInformation Must inherit BasicInstanceInformation 
- * and define static member kTypeName (e.g. relay, mediator, etc...).
  */
 template<typename InstanceInformation>
 class ModuleRegistrar:
@@ -84,6 +84,9 @@ class ModuleRegistrar:
     static_assert(
         std::is_base_of<BasicInstanceInformation, InstanceInformation>::value,
         "InstanceInformation MUST be a descendant of BasicInstanceInformation");
+    static_assert(
+        std::is_same<decltype(InstanceInformation::kTypeName), const char* const>::value,
+        "Define static member kTypeName (e.g. relay, mediator, etc...)");
 
 public:
     ModuleRegistrar(
@@ -107,9 +110,14 @@ public:
     void setInstanceInformation(InstanceInformation instanceInformation)
     {
         post(
-            [this, instanceInformation = std::move(instanceInformation)]()
+            [this, instanceInformation = std::move(instanceInformation)]() mutable
             {
-                m_sendQueue.push(std::move(instanceInformation));
+                if (!m_webSocket)
+                    m_sendQueue.clear();
+                else if (m_sendQueue.size() > 1)
+                    m_sendQueue.erase(std::next(m_sendQueue.begin()), m_sendQueue.end());
+
+                m_sendQueue.push_back(std::move(instanceInformation));
                 if (m_webSocket && m_sendQueue.size() == 1)
                     sendNext();
             });
@@ -148,17 +156,21 @@ private:
     std::unique_ptr<nx_http::AsyncClient> m_webSocketConnector;
     std::unique_ptr<nx::network::WebSocket> m_webSocket;
     nx::Buffer m_sendBuffer;
-    std::queue<InstanceInformation> m_sendQueue;
+    std::deque<InstanceInformation> m_sendQueue;
     std::string m_moduleId;
 
     void onWebSocketConnectFinished()
     {
-        if (!m_webSocketConnector->hasRequestSuccesed())
+        if (!m_webSocketConnector->hasRequestSucceeded())
         {
             NX_DEBUG(this, lm("Failed to establish websocket connection to %1. "
                 "system result code %2, http result code %3")
-                .arg(m_baseUrl).arg(m_webSocketConnector->lastSysErrorCode())
-                /*.arg(nx_http::StatusCode::toString(m_webSocketConnector->httpStatusCode()))*/);
+                .args(
+                    m_baseUrl, m_webSocketConnector->lastSysErrorCode(),
+                    m_webSocketConnector->response()
+                        ? nx_http::StatusCode::toString(
+                            m_webSocketConnector->response()->statusLine.statusCode)
+                        : nx::String("none")));
 
             // TODO Reconnecting.
             return;
@@ -193,7 +205,7 @@ private:
         if (systemErrorCode == SystemError::noError)
         {
             NX_ASSERT(bytesSent == (std::size_t)m_sendBuffer.size());
-            m_sendQueue.pop();
+            m_sendQueue.pop_front();
             if (!m_sendQueue.empty())
                 sendNext();
             return;
@@ -201,11 +213,11 @@ private:
 
         if (nx::network::socketCannotRecoverFromError(systemErrorCode))
         {
-            // TODO Reconnecting.
+            // TODO: #ak Reconnecting.
             return;
         }
     
-        // Retrying to send...
+        // Retrying to send.
         sendNext();
     }
 };

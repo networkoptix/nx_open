@@ -1,14 +1,11 @@
 #include "workbench_videowall_handler.h"
 
-#include <QtCore/QProcess>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -22,12 +19,10 @@
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_app_info.h>
 #include <client/client_installations_manager.h>
 #include <client/client_startup_parameters.h>
 
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -35,14 +30,9 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_type.h>
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -53,8 +43,6 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
-#include <redass/redass_controller.h>
-
 #include <recording/time_period.h>
 
 #include <nx_ec/data/api_videowall_data.h>
@@ -62,6 +50,7 @@
 #include <nx_ec/managers/abstract_videowall_manager.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/radass/radass_types.h>
 #include <ui/dialogs/layout_name_dialog.h> // TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
@@ -84,9 +73,6 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 
@@ -103,6 +89,7 @@
 #include <utils/common/uuid_pool.h>
 #include <nx/utils/counter.h>
 #include <utils/unity_launcher_workaround.h>
+#include <utils/common/delayed.h>
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
@@ -111,6 +98,7 @@
 //#define RECEIVER_DEBUG
 
 using nx::client::desktop::utils::UnityLauncherWorkaround;
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -128,6 +116,7 @@ PARAM_KEY(speed)
 PARAM_KEY(geometry)
 PARAM_KEY(zoomRect)
 PARAM_KEY(checkedButtons)
+PARAM_KEY(items)
 
 #if defined(SENDER_DEBUG) || defined(RECEIVER_DEBUG)
 static QByteArray debugRole(int role)
@@ -1077,9 +1066,20 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         }
         case QnVideoWallControlMessage::RadassModeChanged:
         {
-            Qn::ResolutionMode resolutionMode = static_cast<Qn::ResolutionMode>(message[valueKey].toInt());
-            if (qnRedAssController)
-                qnRedAssController->setMode(resolutionMode);
+            int mode = message[valueKey].toInt();
+            const auto items = QJson::deserialized<std::vector<QnUuid>>(message[itemsKey].toUtf8());
+
+            const auto layout = workbench()->currentLayout()->resource();
+            if (!layout)
+                return;
+
+            QnLayoutItemIndexList layoutItems;
+            for (const auto& id: items)
+                layoutItems.push_back(QnLayoutItemIndex(layout, id));
+
+            ui::action::Parameters parameters(layoutItems);
+            parameters.setArgument(Qn::ResolutionModeRole, mode);
+            menu()->trigger(ui::action::RadassAction, parameters);
             break;
         }
         default:
@@ -1173,9 +1173,8 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     QnWorkbenchLayout* layout = workbench()->currentLayout();
     if (active)
     {
-        connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::AutoResolution); });
-        connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::LowResolution); });
-        connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::HighResolution); });
+        connect(action(action::RadassAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_radassAction_triggered);
 
         connect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         connect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1200,9 +1199,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     }
     else
     {
-        disconnect(action(action::RadassAutoAction), NULL, this, NULL);
-        disconnect(action(action::RadassLowAction), NULL, this, NULL);
-        disconnect(action(action::RadassHighAction), NULL, this, NULL);
+        action(action::RadassAction)->disconnect(this);
 
         disconnect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         disconnect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1245,16 +1242,6 @@ void QnWorkbenchVideoWallHandler::updateMode()
             control = true;
     }
     setControlMode(control);
-}
-
-void QnWorkbenchVideoWallHandler::controlResolutionMode(Qn::ResolutionMode resolutionMode)
-{
-    if (!m_controlMode.active)
-        return;
-
-    QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
-    message[valueKey] = QString::number(resolutionMode);
-    sendMessage(message);
 }
 
 void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
@@ -1865,8 +1852,14 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     menu()->trigger(action::OpenInNewTabAction, layout);
 
-    // new layout should not be marked as changed
-    saveVideowallAndReviewLayout(videoWall, layout);
+    // New layout should not be marked as changed, make sure it will be done after layout opening.
+    executeDelayedParented(
+        [this, videoWall, layout]
+        {
+            saveVideowallAndReviewLayout(videoWall, layout);
+        },
+        kDefaultDelay,
+        this);
 }
 
 void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered()
@@ -2167,6 +2160,25 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
     }
 
     saveVideowalls(videoWalls);
+}
+
+void QnWorkbenchVideoWallHandler::at_radassAction_triggered()
+{
+    if (!m_controlMode.active)
+        return;
+
+    const auto parameters = menu()->currentParameters(sender());
+
+    const auto mode = parameters.argument(Qn::ResolutionModeRole).toInt();
+
+    std::vector<QnUuid> items;
+    for (const auto& item: parameters.layoutItems())
+        items.push_back(item.uuid());
+
+    QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
+    message[valueKey] = QString::number(mode);
+    message[itemsKey] = QString::fromUtf8(QJson::serialized(items));
+    sendMessage(message);
 }
 
 void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &resource)

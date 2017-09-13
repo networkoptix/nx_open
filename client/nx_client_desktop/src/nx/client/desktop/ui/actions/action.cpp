@@ -425,7 +425,7 @@ void Action::addConditionalText(ConditionWrapper&& condition, const QString& tex
     m_conditionalTexts.emplace_back(std::move(condition), text);
 }
 
-bool Action::hasConditionalTexts()
+bool Action::hasConditionalTexts() const
 {
     return !m_conditionalTexts.empty();
 }

@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>Reset alle waarschuwingen</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>Intel HD grafisch display kan worden geconfronteerd met kwesties als vervagen is ingeschakeld. Wij raden aan deze optie ongewijzigd te laten.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>Vervagen uitschakelen</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -873,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Blijf ingelogd</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Onjuist e-mailadres of wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -1873,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>Blijf ingelogd</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2056,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>Waarschuwing: bestand met dezelfde naam bestaat al!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>Servers bijwerken</translation>
     </message>
   </context>
   <context>

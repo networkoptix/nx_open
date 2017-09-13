@@ -156,7 +156,7 @@ void MediaserverEndpointTester::pingServer(
                 m_httpClients.erase(httpClient);
             }
 
-            if (!httpClient->hasRequestSuccesed())
+            if (!httpClient->hasRequestSucceeded())
             {
                 NX_LOGX(lit("Response from %1 has failed")
                     .arg(address.toString()), cl_logDEBUG1);

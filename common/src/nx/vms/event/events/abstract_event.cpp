@@ -12,9 +12,7 @@ bool hasChild(EventType eventType)
     switch (eventType)
     {
         case anyCameraEvent:
-            return true;
         case anyServerEvent:
-            return true;
         case anyEvent:
             return true;
         default:
@@ -51,13 +49,15 @@ QList<EventType> childEvents(EventType eventType)
 {
     switch (eventType)
     {
+        // Some critical issue occurred on the camera.
         case anyCameraEvent:
             return {
                 cameraDisconnectEvent,
                 networkIssueEvent,
-                cameraIpConflictEvent,
-                softwareTriggerEvent };
+                cameraIpConflictEvent
+            };
 
+        // Some critical issue occurred on the server.
         case anyServerEvent:
             return {
                 storageFailureEvent,
@@ -65,16 +65,20 @@ QList<EventType> childEvents(EventType eventType)
                 serverConflictEvent,
                 serverStartEvent,
                 licenseIssueEvent,
-                backupFinishedEvent };
+                backupFinishedEvent
+            };
 
+        // All events except already mentioned.
         case anyEvent:
             return {
                 cameraMotionEvent,
                 cameraInputEvent,
+                softwareTriggerEvent,
                 anyCameraEvent,
                 anyServerEvent,
-                userDefinedEvent,
-                softwareTriggerEvent };
+                analyticsSdkEvent,
+                userDefinedEvent
+            };
 
         default:
             return {};
@@ -96,7 +100,9 @@ QList<EventType> allEvents()
         licenseIssueEvent,
         backupFinishedEvent,
         softwareTriggerEvent,
-        userDefinedEvent };
+        analyticsSdkEvent,
+        userDefinedEvent
+    };
 
     return result;
 }
@@ -114,6 +120,7 @@ bool hasToggleState(EventType eventType)
         case anyEvent:
         case cameraMotionEvent:
         case cameraInputEvent:
+        case analyticsSdkEvent:
         case userDefinedEvent:
         case softwareTriggerEvent:
             return true;
@@ -126,21 +133,27 @@ bool hasToggleState(EventType eventType)
 QList<EventState> allowedEventStates(EventType eventType)
 {
     QList<EventState> result;
-    if (!hasToggleState(eventType) || eventType == userDefinedEvent || eventType == softwareTriggerEvent)
+    if (!hasToggleState(eventType)
+        || eventType == analyticsSdkEvent
+        || eventType == userDefinedEvent
+        || eventType == softwareTriggerEvent)
         result << EventState::undefined;
+
     if (hasToggleState(eventType))
         result << EventState::active << EventState::inactive;
     return result;
 }
 
+// Check if camera required for this event to setup a rule. Camera selector will be displayed.
 bool requiresCameraResource(EventType eventType)
 {
     switch (eventType)
     {
         case cameraMotionEvent:
         case cameraInputEvent:
-        case cameraDisconnectEvent:
+        case cameraDisconnectEvent: //< Think about moving out disconnect event.
         case softwareTriggerEvent:
+        case analyticsSdkEvent:
             return true;
 
         default:
@@ -148,34 +161,27 @@ bool requiresCameraResource(EventType eventType)
     }
 }
 
+// Check if server required for this event to setup a rule. Server selector will be displayed.
 bool requiresServerResource(EventType eventType)
 {
-    switch (eventType)
-    {
-        case storageFailureEvent:
-            return false; // TODO: #GDM #Business restore when will work fine
-        default:
-            return false;
-    }
+    // TODO: #GDM #Business possibly will never be required.
     return false;
 }
 
+// Check if camera required for this event to OCCUR.
 bool isSourceCameraRequired(EventType eventType)
 {
     switch (eventType)
     {
-        case cameraMotionEvent:
-        case cameraInputEvent:
-        case cameraDisconnectEvent:
         case networkIssueEvent:
-        case softwareTriggerEvent:
             return true;
 
         default:
-            return false;
+            return requiresCameraResource(eventType);
     }
 }
 
+// Check if server required for this event to OCCUR.
 bool isSourceServerRequired(EventType eventType)
 {
     switch (eventType)
@@ -188,7 +194,7 @@ bool isSourceServerRequired(EventType eventType)
             return true;
 
         default:
-            return false;
+            return requiresServerResource(eventType);
     }
 }
 

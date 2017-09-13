@@ -314,9 +314,9 @@ protected:
         return CameraDiagnostics::NoErrorResult();
     }
 
-private:
     void setMaxFps(int f);
-
+    void setPrimaryResolution(const QSize& value);
+private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
@@ -367,6 +367,7 @@ protected:
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
+    void scheduleRetrySubscriptionTimer();
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();
@@ -515,6 +516,7 @@ private:
     mutable QElapsedTimer m_timeDriftTimer;
     mutable QTimeZone m_cameraTimeZone;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
+    bool m_isRelayOutputInversed;
     std::map<QString, RelayInputState> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;

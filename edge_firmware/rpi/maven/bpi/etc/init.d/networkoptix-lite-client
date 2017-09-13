@@ -9,14 +9,62 @@
 ### END INIT INFO
 
 CUSTOMIZATION="@deb.customization.company.name@"
+
+SECONDS_TO_WAIT_BEFORE_KILL_9=120
+
 VTCONSOLE=$(fgconsole)
 SERVICE_NAME="lite-client"
-PREFIX="/opt/$CUSTOMIZATION/lite_client"
+INSTALL_DIR="/opt/$CUSTOMIZATION"
+MEDIASERVER_DIR="$INSTALL_DIR/mediaserver"
+LITE_CLIENT_DIR="$INSTALL_DIR/lite_client"
 BIN_NAME="mobile_client"
-BIN_PATH="$PREFIX/bin/$BIN_NAME"
+BIN_FILE="$LITE_CLIENT_DIR/bin/$BIN_NAME"
+LOGS_DIR="$MEDIASERVER_DIR/var/log"
 
-ulimit -n 8192
-ulimit -c unlimited
+# Touch .flag file to capture all output of this script to a file.
+OUT_FLAG="$LOGS_DIR/$(basename "$0")-out.flag"
+OUT_LOG="$LOGS_DIR/$(basename "$0")-out.log"
+
+RUN_ARGS=""
+
+#--------------------------------------------------------------------------------------------------
+
+# Redirect all output of this script to the log file.
+redirectOutput() # log_file
+{
+    LOG_FILE="$1"
+
+    # If the old log file exists, rename it to first available "filename_#.log", stopping at 9.
+    OLD_LOG_FILE_MESSAGE=""
+    if [ -f "$LOG_FILE" ]; then
+        for i in $(seq 1 9); do
+            OLD_LOG_FILE="${LOG_FILE%.*}_$i.log" #< Remove the extension and add the new suffix.
+            if [ ! -f "$OLD_LOG_FILE" ]; then # Unused filename found.
+                break
+            fi
+        done
+        mv "$LOG_FILE" "$OLD_LOG_FILE"
+        OLD_LOG_FILE_MESSAGE=" (old log file renamed to $(basename "$OLD_LOG_FILE"))"
+    fi
+
+    echo "$0: See the log in $LOG_FILE$OLD_LOG_FILE_MESSAGE"
+
+    exec 1<&- #< Close stdout fd.
+    exec 2<&- #< Close stderr fd.
+    exec 1<>"$LOG_FILE" #< Open stdout as $LOG_FILE for reading and writing.
+    exec 2>&1 #< Redirect stderr to stdout.
+}
+
+logArgs() # "$@"
+{
+    echo "Script [$0] started with pid $$ (parent pid $PPID), with $# arg(s):"
+    echo "{"
+    for ARG in "$@"; do
+        echo "    [$ARG]"
+    done
+    echo "}"
+    echo ""
+}
 
 start()
 {
@@ -26,11 +74,11 @@ start()
         return 0
     fi
 
-    PORT=$(cat "/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf" |grep port= |awk -F "=" '{print $2}')
+    PORT=$(cat "$INSTALL_DIR/mediaserver/etc/mediaserver.conf" |grep port= |awk -F "=" '{print $2}')
     if [ -z "$PORT" ]; then
         PORT=7001
     fi
-    echo "Connecting to $CUSTOMIZATION server on port $PORT..."
+    echo "Connecting to mediaserver on port $PORT..."
 
     # Changing active tty to 7 (should be always free).
     if [ "$VTCONSOLE" != "7" ]; then
@@ -42,20 +90,21 @@ start()
 
     WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt" |grep changeset |awk '{print $2}')
     if [ -z "$WEBADMIN_BUILD" ]; then
-        echo "Server is not running. Cannot run Lite Client"
+        echo "Mediaserver is not running. Cannot run $SERVICE_NAME"
         return 1
     else
-        echo "Server is running. Webadmin changeset is $WEBADMIN_BUILD"
-        echo -n "Starting $BIN_NAME via /api/startLiteClient: "
+        echo "Mediaserver is running. Webadmin changeset is $WEBADMIN_BUILD"
+        echo "Starting $BIN_NAME via /api/startLiteClient"
         curl -s "http://127.0.0.1:$PORT/api/startLiteClient"
     fi
 
     sleep 5
 
-    if [ $(pidof "$BIN_NAME") ]; then
+    if [ ! -z "$(pidof "$BIN_NAME")" ]; then
         echo "OK"
     else
         echo "FAILED"
+        return 1
     fi
 }
 
@@ -64,18 +113,18 @@ startquiet()
     start
 }
 
-SECONDS_TO_WAIT_BEFORE_KILL_9=120
-
-stop()
+stop() # [signal]
 {
-    echo -n "Stopping $BIN_NAME... "
-    killall "$1" "$BIN_NAME" >/dev/null 2>&1
+    SIGNAL="$1" #< Can be empty.
+
+    echo "Stopping $BIN_NAME..."
+    killall $SIGNAL "$BIN_NAME" >/dev/null 2>&1
     local i=0
-    while [ "$(pidof "$BIN_NAME")" ]; do
+    while [ ! -z "$(pidof "$BIN_NAME")" ]; do
         sleep 1
         let i++
         if [ $i -gt $SECONDS_TO_WAIT_BEFORE_KILL_9 ]; then
-            echo -n "Sending 9 signal... "
+            echo "$SERVICE_NAME not stopped after $i seconds; doing killall -9"
             killall -9 "$BIN_NAME" >/dev/null 2>&1
         fi
     done
@@ -85,92 +134,118 @@ stop()
         chvt 1
     fi
 
-    echo "DONE"
+    echo "Done"
+}
+
+printWatchdogPid()
+{
+    pgrep -f -- "$0 run_watchdog"
 }
 
 start_watchdog()
 {
-    WATCHDOG_PID=$(ps -eO command | grep lite-client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1)
-    if [ "$WATCHDOG_PID" ]; then
-        echo "$CUSTOMIZATION-lite-client watchdog is already running with pid $WATCHDOG_PID"
+    WATCHDOG_PID=$(printWatchdogPid)
+    if [ ! -z "$WATCHDOG_PID" ]; then
+        echo "$SERVICE_NAME watchdog is already running with pid $WATCHDOG_PID"
         return 0
     fi
-    bash -c "/etc/init.d/$CUSTOMIZATION-lite-client run_watchdog" >/dev/null 2>&1 &
+
+    "$0" "run_watchdog" >/dev/null 2>&1 &
     echo "$SERVICE_NAME watchdog has been started"
 }
 
 stop_watchdog()
 {
-    WATCHDOG_PID=$(ps -eO command | grep lite-client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1)
-    if [ ! "$WATCHDOG_PID" ]; then
-        echo "$CUSTOMIZATION-lite-client watchdog is not running"
+    WATCHDOG_PID=$(printWatchdogPid)
+    if [ -z "$WATCHDOG_PID" ]; then
+        echo "$SERVICE_NAME watchdog is not running"
         return 0
     fi
 
-    echo -n "Stopping $CUSTOMIZATION-lite-client watchdog... "
+    echo "Stopping $SERVICE_NAME watchdog..."
     kill "$WATCHDOG_PID"
     sleep 1
-    echo "OK"
+    WATCHDOG_PID=$(printWatchdogPid)
+    if [ ! -z "$WATCHDOG_PID" ]; then
+        echo "$SERVICE_NAME watchdog still not killed; doing kill -9"
+        kill -9 "$WATCHDOG_PID"
+        sleep 1
+    fi
+    echo "Done"
 }
 
 run_watchdog()
 {
     while true; do
         start
-        # Sometimes our flagship product (Lite Client) behaves slightly incorrectly in certain conditions.
-        # To avoid confusion, I need to put some background here.
-        # First of all, it can work in 2 different modes:
-        # - web (displaying browser and web-client inside)
-        # - video (displaying video)
-        # Second, to avoid more confusion, it is necessary to mention that "video mode" is subdivided by 2 different ones:
-        # - 2x2: Lite client displays 4 videos and decodes secondary (low resolution) stream from each camera
-        #   (as you know, cameras may deliver several streams simultaneously). Software decoding is used in this case.
-        # - 1x1: Lite client displays 1 video and decodes primary (high resolution) stream from a camera.
-        #   Hardware decoding is used in this case.
-        # So, when Lite Client is working in video mode and 2x2 sub-mode, it turns the display blank
-        # after a certain timeout (about 5 minutes). It can exit from blank mode by mouse or keyboard.
-        # This behavior should be disabled by the consoleblank=0 parameter passed to the kernel, however in this mode it doesn't work.
-        # Luckily, screen blanking can be forced off by the following command and it will reset the counter.
-        # There are a lot of interesting commands related to display subsystem here:
-        # http://linux-sunxi.org/Display
-        # Todo: add detail explanation how to pass parameters to the kernel, provide more background information,
-        # resolve further confusion that may arise, make America great again, save the whales.
+
+        # In video-2x2 mode, Linux turns the display blank after a certain timeout (~5 minutes),
+        # until a mouse or a keyboard are used. It should be possible to disable this behavior by
+        # `consoleblank=0` kernel option, however for some reason it doesn't work. Luckily, screen
+        # blanking can be disabled by the following command which resets the counter.
+        # For details, see http://linux-sunxi.org/Display
         echo "0" >/sys/class/graphics/fb0/blank
+
         sleep 20
     done
+}
+
+help()
+{
+    cat <<EOF
+Usage: $0 <command>
+Supported commands:
+ start # Start $SERVICE_NAME and watchdog.
+ startquiet # Start $SERVICE_NAME.
+ start_console # Run $SERVICE_NAME in foreground without output redirection.
+ start_gdb # Run $SERVICE_NAME under gdb.
+ stop # Stop watchdog and kill $SERVICE_NAME with SIGINT.
+ kill # Stop watchdog and kill $SERVICE_NAME with SIGKILL.
+ status # Report whether $SERVICE_NAME is running, and its pid. Exit status is non-zero if stopped.
+ server_status # Output 1 if $SERVICE_NAME is running, otherwise, do nothing.
+ restart, reload, force-reload # Stop watchdog and $SERVICE_NAME, start $SERVICE_NAME and watchdog.
+ start_watchdog # Start watchdog in background.
+ run_watchdog # Run watchdog in foreground.
+ stop_watchdog # Stop watchdog, if it is running.
+EOF
 }
 
 #--------------------------------------------------------------------------------------------------
 # main
 
+if [ -f "$OUT_FLAG" ]; then
+    redirectOutput "$OUT_LOG"
+    logArgs "$@"
+    set -x #< Log each command.
+fi
+
+ulimit -n 8192
+ulimit -c unlimited
+
 case "$1" in
     start)
-        start
+        start || true
         start_watchdog
         ;;
-
     startquiet)
         start
         ;;
-
     start_console)
-        "$BIN_PATH" $RUN_ARGS
+        set -x #< Log each command.
+        "$BIN_FILE" $RUN_ARGS
         ;;
-
     start_gdb)
-        gdbserver 0.0.0.0:12345 "$BIN_PATH" $RUN_ARGS
+        set -x #< Log each command.
+        gdbserver 0.0.0.0:12345 "$BIN_FILE" $RUN_ARGS
         ;;
-
     stop)
         stop_watchdog
         stop
         ;;
-
     kill)
         stop_watchdog
         stop -9
         ;;
-
     status)
         SERVICE_PID=$(pidof "$BIN_NAME")
         if [ ! -z "$SERVICE_PID" ]; then
@@ -181,37 +256,27 @@ case "$1" in
             exit 1
         fi
         ;;
-
     server_status)
-        if [ $(pidof "$BIN_NAME") ]; then
+        if [ ! -z "$(pidof "$BIN_NAME")" ]; then
             echo "1"
         fi
         ;;
-
     restart|reload|force-reload)
-        stop_watchdog
-        stop
-        while [ $(pidof "$BIN_NAME") ]; do
-            sleep 1
-        done
-        start
+        stop_watchdog || true
+        stop || true
+        start || true
         start_watchdog
         ;;
-
     start_watchdog)
         start_watchdog
         ;;
-
     run_watchdog)
         run_watchdog
         ;;
-
     stop_watchdog)
         stop_watchdog
         ;;
-
     *)
-        echo "Usage: $0 {start|startquiet|stop|restart|status}"
+        help
         exit 1
 esac
-

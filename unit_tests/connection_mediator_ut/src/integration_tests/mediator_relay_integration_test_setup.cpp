@@ -166,10 +166,10 @@ void MediatorRelayIntegrationTestSetup::assertTrafficRelayUrlHasBeenReported()
 
     if (m_listenResponse)
     {
-        ASSERT_TRUE(m_listenResponse->trafficRelayUrl);
+        ASSERT_TRUE(!m_listenResponse->trafficRelayUrls.empty());
         ASSERT_EQ(
             m_relayUrl.toString().toStdString(),
-            m_listenResponse->trafficRelayUrl->toStdString());
+            m_listenResponse->trafficRelayUrls.front().toStdString());
     }
 
     if (m_connectResponse)

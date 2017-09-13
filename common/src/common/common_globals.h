@@ -415,6 +415,24 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
 
+    enum class BitrateControl {
+        undefined,
+        cbr,
+        vbr
+    };
+
+    enum class EncodingPriority {
+        undefined,
+        framerate,
+        compressionLevel
+    };
+
+    enum class EntropyCoding {
+        undefined,
+        cavlc,
+        cabac
+    };
+
     enum StatisticsDeviceType {
         StatisticsCPU = 0,                /**< CPU load in percents. */
         StatisticsRAM = 1,                /**< RAM load in percents. */

@@ -184,6 +184,8 @@ namespace Qn
 
         ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
 
+        ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
+
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
         PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
@@ -220,6 +222,7 @@ namespace Qn
         MergedTimePeriodsRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TextRole,                                   /**< Role for generic text. Used in several places. */
+        IntRole,                                    /**< Role for generic integer. Used in several places. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
@@ -283,6 +286,7 @@ namespace Qn
         UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
+        ResolutionModeRole,                         /**< Role for resolution mode. */
 
         RoleCount
     };
@@ -381,17 +385,6 @@ namespace Qn
         CannotRender,       /**< Something went wrong. */
         OldFrameRendered,   /**< No new frames available, old frame was rendered. */
         NewFrameRendered    /**< New frame was rendered. */
-    };
-
-    /**
-     * Video resolution adjustment mode for RADASS.
-     */
-    enum ResolutionMode
-    {
-        AutoResolution,
-        HighResolution,
-        LowResolution,
-        ResolutionModeCount
     };
 
     /**

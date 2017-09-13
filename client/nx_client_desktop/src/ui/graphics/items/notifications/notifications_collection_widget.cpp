@@ -263,7 +263,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
 
     NX_EXPECT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
     if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
-        return
+        return;
 
     widget->setCloseButtonAvailable(false);
     widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
@@ -392,6 +392,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         {
             case vms::event::cameraMotionEvent:
             case vms::event::softwareTriggerEvent:
+            case vms::event::analyticsSdkEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 item->addActionButton(
@@ -591,6 +592,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractA
         case vms::event::cameraDisconnectEvent:
         case vms::event::cameraIpConflictEvent:
         case vms::event::networkIssueEvent:
+        case vms::event::analyticsSdkEvent:
         {
             auto resource = resourcePool()->getResourceById(params.eventResourceId);
             return resource
@@ -688,13 +690,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                     .withArgument(Qn::FocusElementRole, lit("email"))
                     .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 );
-            break;
-
-        case QnSystemHealth::NoPrimaryTimeServer:
-            item->addActionButton(
-                qnSkin->icon("events/settings.png"),
-                action::SelectTimeServerAction,
-                actionParams);
             break;
 
         case QnSystemHealth::SystemIsReadOnly:

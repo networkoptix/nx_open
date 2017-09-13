@@ -156,17 +156,23 @@ void QnUserProfileWidget::applyChanges()
     if (isReadOnly())
         return;
 
-    Qn::Permissions permissions = accessController()->permissions(m_model->user());
+    const auto user = m_model->user();
+    Qn::Permissions permissions = accessController()->permissions(user);
 
     //empty text means 'no change'
     if (permissions.testFlag(Qn::WritePasswordPermission) && !m_newPassword.isEmpty())
     {
-        m_model->user()->setPassword(m_newPassword);
-        m_model->user()->generateHash();
-        if (m_model->mode() == QnUserSettingsModel::OwnProfile)
+        const bool isOwnProfile = m_model->mode() == QnUserSettingsModel::OwnProfile;
+        if (isOwnProfile)
         {
             /* Password was changed. Change it in global settings and hope for the best. */
             context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_newPassword);
+        }
+
+        user->setPasswordAndGenerateHash(m_newPassword);
+
+        if (isOwnProfile)
+        {
             QUrl url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
 
@@ -190,10 +196,10 @@ void QnUserProfileWidget::applyChanges()
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
-        m_model->user()->setEmail(ui->emailInputField->text().trimmed());
+        user->setEmail(ui->emailInputField->text().trimmed());
 
     if (permissions.testFlag(Qn::WriteFullNamePermission))
-        m_model->user()->setFullName(ui->nameInputField->text().trimmed());
+        user->setFullName(ui->nameInputField->text().trimmed());
 }
 
 bool QnUserProfileWidget::canApplyChanges() const

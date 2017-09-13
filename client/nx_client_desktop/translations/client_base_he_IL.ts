@@ -869,14 +869,6 @@ to view more bookmarks</source>
       <translation>הסר מהסרטון</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>התחל סרטון</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>עצור סרטון</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>צור סרטון</translation>
     </message>
@@ -1027,6 +1019,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>התחל סרטון</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -1037,8 +1036,30 @@ to view more bookmarks</source>
       <translation>קובץ &quot;%1&quot; כבר קיים. נסה שם אחר.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>קובץ &quot;%1&quot; נמצא בשימוש בתהליך אחר. נסה שם אחר.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1681,10 +1702,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>מספר Build</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>מספר Build לא חוקי</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2703,6 +2720,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>למד עוד אודות %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4696,6 +4724,10 @@ to %1</source>
       <source>Manage Bookmarks</source>
       <translation>נהל סימניות</translation>
     </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+    </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
@@ -6327,10 +6359,6 @@ to %1</source>
       <translation>שרת דואר לא מוגדר</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>בחר שרת איתו יסנכרנו שאר השרתים את השעה</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>המערכת במצב בטוח</translation>
     </message>
@@ -6361,10 +6389,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>שרת דואר אינו מוגדר.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>שעת השרת אינה מסונכרנת וזמן משותף לא זוהה באופן אוטומטי.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7970,6 +7994,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>עצור סרטון</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>התחל סרטון</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -8245,8 +8288,8 @@ to %1</source>
       <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסרטון לחץ על Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>השתמש בחיצים במקלדת כדי להחליף מצלמות. כדי לצאת מהסרטון לחץ על Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>

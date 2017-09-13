@@ -146,7 +146,7 @@ Expandable.ExpandableItem
 
             delegate: Rtu.SummaryTextDelegate
             {
-                color: (table.model.isSuccessChangesModel ? "black" : "red");
+                color: (table.model && table.model.isSuccessChangesModel ? "black" : "red");
                 parentColumn: valueColumn;
                 text: styleData.value;
             }
@@ -165,8 +165,9 @@ Expandable.ExpandableItem
                     height: Common.SizeManager.clickableSizes.small;
                     width: Common.SizeManager.clickableSizes.small;
                     anchors.centerIn: parent;
-                    source: (table.model.isSuccessChangesModel ? "qrc:/resources/changelog-ok.png"
-                        : "qrc:/resources/changelog-fail.png");
+                    source: table.model && table.model.isSuccessChangesModel
+                        ? "qrc:/resources/changelog-ok.png"
+                        : "qrc:/resources/changelog-fail.png";
                 }
             }
         }

@@ -4,6 +4,7 @@
 
 #include "proxy_worker.h"
 #include "settings.h"
+#include "target_peer_connector.h"
 
 namespace nx {
 namespace cloud {
@@ -39,11 +40,12 @@ private:
     const conf::Settings& m_settings;
     const conf::RunTimeOptions& m_runTimeOptions;
 
-    std::unique_ptr<AbstractStreamSocket> m_targetPeerSocket;
     nx_http::Request m_request;
     nx_http::RequestProcessedHandler m_requestCompletionHandler;
     std::unique_ptr<ProxyWorker> m_requestProxyWorker;
     TargetHost m_targetHost;
+    bool m_sslConnectionRequired = false;
+    std::unique_ptr<TargetPeerConnector> m_targetPeerConnector;
 
     TargetHost cutTargetFromRequest(
         const nx_http::HttpServerConnection& connection,
@@ -52,7 +54,10 @@ private:
     TargetHost cutTargetFromUrl(nx_http::Request* const request);
     TargetHost cutTargetFromPath(nx_http::Request* const request);
 
-    void onConnected(const SocketAddress& targetAddress, SystemError::ErrorCode errorCode);
+    void onConnected(
+        const SocketAddress& targetAddress,
+        SystemError::ErrorCode errorCode,
+        std::unique_ptr<AbstractStreamSocket> connection);
 };
 
 } // namespace gateway

@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>すべての警告をリセット</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>Blurオプションが有効になっていると、Intel HDグラフィックスディスプレイに問題が発生することがあります。オプションを使用しない事を強くお勧めします</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>Blurを無効にする</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -437,7 +447,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>テスト</translation>
     </message>
   </context>
   <context>
@@ -873,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -1873,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Emailまたはパスワードが間違っています</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2056,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>警告: 同じ名前のファイルが既に存在します!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>更新サーバー</translation>
     </message>
   </context>
   <context>

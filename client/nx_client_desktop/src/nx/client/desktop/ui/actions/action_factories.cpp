@@ -20,9 +20,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <nx/client/desktop/radass/radass_types.h>
+#include <nx/client/desktop/radass/radass_resource_manager.h>
+
 #include <nx/client/ptz/ptz_helpers.h>
 #include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -296,6 +300,44 @@ QList<QAction*> LayoutTourSettingsFactory::newActions(const Parameters& paramete
         actionGroup->addAction(action);
     }
     return actionGroup->actions();
+}
+
+QList<QAction*> AnalyticsModeActionFactory::newActions(const Parameters& parameters,
+    QObject* parent)
+{
+    QList<QAction*> result;
+
+    static const int kMinMatrixSize = 2;
+    static const int kMaxMatrixSize = 4;
+
+    for (int i = kMinMatrixSize; i <= kMaxMatrixSize; ++i)
+    {
+        auto action = new QAction(parent);
+        action->setText(lit("%1x%1").arg(i));
+
+        connect(action, &QAction::triggered, this,
+            [this, parameters, i]
+            {
+                menu()->trigger(action::StartAnalyticsAction,
+                    Parameters(parameters).withArgument(Qn::IntRole, i));
+            });
+
+        result << action;
+    }
+
+    {
+        auto action = new QAction(parent);
+        action->setText(tr("Dynamic"));
+        connect(action, &QAction::triggered, this,
+            [this, parameters]
+            {
+                menu()->trigger(action::StartAnalyticsAction, Parameters(parameters));
+            });
+
+        result << action;
+    }
+
+    return result;
 }
 
 } // namespace action

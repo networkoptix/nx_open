@@ -37,7 +37,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="relayComboBox"/>
+    <widget class="QComboBox" name="relayComboBox">
+     <property name="sizeAdjustPolicy">
+      <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

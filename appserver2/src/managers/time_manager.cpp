@@ -939,8 +939,6 @@ void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( qui
         .arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16)
         .arg(m_localTimePriorityKey.toUInt64(), 0, 16),
         cl_logDEBUG2);
-
-    //emit primaryTimeServerSelectionRequired();
 }
 
 
@@ -1005,7 +1003,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
             const auto maxDifferenceBetweenSynchronizedAndInternetTime =
                 m_messageBus->commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndInternetTime();
 
-            if( llabs(getSyncTimeNonSafe() - millisFromEpoch) > 
+            if( llabs(getSyncTimeNonSafe() - millisFromEpoch) >
                 duration_cast<milliseconds>(
                     maxDifferenceBetweenSynchronizedAndInternetTime).count() )
             {
@@ -1273,6 +1271,8 @@ void TimeSynchronizationManager::switchBackToLocalTime(QnMutexLockerBase* const 
 
 void TimeSynchronizationManager::checkSystemTimeForChange()
 {
+    using namespace std::chrono;
+
     {
         QnMutexLocker lock(&m_mutex);
         if (m_terminated)
@@ -1280,31 +1280,34 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
     }
     const auto& settings = m_messageBus->commonModule()->globalSettings();
     const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
-    if (qAbs(getSyncTime() - curSysTime) > SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS)
+    const int synchronizedToLocalTimeOffset = getSyncTime() - curSysTime;
+
+    //local OS time has been changed. If system time is set 
+    //by local host time then updating system time
+    const bool isSystemTimeSynchronizedWithInternet =
+        settings->isSynchronizingTimeWithInternet() &&
+        ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0);
+
+    const bool isTimeSynchronizedByThisPeerLocalTime =
+        m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
+        !isSystemTimeSynchronizedWithInternet;
+
+    const bool isSynchronizedToLocalTimeOffsetExceeded = 
+        qAbs(synchronizedToLocalTimeOffset) >
+        duration_cast<milliseconds>(settings->maxDifferenceBetweenSynchronizedAndLocalTime()).count();
+
+    if (isTimeSynchronizedByThisPeerLocalTime && isSynchronizedToLocalTimeOffsetExceeded)
     {
-        NX_LOGX(lm("Local system time change has been detected"),
-            cl_logDEBUG1);
-
-        //local OS time has been changed. If system time is set
-        //by local host time then updating system time
-        const bool isSystemTimeSynchronizedWithInternet =
-            settings->isSynchronizingTimeWithInternet() &&
-            ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0);
-
-        if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
-            !isSystemTimeSynchronizedWithInternet)
-        {
-            NX_LOG(lm("TimeSynchronizationManager. System time is synchronized with "
-                "this peer's local time. Updating time..."), cl_logDEBUG1);
-            forceTimeResync();
-        }
-
-        if (m_connection)
-        {
-            saveSyncTimeAsync(
-                QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
-                m_usedTimeSyncInfo.timePriorityKey);
-        }
+        NX_LOGX(lm("System time is synchronized with this peer's local time. "
+            "Detected time shift %1 ms. Updating synchronized time...")
+            .arg(synchronizedToLocalTimeOffset), cl_logDEBUG1);
+        forceTimeResync();
+    }
+    else if (m_connection && isSynchronizedToLocalTimeOffsetExceeded)
+    {
+        saveSyncTimeAsync(
+            QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
+            m_usedTimeSyncInfo.timePriorityKey);
     }
 
     QnMutexLocker lock(&m_mutex);

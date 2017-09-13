@@ -1,4 +1,4 @@
-{{event}}{{#source}} on {{source}}{{/source}}
+{{&event}}{{#source}} on {{&source}}{{/source}}
 
-Reason: {{reason}}
-Time: {{timestampDate}} {{timestampTime}}
+Reason: {{&reason}}
+Time: {{&timestampDate}} {{&timestampTime}}

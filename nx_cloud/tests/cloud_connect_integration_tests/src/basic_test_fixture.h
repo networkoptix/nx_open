@@ -13,10 +13,10 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/thread/sync_queue.h>
-#include "model/abstract_remote_relay_peer_pool.h"
 
+#include <nx/cloud/relay/model/abstract_remote_relay_peer_pool.h>
+#include <nx/cloud/relay/test_support/traffic_relay_launcher.h>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
-#include <libtraffic_relay/src/test_support/traffic_relay_launcher.h>
 
 namespace nx {
 namespace network {
@@ -78,6 +78,8 @@ public:
         int relayCount = 1,
         boost::optional<std::chrono::seconds> disconnectedPeerTimeout = boost::none);
     ~BasicTestFixture();
+
+    SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
 
 protected:
     virtual void SetUp() override;
