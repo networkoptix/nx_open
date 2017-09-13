@@ -510,7 +510,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
 CameraDiagnostics::Result HanwhaResource::initPtz()
 {
-    setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME, lit("true"));
+    removeProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME);
 
     m_ptzCapabilities = Ptz::NoPtzCapabilities;
     for (const auto& attributeToCheck: kHanwhaPtzCapabilityAttributes)
@@ -552,13 +552,12 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_ptzTraits.push_back(Ptz::ManualAutoFocusPtzTrait);
     }
 
-#if 0
     auto maxPresetParameter = m_attributes.attribute<int>(
         lit("PTZSupport/MaxPreset/%1").arg(getChannel()));
 
     if (maxPresetParameter)
         m_ptzLimits.maxPresetNumber = maxPresetParameter.get();
-#endif
+
 
     return CameraDiagnostics::NoErrorResult();
 }
