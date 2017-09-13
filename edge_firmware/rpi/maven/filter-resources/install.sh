@@ -14,7 +14,9 @@ configure()
     LOG_FILE="$LOGS_DIR/vms-upgrade.log"
     DISTRIB="@artifact.name.server@"
     STARTUP_SCRIPT="/etc/init.d/$CUSTOMIZATION-mediaserver"
-    TAR_FILE="./$DISTRIB.tar.gz"
+	INSTALLER_DIR="$(dirname "$0")"
+    TAR_FILE="$INSTALLER_DIR/$DISTRIB.tar.gz"
+	ZIP_FILE="$INSTALLER_DIR/../$DISTRIB.zip"
 }
 
 checkRunningUnderRoot()
@@ -118,7 +120,7 @@ installDebs() # package [version]
 
 upgradeVms()
 {
-    rm -rf "../$DISTRIB.zip" || true  #< Already unzipped, so remove .zip to save space in "/tmp".
+    rm -rf "$ZIP_FILE" || true  #< Already unzipped, so remove .zip to save space in "/tmp".
 
     # Clean up potentially unwanted files from previous installations.
     rm -rf "/$MEDIASERVER_PATH/lib" "/$MEDIASERVER_PATH/bin" || true
