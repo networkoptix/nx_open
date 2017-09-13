@@ -884,11 +884,6 @@
       <source>Stay logged in</source>
       <translation>Angemeldet bleiben</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Ihr Benutzername und Passwort stimmen nicht überein</translation>
-    </message>
   </context>
   <context>
     <name>ConnectionNameDialog</name>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>Angemeldet bleiben</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Ihr Benutzername und Passwort stimmen nicht überein</translation>
     </message>
   </context>
   <context>

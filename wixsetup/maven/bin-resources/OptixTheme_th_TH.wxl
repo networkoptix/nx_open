@@ -13,10 +13,10 @@
 /norestart   - suppress any attempts to restart. By default UI will prompt before restart.
 /log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
-  <String Id="ClientAndServer">Client and Server</String>
-  <String Id="ClientOnly">Client only</String>
+  <String Id="ClientAndServer">ไคลเอ็นต์และเซิร์ฟเวอร์</String>
+  <String Id="ClientOnly">ไคลเอ็นต์เท่านั้น</String>
   <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
-  <String Id="ServerOnly">Server only</String>
+  <String Id="ServerOnly">เซิร์ฟเวอร์เท่านั้น</String>
   <String Id="ServerOnlyDesc">The Server application is used to to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">ปิด</String>

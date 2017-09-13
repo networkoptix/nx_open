@@ -28,7 +28,7 @@ QnUuid tourId(const Parameters& parameters)
     return parameters.argument(Qn::UuidRole).value<QnUuid>();
 }
 
-bool tourIsRunning(QnWorkbenchContext* context) 
+bool tourIsRunning(QnWorkbenchContext* context)
 {
     return context->action(ToggleLayoutTourModeAction)->isChecked();
 }
@@ -40,7 +40,7 @@ public:
     {
     }
 
-    virtual ActionVisibility check(const Parameters& /*parameters*/, 
+    virtual ActionVisibility check(const Parameters& /*parameters*/,
         QnWorkbenchContext* context) override
     {
         return tourIsRunning(context)
@@ -100,13 +100,13 @@ QString LayoutTourTextFactory::text(const Parameters& parameters,
         if (reviewTourId.isNull())
             return tr("Start Tour");
     }
-       
+
     return tr("Start Showreel");
 }
 
 namespace condition
 {
-    
+
 ConditionWrapper tourIsRunning()
 {
     return new TourIsRunningCondition();
