@@ -38,6 +38,8 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.activeVideoRecords = null;
         $scope.activeCamera = null;
 
+        $scope.showCameraPanel = true;
+
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
@@ -395,18 +397,18 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
         //if camera doesnt exist get from camerasProvider
-        function checkActiveCamera(){
+        function setActiveCamera(camera){
+            $scope.activeCamera = camera;
             if(!$scope.activeCamera){
                 $scope.activeCamera = $scope.camerasProvider.getFirstCam();
             }
-            //If there are no cameras show camera panel
+
             $scope.showCameraPanel = !$scope.activeCamera;
         }
 
         function requestResources(){
             $scope.camerasProvider.requestResources().then(function(res){
-                $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
-                checkActiveCamera();
+                setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));
 
                 $scope.ready = true;
                 $timeout(updateHeights);
@@ -471,9 +473,8 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
-            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
 
-            checkActiveCamera();
+            setActiveCamera($scope.camerasProvider.getCamera(next.params.cameraId));
         });
 
         $('html').addClass('webclient-page');
