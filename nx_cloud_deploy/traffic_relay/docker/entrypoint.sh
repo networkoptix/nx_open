@@ -8,4 +8,7 @@ mv $tmp /opt/networkoptix/traffic_relay/etc/traffic_relay.conf
 
 tail --pid $$ -n0 -F /opt/networkoptix/traffic_relay/var/log/log_file.log &
 
+# Hack. Wait for cassandra
+sleep 10
+
 exec /opt/networkoptix/traffic_relay/bin/traffic_relay -e
