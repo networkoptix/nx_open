@@ -3,6 +3,8 @@
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/client_core_camera.h>
 
+class QnArchiveStreamReader;
+
 class QnClientCameraResource: public QnClientCoreCamera {
     Q_OBJECT
 
