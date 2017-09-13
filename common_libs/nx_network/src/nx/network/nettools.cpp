@@ -51,7 +51,9 @@
 #endif
 
 namespace {
-    static QList<QHostAddress> allowedInterfaces;
+
+static QList<QHostAddress> allowedInterfaces;
+
 } // namespace
 
 
@@ -68,20 +70,8 @@ QHostAddress QnInterfaceAndAddr::broadcastAddress() const
 
 QHostAddress QnInterfaceAndAddr::networkAddress() const
 {
-    quint32 broadcastIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
-    return QHostAddress(broadcastIpv4);
-}
-
-QHostAddress QnInterfaceAndAddr::broadcastAddress() const
-{
-    quint32 broadcastIpv4 = address.toIPv4Address() | ~netMask.toIPv4Address();
-    return QHostAddress(broadcastIpv4);
-}
-
-QHostAddress QnInterfaceAndAddr::networkAddress() const
-{
-    quint32 broadcastIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
-    return QHostAddress(broadcastIpv4);
+    quint32 networkIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
+    return QHostAddress(networkIpv4);
 }
 
 QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
