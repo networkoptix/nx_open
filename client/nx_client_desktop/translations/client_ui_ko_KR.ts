@@ -884,11 +884,6 @@
       <source>Stay logged in</source>
       <translation>로그인 상태 유지</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
-    </message>
   </context>
   <context>
     <name>ConnectionNameDialog</name>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>로그인 상태 유지</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
