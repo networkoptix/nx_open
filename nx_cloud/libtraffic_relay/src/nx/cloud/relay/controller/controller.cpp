@@ -22,7 +22,7 @@ Controller::Controller(
             &m_trafficRelay)),
     m_listeningPeerManager(
         controller::ListeningPeerManagerFactory::instance().create(
-            settings, &model->listeningPeerPool())),
+            settings.listeningPeer(), &model->listeningPeerPool())),
     m_model(model),
     m_settings(&settings)
 {

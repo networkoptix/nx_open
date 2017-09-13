@@ -18,7 +18,7 @@
         <product.title>${company.name} vms_gateway</product.title>
 
         <qt.libs>core gui network concurrent sql xml</qt.libs>
-        <global.libs>-lvms_gateway -lcommon -ludt -lnx_network -lcloud_db_client -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lvms_gateway -ltraffic_relay -lcloud_db_client -lcommon -lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

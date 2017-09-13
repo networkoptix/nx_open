@@ -1,4 +1,5 @@
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
+INCLUDEPATH += ${root.dir}/nx_cloud/libtraffic_relay/src/
 
 win* {
     DEFINES+=_VARIADIC_MAX=8

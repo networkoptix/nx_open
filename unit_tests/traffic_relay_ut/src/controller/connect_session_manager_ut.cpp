@@ -315,7 +315,7 @@ protected:
 
             m_listeningPeerManager =
                 std::make_unique<controller::ListeningPeerManager>(
-                    m_settingsLoader.settings(),
+                    m_settingsLoader.settings().listeningPeer(),
                     &listeningPeerPool());
         }
 
