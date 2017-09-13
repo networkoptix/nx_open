@@ -28,7 +28,7 @@ public:
 private:
     void exportProcessUpdated(const ExportProcessInfo& info);
 
-    void at_exportVideoAction_triggered();
+    void handleExportVideoAction();
 
 private:
     QScopedPointer<ExportManager> m_exportManager;

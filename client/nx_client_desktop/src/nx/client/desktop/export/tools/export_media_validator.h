@@ -18,6 +18,8 @@ public:
         nonContinuos,
         downscaling,
         transcoding,
+        tooLong,
+        timelapseInBinaryIsNotSupported,
 
 
         count

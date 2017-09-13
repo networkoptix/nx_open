@@ -66,7 +66,7 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
         &WorkbenchExportHandler::exportProcessUpdated);
 
     connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,
-        &WorkbenchExportHandler::at_exportVideoAction_triggered);
+        &WorkbenchExportHandler::handleExportVideoAction);
 }
 
 WorkbenchExportHandler::~WorkbenchExportHandler()
@@ -83,7 +83,7 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
         << info.progressValue;
 }
 
-void WorkbenchExportHandler::at_exportVideoAction_triggered()
+void WorkbenchExportHandler::handleExportVideoAction()
 {
     const auto parameters = menu()->currentParameters(sender());
 

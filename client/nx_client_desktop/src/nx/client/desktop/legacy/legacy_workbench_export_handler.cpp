@@ -1,4 +1,4 @@
-#include "workbench_export_handler.h"
+#include "legacy_workbench_export_handler.h"
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
@@ -34,12 +34,9 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 
-#include <nx/client/desktop/export/data/export_media_settings.h>
-#include <nx/client/desktop/export/data/export_layout_settings.h>
-#include <nx/client/desktop/export/tools/export_media_tool.h>
-#include <nx/client/desktop/export/tools/export_layout_tool.h>
-#include <nx/client/desktop/export/tools/export_manager.h>
-#include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
+#include <nx/client/desktop/legacy/legacy_export_settings.h>
+#include <nx/client/desktop/legacy/legacy_export_media_tool.h>
+#include <nx/client/desktop/legacy/legacy_export_layout_tool.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
@@ -203,7 +200,6 @@ bool WorkbenchExportHandler::isBinaryExportSupported() const
         return !qnRuntime->isActiveXMode();
     return false;
 }
-
 
 bool WorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
     const QnTimePeriod &exportPeriod,
@@ -579,23 +575,23 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
 
         qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaResource, Qn::InvalidUtcOffset);
 
-        ExportMediaSettings settings;
+        LegacyExportMediaSettings settings;
         settings.mediaResource = mediaResource;
         settings.timePeriod = period;
-        settings.fileName = Filename::parse(fileName);
+        settings.fileName = fileName;
         settings.imageParameters = imageParameters;
         settings.serverTimeZoneMs = serverTimeZone;
         settings.timelapseFrameStepMs = timelapseFrameStepMs;
 
-        auto tool = new ExportMediaTool(settings, this);
+        auto tool = new LegacyExportMediaTool(settings, this);
 
-        connect(exportProgressDialog, &QnProgressDialog::canceled, tool, &ExportMediaTool::stop);
+        connect(exportProgressDialog, &QnProgressDialog::canceled, tool, &LegacyExportMediaTool::stop);
 
-        connect(tool, &ExportMediaTool::finished, exportProgressDialog, &QWidget::hide);
-        connect(tool, &ExportMediaTool::finished, exportProgressDialog, &QnProgressDialog::deleteLater);
-        connect(tool, &ExportMediaTool::finished, this, &WorkbenchExportHandler::at_camera_exportFinished);
-        connect(tool, &ExportMediaTool::rangeChanged, exportProgressDialog, &QnProgressDialog::setRange);
-        connect(tool, &ExportMediaTool::valueChanged, exportProgressDialog, &QnProgressDialog::setValue);
+        connect(tool, &LegacyExportMediaTool::finished, exportProgressDialog, &QWidget::hide);
+        connect(tool, &LegacyExportMediaTool::finished, exportProgressDialog, &QnProgressDialog::deleteLater);
+        connect(tool, &LegacyExportMediaTool::finished, this, &WorkbenchExportHandler::at_camera_exportFinished);
+        connect(tool, &LegacyExportMediaTool::rangeChanged, exportProgressDialog, &QnProgressDialog::setRange);
+        connect(tool, &LegacyExportMediaTool::valueChanged, exportProgressDialog, &QnProgressDialog::setValue);
 
         tool->start();
         exportProgressDialog->show();
@@ -992,7 +988,7 @@ void WorkbenchExportHandler::at_camera_exportFinished(bool success, const QStrin
 {
     unlockFile(fileName);
 
-    ExportMediaTool *tool = qobject_cast<ExportMediaTool*>(sender());
+    LegacyExportMediaTool *tool = qobject_cast<LegacyExportMediaTool*>(sender());
     if (!tool)
         return;
 

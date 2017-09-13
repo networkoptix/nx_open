@@ -149,15 +149,17 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions() const
             break;
         case Mode::Layout:
             result << FileExtension::nov;
-            if (utils::AppInfo::isWin64())
-                result << FileExtension::exe64;
-            else if (utils::AppInfo::isWin32())
-                result << FileExtension::exe86;
             break;
         default:
             NX_ASSERT(false, "Should never get here");
             break;
     }
+
+    // Both media and layout can be exported to binary.
+    if (utils::AppInfo::isWin64())
+        result << FileExtension::exe64;
+    else if (utils::AppInfo::isWin32())
+        result << FileExtension::exe86;
 
     return result;
 }

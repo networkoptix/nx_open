@@ -48,7 +48,7 @@
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <nx/client/desktop/export/workbench/workbench_export_handler.h>
-#include <nx/client/desktop/legacy/workbench_export_handler.h>
+#include <nx/client/desktop/legacy/legacy_workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
