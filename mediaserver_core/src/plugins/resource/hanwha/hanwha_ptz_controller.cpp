@@ -10,6 +10,7 @@
 #include <utils/common/app_info.h>
 #include <api/resource_property_adaptor.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace mediaserver_core {
