@@ -259,13 +259,13 @@ QVector3D HanwhaPtzController::toHanwhaPosition(const QVector3D& position) const
 
 QString HanwhaPtzController::toHanwhaFocusCommand(qreal speed) const
 {
+    if (qFuzzyIsNull(speed))
+        return kHanwhaStopFocusMove;
+
     if (speed > 0)
         return kHanwhaFarFocusMove;
 
-    if (speed < 0)
-        return kHanwhaNearFocusMove;
-
-    return kHanwhaStopFocusMove;
+    return kHanwhaNearFocusMove;
 }
 
 std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
