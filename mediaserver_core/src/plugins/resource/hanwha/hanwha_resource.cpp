@@ -390,7 +390,8 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     HanwhaRequestHelper helper(toSharedPointer(this));
     const auto profiles = helper.view(lit("media/videoprofile"));
 
-    if (profiles.statusCode() != nx_http::StatusCode::ok)
+    if (!profiles.isSuccessful() && 
+        (profiles.statusCode() != nx_http::StatusCode::ok || profiles.errorCode() != 612))
     {
         return error(
             profiles,
@@ -407,7 +408,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         int fixedProfileCount = 0;
 
         const auto startSequence = kHanwhaChannelPropertyTemplate.arg(channel);
-        for (const auto& entry : profiles.response())
+        for (const auto& entry: profiles.response())
         {
             const bool isFixedProfile = entry.first.startsWith(startSequence)
                 && entry.first.endsWith(kHanwhaIsFixedProfileProperty)
@@ -427,7 +428,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         }
 
         m_maxProfileCount = *maxProfileCount;
-        bool hasDualStreaming = *maxProfileCount - fixedProfileCount > 1;
+        hasDualStreaming = *maxProfileCount - fixedProfileCount > 1;
         auto result = fetchStreamLimits(&m_streamLimits);
 
         if (!result)
@@ -455,6 +456,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         if (!result)
             return result;
     }
+
+    const bool hasAudio = m_attributes.attribute<int>(
+        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int) hasDualStreaming);
 
     return CameraDiagnostics::NoErrorResult();
 }

@@ -136,14 +136,6 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
 
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)
 {
-#if 0
-    if (profileNumber == kHanwhaInvalidProfile)
-    {
-        return CameraDiagnostics::CameraPluginErrorResult(
-            lit("Get stream URI: invalid profile number is given"));
-    }
-#endif
-
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
@@ -154,15 +146,11 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         { kHanwhaTransportProtocolProperty, rtpTransport() },
         { kHanwhaRtspOverHttpProperty, kHanwhaFalse }
     };
+
     if (m_hanwhaResource->isNvr())
-    {
-        params.emplace(kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel()));
         params.emplace(kHanwhaClientTypeProperty, "PC");
-    }
     else
-    {
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
-    }
 
     HanwhaRequestHelper helper(m_hanwhaResource);
     const auto response = helper.view(lit("media/streamuri"), params);
