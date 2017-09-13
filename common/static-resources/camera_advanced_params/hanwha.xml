@@ -14,7 +14,7 @@
             <param id="image/flip/Rotate"
                     name="HallwayView"
                     dataType="Enumeration"
-                    range="0 degrees, 90 degrees, 270 degrees"
+                    range="0 degrees,90 degrees,270 degrees"
                     internalRange="0,90,270"/>
         </group>
         <group name="Audio Input">
@@ -653,18 +653,21 @@
             </group>
         </group>
         <group name="Maintenance">
-            <param id="system/factoryreset/ExcludeSettings=Network"
+            <param id="system/factoryreset/ExcludeSettings=Network,Authority"
                         name="Soft Reset"
                         dataType="Button"
-                        action="control"/>
+                        writeCmd="control"
+                        aux="noChannel"/>
             <param id="system/factoryreset/ExludeSettings=None"
                         name="Hard Reset"
                         dataType="Button"
-                        writeCmd="control"/>
+                        writeCmd="control"
+                        aux="noChannel"/>
             <param id="system/power/Type=Restart"
                         name="Reboot"
                         dataType="Button"
-                        action="control"/>
+                        writeCmd="control"
+                        aux="noChannel"/>
         </group>
     </parameters>
 </plugin>

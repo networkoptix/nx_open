@@ -170,6 +170,11 @@ private:
 
     QString groupLead(const QString& groupName) const;
 
+    boost::optional<QnCameraAdvancedParamValue> findButtonParameter(
+        const QnCameraAdvancedParamValueList) const;
+
+    bool executeCommand(const QnCameraAdvancedParamValue& command);
+
 private:
     using AdvancedParameterId = QString;
 

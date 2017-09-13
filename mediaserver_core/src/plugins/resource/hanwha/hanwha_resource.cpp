@@ -213,6 +213,10 @@ bool HanwhaResource::setParamsPhysical(
 
     std::map<UpdateInfo, ParameterMap> requests;
 
+    const auto buttonParameter = findButtonParameter(values);
+    if (buttonParameter)
+        return executeCommand(*buttonParameter);
+
     const auto filteredParameters = filterGroupParameters(values);
     for (const auto& value: filteredParameters)
     {
@@ -389,9 +393,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 {
     HanwhaRequestHelper helper(toSharedPointer(this));
     const auto profiles = helper.view(lit("media/videoprofile"));
+    bool isCriticalError = !profiles.isSuccessful()
+        && profiles.errorCode() != kHanwhaConfigurationNotFoundError;
 
-    if (!profiles.isSuccessful() && 
-        (profiles.statusCode() != nx_http::StatusCode::ok || profiles.errorCode() != 612))
+    if (isCriticalError)
     {
         return error(
             profiles,
@@ -400,9 +405,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
                 profiles.errorString()));
     }
 
+    m_isNvr = !profiles.isSuccessful();
     bool hasDualStreaming = false;
     const auto channel = getChannel();
-    m_isNvr = !profiles.isSuccessful();
+    
     if (!m_isNvr)
     {
         int fixedProfileCount = 0;
@@ -459,6 +465,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
     const bool hasAudio = m_attributes.attribute<int>(
         lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
+
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int) hasDualStreaming);
 
@@ -1219,14 +1226,36 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
     QSet<QString> supportedIds;
     for (const auto& id: allParameters.allParameterIds())
     {
-        const auto& parameter = allParameters.getParameterById(id);
+        const auto parameter = allParameters.getParameterById(id);
+        const auto info = advancedParameterInfo(parameter.id);
+
+        if (!info)
+            continue;
 
         bool needToCheck = parameter.dataType == QnCameraAdvancedParameter::DataType::Number
             || parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration;
 
         if (needToCheck && parameter.range.isEmpty())
             continue;
-        
+
+        boost::optional<HanwhaCgiParameter> cgiParameter;
+        const auto rangeParameter = info->rangeParameter();
+        if (rangeParameter.isEmpty())
+        {
+            cgiParameter = m_cgiParameters.parameter(
+                info->cgi(),
+                info->submenu(),
+                info->updateAction(),
+                info->parameterName());
+        }
+        else
+        {
+            cgiParameter = m_cgiParameters.parameter(rangeParameter);
+        }
+
+        if (!cgiParameter)
+            continue;
+
         supportedIds.insert(id);
     }
 
@@ -1656,7 +1685,6 @@ QnCameraAdvancedParamValueList HanwhaResource::filterGroupParameters(
                 info->groupIncludeCondition());
     }
 
-
     // resolve group parameters
     QSet<QString> groupLeadsToFetch;
     QList<QString> parametersToResolve;
@@ -1742,11 +1770,48 @@ QString HanwhaResource::groupLead(const QString& groupName) const
     return QString();
 }
 
+boost::optional<QnCameraAdvancedParamValue> HanwhaResource::findButtonParameter(
+    const QnCameraAdvancedParamValueList parameterValues) const
+{
+    for (const auto& parameterValue: parameterValues)
+    {
+        const auto parameter = m_advancedParameters.getParameterById(parameterValue.id);
+        if (!parameter.isValid())
+            return boost::none;
+
+        if (parameter.dataType != QnCameraAdvancedParameter::DataType::Button)
+            continue;
+
+        return parameterValue;
+    }
+
+    return boost::none;
+}
+
+bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
+{
+    const auto parameter = m_advancedParameters.getParameterById(command.id);
+    if (!parameter.isValid())
+        return false;
+
+    const auto parameterInfo = advancedParameterInfo(command.id);
+    if (!parameterInfo)
+        return false;
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    const auto response = helper.doRequest(
+        parameterInfo->cgi(),
+        parameterInfo->submenu(),
+        parameterInfo->updateAction(),
+        {{parameterInfo->parameterName(), parameterInfo->parameterValue()}});
+
+    return response.isSuccessful();
+}
+
 bool HanwhaResource::isNvr() const
 {
     return m_isNvr;
 }
-
 
 } // namespace plugins
 } // namespace mediaserver_core

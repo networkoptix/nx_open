@@ -163,6 +163,8 @@ static const QString kHanwhaFalseValueAttribute = lit("false");
 static const QString kHanwhaFormatInfoAttribute = lit("formatInfo");
 static const QString kHanwhaFormatAttribute = lit("format");
 
+static const int kHanwhaConfigurationNotFoundError = 612;
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx

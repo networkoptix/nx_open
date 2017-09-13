@@ -48,7 +48,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
                 return result;
         }
     }
-    auto result = streamUri(kHanwhaInvalidProfile, &streamUrl);
+    auto result = streamUri(nxProfileNumber, &streamUrl);
     if (!result)
         return result;
 
@@ -139,12 +139,12 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
-        { kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel()) },
-        { kHanwhaMediaTypeProperty, kHanwhaLiveMediaType },
-        { kHanwhaStreamingModeProperty, kHanwhaFullMode },
-        { kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast },
-        { kHanwhaTransportProtocolProperty, rtpTransport() },
-        { kHanwhaRtspOverHttpProperty, kHanwhaFalse }
+        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+        {kHanwhaMediaTypeProperty, kHanwhaLiveMediaType},
+        {kHanwhaStreamingModeProperty, kHanwhaFullMode},
+        {kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast},
+        {kHanwhaTransportProtocolProperty, rtpTransport()},
+        {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
 
     if (m_hanwhaResource->isNvr())
