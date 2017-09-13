@@ -154,8 +154,8 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
         nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
+        nx::network::SocketGlobals::mediatorConnector().enable(true);
     }
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     m_endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
