@@ -11,7 +11,7 @@
 #include <utils/common/byte_array.h>
 
 #include <nx/streaming/config.h>
-#include "media_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
 
 
 const unsigned int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
@@ -27,7 +27,7 @@ public:
     //bool keyFrame;
     //int flags;
     //bool ignore;
-    QnMetaDataV1Ptr motion;
+    QnAbstractCompressedMetadataPtr motion;
     qint64 pts;
 
     QnCompressedVideoData( QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );

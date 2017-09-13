@@ -129,8 +129,35 @@ namespace nxpl
         virtual void setPluginContainer( nxpl::PluginInterface* pluginContainer ) = 0;
     };
 
+    static const NX_GUID IID_Plugin3
+        = {{0x73, 0x6b, 0xd7, 0xab, 0x46, 0x1c, 0x46, 0xf0, 0x91, 0x92, 0x56, 0x3b, 0x02, 0xed, 0xa1, 0x78}};
+
+    class Plugin3
+    :
+        public Plugin2
+    {
+    public:
+        //!Sets locale information to be used by the plugin.
+        /*!
+            \param locale is BCP47 language tag
+        */
+        virtual void setLocale(const char* locale) = 0;
+    };
+
     //!Type of plugin entry-point function
     typedef PluginInterface* (*CreateNXPluginInstanceProc)();
 }
+
+#ifdef _WIN32
+    #define NX_PLUGIN_API __declspec(dllexport)
+#else
+    #define NX_PLUGIN_API
+#endif
+
+//!Define to mark locale dependent output paramters and return values.
+#define NX_LOCALE_DEPENDENT
+
+//!Define to mark ascii only output parameters and return values.
+#define NX_ASCII
 
 #endif  //NX_PLUGIN_API_H

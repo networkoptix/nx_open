@@ -25,6 +25,7 @@ public:
     */
     bool setContentType( const StringType& contentType );
     void setBoundary( const StringType& boundary );
+    void setForceParseAsBinary(bool force);
     /** Returns headers of last read frame */
     const nx_http::HttpHeaders& prevFrameHeaders() const;
     /** Returns \a true if epilogue has been received */
@@ -67,6 +68,7 @@ private:
     ChunkParseState m_chunkParseState;
     nx::Buffer m_supposedBoundary;
     nx_http::HttpHeaders m_currentFrameHeaders;
+    bool m_forceParseAsBinary = false;
 
     bool processLine(const ConstBufferRefType& lineBuffer);
     bool readUnsizedBinaryData(

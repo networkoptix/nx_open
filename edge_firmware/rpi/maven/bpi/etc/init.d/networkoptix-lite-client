@@ -195,18 +195,18 @@ help()
     cat <<EOF
 Usage: $0 <command>
 Supported commands:
-start # Start $SERVICE_NAME and watchdog.
-startquiet # Start $SERVICE_NAME.
-start_console # Run $SERVICE_NAME in foreground without output redirection.
-start_gdb # Run $SERVICE_NAME under gdb.
-stop # Stop watchdog and kill $SERVICE_NAME with SIGINT.
-kill # Stop watchdog and kill $SERVICE_NAME with SIGKILL.
-status # Report whether $SERVICE_NAME is running, and its pid. Exit status is non-zero if stopped.
-server_status # Output 1 if $SERVICE_NAME is running, otherwise, do nothing.
-restart, reload, force-reload # Stop watchdog and $SERVICE_NAME, start $SERVICE_NAME and watchdog.
-start_watchdog # Start watchdog in background.
-run_watchdog # Run watchdog in foreground.
-stop_watchdog # Stop watchdog, if it is running.
+ start # Start $SERVICE_NAME and watchdog.
+ startquiet # Start $SERVICE_NAME.
+ start_console # Run $SERVICE_NAME in foreground without output redirection.
+ start_gdb # Run $SERVICE_NAME under gdb.
+ stop # Stop watchdog and kill $SERVICE_NAME with SIGINT.
+ kill # Stop watchdog and kill $SERVICE_NAME with SIGKILL.
+ status # Report whether $SERVICE_NAME is running, and its pid. Exit status is non-zero if stopped.
+ server_status # Output 1 if $SERVICE_NAME is running, otherwise, do nothing.
+ restart, reload, force-reload # Stop watchdog and $SERVICE_NAME, start $SERVICE_NAME and watchdog.
+ start_watchdog # Start watchdog in background.
+ run_watchdog # Run watchdog in foreground.
+ stop_watchdog # Stop watchdog, if it is running.
 EOF
 }
 

@@ -430,6 +430,7 @@ bool HevcParser::handleFragmentationPacket(
 
     if (fuHeader.startFlag)
     {
+
         insertPayloadHeader(
             const_cast<uint8_t**>(&payload),  //< Dirty dirty hack.
             &payloadLength,
@@ -440,10 +441,7 @@ bool HevcParser::handleFragmentationPacket(
 
     m_chunks.emplace_back(payload - m_rtpBufferBase, payloadLength, fuHeader.startFlag);
     m_videoFrameSize += payloadLength;
-
-    if (fuHeader.endFlag)
-        ++m_numberOfNalUnits;
-
+    ++m_numberOfNalUnits;
     return true;
 }
 

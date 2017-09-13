@@ -9,9 +9,13 @@
 
 #include <nx/vms/event/events/reasoned_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/analytics_helper.h>
 
 #include <common/common_module.h>
+
 #include <client_core/client_core_module.h>
+
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -36,7 +40,7 @@
 
 using namespace nx;
 
-typedef vms::event::ActionData* QnLightBusinessActionP;
+using eventIterator = vms::event::ActionDataList::iterator;
 
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
@@ -48,7 +52,6 @@ public:
         m_parent(parent),
         m_sortCol(DateTimeColumn),
         m_sortOrder(Qt::DescendingOrder),
-        m_size(0),
         m_lexComparator(new QnBusinessTypesComparator(false))
     {
     }
@@ -67,17 +70,13 @@ public:
         updateIndex();
     }
 
-    void setEvents(const QVector<vms::event::ActionDataListPtr>& events)
+    void setEvents(vms::event::ActionDataList events)
     {
-        m_events = events;
-        m_size = 0;
-        for (auto event: events)
-            m_size += (int)event->size();
-
+        m_events = std::move(events);
         updateIndex();
     }
 
-    QVector<vms::event::ActionDataListPtr> events() const
+    const vms::event::ActionDataList& events() const
     {
         return m_events;
     }
@@ -89,36 +88,36 @@ public:
 
     inline int size() const
     {
-        return m_size;
+        return (int) m_events.size();
     }
 
     inline vms::event::ActionData& at(int row)
     {
-        return m_sortOrder == Qt::AscendingOrder ? *m_records[row] : *m_records[m_size - 1 - row];
+        return m_sortOrder == Qt::AscendingOrder ? *m_records[row] : *m_records[size() - 1 - row];
     }
 
     // comparators
 
-    bool lessThanTimestamp(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
+    bool lessThanTimestamp(eventIterator d1, eventIterator d2) const
     {
         return d1->eventParams.eventTimestampUsec < d2->eventParams.eventTimestampUsec;
     }
 
-    bool lessThanEventType(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
+    bool lessThanEventType(eventIterator d1, eventIterator d2) const
     {
         if (d1->eventParams.eventType != d2->eventParams.eventType)
             return m_lexComparator->lexicographicalLessThan(d1->eventParams.eventType, d2->eventParams.eventType);
         return lessThanTimestamp(d1, d2);
     }
 
-    bool lessThanActionType(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
+    bool lessThanActionType(eventIterator d1, eventIterator d2) const
     {
         if (d1->actionType != d2->actionType)
             return m_lexComparator->lexicographicalLessThan(d1->actionType, d2->actionType);
         return lessThanTimestamp(d1, d2);
     }
 
-    bool lessThanLexicographically(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
+    bool lessThanLexicographically(eventIterator d1, eventIterator d2) const
     {
         int rez = d1->compareString.compare(d2->compareString);
         if (rez != 0)
@@ -128,19 +127,12 @@ public:
 
     void updateIndex()
     {
-        m_records.resize(m_size);
-        if (m_records.isEmpty())
-            return;
+        m_records.clear();
+        m_records.reserve(size());
+        for (auto iter = m_events.begin(); iter != m_events.end(); ++iter)
+            m_records.push_back(iter);
 
-        QnLightBusinessActionP* dst = &m_records[0];
-        for (int i = 0; i < m_events.size(); ++i)
-        {
-            vms::event::ActionDataList& data = *m_events[i].data();
-            for (uint j = 0; j < data.size(); ++j)
-                *dst++ = &data[j];
-        }
-
-        typedef bool (DataIndex::*LessFunc)(const QnLightBusinessActionP&, const QnLightBusinessActionP&) const;
+        typedef bool (DataIndex::*LessFunc)(eventIterator, eventIterator) const;
 
         LessFunc lessThan;
         switch (m_sortCol)
@@ -156,14 +148,14 @@ public:
                 break;
             default:
                 lessThan = &DataIndex::lessThanLexicographically;
-                for (auto record : m_records)
+                for (auto record: m_records)
                     record->compareString = m_parent->textData(m_sortCol, *record);
                 break;
         }
 
         std::sort(m_records.begin(), m_records.end(),
             [this, lessThan]
-            (const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2)
+            (eventIterator d1, eventIterator d2)
             {
                 return (this->*lessThan)(d1, d2);
             });
@@ -173,9 +165,8 @@ private:
     QnEventLogModel* m_parent;
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
-    QVector<vms::event::ActionDataListPtr> m_events;
-    QVector<QnLightBusinessActionP> m_records;
-    int m_size;
+    vms::event::ActionDataList m_events;
+    std::vector<eventIterator> m_records;
     QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
 };
 
@@ -188,7 +179,7 @@ QnEventLogModel::QnEventLogModel(QObject* parent):
     m_columns(),
     m_linkBrush(QPalette().link()),
     m_index(new DataIndex(this)),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_stringsHelper(new vms::event::StringsHelper(commonModule()))
 {
 }
 
@@ -196,10 +187,10 @@ QnEventLogModel::~QnEventLogModel()
 {
 }
 
-void QnEventLogModel::setEvents(const QVector<vms::event::ActionDataListPtr>& events)
+void QnEventLogModel::setEvents(vms::event::ActionDataList events)
 {
     beginResetModel();
-    m_index->setEvents(events);
+    m_index->setEvents(std::move(events));
     endResetModel();
 }
 
@@ -303,12 +294,12 @@ QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
     const int numDeleted = int(ids.size()) - (users.size() + roles.size());
     NX_EXPECT(numDeleted >= 0);
     if (numDeleted <= 0)
-        return m_helper->actionSubjects(users, roles);
+        return m_stringsHelper->actionSubjects(users, roles);
 
     const QString removedSubjectsText = tr("%n Removed subjects", "", numDeleted);
     return roles.empty() && users.empty()
         ? removedSubjectsText
-        : m_helper->actionSubjects(users, roles, false) + lit(", ") + removedSubjectsText;
+        : m_stringsHelper->actionSubjects(users, roles, false) + lit(", ") + removedSubjectsText;
 }
 
 QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
@@ -322,7 +313,7 @@ QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
 
     return users.empty() && roles.empty()
         ? kRemovedUserName
-        : m_helper->actionSubjects(users, roles, false);
+        : m_stringsHelper->actionSubjects(users, roles, false);
 }
 
 QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& action)
@@ -375,10 +366,9 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
     return qnResIconCache->icon(resourcePool->getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(const QnUuid& id)
+QString QnEventLogModel::getResourceNameString(const QnUuid& id) const
 {
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    return QnResourceDisplayInfo(resourcePool->getResourceById(id))
+    return QnResourceDisplayInfo(resourcePool()->getResourceById(id))
         .toString(qnSettings->extraInfoInTree());
 }
 
@@ -394,7 +384,26 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             return dt.toString(Qt::DefaultLocaleShortDate);
         }
         case EventColumn:
-            return m_helper->eventName(action.eventParams.eventType);
+        {
+            if (action.eventParams.eventType == nx::vms::event::EventType::analyticsSdkEvent)
+            {
+                const auto camera = resourcePool()->getResourceById(
+                    action.eventParams.eventResourceId).
+                    dynamicCast<QnVirtualCameraResource>();
+
+                QString eventName = camera
+                    ? m_analyticsHelper->eventName(camera,
+                        action.eventParams.analyticsEventId(),
+                        qnRuntime->locale())
+                    : QString();
+
+                if (!eventName.isEmpty())
+                    return eventName;
+            }
+
+            return m_stringsHelper->eventName(action.eventParams.eventType);
+        }
+
         case EventCameraColumn:
         {
             QString result = getResourceNameString(action.eventParams.eventResourceId);
@@ -403,7 +412,8 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             return result;
         }
         case ActionColumn:
-            return m_helper->actionName(action.actionType);
+            return m_stringsHelper->actionName(action.actionType);
+
         case ActionCameraColumn:
         {
             switch (action.actionType)
@@ -457,7 +467,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             }
             else
             {
-                result = m_helper->eventDetails(action.eventParams).join(L'\n');
+                result = m_stringsHelper->eventDetails(action.eventParams).join(L'\n');
             }
 
             if (!vms::event::hasToggleState(eventType))
@@ -588,7 +598,7 @@ QString QnEventLogModel::motionUrl(Column column, const vms::event::ActionData& 
     if (column != DescriptionColumn || !action.hasFlags(vms::event::ActionData::VideoLinkExists))
         return QString();
 
-    return m_helper->urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
+    return m_stringsHelper->urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
 }
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const

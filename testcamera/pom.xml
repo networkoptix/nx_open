@@ -46,7 +46,7 @@
     <properties>
         <template>app</template>
 
-        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <qt.libs>core network multimedia concurrent xml sql</qt.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32</windows.oslibs>
         <linux.oslibs></linux.oslibs>

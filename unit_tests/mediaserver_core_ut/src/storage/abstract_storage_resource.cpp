@@ -84,14 +84,14 @@ protected:
 
         commonModule()->setModuleGUID(QnUuid("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
 
-        pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
+        pluginManager = std::unique_ptr<PluginManager>( new PluginManager(nullptr));
 
         platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
-        PluginManager::instance()->loadPlugins(roSettings());
+        pluginManager->loadPlugins(roSettings());
 
-        for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+        for (const auto storagePlugin : pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
             QnStoragePluginFactory::instance()->registerStoragePlugin(
                 storagePlugin->storageType(),

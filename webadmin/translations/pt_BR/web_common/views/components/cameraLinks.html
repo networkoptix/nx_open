@@ -5,7 +5,7 @@
     <div class='camera-links-title'>Camera Details</div>
     <table>
         <tr ng-if="debugMode"><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
-        <tr><td>Name</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
+        <tr><td>Nome</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
@@ -30,7 +30,7 @@
             </td>
         </tr>
         <tr>
-            <td>Download</td>
+            <td>Descarregar</td>
             <td>
                 <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">HIGH</a>
                 &nbsp;/&nbsp;
@@ -66,7 +66,7 @@
                        ng-model="linkSettings.duration"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="resolution">Resolution</label></td>
+            <td><label class="camera-links-label" for="resolution">Resolução:</label></td>
             <td><input id="resolution" type="text" class="input-sm camera-links-info" 
                        ng-model="linkSettings.resolution"></td>
         </tr>

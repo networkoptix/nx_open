@@ -15,8 +15,24 @@
 #include <smmintrin.h>
 #endif
 
-QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
-:
+//----------------------------------- QnAbstractMediaData ----------------------------------------
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(/* global namespace */, MediaQuality,
+    (MEDIA_Quality_High, "high")
+    (MEDIA_Quality_Low, "low")
+    (MEDIA_Quality_ForceHigh, "force-high")
+    (MEDIA_Quality_Auto, "auto")
+    (MEDIA_Quality_CustomResolution, "custom")
+    (MEDIA_Quality_LowIframesOnly, "low-iframes-only")
+    (MEDIA_Quality_None, "")
+)
+
+bool isLowMediaQuality(MediaQuality q)
+{
+    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
+}
+
+QnAbstractMediaData::QnAbstractMediaData( DataType _dataType ):
     dataType(_dataType),
     compressionType(AV_CODEC_ID_NONE),
     flags(MediaFlags_None),
@@ -42,14 +58,29 @@ void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
     opaque = other->opaque;
 }
 
-// ----------------------------------- QnAbstractMediaData -----------------------------------------
+bool QnAbstractMediaData::isLQ() const
+{
+    return flags & MediaFlags_LowQuality;
+}
 
-//QnAbstractMediaData* QnAbstractMediaData::clone() const
-//{
-//    QnAbstractMediaData* rez = new QnAbstractMediaData(m_data.getAlignment(), m_data.size());
-//    rez->assign(this);
-//    return rez;
-//}
+bool QnAbstractMediaData::isLive() const
+{
+    return flags & MediaFlags_LIVE;
+}
+
+//------------------------------------- QnEmptyMediaData -----------------------------------------
+
+QnEmptyMediaData::QnEmptyMediaData():
+    QnAbstractMediaData(EMPTY_DATA),
+    m_data(16,0)
+{
+}
+
+QnEmptyMediaData::QnEmptyMediaData(QnAbstractAllocator* allocator):
+    QnAbstractMediaData(EMPTY_DATA),
+    m_data(allocator, 16, 0)
+{
+}
 
 QnEmptyMediaData* QnEmptyMediaData::clone( QnAbstractAllocator* allocator ) const
 {
@@ -59,13 +90,21 @@ QnEmptyMediaData* QnEmptyMediaData::clone( QnAbstractAllocator* allocator ) cons
     return rez;
 }
 
+const char*QnEmptyMediaData::data() const
+{
+    return m_data.data();
+}
 
-// ----------------------------------- QnMetaDataV1 -----------------------------------------
+size_t QnEmptyMediaData::dataSize() const
+{
+    return m_data.size();
+}
 
-QnMetaDataV1::QnMetaDataV1(int initialValue)
-:   //TODO #ak delegate constructor
-    QnAbstractMediaData(META_V1),
-    m_data(CL_MEDIA_ALIGNMENT, Qn::kMotionGridWidth*Qn::kMotionGridHeight/8)
+//--------------------------------------- QnMetaDataV1 -------------------------------------------
+
+//TODO #ak delegate constructor
+QnMetaDataV1::QnMetaDataV1(int initialValue):
+    QnAbstractCompressedMetadata(MetadataType::Motion)
 {
     flags = 0;
     m_input = 0;
@@ -78,12 +117,8 @@ QnMetaDataV1::QnMetaDataV1(int initialValue)
         m_data.writeFiller(0, m_data.capacity());
 }
 
-QnMetaDataV1::QnMetaDataV1(
-    QnAbstractAllocator* allocator,
-    int initialValue)
-:
-    QnAbstractMediaData(META_V1),
-    m_data(allocator, CL_MEDIA_ALIGNMENT, Qn::kMotionGridWidth*Qn::kMotionGridHeight/8)
+QnMetaDataV1::QnMetaDataV1(QnAbstractAllocator* allocator, int initialValue):
+    QnAbstractCompressedMetadata(MetadataType::Motion, allocator)
 {
     flags = 0;
     m_input = 0;
@@ -128,7 +163,7 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
     }
     return false;
 }
-#endif    //__i386
+#endif //__i386
 
 inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
@@ -162,7 +197,6 @@ bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int ma
 #endif
 }
 
-
 void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
@@ -177,6 +211,21 @@ QnMetaDataV1* QnMetaDataV1::clone( QnAbstractAllocator* allocator ) const
     QnMetaDataV1* rez = new QnMetaDataV1( allocator );
     rez->assign(this);
     return rez;
+}
+
+const char* QnMetaDataV1::data() const
+{
+    return m_data.data();
+}
+
+char* QnMetaDataV1::data()
+{
+    return m_data.data();
+}
+
+size_t QnMetaDataV1::dataSize() const
+{
+    return m_data.size();
 }
 
 void QnMetaDataV1::addMotion(QnConstMetaDataV1Ptr data)
@@ -200,7 +249,6 @@ void QnMetaDataV1::removeMotion(const simd128i* image)
         *dst = _mm_andnot_si128(*src, *dst); /* SSE2. */
         dst++;
         src++;
-
     }
 #else
     // remove without SIMD
@@ -336,16 +384,12 @@ void QnMetaDataV1::setMotionAt(int x, int y)
     *b |= (128 >> (shift&7));
 }
 
-
 bool QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
 {
     QRect motioRect = imageRect.intersected(mRect);
 
     if (motioRect.isNull())
         return false;
-
-    //int localZoneWidth = imageRect.width() / Qn::kMotionGridWidth;
-    //int localZoneHight = imageRect.height() / Qn::kMotionGridHeight;
 
     int leftZone = motioRect.left() * Qn::kMotionGridWidth / imageRect.width();
     int topZone = motioRect.top() * Qn::kMotionGridHeight / imageRect.height();
@@ -360,6 +404,11 @@ bool QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
         }
     }
     return true;
+}
+
+bool QnMetaDataV1::isInput(int index) const
+{
+    return (m_input >> index) & 1;
 }
 
 bool QnMetaDataV1::containTime(const qint64 timeUsec) const
@@ -385,7 +434,6 @@ inline void setBit(quint8* data, int x, int y)
     data[offset] |= 0x80 >> (y&7);
 }
 
-
 void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart, int* maskEnd)
 {
     if (maskStart)
@@ -409,7 +457,6 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
             }
         }
     }
-
 }
 
 void QnMetaDataV1::serialize(QIODevice* ioDevice) const
@@ -427,22 +474,6 @@ void QnMetaDataV1::serialize(QIODevice* ioDevice) const
     ioDevice->write(m_data.data(), m_data.size());
 }
 
-/*
-void QnMetaDataV1::deserialize(QIODevice* ioDevice)
-{
-    qint64 timeMs = 0;
-    int durationMs = 0;
-
-    ioDevice->read((char*) &timeMs, sizeof(timeMs));
-    ioDevice->read((char*) &durationMs, 3);
-    ioDevice->read((char*) &m_input, 1);
-    ioDevice->read(m_data.data(), m_data.size());
-
-    timeMs = ntohll(timeMs);
-    durationMs = ntohl(durationMs);
-}
-*/
-
 bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs)
 {
     return data.startTimeMs < timeMs;
@@ -453,17 +484,72 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
     return timeMs < data.startTimeMs;
 }
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(/*global namespace*/, MediaQuality,
-    (MEDIA_Quality_High, "high")
-    (MEDIA_Quality_Low, "low")
-    (MEDIA_Quality_ForceHigh, "force-high")
-    (MEDIA_Quality_Auto, "auto")
-    (MEDIA_Quality_CustomResolution, "custom")
-    (MEDIA_Quality_LowIframesOnly, "low-iframes-only")
-    (MEDIA_Quality_None, "")
-)
+//--------------------------------- QnAbstractCompressedMetadata ---------------------------------
 
-bool isLowMediaQuality(MediaQuality q)
+QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type):
+    QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
+    metadataType(type),
+    m_data(
+        CL_MEDIA_ALIGNMENT,
+        type == MetadataType::Motion
+            ? Qn::kMotionGridWidth*Qn::kMotionGridHeight/8
+            : 0)
 {
-    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
+}
+
+QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator):
+    QnAbstractMediaData(type == MetadataType::Motion ? META_V1 : GENERIC_METADATA),
+    metadataType(type),
+    m_data(
+        allocator,
+        CL_MEDIA_ALIGNMENT,
+        type == MetadataType::Motion
+            ? Qn::kMotionGridWidth*Qn::kMotionGridHeight/8
+            : 0)
+{
+}
+
+bool QnAbstractCompressedMetadata::containTime(const qint64 timeUsec) const
+{
+    if (m_duration == 0)
+        return timestamp == timeUsec;
+    else if( timestamp <= timeUsec && timestamp + m_duration > timeUsec )
+        return true;
+
+    return false;
+}
+
+//------------------------------------ QnCompressedMetadata --------------------------------------
+
+QnCompressedMetadata::QnCompressedMetadata(MetadataType type):
+    QnAbstractCompressedMetadata(type)
+{
+}
+
+QnCompressedMetadata::QnCompressedMetadata(MetadataType type, QnAbstractAllocator* allocator):
+    QnAbstractCompressedMetadata(type, allocator)
+{
+}
+
+QnAbstractMediaData* QnCompressedMetadata::clone(QnAbstractAllocator* allocator) const
+{
+    QnCompressedMetadata* cloned = new QnCompressedMetadata(metadataType, allocator);
+    cloned->assign(this);
+    cloned->m_data.write(m_data.constData(), m_data.size());
+    return cloned;
+}
+
+const char* QnCompressedMetadata::data() const
+{
+    return m_data.constData();
+}
+
+size_t QnCompressedMetadata::dataSize() const
+{
+    return m_data.size();
+}
+
+bool QnCompressedMetadata::setData(const char* data, std::size_t dataSize)
+{
+    return m_data.write(data, dataSize) != 0;
 }

@@ -16,8 +16,7 @@ HttpClient::HttpClient():
     m_done(false),
     m_error(false),
     m_terminated(false),
-    m_maxInternalBufferSize(kDefaultMaxInternalBufferSize),
-    m_expectOnlyBody(false)
+    m_maxInternalBufferSize(kDefaultMaxInternalBufferSize)
 {
     instantiateHttpClient();
 }
@@ -219,6 +218,11 @@ void HttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
     m_expectOnlyBody = expectOnlyBody;
 }
 
+void HttpClient::setAllowLocks(bool allowLocks)
+{
+    m_allowLocks = allowLocks;
+}
+
 const std::unique_ptr<AbstractStreamSocket>& HttpClient::socket()
 {
     return m_asyncHttpClient->socket();
@@ -293,7 +297,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         // Have to re-establish connection if the previous message has not been read up to the end.
         if (m_asyncHttpClient)
         {
-            m_asyncHttpClient->pleaseStopSync();
+            m_asyncHttpClient->pleaseStopSync(!m_allowLocks);
             m_asyncHttpClient.reset();
         }
         instantiateHttpClient();
@@ -351,7 +355,7 @@ void HttpClient::onResponseReceived()
             cl_logWARNING);
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync();
+        m_asyncHttpClient->pleaseStopSync(!m_allowLocks);
     }
     m_cond.wakeAll();
 }
@@ -368,7 +372,7 @@ void HttpClient::onSomeMessageBodyAvailable()
             cl_logWARNING);
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync();
+        m_asyncHttpClient->pleaseStopSync(!m_allowLocks);
     }
     m_cond.wakeAll();
 }

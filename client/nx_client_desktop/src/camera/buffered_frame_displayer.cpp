@@ -75,6 +75,7 @@ void QnBufferedFrameDisplayer::clear()
     QnMutexLocker lock(&m_sync);
     m_queue.clear();
     m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
+    m_sleepCond.wakeOne();
 }
 
 qint64 QnBufferedFrameDisplayer::getTimestampOfNextFrameToRender() const
@@ -131,45 +132,20 @@ void QnBufferedFrameDisplayer::run()
                 m_timer.restart();
             }
             qint64 sleepTime = frame->pkt_dts - currentTime;
-
-            syncLock.unlock();
-
-            if (sleepTime > 0) {
-                msleep(sleepTime/1000);
-            }
-            else if (sleepTime < -1000000) {
+            if (sleepTime > 0)
+                m_sleepCond.wait(&m_sync, sleepTime / 1000);
+            else if (sleepTime < -1000000)
                 m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
-            }
-            /*
-            else if (sleepTime < -15000)
-            {
-                if (m_queue.size() > 1 && sleepTime + (m_queue.at(1)->pkt_dts - frame->pkt_dts) <= 0)
-                {
-                    syncLock.relock();
-                    m_queue.pop(frame);
-                    syncLock.unlock();
-                    continue;
-                }
-                if (sleepTime < -1000000) {
-                m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
-            }
-            }
-            */
 
-            syncLock.relock();
+            if (m_queue.isEmpty())
+                continue; //< queue clear could be called from other thread
+            m_queue.pop(frame);
             m_lastDisplayedTime = frame->pkt_dts;
-            syncLock.unlock();
-
             {
                 QnMutexLocker lock( &m_renderMtx );
                 foreach(QnAbstractRenderer* render, m_renderList)
                     render->draw(frame);
             }
-            //m_drawer->waitForFrameDisplayed(0);
-            syncLock.relock();
-            if (m_queue.size() > 0)
-                m_queue.pop(frame); //< queue clear could be called from other thread
-            syncLock.unlock();
         }
         else {
             msleep(1);

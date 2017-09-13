@@ -12,9 +12,9 @@
 
 #include "api/server_rest_connection_fwd.h"
 
-namespace nx_http {
-    class AsyncHttpClientPtr;
-}
+namespace nx_http { class AsyncHttpClientPtr; }
+namespace nx { namespace api { struct AnalyticsDriverManifest; } }
+
 class SocketAddress;
 
 class QnMediaServerResource:
@@ -104,6 +104,9 @@ public:
 
     QnModuleInformationWithAddresses getModuleInformationWithAddresses() const;
 
+    QList<nx::api::AnalyticsDriverManifest> analyticsDrivers() const;
+    void setAnalyticsDrivers(const QList<nx::api::AnalyticsDriverManifest>& drivers);
+
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
@@ -127,14 +130,17 @@ public:
     virtual QnUuid getOriginalGuid() const { return getId();  }
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
+
 protected:
     static QString apiUrlScheme(bool sslAllowed);
+
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
-    void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
     void at_cloudSettingsChanged();
+
+    void resetCachedValues();
 
 signals:
     void portChanged(const QnResourcePtr &resource);
@@ -162,6 +168,7 @@ private:
     QString m_authKey;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;
+    CachedValue<QList<nx::api::AnalyticsDriverManifest>> m_analyticsDriversCache;
 
     mutable QnResourcePtr m_firstCamera;
 

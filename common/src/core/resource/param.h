@@ -61,6 +61,18 @@ namespace Qn
     static const QString kUnauthrizedTimeoutParamName = lit("unauthorizedTimeoutSec");
     static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
+    static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
+
+    static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
+    static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
+    static const QString kPrimaryStreamCodecParamName = lit("primaryStreamCodec");
+    static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
+    static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
+    static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLenght");
+    static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");
+    static const QString kSecondaryStreamBitrateControlParamName = lit("secondaryStreamBitrateControl");
+    static const QString kPrimaryStreamBitrateParamName = lit("primaryStreamBitrate");
+    static const QString kSecondaryStreamBitrateParamName = lit("secondaryStreamBitrate");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 

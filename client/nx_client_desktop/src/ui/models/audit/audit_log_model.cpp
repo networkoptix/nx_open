@@ -35,8 +35,6 @@
 
 using namespace nx;
 
-typedef vms::event::ActionData* QnLightBusinessActionP;
-
 const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
 const QByteArray QnAuditLogModel::CheckedParamName("checked");
 
