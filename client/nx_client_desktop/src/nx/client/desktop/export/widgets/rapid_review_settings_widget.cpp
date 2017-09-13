@@ -64,7 +64,7 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
             if (m_updating)
                 return;
 
-            QScopedValueRollback<bool> updatingGuard(m_updating);
+            QScopedValueRollback<bool> updatingGuard(m_updating, true);
             d->setSliderSpeed(value);
             updateRanges();
             updateControls();
@@ -76,7 +76,7 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
             if (m_updating)
                 return;
 
-            QScopedValueRollback<bool> updatingGuard(m_updating);
+            QScopedValueRollback<bool> updatingGuard(m_updating, true);
             d->setResultLengthInSelectedUnits(value);
             updateRanges();
             updateControls();
@@ -88,7 +88,7 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
             if (m_updating)
                 return;
 
-            QScopedValueRollback<bool> updatingGuard(m_updating);
+            QScopedValueRollback<bool> updatingGuard(m_updating, true);
             d->setSelectedLengthUnit(index);
             updateRanges();
             updateControls();
@@ -111,7 +111,7 @@ void RapidReviewSettingsWidget::setSpeed(int absoluteValue)
     if (m_updating)
         return;
 
-    QScopedValueRollback<bool> updatingGuard(m_updating);
+    QScopedValueRollback<bool> updatingGuard(m_updating, true);
     d->setAbsoluteSpeed(absoluteValue);
     updateRanges();
     updateControls();
@@ -134,7 +134,7 @@ void RapidReviewSettingsWidget::setSourcePeriodLengthMs(qint64 lengthMs)
     if (m_updating)
         return;
 
-    QScopedValueRollback<bool> updatingGuard(m_updating);
+    QScopedValueRollback<bool> updatingGuard(m_updating, true);
     d->setSourcePeriodLengthMs(lengthMs);
 
     updateRanges();

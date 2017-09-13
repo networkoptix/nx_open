@@ -15,6 +15,8 @@ namespace {
 // Maximal rapid review speed - one year in a minute.
 static constexpr int kMaximalSpeed = 365 * 24 * 60;
 
+static constexpr qreal kMinimalSpeedInUnits = 1.0;
+
 // Default value for timelapse video: 5 minutes.
 static constexpr qint64 kDefaultLengthMs = 5 * 60 * 1000;
 
@@ -73,7 +75,7 @@ void RapidReviewSettingsWidgetPrivate::setAbsoluteSpeed(int absoluteSpeed)
     updateExpectedLength();
 }
 
-int RapidReviewSettingsWidgetPrivate::minAbsoluteSpeed() const
+int RapidReviewSettingsWidgetPrivate::minAbsoluteSpeed()
 {
     return kMinimalSpeed;
 }
@@ -119,8 +121,12 @@ void RapidReviewSettingsWidgetPrivate::setSelectedLengthUnit(int index)
 
     updateResultLengthInSelectedUnitsRange();
 
-    const qreal expectedLengthMs = m_sourcePeriodLengthMs / m_absoluteSpeed;
+    const auto expectedLengthMs = m_sourcePeriodLengthMs / m_absoluteSpeed;
     m_resultLengthInSelectedUnits = expectedLengthMs / selectedLengthMeasureUnitInMs();
+
+    // User selected maximal speed and changed time units to minutes/hours.
+    if (m_resultLengthInSelectedUnits < m_minResultLengthInSelectedUnits)
+        setResultLengthInSelectedUnits(m_minResultLengthInSelectedUnits);
 }
 
 qint64 RapidReviewSettingsWidgetPrivate::sourcePeriodLengthMs() const
@@ -232,10 +238,12 @@ void RapidReviewSettingsWidgetPrivate::updateExpectedLength()
 
 void RapidReviewSettingsWidgetPrivate::updateResultLengthInSelectedUnitsRange()
 {
-    qint64 unit = selectedLengthMeasureUnitInMs();
+    const auto unit = selectedLengthMeasureUnitInMs();
 
-    m_minResultLengthInSelectedUnits = std::max(1.0 * kMinimalLengthMs / (unit * kMinimalSpeed), 1.0);
-    m_maxResultLengthInSelectedUnits = std::max(1.0 * m_sourcePeriodLengthMs / (unit * kMinimalSpeed), 1.0);
+    m_minResultLengthInSelectedUnits = std::max(1.0 * kMinimalLengthMs
+        / (unit * kMinimalSpeed), kMinimalSpeedInUnits);
+    m_maxResultLengthInSelectedUnits = std::max(1.0 * m_sourcePeriodLengthMs
+        / (unit * kMinimalSpeed), kMinimalSpeedInUnits);
 }
 
 qreal RapidReviewSettingsWidgetPrivate::sliderExpCoeff() const
