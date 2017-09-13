@@ -237,6 +237,19 @@ void AsyncClient::doUpgrade(
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
+    doUpgrade(
+        url,
+        nx_http::Method::options,
+        protocolToUpgradeTo,
+        std::move(completionHandler));
+}
+
+void AsyncClient::doUpgrade(
+    const QUrl& url,
+    nx_http::Method::ValueType method,
+    const StringType& protocolToUpgradeTo,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
     m_onDone = std::move(completionHandler);
 
     NX_ASSERT(url.isValid());
@@ -246,7 +259,7 @@ void AsyncClient::doUpgrade(
     m_contentLocationUrl = url;
     m_additionalHeaders.emplace("Connection", "Upgrade");
     m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    composeRequest(nx_http::Method::options);
+    composeRequest(method);
     initiateHttpMessageDelivery();
 }
 

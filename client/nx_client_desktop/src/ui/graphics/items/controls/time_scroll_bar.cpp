@@ -55,10 +55,10 @@ void QnTimeScrollBar::setIndicatorVisible(bool value)
 
 void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    /* Draw scrollbar groove and handle. */
+    // Draw scrollbar groove and handle.
     base_type::paint(painter, option, widget);
 
-    /* Draw handle pixmap. */
+    // Draw handle pixmap.
     QStyleOptionSlider scrollBarOption;
     initStyleOption(&scrollBarOption);
     const auto sliderRect = style()->subControlRect(
@@ -72,22 +72,24 @@ void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
     const auto rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, sliderRect);
     painter->drawPixmap(rect.topLeft(), m_pixmap);
 
-    /* Draw indicator. */
+    // Draw indicator.
     if (m_indicatorVisible)
     {
-        auto relativePos = m_indicatorPosition - minimum();
-        auto range = maximum() - minimum() + pageStep();
+        // Calculate handle- and groove-relative indicator positions.
+        const auto handleValue = qBound(0ll, m_indicatorPosition - sliderPosition(), pageStep());
+        const auto grooveValue = m_indicatorPosition - handleValue;
 
-        if (relativePos < 0 || relativePos >= range)
-            return;
+        // Calculate handle- and groove-relative indicator offsets.
+        const auto grooveOffset = positionFromValue(grooveValue).x();
+        const auto handleOffset = GraphicsStyle::sliderPositionFromValue(0, pageStep(),
+            handleValue, sliderRect.width(), scrollBarOption.upsideDown, true);
 
-        auto grooveFraction = static_cast<qreal>(relativePos) / range;
-        int x = option->rect.left() + static_cast<int>(option->rect.width() * grooveFraction + 0.5);
+        const auto x = handleOffset + grooveOffset;
 
-        /* Paint it. */
+        // Paint it.
         QnScopedPainterPenRollback penRollback(painter, QPen(palette().text(), 2.0));
         QnScopedPainterAntialiasingRollback aaRollback(painter, false);
-        painter->drawLine(QPointF(x, option->rect.top() + 1.0), QPointF(x, option->rect.bottom() - 1.0));
+        painter->drawLine(x, option->rect.top() + 1.0, x, option->rect.bottom() - 1.0);
     }
 }
 

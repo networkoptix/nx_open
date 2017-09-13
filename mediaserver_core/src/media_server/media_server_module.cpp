@@ -161,7 +161,7 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFileDeletor(commonModule()));
 
     store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(), commonModule()));
+        downloadsDirectory(), commonModule(), nullptr, this));
 
     m_pluginManager = store(new PluginManager(this, QString(), &m_pluginContainer));
     m_pluginManager->loadPlugins(roSettings());

@@ -132,7 +132,7 @@
     </div>
 
     <div class="form-group" ng-if="apiMethod.addCredentials">
-        <label class="col-sm-2 control-label" for="useLogin">Login</label>
+        <label class="col-sm-2 control-label" for="useLogin">登录</label>
         <div class="col-sm-10">
             <input id="useLogin" type="text" class="form-control input-sm"
                    ng-model="apiMethod.login">
@@ -150,18 +150,18 @@
 
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Requesting URL</label>
+        <label class="col-sm-2 control-label">请求 URL</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
             <p class="help-block" ng-if="clipboardSupported">
                 <a clipboard
  supported="clipboardSupported"
-                   text="getDebugUrl()" href="">Copy to clipboard</a>
+                   text="getDebugUrl()" href="">复制到剪贴板</a>
             </p>
         </div>
     </div>
     <div class="form-group" ng-if="apiMethod.method=='POST'">
-        <label class="col-sm-2 control-label">POST data</label>
+        <label class="col-sm-2 control-label">POST 数据</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
             <p class="help-block">
@@ -174,30 +174,30 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-if="apiMethod.method=='GET' || apiMethod.method=='POST'"
-                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
+                    class="btn btn-primary" ng-click="testMethod()">测试方法</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+               ng-href="{{getDebugUrl()}}" target="_blank">在新标签页中打开</a>
         </div>
     </div>
 
 
     <div class="form-group" ng-if="result.result || result.image" ng-class="{'has-error':result.error}">
-        <label class="col-sm-2 control-label">Status</label>
+        <label class="col-sm-2 control-label">状态</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{result.status}}</p>
         </div>
     </div>
     <div class="form-group" ng-if="result.image">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">响应内容</label>
         <div class="col-sm-10">
             <img style="max-width:100%" ng-src="{{result.image}}">
             <div class="col-sm-10">
-                <p class="help-block">Content-type: {{result.contentType}}</p>
+                <p class="help-block">内容类型：{{result.contentType}}</p>
             </div>
         </div>
     </div>
     <div class="form-group" ng-if="result.result" ng-class="{'has-error':result.error}">
-        <label class="col-sm-2 control-label">Response</label>
+        <label class="col-sm-2 control-label">响应内容</label>
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">
