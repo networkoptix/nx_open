@@ -49,7 +49,7 @@ public:
     ~TargetPeerConnector()
     {
         if (m_streamSocketFactoryBak)
-            SocketFactory::setCreateStreamSocketFunc(std::move(m_streamSocketFactoryBak));
+            SocketFactory::setCreateStreamSocketFunc(std::move(*m_streamSocketFactoryBak));
     }
 
 protected:
@@ -135,7 +135,7 @@ private:
     std::unique_ptr<gateway::TargetPeerConnector> m_targetPeerConnector;
     nx::utils::SyncQueue<ConnectResult> m_connectResultQueue;
     SocketAddress m_targetEndpoint;
-    SocketFactory::CreateStreamSocketFuncType m_streamSocketFactoryBak;
+    boost::optional<SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
     cloud::relay::conf::ListeningPeer m_listeningPeerPoolSettings;
     cloud::relay::model::ListeningPeerPool m_listeningPeerPool;
