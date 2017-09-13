@@ -7876,7 +7876,7 @@ to %1</source>
     </message>
     <message>
       <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
+      <translation>Uruchom układ cykliczny</translation>
     </message>
     <message>
       <source>Start Showreel</source>
@@ -8153,7 +8153,7 @@ to %1</source>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <translation>Używaj strzałek na klawiaturze do przełączania kamer. Aby zatrzymać układ cykliczny, naciśnij Esc.</translation>
     </message>
   </context>
   <context>
