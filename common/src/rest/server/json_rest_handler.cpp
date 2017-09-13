@@ -1,6 +1,8 @@
 #include "json_rest_handler.h"
 #include <utils/common/util.h>
 
+#include <nx/utils/string.h>
+
 namespace {
 
 static const QLatin1String kExtraFormatting("extraFormatting");
@@ -20,7 +22,7 @@ RestResponse JsonRestResponse::toRest(bool extraFormatting) const
 {
     RestContent content{kJsonContetnType, QJson::serialized(json)};
     if (extraFormatting)
-        content.body  = formatJSonString(content.body);
+        content.body = nx::utils::formatJsonString(content.body);
 
     return {statusCode, std::move(content), isUndefinedContentLength};
 }
