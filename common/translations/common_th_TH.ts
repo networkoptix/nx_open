@@ -961,15 +961,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>แสดงขั้นสูง</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>ผู้ชม</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>แสดงสด</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -977,7 +977,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>แบบกำหนดเอง</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>

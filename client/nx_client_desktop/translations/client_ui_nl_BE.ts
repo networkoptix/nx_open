@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Intel HD grafisch display kan worden geconfronteerd met kwesties als vervagen is ingeschakeld. Wij raden aan deze optie ongewijzigd te laten.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Vervagen uitschakelen</translation>
     </message>
   </context>
   <context>

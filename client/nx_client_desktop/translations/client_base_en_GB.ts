@@ -7778,7 +7778,7 @@ to %1</translation>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
       <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
+      <translation>Stop Layout Tour</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
@@ -7786,7 +7786,7 @@ to %1</translation>
     </message>
     <message>
       <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
+      <translation>Start Layout Tour</translation>
     </message>
     <message>
       <source>Start Showreel</source>
@@ -8056,7 +8056,7 @@ to %1</translation>
     </message>
     <message>
       <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <translation>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
     </message>
   </context>
   <context>
