@@ -523,12 +523,17 @@ struct RadassController::Private
 
 };
 
-RadassController::RadassController():
+RadassController::RadassController(QObject* parent):
+    base_type(parent),
     d(new Private())
 {
     auto timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &RadassController::onTimer);
     timer->start(kTimerIntervalMs);
+}
+
+RadassController::~RadassController()
+{
 }
 
 void RadassController::onSlowStream(QnArchiveStreamReader* reader)
