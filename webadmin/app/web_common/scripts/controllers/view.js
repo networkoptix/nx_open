@@ -394,17 +394,19 @@ angular.module('nxCommon').controller('ViewCtrl',
             timeManager.init(Config.webclient.useServerTime, serverUtcTime, timeZoneOffset);
         });
 
+        //if camera doesnt exist get from camerasProvider
+        function checkActiveCamera(){
+            if(!$scope.activeCamera){
+                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
+            }
+            //If there are no cameras show camera panel
+            $scope.showCameraPanel = !$scope.activeCamera;
+        }
+
         function requestResources(){
             $scope.camerasProvider.requestResources().then(function(res){
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
-                if(!$scope.activeCamera){
-                    $scope.activeCamera = $scope.camerasProvider.getFirstCam();
-
-                    //Just in case there are no camera
-                    if(!$scope.activeCamera){
-                        $scope.showCameraPanel = true;
-                    }
-                }
+                checkActiveCamera();
 
                 $scope.ready = true;
                 $timeout(updateHeights);
@@ -471,14 +473,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             timeFromUrl = $location.search().time;
             $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
 
-            if(!$scope.activeCamera){
-                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
-
-                //Just in case there are no camera
-                if(!$scope.activeCamera){
-                    $scope.showCameraPanel = true;
-                }
-            }
+            checkActiveCamera();
         });
 
         $('html').addClass('webclient-page');
