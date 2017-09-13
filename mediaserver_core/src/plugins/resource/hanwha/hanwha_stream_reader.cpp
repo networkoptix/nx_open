@@ -27,25 +27,30 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     const QnLiveStreamParams& params)
 {
     const auto role = getRole();
-    int nxProfileNumber = m_hanwhaResource->profileByRole(role);
-    if (nxProfileNumber == kHanwhaInvalidProfile)
+    QString streamUrl;
+    int nxProfileNumber = kHanwhaInvalidProfile;
+    if (!m_hanwhaResource->isNvr())
     {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("No profile for %1 stream").arg(
-                role == Qn::ConnectionRole::CR_LiveVideo
+        nxProfileNumber = m_hanwhaResource->profileByRole(role);
+        if (nxProfileNumber == kHanwhaInvalidProfile)
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lit("No profile for %1 stream").arg(
+                    role == Qn::ConnectionRole::CR_LiveVideo
                     ? lit("primary")
                     : lit("secondary")));
+        }
+
+        if (isCameraControlRequired)
+        {
+            auto result = updateProfile(nxProfileNumber, params);
+            if (!result)
+                return result;
+        }
     }
-
-    CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
-    if (isCameraControlRequired)
-        result = updateProfile(nxProfileNumber, params);
-
+    auto result = streamUri(kHanwhaInvalidProfile, &streamUrl);
     if (!result)
         return result;
-
-    QString streamUrl;
-    result = streamUri(nxProfileNumber, &streamUrl);
 
     m_rtpReader.setRole(role);
     m_rtpReader.setRequest(streamUrl);
@@ -131,24 +136,36 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
 
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)
 {
+#if 0
     if (profileNumber == kHanwhaInvalidProfile)
     {
         return CameraDiagnostics::CameraPluginErrorResult(
             lit("Get stream URI: invalid profile number is given"));
     }
+#endif
+
+    using ParameterMap = std::map<QString, QString>;
+    ParameterMap params =
+    {
+        { kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel()) },
+        { kHanwhaMediaTypeProperty, kHanwhaLiveMediaType },
+        { kHanwhaStreamingModeProperty, kHanwhaFullMode },
+        { kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast },
+        { kHanwhaTransportProtocolProperty, rtpTransport() },
+        { kHanwhaRtspOverHttpProperty, kHanwhaFalse }
+    };
+    if (m_hanwhaResource->isNvr())
+    {
+        params.emplace(kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel()));
+        params.emplace(kHanwhaClientTypeProperty, "PC");
+    }
+    else
+    {
+        params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
+    }
 
     HanwhaRequestHelper helper(m_hanwhaResource);
-    const auto response = helper.view(
-        lit("media/streamuri"),
-        {
-            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
-            {kHanwhaProfileNumberProperty, QString::number(profileNumber)},
-            {kHanwhaMediaTypeProperty, kHanwhaLiveMediaType},
-            {kHanwhaStreamingModeProperty, kHanwhaFullMode},
-            {kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast},
-            {kHanwhaTransportProtocolProperty, rtpTransport()},
-            {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
-        });
+    const auto response = helper.view(lit("media/streamuri"), params);
 
     if (!response.isSuccessful())
     {

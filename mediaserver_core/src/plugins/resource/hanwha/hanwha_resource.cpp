@@ -390,7 +390,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     HanwhaRequestHelper helper(toSharedPointer(this));
     const auto profiles = helper.view(lit("media/videoprofile"));
 
-    if (!profiles.isSuccessful())
+    if (profiles.statusCode() != nx_http::StatusCode::ok)
     {
         return error(
             profiles,
@@ -399,61 +399,64 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
                 profiles.errorString()));
     }
 
-    int fixedProfileCount = 0;
-
+    bool hasDualStreaming = false;
     const auto channel = getChannel();
-    const auto startSequence = kHanwhaChannelPropertyTemplate.arg(channel);
-    for (const auto& entry: profiles.response())
+    m_isNvr = !profiles.isSuccessful();
+    if (!m_isNvr)
     {
-        const bool isFixedProfile = entry.first.startsWith(startSequence)
-            && entry.first.endsWith(kHanwhaIsFixedProfileProperty)
-            && entry.second == kHanwhaTrue;
+        int fixedProfileCount = 0;
 
-        if (isFixedProfile)
-            ++fixedProfileCount;
+        const auto startSequence = kHanwhaChannelPropertyTemplate.arg(channel);
+        for (const auto& entry : profiles.response())
+        {
+            const bool isFixedProfile = entry.first.startsWith(startSequence)
+                && entry.first.endsWith(kHanwhaIsFixedProfileProperty)
+                && entry.second == kHanwhaTrue;
+
+            if (isFixedProfile)
+                ++fixedProfileCount;
+        }
+
+        const auto maxProfileCount = m_attributes.attribute<int>(
+            lit("Media/MaxProfile/%1").arg(channel));
+
+        if (!maxProfileCount.is_initialized())
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lit("No 'MaxProfile' attribute found for channel %1").arg(channel));
+        }
+
+        m_maxProfileCount = *maxProfileCount;
+        bool hasDualStreaming = *maxProfileCount - fixedProfileCount > 1;
+        auto result = fetchStreamLimits(&m_streamLimits);
+
+        if (!result)
+            return result;
+
+        result = fetchCodecInfo(&m_codecInfo);
+
+        if (!result)
+            return result;
+
+        auto primaryStreamLimits = m_codecInfo.limits(
+            getChannel(),
+            defaultCodecForStream(Qn::ConnectionRole::CR_LiveVideo),
+            lit("General"),
+            streamResolution(Qn::ConnectionRole::CR_LiveVideo));
+
+        if (!primaryStreamLimits)
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lit("Can not fetch primary stream limits."));
+        }
+        setProperty(Qn::MAX_FPS_PARAM_NAME, primaryStreamLimits->maxFps);
+
+        result = createNxProfiles();
+        if (!result)
+            return result;
     }
 
-    const auto maxProfileCount = m_attributes.attribute<int>(
-        lit("Media/MaxProfile/%1").arg(channel));
-
-    if (!maxProfileCount.is_initialized())
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("No 'MaxProfile' attribute found for channel %1").arg(channel));
-    }
-
-    m_maxProfileCount = *maxProfileCount;
-    const bool hasDualStreaming = *maxProfileCount - fixedProfileCount > 1;
-    auto result = fetchStreamLimits(&m_streamLimits);
-    
-    if (!result)
-        return result;
-
-    result = fetchCodecInfo(&m_codecInfo);
-
-    if (!result)
-        return result;
-
-    auto primaryStreamLimits = m_codecInfo.limits(
-        getChannel(),
-        defaultCodecForStream(Qn::ConnectionRole::CR_LiveVideo),
-        lit("General"),
-        streamResolution(Qn::ConnectionRole::CR_LiveVideo));
-
-    if (!primaryStreamLimits)
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Can not fetch primary stream limits."));
-    }
-
-    const bool hasAudio = m_attributes.attribute<int>(
-        lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
-
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int) hasDualStreaming);
-    setProperty(Qn::MAX_FPS_PARAM_NAME, primaryStreamLimits->maxFps);
-
-    return createNxProfiles();
+    return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result HanwhaResource::initIo()
@@ -1733,6 +1736,12 @@ QString HanwhaResource::groupLead(const QString& groupName) const
 
     return QString();
 }
+
+bool HanwhaResource::isNvr() const
+{
+    return m_isNvr;
+}
+
 
 } // namespace plugins
 } // namespace mediaserver_core

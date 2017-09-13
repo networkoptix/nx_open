@@ -70,6 +70,8 @@ public:
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
     void updateToChannel(int value);
+
+    bool isNvr() const;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -184,6 +186,7 @@ private:
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
     HanwhaAttributes m_attributes;
     HanwhaCgiParameters m_cgiParameters;
+    bool m_isNvr = false;
 };
 
 } // namespace plugins

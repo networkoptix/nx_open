@@ -103,6 +103,7 @@ static const QString kHanwhaStreamingModeProperty("Mode");
 static const QString kHanwhaStreamingTypeProperty = lit("StreamType");
 static const QString kHanwhaTransportProtocolProperty = lit("TransportProtocol");
 static const QString kHanwhaRtspOverHttpProperty = lit("RTSPOverHTTP");
+static const QString kHanwhaClientTypeProperty = lit("ClientType");
 static const QString kHanwhaUriProperty = lit("URI");
 static const QString kHanwhaPanProperty = lit("Pan");
 static const QString kHanwhaTiltProperty = lit("Tilt");
