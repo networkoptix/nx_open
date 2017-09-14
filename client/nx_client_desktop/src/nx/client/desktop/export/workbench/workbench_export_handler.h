@@ -10,7 +10,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class ExportManager;
 struct ExportProcessInfo;
 
 /**
@@ -27,11 +26,13 @@ public:
 
 private:
     void exportProcessUpdated(const ExportProcessInfo& info);
+    void exportProcessFinished(const ExportProcessInfo& info);
 
     void handleExportVideoAction();
 
 private:
-    QScopedPointer<ExportManager> m_exportManager;
+    struct Private;
+    QScopedPointer<Private> d;
 };
 
 } // namespace desktop

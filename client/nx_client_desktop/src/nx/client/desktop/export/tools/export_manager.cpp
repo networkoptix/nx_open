@@ -33,16 +33,16 @@ public:
                 emit infoChanged(m_info);
             });
 
-        connect(m_tool, &ExportMediaTool::finished, this,
-            [this](bool success, const QString& filename)
+        connect(m_tool, &ExportMediaTool::statusChanged, this,
+            [this](ExportProcessStatus status)
             {
-                m_info.status = success
-                    ? ExportProcessStatus::success
-                    : ExportProcessStatus::error;
-                qDebug() << "finished export to" << filename << "with status" <<
-                    QnStreamRecorder::errorString(m_tool->status());
-
+                m_info.status = status;
                 emit infoChanged(m_info);
+            });
+
+        connect(m_tool, &ExportMediaTool::finished, this,
+            [this]
+            {
                 emit finished(m_info.id);
             });
     }
@@ -54,10 +54,12 @@ public:
 
     void start()
     {
-        m_info.status = ExportProcessStatus::exporting;
-        emit infoChanged(m_info);
-
         m_tool->start();
+    }
+
+    void stop()
+    {
+        m_tool->stop();
     }
 
 private:
@@ -73,10 +75,7 @@ ExportProcess::ExportProcess(QObject* parent):
 
 struct ExportManager::Private
 {
-
-
     QMap<QnUuid, QPointer<ExportMediaProcess>> exportMediaProcesses;
-
 };
 
 ExportManager::ExportManager(QObject* parent):
@@ -94,12 +93,28 @@ QnUuid ExportManager::exportMedia(const ExportMediaSettings& settings)
         [this](const QnUuid& id)
         {
             if (auto process = d->exportMediaProcesses.take(id))
+            {
+                emit processFinished(process->info());
                 process->deleteLater();
+            }
         });
     d->exportMediaProcesses.insert(process->info().id, process);
     process->start();
 
     return process->info().id;
+}
+
+void ExportManager::stopExport(const QnUuid& exportProcessId)
+{
+    if (const auto process = d->exportMediaProcesses.value(exportProcessId))
+        process->stop();
+}
+
+ExportProcessInfo ExportManager::info(const QnUuid& exportProcessId) const
+{
+    if (const auto process = d->exportMediaProcesses.value(exportProcessId))
+        return process->info();
+    return ExportProcessInfo();
 }
 
 } // namespace desktop

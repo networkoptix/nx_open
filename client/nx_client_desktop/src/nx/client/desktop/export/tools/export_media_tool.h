@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
+#include <nx/client/desktop/export/data/export_types.h>
 
 #include <recording/stream_recorder.h>
 
@@ -26,49 +26,27 @@ public:
     virtual ~ExportMediaTool();
 
     /**
-     * @brief start                             Start exporting.
+     * Start export.
      */
     bool start();
 
     /**
-     * @brief status                            Camera exporting status.
+     * Export status.
      */
     StreamRecorderError status() const;
 
-public slots:
+    ExportProcessStatus processStatus() const;
+
     /**
-     * @brief stop                              Stop exporting.
+     * Stop exporting.
      */
     void stop();
 
 signals:
-    /**
-     * @brief rangeChanged                      This signal is emitted when progress range of the process is changed.
-     * @param from                              Minimum progress value.
-     * @param to                                Maximum progress value.
-     */
     void rangeChanged(int from, int to);
-
-    /**
-     * @brief valueChanged                      This signal is emitted when progress value is changed.
-     * @param value                             Current progress value.
-     */
     void valueChanged(int value);
-
-    /**
-     * @brief finished                          This signal is emitted when the process is finished.
-     * @param success                           True if the process is finished successfully, false otherwise.
-     */
-    void finished(bool success, const QString &filename);
-
-private slots:
-    void at_camera_exportFinished(const StreamRecorderErrorStruct& status,
-        const QString& filename);
-
-    void at_camera_exportStopped();
-
-private:
-    void finishExport(bool success);
+    void statusChanged(ExportProcessStatus status);
+    void finished();
 
 private:
     struct Private;

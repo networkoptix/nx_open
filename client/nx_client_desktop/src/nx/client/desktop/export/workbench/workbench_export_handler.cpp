@@ -27,6 +27,7 @@
 #include <nx/client/desktop/export/tools/export_manager.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
 
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -54,16 +55,30 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
 
 } // namespace
 
-// -------------------------------------------------------------------------- //
-// WorkbenchExportHandler
-// -------------------------------------------------------------------------- //
+struct WorkbenchExportHandler::Private
+{
+    QScopedPointer<ExportManager> exportManager;
+    QHash<QnUuid, QPointer<QnProgressDialog>> progressDialogs;
+
+    WorkbenchExportHandler::Private():
+        exportManager(new ExportManager())
+    {
+
+    }
+
+
+};
+
+
 WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_exportManager(new ExportManager())
+    d(new Private())
 {
-    connect(m_exportManager, &ExportManager::processUpdated, this,
+    connect(d->exportManager, &ExportManager::processUpdated, this,
         &WorkbenchExportHandler::exportProcessUpdated);
+    connect(d->exportManager, &ExportManager::processFinished, this,
+        &WorkbenchExportHandler::exportProcessFinished);
 
     connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,
         &WorkbenchExportHandler::handleExportVideoAction);
@@ -78,9 +93,42 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
     qDebug() << "Export process"
         << info.id.toString()
         << "state"
-        << (int)info.status
+        << int(info.status)
         << "progress"
         << info.progressValue;
+
+    if (auto dialog = d->progressDialogs.value(info.id))
+    {
+        dialog->setMinimum(info.rangeStart);
+        dialog->setMaximum(info.rangeEnd);
+        dialog->setValue(info.progressValue);
+    }
+}
+
+void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info)
+{
+    if (auto dialog = d->progressDialogs.value(info.id))
+    {
+        dialog->hide();
+        dialog->deleteLater();
+    }
+    d->progressDialogs.remove(info.id);
+
+    switch (info.status)
+    {
+        case ExportProcessStatus::success:
+            // TODO: #GDM add resource to the pool
+            QnMessageBox::success(mainWindow(), tr("Export completed"));
+            break;
+        case ExportProcessStatus::failure:
+            QnMessageBox::warning(mainWindow(), tr("Export failed"));
+            break;
+        case ExportProcessStatus::cancelled:
+            break;
+        default:
+            NX_ASSERT(false, "Invalid state");
+    }
+
 }
 
 void WorkbenchExportHandler::handleExportVideoAction()
@@ -104,11 +152,12 @@ void WorkbenchExportHandler::handleExportVideoAction()
         return;
 
     QnUuid exportProcessId;
+    QString title;
     switch (dialog->mode())
     {
         case ExportSettingsDialog::Mode::Media:
         {
-            exportProcessId = m_exportManager->exportMedia(dialog->exportMediaSettings());
+            exportProcessId = d->exportManager->exportMedia(dialog->exportMediaSettings());
             // TODO: #ynikitenkov immediately check status, export may not start in some cases.
             break;
         }
@@ -126,6 +175,22 @@ void WorkbenchExportHandler::handleExportVideoAction()
     if (exportProcessId.isNull())
         return;
 
+    auto progressDialog = new QnProgressDialog(
+        title,
+        tr("Stop Export"),
+        0,
+        100,
+        mainWindow());
+    connect(progressDialog, &QnProgressDialog::canceled, this,
+        [this, exportProcessId]
+        {
+            d->exportManager->stopExport(exportProcessId);
+        });
+
+    d->progressDialogs.insert(exportProcessId, progressDialog);
+    progressDialog->show();
+    // Fill dialog with initial values (export is already running).
+    exportProcessUpdated(d->exportManager->info(exportProcessId));
 }
 
 } // namespace desktop

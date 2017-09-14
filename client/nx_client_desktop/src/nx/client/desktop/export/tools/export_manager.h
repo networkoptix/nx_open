@@ -2,6 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <nx/client/desktop/export/data/export_types.h>
+
 #include <nx/utils/uuid.h>
 
 namespace nx {
@@ -10,13 +12,7 @@ namespace desktop {
 
 struct ExportMediaSettings;
 
-enum class ExportProcessStatus
-{
-    initializing,
-    exporting,
-    success,
-    error,
-};
+
 
 struct ExportProcessInfo
 {
@@ -24,7 +20,7 @@ struct ExportProcessInfo
     int rangeStart = 0;
     int rangeEnd = 100;
     int progressValue = 0;
-    ExportProcessStatus status = ExportProcessStatus::initializing;
+    ExportProcessStatus status = ExportProcessStatus::initial;
 };
 
 class ExportProcess: public QObject
@@ -55,9 +51,13 @@ public:
     ExportManager(QObject* parent = nullptr);
 
     QnUuid exportMedia(const ExportMediaSettings& settings);
+    void stopExport(const QnUuid& exportProcessId);
+
+    ExportProcessInfo info(const QnUuid& exportProcessId) const;
 
 signals:
     void processUpdated(const ExportProcessInfo& info);
+    void processFinished(const ExportProcessInfo& info);
 
 private:
     struct Private;
