@@ -51,6 +51,7 @@ public:
     virtual ~Private() override;
 
     void loadSettings();
+    void saveSettings();
 
     void setMediaResource(const QnMediaResourcePtr& media);
     void setLayout(const QnLayoutResourcePtr& layout);

@@ -1,22 +1,20 @@
 #include "export_settings_dialog_p.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
-
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/single_thumbnail_loader.h>
+#include <client/client_settings.h>
+#include <ui/common/palette.h>
+#include <utils/common/synctime.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/app_info.h>
 
 #include <nx/client/desktop/export/tools/export_media_validator.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
-
-#include <ui/common/palette.h>
-
-#include <utils/common/synctime.h>
-
-#include <nx/utils/log/assert.h>
-#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace client {
@@ -35,7 +33,23 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::loadSettings()
 {
+    auto lastExportDir = qnSettings->lastExportDir();
+    if (lastExportDir.isEmpty())
+        lastExportDir = qnSettings->mediaFolder();
+    if (lastExportDir.isEmpty())
+        lastExportDir = QDir::homePath();
+
+    m_exportMediaSettings.fileName.path = lastExportDir;
+    m_exportLayoutSettings.filename.path = lastExportDir;
+
     updateOverlays();
+}
+
+void ExportSettingsDialog::Private::saveSettings()
+{
+    qnSettings->setLastExportDir(m_mode == Mode::Layout
+        ? m_exportLayoutSettings.filename.path
+        : m_exportMediaSettings.fileName.path);
 }
 
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)

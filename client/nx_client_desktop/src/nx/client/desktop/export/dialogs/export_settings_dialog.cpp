@@ -126,13 +126,19 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
         });
 
     d->loadSettings();
+    QObject::connect(this, &QDialog::accepted, [this]() { d->saveSettings(); });
 
     d->setTimePeriod(timePeriod);
 
     if (timePeriod.durationMs < RapidReviewSettingsWidget::minimalSourcePeriodLength())
-        ui->speedButton->setHidden(true);
+    {
+        ui->speedButton->setState(ui::SelectableTextButton::State::deactivated);
+        ui->speedButton->setDisabled(true); //TODO: #vkutin #gdm Also show alert.
+    }
     else
+    {
         ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
+    }
 
     updateSettingsWidgets();
 
@@ -338,6 +344,7 @@ void ExportSettingsDialog::updateSettingsWidgets()
     ui->bookmarkSettingsPage->setData(d->bookmarkOverlaySettings());
     ui->imageSettingsPage->setData(d->imageOverlaySettings());
     ui->textSettingsPage->setData(d->textOverlaySettings());
+    ui->filenamePanel->setFilename(d->exportMediaSettings().fileName);
 }
 
 void ExportSettingsDialog::updateMode()
@@ -348,7 +355,6 @@ void ExportSettingsDialog::updateMode()
     d->setMode(currentMode);
 
     ui->filenamePanel->setAllowedExtensions(d->allowedFileExtensions());
-
 }
 
 void ExportSettingsDialog::updateAlerts()
