@@ -923,12 +923,12 @@ void initialize(Manager* manager, Action* root)
     factory(SaveLocalLayoutAction)
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
-        .condition(condition::hasFlags(Qn::layout, All));
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
 
     factory(SaveLocalLayoutAsAction)
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
-        .condition(condition::hasFlags(Qn::layout, All));
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
 
     factory(SaveLayoutAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
