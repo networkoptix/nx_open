@@ -389,12 +389,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
-
-        systemAPI.getTime().then(function(result){
-            var serverUtcTime = parseInt(result.data.reply.utcTime);
-            var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            timeManager.init(Config.webclient.useServerTime, serverUtcTime, timeZoneOffset);
-        });
+        timeManager.init(Config.webclient.useServerTime);
 
         //if camera doesnt exist get from camerasProvider
         function setActiveCamera(camera){
@@ -406,19 +401,17 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.showCameraPanel = !$scope.activeCamera;
         }
 
-        function requestResources(){
-            $scope.camerasProvider.requestResources().then(function(res){
-                setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));
-
-                $scope.ready = true;
-                $timeout(updateHeights);
-                $scope.camerasProvider.startPoll();
-            });
-        }
-
         systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
             $scope.canViewArchive = result;
-            requestResources();
+            return $scope.camerasProvider.requestResources();
+        }).then(function(){
+            return $scope.camerasProvider.getServerTimes();
+        }).then(function(){
+             setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));
+
+            $scope.ready = true;
+            $timeout(updateHeights);
+            $scope.camerasProvider.startPoll();
         });
 
         // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
