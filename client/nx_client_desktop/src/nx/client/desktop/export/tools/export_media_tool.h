@@ -22,16 +22,13 @@ class ExportMediaTool : public Connective<QObject>
 
     typedef Connective<QObject> base_type;
 public:
-    ExportMediaTool(
-        const ExportMediaSettings& settings,
-        QObject* parent = 0);
+    explicit ExportMediaTool(const ExportMediaSettings& settings, QObject* parent = nullptr);
     virtual ~ExportMediaTool();
-
 
     /**
      * @brief start                             Start exporting.
      */
-    void start();
+    bool start();
 
     /**
      * @brief status                            Camera exporting status.

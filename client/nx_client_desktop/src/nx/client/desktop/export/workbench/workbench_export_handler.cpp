@@ -109,6 +109,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
         case ExportSettingsDialog::Mode::Media:
         {
             exportProcessId = m_exportManager->exportMedia(dialog->exportMediaSettings());
+            // TODO: #ynikitenkov immediately check status, export may not start in some cases.
             break;
         }
         case ExportSettingsDialog::Mode::Layout:
