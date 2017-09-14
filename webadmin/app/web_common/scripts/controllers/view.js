@@ -397,6 +397,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.activeCamera){
                 $scope.activeCamera = $scope.camerasProvider.getFirstCam();
             }
+
+            // User server time offset of current server (server camera belongs to)
             var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
             if(serverOffset){
                 timeManager.setOffset(serverOffset);
@@ -409,6 +411,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.canViewArchive = result;
             return $scope.camerasProvider.requestResources();
         }).then(function(){
+            // instead of requesting gettime once - we request it for all servers to know each timezone
             return $scope.camerasProvider.getServerTimes();
         }).then(function(){
             setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));

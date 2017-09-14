@@ -76,6 +76,7 @@ timeManager.debug = function(message, date){
     });
 };
 timeManager.getOffset = function(serverTime, serverTimeZoneOffset){
+    // Calculate server offset comparing with local time
     var minTimeLag = 2000;// Two seconds
     var clientDate = new Date();
     var clientTime = clientDate.getTime();
@@ -89,11 +90,13 @@ timeManager.getOffset = function(serverTime, serverTimeZoneOffset){
     };
 };
 timeManager.setOffset = function(offset){
+    // Set previously calculated server offset
     this.timeLatency = offset.latency; // time latency handles the situation when time is not synchronised
     this.serverTimeZoneOffset = offset.serverTimeZoneOffset;
     this.timeZoneOffset = this.clientTimeZoneOffset - this.serverTimeZoneOffset;
 };
 timeManager.init = function(useServerTime){
+    // Init time manager - get client's timezone
     this.useServerTime = useServerTime;
     var clientDate = new Date();
     this.clientTimeZoneOffset = -clientDate.getTimezoneOffset() * 60000;
