@@ -144,11 +144,15 @@ angular.module('nxCommon')
                 // !!! Render everything: updating function
                 function render(){
                     if(scope.recordsProvider) {
-                        scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
+                        scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration,
+                                                               scope.scaleManager.levels.events.index);
                     }
 
-                    timelineActions.updateState();
-                    timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
+                    timelineActions.updateState(mouseXOverTimeline);
+                    timelineRender.Draw(mouseXOverTimeline,
+                                        mouseYOverTimeline,
+                                        timelineActions.scrollingNow,
+                                        timelineActions.catchScrollBar);
                 }
 
 
@@ -231,8 +235,12 @@ angular.module('nxCommon')
                  */
 
                 // High-level Handlers
-                function scrollbarClickOrHold(left){
-                    timelineActions.scrollingStart(left, timelineConfig.scrollSpeed * scope.viewportWidth);
+                function scrollbarClickOrHold(){
+                    timelineActions.scrollingToCursorStart().then(function(result){
+                        if(result){
+                            scrollbarSliderDragStart();
+                        }
+                    });
                 }
 
                 function scrollButtonClickOrHold(left){
@@ -290,6 +298,13 @@ angular.module('nxCommon')
                 var impetusInit = null;
                 var preventClick = false;
                 // Impetus is inertia drag library
+
+                function scrollbarSliderDragStart(){ // Activate Impetus forcibly
+                    impetusInit = null;
+                    dragStarted = mouseXOverTimeline;
+                    dragged = false;
+                    timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
+                }
                 new Impetus({
                     source: $canvas.get(0),
                     friction: timelineConfig.intertiaFriction,
@@ -309,6 +324,9 @@ angular.module('nxCommon')
                         }
                     },
                     update: function(x, y) {
+                        if(impetusInit === null){
+                            impetusInit = x;
+                        }
                         var virtualMouseX = dragStarted + x - impetusInit;
                         dragged = timelineActions.scrollbarSliderDrag(virtualMouseX) ||
                                   timelineActions.timelineDrag (virtualMouseX) || dragged;
@@ -357,9 +375,7 @@ angular.module('nxCommon')
                     }
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        //checking if mouse is to the left or right of the scrollbar
-                        var scrollLeft = mouseXOverTimeline <= scope.scaleManager.scrollSlider().start;
-                        scrollbarClickOrHold(scrollLeft);
+                        scrollbarClickOrHold();
                     }
                 }
                 function viewportClick(event){
@@ -376,6 +392,7 @@ angular.module('nxCommon')
                 function viewportMouseUp(){
                     updateMouseCoordinate(null);
                     timelineActions.scrollingStop(false);
+                    timelineActions.scrollingToCursorStop();
                 }
                 function viewportMouseMove(event){
                     updateMouseCoordinate(event);

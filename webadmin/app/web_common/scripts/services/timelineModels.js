@@ -1329,6 +1329,10 @@ ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
     return this.bound(0,this.scroll() + pixels * this.getRelativeWidth() / this.viewportWidth,1);
 };
 
+ScaleManager.prototype.getScrollTarget = function(pixels){
+    return this.bound(0, pixels / this.viewportWidth,1);
+};
+
 ScaleManager.prototype.scrollByPixels = function(pixels){
     //scroll right or left by relative value - move anchor date
     this.scroll(this.getScrollByPixelsTarget(pixels));

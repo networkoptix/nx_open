@@ -378,10 +378,51 @@ TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mous
 
 
 // Update timeline state - process animations every render
-TimelineActions.prototype.updateState = function(){
+TimelineActions.prototype.updateState = function(mouseXOverTimeline){
     this.updatePosition();
     this.zoomingRenew();
     this.scrollingRenew();
+    this.mouseXOverTimeline = mouseXOverTimeline;
+};
+
+TimelineActions.prototype.scrollingToCursorStop = function(){
+    var scrollSliderAnimation = this.animateScope.animating(this.scope, 'scrollSliderAnimation');
+    if(scrollSliderAnimation){
+        scrollSliderAnimation.breakAnimation();
+    }
+};
+TimelineActions.prototype.scrollingToCursorStart = function(){
+    var self = this;
+
+    self.scaleManager.stopWatching();
+    var lastTime = 0;
+
+    // Here we run animation for slider to catch mouse cursor
+    return self.animateScope.progress(self.scope, 'scrollSliderAnimation', 'linear',
+            self.timelineConfig.scrollSliderMoveDuration).then(function(){
+        // end of animation - jump to target position
+        var targetScroll = self.scaleManager.getScrollTarget(self.mouseXOverTimeline);
+        self.scaleManager.scroll(targetScroll);
+        self.scaleManager.releaseWatching();
+        self.sliderAnimation = null;
+        return true;
+    },function(){
+        // cancelled
+        self.scaleManager.releaseWatching();
+        self.sliderAnimation = null;
+        return false;
+    },function(curTime){
+        if(curTime === 1){
+            return;
+        }
+        var deltaTime = curTime - lastTime; // Time since last update
+        var timeLeft = 1 - curTime;
+        lastTime = curTime;
+        var currentScroll = self.scaleManager.scroll();
+        var targetScroll = self.scaleManager.getScrollTarget(self.mouseXOverTimeline);
+        var newScroll = currentScroll + deltaTime * (targetScroll - currentScroll)/ timeLeft;
+        self.scaleManager.scroll(newScroll);
+    });
 };
 
 TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
