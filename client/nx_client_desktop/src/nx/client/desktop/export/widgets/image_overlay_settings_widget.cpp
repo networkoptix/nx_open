@@ -14,12 +14,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-ImageOverlaySettingsWidget::Data::Data()
-{
-    image = qnSkin->pixmap(lit("welcome_page/logo.png")).toImage();
-    overlayWidth = image.width();
-}
-
 ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::ImageOverlaySettingsWidget()),
@@ -116,12 +110,12 @@ void ImageOverlaySettingsWidget::updateControls()
     ui->nameEdit->setText(m_data.name);
 }
 
-const ImageOverlaySettingsWidget::Data& ImageOverlaySettingsWidget::data() const
+const settings::ExportImageOverlayPersistent& ImageOverlaySettingsWidget::data() const
 {
     return m_data;
 }
 
-void ImageOverlaySettingsWidget::setData(const Data& data)
+void ImageOverlaySettingsWidget::setData(const settings::ExportImageOverlayPersistent& data)
 {
     m_data = data;
     updateControls();

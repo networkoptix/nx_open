@@ -218,9 +218,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->timestampButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->timestampSettingsPage));
     ui->timestampButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(d->overlay(Private::OverlayType::timestamp)));
-    connect(d->overlay(Private::OverlayType::timestamp), &ExportOverlayWidget::pressed,
-        ui->timestampButton, &ui::SelectableTextButton::click);
+        qVariantFromValue(settings::ExportOverlayType::timestamp));
 
     ui->imageButton->setDeactivatable(true);
     ui->imageButton->setDeactivatedText(tr("Add Image"));
@@ -233,9 +231,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->imageButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->imageSettingsPage));
     ui->imageButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(d->overlay(Private::OverlayType::image)));
-    connect(d->overlay(Private::OverlayType::image), &ExportOverlayWidget::pressed,
-        ui->imageButton, &ui::SelectableTextButton::click);
+        qVariantFromValue(settings::ExportOverlayType::image));
 
     ui->textButton->setDeactivatable(true);
     ui->textButton->setDeactivatedText(tr("Add Text"));
@@ -248,9 +244,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->textButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->textSettingsPage));
     ui->textButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(d->overlay(Private::OverlayType::text)));
-    connect(d->overlay(Private::OverlayType::text), &ExportOverlayWidget::pressed,
-        ui->textButton, &ui::SelectableTextButton::click);
+        qVariantFromValue(settings::ExportOverlayType::text));
 
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Speed Up"));
@@ -273,9 +267,35 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->bookmarkSettingsPage));
     ui->bookmarkButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(d->overlay(Private::OverlayType::bookmark)));
-    connect(d->overlay(Private::OverlayType::bookmark), &ExportOverlayWidget::pressed,
-        ui->bookmarkButton, &ui::SelectableTextButton::click);
+        qVariantFromValue(settings::ExportOverlayType::bookmark));
+
+    const auto buttonForType =
+        [this](settings::ExportOverlayType type)
+        {
+            switch (type)
+            {
+                case settings::ExportOverlayType::timestamp:
+                    return ui->timestampButton;
+                case settings::ExportOverlayType::image:
+                    return ui->imageButton;
+                case settings::ExportOverlayType::text:
+                    return ui->textButton;
+                case settings::ExportOverlayType::bookmark:
+                    return ui->bookmarkButton;
+                default:
+                    return static_cast<ui::SelectableTextButton*>(nullptr);
+            }
+        };
+
+    connect(d, &Private::overlaySelected, this,
+        [buttonForType](settings::ExportOverlayType type)
+        {
+            auto button = buttonForType(type);
+            if (button && button->state() != ui::SelectableTextButton::State::selected)
+                button->click();
+        });
+
+    //    ui->bookmarkButton, &ui::SelectableTextButton::click);
 
     auto group = new ui::SelectableTextButtonGroup(this);
     group->add(ui->cameraExportSettingsButton);
@@ -300,14 +320,21 @@ void ExportSettingsDialog::setupSettingsButtons()
         [this](ui::SelectableTextButton* button)
         {
             NX_EXPECT(button);
-            const auto overlay = button->property(kOverlayPropertyName).value<ExportOverlayWidget*>();
-            if (overlay)
+            const auto overlayType = button->property(kOverlayPropertyName)
+                .value<settings::ExportOverlayType>();
+
+            switch (button->state())
             {
-                const bool selected = button->state() == ui::SelectableTextButton::State::selected;
-                overlay->setHidden(button->state() == ui::SelectableTextButton::State::deactivated);
-                overlay->setBorderVisible(selected);
-                if (selected)
-                    overlay->raise();
+                case ui::SelectableTextButton::State::deactivated:
+                    d->hideOverlay(overlayType);
+                    break;
+
+                case ui::SelectableTextButton::State::selected:
+                    d->selectOverlay(overlayType);
+                    break;
+
+                default:
+                    break;
             }
         });
 
@@ -339,10 +366,10 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 
 void ExportSettingsDialog::updateSettingsWidgets()
 {
-    ui->timestampSettingsPage->setData(d->timestampOverlaySettings());
-    ui->bookmarkSettingsPage->setData(d->bookmarkOverlaySettings());
-    ui->imageSettingsPage->setData(d->imageOverlaySettings());
-    ui->textSettingsPage->setData(d->textOverlaySettings());
+    ui->timestampSettingsPage->setData(d->exportMediaSettings().timestampOverlay);
+    ui->bookmarkSettingsPage->setData(d->exportMediaSettings().bookmarkOverlay);
+    ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
+    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
     ui->mediaFilenamePanel->setFilename(d->exportMediaSettings().fileName);
     ui->layoutFilenamePanel->setFilename(d->exportLayoutSettings().filename);
 }

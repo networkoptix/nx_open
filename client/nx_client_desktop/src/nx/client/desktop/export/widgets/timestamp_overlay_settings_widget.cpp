@@ -63,12 +63,12 @@ void TimestampOverlaySettingsWidget::updateControls()
     ui->formatComboBox->setCurrentIndex(ui->formatComboBox->findData(m_data.format));
 }
 
-const TimestampOverlaySettingsWidget::Data& TimestampOverlaySettingsWidget::data() const
+const settings::ExportTimestampOverlayPersistent& TimestampOverlaySettingsWidget::data() const
 {
     return m_data;
 }
 
-void TimestampOverlaySettingsWidget::setData(const Data& data)
+void TimestampOverlaySettingsWidget::setData(const settings::ExportTimestampOverlayPersistent& data)
 {
     m_data = data;
     updateControls();

@@ -19,12 +19,6 @@ static constexpr int kMaximumFontSize = 400;
 
 } // namespace
 
-BookmarkOverlaySettingsWidget::Data::Data()
-{
-    foreground = Qt::white;
-    background = QColor(0x2E, 0x69, 0x96, 0xB3);
-}
-
 BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::BookmarkOverlaySettingsWidget())
@@ -83,12 +77,12 @@ void BookmarkOverlaySettingsWidget::updateControls()
     ui->widthSlider->setValue(m_data.overlayWidth);
 }
 
-const BookmarkOverlaySettingsWidget::Data& BookmarkOverlaySettingsWidget::data() const
+const settings::ExportBookmarkOverlayPersistent& BookmarkOverlaySettingsWidget::data() const
 {
     return m_data;
 }
 
-void BookmarkOverlaySettingsWidget::setData(const Data& data)
+void BookmarkOverlaySettingsWidget::setData(const settings::ExportBookmarkOverlayPersistent& data)
 {
     m_data = data;
     updateControls();

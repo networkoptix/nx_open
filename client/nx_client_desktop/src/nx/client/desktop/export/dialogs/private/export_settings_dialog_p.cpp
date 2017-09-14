@@ -9,9 +9,12 @@
 #include <camera/single_thumbnail_loader.h>
 #include <client/client_settings.h>
 #include <ui/common/palette.h>
+#include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
+
+#include <nx/fusion/serialization/json_functions.h>
 
 #include <nx/client/desktop/export/tools/export_media_validator.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
@@ -33,6 +36,9 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::loadSettings()
 {
+    m_exportMediaSettings = qnSettings->exportMediaSettings();
+    m_exportLayoutSettings = qnSettings->exportLayoutSettings();
+
     auto lastExportDir = qnSettings->lastExportDir();
     if (lastExportDir.isEmpty())
         lastExportDir = qnSettings->mediaFolder();
@@ -43,13 +49,29 @@ void ExportSettingsDialog::Private::loadSettings()
     m_exportLayoutSettings.filename.path = lastExportDir;
 
     updateOverlays();
+
+    const auto used = m_exportMediaSettings.usedOverlays;
+    for (const auto type: used)
+        selectOverlay(type);
 }
 
 void ExportSettingsDialog::Private::saveSettings()
 {
-    qnSettings->setLastExportDir(m_mode == Mode::Layout
-        ? m_exportLayoutSettings.filename.path
-        : m_exportMediaSettings.fileName.path);
+    switch (m_mode)
+    {
+        case Mode::Media:
+        {
+            qnSettings->setExportMediaSettings(m_exportMediaSettings);
+            qnSettings->setLastExportDir(m_exportMediaSettings.fileName.path);
+            break;
+        }
+        case Mode::Layout:
+        {
+            qnSettings->setExportLayoutSettings(m_exportLayoutSettings);
+            qnSettings->setLastExportDir(m_exportLayoutSettings.filename.path);
+            break;
+        }
+    }
 }
 
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)
@@ -88,9 +110,19 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_mediaImageProvider->loadAsync();
 
     // Set defaults that depend on frame size.
-    m_timestampSettings.fontSize = m_fullFrameSize.height() / 20;
-    m_textSettings.fontSize = m_bookmarkSettings.fontSize = m_fullFrameSize.height() / 30;
-    m_textSettings.overlayWidth = m_bookmarkSettings.overlayWidth = m_fullFrameSize.width() / 4;
+    // TODO: FIXME: #vkutin Are these stored or calculated?
+    /*
+    m_exportMediaSettings.timestampOverlay.fontSize = m_fullFrameSize.height() / 20;
+
+    m_exportMediaSettings.textOverlay.fontSize = m_fullFrameSize.height() / 30;
+    m_exportMediaSettings.textOverlay.overlayWidth = m_fullFrameSize.width() / 4;
+
+    m_exportMediaSettings.bookmarkOverlay.fontSize = m_exportMediaSettings.textOverlay.fontSize;
+    m_exportMediaSettings.bookmarkOverlay.overlayWidth =
+        m_exportMediaSettings.textOverlay.overlayWidth;
+    */
+    // TODO: #vkutin #gdm Required?
+    //emit exportMediaSettingsChanged(m_exportLayoutSettings);
 }
 
 void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
@@ -106,27 +138,35 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
     m_layoutImageProvider->loadAsync();
 
     // TODO: #vkutin #GDM Further init.
+
+    // TODO: #vkutin #gdm Required?
+    //emit exportLayoutSettingsChanged(m_exportLayoutSettings);
 }
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
 {
     m_exportMediaSettings.timePeriod = period;
     m_exportLayoutSettings.period = period;
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
+    emit exportLayoutSettingsChanged(m_exportLayoutSettings);
 }
 
 void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     m_exportMediaSettings.fileName = filename;
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
     m_exportLayoutSettings.filename = filename;
+    emit exportLayoutSettingsChanged(m_exportLayoutSettings);
 }
 
 void ExportSettingsDialog::Private::setRapidReviewFrameStep(qint64 frameStepMs)
 {
     m_exportMediaSettings.timelapseFrameStepMs = frameStepMs;
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 ExportSettingsDialog::Private::ErrorCode ExportSettingsDialog::Private::status() const
@@ -184,115 +224,107 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode
     return result;
 }
 
-ExportMediaSettings ExportSettingsDialog::Private::exportMediaSettings() const
+void ExportSettingsDialog::Private::overlayPositionChanged(settings::ExportOverlayType type)
 {
-    ExportMediaSettings result = m_exportMediaSettings;
+    auto overlayWidget = overlay(type);
+    NX_EXPECT(overlayWidget);
+    if (!overlayWidget || overlayWidget->isHidden())
+        return;
 
-    const auto calculateOverlayPosition =
-        [](const QWidget* widget, ExportOverlaySettings& settings)
-        {
-            // TODO: #vkutin Calculate alignment depending on position in widget's parent.
-            settings.position = widget->pos();
-            settings.alignment = Qt::AlignLeft | Qt::AlignCenter;
-        };
+    auto settings = m_exportMediaSettings.overlaySettings(type);
+    NX_EXPECT(settings);
+    if (!settings)
+        return;
 
-    // TODO: #vkutin Honor z-order.
+    // TODO: #vkutin Calculate alignment depending on position in widget's parent.
+    settings->position = overlayWidget->pos();
+    settings->alignment = Qt::AlignLeft | Qt::AlignTop;
 
-    result.overlays.reserve(overlayCount);
-
-    if (!overlay(OverlayType::timestamp)->isHidden())
-    {
-        QSharedPointer<ExportTimestampOverlaySettings> settings(
-            new ExportTimestampOverlaySettings(m_timestampSettings));
-
-        calculateOverlayPosition(overlay(OverlayType::timestamp), *settings);
-        result.overlays << settings;
-    }
-
-    if (!overlay(OverlayType::bookmark)->isHidden())
-    {
-        QSharedPointer<ExportTextOverlaySettings> settings(
-            new ExportTextOverlaySettings(m_bookmarkSettings));
-
-        calculateOverlayPosition(overlay(OverlayType::bookmark), *settings);
-        result.overlays << settings;
-    }
-
-    if (!overlay(OverlayType::image)->isHidden())
-    {
-        QSharedPointer<ExportImageOverlaySettings> settings(
-            new ExportImageOverlaySettings(m_imageSettings));
-
-        calculateOverlayPosition(overlay(OverlayType::image), *settings);
-        result.overlays << settings;
-    }
-
-    if (!overlay(OverlayType::text)->isHidden())
-    {
-        QSharedPointer<ExportTextOverlaySettings> settings(
-            new ExportTextOverlaySettings(m_textSettings));
-
-        calculateOverlayPosition(overlay(OverlayType::text), *settings);
-        result.overlays << settings;
-    }
-
-    return result;
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
-ExportLayoutSettings ExportSettingsDialog::Private::exportLayoutSettings() const
+const settings::ExportMediaPersistent& ExportSettingsDialog::Private::exportMediaSettings() const
+{
+    return m_exportMediaSettings;
+}
+
+const settings::ExportLayoutPersistent& ExportSettingsDialog::Private::exportLayoutSettings() const
 {
     return m_exportLayoutSettings;
 }
 
-const TimestampOverlaySettingsWidget::Data&
-    ExportSettingsDialog::Private::timestampOverlaySettings() const
+bool ExportSettingsDialog::Private::isOverlayVisible(settings::ExportOverlayType type) const
 {
-    return m_timestampSettings;
+    const auto overlayWidget = overlay(type);
+    return overlayWidget && !overlayWidget->isHidden();
+}
+
+void ExportSettingsDialog::Private::selectOverlay(settings::ExportOverlayType type)
+{
+    auto newSelection = overlay(type);
+    if (!newSelection || newSelection == m_selectedOverlay)
+        return;
+
+    if (m_selectedOverlay)
+        m_selectedOverlay->setBorderVisible(false);
+
+    m_selectedOverlay = newSelection;
+    m_selectedOverlay->setVisible(true);
+    m_selectedOverlay->setBorderVisible(true);
+    m_selectedOverlay->raise();
+
+    m_exportMediaSettings.usedOverlays.removeOne(type);
+    m_exportMediaSettings.usedOverlays.push_back(type);
+    m_exportMediaSettings.updateRuntimeSettings(); //< TODO: sub-optimal.
+
+    emit overlaySelected(type);
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
+}
+
+void ExportSettingsDialog::Private::hideOverlay(settings::ExportOverlayType type)
+{
+    auto overlayWidget = overlay(type);
+    if (!overlayWidget || overlayWidget->isHidden())
+        return;
+
+    overlayWidget->setHidden(true);
+    m_exportMediaSettings.usedOverlays.removeOne(type);
+    m_exportMediaSettings.updateRuntimeSettings(); //< TODO: sub-optimal.
+
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setTimestampOverlaySettings(
-    const TimestampOverlaySettingsWidget::Data& settings)
+    const settings::ExportTimestampOverlayPersistent& settings)
 {
-    m_timestampSettings = settings;
-    updateOverlay(OverlayType::timestamp);
-}
-
-const ImageOverlaySettingsWidget::Data& ExportSettingsDialog::Private::imageOverlaySettings() const
-{
-    return m_imageSettings;
+    m_exportMediaSettings.timestampOverlay = settings;
+    updateOverlay(settings::ExportOverlayType::timestamp);
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setImageOverlaySettings(
-    const ImageOverlaySettingsWidget::Data& settings)
+    const settings::ExportImageOverlayPersistent& settings)
 {
-    m_imageSettings = settings;
-    updateOverlay(OverlayType::image);
-}
-
-const TextOverlaySettingsWidget::Data& ExportSettingsDialog::Private::textOverlaySettings() const
-{
-    return m_textSettings;
+    m_exportMediaSettings.imageOverlay = settings;
+    updateOverlay(settings::ExportOverlayType::image);
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
-    const TextOverlaySettingsWidget::Data& settings)
+    const settings::ExportTextOverlayPersistent& settings)
 {
-    m_textSettings = settings;
-    updateOverlay(OverlayType::text);
-}
-
-const BookmarkOverlaySettingsWidget::Data&
-    ExportSettingsDialog::Private::bookmarkOverlaySettings() const
-{
-    return m_bookmarkSettings;
+    m_exportMediaSettings.textOverlay = settings;
+    updateOverlay(settings::ExportOverlayType::text);
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
-    const BookmarkOverlaySettingsWidget::Data& settings)
+    const settings::ExportBookmarkOverlayPersistent& settings)
 {
-    m_bookmarkSettings = settings;
+    m_exportMediaSettings.bookmarkOverlay = settings;
     // TODO: #vkutin Generate text from bookmark information and passed settings
-    updateOverlay(OverlayType::bookmark);
+    updateOverlay(settings::ExportOverlayType::bookmark);
+    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::validateSettings()
@@ -305,23 +337,29 @@ void ExportSettingsDialog::Private::validateSettings()
     {
 
     }
-
 }
 
 void ExportSettingsDialog::Private::updateOverlays()
 {
     for (size_t i = 0; i != overlayCount; ++i)
-        updateOverlay(static_cast<OverlayType>(i));
+        updateOverlay(static_cast<settings::ExportOverlayType>(i));
 }
 
-void ExportSettingsDialog::Private::updateOverlay(OverlayType type)
+void ExportSettingsDialog::Private::updateOverlay(settings::ExportOverlayType type)
 {
+    const auto positionOverlay =
+        [](QWidget* overlay, const ExportOverlaySettings& data)
+        {
+            // TODO: #vkutin Alignment.
+            overlay->move(data.position.toPoint());
+        };
+
     auto overlay = this->overlay(type);
     switch (type)
     {
-        case OverlayType::timestamp:
+        case settings::ExportOverlayType::timestamp:
         {
-            const auto& data = m_timestampSettings;
+            const auto& data = m_exportMediaSettings.timestampOverlay;
             auto font = overlay->font();
             font.setPixelSize(data.fontSize);
             overlay->setFont(font);
@@ -332,25 +370,28 @@ void ExportSettingsDialog::Private::updateOverlay(OverlayType type)
             overlay->setPalette(palette);
 
             updateTimestampText();
+            positionOverlay(overlay, data);
             break;
         }
 
-        case OverlayType::image:
+        case settings::ExportOverlayType::image:
         {
-            const auto& data = m_imageSettings;
+            const auto& data = m_exportMediaSettings.imageOverlay;
             overlay->setImage(data.image);
             overlay->setOverlayWidth(data.overlayWidth);
             overlay->setOpacity(data.opacity);
+            positionOverlay(overlay, data);
             break;
         }
 
-        case OverlayType::text:
-        case OverlayType::bookmark:
+        case settings::ExportOverlayType::bookmark:
+        case settings::ExportOverlayType::text:
         {
-            const auto& data = type == OverlayType::text
-                ? static_cast<const ExportTextOverlaySettings&>(m_textSettings)
-                : m_bookmarkSettings;
+            const auto& data = (type == settings::ExportOverlayType::text)
+                ? static_cast<const ExportTextOverlaySettings&>(m_exportMediaSettings.textOverlay)
+                : m_exportMediaSettings.bookmarkOverlay;
 
+            overlay->setText(data.text);
             overlay->setTextIndent(data.indent);
             overlay->setOverlayWidth(data.overlayWidth);
             overlay->setRoundingRadius(data.roundingRadius);
@@ -363,6 +404,7 @@ void ExportSettingsDialog::Private::updateOverlay(OverlayType type)
             palette.setColor(QPalette::Text, data.foreground);
             palette.setColor(QPalette::Window, data.background);
             overlay->setPalette(palette);
+            positionOverlay(overlay, data);
             break;
         }
 
@@ -393,11 +435,19 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
     {
         m_overlays[index] = new ExportOverlayWidget(overlayContainer);
         m_overlays[index]->setHidden(true);
+
+        const auto type = static_cast<settings::ExportOverlayType>(index);
+
+        connect(m_overlays[index], &ExportOverlayWidget::pressed, this,
+            [this, type]() { selectOverlay(type); });
+
+        installEventHandler(m_overlays[index], { QEvent::Resize, QEvent::Move, QEvent::Show }, this,
+            [this, type]() { overlayPositionChanged(type); });
     }
 
-    setPaletteColor(overlay(OverlayType::image), QPalette::Window, Qt::transparent);
+    setPaletteColor(overlay(settings::ExportOverlayType::image), QPalette::Window, Qt::transparent);
 
-    auto timestampOverlay = overlay(OverlayType::timestamp);
+    auto timestampOverlay = overlay(settings::ExportOverlayType::timestamp);
     timestampOverlay->setTextIndent(0);
 
     static constexpr qreal kShadowBlurRadius = 3.0;
@@ -411,16 +461,16 @@ void ExportSettingsDialog::Private::updateTimestampText()
     auto currentDayTime = qnSyncTime->currentDateTime();
     currentDayTime = currentDayTime.toOffsetFromUtc(currentDayTime.offsetFromUtc());
 
-    overlay(OverlayType::timestamp)->setText(currentDayTime.toString(
-        m_timestampSettings.format));
+    overlay(settings::ExportOverlayType::timestamp)->setText(currentDayTime.toString(
+        m_exportMediaSettings.timestampOverlay.format));
 }
 
-ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type)
+ExportOverlayWidget* ExportSettingsDialog::Private::overlay(settings::ExportOverlayType type)
 {
     return m_overlays[int(type)];
 }
 
-const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(OverlayType type) const
+const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(settings::ExportOverlayType type) const
 {
     return m_overlays[int(type)];
 }
