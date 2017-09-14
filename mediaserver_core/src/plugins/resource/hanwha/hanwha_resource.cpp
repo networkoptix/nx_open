@@ -615,11 +615,9 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 {
     const auto channel = getChannel();
 
-    auto codecListStr = m_attributes.attribute<QString>(lit("Media/AudioEncodingType/%1").arg(channel));
-    QStringList availableCodecs;
-    if (codecListStr && !codecListStr->isEmpty())
-        availableCodecs = codecListStr->split(L',');
-    if (availableCodecs.empty())
+    const auto codec = m_cgiParameters.parameter(
+        lit("media/audiooutput/set/DecodingType"));
+    if (!codec || codec->possibleValues().isEmpty())
         return CameraDiagnostics::NoErrorResult();
 
     const auto bitrateParam = m_cgiParameters.parameter(lit("media/audiooutput/set/Bitrate"));
@@ -633,11 +631,6 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 #if 0
     // Not used so far. Our devices can't change codec, so we need to use current value only.
-
-    const auto codec = m_cgiParameters.parameter(
-        lit("media/audiooutput/set/DecodingType"));
-    if (!codec || codec->possibleValues().isEmpty())
-        return CameraDiagnostics::NoErrorResult();
 
     QnAudioFormat audioFormat;
 
