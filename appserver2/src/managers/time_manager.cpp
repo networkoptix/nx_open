@@ -1315,7 +1315,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         // Checking whether it is appropriate to switch to local time.
         QnMutexLocker lk(&m_mutex);
         if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-                m_localTimePriorityKey, qnGlobalSettings->isSynchronizingTimeWithInternet()))
+                m_localTimePriorityKey, settings->isSynchronizingTimeWithInternet()))
         {
             selectLocalTimeAsSynchronized(&lk, m_localTimePriorityKey.sequence);
             isTimeChanged = true;
@@ -1323,7 +1323,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
     }
     
     if (!isTimeChanged &&
-        connection &&
+        m_connection &&
         isSynchronizedToLocalTimeOffsetExceeded)
     {
         saveSyncTimeAsync(
