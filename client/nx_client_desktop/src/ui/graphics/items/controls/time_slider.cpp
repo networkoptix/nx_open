@@ -466,7 +466,7 @@ Q_GLOBAL_STATIC(QnTimeSliderStepStorage, timeSteps);
 // QnTimeSlider::KineticHandlerBase
 // -------------------------------------------------------------------------- //
 
-class QnTimeSlider::KineticHandlerBase : public KineticProcessHandler
+class QnTimeSlider::KineticHandlerBase: public KineticProcessHandler
 {
 public:
     KineticHandlerBase(QnTimeSlider* slider): m_slider(slider) {}
@@ -483,15 +483,20 @@ public:
         updateKineticProcessor();
     }
 
-    virtual void updateKineticProcessor() {}
-
-    virtual void finishKinetic() override
+    void unhurry()
     {
         if (!m_hurried)
             return;
 
         m_hurried = false;
         updateKineticProcessor();
+    }
+
+    virtual void updateKineticProcessor() {}
+
+    virtual void finishKinetic() override
+    {
+        unhurry();
     }
 
 protected:
@@ -2244,6 +2249,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     if (qFuzzyIsNull(m_totalLineStretch))
     {
         drawSolidBackground(painter, rect());
+        painter->fillRect(lineBarRect, m_colors.pastRecording);
     }
     else
     {
@@ -2264,8 +2270,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
-                lineRect
-            );
+                lineRect);
 
             lineTop += lineHeight;
         }
@@ -3056,9 +3061,11 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
      * in eighths (1/8s) of a degree. */
     const qreal degrees = event->delta() / 8.0;
 
-    if (event->modifiers().testFlag(Qt::ControlModifier))
+    if (event->modifiers().testFlag(Qt::ControlModifier)
+        || event->modifiers().testFlag(Qt::ShiftModifier))
     {
         /* Kinetic drag: */
+        m_kineticScrollHandler->unhurry();
         m_kineticScrollHandler->kineticProcessor()->shift(degrees / kWheelDegreesFor1PixelScroll);
         m_kineticScrollHandler->kineticProcessor()->start();
     }
@@ -3077,6 +3084,7 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
                 m_zoomAnchor = m_windowEnd;
         }
 
+        m_kineticZoomHandler->unhurry();
         m_kineticZoomHandler->kineticProcessor()->shift(degrees);
         m_kineticZoomHandler->kineticProcessor()->start();
     }
@@ -3397,6 +3405,7 @@ void QnTimeSlider::dragMove(DragInfo* info)
         const auto prevWindowStart = m_windowStart;
         shiftWindow(relativeDelta, false);
 
+        m_kineticScrollHandler->unhurry();
         m_kineticScrollHandler->kineticProcessor()->shift(qreal(m_windowStart - prevWindowStart) / m_msecsPerPixel);
         return;
     }

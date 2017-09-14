@@ -38,15 +38,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>처음부터 북마크를 재생</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>북마크 편집</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>북마크 삭제</translation>
     </message>
   </context>
   <context>
@@ -410,7 +410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>비디오 월 열기</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -869,14 +869,6 @@ to view more bookmarks</source>
       <translation type="unfinished">Remove from Showreel</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation type="unfinished">Make Showreel</translation>
     </message>
@@ -1027,6 +1019,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -1037,8 +1036,24 @@ to view more bookmarks</source>
       <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1316,10 +1331,6 @@ to view more bookmarks</source>
       <translation>선택된 정보 파일로 저장</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>감사 로고 재생</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>장치</translation>
     </message>
@@ -1392,6 +1403,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>이 리소스는 시스템에서 제거 됩니다.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
@@ -1657,10 +1672,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>빌드 번호</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>잘못 된 빌드 번호</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2621,6 +2632,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1에 대 한 자세한 내용은</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4548,6 +4570,10 @@ to %1</source>
       <source>Manage Bookmarks</source>
       <translation type="unfinished">Manage Bookmarks</translation>
     </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+    </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
@@ -6134,10 +6160,6 @@ to %1</source>
       <translation>이메일서버 설정 안됨</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>서버끼리 동기화를 위해 서버 선택하세요</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>시스템 안전모드 상태 입니다</translation>
     </message>
@@ -6168,10 +6190,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>이메일서버 설정안됨</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>서버 시간이 동기화 되지 않았으며 공용시간이 자동으로 검색되지 않았습니다.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7684,6 +7702,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -7938,8 +7975,8 @@ to %1</source>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>

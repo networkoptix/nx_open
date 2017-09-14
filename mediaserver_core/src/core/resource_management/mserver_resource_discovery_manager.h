@@ -40,8 +40,6 @@ private:
     QMap<QString, int> m_resourceDiscoveryCounter;
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_disconnectSended;
-    QTime netStateTime;
-    CLNetState netState;
 
     QMap<QString, QnSecurityCamResourcePtr> m_tmpForeignResources;
     int m_foreignResourcesRetryCount;

@@ -1,5 +1,7 @@
 #include "resources_messages.h"
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <common/common_module.h>
 
 #include <client_core/client_core_module.h>
@@ -38,6 +40,9 @@ static const QString kRemoveItemsFromLayoutShowOnceKey(lit("RemoveItemsFromLayou
 /*  Batch delete resources. */
 static const QString kDeleteResourcesShowOnceKey(lit("DeleteResources"));
 
+static const QnResourceListView::Options kSimpleOptions(QnResourceListView::HideStatusOption 
+    | QnResourceListView::ServerAsHealthMonitorOption
+    | QnResourceListView::SortAsInTreeOption);
 
 bool showCompositeDialog(
     QWidget* parent,
@@ -59,10 +64,10 @@ bool showCompositeDialog(
     messageBox.setText(text);
 
     if (useResources)
-        messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+        messageBox.addCustomWidget(new QnResourceListView(resources, kSimpleOptions, &messageBox));
 
     messageBox.setInformativeText(extras);
-    messageBox.setCheckBoxEnabled();
+    messageBox.setCheckBoxEnabled(!showOnceFlag.isEmpty());
 
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
@@ -164,7 +169,7 @@ bool Resources::deleteSharedLayouts(QWidget* parent, const QnResourceList& layou
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Delete %n shared layouts?", "", layouts.size()));
-    messageBox.addCustomWidget(new QnResourceListView(layouts, true, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(layouts, kSimpleOptions, &messageBox));
     messageBox.setInformativeText(
         tr("These %n layouts are shared with other users, so you delete it for them too.",
             "", layouts.size()));
@@ -192,11 +197,11 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Remove %n items from layout?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, kSimpleOptions, &messageBox));
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
@@ -212,11 +217,11 @@ bool Resources::removeItemsFromLayoutTour(QWidget* parent, const QnResourceList&
         return true;
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Remove %n items from showreel?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, kSimpleOptions, &messageBox));
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
@@ -300,13 +305,13 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     }
 
     QnSessionAwareMessageBox messageBox(parent);
-    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(text);
     messageBox.setInformativeText(extras);
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, false, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     messageBox.setCheckBoxEnabled();
 
     const auto result = messageBox.exec();

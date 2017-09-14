@@ -82,6 +82,15 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Bukut tabanlı sistemler ancak bulut olmatan bir sistem ile birleştirebilir. Sistem ismi ve şifre bulut sistemden alınacaktır.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -123,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>%1 sunucusundan geçersiz cevap:&quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -147,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Bir giriş / çıkış hatası oluştu. OS mesajı: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -171,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Cihaz isteği &quot;%1&quot;, hata &quot;%2&quot; ile başarısız oldu.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Kamera isteği &quot;%1&quot;, hata &quot;%2&quot; ile başarısız oldu.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -215,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I/O modülisteği &quot;%1&quot;&quot;%2&quot; ile başarısız oldu.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -303,7 +312,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Kamera arşivden geri yüklendi. Canlı video izlemek için kamerayı silin ve tekrar ekleyin.</translation>
     </message>
   </context>
   <context>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>Deneme</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>Analog</translation>
     </message>
@@ -403,11 +408,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Uç</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>Analog Kodlayıcı</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>Deneme Lisansları</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>Ücretsiz lisans</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Zaman</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation>Deneme Lisansları</translation>
     </message>
   </context>
   <context>
@@ -541,7 +550,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Sunucu İle Eşleşen Donanım Id'si Bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -651,10 +660,6 @@
       <translation>Bilinmeyen</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>Deneme Lisansı</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>ÜCRETSİZ Lisans</translation>
     </message>
@@ -668,7 +673,11 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Donanım Kimliği: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation>Deneme Lisansı</translation>
     </message>
   </context>
   <context>
@@ -1219,7 +1228,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>Sunucu &quot;%1&quot; Hata</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1233,19 +1242,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>Sunucu &quot;%1&quot; Çakışması</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>Sunucu &quot;%1&quot; Başladı</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>Sunucu &quot;%1&quot; bir lisans sorunu yaşıyor</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>Sunucu &quot;%1&quot; bir arşiv yedekleme işlemini tamamladı</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1257,7 +1266,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Birden çok %1 etkinliği meydana geldi</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1299,7 +1308,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Tetikleyici: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1309,9 +1318,9 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n defa, önce: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n defa, önce: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1376,11 +1385,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD / SSD disk &quot;%1&quot; dolu. Disk, VMS tarafından yönetilmeyen çok fazla veri içeriyor.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Sistem diski &quot;%1&quot; neredeyse doluydu.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1444,7 +1453,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Tetikleyici Adı</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1466,7 +1475,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Yöneticiler</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1478,23 +1487,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Yazılımsal Tetikleyici</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>%2'de Yazılımsal Tetikleme %1</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Yazılımsal Tetikleyici %1 birden çok kez etkinleştirildi</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>E-posta gönder</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Kabul edilen</translation>
     </message>
   </context>
   <context>

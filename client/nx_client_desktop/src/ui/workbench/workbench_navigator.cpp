@@ -44,8 +44,6 @@ extern "C"
 
 #include <plugins/resource/avi/avi_resource.h>
 
-#include <redass/redass_controller.h>
-
 #include <server/server_storage_manager.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -223,6 +221,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
                         archiveReader->setPlaybackMask(result);
                 }
             }
+
             if (m_timeSlider)
                 m_timeSlider->setTimePeriods(SyncedLine, timePeriodType, result);
             if (m_calendar)
@@ -1091,13 +1090,18 @@ void QnWorkbenchNavigator::updateCentralWidget()
     if (m_centralWidget == centralWidget)
         return;
 
-    if (m_centralWidget && m_centralWidget->resource())
-        disconnect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    m_centralWidgetConnections.clear();
 
     m_centralWidget = centralWidget;
 
-    if (m_centralWidget && m_centralWidget->resource())
-        connect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    if (m_centralWidget)
+    {
+        m_centralWidgetConnections = QnDisconnectHelper::create();
+        *m_centralWidgetConnections << connect(m_centralWidget->resource(),
+            &QnResource::parentIdChanged,
+            this,
+            &QnWorkbenchNavigator::updateLocalOffset);
+    }
 
     updateCurrentWidget();
 }
@@ -1114,6 +1118,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
+    m_currentWidgetConnections.clear();
+
     if (m_currentWidget)
     {
         m_timeSlider->setThumbnailsLoader(nullptr, -1);
@@ -1127,10 +1133,6 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         {
             updateItemDataFromSlider(m_currentWidget);
         }
-
-        m_currentWidget->disconnect(this);
-        m_currentWidget->resource()->disconnect(this);
-        connect(m_currentWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
     }
     else
     {
@@ -1154,9 +1156,16 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     if (m_currentWidget)
     {
-        connect(m_currentWidget, &QnMediaResourceWidget::aspectRatioChanged, this,
+        m_currentWidgetConnections = QnDisconnectHelper::create();
+
+        *m_currentWidgetConnections << connect(m_currentWidget,
+            &QnMediaResourceWidget::aspectRatioChanged,
+            this,
             &QnWorkbenchNavigator::updateThumbnailsLoader);
-        connect(m_currentWidget->resource(), &QnResource::nameChanged, this,
+
+        *m_currentWidgetConnections << connect(m_currentWidget->resource(),
+            &QnResource::nameChanged,
+            this,
             &QnWorkbenchNavigator::updateLines);
     }
 
@@ -1531,9 +1540,17 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (m_previousMediaPosition != timeMSec || isTimelineCatchingUp())
             {
                 qint64 delta = timeMSec - m_animatedPosition;
-                if (qAbs(delta) < m_timeSlider->msecsPerPixel() || delta * speed() < 0)
+
+                // See VMS-2657
+                const bool canOmitAnimation = m_currentWidget
+                    && m_currentWidget->resource()->flags().testFlag(Qn::local_media)
+                    && !m_currentWidget->resource()->flags().testFlag(Qn::sync);
+
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel() ||
+                    (canOmitAnimation && delta * speed() < 0))
                 {
-                    /* If distance is less than 1 pixel or we catch up backwards, do it instantly: */
+                    // If distance is less than 1 pixel or we catch up backwards on
+                    // local media file do it instantly
                     m_animatedPosition = timeMSec;
                     timelineAdvance(timeMSec);
                 }
@@ -2129,8 +2146,6 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value)
                 {
                     reader->jumpTo(value * 1000, 0);
                 }
-                //else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
-                //    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                 else
                 {
                     reader->setSkipFramesToTime(value * 1000); /* Precise seek. */
@@ -2226,8 +2241,8 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget)
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget)
 {
-    disconnect(widget, NULL, this, NULL);
-    disconnect(widget->resource(), NULL, this, NULL);
+    widget->disconnect(this);
+    widget->resource()->disconnect(this);
 
     if (widget->resource()->flags().testFlag(Qn::sync))
     {

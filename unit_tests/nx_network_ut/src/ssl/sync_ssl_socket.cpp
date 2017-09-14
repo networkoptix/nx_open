@@ -9,7 +9,6 @@ namespace network {
 namespace ssl {
 namespace test {
 
-static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
 int sock_read(BIO *b, char *out, int outl)

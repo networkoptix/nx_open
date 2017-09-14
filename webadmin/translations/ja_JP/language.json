@@ -41,9 +41,12 @@
     "confirmDisconnectFromCloud":"{{CLOUD_NAME}} からシステムを切断します",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'> クラウドのすべてのユーザーが削除されます</span><br><br>システムはローカル管理者アカウントとローカル ネットワーク経由でアクセスされます",
     "confirmDisconnectFromCloudAction":"切断",
-    "disconnectedSuccess":"システムが正常に切断されました",
+    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
+    "confirmDisconnectFromSystem":"Detach server from current system",
+    "confirmDisconnectFromSystemTitle":"",
+    "confirmDisconnectFromSystemAction":"Detach",
+    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
     "connectedSuccess":"システムが正常に接続されています",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"ローカルの管理者を登録",
     "confirmChangePassword":"adminパスワードの変更",
     "confirmChangePasswordTitle":"システム パスワードを変更しますか? 一部のサーバー ユーザー 'admin' と root のパスワードに影響します",
@@ -109,6 +112,6 @@
     "reserved":"予約済み"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"{{PRODUCT_NAME}} web インターフェイス"
   }
 }

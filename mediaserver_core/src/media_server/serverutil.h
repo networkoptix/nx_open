@@ -100,3 +100,13 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
  * @return false if failed to save some data.
  */
 bool resetSystemToStateNew(QnCommonModule* commonModule);
+
+/**
+ * Drop message bus connections to other servers in the system.
+ */
+void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);
+
+/**
+ * Resume connection listening
+ */
+void resumeConnectionsToRemotePeers();

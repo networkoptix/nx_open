@@ -15,9 +15,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_license_notifier.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
-#include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_watcher.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 #include <ui/workbench/workbench_welcome_screen.h>
@@ -75,9 +73,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_menu.reset(new nx::client::desktop::ui::action::Manager(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
-
-	if (!qnRuntime->isActiveXMode())
-		instance<QnWorkbenchLicenseNotifier>(); // TODO: #Elric belongs here?
 
     // Adds statistics modules
 

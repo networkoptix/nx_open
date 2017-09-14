@@ -15,132 +15,36 @@ PageBase
     id: videoScreen
     objectName: "videoScreen"
 
-    property alias resourceId: videoScreenController.resourceId
+    property alias resourceId: cameraDisplay.resourceId
     property string initialScreenshot
-    property LiteClientLayoutHelper layoutHelper: null
-    property QnCameraListModel camerasModel: null
+    property alias layoutHelper: cameraDisplay.layoutHelper
+    property alias camerasModel: cameraDisplay.camerasModel
 
     signal nextCameraRequested()
     signal previousCameraRequested()
 
-    VideoScreenController
+    CameraDisplay
     {
-        id: videoScreenController
-
-        mediaPlayer.onPlayingChanged:
-        {
-            if (mediaPlayer.playing)
-                screenshot.source = ""
-        }
-
-        mediaPlayer.onSourceChanged:
-        {
-            video.clear()
-
-            if (mediaPlayer.source && !transformationsWarningLoader.active)
-                mediaPlayer.playLive()
-            else
-                mediaPlayer.stop()
-        }
-
-        onOfflineChanged:
-        {
-            if (offline)
-            {
-                offlineStatusDelay.restart()
-            }
-            else
-            {
-                offlineStatusDelay.stop()
-                d.showOfflineStatus = false
-            }
-        }
-    }
-
-    QnThumbnailCacheAccessor
-    {
-        id: thumbnailCacheAccessor
-        resourceId: videoScreen.resourceId
-        onResourceIdChanged: refreshThumbnail()
-    }
-
-    Object
-    {
-        id: d
-
-        property bool showOfflineStatus: false
-        property bool cameraWarningVisible:
-            (showOfflineStatus
-                || videoScreenController.cameraUnauthorized
-                || videoScreenController.failed)
-            && !videoScreenController.mediaPlayer.playing
-
-        Timer
-        {
-            id: offlineStatusDelay
-            interval: 2000
-            onTriggered: d.showOfflineStatus = true
-        }
-    }
-
-    ScalableVideo
-    {
-        id: video
+        id: cameraDisplay
 
         anchors.fill: parent
-        visible: !dummyLoader.visible && !screenshot.visible
 
-        mediaPlayer: videoScreenController.mediaPlayer
-        resourceHelper: videoScreenController.resourceHelper
-    }
+        useClickEffect: false
 
-    Image
-    {
-        id: screenshot
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectFit
-        visible: status == Image.Ready
-        source: thumbnailCacheAccessor.thumbnailUrl
-    }
+        onNextCameraRequested:
+        {
+            layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
+            videoScreen.start()
+        }
+        onPreviousCameraRequested:
+        {
+            layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
+            videoScreen.start()
+        }
 
-    WheelSwitchArea
-    {
-        anchors.fill: parent
-        onPreviousRequested: previousCameraRequested()
-        onNextRequested: nextCameraRequested()
-        maxConsequentRequests: camerasModel ? camerasModel.count : 0
-    }
-
-    MouseArea
-    {
-        anchors.fill: parent
         onDoubleClicked: Workflow.popCurrentScreen()
-    }
 
-    Loader
-    {
-        id: dummyLoader
-        anchors.fill: parent
-        visible: active
-        sourceComponent: Component
-        {
-            VideoDummy
-            {
-                width: videoScreen.width
-                state: videoScreenController.dummyState
-            }
-        }
-
-        active: d.cameraWarningVisible
-    }
-
-    Loader
-    {
-        id: noCameraDummyLoader
-        anchors.fill: parent
-        visible: active
-        sourceComponent: SelectCameraDummy {}
-        active: resourceId === ""
+        Component.onCompleted: forceActiveFocus()
     }
 
     Loader
@@ -155,48 +59,18 @@ PageBase
             onCloseClicked:
             {
                 transformationsWarningLoader.active = false
-                videoScreenController.start()
+                cameraDisplay.videoScreenController.start()
+                cameraDisplay.forceActiveFocus()
             }
-        }
-    }
 
-    Keys.onPressed:
-    {
-        if (event.modifiers == Qt.ControlModifier)
-        {
-            if (event.key == Qt.Key_Left)
-            {
-                previousCameraRequested()
-                event.accepted = true
-            }
-            else if (event.key == Qt.Key_Right)
-            {
-                nextCameraRequested()
-                event.accepted = true
-            }
+            Keys.forwardTo: cameraDisplay
         }
-        else if (event.key == Qt.Key_Enter || event.key == Qt.Key_Return)
-        {
-            Workflow.popCurrentScreen()
-            event.accepted = true
-        }
-    }
-
-    onNextCameraRequested:
-    {
-        layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)
-        showTransformationsWarningIfNeeded()
-    }
-    onPreviousCameraRequested:
-    {
-        layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
-        showTransformationsWarningIfNeeded()
     }
 
     onActivePageChanged:
     {
         if (activePage && !transformationsWarningLoader.active)
-            videoScreenController.start()
+            cameraDisplay.videoScreenController.start()
     }
 
     onResourceIdChanged: hideTransformationsWarning()
@@ -204,14 +78,27 @@ PageBase
     function hideTransformationsWarning()
     {
         transformationsWarningLoader.active = false
+        cameraDisplay.forceActiveFocus()
     }
 
-    function showTransformationsWarningIfNeeded()
+    function start()
     {
+        var resourceHelper = cameraDisplay.videoScreenController.resourceHelper
+
         transformationsWarningLoader.active =
             resourceId !== ""
-                && !d.cameraWarningVisible
-                && (videoScreenController.resourceHelper.customRotation !== 0
-                    || videoScreenController.resourceHelper.customAspectRatio !== 0.0)
+                && !cameraDisplay.cameraWarningVisible
+                && (resourceHelper.customRotation !== 0
+                    || resourceHelper.customAspectRatio !== 0.0)
+
+        if (transformationsWarningLoader.active)
+        {
+            cameraDisplay.videoScreenController.stop()
+        }
+        else
+        {
+            cameraDisplay.videoScreenController.start()
+            cameraDisplay.forceActiveFocus()
+        }
     }
 }

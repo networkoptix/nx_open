@@ -20,9 +20,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <nx/client/desktop/radass/radass_types.h>
+#include <nx/client/desktop/radass/radass_resource_manager.h>
+
 #include <nx/client/ptz/ptz_helpers.h>
 #include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>

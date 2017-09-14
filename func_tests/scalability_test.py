@@ -6,13 +6,14 @@
 import pytest
 import yaml
 import logging
-import time
 import requests
 import datetime
 import traceback
 import json
+from requests.exceptions import ReadTimeout
 from functools import wraps
 import test_utils.utils as utils
+from test_utils.utils import GrowingSleep
 from test_utils.compare import compare_values
 import resource_synchronization_test as resource_test
 import server_api_data_generators as generator
@@ -20,12 +21,14 @@ from test_utils.utils import SimpleNamespace
 from multiprocessing import Pool as ThreadPool
 from test_utils.server import Server, MEDIASERVER_MERGE_TIMEOUT
 import transaction_log
+from memory_usage_metrics import load_host_memory_usage
 
 log = logging.getLogger(__name__)
 
 
-MERGE_DONE_CHECK_PERIOD = datetime.timedelta(seconds=10)
 SET_RESOURCE_STATUS_CMD = '202'
+CHECK_METHOD_TIMEOUT = datetime.timedelta(minutes=2)
+CHECK_METHOD_RETRY_COUNT = 5
 
 
 @pytest.fixture
@@ -46,11 +49,12 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
     assert config.SERVER_COUNT > 1, repr(config.SERVER_COUNT)  # Must be at least 2 servers
     if not config.USE_LIGHTWEIGHT_SERVERS:
         return []
-    log.info('Creating lightweight servers:')
+    lws_count = config.SERVER_COUNT - 1
+    log.info('Creating %d lightweight servers:', lws_count)
     start_time = utils.datetime_utc_now()
     # at least one full/real server is required for testing
     lws_list = lightweight_servers_factory(
-        config.SERVER_COUNT - 1,
+        lws_count,
         CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
         USERS_PER_SERVER=config.USERS_PER_SERVER,
         PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
@@ -154,12 +158,17 @@ def create_test_data(config, servers):
 # merge  ============================================================================================
 
 def get_response(server, method, api_object, api_method):
-    try:
-        return server.rest_api.get_api_fn(method, api_object, api_method)()
-    except Exception, x:
-        log.error("%r call '%s/%s' error: %s" % (server, api_object, api_method, str(x)))
-        return None
-
+    for i in range(CHECK_METHOD_RETRY_COUNT):
+        try:
+            return server.rest_api.get_api_fn(method, api_object, api_method)(timeout=CHECK_METHOD_TIMEOUT)
+        except ReadTimeout as x:
+            log.error('ReadTimeout when waiting for %s call %s/%s: %s', server, api_object, api_method, x)
+        except Exception as x:
+            log.error("%s call '%s/%s' error: %s", server, api_object, api_method, x)
+    log.error('Retry count exceeded limit (%d) for %s call %s/%s; seems server is deadlocked, will make core dump.',
+              CHECK_METHOD_RETRY_COUNT, server, api_object, api_method)
+    server.make_core_dump()
+    raise  # reraise last exception
 
 def clean_transaction_log(json):
     # We have to filter 'setResourceStatus' transactions due to VMS-5969
@@ -201,6 +210,7 @@ def save_json_artifact(artifact_factory, api_method, side_name, server, value):
 
 
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
+    growing_delay = GrowingSleep()
     api_call_start_time = utils.datetime_utc_now()
     while True:
         expected_result_dirty = get_response(servers[0], method, api_object, api_method)
@@ -231,7 +241,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
             save_json_artifact(artifact_factory, api_method, 'y', first_unsynced_server, unmatched_result)
             pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
                 merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
-        time.sleep(MERGE_DONE_CHECK_PERIOD.total_seconds())
+        growing_delay.sleep()
 
 
 def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
@@ -244,6 +254,22 @@ def wait_for_data_merged(artifact_factory, servers, merge_timeout, start_time):
             'getTransactionLog',
             ]:
         wait_for_method_matched(artifact_factory, servers, 'GET', 'ec2', api_method, start_time, merge_timeout)
+
+
+def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
+    if lightweight_servers:
+        reply = lightweight_servers[0].rest_api.api.p2pStats.GET()
+        metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
+        # for test with lightweight servers pick only hosts with lightweight servers
+        host_set = set(server.host for server in lightweight_servers)
+    else:
+        host_set = set(server.host for server in servers)
+    for host in host_set:
+        metrics = load_host_memory_usage(host)
+        for name in 'total used free used_swap mediaserver lws'.split():
+            metric_name = 'host_memory_usage.%s.%s' % (host.name, name)
+            metric_value = getattr(metrics, name)
+            metrics_saver.save(metric_name, metric_value)
 
 
 def test_scalability(artifact_factory, metrics_saver, config, lightweight_servers, servers):
@@ -266,6 +292,7 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         wait_for_data_merged(artifact_factory, lightweight_servers + servers, config.MERGE_TIMEOUT, start_time)
         merge_duration = utils.datetime_utc_now() - start_time
         metrics_saver.save('merge_duration', merge_duration)
+        collect_additional_metrics(metrics_saver, servers, lightweight_servers)
     finally:
         servers[0].load_system_settings(log_settings=True)  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False

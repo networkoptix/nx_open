@@ -12,11 +12,19 @@ option(rdepSync
     "Whether rdep should sync packages or use only existing copies"
     ON)
 
+option(addQtPdb
+    "Whether add Qt PDB files to debug libs"
+    OFF)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")
+
+if(targetDevice STREQUAL "none")
+    set(targetDevice "")
+endif()
 
 # Early loading rdep to download a toolchain if needed.
 include(build_utils/cmake/find_python.cmake)
@@ -120,12 +128,6 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
-if(withDesktopClient OR withTrayTool)
-    find_package(Qt5
-        COMPONENTS
-            Widgets)
-endif()
-
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
         COMPONENTS
@@ -145,6 +147,9 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_subdirectory(wixsetup)
+    endif()
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
@@ -162,6 +167,10 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
 endif()
 
+if(withTestCamera)
+    add_subdirectory(testcamera)
+endif()
+
 if(withTrayTool)
     add_subdirectory(traytool)
 endif()
@@ -173,6 +182,10 @@ endif()
 if(withTests)
     add_subdirectory(unit_tests)
     add_subdirectory(tests)
+endif()
+
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+    add_subdirectory(edge_firmware)
 endif()
 
 include(fix_qt_vars)

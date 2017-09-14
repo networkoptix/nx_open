@@ -105,8 +105,8 @@ protected:
 
         if (m_listenResponse)
         {
-            ASSERT_TRUE(m_listenResponse->trafficRelayUrl);
-            ASSERT_EQ(m_relayUrl, m_listenResponse->trafficRelayUrl->toStdString());
+            ASSERT_TRUE(!m_listenResponse->trafficRelayUrls.empty());
+            ASSERT_EQ(m_relayUrl, m_listenResponse->trafficRelayUrls.front().toStdString());
         }
 
         if (m_connectResponse)

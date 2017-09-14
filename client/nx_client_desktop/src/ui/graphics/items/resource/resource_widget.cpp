@@ -170,13 +170,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this](bool animated)
         {
-            const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
-            setOverlayWidgetVisible(m_statusOverlay, !isEmptyOverlay, animated);
+            const auto visibility = (m_statusController->statusOverlay() == Qn::EmptyOverlay)
+                ? Invisible
+                : Visible;
+            setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
             updateOverlayButton();
         });
 
-    addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
-    setOverlayWidgetVisible(m_statusOverlay, false, false);
+    addOverlayWidget(m_statusOverlay, detail::OverlayParams(Invisible, true, false, StatusLayer));
 
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
@@ -555,7 +556,32 @@ QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
 
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
-    QSizeF result = base_type::sizeHint(which, constraint);
+    QSizeF result;
+    switch (which)
+    {
+        case Qt::MinimumSize:
+        {
+            static const qreal kMinPartOfCell = 0.25;
+            static const qreal kMinimalWidth = qnGlobals->workbenchUnitSize() * kMinPartOfCell;
+            static const qreal kMinimalHeight = kMinimalWidth
+                / qnGlobals->defaultLayoutCellAspectRatio();
+            result = QSizeF(kMinimalWidth, kMinimalHeight);
+            break;
+        }
+        case Qt::MaximumSize:
+        {
+            static const int kMaxCells = 64;
+            static const qreal kMaximalWidth = qnGlobals->workbenchUnitSize() * kMaxCells;
+            static const qreal kMaximalHeight = kMaximalWidth
+                / qnGlobals->defaultLayoutCellAspectRatio();
+            result = QSizeF(kMaximalWidth, kMaximalHeight);
+            break;
+        }
+
+        default:
+            result = base_type::sizeHint(which, constraint);
+            break;
+    }
 
     if (!hasAspectRatio())
         return result;

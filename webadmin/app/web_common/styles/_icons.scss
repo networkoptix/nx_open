@@ -84,6 +84,7 @@
   }
 }
 
+.glyphicon-server-online,
 .glyphicon-server-active,
 .glyphicon-server-offline
 {
@@ -92,9 +93,15 @@
   height: 22px;
   width: 22px;
 }
-.glyphicon-server-active{
-  background-position: -1px -170px;
+
+.glyphicon-server-online{
+  background-position: -2px -170px;
 }
+
+.glyphicon-server-active{
+  background-position: -26px -170px;
+}
+
 .glyphicon-server-offline{
   background-position: -50px -170px
 }
@@ -126,6 +133,14 @@
     background-position: -73px -61px;
   }
 }
+
+.camera-links-panel .glyphicon-remove{
+  @include kill-glyphicon;
+  height: 18px !important;
+  width: 18px !important;
+  background-position: -148px -52px;
+}
+
 .camera-preview-offline,
 .camera-preview-unauthorized{
   @include icon;
@@ -138,7 +153,7 @@
 }
 
 .camera-preview-offline{
-  background-position: -24px -191px;
+  background-position: -23px -191px;
 }
 .camera-preview-unauthorized{
   background-position: 1px -191px;

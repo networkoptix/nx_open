@@ -25,7 +25,8 @@ angular.module('nxCommon')
             id = id.replace('{','').replace('}','');
             for(var serverId in this.cameras) {
                 var cam = _.find(this.cameras[serverId], function (camera) {
-                    return camera.id.replace('{','').replace('}','') === id;
+                    return (camera.id.replace('{','').replace('}','') === id) ||
+                           (camera.physicalId.replace('{','').replace('}','') === id);
                 });
                 if(cam){
                     return cam;
@@ -206,6 +207,7 @@ angular.module('nxCommon')
             function serverSorter(server){
                 server.url = self.extractDomain(server.url);
                 server.collapsed = self.storage.serverStates[server.id];
+                server.active = server.id == Config.currentServerId;
 
 
                 if(typeof(server.visible) === 'undefined'){

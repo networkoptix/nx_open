@@ -40,7 +40,9 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui(new Ui::LdapUsersDialog),
     m_timeoutTimer(new QTimer(this)),
     m_rolesModel(new QnUserRolesModel(this,
-        QnUserRolesModel::StandardRoleFlag | QnUserRolesModel::UserRoleFlag))
+        QnUserRolesModel::StandardRoleFlag
+      | QnUserRolesModel::UserRoleFlag
+      | QnUserRolesModel::AssignableFlag))
 {
     ui->setupUi(this);
 

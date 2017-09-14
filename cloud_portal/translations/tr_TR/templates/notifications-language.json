@@ -6,12 +6,12 @@
     "emailSubject":"Parolanı sıfırla"
   },
   "system_invite":{
-    "emailSubject":"Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+    "emailSubject":"Video sistemi {{message.system_name}} sizinle paylaşıldı"
   },
   "system_shared":{
-    "emailSubject":"Video sistemi {{message.system_name}} sizinle paylaşılan yapıldı"
+    "emailSubject":"Video sistemi {{message.system_name}} sizinle paylaşıldı"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"Sürüm {{message.id}} incelenmeye hazır"
   }
 }

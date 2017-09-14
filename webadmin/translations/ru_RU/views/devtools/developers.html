@@ -1,0 +1,65 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div ng-if="developersFeedbackForm">
+        <h2>Developer Tools</h2>
+        <p>
+            Are you happy developing intergrations? Let us know.
+        </p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+    </div>
+
+    <div>
+        <h3>Генератор произвольных событий</h3>
+        <p>
+            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
+            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
+            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+        </p>
+        <p><a href="#/developers/events">Генератор произвольных событий</a></p>
+    </div>
+    <div>
+        <h3>API сервера</h3>
+        <p>
+            API сервера обеспечивает стандартный набор API вызовов для внешних систем. Это дает возможность разработчикам получать доступ к почти каждой функции системы, доступной в обычном клиенте: запросу и управлению системными ресурсами (серверы, камеры, пользователи, полномочия), получению живого видео или архива из системы, генерирации событий, созданию правил, управлению PTZ-камерами и многому другому.
+        </p>
+        <p>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+        </p>
+
+    </div>
+    <div>
+        <h3>Панель сведений о камере</h3>
+        <p>
+            Special panel for a webclient which displays additional information for cameras:
+        </p>
+        <ul>
+            <li>Идентификатор камеры</li>
+            <li>Links for all available video-streams</li>
+            <li>Direct export video from browser</li>
+        </ul>
+        <p>
+            Чтобы открыть панель сведений о камере - откройте <a href="#/view">web-клиент</a>, выберите камеру, 
+            значок настроек (шестеренка), затем выберите «Сведения о камере»
+        </p>
+        <p><a href="#/view/?cameraLinks">открыть панель сведений о камере</a></p>
+    </div>
+    <div>
+        <h3>SDK для интеграции источников видео</h3>
+        <p>
+            SDK предоставляет возможность интеграции практически любого источника живого или записанного видео (IP-камер, NVR, цифровых видеорегистраторов, и т. д.) в систему. SDK позволяет создавать методы для обнаружения, отображения, анализа и записи видео. Также возможно интегрировать порты устройств ввода-вывода и данные обнаружения движения.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >получить пакет SDK</a></p>
+    </div>
+
+    <div>
+        <h3>SDK для интеграции хранилищ</h3>
+        <p>
+            SDK хранения данных предоставляет возможность интеграции потенциальных хранилищ в систему. Это позволяет разработчикам выполнять операции чтения/записи в любое место хранения: местное, удаленное и даже облачное. Создание плагина хранения данных требует реализации стандартных функций таких как: потоковый ввод-вывод, проверка существования файла, удаление файла, получения списка файлов в папке и др. SDK также содержит пример использования FTP-сервера в качестве хранилища.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >получить пакет SDK</a></p>
+    </div>
+</div>

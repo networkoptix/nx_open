@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>Minden figyelmeztetés visszaállítása</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>Az Intel HD Graphics megjelenítésének problémái lehetnek, ha az elmosódás engedélyezve van. Javasoljuk, hogy hagyja el az opciót alapbeállításon.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>Elmosódás letiltása</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>Azonnali</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Külső tárhely hozzáadása...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Verzió:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Ellenőrzés</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>Nem ellenőrzött</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>A telepített verzió beszerzése</translation>
     </message>
   </context>
   <context>
@@ -462,6 +444,11 @@
       <source>Event Log...</source>
       <translation>Eseménynapló...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Teszt</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about: blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Haladó beállítások nem elérhetők</translation>
     </message>
@@ -901,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Maradjon bejelentkezve</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Hibás e-mail cím vagy jelszó</translation>
     </message>
   </context>
   <context>
@@ -1632,7 +1609,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>További információk megjelenítése a faszerkezetben</translation>
+      <translation>Kiegészítő információk megjelenítése az eszközfában</translation>
     </message>
     <message>
       <location/>
@@ -1642,7 +1619,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Showreel ciklus</translation>
     </message>
   </context>
   <context>
@@ -1901,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>Maradjon bejelentkezve</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Hibás e-mail cím vagy jelszó</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2084,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>Figyelem: már létezik ilyen nevű mappa!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>Szerverek frissítése</translation>
     </message>
   </context>
   <context>

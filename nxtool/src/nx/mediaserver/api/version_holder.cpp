@@ -78,9 +78,19 @@ bool VersionHolder::operator < (const VersionHolder &other) const
     return (m_data < other.m_data);
 }
 
+bool VersionHolder::operator <= (const VersionHolder &other) const
+{
+    return (m_data <= other.m_data);
+}
+
 bool VersionHolder::operator > (const VersionHolder &other) const
 {
     return (m_data > other.m_data);
+}
+
+bool VersionHolder::operator >= (const VersionHolder &other) const
+{
+    return (m_data >= other.m_data);
 }
 
 bool VersionHolder::operator == (const VersionHolder &other) const

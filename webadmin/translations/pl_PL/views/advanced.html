@@ -1,25 +1,25 @@
 <div class="container">
-    <h1>Advanced server settings</h1>
+    <h1>Zaawansowane ustawienia serwera</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Uwaga! </b> Wszelkie zmiany na tej stronie mogą spowodować nieprawidłowe działanie serwera.
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>Magazyn danych</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
             <thead>
                 <tr>
                     <th >
-                        URL
+                        Adres URL
                     </th>
                     <th width="200">
-                        Free Space
+                        Dostępna przestrzeń
                     </th>
                     <th width="150">
-                        Reserved Space
+                        Zarezerwowana przestrzeń
                     </th>
                     <th >
                     </th>
@@ -40,7 +40,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} z {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -54,7 +54,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                Niedostępne
                             </div>
                         </div>
                     </td>
@@ -67,14 +67,14 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Reserved space"/>
+ placeholder="Zarezerwowana przestrzeń"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
+ placeholder="Zarezerwowana przestrzeń"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -86,7 +86,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Use for writing"/>
+                                   placeholder="Używaj do nagrywania"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -103,45 +103,45 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            No main storage drive was selected for writing - video will not be recorded on this server.
+            Nie wybrano głównego magazynu do nagrywania - dane wideo nie będą nagrywane na tym serwerze.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Zarezerwowana przestrzeń jest większa niż dostępna przestrzeń. Bieżące materiały mogą zostać usunięte w celu zwiększenia dostępnej przestrzeni.
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Skonfiguruj podświetlone ustawienia, aby je zapisać.</div>
 
         <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Zachowaj</button>
         <button class="btn btn-warning" ng-click="cancel()">Anuluj</button>
     </form>
 
-    <h2>Log settings</h2>
+    <h2>Ustawienia dziennika</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div class="form-group">
-            <label class="col-sm-4">Main log level</label>
+            <label class="col-sm-4">Poziom dziennika głównego</label>
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                    <option value="NONE">Brak: rejestrowanie w dzienniku jest wyłączone.</option>
+                    <option value="ALWAYS">Ważne: rejestruj błędy, ostrzeżenia i najważniejsze komunikaty.</option>
+                    <option value="ERROR">Błędy: rejestruj tylko błędy.</option>
+                    <option value="WARNING">Ostrzeżenia: rejestruj ostrzeżenia i błędy.</option>
+                    <option value="INFO">Wszystko: rejestruj błędy, ostrzeżenia i wszystkie komunikaty.</option>
+                    <option value="DEBUG">Debug: rejestruj wszystkie komunikaty systemowe i programistyczne.</option>
+                    <option value="DEBUG2">Debug2: rejestruj wszystkie komunikaty systemowe i rozszerzone programistyczne.</option>
                 </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">Transaction log level</label>
+            <label class="col-sm-4">Poziom dziennika transakcji</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                    <option value="NONE">Brak: rejestrowanie w dzienniku jest wyłączone.</option>
+                    <option value="ALWAYS">Ważne: rejestruj błędy, ostrzeżenia i najważniejsze komunikaty.</option>
+                    <option value="ERROR">Błędy: rejestruj tylko błędy.</option>
+                    <option value="WARNING">Ostrzeżenia: rejestruj ostrzeżenia i błędy.</option>
+                    <option value="INFO">Wszystko: rejestruj błędy, ostrzeżenia i wszystkie komunikaty.</option>
+                    <option value="DEBUG">Debug: rejestruj wszystkie komunikaty systemowe i programistyczne.</option>
+                    <option value="DEBUG2">Debug2: rejestruj wszystkie komunikaty systemowe i rozszerzone programistyczne.</option>
                 </select>
             </div>
         </div>
@@ -151,20 +151,20 @@
         </div>
     </form>
 
-    <h2>Manual update</h2>
+    <h2>Aktualizacja ręczna</h2>
     <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
         <div class="form-group">
-            <label class="col-sm-4">Upload installer</label>
+            <label class="col-sm-4">Prześlij pakiet instalacyjny</label>
             <div class="col-sm-8">
                 <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Please ensure the configuration is correct.</p>
+                <p class="help-block">Sprawdź poprawność konfiguracji.</p>
             </div>
         </div>
     </form>
 
-    <h1>Advanced system settings</h1>
+    <h1>Zaawansowane ustawienia systemu</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Uwaga! </b> Wszelkie zmiany na tej stronie mogą spowodować nieprawidłowe działanie serwera.
     </div>
 
     <form class="form row" role="form" name="systemSettings" novalidate>
@@ -208,9 +208,9 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Uwaga!</b> Niektóre zmiany wymagają ponownego uruchomienia <b>wszystkich</b> serwerów w systemie.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >Uruchom ponownie bieżący serwer</button>
         </div>
     </div>
 </div>

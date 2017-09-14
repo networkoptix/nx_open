@@ -3,6 +3,7 @@
 #include <api/model/password_data.h>
 
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/raii_guard.h>
 
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_properties.h>
@@ -10,9 +11,22 @@
 #include <common/common_module.h>
 #include "resource.h"
 
-namespace {
-    static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
-    static const int MSEC_PER_SEC = 1000;
+namespace
+{
+static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
+static const int MSEC_PER_SEC = 1000;
+
+QnRaiiGuardPtr createSignalGuard(
+    QnUserResource* resource,
+    void (QnUserResource::*targetSignal)(const QnResourcePtr&))
+{
+    return QnRaiiGuard::createDestructible(
+        [resource, targetSignal]()
+        {
+            (resource->*targetSignal)(::toSharedPointer(resource));
+        });
+}
+
 }
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
@@ -47,6 +61,23 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_fullName(right.m_fullName),
     m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
 {
+}
+
+template<typename T>
+bool QnUserResource::setMemberChecked(
+    T QnUserResource::* member,
+    T value,
+    MiddlestepFunction middlestep)
+{
+    QnMutexLocker locker(&m_mutex);
+    if (this->*member == value)
+        return false;
+
+    if (middlestep)
+        middlestep();
+
+    this->*member = value;
+    return true;
 }
 
 Qn::UserRole QnUserResource::userRole() const
@@ -89,13 +120,8 @@ QByteArray QnUserResource::getHash() const
 
 void QnUserResource::setHash(const QByteArray& hash)
 {
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_hash == hash)
-            return;
-        m_hash = hash;
-    }
-    emit hashChanged(::toSharedPointer(this));
+    if (setMemberChecked(&QnUserResource::m_hash, hash))
+        emit hashChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getPassword() const
@@ -104,15 +130,17 @@ QString QnUserResource::getPassword() const
     return m_password;
 }
 
-void QnUserResource::setPassword(const QString& password)
+void QnUserResource::setPasswordAndGenerateHash(const QString& password)
 {
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_password == password)
-            return;
-        m_password = password;
-    }
-    emit passwordChanged(::toSharedPointer(this));
+    const bool emitChangedSignal = setMemberChecked(&QnUserResource::m_password, password);
+    updateHash();
+    if (emitChangedSignal)
+        emit passwordChanged(::toSharedPointer(this));
+}
+
+void QnUserResource::resetPassword()
+{
+    setMemberChecked(&QnUserResource::m_password, QString());
 }
 
 QString QnUserResource::decodeLDAPPassword() const
@@ -126,18 +154,30 @@ QString QnUserResource::decodeLDAPPassword() const
     return QString::fromUtf8(nx::utils::encodeSimple(encodedPassword, salt));
 }
 
-void QnUserResource::generateHash()
+void QnUserResource::updateHash()
 {
     QString password = getPassword();
     if (password.isEmpty())
         return;
 
-    auto hashes = PasswordData::calculateHashes(getName(), password, isLdap());
+    const auto hashes = PasswordData::calculateHashes(getName(), password, isLdap());
 
-    setRealm(hashes.realm);
-    setHash(hashes.passwordHash);
-    setDigest(hashes.passwordDigest);
-    setCryptSha512Hash(hashes.cryptSha512Hash);
+    using SignalGuardList = QList<QnRaiiGuardPtr>;
+
+    SignalGuardList guards;
+
+    const auto resource = ::toSharedPointer(this);
+    if (setMemberChecked(&QnUserResource::m_realm, hashes.realm))
+        guards.append(createSignalGuard(this, &QnUserResource::realmChanged));
+
+    if (setMemberChecked(&QnUserResource::m_hash, hashes.passwordHash))
+        guards.append(createSignalGuard(this, &QnUserResource::hashChanged));
+
+    if (setMemberChecked(&QnUserResource::m_digest, hashes.passwordDigest))
+        guards.append(createSignalGuard(this, &QnUserResource::digestChanged));
+
+    if (setMemberChecked(&QnUserResource::m_cryptSha512Hash, hashes.cryptSha512Hash))
+        guards.append(createSignalGuard(this, &QnUserResource::cryptSha512HashChanged));
 }
 
 bool QnUserResource::checkLocalUserPassword(const QString &password)
@@ -160,21 +200,17 @@ bool QnUserResource::checkLocalUserPassword(const QString &password)
     return md5.result().toHex() == values[2];
 }
 
-void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)
+void QnUserResource::setDigest(const QByteArray& digest)
 {
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_digest == digest)
-            return;
-        if (m_userType == QnUserType::Ldap)
+    const auto middlestep =
+        [this]()
         {
-            m_passwordExpirationTimestamp = isValidated
-                ? qnSyncTime->currentMSecsSinceEpoch() + LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC
-                : 0;
-        }
-        m_digest = digest;
-    }
-    emit digestChanged(::toSharedPointer(this));
+            if (m_userType == QnUserType::Ldap)
+                m_passwordExpirationTimestamp = 0;
+        };
+
+    if (setMemberChecked(&QnUserResource::m_digest, digest, middlestep))
+        emit digestChanged(::toSharedPointer(this));
 }
 
 QByteArray QnUserResource::getDigest() const
@@ -185,13 +221,8 @@ QByteArray QnUserResource::getDigest() const
 
 void QnUserResource::setCryptSha512Hash(const QByteArray& cryptSha512Hash)
 {
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_cryptSha512Hash == cryptSha512Hash)
-            return;
-        m_cryptSha512Hash = cryptSha512Hash;
-    }
-    emit cryptSha512HashChanged(::toSharedPointer(this));
+    if (setMemberChecked(&QnUserResource::m_cryptSha512Hash, cryptSha512Hash))
+        emit cryptSha512HashChanged(::toSharedPointer(this));
 }
 
 QByteArray QnUserResource::getCryptSha512Hash() const
@@ -208,8 +239,8 @@ QString QnUserResource::getRealm() const
 
 void QnUserResource::setRealm(const QString& realm)
 {
-    QnMutexLocker locker(&m_mutex);
-    m_realm = realm;
+    if (setMemberChecked(&QnUserResource::m_realm, realm))
+        emit realmChanged(::toSharedPointer(this));
 }
 
 Qn::GlobalPermissions QnUserResource::getRawPermissions() const
@@ -220,13 +251,8 @@ Qn::GlobalPermissions QnUserResource::getRawPermissions() const
 
 void QnUserResource::setRawPermissions(Qn::GlobalPermissions permissions)
 {
-    {
-        QnMutexLocker locker(&m_mutex);
-        if (m_permissions == permissions)
-            return;
-        m_permissions = permissions;
-    }
-    emit permissionsChanged(::toSharedPointer(this));
+    if (setMemberChecked(&QnUserResource::m_permissions, permissions))
+        emit permissionsChanged(::toSharedPointer(this));
 }
 
 bool QnUserResource::isBuiltInAdmin() const

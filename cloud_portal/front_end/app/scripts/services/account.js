@@ -95,7 +95,7 @@ angular.module('cloudApp')
                 var self = this;
                 this.get().then(function(){
                     // logoutAuthorisedLogoutButton
-                    dialogs.confirm(L.dialogs.logoutAuthorisedText,
+                    dialogs.confirm(null /*L.dialogs.logoutAuthorisedText*/,
                         L.dialogs.logoutAuthorisedTitle,
                         L.dialogs.logoutAuthorisedContinueButton,
                         null,

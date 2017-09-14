@@ -8,6 +8,9 @@
 #include <utils/common/synctime.h>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
+
+#include <nx/client/desktop/radass/radass_controller.h>
 
 #include "core/resource/camera_resource.h"
 #include "nx/streaming/media_data_packet.h"
@@ -15,7 +18,6 @@
 
 #include "decoders/audio/ffmpeg_audio_decoder.h"
 #include "nx/streaming/archive_stream_reader.h"
-#include "redass/redass_controller.h"
 
 #include "video_stream_display.h"
 #include "audio_stream_display.h"
@@ -175,8 +177,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 
 QnCamDisplay::~QnCamDisplay()
 {
-    if (qnRedAssController)
-        qnRedAssController->unregisterConsumer(this);
+    qnClientModule->radassController()->unregisterConsumer(this);
 
     NX_ASSERT(!isRunning());
     stop();
@@ -325,8 +326,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
             if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2)
             {
                 QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
-                if (qnRedAssController)
-                    qnRedAssController->onSlowStream(reader);
+                qnClientModule->radassController()->onSlowStream(reader);
             }
         }
     }
@@ -353,16 +353,18 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount = qMax(0, m_delayedFrameCount);
             m_delayedFrameCount++;
             if (m_delayedFrameCount > 10 && m_archiveReader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
-                if (qnRedAssController)
-                    qnRedAssController->onSlowStream(m_archiveReader);
+            {
+                qnClientModule->radassController()->onSlowStream(m_archiveReader);
+            }
         }
         else if (realSleepTime >= 0)
         {
             m_delayedFrameCount = qMin(0, m_delayedFrameCount);
             m_delayedFrameCount--;
             if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
-                if (qnRedAssController)
-                    qnRedAssController->streamBackToNormal(m_archiveReader);
+            {
+                qnClientModule->radassController()->streamBackToNormal(m_archiveReader);
+            }
         }
     }
 }
@@ -460,7 +462,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (!m_forceMtDecoding)
     {
-        bool canSwitchToMT = isFullScreen() || (qnRedAssController && qnRedAssController->counsumerCount() == 1);
+        bool canSwitchToMT = isFullScreen()
+            || qnClientModule->radassController()->consumerCount() == 1;
+
         bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
         if (canSwitchToMT && shouldSwitchToMT)
         {
@@ -1350,7 +1354,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                if (isFillerPacket && m_display[i])
+                if( m_display[i] )
                     m_display[i]->overrideTimestampOfNextFrameToRender(emptyData->timestamp);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }
@@ -1978,6 +1982,11 @@ void QnCamDisplay::setOverridenAspectRatio(qreal aspectRatio)
 {
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         m_display[i]->setOverridenAspectRatio(aspectRatio);
+}
+
+QnMediaResourcePtr QnCamDisplay::resource() const
+{
+    return m_resource;
 }
 
 qint64 QnCamDisplay::initialLiveBufferMkSecs()

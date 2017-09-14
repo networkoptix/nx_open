@@ -1,0 +1,64 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div ng-if="developersFeedbackForm">
+        <h2>Narzędzia programistyczne</h2>
+        <p>
+            Czy jesteś zadowolony z mechanizmów umożliwiających integrację ? Daj nam znać.
+        </p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Wystaw opinię</a></p>
+    </div>
+
+    <div>
+        <h3>Generator zdarzeń</h3>
+        <p>
+            Zdarzenia generowane to specjalny rodzaj zdarzeń, które mogą być generowane przez systemy innych firm i mogą powodować automatyczne reakcje systemu VMS.
+            Aby wygenerować zdarzenie na serwerze, należy wysłać do niego zapytanie HTTP (używając API serwera).
+            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+        </p>
+        <p><a href="#/developers/events">Generator zdarzeń</a></p>
+    </div>
+    <div>
+        <h3>API serwera</h3>
+        <p>
+            API serwera zawiera standardowy zestaw wywołań API dla systemów innych firm. Umożliwia programistom dostęp do niemal każdej funkcji podstawowej aplikacji klienckiej: zarządzanie zasobami systemu (serwerami, kamerami, użytkownikami, uprawnieniami), uzyskiwanie wideo na żywo z kamer lub z archiwum nagrań, generowanie zdarzeń, tworzenie reguł, sterowanie kamerami PTZ i wiele innych.
+        </p>
+        <p>
+            <a href="#/developers/api"><b>Narzędzie testowania API (nowe)</b></a>
+            - interaktywna dokumentacja z narzędziami do testowania wywołań API<br>
+            <a href="#/developers/changelog">API changelog</a>
+            - lista istotnych zmian w API<br>
+            <a id="api-doc" href="api.xml" target="_blank">dokumentacja API</a>
+        </p>
+
+    </div>
+    <div>
+        <h3>Panel szczegółowy kamery</h3>
+        <p>
+            Specjalny panel WWW, który wyświetla dodatkowe informacje dotyczące kamer:
+        </p>
+        <ul>
+            <li>ID kamery</li>
+            <li>Linki dla wszystkich dostępnych strumieni wideo</li>
+            <li>Bezpośredni eksport wideo z przeglądarki</li>
+        </ul>
+        <p>
+            Aby otworzyć panel szczegółowy kamery - otwórz <a href="#/view">klienta WWW</a>, wybierz kamerę, ikonę ustawień (koło zębate), a następnie wybierz "Szczegóły kamery"
+        </p>
+        <p><a href="#/view/?cameraLinks">otwórz panel szczegółowy kamery</a></p>
+    </div>
+    <div>
+        <h3>Pakiet SDK do integrowania nowych źródeł wideo</h3>
+        <p>
+            Pakiet Video Source Integration SDK umożliwia zintegrowanie systemu z praktycznie każdym źródłem wideo generującym obraz na żywo lub do pliku (np. kamery IP, rejestratory itp.). SDK umożliwia tworzenie metod wykrywania, wyświetlania, analizowania i nagrywania wideo. Pozwala również na integrację detekcji ruchu oraz portów I/O wbudowanych w urządzeniach.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >pobierz SDK</a></p>
+    </div>
+
+    <div>
+        <h3>Pakiet SDK do integrowania pamięci masowych</h3>
+        <p>
+            Pakiet Storage SDK umożliwia zintegrowanie nietypowych pamięci masowych. Umożliwia programistom odczyt lub zapis nagrań w dowolnych magazynach: lokalnych i zdalnych, nawet w chmurze. Utworzenie wtyczki pamięci masowej wymaga zaimplementowania standardowych funkcji, takich jak strumieniowanie I/O, "jeśli plik istnieje", "usuń plik", "lista plików w folderze" itp. To SDK zawiera również przykład użycia serwera FTP jako magazynu danych.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >pobierz SDK</a></p>
+    </div>
+</div>

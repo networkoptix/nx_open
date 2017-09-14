@@ -82,6 +82,15 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>Próba</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>Analóg</translation>
     </message>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>Analóg enkóder</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>Próbalicenc</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>Ingyenes licenc</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Idő</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation>Idő licencek</translation>
     </message>
   </context>
   <context>
@@ -651,10 +660,6 @@
       <translation>Ismeretlen</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>Próbalicenc</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>Ingyenes licence</translation>
     </message>
@@ -669,6 +674,10 @@
     <message>
       <source>Hardware Id: %1</source>
       <translation>Hardver ID: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation>Idő licenc</translation>
     </message>
   </context>
   <context>
@@ -704,12 +713,12 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Legalacsonyabb</translation>
+      <translation>La</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Alacsony</translation>
+      <translation>A</translation>
     </message>
     <message>
       <source>Me</source>
@@ -719,7 +728,7 @@
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Magas</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>Bst</source>

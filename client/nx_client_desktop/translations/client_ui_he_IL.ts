@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>אפס את כל האזהרות</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>תצוגת Intel HD Graphics עשויה להיתקל בבעיות אם הטשטוש מופעל. אנו ממליצים בחום להשאיר את האופציה כמו שהיא.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>בטל טשטוש</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>מיידי</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>הוסף אחסון חיצוני...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>גירסה:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>בדוק</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>לא נבדק</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>קבל גירסאות מותקנות</translation>
     </message>
   </context>
   <context>
@@ -462,6 +444,11 @@
       <source>Event Log...</source>
       <translation>יומן אירועים...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>בדיקה</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>הגדרות מתקדמות אינן זמינות</translation>
     </message>
@@ -901,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>השאר מחובר</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>
@@ -1642,7 +1619,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>מחזור סרטון</translation>
     </message>
   </context>
   <context>
@@ -1901,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>השאר מחובר</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמא שגויים</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2084,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>אזהרה: קובץ בשם זהה כבר קיים!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>עדכן שרתים</translation>
     </message>
   </context>
   <context>

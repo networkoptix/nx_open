@@ -28,13 +28,18 @@ extern "C" {
 
 using namespace nx::utils;
 
+namespace {
+
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;
 char SIGN_TEXT_DELIMITER('\\');
 char SIGN_TEXT_DELIMITER_REPLACED('/');
+static constexpr int kSignatureSize = 512;
 
 QByteArray INITIAL_SIGNATURE_MAGIC("BCDC833CB81C47bc83B37ECD87FD5217"); // initial MD5 hash
 QByteArray SIGNATURE_XOR_MAGIC = QByteArray::fromHex("B80466320F15448096F7CEE3379EEF78");
+
+} // namespace
 
 
 int getSquareSize(int width, int height, int signBits)
@@ -67,7 +72,7 @@ QnSignHelper::QnSignHelper(QnCommonModule* commonModule, QObject* parent):
     QnCommonModuleAware(commonModule),
     m_cachedMetric(QFont()),
     m_outPacket(av_packet_alloc()),
-    m_licenseValidator(new QnLicenseValidator(this))
+    m_licenseValidator(new QnLicenseValidator(commonModule, this))
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
@@ -745,14 +750,16 @@ QByteArray QnSignHelper::getSignMagic()
     return INITIAL_SIGNATURE_MAGIC;
 }
 
+QByteArray QnSignHelper::makeSignature(QByteArray source)
+{
+    while (source.size() < kSignatureSize)
+        source.append(" ");
+    return source.mid(0, kSignatureSize);
+}
+
 char QnSignHelper::getSignPatternDelim()
 {
     return SIGN_TEXT_DELIMITER;
-}
-
-int QnSignHelper::getMaxSignSize()
-{
-    return 512;
 }
 
 QByteArray QnSignHelper::getSignPattern(QnLicensePool* licensePool)

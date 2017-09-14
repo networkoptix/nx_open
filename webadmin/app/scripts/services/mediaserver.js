@@ -34,6 +34,7 @@ angular.module('webadminApp')
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
                     Config.cloud.systemId = data.cloudSystemId;
                     Config.protoVersion = data.protoVersion;
+                    Config.currentServerId = data.id;
                 }
 
                 var ips = _.filter(data.remoteAddresses,function(address){
@@ -332,6 +333,9 @@ angular.module('webadminApp')
                 return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
             },
+            disconnectFromSystem:function(){
+                return wrapPost(proxy + '/web/api/detachFromSystem');
+            },
             restoreFactoryDefaults:function(){
                 return wrapPost(proxy + '/web/api/restoreState');
             },
@@ -475,12 +479,16 @@ angular.module('webadminApp')
                 });
             },
 
-            debugFunctionUrl:function(url, getParams){
+            debugFunctionUrl:function(url, getParams, credentials){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
                 var params = '';
-                if (!window.location.origin) {
-                    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-                }
+
+                credentials = credentials ? (credentials.login + ":" + credentials.password + "@") : "";
+                var host = window.location.protocol + "//" +
+                           credentials +
+                           window.location.hostname +
+                           (window.location.port ? ':' + window.location.port: '');
+
                 if(getParams && !_.isEmpty(getParams)){
                     params = delimeter + $.param(getParams);
                 }
@@ -490,7 +498,7 @@ angular.module('webadminApp')
                     url = '/' + url;
                 }
                 url = url.replace('//','/');
-                return window.location.origin + url;
+                return host + url;
             },
             debugFunction:function(method, url, getParams, postParams, binary){
                 switch(method){

@@ -79,8 +79,6 @@
 
 #include <recording/time_period_list.h>
 
-#include <redass/redass_controller.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/about_dialog.h>
@@ -160,6 +158,7 @@
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/utils/app_info.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -214,7 +213,6 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
-    connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
 
     connect(action(action::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
@@ -295,6 +293,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(action::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
 
+    connect(action(action::ConvertCameraToEntropix), &QAction::triggered,
+        this, &ActionHandler::at_convertCameraToEntropix_triggered);
+
     connect(action(action::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
         [this]
         {
@@ -323,9 +324,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::Rotate90Action), &QAction::triggered, this, [this] { rotateItems(90); });
     connect(action(action::Rotate180Action), &QAction::triggered, this, [this] { rotateItems(180); });
     connect(action(action::Rotate270Action), &QAction::triggered, this, [this] { rotateItems(270); });
-    connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::AutoResolution); });
-    connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::LowResolution); });
-    connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::HighResolution); });
     connect(action(action::SetAsBackgroundAction), SIGNAL(triggered()), this, SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(action::WhatsThisAction), SIGNAL(triggered()), this, SLOT(at_whatsThisAction_triggered()));
     connect(action(action::EscapeHotkeyAction), SIGNAL(triggered()), this, SLOT(at_escapeHotkeyAction_triggered()));
@@ -484,11 +482,6 @@ void ActionHandler::rotateItems(int degrees) {
     }
 }
 
-void ActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    if (qnRedAssController)
-        qnRedAssController->setMode(resolutionMode);
-}
-
 void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
 {
     // TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
@@ -633,12 +626,6 @@ void ActionHandler::at_workbench_cellSpacingChanged()
         action(action::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
 }
 
-void ActionHandler::at_workbench_currentLayoutChanged() {
-    action(action::RadassAutoAction)->setChecked(true);
-    if (qnRedAssController)
-        qnRedAssController->setMode(Qn::AutoResolution);
-}
-
 void ActionHandler::at_nextLayoutAction_triggered()
 {
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
@@ -659,6 +646,20 @@ void ActionHandler::at_previousLayoutAction_triggered()
 
 void ActionHandler::at_openInLayoutAction_triggered()
 {
+    /**
+     * When we add widget (possibliy with animation) to the scene, whole scene may loose
+     * ability to handle hover events.
+     * TODO: #ynikitenkov. Investigate problem and get rid of this ugly workaround
+     */
+    const auto uglyMacOsHoverWorkaround = nx::utils::AppInfo::isMacOsX()
+        ? QnRaiiGuard::create(
+            []() { QCursor::setPos(QPoint(0, 0)); },
+            [this, mp = QCursor::pos()]()
+            {
+                executeDelayedParented([mp]() { QCursor::setPos(mp); }, 0, this);
+            })
+        : QnRaiiGuardPtr();
+
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
@@ -947,6 +948,38 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
         });
 }
 
+void ActionHandler::at_convertCameraToEntropix_triggered()
+{
+    using nx::vms::common::core::resource::SensorDescription;
+    using nx::vms::common::core::resource::CombinedSensorsDescription;
+
+    const auto& parameters = menu()->currentParameters(sender());
+    const auto& resources = parameters.resources();
+
+    for (const auto& resource: resources)
+    {
+        const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+
+        if (camera->hasCombinedSensors())
+        {
+            camera->setCombinedSensorsDescription(CombinedSensorsDescription());
+        }
+        else
+        {
+            camera->setCombinedSensorsDescription(
+                CombinedSensorsDescription{
+                    SensorDescription(
+                        QRectF(0, 0, 0.5, 1.0), SensorDescription::Type::blackAndWhite),
+                    SensorDescription(
+                        QRectF(0.5, 0, 0.5, 1.0))
+                });
+        }
+        camera->saveParamsAsync();
+    }
+}
+
 void ActionHandler::at_moveCameraAction_triggered() {
     const auto parameters = menu()->currentParameters(sender());
 
@@ -1180,8 +1213,44 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
 
 void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)
 {
+    auto newFileName = newName;
+    if (nx::utils::AppInfo::isWindows())
+    {
+        while (newFileName.endsWith(QChar(L' ')) || newFileName.endsWith(QChar(L'.')))
+            newFileName.resize(newFileName.size() - 1);
+
+        const QSet<QString> kReservedFilenames{
+            lit("CON"), lit("PRN"), lit("AUX"), lit("NUL"),
+            lit("COM1"), lit("COM2"), lit("COM3"), lit("COM4"),
+            lit("COM5"), lit("COM6"), lit("COM7"), lit("COM8"), lit("COM9"),
+            lit("LPT1"), lit("LPT2"), lit("LPT3"), lit("LPT4"), lit("LPT5"),
+            lit("LPT6"), lit("LPT7"), lit("LPT8"), lit("LPT9") };
+
+        const auto upperCaseName = newFileName.toUpper();
+        if (kReservedFilenames.contains(upperCaseName))
+        {
+            messages::LocalFiles::reservedFilename(mainWindow(), upperCaseName);
+            return;
+        }
+    }
+
+    static const QString kForbiddenChars =
+        nx::utils::AppInfo::isWindows() ? lit("\\|/:*?\"<>")
+      : nx::utils::AppInfo::isLinux()   ? lit("/")
+      : nx::utils::AppInfo::isMacOsX()  ? lit("/:")
+      : QString();
+
+    for (const auto character: newFileName)
+    {
+        if (kForbiddenChars.contains(character))
+        {
+            messages::LocalFiles::invalidChars(mainWindow(), kForbiddenChars);
+            return;
+        }
+    }
+
     QFileInfo fi(resource->getUrl());
-    QString filePath = fi.absolutePath() + L'/' + newName;
+    QString filePath = fi.absolutePath() + QDir::separator() + newFileName;
 
     if (QFileInfo::exists(filePath))
     {
@@ -1196,6 +1265,15 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         return;
     }
 
+    QFile writabilityTest(filePath);
+    if (!writabilityTest.open(QIODevice::WriteOnly))
+    {
+        messages::LocalFiles::fileCannotBeWritten(mainWindow(), filePath);
+        return;
+    }
+
+    writabilityTest.remove();
+
     // If video is opened right now, it is quite hard to close it synchronously.
     static const int kTimeToCloseResourceMs = 300;
 
@@ -1204,10 +1282,11 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         [this, resource, filePath]()
         {
             QnResourcePtr result = resource;
+            const auto oldPath = resource->getUrl();
 
-            if (!QFile::rename(resource->getUrl(), filePath))
+            if (!QFile::rename(oldPath, filePath))
             {
-                messages::LocalFiles::fileIsBusy(mainWindow(), filePath);
+                messages::LocalFiles::fileIsBusy(mainWindow(), oldPath);
             }
             else
             {

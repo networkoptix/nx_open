@@ -44,6 +44,8 @@ angular.module('nxCommon')
             this.urlBase = this._getUrlBase();
         }
 
+        ServerConnection.emptyId = '{00000000-0000-0000-0000-000000000000}';
+
         // Connections cache
         var connections = {};
         function connect (userEmail, systemId, serverId, unauthorizedCallBack){
@@ -71,6 +73,12 @@ angular.module('nxCommon')
             }
             return urlBase;
         };
+        ServerConnection.prototype.apiHost = function(){
+            if(this.systemId){
+                return window.location.host + Config.gatewayUrl + '/' + this.systemId;
+            }
+            return window.location.host;
+        };
         ServerConnection.prototype._wrapRequest = function(method, url, data, repeat){
             var self = this;
             var auth = method=='GET'? this.authGet() : this.authPost();
@@ -94,12 +102,12 @@ angular.module('nxCommon')
                         return self.unauthorizedCallBack(error).then(function(){
                             return self._wrapRequest(method, url, data, true);
                         },function(){
-                            $rootScope.$broadcast("unauthirosed_" + self.systemId);
+                            $rootScope.$broadcast("unauthorized_" + self.systemId);
                             return $q.reject(error);
                         });
                     }
                     // Not authorised request - we lost connection to the system, broadcast this for active controller to handle the situation if needed
-                    $rootScope.$broadcast("unauthirosed_" + self.systemId);
+                    $rootScope.$broadcast("unauthorized_" + self.systemId);
                 }
                 if(!repeat && error.status == 503){ // Repeat the request once again for 503 error
                     return self._wrapRequest(method, url, data, true);
@@ -121,7 +129,7 @@ angular.module('nxCommon')
 
             return promise;
         };
-        ServerConnection.prototype._setGetParams = function(url, data, auth){
+        ServerConnection.prototype._setGetParams = function(url, data, auth, absoluteUrl){
             if(auth){
                 data = data || {}
                 data.auth = auth;
@@ -130,7 +138,14 @@ angular.module('nxCommon')
                 url += (url.indexOf('?')>0)?'&':'?';
                 url += $.param(data);
             }
-            return this.urlBase + url;
+            url = this.urlBase + url;
+            if(absoluteUrl){
+                var host = window.location.protocol + "//" +
+                           window.location.hostname +
+                           (window.location.port ? ':' + window.location.port: '');
+                url = host + url;
+            }
+            return url;
         };
         ServerConnection.prototype._get = function(url, data){
             return this._wrapRequest('GET', url, data);
@@ -183,7 +198,7 @@ angular.module('nxCommon')
             // TODO: getCurrentUser will not work on portal for 3.0 systems, think of something
             var self = this;
             return this.getCurrentUser().then(function(user) {
-                if(!user.isAdmin && user.userRoleId){
+                if(!user.isAdmin && !self.isEmptyId(user.userRoleId)){
                     return self.getRolePermissions(user.userRoleId).then(function(role){
                         return role.data[0].permissions.indexOf(flag)>=0;
                     });
@@ -224,7 +239,10 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.deleteUser = function(userId){
             return this._post('/ec2/removeUser', {id:userId});
-        }
+        };
+        ServerConnection.prototype.isEmptyId = function(id){
+            return !id || id === ServerConnection.emptyId;
+        };
         ServerConnection.prototype.cleanUserObject = function(user){ // Remove unnesesary fields from the object
             var cleanedUser = {};
             if(user.id){
@@ -236,7 +254,7 @@ angular.module('nxCommon')
                 cleanedUser[supportedFields[i]] = user[supportedFields[i]];
             }
             if(!cleanedUser.userRoleId){
-                cleanedUser.userRoleId = '{00000000-0000-0000-0000-000000000000}';
+                cleanedUser.userRoleId = ServerConnection.emptyId;
             }
             cleanedUser.email = cleanedUser.email.toLowerCase();
             cleanedUser.name = cleanedUser.name.toLowerCase();
@@ -252,7 +270,7 @@ angular.module('nxCommon')
                 'isCloud': true,
                 'isEnabled': true,
 
-                'userRoleId': '{00000000-0000-0000-0000-000000000000}',
+                'userRoleId': ServerConnection.emptyId,
                 'permissions': '',
 
                 //TODO: Remove the trash below after #VMS-2968
@@ -263,15 +281,12 @@ angular.module('nxCommon')
         /* End of Working with users */
 
         /* Cameras and Servers */
-        ServerConnection.prototype._cleanId = function(id) {
-            return id.replace('{','').replace('}','');
-        };
         ServerConnection.prototype.getCameras = function(id){
-            var params = id?{id:this._cleanId(id)}:null;
+            var params = id?{id:cleanId(id)}:null;
             return this._get('/ec2/getCamerasEx',params);
         };
         ServerConnection.prototype.getMediaServers = function(id){
-            var params = id?{id:this._cleanId(id)}:null;
+            var params = id?{id:cleanId(id)}:null;
             return this._get('/ec2/getMediaServersEx',params);
         };
         ServerConnection.prototype.getMediaServersAndCameras = function(){
@@ -302,7 +317,7 @@ angular.module('nxCommon')
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet());
+            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet(), true);
         };
         ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
             var data = {

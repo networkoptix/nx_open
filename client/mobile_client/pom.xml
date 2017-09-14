@@ -6,7 +6,7 @@
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>17.2-SNAPSHOT</version>
+    <version>17.2.4-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
@@ -31,7 +31,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg qtsingleguiapplication roboto-ttf</rdep.packages>
+        <rdep.packages>openssl ffmpeg qtsingleguiapplication roboto-fonts</rdep.packages>
         <rdep.windows.packages>quazip openal</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>
@@ -139,7 +139,7 @@
             <properties>
                 <buildLib>staticlib</buildLib>
                 <android.keystore>${customization.dir}/mobile_client/key.store</android.keystore>
-                <!-- Exclude roboto-ttf package because the font is present on the every android device. -->
+                <!-- Exclude roboto-fonts package because the font is present on the every android device. -->
                 <rdep.packages>openssl ffmpeg qtsingleguiapplication</rdep.packages>
             </properties>
             <build>
@@ -271,6 +271,6 @@
                 <provisioning_profile>${provisioning_profiles_dir}/production.mobileprovision</provisioning_profile>
                 <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
             </properties>
-        </profile>        
+        </profile>
     </profiles>
 </project>

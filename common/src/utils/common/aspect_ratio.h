@@ -1,10 +1,14 @@
 #pragma once
 
+#include <QtCore/QSize>
+#include <QtCore/QMetaType>
+
 class QnAspectRatio
 {
 public:
     QnAspectRatio();
     QnAspectRatio(int width, int height);
+    explicit QnAspectRatio(const QSize& size);
 
     bool isValid() const;
 
@@ -24,8 +28,8 @@ public:
     bool operator ==(const QnAspectRatio &other) const;
 
 private:
-    int m_width;
-    int m_height;
+    int m_width = 0;
+    int m_height = 0;
 };
 
 Q_DECLARE_METATYPE(QnAspectRatio)

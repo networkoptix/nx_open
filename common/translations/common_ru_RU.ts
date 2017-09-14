@@ -82,13 +82,22 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Системное событие</translation>
     </message>
   </context>
   <context>
@@ -303,7 +312,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Камера была восстановлена ​​из архива. Удалите камеру и добавьте ее снова, чтобы просмотреть видео в реальном времени.</translation>
     </message>
   </context>
   <context>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>Временная</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>Аналоговая</translation>
     </message>
@@ -403,11 +408,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>Аналоговый кодировщик</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>Временные лицензии</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>Бесплатная лицензия</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Время</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation type="unfinished">Time Licenses</translation>
     </message>
   </context>
   <context>
@@ -545,7 +554,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Сервер с соответствующим аппаратным Id не найден</translation>
     </message>
   </context>
   <context>
@@ -661,10 +670,6 @@
       <translation>Неизвестно</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>Временная лицензия</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>Бесплатная лицензия</translation>
     </message>
@@ -678,7 +683,11 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Аппаратный Id: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation type="unfinished">Time License</translation>
     </message>
   </context>
   <context>
@@ -1282,7 +1291,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Произошло несколько событий %1</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1324,7 +1333,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Триггер: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1404,11 +1413,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>Диск %1 переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Системный диск &quot;%1&quot; почти заполнен.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1472,7 +1481,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Название триггера</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1496,7 +1505,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Все администраторы</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1508,15 +1517,15 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Программный триггер</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Программный триггер %1 на %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Программный триггер %1 активирован несколько раз</translation>
     </message>
     <message>
       <source>Send email</source>
@@ -1524,7 +1533,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Подтверждить</translation>
     </message>
   </context>
   <context>

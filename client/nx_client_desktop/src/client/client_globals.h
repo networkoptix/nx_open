@@ -283,6 +283,7 @@ namespace Qn
         UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
+        ResolutionModeRole,                         /**< Role for resolution mode. */
 
         RoleCount
     };
@@ -382,18 +383,6 @@ namespace Qn
         OldFrameRendered,   /**< No new frames available, old frame was rendered. */
         NewFrameRendered    /**< New frame was rendered. */
     };
-
-    /**
-     * Video resolution adjustment mode for RADASS.
-     */
-    enum ResolutionMode
-    {
-        AutoResolution,
-        HighResolution,
-        LowResolution,
-        ResolutionModeCount
-    };
-
 
 
     /**

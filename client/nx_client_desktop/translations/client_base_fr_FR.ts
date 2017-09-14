@@ -859,27 +859,19 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Nouveau Showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Retirer du Showreel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Faire Showreel</translation>
     </message>
   </context>
   <context>
@@ -1028,6 +1020,13 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Démarrer Showreel</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -1038,8 +1037,26 @@ pour afficher plus de signets</translation>
       <translation>Fichier &quot;%1&quot; existe déjà. S.V.P essayer un autre nom.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Fichier &quot;%1&quot; utilisé par un autre processus. S.V.P essayer un autre nom.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1318,10 +1335,6 @@ pour afficher plus de signets</translation>
       <translation>Exporter les enregistrements sélectionnés vers un fichier</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Relecture du journal de vérification</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Périphériques</translation>
     </message>
@@ -1399,6 +1412,10 @@ pour afficher plus de signets</translation>
         <numerusform>Cette ressource est retiré du système</numerusform>
         <numerusform>Ces ressources sont retirés du système</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Relecture piste de vérification</translation>
     </message>
   </context>
   <context>
@@ -1666,10 +1683,6 @@ pour afficher plus de signets</translation>
     <message>
       <source>Build Number</source>
       <translation>Numéro de version</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>Numéro de version invalide</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2352,7 +2365,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
+      <translation>Nombre maximal de paramètres sensibilité de mouvement pour n'importe quel capteur de la caméra actuelle est %1, et %2 paramètres sont actuellement sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -2653,6 +2666,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>En savoir plus sur %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4602,6 +4626,10 @@ to %1</source>
       <source>Manage Bookmarks</source>
       <translation>Gérer Signets</translation>
     </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+    </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
@@ -5082,11 +5110,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
   </context>
   <context>
@@ -6203,10 +6231,6 @@ to %1</source>
       <translation>Serveur courriel non configuré</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Sélectionner serveur pour la synchronisation de l'heure des autres</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>Système est en mode sans échec</translation>
     </message>
@@ -6237,10 +6261,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>Serveur courriel non configuré.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Le serveur temps n'est pas synchronisé et un temps commun n'a pas été détecté automatiquement.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -6477,12 +6497,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h:mm ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6806,7 +6826,7 @@ to %1</source>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Cet usager n'est pas encore inscrit pour %1</translation>
     </message>
   </context>
   <context>
@@ -7661,17 +7681,17 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation type="unfinished">Overwrite existing showreel?</translation>
+      <translation>Ecraser le showreel existant?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation type="unfinished">There is another showreel with the same name.</translation>
+      <translation>Il y a un autre showreel du même nom.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>Supprimer %n objets du showreel?</numerusform>
+        <numerusform>Supprimer %n objets du showreel?</numerusform>
       </translation>
     </message>
   </context>
@@ -7754,7 +7774,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>Faites glisser la mise en page ou caméra ici pour l’ajouter au showreel</translation>
     </message>
   </context>
   <context>
@@ -7781,6 +7801,25 @@ to %1</source>
     <message>
       <source>Switch on Timer</source>
       <translation>Changer sur minuterie</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Arrêter Showreel</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Démarrer Showreel</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
     </message>
   </context>
   <context>
@@ -8042,11 +8081,11 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>Utilisez les flèches du clavier pour changer les mises en page. Pour quitter le showreel appuyez sur Echap(Esc).</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>
@@ -8072,11 +8111,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>Showreel %1</translation>
     </message>
   </context>
   <context>

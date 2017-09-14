@@ -24,6 +24,9 @@ struct NX_NETWORK_API QnInterfaceAndAddr
     {
     }
 
+    QHostAddress networkAddress() const;
+    QHostAddress broadcastAddress() const;
+
     QString name;
     QHostAddress address;
     QHostAddress netMask;
@@ -66,9 +69,6 @@ QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
  * Set filter for interface list
  */
 void NX_NETWORK_API setInterfaceListFilter(const QList<QHostAddress>& ifList);
-
-// return true if succeded
-bool NX_NETWORK_API getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
 
 void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 

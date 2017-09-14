@@ -72,6 +72,9 @@ namespace
 
     const QString kCloudConnectRelayingEnabled(lit("cloudConnectRelayingEnabled"));
     const bool kCloudConnectRelayingEnabledDefault = true;
+
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
 }
 
 using namespace nx::settings_names;
@@ -258,6 +261,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors()
 {
+    using namespace std::chrono;
+
     QList<QnAbstractResourcePropertyAdaptor*> timeSynchronizationAdaptors;
     m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kNameTimeSynchronizationEnabled,
@@ -270,6 +275,20 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         true,
         this);
     timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
+    
+    m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = 
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kMaxDifferenceBetweenSynchronizedAndInternetTime,
+            duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndInternetDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
+
+    m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kMaxDifferenceBetweenSynchronizedAndLocalTime,
+            duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
 
     for (auto adaptor: timeSynchronizationAdaptors)
     {
@@ -872,6 +891,18 @@ bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
 void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
 {
     m_synchronizeTimeWithInternetAdaptor->setValue(value);
+}
+
+std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndInternetTime() const
+{
+    return std::chrono::milliseconds(
+        m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor->value());
+}
+
+std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndLocalTime() const
+{
+    return std::chrono::milliseconds(
+        m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor->value());
 }
 
 QString QnGlobalSettings::cloudAccountName() const

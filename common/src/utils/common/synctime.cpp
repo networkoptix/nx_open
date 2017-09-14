@@ -27,6 +27,7 @@ QnSyncTime::QnSyncTime(QObject *parent)
     m_refCounter( 1 )
 {
     reset();
+    m_timer.invalidate();
 }
 
 QnSyncTime::~QnSyncTime() {}
@@ -41,7 +42,7 @@ void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newT
     }
 
     QnMutexLocker lock( &m_mutex );
-    qint64 oldTime = m_lastReceivedTime + m_timer.elapsed();
+    qint64 oldTime = m_timer.isValid() ? m_lastReceivedTime + m_timer.elapsed() : newTime;
 
     m_lastReceivedTime = newTime;
     m_timer.restart();

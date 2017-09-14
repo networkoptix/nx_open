@@ -82,6 +82,15 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation type="unfinished">Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>ทดลอง</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>อนาล๊อก</translation>
     </message>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>เข้ารหัสอนาล็อก</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>ใบอนุญาตทดลอง</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation type="unfinished">Free license</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>เวลา</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation type="unfinished">Time Licenses</translation>
     </message>
   </context>
   <context>
@@ -641,10 +650,6 @@
       <translation>ไม่ระบุ</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>ใบอนุญาตทดลอง</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>ใบอนุญาตฟรี</translation>
     </message>
@@ -659,6 +664,10 @@
     <message>
       <source>Hardware Id: %1</source>
       <translation type="unfinished">Hardware Id: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation type="unfinished">Time License</translation>
     </message>
   </context>
   <context>
@@ -961,15 +970,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>แสดงขั้นสูง</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>ผู้ชม</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>แสดงสด</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -977,7 +986,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>แบบกำหนดเอง</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>

@@ -81,18 +81,23 @@ angular.module('webadminApp', [
         })
         .when('/developers/api/:apiMethod*', {
             templateUrl: Config.viewsDir + 'devtools/api.html',
-            controller: 'ApiToolCtrl'
+            controller: 'ApiToolCtrl',
+            reloadOnSearch: false
         })
         .when('/developers/api', {
             templateUrl: Config.viewsDir + 'devtools/api.html',
-            controller: 'ApiToolCtrl'
-        })
-        .when('/developers/changelog', {
-            templateUrl: Config.viewsDir + 'devtools/api_changelog.html',
-            controller: 'DevtoolsCtrl'
+            controller: 'ApiToolCtrl',
+            reloadOnSearch: false
         })
         .when('/developers/events', {
             templateUrl: Config.viewsDir + 'devtools/events.html',
+            controller: 'ApiToolCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.apiMethod = 'api/createEvent'; }]
+            }
+        })
+        .when('/developers/changelog', {
+            templateUrl: Config.viewsDir + 'devtools/api_changelog.html',
             controller: 'DevtoolsCtrl'
         })
         .when('/client', {
@@ -106,16 +111,6 @@ angular.module('webadminApp', [
         })
         .when('/view/:cameraId', {
             templateUrl: Config.viewsDir + 'view.html',
-            reloadOnSearch: false
-        })
-        .when('/viewdebug', {
-            templateUrl: Config.viewsDir + 'viewdebug.html',
-            controller: 'ViewdebugCtrl',
-            reloadOnSearch: false
-        })
-        .when('/viewdebug/:cameraId', {
-            templateUrl: Config.viewsDir + 'viewdebug.html',
-            controller: 'ViewdebugCtrl',
             reloadOnSearch: false
         })
         .when('/sdkeula', {

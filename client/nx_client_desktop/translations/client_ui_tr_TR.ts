@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>Tüm uyarıları sıfırla</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation type="unfinished">Disable blur</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>Derhal</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Harici Depolama Ekle...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Versiyon:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>İşaretli</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>İşaretli değil</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>Yüklü sürümleri al</translation>
     </message>
   </context>
   <context>
@@ -437,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>da/de</translation>
     </message>
   </context>
   <context>
@@ -461,6 +443,11 @@
       <location/>
       <source>Event Log...</source>
       <translation>Olay Günlükleri...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -583,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>hakkında:boş</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Gelişmiş seçenekler kullanılamıyor</translation>
     </message>
@@ -717,7 +699,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;Kameranın ayarlarını optimize etmek için Sistemi kapatın&quot;, Sistem Yönetimi'nde devre dışı bırakıldı.</translation>
     </message>
     <message>
       <location/>
@@ -727,17 +709,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZ Kontrolü</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Yerel hazır ayarları devre dışı bırakın, bunun yerine sistem hazır ayarlarını kullanın</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Uyarı! Yerli kamera hazır ayarları mevcut olmayacaktır.</translation>
     </message>
   </context>
   <context>
@@ -745,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Giriş kimliği</translation>
     </message>
   </context>
   <context>
@@ -771,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Çıkış Kimliği:</translation>
     </message>
   </context>
   <context>
@@ -901,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Oturum açık kalsın</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1416,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Donanım Kimliği'ne kaydedildi:</translation>
     </message>
   </context>
   <context>
@@ -1515,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Donanım Kimliği</translation>
     </message>
   </context>
   <context>
@@ -1642,7 +1619,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Showreel döngüsü</translation>
     </message>
   </context>
   <context>
@@ -1711,7 +1688,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Kullanıcıya oynat</translation>
     </message>
   </context>
   <context>
@@ -1729,7 +1706,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>İlerleme Bildirimi</translation>
     </message>
   </context>
   <context>
@@ -1900,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>Oturum açık kalsın</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -2087,14 +2059,6 @@
     </message>
   </context>
   <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>Sunucuları Güncelle</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2241,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>En iyi kalite ve çözünürlük için güçlü bir bilgisayar tavsiye edilir.</translation>
     </message>
     <message>
       <location/>
@@ -2307,7 +2271,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Kullnıcıya konuş</translation>
     </message>
   </context>
   <context>
@@ -2550,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2647,7 +2611,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Uygun</translation>
     </message>
     <message>
       <location/>
@@ -2657,7 +2621,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Simge</translation>
     </message>
   </context>
   <context>
@@ -2772,22 +2736,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Roller</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Tüm kullanıcıları göster</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Kullanıcıları seçin</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Aramanızla eşleşen öğe yok.</translation>
     </message>
   </context>
   <context>
@@ -2823,7 +2787,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Internet üzerinden tarihi eşitle</translation>
     </message>
   </context>
   <context>
@@ -2863,8 +2827,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Özel tanımlı kullanıcı yetkilendirmesi yok. Oluşturmak için &quot;Yeni Rol&quot; butonuna tıklayın.</translation>
     </message>
     <message>
       <location/>

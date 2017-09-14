@@ -1,25 +1,25 @@
 <div class="container">
-    <h1>Advanced server settings</h1>
+    <h1>Cài đặt máy chủ nâng cao</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Cảnh báo! </b> Bất kỳ thay đổi nào trên trang này có thể khiến máy chủ hoạt động không chính xác.
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>Lưu trữ</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
             <thead>
                 <tr>
                     <th >
-                        nơi
+                        Đường dẫn
                     </th>
                     <th width="200">
-                        Free Space
+                        Dung lượng trống
                     </th>
                     <th width="150">
-                        Reserved Space
+                        Không gian dành riêng
                     </th>
                     <th >
                     </th>
@@ -40,7 +40,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} trong số {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -54,7 +54,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                không thể tiếp cận
+                                Không thể truy cập
                             </div>
                         </div>
                     </td>
@@ -67,14 +67,14 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Reserved space"/>
+ placeholder="Bộ nhớ dự trữ"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
+ placeholder="Bộ nhớ dự trữ"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -86,7 +86,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Use for writing"/>
+                                   placeholder="Sử dụng để ghi"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -103,45 +103,45 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            No main storage drive was selected for writing - video will not be recorded on this server.
+            Không có ổ lưu trữ chính nào được chọn để ghi - video sẽ không được ghi lại trên máy chủ này.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Dung lượng dự trữ lớn hơn khoảng trống còn lại. Đoạn video hiện tại có thể bị loại bỏ để giải phóng không gian.
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Sửa chữa tất cả các cài đặt được đánh dấu để lưu nó</div>
 
         <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >tiết kiệm</button>
         <button class="btn btn-warning" ng-click="cancel()">hủy bỏ</button>
     </form>
 
-    <h2>Log settings</h2>
+    <h2>Cài đặt nhật ký</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div class="form-group">
-            <label class="col-sm-4">Main log level</label>
+            <label class="col-sm-4">Mức đăng nhập chính</label>
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                    <option value="NONE">Không: Vô hiệu hoá log.</option>
+                    <option value="ALWAYS">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
+                    <option value="ERROR">Lỗi: Duy nhất lỗi đăng nhập.</option>
+                    <option value="WARNING">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
+                    <option value="INFO">Thông tin: Ghi lỗi, cảnh báo tất cả các thông điệp.</option>
+                    <option value="DEBUG">Gỡ lỗi: Đăng nhập tất cả thông tin thư và gỡ lỗi hệ thống.</option>
+                    <option value="DEBUG2">Gỡ lỗi 2: Đăng nhập mọi thông báo hệ thống và thông tin gỡ rối mở rộng.</option>
                 </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">Transaction log level</label>
+            <label class="col-sm-4">Cấp nhật ký giao dịch</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                    <option value="NONE">Không có: Đăng nhập bị vô hiệu.</option>
+                    <option value="ALWAYS">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
+                    <option value="ERROR">Lỗi: Duy nhất lỗi đăng nhập.</option>
+                    <option value="WARNING">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
+                    <option value="INFO">Thông tin: Ghi lỗi, cảnh báo tất cả các thông điệp.</option>
+                    <option value="DEBUG">Gỡ lỗi: Đăng nhập tất cả thông tin thư và gỡ lỗi hệ thống.</option>
+                    <option value="DEBUG2">Gỡ lỗi 2: Đăng nhập mọi thông báo hệ thống và thông tin gỡ rối mở rộng.</option>
                 </select>
             </div>
         </div>
@@ -151,20 +151,20 @@
         </div>
     </form>
 
-    <h2>Manual update</h2>
+    <h2>Cập nhật thủ công</h2>
     <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
         <div class="form-group">
-            <label class="col-sm-4">Upload installer</label>
+            <label class="col-sm-4">Tải lên trình cài đặt</label>
             <div class="col-sm-8">
                 <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Please ensure the configuration is correct.</p>
+                <p class="help-block">Hãy đảm bảo cấu hình là chính xác.</p>
             </div>
         </div>
     </form>
 
-    <h1>Advanced system settings</h1>
+    <h1>Thiết lập hệ thống nâng cao</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Cảnh báo! </b> Bất kỳ thay đổi nào trên trang này có thể khiến máy chủ hoạt động không chính xác.
     </div>
 
     <form class="form row" role="form" name="systemSettings" novalidate>
@@ -191,7 +191,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{SystemSettings[setting] || 'trống'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -208,9 +208,9 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Cảnh báo!</b> Một số thay đổi cần khởi động lại <b>tất cả</b> các máy chủ trong hệ thống.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >Khởi động lại máy chủ hiện tại</button>
         </div>
     </div>
 </div>

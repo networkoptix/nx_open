@@ -859,27 +859,19 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Új showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
-    </message>
-    <message>
-      <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Eltávolítás a showreelből</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Showreel készítése</translation>
     </message>
   </context>
   <context>
@@ -1028,6 +1020,13 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Showreel indítása</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -1038,8 +1037,26 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>&quot;%1&quot; fájlt már létezik. Próbáljon más nevet.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>&quot;%1&quot; fájlt más alkalmazás használja. Próbáljon más nevet.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1318,10 +1335,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Kiválasztott felvételek exportálása fájlba</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Audit napló visszajátszás</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Eszközök</translation>
     </message>
@@ -1399,6 +1412,10 @@ több könyvjelző megjelenítéséhez</translation>
         <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
         <numerusform>Ezeket az erőforrásokat eltávolították a rendszerből</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Audit napló visszajátszás</translation>
     </message>
   </context>
   <context>
@@ -1666,10 +1683,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Build Number</source>
       <translation>Verziószám</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>Érvénytelen verziószám</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2352,7 +2365,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
+      <translation>A maximális mozgásérzékenység beállítások száma bármennyi szenzor esetén erre a kamera %1, és %2 már ki van jelölve.</translation>
     </message>
   </context>
   <context>
@@ -2651,6 +2664,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Tudjon meg többet erről: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4600,6 +4624,10 @@ to %1</source>
       <source>Manage Bookmarks</source>
       <translation>Könyvjelzők kezelése</translation>
     </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+    </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
@@ -5080,11 +5108,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreelek</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
   </context>
   <context>
@@ -6201,10 +6229,6 @@ to %1</source>
       <translation>Nincs e-mail szerver beállítva</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Válassza ki a szervert amivel a többit szeretné szinkronizálni</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>A rendszer biztonsági módban fut</translation>
     </message>
@@ -6235,10 +6259,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>Nincs e-mail szerver beállítva.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Szerveridők nincsenek szinkronban és a közös idő nem detektálható automatikusan.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -6440,47 +6460,47 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>éééé</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>nn HHHH éééé óó:pp</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>nn HHHH éééé óó:pp</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>nn HHHH éééé ó ap</translation>
+      <translation>yyyy MMMM dd h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>nn HHHH éééé</translation>
+      <translation>yyyy MMMM dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>HHHH éééé</translation>
+      <translation>yyyy MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>éééé</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h:mm ap</translation>
+      <translation>ó:pp ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
+      <translation>yyyy MMMM dd hh:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6804,7 +6824,7 @@ to %1</source>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Ez a felhasználó még nem jelentkezett be %1 felhőre</translation>
     </message>
   </context>
   <context>
@@ -7659,17 +7679,17 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation type="unfinished">Overwrite existing showreel?</translation>
+      <translation>Felülírja a meglévő showreelt?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation type="unfinished">There is another showreel with the same name.</translation>
+      <translation>Ugyanezzel a névvel már létezik egy showreel.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>Eltávolít %n elemet a showreelből?</numerusform>
+        <numerusform>Eltávolít %n elemet a showreelből?</numerusform>
       </translation>
     </message>
   </context>
@@ -7752,7 +7772,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>Húzza az elrendezést vagy a kamerát a showreelhez</translation>
     </message>
   </context>
   <context>
@@ -7779,6 +7799,25 @@ to %1</source>
     <message>
       <source>Switch on Timer</source>
       <translation>Időzítő bekapcsolása</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Showreel leállítása</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Showreel indítása</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
     </message>
   </context>
   <context>
@@ -8040,11 +8079,11 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>Elrendezések váltásához használja a nyilakat. Kilépés a showreelből az Esc billentyűvel.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To exit the showreel press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>
@@ -8070,11 +8109,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>%1 showreel</translation>
     </message>
   </context>
   <context>

@@ -170,7 +170,7 @@ public:
     /**
      * \returns true if there is at least one conditional text
     */
-    bool hasConditionalTexts();
+    bool hasConditionalTexts() const;
 
     /**
      * \param parameters                Parameters for action execution.

@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>모든 경고를 다시 설정</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation type="unfinished">Disable blur</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>긴급</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>외부 장치 추가...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>버전:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>확인</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>선택 되지 않음</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>설치된 버젼을 가져옮니다.</translation>
     </message>
   </context>
   <context>
@@ -462,6 +444,11 @@
       <source>Event Log...</source>
       <translation>이벤트 로그...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>테스트</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>고급 설정을 사용할 수 있습니다.</translation>
     </message>
@@ -901,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>로그인 상태 유지</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1901,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>로그인 상태 유지</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2084,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>주의: 이미 같은 이름의 파일 또는 폴더가 있습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>업데이트 서버</translation>
     </message>
   </context>
   <context>

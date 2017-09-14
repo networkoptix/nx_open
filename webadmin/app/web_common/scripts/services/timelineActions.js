@@ -184,9 +184,47 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
 
     var zoom = self.scaleManager.zoom();
     if(zoom == zoomTarget){
-        return;
+        return; // No need to zoom
     }
 
+    this.updateZoomLevels(zoomTarget);
+    function setZoom(value){
+
+    // Actually, we'd better use zoom around coordinate instead of date?
+        self.scaleManager.zoomAroundPoint(
+            value,
+            zoomCoordinate
+        );
+        self.scaleManager.checkZoomAsync().then(function(){
+            // TODO: here we need to apply the change to scope - call digest if anything changed
+            self.scope.$digest();
+        });
+        self.delayWatchingPlayingPosition();
+    }
+
+
+    if(!instant) {
+        if(!self.scope.zoomTarget) {
+            self.scope.zoomTarget = self.scaleManager.zoom();
+        }
+
+        self.delayWatchingPlayingPosition();
+        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, 'dryResistance').then(
+            function () {
+                self.zoomByWheelTarget = 0; // When animation if over - clean zoomByWheelTarget
+            },
+            function () {},
+            setZoom);
+    }else{
+        setZoom(zoomTarget);
+        self.scope.zoomTarget = self.scaleManager.zoom();
+        self.zoomByWheelTarget = 0;
+    }
+};
+
+// Update zoom levels - run animation if needed
+TimelineActions.prototype.updateZoomLevels = function(zoomTarget){
+    var self = this;
     function levelsChanged(newLevels,oldLevels){
         if(newLevels && (!oldLevels || !oldLevels.labels)){
             return true;
@@ -221,7 +259,8 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
         }
 
         // This allows us to continue (and slowdown, mb) animation every time
-        self.zooming = self.animationState.zooming;
+        self.scope.zooming = self.animationState.zooming;
+
         self.animateScope.animate(self.scope,'zooming',1,'dryResistance').then(function(){
             self.animationState.currentLevels = self.scaleManager.levels;
         },function(){
@@ -231,39 +270,6 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
         });
     }
 
-
-    function setZoom(value){
-
-    // Actually, we'd better use zoom around coordinate instead of date?
-        self.scaleManager.zoomAroundPoint(
-            value,
-            zoomCoordinate
-        );
-        self.scaleManager.checkZoomAsync().then(function(){
-            // TODO: here we need to apply the change to scope - call digest if anything changed
-            self.scope.$digest();
-        });
-        self.delayWatchingPlayingPosition();
-    }
-
-
-    if(!instant) {
-        if(!self.scope.zoomTarget) {
-            self.scope.zoomTarget = self.scaleManager.zoom();
-        }
-
-        self.delayWatchingPlayingPosition();
-        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, 'dryResistance').then(
-            function () {
-                self.zoomByWheelTarget = 0; // When animation if over - clean zoomByWheelTarget
-            },
-            function () {},
-            setZoom);
-    }else{
-        setZoom(zoomTarget);
-        self.scope.zoomTarget = self.scaleManager.zoom();
-        self.zoomByWheelTarget = 0;
-    }
 };
 
 // Relative zoom (incremental)

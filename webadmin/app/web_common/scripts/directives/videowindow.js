@@ -46,10 +46,7 @@ angular.module('nxCommon')
                     'mp4': 'video/mp4'
                 };
                 scope.Config = Config;
-                scope.debugMode = Config.debug.video && Config.allowDebugMode;
-                scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
-                scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
-                scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
+                scope.debugMode = Config.allowDebugMode;
                 scope.videoFlags = {};
                 scope.loading = false; // Initiate state - not loading (do nothing)
                 
@@ -251,7 +248,6 @@ angular.module('nxCommon')
                     });
                 }
 
-
                 function initFlashls() {
                     scope.flashls = true;
                     scope.native = false;
@@ -262,9 +258,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = "web_common/components/flashlsChromeless.swf";
-                    if(scope.debugMode && scope.debugFormat){
-                        scope.flashSource = "web_common/components/flashlsChromeless_debug.swf";
+                    scope.flashSource = Config.webclient.staticResources + Config.webclient.flashChromelessPath;
+                    if(scope.debugMode){
+                        scope.flashSource = Config.webclient.staticResources + Config.webclient.flashChromelessDebugPath;
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);
@@ -296,10 +292,8 @@ angular.module('nxCommon')
                                 scope.vgPlayerReady({$API: null});
                                 console.error(error);
                             }, function (position, duration) {
-                                if (position != 0) {
-                                    scope.loading = false; // Video is playing - disable loading
-                                    scope.vgUpdateTime({$currentTime: position, $duration: duration});
-                                }
+                                scope.loading = false; // Video is playing - disable loading
+                                scope.vgUpdateTime({$currentTime: position, $duration: duration});
                             });
 
                             videoPlayers.push(flashlsAPI);
@@ -314,35 +308,42 @@ angular.module('nxCommon')
 
                     $timeout(function(){
                         var jsHlsAPI = new JsHlsAPI();
-                        jsHlsAPI.init( element.find(".videoplayer"), scope.jshlsHideError, scope.jshlsDebugMode, function (api) {
-                            scope.vgApi = api;
-                            if (scope.vgSrc) {
-                                scope.vgApi.load(getFormatSrc('hls'));
-                                scope.vgApi.addEventListener("timeupdate", function (event) {
-                                    var video = event.srcElement || event.originalTarget;
-                                    if(video.currentTime){ // When video is playing - disable loading
-                                        scope.loading = false;
-                                    }
-                                    scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
-                                });
-                            }
-                            scope.vgPlayerReady({$API:api});
-                        },  function (error) {
-                            $timeout(function(){
-                                scope.loading = false;
-                                scope.videoFlags.errorLoading = true;
-                                scope.jsHls = false;
-                            });
+                        jsHlsAPI.init(element.find(".videoplayer"),
+                                      Config.webclient.hlsLoadingTimeout,
+                                      scope.debugMode,
+                                      function (api) {
+                                            scope.vgApi = api;
+                                            if (scope.vgSrc) {
+                                                scope.vgApi.load(getFormatSrc('hls'));
 
-                            if(scope.vgApi){
-                                scope.vgApi.kill();
-                            }
-                            scope.vgPlayerReady({$API: null});
-                            console.error(error);
-                        });
+                                                scope.vgApi.addEventListener("timeupdate", function (event) {
+                                                    var video = event.srcElement || event.originalTarget;
+                                                    if(video.currentTime){ // When video is playing - disable loading
+                                                        scope.loading = false;
+                                                    }
+                                                    scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                                });
+
+                                                scope.vgApi.addEventListener("ended",function(event){
+                                                    scope.vgUpdateTime({$currentTime: null, $duration: null});
+                                                });
+                                            }
+                                            scope.vgPlayerReady({$API:api});
+                                      },  function (error) {
+                                            $timeout(function(){
+                                                scope.loading = false;
+                                                scope.videoFlags.errorLoading = true;
+                                                scope.jsHls = false;
+                                            });
+
+                                            if(scope.vgApi){
+                                                scope.vgApi.kill();
+                                            }
+                                            scope.vgPlayerReady({$API: null});
+                                            console.error(error);
+                                      });
                         videoPlayers.push(jsHlsAPI);
                     });
-
                 }
 
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
@@ -377,10 +378,11 @@ angular.module('nxCommon')
 
                     if(scope.vgSrc ) {
                         format = detectBestFormat();
+                        //Turn off all players to reset ng-class for rotation
+                        scope.native = false;
+                        scope.flashls = false;
+                        scope.jsHls = false;
                         if(!format){
-                            scope.native = false;
-                            scope.flashls = false;
-                            scope.jsHls = false;
                             scope.loading = false; // no supported format - no loading
                             recyclePlayer(null); //There is no player so it should be set to null
                             return;
@@ -393,11 +395,9 @@ angular.module('nxCommon')
                         if(videoPlayers){
                             videoPlayers.pop();
                         }
-                        $timeout(initNewPlayer);
 
-                        if(scope.rotation != 0 && scope.rotation != 180){
-                            updateWidth();
-                        }
+                        $timeout(initNewPlayer);
+                        $timeout(updateWidth);
                     }
                 }
 
@@ -405,8 +405,9 @@ angular.module('nxCommon')
 
                 scope.$on('$destroy',function(){
                     recyclePlayer(null);
-                    scope.vgApi.kill();
-
+                    if(scope.vgApi){
+                        scope.vgApi.kill();
+                    }
                     if(videoPlayers.length > 1){
                         $log.error('Problem with deallocating video players');
                         $log.error(videoPlayers);

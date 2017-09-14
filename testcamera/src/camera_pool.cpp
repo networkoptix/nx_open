@@ -14,6 +14,17 @@ int MEDIA_PORT = 4985;
 
 class QnCameraDiscoveryListener: public QnLongRunnable
 {
+    struct NetRange
+    {
+        bool contains(quint32 addr) const
+        {
+            return qBetween(firstIp, addr, lastIp);
+        }
+
+        quint32 firstIp = 0;
+        quint32 lastIp = 0;
+    };
+
 public:
     QnCameraDiscoveryListener( const QStringList& localInterfacesToListen )
     :
@@ -25,18 +36,58 @@ protected:
     virtual void run() override
     {
         std::unique_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket().release() );
+#if 1
+        discoverySock->bind(SocketAddress(HostAddress::anyHost, TestCamConst::DISCOVERY_PORT));
+        for (const auto& addr: m_localInterfacesToListen)
+        {
+            for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+            {
+                if (iface.address == QHostAddress(addr))
+                {
+                    NetRange netRange;
+                    netRange.firstIp = iface.networkAddress().toIPv4Address();
+                    netRange.lastIp = iface.broadcastAddress().toIPv4Address();
+                    m_allowedIpRange.push_back(netRange);
+                }
+            }
+        }
+#else
+        // Linux doesn't support binding to specified interface and receiving broadcast packets at the same time.
+        // Another option is to use SO_BINDTODEVICE socket option but it requires root access.
         if( m_localInterfacesToListen.isEmpty() )
             discoverySock->bind( SocketAddress( HostAddress::anyHost, TestCamConst::DISCOVERY_PORT ) );
         else
             discoverySock->bind( SocketAddress( m_localInterfacesToListen[0], TestCamConst::DISCOVERY_PORT ) );
+#endif
         discoverySock->setRecvTimeout(100);
         quint8 buffer[1024*8];
         SocketAddress peerEndpoint;
+
+        auto hasRange = [&](const SocketAddress& peerEndpoint)
+        {
+            const auto addr = peerEndpoint.address.ipV4();
+            if (!addr)
+                return false;
+            const auto addrPtr = (quint32*)&addr->s_addr;
+            const quint32 v4Addr = ntohl(*addrPtr);
+
+            return std::any_of(
+                m_allowedIpRange.begin(), 
+                m_allowedIpRange.end(),
+                [v4Addr](const NetRange& range)
+                { 
+                    return range.contains(v4Addr);
+                });
+        };
+
         while(!m_needStop)
         {
             int readed = discoverySock->recvFrom(buffer, sizeof(buffer), &peerEndpoint);
             if (readed > 0)
             {
+                if (!m_allowedIpRange.isEmpty() && !hasRange(peerEndpoint))
+                    continue;
+
                 if (QByteArray((const char*)buffer, readed).startsWith(TestCamConst::TEST_CAMERA_FIND_MSG))
                 {
                     // got discovery message
@@ -54,6 +105,7 @@ protected:
 
 private:
     const QStringList m_localInterfacesToListen;
+    QVector<NetRange> m_allowedIpRange;
 };
 
 

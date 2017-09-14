@@ -5,11 +5,15 @@
 #if defined(Q_OS_WIN)
     #include <WinSock2.h>
     #include <WS2tcpip.h>
-#elif defined(Q_OS_LINUX)
+#elif defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <netinet/ip.h>
     #include <arpa/inet.h>
+
+    #if defined(Q_OS_MACX)
+        #include <errno.h>
+    #endif
 #else
     #error Not supported target os
 #endif
@@ -23,7 +27,6 @@ const int MulticastHttpTransport::Packet::MAX_PAYLOAD_SIZE = MulticastHttpTransp
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
 
-static const int MTU_SIZE = 1412;
 static const QHostAddress MULTICAST_GROUP(QLatin1String("239.57.43.102"));
 static const int MULTICAST_PORT = 7001;
 

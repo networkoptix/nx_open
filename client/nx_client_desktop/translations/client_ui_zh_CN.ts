@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>重置所有警告</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation type="unfinished">Disable blur</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>立即作用</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>增加外部存储...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>版本：</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>检查</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>未检查</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>获取安装的版本</translation>
     </message>
   </context>
   <context>
@@ -462,6 +444,11 @@
       <source>Event Log...</source>
       <translation>事件日志...</translation>
     </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>测试</translation>
+    </message>
   </context>
   <context>
     <name>CameraAdditionDialog</name>
@@ -583,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>高级的设置都不可用</translation>
     </message>
@@ -901,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>保持登录状态</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
     </message>
   </context>
   <context>
@@ -1642,7 +1619,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>幻灯片周期</translation>
     </message>
   </context>
   <context>
@@ -1901,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>保持登录状态</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2084,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>警告︰ 具有相同名称的文件已经存在 ！</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>升级服务器</translation>
     </message>
   </context>
   <context>

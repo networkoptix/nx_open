@@ -64,7 +64,7 @@ angular.module('cloudApp')
             return;
         }
         if(!foundPlatform){
-            $scope.downloads.groups[0] = true;
+            $scope.downloads.groups[0].active = true;
         }
 
 

@@ -48,8 +48,8 @@ public:
     QString logLevel;
     QString exceptionFilters;
 
-    // Log level of http requests log.
-    QString msgLogLevel;
+    QString httpLogLevel;
+    QString hwLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
 
@@ -141,6 +141,7 @@ private slots:
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
+    void at_timeChanged(qint64 time);
     void at_emptyDigestDetected(
         const QnUserResourcePtr& user, const QString& login, const QString& password);
     void at_databaseDumped();
