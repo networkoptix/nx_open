@@ -36,13 +36,15 @@
 struct ErrorStream
 {
     QnMutex mutex;
-    std::stringstream stream;
+    std::unique_ptr<std::stringstream> stream;
 
     void reset()
     {
         QnMutexLocker lock(&mutex);
-        stream = std::stringstream{};
+        stream.reset(new std::stringstream);
     }
+
+    ErrorStream(): stream(new std::stringstream) {}
 };
 
 template<class _Elem, class _Traits>
@@ -51,7 +53,7 @@ using EndlType = std::basic_ostream<_Elem, _Traits>& (*)(std::basic_ostream<_Ele
 ErrorStream& operator<<(ErrorStream& stream, EndlType<char, std::char_traits<char>>)
 {
     QnMutexLocker lock(&stream.mutex);
-    stream.stream << std::endl;
+    *(stream.stream) << std::endl;
     return stream;
 }
 
@@ -59,7 +61,7 @@ template<typename T>
 ErrorStream& operator<<(ErrorStream& stream, T&& t)
 {
     QnMutexLocker lock(&stream.mutex);
-    stream.stream << std::forward<T>(t);
+    *(stream.stream) << std::forward<T>(t);
     return stream;
 }
 
@@ -310,7 +312,7 @@ public:
 
     boost::optional<TestChunk> generateAddOperation()
     {
-        Catalog *catalog = &m_catalogs[nx::utils::random::number(0ULL, m_catalogs.size() - 1)];
+        Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
         errorStream << "catalog: " << catalog->cameraUniqueId.constData() << std::endl;
         TestFileOperation fileOp = generateFileOperation(0);
 
@@ -343,14 +345,14 @@ public:
         if (unremovedChunks.empty())
             return nullptr;
 
-        TestChunk *chunk = unremovedChunks[nx::utils::random::number(0ULL, unremovedChunks.size() - 1)];
+        TestChunk *chunk = unremovedChunks[nx::utils::random::number((size_t)0, unremovedChunks.size() - 1)];
         chunk->isDeleted = true;
         return chunk;
     }
 
     std::pair<Catalog, std::deque<DeviceFileCatalog::Chunk>> generateReplaceOperation(int size)
     {
-        Catalog *catalog = &m_catalogs[nx::utils::random::number(0ULL, m_catalogs.size() - 1)];
+        Catalog *catalog = &m_catalogs[nx::utils::random::number((size_t)0, m_catalogs.size() - 1)];
         for (auto& chunk: m_chunks)
         {
             bool sameUniqueId = chunk.catalog->cameraUniqueId == catalog->cameraUniqueId;
@@ -716,7 +718,7 @@ TEST(MediaDbTest, DbFileTruncate)
                                      << fileName.toLatin1().constData()
                                      << " remove failed";
         // truncating randomly last record
-        content.truncate(content.size() - nx::utils::random::number(1ULL, sizeof(qint64) * 2 - 1));
+        content.truncate(content.size() - nx::utils::random::number((size_t)1, sizeof(qint64) * 2 - 1));
 
         initDbFile(&dbFile, fileName);
         dbFile.write(content);
@@ -989,7 +991,7 @@ TEST(MediaDbTest, StorageDB)
                                    });
     if (!allVisited)
     {
-        std::cout << errorStream.stream.str() << std::endl;
+        std::cout << errorStream.stream->str() << std::endl;
         errorStream.reset();
         size_t notVisited = std::count_if(
                 tcm.get().cbegin(),
