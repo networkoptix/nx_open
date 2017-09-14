@@ -310,11 +310,16 @@ angular.module('nxCommon')
             return null;
         };
 
+        camerasProvider.prototype.getServerTimeOffset = function(serverId){
+            return this.serverOffsets[serverId];
+        };
         camerasProvider.prototype.getServerTimes = function(){
-            var servers = this.getMediaServers();
             var self = this;
-            _.each(servers,function(server){
-                system.getTime(server.id).then(function(result){
+            _.each(this.mediaServers,function(server){
+                if (server.status != 'Online'){ // We can't get time from offline server
+                    return;
+                }
+                self.systemAPI.getTime(server.id).then(function(result){
                     var serverUtcTime = parseInt(result.data.reply.utcTime);
                     var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
                     self.serverOffsets[server.id] = timeManager.getOffset(serverUtcTime, timeZoneOffset);

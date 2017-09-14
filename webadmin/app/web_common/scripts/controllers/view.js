@@ -397,6 +397,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(!$scope.activeCamera){
                 $scope.activeCamera = $scope.camerasProvider.getFirstCam();
             }
+            var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
+            if(serverOffset){
+                timeManager.setOffset(serverOffset);
+            }
 
             $scope.showCameraPanel = !$scope.activeCamera;
         }
@@ -407,7 +411,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         }).then(function(){
             return $scope.camerasProvider.getServerTimes();
         }).then(function(){
-             setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));
+            setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));
 
             $scope.ready = true;
             $timeout(updateHeights);
