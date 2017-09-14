@@ -77,16 +77,27 @@ int QnDetachFromSystemRestHandler::execute(
 
     if (resetSystemToStateNew(owner->commonModule()))
     {
-        m_cloudConnectionManager->removeCloudUsers();
+        if (!m_cloudConnectionManager->detachSystemFromCloud())
+        {
+            errStr = lm("Cannot detach from cloud. Failed to reset cloud attributes. cloudSystemId %1")
+                .arg(owner->globalSettings()->cloudSystemId());
+        }
     }
     else
     {
-        NX_LOGX(lm("Cannot detach from system. Failed to reset system to state new."), cl_logWARNING);
+        errStr = lm("Cannot detach from system. Failed to reset system to state new.");
+    }
+
+    if (errStr.isEmpty())
+    {
+        NX_LOGX(lm("Detaching server from system finished."), cl_logDEBUG1);
+    }
+    else
+    {
+        NX_LOGX(errStr, cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return nx_http::StatusCode::ok;
     }
 
     resumeConnectionsToRemotePeers();
-    NX_LOGX(lm("Detaching server from system finished."), cl_logDEBUG1);
     return nx_http::StatusCode::ok;
 }
