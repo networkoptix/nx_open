@@ -1273,6 +1273,9 @@ bool HanwhaResource::fillRanges(
 
         if (!needToFixRange)
             continue;
+
+        if (info->isSpecific())
+            addSpecificRanges(&parameter);
  
         auto range = cgiParameters.parameter(info->rangeParameter());
         if (!range || !range->isValid())
@@ -1292,6 +1295,95 @@ bool HanwhaResource::fillRanges(
                 .arg(range->min())
                 .arg(range->max());
             inOutParameters->updateParameter(parameter);
+        }
+    }
+
+    return true;
+}
+
+bool HanwhaResource::addSpecificRanges(
+    QnCameraAdvancedParameter* inOutParameter) const
+{
+    const auto info = advancedParameterInfo(inOutParameter->id);
+    if (!info)
+        return false;
+
+    const auto streamPrefix = info->profileDependency() == Qn::ConnectionRole::CR_LiveVideo
+        ? lit("PRIMARY%")
+        : lit("SECONDARY%");
+
+    const auto parameterName = info->parameterName();
+    if (parameterName == kHanwhaBitrateProperty)
+    {
+        const auto channel = getChannel();
+        const auto codecs = m_codecInfo.codecs(channel);
+        
+        for (const auto& codec: codecs)
+        {
+            const auto resolutions = m_codecInfo.resolutions(channel, codec, lit("General"));
+            for (const auto& resolution: resolutions)
+            {
+                auto limits = m_codecInfo.limits(channel, codec, lit("General"), resolution);
+
+                const auto codecString = toHanwhaString(codec);
+                QnCameraAdvancedParameterCondition codecCondition;
+                codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                codecCondition.paramId = lit("%1media/videoprofile/EncodingType")
+                    .arg(streamPrefix);
+                codecCondition.value = codecString;
+
+                const auto resolutionString = toHanwhaString(resolution);
+                QnCameraAdvancedParameterCondition resolutionCondition;
+                resolutionCondition.type =
+                    QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                resolutionCondition.paramId = lit("%1media/videoprofile/Resolution")
+                    .arg(streamPrefix);
+                resolutionCondition.value = resolutionString;
+
+                QStringList bitrateControlTypeList;
+                const auto bitrateControlTypes = m_cgiParameters.parameter(
+                    lit("media/videoprofile/%2.BitrateControlType/%3")
+                        .arg(codecString)
+                        .arg(channel));
+
+                if (bitrateControlTypes)
+                    bitrateControlTypeList = bitrateControlTypes->possibleValues();
+                
+                if (bitrateControlTypeList.isEmpty())
+                    bitrateControlTypeList.push_back(lit("CBR"));
+
+                for (const auto& bitrateControlType: bitrateControlTypeList)
+                {
+                    QnCameraAdvancedParameterCondition bitrateControlTypeCondition;
+                    bitrateControlTypeCondition.type
+                        = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                    bitrateControlTypeCondition.paramId
+                        = lit("%1media/videoprofile/%2.BitrateControlType")
+                            .arg(streamPrefix)
+                            .arg(codecString);
+                    bitrateControlTypeCondition.value = bitrateControlType;
+
+                    const int minLimit = bitrateControlType == lit("CBR")
+                        ? limits->minCbrBitrate
+                        : limits->minVbrBitrate;
+
+                    const int maxLimit = bitrateControlType == lit("CBR")
+                        ? limits->maxCbrBitrate
+                        : limits->maxVbrBitrate;
+
+                    QnCameraAdvancedParameterDependency dependency;
+                    dependency.id = QnUuid::createUuid().toString();
+                    dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+                    dependency.range = lit("%1,%2").arg(minLimit).arg(maxLimit);
+                    dependency.conditions.push_back(codecCondition);
+                    dependency.conditions.push_back(resolutionCondition);
+
+                    if (codec != AV_CODEC_ID_MJPEG)
+                        dependency.conditions.push_back(bitrateControlTypeCondition);
+
+                    inOutParameter->dependencies.push_back(dependency);
+                }
+            }
         }
     }
 

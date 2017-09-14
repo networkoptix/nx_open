@@ -24,7 +24,7 @@ bool MixedPresetManager::createPreset(const QnPtzPreset& preset)
         return false;
 
     QnPtzPreset copy(preset);
-    copy.idOnDevice = nativePresetId; 
+    copy.idOnDevice = nativePresetId;
     if (!createNxPreset(copy))
         return false;
 

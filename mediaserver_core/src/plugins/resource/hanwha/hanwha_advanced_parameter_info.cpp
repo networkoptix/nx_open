@@ -9,6 +9,7 @@ namespace {
 
 static const QString kSupportAux = lit("support");
 static const QString kRangeAux = lit("range");
+static const QString kSpecificAux = lit("specific");
 static const QString kProfileAux = lit("profile");
 static const QString kNoChannelAux = lit("noChannel");
 static const QString kCodecAux = lit("codec");
@@ -90,6 +91,11 @@ QString HanwhaAdavancedParameterInfo::rangeParameter() const
         .arg(m_submenu)
         .arg(m_updateAction)
         .arg(m_parameterName);
+}
+
+bool HanwhaAdavancedParameterInfo::isSpecific() const
+{
+    return m_isSpecific;
 }
 
 Qn::ConnectionRole HanwhaAdavancedParameterInfo::profileDependency() const
@@ -193,6 +199,8 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
             m_supportAttribute = auxValue;
         else if (auxName == kRangeAux)
             m_rangeParameter = auxValue;
+        else if (auxName == kSpecificAux)
+            m_isSpecific = fromString<bool>(auxValue);
         else if (auxName == kNoChannelAux)
             m_channelIndependent = fromString<bool>(auxValue);
         else if (auxName == kProfileAux)

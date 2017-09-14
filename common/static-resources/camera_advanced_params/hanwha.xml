@@ -6,13 +6,13 @@
     <parameters>
         <group name="Video Source">
             <param id="image/flip/VerticalFlipEnable"
-                    name="Flip mode"
+                    name="Flip Mode"
                     dataType="Bool"/>
             <param id="image/flip/HorizontalFlipEnable"
-                    name="Mirror mode"
+                    name="Mirror Mode"
                     dataType="Bool"/>
             <param id="image/flip/Rotate"
-                    name="HallwayView"
+                    name="Hallway View"
                     dataType="Enumeration"
                     range="0 degrees,90 degrees,270 degrees"
                     internalRange="0,90,270"/>
@@ -148,12 +148,14 @@
                         name="Bitrate"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate"/>
+                        showRange="true"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true"/>
                         
                 <param id="PRIMARY%media/videoprofile/H264.GOVLength"
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
+                        showRange="true"
                         aux="range=media/videoprofile/add_update/H264.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength;group=primaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
@@ -170,6 +172,7 @@
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
+                        showRange="true"
                         aux="range=media/videoprofile/add_update/H265.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength;group=primaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
@@ -215,7 +218,7 @@
                 </param>
                 
                 <param id="PRIMARY%media/videoprofile/H264.EntropyCoding"
-                        name="Entropy coding"
+                        name="Entropy Coding"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=264">
@@ -231,7 +234,7 @@
                 </param>
                 
                 <param id="PRIMARY%media/videoprofile/H265.EntropyCoding"
-                        name="Entropy coding"
+                        name="Entropy Coding"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=H265">
@@ -335,12 +338,14 @@
                         name="Bitrate"
                         dataType="Number"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate"/>
+                        showRange="true"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"/>
                         
                 <param id="SECONDARY%media/videoprofile/H264.GOVLength"
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
+                        showRange="true"
                         aux="range=media/videoprofile/add_update/H264.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
@@ -357,6 +362,7 @@
                         name="GOV Length"
                         dataType="Number"
                         writeCmd="update"
+                        showRange="true"
                         aux="range=media/videoprofile/add_update/H265.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H265">
                     <dependencies>
                         <dependencies-show>
@@ -402,7 +408,7 @@
                 </param>
                 
                 <param id="SECONDARY%media/videoprofile/H264.EntropyCoding"
-                        name="Entropy coding"
+                        name="Entropy Coding"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H265">
@@ -418,7 +424,7 @@
                 </param>
                 
                 <param id="SECONDARY%media/videoprofile/H265.EntropyCoding"
-                        name="Entropy coding"
+                        name="Entropy Coding"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H265">

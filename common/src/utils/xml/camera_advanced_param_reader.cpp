@@ -153,6 +153,7 @@ namespace QnXmlTag {
     const QString paramReadCmd          = lit("readCmd");
     const QString paramWriteCmd         = lit("writeCmd");
     const QString paramAux              = lit("aux");
+    const QString paramShowRange        = lit("showRange");
 
     const QString dependenciesRoot      = lit("dependencies");
     const QString dependenciesShow      = lit("dependencies-ranges");
@@ -248,6 +249,7 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
     param.readCmd       = elementXml.attribute(QnXmlTag::paramReadCmd);
     param.writeCmd      = elementXml.attribute(QnXmlTag::paramWriteCmd);
     param.aux           = elementXml.attribute(QnXmlTag::paramAux);
+    param.showRange     = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramShowRange));
 
     auto childNodes = elementXml.childNodes();
 

@@ -103,11 +103,12 @@ struct QnCameraAdvancedParameter
     QString description;
     QString tag;  
     bool readOnly = false;
-    QString readCmd; // read parameter command line. Isn't used in UI
-    QString writeCmd; // write parameter command line. Isn't used in UI
-    QString internalRange; // internal device values for range parameters
-    QString aux;
+    QString readCmd; //< Read parameter command line. Isn't used in UI.
+    QString writeCmd; //< Write parameter command line. Isn't used in UI.
+    QString internalRange; //< Internal device values for range parameters.
+    QString aux; //< Auxiliary driver dependent data.
     std::vector<QnCameraAdvancedParameterDependency> dependencies;
+    bool showRange = false; //< Show range near parameter's label
 
     bool isValid() const;
     QStringList getRange() const;
@@ -137,7 +138,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (writeCmd)\
     (internalRange)\
     (aux)\
-    (dependencies)
+    (dependencies)\
+    (showRange)
 
 struct QnCameraAdvancedParamGroup
 {

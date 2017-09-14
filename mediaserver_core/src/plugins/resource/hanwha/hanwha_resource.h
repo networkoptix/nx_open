@@ -122,6 +122,9 @@ private:
         QnCameraAdvancedParams* inOutParameters,
         const HanwhaCgiParameters& cgiParameters) const;
 
+    bool addSpecificRanges(
+        QnCameraAdvancedParameter* inOutParameter) const;
+
     boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
 
     boost::optional<QString> tryToGetSpecificParameterDefault(
