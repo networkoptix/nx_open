@@ -130,8 +130,8 @@ private:
     } m_auth;
 
     std::atomic_flag m_footageUpToDate;
+    std::atomic_flag m_currentServerUpToDate;
     QElapsedTimer m_reopenTimer;
-    mutable QnMutex m_rtpDataMutex;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
