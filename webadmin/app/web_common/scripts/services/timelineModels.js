@@ -67,15 +67,15 @@ timeManager.translate = function(date, reverse){
 };
 timeManager.nowLocal = function(){
     return (new Date()).getTime();
-}
+};
 timeManager.debug = function(message, date){
     console.log(message, {
         display: new Date(date),
         toServer: new Date(this.displayToServer(date)),
         toLocal: new Date(this.displayToLocal(date))
     });
-}
-timeManager.init = function(useServerTime, serverTime, serverTimeZoneOffset){
+};
+timeManager.getOffset = function(serverTime, serverTimeZoneOffset){
     var minTimeLag = 2000;// Two seconds
     var clientDate = new Date();
     var clientTime = clientDate.getTime();
@@ -83,14 +83,21 @@ timeManager.init = function(useServerTime, serverTime, serverTimeZoneOffset){
     if(Math.abs(clientTime - serverTime) > minTimeLag){
         latency = clientTime - serverTime;
     }
-
+    return {
+        latency:latency,
+        serverTimeZoneOffset: serverTimeZoneOffset
+    };
+};
+timeManager.setOffset = function(offset){
+    this.timeLatency = offset.latency; // time latency handles the situation when time is not synchronised
+    this.serverTimeZoneOffset = offset.serverTimeZoneOffset;
+    this.timeZoneOffset = this.clientTimeZoneOffset - this.serverTimeZoneOffset;
+};
+timeManager.init = function(useServerTime){
     this.useServerTime = useServerTime;
-    this.timeLatency = latency; // time latency handles the situation when time is not synchronised
-    this.serverTimeZoneOffset = serverTimeZoneOffset;
+    var clientDate = new Date();
     this.clientTimeZoneOffset = -clientDate.getTimezoneOffset() * 60000;
     // For some reason local timezone offset has wrong sign, so we sum them instead of subtractions
-
-    this.timeZoneOffset = this.clientTimeZoneOffset - this.serverTimeZoneOffset;
 };
 
 //Record

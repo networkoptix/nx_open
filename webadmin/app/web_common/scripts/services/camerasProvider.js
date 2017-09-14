@@ -13,6 +13,7 @@ angular.module('nxCommon')
             this.mediaServers = null;
             this.storage = $localStorage;
             this.poll = null;
+            this.serverOffsets = {};
 
             this.bothRequest = null;
         }
@@ -307,6 +308,18 @@ angular.module('nxCommon')
                 }
             }
             return null;
+        };
+
+        camerasProvider.prototype.getServerTimes = function(){
+            var servers = this.getMediaServers();
+            var self = this;
+            _.each(servers,function(server){
+                system.getTime(server.id).then(function(result){
+                    var serverUtcTime = parseInt(result.data.reply.utcTime);
+                    var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
+                    self.serverOffsets[server.id] = timeManager.getOffset(serverUtcTime, timeZoneOffset);
+                });
+            });
         };
 
         return {
