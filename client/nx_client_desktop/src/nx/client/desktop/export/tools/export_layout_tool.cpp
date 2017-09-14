@@ -39,8 +39,8 @@
 #endif
 
 namespace {
-    const int retryTimes = 3;
-    const int retryDelayMs = 500;
+const int retryTimes = 3;
+const int retryDelayMs = 500;
 }
 
 namespace nx {
@@ -60,7 +60,7 @@ ExportLayoutTool::ItemInfo::ItemInfo(const QString& name, qint64 timezone):
 }
 
 
-ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* parent) :
+ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* parent):
     QObject(parent),
     m_settings(settings),
     m_realFilename(m_settings.filename.completeFileName())
@@ -124,7 +124,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     if (!resourcePool)
         return result;
 
-    for (const auto& item: m_layout->getItems())
+    for (const auto& item : m_layout->getItems())
     {
         const auto resource = resourcePool->getResourceByDescriptor(item.resource);
         if (!resource)
@@ -158,13 +158,14 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
 }
 
 
-bool ExportLayoutTool::exportMetadata(const ItemInfoList &items) {
+bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
+{
 
     /* Names of exported resources. */
     {
         QByteArray names;
         QTextStream itemNames(&names, QIODevice::WriteOnly);
-        for (const ItemInfo &info: items)
+        for (const ItemInfo &info : items)
             itemNames << info.name << lit("\n");
         itemNames.flush();
 
@@ -176,7 +177,7 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items) {
     {
         QByteArray timezones;
         QTextStream itemTimeZonesStream(&timezones, QIODevice::WriteOnly);
-        for (const ItemInfo &info: items)
+        for (const ItemInfo &info : items)
             itemTimeZonesStream << info.timezone << lit("\n");
         itemTimeZonesStream.flush();
 
@@ -204,20 +205,23 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items) {
     /* Additional flags. */
     {
         quint32 flags = m_settings.readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
-        for (const QnMediaResourcePtr resource: m_resources) {
-            if (resource->toResource()->hasFlags(Qn::utc)) {
+        for (const QnMediaResourcePtr resource : m_resources)
+        {
+            if (resource->toResource()->hasFlags(Qn::utc))
+            {
                 flags |= QnLayoutFileStorageResource::ContainsCameras;
                 break;
             }
         }
 
-        if (!tryAsync([this, flags] {
+        if (!tryAsync([this, flags]
+        {
             QScopedPointer<QIODevice> miscFile(m_storage->open(lit("misc.bin"), QIODevice::WriteOnly));
             if (!miscFile)
                 return false;
-            miscFile->write((const char*) &flags, sizeof(flags));
+            miscFile->write((const char*)&flags, sizeof(flags));
             return true;
-        } ))
+        }))
             return false;
     }
 
@@ -228,7 +232,8 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items) {
     }
 
     /* Chunks. */
-    for (const QnMediaResourcePtr &resource: m_resources) {
+    for (const QnMediaResourcePtr &resource : m_resources)
+    {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
         auto loader = qnClientModule->cameraDataManager()->loader(resource);
@@ -253,15 +258,17 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items) {
             cache.reset(new ServerImageCache(this));
 
         QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
-        if (!background.isNull()) {
+        if (!background.isNull())
+        {
 
-            if (!tryAsync([this, background] {
+            if (!tryAsync([this, background]
+            {
                 QScopedPointer<QIODevice> imageFile(m_storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly));
                 if (!imageFile)
                     return false;
                 background.save(imageFile.data(), "png");
                 return true;
-            } ))
+            }))
                 return false;
 
             LocalFileCache localCache;
@@ -272,13 +279,15 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items) {
     return true;
 }
 
-bool ExportLayoutTool::start() {
+bool ExportLayoutTool::start()
+{
     if (!prepareStorage())
         return false;
 
     ItemInfoList items = prepareLayout();
 
-    if (!exportMetadata(items)) {
+    if (!exportMetadata(items))
+    {
         m_errorMessage = tr("Could not create output file %1...").arg(m_settings.filename.completeFileName());
         emit finished(false, m_settings.filename.completeFileName());   //file is not created, finishExport() is not required
         return false;
@@ -289,38 +298,46 @@ bool ExportLayoutTool::start() {
     return exportNextCamera();
 }
 
-void ExportLayoutTool::stop() {
+void ExportLayoutTool::stop()
+{
     m_stopped = true;
     m_resources.clear();
     m_errorMessage = QString(); //suppress error by manual canceling
 
-    if (m_currentCamera) {
+    if (m_currentCamera)
+    {
         connect(m_currentCamera, SIGNAL(exportStopped()), this, SLOT(at_camera_exportStopped()));
         m_currentCamera->stopExport();
-    } else {
+    }
+    else
+    {
         finishExport(false);
     }
 }
 
-ExportLayoutSettings::Mode ExportLayoutTool::mode() const {
+ExportLayoutSettings::Mode ExportLayoutTool::mode() const
+{
     return m_settings.mode;
 }
 
-QString ExportLayoutTool::errorMessage() const {
+QString ExportLayoutTool::errorMessage() const
+{
     return m_errorMessage;
 }
 
-bool ExportLayoutTool::exportNextCamera() {
+bool ExportLayoutTool::exportNextCamera()
+{
     if (m_stopped)
         return false;
 
-    if (m_resources.isEmpty()) {
+    if (m_resources.isEmpty())
+    {
         finishExport(true);
         return false;
-    } else {
-        m_offset++;
-        return exportMediaResource(m_resources.dequeue());
     }
+
+    m_offset++;
+    return exportMediaResource(m_resources.dequeue());
 }
 
 void ExportLayoutTool::finishExport(bool success)
@@ -365,16 +382,16 @@ void ExportLayoutTool::finishExport(bool success)
             if (existing)
                 resourcePool->removeResources(existing->layoutResources().toList() << existing);
 
-            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl(), resourcePool);
-            if (!layout)
-            {
-                /* Something went wrong */
-                m_errorMessage = tr("Unknown error has occurred.");
-                QFile::remove(m_realFilename);
-                emit finished(false, m_settings.filename.completeFileName());
-                return;
-            }
-            resourcePool->addResource(layout);
+            //auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl(), resourcePool);
+            //if (!layout)
+            //{
+            //    /* Something went wrong */
+            //    m_errorMessage = tr("Unknown error has occurred.");
+            //    QFile::remove(m_realFilename);
+            //    emit finished(false, m_settings.filename.completeFileName());
+            //    return;
+            //}
+            //resourcePool->addResource(layout);
             break;
         }
         default:
@@ -410,20 +427,22 @@ void ExportLayoutTool::finishExport(bool success)
 
 }
 
-bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
+bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
+{
     m_currentCamera = new QnClientVideoCamera(resource);
-    connect(m_currentCamera,    SIGNAL(exportProgress(int)),            this,   SLOT(at_camera_progressChanged(int)));
-    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &ExportLayoutTool::at_camera_exportFinished);
+    connect(m_currentCamera, SIGNAL(exportProgress(int)), this, SLOT(at_camera_progressChanged(int)));
+    connect(m_currentCamera, &QnClientVideoCamera::exportFinished, this, &ExportLayoutTool::at_camera_exportFinished);
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
-    for (int i = 0; i < numberOfChannels; ++i) {
+    for (int i = 0; i < numberOfChannels; ++i)
+    {
         QSharedPointer<QBuffer> motionFileBuffer(new QBuffer());
         motionFileBuffer->open(QIODevice::ReadWrite);
         m_currentCamera->setMotionIODevice(motionFileBuffer, i);
     }
 
     QString uniqId = resource->toResource()->getUniqueId();
-    uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
+    uniqId = uniqId.mid(uniqId.indexOf(L'?') + 1); // simplify name if export from existing layout
     auto role = StreamRecorderRole::fileExport;
     if (resource->toResource()->hasFlags(Qn::utc))
         role = StreamRecorderRole::fileExportWithEmptyContext;
@@ -431,23 +450,22 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     qint64 serverTimeZone = QnWorkbenchServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
     m_currentCamera->exportMediaPeriodToFile(m_settings.period,
-                                    uniqId,
-                                    lit("mkv"),
-                                    m_storage,
-                                    role,
-                                    serverTimeZone,
-                                    0,
-                                    QnImageFilterHelper()
-                                    );
+        uniqId,
+        lit("mkv"),
+        m_storage,
+        role,
+        serverTimeZone,
+        0,
+        QnImageFilterHelper()
+    );
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;
 }
 
 void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct& status,
-    const QString& filename)
+    const QString& /*filename*/)
 {
-    Q_UNUSED(filename)
     if (status.lastError != StreamRecorderError::noError)
     {
         m_errorMessage = QnStreamRecorder::errorString(status.lastError);
@@ -455,21 +473,23 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
         return;
     }
 
-    QnClientVideoCamera* camera = dynamic_cast<QnClientVideoCamera*>(sender());
+    auto camera = dynamic_cast<QnClientVideoCamera*>(sender());
     if (!camera)
         return;
 
     int numberOfChannels = camera->resource()->getVideoLayout()->channelCount();
     bool error = false;
 
-    for (int i = 0; i < numberOfChannels; ++i) {
-        if (QSharedPointer<QBuffer> motionFileBuffer = camera->motionIODevice(i)) {
+    for (int i = 0; i < numberOfChannels; ++i)
+    {
+        if (QSharedPointer<QBuffer> motionFileBuffer = camera->motionIODevice(i))
+        {
             motionFileBuffer->close();
             if (error)
                 continue;
 
             QString uniqId = camera->resource()->toResource()->getUniqueId();
-            uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).completeBaseName(); // simplify name if export from existing layout
+            uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?') + 1)).completeBaseName(); // simplify name if export from existing layout
             QString motionFileName = lit("motion%1_%2.bin").arg(i).arg(uniqId);
             /* Other buffers must be closed even in case of error. */
             writeData(motionFileName, motionFileBuffer->buffer());
@@ -480,7 +500,7 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
 
     if (error)
     {
-        QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        auto camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
         const auto resourcePool = camRes->resourcePool();
         NX_ASSERT(resourcePool);
@@ -500,25 +520,29 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     }
 }
 
-void ExportLayoutTool::at_camera_exportStopped() {
+void ExportLayoutTool::at_camera_exportStopped()
+{
     if (m_currentCamera)
         m_currentCamera->deleteLater();
 
     finishExport(false);
 }
 
-void ExportLayoutTool::at_camera_progressChanged(int progress) {
+void ExportLayoutTool::at_camera_progressChanged(int progress)
+{
     emit valueChanged(m_offset * 100 + progress);
 }
 
-bool ExportLayoutTool::tryAsync( std::function<bool()> handler ) {
+bool ExportLayoutTool::tryAsync(std::function<bool()> handler)
+{
     if (!handler)
         return false;
 
     QPointer<QObject> guard(this);
     int times = retryTimes;
 
-    while (times > 0) {
+    while (times > 0)
+    {
         if (!guard)
             return false;
 
@@ -542,14 +566,17 @@ bool ExportLayoutTool::tryAsync( std::function<bool()> handler ) {
     return false;
 }
 
-bool ExportLayoutTool::writeData( const QString &fileName, const QByteArray &data ) {
-    return tryAsync([this, fileName, data] {
-        QScopedPointer<QIODevice> file(m_storage->open(fileName, QIODevice::WriteOnly));
-        if (!file)
-            return false;
-        file->write(data);
-        return true;
-    } );
+bool ExportLayoutTool::writeData(const QString &fileName, const QByteArray &data)
+{
+    return tryAsync(
+        [this, fileName, data]
+        {
+            QScopedPointer<QIODevice> file(m_storage->open(fileName, QIODevice::WriteOnly));
+            if (!file)
+                return false;
+            file->write(data);
+            return true;
+        });
 }
 
 } // namespace desktop

@@ -8,6 +8,7 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/streaming/archive_stream_reader.h>
@@ -58,12 +59,52 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
 struct WorkbenchExportHandler::Private
 {
     QScopedPointer<ExportManager> exportManager;
-    QHash<QnUuid, QPointer<QnProgressDialog>> progressDialogs;
+
+    struct ExportInfo
+    {
+        Filename filename;
+        QPointer<QnProgressDialog> progressDialog;
+    };
+    QHash<QnUuid, ExportInfo> runningExports;
 
     WorkbenchExportHandler::Private():
         exportManager(new ExportManager())
     {
+    }
 
+    static void addResourceToPool(const Filename& filename, QnResourcePool* resourcePool)
+    {
+        const auto completeFilename = filename.completeFileName();
+        NX_ASSERT(QFileInfo(completeFilename).exists());
+        if (!QFileInfo(completeFilename).exists())
+            return;
+
+        switch (filename.extension)
+        {
+            case FileExtension::avi:
+            case FileExtension::mkv:
+            case FileExtension::mp4:
+            {
+                QnAviResourcePtr file(new QnAviResource(completeFilename));
+                file->setStatus(Qn::Online);
+                resourcePool->addResource(file);
+                break;
+            }
+
+            case FileExtension::nov:
+            case FileExtension::exe64:
+            case FileExtension::exe86:
+            {
+                const auto layout = QnResourceDirectoryBrowser::layoutFromFile(
+                    completeFilename, resourcePool);
+                if (layout)
+                    resourcePool->addResource(layout);
+                break;
+            }
+            default:
+                NX_ASSERT(false, "Unsuported format");
+                break;
+        }
     }
 
 
@@ -90,14 +131,7 @@ WorkbenchExportHandler::~WorkbenchExportHandler()
 
 void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
 {
-    qDebug() << "Export process"
-        << info.id.toString()
-        << "state"
-        << int(info.status)
-        << "progress"
-        << info.progressValue;
-
-    if (auto dialog = d->progressDialogs.value(info.id))
+    if (auto dialog = d->runningExports.value(info.id).progressDialog)
     {
         dialog->setMinimum(info.rangeStart);
         dialog->setMaximum(info.rangeEnd);
@@ -107,20 +141,22 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
 
 void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info)
 {
-    if (auto dialog = d->progressDialogs.value(info.id))
+    const auto exportProcess = d->runningExports.take(info.id);
+
+    if (auto dialog = exportProcess.progressDialog)
     {
         dialog->hide();
         dialog->deleteLater();
     }
-    d->progressDialogs.remove(info.id);
 
     switch (info.status)
     {
         case ExportProcessStatus::success:
-            // TODO: #GDM add resource to the pool
+            d->addResourceToPool(exportProcess.filename, resourcePool());
             QnMessageBox::success(mainWindow(), tr("Export completed"));
             break;
         case ExportProcessStatus::failure:
+            // TODO: #GDM show full error message
             QnMessageBox::warning(mainWindow(), tr("Export failed"));
             break;
         case ExportProcessStatus::cancelled:
@@ -130,11 +166,6 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     }
 
     /*
-     *        QnAviResourcePtr file(new QnAviResource(fileName));
-        file->setStatus(Qn::Online);
-        resourcePool()->addResource(file);
-        showExportCompleteMessage();
-    }
     else if (tool->status() != StreamRecorderError::noError)
     {
         QnMessageBox::critical(mainWindow(),
@@ -166,18 +197,22 @@ void WorkbenchExportHandler::handleExportVideoAction()
         return;
 
     QnUuid exportProcessId;
-    QString title;
+    Filename filename;
     switch (dialog->mode())
     {
         case ExportSettingsDialog::Mode::Media:
         {
-            exportProcessId = d->exportManager->exportMedia(dialog->exportMediaSettings());
-            // TODO: #ynikitenkov immediately check status, export may not start in some cases.
+            const auto settings = dialog->exportMediaSettings();
+            exportProcessId = d->exportManager->exportMedia(settings);
+            filename = settings.fileName;
+            // TODO: #GDM immediately check status, export may not start in some cases.
             break;
         }
         case ExportSettingsDialog::Mode::Layout:
         {
-            exportProcessId = d->exportManager->exportLayout(dialog->exportLayoutSettings());
+            const auto settings = dialog->exportLayoutSettings();
+            exportProcessId = d->exportManager->exportLayout(settings);
+            filename = settings.filename;
             break;
         }
         default:
@@ -190,7 +225,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
         return;
 
     auto progressDialog = new QnProgressDialog(
-        title,
+        filename.completeFileName(),
         tr("Stop Export"),
         0,
         100,
@@ -201,7 +236,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             d->exportManager->stopExport(exportProcessId);
         });
 
-    d->progressDialogs.insert(exportProcessId, progressDialog);
+    d->runningExports.insert(exportProcessId, { filename, progressDialog });
     progressDialog->show();
     // Fill dialog with initial values (export is already running).
     exportProcessUpdated(d->exportManager->info(exportProcessId));
