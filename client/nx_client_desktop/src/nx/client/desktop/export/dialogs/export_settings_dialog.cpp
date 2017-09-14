@@ -106,11 +106,6 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
 
     autoResizePagesToContents(ui->tabWidget,
         QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed), true);
-    autoResizePagesToContents(ui->alertsStackedWidget,
-        QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed), true);
-
-    connect(ui->tabWidget, &QTabWidget::currentChanged,
-        ui->alertsStackedWidget, &QStackedWidget::setCurrentIndex);
 
     d->createOverlays(ui->mediaPreviewWidget);
 
@@ -126,7 +121,7 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
         });
 
     d->loadSettings();
-    QObject::connect(this, &QDialog::accepted, [this]() { d->saveSettings(); });
+    connect(this, &QDialog::accepted, d, &Private::saveSettings);
 
     d->setTimePeriod(timePeriod);
 
@@ -140,9 +135,13 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
         ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
     }
 
+    ui->mediaFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Media));
+    ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Layout));
+
     updateSettingsWidgets();
 
-    connect(ui->filenamePanel, &FilenamePanel::filenameChanged, d, &Private::setFilename);
+    connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setMediaFilename);
+    connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
         d, &Private::setTimestampOverlaySettings);
@@ -344,7 +343,8 @@ void ExportSettingsDialog::updateSettingsWidgets()
     ui->bookmarkSettingsPage->setData(d->bookmarkOverlaySettings());
     ui->imageSettingsPage->setData(d->imageOverlaySettings());
     ui->textSettingsPage->setData(d->textOverlaySettings());
-    ui->filenamePanel->setFilename(d->exportMediaSettings().fileName);
+    ui->mediaFilenamePanel->setFilename(d->exportMediaSettings().fileName);
+    ui->layoutFilenamePanel->setFilename(d->exportLayoutSettings().filename);
 }
 
 void ExportSettingsDialog::updateMode()
@@ -352,9 +352,8 @@ void ExportSettingsDialog::updateMode()
     const auto currentMode = ui->tabWidget->currentWidget() == ui->cameraTab
         ? Mode::Media
         : Mode::Layout;
-    d->setMode(currentMode);
 
-    ui->filenamePanel->setAllowedExtensions(d->allowedFileExtensions());
+    d->setMode(currentMode);
 }
 
 void ExportSettingsDialog::updateAlerts()

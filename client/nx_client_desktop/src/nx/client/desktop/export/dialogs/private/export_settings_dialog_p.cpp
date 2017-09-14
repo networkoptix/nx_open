@@ -114,9 +114,13 @@ void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
     m_exportLayoutSettings.period = period;
 }
 
-void ExportSettingsDialog::Private::setFilename(const Filename& filename)
+void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     m_exportMediaSettings.fileName = filename;
+}
+
+void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
+{
     m_exportLayoutSettings.filename = filename;
 }
 
@@ -152,10 +156,10 @@ void ExportSettingsDialog::Private::setMode(Mode mode)
     m_mode = mode;
 }
 
-FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions() const
+FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode)
 {
     FileExtensionList result;
-    switch(m_mode)
+    switch (mode)
     {
         case Mode::Media:
             result

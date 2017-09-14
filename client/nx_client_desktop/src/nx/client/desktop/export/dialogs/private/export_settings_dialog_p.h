@@ -56,7 +56,8 @@ public:
     void setMediaResource(const QnMediaResourcePtr& media);
     void setLayout(const QnLayoutResourcePtr& layout);
     void setTimePeriod(const QnTimePeriod& period);
-    void setFilename(const Filename& filename);
+    void setMediaFilename(const Filename& filename);
+    void setLayoutFilename(const Filename& filename);
     void setRapidReviewFrameStep(qint64 frameStepMs);
 
     ErrorCode status() const;
@@ -65,7 +66,7 @@ public:
     Mode mode() const;
     void setMode(Mode mode);
 
-    FileExtensionList allowedFileExtensions() const;
+    static FileExtensionList allowedFileExtensions(Mode mode);
 
     ExportMediaSettings exportMediaSettings() const;
     ExportLayoutSettings exportLayoutSettings() const;
