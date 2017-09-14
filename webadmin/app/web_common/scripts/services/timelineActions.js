@@ -177,7 +177,7 @@ TimelineActions.prototype.scrollingStop = function(){
 
 TimelineActions.prototype.scrollByPixels = function(pixels){
     this.scaleManager.scrollByPixels(pixels);
-    this.delayWatchingPlayingPosition();   
+    this.delayWatchingPlayingPosition();
 };
 
 
@@ -200,6 +200,8 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
     }
 
     var keepWatching = false;
+    //Need to make sure scaleManager is watching live. Only force it when heading to the right edge
+    self.scaleManager.checkWatch(zoomCoordinate == self.scaleManager.viewportWidth);
     //zooming in
     if(zoom >= zoomTarget){
         /*If the zoomCoordinate is at the right border it will be set to the viewport width.
@@ -210,9 +212,7 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
     }
     //zooming out
     else{
-        //Make sure the scale manager is watching the correct position
         //If scaleManager is watching live we ignore delayingWatchingPlayingPosition
-        self.scaleManager.checkWatch(true);
         keepWatching = self.scaleManager.watch.live;
     }
 

@@ -1072,8 +1072,8 @@ ScaleManager.prototype.watchPosition = function(date, livePosition){
     this.setAnchorDateAndPoint(date, targetPoint);
 };
 
-ScaleManager.prototype.checkWatch = function(force){
-    if(!force && this.watch.forcedToStop){
+ScaleManager.prototype.checkWatch = function(liveOnly){
+    if(!liveOnly && this.watch.forcedToStop){
         return;  // was forced to stop - wait for release
     }
 
@@ -1084,7 +1084,7 @@ ScaleManager.prototype.checkWatch = function(force){
     //      no: live position is visible or close to right border?
     //           yes: watch live and return
 
-    if(this.playing){
+    if(!liveOnly && this.playing){
         // check current playing position is visible
         var playingPoint = this.dateToScreenCoordinate(this.playedPosition);
         if(0 <= playingPoint && playingPoint <= this.viewportWidth - 1){ // playing position is visible on the screen
