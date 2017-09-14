@@ -202,10 +202,16 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
     var keepWatching = false;
     //zooming in
     if(zoom >= zoomTarget){
+        /*If the zoomCoordinate is at the right border it will be set to the viewport width.
+          When the scaleManager is watching the live position it still needs to keep updating the end.
+          If both conditions are true then we ignore the delayingWatchingPlayingPosition in the setZoom function.
+        */
         keepWatching = zoomCoordinate == self.scaleManager.viewportWidth && self.scaleManager.watch.live;
     }
     //zooming out
     else{
+        //Make sure the scale manager is watching the correct position
+        //If scaleManager is watching live we ignore delayingWatchingPlayingPosition
         self.scaleManager.checkWatch(true);
         keepWatching = self.scaleManager.watch.live;
     }
@@ -219,8 +225,12 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
             zoomCoordinate
         );
 
+        //Have to skip delayWatchingPlayingPosition because it freezes visibleEnd
+        //As a result zoom will not behave correctly
         if(!keepWatching)
+        {
             self.delayWatchingPlayingPosition();
+        }
     }
 
 
