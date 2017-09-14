@@ -177,7 +177,15 @@ TimelineActions.prototype.scrollingStop = function(){
 
 TimelineActions.prototype.scrollByPixels = function(pixels){
     this.scaleManager.scrollByPixels(pixels);
-    this.delayWatchingPlayingPosition();
+
+    //If we cant scroll right and we are trying to watch live position and dont delay
+    //Otherwise proceed as normal
+    if(!this.scaleManager.canScroll(false) && pixels > 0){
+        this.scaleManager.checkWatch(true);
+    }
+    else{
+        this.delayWatchingPlayingPosition();
+    }
 };
 
 
