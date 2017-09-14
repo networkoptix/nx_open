@@ -48,8 +48,7 @@ QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
     QObject* parent)
     :
-    QObject(parent),
-    m_clientCoreModule(new QnClientCoreModule())
+    QObject(parent)
 {
     Q_INIT_RESOURCE(mobile_client);
 
@@ -60,12 +59,12 @@ QnMobileClientModule::QnMobileClientModule(
     QGuiApplication::setApplicationName(QnMobileClientAppInfo::applicationName());
     QGuiApplication::setApplicationDisplayName(QnMobileClientAppInfo::applicationDisplayName());
     QGuiApplication::setApplicationVersion(QnAppInfo::applicationVersion());
-
     // We should load translations before major client's services are started to prevent races
     QnMobileClientTranslationManager *translationManager = new QnMobileClientTranslationManager();
     translationManager->updateTranslation();
 
     /* Init singletons. */
+    m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
