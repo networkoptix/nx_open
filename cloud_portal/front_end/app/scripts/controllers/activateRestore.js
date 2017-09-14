@@ -64,6 +64,7 @@ angular.module('cloudApp')
                 errorPrefix:L.errorCodes.cantChangePasswordPrefix
             }).then(function(){
                 setContext('changeSuccess');
+                dialogs.dismissNotifications();
                 $location.path('/restore_password/success', false); // Change url, do not reload
             });
 
@@ -80,6 +81,7 @@ angular.module('cloudApp')
                 $scope.restoring = false;
                 $scope.restoringSuccess = true;
                 setContext('restoringSuccess');
+                dialogs.dismissNotifications();
                 $location.path('/restore_password/sent', false); // Change url, do not reload
             });
 
@@ -104,6 +106,7 @@ angular.module('cloudApp')
             }).then(function(){
                 setContext('activateSuccess');
                 $scope.activationSuccess = true;
+                dialogs.dismissNotifications();
                 $location.path('/activate/success', false); // Change url, do not reload
             });
 
