@@ -144,11 +144,6 @@ bool HanwhaResourceSearcher::processPacket(
         cameraMac = QnMacAddress(devInfo.serialNumber);
 
     QString model(devInfo.modelName);
-    QnNetworkResourcePtr existingRes = resourcePool()->getResourceByMacAddress(cameraMac.toString());
-    QAuthenticator cameraAuth;
-
-    if (existingRes)
-        cameraAuth = existingRes->getAuth();
 
 	{
 		QnMutexLocker lock(&m_mutex);
@@ -157,7 +152,7 @@ bool HanwhaResourceSearcher::processPacket(
     }
 
     decltype(m_foundUpnpResources) foundUpnpResources;
-    createResource(devInfo, cameraMac, cameraAuth, foundUpnpResources);
+    createResource(devInfo, cameraMac, QAuthenticator(), foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
     m_alreadFoundMacAddresses.insert(cameraMac.toString());
