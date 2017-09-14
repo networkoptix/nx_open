@@ -282,7 +282,7 @@ angular.module('nxCommon')
                 function viewportMouseWheel(event){
                     updateMouseCoordinate(event);
                     event.preventDefault();
-                    var vertical = Math.abs(event.deltaY) > Math.abs(event.deltaX);
+                    var vertical = Math.abs(event.deltaY) >= Math.abs(event.deltaX);
 
                     if(vertical) { // Zoom or scroll - not both
                         timelineActions.zoomByWheel(event.deltaY, mouseOverElements, mouseXOverTimeline);
@@ -320,7 +320,7 @@ angular.module('nxCommon')
                             timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
                         }
                         if(mouseOverElements.timeline){
-                            timelineActions.timelineDragStart(mouseXOverTimeline)
+                            timelineActions.timelineDragStart(mouseXOverTimeline);
                         }
                     },
                     update: function(x, y) {

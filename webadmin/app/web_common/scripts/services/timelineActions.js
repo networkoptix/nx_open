@@ -199,6 +199,18 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
         return; // No need to zoom
     }
 
+    var keepWatching = false;
+    //zooming in
+    if(zoom >= zoomTarget){
+        keepWatching = zoomCoordinate == self.scaleManager.viewportWidth && self.scaleManager.watch.live;
+    }
+    //zooming out
+    else{
+        self.scaleManager.checkWatch(true);
+        keepWatching = self.scaleManager.watch.live;
+    }
+
+
     this.updateZoomLevels(zoomTarget);
     function setZoom(value){
         // Actually, we'd better use zoom around coordinate instead of date?
@@ -206,7 +218,9 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
             value,
             zoomCoordinate
         );
-        self.delayWatchingPlayingPosition();
+
+        if(!keepWatching)
+            self.delayWatchingPlayingPosition();
     }
 
 

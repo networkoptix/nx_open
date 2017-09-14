@@ -1022,7 +1022,6 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.anchorPoint = this.bound(0, this.anchorPoint, 1);
     this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
 
-
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
 
@@ -1073,8 +1072,8 @@ ScaleManager.prototype.watchPosition = function(date, livePosition){
     this.setAnchorDateAndPoint(date, targetPoint);
 };
 
-ScaleManager.prototype.checkWatch = function(){
-    if(this.watch.forcedToStop){
+ScaleManager.prototype.checkWatch = function(force){
+    if(!force && this.watch.forcedToStop){
         return;  // was forced to stop - wait for release
     }
 
