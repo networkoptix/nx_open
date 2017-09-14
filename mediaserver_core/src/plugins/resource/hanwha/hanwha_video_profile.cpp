@@ -16,6 +16,13 @@ void setInteger(T* target, const QString& stringParameter)
         *target = tmp;
 }
 
+const QSet<QString> kKnownBuiltinProfiles = {
+    lit("PLUGINFREE"),
+    lit("MOBILE"),
+    lit("LeftHalfView"),
+    lit("RightHalfView")
+};
+
 } // namespace
 
 void HanwhaVideoProfile::setParameter(
@@ -62,6 +69,11 @@ void HanwhaVideoProfile::setParameter(
         fixed = parameterValue == lit("True");
     else if (parameterName == lit("ProfileToken"))
         token = parameterValue;
+}
+
+bool HanwhaVideoProfile::isBuiltinProfile() const
+{
+    return this->fixed || kKnownBuiltinProfiles.contains(this->name);
 }
 
 } // namespace plugins

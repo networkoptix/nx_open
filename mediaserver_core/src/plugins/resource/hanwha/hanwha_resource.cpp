@@ -824,11 +824,11 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     {
         const auto& profile = entry.second;
         
-        if (profile.name == kPrimaryNxProfileName)
+        if (profile.name == nxProfileName(Qn::ConnectionRole::CR_LiveVideo))
             *outPrimaryProfileNumber = profile.number;
-        else if (profile.name == kSecondaryNxProfileName)
+        else if (profile.name == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo))
             *outSecondaryProfileNumber = profile.number;
-        else if (!profile.fixed)
+        else if (!profile.isBuiltinProfile())
             profilesToRemoveIfProfilesExhausted->insert(profile.number);
     }
 

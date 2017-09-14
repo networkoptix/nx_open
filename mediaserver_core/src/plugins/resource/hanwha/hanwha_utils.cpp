@@ -1,6 +1,8 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 
+#include <utils/common/app_info.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -117,22 +119,21 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
 
 QString nxProfileName(Qn::ConnectionRole role)
 {
-    switch (role)
-    {
-        case Qn::ConnectionRole::CR_LiveVideo:
-            return kPrimaryNxProfileName;
-        case Qn::ConnectionRole::CR_SecondaryLiveVideo:
-            return kSecondaryNxProfileName;
-        default:
-            NX_ASSERT(false, "Wrong role");
-            return QString();
-    }
+    auto suffix = role == Qn::ConnectionRole::CR_LiveVideo
+        ? kHanwhaPrimaryNxProfileSuffix
+        : kHanwhaSecondaryNxProfileSuffix;
+
+    auto appName = QnAppInfo::productNameShort()
+        .mid(0, kHanwhaProfileNameMaxLength - suffix.length())
+        .remove(QRegExp("[^a-zA-Z]"));
+
+    return appName + suffix;
 }
 
 bool isNxProfile(const QString& profileName)
 {
-    return profileName == kPrimaryNxProfileName
-        || profileName == kSecondaryNxProfileName;
+    return profileName == nxProfileName(Qn::ConnectionRole::CR_LiveVideo)
+        || profileName == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo);
 }
 
 template<>

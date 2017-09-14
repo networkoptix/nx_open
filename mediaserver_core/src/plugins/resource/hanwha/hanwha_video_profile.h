@@ -50,6 +50,8 @@ struct HanwhaVideoProfile
     QString token;
 
     void setParameter(const QString& parameterName, const QString& parameterValue);
+
+    bool isBuiltinProfile() const;
 };
 
 } // namespace plugins

@@ -48,9 +48,10 @@ static const int kHanwhaInvalidBitrate = -1;
 static const int kHanwhaInvalidChannel = -1;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaMaxPresetNumber = 1000;
+static const int kHanwhaProfileNameMaxLength = 12;
 
-const QString kPrimaryNxProfileName = lit("NxPrimary");
-const QString kSecondaryNxProfileName = lit("NxSecondary");
+const QString kHanwhaPrimaryNxProfileSuffix = lit("P");
+const QString kHanwhaSecondaryNxProfileSuffix = lit("S");
 
 static const QString kHanwhaTrue = lit("True");
 static const QString kHanwhaFalse = lit("False");
