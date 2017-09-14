@@ -1,6 +1,12 @@
 #include "export_media_validator.h"
 
+#include <client/client_module.h>
+
+#include <camera/camera_data_manager.h>
+#include <camera/loaders/caching_camera_data_loader.h>
+
 #include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 #include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/data/export_media_settings.h>
@@ -20,22 +26,20 @@ namespace
 static const qint64 kMaxRecordingDurationMs = 1000 * 60 * 30;
 static const qint64 kTimelapseBaseFrameStepMs = 1000 / ui::dialogs::ExportRapidReview::kResultFps;
 
-bool validateLength(const QnTimePeriod& timePeriod, qint64 timelapseFrameStepMs = 0)
+bool validateLength( const ExportMediaSettings& settings)
 {
-    const auto exportSpeed = qMax(1ll, timelapseFrameStepMs / kTimelapseBaseFrameStepMs);
+    const auto exportSpeed = qMax(1ll, settings.timelapseFrameStepMs / kTimelapseBaseFrameStepMs);
 
     // TODO: #GDM implement more precise estimation
-    const auto durationMs = timePeriod.durationMs;
+    auto durationMs = settings.timePeriod.durationMs;
 
-    /* //TODO: #GDM Restore this logic #3.1.1 #high
-        if (auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource))
-        {
-            QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
-            if (!periods.isEmpty())
-                durationMs = periods.duration();
-            NX_ASSERT(durationMs > 0, "Intersected periods must not be empty or infinite");
-        }
-     */
+    if (const auto loader = qnClientModule->cameraDataManager()->loader(settings.mediaResource))
+    {
+        const auto periods = loader->periods(Qn::RecordingContent).intersected(settings.timePeriod);
+        if (!periods.isEmpty())
+            durationMs = periods.duration();
+        NX_ASSERT(durationMs > 0, "Intersected periods must not be empty or infinite");
+    }
 
     return durationMs / exportSpeed <= kMaxRecordingDurationMs;
 }
@@ -47,8 +51,11 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 {
     Results results;
 
-    if  (!validateLength(settings.timePeriod, settings.timelapseFrameStepMs))
+    if  (!validateLength(settings))
         results.set(int(Result::tooLong));
+
+    if (!FileExtensionUtils::isExecutable(settings.fileName.extension))
+        results.set(int(Result::transcodingInBinaryIsNotSupported));
 
     /*
     if (!FileExtensionUtils::isExecutable(settings.filename.extension))

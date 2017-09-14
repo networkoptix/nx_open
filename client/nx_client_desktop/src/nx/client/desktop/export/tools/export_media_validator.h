@@ -19,7 +19,8 @@ public:
         downscaling,
         transcoding,
         tooLong,
-        timelapseInBinaryIsNotSupported,
+        tooBigExeFile,
+        transcodingInBinaryIsNotSupported,
 
 
         count

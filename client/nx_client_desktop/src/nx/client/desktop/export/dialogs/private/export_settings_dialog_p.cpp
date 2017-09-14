@@ -26,6 +26,7 @@ ExportSettingsDialog::Private::Private(const QSize& previewSize, QObject* parent
     base_type(parent),
     m_previewSize(previewSize)
 {
+    m_exportLayoutSettings.mode = ExportLayoutSettings::Mode::Export;
 }
 
 ExportSettingsDialog::Private::~Private()
@@ -80,6 +81,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
 
 void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
 {
+    m_exportLayoutSettings.layout = layout;
     m_layoutImageProvider.reset();
     if (!layout)
         return;

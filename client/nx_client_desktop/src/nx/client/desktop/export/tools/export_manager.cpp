@@ -2,6 +2,7 @@
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/tools/export_media_tool.h>
+#include "export_layout_tool.h"
 
 namespace nx {
 namespace client {
@@ -47,23 +48,72 @@ public:
             });
     }
 
-    const ExportProcessInfo& info() const
-    {
-        return m_info;
-    }
-
-    void start()
+    virtual void start() override
     {
         m_tool->start();
     }
 
-    void stop()
+    virtual void stop() override
     {
         m_tool->stop();
     }
 
 private:
     ExportMediaTool* m_tool;
+};
+
+class ExportLayoutProcess: public ExportProcess
+{
+public:
+    ExportLayoutProcess(const ExportLayoutSettings& settings, QObject* parent):
+        ExportProcess(parent),
+        m_tool(new ExportLayoutTool(settings, this))
+    {
+        NX_ASSERT(settings.mode == ExportLayoutSettings::Mode::Export);
+        connect(m_tool, &ExportLayoutTool::rangeChanged, this,
+            [this](int from, int to)
+            {
+                m_info.rangeStart = from;
+                m_info.rangeEnd = to;
+                m_info.progressValue = qBound(from, m_info.progressValue, to);
+                emit infoChanged(m_info);
+            });
+
+        connect(m_tool, &ExportLayoutTool::valueChanged, this,
+            [this](int value)
+            {
+                m_info.progressValue = qBound(m_info.rangeStart, value, m_info.rangeEnd);
+                NX_EXPECT(m_info.progressValue == value, "Value not in range");
+                emit infoChanged(m_info);
+            });
+/*
+        connect(m_tool, &ExportLayoutTool::stageChanged, this,...
+        connect(m_tool, &ExportLayoutTool::statusChanged, this,
+            [this](ExportProcessStatus status)
+        {
+            m_info.status = status;
+            emit infoChanged(m_info);
+        });*/
+
+        connect(m_tool, &ExportLayoutTool::finished, this,
+            [this]
+            {
+                emit finished(m_info.id);
+            });
+    }
+
+    virtual void start() override
+    {
+        m_tool->start();
+    }
+
+    virtual void stop() override
+    {
+        m_tool->stop();
+    }
+
+private:
+    ExportLayoutTool* m_tool;
 };
 
 } // namespace
@@ -73,46 +123,68 @@ ExportProcess::ExportProcess(QObject* parent):
 {
 }
 
+ExportProcess::~ExportProcess()
+{
+}
+
+const ExportProcessInfo& ExportProcess::info() const
+{
+    return m_info;
+}
+
 struct ExportManager::Private
 {
-    QMap<QnUuid, QPointer<ExportMediaProcess>> exportMediaProcesses;
+    ExportManager* const q;
+    QMap<QnUuid, QPointer<ExportProcess>> exportProcesses;
+
+    explicit ExportManager::Private(ExportManager* owner):
+        q(owner)
+    {
+    }
+
+    QnUuid startExport(ExportProcess* process)
+    {
+        connect(process, &ExportMediaProcess::infoChanged, q, &ExportManager::processUpdated);
+        connect(process, &ExportMediaProcess::finished, q,
+            [this](const QnUuid& id)
+            {
+                if (auto process = exportProcesses.take(id))
+                {
+                    emit q->processFinished(process->info());
+                    process->deleteLater();
+                }
+            });
+        exportProcesses.insert(process->info().id, process);
+        process->start();
+        return process->info().id;
+    }
 };
 
 ExportManager::ExportManager(QObject* parent):
     base_type(parent),
-    d(new Private())
+    d(new Private(this))
 {
-
 }
 
 QnUuid ExportManager::exportMedia(const ExportMediaSettings& settings)
 {
-    auto process = new ExportMediaProcess(settings, this);
-    connect(process, &ExportMediaProcess::infoChanged, this, &ExportManager::processUpdated);
-    connect(process, &ExportMediaProcess::finished, this,
-        [this](const QnUuid& id)
-        {
-            if (auto process = d->exportMediaProcesses.take(id))
-            {
-                emit processFinished(process->info());
-                process->deleteLater();
-            }
-        });
-    d->exportMediaProcesses.insert(process->info().id, process);
-    process->start();
+    return d->startExport(new ExportMediaProcess(settings, this));
+}
 
-    return process->info().id;
+QnUuid ExportManager::exportLayout(const ExportLayoutSettings& settings)
+{
+    return d->startExport(new ExportLayoutProcess(settings, this));
 }
 
 void ExportManager::stopExport(const QnUuid& exportProcessId)
 {
-    if (const auto process = d->exportMediaProcesses.value(exportProcessId))
+    if (const auto process = d->exportProcesses.value(exportProcessId))
         process->stop();
 }
 
 ExportProcessInfo ExportManager::info(const QnUuid& exportProcessId) const
 {
-    if (const auto process = d->exportMediaProcesses.value(exportProcessId))
+    if (const auto process = d->exportProcesses.value(exportProcessId))
         return process->info();
     return ExportProcessInfo();
 }

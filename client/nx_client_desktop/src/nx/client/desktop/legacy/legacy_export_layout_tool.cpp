@@ -4,6 +4,7 @@
 #include <QtCore/QEventLoop>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
@@ -220,7 +221,7 @@ bool ExportLayoutTool::exportMetadata(const ExportLayoutTool::ItemInfoList &item
     for (const QnMediaResourcePtr &resource: m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        auto loader = context()->instance<QnCameraDataManager>()->loader(resource);
+        auto loader = qnClientModule->cameraDataManager()->loader(resource);
         if (!loader)
             continue;
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_settings.period);

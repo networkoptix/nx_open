@@ -129,6 +129,20 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             NX_ASSERT(false, "Invalid state");
     }
 
+    /*
+     *        QnAviResourcePtr file(new QnAviResource(fileName));
+        file->setStatus(Qn::Online);
+        resourcePool()->addResource(file);
+        showExportCompleteMessage();
+    }
+    else if (tool->status() != StreamRecorderError::noError)
+    {
+        QnMessageBox::critical(mainWindow(),
+            tr("Failed to export video"),
+            QnStreamRecorder::errorString(tool->status()));
+     *
+     */
+
 }
 
 void WorkbenchExportHandler::handleExportVideoAction()
@@ -163,7 +177,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
         }
         case ExportSettingsDialog::Mode::Layout:
         {
-
+            exportProcessId = d->exportManager->exportLayout(dialog->exportLayoutSettings());
             break;
         }
         default:

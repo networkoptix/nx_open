@@ -576,7 +576,6 @@ bool QnTimeServerSelectionModel::hasInternetAccess() const
 
 bool QnTimeServerSelectionModel::calculateSameTimezone() const
 {
-    auto watcher = context()->instance<QnWorkbenchServerTimeWatcher>();
     qint64 localOffset = nx_tz::getLocalTimeZoneOffset(); /* In minutes. */
     qint64 commonOffset = localOffset == -1
         ? Qn::InvalidUtcOffset
@@ -588,7 +587,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
         if (!server || server->getStatus() != Qn::Online)
             continue;
 
-        auto offsetMs = watcher->utcOffset(server);
+        auto offsetMs = server->utcOffset();
         if (offsetMs == Qn::InvalidUtcOffset)
             continue;
 

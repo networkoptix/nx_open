@@ -4,6 +4,7 @@
 #include <QtCore/QEventLoop>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
@@ -24,16 +25,14 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 #include <plugins/resource/avi/avi_resource.h>
 
-#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
-#include <client_core/client_core_module.h>
 
 #include <nx/utils/app_info.h>
+#include "ui/workbench/watchers/workbench_server_time_watcher.h"
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -48,20 +47,21 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-ExportLayoutTool::ItemInfo::ItemInfo()
-    : name()
-    , timezone(0)
-{}
+ExportLayoutTool::ItemInfo::ItemInfo():
+    name(),
+    timezone(0)
+{
+}
 
-ExportLayoutTool::ItemInfo::ItemInfo( const QString name, qint64 timezone )
-    : name(name)
-    , timezone(timezone)
-{}
+ExportLayoutTool::ItemInfo::ItemInfo(const QString& name, qint64 timezone):
+    name(name),
+    timezone(timezone)
+{
+}
 
 
 ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
     m_settings(settings),
     m_realFilename(m_settings.filename.completeFileName())
 {
@@ -74,6 +74,9 @@ ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* paren
         m_layout->setId(QnUuid::createUuid());
 }
 
+ExportLayoutTool::~ExportLayoutTool()
+{
+}
 
 bool ExportLayoutTool::prepareStorage()
 {
@@ -103,7 +106,7 @@ bool ExportLayoutTool::prepareStorage()
         QFile::remove(m_realFilename);
     }
 
-    m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource(qnClientCoreModule->commonModule()));
+    m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource(m_layout->commonModule()));
     m_storage->setUrl(m_realFilename);
     return true;
 }
@@ -115,10 +118,19 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     QSet<QString> uniqIdList;
     QnLayoutItemDataMap items;
 
-    for (const QnLayoutItemData &item: m_layout->getItems())
+    // Take resource pool from the original layout.
+    const auto resourcePool = m_settings.layout->resourcePool();
+    NX_ASSERT(resourcePool, "Export of temporary layout is forbidden");
+    if (!resourcePool)
+        return result;
+
+    for (const auto& item: m_layout->getItems())
     {
-        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(item.resource);
+        const auto resource = resourcePool->getResourceByDescriptor(item.resource);
         if (!resource)
+            continue;
+
+        if (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page))
             continue;
 
         QnLayoutItemData localItem = item;
@@ -135,7 +147,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
                 m_resources << mediaRes;
                 uniqIdList << uniqueId;
             }
-            info.timezone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
+            info.timezone = QnWorkbenchServerTimeWatcher::utcOffset(mediaRes, Qn::InvalidUtcOffset);
         }
 
         items.insert(localItem.uuid, localItem);
@@ -146,7 +158,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
 }
 
 
-bool ExportLayoutTool::exportMetadata(const ExportLayoutTool::ItemInfoList &items) {
+bool ExportLayoutTool::exportMetadata(const ItemInfoList &items) {
 
     /* Names of exported resources. */
     {
@@ -219,7 +231,7 @@ bool ExportLayoutTool::exportMetadata(const ExportLayoutTool::ItemInfoList &item
     for (const QnMediaResourcePtr &resource: m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        auto loader = context()->instance<QnCameraDataManager>()->loader(resource);
+        auto loader = qnClientModule->cameraDataManager()->loader(resource);
         if (!loader)
             continue;
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_settings.period);
@@ -323,9 +335,16 @@ void ExportLayoutTool::finishExport(bool success)
     if (m_realFilename != m_settings.filename.completeFileName())
         m_storage->renameFile(m_storage->getUrl(), m_settings.filename.completeFileName());
 
-    auto existing = resourcePool()->getResourceByUrl(m_settings.filename.completeFileName())
+    // Take resource pool from the original layout.
+    const auto resourcePool = m_settings.layout->resourcePool();
+    NX_ASSERT(resourcePool);
+    if (!resourcePool)
+        return;
+
+    auto existing = resourcePool->getResourceByUrl(m_settings.filename.completeFileName())
         .dynamicCast<QnLayoutResource>();
 
+    // TODO: #GDM move this logic to handler
     switch (m_settings.mode)
     {
         case ExportLayoutSettings::Mode::LocalSave:
@@ -335,7 +354,7 @@ void ExportLayoutTool::finishExport(bool success)
             if (existing)
             {
                 existing->update(m_layout);
-                snapshotManager()->store(existing);
+                //snapshotManager()->store(existing); //TODO: #GDM restore functionality
             }
             break;
         }
@@ -344,9 +363,9 @@ void ExportLayoutTool::finishExport(bool success)
         {
             /* Existing is present if we did 'Save As..' with another existing layout name. */
             if (existing)
-                resourcePool()->removeResources(existing->layoutResources().toList() << existing);
+                resourcePool->removeResources(existing->layoutResources().toList() << existing);
 
-            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl(), resourcePool());
+            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl(), resourcePool);
             if (!layout)
             {
                 /* Something went wrong */
@@ -355,7 +374,7 @@ void ExportLayoutTool::finishExport(bool success)
                 emit finished(false, m_settings.filename.completeFileName());
                 return;
             }
-            resourcePool()->addResource(layout);
+            resourcePool->addResource(layout);
             break;
         }
         default:
@@ -409,7 +428,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     if (resource->toResource()->hasFlags(Qn::utc))
         role = StreamRecorderRole::fileExportWithEmptyContext;
 
-    qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
+    qint64 serverTimeZone = QnWorkbenchServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
     m_currentCamera->exportMediaPeriodToFile(m_settings.period,
                                     uniqId,
@@ -463,9 +482,10 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     {
         QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
-        //: "Could not export camera AXIS1334"
+        const auto resourcePool = camRes->resourcePool();
+        NX_ASSERT(resourcePool);
         m_errorMessage = QnDeviceDependentStrings::getNameFromSet(
-            resourcePool(),
+            resourcePool,
             QnCameraDeviceStringSet(
                 tr("Could not export device %1."),
                 tr("Could not export camera %1."),

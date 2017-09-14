@@ -7,6 +7,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <common/common_globals.h>
 
@@ -275,7 +276,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
 )
 {
     qint64 durationMs = period.durationMs;
-    auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    auto loader = qnClientModule->cameraDataManager()->loader(mediaResource);
     if (loader)
     {
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
@@ -435,7 +436,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
 
         if (selectedExtension.contains(lit(".avi")))
         {
-            if (auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource))
+            if (auto loader = qnClientModule->cameraDataManager()->loader(mediaResource))
             {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
                 if (periods.size() > 1)
@@ -922,7 +923,7 @@ void WorkbenchExportHandler::at_exportRapidReviewAction_triggered()
 
     qint64 durationMs = period.durationMs;
     QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
-    auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    auto loader = qnClientModule->cameraDataManager()->loader(mediaResource);
     if (loader)
     {
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);

@@ -2,16 +2,12 @@
 
 #include <QtCore/QObject>
 
-#include <client/client_globals.h>
-
 #include <core/resource/resource_fwd.h>
 
 #include <nx/client/desktop/export/data/export_layout_settings.h>
 
 #include <recording/time_period.h>
 #include <recording/stream_recorder.h>
-
-#include <ui/workbench/workbench_context_aware.h>
 
 class QnClientVideoCamera;
 
@@ -24,11 +20,12 @@ namespace desktop {
  * every new export process. Correct behaviour while re-using is not guarantied. Notifies about
  * progress of the process.
  */
-class ExportLayoutTool : public QObject, public QnWorkbenchContextAware
+class ExportLayoutTool : public QObject
 {
     Q_OBJECT
 public:
     explicit ExportLayoutTool(ExportLayoutSettings settings, QObject* parent = nullptr);
+    virtual ~ExportLayoutTool() override;
 
     /**
      * @brief start                             Start exporting. Async.
@@ -95,7 +92,7 @@ private:
         qint64 timezone;
 
         ItemInfo();
-        ItemInfo(const QString name, qint64 timezone);
+        ItemInfo(const QString& name, qint64 timezone);
     };
     typedef QList<ItemInfo> ItemInfoList;
 

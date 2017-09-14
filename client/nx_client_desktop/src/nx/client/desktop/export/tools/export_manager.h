@@ -10,10 +10,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-struct ExportMediaSettings;
-
-
-
 struct ExportProcessInfo
 {
     const QnUuid id = QnUuid::createUuid();
@@ -29,7 +25,13 @@ class ExportProcess: public QObject
     Q_OBJECT
 
 public:
-    ExportProcess(QObject* parent = nullptr);
+    explicit ExportProcess(QObject* parent = nullptr);
+    virtual ~ExportProcess() override;
+
+    const ExportProcessInfo& info() const;
+
+    virtual void start() = 0;
+    virtual void stop() = 0;
 
 signals:
     void infoChanged(const ExportProcessInfo& info);
@@ -51,6 +53,7 @@ public:
     ExportManager(QObject* parent = nullptr);
 
     QnUuid exportMedia(const ExportMediaSettings& settings);
+    QnUuid exportLayout(const ExportLayoutSettings& settings);
     void stopExport(const QnUuid& exportProcessId);
 
     ExportProcessInfo info(const QnUuid& exportProcessId) const;

@@ -6,6 +6,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+struct ExportMediaSettings;
+struct ExportLayoutSettings;
+
 enum class ExportProcessStatus
 {
     initial,
