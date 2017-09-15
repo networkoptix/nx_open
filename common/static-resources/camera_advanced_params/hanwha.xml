@@ -820,8 +820,7 @@
             <group name="IR">
                 <param id="image/irled/Mode"
                         name="Mode"
-                        dataType="Enumeration"
-                        range="Off,Auto"/>
+                        dataType="Enumeration"/>
             </group>
         </group>
         <group name="Maintenance">
