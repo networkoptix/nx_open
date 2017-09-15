@@ -75,12 +75,12 @@ void Controller::subscribeForPeerConnected(
                     {
                         if (addPeerFuture.get())
                         {
-                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
                         else
                         {
-                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
 
@@ -101,12 +101,12 @@ void Controller::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscri
                     {
                         if (removePeerFuture.get())
                         {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
                         else
                         {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
 
