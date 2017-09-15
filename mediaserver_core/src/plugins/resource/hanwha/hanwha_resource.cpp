@@ -1073,14 +1073,14 @@ Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role)
     return result;
 }
 
-int HanwhaResource::streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality) const
+int HanwhaResource::streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality, int framerate) const
 {
-    return streamBitrateInternal(role, bitrateCoefficient(quality));
+    return streamBitrateInternal(role, bitrateCoefficient(quality), framerate);
 }
 
-int HanwhaResource::streamBitrate(Qn::ConnectionRole role, Qn::SecondStreamQuality quality) const
+int HanwhaResource::streamBitrate(Qn::ConnectionRole role, Qn::SecondStreamQuality quality, int framerate) const
 {
-    return streamBitrateInternal(role, bitrateCoefficient(quality));
+    return streamBitrateInternal(role, bitrateCoefficient(quality), framerate);
 }
 
 int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const
@@ -1633,7 +1633,8 @@ void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
 int HanwhaResource::suggestBitrate(
     const HanwhaCodecLimits& limits,
     Qn::BitrateControl bitrateControl,
-    double coefficient) const
+    double coefficient,
+    int framerate) const
 {
     int range = 0;
     int defaultBitrate = kHanwhaInvalidBitrate;
@@ -1657,10 +1658,12 @@ int HanwhaResource::suggestBitrate(
     else
         range = defaultBitrate - minBitrate;
 
+    const int bitrate = defaultBitrate * coefficient;
+
     return qBound(
-        (double) minBitrate,
-        defaultBitrate + range * coefficient,
-        (double) maxBitrate);
+        (double)minBitrate,
+        bitrate * ((double) framerate / limits.defaultFps),
+        (double)maxBitrate);
 }
 
 bool HanwhaResource::isBitrateInLimits(
@@ -1689,18 +1692,19 @@ double HanwhaResource::bitrateCoefficient(Qn::StreamQuality quality) const
     switch (quality)
     {
         case Qn::StreamQuality::QualityLowest:
-            return -1;
+            return 0.75;
         case Qn::StreamQuality::QualityLow:
-            return -0.5;
-        case Qn::StreamQuality::QualityHigh:
-            return 0.5;
-        case Qn::StreamQuality::QualityHighest:
-            return 1;
+            return 1.0;
         case Qn::StreamQuality::QualityNormal:
+            return 1.5;
+        case Qn::StreamQuality::QualityHigh:
+            return 2.0;
+        case Qn::StreamQuality::QualityHighest:
+            return 2.5;
         case Qn::StreamQuality::QualityPreSet:
         case Qn::StreamQuality::QualityNotDefined:
         default:
-            return 0;
+            return 1.0;
     }
 }
 
@@ -1719,7 +1723,10 @@ double HanwhaResource::bitrateCoefficient(Qn::SecondStreamQuality quality) const
     }
 }
 
-int HanwhaResource::streamBitrateInternal(Qn::ConnectionRole role, double coefficient) const
+int HanwhaResource::streamBitrateInternal(
+    Qn::ConnectionRole role, 
+    double coefficient, 
+    int framerate) const
 {
     const auto codec = streamCodec(role);
     const auto resolution = streamResolution(role);
@@ -1739,12 +1746,12 @@ int HanwhaResource::streamBitrateInternal(Qn::ConnectionRole role, double coeffi
 
     QString bitrateString = getProperty(propertyName);
     if (bitrateString.isEmpty())
-        return suggestBitrate(*limits, bitrateControl, coefficient);
+        return suggestBitrate(*limits, bitrateControl, coefficient, framerate);
 
     bool success = false;
     const int result = fromHanwhaString<int>(bitrateString, &success);
     if (!success || !isBitrateInLimits(*limits, bitrateControl, result))
-        return suggestBitrate(*limits, bitrateControl, coefficient);
+        return suggestBitrate(*limits, bitrateControl, coefficient, framerate);
 
     return result;
 }
