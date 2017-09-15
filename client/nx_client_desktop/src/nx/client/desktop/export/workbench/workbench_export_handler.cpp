@@ -7,9 +7,10 @@
 
 #include <camera/loaders/caching_camera_data_loader.h>
 
-#include <core/resource/camera_resource.h>
-#include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/resource_directory_browser.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/fusion/model_functions.h>
