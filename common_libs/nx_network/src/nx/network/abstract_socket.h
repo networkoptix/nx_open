@@ -256,6 +256,10 @@ public:
      */
     virtual SocketAddress getForeignAddress() const = 0;
     /**
+     * @return Text name of the remote host. By default, getForeignAddress().address.toString().
+     */
+    virtual QString getForeignHostName() const;
+    /**
      * Returns true, if connection has been established, false otherwise.
      */
     virtual bool isConnected() const = 0;
@@ -340,6 +344,8 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
+
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
 private:
     void readAsyncAtLeastImpl(
@@ -495,6 +501,8 @@ public:
      * NOTE: If called within socket's aio thread, then does not block.
      */
     virtual void cancelIOSync() = 0;
+
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

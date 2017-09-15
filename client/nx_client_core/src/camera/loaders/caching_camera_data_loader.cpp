@@ -234,7 +234,7 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
 
 void QnCachingCameraDataLoader::discardCachedData()
 {
-    NX_VERBOSE(this, "Chunks: clear local cache");
+    NX_VERBOSE(this) << "Chunks: clear local cache";
     for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
 
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);

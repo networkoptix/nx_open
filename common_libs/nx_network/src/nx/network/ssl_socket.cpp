@@ -26,18 +26,12 @@
 #include "ssl/ssl_static_data.h"
 
 #ifdef max
-#undef max
+    #undef max
 #endif
 
 #ifdef min
-#undef min
+    #undef min
 #endif
-
-#define DEBUG_LOG(MESSAGE) do \
-{ \
-    if (nx::network::SocketGlobals::debugIni().sslSocketWrappers) \
-        NX_LOGX(MESSAGE, cl_logDEBUG1); \
-} while (0)
 
 static const std::size_t kSslAsyncRecvBufferSize(1024 * 64);
 
@@ -129,7 +123,7 @@ public:
             m_readBytes += *sslReturn;
         }
 
-        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
+        NX_VERBOSE(this, lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(
@@ -151,7 +145,7 @@ protected:
         m_handler = nullptr;
 
         NX_ASSERT(handler != nullptr);
-        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        NX_VERBOSE(this, lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
         {
             case SslAsyncOperation::EXCEPTION:
@@ -182,7 +176,7 @@ public:
             m_ssl,m_writeBuffer->constData(),m_writeBuffer->size());
         *sslError = SSL_get_error(m_ssl,*sslReturn);
 
-        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
+        NX_VERBOSE(this, lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(
@@ -202,7 +196,7 @@ protected:
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
 
-        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        NX_VERBOSE(this, lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
         {
             case SslAsyncOperation::EXCEPTION:
@@ -229,7 +223,7 @@ public:
         *sslReturn = SSL_do_handshake(m_ssl);
         *sslError = SSL_get_error(m_ssl,*sslReturn);
 
-        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
+        NX_VERBOSE(this, lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(std::function<void(SystemError::ErrorCode)>&& handler)
@@ -246,7 +240,7 @@ protected:
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
 
-        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        NX_VERBOSE(this, lm("ivokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
         {
             case SslAsyncOperation::EXCEPTION:
@@ -297,7 +291,7 @@ public:
 
     void clear()
     {
-        DEBUG_LOG(lm("Clear read/write queues"));
+        NX_VERBOSE(this, lm("Clear read/write queues"));
         m_readQueue.clear();
         m_writeQueue.clear();
     }
@@ -527,12 +521,12 @@ void SslAsyncBioHelper::checkShutdown(int sslReturn, int sslError)
         sslError == SSL_ERROR_ZERO_RETURN) {
             // This should be the normal shutdown which means the
             // peer at least call SSL_shutdown once
-            DEBUG_LOG("normal shutdown");
+            NX_VERBOSE(this, "normal shutdown");
             m_eof = true;
     } else if (sslError == SSL_ERROR_SYSCALL) {
         // Brute shutdown for SSL connection
         if (ERR_get_error() == 0) {
-            DEBUG_LOG("brute shutdown");
+            NX_VERBOSE(this, "brute shutdown");
             m_eof = true;
         }
     }
@@ -558,14 +552,14 @@ void SslAsyncBioHelper::handleSslError(int sslReturn, int sslError)
         errorStack << QLatin1String(err_str);
     }
 
-    DEBUG_LOG(lm("SSL returns %1, error %2, stack: %3")
+    NX_VERBOSE(this, lm("SSL returns %1, error %2, stack: %3")
         .args(sslReturn, sslError).container(errorStack));
 }
 
 void SslAsyncBioHelper::onRecv(
     SystemError::ErrorCode errorCode, std::size_t transferred)
 {
-    DEBUG_LOG(lm("transport read %1: %2").args(transferred, SystemError::toString(errorCode)));
+    NX_VERBOSE(this, lm("transport read %1: %2").args(transferred, SystemError::toString(errorCode)));
     if (m_readQueue.empty()) return;
     if (errorCode != SystemError::noError) {
         DeletionFlag deleted(this);
@@ -599,7 +593,7 @@ void SslAsyncBioHelper::onRecv(
 void SslAsyncBioHelper::enqueueRead(SslAsyncOperation* operation)
 {
     m_readQueue.push_back(operation);
-    DEBUG_LOG(lm("there are %1 reads in queue").arg(m_readQueue.size()));
+    NX_VERBOSE(this, lm("there are %1 reads in queue").arg(m_readQueue.size()));
     if (m_readQueue.size() == 1) {
         m_outstandingRead = m_readQueue.front();
         doRead();
@@ -631,7 +625,7 @@ void SslAsyncBioHelper::doRead()
         // We have to issue our operations right just here since we have no
         // left data inside of the buffer and our user needs to read all the
         // data out in the buffer here.
-        DEBUG_LOG(lm("transport try read some"));
+        NX_VERBOSE(this, lm("transport try read some"));
         m_outstandingRead->increasePendingIOCount();
         m_underlySocket->readSomeAsync(
             &m_recvBuffer,
@@ -647,7 +641,7 @@ void SslAsyncBioHelper::onSend(
         SystemError::ErrorCode errorCode,
         std::size_t transferred)
 {
-    DEBUG_LOG(lm("transport sent %1: %2").args(transferred, SystemError::toString(errorCode)));
+    NX_VERBOSE(this, lm("transport sent %1: %2").args(transferred, SystemError::toString(errorCode)));
     Q_UNUSED(transferred);
     if (m_writeQueue.empty()) return;
     if (errorCode != SystemError::noError) {
@@ -674,7 +668,7 @@ void SslAsyncBioHelper::onSend(
 
 void SslAsyncBioHelper::doWrite()
 {
-    DEBUG_LOG(lm("transport try send %1").arg(m_outstandingWrite->writeBuffer.size()));
+    NX_VERBOSE(this, lm("transport try send %1").arg(m_outstandingWrite->writeBuffer.size()));
     m_outstandingWrite->operation->increasePendingIOCount();
     m_underlySocket->sendAsync(
         m_outstandingWrite->writeBuffer,
@@ -896,7 +890,7 @@ private:
         std::size_t transferred,
         SnifferData data)
     {
-        DEBUG_LOG(lm("Transport read %1: %2").args(transferred, SystemError::toString(ec)));
+        NX_VERBOSE(this, lm("Transport read %1: %2").args(transferred, SystemError::toString(ec)));
         // We have the data in our buffer right now
         if (ec) {
             data.completionHandler(ec,0);
@@ -1463,6 +1457,12 @@ SocketAddress SslSocket::getForeignAddress() const
     return d->wrappedSocket->getForeignAddress();
 }
 
+QString SslSocket::getForeignHostName() const
+{
+    Q_D(const SslSocket);
+    return d->wrappedSocket->getForeignHostName();
+}
+
 bool SslSocket::isConnected() const
 {
     Q_D(const SslSocket);
@@ -1542,7 +1542,7 @@ bool SslSocket::getNonBlockingMode(bool* value) const
 bool SslSocket::shutdown()
 {
     Q_D(SslSocket);
-    DEBUG_LOG("Shutdown...");
+    NX_VERBOSE(this, "Shutdown...");
     {
         QnMutexLocker lock(&d->syncIoMutex);
         d->isShutdown = true;
@@ -1552,11 +1552,11 @@ bool SslSocket::shutdown()
     d->wrappedSocket->pleaseStop(
         [this, d, &promise]()
         {
-            DEBUG_LOG("Shutdown: notify send");
+            NX_VERBOSE(this, "Shutdown: notify send");
             if (auto promisePtr = d->syncSendPromise.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
 
-            DEBUG_LOG("Shutdown: notify recv");
+            NX_VERBOSE(this, "Shutdown: notify recv");
             if (auto promisePtr = d->syncRecvPromise.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
 
@@ -1566,6 +1566,12 @@ bool SslSocket::shutdown()
 
     promise.get_future().wait();
     return d->wrappedSocket->shutdown();
+}
+
+QString SslSocket::idForToStringFromPtr() const
+{
+    Q_D(const SslSocket);
+    return d->wrappedSocket ? d->wrappedSocket->idForToStringFromPtr() : QString();
 }
 
 void SslSocket::connectAsync(
@@ -1676,7 +1682,7 @@ int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen)
     };
 
     int ret = d->asyncSslHelper->eof() ? 0 : bioRead();
-    DEBUG_LOG(lm("BIO read %1 returned %2").arg(bufferLen).arg(ret));
+    NX_VERBOSE(this, lm("BIO read %1 returned %2").arg(bufferLen).arg(ret));
     return ret;
 }
 
@@ -1686,7 +1692,7 @@ int SslSocket::asyncSendInternal(
 {
     Q_D(SslSocket);
     auto ret = static_cast<int>(d->asyncSslHelper->bioWrite(buffer, bufferLen));
-    DEBUG_LOG(lm("BIO write %1 returned %2").arg(bufferLen).arg(ret));
+    NX_VERBOSE(this, lm("BIO write %1 returned %2").arg(bufferLen).arg(ret));
     return ret;
 }
 

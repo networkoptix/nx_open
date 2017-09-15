@@ -290,7 +290,7 @@ namespace ec2
     {
         const auto& settings = m_ec2Connection->commonModule()->globalSettings();
 
-        if (httpClient->hasRequestSuccesed())
+        if (httpClient->hasRequestSucceeded())
         {
             m_timerCycle = kInitialTimerCycle;
             NX_LOGX(lm("Statistics report successfully sent to %1")

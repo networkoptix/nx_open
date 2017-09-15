@@ -41,6 +41,28 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    class InformationReader
+    {
+    public:
+        InformationReader(const ModuleConnector* parent);
+        ~InformationReader();
+
+        void setHandler(std::function<void(boost::optional<QnModuleInformation>, QString)> handler);
+        void start(const SocketAddress& endpoint);
+        HostAddress ip() const { return m_socket->getForeignAddress().address; }
+
+    private:
+        void readUntilError();
+
+        const ModuleConnector* const m_parent;
+        nx_http::AsyncHttpClientPtr m_httpClient;
+        SocketAddress m_endpoint;
+        nx::Buffer m_buffer;
+        std::unique_ptr<AbstractStreamSocket> m_socket;
+        std::function<void(boost::optional<QnModuleInformation>, QString)> m_handler;
+        nx::utils::ObjectDestructionFlag m_destructionFlag;
+    };
+
     class Module
     {
     public:
@@ -50,6 +72,7 @@ private:
         void addEndpoints(std::set<SocketAddress> endpoints);
         void ensureConnection();
         void setForbiddenEndpoints(std::set<SocketAddress> endpoints);
+        QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
     private:
         enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther, kCloud };
@@ -59,8 +82,7 @@ private:
         boost::optional<Endpoints::iterator> saveEndpoint(SocketAddress endpoint);
         void connectToGroup(Endpoints::iterator endpointsGroup);
         void connectToEndpoint(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
-        boost::optional<QnModuleInformation> getInformation(nx_http::AsyncHttpClientPtr client);
-        bool saveConnection(SocketAddress endpoint, nx_http::AsyncHttpClientPtr client,
+        bool saveConnection(SocketAddress endpoint, std::unique_ptr<InformationReader> reader,
             const QnModuleInformation& information);
 
     private:
@@ -69,8 +91,8 @@ private:
         Endpoints m_endpoints;
         std::set<SocketAddress> m_forbiddenEndpoints;
         network::RetryTimer m_reconnectTimer;
-        std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
-        std::unique_ptr<AbstractStreamSocket> m_socket;
+        std::list<std::unique_ptr<InformationReader>> m_attemptingReaders;
+        std::unique_ptr<InformationReader> m_connectedReader;
         network::aio::Timer m_disconnectTimer;
     };
 

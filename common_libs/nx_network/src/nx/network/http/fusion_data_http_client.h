@@ -7,6 +7,7 @@
 
 #include <nx/fusion/serialization_format.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <nx/fusion/serialization/lexical_functions.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/buffer_source.h>
@@ -93,11 +94,23 @@ public:
         const nx_http::StringType& protocolToUpgradeConnectionTo,
         nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
+        executeUpgrade(
+            nx_http::Method::options,
+            protocolToUpgradeConnectionTo,
+            std::move(handler));
+    }
+
+    void executeUpgrade(
+        nx_http::Method::ValueType httpMethod,
+        const nx_http::StringType& protocolToUpgradeConnectionTo,
+        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+    {
         m_handler = std::move(handler);
         addRequestBody();
 
         m_httpClient.doUpgrade(
             m_url,
+            httpMethod,
             protocolToUpgradeConnectionTo,
             std::bind(&self_type::requestDone, this, &m_httpClient));
     }

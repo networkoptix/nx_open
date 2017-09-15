@@ -86,7 +86,7 @@ QnAuthHelper::QnAuthHelper(
 {
     Ini ini;
 
-    const auto logger = nx::utils::log::addLogger({"QnAuthHelper"});
+    const auto logger = nx::utils::log::addLogger({nx::utils::log::Tag(typeid(QnAuthHelper))});
     logger->setDefaultLevel(static_cast<nx::utils::log::Level>(ini.logLevel));
     logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
 }

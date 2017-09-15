@@ -137,8 +137,8 @@ private:
 
         const ApiPersistentIdData remotePeer(connection->remotePeer());
         const auto& descriptor = ec2::getTransactionDescriptorByTransaction(tran);
-        auto remoteAccess = descriptor->
-            checkRemotePeerAccessFunc(commonModule(), connection->userAccessData(), tran.params);
+        auto remoteAccess = descriptor->checkRemotePeerAccessFunc(
+            commonModule(), connection.staticCast<Connection>()->userAccessData(), tran.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
             NX_VERBOSE(
@@ -169,6 +169,12 @@ private:
         {
             return;
         }
+        else if (connection->remotePeer().isCloudServer())
+        {
+            if (!descriptor->isPersistent || context->sendDataInProgress)
+                return;
+        }
+
         NX_ASSERT(!(remotePeer == peerId)); //< loop
 
         if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
@@ -296,6 +302,7 @@ private:
     bool handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handleSubscribeForAllDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data, const TransportHeader& header);
     bool handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList);
     template <typename Function>
@@ -329,7 +336,17 @@ private:
     bool needSubscribeDelay();
     void connectSignals(const P2pConnectionPtr& connection);
     void resotreAfterDbError();
-    bool selectAndSendTransactions(const P2pConnectionPtr& connection, QnTranState newSubscription);
+
+    /**
+     * Select next portion of data from transaction log and send it.
+     * @param addImplicitData - if parameter is false then select only data from newSubscription list.
+     * If parameter is true then add all data from sequence 0 what are not mentioned in the list.
+     */
+    bool selectAndSendTransactions(
+        const P2pConnectionPtr& connection,
+        QnTranState newSubscription,
+        bool addImplicitData);
+
     private slots:
     void at_gotMessage(QWeakPointer<ConnectionBase> connection, MessageType messageType, const QByteArray& payload);
     void at_stateChanged(QWeakPointer<ConnectionBase> connection, Connection::State state);
@@ -339,6 +356,7 @@ private:
         const QList<QByteArray>& serializedTransactions);
     void startReading(P2pConnectionPtr connection);
     void sendInitialDataToClient(const P2pConnectionPtr& connection);
+    void sendInitialDataToCloud(const P2pConnectionPtr& connection);
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
     void cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer);
 

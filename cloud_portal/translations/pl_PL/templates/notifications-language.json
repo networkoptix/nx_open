@@ -1,17 +1,17 @@
 {
   "activate_account":{
-    "emailSubject":"Confirm your account"
+    "emailSubject":"Potwierdź swoje konto"
   },
   "restore_password":{
-    "emailSubject":"Restore your password"
+    "emailSubject":"Przywróć swoje hasło"
   },
   "system_invite":{
-    "emailSubject":"Video system {{message.system_name}} was shared with you"
+    "emailSubject":"Udostępniono Ci system wideo {{message.system_name}}"
   },
   "system_shared":{
-    "emailSubject":"Video system {{message.system_name}} was shared with you"
+    "emailSubject":"Udostępniono Ci system wideo {{message.system_name}}"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"Wersja {{message.id}} jest gotowa do sprawdzenia"
   }
 }

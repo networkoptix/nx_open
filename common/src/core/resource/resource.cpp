@@ -1259,6 +1259,11 @@ QnCommonModule* QnResource::commonModule() const
     return nullptr;
 }
 
+QString QnResource::idForToStringFromPtr() const
+{
+    return getId().toSimpleString();
+}
+
 bool QnResource::saveParams()
 {
     NX_EXPECT(commonModule() && !getId().isNull());

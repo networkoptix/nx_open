@@ -46,6 +46,11 @@ int AbstractCommunicatingSocket::send(const QByteArray& data)
     return send(data.constData(), data.size());
 }
 
+QString AbstractCommunicatingSocket::getForeignHostName() const
+{
+    return getForeignAddress().address.toString();
+}
+
 void AbstractCommunicatingSocket::registerTimer(
     unsigned int timeout,
     nx::utils::MoveOnlyFunc<void()> handler)
@@ -87,6 +92,11 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
     #endif
 
     cancelIOSync(nx::network::aio::EventType::etNone);
+}
+
+QString AbstractCommunicatingSocket::idForToStringFromPtr() const
+{
+    return lm("%1->%2").args(getLocalAddress(), getForeignAddress());
 }
 
 void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
@@ -163,6 +173,11 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
 }
 
 //-------------------------------------------------------------------------------------------------
+
+QString AbstractStreamServerSocket::idForToStringFromPtr() const
+{
+    return lm("%1").args(getLocalAddress());
+}
 
 bool AbstractDatagramSocket::setDestAddr(
     const QString& foreignAddress,

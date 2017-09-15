@@ -17,7 +17,7 @@
         <product.title>${project.name}</product.title>
 
         <qt.libs>core</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_utils</global.libs>
     </properties>
 
     <dependencies>

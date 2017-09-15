@@ -127,6 +127,7 @@ win* {
     DEFINES += \
         NX_KIT_API=__declspec(dllimport) \
         NX_NETWORK_API=__declspec(dllimport) \
+        NX_CASSANDRA_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
         NX_FUSION_API=__declspec(dllimport) \
         NX_VMS_UTILS_API=__declspec(dllimport) \
@@ -136,6 +137,7 @@ win* {
     DEFINES += \
         NX_KIT_API= \
         NX_NETWORK_API= \
+        NX_CASSANDRA_API= \
         NX_UTILS_API= \
         NX_FUSION_API= \
         NX_VMS_UTILS_API= \
@@ -225,7 +227,11 @@ unix: {
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized -Wno-error=maybe-uninitialized
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+
+  linux {
+      QMAKE_CXXFLAGS += -Wno-error=maybe-uninitialized
+  }
 }
 
 !win32 {
@@ -254,13 +260,12 @@ linux*:!android {
     QMAKE_CXXFLAGS += -fno-omit-frame-pointer
     CONFIG(release, debug|release)|!equals(BOX, tx1): QMAKE_CXXFLAGS += -ggdb1
   }
-  QMAKE_LFLAGS += -rdynamic
+  QMAKE_LFLAGS += -rdynamic -Wl,--no-undefined
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 
   equals(TEMPLATE, app): QMAKE_RPATHDIR += $ORIGIN/../lib
-  contains(TEMPLATE, "lib"): LIBS += "-Wl,--allow-shlib-undefined"
 }
 
 ## MAC OS
@@ -273,10 +278,6 @@ macx {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
-
-  contains(TEMPLATE, "lib") {
-    QMAKE_LFLAGS += -undefined dynamic_lookup
-  }
 }
 
 ## ANDROID

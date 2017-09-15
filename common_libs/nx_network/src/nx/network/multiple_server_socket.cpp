@@ -9,12 +9,6 @@
 #include "stream_server_socket_to_acceptor_wrapper.h"
 #include "socket_global.h"
 
-#define DEBUG_LOG(MESSAGE) do \
-{ \
-    if (nx::network::SocketGlobals::debugIni().multipleServerSocket) \
-        NX_LOGX(MESSAGE, cl_logDEBUG1); \
-} while (0)
-
 namespace nx {
 namespace network {
 
@@ -187,7 +181,7 @@ MultipleServerSocket_FORWARD_SET(listen, int);
 
 AbstractStreamSocket* MultipleServerSocket::accept()
 {
-    DEBUG_LOG(lm("accept()"));
+    NX_VERBOSE(this, lm("accept()"));
     if (m_nonBlockingMode)
     {
         for (auto& server : m_serverSockets)
@@ -210,7 +204,7 @@ AbstractStreamSocket* MultipleServerSocket::accept()
             post(
                 [this, &promise, code, socket = std::move(rawSocket)]() mutable
                 {
-                    DEBUG_LOG(lm("accept() returns %1").arg(socket));
+                    NX_VERBOSE(this, lm("accept() returns %1").arg(socket));
                     promise.set_value(std::make_pair(code, std::move(socket)));
                 });
         });
@@ -271,7 +265,7 @@ void MultipleServerSocket::acceptAsync(AcceptCompletionHandler handler)
 
 void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    DEBUG_LOG(lm("Canceling async IO asynchronously..."));
+    NX_VERBOSE(this, lm("Canceling async IO asynchronously..."));
     post(
         [this, handler = std::move(handler)]() mutable
         {
@@ -283,7 +277,7 @@ void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler
 
 void MultipleServerSocket::cancelIOSync()
 {
-    DEBUG_LOG(lm("Canceling async IO synchronously..."));
+    NX_VERBOSE(this, lm("Canceling async IO synchronously..."));
     nx::utils::promise<void> ioCancelledPromise;
     dispatch(
         [this, &ioCancelledPromise]() mutable
@@ -299,7 +293,7 @@ void MultipleServerSocket::cancelIOSync()
 bool MultipleServerSocket::addSocket(
     std::unique_ptr<AbstractStreamServerSocket> socket)
 {
-    DEBUG_LOG(lm("Add socket(%1)").arg(socket));
+    NX_VERBOSE(this, lm("Add socket(%1)").arg(socket));
     if (!socket->setNonBlockingMode(true))
         return false;
 

@@ -21,8 +21,7 @@
 using namespace nx::cdb;
 
 class CloudAuthentication:
-    public MediaServerCloudIntegrationTest,
-    public ::testing::Test
+    public MediaServerCloudIntegrationTest
 {
 public:
     CloudAuthentication()
@@ -172,19 +171,19 @@ private:
     }
 };
 
-TEST_F(CloudAuthentication, authorize_api_request_with_cloud_credentials)
+TEST_P(CloudAuthentication, authorize_api_request_with_cloud_credentials)
 {
     assertServerAuthorizesCloudUserCredentials();
 }
 
-TEST_F(CloudAuthentication, one_step_digest_authentication_using_nonce_received_from_cloud)
+TEST_P(CloudAuthentication, one_step_digest_authentication_using_nonce_received_from_cloud)
 {
     givenCloudNonce();
     whenIssuedHttpRequestSignedWithThatNonce();
     thenRequestShouldBeFulfilled();
 }
 
-TEST_F(CloudAuthentication, authenticating_on_mediaserver_using_temporary_cloud_credentials)
+TEST_P(CloudAuthentication, authenticating_on_mediaserver_using_temporary_cloud_credentials)
 {
     givenTemporaryCloudCredentials();
     assertServerAuthorizesCloudUserCredentials();
@@ -216,13 +215,13 @@ protected:
         ASSERT_EQ(
             api::ResultCode::ok,
             cdb()->addAccount(&newAccount, &m_inivitedUserPassword, &accountConfirmationCode));
-        
+
         std::string resultEmail;
         ASSERT_EQ(
             api::ResultCode::ok,
             cdb()->activateAccount(accountConfirmationCode, &resultEmail));
     }
-    
+
     void assertInvitedUserIsAuthenticatedSuccessfully()
     {
         while (!userRequestIsAuthorizedByServer(m_inivitedUserEmail, m_inivitedUserPassword))
@@ -236,8 +235,12 @@ private:
     std::string m_inivitedUserPassword;
 };
 
-TEST_F(CloudAuthenticationInviteUser, invited_user_is_authorized_by_mediaserver)
+TEST_P(CloudAuthenticationInviteUser, invited_user_is_authorized_by_mediaserver)
 {
     inviteCloudUser();
     assertInvitedUserIsAuthenticatedSuccessfully();
 }
+
+INSTANTIATE_TEST_CASE_P(P2pMode, CloudAuthenticationInviteUser,
+    ::testing::Values(TestParams(false), TestParams(true)
+));

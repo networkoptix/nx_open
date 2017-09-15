@@ -186,6 +186,7 @@ Object
     function pause()
     {
         mediaPlayer.pause()
+        d.savePosition();
     }
 
     function preview()

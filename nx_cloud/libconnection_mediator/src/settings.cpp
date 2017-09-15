@@ -209,6 +209,11 @@ const TrafficRelay& Settings::trafficRelay() const
     return m_trafficRelay;
 }
 
+const nx::cloud::discovery::conf::Discovery& Settings::discovery() const
+{
+    return m_discovery;
+}
+
 void Settings::initializeWithDefaultValues()
 {
     m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
@@ -294,6 +299,8 @@ void Settings::loadSettings()
     loadConnectionParameters();
 
     loadTrafficRelay();
+
+    m_discovery.load(settings());
 
     //analyzing values
     if (m_general.dataDir.isEmpty())

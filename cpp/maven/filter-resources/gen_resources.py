@@ -194,9 +194,6 @@ if __name__ == '__main__':
 
     append_file(specifics_file, output_pro_file)
 
-    with open(output_pro_file, 'a') as dst:
-        dst.write("\nQMAKE_CXXFLAGS -= -Werror\n")
-
     with open(output_pro_file, "a") as f:
         gentext(f, '${project.build.sourceDirectory}', ['.cpp', '.c'], 'SOURCES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.h'], 'HEADERS += ')

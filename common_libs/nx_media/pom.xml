@@ -18,7 +18,7 @@
         <product.title>${company.name} nx_media</product.title>
 
         <qt.libs>core gui multimedia multimedia-private</qt.libs>
-        <global.libs>-lcommon -lnx_kit</global.libs>
+        <global.libs>-lcommon -lnx_kit -lnx_audio -lnx_fusion -lnx_utils</global.libs>
 
         <rdep.packages>ffmpeg</rdep.packages>
         <rdep.android.packages>libjpeg-turbo</rdep.android.packages>

@@ -274,7 +274,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
         timeouts.responseReadTimeout = std::chrono::milliseconds(kHttpReadTimeout);
         nx_http::downloadFileAsyncEx(
             apiUrl, requestCompletionFunc, nx_http::HttpHeaders(),
-            nx_http::AsyncHttpClient::authBasicAndDigest, std::move(timeouts));
+            nx_http::AuthType::authBasicAndDigest, std::move(timeouts));
         ++workers;
     }
     while (workers > 0)
@@ -364,7 +364,7 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
         timeouts.responseReadTimeout = std::chrono::milliseconds(kHttpReadTimeout);
         nx_http::downloadFileAsyncEx(
             apiUrl, requestCompletionFunc, nx_http::HttpHeaders(),
-            nx_http::AsyncHttpClient::authBasicAndDigest, std::move(timeouts));
+            nx_http::AuthType::authBasicAndDigest, std::move(timeouts));
         ++workers;
     }
     while (workers > 0)

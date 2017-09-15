@@ -42,7 +42,7 @@ private:
     nx::Buffer* m_readBuffer = nullptr;
     std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
     nx::network::TCPSocket m_delegatee;
-    nx::utils::bstream::ReflectingPipeline m_reflectingPipeline;
+    nx::utils::bstream::Pipe m_reflectingPipeline;
     SocketAddress m_foreignAddress;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
     boost::optional<std::chrono::milliseconds> m_postDelay;

@@ -14,7 +14,7 @@ ZoomableFlickable
 
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
-
+    property size fitSize: content.boundedSize(width, height)
     function getMoveViewportData(position)
     {
         var mapped = mapToItem(video, position.x, position.y)

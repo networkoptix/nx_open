@@ -44,6 +44,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <helpers/system_helpers.h>
+
 using namespace nx::client::desktop::ui;
 
 namespace
@@ -422,7 +424,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
     if (localId.isNull())
         return;
 
-    NX_DEBUG("CredentialsManager", lm("Forget password of %1 to the system %2")
+    NX_DEBUG(nx::client::core::helpers::kCredentialsLogTag, lm("Forget password of %1 to the system %2")
         .arg(userName).arg(localSystemId));
 
     const auto callback = [localId, userName]()

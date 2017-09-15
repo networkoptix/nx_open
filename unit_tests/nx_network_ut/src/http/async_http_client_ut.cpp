@@ -15,6 +15,7 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
@@ -65,11 +66,6 @@ public:
     AsyncHttpClient():
         m_testHttpServer(std::make_unique<TestHttpServer>())
     {
-        m_testHttpServer->registerRequestProcessor<SslAssertHandler>(
-            lit("/httpOnly"), []() { return std::make_unique<SslAssertHandler>(false); });
-
-        m_testHttpServer->registerRequestProcessor<SslAssertHandler>(
-            lit("/httpsOnly"), []() { return std::make_unique<SslAssertHandler>(true); });
     }
 
     TestHttpServer& testHttpServer()
@@ -85,6 +81,44 @@ public:
 protected:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
 
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        m_testHttpServer->registerRequestProcessor<SslAssertHandler>(
+            lit("/httpOnly"), []() { return std::make_unique<SslAssertHandler>(false); });
+
+        m_testHttpServer->registerRequestProcessor<SslAssertHandler>(
+            lit("/httpsOnly"), []() { return std::make_unique<SslAssertHandler>(true); });
+
+        ASSERT_TRUE(
+            m_testHttpServer->registerRequestProcessorFunc(
+                "/saveRequest",
+                std::bind(&AsyncHttpClient::onRequestReceived, this, _1, _2, _3, _4, _5)));
+    }
+
+    void whenPostSomeBodyWithContentLength()
+    {
+        postSomeBody(true);
+    }
+
+    void whenPostSomeBodyWithoutContentLength()
+    {
+        postSomeBody(false);
+    }
+
+    void thenRequestReceivedContainsContentLength()
+    {
+        auto request = m_receivedRequests.pop();
+        ASSERT_TRUE(request.headers.find("Content-Length") != request.headers.end());
+    }
+
+    void thenRequestReceivedDoesNotContainContentLength()
+    {
+        auto request = m_receivedRequests.pop();
+        ASSERT_TRUE(request.headers.find("Content-Length") == request.headers.end());
+    }
+
     void httpsTest(const QString& scheme, const QString& path)
     {
         const QUrl url(lit("%1://%2/%3")
@@ -97,7 +131,7 @@ protected:
         client->doGet(url,
             [&promise](AsyncHttpClientPtr ptr)
             {
-                 EXPECT_TRUE(ptr->hasRequestSuccesed());
+                 EXPECT_TRUE(ptr->hasRequestSucceeded());
                  promise.set_value();
             });
 
@@ -116,12 +150,51 @@ protected:
         client->doGet(url,
             [&promise, &expectedResult](AsyncHttpClientPtr ptr)
             {
-                 EXPECT_TRUE(ptr->hasRequestSuccesed());
+                 EXPECT_TRUE(ptr->hasRequestSucceeded());
                  EXPECT_EQ(expectedResult, ptr->fetchMessageBodyBuffer());
                  promise.set_value();
             });
 
         promise.get_future().wait();
+    }
+
+private:
+    nx::utils::SyncQueue<nx_http::Request> m_receivedRequests;
+
+    QUrl commonTestUrl(const QString& requestPath) const
+    {
+        return nx::network::url::Builder().setScheme("http")
+            .setEndpoint(testHttpServer().serverAddress())
+            .setPath(requestPath).toUrl();
+    }
+
+    void postSomeBody(bool includeContentLength)
+    {
+        nx::utils::promise<void> promise;
+
+        const auto client = nx_http::AsyncHttpClient::create();
+        client->doPost(
+            commonTestUrl("/saveRequest"),
+            "plain/text",
+            "Hello, world",
+            includeContentLength,
+            [&promise](AsyncHttpClientPtr /*ptr*/)
+            {
+                 promise.set_value();
+            });
+
+        promise.get_future().wait();
+    }
+
+    void onRequestReceived(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        m_receivedRequests.push(std::move(request));
+        completionHandler(nx_http::StatusCode::ok);
     }
 };
 
@@ -287,6 +360,23 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
 
     clients.clear();
 }
+
+TEST_F(AsyncHttpClient, posting_with_content_length)
+{
+    ASSERT_TRUE(testHttpServer().bindAndListen());
+
+    whenPostSomeBodyWithContentLength();
+    thenRequestReceivedContainsContentLength();
+}
+
+// TODO: #ak Revive test. It requires HTTP server with infinite message body support.
+//TEST_F(AsyncHttpClient, posting_without_content_length)
+//{
+//    ASSERT_TRUE(testHttpServer().bindAndListen());
+//
+//    whenPostSomeBodyWithoutContentLength();
+//    thenRequestReceivedDoesNotContainContentLength();
+//}
 
 class AsyncHttpClientTestMultiRequest:
     public AsyncHttpClient

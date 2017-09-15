@@ -31,6 +31,9 @@ QList<QByteArray> deserializeTransactionList(const QByteArray& tranList, bool* s
 QByteArray serializeTransportHeader(const TransportHeader& records);
 TransportHeader deserializeTransportHeader(const QByteArray& data, int* bytesRead);
 
+QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int reservedSpaceAtFront = 1);
+ec2::QnTranState deserializeSubscribeAllRequest(const QByteArray& data, bool* success);
+
 QString toString(MessageType value);
 
 } // namespace p2p

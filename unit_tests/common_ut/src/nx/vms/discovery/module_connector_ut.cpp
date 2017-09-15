@@ -33,7 +33,6 @@ public:
                     if (knownEndpoint == endpoint)
                         return;
 
-                    NX_INFO(this) "NEW!!" << endpoint;
                     knownEndpoint = endpoint;
                 }
 
@@ -49,7 +48,6 @@ public:
                         return;
                 }
 
-                NX_INFO(this) "LOSS!!";
                 disconnectedQueue.push(std::move(id));
             });
 
@@ -75,7 +73,7 @@ public:
     void expectConnect(const QnUuid& id, const SocketAddress& endpoint)
     {
         const auto server = connectedQueue.pop();
-        EXPECT_EQ(id, server.first);
+        EXPECT_EQ(id.toString(), server.first.toString());
         EXPECT_EQ(endpoint.toString(), server.second.toString()) << id.toStdString();
     }
 
@@ -97,6 +95,7 @@ public:
 
         const auto endpoint = server->serverAddress();
         mediaservers[endpoint] = std::move(server);
+        NX_INFO(this, lm("Module %1 started with endpoint %2").args(module.id, endpoint));
         return endpoint;
     }
 
@@ -241,6 +240,13 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 
     connector.setForbiddenEndpoints({}, id);
     expectConnect(id, endpoint3); //< The last one is unblocked now.
+}
+
+// This unit test is just for easy debug agains real mediaserver.
+TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
+{
+    connector.newEndpoints({SocketAddress("127.0.0.1:7001")}, QnUuid());
+    std::this_thread::sleep_for(std::chrono::hours(1));
 }
 
 } // namespace test

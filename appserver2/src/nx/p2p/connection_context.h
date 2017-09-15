@@ -37,12 +37,13 @@ public:
     QVector<ec2::ApiPersistentIdData> localSubscription; //< local -> remote subscription
     bool isLocalStarted = false; //< we opened connection to remote peer
     QVector<PeerNumberType> awaitingNumbersToResolve;
-    bool sendDataInProgress = false;
+    bool sendDataInProgress = false; //< Select from transaction log in progress
 
     // to remote part
     QByteArray remotePeersMessage; //< last received peers message
     QVector<PeerDistanceRecord> remotePeers;
     ec2::QnTranState remoteSubscription; //< remote -> local subscription
+    bool remoteAddImplicitData = false; //< remote -> local subscription. Add implicit data to subscription (subscribeAll).
     bool recvDataInProgress = false;
     bool isRemoteStarted = false; //< remote peer has open logical connection to us
     PeerNumberInfo shortPeerInfo;

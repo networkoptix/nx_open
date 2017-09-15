@@ -1,7 +1,5 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -11,8 +9,7 @@ namespace utils {
 static const std::chrono::minutes kTestSyncQueueTimeout(1);
 
 template<typename Base>
-class TestSyncQueueBase
-:
+class TestSyncQueueBase:
     public Base
 {
 public:

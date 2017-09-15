@@ -10,7 +10,7 @@ var AlertSuite = function () {
         registerSuccess: 'Account is created.\nConfirmation message is sent to',
         registerConfirmSuccess: 'Your account is successfully activated',
         registerConfirmError: 'Account is already activated or confirmation code is incorrect',
-        accountSuccess: 'Your account was successfully saved.',
+        accountSuccess: 'Your account is successfully saved',
         restorePassWrongEmail: 'Couldn\'t send confirmation email: This email has not been registered in portal.',
         restorePassConfirmSent: 'Password reset instructions are sent to Email',
         restorePassWrongCode: 'Cannot save password: Confirmation code is already used or incorrect',

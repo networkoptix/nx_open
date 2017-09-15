@@ -8,20 +8,23 @@ namespace utils {
 namespace log {
 namespace test {
 
+static const Tag kTestTag(lit("TestTag"));
+static const Tag kNamespaceTag(lit("nx::utils::log::test"));
+
 class LogMainTest: public ::testing::Test
 {
 public:
     LogMainTest()
     {
-        logger = addLogger({lit("SomeTag"), lit("nx::utils::log::test")});
+        logger = addLogger({kTestTag, kNamespaceTag});
         logger->setDefaultLevel(levelFromString("INFO"));
         logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
-        logger->setExceptionFilters({lit("nx::utils::log::test")});
+        logger->setLevelFilters(LevelFilters{{kNamespaceTag, Level::verbose}});
     }
 
     ~LogMainTest()
     {
-        removeLoggers({lit("SomeTag"), lit("nx::utils::log::test")});
+        removeLoggers({kTestTag, kNamespaceTag});
     }
 
     void expectMessages(const std::vector<const char*>& patterns)
@@ -45,30 +48,28 @@ public:
 
 TEST_F(LogMainTest, ExplicitTag)
 {
-    const auto testTag = lit("SomeTag");
-    NX_ALWAYS(testTag, "Always");
-    NX_ERROR(testTag, "Error");
-    NX_WARNING(testTag, "Warning");
-    NX_INFO(testTag, "Info");
-    NX_DEBUG(testTag, "Debug");
-    NX_VERBOSE(testTag, "Verbose");
+    NX_ALWAYS(kTestTag, "Always");
+    NX_ERROR(kTestTag, "Error");
+    NX_WARNING(kTestTag, "Warning");
+    NX_INFO(kTestTag, "Info");
+    NX_DEBUG(kTestTag, "Debug");
+    NX_VERBOSE(kTestTag, "Verbose");
     expectMessages({
-        "* ALWAYS SomeTag: Always",
-        "* ERROR SomeTag: Error",
-        "* WARNING SomeTag: Warning",
-        "* INFO SomeTag: Info"});const int kSeven = 7;
+        "* ALWAYS TestTag: Always",
+        "* ERROR TestTag: Error",
+        "* WARNING TestTag: Warning",
+        "* INFO TestTag: Info"});const int kSeven = 7;
 
-    NX_ALWAYS(testTag) "Always" << kSeven;
-    NX_INFO(testTag) "Info" << kSeven;
-    NX_VERBOSE(testTag) "Verbose" << kSeven;
+    NX_ALWAYS(kTestTag) << "Always" << kSeven;
+    NX_INFO(kTestTag) << "Info" << kSeven;
+    NX_VERBOSE(kTestTag) << "Verbose" << kSeven;
     expectMessages({
-        "* ALWAYS SomeTag: Always 7",
-        "* INFO SomeTag: Info 7"});
+        "* ALWAYS TestTag: Always 7",
+        "* INFO TestTag: Info 7"});
 }
 
 TEST_F(LogMainTest, This)
 {
-
     NX_ALWAYS(this, "Always");
     NX_ERROR(this, "Error");
     NX_WARNING(this, "Warning");
@@ -83,16 +84,14 @@ TEST_F(LogMainTest, This)
         "* DEBUG nx::utils::log::test::*LogMain*(0x*): Debug",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose"});
 
-#if 0
     const QSize kSize(2, 3);
-    NX_ALWAYS() << "Always" << kSize;
-    NX_INFO() << "Info" << kSize;
-    NX_VERBOSE() << "Verbose" << kSize;
+    NX_ALWAYS(this) << "Always" << kSize;
+    NX_INFO(this) << "Info" << kSize;
+    NX_VERBOSE(this) << "Verbose" << kSize;
     expectMessages({
         "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always QSize(2, 3)",
-        "* ERROR nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
+        "* INFO nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)"});
-#endif
 }
 
 } // namespace test

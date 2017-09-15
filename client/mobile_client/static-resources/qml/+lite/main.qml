@@ -74,7 +74,7 @@ ApplicationWindow
 
     Component.onDestruction:
     {
-        connectionManager.disconnectFromServer(true)
+        connectionManager.disconnectFromServer()
     }
 
     onActiveFocusItemChanged: stackView.restoreActiveFocus()

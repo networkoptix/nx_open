@@ -107,7 +107,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
             if (adminUser)
             {
                 httpClient->setUserPassword(adminUser->getDigest());
-                httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+                httpClient->setAuthType(nx_http::AuthType::authDigestWithPasswordHash);
             }
         }
         else
@@ -142,10 +142,10 @@ bool QnTransactionTransport::sendSerializedTransaction(
     switch (remotePeer().dataFormat)
     {
         case Qn::JsonFormat:
-            addData(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(serializedTran) + QByteArray("\r\n"));
+            addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(serializedTran) + QByteArray("\r\n"));
             break;
             //case Qn::BnsFormat:
-            //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+            //    addDataToTheSendQueue(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
             break;
         case Qn::UbjsonFormat: {
 
@@ -157,12 +157,12 @@ bool QnTransactionTransport::sendSerializedTransaction(
                 NX_LOG(QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
             }
 
-            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));
+            addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));
             break;
         }
         default:
             qWarning() << "Client has requested data in the unsupported format" << remotePeer().dataFormat;
-            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));
+            addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));
             break;
     }
 

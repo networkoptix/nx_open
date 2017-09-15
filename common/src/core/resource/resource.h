@@ -306,6 +306,9 @@ public:
 
     void setCommonModule(QnCommonModule* commonModule);
     QnCommonModule* commonModule() const;
+
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
+
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 
@@ -315,7 +318,7 @@ protected:
 
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
-    virtual CameraDiagnostics::Result initInternal();;
+    virtual CameraDiagnostics::Result initInternal();
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first

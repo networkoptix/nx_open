@@ -1,12 +1,12 @@
 #pragma once
 
 #include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace cdb {
 
 class AuthorizationManager;
-class CloudModuleUrlProvider;
 
 namespace http_handler {
 
@@ -14,9 +14,12 @@ class GetCloudModulesXml:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
+    using GenerateModulesXmlFunc = 
+        nx::utils::MoveOnlyFunc<QByteArray(const nx::String& /*httpHostHeader*/)>;
+
     static const QString kHandlerPath;
 
-    GetCloudModulesXml(const CloudModuleUrlProvider& cloudModuleUrlProvider);
+    GetCloudModulesXml(GenerateModulesXmlFunc generateModulesXmlFunc);
 
 protected:
     virtual void processRequest(
@@ -27,7 +30,7 @@ protected:
         nx_http::RequestProcessedHandler completionHandler) override;
 
 private:
-    const CloudModuleUrlProvider& m_cloudModuleUrlProvider;
+    GenerateModulesXmlFunc m_generateModulesXmlFunc;
 };
 
 } // namespace http_handler

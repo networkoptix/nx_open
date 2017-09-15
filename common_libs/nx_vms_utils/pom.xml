@@ -20,6 +20,7 @@
         <buildLib>sharedlib</buildLib>
         <qt.libs>core</qt.libs>
         <global.libs>-lnx_utils</global.libs>
+        <mac.oslibs>-framework CoreServices</mac.oslibs>
         <windows.defines>_USING_V110_SDK71_</windows.defines>
     </properties>
     

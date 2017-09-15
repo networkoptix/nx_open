@@ -72,7 +72,7 @@
     },
     "Custom":{
       "label":"Egyéni",
-      "description":"Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
+      "description":"Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     },
     "cloudAdmin":{
       "label":"Adminisztrátor",
@@ -83,24 +83,24 @@
       "description":"Rendszerben megadott egyéni szerepkör"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"Tulajdonos",
+      "description":"Korlátlan jog, mely tartalmazza a felhőhöz való csatlakozást, megosztást, leválasztást"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"Felhasználó",
+      "description":"Élő videó megtekintése és rögzített visszajátszása"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"Felhasználó (élő)",
+      "description":"Csak élőkép megtekintése"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"Speciális felhasználó",
+      "description":"Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"Egyéni",
+      "description":"Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     }
   },
   "errorCodes":{

@@ -14,17 +14,17 @@ Connection::Connection(
     QnCommonModule* commonModule,
     const QnUuid& remoteId,
     const ApiPeerDataEx& localPeer,
-    ConnectionLockGuard connectionLockGuard,
     const QUrl& remotePeerUrl,
-    std::unique_ptr<QObject> opaqueObject)
+    std::unique_ptr<QObject> opaqueObject,
+    ConnectionLockGuard connectionLockGuard)
     :
     ConnectionBase(
         remoteId,
         localPeer,
-        std::move(connectionLockGuard),
         remotePeerUrl,
         commonModule->globalSettings()->aliveUpdateInterval(),
-        std::move(opaqueObject)),
+        std::move(opaqueObject),
+        std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
 }
@@ -33,18 +33,17 @@ Connection::Connection(
     QnCommonModule* commonModule,
     const ApiPeerDataEx& remotePeer,
     const ApiPeerDataEx& localPeer,
-    ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
     const Qn::UserAccessData& userAccessData,
-    std::unique_ptr<QObject> opaqueObject)
+    std::unique_ptr<QObject> opaqueObject,
+    ConnectionLockGuard connectionLockGuard)
     :
     ConnectionBase(
         remotePeer,
         localPeer,
-        std::move(connectionLockGuard),
         std::move(webSocket),
-        userAccessData,
-        std::move(opaqueObject)),
+        std::move(opaqueObject),
+        std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
 }
@@ -82,7 +81,7 @@ void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
             if (adminUser)
             {
                 httpClient->setUserPassword(adminUser->getDigest());
-                httpClient->setAuthType(nx_http::AsyncClient::authDigestWithPasswordHash);
+                httpClient->setAuthType(nx_http::AuthType::authDigestWithPasswordHash);
             }
         }
         else

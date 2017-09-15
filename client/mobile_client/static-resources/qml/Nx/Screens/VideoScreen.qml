@@ -1,4 +1,5 @@
 import QtQuick 2.6
+
 import Nx 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
@@ -37,6 +38,7 @@ PageBase
             if (offline)
             {
                 offlineStatusDelay.restart()
+                ptzPanel.moveOnTapMode = false
             }
             else
             {
@@ -54,6 +56,7 @@ PageBase
 
         property var videoNavigation: navigationLoader.item
 
+        property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
         property bool cameraWarningVisible:
             (showOfflineStatus
@@ -201,6 +204,18 @@ PageBase
         }
     }
 
+    MouseArea
+    {
+        id: toggleMouseArea
+
+        anchors.fill: parent
+        onClicked:
+        {
+            if (!ptzPanel.moveOnTapMode)
+                toggleUi()
+        }
+    }
+
     Loader
     {
         id: video
@@ -233,11 +248,6 @@ PageBase
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
-            onClicked:
-            {
-                if (!ptzPanel.moveOnTapMode)
-                    toggleUi()
-            }
         }
     }
 
@@ -299,26 +309,22 @@ PageBase
                     width: mainWindow.width
                     height: mainWindow.height
                     state: videoScreenController.dummyState
-
-                    MouseArea
-                    {
-                        anchors.fill: parent
-                        onClicked: toggleUi()
-                    }
                 }
             }
         }
 
         Image
         {
-            width: parent.width
+            width: mainWindow.width
             height: sourceSize.height
             anchors.bottom: parent.bottom
-            sourceSize.height: 56 * 2
+            anchors.bottomMargin: videoScreen.height - mainWindow.height
+
+            sourceSize.height: 56 * 2 - anchors.bottomMargin
             source: lp("/images/timeline_gradient.png")
 
             visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || ptzPanel.moveOnTapMode || navigationLoader.visible;
+                || ptzPanel.moveOnTapMode || navigationLoader.visible
             opacity: visible ? 1 : 0
 
             Behavior on opacity
@@ -330,6 +336,11 @@ PageBase
         PtzPanel
         {
             id: ptzPanel
+
+            preloaders.parent: video.item
+            preloaders.height: video.item.fitSize ? video.item.fitSize.height : 0
+            preloaders.x: (video.item.width - preloaders.width) / 2
+            preloaders.y: (video.item.height - preloaders.height) / 3
 
             width: parent.width
             anchors.bottom: parent.bottom
@@ -455,6 +466,7 @@ PageBase
 
                 VideoNavigation
                 {
+                    animatePlaybackControls: d.animatePlaybackControls
                     videoScreenController: d.controller
                     controlsOpacity: d.cameraUiOpacity
                     ptzAvailable: ptzPanel.controller.available
@@ -511,9 +523,11 @@ PageBase
         {
             script:
             {
+                d.animatePlaybackControls = false
                 videoScreen.resourceId = cameraSwitchAnimation.newResourceId
                 initialScreenshot = cameraSwitchAnimation.thumbnail
                 video.clear()
+                d.animatePlaybackControls = true
             }
         }
 

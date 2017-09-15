@@ -14,11 +14,18 @@
 #include <nx/utils/object_destruction_flag.h>
 
 #include "abstract_msg_body_source.h"
-#include "asynchttpclient.h"
 #include "auth_cache.h"
 #include "http_stream_reader.h"
 
 namespace nx_http {
+
+enum class AuthType
+{
+    authBasicAndDigest,
+    authDigest,
+    authDigestWithPasswordHash,
+    authBasic,
+};
 
 /**
  * HTTP client. All operations are done asynchronously.
@@ -38,15 +45,7 @@ class NX_NETWORK_API AsyncClient:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    enum AuthType
-    {
-        authBasicAndDigest,
-        authDigest,
-        authDigestWithPasswordHash,
-        authBasic,
-    };
-
-    enum State
+    enum class State
     {
         sInit,
         sWaitingConnectToHost,
@@ -162,8 +161,18 @@ public:
         const QUrl& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doDelete(const QUrl& url);
+    void doDelete(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
     void doUpgrade(
         const QUrl& url,
+        const StringType& protocolToUpgradeTo,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void doUpgrade(
+        const QUrl& url,
+        nx_http::Method::ValueType method,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
@@ -179,7 +188,7 @@ public:
     /**
      * Checks state as well as response return HTTP code (expect 2XX).
      */
-    bool hasRequestSuccesed() const;
+    bool hasRequestSucceeded() const;
 
     /**
      * Returns current message body buffer, clearing it.
@@ -205,7 +214,6 @@ public:
     void setProxyUserPassword(const QString& userPassword);
     void setAuth(const AuthInfo& auth);
     void setProxyVia(const SocketAddress& proxyEndpoint);
-    void setConnectionHeader(const StringType& value);
 
     /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
@@ -235,11 +243,7 @@ public:
     void addAdditionalHeader(const StringType& key, const StringType& value);
     void addRequestHeaders(const HttpHeaders& headers);
     void removeAdditionalHeader(const StringType& key);
-    template<class HttpHeadersRef>
-    void setAdditionalHeaders(HttpHeadersRef&& additionalHeaders)
-    {
-        m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
-    }
+    void setAdditionalHeaders(HttpHeaders additionalHeaders);
     void setAuthType(AuthType value);
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
     /**
@@ -248,6 +252,8 @@ public:
      * WARNING: It is a hack. Use it only if you strongly know what you are doing.
      */
     void forceEndOfMsgBody();
+
+    void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
 
     static QString endpointWithProtocol(const QUrl& url);
 
@@ -302,6 +308,7 @@ private:
     int m_numberOfRedirectsTried;
     nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
+    bool m_expectOnlyBody = false;
 
     virtual void stopWhileInAioThread() override;
 

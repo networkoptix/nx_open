@@ -50,15 +50,15 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
-    bool sslRequired,
-    NatTraversalSupport natTraversalSupport)
+    bool sslRequired, NatTraversalSupport natTraversalSupport, boost::optional<int> ipVersion)
 {
     if (createStreamServerSocketFunc)
-        return createStreamServerSocketFunc(sslRequired, natTraversalSupport);
+        return createStreamServerSocketFunc(sslRequired, natTraversalSupport, ipVersion);
 
     auto result = defaultStreamServerSocketFactoryFunc(
         natTraversalSupport,
-        s_enforcedStreamSocketType);
+        s_enforcedStreamSocketType,
+        ipVersion);
 
     if (!result)
         return std::unique_ptr<AbstractStreamServerSocket>();
@@ -261,10 +261,9 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
 }
 
 std::unique_ptr<AbstractStreamServerSocket> SocketFactory::defaultStreamServerSocketFactoryFunc(
-    NatTraversalSupport nttType,
-    SocketType socketType)
+    NatTraversalSupport nttType, SocketType socketType, boost::optional<int> _ipVersion)
 {
-    auto ipVersion = s_tcpServerIpVersion.load();
+    auto ipVersion = (bool) _ipVersion ? *_ipVersion : s_tcpServerIpVersion.load();
     static_cast<void>(nttType);
     switch (socketType)
     {

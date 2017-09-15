@@ -4,14 +4,15 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/model_functions.h>
+#include <utils/common/connective.h>
 
 namespace {
 
-static constexpr bool kFisheyeDewarpingFeatureEnabled = false;
+static constexpr bool kFisheyeDewarpingFeatureEnabled = true;
 
 } // namespace
 
-class QnMediaResourceHelperPrivate : public QObject
+class QnMediaResourceHelperPrivate : public Connective<QObject>
 {
     QnMediaResourceHelper* q_ptr;
     Q_DECLARE_PUBLIC(QnMediaResourceHelper)
@@ -22,78 +23,24 @@ public:
 
     QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent);
 
-    void at_propertyChanged(const QnResourcePtr& resource, const QString& key);
+    void handlePropertyChanged(const QnResourcePtr& resource, const QString& key);
     void updateServer();
+    void handleResourceChanged();
 };
+
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject* parent):
     base_type(parent),
     d_ptr(new QnMediaResourceHelperPrivate(this))
 {
+    Q_D(QnMediaResourceHelper);
+
+    connect(this, &QnResourceHelper::resourceIdChanged,
+        d, &QnMediaResourceHelperPrivate::handleResourceChanged);
 }
 
 QnMediaResourceHelper::~QnMediaResourceHelper()
 {
-}
-
-QString QnMediaResourceHelper::resourceId() const
-{
-    Q_D(const QnMediaResourceHelper);
-    return d->camera ? d->camera->getId().toString() : QString();
-}
-
-void QnMediaResourceHelper::setResourceId(const QString& id)
-{
-    Q_D(QnMediaResourceHelper);
-
-    auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid::fromStringSafe(id));
-    if (camera == d->camera)
-        return;
-
-    if (d->camera)
-        d->camera->disconnect(this);
-
-    d->updateServer();
-
-    d->camera = camera;
-
-    if (d->camera)
-    {
-        connect(d->camera, &QnResource::nameChanged,
-            this, &QnMediaResourceHelper::resourceNameChanged);
-        connect(d->camera, &QnResource::statusChanged,
-            this, &QnMediaResourceHelper::resourceStatusChanged);
-        connect(d->camera, &QnResource::propertyChanged,
-            d, &QnMediaResourceHelperPrivate::at_propertyChanged);
-        connect(d->camera, &QnResource::videoLayoutChanged,
-            this, &QnMediaResourceHelper::videoLayoutChanged);
-        connect(d->camera, &QnResource::parentIdChanged,
-            d, &QnMediaResourceHelperPrivate::updateServer);
-        connect(d->camera, &QnResource::mediaDewarpingParamsChanged,
-            this, &QnMediaResourceHelper::fisheyeParamsChanged);
-
-        d->updateServer();
-    }
-
-    emit resourceIdChanged();
-    emit resourceNameChanged();
-    emit customAspectRatioChanged();
-    emit customRotationChanged();
-    emit resourceStatusChanged();
-    emit videoLayoutChanged();
-    emit fisheyeParamsChanged();
-}
-
-Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const
-{
-    Q_D(const QnMediaResourceHelper);
-    return d->camera ? d->camera->getStatus() : Qn::NotDefined;
-}
-
-QString QnMediaResourceHelper::resourceName() const
-{
-    Q_D(const QnMediaResourceHelper);
-    return d->camera ? d->camera->getName() : QString();
 }
 
 QString QnMediaResourceHelper::serverName() const
@@ -145,7 +92,7 @@ QnMediaResourceHelperPrivate::QnMediaResourceHelperPrivate(QnMediaResourceHelper
 {
 }
 
-void QnMediaResourceHelperPrivate::at_propertyChanged(
+void QnMediaResourceHelperPrivate::handlePropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
     Q_Q(QnMediaResourceHelper);
@@ -181,4 +128,45 @@ void QnMediaResourceHelperPrivate::updateServer()
     }
 
     emit q->serverNameChanged();
+}
+
+void QnMediaResourceHelperPrivate::handleResourceChanged()
+{
+    Q_Q(QnMediaResourceHelper);
+
+    const auto currentResource = q->resource();
+    const auto cameraResource = currentResource.dynamicCast<QnVirtualCameraResource>();
+    if (currentResource && !cameraResource)
+    {
+        q->setResourceId(QString()); //< We support only camera resources.
+        return;
+    }
+
+    if (camera)
+        camera->disconnect(this);
+
+    updateServer();
+
+    camera = cameraResource;
+
+    if (camera)
+    {
+        connect(camera, &QnResource::propertyChanged,
+            this, &QnMediaResourceHelperPrivate::handlePropertyChanged);
+        connect(camera, &QnResource::parentIdChanged,
+            this, &QnMediaResourceHelperPrivate::updateServer);
+
+        connect(camera, &QnResource::videoLayoutChanged,
+            q, &QnMediaResourceHelper::videoLayoutChanged);
+        connect(camera, &QnResource::mediaDewarpingParamsChanged,
+            q, &QnMediaResourceHelper::fisheyeParamsChanged);
+
+        updateServer();
+    }
+
+    emit q->customAspectRatioChanged();
+    emit q->customRotationChanged();
+    emit q->resourceStatusChanged();
+    emit q->videoLayoutChanged();
+    emit q->fisheyeParamsChanged();
 }
