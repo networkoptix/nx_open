@@ -295,6 +295,15 @@ int HanwhaResource::maxProfileCount() const
 
 CameraDiagnostics::Result HanwhaResource::initInternal()
 {
+    const auto result = init();
+    if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
+        setStatus(Qn::Unauthorized);
+
+    return result;
+}
+
+CameraDiagnostics::Result HanwhaResource::init()
+{
     CameraDiagnostics::Result result = initSystem();
     if (!result)
         return result;

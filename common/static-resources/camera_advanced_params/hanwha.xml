@@ -13,9 +13,7 @@
                     dataType="Bool"/>
             <param id="image/flip/Rotate"
                     name="Hallway View"
-                    dataType="Enumeration"
-                    range="0 degrees,90 degrees,270 degrees"
-                    internalRange="0,90,270"/>
+                    dataType="Enumeration"/>
         </group>
         <group name="Audio Input">
             <param id="media/audioinput/Source"
@@ -452,42 +450,78 @@
             <group name="SSDR">
                 <param id="image/ssdr/Enable"
                         name="SSDR Enabled"
-                        dataType="Bool"
-                        range=""
-                        readCmd=""/>
+                        dataType="Bool"/>
                 <param id="image/ssdr/Level"
                         name="Level"
-                        dataType="Bool"
-                        range=""
-                        readCmd=""/>
+                        dataType="Number">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/ssdr/Enable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/ssdr/DynamicRange"
                         name="D-Range"
-                        dataType="Enumeration"
-                        range=""
-                        readCmd=""/>
+                        dataType="Enumeration">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/ssdr/Enable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
             </group>
             <group name="White Balance">
                 <param id="image/whitebalance/WhiteBalanceMode"
                         name="Mode"
                         dataType="Enumeration"
                         range=""/>
-                <param id="image/whitebalance/WhiteBalanceModeManualRedLevel"
+                <param id="image/whitebalance/WhiteBalanceManualRedLevel"
                         name="Red Gain"
-                        dataType="Number"/>
-                <param id="image/whitebalance/WhiteBalanceModeManualBlueLevel"
+                        dataType="Number">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/whitebalance/WhiteBalanceMode"
+                                    condition="value=Manual"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/whitebalance/WhiteBalanceManualBlueLevel"
                         name="Blue Gain"
                         dataType="Number"
-                        range=""/>
+                        range="">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/whitebalance/WhiteBalanceMode"
+                                    condition="value=Manual"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
             </group>
             <group name="Back Light">
                 <param id="image/camera/CompensationMode"
                         name="Mode"
                         dataType="Enumeration"
-                        range="BLC,WDR"/>
+                        range=""
+                        aux="groupLead=whitebalance"/>
                 <param id="image/camera/WDRLevel"
                         name="WDR Level"
                         dataType="Enumeration"
-                        range="Low,Middle,High">
+                        range="Low,Middle,High"
+                        aux="group=whitebalance;groupInclude=WDR">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -501,7 +535,8 @@
                 <param id="image/camera/BLCLevel"
                         name="BLC Level"
                         dataType="Enumeration"
-                        range="Low,Middle,High">
+                        range="Low,Middle,High"
+                        aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -513,8 +548,9 @@
                     </dependencies>
                 </param>
                 <param id="image/camera/BLCAreaTop"
-                        name="Top"
-                        dataType="Number">
+                        name="BLC Area Top"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -526,8 +562,9 @@
                     </dependencies>
                 </param>
                 <param id="image/camera/BLCAreaBottom"
-                        name="Bottom"
-                        dataType="Number">
+                        name="BLC Area Bottom"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -539,8 +576,9 @@
                     </dependencies>
                 </param>
                 <param id="image/camera/BLCAreaLeft"
-                        name="Left"
-                        dataType="Number">
+                        name="BLC Area Left"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -552,14 +590,142 @@
                     </dependencies>
                 </param>
                 <param id="image/camera/BLCAreaRight"
-                        name="Right"
-                        dataType="Number">
+                        name="BLC Area Right"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
                                 <condition 
                                     watch="image/camera/CompensationMode"
                                     condition="value=BLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                
+                <param id="image/camera/HLCMode"
+                    name="HLC Mode"
+                    dataType="Enumeration"
+                    aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCLevel"
+                    name="HLC Level"
+                    dataType="Enumeration"
+                    aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCMaskTone"
+                    name="HLC Mask Tone"
+                    dataType="Number"
+                    aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCMaskColor"
+                    name="HLC Mask Color"
+                    dataType="Enumeration"
+                    aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCDim"
+                    name="Dimming"
+                    dataType="Bool"
+                    aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCAreaTop"
+                        name="HLC Area Top"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCAreaBottom"
+                        name="HLC Area Bottom"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCAreaLeft"
+                        name="HLC Area Left"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+                <param id="image/camera/HLCAreaRight"
+                        name="HLC Area Right"
+                        dataType="Number"
+                        aux="group=whitebalance;groupInclude=HLC">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition 
+                                    watch="image/camera/CompensationMode"
+                                    condition="value=HLC"/>
                             </conditional-show>
                         </dependencies-show>
                     </dependencies>

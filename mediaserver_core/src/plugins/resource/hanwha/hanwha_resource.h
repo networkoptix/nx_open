@@ -78,6 +78,7 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
 
 private:
+    CameraDiagnostics::Result init();
     CameraDiagnostics::Result initSystem();
     CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
