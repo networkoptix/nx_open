@@ -498,7 +498,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         role,
         serverTimeZone,
         0,
-        QnImageFilterHelper()
+        QnLegacyTranscodingSettings()
     );
 
     return true;

@@ -1,4 +1,5 @@
 #pragma once
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -27,7 +28,7 @@ extern "C"
 
 #include <utils/color_space/image_correction.h>
 #include <core/resource/resource_consumer.h>
-#include <transcoding/filters/filter_helper.h>
+#include <transcoding/filters/abstract_image_filter.h>
 
 #include <recording/stream_recorder_data.h>
 #include <boost/optional.hpp>
@@ -121,7 +122,7 @@ public:
     */
     void setServerTimeZoneMs(qint64 value);
 
-    void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
+    void setTranscodeFilters(const QnLegacyTranscodingSettings& filters);
 
 signals:
     void recordingStarted();
@@ -228,7 +229,7 @@ private:
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
     StreamRecorderRole m_role;
-    QnImageFilterHelper m_extraTranscodeParams;
+    QnLegacyTranscodingSettings m_transcodeFilters;
 
     std::random_device m_rd;
     std::mt19937 m_gen;

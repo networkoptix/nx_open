@@ -4,7 +4,6 @@
 
 #include <recording/stream_recorder.h>
 
-
 namespace nx {
 namespace client {
 namespace desktop {

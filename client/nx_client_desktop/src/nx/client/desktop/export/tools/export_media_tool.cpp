@@ -7,6 +7,7 @@
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
+#include <nx/client/desktop/export/tools/export_filter_chain.h>
 
 #include <nx/network/http/custom_headers.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
@@ -90,8 +91,9 @@ struct ExportMediaTool::Private
                 dataProvider->pleaseStop();
             });
 
-        //TODO: #vkutin implement filters.
-        // exportRecorder->setExtraTranscodeParams(transcodeParams);
+        //TODO: #gdm implement filters.
+        QnLegacyTranscodingSettings legacyParameters;
+        exportRecorder->setTranscodeFilters(legacyParameters);
 
         connect(exportRecorder, &QnStreamRecorder::recordingProgress, q,
             &ExportMediaTool::valueChanged);

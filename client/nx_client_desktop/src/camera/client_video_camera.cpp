@@ -142,7 +142,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     StreamRecorderRole role,
     qint64 serverTimeZoneMs,
     qint64 timelapseFrameStepMs,
-    QnImageFilterHelper transcodeParams)
+    const QnLegacyTranscodingSettings& transcodeParams)
 {
     qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -227,7 +227,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         });
 
 
-        m_exportRecorder->setExtraTranscodeParams(transcodeParams);
+        m_exportRecorder->setTranscodeFilters(transcodeParams);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

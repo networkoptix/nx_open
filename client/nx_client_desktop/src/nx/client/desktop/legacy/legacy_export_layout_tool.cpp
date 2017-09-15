@@ -414,14 +414,14 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
 
     m_currentCamera->exportMediaPeriodToFile(m_settings.period,
-                                    uniqId,
-                                    lit("mkv"),
-                                    m_storage,
-                                    role,
-                                    serverTimeZone,
-                                    0,
-                                    QnImageFilterHelper()
-                                    );
+        uniqId,
+        lit("mkv"),
+        m_storage,
+        role,
+        serverTimeZone,
+        0,
+        QnLegacyTranscodingSettings()
+    );
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;

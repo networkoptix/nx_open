@@ -39,6 +39,8 @@
 #include <nx/client/desktop/legacy/legacy_export_media_tool.h>
 #include <nx/client/desktop/legacy/legacy_export_layout_tool.h>
 
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/file_messages.h>
@@ -342,7 +344,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
 
 
     bool transcodeWarnShown = false;
-    QnImageFilterHelper imageParameters;
+    QnLegacyTranscodingSettings imageParameters;
 
     while (true)
     {
@@ -453,13 +455,14 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
             }
         }
 
-        imageParameters.setSrcRect(zoomRect);
-        imageParameters.setContrastParams(contrastParams);
-        imageParameters.setDewarpingParams(mediaResource->getDewarpingParams(), dewarpingParams);
-        imageParameters.setRotation(rotation);
-        imageParameters.setCustomAR(customAr);
-        imageParameters.setTimeStampParams(timestampParams);
-        imageParameters.setVideoLayout(mediaResource->getVideoLayout());
+        imageParameters.zoomWindow = zoomRect;
+        imageParameters.contrastParams = contrastParams;
+        imageParameters.itemDewarpingParams = dewarpingParams;
+        imageParameters.mediaDewarpingParams = mediaResource->getDewarpingParams();
+        imageParameters.rotation = rotation;
+        imageParameters.forcedAspectRatio = customAr;
+        imageParameters.timestampParams = timestampParams;
+        imageParameters.layout = mediaResource->getVideoLayout();
 
         auto videoLayout = mediaResource->getVideoLayout();
         bool doTranscode = transcodeCheckbox ||
@@ -479,10 +482,11 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
                     const int bigValue = std::numeric_limits<int>::max();
                     NX_ASSERT(resolution.isValid());
 
-                    auto filters = imageParameters.createFilterChain(resolution, QSize(bigValue, bigValue));
-                    const QSize resultResolution = imageParameters.updatedResolution(filters, resolution);
-                    if (resultResolution.width() > imageParameters.defaultResolutionLimit.width() ||
-                        resultResolution.height() > imageParameters.defaultResolutionLimit.height())
+                    auto filters = QnImageFilterHelper::createFilterChain(imageParameters,
+                        resolution, QSize(bigValue, bigValue));
+                    const QSize resultResolution = QnImageFilterHelper::applyFilterChain(filters, resolution);
+                    if (resultResolution.width() > QnImageFilterHelper::kDefaultResolutionLimit.width() ||
+                        resultResolution.height() > QnImageFilterHelper::kDefaultResolutionLimit.height())
                     {
                         transcodeWarnShown = true;
                         const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,

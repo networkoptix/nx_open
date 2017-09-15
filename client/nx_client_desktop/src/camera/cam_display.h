@@ -16,6 +16,9 @@
 #include "video_stream_display.h"
 #include <map>
 
+// TODO: #GDM use forward declaration
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
@@ -86,7 +89,7 @@ public:
     void setMTDecoding(bool value);
 
     QSize getFrameSize(int channel) const;
-    QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality);
+    QImage getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality);
     QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;

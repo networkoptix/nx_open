@@ -137,8 +137,8 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
                 //auto filters = imageParameters.createFilterChain(resolution, QSize(bigValue, bigValue));
                 //const QSize resultResolution = imageParameters.updatedResolution(filters, resolution);
-                //if (resultResolution.width() > imageParameters.defaultResolutionLimit.width() ||
-                //    resultResolution.height() > imageParameters.defaultResolutionLimit.height())
+                //if (resultResolution.width() > imageParameters.kDefaultResolutionLimit.width() ||
+                //    resultResolution.height() > imageParameters.kDefaultResolutionLimit.height())
                 //{
                 //    results.set(int(Result::downscaling));
                 //}

@@ -4,8 +4,6 @@
 
 #include <recording/time_period.h>
 
-#include <transcoding/filters/filter_helper.h>
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -16,7 +14,7 @@ struct LegacyExportMediaSettings
     QnMediaResourcePtr mediaResource;
     QnTimePeriod timePeriod;
     QString fileName;
-    QnImageFilterHelper imageParameters;
+    QnLegacyTranscodingSettings imageParameters;
     qint64 serverTimeZoneMs = 0;
     qint64 timelapseFrameStepMs = 0; //< 0 means disabled timelapse.
 };

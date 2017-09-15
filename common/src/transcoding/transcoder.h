@@ -15,7 +15,8 @@ extern "C"
 #include "nx/streaming/audio_data_packet.h"
 #include "nx/streaming/video_data_packet.h"
 #include "filters/abstract_image_filter.h"
-#include "filters/filter_helper.h"
+
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 class CLVideoDecoderOutput;
 
@@ -45,7 +46,7 @@ class QnCodecTranscoder
 public:
     QnCodecTranscoder(AVCodecID codecId);
     virtual ~QnCodecTranscoder() {}
-    
+
     /*
     * Function provide additional information about transcoded context.
     * Function may be not implemented in derived classes and return NULL
@@ -111,7 +112,7 @@ public:
 protected:
     static const int WIDTH_ALIGN = 16;
     static const int HEIGHT_ALIGN = 2;
-        
+
     QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
 
 protected:
@@ -218,7 +219,7 @@ public:
     //!Selects media stream parameters based on \a resolution and \a quality
     /*!
         Can add parameters to \a params
-        \parm codec 
+        \parm codec
         \return bitrate in kbps
         \note Does not modify existing parameters in \a params
     */
@@ -228,7 +229,7 @@ public:
         Qn::StreamQuality quality,
         QnCodecParams::Value* const params = NULL );
 
-    void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
+    void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 
     void setUseRealTimeOptimization(bool value);
 protected:
@@ -263,7 +264,7 @@ private:
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter;
     bool m_packetizedMode;
-    QnImageFilterHelper m_extraTranscodeParams;
+    QnLegacyTranscodingSettings m_transcodingSettings;
     bool m_useRealTimeOptimization;
 };
 
