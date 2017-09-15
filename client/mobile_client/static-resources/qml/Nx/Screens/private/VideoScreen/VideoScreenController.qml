@@ -110,11 +110,17 @@ Object
         }
     }
 
-    function tryPlay()
+    Timer
     {
-        // We try to play even if camera is offline.
-        if (!cameraUnauthorized && d.playing && !mediaPlayer.playing)
-            mediaPlayer.play()
+        id: tryPlayTimer
+
+        interval: 0
+        onTriggered:
+        {
+            // We try to play even if camera is offline.
+            if (!cameraUnauthorized && d.playing && !mediaPlayer.playing)
+                mediaPlayer.play()
+        }
     }
 
     onFailedChanged:
@@ -123,11 +129,11 @@ Object
             mediaPlayer.stop()
     }
 
-    onCameraUnauthorizedChanged: tryPlay()
+    onCameraUnauthorizedChanged: tryPlayTimer.restart()
 
     onResourceIdChanged:
     {
-        tryPlay();
+        tryPlayTimer.restart();
 
         playerJump(d.lastPosition)
         mediaPlayer.position = d.lastPosition

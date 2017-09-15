@@ -8,7 +8,7 @@
     </message>
     <message>
       <source>{{CLIENT_PROTOCOL}}</source>
-      <translation>hta-vms</translation>
+      <translation>hanwha-vms</translation>
     </message>
     <message>
       <source>{{VMS_NAME}}</source>
