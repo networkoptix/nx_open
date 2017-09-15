@@ -6,7 +6,8 @@ angular.module('nxCommon')
 			restrict: 'E',
         	scope:{
         	    flags: "=",
-        	    preloader: "="
+        	    preloader: "=",
+                preview: "="
         	},
         	templateUrl: Config.viewsDirCommon + 'components/placeholder.html',
         	link: function(scope){
