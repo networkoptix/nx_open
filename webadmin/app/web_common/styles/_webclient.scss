@@ -922,3 +922,19 @@ table.webclient-window>tbody>tr>td{
   width: 40px;
   display: block;
 }
+
+.collapse-box{
+    /*
+        Trick to fix WEB-561 - when collapsing we are making content for collapsing box move up while height is decreasing
+    */
+
+    overflow:hidden;
+
+    .collapsing.closing{ /* Additional animation for collapsing */
+        margin-top:-100px;
+        transform: translate3d(0, 0, 0); /* Enable hardware acceleration */
+        @include transition-property(height,visibility,margin-top);
+        @include transition-duration(.35s);
+        @include transition-timing-function(ease);
+    }
+}
