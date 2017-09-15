@@ -429,14 +429,16 @@ TimelineActions.prototype.scrollingToCursorStart = function(scrollQuickly){
 
     self.scaleManager.stopWatching();
     var lastTime = 0;
-    //quickly is for when then scrollbar is double clicked
-    var scrollDuration = scrollQuickly ? self.timelineConfig.animationDuration : self.timelineConfig.scrollSliderMoveDuration;
+    //If scrollQuickly move to a fixed point quickly
+    var fixedPosition = self.mouseXOverTimeline;
+    var scrollDuration = scrollQuickly ? self.timelineConfig.animationDuration
+                                       : self.timelineConfig.scrollSliderMoveDuration;
 
     // Here we run animation for slider to catch mouse cursor
     return self.animateScope.progress(self.scope, 'scrollSliderAnimation', 'linear',
             scrollDuration).then(function(){
         // end of animation - jump to target position
-        var targetScroll = self.scaleManager.getScrollTarget(self.mouseXOverTimeline);
+        var targetScroll = self.scaleManager.getScrollTarget(scrollQuickly ? fixedPosition : self.mouseXOverTimeline);
         self.scaleManager.scroll(targetScroll);
         self.scaleManager.releaseWatching();
         self.sliderAnimation = null;
@@ -454,7 +456,7 @@ TimelineActions.prototype.scrollingToCursorStart = function(scrollQuickly){
         var timeLeft = 1 - curTime;
         lastTime = curTime;
         var currentScroll = self.scaleManager.scroll();
-        var targetScroll = self.scaleManager.getScrollTarget(self.mouseXOverTimeline);
+        var targetScroll = self.scaleManager.getScrollTarget(scrollQuickly ? fixedPosition : self.mouseXOverTimeline);
         var newScroll = currentScroll + deltaTime * (targetScroll - currentScroll)/ timeLeft;
         self.scaleManager.scroll(newScroll);
     });
