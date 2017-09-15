@@ -15,13 +15,12 @@ public:
     enum class Result
     {
         ok,
-        nonContinuos,
-        downscaling,
         transcoding,
+        nonContinuosAvi,
+        downscaling,
         tooLong,
         tooBigExeFile,
         transcodingInBinaryIsNotSupported,
-
 
         count
     };
