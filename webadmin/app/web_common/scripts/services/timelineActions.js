@@ -424,15 +424,17 @@ TimelineActions.prototype.scrollingToCursorStop = function(){
         scrollSliderAnimation.breakAnimation();
     }
 };
-TimelineActions.prototype.scrollingToCursorStart = function(){
+TimelineActions.prototype.scrollingToCursorStart = function(scrollQuickly){
     var self = this;
 
     self.scaleManager.stopWatching();
     var lastTime = 0;
+    //quickly is for when then scrollbar is double clicked
+    var scrollDuration = scrollQuickly ? self.timelineConfig.animationDuration : self.timelineConfig.scrollSliderMoveDuration;
 
     // Here we run animation for slider to catch mouse cursor
     return self.animateScope.progress(self.scope, 'scrollSliderAnimation', 'linear',
-            self.timelineConfig.scrollSliderMoveDuration).then(function(){
+            scrollDuration).then(function(){
         // end of animation - jump to target position
         var targetScroll = self.scaleManager.getScrollTarget(self.mouseXOverTimeline);
         self.scaleManager.scroll(targetScroll);

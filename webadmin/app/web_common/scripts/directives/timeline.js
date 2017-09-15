@@ -236,7 +236,7 @@ angular.module('nxCommon')
 
                 // High-level Handlers
                 function scrollbarClickOrHold(){
-                    timelineActions.scrollingToCursorStart().then(function(result){
+                    timelineActions.scrollingToCursorStart(false).then(function(result){
                         if(result){
                             scrollbarSliderDragStart();
                         }
@@ -358,6 +358,15 @@ angular.module('nxCommon')
 
                     if(mouseOverElements.rightButton){
                         scrollButtonDblClick(false);
+                        return;
+                    }
+
+                    if(mouseOverElements.scrollbarSlider){
+                        timelineActions.fullZoomOut();
+                        return;
+                    }
+                    if(mouseOverElements.scrollbar){
+                        timelineActions.scrollingToCursorStart(true);
                         return;
                     }
                 }
