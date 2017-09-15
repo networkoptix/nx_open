@@ -249,8 +249,10 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
         if(!self.scope.zoomTarget) {
             self.scope.zoomTarget = self.scaleManager.zoom();
         }
-
-        self.delayWatchingPlayingPosition();
+        //if using zoom buttons we need to not delay if live
+        if(!keepWatching){
+            self.delayWatchingPlayingPosition();
+        }
         // If we animate - we animate not to bound zoom, but to original value
         // we need this to keep constant zooming speed
         self.animateScope.animate(self.scope, 'zoomTarget', originalZoomTarget, 'dryResistance').then(
