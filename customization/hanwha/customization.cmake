@@ -20,10 +20,7 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
 set(supportUrl "")
-set(supportEmail
-    "America - support@hanwhasecurity.com"
-    "Europe -
-)
+set(supportEmail "support@hanwhasecurity.com")
 set(supportPhone "")
 set(licenseEmail "WAVElicense@hanwha.com")
 
