@@ -62,9 +62,8 @@ TimelineActions.prototype.playPause = function() {
 
 TimelineActions.prototype.delayWatchingPlayingPosition = function(){
     var self = this;
-    if(!self.stopDelay) {
-        self.scaleManager.stopWatching();
-    }else{
+    self.scaleManager.stopWatching();
+    if(self.stopDelay) {
         clearTimeout(self.stopDelay);
     }
     self.stopDelay = setTimeout(function(){
@@ -209,8 +208,8 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
 
     var keepWatching = false;
     //Need to make sure scaleManager is watching live. Only force it when heading to the right edge
-    self.scaleManager.checkWatch(zoomCoordinate == self.scaleManager.viewportWidth);
     //zooming in
+    self.scaleManager.checkWatch(true);
     if(zoom >= zoomTarget){
         /*If the zoomCoordinate is at the right border it will be set to the viewport width.
           When the scaleManager is watching the live position it still needs to keep updating the end.
