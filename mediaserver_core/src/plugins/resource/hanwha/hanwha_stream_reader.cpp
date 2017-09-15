@@ -121,7 +121,10 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
 
     HanwhaRequestHelper helper(m_hanwhaResource);
     const auto profileParameters = makeProfileParameters(profileNumber, parameters);
+
+    m_hanwhaResource->beforeConfigureStream(getRole());
     const auto response = helper.update(lit("media/videoprofile"), profileParameters);
+    m_hanwhaResource->afterConfigureStream(getRole());
     if (!response.isSuccessful())
     {
         return error(
