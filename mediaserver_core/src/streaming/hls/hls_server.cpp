@@ -745,11 +745,11 @@ namespace nx_hls
 
         quint64 startTimestamp = 0;
         if (params.startTimestamp)
-            startTimestamp = *params.startTimestamp;
+            startTimestamp = (quint64) params.startTimestamp->count();
 
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
         if (params.duration)
-            chunkDuration = params.duration->count();
+            chunkDuration = (quint64) params.duration->count();
 
         bool requestIsAPartOfHlsSession = false;
         {
@@ -774,7 +774,7 @@ namespace nx_hls
             params.channel,
             params.containerFormat,
             params.alias ? *params.alias : QString(),
-            startTimestamp,
+            std::chrono::microseconds(startTimestamp),
             std::chrono::microseconds(chunkDuration),
             params.streamQuality,
             requestParams);
@@ -946,7 +946,7 @@ namespace nx_hls
                 nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager =
                     std::make_shared<ArchivePlaylistManager>(
                         camResource,
-                        params.startTimestamp.get(),
+                        params.startTimestamp->count(),
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
                         newHlsSession->targetDurationMS() * USEC_IN_MSEC,
                         quality );
@@ -1058,7 +1058,8 @@ namespace nx_hls
 
         if (startTimestampIter != requestParams.end())
         {
-            result.startTimestamp = startTimestampIter->second.toULongLong();
+            result.startTimestamp = std::chrono::microseconds(
+                startTimestampIter->second.toULongLong());
         }
         else
         {
@@ -1069,7 +1070,8 @@ namespace nx_hls
                 // Converting startDatetime to startTimestamp.
                 // This is secondary functionality, not used by this 
                 //   HLS implementation (since all chunks are referenced by npt timestamps).
-                result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
+                result.startTimestamp = std::chrono::microseconds(
+                    nx::utils::parseDateTime(startDatetimeIter->second));
             }
             else
             {
@@ -1077,7 +1079,10 @@ namespace nx_hls
                 std::multimap<QString, QString>::const_iterator startDatetimeIter =
                     requestParams.find(QLatin1String(StreamingParams::START_DATETIME_PARAM_NAME));
                 if (startDatetimeIter != requestParams.end())
-                    result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
+                {
+                    result.startTimestamp = std::chrono::microseconds(
+                        nx::utils::parseDateTime(startDatetimeIter->second));
+                }
             }
         }
 

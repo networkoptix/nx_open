@@ -121,8 +121,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
         const quint64 cacheEndTimestamp = 
             camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
         if (transcodeParams.alias().isEmpty() &&
-            transcodeParams.startTimestamp() > cacheEndTimestamp &&
-            transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS)
+            transcodeParams.startTimestamp().count() > cacheEndTimestamp &&
+            transcodeParams.startTimestamp().count() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS)
         {
             // Chunk is in the future not futher than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
             // Scheduling transcoding on data availability.
@@ -137,7 +137,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
             if (scheduleTranscoding(
                    newTranscodingId,
-                   (transcodeParams.startTimestamp() - cacheEndTimestamp) / USEC_IN_MSEC + 1))
+                   (transcodeParams.startTimestamp().count() - cacheEndTimestamp) / USEC_IN_MSEC + 1))
             {
                 return true;
             }
@@ -227,16 +227,16 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createMediaDataProvide
         const quint64 cacheEndTimestamp = 
             camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
         const quint64 actualStartTimestamp = 
-            std::max<>(cacheStartTimestamp, transcodeParams.startTimestamp());
+            std::max<>(cacheStartTimestamp, (quint64)transcodeParams.startTimestamp().count());
         mediaDataProvider = AbstractOnDemandDataProviderPtr(
             new LiveMediaCacheReader(
                 camera->liveCache(transcodeParams.streamQuality()), actualStartTimestamp));
 
-        if ((transcodeParams.startTimestamp() < cacheEndTimestamp && //< Requested data is in live cache (at least, partially).
-            transcodeParams.endTimestamp() > cacheStartTimestamp) ||
-            (transcodeParams.startTimestamp() > cacheEndTimestamp && //< Chunk is in the future not futher
+        if ((transcodeParams.startTimestamp().count() < cacheEndTimestamp && //< Requested data is in live cache (at least, partially).
+            transcodeParams.endTimestamp().count() > cacheStartTimestamp) ||
+            (transcodeParams.startTimestamp().count() > cacheEndTimestamp && //< Chunk is in the future not futher
                                                                      //< than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
-                transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS) ||
+                transcodeParams.startTimestamp().count() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS) ||
             !transcodeParams.alias().isEmpty()) //< Has alias, startTimestamp may be invalid.
         {
         }
@@ -278,8 +278,10 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createMediaDataProvide
             : transcodeParams.streamQuality(),
             true);
         archiveReader->setPlaybackRange(QnTimePeriod(
-            transcodeParams.startTimestamp() / USEC_IN_MSEC,
+            duration_cast<milliseconds>(transcodeParams.startTimestamp()).count(),
             duration_cast<milliseconds>(transcodeParams.duration()).count()));
+        //archiveReader->jumpTo(
+        //    duration_cast<milliseconds>(transcodeParams.startTimestamp()).count(), 0);
         mediaDataProvider = OnDemandMediaDataProviderPtr(new OnDemandMediaDataProvider(dp));
         archiveReader->start();
     }
