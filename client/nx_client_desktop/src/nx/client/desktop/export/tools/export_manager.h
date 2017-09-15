@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 
 #include <nx/client/desktop/export/data/export_types.h>
+#include <utils/common/connective.h>
 
 #include <nx/utils/uuid.h>
 
@@ -19,19 +20,19 @@ struct ExportProcessInfo
     ExportProcessStatus status = ExportProcessStatus::initial;
 };
 
-class ExportProcess: public QObject
+class ExportProcess: public Connective<QObject>
 {
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
     Q_OBJECT
 
 public:
-    explicit ExportProcess(QObject* parent = nullptr);
+    explicit ExportProcess(AbstractExportTool* tool, QObject* parent = nullptr);
     virtual ~ExportProcess() override;
 
     const ExportProcessInfo& info() const;
 
-    virtual void start() = 0;
-    virtual void stop() = 0;
+    virtual void start();
+    virtual void stop();
 
 signals:
     void infoChanged(const ExportProcessInfo& info);
@@ -39,6 +40,7 @@ signals:
 
 protected:
     ExportProcessInfo m_info;
+    QScopedPointer<AbstractExportTool> const m_tool;
 };
 
 /**

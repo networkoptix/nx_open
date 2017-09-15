@@ -80,6 +80,11 @@ struct WorkbenchExportHandler::Private
         if (!QFileInfo(completeFilename).exists())
             return;
 
+        auto existing = resourcePool->getResourceByUrl(completeFilename);
+        NX_ASSERT(!existing);
+        if (existing)
+            resourcePool->removeResource(existing);
+
         switch (filename.extension)
         {
             case FileExtension::avi:

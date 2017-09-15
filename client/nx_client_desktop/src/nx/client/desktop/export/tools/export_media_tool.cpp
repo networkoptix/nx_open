@@ -45,9 +45,8 @@ struct ExportMediaTool::Private
     const ExportMediaSettings settings;
     QScopedPointer<QnAbstractMediaStreamDataProvider> dataProvider;
     QScopedPointer<QnStreamRecorder> exportRecorder;
-    StreamRecorderError status = StreamRecorderError::noError;
-
-    ExportProcessStatus state = ExportProcessStatus::initial;
+    ExportProcessError lastError = ExportProcessError::noError;
+    ExportProcessStatus status = ExportProcessStatus::initial;
 
     explicit Private(ExportMediaTool* owner, const ExportMediaSettings& settings):
         q(owner),
@@ -57,7 +56,7 @@ struct ExportMediaTool::Private
 
     bool exportMediaPeriodToFile()
     {
-        NX_ASSERT(state == ExportProcessStatus::initial);
+        NX_ASSERT(status == ExportProcessStatus::initial);
         const auto timelapseFrameStepUs = settings.timelapseFrameStepMs * 1000ll;
         const auto startTimeUs = settings.timePeriod.startTimeMs * 1000ll;
         NX_ASSERT(settings.timePeriod.durationMs > 0,
@@ -68,29 +67,25 @@ struct ExportMediaTool::Private
 
         if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs))
         {
-            state = ExportProcessStatus::failure;
-            emit q->statusChanged(state);
+            setStatus(ExportProcessStatus::failure);
             return false;
         }
 
         connect(dataProvider.data(), &QnAbstractArchiveStreamReader::finished, q,
             [this]
             {
-                qDebug() << "dataProvider finished in thread" << QThread::currentThreadId();
                 finishExport();
             });
 
         if (!initExportRecorder(timelapseFrameStepUs))
         {
-            state = ExportProcessStatus::failure;
-            emit q->statusChanged(state);
+            setStatus(ExportProcessStatus::failure);
             return false;
         }
 
         connect(exportRecorder.data(), &QnStreamRecorder::finished, q,
             [this]()
             {
-                qDebug() << "exportRecorder finished in thread" << QThread::currentThreadId();
                 dataProvider->removeDataProcessor(exportRecorder.data());
                 dataProvider->pleaseStop();
             });
@@ -102,9 +97,9 @@ struct ExportMediaTool::Private
             &ExportMediaTool::valueChanged);
 
         connect(exportRecorder, &QnStreamRecorder::recordingFinished, q,
-            [this]
+            [this](const StreamRecorderErrorStruct &status, const QString& /*fileName*/)
             {
-                qDebug() << "exportRecorder recordingFinished in thread" << QThread::currentThreadId();
+                lastError = convertError(status.lastError);
                 emit q->valueChanged(100);
             });
 
@@ -130,16 +125,14 @@ struct ExportMediaTool::Private
         dataProvider->start();
         exportRecorder->start();
 
-        state = ExportProcessStatus::exporting;
-        emit q->statusChanged(state);
+        setStatus(ExportProcessStatus::exporting);
         return true;
     }
 
     void cancelExport()
     {
-        NX_ASSERT(state == ExportProcessStatus::exporting);
-        state = ExportProcessStatus::cancelling;
-        emit q->statusChanged(state);
+        NX_ASSERT(status == ExportProcessStatus::exporting);
+        setStatus(ExportProcessStatus::cancelling);
 
         // Minor optimization.
         dataProvider->removeDataProcessor(exportRecorder.data());
@@ -152,6 +145,13 @@ struct ExportMediaTool::Private
     }
 
 private:
+    void setStatus(ExportProcessStatus value)
+    {
+        NX_EXPECT(status != value);
+        status = value;
+        emit q->statusChanged(status);
+    }
+
     bool initDataProvider(qint64 startTimeUs, qint64 endTimeUs, qint64 timelapseFrameStepUs)
     {
         NX_ASSERT(!dataProvider);
@@ -172,7 +172,7 @@ private:
         if (!archiveReader)
         {
             delete tmpReader;
-            status = StreamRecorderError::invalidResourceType;
+            lastError = ExportProcessError::unsupportedMedia;
             return false;
         }
 
@@ -210,23 +210,21 @@ private:
 
     void finishExport()
     {
-        switch (state)
+        switch (status)
         {
             case ExportProcessStatus::exporting:
-                state = (status == StreamRecorderError::noError)
+                setStatus(lastError == ExportProcessError::noError
                     ? ExportProcessStatus::success
-                    : ExportProcessStatus::failure;
+                    : ExportProcessStatus::failure);
                 break;
             case ExportProcessStatus::cancelling:
-                state = ExportProcessStatus::cancelled;
+                setStatus(ExportProcessStatus::cancelled);
                 break;
             default:
                 NX_ASSERT(false, "Should never get here");
                 break;
         }
-        emit q->statusChanged(state);
-
-        if (state != ExportProcessStatus::success)
+        if (status != ExportProcessStatus::success)
             QFile::remove(settings.fileName.completeFileName());
         emit q->finished();
     }
@@ -254,14 +252,14 @@ bool ExportMediaTool::start()
     return d->exportMediaPeriodToFile();
 }
 
-StreamRecorderError ExportMediaTool::status() const
+ExportProcessError ExportMediaTool::lastError() const
 {
-    return d->status;
+    return d->lastError;
 }
 
 ExportProcessStatus ExportMediaTool::processStatus() const
 {
-    return d->state;
+    return d->status;
 }
 
 void ExportMediaTool::stop()
