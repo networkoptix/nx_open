@@ -1,5 +1,7 @@
 #include "proxy_handler.h"
 
+#include <typeinfo>
+
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
@@ -231,6 +233,8 @@ void ProxyHandler::onConnected(
             nx_http::StatusCode::internalServerError);
     }
 
+    const auto originalType = typeid(*connection.get()).name();
+
     if (m_sslConnectionRequired)
     {
         connection = std::make_unique<nx::network::deprecated::SslSocket>(
@@ -245,9 +249,9 @@ void ProxyHandler::onConnected(
     }
 
     NX_VERBOSE(this,
-        lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
-        .args(targetAddress, connection->getForeignAddress(), m_request.requestLine.url,
-            connection->getLocalAddress(), m_sslConnectionRequired));
+        lm("Successfully established connection to %1(%2, full name %3, typeid %4) (path %5) from %6 with SSL=%7")
+        .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(), originalType,
+            m_request.requestLine.url, connection->getLocalAddress(), m_sslConnectionRequired));
 
     m_requestProxyWorker = std::make_unique<ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
