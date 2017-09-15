@@ -4,8 +4,8 @@
     </div>
     <div class='camera-links-title'>Camera Details</div>
     <table>
-        <tr ng-if="debugMode"><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
-        <tr><td>Name</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
+        <tr ng-if="debugMode"><td>Spelen</td><td class="camera-links-info">{{transport}} - {{currentResolution}} met {{player}}</td></tr>
+        <tr><td>Naam</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
@@ -13,6 +13,13 @@
             </td>
         </tr>
         <tr><td>IP (URL)</td><td class="camera-links-info"><a target="_blank" ng-href="{{activeCamera.url | checkProtocol}}">{{activeCamera.url}}</a></td></tr>
+        <tr>
+            <td>Weergave</td>
+            <td>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}"> Web </a>
+                <copy-button copy-data="formatLink(activeCamera, 0, 'web')"></copy-button>
+            </td>
+        </tr>
         <tr ng-repeat="stream in activeCamera.mediaStreams">
             <td>{{streamName(stream)}}</td>
             <td>
@@ -34,14 +41,14 @@
         </tr>
     </table>
     <div class="camera-links-break"></div>
-    <div class='camera-links-title'>Link settings</div>
+    <div class='camera-links-title'>Link instellingen</div>
     <table>
         <tr>
-            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;Use temporary key</label></td>
+            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;Gebruik tijdelijke sleutel</label></td>
         </tr>
         <tr>
             <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useCredentials"
-                       ng-disabled="linkSettings.useAuth">&nbsp;Use credentials</label></td>
+                       ng-disabled="linkSettings.useAuth">&nbsp;Gebruik inloggegevens</label></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
             <td><label class="camera-links-label" for="useLogin">Login</label></td>
@@ -49,22 +56,22 @@
                        ng-model="linkSettings.useLogin"></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
-            <td><label class="camera-links-label" for="usePassword">Password</label></td>
+            <td><label class="camera-links-label" for="usePassword">Wachtwoord</label></td>
             <td><input id="usePassword" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.usePassword"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="duration">Duration (sec)</label></td>
+            <td><label class="camera-links-label" for="duration">Duur (sec)</label></td>
             <td><input id="duration" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.duration"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="resolution">Resolution</label></td>
+            <td><label class="camera-links-label" for="resolution">Resolutie</label></td>
             <td><input id="resolution" type="text" class="input-sm camera-links-info" 
                        ng-model="linkSettings.resolution"></td>
         </tr>
         <tr>
-            <td>Playing position</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
+            <td>Speelpositie</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
         </tr>
     </table>
 </div>

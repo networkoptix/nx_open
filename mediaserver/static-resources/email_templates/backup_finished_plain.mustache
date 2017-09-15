@@ -1,19 +1,19 @@
 {{#systemName}}
-{{systemName}}
+{{&systemName}}
 {{#systemSignature}}
-{{systemSignature}}
+{{&systemSignature}}
 {{/systemSignature}}
 {{#cloudOwnerEmail}}
-{{cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
 {{/cloudOwnerEmail}}
 {{/systemName}}
 
-{{event}}{{#source}} on {{source}}{{/source}}
+{{&event}}{{#source}} on {{&source}}{{/source}}
 
-Reason: {{reason}}
-Time: {{timestampDate}} {{timestampTime}}
+Reason: {{&reason}}
+Time: {{&timestampDate}} {{&timestampTime}}
 
 
-Website: {{companyUrl}}
-Support: {{supportLinkText}}
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
 

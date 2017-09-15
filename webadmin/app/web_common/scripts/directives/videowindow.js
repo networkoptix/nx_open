@@ -292,10 +292,8 @@ angular.module('nxCommon')
                                 scope.vgPlayerReady({$API: null});
                                 console.error(error);
                             }, function (position, duration) {
-                                if (position != 0) {
-                                    scope.loading = false; // Video is playing - disable loading
-                                    scope.vgUpdateTime({$currentTime: position, $duration: duration});
-                                }
+                                scope.loading = false; // Video is playing - disable loading
+                                scope.vgUpdateTime({$currentTime: position, $duration: duration});
                             });
 
                             videoPlayers.push(flashlsAPI);
@@ -317,12 +315,17 @@ angular.module('nxCommon')
                                             scope.vgApi = api;
                                             if (scope.vgSrc) {
                                                 scope.vgApi.load(getFormatSrc('hls'));
+
                                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                                     var video = event.srcElement || event.originalTarget;
                                                     if(video.currentTime){ // When video is playing - disable loading
                                                         scope.loading = false;
                                                     }
                                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                                });
+
+                                                scope.vgApi.addEventListener("ended",function(event){
+                                                    scope.vgUpdateTime({$currentTime: null, $duration: null});
                                                 });
                                             }
                                             scope.vgPlayerReady({$API:api});

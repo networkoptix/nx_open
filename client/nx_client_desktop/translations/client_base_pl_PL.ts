@@ -869,14 +869,6 @@ to view more bookmarks</source>
       <translation>Usuń z sekwencji</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>Uruchom sekwencję</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>Zatrzymaj sekwencję</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>Utwórz sekwencję</translation>
     </message>
@@ -1027,6 +1019,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Uruchom sekwencję</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -1037,8 +1036,28 @@ to view more bookmarks</source>
       <translation>Plik &quot;%1&quot; już istnieje. Spróbuj użyć innej nazwy pliku.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Plik &quot;%1&quot; jest używany w innym procesie. Spróbuj użyć innej nazwy pliku.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1673,10 +1692,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>Numer wersji</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>Nieprawidłowy numer wersji</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2675,6 +2690,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Dowiedz się więcej o %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4646,6 +4672,10 @@ to %1</source>
       <source>Manage Bookmarks</source>
       <translation>Zarządzaj zakładkami</translation>
     </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+    </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
@@ -6262,10 +6292,6 @@ to %1</source>
       <translation>Serwer e-mail nie jest wprowadzony</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Wybierz serwer stanowiący źródło czasu dla innych serwerów</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>System pracuje w trybie awaryjnym</translation>
     </message>
@@ -6296,10 +6322,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>Serwer e-mail nie jest wprowadzony.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Zegary serwerów nie są synchronizowane i nie można ustalić wspólnego czasu.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7874,6 +7896,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Zatrzymaj sekwencję</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Uruchom sekwencję</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -8142,8 +8183,8 @@ to %1</source>
       <translation>Możesz używać strzałek na klawiaturze do przełączania układów. Aby wyjść z sekwencji naciśnij Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>Możesz używać strzałek na klawiaturze do przełączania kamer. Aby wyjść z sekwencji naciśnij Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>
@@ -8165,7 +8206,7 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Delete layout tour %1?</source>
-      <translation>Usuń cykl układów %1?</translation>
+      <translation>Usunąć układ cykliczny %1?</translation>
     </message>
     <message>
       <source>Showreel</source>

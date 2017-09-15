@@ -32,10 +32,9 @@ namespace detail {
         {
             BaseLayer = 0,
             StatusLayer,
-            InfoLayer,
-            HudLayer,
-            TopControlsLayer,
             SelectionLayer,
+            InfoLayer,
+            TopControlsLayer,
         };
 
         bool isOverlayVisible() const;

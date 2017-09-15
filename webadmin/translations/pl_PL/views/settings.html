@@ -36,24 +36,33 @@
 
                     <div>
                         <h3>Przywróć serwer</h3>
-                        <p>To działanie spowoduje przywrócenie serwera do ustawień domyślnych (wyczyszczenie bazy danych i zresetowanie konfiguracji). Serwer zostanie odłączony od bieżącego systemu. Archiwum wideo pozostanie nienaruszone.</p>
+                        <p>This action will revert this server to defaults (clear the database and reset configuration).
+                            The server will be detached from the current system. Video archive will remain intact.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Przywróć ustawienia fabryczne</button></p>
                     </div>
                     <div>
-                        <h3>Uruchom ponownie</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()"> Uruchom ponownie oprogramowanie </button><button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Uruchom ponownie komputer</button></p>
+                        <h3>Detach server from the system</h3>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                    </div>
+                    <div>
+                        <h3>Restart</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
-                            <h3>Zmień hasło administratora</h3>
-                            <p>Jeśli system nie jest podłączony do chmury spowoduje to zmianę hasła dla lokalnego użytkownika "admin" i hasła ratunkowego (root) na niektórych serwerach. <br> Natomiast jeśli system jest podłączony do chmury, spowoduje to tylko zmianę hasła ratunkowego.</p>
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
+                            <h3>Change admin password</h3>
+                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
+                                Otherwise this will change the recovery password only.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Zmień hasło</button>
+                                        ng-click="changePassword()">Change password</button>
                             </div>
                         </form>
                     </div>

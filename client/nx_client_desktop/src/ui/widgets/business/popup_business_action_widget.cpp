@@ -10,6 +10,7 @@
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include "ui/style/skin.h"
 
 using namespace nx::client::desktop::ui;
 
@@ -19,6 +20,10 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
     ui(new Ui::PopupBusinessActionWidget)
 {
     ui->setupUi(this);
+
+    ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
+    ui->hintLabel->setToolTip(tr("Notification will be shown until one of the users who see it "
+        "creates bookmark with event description"));
 
     connect(ui->settingsButton, &QPushButton::clicked,
         this, &QnPopupBusinessActionWidget::at_settingsButton_clicked);
@@ -41,8 +46,10 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
     {
         const auto sourceCameraRequired =
             nx::vms::event::isSourceCameraRequired(model()->eventType());
-        ui->forceAcknoledgementCheckBox->setEnabled(sourceCameraRequired
-            || model()->eventType() >= nx::vms::event::userDefinedEvent);
+        const auto allowForceAcknoledgement = sourceCameraRequired
+            || model()->eventType() >= nx::vms::event::userDefinedEvent;
+        ui->forceAcknoledgementCheckBox->setEnabled(allowForceAcknoledgement);
+        ui->hintLabel->setEnabled(allowForceAcknoledgement);
     }
 
     if (fields.testFlag(Field::actionParams))

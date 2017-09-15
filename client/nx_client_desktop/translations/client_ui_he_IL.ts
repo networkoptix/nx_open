@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>תצוגת Intel HD Graphics עשויה להיתקל בבעיות אם הטשטוש מופעל. אנו ממליצים בחום להשאיר את האופציה כמו שהיא.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>בטל טשטוש</translation>
     </message>
   </context>
   <context>
@@ -883,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>השאר מחובר</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>השאר מחובר</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>

@@ -13,42 +13,38 @@
         <p>
             通用事件是一種讓第三方系統觸發 VMS 動作的特殊事件。
             要建立 Generic Event 來整合系統需要向伺服器發出HTTP請求（使用Server API）。
-            Actions for Generic Events can be configured them using Events&Rules dialog in desktop client application.
+            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">通用事件生成器</a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>伺服器 API</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            伺服器 API 提供一套標準的 API 供第三方廠商呼叫. 讓開發者可取用所有在 Client 上能操作的系統功能: 調閱/管理系統資源 (伺服器, 攝影機, 使用者, 權限), 從系統中索取即時影像或錄影資料, 生成事件, 建立規則, 操控 PTZ 攝影機以及更多功能.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+            <a href="#/developers/api"><b>API 測試工具（新）</b></a>
+            - 帶有工具的互動式文件以測試 API 呼叫 <br>
+            <a href="#/developers/changelog">API 更新日誌</a>
+            - API 重大變更的清單<br>
+            <a id="api-doc" href="api.xml" target="_blank">API 文件</a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>攝影機詳細資訊面板</h3>
         <p>
-            Special panel for a webclient which displays additional information for cameras:
+            用於顯示攝影機附加資訊的web client特殊面板:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>攝影機 ID</li>
+            <li>所有可用的影像流的連結</li>
+            <li>從瀏覽器直接匯出影像</li>
         </ul>
         <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
+            若要開啟攝影機詳細資訊面板 - 開啟 <a href="#/view">web client</a>，選擇攝影機，設置圖示（齒輪），然後選擇 "攝影機細節"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">開啟攝影機詳細資訊面板</a></p>
     </div>
     <div>
         <h3>影像來源整合 SDK</h3>

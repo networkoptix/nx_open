@@ -869,14 +869,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start Showreel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop Showreel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Make Showreel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1027,6 +1019,13 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+        <source>Start Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LocalFiles</name>
     <message>
         <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -1037,7 +1036,23 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+        <source>File &quot;%1&quot; is used by another process.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Filename should not contain the following reserved characters:
+%1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1664,10 +1679,6 @@ to view more bookmarks</source>
     <name>QnBuildNumberDialog</name>
     <message>
         <source>Build Number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid build number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2647,6 +2658,17 @@ to %1</source>
     <message>
         <source>Learn more about %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCloudResultMessages</name>
+    <message>
+        <source>Incorrect email or password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4597,6 +4619,10 @@ to %1</source>
         <source>Manage Bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -6197,10 +6223,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>System is in safe mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6231,10 +6253,6 @@ to %1</source>
     <message>
         <source>Email server is not set.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation></translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
@@ -7778,6 +7796,25 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+        <source>Stop Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Showreel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
         <source>%1 (active)</source>
@@ -8039,7 +8076,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
+        <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

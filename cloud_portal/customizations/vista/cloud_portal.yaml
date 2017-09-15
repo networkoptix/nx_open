@@ -42,6 +42,7 @@ languages:
     - de_DE
     - es_ES
     - hu_HU
+    - nl_NL
 
 queue_name: '$INSTANCE_NAME'
 

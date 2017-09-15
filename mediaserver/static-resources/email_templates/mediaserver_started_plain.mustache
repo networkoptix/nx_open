@@ -1,18 +1,18 @@
 {{#systemName}}
-{{systemName}}
+{{&systemName}}
 {{#systemSignature}}
-{{systemSignature}}
+{{&systemSignature}}
 {{/systemSignature}}
 {{#cloudOwnerEmail}}
-{{cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
 {{/cloudOwnerEmail}}
 {{/systemName}}
 
-Server {{#source}}{{source}} {{/source}}started 
+Server {{#source}}{{&source}} {{/source}}started 
 
-{{#aggregated}} {{timestampDate}} {{timestampTime}} {{/aggregated}}
+{{#aggregated}} {{&timestampDate}} {{&timestampTime}} {{/aggregated}}
 
 
-Website: {{companyUrl}}
-Support: {{supportLinkText}}
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
 

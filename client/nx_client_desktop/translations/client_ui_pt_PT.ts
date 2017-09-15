@@ -447,7 +447,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Testar</translation>
     </message>
   </context>
   <context>
@@ -883,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
