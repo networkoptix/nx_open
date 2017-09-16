@@ -187,7 +187,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.Profile;profile=primary;group=primaryCodec;groupInclude=H265">
+                        aux="range=media/videoprofile/add_update/H265.Profile;profile=primary;group=primaryCodec;groupInclude=H265;resourceProperty=primaryStreamCodecProfile">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -203,7 +203,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.Profile;profile=primary;default=High;group=primaryCodec;groupInclude=H264">
+                        aux="range=media/videoprofile/add_update/H264.Profile;profile=primary;default=High;group=primaryCodec;groupInclude=H264;resourceProperty=primaryStreamCodecProfile">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -344,7 +344,7 @@
                         dataType="Number"
                         writeCmd="update"
                         showRange="true"
-                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H265">
+                        aux="range=media/videoprofile/add_update/H264.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -377,7 +377,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H265.Profile;profile=secondary;group=secondaryCodec;groupInclude=H265">
+                        aux="range=media/videoprofile/add_update/H265.Profile;profile=secondary;group=secondaryCodec;groupInclude=H265;resourceProperty=secondaryStreamCodecProfile">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -393,7 +393,7 @@
                         name="Profile"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.Profile;profile=secondary;group=secondaryCodec;groupInclude=H265">
+                        aux="range=media/videoprofile/add_update/H264.Profile;profile=secondary;group=secondaryCodec;groupInclude=H264;resourceProperty=secondaryStreamCodecProfile">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -409,7 +409,7 @@
                         name="Entropy Coding"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H265">
+                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>

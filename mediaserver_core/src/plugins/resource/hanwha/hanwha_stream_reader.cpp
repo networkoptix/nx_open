@@ -65,6 +65,7 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
 {
     const auto role = getRole();
     const auto codec = m_hanwhaResource->streamCodec(role);
+    const auto codecProfile = m_hanwhaResource->streamCodecProfile(codec, role);
     const auto resolution = m_hanwhaResource->streamResolution(role);
     const auto frameRate = m_hanwhaResource->closestFrameRate(role, parameters.fps);
     const auto govLength = m_hanwhaResource->streamGovLength(role);
@@ -94,8 +95,13 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
             m_hanwhaResource->isAudioEnabled()));
     }
 
-    if (isH26x && govLength != kHanwhaInvalidGovLength)
-        result.emplace(govLengthParameterName, QString::number(govLength));
+    if (isH26x)
+    {
+        if (govLength != kHanwhaInvalidGovLength)
+            result.emplace(govLengthParameterName, QString::number(govLength));
+        if (!codecProfile.isEmpty())
+            result.emplace(lit("%1.Profile").arg(toHanwhaString(codec)), codecProfile);
+    }
 
     if (isH26x && bitrateControl != Qn::BitrateControl::undefined)
         result.emplace(bitrateControlParameterName, toHanwhaString(bitrateControl));

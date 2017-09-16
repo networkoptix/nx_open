@@ -1021,6 +1021,25 @@ AVCodecID HanwhaResource::streamCodec(Qn::ConnectionRole role) const
     return result;
 }
 
+QString HanwhaResource::streamCodecProfile(AVCodecID codec, Qn::ConnectionRole role) const
+{
+    const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
+        ? Qn::kPrimaryStreamCodecProfileParamName
+        : Qn::kSecondaryStreamCodecProfileParamName;
+    QString profile = getProperty(propertyName);
+
+    if (!profile.isEmpty())
+        return profile;
+
+    const QStringList* profileList = nullptr;
+    if (codec == AV_CODEC_ID_H264)
+        profileList = &m_streamLimits.h264Profiles;
+    else if (codec == AV_CODEC_ID_H265)
+        profileList = &m_streamLimits.hevcProfiles;
+    
+    return !profileList || profileList->isEmpty() ? QString() : profileList->at(0);
+}
+
 QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo

@@ -32,8 +32,8 @@ struct HanwhaStreamLimits
     std::set<Qn::EntropyCoding> entropyCodingTypes;
     std::set<Qn::BitrateControl> bitrateControlTypes;
     std::set<Qn::EncodingPriority> encodingPriorityTypes;
-    std::set<nx::media_utils::h264::Profile> h264Profiles;
-    std::set<nx::media_utils::hevc::Profile> hevcProfiles;
+    QStringList h264Profiles;
+    QStringList hevcProfiles;
 
     bool setLimit(const HanwhaCgiParameter& parameter);
 

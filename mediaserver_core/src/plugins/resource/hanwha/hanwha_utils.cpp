@@ -216,30 +216,6 @@ Qn::EntropyCoding fromHanwhaString(const QString& str)
 }
 
 template<>
-nx::media_utils::h264::Profile fromHanwhaString(const QString& str)
-{
-    using namespace nx::media_utils::h264;
-    if (str == kHanwhaBaselineProfile)
-        return Profile::baseline;
-    else if (str == kHanwhaMainProfile)
-        return Profile::main;
-    else if (str == kHanwhaHighProfile)
-        return Profile::high;
-
-    return Profile::undefined;
-}
-
-template<>
-nx::media_utils::hevc::Profile fromHanwhaString(const QString& str)
-{
-    using namespace nx::media_utils::hevc;
-    if (str == kHanwhaMainProfile)
-        return Profile::main;
-
-    return Profile::undefined;
-}
-
-template<>
 HanwhaMediaType fromHanwhaString(const QString& str)
 {
     if (str == kHanwhaLiveMediaType)

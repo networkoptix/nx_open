@@ -49,6 +49,7 @@ public:
     int maxProfileCount() const;
 
     AVCodecID streamCodec(Qn::ConnectionRole role) const;
+    QString streamCodecProfile(AVCodecID codec, Qn::ConnectionRole role) const;
     QSize streamResolution(Qn::ConnectionRole role) const;
     int streamGovLength(Qn::ConnectionRole role) const;
     Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;

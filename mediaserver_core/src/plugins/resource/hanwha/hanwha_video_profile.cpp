@@ -56,9 +56,9 @@ void HanwhaVideoProfile::setParameter(
     else if (parameterName.endsWith("GOVLength"))
         setInteger(&govLength, parameterValue);
     else if (parameterName == lit("H264.Profile"))
-        h264Profile = fromHanwhaString<nx::media_utils::h264::Profile>(parameterValue);
+        codecProfile = parameterValue.trimmed();
     else if (parameterName == lit("H265.Profile"))
-        hevcProfile = fromHanwhaString<nx::media_utils::hevc::Profile>(parameterValue);
+        codecProfile = parameterValue.trimmed();
     else if (parameterName.endsWith("EntropyCoding"))
         entropyCoding = fromHanwhaString<Qn::EntropyCoding>(parameterValue);
     else if (parameterName.endsWith("DynamicGOVEnable"))
