@@ -60,7 +60,7 @@ var TimelineConfig = {
     lineWidth: 1,
 
     chunkHeight:24/100, // %    //Height for event line
-    minChunkWidth: 0,
+    minChunkWidth: 1,
     minPixelsPerLevel: 1,
     chunksBgColor:[235,239,241],  //$light3
     chunksBgBorderColor: [225,231,234],  //$light4
