@@ -1068,6 +1068,7 @@ bool AsyncHttpClient::sendRequestToNewLocation(const Response& response)
 
     m_contentLocationUrl = QUrl(QLatin1String(locationIter->second));
 
+    composeRequest(m_request.requestLine.method);
     initiateHttpMessageDelivery();
     return true;
 }
