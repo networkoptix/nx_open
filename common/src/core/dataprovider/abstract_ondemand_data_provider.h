@@ -8,6 +8,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <memory>
+#include <chrono>
 
 #include <QObject>
 
@@ -34,6 +35,8 @@ public:
     //!Return packet to the top of the stream
     virtual void put( QnAbstractDataPacketPtr packet ) = 0;
 
+    // TODO: remove currentPos() and use this one instead
+    std::chrono::microseconds currentPosition() const { return std::chrono::microseconds(currentPos()); }
 signals:
     //!
     /*!

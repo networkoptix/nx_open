@@ -21,10 +21,8 @@
  * Maximum time offset (in micros) requested chunk can be ahead of current live position.
  * Such chunk will be prepared as soon as live position reaches chunk start time.
  */
-static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30 * 1000 * 1000;
-static const int TRANSCODE_THREAD_COUNT = 1;
-static const int USEC_IN_MSEC = 1000;
-static const int MSEC_IN_SEC = 1000;
+static const std::chrono::seconds kMaxChunkTimestampAdvance(30);
+static const int kTranscodeThreadCount = 1;
 
 StreamingChunkTranscoder::TranscodeContext::TranscodeContext():
     chunk(NULL),
@@ -36,7 +34,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder(QnResourcePool* resPool, Flag
     m_flags(flags),
     m_resPool(resPool)
 {
-    m_transcodeThreads.resize(TRANSCODE_THREAD_COUNT);
+    m_transcodeThreads.resize(kTranscodeThreadCount);
     for (size_t i = 0; i < m_transcodeThreads.size(); ++i)
     {
         m_transcodeThreads[i] = new StreamingChunkTranscoderThread();
@@ -118,11 +116,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
             .arg(transcodeParams.startTimestamp()).arg(transcodeParams.duration()),
             cl_logDEBUG1);
 
-        const quint64 cacheEndTimestamp = 
-            camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
+        const std::chrono::microseconds cacheEndTimestamp(
+            camera->liveCache(transcodeParams.streamQuality())->currentTimestamp());
         if (transcodeParams.alias().isEmpty() &&
-            transcodeParams.startTimestamp().count() > cacheEndTimestamp &&
-            transcodeParams.startTimestamp().count() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS)
+            transcodeParams.startTimestamp() > cacheEndTimestamp &&
+            transcodeParams.startTimestamp() - cacheEndTimestamp < kMaxChunkTimestampAdvance)
         {
             // Chunk is in the future not futher than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
             // Scheduling transcoding on data availability.
@@ -135,12 +133,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
             p.first->second.transcodeParams = transcodeParams;
             p.first->second.chunk = chunk;
 
-            if (scheduleTranscoding(
-                   newTranscodingId,
-                   (transcodeParams.startTimestamp().count() - cacheEndTimestamp) / USEC_IN_MSEC + 1))
-            {
+            const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                transcodeParams.startTimestamp() - cacheEndTimestamp) + std::chrono::milliseconds(1);
+            if (scheduleTranscoding(newTranscodingId, duration.count()))
                 return true;
-            }
+
             chunk->doneModification(StreamingChunk::rcError);
             m_scheduledTranscodings.erase(p.first);
             return false;
@@ -185,7 +182,11 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
             return nullptr;
     }
 
-    if (!dataSourceCtx->transcoder)
+    // We should newer transcode the same chunk in the same transcoder more than once, FFMPEG error:
+    //     [matroska @ 0x7f10740342a0] Application provided invalid, non monotonically increasing
+    //     dts to muxer in stream 0: 65699 >= 65566
+    //
+    // if (!dataSourceCtx->transcoder)
     {
         // Creating transcoder.
         dataSourceCtx->transcoder = createTranscoder(cameraResource, transcodeParams);
@@ -222,21 +223,18 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createMediaDataProvide
             .arg(transcodeParams.startTimestamp())
             .arg(transcodeParams.duration()), cl_logDEBUG2);
 
-        const quint64 cacheStartTimestamp = 
-            camera->liveCache(transcodeParams.streamQuality())->startTimestamp();
-        const quint64 cacheEndTimestamp = 
-            camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
-        const quint64 actualStartTimestamp = 
-            std::max<>(cacheStartTimestamp, (quint64)transcodeParams.startTimestamp().count());
-        mediaDataProvider = AbstractOnDemandDataProviderPtr(
-            new LiveMediaCacheReader(
-                camera->liveCache(transcodeParams.streamQuality()), actualStartTimestamp));
+        const auto& liveCache = camera->liveCache(transcodeParams.streamQuality());
+        const std::chrono::microseconds cacheStartTimestamp(liveCache->startTimestamp());
+        const std::chrono::microseconds cacheEndTimestamp(liveCache->currentTimestamp());
+        mediaDataProvider = AbstractOnDemandDataProviderPtr(new LiveMediaCacheReader(
+            camera->liveCache(transcodeParams.streamQuality()),
+            std::max(cacheStartTimestamp, transcodeParams.startTimestamp()).count()));
 
-        if ((transcodeParams.startTimestamp().count() < cacheEndTimestamp && //< Requested data is in live cache (at least, partially).
-            transcodeParams.endTimestamp().count() > cacheStartTimestamp) ||
-            (transcodeParams.startTimestamp().count() > cacheEndTimestamp && //< Chunk is in the future not futher
+        if ((transcodeParams.startTimestamp() < cacheEndTimestamp && //< Requested data is in live cache (at least, partially).
+            transcodeParams.endTimestamp() > cacheStartTimestamp) ||
+            (transcodeParams.startTimestamp() > cacheEndTimestamp && //< Chunk is in the future not futher
                                                                      //< than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
-                transcodeParams.startTimestamp().count() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS) ||
+            transcodeParams.startTimestamp() - cacheEndTimestamp < kMaxChunkTimestampAdvance) ||
             !transcodeParams.alias().isEmpty()) //< Has alias, startTimestamp may be invalid.
         {
         }
@@ -280,8 +278,6 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createMediaDataProvide
         archiveReader->setPlaybackRange(QnTimePeriod(
             duration_cast<milliseconds>(transcodeParams.startTimestamp()).count(),
             duration_cast<milliseconds>(transcodeParams.duration()).count()));
-        //archiveReader->jumpTo(
-        //    duration_cast<milliseconds>(transcodeParams.startTimestamp()).count(), 0);
         mediaDataProvider = OnDemandMediaDataProviderPtr(new OnDemandMediaDataProvider(dp));
         archiveReader->start();
     }
