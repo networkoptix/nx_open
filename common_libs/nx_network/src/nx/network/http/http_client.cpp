@@ -232,10 +232,10 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     nx::utils::promise<void> socketTakenPromise;
     m_asyncHttpClient->dispatch(
         [this, &sock, &socketTakenPromise]()
-        {   
+        {
             QnMutexLocker lock(&m_mutex);
             m_terminated = true;
-            
+
             sock = std::move(m_asyncHttpClient->takeSocket());
 
             m_msgBodyBuffer.append(m_asyncHttpClient->fetchMessageBodyBuffer());
@@ -259,7 +259,7 @@ bool HttpClient::fetchResource(
 
     while (!client.eof())
         *msgBody += client.fetchMessageBodyBuffer();
-    
+
     *contentType = getHeaderValue(client.response()->headers, "Content-Type");
     return true;
 }

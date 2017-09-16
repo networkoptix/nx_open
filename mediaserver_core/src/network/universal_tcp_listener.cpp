@@ -77,27 +77,36 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
     return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
 }
 
-bool QnUniversalTcpListener::addServerSocketToMultipleSocket(const SocketAddress& localAddress,
-    nx::network::MultipleServerSocket* multipleServerSocket, int ipVersion)
+AbstractStreamServerSocket* QnUniversalTcpListener::addServerSocketToMultipleSocket(
+    const SocketAddress& localAddress,
+    nx::network::MultipleServerSocket* multipleServerSocket,
+    int ipVersion)
 {
-    auto tcpServerSocket = SocketFactory::createStreamServerSocket(false,
-        nx::network::NatTraversalSupport::enabled, ipVersion);
+    auto tcpServerSocket = SocketFactory::createStreamServerSocket(
+        false,
+        nx::network::NatTraversalSupport::enabled,
+        ipVersion);
+
+    std::cout << "---- Socket " << ipVersion << " created ----" << std::endl;
 
     if (!tcpServerSocket->setReuseAddrFlag(true) ||
         !tcpServerSocket->bind(localAddress) ||
         !tcpServerSocket->listen())
     {
         setLastError(SystemError::getLastOSErrorCode());
-        return false;
+        return nullptr;
     }
 
+    std::cout << "---- Socket " << ipVersion << " bound and is listened on ----" << std::endl;
+
+    auto result = tcpServerSocket.get();
     if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
     {
         setLastError(SystemError::getLastOSErrorCode());
-        return false;
+        return nullptr;
     }
 
-    return true;
+    return result;
 }
 
 AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
@@ -107,16 +116,23 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     QnMutexLocker lk(&m_mutex);
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
-    bool needToAddIpV4Socket = localAddress.address == HostAddress::anyHost
+    bool needToAddIpV4Socket =
+        localAddress.address == HostAddress::anyHost
         || (bool) localAddress.address.ipV4();
 
-    bool needToAddIpV6Socket = false;
-    // localAddress.address == HostAddress::anyHost
-    //     || (bool)localAddress.address.ipV6();
+    bool needToAddIpV6Socket =
+        localAddress.address == HostAddress::anyHost
+        || (bool)localAddress.address.ipV6();
 
+    AbstractStreamServerSocket* ipV4ServerSocket = nullptr;
     if (needToAddIpV4Socket)
     {
-        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET))
+        ipV4ServerSocket = addServerSocketToMultipleSocket(
+            localAddress,
+            multipleServerSocket.get(),
+            AF_INET);
+
+        if (ipV4ServerSocket == nullptr)
             return nullptr;
         ++m_totalListeningSockets;
         ++m_cloudSocketIndex;
@@ -124,13 +140,24 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 
     if (needToAddIpV6Socket)
     {
-        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET6))
+        SocketAddress ipV6SocketAddress = localAddress;
+        if (ipV4ServerSocket != nullptr)
+            ipV6SocketAddress.port = ipV4ServerSocket->getLocalAddress().port;
+
+        if (!addServerSocketToMultipleSocket(
+                ipV6SocketAddress,
+                multipleServerSocket.get(),
+                AF_INET6))
+        {
+            std::cout << "---- Adding ipv6 socket to multipleServerSocket FAILED ----" << std::endl;
             return nullptr;
+        }
         ++m_totalListeningSockets;
         ++m_cloudSocketIndex;
     }
 
     #ifdef LISTEN_ON_UDT_SOCKET
+        std::cout << "---- Listening on UDT is ON ----" << std::endl;
         auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
         if (!udtServerSocket->setReuseAddrFlag(true) ||
             !udtServerSocket->bind(localAddress) ||
@@ -153,6 +180,7 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         {
             m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
                 std::move(m_serverSocket), true);
+            std::cout << "---- SSL is ON ----" << std::endl;
         }
     #endif
 

@@ -89,10 +89,10 @@ public:
 
     /** See AsyncHttpClient::setResponseReadTimeoutMs */
     void setResponseReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
-    
+
     /** See AsyncHttpClient::setMessageBodyReadTimeoutMs */
     void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
-    
+
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);

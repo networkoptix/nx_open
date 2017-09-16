@@ -35,7 +35,7 @@ static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
 constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultSendTimeout;
 constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultResponseReadTimeout;
 constexpr const std::chrono::seconds AsyncClient::Timeouts::kDefaultMessageBodyReadTimeout;
-    
+
 constexpr int kMaxNumberOfRedirects = 5;
 
 AsyncClient::Timeouts::Timeouts(
@@ -105,7 +105,7 @@ std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
     result->cancelIOSync(nx::network::aio::etNone);
     if (!m_receivedBytesLeft.isEmpty())
     {
-        auto bufferedStreamSocket = 
+        auto bufferedStreamSocket =
             std::make_unique<nx::network::BufferedStreamSocket>(std::move(result));
         BufferType buf;
         buf.swap(m_receivedBytesLeft);
@@ -138,7 +138,7 @@ SystemError::ErrorCode AsyncClient::lastSysErrorCode() const
 {
     if (m_lastSysErrorCode != SystemError::noError)
         return m_lastSysErrorCode;
-    // Ensuring system error code is always non-zero in case of failure 
+    // Ensuring system error code is always non-zero in case of failure
     //  to simplify AsyncClient user's life.
     return failed() ? SystemError::connectionReset : SystemError::noError;
 }
@@ -438,6 +438,10 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     NX_LOGX(lm("Opened connection to url %1. Result code %2")
         .arg(m_contentLocationUrl).arg(errorCode), cl_logDEBUG2);
 
+    qWarning()
+        << lm("Opened connection to url %1. Result code %2")
+                .arg(m_contentLocationUrl).arg(errorCode);
+
     if (m_terminated)
         return;
 
@@ -664,10 +668,27 @@ void AsyncClient::initiateTcpConnection()
 
     m_state = State::sInit;
 
-    m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lm("https"));
+    int ipVersion = AF_INET;
+    if (!(bool) HostAddress(m_contentLocationUrl.host()).ipV4()
+        && (bool) HostAddress(m_contentLocationUrl.host()).ipV6())
+    {
+        ipVersion = AF_INET6;
+    }
+
+    m_socket = SocketFactory::createStreamSocket(
+        m_contentLocationUrl.scheme() == lm("https"),
+        nx::network::NatTraversalSupport::enabled,
+        ipVersion);
 
     NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
         .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+
+    qWarning()
+        << lm("Opening connection to %1. url %2, socket %3, ipVersion: %4")
+                .arg(remoteAddress)
+                .arg(m_contentLocationUrl)
+                .arg(m_socket->handle())
+                .arg(ipVersion == AF_INET ? "V4" : "V6");
 
     m_socket->bindToAioThread(getAioThread());
     m_connectionClosed = false;
@@ -973,7 +994,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
 
             break;
         }
-            
+
         case StatusCode::proxyAuthenticationRequired:
         {
             if (!m_proxyAuthorizationTried &&
@@ -984,7 +1005,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
             }
             break;
         }
-            
+
         case StatusCode::found:
         case StatusCode::movedPermanently:
             return sendRequestToNewLocation(response);

@@ -6,7 +6,7 @@
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, 0),
+    m_serverEndpoint(HostAddress::anyHost, 0),
     m_firstStartup(true)
 {
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
@@ -59,14 +59,14 @@ void MediaServerLauncher::prepareToStart()
     }
 
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
-    char* argv[] = { "", "-e", configFileOption.data() };
+    const char* argv[] = { "", "-e", configFileOption.data() };
     const int argc = 3;
 
     m_configFile.flush();
     m_configFile.close();
 
     m_mediaServerProcess.reset();
-    m_mediaServerProcess.reset(new MediaServerProcess(argc, argv));
+    m_mediaServerProcess.reset(new MediaServerProcess(argc, (char**) argv));
     connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this, &MediaServerLauncher::started);
 
     m_firstStartup = false;

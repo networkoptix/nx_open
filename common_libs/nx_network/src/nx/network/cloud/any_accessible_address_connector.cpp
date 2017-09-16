@@ -21,7 +21,7 @@ AnyAccessibleAddressConnector::AnyAccessibleAddressConnector(
 void AnyAccessibleAddressConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    
+
     m_timer.bindToAioThread(aioThread);
 
     for (auto& connection: m_directConnections)
@@ -71,7 +71,7 @@ void AnyAccessibleAddressConnector::connectAsync(
 void AnyAccessibleAddressConnector::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
-    
+
     m_timer.pleaseStopSync();
     m_directConnections.clear();
     m_cloudConnectors.clear();
@@ -86,6 +86,7 @@ void AnyAccessibleAddressConnector::connectToEntryAsync(const AddressEntry& dnsE
 {
     using namespace std::placeholders;
 
+    qWarning() << Q_FUNC_INFO << "address type:" << (int) dnsEntry.type;
     switch (dnsEntry.type)
     {
         case AddressType::direct:
@@ -122,6 +123,8 @@ bool AnyAccessibleAddressConnector::establishDirectConnection(const SocketAddres
     using namespace std::placeholders;
 
     NX_LOGX(lm("Trying direct connection to %1").arg(endpoint), cl_logDEBUG2);
+
+    qWarning() << lm("Trying direct connection to %1").arg(endpoint) << "ip version:" << m_ipVersion;
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());
@@ -172,7 +175,7 @@ void AnyAccessibleAddressConnector::onConnectDone(
             .arg(m_awaitedConnectOperationCount), cl_logDEBUG2);
         return; //< Waiting for other operations to finish.
     }
-    
+
     if (connection)
         m_socketAttributes.applyTo(connection.get());
 

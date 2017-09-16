@@ -1248,7 +1248,11 @@ void MediaServerProcess::updateAddressesList()
     fromResourceToApi(m_mediaServer, prevValue);
 
 
-    AddressFilters addressMask = AddressFilter::ipV4 | AddressFilter::ipV6 | AddressFilter::noLocal | AddressFilter::noLoopback;
+    AddressFilters addressMask =
+        AddressFilter::ipV4
+        | AddressFilter::ipV6
+        | AddressFilter::noLocal
+        | AddressFilter::noLoopback;
 
     QList<SocketAddress> serverAddresses;
     const auto port = m_universalTcpListener->getPort();
@@ -1281,10 +1285,16 @@ void MediaServerProcess::updateAddressesList()
     ec2::ApiMediaServerData server;
     fromResourceToApi(m_mediaServer, server);
     if (server != prevValue)
-        commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->save(server, this, &MediaServerProcess::at_serverSaved);
+    {
+        auto mediaServerManager =
+            commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
+        mediaServerManager->save(server, this, &MediaServerProcess::at_serverSaved);
+    }
 
-    nx::network::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
-        serverAddresses.begin(), serverAddresses.end()));
+    nx::network::SocketGlobals::addressPublisher().updateAddresses(
+        std::list<SocketAddress>(
+            serverAddresses.begin(),
+            serverAddresses.end()));
 }
 
 void MediaServerProcess::loadResourcesFromECS(
@@ -1573,7 +1583,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
     server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
-    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) 
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
 
     QFile hddList(Qn::HDD_LIST_FILE);
@@ -2654,12 +2664,12 @@ void MediaServerProcess::run()
         auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
-    
+
     connect(
-        ec2Connection->getTimeNotificationManager().get(), 
+        ec2Connection->getTimeNotificationManager().get(),
         &ec2::AbstractTimeNotificationManager::timeChanged,
-        this, 
-        &MediaServerProcess::at_timeChanged, 
+        this,
+        &MediaServerProcess::at_timeChanged,
         Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
