@@ -301,7 +301,7 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setParams(params);
             ffmpegTranscoder->setQuality(quality);
             ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
-            m_transcodingSettings.codec = codec;
+           // m_transcodingSettings.codec = codec;
             ffmpegTranscoder->setFilterList(QnImageFilterHelper::createFilterChain(
                 m_transcodingSettings, resolution));
 

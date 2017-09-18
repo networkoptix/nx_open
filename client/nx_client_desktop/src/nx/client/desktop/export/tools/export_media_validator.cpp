@@ -10,6 +10,8 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
+#include <nx/core/transcoding/filters/filter_chain.h>
+
 #include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/data/export_layout_settings.h>
@@ -45,16 +47,11 @@ static const int kBitsPerByte = 8;
 
 bool validateLength(const ExportMediaSettings& settings, qint64 durationMs)
 {
-    const auto exportSpeed = qMax(1ll, settings.timelapseFrameStepMs / kTimelapseBaseFrameStepMs);
+    const auto exportSpeed = qMax(1ll, settings.timelapseFrameStepMs
+        / kTimelapseBaseFrameStepMs);
 
     // TODO: #GDM implement more precise estimation
     return durationMs / exportSpeed <= kMaxRecordingDurationMs;
-}
-
-bool isPanoramic(const QnMediaResourcePtr& mediaResource)
-{
-    const auto videoLayout = mediaResource->getVideoLayout();
-    return videoLayout && videoLayout->channelCount() > 1;
 }
 
 /** Calculate estimated video size in megabytes. */
@@ -85,6 +82,16 @@ bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, qint64 durationMs)
     return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
 }
 
+QSize estimatedResolution(const QnMediaResourcePtr& mediaResource)
+{
+    if (const auto camera = mediaResource.dynamicCast<QnVirtualCameraResource>())
+        return camera->defaultStream().getResolution();
+    return QSize();
+}
+
+static const QSize kMaximumResolution(std::numeric_limits<int>::max(),
+    std::numeric_limits<int>::max());
+
 } // namespace
 
 ExportMediaValidator::Results ExportMediaValidator::validateSettings(
@@ -114,36 +121,17 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     if  (!validateLength(settings, durationMs))
         results.set(int(Result::tooLong));
 
-    const bool transcodingRequired = settings.enhancement.enabled
-        || settings.aspectRatio.isValid()
-        || settings.rotation != 0
-        || settings.dewarping.enabled
-        || !settings.zoomWindow.isEmpty()
-        || !settings.overlays.empty()
-        || isPanoramic(settings.mediaResource);
+    core::transcoding::FilterChain filters(settings.transcodingSettings);
 
-    if (transcodingRequired)
+    if (filters.isTranscodingRequired(settings.mediaResource))
     {
         results.set(int(Result::transcoding));
-        if (const auto camera = settings.mediaResource.dynamicCast<QnVirtualCameraResource>())
+        const auto resolution = estimatedResolution(settings.mediaResource);
+        if (!resolution.isEmpty())
         {
-            const auto stream = camera->defaultStream();
-            const auto resolution = stream.getResolution();
-
-            if (!resolution.isEmpty())
-            {
-                const int bigValue = std::numeric_limits<int>::max();
-                NX_ASSERT(resolution.isValid());
-
-                //auto filters = imageParameters.createFilterChain(resolution, QSize(bigValue, bigValue));
-                //const QSize resultResolution = imageParameters.updatedResolution(filters, resolution);
-                //if (resultResolution.width() > imageParameters.kDefaultResolutionLimit.width() ||
-                //    resultResolution.height() > imageParameters.kDefaultResolutionLimit.height())
-                //{
-                //    results.set(int(Result::downscaling));
-                //}
-
-            }
+            filters.prepare(settings.mediaResource, resolution, kMaximumResolution);
+            if (filters.isDownscaleRequired(resolution))
+                results.set(int(Result::downscaling));
         }
     }
 
@@ -153,12 +141,15 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     const ExportLayoutSettings& settings)
 {
+    Results results;
     if (FileExtensionUtils::isExecutable(settings.filename.extension))
     {
-
+        // TODO: #GDM estimated binary size for layout.
+        //if (exeFileIsTooBig(settings.layout, durationMs))
+            results.set(int(Result::tooBigExeFile));
     }
 
-    return Results();
+    return results;
 }
 
 } // namespace desktop

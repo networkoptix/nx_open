@@ -640,7 +640,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     qreal customAR = getResource()->customAspectRatio();
 
     QnLegacyTranscodingSettings extraTranscodeParams;
-    extraTranscodeParams.layout = vLayout;
+    extraTranscodeParams.resource = getResource();
     extraTranscodeParams.rotation = rotation;
     extraTranscodeParams.forcedAspectRatio = customAR;
 

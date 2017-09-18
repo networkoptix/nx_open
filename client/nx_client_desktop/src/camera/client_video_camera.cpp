@@ -226,8 +226,10 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             sender()->deleteLater();
         });
 
+        const auto filterChain = QnImageFilterHelper::createFilterChain(transcodeParams,
+            QSize());
 
-        m_exportRecorder->setTranscodeFilters(transcodeParams);
+        m_exportRecorder->setTranscodeFilters(filterChain);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

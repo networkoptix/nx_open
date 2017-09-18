@@ -458,11 +458,10 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
         imageParameters.zoomWindow = zoomRect;
         imageParameters.contrastParams = contrastParams;
         imageParameters.itemDewarpingParams = dewarpingParams;
-        imageParameters.mediaDewarpingParams = mediaResource->getDewarpingParams();
+        imageParameters.resource = mediaResource;
         imageParameters.rotation = rotation;
         imageParameters.forcedAspectRatio = customAr;
         imageParameters.timestampParams = timestampParams;
-        imageParameters.layout = mediaResource->getVideoLayout();
 
         auto videoLayout = mediaResource->getVideoLayout();
         bool doTranscode = transcodeCheckbox ||
@@ -482,11 +481,9 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
                     const int bigValue = std::numeric_limits<int>::max();
                     NX_ASSERT(resolution.isValid());
 
-                    auto filters = QnImageFilterHelper::createFilterChain(imageParameters,
+                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters,
                         resolution, QSize(bigValue, bigValue));
-                    const QSize resultResolution = QnImageFilterHelper::applyFilterChain(filters, resolution);
-                    if (resultResolution.width() > QnImageFilterHelper::kDefaultResolutionLimit.width() ||
-                        resultResolution.height() > QnImageFilterHelper::kDefaultResolutionLimit.height())
+                    if (filterChain.isDownscaleRequired(resolution))
                     {
                         transcodeWarnShown = true;
                         const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,

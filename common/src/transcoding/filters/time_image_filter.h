@@ -36,4 +36,4 @@ private:
     QnTimeStampParams m_params;
 };
 
-#endif // ENABLE_DATA_PROVIDER
+#endif // ENABLE_DATA_PROVIDERS

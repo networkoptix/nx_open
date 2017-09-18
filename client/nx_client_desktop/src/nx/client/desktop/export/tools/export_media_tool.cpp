@@ -91,9 +91,8 @@ struct ExportMediaTool::Private
                 dataProvider->pleaseStop();
             });
 
-        //TODO: #gdm implement filters.
-        QnLegacyTranscodingSettings legacyParameters;
-        exportRecorder->setTranscodeFilters(legacyParameters);
+        nx::core::transcoding::FilterChain filters(settings.transcodingSettings);
+        exportRecorder->setTranscodeFilters(filters);
 
         connect(exportRecorder, &QnStreamRecorder::recordingProgress, q,
             &ExportMediaTool::valueChanged);

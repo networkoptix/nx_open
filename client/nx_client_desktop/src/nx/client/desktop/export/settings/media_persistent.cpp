@@ -39,8 +39,8 @@ ExportOverlaySettings* ExportMediaPersistent::overlaySettings(ExportOverlayType 
 
 void ExportMediaPersistent::updateRuntimeSettings()
 {
-    overlays.clear();
-    overlays.reserve(usedOverlays.size());
+    transcodingSettings.overlays.clear();
+    transcodingSettings.overlays.reserve(usedOverlays.size());
 
     const auto createRuntimeSettings =
         [this](ExportOverlayType type) -> QSharedPointer<ExportOverlaySettings>
@@ -62,7 +62,7 @@ void ExportMediaPersistent::updateRuntimeSettings()
         };
 
     for (const auto type: usedOverlays)
-        overlays << createRuntimeSettings(type);
+        transcodingSettings.overlays << createRuntimeSettings(type);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(EXPORT_MEDIA_PERSISTENT_TYPES, (json), _Fields)

@@ -565,9 +565,10 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
-        if (mediaRes) {
+        if (mediaRes)
+        {
             QnLegacyTranscodingSettings extraParams;
-            extraParams.layout = mediaRes->getVideoLayout();
+            extraParams.resource = mediaRes;
             int rotation;
             if (decodedUrlQuery.hasQueryItem("rotation"))
                 rotation = decodedUrlQuery.queryItemValue("rotation").toInt();

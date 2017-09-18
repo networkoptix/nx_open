@@ -58,12 +58,7 @@ namespace {
     const qint64 latestScreenshotTime = -1;
 }
 
-QnScreenshotParameters::QnScreenshotParameters():
-    utcTimestampMsec(0),
-    isUtc(false),
-    displayTimeMsec(0),
-    customAspectRatio(0.0),
-    rotationAngle(0.0)
+QnScreenshotParameters::QnScreenshotParameters()
 {
     timestampParams.enabled = true;
     timestampParams.corner = Qt::BottomRightCorner;
@@ -182,12 +177,9 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
 
     QnLegacyTranscodingSettings imageProcessingParams;
-    QnMediaResourcePtr mediaRes = display->mediaResource();
-    if (mediaRes)
-        imageProcessingParams.layout = layout;
+    imageProcessingParams.resource = display->mediaResource();
     imageProcessingParams.zoomWindow = parameters.zoomRect;
     imageProcessingParams.contrastParams = parameters.imageCorrectionParams;
-    imageProcessingParams.mediaDewarpingParams = parameters.mediaDewarpingParams;
     imageProcessingParams.itemDewarpingParams = parameters.itemDewarpingParams;
     imageProcessingParams.rotation = parameters.rotationAngle;
     imageProcessingParams.forcedAspectRatio = parameters.customAspectRatio;
@@ -301,7 +293,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         Key timeKey(keyStack, lit("_") + parameters.timeString());
 
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-        parameters.mediaDewarpingParams = widget->dewarpingParams();
+        parameters.resource = widget->resource();
         parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
 
         for (const ImageCorrectionParams &imageCorr: imageCorrList) {
@@ -377,7 +369,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.filename = filename;
    // parameters.timestampPosition = qnSettings->timestampCorner(); // TODO: #GDM #3.1 store full screenshot settings
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-    parameters.mediaDewarpingParams = widget->dewarpingParams();
+    parameters.resource = widget->resource();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
@@ -519,7 +511,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QnLegacyTranscodingSettings transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
         transcodeParams.itemDewarpingParams = parameters.itemDewarpingParams;
-        transcodeParams.mediaDewarpingParams = parameters.mediaDewarpingParams;
+        transcodeParams.resource = parameters.resource;
         transcodeParams.contrastParams = parameters.imageCorrectionParams;
         transcodeParams.timestampParams = parameters.timestampParams;
         transcodeParams.rotation = parameters.rotationAngle;
@@ -611,15 +603,17 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     QnScreenshotParameters localParameters = parameters;
 
     // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
-    if (localParameters.itemDewarpingParams.enabled && localParameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
+    if (localParameters.itemDewarpingParams.enabled
+        && widget->resource()->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown)
+    {
         localParameters.rotationAngle -= 180;
+    }
 
     QnResourceDisplayPtr display = widget->display();
     QnImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
     if (imageProvider) {
         // avoiding post-processing duplication
         localParameters.imageCorrectionParams.enabled = false;
-        localParameters.mediaDewarpingParams.enabled = false;
         localParameters.itemDewarpingParams.enabled = false;
         localParameters.zoomRect = QRectF();
         localParameters.customAspectRatio = 0.0;

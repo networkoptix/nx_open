@@ -1,16 +1,14 @@
 #pragma once
 
-#ifdef ENABLE_DATA_PROVIDERS
+#if defined(ENABLE_DATA_PROVIDERS)
 
-#include <transcoding/filters/abstract_image_filter.h>
+#include <nx/core/transcoding/filters/filter_chain.h>
 
 namespace nx { namespace core { namespace transcoding { struct LegacyTranscodingSettings; }}}
 
 class QnImageFilterHelper
 {
 public:
-    const static QSize kDefaultResolutionLimit;
-
     /**
      * Create filters for source image processing
      *
@@ -18,15 +16,10 @@ public:
      * \param srcResolution             Source video size
      * \returns                         Filter chain to process video
      */
-    static QnAbstractImageFilterList createFilterChain(
+    static nx::core::transcoding::FilterChain createFilterChain(
         const nx::core::transcoding::LegacyTranscodingSettings& settings,
         const QSize& srcResolution,
-        const QSize& resolutionLimit = kDefaultResolutionLimit);
-
-    static QSize applyFilterChain(const QnAbstractImageFilterList& filters,
-        const QSize& resolution);
-
-
+        const QSize& resolutionLimit = nx::core::transcoding::FilterChain::kDefaultResolutionLimit);
 };
 
 #endif // ENABLE_DATA_PROVIDERS
