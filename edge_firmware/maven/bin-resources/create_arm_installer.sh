@@ -535,6 +535,9 @@ main()
     echo "Creating version.txt: $VERSION"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
 
+    echo "Copying build_info.txt"
+    cp -r "$BUILD_DIR/common/build_info.txt" "$INSTALL_DIR/"
+
     copyBuildLibs
     copyQtLibs
     copyBins

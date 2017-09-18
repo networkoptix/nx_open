@@ -40,6 +40,7 @@ namespace {
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
+static const int kMinServerVersionWithClientKeepAlive = 3031;
 
 } // namespace
 
@@ -1209,17 +1210,17 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
         client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
 
+    nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
+        client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
+
+    m_remotePeerEcProtoVersion =
+        ec2ProtoVersionIter == client->response()->headers.end()
+        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        : ec2ProtoVersionIter->second.toInt();
+
     if (!m_localPeer.isMobileClient())
     {
         //checking remote server protocol version
-        nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
-            client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
-
-        m_remotePeerEcProtoVersion =
-            ec2ProtoVersionIter == client->response()->headers.end()
-            ? nx_ec::INITIAL_EC2_PROTO_VERSION
-            : ec2ProtoVersionIter->second.toInt();
-
         if (m_localPeerProtocolVersion != m_remotePeerEcProtoVersion)
         {
             NX_LOG(lm("Cannot connect to server %1 because of different EC2 proto version. "
@@ -1375,7 +1376,9 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         }
 
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
-        if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
+        // Servers 3.1 and above sends keep-alive to the client
+        if (keepAliveHeaderIter != m_httpClient->response()->headers.end() && 
+            m_remotePeerEcProtoVersion >= kMinServerVersionWithClientKeepAlive)
         {
             m_remotePeerSupportsKeepAlive = true;
             nx_http::header::KeepAlive keepAliveHeader;

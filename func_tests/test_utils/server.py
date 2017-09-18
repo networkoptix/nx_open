@@ -480,7 +480,9 @@ class Storage(object):
         contents = sample.get_contents()
         lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, sample.duration)
         hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, sample.duration)
+        log.info('Storing media sample %r to %r', sample.fpath, lowq_fpath)
         self.host.write_file(lowq_fpath, contents)
+        log.info('Storing media sample %r to %r', sample.fpath, hiq_fpath)
         self.host.write_file(hiq_fpath,  contents)
 
     # server stores media data in this format, using local time for directory parts:
