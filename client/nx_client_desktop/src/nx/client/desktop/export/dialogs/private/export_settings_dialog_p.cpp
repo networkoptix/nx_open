@@ -16,7 +16,6 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <nx/client/desktop/export/tools/export_media_validator.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 
 namespace nx {
@@ -140,50 +139,31 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
     // TODO: #vkutin #GDM Further init.
 
     // TODO: #vkutin #gdm Required?
-    //emit exportLayoutSettingsChanged(m_exportLayoutSettings);
+    //validateSettings(Mode::Layout);
 }
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
 {
     m_exportMediaSettings.timePeriod = period;
     m_exportLayoutSettings.period = period;
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
-    emit exportLayoutSettingsChanged(m_exportLayoutSettings);
+    validateSettings(Mode::Media);
+    validateSettings(Mode::Layout);
 }
 
 void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     m_exportMediaSettings.fileName = filename;
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
     m_exportLayoutSettings.filename = filename;
-    emit exportLayoutSettingsChanged(m_exportLayoutSettings);
 }
 
 void ExportSettingsDialog::Private::setRapidReviewFrameStep(qint64 frameStepMs)
 {
     m_exportMediaSettings.timelapseFrameStepMs = frameStepMs;
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
-}
-
-ExportSettingsDialog::Private::ErrorCode ExportSettingsDialog::Private::status() const
-{
-    return m_status;
-}
-
-bool ExportSettingsDialog::Private::isExportAllowed(ErrorCode code)
-{
-    switch (code)
-    {
-        case ErrorCode::ok:
-            return true;
-
-        default:
-            return false;
-    }
+    validateSettings(Mode::Media);
 }
 
 ExportSettingsDialog::Mode ExportSettingsDialog::Private::mode() const
@@ -239,8 +219,6 @@ void ExportSettingsDialog::Private::overlayPositionChanged(settings::ExportOverl
     // TODO: #vkutin Calculate alignment depending on position in widget's parent.
     settings->position = overlayWidget->pos();
     settings->alignment = Qt::AlignLeft | Qt::AlignTop;
-
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 const settings::ExportMediaPersistent& ExportSettingsDialog::Private::exportMediaSettings() const
@@ -268,6 +246,8 @@ void ExportSettingsDialog::Private::selectOverlay(settings::ExportOverlayType ty
     if (m_selectedOverlay)
         m_selectedOverlay->setBorderVisible(false);
 
+    const auto visibilityChanged = newSelection->isHidden();
+
     m_selectedOverlay = newSelection;
     m_selectedOverlay->setVisible(true);
     m_selectedOverlay->setBorderVisible(true);
@@ -278,7 +258,9 @@ void ExportSettingsDialog::Private::selectOverlay(settings::ExportOverlayType ty
     m_exportMediaSettings.updateRuntimeSettings(); //< TODO: sub-optimal.
 
     emit overlaySelected(type);
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
+
+    if (visibilityChanged)
+        validateSettings(Mode::Media);
 }
 
 void ExportSettingsDialog::Private::hideOverlay(settings::ExportOverlayType type)
@@ -291,7 +273,7 @@ void ExportSettingsDialog::Private::hideOverlay(settings::ExportOverlayType type
     m_exportMediaSettings.usedOverlays.removeOne(type);
     m_exportMediaSettings.updateRuntimeSettings(); //< TODO: sub-optimal.
 
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
+    validateSettings(Mode::Media);
 }
 
 void ExportSettingsDialog::Private::setTimestampOverlaySettings(
@@ -299,7 +281,6 @@ void ExportSettingsDialog::Private::setTimestampOverlaySettings(
 {
     m_exportMediaSettings.timestampOverlay = settings;
     updateOverlay(settings::ExportOverlayType::timestamp);
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setImageOverlaySettings(
@@ -307,7 +288,6 @@ void ExportSettingsDialog::Private::setImageOverlaySettings(
 {
     m_exportMediaSettings.imageOverlay = settings;
     updateOverlay(settings::ExportOverlayType::image);
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
@@ -315,7 +295,6 @@ void ExportSettingsDialog::Private::setTextOverlaySettings(
 {
     m_exportMediaSettings.textOverlay = settings;
     updateOverlay(settings::ExportOverlayType::text);
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
 void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
@@ -324,18 +303,28 @@ void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
     m_exportMediaSettings.bookmarkOverlay = settings;
     // TODO: #vkutin Generate text from bookmark information and passed settings
     updateOverlay(settings::ExportOverlayType::bookmark);
-    emit exportMediaSettingsChanged(m_exportMediaSettings);
 }
 
-void ExportSettingsDialog::Private::validateSettings()
+void ExportSettingsDialog::Private::validateSettings(Mode mode)
 {
-    if (m_mode == Mode::Media)
+    if (mode == Mode::Media)
     {
-        const auto result = ExportMediaValidator::validateSettings(exportMediaSettings());
+        const auto results = ExportMediaValidator::validateSettings(exportMediaSettings());
+        if (m_mediaValidationResults == results)
+            return;
+
+        m_mediaValidationResults = results;
+        emit validated(m_mode, results);
     }
     else
     {
+        // TODO: #vkutin #gdm
+        //const auto results = ???
+        //if (m_layoutValidationResults == results)
+        //    return;
 
+        //m_layoutValidationResults = results;
+        //emit validated(m_mode, results);
     }
 }
 
@@ -412,15 +401,6 @@ void ExportSettingsDialog::Private::updateOverlay(settings::ExportOverlayType ty
             NX_ASSERT(false); //< Should not happen.
             break;
     }
-}
-
-void ExportSettingsDialog::Private::setStatus(ErrorCode value)
-{
-    if (value == m_status)
-        return;
-
-    m_status = value;
-    emit statusChanged(value);
 }
 
 void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)

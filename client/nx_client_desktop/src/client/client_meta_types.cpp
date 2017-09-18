@@ -154,7 +154,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?
     QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
-    QnJsonSerializer::registerSerializer<nx::client::desktop::settings::ExportMediaPersistent>();
 
     qn_clientMetaTypes_initialized = true;
 }

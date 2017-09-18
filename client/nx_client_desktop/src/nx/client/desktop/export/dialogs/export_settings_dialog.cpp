@@ -114,12 +114,6 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     auto exportButton = ui->buttonBox->addButton(tr("Export"), QDialogButtonBox::AcceptRole);
     setAccentStyle(exportButton);
 
-    connect(d, &Private::statusChanged, this,
-        [this, exportButton](Private::ErrorCode value)
-        {
-            exportButton->setEnabled(Private::isExportAllowed(value));
-        });
-
     d->loadSettings();
     connect(this, &QDialog::accepted, d, &Private::saveSettings);
 
@@ -381,12 +375,6 @@ void ExportSettingsDialog::updateMode()
         : Mode::Layout;
 
     d->setMode(currentMode);
-}
-
-void ExportSettingsDialog::updateAlerts()
-{
-    d->validateSettings();
-
 }
 
 void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)

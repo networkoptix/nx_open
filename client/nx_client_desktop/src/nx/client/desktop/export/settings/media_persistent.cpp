@@ -10,7 +10,7 @@ namespace settings {
 
 ExportImageOverlayPersistent::ExportImageOverlayPersistent()
 {
-    image = QImage(lit(":/skin/welcome_page/logo.png"));
+    image = QImage(lit(":/logo.png"));
     overlayWidth = image.width();
 }
 

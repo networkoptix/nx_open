@@ -8,9 +8,10 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/client/desktop/common/utils/filesystem.h>
+#include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
 #include <nx/client/desktop/export/settings/media_persistent.h>
 #include <nx/client/desktop/export/settings/layout_persistent.h>
-#include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
+#include <nx/client/desktop/export/tools/export_media_validator.h>
 #include <nx/client/desktop/export/widgets/export_overlay_widget.h>
 #include <nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.h>
 #include <nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.h>
@@ -34,11 +35,6 @@ class ExportSettingsDialog::Private: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    enum class ErrorCode
-    {
-        ok,
-    };
-
     explicit Private(const QSize& previewSize, QObject* parent = nullptr);
     virtual ~Private() override;
 
@@ -51,9 +47,6 @@ public:
     void setMediaFilename(const Filename& filename);
     void setLayoutFilename(const Filename& filename);
     void setRapidReviewFrameStep(qint64 frameStepMs);
-
-    ErrorCode status() const;
-    static bool isExportAllowed(ErrorCode code);
 
     Mode mode() const;
     void setMode(Mode mode);
@@ -79,19 +72,16 @@ public:
     void setTextOverlaySettings(const settings::ExportTextOverlayPersistent& settings);
     void setBookmarkOverlaySettings(const settings::ExportBookmarkOverlayPersistent& settings);
 
-    void validateSettings();
+    void validateSettings(Mode mode);
 
 signals:
-    void statusChanged(ErrorCode value);
+    void validated(Mode mode, ExportMediaValidator::Results results);
     void overlaySelected(settings::ExportOverlayType type);
-    void exportMediaSettingsChanged(const ExportMediaSettings&);
-    void exportLayoutSettingsChanged(const ExportLayoutSettings&);
 
 private:
     ExportOverlayWidget* overlay(settings::ExportOverlayType type);
     const ExportOverlayWidget* overlay(settings::ExportOverlayType type) const;
 
-    void setStatus(ErrorCode value);
     void updateOverlay(settings::ExportOverlayType type);
     void updateOverlays();
     void updateTimestampText();
@@ -100,7 +90,8 @@ private:
 private:
     const QSize m_previewSize;
     ExportSettingsDialog::Mode m_mode = Mode::Media;
-    ErrorCode m_status = ErrorCode::ok;
+    ExportMediaValidator::Results m_mediaValidationResults;
+    ExportMediaValidator::Results m_layoutValidationResults;
     settings::ExportMediaPersistent m_exportMediaSettings;
     settings::ExportLayoutPersistent m_exportLayoutSettings;
 
