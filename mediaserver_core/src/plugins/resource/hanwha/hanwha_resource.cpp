@@ -1162,7 +1162,7 @@ int HanwhaResource::defaultGovLengthForStream(Qn::ConnectionRole role) const
 
 Qn::BitrateControl HanwhaResource::defaultBitrateControlForStream(Qn::ConnectionRole role) const
 {
-    return Qn::BitrateControl::cbr;
+    return Qn::BitrateControl::vbr;
 }
 
 int HanwhaResource::defaultBitrateForStream(Qn::ConnectionRole role) const
@@ -1378,7 +1378,7 @@ bool HanwhaResource::addSpecificRanges(
                     bitrateControlTypeList = bitrateControlTypes->possibleValues();
                 
                 if (bitrateControlTypeList.isEmpty())
-                    bitrateControlTypeList.push_back(lit("CBR"));
+                    bitrateControlTypeList.push_back(lit("VBR"));
 
                 for (const auto& bitrateControlType: bitrateControlTypeList)
                 {
@@ -1469,7 +1469,7 @@ boost::optional<QString> HanwhaResource::tryToGetSpecificParameterDefault(
         return lit("CABAC");
 
     if (parameterString.endsWith(lit(".BitrateControlType")))
-        return lit("CBR");
+        return lit("VBR");
 
     if (parameterString.endsWith(lit(".Profile")))
     {
