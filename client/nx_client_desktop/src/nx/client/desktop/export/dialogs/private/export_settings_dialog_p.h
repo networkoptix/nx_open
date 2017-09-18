@@ -75,7 +75,7 @@ public:
     void validateSettings(Mode mode);
 
 signals:
-    void validated(Mode mode, ExportMediaValidator::Results results);
+    void validated(Mode mode, const QStringList& alerts);
     void overlaySelected(settings::ExportOverlayType type);
 
 private:
@@ -86,6 +86,8 @@ private:
     void updateOverlays();
     void updateTimestampText();
     void overlayPositionChanged(settings::ExportOverlayType type);
+
+    static QStringList generateAlerts(ExportMediaValidator::Results results);
 
 private:
     const QSize m_previewSize;

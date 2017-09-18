@@ -26,17 +26,6 @@ static const QSize kPreviewSize(512, 288);
 static constexpr int kBusyIndicatorDotRadius = 8;
 static constexpr int kNoDataDefaultFontSize = 18;
 
-void addAlert(QLayout* layout, const QString& text)
-{
-    NX_EXPECT(!text.isEmpty());
-    if (text.isEmpty())
-        return;
-
-    auto alert = new QnAlertBar();
-    alert->setText(text);
-    layout->addWidget(alert);
-}
-
 } // namespace
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -118,6 +107,8 @@ ExportSettingsDialog::ExportSettingsDialog(
     auto exportButton = ui->buttonBox->addButton(tr("Export"), QDialogButtonBox::AcceptRole);
     setAccentStyle(exportButton);
 
+    connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateAlerts);
+
     d->loadSettings();
     connect(this, &QDialog::accepted, d, &Private::saveSettings);
 
@@ -188,6 +179,8 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
     updateMode();
+
+    ui->cameraExportSettingsButton->click(); //< Set current page to settings.
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -297,8 +290,6 @@ void ExportSettingsDialog::setupSettingsButtons()
                 button->click();
         });
 
-    //    ui->bookmarkButton, &ui::SelectableTextButton::click);
-
     auto group = new ui::SelectableTextButtonGroup(this);
     group->add(ui->cameraExportSettingsButton);
     group->add(ui->bookmarkButton);
@@ -322,8 +313,10 @@ void ExportSettingsDialog::setupSettingsButtons()
         [this](ui::SelectableTextButton* button)
         {
             NX_EXPECT(button);
-            const auto overlayType = button->property(kOverlayPropertyName)
-                .value<settings::ExportOverlayType>();
+            const auto overlayTypeVariant = button->property(kOverlayPropertyName);
+            const auto overlayType = overlayTypeVariant.canConvert<settings::ExportOverlayType>()
+                ? overlayTypeVariant.value<settings::ExportOverlayType>()
+                : settings::ExportOverlayType::none;
 
             switch (button->state())
             {
@@ -385,6 +378,43 @@ void ExportSettingsDialog::updateMode()
     d->setMode(currentMode);
 }
 
+void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& texts)
+{
+    QLayout* layout = (mode == Mode::Media)
+        ? ui->mediaAlertsLayout
+        : ui->layoutAlertsLayout;
+
+    const auto newCount = texts.count();
+    const auto oldCount = layout->count();
+
+    const auto setAlertText =
+        [layout](int index, const QString& text)
+        {
+            auto item = layout->itemAt(index);
+            auto bar = item ? qobject_cast<QnAlertBar*>(item->widget()) : nullptr;
+            NX_EXPECT(bar);
+            if (bar)
+                bar->setText(text);
+        };
+
+    if (newCount > oldCount)
+    {
+        // Add new alert bars.
+        for (int i = oldCount; i < newCount; ++i)
+            layout->addWidget(new QnAlertBar());
+    }
+    else
+    {
+        // Clear unused alerts.
+        for (int i = newCount; i < oldCount; ++i)
+            setAlertText(i, QString());
+    }
+
+    // Set alert texts.
+    for (int i = 0; i < newCount; ++i)
+        setAlertText(i, texts[i]);
+}
+
 void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
 {
     d->setMediaResource(media);
@@ -395,16 +425,6 @@ void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
     ui->textSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
 
     updateSettingsWidgets();
-}
-
-void ExportSettingsDialog::addSingleCameraAlert(const QString& text)
-{
-    addAlert(ui->mediaAlertsLayout, text);
-}
-
-void ExportSettingsDialog::addMultiVideoAlert(const QString& text)
-{
-    addAlert(ui->layoutAlertsLayout, text);
 }
 
 } // namespace desktop

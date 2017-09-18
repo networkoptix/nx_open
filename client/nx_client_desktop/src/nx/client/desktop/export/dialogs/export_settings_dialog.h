@@ -60,9 +60,7 @@ private:
     void setMediaResource(const QnMediaResourcePtr& media);
     void updateSettingsWidgets();
     void updateMode();
-
-    void addSingleCameraAlert(const QString& text);
-    void addMultiVideoAlert(const QString& text);
+    void updateAlerts(Mode mode, const QStringList& texts);
 
 private:
     class Private;

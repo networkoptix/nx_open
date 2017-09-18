@@ -14,7 +14,9 @@ enum class ExportOverlayType
     image,
     text,
     bookmark,
-    overlayCount
+
+    none,
+    overlayCount = none
 };
 
 struct ExportImageOverlayPersistent: public ExportImageOverlaySettings

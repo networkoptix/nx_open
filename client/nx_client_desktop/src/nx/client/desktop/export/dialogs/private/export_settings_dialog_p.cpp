@@ -249,21 +249,24 @@ bool ExportSettingsDialog::Private::isOverlayVisible(settings::ExportOverlayType
 void ExportSettingsDialog::Private::selectOverlay(settings::ExportOverlayType type)
 {
     auto newSelection = overlay(type);
-    if (!newSelection || newSelection == m_selectedOverlay)
+    if (newSelection == m_selectedOverlay)
         return;
 
     if (m_selectedOverlay)
         m_selectedOverlay->setBorderVisible(false);
 
-    const auto visibilityChanged = newSelection->isHidden();
-
-    m_selectedOverlay = newSelection;
-    m_selectedOverlay->setVisible(true);
-    m_selectedOverlay->setBorderVisible(true);
-    m_selectedOverlay->raise();
-
+    const auto visibilityChanged = newSelection && newSelection->isHidden();
     m_exportMediaSettings.usedOverlays.removeOne(type);
-    m_exportMediaSettings.usedOverlays.push_back(type);
+    m_selectedOverlay = newSelection;
+
+    if (m_selectedOverlay)
+    {
+        m_exportMediaSettings.usedOverlays.push_back(type);
+        m_selectedOverlay->setVisible(true);
+        m_selectedOverlay->setBorderVisible(true);
+        m_selectedOverlay->raise();
+    }
+
     m_exportMediaSettings.updateRuntimeSettings(); //< TODO: sub-optimal.
 
     emit overlaySelected(type);
@@ -323,7 +326,7 @@ void ExportSettingsDialog::Private::validateSettings(Mode mode)
             return;
 
         m_mediaValidationResults = results;
-        emit validated(m_mode, results);
+        emit validated(m_mode, generateAlerts(results));
     }
     else
     {
@@ -333,7 +336,7 @@ void ExportSettingsDialog::Private::validateSettings(Mode mode)
         //    return;
 
         //m_layoutValidationResults = results;
-        //emit validated(m_mode, results);
+        //emit validated(m_mode, generateAlerts(results));
     }
 }
 
@@ -456,12 +459,14 @@ void ExportSettingsDialog::Private::updateTimestampText()
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(settings::ExportOverlayType type)
 {
-    return m_overlays[int(type)];
+    const auto index = int(type);
+    return index < m_overlays.size() ? m_overlays[index] : nullptr;
 }
 
 const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(settings::ExportOverlayType type) const
 {
-    return m_overlays[int(type)];
+    const auto index = int(type);
+    return index < m_overlays.size() ? m_overlays[index] : nullptr;
 }
 
 QnSingleThumbnailLoader* ExportSettingsDialog::Private::mediaImageProvider() const
@@ -477,6 +482,54 @@ LayoutThumbnailLoader* ExportSettingsDialog::Private::layoutImageProvider() cons
 QSize ExportSettingsDialog::Private::fullFrameSize() const
 {
     return m_fullFrameSize;
+}
+
+QStringList ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results results)
+{
+    const auto alertText =
+        [](ExportMediaValidator::Result res) -> QString
+        {
+            switch (res)
+            {
+                case ExportMediaValidator::Result::transcoding:
+                    return ExportSettingsDialog::tr("Chosen settings require transcoding. "
+                        "It will increase CPU usage and may take significant time.");
+
+                case ExportMediaValidator::Result::nonContinuosAvi:
+                    return ExportSettingsDialog::tr("AVI format is not recommended to export "
+                        "a non-continuous recording with audio track.");
+
+                case ExportMediaValidator::Result::downscaling:
+                    return ExportSettingsDialog::tr("We recommend to export video from "
+                        "this camera as \"Multi Video\" to avoid downscaling.");
+
+                case ExportMediaValidator::Result::tooLong:
+                    return ExportSettingsDialog::tr("You are about to export a long video. "
+                        "It may require over a gigabyte of HDD space and take "
+                        "several minutes to complete.");
+
+                case ExportMediaValidator::Result::tooBigExeFile:
+                    return ExportSettingsDialog::tr("Exported .EXE file will have size over 4 GB "
+                        "and cannot be opened by double-click in Windows. "
+                        "It can be played only in Nx Witness Client.");
+
+                case ExportMediaValidator::Result::transcodingInBinaryIsNotSupported:
+                    return ExportSettingsDialog::tr("Settings are not available for .EXE files.");
+
+                default:
+                    NX_EXPECT(false);
+                    return QString();
+            }
+        };
+
+    QStringList alerts;
+    for (int i = 0; i < int(ExportMediaValidator::Result::count); ++i)
+    {
+        if (results.test(i))
+            alerts << alertText(ExportMediaValidator::Result(i));
+    }
+
+    return alerts;
 }
 
 } // namespace desktop
