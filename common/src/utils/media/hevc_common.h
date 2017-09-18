@@ -73,51 +73,6 @@ bool isLeadingPicture(NalUnitType unitType);
 bool isTrailingPicture(NalUnitType unitType);
 bool isParameterSet(NalUnitType unitType);
 
-enum class Profile
-{
-    undefined,
-    // version 1
-    main,
-    main10,
-    mainStillPicture,
-
-    // version 2
-    monochrome,
-    monochrome12,
-    monochrome16,
-    main12,
-    main42210,
-    main42212,
-    main444,
-    main44410,
-    main44412,
-    main44416Intra,
-    highThroughput44416Intra,
-    main444StillPicture,
-    main44416StillPicture,
-    scalableMain,
-    scalableMain10,
-    multiviewMain,
-
-    // version 3
-    threeDMain, //< 3D Main
-    screenExtendedMain,
-    screenExtendedMain10,
-    screenExtendedMain444,
-    screenExtendedMain44410,
-    screenExtendedHighThroughput444,
-    screenExtendedHighThroughput44410,
-    screenExtendedHighThroughput44414,
-    highThroughput444,
-    highThroughput44410,
-    highThroughput44414,
-    scalableMonochrome,
-    scalableMonochrome12,
-    scalableMonochrome16,
-    scalableMain444
-};
-
 } // namespace hevc
 } // namespace media_utils
 } // namespace nx
-

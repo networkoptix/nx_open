@@ -103,6 +103,34 @@ public:
             m_spinBox->setValue(qRound(newValue.toDouble() * 100));
 	}
 
+    virtual void setRange(const QString& range) override
+    {
+        const auto minMax = range.split(L',');
+        if (minMax.size() != 2)
+            return;
+
+        bool success = false;
+        double min = minMax[0].toDouble(&success);
+        if (!success)
+            return;
+
+        double max = minMax[1].toDouble(&success);
+        if (!success)
+            return;
+
+        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min > 1.0);
+        if (m_isInteger)
+        {
+            m_spinBox->setMinimum(qRound(min));
+            m_spinBox->setMaximum(qRound(max));
+        }
+        else
+        {
+            m_spinBox->setMinimum(qRound(min * 100));
+            m_spinBox->setMaximum(qRound(max * 100));
+        }
+    }
+
 private:
 	QSpinBox* m_spinBox;
     bool m_isInteger;

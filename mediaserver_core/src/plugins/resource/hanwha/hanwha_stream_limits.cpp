@@ -52,9 +52,9 @@ bool HanwhaStreamLimits::setLimit(const HanwhaCgiParameter& parameter)
     else if (limitName.endsWith(".EntropyCoding"))
         setCollectionLimits<Qn::EntropyCoding>(parameter, &entropyCodingTypes);
     else if (limitName == lit("H264.Profile"))
-        setCollectionLimits<nx::media_utils::h264::Profile>(parameter, &h264Profiles);
+        h264Profiles = parameter.possibleValues();
     else if (limitName == lit("H265.Profile"))
-        setCollectionLimits<nx::media_utils::hevc::Profile>(parameter, &hevcProfiles);
+        hevcProfiles = parameter.possibleValues();
 
     return true;
 }

@@ -2,8 +2,11 @@
 
 #if defined(ENABLE_HANWHA)
 
+#include <plugins/resource/hanwha/hanwha_mixed_preset_manager.h>
+
 #include <core/ptz/basic_ptz_controller.h>
 #include <core/resource/resource_fwd.h>
+#include <core/ptz/ptz_preset.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -26,7 +29,11 @@ static const std::map<QString, Ptz::Capability> kHanwhaPtzCapabilityAttributes =
 class HanwhaPtzController: public QnBasicPtzController
 {
     Q_OBJECT
-        using base_type = QnAbstractPtzController;
+    using base_type = QnAbstractPtzController;
+
+public:
+    using DevicePresetId = QString;
+    using NxPresetId = QString;
 
 public:
     HanwhaPtzController(const HanwhaResourcePtr& resource);
@@ -47,13 +54,11 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
     virtual bool getFlip(Qt::Orientations* flip) const override;
 
-#if 0
     virtual bool createPreset(const QnPtzPreset& preset) override;
     virtual bool updatePreset(const QnPtzPreset& preset) override;
     virtual bool removePreset(const QString& presetId) override;
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
     virtual bool getPresets(QnPtzPresetList* presets) const override;
-#endif
 
     virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const override;
     virtual bool runAuxilaryCommand(
@@ -62,11 +67,9 @@ public:
 
 private:
     QString channel() const;
-    QString freePresetNumber() const;
     QVector3D toHanwhaSpeed(const QVector3D& speed) const;
     QVector3D toHanwhaPosition(const QVector3D& position) const;
     QString toHanwhaFocusCommand(qreal speed) const;
-    QString presetNumberFromId(const QString& presetId) const;
     std::map<QString, QString> makeViewPortParameters(
         qreal aspectRatio,
         const QRectF rect) const;
@@ -75,12 +78,13 @@ private:
     using PresetNumber = QString;
     using PresetId = QString;
 
+    mutable QnMutex m_mutex;
     HanwhaResourcePtr m_hanwhaResource;
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
+    mutable std::unique_ptr<HanwhaMixedPresetManager> m_presetManager;
 
-    mutable std::map<PresetId, PresetNumber> m_presetNumberById;
 };
 
 } // namespace plugins

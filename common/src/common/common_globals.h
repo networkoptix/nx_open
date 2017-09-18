@@ -118,7 +118,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
-        LogicalPtzCoordinateSpace
+        LogicalPtzCoordinateSpace,
+        InvalidPtzCoordinateSpace 
     };
 
     enum PtzObjectType {

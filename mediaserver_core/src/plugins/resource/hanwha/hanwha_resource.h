@@ -49,11 +49,12 @@ public:
     int maxProfileCount() const;
 
     AVCodecID streamCodec(Qn::ConnectionRole role) const;
+    QString streamCodecProfile(AVCodecID codec, Qn::ConnectionRole role) const;
     QSize streamResolution(Qn::ConnectionRole role) const;
     int streamGovLength(Qn::ConnectionRole role) const;
     Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;
-    int streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality) const;
-    int streamBitrate(Qn::ConnectionRole role, Qn::SecondStreamQuality quality) const;
+    int streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality, int framerate) const;
+    int streamBitrate(Qn::ConnectionRole role, Qn::SecondStreamQuality quality, int framerate) const;
 
     int closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const;
 
@@ -70,12 +71,15 @@ public:
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
     void updateToChannel(int value);
+
+    bool isNvr() const;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
 
 private:
+    CameraDiagnostics::Result init();
     CameraDiagnostics::Result initSystem();
     CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
@@ -120,6 +124,9 @@ private:
         QnCameraAdvancedParams* inOutParameters,
         const HanwhaCgiParameters& cgiParameters) const;
 
+    bool addSpecificRanges(
+        QnCameraAdvancedParameter* inOutParameter) const;
+
     boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
 
     boost::optional<QString> tryToGetSpecificParameterDefault(
@@ -151,7 +158,8 @@ private:
     int suggestBitrate(
         const HanwhaCodecLimits& limits,
         Qn::BitrateControl bitrateControl,
-        double coefficient) const;
+        double coefficient,
+        int framerate) const;
 
     bool isBitrateInLimits(
         const HanwhaCodecLimits& limits,
@@ -161,12 +169,17 @@ private:
     double bitrateCoefficient(Qn::StreamQuality quality) const;
     double bitrateCoefficient(Qn::SecondStreamQuality quality) const;
     
-    int streamBitrateInternal(Qn::ConnectionRole role, double coefficient) const;
+    int streamBitrateInternal(Qn::ConnectionRole role, double coefficient, int framerate) const;
 
     QnCameraAdvancedParamValueList filterGroupParameters(
         const QnCameraAdvancedParamValueList& values);
 
     QString groupLead(const QString& groupName) const;
+
+    boost::optional<QnCameraAdvancedParamValue> findButtonParameter(
+        const QnCameraAdvancedParamValueList) const;
+
+    bool executeCommand(const QnCameraAdvancedParamValue& command);
 
 private:
     using AdvancedParameterId = QString;
@@ -184,6 +197,7 @@ private:
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
     HanwhaAttributes m_attributes;
     HanwhaCgiParameters m_cgiParameters;
+    bool m_isNvr = false;
 };
 
 } // namespace plugins

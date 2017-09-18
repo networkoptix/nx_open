@@ -144,11 +144,6 @@ bool HanwhaResourceSearcher::processPacket(
         cameraMac = QnMacAddress(devInfo.serialNumber);
 
     QString model(devInfo.modelName);
-    QnNetworkResourcePtr existingRes = resourcePool()->getResourceByMacAddress(cameraMac.toString());
-    QAuthenticator cameraAuth;
-
-    if (existingRes)
-        cameraAuth = existingRes->getAuth();
 
 	{
 		QnMutexLocker lock(&m_mutex);
@@ -157,7 +152,7 @@ bool HanwhaResourceSearcher::processPacket(
     }
 
     decltype(m_foundUpnpResources) foundUpnpResources;
-    createResource(devInfo, cameraMac, cameraAuth, foundUpnpResources);
+    createResource(devInfo, cameraMac, QAuthenticator(), foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
     m_alreadFoundMacAddresses.insert(cameraMac.toString());
@@ -203,17 +198,13 @@ int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource)
     if (result > 0)
         return result;
     
+
     HanwhaRequestHelper helper(resource);
-    const HanwhaResponse sources = helper.view(lit("media/videosource"));
-    if (!sources.isSuccessful())
-        return 0;
-    const auto params = sources.response();
-    for (auto itr = params.begin(); itr != params.end(); ++itr)
-    {
-        auto paramName = itr->first;
-        if (paramName.endsWith("VideoSourceToken"))
-            ++result;
-    }
+    auto attributes = helper.fetchAttributes(lit("attributes/System"));
+    const auto maxProfileCount = attributes.attribute<int>(lit("System/MaxChannel"));
+    if (maxProfileCount)
+        result = *maxProfileCount;
+
     m_channelsByCamera.insert(resource->getUniqueId(), result);
     return result;
 }

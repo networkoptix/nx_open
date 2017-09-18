@@ -48,9 +48,10 @@ static const int kHanwhaInvalidBitrate = -1;
 static const int kHanwhaInvalidChannel = -1;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaMaxPresetNumber = 1000;
+static const int kHanwhaProfileNameMaxLength = 12;
 
-const QString kPrimaryNxProfileName = lit("NxPrimary");
-const QString kSecondaryNxProfileName = lit("NxSecondary");
+const QString kHanwhaPrimaryNxProfileSuffix = lit("P");
+const QString kHanwhaSecondaryNxProfileSuffix = lit("S");
 
 static const QString kHanwhaTrue = lit("True");
 static const QString kHanwhaFalse = lit("False");
@@ -103,6 +104,7 @@ static const QString kHanwhaStreamingModeProperty("Mode");
 static const QString kHanwhaStreamingTypeProperty = lit("StreamType");
 static const QString kHanwhaTransportProtocolProperty = lit("TransportProtocol");
 static const QString kHanwhaRtspOverHttpProperty = lit("RTSPOverHTTP");
+static const QString kHanwhaClientTypeProperty = lit("ClientType");
 static const QString kHanwhaUriProperty = lit("URI");
 static const QString kHanwhaPanProperty = lit("Pan");
 static const QString kHanwhaTiltProperty = lit("Tilt");
@@ -111,7 +113,7 @@ static const QString kHanwhaFocusProperty = lit("Focus");
 static const QString kHanwhaNormalizedSpeedProperty = lit("NormalizedSpeed");
 static const QString kHanwhaPtzQueryProperty = lit("Query");
 static const QString kHanwhaPresetNumberProperty = lit("Preset");
-static const QString kHanwhaPresetNameProperty = lit("PresetName");
+static const QString kHanwhaPresetNameProperty = lit("Name");
 static const QString kHanwhaHorizontalFlipProperty = lit("HorizontalFlipEnable");
 static const QString kHanwhaVerticalFlipProperty = lit("VerticalFlipEnable");
 static const QString kHanwhaRotationProperty = lit("Rotate");
@@ -161,6 +163,8 @@ static const QString kHanwhaTrueValueAttribute = lit("true");
 static const QString kHanwhaFalseValueAttribute = lit("false");
 static const QString kHanwhaFormatInfoAttribute = lit("formatInfo");
 static const QString kHanwhaFormatAttribute = lit("format");
+
+static const int kHanwhaConfigurationNotFoundError = 612;
 
 } // namespace plugins
 } // namespace mediaserver_core

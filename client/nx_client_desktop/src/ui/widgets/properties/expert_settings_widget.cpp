@@ -38,28 +38,28 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
 
     CheckboxUtils::autoClearTristate(ui->checkBoxForceMotionDetection);
 
-    setWarningStyle(ui->settingsWarningLabel);
-    setWarningStyle(ui->settingsDisabledWarningLabel);
-    setWarningStyle(ui->highQualityWarningLabel);
-    setWarningStyle(ui->lowQualityWarningLabel);
-    setWarningStyle(ui->generalWarningLabel);
+    setWarningStyle(ui->settingsWarningLabel, style::Hints::kDisabledItemOpacity);
+    setWarningStyle(ui->settingsDisabledWarningLabel, style::Hints::kDisabledItemOpacity);
+    setWarningStyle(ui->highQualityWarningLabel, style::Hints::kDisabledItemOpacity);
+    setWarningStyle(ui->lowQualityWarningLabel, style::Hints::kDisabledItemOpacity);
+    setWarningStyle(ui->generalWarningLabel, style::Hints::kDisabledItemOpacity);
 
     ui->iconLabel->setPixmap(qnSkin->pixmap("legacy/warning.png"));
     ui->iconLabel->setScaledContents(true);
 
-    // if "I have read manual" is set, all controls should be enabled
-    connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureCheckBox, SLOT(setDisabled(bool)));
-    connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->assureWidget, SLOT(setEnabled(bool)));
-    connect(ui->assureCheckBox, SIGNAL(toggled(bool)), ui->scrollArea, SLOT(setEnabled(bool)));
-    ui->assureWidget->setEnabled(false);
+    // If "I have read manual" is set, all controls should be enabled.
+    connect(ui->assureCheckBox, &QCheckBox::toggled, ui->assureCheckBox, &QWidget::setDisabled);
+    connect(ui->assureCheckBox, &QCheckBox::toggled, ui->restoreDefaultsButton, &QWidget::setEnabled);
+    connect(ui->assureCheckBox, &QCheckBox::toggled, ui->scrollArea, &QWidget::setEnabled);
+    ui->restoreDefaultsButton->setEnabled(false);
 
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, ui->qualityGroupBox, &QGroupBox::setDisabled);
     connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, this, &QnCameraExpertSettingsWidget::updateControlBlock);
     connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this, &QnCameraExpertSettingsWidget::updateControlBlock);
     updateControlBlock();
 
-    connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualitySlider, SLOT(setVisible(bool)));
-    connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), ui->qualityLabelsWidget, SLOT(setVisible(bool)));
+    connect(ui->qualityOverrideCheckBox, &QCheckBox::toggled, ui->qualitySlider, &QWidget::setVisible);
+    connect(ui->qualityOverrideCheckBox, &QCheckBox::toggled, ui->qualityLabelsWidget, &QWidget::setVisible);
     ui->qualitySlider->setVisible(false);
     ui->qualityLabelsWidget->setVisible(false);
 

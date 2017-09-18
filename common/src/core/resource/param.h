@@ -66,7 +66,9 @@ namespace Qn
     static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
     static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");
     static const QString kPrimaryStreamCodecParamName = lit("primaryStreamCodec");
+    static const QString kPrimaryStreamCodecProfileParamName = lit("primaryStreamCodecProfile");
     static const QString kSecondaryStreamCodecParamName = lit("secondaryStreamCodec");
+    static const QString kSecondaryStreamCodecProfileParamName = lit("secondaryStreamCodecProfile");
     static const QString kPrimaryStreamGovLengthParamName = lit("primaryStreamGovLength");
     static const QString kSecondaryStreamGovLengthParamName = lit("secondaryStreamGovLenght");
     static const QString kPrimaryStreamBitrateControlParamName = lit("primaryStreamBitrateControl");

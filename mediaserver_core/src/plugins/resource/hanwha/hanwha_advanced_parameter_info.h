@@ -18,6 +18,7 @@ public:
     QString viewAction() const;
     QString updateAction() const;
     QString rangeParameter() const;
+    bool isSpecific() const;
 
     Qn::ConnectionRole profileDependency() const;
     bool isChannelIndependent() const;
@@ -46,6 +47,7 @@ private:
     QString m_viewAction = lit("view");
     QString m_updateAction = lit("set");
     QString m_rangeParameter;
+    bool m_isSpecific = false;
 
     Qn::ConnectionRole m_profile = Qn::ConnectionRole::CR_Default;
     bool m_channelIndependent = false;

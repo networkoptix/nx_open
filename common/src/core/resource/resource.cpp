@@ -1100,16 +1100,9 @@ bool QnResource::init()
 
     bool changed = m_initialized;
     if (m_initialized)
-    {
         initializationDone();
-    }
-    else
-    {
-        if (initResult.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
-            setStatus(Qn::Unauthorized);
-        else
-            setStatus(Qn::Offline);
-    }
+    else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
+        setStatus(Qn::Offline);
 
     m_initMutex.unlock();
 

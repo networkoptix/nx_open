@@ -79,8 +79,6 @@ T fromHanwhaString(const QString& str)
         || std::is_same<T, Qn::BitrateControl>::value
         || std::is_same<T, Qn::EncodingPriority>::value
         || std::is_same<T, Qn::EntropyCoding>::value
-        || std::is_same<T, nx::media_utils::h264::Profile>::value
-        || std::is_same<T, nx::media_utils::hevc::Profile>::value
         || std::is_same<T, HanwhaMediaType>::value
         || std::is_same<T, HanwhaStreamingMode>::value
         || std::is_same<T, HanwhaStreamingType>::value
@@ -115,12 +113,6 @@ Qn::EncodingPriority fromHanwhaString(const QString& str);
 
 template<>
 Qn::EntropyCoding fromHanwhaString(const QString& str);
-
-template<>
-nx::media_utils::h264::Profile fromHanwhaString(const QString& str);
-
-template<>
-nx::media_utils::hevc::Profile fromHanwhaString(const QString& str);
 
 template<>
 HanwhaMediaType fromHanwhaString(const QString& str);
