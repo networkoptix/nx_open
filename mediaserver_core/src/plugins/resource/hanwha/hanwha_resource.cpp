@@ -338,10 +338,6 @@ CameraDiagnostics::Result HanwhaResource::init()
 
     initMediaStreamCapabilities();
 
-    setProperty(
-        nx::media::kCameraMediaCapabilityParamName,
-        QString::fromLatin1(QJson::serialized(m_capabilities)));
-
     saveParams();
     return result;
 }
@@ -352,6 +348,10 @@ void HanwhaResource::initMediaStreamCapabilities()
         mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
     m_capabilities.streamCapabilities[Qn::ConnectionRole::CR_SecondaryLiveVideo] =
         mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
+
+    setProperty(
+        nx::media::kCameraMediaCapabilityParamName,
+        QString::fromLatin1(QJson::serialized(m_capabilities)));
 }
 
 nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::ConnectionRole role)
