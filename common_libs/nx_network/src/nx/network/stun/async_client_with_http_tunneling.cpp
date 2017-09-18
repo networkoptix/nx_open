@@ -39,7 +39,14 @@ void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handl
         [this, handler = std::move(handler)]() mutable
         {
             QnMutexLocker lock(&m_mutex);
-            connectInternal(lock, std::move(handler));
+            connectInternal(
+                lock,
+                [this, handler = std::move(handler)](
+                    SystemError::ErrorCode systemErrorCode)
+                {
+                    scheduleReconnect();
+                    handler(systemErrorCode);
+                });
         });
 }
 
