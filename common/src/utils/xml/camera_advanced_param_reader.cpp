@@ -112,7 +112,14 @@ void QnCachingCameraAdvancedParamsReader::setParams(const QnResourcePtr &resourc
     m_paramsByCameraId[resource->getId()] = params;
 }
 
-bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
+void QnCachingCameraAdvancedParamsReader::clearResourceParams(const QnResourcePtr& resource)
+{
+    NX_ASSERT(resource);
+    m_paramsByCameraId.remove(resource->getId());
+}
+
+bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource)
+{
     // TODO: #GDM Why the file is not reset to initial position? It leads to 'EOF' error in parsing.
     return true;
 
