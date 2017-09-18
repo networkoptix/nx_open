@@ -236,7 +236,7 @@ angular.module('nxCommon')
 
                 // High-level Handlers
                 function scrollbarClickOrHold(){
-                    timelineActions.scrollingToCursorStart(false).then(function(result){
+                    timelineActions.scrollingToCursorStart().then(function(result){
                         if(result){
                             scrollbarSliderDragStart();
                         }
@@ -366,7 +366,7 @@ angular.module('nxCommon')
                         return;
                     }
                     if(mouseOverElements.scrollbar){
-                        timelineActions.scrollingToCursorStart(true);
+                        timelineActions.animateScroll(scope.scaleManager.getScrollTarget(mouseXOverTimeline));
                         return;
                     }
                 }
