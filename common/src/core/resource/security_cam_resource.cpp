@@ -89,6 +89,13 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
             return QJson::deserialized<nx::api::AnalyticsSupportedEvents>(
                 getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
         },
+        &m_mutex),
+    m_cachedCameraMediaCapabilities(
+        [this]()
+        {
+            return QJson::deserialized<nx::media::CameraMediaCapability>(
+                getProperty(nx::media::kCameraMediaCapabilityParamName).toUtf8());
+        },
         &m_mutex)
 {
     addFlags(Qn::live_cam);
@@ -188,7 +195,13 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
     }
 }
 
-int QnSecurityCamResource::getMaxFps() const {
+int QnSecurityCamResource::getMaxFps() const 
+{
+    const auto capabilities = cameraMediaCapability();
+    if (!capabilities.isNull())
+        return capabilities.streamCapabilities.value(Qn::CR_LiveVideo).maxFps;
+
+    // Compatibility with version < 3.1.2
     QString value = getProperty(Qn::MAX_FPS_PARAM_NAME);
     return value.isNull() ? kDefaultMaxFps : value.toInt();
 }
@@ -368,7 +381,18 @@ bool QnSecurityCamResource::hasDualStreaming2() const {
     return m_cachedHasDualStreaming2.get();
 }
 
-bool QnSecurityCamResource::hasDualStreaming() const {
+nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() const
+{
+    return m_cachedCameraMediaCapabilities.get();
+}
+
+bool QnSecurityCamResource::hasDualStreaming() const 
+{
+    const auto capabilities = cameraMediaCapability();
+    if (!capabilities.isNull())
+        return capabilities.hasDualStreaming;
+
+    // Compatibility with version < 3.1.2
     QString val = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
     return val.toInt() > 0;
 }
@@ -569,7 +593,13 @@ bool QnSecurityCamResource::hasTwoWayAudio() const
     return getCameraCapabilities().testFlag(Qn::AudioTransmitCapability);
 }
 
-bool QnSecurityCamResource::isAudioSupported() const {
+bool QnSecurityCamResource::isAudioSupported() const 
+{
+    const auto capabilities = cameraMediaCapability();
+    if (!capabilities.isNull())
+        return capabilities.hasAudio;
+
+    // Compatibility with version < 3.1.2
     QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
     if (val.toInt() > 0)
         return true;
@@ -1127,6 +1157,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_motionType.reset();
     m_cachedIsIOModule.reset();
     m_cachedAnalyticsSupportedEvents.reset();
+    m_cachedCameraMediaCapabilities.reset();
 }
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const

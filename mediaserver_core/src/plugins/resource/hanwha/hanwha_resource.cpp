@@ -15,6 +15,9 @@
 
 #include <nx/utils/log/log.h>
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
+#include <core/resource/media_stream_capability.h>
+#include <nx/fusion/fusion/fusion.h>
+#include <nx/fusion/serialization/json.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -248,7 +251,8 @@ bool HanwhaResource::setParamsPhysical(
             *info,
             value.value);
     }
-
+    if (reopenPrimaryStream || reopenSecondaryStream)
+        initMediaStreamCapabilities();
     saveParams();
 
     bool success = true;
@@ -332,8 +336,53 @@ CameraDiagnostics::Result HanwhaResource::init()
     if (!result)
         return result;
 
+    initMediaStreamCapabilities();
+
+    setProperty(
+        nx::media::kCameraMediaCapabilityParamName,
+        QString::fromLatin1(QJson::serialized(m_capabilities)));
+
     saveParams();
     return result;
+}
+
+void HanwhaResource::initMediaStreamCapabilities()
+{
+    m_capabilities.streamCapabilities[Qn::ConnectionRole::CR_LiveVideo] =
+        mediaCapabilityForRole(Qn::ConnectionRole::CR_LiveVideo);
+    m_capabilities.streamCapabilities[Qn::ConnectionRole::CR_SecondaryLiveVideo] =
+        mediaCapabilityForRole(Qn::ConnectionRole::CR_SecondaryLiveVideo);
+}
+
+nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::ConnectionRole role)
+{
+    nx::media::CameraStreamCapability capability;
+    const auto codec = streamCodec(role);
+    const auto resolution = streamResolution(role);
+    const auto bitrateControlType = streamBitrateControl(role);
+
+    const auto limits = m_codecInfo.limits(
+        getChannel(),
+        codec,
+        lit("General"),
+        resolution);
+
+    capability.minBitrateKbps = bitrateControlType == Qn::BitrateControl::cbr
+        ? limits->minCbrBitrate
+        : limits->minVbrBitrate;
+
+    capability.maxBitrateKbps = bitrateControlType == Qn::BitrateControl::cbr
+        ? limits->maxCbrBitrate
+        : limits->maxVbrBitrate;
+
+    capability.defaultBitrateKbps = bitrateControlType == Qn::BitrateControl::cbr
+        ? limits->defaultCbrBitrate
+        : limits->defaultVbrBitrate;
+
+    capability.defaultFps = limits->defaultFps;
+    capability.maxFps = limits->maxFps;
+
+    return capability;
 }
 
 QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
@@ -465,7 +514,6 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
             return CameraDiagnostics::CameraInvalidParams(
                 lit("Can not fetch primary stream limits."));
         }
-        setProperty(Qn::MAX_FPS_PARAM_NAME, primaryStreamLimits->maxFps);
 
         result = createNxProfiles();
         if (!result)
@@ -475,8 +523,8 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     const bool hasAudio = m_attributes.attribute<int>(
         lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
 
-    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, (int) hasAudio);
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, (int) hasDualStreaming);
+    m_capabilities.hasAudio = hasAudio;
+    m_capabilities.hasDualStreaming = hasDualStreaming;
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1037,7 +1085,7 @@ QString HanwhaResource::streamCodecProfile(AVCodecID codec, Qn::ConnectionRole r
     else if (codec == AV_CODEC_ID_H265)
         profileList = &m_streamLimits.hevcProfiles;
     
-    return !profileList || profileList->isEmpty() ? QString() : profileList->at(0);
+    return !profileList || profileList->isEmpty() ? QString() : profileList->last();
 }
 
 QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const

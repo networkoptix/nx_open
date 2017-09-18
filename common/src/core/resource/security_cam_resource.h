@@ -21,6 +21,7 @@
 #include "core/dataconsumer/audio_data_transmitter.h"
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/combined_sensors_description.h>
+#include "media_stream_capability.h"
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -124,12 +125,13 @@ public:
     virtual QnIOPortDataList getRelayOutputList() const;
     virtual QnIOPortDataList getInputPortList() const;
 
-
+    // TODO: move this flags inside CameraMediaCapability struct
     Qn::CameraCapabilities getCameraCapabilities() const;
     bool hasCameraCapabilities(Qn::CameraCapabilities capabilities) const;
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
+    nx::media::CameraMediaCapability cameraMediaCapability() const;
 
     /*!
         Change output with id \a ouputID state to \a activate
@@ -400,6 +402,7 @@ private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
+    CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
 
 private slots:
     void resetCachedValues();

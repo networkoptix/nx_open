@@ -180,7 +180,8 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
-
+    void initMediaStreamCapabilities();
+    nx::media::CameraStreamCapability mediaCapabilityForRole(Qn::ConnectionRole role);
 private:
     using AdvancedParameterId = QString;
 
@@ -198,6 +199,8 @@ private:
     HanwhaAttributes m_attributes;
     HanwhaCgiParameters m_cgiParameters;
     bool m_isNvr = false;
+
+    nx::media::CameraMediaCapability m_capabilities;
 };
 
 } // namespace plugins
