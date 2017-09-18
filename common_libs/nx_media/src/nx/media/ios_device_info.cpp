@@ -1,4 +1,5 @@
 #include "ios_device_info.h"
+#if defined(TARGET_OS_IPHONE)
 
 #include <sys/utsname.h>
 
@@ -36,3 +37,4 @@ IosDeviceInformation iosDeviceInformation()
 } // namespace media
 } // namespace nx
 
+#endif // defined(TARGET_OS_IPHONE)
