@@ -22,9 +22,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-ExportSettingsDialog::Private::Private(const QSize& previewSize, QObject* parent):
+ExportSettingsDialog::Private::Private(bool isBookmark, const QSize& previewSize, QObject* parent):
     base_type(parent),
-    m_previewSize(previewSize)
+    m_previewSize(previewSize),
+    m_isBookmark(isBookmark)
 {
     m_exportLayoutSettings.mode = ExportLayoutSettings::Mode::Export;
 }
@@ -35,7 +36,10 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::loadSettings()
 {
-    m_exportMediaSettings = qnSettings->exportMediaSettings();
+    m_exportMediaSettings = m_isBookmark
+        ? qnSettings->exportBookmarkSettings()
+        : qnSettings->exportMediaSettings();
+
     m_exportLayoutSettings = qnSettings->exportLayoutSettings();
 
     auto lastExportDir = qnSettings->lastExportDir();
@@ -60,10 +64,15 @@ void ExportSettingsDialog::Private::saveSettings()
     {
         case Mode::Media:
         {
-            qnSettings->setExportMediaSettings(m_exportMediaSettings);
+            if (m_isBookmark)
+                qnSettings->setExportBookmarkSettings(m_exportMediaSettings);
+            else
+                qnSettings->setExportMediaSettings(m_exportMediaSettings);
+
             qnSettings->setLastExportDir(m_exportMediaSettings.fileName.path);
             break;
         }
+
         case Mode::Layout:
         {
             qnSettings->setExportLayoutSettings(m_exportLayoutSettings);

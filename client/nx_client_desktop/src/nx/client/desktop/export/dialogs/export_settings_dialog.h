@@ -54,7 +54,7 @@ public:
     ExportLayoutSettings exportLayoutSettings() const;
 
 private:
-    ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent = nullptr);
+    ExportSettingsDialog(const QnTimePeriod& timePeriod, bool isBookmark, QWidget* parent = nullptr);
 
     void setupSettingsButtons();
     void setMediaResource(const QnMediaResourcePtr& media);

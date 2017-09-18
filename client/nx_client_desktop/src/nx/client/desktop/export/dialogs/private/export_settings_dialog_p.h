@@ -35,7 +35,7 @@ class ExportSettingsDialog::Private: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    explicit Private(const QSize& previewSize, QObject* parent = nullptr);
+    explicit Private(bool isBookmark, const QSize& previewSize, QObject* parent = nullptr);
     virtual ~Private() override;
 
     void loadSettings();
@@ -89,6 +89,7 @@ private:
 
 private:
     const QSize m_previewSize;
+    const bool m_isBookmark = false;
     ExportSettingsDialog::Mode m_mode = Mode::Media;
     ExportMediaValidator::Results m_mediaValidationResults;
     ExportMediaValidator::Results m_layoutValidationResults;

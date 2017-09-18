@@ -44,7 +44,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     QWidget* parent)
     :
-    ExportSettingsDialog(timePeriod, parent)
+    ExportSettingsDialog(timePeriod, false /*isBookmark*/, parent)
 {
     setMediaResource(widget->resource());
 
@@ -64,15 +64,19 @@ ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     QWidget* parent)
     :
-    ExportSettingsDialog(timePeriod, parent)
+    ExportSettingsDialog(timePeriod, true /*isBookmark*/, parent)
 {
     ui->layoutTab->setVisible(false);
     setMediaResource(media);
 }
 
-ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidget* parent) :
+ExportSettingsDialog::ExportSettingsDialog(
+    const QnTimePeriod& timePeriod,
+    bool isBookmark,
+    QWidget* parent)
+    :
     base_type(parent),
-    d(new Private(kPreviewSize)),
+    d(new Private(isBookmark, kPreviewSize)),
     ui(new Ui::ExportSettingsDialog)
 {
     ui->setupUi(this);
@@ -133,6 +137,10 @@ ExportSettingsDialog::ExportSettingsDialog(const QnTimePeriod& timePeriod, QWidg
     ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Layout));
 
     updateSettingsWidgets();
+
+    ui->bookmarkButton->setVisible(isBookmark);
+    if (!isBookmark) // Just in case...
+        ui->bookmarkButton->setState(ui::SelectableTextButton::State::deactivated);
 
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setMediaFilename);
     connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);

@@ -200,6 +200,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         }
 
         case EXPORT_MEDIA_SETTINGS:
+        case EXPORT_BOOKMARK_SETTINGS:
         {
             const auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
                 .value<QString>().toUtf8();
@@ -329,6 +330,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         }
 
         case EXPORT_MEDIA_SETTINGS:
+        case EXPORT_BOOKMARK_SETTINGS:
         {
             const auto asJson = QString::fromUtf8(QJson::serialized(value.value<ExportMediaSettings>()));
             base_type::writeValueToSettings(settings, id, asJson);
