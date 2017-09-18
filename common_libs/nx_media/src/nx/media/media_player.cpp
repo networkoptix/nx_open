@@ -917,7 +917,7 @@ void Player::play()
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
-    d->dataConsumer->setAudioEnabled(true);
+    d->dataConsumer->setAudioEnabled(d->isAudioEnabled);
 
     d->lastVideoPtsMs.reset();
     d->at_hurryUp(); //< renew receiving frames
