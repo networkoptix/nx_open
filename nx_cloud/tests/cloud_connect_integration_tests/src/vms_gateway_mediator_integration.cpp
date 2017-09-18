@@ -57,9 +57,11 @@ protected:
 
     void thenGatewayReconnectedToMediator()
     {
+        // TODO: #ak Probably, it is better to check that gateway 
+        // endpoint is in mediator connection_requested event.
+
         for (;;)
         {
-            // Checking that gateway endpoint is in mediator connection_requested event.
             auto listeningPeers =
                 mediator().moduleInstance()->impl()->controller()
                     .listeningPeerRegistrator().getListeningPeers().clients;
