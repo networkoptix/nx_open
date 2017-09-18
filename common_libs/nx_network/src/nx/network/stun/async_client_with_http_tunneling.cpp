@@ -44,7 +44,8 @@ void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handl
                 [this, handler = std::move(handler)](
                     SystemError::ErrorCode systemErrorCode)
                 {
-                    scheduleReconnect();
+                    if (systemErrorCode != SystemError::noError)
+                        scheduleReconnect();
                     handler(systemErrorCode);
                 });
         });
