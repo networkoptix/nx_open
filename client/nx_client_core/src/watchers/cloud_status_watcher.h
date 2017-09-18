@@ -29,11 +29,11 @@ class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatch
     using base_type = QObject;
 
 public:
-
     enum ErrorCode
     {
         NoError,
         InvalidCredentials,
+        AccountNotActivated,
         UnknownError
     };
     Q_ENUM(ErrorCode)
@@ -47,8 +47,8 @@ public:
     };
     Q_ENUM(Status)
 
-    explicit QnCloudStatusWatcher(QObject *parent = nullptr, bool isMobile = true);
-    ~QnCloudStatusWatcher();
+    explicit QnCloudStatusWatcher(QObject* parent = nullptr, bool isMobile = true);
+    virtual ~QnCloudStatusWatcher() override;
 
     QnEncodedCredentials credentials() const;
     void resetCredentials();

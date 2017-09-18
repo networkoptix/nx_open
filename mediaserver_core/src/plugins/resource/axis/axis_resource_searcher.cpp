@@ -178,7 +178,11 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     for (int i = iqpos; i < macpos; i++)
     {
-        name += QLatin1Char(responseData[i]);
+        const unsigned char c = responseData.at(i);
+        if (c < 0x20 || c == 0x7F) // Control char.
+            name += QLatin1Char('?');
+        else
+            name += QLatin1Char(c); //< Assume Latin-1 encoding.
     }
 
     int macpos2 = responseData.indexOf(prefix2, macpos);

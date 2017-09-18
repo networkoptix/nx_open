@@ -367,6 +367,7 @@ protected:
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
+    void scheduleRetrySubscriptionTimer();
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();

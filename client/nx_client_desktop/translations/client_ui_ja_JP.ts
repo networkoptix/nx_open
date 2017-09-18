@@ -884,11 +884,6 @@
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Emailまたはパスワードが間違っています</translation>
-    </message>
   </context>
   <context>
     <name>ConnectionNameDialog</name>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>

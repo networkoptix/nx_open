@@ -324,8 +324,8 @@
     "QnResourcePreviewWidget": {
         "palette": {
             "default": {
-                "window":        "dark7",
-                "dark":          "dark9",
+                "shadow":        "dark7",
+                "window":        "dark9",
                 "windowText":    "light16"
             }
         }

@@ -95,4 +95,7 @@ set(additionalTranslations
     zh_TW
     he_IL
     hu_HU
+    nl_NL
+    pl_PL
+    vi_VN
 )

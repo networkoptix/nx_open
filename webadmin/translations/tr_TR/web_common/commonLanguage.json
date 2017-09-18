@@ -1,18 +1,18 @@
 {
   "cameraLinks":{
-    "highStream":"High stream",
-    "lowStream":"Low stream",
-    "transcoding":"Transcoding",
-    "unknown":"Unknown",
+    "highStream":"Yüksek akış",
+    "lowStream":"Düşük akış",
+    "transcoding":"Dönüştürme",
+    "unknown":"Belirtilmemiş",
     "copyToClipboard":"copy to clipboard",
     "copyDefaultText":"copy",
     "copyActiveText":"copied to clipboard"
   },
   "systemOffline":"System Offline",
   "cameraStates":{
-    "offline":"Offline",
-    "error":"Error",
-    "unauthorized":"Authentication required",
+    "offline":"Çevrimdışı",
+    "error":"Hata",
+    "unauthorized":"Kimlik doğrulaması gerekli",
     "noData":"No data",
     "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
     "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",

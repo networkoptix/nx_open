@@ -50,6 +50,7 @@ private:
     QTime m_alignedTimer;
     qint64 m_currentTime;
     mutable QnMutex m_sync;
+    QnWaitCondition m_sleepCond;
     //!This mutex is used for clearing frame queue only
     QnMutex m_renderMtx;
     qint64 m_lastDisplayedTime;

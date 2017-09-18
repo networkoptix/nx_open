@@ -21,7 +21,7 @@ bool verifyUpdatePackage(
     QnSystemInformation* sysInfo = nullptr,
     QString* cloudHost = nullptr,
     bool* isClient = nullptr);
-QString passwordForBuild(unsigned buildNumber);
+QString passwordForBuild(const QString& build);
 QDir updatesCacheDir();
 QString updateFilePath(const QString &fileName);
 QString makeMd5(const QString &fileName);
