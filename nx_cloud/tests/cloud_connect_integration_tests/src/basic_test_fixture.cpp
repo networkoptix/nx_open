@@ -102,6 +102,11 @@ BasicTestFixture::~BasicTestFixture()
     m_httpServer.reset();
 }
 
+void BasicTestFixture::setInitFlags(int flags)
+{
+    m_initFlags = flags;
+}
+
 SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
 {
     return m_relays[index]->moduleInstance()->httpEndpoints()[0];
@@ -159,11 +164,14 @@ void BasicTestFixture::SetUp()
             break;
     }
 
-    SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
-        nx::network::url::Builder().setScheme("http")
-            .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
-            .setPath(kCloudModulesXmlPath));
-    SocketGlobals::mediatorConnector().enable(true);
+    if ((m_initFlags & doNotInitializeMediatorConnection) == 0)
+    {
+        SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
+            nx::network::url::Builder().setScheme("http")
+                .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
+                .setPath(kCloudModulesXmlPath));
+        SocketGlobals::mediatorConnector().enable(true);
+    }
 }
 
 void BasicTestFixture::startServer()

@@ -916,19 +916,20 @@ ShortCache.prototype.setPlayingPosition = function(position){
         }
     }
 
-    if(!this.liveMode && this.currentDetailization.length>0
-        && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
-            + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
-            < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
-
-        // TODO: update live detailization?
-
-        this.update();
+    if(!this.liveMode && this.currentDetailization.length>0){
+        var archiveEnd = this.currentDetailization[this.currentDetailization.length - 1].durationMs +
+                         this.currentDetailization[this.currentDetailization.length - 1].startTimeMs;
+        if (archiveEnd < Math.round(this.playedPosition) + this.updateInterval && this.lastArchiveEnd != archiveEnd) {
+            // It's time to update
+            // And last update get new information
+            this.lastArchiveEnd = archiveEnd;
+            this.update();
+        }
     }
 
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache
-        this.lastPlayedDate =  this.playedPosition; // Save the boundaries of uploaded cache
+        this.lastPlayedDate = this.playedPosition; // Save the boundaries of uploaded cache
     }
 
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
