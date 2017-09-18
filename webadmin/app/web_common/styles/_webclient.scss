@@ -480,7 +480,7 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
-    z-index: 1;
+    z-index: 112;
 
     & table{
       font-size: 12px;
@@ -604,7 +604,7 @@ table.webclient-window>tbody>tr>td{
     height: 48px;
     top:0;
     left: 0;
-    z-index: 1;  
+    z-index: 110;
   }
 
   .stick-to-bottom{
