@@ -297,6 +297,9 @@ public:
     virtual void analyticsEventStarted(const QString& caption, const QString& description);
     virtual void analyticsEventEnded(const QString& caption, const QString& description);
 
+    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
+    float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const;
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

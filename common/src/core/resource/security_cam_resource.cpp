@@ -1209,3 +1209,64 @@ void QnSecurityCamResource::analyticsEventEnded(const QString& caption, const QS
         description,
         qnSyncTime->currentMSecsSinceEpoch());
 }
+
+float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+{
+    float lowEnd = 0.1f;
+    float hiEnd = 1.0f;
+
+    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
+
+    float resolutionFactor = 0.009f * pow(resolution.width() * resolution.height(), 0.7f);
+
+    float frameRateFactor = fps / 1.0f;
+
+    float result = qualityFactor*frameRateFactor * resolutionFactor;
+
+    return qMax(192.0, result);
+}
+
+
+int QnSecurityCamResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
+{
+    auto bitrateCoefficient = [](Qn::StreamQuality quality)
+    {
+        switch (quality)
+        {
+        case Qn::StreamQuality::QualityLowest:
+            return 0.75;
+        case Qn::StreamQuality::QualityLow:
+            return 1.0;
+        case Qn::StreamQuality::QualityNormal:
+            return 1.5;
+        case Qn::StreamQuality::QualityHigh:
+            return 2.0;
+        case Qn::StreamQuality::QualityHighest:
+            return 2.5;
+        case Qn::StreamQuality::QualityPreSet:
+        case Qn::StreamQuality::QualityNotDefined:
+        default:
+            return 1.0;
+        }
+    };
+
+    auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+    if (streamCapability.defaultBitrateKbps > 0)
+    {
+        double coefficient = bitrateCoefficient(quality);
+        const int bitrate = streamCapability.defaultBitrateKbps * coefficient;
+        return qBound(
+            (double)streamCapability.minBitrateKbps,
+            bitrate * ((double)fps / streamCapability.defaultFps),
+            (double)streamCapability.maxBitrateKbps);
+    }
+
+
+    auto result = rawSuggestBitrateKbps(quality, resolution, fps);
+
+    if (bitratePerGopType() != Qn::BPG_None)
+        result = result * (30.0 / (qreal)fps);
+
+    return (int)result;
+}
+
