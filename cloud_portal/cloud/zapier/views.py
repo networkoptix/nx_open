@@ -4,6 +4,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from api.helpers.exceptions import handle_exceptions, APINotAuthorisedException, require_params
 
+import requests, json
+from requests.auth import HTTPDigestAuth
+
 
 def authenticate(request):
     require_params(request, ('email', 'password'))
@@ -14,16 +17,31 @@ def authenticate(request):
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
-    return user
+    return email, password
 
+
+'''
+whole url
+https://cloud-test.hdw.mx/gateway/9aeb4e34-d495-4e93-8ae5-3af9630ffc0e/ec2/getUsers
+
+instance
+https://cloud-test.hdw.mx/gateway/
+
+system
+9aeb4e34-d495-4e93-8ae5-3af9630ffc0e
+
+apicall
+/ec2/getUsers
+
+to send requests to cloud test
+return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+'''
 
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def nx_action(request):
-    # authorize user here
-    # return user
-    user = authenticate(request)
+    email, password = authenticate(request)
 
     return Response('ok')
 
@@ -32,7 +50,7 @@ def nx_action(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def zap_trigger(request):
-    user = authenticate(request)
+    email, password = authenticate(request)
 
     return Response('ok')
 
@@ -45,7 +63,11 @@ def ping(request):
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def list_systems(request):
-    user = authenticate(request)
+def get_users_for_system(request):
+    email, password = authenticate(request)
+    url = 'http://cloud-test.hdw.mx/gateway/9aeb4e34-d495-4e93-8ae5-3af9630ffc0e/ec2/getUsers'
+    headers = {'Content-Type': 'application/json'}
 
-    return Response('ok')
+    r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
+
+    return json.loads(r.text)
