@@ -206,7 +206,7 @@ class CloudSession(object):
         self.post('/gateway/{system_id}/ec2/removeUser'.format(system_id=self.system_id),
                   request_data, auth=auth)
 
-    @testmethod()
+    @testmethod(delay=10)
     def check_vasily_is_absent(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
