@@ -127,27 +127,6 @@ static QSize transcodingResolution(
     return result;
 }
 
-static bool isTranscodingSupported(
-    bool liveMode, qint64 positionMs, const QnVirtualCameraResourcePtr& camera)
-{
-    if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
-        return false;
-
-    auto module = camera->commonModule();
-    NX_ASSERT(module);
-    if (!module)
-        return false;
-
-    QnMediaServerResourcePtr server = liveMode
-        ? camera->getParentServer()
-        : module->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
-
-    if (!server)
-        return false;
-
-    return server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding);
-}
-
 /**
  * @return Transcoding resolution, or invalid (default) QSize if transcoding is not possible.
  */
@@ -160,7 +139,8 @@ static Result applyTranscodingIfPossible(
     const QSize& desiredResolution,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
-    if (!isTranscodingSupported(liveMode, positionMs, camera))
+    if (transcodingSupportStatus(camera, positionMs, liveMode, TranscodingRequestType::simple)
+        != Player::TranscodingSupported)
     {
         NX_LOG(lit("[media_player] Transcoding is not supported for the camera."),
             cl_logDEBUG1);
@@ -416,6 +396,38 @@ Result chooseVideoQuality(
 
     logResult();
     return result;
+}
+
+Player::TranscodingSupportStatus transcodingSupportStatus(
+    const QnVirtualCameraResourcePtr& camera,
+    qint64 positionMs,
+    bool liveMode,
+    TranscodingRequestType requestType)
+{
+    if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
+        return Player::TranscodingDisabled;
+
+    const QnMediaServerResourcePtr& server = liveMode
+        ? camera->getParentServer()
+        : camera->commonModule()->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
+
+    if (!server)
+        return Player::TranscodingNotSupported;
+
+    if (server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding))
+        return Player::TranscodingSupported;
+
+    if (requestType == TranscodingRequestType::detailed)
+    {
+        if (server->getVersion() < QnSoftwareVersion(3, 0))
+            return Player::TranscodingNotSupportedForServersOlder30;
+
+        const auto& info = server->getSystemInfo();
+        if (info.arch == lit("arm") || info.arch == lit("aarch64"))
+            return Player::TranscodingNotSupportedForArmServers;
+    }
+
+    return Player::TranscodingNotSupported;
 }
 
 Result::Result(Player::VideoQuality quality, const QSize& frameSize):

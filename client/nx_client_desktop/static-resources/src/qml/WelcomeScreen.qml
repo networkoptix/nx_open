@@ -257,7 +257,7 @@ Rectangle
 
                         wrongVersion: (model.wrongVersion && !model.wrongVersion.isNull()
                             && model.wrongVersion.toString()) || "";
-                        isCompatibleInternal: model.isCompatibleInternal;
+                        isCompatible: model.isCompatibleToDesktopClient;
                         compatibleVersion:(model.compatibleVersion
                             && !model.compatibleVersion.isNull()
                             && model.compatibleVersion.toString()) || "";

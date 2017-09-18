@@ -101,7 +101,7 @@ Page
                 ownerDescription: cloudSystem ? model.ownerDescription : ""
                 running: model.isRunning
                 reachable: model.isReachable
-                compatible: model.isCompatible || model.isFactorySystem
+                compatible: model.isCompatibleToMobileClient || model.isFactorySystem
 
                 invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
             }
