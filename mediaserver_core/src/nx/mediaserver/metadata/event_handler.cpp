@@ -44,7 +44,7 @@ void EventHandler::handleMetadata(
 
         const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
 
-        bool dublicate = eventState == nx::vms::event::EventState::inactive
+        const bool dublicate = eventState == nx::vms::event::EventState::inactive
             && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
 
         if (dublicate)

@@ -16,20 +16,30 @@
 #include <ui/style/globals.h>
 
 #include <utils/common/object_companion.h>
+#include <utils/math/color_transformations.h>
 
-
-void setWarningStyle(QWidget *widget)
+// TODO: #vkutin Default disabledOpacity to style::Hints::kDisabledItemOpacity in new versions.
+void setWarningStyle(QWidget* widget, qreal disabledOpacity)
 {
-    setPaletteColor(widget, QPalette::ButtonText, qnGlobals->errorTextColor());
-    setPaletteColor(widget, QPalette::WindowText, qnGlobals->errorTextColor());
-    setPaletteColor(widget, QPalette::Text, qnGlobals->errorTextColor());
+    auto palette = widget->palette();
+    setWarningStyle(&palette, disabledOpacity);
+    widget->setPalette(palette);
 }
 
-void setWarningStyle(QPalette *palette)
+void setWarningStyle(QPalette* palette, qreal disabledOpacity)
 {
-    palette->setColor(QPalette::ButtonText, qnGlobals->errorTextColor());
-    palette->setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    palette->setColor(QPalette::Text, qnGlobals->errorTextColor());
+    const auto color = qnGlobals->errorTextColor();
+    palette->setColor(QPalette::ButtonText, color);
+    palette->setColor(QPalette::WindowText, color);
+    palette->setColor(QPalette::Text, color);
+
+    if (qFuzzyIsNull(disabledOpacity - 1.0))
+        return;
+
+    const auto disabledColor = toTransparent(color, disabledOpacity);
+    palette->setColor(QPalette::Disabled, QPalette::ButtonText, disabledColor);
+    palette->setColor(QPalette::Disabled, QPalette::WindowText, disabledColor);
+    palette->setColor(QPalette::Disabled, QPalette::Text, disabledColor);
 }
 
 QString setWarningStyleHtml( const QString &source )
@@ -44,7 +54,7 @@ void resetButtonStyle(QAbstractButton* button)
     button->update();
 }
 
-void setAccentStyle(QAbstractButton *button)
+void setAccentStyle(QAbstractButton* button)
 {
     button->setProperty(style::Properties::kAccentStyleProperty, true);
     button->update();

@@ -525,13 +525,25 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
         && m_videoMetadataPlugin->hasMetadata();
 
     if (detectionMetadataExists)
-        m_metadataQueue.push(m_videoMetadataPlugin->getNextMetadata());
+    {
+        auto metadata = m_videoMetadataPlugin->getNextMetadata();
+        if (metadata)
+            m_metadataQueue.push(metadata);
+    }
 
     if (motionMetadataExists)
-        m_metadataQueue.push(m_motionEstimation[m_softMotionLastChannel].getMotion());
+    {
+        auto motion = m_motionEstimation[m_softMotionLastChannel].getMotion();
+        if (motion)
+            m_metadataQueue.push(motion);
+    }
     else if (m_cameraRes->getMotionType() != Qn::MT_SoftwareGrid)
 #endif
-        m_metadataQueue.push(getCameraMetadata());
+    {
+        auto motion = getCameraMetadata();
+        if (motion)
+            m_metadataQueue.push(motion);
+    }
 
     if (!m_metadataQueue.empty())
     {

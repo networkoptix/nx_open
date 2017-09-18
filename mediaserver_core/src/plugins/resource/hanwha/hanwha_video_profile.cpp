@@ -16,6 +16,13 @@ void setInteger(T* target, const QString& stringParameter)
         *target = tmp;
 }
 
+const QSet<QString> kKnownBuiltinProfiles = {
+    lit("PLUGINFREE"),
+    lit("MOBILE"),
+    lit("LeftHalfView"),
+    lit("RightHalfView")
+};
+
 } // namespace
 
 void HanwhaVideoProfile::setParameter(
@@ -49,9 +56,9 @@ void HanwhaVideoProfile::setParameter(
     else if (parameterName.endsWith("GOVLength"))
         setInteger(&govLength, parameterValue);
     else if (parameterName == lit("H264.Profile"))
-        h264Profile = fromHanwhaString<nx::media_utils::h264::Profile>(parameterValue);
+        codecProfile = parameterValue.trimmed();
     else if (parameterName == lit("H265.Profile"))
-        hevcProfile = fromHanwhaString<nx::media_utils::hevc::Profile>(parameterValue);
+        codecProfile = parameterValue.trimmed();
     else if (parameterName.endsWith("EntropyCoding"))
         entropyCoding = fromHanwhaString<Qn::EntropyCoding>(parameterValue);
     else if (parameterName.endsWith("DynamicGOVEnable"))
@@ -62,6 +69,11 @@ void HanwhaVideoProfile::setParameter(
         fixed = parameterValue == lit("True");
     else if (parameterName == lit("ProfileToken"))
         token = parameterValue;
+}
+
+bool HanwhaVideoProfile::isBuiltinProfile() const
+{
+    return this->fixed || kKnownBuiltinProfiles.contains(this->name);
 }
 
 } // namespace plugins

@@ -6,6 +6,12 @@
 #include "hanwha_common.h"
 #include "hanwha_utils.h"
 
+#include <core/ptz/ptz_preset.h>
+#include <utils/common/app_info.h>
+#include <api/resource_property_adaptor.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/utils/std/cpp14.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -21,9 +27,9 @@ static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 
 HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
     QnBasicPtzController(resource),
-    m_hanwhaResource(resource)
+    m_hanwhaResource(resource),
+    m_presetManager(std::make_unique<HanwhaMixedPresetManager>(resource, this))
 {
-
 }
 
 Ptz::Capabilities HanwhaPtzController::getCapabilities() const
@@ -39,6 +45,7 @@ void HanwhaPtzController::setPtzCapabilities(Ptz::Capabilities capabilities)
 void HanwhaPtzController::setPtzLimits(const QnPtzLimits& limits)
 {
     m_ptzLimits = limits;
+    m_presetManager->setMaxPresetNumber(limits.maxPresetNumber);
 }
 
 void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
@@ -181,100 +188,30 @@ bool HanwhaPtzController::getFlip(Qt::Orientations* flip) const
     return true;
 }
 
-#if 0
 bool HanwhaPtzController::createPreset(const QnPtzPreset& preset)
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
-    const auto presetNumber = freePresetNumber();
-    if (presetNumber.isEmpty())
-        return false;
-
-    const auto response = helper.add(
-        lit("ptzconfig/preset"),
-        {
-            {kHanwhaChannelProperty, channel()},
-            {kHanwhaPresetNumberProperty, presetNumber},
-            {kHanwhaPresetNameProperty, preset.name}
-        });
-
-    if (!response.isSuccessful())
-        return false;
-
-    m_presetNumberById[preset.id] = presetNumber;
-
-    return response.isSuccessful();
+    return m_presetManager->createPreset(preset);
 }
 
 bool HanwhaPtzController::updatePreset(const QnPtzPreset& preset)
 {
-    const auto presetNumber = presetNumberFromId(preset.id);
-    if (presetNumber.isEmpty())
-        return false;
-
-    HanwhaRequestHelper helper(m_hanwhaResource);
-    const auto response = helper.update(
-        lit("ptzconfig/preset"),
-        {
-            {kHanwhaChannelProperty, channel()},
-            {kHanwhaPresetNumberProperty, presetNumber},
-            {kHanwhaPresetNameProperty, preset.name}
-        });
-
-    return response.isSuccessful();
+    return m_presetManager->updatePreset(preset);
 }
 
 bool HanwhaPtzController::removePreset(const QString& presetId)
 {
-    const auto presetNumber = presetNumberFromId(presetId);
-    if (presetNumber.isEmpty())
-        return false;
-
-    HanwhaRequestHelper helper(m_hanwhaResource);
-    const auto response = helper.remove(
-        lit("ptzconfig/preset"),
-        {{kHanwhaChannelProperty, channel()}});
-
-    return response.isSuccessful();
+    return m_presetManager->removePreset(presetId);
 }
 
-bool HanwhaPtzController::activatePreset(const QString& presetId, qreal /*speed*/)
+bool HanwhaPtzController::activatePreset(const QString& presetId, qreal speed)
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
-
-    const auto response = helper.control(
-        lit("ptzcontrol/preset"),
-        {{kHanwhaPresetNumberProperty, presetNumberFromId(presetId)}});
-
-    return response.isSuccessful();
+   return m_presetManager->activatePreset(presetId, speed);
 }
 
 bool HanwhaPtzController::getPresets(QnPtzPresetList* presets) const
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
-
-    const auto response = helper.view(
-        lit("ptzcontrol/preset"),
-        {{kHanwhaChannelProperty, channel()}});
-
-    response.isSuccessful();
-
-    for (const auto& presetEntry: response.response())
-    {
-        const auto split = presetEntry.first.split(L'.');
-        if (split.size() != 5)
-            continue;
-
-        const auto& presetNumber = split[4];
-        const auto& presetName = presetEntry.second;
-
-        QnPtzPreset preset(presetNumber, presetName);
-        presets->push_back(preset);
-        m_presetNumberById[presetNumber] = presetNumber;
-    }
-
-    return true;
+    return m_presetManager->presets(presets);
 }
-#endif
 
 bool HanwhaPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
 {
@@ -305,40 +242,6 @@ QString HanwhaPtzController::channel() const
     return QString::number(m_hanwhaResource->getChannel());
 }
 
-QString HanwhaPtzController::freePresetNumber() const
-{
-    if (m_ptzLimits.maxPresetNumber == 0)
-        return QString();
-
-    QnPtzPresetList presets;
-    if (!getPresets(&presets))
-        return QString();
- 
-    std::set<int> availablePresets;
-    for (const auto& preset: presets)
-    {
-        bool success = false;
-        const int presetNumber = preset.id.toInt(&success);
-        if (!success)
-            continue;
-
-        availablePresets.insert(presetNumber);
-    }
-
-    const int limit = m_ptzLimits.maxPresetNumber > 0
-        ? m_ptzLimits.maxPresetNumber
-        : kHanwhaMaxPresetNumber;
-
-    for (auto i = 0; i < limit; ++i)
-    {
-        const auto itr = availablePresets.find(i);
-        if (itr == availablePresets.cend())
-            return QString::number(i);
-    }
-
-    return QString();
-}
-
 QVector3D HanwhaPtzController::toHanwhaSpeed(const QVector3D& speed) const
 {
     QVector3D outSpeed;
@@ -356,22 +259,13 @@ QVector3D HanwhaPtzController::toHanwhaPosition(const QVector3D& position) const
 
 QString HanwhaPtzController::toHanwhaFocusCommand(qreal speed) const
 {
+    if (qFuzzyIsNull(speed))
+        return kHanwhaStopFocusMove;
+
     if (speed > 0)
         return kHanwhaFarFocusMove;
 
-    if (speed < 0)
-        return kHanwhaNearFocusMove;
-
-    return kHanwhaStopFocusMove;
-}
-
-QString HanwhaPtzController::presetNumberFromId(const QString& presetId) const
-{
-    auto itr = m_presetNumberById.find(presetId);
-    if (itr == m_presetNumberById.cend())
-        return QString();
-
-    return itr->second;
+    return kHanwhaNearFocusMove;
 }
 
 std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
@@ -401,17 +295,46 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
 
     if (toPoint)
     {
-        x1 = QString::number(qBound(0, (int)std::round(((topLeft.x() + 0.5) * 10000)), 10000));
-        y1 = QString::number(qBound(0, (int)std::round(((topLeft.y() + 0.5) * 10000)), 10000));
-        x2 = QString::number(qBound(0, (int)std::round(((topLeft.x() + 0.5) * 10000)), 10000));
-        y2 = QString::number(qBound(0, (int)std::round(((topLeft.y() + 0.5) * 10000)), 10000));
+        x1 = QString::number(
+            qBound(
+                0,
+                (int)std::round(((topLeft.x() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+                kHanwhaAbsoluteMoveCoefficient));
+
+        y1 = QString::number(
+            qBound(
+                0,
+                (int)std::round(((topLeft.y() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+                kHanwhaAbsoluteMoveCoefficient));
+
+        x2 = x1;
+        y2 = y1;
     }
     else
     {
-        x1 = QString::number(qBound(0, (int)(topLeft.x() * 10000), 10000));
-        y1 = QString::number(qBound(0, (int)(topLeft.y() * 10000), 10000));
-        x2 = QString::number(qBound(0, (int)(bottomRight.x() * 10000), 10000));
-        y2 = QString::number(qBound(0, (int)(bottomRight.y() * 10000), 10000));
+        x1 = QString::number(
+            qBound(
+                0,
+                (int)(topLeft.x() * kHanwhaAbsoluteMoveCoefficient),
+                kHanwhaAbsoluteMoveCoefficient));
+
+        y1 = QString::number(
+            qBound(
+                0,
+                (int)(topLeft.y() * kHanwhaAbsoluteMoveCoefficient),
+                kHanwhaAbsoluteMoveCoefficient));
+
+        x2 = QString::number(
+            qBound(
+                0,
+                (int)(bottomRight.x() * kHanwhaAbsoluteMoveCoefficient),
+                kHanwhaAbsoluteMoveCoefficient));
+
+        y2 = QString::number(
+            qBound(
+                0,
+                (int)(bottomRight.y() * kHanwhaAbsoluteMoveCoefficient),
+                kHanwhaAbsoluteMoveCoefficient));
     }
 
     result.emplace(lit("X1"), x1);
