@@ -54,7 +54,6 @@ public:
     int streamGovLength(Qn::ConnectionRole role) const;
     Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;
     int streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality, int framerate) const;
-    int streamBitrate(Qn::ConnectionRole role, Qn::SecondStreamQuality quality, int framerate) const;
 
     int closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const;
 
@@ -165,11 +164,6 @@ private:
         const HanwhaCodecLimits& limits,
         Qn::BitrateControl bitrateControl,
         int bitrate) const;
-
-    double bitrateCoefficient(Qn::StreamQuality quality) const;
-    double bitrateCoefficient(Qn::SecondStreamQuality quality) const;
-    
-    int streamBitrateInternal(Qn::ConnectionRole role, double coefficient, int framerate) const;
 
     QnCameraAdvancedParamValueList filterGroupParameters(
         const QnCameraAdvancedParamValueList& values);

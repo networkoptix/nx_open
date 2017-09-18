@@ -96,7 +96,38 @@ float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality,
 
 int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
-    QN_UNUSED(role);
+    auto bitrateCoefficient = [](Qn::StreamQuality quality)
+    {
+        switch (quality)
+        {
+        case Qn::StreamQuality::QualityLowest:
+            return 0.75;
+        case Qn::StreamQuality::QualityLow:
+            return 1.0;
+        case Qn::StreamQuality::QualityNormal:
+            return 1.5;
+        case Qn::StreamQuality::QualityHigh:
+            return 2.0;
+        case Qn::StreamQuality::QualityHighest:
+            return 2.5;
+        case Qn::StreamQuality::QualityPreSet:
+        case Qn::StreamQuality::QualityNotDefined:
+        default:
+            return 1.0;
+        }
+    };
+
+    auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+    if (streamCapability.defaultBitrateKbps > 0)
+    {
+        double coefficient = bitrateCoefficient(quality);
+        const int bitrate = streamCapability.defaultBitrateKbps * coefficient;
+        return qBound(
+            (double)streamCapability.minBitrateKbps,
+            bitrate * ((double)fps / streamCapability.defaultFps),
+            (double)streamCapability.maxBitrateKbps);
+    }
+
 
     auto result = rawSuggestBitrateKbps(quality, resolution, fps);
 
