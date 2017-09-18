@@ -64,7 +64,7 @@ ApplicationWindow
 
     Component.onCompleted:
     {
-        updateNavigationBarPadding()
+        androidBarPositionWorkaround.tryUpdateBarPosition()
 
         if (autoLoginEnabled)
         {
@@ -103,48 +103,59 @@ ApplicationWindow
         connectionManager.disconnectFromServer()
     }
 
-    function updateNavigationBarPadding()
-    {
-        if (Qt.platform.os !== "android")
-            return
-
-        if (!getDeviceIsPhone() || Screen.orientation === Qt.PortraitOrientation
-            || Screen.orientation === Qt.InvertedPortraitOrientation)
-        {
-            rightPadding = 0
-            leftPadding = 0
-            bottomPadding = getNavigationBarHeight()
-            return
-        }
-
-        var leftSideNavigationBar = getNavigationBarIsLeftSide()
-        leftPadding = leftSideNavigationBar ? getNavigationBarHeight() : 0
-        rightPadding = leftSideNavigationBar ? 0 : getNavigationBarHeight()
-        bottomPadding = 0
-    }
-
-    Screen.orientationUpdateMask:
-        Qt.LandscapeOrientation | Qt.InvertedLandscapeOrientation
-        | Qt.PortraitOrientation | Qt.InvertedPortraitOrientation
+    Screen.onPrimaryOrientationChanged: androidBarPositionWorkaround.updateBarPosition()
 
     Timer
     {
-        // We have to use this workaround timer because of orientation changed
-        // notification order. Without it at time when we update navigation bar
-        // paddings we have old values for window insets.
-        id: androidOrientationChangedWorkaroundTimer
-        interval: 100
+        // We need periodically update paddings due to Qt does not emit signal
+        // screenOrientationChanged when we change it from normal to inverted.
+        id: androidBarPositionWorkaround
+        interval: 200
+        repeat: true
+        running: Qt.platform.os == "android"
 
-        onTriggered: updateNavigationBarPadding()
+        property int lastBarSize: -1
+        property bool lastLeftSideBar: false
+
+        onTriggered: tryUpdateBarPosition()
+
+        function tryUpdateBarPosition()
+        {
+            if (Qt.platform.os != "android")
+                return
+
+            var barSize = getNavigationBarHeight()
+            var leftSideBar = getNavigationBarIsLeftSide()
+
+            if (barSize == lastBarSize && lastLeftSideBar == leftSideBar)
+                return
+
+            lastBarSize = barSize
+            lastLeftSideBar = leftSideBar
+
+            updateBarPosition()
+        }
+
+        function updateBarPosition()
+        {
+            if (Qt.platform.os != "android")
+                return
+
+            if (!getDeviceIsPhone() ||  Screen.primaryOrientation == Qt.PortraitOrientation)
+            {
+                rightPadding = 0
+                leftPadding = 0
+                bottomPadding = lastBarSize
+            }
+            else
+            {
+                leftPadding = lastLeftSideBar ? lastBarSize : 0
+                rightPadding = lastLeftSideBar ? 0 : lastBarSize
+                bottomPadding = 0
+            }
+        }
     }
 
-    Screen.onOrientationChanged:
-    {
-        if (Qt.platform.os == "android")
-            androidOrientationChangedWorkaroundTimer.restart()
-        else
-            updateNavigationBarPadding()
-    }
 
     onActiveFocusItemChanged:
     {
