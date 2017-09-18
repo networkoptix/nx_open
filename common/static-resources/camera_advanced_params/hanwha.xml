@@ -745,14 +745,14 @@
                         aux="sorting=ratio"/>
                 <param id="image/camera/AFLKMode"
                         name="Anti Flicker"
-                        dataType="Enumeration"
-                        range="Off,60Hz,70Hz"/>
+                        dataType="Enumeration"/>
                 <param id="image/camera/SSNRMode"
                         name="SSNR Mode"
                         dataType="Enumeration"/>
                 <param id="image/camera/SSNRLevel"
                         name="SSNR Level"
-                        dataType="Number">
+                        dataType="Number"
+                        aux="group=ssnr;groupInclude=Manual">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -773,19 +773,28 @@
                         name="Mode"
                         dataType="Enumeration"
                         range="Color,B/W,Auto,External"
-                        internalRange="Color,BW,Auto,ExternalBW"/>
-                <!--<param id="root.ImageSource.I0.Sensor.ColorLevel"
-                        name="Dwell Time"
-                        dataType="Enumeration"/>-->
+                        internalRange="Color,BW,Auto,ExternalBW"
+                        aux="groupLead=dn"/>
                 <param id="image/camera/DayNightSwitchingMode"
                         name="Duration"
                         dataType="Enumeration"
-                        range="Very fast,Fast,Normal,Slow,Very slow"/>
+                        aux="group=dn;groupInclude=Auto">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/camera/DayNightMode"
+                                    condition="value=Auto"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/DayNightAlarmIn"
                         name="Alarm Input"
                         dataType="Enumeration"
                         range="Open:Color/Close:BW,Open:BW/Close:Color"
-                        internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens">
+                        internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens"
+                        aux="group=dn;groupInclude=External">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -800,10 +809,22 @@
             <group name="Special">
                 <param id="image/imageenhancements/SharpnessEnable"
                         name="Sharpness"
-                        dataType="Bool"/>
+                        dataType="Bool"
+                        aux="groupLead=sharpness"/>
                 <param id="image/imageenhancements/SharpnessLevel"
                         name="Sharpness Level"
-                        dataType="Number"/>
+                        dataType="Number"
+                        aux="group=sharpness;groupInclude=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/imageenhancements/SharpnessEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/imageenhacements/Gamma"
                         name="Gamma"
                         dataType="Number"/>
@@ -812,10 +833,22 @@
                         dataType="Number"/>
                 <param id="image/imageenhacements/LDCEnable" 
                         name="LDC"
-                        dataType="Bool"/>
+                        dataType="Bool"
+                        aux="groupLead=ldc"/>
                 <param id="image/imageenhacements/LDCLevel"
                         name="LDC Level"
-                        dataType="Number"/>
+                        dataType="Number"
+                        aux="group=ldc;groupInclude=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/imageenhancements/LDCEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
             </group>
             <group name="IR">
                 <param id="image/irled/Mode"
