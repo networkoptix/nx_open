@@ -24,6 +24,7 @@
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
+#include <watchers/server_interface_watcher.h>
 #include <finders/systems_finder.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
@@ -40,7 +41,6 @@
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
-#include <utils/server_interface_watcher.h>
 
 using namespace nx::mobile_client;
 
@@ -59,14 +59,12 @@ QnMobileClientModule::QnMobileClientModule(
     QGuiApplication::setApplicationName(QnMobileClientAppInfo::applicationName());
     QGuiApplication::setApplicationDisplayName(QnMobileClientAppInfo::applicationDisplayName());
     QGuiApplication::setApplicationVersion(QnAppInfo::applicationVersion());
-
     // We should load translations before major client's services are started to prevent races
     QnMobileClientTranslationManager *translationManager = new QnMobileClientTranslationManager();
     translationManager->updateTranslation();
 
     /* Init singletons. */
-    m_clientCoreModule = new QnClientCoreModule(this);
-
+    m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
@@ -136,6 +134,9 @@ QnMobileClientModule::QnMobileClientModule(
 
 QnMobileClientModule::~QnMobileClientModule()
 {
+    if (auto longRunnablePool = QnLongRunnablePool::instance())
+        longRunnablePool->stopAll();
+
     qApp->disconnect(this);
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 }

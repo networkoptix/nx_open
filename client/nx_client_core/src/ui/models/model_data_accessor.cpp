@@ -40,6 +40,8 @@ void ModelDataAccessor::setModel(const QVariant& modelVariant)
         this, &ModelDataAccessor::countChanged);
     connect(m_model, &QAbstractItemModel::rowsInserted,
         this, &ModelDataAccessor::countChanged);
+    connect(m_model, &QAbstractItemModel::rowsMoved,
+        this, &ModelDataAccessor::rowsMoved);
 
     connect(m_model, &QAbstractItemModel::dataChanged, this,
         [this](const QModelIndex& topLeft, const QModelIndex& bottomRight)
