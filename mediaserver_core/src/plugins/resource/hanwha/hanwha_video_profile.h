@@ -41,8 +41,7 @@ struct HanwhaVideoProfile
     boost::optional<int> dynamicGovLength;
     boost::optional<int> maxDynamicGovLength;
 
-    boost::optional<nx::media_utils::h264::Profile> h264Profile;
-    boost::optional<nx::media_utils::hevc::Profile> hevcProfile;
+    boost::optional<QString> codecProfile;
     boost::optional<Qn::EntropyCoding> entropyCoding;
     
     bool audioEnabled = false;
@@ -50,6 +49,8 @@ struct HanwhaVideoProfile
     QString token;
 
     void setParameter(const QString& parameterName, const QString& parameterValue);
+
+    bool isBuiltinProfile() const;
 };
 
 } // namespace plugins
