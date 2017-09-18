@@ -16,7 +16,7 @@ AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
     bindToAioThread(getAioThread());
 }
 
-void AsyncClientWithHttpTunneling::bindToAioThread(
+void AsyncClientWithHttpTunneling::bindToAioThread( 
     nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);

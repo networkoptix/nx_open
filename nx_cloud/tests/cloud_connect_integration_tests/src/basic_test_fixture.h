@@ -74,11 +74,20 @@ class BasicTestFixture:
     public ::testing::Test
 {
 public:
+    enum Flag
+    {
+        doNotInitializeMediatorConnection = 1,
+    };
+
     BasicTestFixture(
         int relayCount = 1,
         boost::optional<std::chrono::seconds> disconnectedPeerTimeout = boost::none);
     ~BasicTestFixture();
 
+    /**
+     * @param flags Bitset of BasicTestFixture::Flag values.
+     */
+    void setInitFlags(int flags);
     SocketAddress relayInstanceEndpoint(RelayPtrList::size_type index) const;
 
 protected:
@@ -134,6 +143,7 @@ private:
     std::atomic<int> m_unfinishedRequestsLeft;
     boost::optional<nx::String> m_remotePeerName;
     MediatorApiProtocol m_mediatorApiProtocol = MediatorApiProtocol::http;
+    int m_initFlags = 0;
 
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx_http::BufferType m_expectedMsgBody;
