@@ -20,8 +20,8 @@ namespace plugins {
 namespace {
 
 const char* kPluginName = "Hanwha metadata plugin";
-const QString kSamsungTechwinVendor = lit("samsung techwin");
-const QString kHanwhaTechwinVendor = lit("hanwha techwin");
+const QString kSamsungTechwinVendor = lit("samsung");
+const QString kHanwhaTechwinVendor = lit("hanwha");
 
 const QString kVideoAnalytics = lit("VideoAnalytics");
 const QString kAudioAnalytics = lit("AudioAnalytics");
@@ -104,7 +104,8 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     *outError = Error::noError;
 
     auto vendor = QString(resourceInfo.vendor).toLower();
-    if (vendor != kHanwhaTechwinVendor && vendor != kSamsungTechwinVendor)
+    
+    if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
     auto url = QUrl(QString(resourceInfo.url));
