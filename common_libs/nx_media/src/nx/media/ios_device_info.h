@@ -1,4 +1,5 @@
 #pragma once
+#if defined(TARGET_OS_IPHONE)
 
 #include <QtCore/QString>
 
@@ -23,3 +24,6 @@ IosDeviceInformation iosDeviceInformation();
 
 } // namespace media
 } // namespace nx
+
+ #endif // defined(TARGET_OS_IPHONE)
+ 
