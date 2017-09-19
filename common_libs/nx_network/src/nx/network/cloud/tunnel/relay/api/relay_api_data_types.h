@@ -52,7 +52,10 @@ struct CreateClientSessionResponse
 {
     std::string sessionId;
     std::chrono::seconds sessionTimeout;
-    std::string redirectUrl;
+    /**
+     * This url can be different from the initial one in case of redirect to another relay instance.
+     */
+    std::string actualRelayUrl;
 };
 
 #define CreateClientSessionResponse_Fields (sessionId)(sessionTimeout)

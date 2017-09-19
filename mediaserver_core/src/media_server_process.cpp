@@ -2371,7 +2371,7 @@ void MediaServerProcess::run()
     if (ipVersion.isEmpty())
         ipVersion = qnServerModule->roSettings()->value(QLatin1String("ipVersion")).toString();
 
-    SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
+    SocketFactory::setIpVersion(ipVersion);
 
     m_serverModule = serverModule;
 

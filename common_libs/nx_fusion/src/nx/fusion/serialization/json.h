@@ -169,7 +169,7 @@ bool deserialize(
     bool optional = false,
     bool* outFound = nullptr,
     DeprecatedFieldNames* deprecatedFieldNames = nullptr,
-    const std::type_info& structTypeInfo = typeid(nullptr_t))
+    const std::type_info& structTypeInfo = typeid(std::nullptr_t))
 {
     QJsonObject::const_iterator pos = QJsonDetail::findField(
         value, key, deprecatedFieldNames, structTypeInfo);

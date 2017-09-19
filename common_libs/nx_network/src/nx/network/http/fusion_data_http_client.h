@@ -127,6 +127,16 @@ public:
         return m_httpClient.takeSocket();
     }
 
+    nx_http::AsyncClient& httpClient()
+    {
+        return m_httpClient;
+    }
+
+    const nx_http::AsyncClient& httpClient() const
+    {
+        return m_httpClient;
+    }
+
 protected:
     QUrl m_url;
     nx_http::StringType m_requestContentType;
