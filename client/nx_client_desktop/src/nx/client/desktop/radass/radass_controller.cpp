@@ -51,6 +51,8 @@ static constexpr int kSlowNetworkFrameLimit = 3;
 // Item will go to LQ if it is small for this period of time already.
 static constexpr int kLowerSmallItemQualityIntervalMs = 1000;
 
+static constexpr int kAutomaticSpeed = std::numeric_limits<int>().max();
+
 bool isForcedHqDisplay(QnCamDisplay* display)
 {
     return display->isFullScreen() || display->isZoomWindow() || display->isFisheyeEnabled();
@@ -236,7 +238,8 @@ struct RadassController::Private
 
             // Put display with max pps to the beginning, so if slow stream do HQ->LQ for max pps
             // display (between displays with same size).
-            pps = INT_MAX - pps;
+            static const int kMaximumValue = std::numeric_limits<int>().max();
+            pps = kMaximumValue - pps;
 
             consumerByScreenSize.insert((screenSquare << 32) + pps, info);
         }
@@ -268,7 +271,7 @@ struct RadassController::Private
         return consumers.end();
     }
 
-    void gotoLowQuality(Consumer consumer, LqReason reason, double speed = INT_MAX)
+    void gotoLowQuality(Consumer consumer, LqReason reason, double speed = kAutomaticSpeed)
     {
         auto oldReason = consumer->lqReason;
         if ((oldReason == LqReason::Network || oldReason == LqReason::CPU)
@@ -280,7 +283,7 @@ struct RadassController::Private
         consumer->display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
         consumer->lqReason = reason;
         // Get speed for FF reason as external variable to prevent race condition.
-        consumer->toLQSpeed = speed != INT_MAX ? speed : consumer->display->getSpeed();
+        consumer->toLQSpeed = speed != kAutomaticSpeed ? speed : consumer->display->getSpeed();
         consumer->awaitingLqTime.invalidate();
     }
 
