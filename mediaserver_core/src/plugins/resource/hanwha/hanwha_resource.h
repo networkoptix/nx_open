@@ -51,6 +51,7 @@ public:
     AVCodecID streamCodec(Qn::ConnectionRole role) const;
     QString streamCodecProfile(AVCodecID codec, Qn::ConnectionRole role) const;
     QSize streamResolution(Qn::ConnectionRole role) const;
+    int streamFrameRate(Qn::ConnectionRole role, int desiredFps) const;
     int streamGovLength(Qn::ConnectionRole role) const;
     Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;
     int streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality, int framerate) const;
@@ -113,6 +114,13 @@ private:
     int defaultGovLengthForStream(Qn::ConnectionRole role) const;
     Qn::BitrateControl defaultBitrateControlForStream(Qn::ConnectionRole role) const;
     int defaultBitrateForStream(Qn::ConnectionRole role) const;
+    Qn::EntropyCoding defaultEntropyCodingForStream(Qn::ConnectionRole role) const;
+    QString defaultCodecProfileForStream(Qn::ConnectionRole role) const;
+    int defaultFrameRateForStream(Qn::ConnectionRole role) const;
+
+    QString defaultValue(const QString& parameter, Qn::ConnectionRole role) const;
+
+    QString suggestCodecProfile(AVCodecID codec, QString desiredProfile) const;
 
     QSize bestSecondaryResolution(
         const QSize& primaryResolution,
@@ -126,6 +134,26 @@ private:
 
     bool addSpecificRanges(
         QnCameraAdvancedParameter* inOutParameter) const;
+
+    bool addBitrateRanges(
+        QnCameraAdvancedParameter* inOutParameter,
+        const HanwhaAdavancedParameterInfo& info) const;
+
+    bool addFrameRateRanges(
+        QnCameraAdvancedParameter* inOutParameter,
+        const HanwhaAdavancedParameterInfo& info) const;
+
+    using CreateDependencyFunc = 
+        std::function<QnCameraAdvancedParameterDependency(
+            const HanwhaCodecLimits& codecLimits,
+            AVCodecID codec,
+            const QSize& resolution,
+            const QString& bitrateControl)>;
+
+    bool addDependencies(
+        QnCameraAdvancedParameter* inOutParameter,
+        const HanwhaAdavancedParameterInfo& info,
+        CreateDependencyFunc createDependencyFunc) const;
 
     boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
 
@@ -180,6 +208,14 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
+
+    bool executeServiceCommand(
+        const QnCameraAdvancedParameter& parameter,
+        const HanwhaAdavancedParameterInfo& info);
+
+    bool resetProfileToDefault(Qn::ConnectionRole role);
+
+    QString propertyByPrameterAndRole(const QString& parameter, Qn::ConnectionRole role) const;
 
 private:
     using AdvancedParameterId = QString;
