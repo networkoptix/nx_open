@@ -38,9 +38,10 @@ class QnLiveStreamProvider;
 
 struct QnLiveStreamParams
 {
-    Qn::StreamQuality quality;
-    Qn::SecondStreamQuality secondaryQuality;
-    mutable float fps;
+    Qn::StreamQuality quality = Qn::QualityLowest;
+    Qn::SecondStreamQuality secondaryQuality = Qn::SSQualityLow;
+    float fps = 0;
+    int bitrateKbps = 0;
 
     QnLiveStreamParams();
     bool operator ==(const QnLiveStreamParams& rhs);

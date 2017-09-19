@@ -1226,8 +1226,20 @@ float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QS
     return qMax(192.0, result);
 }
 
+int QnSecurityCamResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
+{
+    if (streamParams.bitrateKbps > 0)
+    {
+        auto result = streamParams.bitrateKbps;
+        auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+        if (streamCapability.maxBitrateKbps > 0)
+            result = qBound(streamCapability.minBitrateKbps, result, streamCapability.maxBitrateKbps);
+        return result;
+    }
+    return suggestBitrateForQualityKbps(streamParams.quality, resolution, streamParams.fps, role);
+}
 
-int QnSecurityCamResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
+int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
     auto bitrateCoefficient = [](Qn::StreamQuality quality)
     {

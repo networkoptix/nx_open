@@ -720,7 +720,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
         liveParams.quality, resoulution, liveParams.fps) / 1024;
     info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
-        liveParams.quality, resoulution, liveParams.fps)) / 1024;
+        resoulution, liveParams, getRole())) / 1024;
     info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
     info.bitratePerGop = m_cameraRes->bitratePerGopType();

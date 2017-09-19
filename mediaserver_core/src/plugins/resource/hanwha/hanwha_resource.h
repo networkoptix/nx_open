@@ -53,7 +53,7 @@ public:
     QSize streamResolution(Qn::ConnectionRole role) const;
     int streamGovLength(Qn::ConnectionRole role) const;
     Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;
-    int streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality, int framerate) const;
+    int streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& streamParams) const;
 
     int closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const;
 

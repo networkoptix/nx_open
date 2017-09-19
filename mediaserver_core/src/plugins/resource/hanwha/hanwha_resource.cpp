@@ -868,7 +868,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     if (currentChannelProfiles == profileByChannel.cend())
         return CameraDiagnostics::NoErrorResult();
 
-    *totalProfileNumber = currentChannelProfiles->second.size();
+    *totalProfileNumber = (int) currentChannelProfiles->second.size();
     for (const auto& entry : currentChannelProfiles->second)
     {
         const auto& profile = entry.second;
@@ -1139,33 +1139,18 @@ Qn::BitrateControl HanwhaResource::streamBitrateControl(Qn::ConnectionRole role)
     return result;
 }
 
-int HanwhaResource::streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality, int framerate) const
+int HanwhaResource::streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& streamParams) const
 {
-    const auto codec = streamCodec(role);
-    const auto resolution = streamResolution(role);
-    const auto bitrateControl = streamBitrateControl(role);
-    const auto limits = m_codecInfo.limits(
-        getChannel(),
-        codec,
-        lit("General"),
-        resolution);
-
-    if (!limits)
-        return kHanwhaInvalidBitrate;
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
         ? Qn::kPrimaryStreamBitrateParamName
         : Qn::kSecondaryStreamBitrateParamName;
 
-    QString bitrateString = getProperty(propertyName);
-    if (!bitrateString.isEmpty())
-    {
-        bool success = false;
-        const int result = fromHanwhaString<int>(bitrateString, &success);
-        if (success && isBitrateInLimits(*limits, bitrateControl, result))
-            return result;
-    }
-
-    return QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, framerate, role);
+    const QString bitrateString = getProperty(propertyName);
+    int bitrateKbps = bitrateString.toInt();
+    if (bitrateKbps == 0)
+        bitrateKbps = QnPhysicalCameraResource::suggestBitrateKbps(streamResolution(role), streamParams, role);
+    auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
+    return qBound(streamCapability.minBitrateKbps, bitrateKbps, streamCapability.maxBitrateKbps);
 }
 
 int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const

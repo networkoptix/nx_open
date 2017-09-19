@@ -875,7 +875,7 @@ qreal QnCameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) const
     const auto camera = m_cameras.front();
     const auto resolution = camera->defaultStream().getResolution();
     const auto fps = ui->fpsSpinBox->value();
-    const auto bitrateMbps = camera->suggestBitrateKbps(quality, resolution, fps) / kKbpsInMbps;
+    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps) / kKbpsInMbps;
 
     const auto roundingStep = std::pow(0.1, ui->bitrateSpinBox->decimals());
     return qRound(bitrateMbps, roundingStep);
