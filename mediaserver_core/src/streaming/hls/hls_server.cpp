@@ -742,15 +742,14 @@ namespace nx_hls
         nx_http::Response* const response )
     {
         HlsRequestParams params = readRequestParams(requestParams);
-        const auto microseconds = [](std::chrono::microseconds t) { return (quint64) t.count(); };
 
         quint64 startTimestamp = 0;
         if (params.startTimestamp)
-            startTimestamp = microseconds(*params.startTimestamp);
+            startTimestamp = (quint64) params.startTimestamp->count();
 
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
         if (params.duration)
-            chunkDuration = microseconds(*params.duration);
+            chunkDuration = (quint64) params.duration->count();
 
         bool requestIsAPartOfHlsSession = false;
         {
@@ -763,7 +762,7 @@ namespace nx_hls
                 if (hlsSession)
                 {
                     requestIsAPartOfHlsSession = true;
-                    hlsSession->updateAuditInfo((qint64) startTimestamp);
+                    hlsSession->updateAuditInfo(startTimestamp);
                     if (params.alias)
                         hlsSession->getChunkByAlias(params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
                 }
@@ -909,7 +908,6 @@ namespace nx_hls
         }
 
         HlsRequestParams params = readRequestParams(requestParams);
-        const auto microseconds = [](std::chrono::microseconds t) { return (quint64) t.count(); };
 
         using namespace std::chrono;
 
@@ -948,7 +946,7 @@ namespace nx_hls
                 nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager =
                     std::make_shared<ArchivePlaylistManager>(
                         camResource,
-                        microseconds(*params.startTimestamp),
+                        params.startTimestamp->count(),
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
                         newHlsSession->targetDurationMS() * USEC_IN_MSEC,
                         quality );
