@@ -120,7 +120,7 @@ private:
     void bitrateSpinBoxChanged();
     void bitrateSliderChanged();
 
-    void showMoreSettings(bool show);
+    void setAdvancedSettingsVisible(bool value);
 
     QPair<Qn::StreamQuality, bool> qualityForBitrate(qreal bitrateMbps) const;
     qreal bitrateForQuality(Qn::StreamQuality quality) const;
@@ -158,6 +158,7 @@ private:
     int m_maxDualStreamingFps;
 
     bool m_advancedSettingsSupported = false;
+    bool m_advancedSettingsVisible = false;
 
     Qn::MotionType m_motionTypeOverride;
 

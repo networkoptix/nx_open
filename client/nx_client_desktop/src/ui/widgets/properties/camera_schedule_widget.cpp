@@ -401,7 +401,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
         updateLicensesIfNeeded);
 
     connect(ui->advancedSettingsButton, &QPushButton::clicked, this,
-        [this]() { showMoreSettings(ui->advancedSettingsWidget->isHidden()); });
+        [this]() { setAdvancedSettingsVisible(!m_advancedSettingsVisible); });
 
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel });
@@ -435,7 +435,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     connect(ui->fpsSpinBox, QnSpinboxIntValueChanged,
         this, &QnCameraScheduleWidget::syncBitrateWithFps);
 
-    showMoreSettings(false);
+    setAdvancedSettingsVisible(false);
 
     retranslateUi();
 }
@@ -603,11 +603,12 @@ void QnCameraScheduleWidget::updateFromResources()
     updateMotionAvailable();
     updateRecordingParamsAvailable();
 
-    showMoreSettings(false);
     m_advancedSettingsSupported = m_cameras.size() == 1
         && !m_cameras.front()->cameraMediaCapability().isNull();
 
     ui->advancedSettingsButton->setVisible(m_advancedSettingsSupported);
+    ui->advancedSettingsWidget->setVisible(m_advancedSettingsSupported && m_advancedSettingsVisible);
+    ui->settingsGroupBox->layout()->activate();
 
     if (m_cameras.isEmpty())
     {
@@ -831,14 +832,15 @@ void QnCameraScheduleWidget::updateMaxFPS()
     ui->gridWidget->setMaxFps(m_maxFps, m_maxDualStreamingFps);
 }
 
-void QnCameraScheduleWidget::showMoreSettings(bool show)
+void QnCameraScheduleWidget::setAdvancedSettingsVisible(bool value)
 {
-    const auto text = show ? tr("Less Settings") : tr("More Settings");
-    const auto icon = qnSkin->icon(show ? lit("buttons/collapse.png") : lit("buttons/expand.png"));
+    const auto text = value ? tr("Less Settings") : tr("More Settings");
+    const auto icon = qnSkin->icon(value ? lit("buttons/collapse.png") : lit("buttons/expand.png"));
     ui->advancedSettingsButton->setText(text);
     ui->advancedSettingsButton->setIcon(icon);
-    ui->advancedSettingsWidget->setVisible(show);
+    ui->advancedSettingsWidget->setVisible(value);
     ui->settingsGroupBox->layout()->activate();
+    m_advancedSettingsVisible = value;
 }
 
 QPair<Qn::StreamQuality, bool> QnCameraScheduleWidget::qualityForBitrate(qreal bitrateMbps) const
