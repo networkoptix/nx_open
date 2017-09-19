@@ -129,8 +129,8 @@ TestFileOperation generateFileOperation(int code)
 
     result.chunksCatalog = nx::utils::random::number(0, 1);
     result.fileIndex = nx::utils::random::number(0, 1) == 0
-        ? DeviceFileCatalog::Chunk::FILE_INDEX_NONE
-        : DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
+        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
+        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
 
     errorStream
         << "result.startTime: " << result.startTime << std::endl
