@@ -41,6 +41,14 @@ def context_for_file(filename, customization_name):
     return context_name, language
 
 
+def file_for_context(context, language, customization_name):
+    file_name = context.name
+    if context.translatable:
+        file_name = file_name.replace('lang_{{language}}', 'lang_'+language)
+    custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
+    return os.path.join(custom_dir, file_name)
+
+
 def iterate_cms_files(customization_name, ignore_not_english):
     custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
     for root, dirs, files in os.walk(custom_dir):
@@ -106,11 +114,10 @@ def process_context_structure(customization, context, content,
     return content
 
 
-def process_file(source_file, customization, product_id, preview, version_id):
+def process_file(source_file, customization, product_id, preview, version_id, global_contexts):
     context_name, language_code = context_for_file(
         source_file, customization.name)
 
-    global_contexts = Context.objects.filter(is_global=True)
     context = Context.objects.filter(
         file_path=context_name, product_id=product_id)
     if language_code:
@@ -165,7 +172,7 @@ def generate_languages_json(customization_name, preview):
 
 
 def fill_content(customization_name='default', product='cloud_portal',
-                 preview=True, version_id=None):
+                 preview=True, version_id=None, incremental=False):
 
     # if preview=False
     #   retrieve latest accepted version
@@ -175,6 +182,8 @@ def fill_content(customization_name='default', product='cloud_portal',
     #   else - preview specific version
     product_id = Product.objects.get(name=product).id
     customization = Customization.objects.get(name=customization_name)
+
+    global_contexts = Context.objects.filter(is_global=True)
 
     if not preview:
         if version_id is not None:
@@ -187,11 +196,41 @@ def fill_content(customization_name='default', product='cloud_portal',
             version_id = versions.latest('accepted_date')
         else:
             version_id = 0
+            incremental = False  # no version - do full update using default values
+
+    if incremental:
+        # filter records changed in this version
+        # get their datastructures
+        # detect their contexts
+        changed_records = DataRecord.objects.\
+            filter(version_id=version_id)
+        changed_contexts = changed_records.\
+            values_list('data_structure', flat=True).\
+            values_list('context', flat=True).\
+            distinct()
+        changed_global_contexts = changed_contexts.filter(is_global = True)
+        if changed_global_contexts.exists():  # global context was changed - force full rebuild
+            incremental = False
 
     # iterate all files (same way we fill structure)
-    for source_file in iterate_cms_files(customization_name, False):
-        process_file(source_file, customization,
-                     product_id, preview, version_id)
+    if not incremental:
+        for source_file in iterate_cms_files(customization_name, False):
+            process_file(source_file, customization,
+                         product_id, preview, version_id, global_contexts)
+    else:
+        for context in changed_contexts:
+            # now we need to check what languages were changes
+            # if the default language is changed - we update all languages (lazy way)
+            # otherwise - update only affected languages
+            changed_languages = changed_records.values_list('language').distinct()
+            if changed_languages.exists(language_id=customization.default_language_id):
+                # update all languages in the context
+                changed_languages = customization.languages.values_list('code', flat=True)
+
+            # update affected languages
+            for language in changed_languages:
+                source_file = file_for_context(context, language.code)
+                process_file(source_file, customization, product_id, preview, version_id, global_contexts)
 
     generate_languages_json(customization_name, preview)
 
