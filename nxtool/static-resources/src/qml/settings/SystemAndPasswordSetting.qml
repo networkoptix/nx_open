@@ -11,7 +11,21 @@ Expandable.MaskedSettingsPanel
 
     extraWarned: rtuContext.selection.safeMode;
 
-    changed:  (maskedArea && maskedArea.changed?  true : false);
+    changed:  d.passwordChanged || d.systemNameChanged
+
+    extraInformation: rtuContext.selection.count > 1
+        && (d.bothChanged || (rtuContext.selection.isNewSystem && d.appropriateFieldsForNewSystem))
+        ? qsTr("Selected servers will be merged into single system")
+        : ""
+
+    readonly property string newSystemExplanationMessage:
+    {
+        var primaryMessage = rtuContext.selection.count == 1
+            ? qsTr("Selected server is new and should be configured.")
+            : qsTr("Some of selected servers are new and should be configured.");
+
+        return primaryMessage + qsTr("\nPlease fill in System Name and System Password fields.");
+    }
 
     function tryApplyChanges(warnings)
     {
@@ -30,43 +44,51 @@ Expandable.MaskedSettingsPanel
 
     propertiesDelegate: FocusScope
     {
-        property bool changed: systemName.changed || password.changed;
-        property alias systemNameControl: systemName;
+        property alias systemNameControl: systemName
+        property alias passwordControl: password
 
         height: settingsColumn.height;
-
 
         Dialogs.ErrorDialog
         {
             id: errorDialog;
         }
+        property bool isDifferentSystemNames:
+            rtuContext.selection.systemName.length == 0 && rtuContext.selection.count !== 1
 
-        readonly property string errorTemplate: qsTr("Invalid %1 specified. Can't apply changes");
+        function showError(message)
+        {
+            errorDialog.message = message;
+            errorDialog.show();
+
+            systemName.forceActiveFocus();
+            return false;
+        }
+
         function tryApplyChanges()
         {
+            if (rtuContext.selection.isNewSystem)
+            {
+                if (!d.appropriateFieldsForNewSystem)
+                    return showError(thisComponent.newSystemExplanationMessage);
+
+                rtuContext.changesManager().changeset().addSystemChange(systemName.text);
+                rtuContext.changesManager().changeset().addPasswordChange(password.text);
+                return true;
+            }
+
             if (systemName.changed)
             {
                 if (systemName.text.trim().length === 0)
-                {
-                    errorDialog.message = errorTemplate.arg(qsTr("system name"));
-                    errorDialog.show();
-
-                    systemName.forceActiveFocus();
-                    return false;
-                }
+                    return showError(qsTr("Invalid system name specified. Can't apply changes"));
 
                 rtuContext.changesManager().changeset().addSystemChange(systemName.text);
             }
+
             if (password.changed)
             {
                 if (password.text.trim().length === 0)
-                {
-                    errorDialog.message = errorTemplate.arg(qsTr("password"));
-                    errorDialog.show();
-
-                    password.forceActiveFocus();
-                    return false;
-                }
+                    return showError(qsTr("Invalid password specified. Can't apply changes"));
 
                 rtuContext.changesManager().changeset().addPasswordChange(password.text);
             }
@@ -98,8 +120,7 @@ Expandable.MaskedSettingsPanel
 
                 implicitWidth: implicitHeight * 6;
 
-                clearOnInitValue: ((rtuContext.selection.systemName.length === 0)
-                    && rtuContext.selection.count !== 1);
+                clearOnInitValue: d.differentSystemNames;
                 initialText: (clearOnInitValue ?
                     kDifferentSystems : rtuContext.selection.systemName);
             }
@@ -121,17 +142,48 @@ Expandable.MaskedSettingsPanel
             {
                 id: password;
 
-                KeyNavigation.backtab: systemName;
-
                 readonly property string kDifferentPasswords: qsTr("<different passwords>");
 
+                KeyNavigation.backtab: systemName;
                 implicitWidth: systemName.implicitWidth;
 
-                clearOnInitValue: (rtuContext.selection.password.length === 0);
+                clearOnInitValue: d.differentPasswords;
                 initialText: (clearOnInitValue ?
                     kDifferentPasswords : rtuContext.selection.password);
             }
         }
     }
+
+    QtObject
+    {
+        id: d
+
+        readonly property bool systemNameChanged: maskedArea && maskedArea.systemNameControl
+            ? maskedArea.systemNameControl.changed
+            : false
+        readonly property bool passwordChanged: maskedArea && maskedArea.passwordControl
+            ? maskedArea.passwordControl.changed
+            : false
+        readonly property bool bothChanged: systemNameChanged && passwordChanged
+
+        readonly property bool appropriateFieldsForNewSystem:
+            appropriatePasswordForNewSystem && appropriateSystemNameForNewSystem
+
+        readonly property bool nonEmptySystemName: maskedArea && maskedArea.systemNameControl
+            ? maskedArea.systemNameControl.length > 0
+            : false
+        readonly property bool differentSystemNames:
+            rtuContext.selection.systemName.length === 0 && rtuContext.selection.count !== 1
+        readonly property bool appropriateSystemNameForNewSystem:
+            (systemNameChanged || !differentSystemNames) && nonEmptySystemName
+
+        readonly property bool nonEmptyPassword: maskedArea && maskedArea.passwordControl
+            ? maskedArea.passwordControl.length > 0
+            : false
+        readonly property bool differentPasswords: rtuContext.selection.password.length == 0
+        property bool appropriatePasswordForNewSystem:
+            (passwordChanged || !differentPasswords) && nonEmptyPassword
+    }
 }
+
 

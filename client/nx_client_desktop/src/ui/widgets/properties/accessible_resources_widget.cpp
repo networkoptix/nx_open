@@ -310,10 +310,8 @@ void QnAccessibleResourcesWidget::initControlsModel()
     m_controlsModel->setHasCheckboxes(true);
     m_controlsModel->setUserCheckable(false);
 
-    QnResourceListModel::Options options;
-    options.set(QnResourceListModel::HideStatus);
-    options.set(QnResourceListModel::ServerAsHealthMonitor);
-    m_controlsModel->setOptions(options);
+    m_controlsModel->setOptions(QnResourceListModel::HideStatusOption | 
+        QnResourceListModel::ServerAsHealthMonitorOption);
 
     auto modelUpdated = [this](const QModelIndex& index = QModelIndex())
     {
@@ -381,11 +379,8 @@ void QnAccessibleResourcesWidget::initResourcesModel()
 {
     m_resourcesModel->setHasCheckboxes(true);
     m_resourcesModel->setUserCheckable(false);
-
-    QnResourceListModel::Options options;
-    options.set(QnResourceListModel::HideStatus);
-    options.set(QnResourceListModel::ServerAsHealthMonitor);
-    m_resourcesModel->setOptions(options);
+    m_resourcesModel->setOptions(QnResourceListModel::HideStatusOption
+        | QnResourceListModel::ServerAsHealthMonitorOption);
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnAccessibleResourcesWidget::handleResourceAdded);

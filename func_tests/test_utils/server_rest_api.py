@@ -19,6 +19,7 @@ from requests.auth import HTTPDigestAuth
 
 REST_API_USER = 'admin'
 REST_API_PASSWORD = 'admin'
+STANDARD_PASSWORDS = [REST_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
 REST_API_TIMEOUT = datetime.timedelta(seconds=10)
 MAX_CONTENT_LEN_TO_LOG = 1000
 
@@ -27,10 +28,11 @@ log = logging.getLogger(__name__)
 
 class HttpError(RuntimeError):
 
-    def __init__(self, server_name, url, status_code, reason):
+    def __init__(self, server_name, url, status_code, reason, json=None):
          RuntimeError.__init__(self, '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
          self.status_code = status_code
          self.reason = reason
+         self.json = json
 
         
 class ServerRestApiError(RuntimeError):
@@ -55,8 +57,8 @@ class ServerRestApiProxy(object):
         return ServerRestApiProxy(self._server_name, self._url + '/' + name, self._user, self._password, self._timeout)
 
     def GET(self, raise_exception=True, timeout=None, headers=None, **kw):
-        self._log_request('GET', kw)
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
+        self._log_request('GET', params)
         return self._make_request(raise_exception, timeout, requests.get, self._url, headers=headers, params=params)
 
     def POST(self, raise_exception=True, timeout=None, headers=None, json=None, **kw):
@@ -67,7 +69,10 @@ class ServerRestApiProxy(object):
         return self._make_request(raise_exception, timeout, requests.post, self._url, headers=headers, json=json)
 
     def _log_request(self, method, data):
-        log.debug('%s: %s:%s %s %s %s', self._server_name, self._user, self._password, method, self._url, data)
+        password = self._password
+        if password not in STANDARD_PASSWORDS:
+            password = '***'  # mask nondefault passwords
+        log.debug('%s: %s:%s %s %s %s', self._server_name, self._user, password, method, self._url, json.dumps(data))
 
     def _get_param_to_str(self, value):
         if type(value) is bool:
@@ -89,7 +94,18 @@ class ServerRestApiProxy(object):
                       else response.content[:MAX_CONTENT_LEN_TO_LOG] + '...')
         if raise_exception:
             if 400 <= response.status_code < 600:
-                raise HttpError(self._server_name, url, response.status_code, response.reason)
+                reason = response.reason
+                json = None
+                if response.content:
+                    try:
+                        json = response.json()
+                    except ValueError:
+                        pass
+                    else:
+                        error_string = json.get('errorString')
+                        if error_string:
+                            reason = error_string
+                raise HttpError(self._server_name, url, response.status_code, reason, json)
             else:
                 response.raise_for_status()
         if not response.content:
@@ -146,3 +162,7 @@ class CloudRestApi(RestApiBase):
     @property
     def cdb(self):
         return self._make_proxy('cdb')
+
+    @property
+    def api(self):
+        return self._make_proxy('api')

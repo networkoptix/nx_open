@@ -129,8 +129,11 @@ struct MediaFileOperation : RecordBase
             part2 |= ((quint64)2 & 0x3) << 0x15;
     }
 
-    qint64 getFileSize() const { return (part2 >> 0x17) & getBitMask(0x28ll); }
-    void setFileSize(qint64 fileSize) { part2 |= ((quint64)fileSize & getBitMask(0x28ll)) << 0x17; }
+    qint64 getFileSize() const { return (part2 >> 0x17) & getBitMask(0x27LL); }
+    void setFileSize(qint64 fileSize) { part2 |= ((quint64)fileSize & getBitMask(0x27LL)) << 0x17; }
+
+    int getFileTypeIndex() const;
+    void setFileTypeIndex(int fileTypeIndex);
 
     int getCatalog() const { return (part2 >> 0x3F) & 0x1; }
     void setCatalog(int catalog) { part2 |= ((quint64)catalog & 0x1) << 0x3F; }

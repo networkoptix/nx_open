@@ -93,11 +93,23 @@ public:
         const nx_http::StringType& protocolToUpgradeConnectionTo,
         nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
+        executeUpgrade(
+            nx_http::Method::options,
+            protocolToUpgradeConnectionTo,
+            std::move(handler));
+    }
+
+    void executeUpgrade(
+        nx_http::Method::ValueType httpMethod,
+        const nx_http::StringType& protocolToUpgradeConnectionTo,
+        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+    {
         m_handler = std::move(handler);
         addRequestBody();
 
         m_httpClient.doUpgrade(
             m_url,
+            httpMethod,
             protocolToUpgradeConnectionTo,
             std::bind(&self_type::requestDone, this, &m_httpClient));
     }
@@ -112,6 +124,16 @@ public:
     std::unique_ptr<AbstractStreamSocket> takeSocket()
     {
         return m_httpClient.takeSocket();
+    }
+
+    nx_http::AsyncClient& httpClient()
+    {
+        return m_httpClient;
+    }
+
+    const nx_http::AsyncClient& httpClient() const
+    {
+        return m_httpClient;
     }
 
 protected:

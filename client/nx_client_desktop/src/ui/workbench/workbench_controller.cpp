@@ -445,6 +445,11 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(action::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(action::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(action::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+        [this](bool on)
+        {
+            m_motionSelectionInstrument->setEnabled(!on);
+        });
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);

@@ -10,38 +10,29 @@ angular.module('cloudApp')
         });
 
         $scope.showSearch = false;
-
+        function updateSystems(){
+            return cloudApi.systems().then(function(result){
+                if(result.data.length == 1){
+                    $scope.openSystem(result.data[0]);
+                    return;
+                }
+                $scope.systems = cloudApi.sortSystems(result.data);
+                $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
+                return $scope.systems;
+            });
+        }
         function delayedUpdateSystems(){
-            var pollingSystemsUpdate = $poll(function(){
-                return cloudApi.systems().then(function(result){
-                    $scope.systems = cloudApi.sortSystems(result.data);
-
-                    $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
-                    return $scope.systems;
-                });
-            },Config.updateInterval);
+            var pollingSystemsUpdate = $poll(updateSystems,Config.updateInterval);
 
             $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemsUpdate);
             } );
         }
 
-
-        $scope.gettingSystems = process.init(function(){
-            return cloudApi.systems();
-        },{
+        $scope.gettingSystems = process.init(updateSystems,{
             errorPrefix: L.errorCodes.cantGetSystemsListPrefix,
             logoutForbidden: true
-        }).then(function(result){
-            // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
-            if(result.data.length == 1){
-                $scope.openSystem(result.data[0]);
-                return;
-            }
-            $scope.systems = cloudApi.sortSystems(result.data);
-            $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
-            delayedUpdateSystems();
-        });
+        }).then(delayedUpdateSystems);
 
         $scope.openSystem = function(system){
             $location.path('/systems/' + system.id);

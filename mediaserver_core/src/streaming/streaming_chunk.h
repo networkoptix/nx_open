@@ -26,7 +26,7 @@ using StreamingChunkPtr = std::shared_ptr<StreamingChunk>;
  * Chunk can actually not contain data, but only expect some data to arrive.
  * Chunk, which is still being filled by data is "opened". Chunk already filled is "closed".
  * WARNING: Object of this class MUST be used as std::shared_ptr.
- * WARNING: It is required to connect to this class's signals using Qt::DirectConnection only.
+ * WARNING: It is required to connect to this class'es signals using Qt::DirectConnection only.
  * NOTE: Class methods are thread-safe.
  */
 class StreamingChunk:
@@ -73,10 +73,10 @@ public:
     /**
      * Sequential reading.
      * Appends data to dataBuffer.
-     * End-of stream is signalled with returning no data and returning true.
+     * End-of-stream is signalled with returning no data and returning true.
      * @param ctx Used to save position.
-     * @return true, if some data has been read or end-of file has been reached.
-     *   false, if no data in chunk, but some data may arrive in future.
+     * @return True, if some data has been read or end-of file has been reached.
+     *     False, if no data in chunk, but some data may arrive in future.
      * NOTE: If chunk is not being modified, then first call returns whole chunk data
      * TODO: Use container that do not require copying to get array substring.
      */
@@ -89,11 +89,12 @@ public:
 
     /**
      * Only one thread is allowed to modify chunk data at a time.
-     * @return false, if chunk already opened for modification.
+     * @return False, if chunk already opened for modification.
      */
     bool openForModification();
     /**
-     * @return false if internal buffer is filled. True when some data has been read from chunk.
+     * @return False if the internal buffer is filled. 
+     *    True when some data has been read from the chunk.
      */
     bool wantMoreData() const;
     void appendData(const nx::Buffer& data);
@@ -101,10 +102,10 @@ public:
     bool isClosed() const;
     size_t sizeInBytes() const;
     /**
-     * Blocks until chunk is non-empty and closed or internal buffer has been filled.
+     * Blocks until the chunk is non-empty and closed or the internal buffer has been filled.
      * NOTE: (StreamingChunk::isClosed returns true and StreamingChunk::sizeInBytes() > 0).
      * NOTE: If it already closed, then returns immediately.
-     * @return true if chunk is fully generated. false otherwise
+     * @return True if chunk is fully generated. False otherwise.
      */
     bool waitForChunkReadyOrInternalBufferFilled();
     /** Disables check on internal buffer size. */
@@ -132,7 +133,7 @@ private:
     std::size_t m_maxInternalBufferSize;
     /**
      * Data offset corresponding to the beginning of m_data.
-     * Can be greater then zero if data is removed from the front of the buffer.
+     * Can be greater than zero if the data is removed from the front of the buffer
      * due to very large chunk size (e.g., in case of using it for export).
      */
     quint64 m_dataOffsetAtTheFrontOfTheBuffer;
@@ -148,8 +149,8 @@ public:
      * Sequential reading.
      * Appends data to dataBuffer.
      * End-of stream is signalled with returning no data and returning true.
-     * @return true, if some data has been read or end-of file has been reached.
-     * false, if no data has been read (more data may be available in the future).
+     * @return True, if some data has been read or end-of-file has been reached.
+     *    False, if no data has been read (more data may be available in the future).
      */
     virtual bool tryRead(nx::Buffer* const dataBuffer, std::size_t maxBytesToRead) = 0;
 };

@@ -133,7 +133,7 @@ QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
     params << QByteArray("NAME=").append(value.name);
     params << QByteArray("SERIAL=").append(value.key);
     params << QByteArray("HWID=").append(value.hardwareId);
-    params << QByteArray("COUNT=").append(value.cameraCount);
+    params << QByteArray("COUNT=").append(QByteArray::number(value.cameraCount));
     params << QByteArray("CLASS=").append(value.licenseType);
     params << QByteArray("VERSION=").append(value.version);
     params << QByteArray("BRAND=").append(value.brand);

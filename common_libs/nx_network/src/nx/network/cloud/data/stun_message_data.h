@@ -9,9 +9,10 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-/** Helper class for serializing / deserializing STUN messages.
-    Contains set of utility methods
-*/
+/**
+ * Helper class for serializing / deserializing STUN messages.
+ * Contains set of utility methods.
+ */
 class NX_NETWORK_API StunMessageParseHelper
 {
 public:
@@ -25,11 +26,24 @@ protected:
         const nx::stun::Message& message,
         AttributeValueType* const value)
     {
-        const auto attribute = message.getAttribute< AttributeType >();
+        return readAttributeValue<AttributeType, AttributeValueType>(
+            message,
+            AttributeType::TYPE,
+            value);
+    }
+
+    template<typename AttributeType, typename AttributeValueType>
+    bool readAttributeValue(
+        const nx::stun::Message& message,
+        const int type,
+        AttributeValueType* const value)
+    {
+        const auto attribute = message.getAttribute< AttributeType >(type);
         if (!attribute)
         {
             setErrorText(nx::String("Missing required attribute ") +
-                stun::extension::attrs::toString(AttributeType::TYPE));
+                stun::extension::attrs::toString(
+                    static_cast<stun::extension::attrs::AttributeType>(type)));
             return false;
         }
         *value = attribute->get();
@@ -108,7 +122,8 @@ protected:
     bool readAttributeValue(
         const nx::stun::Message& message,
         const int type,
-        std::chrono::duration<Rep, Period>* const value)
+        std::chrono::duration<Rep, Period>* const value,
+        typename std::enable_if<std::is_arithmetic<Rep>::value>::type* = nullptr)
     {
         const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
         if (!attribute)

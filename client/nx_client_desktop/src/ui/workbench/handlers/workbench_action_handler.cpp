@@ -12,7 +12,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
@@ -89,6 +88,7 @@
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/failover_priority_dialog.h>
@@ -162,6 +162,7 @@
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/utils/app_info.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -668,6 +669,20 @@ void ActionHandler::at_previousLayoutAction_triggered()
 
 void ActionHandler::at_openInLayoutAction_triggered()
 {
+    /**
+     * When we add widget (possibliy with animation) to the scene, whole scene may loose
+     * ability to handle hover events.
+     * TODO: #ynikitenkov. Investigate problem and get rid of this ugly workaround
+     */
+    const auto uglyMacOsHoverWorkaround = nx::utils::AppInfo::isMacOsX()
+        ? QnRaiiGuard::create(
+            []() { QCursor::setPos(QPoint(0, 0)); },
+            [this, mp = QCursor::pos()]()
+            {
+                executeDelayedParented([mp]() { QCursor::setPos(mp); }, 0, this);
+            })
+        : QnRaiiGuardPtr();
+
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
@@ -1233,8 +1248,44 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
 
 void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)
 {
+    auto newFileName = newName;
+    if (nx::utils::AppInfo::isWindows())
+    {
+        while (newFileName.endsWith(QChar(L' ')) || newFileName.endsWith(QChar(L'.')))
+            newFileName.resize(newFileName.size() - 1);
+
+        const QSet<QString> kReservedFilenames{
+            lit("CON"), lit("PRN"), lit("AUX"), lit("NUL"),
+            lit("COM1"), lit("COM2"), lit("COM3"), lit("COM4"),
+            lit("COM5"), lit("COM6"), lit("COM7"), lit("COM8"), lit("COM9"),
+            lit("LPT1"), lit("LPT2"), lit("LPT3"), lit("LPT4"), lit("LPT5"),
+            lit("LPT6"), lit("LPT7"), lit("LPT8"), lit("LPT9") };
+
+        const auto upperCaseName = newFileName.toUpper();
+        if (kReservedFilenames.contains(upperCaseName))
+        {
+            messages::LocalFiles::reservedFilename(mainWindow(), upperCaseName);
+            return;
+        }
+    }
+
+    static const QString kForbiddenChars =
+        nx::utils::AppInfo::isWindows() ? lit("\\|/:*?\"<>")
+      : nx::utils::AppInfo::isLinux()   ? lit("/")
+      : nx::utils::AppInfo::isMacOsX()  ? lit("/:")
+      : QString();
+
+    for (const auto character: newFileName)
+    {
+        if (kForbiddenChars.contains(character))
+        {
+            messages::LocalFiles::invalidChars(mainWindow(), kForbiddenChars);
+            return;
+        }
+    }
+
     QFileInfo fi(resource->getUrl());
-    QString filePath = fi.absolutePath() + L'/' + newName;
+    QString filePath = fi.absolutePath() + QDir::separator() + newFileName;
 
     if (QFileInfo::exists(filePath))
     {
@@ -1249,6 +1300,15 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         return;
     }
 
+    QFile writabilityTest(filePath);
+    if (!writabilityTest.open(QIODevice::WriteOnly))
+    {
+        messages::LocalFiles::fileCannotBeWritten(mainWindow(), filePath);
+        return;
+    }
+
+    writabilityTest.remove();
+
     // If video is opened right now, it is quite hard to close it synchronously.
     static const int kTimeToCloseResourceMs = 300;
 
@@ -1257,10 +1317,11 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         [this, resource, filePath]()
         {
             QnResourcePtr result = resource;
+            const auto oldPath = resource->getUrl();
 
-            if (!QFile::rename(resource->getUrl(), filePath))
+            if (!QFile::rename(oldPath, filePath))
             {
-                messages::LocalFiles::fileIsBusy(mainWindow(), filePath);
+                messages::LocalFiles::fileIsBusy(mainWindow(), oldPath);
             }
             else
             {
@@ -1785,19 +1846,21 @@ void ActionHandler::at_renameAction_triggered()
         ? camera->getGroupName()
         : resource->getName();
 
+    // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
         bool ok = false;
         do
         {
-            name = QInputDialog::getText(mainWindow(),
+            name = QnInputDialog::getText(mainWindow(),
                 tr("Rename"),
                 tr("Enter new name for the selected item:"),
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                 QLineEdit::Normal,
-                oldName,
-                &ok)
-                .trimmed();
-            if (!ok || name.isEmpty() || name == oldName)
+                QString(),
+                oldName).trimmed();
+
+            if (name.isEmpty() || name == oldName)
                 return;
 
         } while (!validateResourceName(resource, name));

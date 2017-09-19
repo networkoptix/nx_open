@@ -602,7 +602,7 @@ template <class T, class T2>
 static QList<T> smartSplitInternal(
     const T& data,
     const T2 delimiter,
-    const T2 quoteChar, 
+    const T2 quoteChar,
     bool keepEmptyParts)
 {
     bool quoted = false;
@@ -641,7 +641,7 @@ QStringList smartSplit(
     QString::SplitBehavior splitBehavior)
 {
     return smartSplitInternal(
-        data, 
+        data,
         delimiter,
         QChar(L'\"'),
         splitBehavior == QString::KeepEmptyParts);
@@ -664,6 +664,56 @@ QByteArray unquoteStr(const QByteArray& v)
 QString unquoteStr(const QString& v)
 {
     return unquoteStrInternal(v, L'\"');
+}
+
+static int doFormatJsonString(const char* srcPtr, const char* srcEnd, char* dstPtr)
+{
+    static const int INDENT_SIZE = 4; //< How many spaces to add to formatting.
+    static const char INDENT_SYMBOL = ' '; //< Space filler.
+    static QByteArray OUTPUT_DELIMITER("\n"); //< New line.
+    static const QByteArray INPUT_DELIMITERS("[]{},"); //< Delimiters in the input string.
+    static const int INDENTS[] = {1, -1, 1, -1, 0}; //< Indentation offset for INPUT_DELIMITERS.
+    const char* dstPtrBase = dstPtr;
+    int indent = 0;
+    bool quoted = false;
+    bool escaped = false;
+    for (; srcPtr < srcEnd; ++srcPtr)
+    {
+        if (*srcPtr == '"' && !escaped)
+            quoted = !quoted;
+
+        escaped = *srcPtr == '\\' && !escaped;
+
+        int symbolIdx = INPUT_DELIMITERS.indexOf(*srcPtr);
+        bool isDelimBefore = symbolIdx >= 0 && INDENTS[symbolIdx] < 0;
+        if (!dstPtrBase)
+            dstPtr++;
+        else if (!isDelimBefore)
+            *dstPtr++ = *srcPtr;
+
+        if (symbolIdx >= 0 && !quoted)
+        {
+            if (dstPtrBase)
+                memcpy(dstPtr, OUTPUT_DELIMITER.data(), OUTPUT_DELIMITER.size());
+            dstPtr += OUTPUT_DELIMITER.size();
+            indent += INDENT_SIZE * INDENTS[symbolIdx];
+            if (dstPtrBase)
+                memset(dstPtr, INDENT_SYMBOL, indent);
+            dstPtr += indent;
+        }
+
+        if (dstPtrBase && isDelimBefore)
+            *dstPtr++ = *srcPtr;
+    }
+    return dstPtr - dstPtrBase;
+}
+
+QByteArray formatJsonString(const QByteArray& data)
+{
+    QByteArray result;
+    result.resize(doFormatJsonString(data.data(), data.data() + data.size(), 0));
+    doFormatJsonString(data.data(), data.data() + data.size(), result.data());
+    return result;
 }
 
 } // namespace utils

@@ -17,21 +17,19 @@ class QnResourceListView: public QnTreeView
 public:
     enum Option
     {
-        HideStatus,
-        ServerAsHealthMonitor,
-        SortByName,
-        SortAsInTree,
-
-        Count
+        HideStatusOption            = 0x01,
+        ServerAsHealthMonitorOption = 0x02,
+        SortByNameOption            = 0x04,
+        SortAsInTreeOption          = 0x08,
     };
-    using Options = std::bitset<(int)Option::Count>;
+    Q_DECLARE_FLAGS(Options, Option)
 
     /* If parent is specified, the view creates snapped vertical scroll bar at window edge.
      * If parent is not specified, the view uses normal vertical scroll bar. */
     explicit QnResourceListView(QWidget* parent = nullptr);
 
-    /** Default constructor. Will set SortAsInTree as options. */
-    QnResourceListView(const QnResourceList& resources, QWidget* parent = nullptr);
+    /** Default constructor. Will set SortAsInTreeOption as options. */
+    explicit QnResourceListView(const QnResourceList& resources, QWidget* parent = nullptr);
 
     QnResourceListView(const QnResourceList& resources, Options options, QWidget* parent = nullptr);
 
@@ -57,3 +55,5 @@ private:
     QSortFilterProxyModel* m_sortModel = nullptr;
     Options m_options;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceListView::Options)

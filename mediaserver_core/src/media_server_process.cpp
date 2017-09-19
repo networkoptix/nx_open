@@ -160,7 +160,8 @@
 #include <rest/handlers/ifconfig_rest_handler.h>
 #include <rest/handlers/settime_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
-#include <rest/handlers/detach_rest_handler.h>
+#include <rest/handlers/detach_from_cloud_rest_handler.h>
+#include <rest/handlers/detach_from_system_rest_handler.h>
 #include <rest/handlers/restore_state_rest_handler.h>
 #include <rest/handlers/setup_local_rest_handler.h>
 #include <rest/handlers/setup_cloud_rest_handler.h>
@@ -1553,11 +1554,6 @@ void MediaServerProcess::loadResourcesFromECS(
             messageProcessor->on_licenseChanged(license);
     }
 
-    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) {
-        m_mediaServer->setPanicMode(Qn::PM_None);
-        m_mediaServer->saveParams();
-    }
-
     // Start receiving local notifications
     auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
     processor->startReceivingLocalNotifications(ec2Connection);
@@ -1575,6 +1571,9 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
     server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) 
+        server->setPanicMode(Qn::PM_None);
 
     QFile hddList(Qn::HDD_LIST_FILE);
     if (hddList.open(QFile::ReadOnly))
@@ -1856,6 +1855,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
+    reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
+        &cloudManagerGroup->connectionManager, messageBus), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
     reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), kAdmin);
     reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudManagerGroup), kAdmin);
@@ -2386,7 +2387,7 @@ void MediaServerProcess::run()
     if (ipVersion.isEmpty())
         ipVersion = qnServerModule->roSettings()->value(QLatin1String("ipVersion")).toString();
 
-    SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
+    SocketFactory::setIpVersion(ipVersion);
 
     m_serverModule = serverModule;
 
@@ -2517,11 +2518,6 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
-
-    QString dataLocation = getDataDirectory();
-    QDir stateDirectory;
-    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
     auto remoteArchiveSynchronizer =
         std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
@@ -2676,22 +2672,13 @@ void MediaServerProcess::run()
         auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
-
-    connect(ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
-        [this](qint64 newTime)
-        {
-            QnSyncTime::instance()->updateTime(newTime);
-
-            using namespace ec2;
-            QnTransaction<ApiPeerSyncTimeData> tran(
-                ApiCommand::broadcastPeerSyncTime,
-                commonModule()->moduleGUID());
-            tran.params.syncTimeMs = newTime;
-            if (auto connection = commonModule()->ec2Connection())
-                connection->messageBus()->sendTransaction(tran);
-        }
-        );
-
+    
+    connect(
+        ec2Connection->getTimeNotificationManager().get(), 
+        &ec2::AbstractTimeNotificationManager::timeChanged,
+        this, 
+        &MediaServerProcess::at_timeChanged, 
+        Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
     CommonPluginContainer pluginContainer;
@@ -3227,7 +3214,25 @@ void MediaServerProcess::at_appStarted()
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
     m_crashReporter->scanAndReportByTimer(qnServerModule->runTimeSettings());
+
+    QString dataLocation = getDataDirectory();
+    QDir stateDirectory;
+    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
+    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 };
+
+void MediaServerProcess::at_timeChanged(qint64 newTime)
+{
+    QnSyncTime::instance()->updateTime(newTime);
+
+    using namespace ec2;
+    QnTransaction<ApiPeerSyncTimeData> tran(
+        ApiCommand::broadcastPeerSyncTime,
+        commonModule()->moduleGUID());
+    tran.params.syncTimeMs = newTime;
+    if (auto connection = commonModule()->ec2Connection())
+        connection->messageBus()->sendTransaction(tran);
+}
 
 void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {
@@ -3256,8 +3261,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
     {
         user->setName(login);
-        user->setPassword(password);
-        user->generateHash();
+        user->setPasswordAndGenerateHash(password);
 
         ec2::ApiUserData userData;
         fromResourceToApi(user, userData);

@@ -870,14 +870,6 @@ to view more bookmarks</source>
       <translation>从幻灯片中移除</translation>
     </message>
     <message>
-      <source>Start Showreel</source>
-      <translation>启动幻灯片</translation>
-    </message>
-    <message>
-      <source>Stop Showreel</source>
-      <translation>停止幻灯片</translation>
-    </message>
-    <message>
       <source>Make Showreel</source>
       <translation>制作幻灯片</translation>
     </message>
@@ -1028,6 +1020,13 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>启动幻灯片</translation>
+    </message>
+  </context>
+  <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
@@ -1038,8 +1037,24 @@ to view more bookmarks</source>
       <translation>文件 &quot;%1&quot; 已存在，请尝试另一个名称。</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>文件 &quot;%1&quot; 正在被另一个程序使用，请尝试另一个名称。</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1658,10 +1673,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>版本号</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>无效的内部版本号</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2622,6 +2633,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>了解更多关于 %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4549,6 +4571,10 @@ to %1</source>
       <source>Manage Bookmarks</source>
       <translation>管理书签</translation>
     </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+    </message>
   </context>
   <context>
     <name>QnProgressDialog</name>
@@ -6135,10 +6161,6 @@ to %1</source>
       <translation>邮件服务器未设置</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>请给其它服务器选择服务器时间同步</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>系统处于安全模式</translation>
     </message>
@@ -6169,10 +6191,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>邮件服务器未设置.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>系统时间未同步，无法自动检测共同时间.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7685,6 +7703,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>停止幻灯片</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>启动幻灯片</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
     <message>
       <source>%1 (active)</source>
@@ -7939,8 +7976,8 @@ to %1</source>
       <translation>使用键盘方向键切换布局。退出幻灯片按Esc键。</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To exit the showreel press Esc.</source>
-      <translation>使用键盘箭头切换摄像机。退出幻灯片请按Esc键。</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>

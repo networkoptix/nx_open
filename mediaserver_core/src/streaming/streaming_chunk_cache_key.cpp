@@ -30,7 +30,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     int channel,
     const QString& containerFormat,
     const QString& alias,
-    quint64 startTimestamp,
+    std::chrono::microseconds startTimestamp,
     std::chrono::microseconds duration,
     MediaQuality streamQuality,
     const std::multimap<QString, QString>& auxiliaryParams )
@@ -42,8 +42,8 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_startTimestamp( startTimestamp ),
     m_duration( duration ),
     m_streamQuality( streamQuality ),
-    m_isLive( false )
-    //,m_auxiliaryParams( auxiliaryParams )
+    m_isLive( false ),
+    m_auxiliaryParams( auxiliaryParams )
 {
     NX_ASSERT( !containerFormat.isEmpty() );
 
@@ -94,7 +94,7 @@ QString StreamingChunkCacheKey::alias() const
     return m_alias;
 }
 
-quint64 StreamingChunkCacheKey::startTimestamp() const
+std::chrono::microseconds StreamingChunkCacheKey::startTimestamp() const
 {
     return m_startTimestamp;
 }
@@ -105,9 +105,9 @@ std::chrono::microseconds StreamingChunkCacheKey::duration() const
 }
 
 //!startTimestamp() + duration
-quint64 StreamingChunkCacheKey::endTimestamp() const
+std::chrono::microseconds StreamingChunkCacheKey::endTimestamp() const
 {
-    return m_startTimestamp + m_duration.count();
+    return m_startTimestamp + m_duration;
 }
 
 MediaQuality StreamingChunkCacheKey::streamQuality() const
@@ -140,6 +140,14 @@ const QString& StreamingChunkCacheKey::audioCodec() const
 bool StreamingChunkCacheKey::live() const
 {
     return m_isLive;
+}
+
+QString StreamingChunkCacheKey::streamingSessionId() const
+{
+    auto it = m_auxiliaryParams.find(StreamingParams::SESSION_ID_PARAM_NAME);
+    if (it != m_auxiliaryParams.end())
+        return it->second;
+    return QString();
 }
 
 bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(const StreamingChunkCacheKey& right) const
@@ -244,10 +252,10 @@ uint qHash( const StreamingChunkCacheKey& key )
 {
     return qHash(key.srcResourceUniqueID())
         + key.channel()
-        + key.startTimestamp()
+        + key.startTimestamp().count()
         + qHash(key.alias())
         + key.duration().count()
-        + key.endTimestamp()
+        + key.endTimestamp().count()
         + key.streamQuality()
         + key.pictureSizePixels().width()
         + key.pictureSizePixels().height()

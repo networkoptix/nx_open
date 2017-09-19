@@ -8,16 +8,16 @@
             Name="$(var.productName) Paxton Plugin"
             Manufacturer="$(var.companyName)"
             Version="$(var.releaseVersionFull)"
-            IconSourceFile="favicon.ico"
+            IconSourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"
             UpgradeCode="$(var.axBundleUpgradeCode)"
             DisableModify="yes">
 
         <util:RegistrySearch
-          Id='PaxtonDirSearch' 
-          Variable="PaxtonDirExists" 
+          Id='PaxtonDirSearch'
+          Variable="PaxtonDirExists"
           Result="exists"
           Root="HKLM"
-          Key="SOFTWARE\Paxton Access\Common" 
+          Key="SOFTWARE\Paxton Access\Common"
           Win64="no"/>
 
         <bal:Condition Message="You need to have Paxton Access installed">
@@ -25,10 +25,10 @@
         </bal:Condition>
 
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
-            <Payload SourceFile="License.html" />
-            <Payload SourceFile="installer_bg.png" />
-            <Payload SourceFile="logo-102x102.png" />
-            <Payload SourceFile="logo-64x64.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/wixsetup/License.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
 
             <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"

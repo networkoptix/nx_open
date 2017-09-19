@@ -16,7 +16,7 @@ protected:
     void givenChunkInputStream()
     {
         givenChunk();
-        
+
         m_chunkInputStream = std::make_unique<::StreamingChunkInputStream>(m_chunk.get());
     }
 

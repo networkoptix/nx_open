@@ -498,6 +498,13 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     if (item()->layout()->isSearchLayout())
         return;
 
+    static const auto kUpdateTriggersInterval = 1000;
+    const auto updateTriggersAvailabilityTimer = new QTimer(this);
+    updateTriggersAvailabilityTimer->setInterval(kUpdateTriggersInterval);
+    connect(updateTriggersAvailabilityTimer, &QTimer::timeout,
+        this, &QnMediaResourceWidget::updateTriggersAvailability);
+    updateTriggersAvailabilityTimer->start();
+
     resetTriggers();
 
     auto eventRuleManager = commonModule()->eventRuleManager();
@@ -510,6 +517,47 @@ void QnMediaResourceWidget::initSoftwareTriggers()
 
     connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
+}
+
+void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+{
+    if (!rule)
+        return;
+
+    const auto triggerIt = m_softwareTriggers.find(rule->id());
+    if (triggerIt == m_softwareTriggers.end())
+        return;
+
+    const auto button = qobject_cast<QnSoftwareTriggerButton*>(
+        m_triggersContainer->item(triggerIt.value().overlayItemId));
+
+    if (!button)
+        return;
+
+    const bool buttonEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime())
+        || !button->isLive();
+
+    if (button->isEnabled() == buttonEnabled)
+        return;
+
+    const auto info = triggerIt.value().info;
+
+    if (!buttonEnabled)
+    {
+        const bool longPressed = info.prolonged &&
+            button->state() == QnSoftwareTriggerButton::State::Waiting;
+        if (longPressed)
+            button->setState(QnSoftwareTriggerButton::State::Failure);
+    }
+
+    button->setEnabled(buttonEnabled);
+    updateTriggerButtonTooltip(button, info, buttonEnabled);
+}
+
+void QnMediaResourceWidget::updateTriggersAvailability()
+{
+    for (auto ruleId: m_softwareTriggers.keys())
+        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(ruleId));
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -2511,6 +2559,12 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
     const auto button = new QnSoftwareTriggerButton(this);
     configureTriggerButton(button, info, clientSideHandler);
 
+    connect(button, &QnSoftwareTriggerButton::isLiveChanged, this,
+        [this, button, rule]()
+        {
+            updateTriggerAvailability(rule);
+        });
+
     // TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
     const auto overlayItemId = m_triggersContainer->insertItem(0, button);
 
@@ -2540,17 +2594,40 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
     return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
 }
 
+void QnMediaResourceWidget::updateTriggerButtonTooltip(
+    QnSoftwareTriggerButton* button,
+    const SoftwareTriggerInfo& info,
+    bool enabledBySchedule)
+{
+    if (!button)
+    {
+        NX_EXPECT(false, "Trigger button is null");
+        return;
+    }
+
+    if (enabledBySchedule)
+    {
+        const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
+        button->setToolTip(info.prolonged
+            ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
+            : name);
+        return;
+    }
+    else
+    {
+        button->setToolTip(tr("Disabled by schedule"));
+    }
+
+}
+
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
     NX_EXPECT(button);
 
-    const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
-    button->setToolTip(info.prolonged
-        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
-        : name);
+    updateTriggerButtonTooltip(button, info, true);
 
     const auto resultHandler =
         [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)
@@ -2665,6 +2742,8 @@ void QnMediaResourceWidget::resetTriggers()
     /* Create new relevant triggers: */
     for (const auto& rule: commonModule()->eventRuleManager()->rules())
         createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
+
+    updateTriggersAvailability();
 }
 
 void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
@@ -2701,6 +2780,8 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
         /* Recreate trigger if the rule is still relevant: */
         createTriggerIfRelevant(rule);
     }
+
+    updateTriggerAvailability(rule);
 };
 
 rest::Handle QnMediaResourceWidget::invokeTrigger(

@@ -201,6 +201,7 @@ const KeyParserContainer parser = []() -> KeyParserContainer
                 TextFlagsInfo("SF_timeCtrl", Constants::ServerFlag::AllowChangeDateTimeFlag)
                 , TextFlagsInfo("SF_IfListCtrl", Constants::ServerFlag::AllowIfConfigFlag)
                 , TextFlagsInfo("SF_AutoSystemName", Constants::ServerFlag::IsFactoryFlag)
+                , TextFlagsInfo("SF_NewSystem", Constants::ServerFlag::IsNewSystemFlag)
                 , TextFlagsInfo("SF_Has_HDD", Constants::ServerFlag::HasHdd)
             };
 
@@ -957,9 +958,10 @@ void Client::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
 
 ///
 
-void Client::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
+void Client::sendSetPasswordAndLocalIdRequest(const BaseServerInfoPtr &baseInfo
     , const QString &currentPassword
     , const QString &password
+    , const QUuid &localSystemId
     , bool useNewPassword
     , const OperationCallbackEx &callback)
 {
@@ -973,11 +975,14 @@ void Client::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
 
     static const QString newPasswordTag = "password";
     static const QString oldPasswordTag = "oldPassword";
+    static const QString localSystemIdTag = "localSystemId";
 
     const QString authPass = (useNewPassword ? password : currentPassword);
     QUrlQuery query;
     query.addQueryItem(newPasswordTag, password);
     query.addQueryItem(oldPasswordTag, authPass);
+    if (!localSystemId.isNull() && baseInfo->version >= VersionHolder("3.0"))
+        query.addQueryItem(localSystemIdTag, localSystemId.toString());
 
     instance().m_restClient->sendGet(makeRequest(baseInfo
         , authPass, kConfigureCommand, query, kDefaultTimeoutMs

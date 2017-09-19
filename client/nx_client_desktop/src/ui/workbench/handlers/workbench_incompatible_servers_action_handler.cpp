@@ -3,7 +3,6 @@
 #include <QtCore/QUrl>
 
 #include <QtWidgets/QAction>
-#include <QtWidgets/QInputDialog>
 
 #include <core/resource/resource.h>
 #include <core/resource/fake_media_server.h>
@@ -16,6 +15,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topics.h>
@@ -217,29 +217,13 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
 
 QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
 {
-    QString password;
-    for (;;)
-    {
-        QInputDialog dialog(mainWindow());
-        dialog.setWindowTitle(tr("Enter Password..."));
-        dialog.setLabelText(tr("Administrator Password"));
-        dialog.setTextEchoMode(QLineEdit::Password);
-        dialog.setTextValue(password);
-        setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
+    QnInputDialog dialog(mainWindow());
+    dialog.setWindowTitle(tr("Enter password..."));
+    dialog.setCaption(tr("Administrator password"));
+    dialog.setEchoMode(QLineEdit::Password);
+    setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
 
-        if (dialog.exec() != QDialog::Accepted)
-            return QString();
-
-        password = dialog.textValue();
-
-        if (password.isEmpty())
-        {
-            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty."));
-            continue;
-        }
-
-        break;
-    }
-
-    return password;
+    return dialog.exec() == QDialog::Accepted
+        ? dialog.value()
+        : QString();
 }
