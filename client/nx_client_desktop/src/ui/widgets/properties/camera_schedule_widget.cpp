@@ -319,6 +319,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
         &QnCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, this,
         &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged, this,
+        &QnCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, this,
         &QnCameraScheduleWidget::updateMaxFpsValue);
     connect(ui->noRecordButton, &QToolButton::toggled, this,
@@ -939,28 +941,37 @@ QnScheduleTaskList QnCameraScheduleWidget::scheduleTasks() const
 
             Qn::RecordingType recordType = params.recordingType;
             Qn::StreamQuality streamQuality = Qn::QualityHighest;
+            int bitrateKbps = 0;
+
             if (recordType != Qn::RT_Never)
+            {
                 streamQuality = params.quality;
+                if (m_advancedSettingsSupported)
+                    bitrateKbps = qRound(params.bitrateMbps * kKbpsInMbps);
+            }
+
             int fps = params.fps;
             if (fps == 0 && recordType != Qn::RT_Never)
                 fps = 10;
 
             if (task.m_startTime == task.m_endTime)
             {
-                // an invalid one; initialize
+                // An invalid one; initialize.
                 task.m_dayOfWeek = row + 1;
-                task.m_startTime = col * 3600; // in secs from start of day
-                task.m_endTime = (col + 1) * 3600; // in secs from start of day
+                task.m_startTime = col * 3600; //< In secs from start of day.
+                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
                 task.m_recordType = recordType;
                 task.m_streamQuality = streamQuality;
+                task.m_bitrateKbps = bitrateKbps;
                 task.m_fps = fps;
                 ++col;
             }
             else if (task.m_recordType == recordType
                 && task.m_streamQuality == streamQuality
+                && task.m_bitrateKbps == bitrateKbps
                 && task.m_fps == fps)
             {
-                task.m_endTime = (col + 1) * 3600; // in secs from start of day
+                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
                 ++col;
             }
             else
@@ -1005,6 +1016,8 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
     {
         const int row = task.getDayOfWeek() - 1;
         Qn::StreamQuality quality = Qn::QualityNotDefined;
+        qreal bitrateMbps = 0.0;
+
         if (task.getRecordingType() != Qn::RT_Never)
         {
             switch (task.getStreamQuality())
@@ -1014,6 +1027,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
                 case Qn::QualityHigh:
                 case Qn::QualityHighest:
                     quality = task.getStreamQuality();
+                    bitrateMbps = task.getBitrateKbps() / kKbpsInMbps;
                     break;
                 default:
                     qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.getStreamQuality());
@@ -1028,6 +1042,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
             params.recordingType = task.getRecordingType();
             params.quality = quality;
             params.fps = task.getFps();
+            params.bitrateMbps = m_advancedSettingsSupported ? bitrateMbps : 0.0;
             ui->gridWidget->setCellValue(cell, params);
         }
     }
@@ -1107,8 +1122,11 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
         }
         else
         {
+            const bool customBitrate = m_advancedSettingsSupported
+                && ui->qualityComboBox->currentData().toInt() >= Qn::StreamQualityCount;
             brush.fps = ui->fpsSpinBox->value();
             brush.quality = currentItemQuality(ui->qualityComboBox);
+            brush.bitrateMbps = customBitrate ? ui->bitrateSpinBox->value() : 0.0;
         }
 
         ui->gridWidget->setBrush(brush);
@@ -1307,7 +1325,10 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     if (params.recordingType != Qn::RT_Never)
     {
         ui->fpsSpinBox->setValue(params.fps);
-        ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(params.quality));
+        if (qFuzzyIsNull(params.bitrateMbps) || !m_advancedSettingsSupported)
+            ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(params.quality));
+        else
+            ui->bitrateSpinBox->setValue(params.bitrateMbps);
     }
 
     m_disableUpdateGridParams = false;
