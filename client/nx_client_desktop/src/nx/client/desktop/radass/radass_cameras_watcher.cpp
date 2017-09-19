@@ -19,7 +19,8 @@ RadassCamerasWatcher::RadassCamerasWatcher(RadassController* controller,
 {
     QPointer<RadassController> controllerGuard(controller);
 
-    auto handleResourceAdded = [controllerGuard](const QnResourcePtr& resource)
+    auto handleResourceAdded =
+        [controllerGuard](const QnResourcePtr& resource)
         {
             if (!controllerGuard)
                 return;
@@ -31,7 +32,8 @@ RadassCamerasWatcher::RadassCamerasWatcher(RadassController* controller,
             }
         };
 
-    auto handleResourceRemoved = [controllerGuard](const QnResourcePtr& resource)
+    auto handleResourceRemoved =
+        [controllerGuard](const QnResourcePtr& resource)
         {
             if (!controllerGuard)
                 return;
