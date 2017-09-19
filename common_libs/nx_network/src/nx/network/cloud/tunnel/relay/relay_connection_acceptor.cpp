@@ -198,7 +198,7 @@ void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
                     .args(SystemError::toString(sysErrorCode), m_relayUrl));
             }
 
-            handler(sysErrorCode, toStreamSocket(std::move(connection)));
+            handler(sysErrorCode, std::move(acceptedSocket));
         });
 }
 
