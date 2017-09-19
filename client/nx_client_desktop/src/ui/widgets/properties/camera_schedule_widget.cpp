@@ -415,94 +415,23 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     ui->bitrateSlider->setProperty(style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
 
-    // Sync quality with bitrate changes.
-    const auto syncQualityWithBitrate =
-        [this]()
-        {
-            if (!m_advancedSettingsSupported)
-                return;
-
-            const auto quality = qualityForBitrate(ui->bitrateSpinBox->value());
-            ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality.first
-                + (quality.second ? 0 : Qn::StreamQualityCount)));
-        };
-
     // Sync bitrate spin box and quality combo box with bitrate slider changes.
-    connect(ui->bitrateSlider, &QSlider::valueChanged, this,
-        [this, syncQualityWithBitrate]()
-        {
-            if (m_bitrateUpdating)
-                return;
-
-            QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
-            setNormalizedValue(ui->bitrateSpinBox, normalizedValue(ui->bitrateSlider));
-            syncQualityWithBitrate();
-        });
+    connect(ui->bitrateSlider, &QSlider::valueChanged,
+        this, &QnCameraScheduleWidget::syncBitrateSpinBoxWithSlider);
 
     // Sync bitrate slider and quality combo box with bitrate spin box changes.
-    connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged, this,
-        [this, syncQualityWithBitrate]()
-        {
-            if (m_bitrateUpdating)
-                return;
-
-            QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
-            setNormalizedValue(ui->bitrateSlider, normalizedValue(ui->bitrateSpinBox));
-            syncQualityWithBitrate();
-        });
+    connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged,
+        this, &QnCameraScheduleWidget::syncBitrateSliderWithSpinBox);
 
     // Sync bitrate with quality changes.
-    const auto syncBitrateWithQuality =
-        [this]()
-        {
-            if (m_bitrateUpdating || !m_advancedSettingsSupported)
-                return;
-
-            ui->bitrateSpinBox->setValue(bitrateForQuality(static_cast<Qn::StreamQuality>(
-                currentItemQuality(ui->qualityComboBox))));
-        };
-
-    connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged, this, syncBitrateWithQuality);
     syncBitrateWithQuality();
+    connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged,
+        this, &QnCameraScheduleWidget::syncBitrateWithQuality);
 
     // Sync bitrate with fps changes.
-    const auto syncBitrateWithFps =
-        [this, syncBitrateWithQuality]()
-        {
-            if (!m_advancedSettingsSupported)
-                return;
-
-            const auto minBitrate = bitrateForQuality(Qn::QualityLowest);
-            const auto maxBitrate = bitrateForQuality(Qn::QualityHighest);
-
-            const auto quality = Qn::StreamQuality(ui->qualityComboBox->currentData().toInt());
-            if (quality < Qn::StreamQualityCount)
-            {
-                // Lock quality.
-                ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
-                ui->bitrateSpinBox->setValue(bitrateForQuality(quality));
-                const auto normalizedBitrate = normalizedValue(ui->bitrateSpinBox);
-                setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
-
-                // Force quality(in case several qualities have the same rounded bitrate value).
-                QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
-                ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality));
-            }
-            else
-            {
-                // TODO: #vkutin Maybe should lock value normalized between two qualities.
-                // Currently it's normalized between minimum and maximum bitrate.
-
-                // Lock normalized bitrate. Use value from slider to avoid its jerking by 1px.
-                const auto normalizedBitrate = normalizedValue(ui->bitrateSlider);
-                ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
-                setNormalizedValue(ui->bitrateSpinBox, normalizedBitrate);
-                setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
-            }
-        };
-
-    connect(ui->fpsSpinBox, QnSpinboxIntValueChanged, this, syncBitrateWithFps);
     syncBitrateWithFps();
+    connect(ui->fpsSpinBox, QnSpinboxIntValueChanged,
+        this, &QnCameraScheduleWidget::syncBitrateWithFps);
 
     showMoreSettings(false);
 
@@ -511,6 +440,79 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget()
 {
+}
+
+void QnCameraScheduleWidget::syncQualityWithBitrate()
+{
+    if (!m_advancedSettingsSupported)
+        return;
+
+    const auto quality = qualityForBitrate(ui->bitrateSpinBox->value());
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality.first
+        + (quality.second ? 0 : Qn::StreamQualityCount)));
+}
+
+void QnCameraScheduleWidget::syncBitrateWithQuality()
+{
+    if (m_bitrateUpdating || !m_advancedSettingsSupported)
+        return;
+
+    ui->bitrateSpinBox->setValue(bitrateForQuality(static_cast<Qn::StreamQuality>(
+        currentItemQuality(ui->qualityComboBox))));
+}
+
+void QnCameraScheduleWidget::syncBitrateWithFps()
+{
+    if (!m_advancedSettingsSupported)
+        return;
+
+    const auto minBitrate = bitrateForQuality(Qn::QualityLowest);
+    const auto maxBitrate = bitrateForQuality(Qn::QualityHighest);
+
+    const auto quality = Qn::StreamQuality(ui->qualityComboBox->currentData().toInt());
+    if (quality < Qn::StreamQualityCount)
+    {
+        // Lock quality.
+        ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
+        ui->bitrateSpinBox->setValue(bitrateForQuality(quality));
+        const auto normalizedBitrate = normalizedValue(ui->bitrateSpinBox);
+        setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
+
+        // Force quality (in case several qualities have the same rounded bitrate value).
+        QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
+        ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality));
+    }
+    else
+    {
+        // TODO: #vkutin Maybe should lock value normalized between two qualities.
+        // Currently it's normalized between minimum and maximum bitrate.
+
+        // Lock normalized bitrate. Use value from slider to avoid its jerking by 1px.
+        const auto normalizedBitrate = normalizedValue(ui->bitrateSlider);
+        ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
+        setNormalizedValue(ui->bitrateSpinBox, normalizedBitrate);
+        setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
+    }
+}
+
+void QnCameraScheduleWidget::syncBitrateSliderWithSpinBox()
+{
+    if (m_bitrateUpdating)
+        return;
+
+    QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
+    setNormalizedValue(ui->bitrateSlider, normalizedValue(ui->bitrateSpinBox));
+    syncQualityWithBitrate();
+}
+
+void QnCameraScheduleWidget::syncBitrateSpinBoxWithSlider()
+{
+    if (m_bitrateUpdating)
+        return;
+
+    QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
+    setNormalizedValue(ui->bitrateSpinBox, normalizedValue(ui->bitrateSlider));
+    syncQualityWithBitrate();
 }
 
 void QnCameraScheduleWidget::overrideMotionType(Qn::MotionType motionTypeOverride)

@@ -114,6 +114,12 @@ private:
     void updateMaxFPS();
     void updateMotionAvailable();
 
+    void syncQualityWithBitrate();
+    void syncBitrateWithQuality();
+    void syncBitrateWithFps();
+    void syncBitrateSliderWithSpinBox();
+    void syncBitrateSpinBoxWithSlider();
+
     void showMoreSettings(bool show);
 
     QPair<Qn::StreamQuality, bool> qualityForBitrate(qreal bitrateMbps) const;
