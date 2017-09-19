@@ -94,7 +94,7 @@ void ConnectSessionManager::createClientSession(
                 ss << "http://" << redirectEndpointString << "/relay/server/"
                     << request.targetPeerName << "/client_sessions/";
 
-                response.redirectUrl = ss.str();
+                response.actualRelayUrl = ss.str();
                 completionHandler(api::ResultCode::needRedirect, std::move(response));
 
                 return cf::unit();
