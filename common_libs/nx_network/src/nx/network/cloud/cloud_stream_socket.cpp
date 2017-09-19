@@ -365,7 +365,11 @@ QString CloudStreamSocket::idForToStringFromPtr() const
 
 QString CloudStreamSocket::getForeignHostName() const
 {
-    return m_cloudTunnelAttributes.remotePeerName;
+    if (!m_cloudTunnelAttributes.remotePeerName.isEmpty())
+        return m_cloudTunnelAttributes.remotePeerName;
+    if (m_socketDelegate)
+        return m_socketDelegate->getForeignHostName();
+    return QString();
 }
 
 void CloudStreamSocket::connectToEntriesAsync(
@@ -437,7 +441,14 @@ void CloudStreamSocket::onConnectDone(
         if (errorCode != SystemError::noError)
             connection.reset();
         if (cloudTunnelAttributes)
+        {
+            NX_VERBOSE(this, lm("Got connection to %1").arg(cloudTunnelAttributes->remotePeerName));
             m_cloudTunnelAttributes = std::move(*cloudTunnelAttributes);
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("Got connection without tunnel attributes"));
+        }
     }
 
     if (errorCode == SystemError::noError)
