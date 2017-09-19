@@ -43,7 +43,7 @@ class CustomContextForm(forms.Form):
 
             if data_structure.type == DataStructure.get_type("HTML"):
                 widget_type = forms.Textarea(
-                    attrs={'cols': 80, 'rows': 10, 'class': 'tinymce'})
+                    attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
             if data_structure.type == DataStructure.get_type("Image"):
                 self.fields[ds_name] = forms.ImageField(label=ds_name,
