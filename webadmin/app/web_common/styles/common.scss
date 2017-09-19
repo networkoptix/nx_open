@@ -25,6 +25,7 @@ $preloader_small_circle_distance: 8px;
         width:$circle_size;
         border-radius:$circle_size/2;
         margin:0 $circle_distance/2;
+        -webkit-transform: translate3d(0, 0, 0);
         -webkit-animation-name:bounce_circleG;
                 animation-name:bounce_circleG;
         -webkit-animation-duration:1.4s;
@@ -72,6 +73,7 @@ placeholder{ /* Hack to have full-screen */
     z-index:100;
     background-color: $dark9;
     opacity: 0.6;
+    position: relative;
 
     &.has-preloader{
         background-color: transparent;

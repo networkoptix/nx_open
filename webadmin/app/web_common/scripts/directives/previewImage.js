@@ -23,7 +23,8 @@ angular.module('nxCommon')
         return {
             restrict: 'A',
             scope: {
-                ngSrc: '@'
+                ngSrc: '@',
+                errorLoading: '='
             },
 
             link: function (scope, element/*, attrs*/) {
@@ -36,6 +37,7 @@ angular.module('nxCommon')
                     element.removeClass("hidden");
                 });
                 element.on('error', function (event) {
+                    scope.errorLoading = true;
                     element.addClass("hidden");
                 });
             }

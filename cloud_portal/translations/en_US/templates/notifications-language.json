@@ -1,0 +1,17 @@
+{
+  "activate_account":{
+    "emailSubject":"Activate your account"
+  },
+  "restore_password":{
+    "emailSubject":"Reset your password"
+  },
+  "system_invite":{
+    "emailSubject":"{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+  },
+  "system_shared":{
+    "emailSubject":"{{message.sharer_name}} invites you to {{PRODUCT_NAME}}"
+  },
+  "review_version":{
+    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+  }
+}
