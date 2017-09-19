@@ -51,6 +51,16 @@ void QnInputDialog::setPlaceholderText(const QString &placeholderText)
     ui->valueLineEdit->setPlaceholderText(placeholderText);
 }
 
+QLineEdit::EchoMode QnInputDialog::echoMode() const
+{
+    return ui->valueLineEdit->echoMode();
+}
+
+void QnInputDialog::setEchoMode(QLineEdit::EchoMode echoMode)
+{
+    ui->valueLineEdit->setEchoMode(echoMode);
+}
+
 QDialogButtonBox::StandardButtons QnInputDialog::buttons() const
 {
     return ui->buttonBox->standardButtons();
@@ -79,6 +89,7 @@ void QnInputDialog::validateInput()
 QString QnInputDialog::getText(QWidget* parent,
     const QString& title, const QString& label,
     QDialogButtonBox::StandardButtons buttons,
+    QLineEdit::EchoMode echoMode,
     const QString& placeholder,
     const QString& initialText)
 {
@@ -87,6 +98,7 @@ QString QnInputDialog::getText(QWidget* parent,
     dialog.setCaption(label);
     dialog.setButtons(buttons);
     dialog.setPlaceholderText(placeholder);
+    dialog.setEchoMode(echoMode);
     dialog.setValue(initialText);
 
     if (dialog.exec() != Accepted)
