@@ -37,13 +37,19 @@ to send requests to cloud test
 return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 '''
 
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def nx_action(request):
     email, password = authenticate(request)
+    instance = request.data['instance']
+    call = request.data['call']
+    server_id = request.data['serverId']
+    url = instance + server_id + call
+    headers = {'Content-Type': 'application/json'}
+    r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
 
-    return Response('ok')
+    return json.loads(r.text)
 
 
 @api_view(['GET', 'POST'])
@@ -59,15 +65,3 @@ def zap_trigger(request):
 @permission_classes((AllowAny, ))
 def ping(request):
     return Response('ok')
-
-@api_view(['GET', 'POST'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
-def get_users_for_system(request):
-    email, password = authenticate(request)
-    url = 'http://cloud-test.hdw.mx/gateway/9aeb4e34-d495-4e93-8ae5-3af9630ffc0e/ec2/getUsers'
-    headers = {'Content-Type': 'application/json'}
-
-    r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
-
-    return json.loads(r.text)
