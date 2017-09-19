@@ -1,5 +1,8 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
 
 #include <streaming/data_source_cache.h>
