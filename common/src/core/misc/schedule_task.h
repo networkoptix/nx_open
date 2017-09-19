@@ -23,8 +23,7 @@ public:
             Qn::RecordingType recordType,
             int beforeThreshold, 
             int afterThreshold, 
-            Qn::StreamQuality 
-            streamQuality, 
+            Qn::StreamQuality streamQuality, 
             int fps, 
             bool recordAudio,
             int bitrateKbps)

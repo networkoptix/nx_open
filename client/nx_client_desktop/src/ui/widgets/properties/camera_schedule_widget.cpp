@@ -987,8 +987,14 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
     if (tasks.isEmpty())
     {
         for (int nDay = 1; nDay <= 7; ++nDay)
-            tasks.append(QnScheduleTask::Data(nDay, 0, 86400, Qn::RT_Never,
-                kDefaultBeforeThresholdSec, kDefaultAfterThresholdSec));
+        {
+            QnScheduleTask::Data data;
+            data.m_dayOfWeek = nDay;
+            data.m_startTime = 0;
+            data.m_endTime = 86400;
+            data.m_beforeThreshold = kDefaultBeforeThresholdSec;
+            data.m_afterThreshold = kDefaultAfterThresholdSec;
+        }
     }
 
     auto task = tasks.first();
