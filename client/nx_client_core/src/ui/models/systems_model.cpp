@@ -30,9 +30,9 @@ namespace
         {QnSystemsModel::IsRunningRoleId, "isRunning"},
         {QnSystemsModel::IsReachableRoleId, "isReachable"},
         {QnSystemsModel::IsConnectableRoleId, "isConnectable"},
-        {QnSystemsModel::IsCompatibleRoleId, "isCompatible"},
+        {QnSystemsModel::IsCompatibleToMobileClient, "isCompatibleToMobileClient"},
         {QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion"},
-        {QnSystemsModel::IsCompatibleInternalRoleId, "isCompatibleInternal"},
+        {QnSystemsModel::IsCompatibleToDesktopClient, "isCompatibleToDesktopClient"},
 
         {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"}};
@@ -206,9 +206,9 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->isReachable();
         case IsConnectableRoleId:
             return system->isConnectable();
-        case IsCompatibleRoleId:
+        case IsCompatibleToMobileClient:
             return d->isCompatibleSystem(system);
-        case IsCompatibleInternalRoleId:
+        case IsCompatibleToDesktopClient:
             return d->isCompatibleInternal(system);
         case IsCompatibleVersionRoleId:
             return d->isCompatibleVersion(system);
@@ -523,8 +523,9 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
             if (!minimalVersion.isNull() && serverInfo.version < minimalVersion)
                 return false;
 
-            auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult == Qn::SuccessConnectionResult;
+            const auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
+            return connectionResult == Qn::SuccessConnectionResult
+                || connectionResult == Qn::IncompatibleCloudHostConnectionResult;
         });
 }
 

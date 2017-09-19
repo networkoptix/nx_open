@@ -43,10 +43,6 @@ class Player: public QObject
 {
     Q_OBJECT
 
-    Q_ENUMS(State)
-    Q_ENUMS(MediaStatus)
-    Q_ENUMS(VideoQuality)
-
     /**
      * Source url to open. In order to support multiserver archive, media player supports
      * non-standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>".
@@ -113,6 +109,7 @@ public:
         Paused,
         Previewing,
     };
+    Q_ENUM(State)
 
     enum class MediaStatus
     {
@@ -128,6 +125,7 @@ public:
         EndOfMedia,
         InvalidMedia,
     };
+    Q_ENUM(MediaStatus)
 
     enum VideoQuality
     {
@@ -137,6 +135,17 @@ public:
         LowIframesOnlyVideoQuality = 2, //< Native stream, low quality, I-frames only.
         CustomVideoQuality //< A number greater or equal to this is treated as a number of lines.
     };
+    Q_ENUM(VideoQuality)
+
+    enum TranscodingSupportStatus
+    {
+        TranscodingDisabled,
+        TranscodingSupported,
+        TranscodingNotSupported,
+        TranscodingNotSupportedForServersOlder30,
+        TranscodingNotSupportedForArmServers,
+    };
+    Q_ENUM(TranscodingSupportStatus)
 
 public:
     Player(QObject *parent = nullptr);
@@ -201,6 +210,8 @@ public:
     void setAllowOverlay(bool allowOverlay);
 
     QSize currentResolution() const;
+
+    Q_INVOKABLE TranscodingSupportStatus transcodingStatus() const;
 
     QRect videoGeometry() const;
     void setVideoGeometry(const QRect& rect);

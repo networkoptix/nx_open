@@ -169,7 +169,7 @@ bool deserialize(
     bool optional = false,
     bool* outFound = nullptr,
     DeprecatedFieldNames* deprecatedFieldNames = nullptr,
-    const std::type_info& structTypeInfo = typeid(nullptr_t))
+    const std::type_info& structTypeInfo = typeid(std::nullptr_t))
 {
     QJsonObject::const_iterator pos = QJsonDetail::findField(
         value, key, deprecatedFieldNames, structTypeInfo);
@@ -241,7 +241,7 @@ bool deserialize(const QByteArray& value, T* outTarget)
 }
 
 /**
- * NOTE: This overload is required since otherwise QString will be converted to QJsonValue, 
+ * NOTE: This overload is required since otherwise QString will be converted to QJsonValue,
  * corresponding overload will be called and deserialize will fail.
  */
 template<class T>
@@ -302,7 +302,15 @@ T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* succe
     bool result = QJson::deserialize(value, &target);
     if (success)
         *success = result;
-    return result ? target : defaultValue;
+
+    T local; //enforcing NVRO
+    if (result)
+    {
+        std::swap(local, target);
+        return local;
+    }
+
+    return defaultValue;
 }
 
 } // namespace QJson

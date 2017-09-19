@@ -25,6 +25,7 @@
 #include <utils/common/html.h>
 
 #include <ui/common/aligner.h>
+#include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -40,7 +41,6 @@ using namespace nx::cdb;
 using namespace nx::client::desktop::ui;
 
 namespace {
-QString kCreateAccountPath = lit("/static/index.html#/register");
 
 const int kHeaderFontSizePixels = 15;
 const int kHeaderFontWeight = QFont::DemiBold;
@@ -57,7 +57,7 @@ rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
     return rest::QnConnectionPtr();
 }
 
-}
+} // namespace
 
 class QnConnectToCloudDialogPrivate: public QObject, public QnConnectionContextAware
 {
@@ -73,14 +73,15 @@ public:
     void lockUi(bool locked);
     void bindSystem();
 
-    void showCredentialsError(bool show);
+    void showCredentialsError(const QString& text);
 
     void showFailure(const QString& message);
 
     void showSuccess(const QString& cloudLogin);
 
 private:
-    void at_bindFinished(api::ResultCode result, const api::SystemData &systemData, const rest::QnConnectionPtr &connection);
+    void at_bindFinished(api::ResultCode result, const api::SystemData &systemData,
+        const rest::QnConnectionPtr &connection);
 
 public:
     std::unique_ptr<api::Connection> cloudConnection;
@@ -199,14 +200,15 @@ void QnConnectToCloudDialogPrivate::updateUi()
     const bool visible = (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut);
     q->ui->stayLoggedInCheckBox->setVisible(visible);
 
-    showCredentialsError(false);
+    showCredentialsError(QString());
 };
 
 
-void QnConnectToCloudDialogPrivate::showCredentialsError(bool show)
+void QnConnectToCloudDialogPrivate::showCredentialsError(const QString& text)
 {
     Q_Q(QnConnectToCloudDialog);
-    q->ui->invalidCredentialsLabel->setVisible(show);
+    q->ui->invalidCredentialsLabel->setHidden(text.isEmpty());
+    q->ui->invalidCredentialsLabel->setText(text);
     q->ui->credentialsWidget->layout()->activate();
 }
 
@@ -294,9 +296,9 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
 }
 
 void QnConnectToCloudDialogPrivate::at_bindFinished(
-        api::ResultCode result,
-        const api::SystemData &systemData,
-        const rest::QnConnectionPtr &connection)
+    api::ResultCode result,
+    const api::SystemData &systemData,
+    const rest::QnConnectionPtr &connection)
 {
     Q_Q(QnConnectToCloudDialog);
 
@@ -304,14 +306,20 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
     {
         switch (result)
         {
-        case api::ResultCode::badUsername:
-        case api::ResultCode::notAuthorized:
-            showCredentialsError(true);
-            break;
-        default:
-            showFailure(QnCloudResultInfo(result));
-            break;
+            case api::ResultCode::badUsername:
+            case api::ResultCode::notAuthorized:
+                showCredentialsError(QnCloudResultMessages::invalidCredentials());
+                break;
+
+            case api::ResultCode::accountNotActivated:
+                showCredentialsError(QnCloudResultMessages::accountNotActivated());
+                break;
+
+            default:
+                showFailure(QnCloudResultInfo(result));
+                break;
         }
+
         lockUi(false);
         return;
     }

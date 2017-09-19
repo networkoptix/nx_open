@@ -137,7 +137,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
         {
             auto label = new QLabel(scrollAreaWidgetContents);
             label->setToolTip(param.description);
-            label->setText(lit("%1: ").arg(param.name));
+            setLabelText(label, param, param.range);
+            //label->setText(lit("%1: ").arg(param.name));
             label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             label->setBuddy(widget);
             gridLayout->addWidget(label, row, 0);
@@ -173,8 +174,9 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             for (const auto& cond: dependency.conditions)
                 watches.insert(cond.paramId);
 
-            auto handler = [dependency, paramId = param.id, this]() -> bool
+            auto handler = [dependency, param, this]() -> bool
                 {
+                    const auto paramId = param.id;
                     bool allConditionsSatisfied = std::all_of(
                         dependency.conditions.cbegin(), dependency.conditions.cend(),
                         [this](const QnCameraAdvancedParameterCondition& condition)
@@ -193,11 +195,20 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                     }
                     else if (dependency.type == DependencyType::Range)
                     {
-                        if (auto widget = m_paramWidgetsById.value(paramId))
-                        {
-                            if (allConditionsSatisfied)
-                                m_paramWidgetsById[paramId]->setRange(dependency.range);
-                        }
+                        if (!allConditionsSatisfied)
+                            return false;
+
+                        auto widget = m_paramWidgetsById.value(paramId);
+                        if (!widget)
+                            return false;
+
+                        widget->setRange(dependency.range);
+                        
+                        auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
+                        if (!label)
+                            return false;
+
+                        setLabelText(label, param, dependency.range);
                     }
 
                     return allConditionsSatisfied;
@@ -233,4 +244,31 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
     }
 
 	return page;
+}
+
+void QnCameraAdvancedParamWidgetsManager::setLabelText(
+    QLabel* label,
+    const QnCameraAdvancedParameter& parameter,
+    const QString& range) const
+{
+    NX_ASSERT(label);
+    if (!label)
+        return;
+
+    if (!parameter.showRange)
+    {
+        label->setText(lit("%1: ").arg(parameter.name));
+        return;
+    }
+
+    const auto rangeSplit = range.split(L',');
+    if (rangeSplit.size() != 2)
+        return;
+
+    NX_ASSERT(parameter.dataType == QnCameraAdvancedParameter::DataType::Number);
+    label->setText(
+        lit("%1 (%2-%3): ")
+            .arg(parameter.name)
+            .arg(rangeSplit[0].trimmed())
+            .arg(rangeSplit[1].trimmed()));
 }

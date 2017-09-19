@@ -38,4 +38,4 @@ Config.allowDebugMode = false;
 Config.productName = 'Qulu';
 Config.cloud.productName = 'Qloud';
 
-Config.supportedLanguages = ['en_GB', 'fr_FR', 'de_DE', 'ru_RU', 'es_ES', 'hu_HU'];
+Config.supportedLanguages = ['en_GB', 'fr_FR', 'de_DE', 'ru_RU', 'es_ES', 'hu_HU', 'nl_NL'];

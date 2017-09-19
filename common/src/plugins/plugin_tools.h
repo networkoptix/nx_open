@@ -10,6 +10,8 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
+#include <iomanip>
 
 #include "plugin_api.h"
 
@@ -39,6 +41,11 @@ namespace nxpt
         ~ScopedRef()
         {
             reset();
+        }
+
+        operator bool() const
+        {
+            return m_ptr;
         }
 
         //!Returns protected pointer without releasing it
@@ -247,6 +254,146 @@ namespace nxpt
         nxpl::PluginInterface* m_objToWatch;
         CommonRefManager* m_refCountingDelegate;
     };
+
+    
+    template <typename T>
+    class CommonRefCounter: public T
+    {
+    public:
+        virtual unsigned int addRef() override
+        {
+            return m_refManager.addRef();
+        }
+
+        virtual unsigned int releaseRef() override
+        {
+            return m_refManager.releaseRef();
+        }
+
+    protected:
+        nxpt::CommonRefManager m_refManager;
+
+        CommonRefCounter():
+            m_refManager(static_cast<T*>(this))
+        {
+        }
+
+        CommonRefCounter(nxpt::CommonRefManager* refManager):
+            m_refManager(refManager)
+        {
+        }
+    };
+
+    enum NxGuidFormatOption
+    {
+        uppercase = 0x1,
+        hyphens = 0x2,
+        braces = 0x4,
+
+        applyAll = uppercase | hyphens | braces
+    };
+
+    class NxGuidHelper
+    {
+    public:
+        static nxpl::NX_GUID fromRawData(const char* data)
+        {
+            nxpl::NX_GUID result;
+            memcpy(result.bytes, data, sizeof(result.bytes));
+            return result;
+        }
+
+        static std::string toStdString(
+            const nxpl::NX_GUID& guid,
+            unsigned int format = NxGuidFormatOption::applyAll)
+        {
+            std::stringstream ss;
+            ss << std::hex << std::setfill('0');
+
+            if (format & NxGuidFormatOption::braces)
+                ss << '{';
+
+            if (format & NxGuidFormatOption::uppercase)
+                ss << std::uppercase;
+
+            for (int i = 0; i < 4; ++i)
+            {
+                ss << std::setw(2);
+                ss << static_cast<unsigned int>(guid.bytes[i]);
+            }
+
+            if (format & NxGuidFormatOption::hyphens)
+                ss << '-';
+
+            for (int i = 0; i < 2; ++i)
+            {
+                ss << std::setw(2);
+                ss << static_cast<unsigned int>(guid.bytes[4 + i]);
+            }
+
+            if (format & NxGuidFormatOption::hyphens)
+                ss << "-";
+
+            for (int i = 0; i < 2; ++i)
+            {
+                ss << std::setw(2);
+                ss << static_cast<unsigned int>(guid.bytes[6 + i]);
+            }
+
+            if (format & NxGuidFormatOption::hyphens)
+                ss << "-";
+
+            for (int i = 0; i < 2; ++i)
+            {
+                ss << std::setw(2);
+                ss << static_cast<unsigned int>(guid.bytes[8 + i]);
+            }
+
+            if (format & NxGuidFormatOption::hyphens)
+                ss << "-";
+
+            for (int i = 0; i < 6; ++i)
+            {
+                ss << std::setw(2);
+                ss << static_cast<unsigned int>(guid.bytes[10 + i]);
+            }
+
+            if (format & NxGuidFormatOption::braces)
+                ss << '}';
+
+            return ss.str();
+        }
+    };
+
+    
+
+} // namespace nxpt
+
+namespace nxpl {
+
+inline bool operator == (const nxpl::NX_GUID& id1, const nxpl::NX_GUID& id2)
+{
+    return memcmp(id1.bytes, id2.bytes, sizeof(id1.bytes)) == 0;
 }
+
+} // namespace nxpl
+
+namespace std {
+
+template<>
+struct hash<nxpl::NX_GUID>
+{
+    std::size_t operator()(const nxpl::NX_GUID& guid) const
+    {
+        std::size_t h;
+
+        for (auto i = 0; i < sizeof(guid.bytes); ++i)
+            h = (h + (324723947 + guid.bytes[i])) ^ 93485734985;
+        
+        return h;
+    }
+};
+
+} // namespace std
 
 #endif  //PLUGIN_TOOLS_H

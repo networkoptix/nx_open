@@ -270,9 +270,14 @@ void QnLayoutsModelUnsorted::resetModel()
 
 bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout) const
 {
-    return m_user
-        && !layout->isServiceLayout()
-        && resourceAccessProvider()->hasAccess(m_user, layout);
+    if (!m_user || layout->isServiceLayout()
+        || !resourceAccessProvider()->hasAccess(m_user, layout))
+    {
+        return false;
+    }
+
+    // We show only user's and shared layouts.
+    return layout->isShared() || layout->getParentId() == m_user->getId();
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
@@ -357,6 +362,9 @@ void QnLayoutsModelUnsorted::updateItem(const QnUuid& id)
 void QnLayoutsModelUnsorted::addLayout(const QnLayoutResourcePtr& layout)
 {
     const auto layoutId = layout->getId();
+
+    if (const bool layoutExists = itemRow(layoutId) >= 0)
+        return;
 
     const auto watcher = QSharedPointer<LayoutCamerasWatcher>(new LayoutCamerasWatcher(this));
     watcher->setLayout(layout);

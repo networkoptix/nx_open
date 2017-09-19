@@ -2,6 +2,8 @@
 
 #include <QtCore/QtEndian>
 
+#include <api/helpers/event_log_request_data.h>
+
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 
@@ -741,15 +743,37 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare(R"(
-        INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params,
-            business_rule_guid, toggle_state, aggregation_count, event_type,
-            event_resource_guid, action_resource_guid)
-        VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid,
-            :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);
+        INSERT INTO runtime_actions (
+            timestamp,
+            action_type,
+            action_params,
+            runtime_params,
+            business_rule_guid,
+            toggle_state,
+            aggregation_count,
+            event_type,
+            event_subtype,
+            event_resource_guid,
+            action_resource_guid)
+        VALUES (
+            :timestamp,
+            :action_type,
+            :action_params,
+            :runtime_params,
+            :business_rule_guid,
+            :toggle_state,
+            :aggregation_count,
+            :event_type,
+            :event_subtype,
+            :event_resource_guid,
+            :action_resource_guid);
     )");
 
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
+    QnUuid eventSubtype;
+    if (action->getRuntimeParams().eventType == nx::vms::event::analyticsSdkEvent)
+        eventSubtype = action->getRuntimeParams().analyticsEventId();
 
     auto actionParams = action->getParams();
 
@@ -762,11 +786,9 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
     insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
+    bindId(&insQuery, ":event_subtype", eventSubtype);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
-    insQuery.bindValue(":action_resource_guid",
-        !actionParams.actionResourceId.isNull()
-            ? actionParams.actionResourceId.toRfc4122()
-            : QByteArray());
+    bindId(&insQuery, ":action_resource_guid", actionParams.actionResourceId);
 
     bool rez = execSQLQuery(&insQuery, Q_FUNC_INFO);
     if (rez)
@@ -778,84 +800,82 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     return rez;
 }
 
-QString QnServerDb::getRequestStr(
-    const QnTimePeriod& period,
-    const QnResourceList& resList,
-    const vms::event::EventType& eventType,
-    const vms::event::ActionType& actionType,
-    const QnUuid& businessRuleId) const
+QString QnServerDb::getRequestStr(const QnEventLogRequestData& request) const
 {
-    QString request(lit("SELECT * FROM runtime_actions where"));
-    if (!period.isInfinite())
+    QString requestStr(lit("SELECT * FROM runtime_actions where"));
+    if (!request.period.isInfinite())
     {
-        request += QString(lit(" timestamp between '%1' and '%2'"))
-            .arg(period.startTimeMs / 1000).arg(period.endTimeMs() / 1000);
+        requestStr += lit(" timestamp between '%1' and '%2'")
+            .arg(request.period.startTimeMs / 1000).arg(request.period.endTimeMs() / 1000);
     }
     else
     {
-        request += QString(lit(" timestamp >= '%1'")).arg(period.startTimeMs / 1000);
+        requestStr += lit(" timestamp >= '%1'").arg(request.period.startTimeMs / 1000);
     }
 
-    if (resList.size() == 1)
+    if (request.cameras.size() == 1)
     {
-        request += QString(lit(" and event_resource_guid = %1 "))
-            .arg(guidToSqlString(resList[0]->getId()));
+        requestStr += QString(lit(" and event_resource_guid = %1 "))
+            .arg(guidToSqlString(request.cameras[0]->getId()));
     }
-    else if (resList.size() > 1)
+    else if (request.cameras.size() > 1)
     {
         QString idList;
-        for (const QnResourcePtr& res: resList)
+        for (const auto& camera: request.cameras)
         {
             if (!idList.isEmpty())
                 idList += QLatin1Char(',');
-            idList += guidToSqlString(res->getId());
+            idList += guidToSqlString(camera->getId());
         }
-        request += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
+        requestStr += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
     }
 
-    if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
+    if (request.eventType != vms::event::undefinedEvent
+        && request.eventType != vms::event::anyEvent)
     {
-        if (vms::event::hasChild(eventType))
+        if (vms::event::hasChild(request.eventType))
         {
-            QList<vms::event::EventType> events = vms::event::childEvents(eventType);
+            QList<vms::event::EventType> events = vms::event::childEvents(request.eventType);
             QString eventTypeStr;
             for(vms::event::EventType evnt: events) {
                 if (!eventTypeStr.isEmpty())
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);
             }
-            request += QString(lit(" and event_type in (%1) ")).arg(eventTypeStr);
+            requestStr += QString(lit(" and event_type in (%1) ")).arg(eventTypeStr);
         }
         else
         {
-            request += QString(lit(" and event_type = %1 ")).arg((int) eventType);
+            requestStr += QString(lit(" and event_type = %1 ")).arg((int) request.eventType);
         }
     }
-    if (actionType != vms::event::undefinedAction)
-        request += QString(lit(" and action_type = %1 ")).arg((int) actionType);
-    if (!businessRuleId.isNull())
+
+    if (!request.eventSubtype.isNull())
     {
-        request += QString(lit(" and  business_rule_guid = %1 "))
-            .arg(guidToSqlString(businessRuleId));
+        requestStr += lit(" and event_subtype = %1 ").arg(guidToSqlString(request.eventSubtype));
     }
 
-    return request;
+    if (request.actionType != vms::event::undefinedAction)
+        requestStr += QString(lit(" and action_type = %1 ")).arg((int) request.actionType);
+
+    if (!request.ruleId.isNull())
+    {
+        requestStr += QString(lit(" and  business_rule_guid = %1 "))
+            .arg(guidToSqlString(request.ruleId));
+    }
+
+    return requestStr;
 }
 
-vms::event::ActionDataList QnServerDb::getActions(
-    const QnTimePeriod& period,
-    const QnResourceList& resList,
-    const vms::event::EventType& eventType,
-    const vms::event::ActionType& actionType,
-    const QnUuid& businessRuleId) const
+vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& request) const
 {
     vms::event::ActionDataList result;
-    QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
+    QString requestStr = getRequestStr(request);
 
     QnWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
-    query.prepare(request);
+    query.prepare(requestStr);
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return result;
 
@@ -896,20 +916,15 @@ inline void appendQnUuidToByteArray(QByteArray& byteArray, const QnUuid& value)
     byteArray.append(value.toRfc4122());
 }
 
-void QnServerDb::getAndSerializeActions(
-    QByteArray& result,
-    const QnTimePeriod& period,
-    const QnResourceList& resList,
-    const vms::event::EventType& eventType,
-    const vms::event::ActionType& actionType,
-    const QnUuid& businessRuleId) const
+void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
+    QByteArray& result) const
 {
-    QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
+    QString requestStr = getRequestStr(request);
 
     QnWriteLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(m_sdb);
-    actionsQuery.prepare(request);
+    actionsQuery.prepare(requestStr);
     if (!execSQLQuery(&actionsQuery, Q_FUNC_INFO))
         return;
 
@@ -1428,7 +1443,7 @@ qint64 QnServerDb::getLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource)
 
     QSqlQuery query(m_sdb);
     query.prepare(R"(
-        SELECT property_value  
+        SELECT property_value
         FROM local_resource_properties
         WHERE resource_id = :resource_id AND property_name = :property_name)");
 
@@ -1461,11 +1476,11 @@ bool QnServerDb::updateLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource
 
     QSqlQuery updateQuery(m_sdb);
     updateQuery.prepare(R"(
-        INSERT OR REPLACE INTO local_resource_properties 
+        INSERT OR REPLACE INTO local_resource_properties
             (id, resource_id, property_name, property_value)
-        VALUES 
+        VALUES
             ((  SELECT id
-                FROM local_resource_properties 
+                FROM local_resource_properties
                 WHERE resource_id = :resource_id AND property_name = :property_name),
                 :resource_id,
                 :property_name,

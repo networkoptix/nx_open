@@ -24,7 +24,7 @@ public:
 
     static bool isArm()
     {
-        #if defined(__arm__)
+        #if defined(__arm__) || defined(__aarch64__)
             return true;
         #else
             return false;

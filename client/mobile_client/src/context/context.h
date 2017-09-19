@@ -45,6 +45,8 @@ class QnContext: public QObject, public QnConnectionContextAware
         NOTIFY showCameraInfoChanged)
     Q_PROPERTY(bool testMode READ testMode CONSTANT)
     Q_PROPERTY(QString initialTest READ initialTest CONSTANT)
+    Q_PROPERTY(int deviceStatusBarHeight READ deviceStatusBarHeight
+        NOTIFY deviceStatusBarHeightChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -62,7 +64,7 @@ public:
 
     Q_INVOKABLE void copyToClipboard(const QString &text);
 
-    Q_INVOKABLE int getStatusBarHeight() const;
+    Q_INVOKABLE bool getNavigationBarIsLeftSide() const;
     Q_INVOKABLE int getNavigationBarHeight() const;
     Q_INVOKABLE bool getDeviceIsPhone() const;
 
@@ -84,6 +86,8 @@ public:
     Q_INVOKABLE bool testMode() const;
     Q_INVOKABLE QString initialTest() const;
 
+    Q_INVOKABLE int deviceStatusBarHeight() const;
+
     Q_INVOKABLE void removeSavedConnection(
         const QString& localSystemId, const QString& userName = QString());
 
@@ -100,8 +104,9 @@ public:
     void setLocalPrefix(const QString& prefix);
 
 signals:
-    bool autoLoginEnabledChanged();
-    bool showCameraInfoChanged();
+    void autoLoginEnabledChanged();
+    void showCameraInfoChanged();
+    void deviceStatusBarHeightChanged();
 
 private:
     NxGlobalsObject* m_nxGlobals;

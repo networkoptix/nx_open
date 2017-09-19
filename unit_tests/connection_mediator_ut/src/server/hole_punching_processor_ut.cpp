@@ -187,6 +187,39 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
     }
 }
 
+TEST_F(FtHolePunchingProcessor, destruction)
+{
+    const auto server1 = addRandomServer(m_system);
+
+    ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
+
+    for (int i = 0; i < 100; ++i)
+    {
+        reinitializeUdpClient();
+
+        api::ConnectRequest connectRequest;
+        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
+        connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
+        connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
+        connectRequest.destinationHostName = server1->serverId() + "." + m_system.id;
+        nx::utils::promise<void> connectResponsePromise;
+        m_udpClient->connect(
+            connectRequest,
+            [&connectResponsePromise](
+                stun::TransportHeader /*stunTransportHeader*/,
+                api::ResultCode /*resultCode*/,
+                api::ConnectResponse /*responseData*/)
+            {
+                connectResponsePromise.set_value();
+            });
+        connectResponsePromise.get_future().wait();
+
+        resetUdpClient();
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 class FtHolePunchingProcessorServerFailure:
     public FtHolePunchingProcessor
 {
@@ -200,6 +233,27 @@ public:
     }
 
 protected:
+    void givenSilentServer()
+    {
+        initialiseServerEmulator(MediaServerEmulator::ActionToTake::ignoreIndication);
+    }
+
+    void givenServerThatBreaksConnectionToMediatorOnIndication()
+    {
+        initialiseServerEmulator(MediaServerEmulator::ActionToTake::closeConnectionToMediator);
+    }
+
+    void whenIssueConnectRequest()
+    {
+        // TODO
+    }
+
+    void thenConnectResultCodeIs(api::ResultCode resultCode)
+    {
+        reinitializeUdpClient();
+        assertConnectRequestProducesResult(*m_server, resultCode);
+    }
+
     void assertConnectRequestProducesResult(
         const MediaServerEmulator& mediaServer,
         api::ResultCode expectedResult)
@@ -260,81 +314,45 @@ private:
                     std::placeholders::_1));
         return resultCode;
     }
-};
+    std::unique_ptr<MediaServerEmulator> m_server;
 
-TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
-{
-    using namespace nx::hpm;
-
-    const auto server1 = addRandomServer(m_system, boost::none);
-
-    typedef MediaServerEmulator::ActionToTake MsAction;
-    static const std::map<MsAction, api::ResultCode> kTestCases =
+    void initialiseServerEmulator(MediaServerEmulator::ActionToTake actionToTake)
     {
-        { MsAction::ignoreIndication, api::ResultCode::noReplyFromServer },
-        { MsAction::closeConnectionToMediator, api::ResultCode::notFound },
-    };
+        m_server = addRandomServer(m_system, boost::none);
 
-    for (const auto& testCase: kTestCases)
-    {
-        const auto actionToTake = testCase.first;
-        const auto expectedResult = testCase.second;
-
-        boost::optional<api::ConnectionRequestedEvent> connectionRequestedEventData;
-        server1->setOnConnectionRequestedHandler(
-            [&connectionRequestedEventData, actionToTake](api::ConnectionRequestedEvent data)
+        m_server->setOnConnectionRequestedHandler(
+            [actionToTake](api::ConnectionRequestedEvent /*data*/)
                 -> MediaServerEmulator::ActionToTake
             {
-                connectionRequestedEventData = std::move(data);
                 return actionToTake;
             });
 
-        ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
-
-        reinitializeUdpClient();
-
-        assertConnectRequestProducesResult(*server1, expectedResult);
-
-        if (actionToTake != MsAction::closeConnectionToMediator)
-        {
-            // Testing that mediator has cleaned up session data.
-            waitForMediatorToDropConnectSession();
-        }
-
-        resetUdpClient();
+        ASSERT_EQ(api::ResultCode::ok, m_server->listen().first);
     }
-}
+};
 
-TEST_F(FtHolePunchingProcessor, destruction)
+TEST_F(
+    FtHolePunchingProcessorServerFailure,
+    proper_error_is_reported_in_case_of_silent_listening_peer)
 {
-    const auto server1 = addRandomServer(m_system);
-
-    ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
-
-    for (int i = 0; i < 100; ++i)
-    {
-        reinitializeUdpClient();
-
-        api::ConnectRequest connectRequest;
-        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
-        connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
-        connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
-        connectRequest.destinationHostName = server1->serverId() + "." + m_system.id;
-        nx::utils::promise<void> connectResponsePromise;
-        m_udpClient->connect(
-            connectRequest,
-            [&connectResponsePromise](
-                stun::TransportHeader /*stunTransportHeader*/,
-                api::ResultCode /*resultCode*/,
-                api::ConnectResponse /*responseData*/)
-            {
-                connectResponsePromise.set_value();
-            });
-        connectResponsePromise.get_future().wait();
-
-        resetUdpClient();
-    }
+    givenSilentServer();
+ 
+    whenIssueConnectRequest();
+    
+    thenConnectResultCodeIs(api::ResultCode::noReplyFromServer);
+    waitForMediatorToDropConnectSession();
 }
+
+TEST_F(
+    FtHolePunchingProcessorServerFailure,
+    proper_error_is_reported_in_case_of_listening_peer_breaking_connection)
+{
+    givenServerThatBreaksConnectionToMediatorOnIndication();
+    whenIssueConnectRequest();
+    thenConnectResultCodeIs(api::ResultCode::notFound);
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class DummyStatisticsCollector:
     public stats::AbstractCollector

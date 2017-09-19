@@ -9,6 +9,10 @@ nx_configure_file(
     maven/filter-resources/app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
+nx_configure_file(
+    maven/filter-resources/build_info.txt
+    ${CMAKE_CURRENT_BINARY_DIR})
+
 if(MACOSX)
     set(mac_sources src/utils/mac_utils.mm)
 endif()
@@ -23,6 +27,7 @@ nx_add_target(common LIBRARY
         Qt5::Gui Qt5::Concurrent Qt5::Multimedia
         Qt5::Xml Qt5::XmlPatterns Qt5::Sql
         ffmpeg
+        detection_plugin_interface
         nx_network nx_utils nx_fusion
 )
 

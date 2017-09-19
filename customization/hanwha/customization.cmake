@@ -48,13 +48,13 @@ set(ios.skip.sign "false")
 set(ios.bundle_identifier "com.hanwhasecurity.wave")
 set(ios.new_bundle_identifier "com.hanwhasecurity.wavemobile")
 set(ios.group_identifier "group.com.hanwhasecurity.wave")
-#set(ios.sign.identity "iPhone Distribution: RAS Bvba (CJ7G58V6NE)")
+set(ios.sign.identity "iPhone Distribution: Ethan Kim (Q5VL4R39XK)")
 set(ios.old_app_appstore_id "")
 
 set(mac.skip.sign "false")
-#set(mac.sign.identity "Developer ID Application: RAS Bvba (CJ7G58V6NE)")
-#set(mac.app.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
-#set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: RAS Bvba (CJ7G58V6NE)")
+set(mac.sign.identity "Developer ID Application: Ethan Kim (Q5VL4R39XK)")
+set(mac.app.sign.identity "3rd Party Mac Developer Application: Ethan Kim (Q5VL4R39XK)")
+set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Ethan Kim (Q5VL4R39XK)")
 set(mac.bundle.identifier "com.hanwhasecurity.wave2")
 set(mac.protocol_handler_bundle.identifier "com.hanwhasecurity.protocol_handler")
 
@@ -70,4 +70,20 @@ set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)
-set(additionalTranslations en_GB fr_FR de_DE ru_RU es_ES ja_JP ko_KR tr_TR zh_CN zh_TW he_IL hu_HU)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_NL
+    pl_PL
+    vi_VN
+)

@@ -94,10 +94,10 @@ void ConnectSessionManager::createClientSession(
                 ss << "http://" << redirectEndpointString << "/relay/server/"
                     << request.targetPeerName << "/client_sessions/";
 
-                response.redirectUrl = ss.str();
+                response.actualRelayUrl = ss.str();
                 NX_VERBOSE(this, lm("Session %1. Redirect relay %2 found for peer %3")
                     .arg(request.desiredSessionId)
-                    .arg(response.redirectUrl)
+                    .arg(response.actualRelayUrl)
                     .arg(request.targetPeerName));
 
                 completionHandler(api::ResultCode::needRedirect, std::move(response));
