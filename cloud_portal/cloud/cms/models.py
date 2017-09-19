@@ -49,6 +49,7 @@ class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
+    label = models.CharField(max_length=1024)
 
     type = models.IntegerField(choices=DATA_TYPES, default=0)
     default = models.TextField(default='')

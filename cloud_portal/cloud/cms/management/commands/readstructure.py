@@ -92,17 +92,19 @@ def read_structure_json():
             type = None
             description = None
             meta = None
-            if len(record) == 2:
-                name, value = record
             if len(record) == 3:
-                name, value, description = record
+                label, name, value = record
             if len(record) == 4:
-                name, value, description, type = record
+                label, name, value, description = record
             if len(record) == 5:
-                name, value, description, type, meta = record
+                label, name, value, description, type = record
+            if len(record) == 6:
+                label, name, value, description, type, meta = record
 
             data_structure = find_or_add_data_stucture(
                 name, context.id, has_language)
+
+            data_structure.label = label
             if description:
                 data_structure.description = description
             if type:

@@ -20,7 +20,7 @@ class CustomContextForm(forms.Form):
             self.remove_langauge()
 
         for data_structure in data_structures:
-            ds_name = data_structure.name
+            ds_name = data_structure.label
 
             ds_description = data_structure.description
 
