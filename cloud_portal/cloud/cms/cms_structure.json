@@ -10,7 +10,8 @@
         ["{{CLIENT_PROTOCOL}}","demo-vms","URL protocol for calling native clients from browser"],
         ["{{VMS_NAME}}","VMS Demonstration","Name of the VMS customization. Must be short!"],
         ["{{downloadLink}}","http://www.networkoptix.com/live-demo#fulltrial","Emergency link for downloading applications (in case if cloud is down)"],
-        ["{{supportLink}}","http://support.networkoptix.com","Support link. If you use phone number here - make sure you format the link correctly like 'tel:...'"],
+        ["{{supportLink}}","/content/support",
+          "Support link. Use /content/support to use embedded page. If you use phone number here - make sure you format the link correctly like 'tel:...'"],
         ["{{supportLinkText}}","http://support.networkoptix.com","Text to be shown on the support link"],
         ["{{companyUrl}}","http://networkoptix.com","Company main web site"],
         ["{{iOSappID}}","L6FE34GJWM.com.networkoptix.NxMobile","App ID for iOS mobile application"],
@@ -50,6 +51,15 @@
           "1-3 words"],
         ["%BLOCK3_CONTENT%","No port-forwarding and IP configuration anymore",
           "8-10 words","Long Text"]
+      ]
+    },
+    {
+      "name": "Support page",
+      "file_path": "static/lang_{{language}}/views/static/support.html",
+      "url": "/content/support",
+      "translatable": true,
+      "values":[
+        ["%CONTENT%", "", "Content for support page", "HTML"]
       ]
     },
     {

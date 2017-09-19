@@ -25,7 +25,10 @@ public:
         nx::stun::MessageDispatcher* stunMessageDispatcher);
 
     PeerRegistrator& listeningPeerRegistrator();
+    const PeerRegistrator& listeningPeerRegistrator() const;
+
     ListeningPeerPool& listeningPeerPool();
+
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();
 
     void stop();

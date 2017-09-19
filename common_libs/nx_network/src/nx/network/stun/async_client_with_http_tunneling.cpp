@@ -16,7 +16,7 @@ AsyncClientWithHttpTunneling::AsyncClientWithHttpTunneling(Settings settings):
     bindToAioThread(getAioThread());
 }
 
-void AsyncClientWithHttpTunneling::bindToAioThread(
+void AsyncClientWithHttpTunneling::bindToAioThread( 
     nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
@@ -39,7 +39,15 @@ void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handl
         [this, handler = std::move(handler)]() mutable
         {
             QnMutexLocker lock(&m_mutex);
-            connectInternal(lock, std::move(handler));
+            connectInternal(
+                lock,
+                [this, handler = std::move(handler)](
+                    SystemError::ErrorCode systemErrorCode)
+                {
+                    if (systemErrorCode != SystemError::noError)
+                        scheduleReconnect();
+                    handler(systemErrorCode);
+                });
         });
 }
 
