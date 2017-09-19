@@ -417,11 +417,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
 
     // Sync bitrate spin box and quality combo box with bitrate slider changes.
     connect(ui->bitrateSlider, &QSlider::valueChanged,
-        this, &QnCameraScheduleWidget::syncBitrateSpinBoxWithSlider);
+        this, &QnCameraScheduleWidget::bitrateSliderChanged);
 
     // Sync bitrate slider and quality combo box with bitrate spin box changes.
     connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged,
-        this, &QnCameraScheduleWidget::syncBitrateSliderWithSpinBox);
+        this, &QnCameraScheduleWidget::bitrateSpinBoxChanged);
 
     // Sync bitrate with quality changes.
     syncBitrateWithQuality();
@@ -495,7 +495,7 @@ void QnCameraScheduleWidget::syncBitrateWithFps()
     }
 }
 
-void QnCameraScheduleWidget::syncBitrateSliderWithSpinBox()
+void QnCameraScheduleWidget::bitrateSpinBoxChanged()
 {
     if (m_bitrateUpdating)
         return;
@@ -505,7 +505,7 @@ void QnCameraScheduleWidget::syncBitrateSliderWithSpinBox()
     syncQualityWithBitrate();
 }
 
-void QnCameraScheduleWidget::syncBitrateSpinBoxWithSlider()
+void QnCameraScheduleWidget::bitrateSliderChanged()
 {
     if (m_bitrateUpdating)
         return;

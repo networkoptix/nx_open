@@ -117,8 +117,8 @@ private:
     void syncQualityWithBitrate();
     void syncBitrateWithQuality();
     void syncBitrateWithFps();
-    void syncBitrateSliderWithSpinBox();
-    void syncBitrateSpinBoxWithSlider();
+    void bitrateSpinBoxChanged();
+    void bitrateSliderChanged();
 
     void showMoreSettings(bool show);
 
