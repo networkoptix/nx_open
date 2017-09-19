@@ -100,6 +100,11 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     m_tunnelClosedHandler = std::move(handler);
 }
 
+std::string OutgoingTunnelConnection::toString() const
+{
+    return lm("Relaying. Relay server in use: %1").args(m_relayUrl).toStdString();
+}
+
 void OutgoingTunnelConnection::setInactivityTimeout(std::chrono::milliseconds timeout)
 {
     m_inactivityTimeout = timeout;

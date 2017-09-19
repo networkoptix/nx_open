@@ -4,7 +4,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-AbstractTunnelAcceptor:: AbstractTunnelAcceptor():
+AbstractTunnelAcceptor::AbstractTunnelAcceptor():
     m_mediatorConnection(nullptr)
 {
 }
@@ -20,6 +20,16 @@ void AbstractTunnelAcceptor::setMediatorConnection(
     hpm::api::MediatorServerTcpConnection*  connection)
 {
     m_mediatorConnection = connection;
+}
+
+String AbstractTunnelAcceptor::connectionId() const
+{
+    return m_connectionId;
+}
+
+String AbstractTunnelAcceptor::remotePeerId() const
+{
+    return m_remotePeerId;
 }
 
 } // namespace cloud

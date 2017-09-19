@@ -538,6 +538,12 @@ main()
     echo "Copying build_info.txt"
     cp -r "$BUILD_DIR/common/build_info.txt" "$INSTALL_DIR/"
 
+    echo "Copying build_info.txt"
+    cp "$BUILD_DIR/common/build_info.txt" "$INSTALL_DIR/" || {
+        # This is an ugly workaround for maven, remove as soon as maven is not in use.
+        cp "$BUILD_DIR/../../common/arm-$BOX/build_info.txt" "$INSTALL_DIR"
+    }
+
     copyBuildLibs
     copyQtLibs
     copyBins
