@@ -29,10 +29,10 @@ public:
     AnalyticsHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     /** Get list of all supported analytics events in the system. */
-    QList<EventDescriptor> analyticsEvents() const;
+    QList<EventDescriptor> systemSupportedAnaliticEvents() const;
 
     /** Get list of all supported analytics events for the given cameras. */
-    static QList<EventDescriptor> analyticsEvents(
+    static QList<EventDescriptor> supportedAnalyticsEvents(
         const QnVirtualCameraResourceList& cameras);
 
     static bool hasDifferentDrivers(const QList<EventDescriptor>& events);
