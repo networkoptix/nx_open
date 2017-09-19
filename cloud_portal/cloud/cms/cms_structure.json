@@ -3,6 +3,7 @@
   "contexts":[
     {
       "name":"branding",
+      "is_global":true,
       "description":"Common branding information",
       "translatable": false,
       "values":[

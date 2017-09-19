@@ -20,16 +20,18 @@ def find_or_add_context_by_file(file_path, product_id, has_language):
     if Context.objects.filter(file_path=file_path, product_id=product_id).exists():
         return Context.objects.get(file_path=file_path, product_id=product_id)
     context = Context(name=file_path, file_path=file_path,
-                      product_id=product_id, translatable=has_language)
+                      product_id=product_id, translatable=has_language,
+                      is_global=False)
     context.save()
     return context
 
 
-def find_or_add_context(context_name, product_id, has_language):
+def find_or_add_context(context_name, product_id, has_language, is_global):
     if Context.objects.filter(name=context_name, product_id=product_id).exists():
         return Context.objects.get(name=context_name, product_id=product_id)
     context = Context(name=context_name, file_path=context_name,
-                      product_id=product_id, translatable=has_language)
+                      product_id=product_id, translatable=has_language,
+                      is_global=is_global)
     context.save()
     return context
 
@@ -78,8 +80,11 @@ def read_structure_json():
     product_id = Product.objects.get(name=product_name).id
     for context_data in cms_structure['contexts']:
         has_language = context_data["translatable"]
+        is_global = False
+        if "is_global" in context_data:
+            is_global = context_data["is_global"]
         context = find_or_add_context(
-            context_data["name"], product_id, has_language)
+            context_data["name"], product_id, has_language, is_global)
         if "description" in context_data:
             context.description = context_data["description"]
         if "file_path" in context_data:

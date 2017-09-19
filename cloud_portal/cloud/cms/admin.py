@@ -46,7 +46,7 @@ admin.site.register(Product, ProductAdmin)
 
 class ContextAdmin(CMSAdmin):
     list_display = ('context_actions', 'name', 'description',
-                    'url', 'translatable')
+                    'url', 'translatable', 'is_global')
     search_fields = ('name', 'description', 'url')
 
     def context_actions(self, obj):

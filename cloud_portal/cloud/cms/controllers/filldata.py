@@ -110,7 +110,7 @@ def process_file(source_file, customization, product_id, preview, version_id):
     context_name, language_code = context_for_file(
         source_file, customization.name)
 
-    branding_context = Context.objects.filter(name='branding')
+    global_contexts = Context.objects.filter(is_global=True)
     context = Context.objects.filter(
         file_path=context_name, product_id=product_id)
     if language_code:
@@ -125,9 +125,10 @@ def process_file(source_file, customization, product_id, preview, version_id):
     if context.exists() and language:
         content = process_context_structure(
             customization, context.first(), content, language, version_id, preview)
-    if branding_context.exists():
+        
+    for global_context in global_contexts.all():
         content = process_context_structure(
-            customization, branding_context.first(), content, None, version_id, preview)
+            customization, global_context, content, None, version_id, preview)
 
     filename = context_name
     if language_code:
