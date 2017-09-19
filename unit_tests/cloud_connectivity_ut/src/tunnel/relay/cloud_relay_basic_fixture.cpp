@@ -21,8 +21,16 @@ BasicFixture::BasicFixture()
 
 BasicFixture::~BasicFixture()
 {
-    api::ClientFactory::setCustomFactoryFunc(
-        std::move(m_clientFactoryBak));
+    resetClientFactoryToDefault();
+}
+
+void BasicFixture::resetClientFactoryToDefault()
+{
+    if (m_clientFactoryBak)
+    {
+        api::ClientFactory::setCustomFactoryFunc(std::move(*m_clientFactoryBak));
+        m_clientFactoryBak = boost::none;
+    }
 }
 
 std::unique_ptr<api::Client> 
