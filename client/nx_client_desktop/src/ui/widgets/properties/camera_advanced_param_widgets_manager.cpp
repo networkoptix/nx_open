@@ -177,6 +177,14 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this,
                 &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
         }
+
+        if (!param.notes.isEmpty())
+        {
+            auto label = new QLabel(scrollAreaWidgetContents);
+            label->setWordWrap(true);
+            label->setText(param.notes);
+            gridLayout->addWidget(label, row + 1, 1);
+        }
 	}
 
     gridLayout->setColumnStretch(1, 1);
