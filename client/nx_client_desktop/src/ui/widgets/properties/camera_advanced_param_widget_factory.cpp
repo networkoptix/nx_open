@@ -62,20 +62,28 @@ private:
     QCheckBox* m_checkBox;
 };
 
-class QnMinMaxStepCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
+class QnMinMaxStepCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget
+{
 public:
-    QnMinMaxStepCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
+    QnMinMaxStepCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
         QnAbstractCameraAdvancedParamWidget(parameter, parent),
         m_spinBox(new QSpinBox(this))
     {
         double min = 0;
         double max = 0;
         parameter.getRange(min, max);
-        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min >= 1.0);
-        if (m_isInteger) {
+
+        m_isInteger = qFuzzyEquals(qRound(min), min)
+            && qFuzzyEquals(qRound(max), max)
+            && (max - min >= 1.0);
+
+        if (m_isInteger)
+        {
             m_spinBox->setMinimum(qRound(min));
             m_spinBox->setMaximum(qRound(max));
-        } else {
+        }
+        else
+        {
             m_spinBox->setMinimum(qRound(min * 100));
             m_spinBox->setMaximum(qRound(max * 100));
         }
@@ -83,21 +91,29 @@ public:
         m_spinBox->setToolTip(parameter.description);
         setReadOnly(m_spinBox, parameter.readOnly);
 
-        m_layout->insertStretch(0);
-        m_layout->insertWidget(0, m_spinBox);
-        connect(m_spinBox, QnSpinboxIntValueChanged, this, [this] {
-            emit valueChanged(m_id, value());
-        });
+        if (!parameter.unit.isEmpty())
+            m_spinBox->setSuffix(lit(" %1").arg(parameter.unit));
+
+        m_layout->addWidget(m_spinBox);
+        m_layout->addStretch(0);
+
+        connect(m_spinBox, QnSpinboxIntValueChanged, this,
+            [this]()
+            {
+                emit valueChanged(m_id, value());
+            });
     }
 
-    virtual QString value() const override	{
+    virtual QString value() const override
+    {
         int innerValue = m_spinBox->value();
         if (m_isInteger)
             return QString::number(innerValue);
         return QString::number(0.01 * innerValue);
     }
 
-    virtual void setValue(const QString &newValue) override	{
+    virtual void setValue(const QString &newValue) override
+    {
         if (m_isInteger)
             m_spinBox->setValue(newValue.toInt());
         else
@@ -119,7 +135,10 @@ public:
         if (!success)
             return;
 
-        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min >= 1.0);
+        m_isInteger = qFuzzyEquals(qRound(min), min)
+            && qFuzzyEquals(qRound(max), max)
+            && (max - min >= 1.0);
+
         if (m_isInteger)
         {
             m_spinBox->setMinimum(qRound(min));
@@ -133,8 +152,8 @@ public:
     }
 
 private:
-    QSpinBox* m_spinBox;
-    bool m_isInteger;
+    QSpinBox* const m_spinBox = nullptr;
+    bool m_isInteger = false;
 };
 
 class QnEnumerationCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget
