@@ -17,3 +17,10 @@ set(CMAKE_ANDROID_ARM_MODE ON)
 set(CMAKE_ANDROID_ARCH_ABI armeabi-v7a)
 set(CMAKE_ANDROID_STL_TYPE gnustl_shared)
 set(CMAKE_ANDROID_NDK_TOOLCHAIN_VERSION clang)
+
+# These macros are not required because they are declared by a compiler.
+# We declare them explicitly to improve code parsing by IDEs.
+add_definitions(-DANDROID -D__ANDROID__)
+
+# TODO: Remove after switching to Android NDK r16.
+add_definitions(-D__LP32__)
