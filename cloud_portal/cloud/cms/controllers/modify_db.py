@@ -155,15 +155,16 @@ def remove_unused_records(customization):
 
 
 def generate_preview(context=None):
-    fill_content(customization_name=settings.CUSTOMIZATION)
+    fill_content(customization_name=settings.CUSTOMIZATION, preview=True, incremental=True)
     return context.url + "?preview" if context else "?preview"
 
 
 def publish_latest_version(customization, user):
     publish_errors = accept_latest_draft(customization, user)
     if not publish_errors:
-        fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
+        fill_content(customization_name=settings.CUSTOMIZATION, preview=False, incremental=True)
     return publish_errors
+
 
 def send_version_for_review(customization, language, data_structures,
                             product, request_data, request_files, user):
