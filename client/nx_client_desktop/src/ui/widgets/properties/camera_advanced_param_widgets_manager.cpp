@@ -146,13 +146,19 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
         if (!widget)
             continue;
 
-        int row = gridLayout->rowCount();
+        const auto row = gridLayout->rowCount();
+
+        if (param.dataType == QnCameraAdvancedParameter::DataType::Separator)
+        {
+            gridLayout->addWidget(widget, row, 0, 1, 2);
+            continue;
+        }
+
         if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
         {
             auto label = new QLabel(scrollAreaWidgetContents);
             label->setToolTip(param.description);
             setLabelText(label, param, param.range);
-            //label->setText(lit("%1: ").arg(param.name));
             label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             label->setBuddy(widget);
             gridLayout->addWidget(label, row, 0);
@@ -271,7 +277,7 @@ void QnCameraAdvancedParamWidgetsManager::setLabelText(
 
     if (!parameter.showRange)
     {
-        label->setText(lit("%1: ").arg(parameter.name));
+        label->setText(lit("%1").arg(parameter.name));
         return;
     }
 
@@ -281,7 +287,7 @@ void QnCameraAdvancedParamWidgetsManager::setLabelText(
 
     NX_ASSERT(parameter.dataType == QnCameraAdvancedParameter::DataType::Number);
     label->setText(
-        lit("%1 (%2-%3): ")
+        lit("%1 (%2-%3)")
             .arg(parameter.name)
             .arg(rangeSplit[0].trimmed())
             .arg(rangeSplit[1].trimmed()));

@@ -6,6 +6,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
@@ -232,34 +233,59 @@ private:
 	QLineEdit* m_lineEdit;
 };
 
-QnAbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent) {
+class QnSeparatorCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget
+{
+public:
+    QnSeparatorCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
+        QnAbstractCameraAdvancedParamWidget(parameter, parent),
+        m_line(new QFrame(this))
+    {
+        m_line->setFrameShape(QFrame::HLine);
+        m_line->setFrameShadow(QFrame::Sunken);
+        m_layout->addWidget(m_line);
+    }
+
+    virtual QString value() const override { return QString(); }
+    virtual void setValue(const QString& /*newValue*/) override {}
+
+private:
+    QFrame* const m_line;
+};
+
+QnAbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createWidget(
+    const QnCameraAdvancedParameter& parameter, QWidget* parent)
+{
 	if (!parameter.isValid())
-		return NULL;
+		return nullptr;
 
-	switch (parameter.dataType) {
+	switch (parameter.dataType)
+    {
+	    /* CheckBox */
+	    case QnCameraAdvancedParameter::DataType::Bool:
+		    return new QnBoolCameraAdvancedParamWidget(parameter, parent);
 
-	/* CheckBox */
-	case QnCameraAdvancedParameter::DataType::Bool:
-		return new QnBoolCameraAdvancedParamWidget(parameter, parent);
+	    /* Slider */
+	    case QnCameraAdvancedParameter::DataType::Number:
+		    return new QnMinMaxStepCameraAdvancedParamWidget(parameter, parent);
 
-	/* Slider */
-	case QnCameraAdvancedParameter::DataType::Number:
-		return new QnMinMaxStepCameraAdvancedParamWidget(parameter, parent);
+	    /* Drop-down box. */
+	    case QnCameraAdvancedParameter::DataType::Enumeration:
+		    return new QnEnumerationCameraAdvancedParamWidget(parameter, parent);
 
-	/* Drop-down box. */
-	case QnCameraAdvancedParameter::DataType::Enumeration:
-		return new QnEnumerationCameraAdvancedParamWidget(parameter, parent);
+	    /* Button */
+	    case QnCameraAdvancedParameter::DataType::Button:
+		    return new QnButtonCameraAdvancedParamWidget(parameter, parent);
 
-	/* Button */
-	case QnCameraAdvancedParameter::DataType::Button:
-		return new QnButtonCameraAdvancedParamWidget(parameter, parent);
+	    /* LineEdit  */
+	    case QnCameraAdvancedParameter::DataType::String:
+		    return new QnStringCameraAdvancedParamWidget(parameter, parent);
 
-	/* LineEdit  */
-	case QnCameraAdvancedParameter::DataType::String:
-		return new QnStringCameraAdvancedParamWidget(parameter, parent);
+        /* Separator */
+        case QnCameraAdvancedParameter::DataType::Separator:
+            return new QnSeparatorCameraAdvancedParamWidget(parameter, parent);
 
-	default:
-		return NULL;
+	    default:
+		    return nullptr;
 	}
 }
 
