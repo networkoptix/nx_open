@@ -21,7 +21,7 @@
 #define O_LARGEFILE 0
 #endif
 
-#ifdef Q_OS_IOS
+#if defined(Q_OS_IOS) || (defined(Q_OS_ANDROID) && __ANDROID_API__ < 21)
 #define stat64 stat
 #define fstat64 fstat
 #endif

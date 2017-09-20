@@ -6,7 +6,10 @@
 #include "tz.h"
 
 #include <sys/stat.h>
-#include <sys/timeb.h>
+
+#if defined(_WIN32)
+    #include <sys/timeb.h>
+#endif
 
 #include <atomic>
 #include <fstream>
