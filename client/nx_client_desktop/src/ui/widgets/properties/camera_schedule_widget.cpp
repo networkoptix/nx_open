@@ -50,7 +50,7 @@ using namespace nx::client::desktop::ui;
 
 namespace {
 
-static constexpr qreal kKbpsInMbps = 1024.0;
+static constexpr qreal kKbpsInMbps = 1000.0;
 
 void setLayoutEnabled(QLayout* layout, bool enabled)
 {
