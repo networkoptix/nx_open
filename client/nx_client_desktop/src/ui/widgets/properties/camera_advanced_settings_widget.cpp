@@ -51,10 +51,12 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
     ui->secondaryStreamUrlInputField->setTitle(tr("Secondary Stream"));
     ui->secondaryStreamUrlInputField->setReadOnly(true);
 
+    auto cameraIdLineEdit = ui->cameraIdInputField->findChild<QLineEdit*>();
     auto primaryLineEdit = ui->primaryStreamUrlInputField->findChild<QLineEdit*>();
     auto secondaryLineEdit = ui->secondaryStreamUrlInputField->findChild<QLineEdit*>();
-    NX_ASSERT(primaryLineEdit && secondaryLineEdit);
+    NX_ASSERT(cameraIdLineEdit && primaryLineEdit && secondaryLineEdit);
 
+    ClipboardButton::createInline(cameraIdLineEdit, ClipboardButton::StandardType::copy);
     ClipboardButton::createInline(primaryLineEdit, ClipboardButton::StandardType::copy);
     ClipboardButton::createInline(secondaryLineEdit, ClipboardButton::StandardType::copy);
 
