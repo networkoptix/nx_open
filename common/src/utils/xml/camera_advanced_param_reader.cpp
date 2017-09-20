@@ -163,6 +163,7 @@ namespace QnXmlTag {
     const QString paramShowRange        = lit("showRange");
     const QString paramNotes            = lit("notes");
     const QString paramUnit             = lit("unit");
+    const QString paramResync           = lit("resync");
 
     const QString dependenciesRoot      = lit("dependencies");
     const QString dependenciesShow      = lit("dependencies-ranges");
@@ -260,7 +261,8 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
     param.aux           = elementXml.attribute(QnXmlTag::paramAux);
     param.showRange     = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramShowRange));
     param.notes         = elementXml.attribute(QnXmlTag::paramNotes);
-    param.unit         = elementXml.attribute(QnXmlTag::paramUnit);
+    param.unit          = elementXml.attribute(QnXmlTag::paramUnit);
+    param.resync        = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
 
     auto childNodes = elementXml.childNodes();
 

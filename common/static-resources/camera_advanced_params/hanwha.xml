@@ -71,6 +71,21 @@
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;">
                 </param>
+                
+                <param id="PRIMARY%media/videoprofile/FrameRate"
+                    name="Frame Rate"
+                    dataType="Number"
+                    readOnly="true"
+                    aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
+                </param>
+                
+                <param id="PRIMARY%media/videoprofile/Bitrate"
+                        name="Bitrate"
+                        dataType="Number"
+                        writeCmd="update"
+                        readOnly="true"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true">
+                </param>
                         
                 <param id="PRIMARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
@@ -245,7 +260,7 @@
                 <param id="PRIMARY%SERVICE%ResetToDefault"
                     name="Reset To Default"
                     dataType="Button"
-                    reloadOnClick="true"
+                    resync="true"
                     aux="streamsToReopen=primary;profile=primary"/>
                 
             </group>
@@ -464,7 +479,7 @@
                 <param id="SECONDARY%SERVICE%ResetToDefault"
                     name="Reset To Default"
                     dataType="Button"
-                    reloadOnClick="true"
+                    resync="true"
                     aux="streamsToReopen=secondary;profile=secondary"/>
             </group>
             

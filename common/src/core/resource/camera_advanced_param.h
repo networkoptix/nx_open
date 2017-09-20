@@ -112,6 +112,7 @@ struct QnCameraAdvancedParameter
     bool showRange = false; //< Show range near parameter's label
     QString unit;
     QString notes;
+    bool resync = false;
 
     bool isValid() const;
     QStringList getRange() const;
