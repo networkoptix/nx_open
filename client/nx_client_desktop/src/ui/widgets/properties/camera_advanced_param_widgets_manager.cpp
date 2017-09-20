@@ -127,7 +127,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
 {
     auto page = new QWidget(m_contentsWidget);
     auto pageLayout = new QHBoxLayout(page);
-    pageLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargin, 0, 0, 0);
+    pageLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
 	auto groupBox = new QGroupBox(page);
     groupBox->setFlat(true);
