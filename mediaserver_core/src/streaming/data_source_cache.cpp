@@ -7,8 +7,8 @@
 
 const unsigned int DataSourceCache::DEFAULT_LIVE_TIME_MS;
 
-DataSourceCache::DataSourceCache(nx::utils::StandaloneTimerManager* timeManager):
-    m_timeManager(timeManager),
+DataSourceCache::DataSourceCache(nx::utils::StandaloneTimerManager* timerManager):
+    m_timerManager(timerManager),
     m_terminated(false)
 {
 }
@@ -25,7 +25,7 @@ DataSourceCache::~DataSourceCache()
     }
 
     for (auto val: timers)
-        m_timeManager->joinAndDeleteTimer(val.first);
+        m_timerManager->joinAndDeleteTimer(val.first);
 }
 
 DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
@@ -58,7 +58,7 @@ DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
         // Taking existing reader which is already at required position (from previous chunk).
         DataSourceContextPtr item = it->second.first;
         timerGuard = nx::utils::TimerManager::TimerGuard(
-            m_timeManager,
+            m_timerManager,
             it->second.second);
         // timerGuard will remove timer after unlocking mutex.
         m_timers.erase(timerGuard.get());
@@ -83,7 +83,7 @@ void DataSourceCache::put(
     const unsigned int livetimeMs)
 {
     QnMutexLocker lock(&m_mutex);
-    const quint64 timerId = m_timeManager->addTimer(
+    const quint64 timerId = m_timerManager->addTimer(
         this,
         std::chrono::milliseconds(livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs));
     m_cachedDataProviders.emplace(key, std::make_pair(data, timerId));
@@ -103,7 +103,7 @@ void DataSourceCache::removeRange(
     {
         timerGuards.emplace_back(
             nx::utils::TimerManager::TimerGuard(
-                m_timeManager,
+                m_timerManager,
                 it->second.second));
         it = m_cachedDataProviders.erase(it);
     }
