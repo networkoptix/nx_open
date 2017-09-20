@@ -94,10 +94,16 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 	item->setData(0, Qt::ToolTipRole, group.description);
     item->setExpanded(true);
 
-	QWidget* contentsPage = createContentsPage(group.name, group.params);
-	m_contentsWidget->addWidget(contentsPage);
-
-	item->setData(0, Qt::UserRole, qVariantFromValue(contentsPage));
+    if (group.params.empty() && !group.groups.empty())
+    {
+        item->setFlags(Qt::ItemIsEnabled);
+    }
+    else
+    {
+        QWidget* contentsPage = createContentsPage(group.name, group.params);
+        m_contentsWidget->addWidget(contentsPage);
+        item->setData(0, Qt::UserRole, qVariantFromValue(contentsPage));
+    }
 
     for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
         createGroupWidgets(subGroup, item);
@@ -203,7 +209,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                             return false;
 
                         widget->setRange(dependency.range);
-                        
+
                         auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
                         if (!label)
                             return false;
