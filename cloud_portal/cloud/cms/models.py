@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
+from model_utils import Choices
 
 from django.template.defaultfilters import truncatechars
 
@@ -10,7 +11,9 @@ from django.template.defaultfilters import truncatechars
 # CMS structure (data structure). Only developers can change that
 
 class Product(models.Model):
+    PREVIEW_STATUS = Choices('draft', 'review')
     name = models.CharField(max_length=255, unique=True)
+    preview_state = models.CharField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft, max_length=20)
 
     def __str__(self):
         return self.name
