@@ -15,6 +15,12 @@
 
 #include <nx/utils/log/assert.h>
 
+namespace {
+
+static constexpr int kParameterLabelWidth = 120;
+
+} // namespace
+
 using ConditionType = QnCameraAdvancedParameterCondition::ConditionType;
 using Dependency = QnCameraAdvancedParameterDependency;
 using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
@@ -162,6 +168,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             label->setBuddy(widget);
             gridLayout->addWidget(label, row, 0);
             m_paramLabelsById[param.id] = label;
+            label->setFixedWidth(kParameterLabelWidth);
+            label->setWordWrap(true);
         }
 
         gridLayout->addWidget(widget, row, 1, Qt::AlignVCenter);
@@ -188,7 +196,6 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
 	}
 
     gridLayout->setColumnStretch(1, 1);
-    gridLayout->setColumnMinimumWidth(1, style::Hints::kMinimumFormLabelWidth);
 
     for (const auto& param: params)
     {
