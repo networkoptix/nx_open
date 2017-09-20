@@ -70,7 +70,7 @@ public:
         double min = 0;
         double max = 0;
         parameter.getRange(min, max);
-        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min > 1.0);
+        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min >= 1.0);
         if (m_isInteger) {
             m_spinBox->setMinimum(qRound(min));
             m_spinBox->setMaximum(qRound(max));
@@ -118,7 +118,7 @@ public:
         if (!success)
             return;
 
-        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min > 1.0);
+        m_isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min >= 1.0);
         if (m_isInteger)
         {
             m_spinBox->setMinimum(qRound(min));

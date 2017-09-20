@@ -49,6 +49,7 @@
             </param>
             <param id="media/audioinput/Gain"
                     name="Gain"
+                    showRange="true"
                     dataType="Number"
                     range="1,10"
                     aux="support=Media/Limit/MaxAudioInput"/>
@@ -68,7 +69,8 @@
                         name="Resolution"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;"/>
+                        aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;">
+                </param>
                         
                 <param id="PRIMARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
@@ -141,15 +143,6 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                
-                <param id="PRIMARY%media/videoprofile/Bitrate"
-                        name="Bitrate"
-                        dataType="Number"
-                        writeCmd="update"
-                        showRange="true"
-                        unit="Kbit/s"
-                        notes="FPS and Bitrate for the primary stream can only be set up on the Recording tab."
-                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true"/>
                         
                 <param id="PRIMARY%media/videoprofile/H264.GOVLength"
                         name="GOV Length"
@@ -221,7 +214,7 @@
                         name="Entropy Coding"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=264">
+                        aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=H264">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -248,9 +241,17 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
+                
+                <param id="PRIMARY%SERVICE%ResetToDefault"
+                    name="Reset To Default"
+                    dataType="Button"
+                    reloadOnClick="true"
+                    aux="streamsToReopen=primary;profile=primary"/>
+                
             </group>
             
             <group name="Secondary Stream">
+                    
                 <param id="SECONDARY%media/videoprofile/EncodingType"
                         name="Codec"
                         dataType="Enumeration"
@@ -262,11 +263,27 @@
                         name="Resolution"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;"/>
-                
+                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;">
+                </param>
+
                 <param id="SECONDARY%SERVICE%ResolutionSeparator"
                     name="sep"
-                    dataType="Separator"/>
+                    dataType="Separator"/>                
+
+                <param id="SECONDARY%media/videoprofile/FrameRate"
+                    name="Frame Rate"
+                    dataType="Number"
+                    showRange="true"
+                    aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
+                </param>
+                
+                <param id="SECONDARY%media/videoprofile/Bitrate"
+                        name="Bitrate"
+                        dataType="Number"
+                        writeCmd="update"
+                        showRange="true"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true">
+                </param>
                         
                 <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
@@ -444,7 +461,13 @@
                     </dependencies>
                 </param>
                 
+                <param id="SECONDARY%SERVICE%ResetToDefault"
+                    name="Reset To Default"
+                    dataType="Button"
+                    reloadOnClick="true"
+                    aux="streamsToReopen=secondary;profile=secondary"/>
             </group>
+            
             <group name="WiseStream">
                 <param id="media/wisestream/Mode"
                         name="Mode"
@@ -460,6 +483,7 @@
                         dataType="Bool"/>
                 <param id="image/ssdr/Level"
                         name="Level"
+                        showRange="true"
                         dataType="Number">
                     <dependencies>
                         <dependencies-show>
@@ -492,6 +516,7 @@
                         range=""/>
                 <param id="image/whitebalance/WhiteBalanceManualRedLevel"
                         name="Red Gain"
+                        showRange="true"
                         dataType="Number">
                     <dependencies>
                         <dependencies-show>
@@ -506,7 +531,7 @@
                 <param id="image/whitebalance/WhiteBalanceManualBlueLevel"
                         name="Blue Gain"
                         dataType="Number"
-                        range="">
+                        showRange="true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -557,6 +582,7 @@
                 <param id="image/camera/BLCAreaTop"
                         name="BLC Area Top"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
@@ -571,6 +597,7 @@
                 <param id="image/camera/BLCAreaBottom"
                         name="BLC Area Bottom"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
@@ -585,6 +612,7 @@
                 <param id="image/camera/BLCAreaLeft"
                         name="BLC Area Left"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
@@ -599,6 +627,7 @@
                 <param id="image/camera/BLCAreaRight"
                         name="BLC Area Right"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
@@ -642,6 +671,7 @@
                 <param id="image/camera/HLCMaskTone"
                     name="HLC Mask Tone"
                     dataType="Number"
+                    showRange="true"
                     aux="group=whitebalance;groupInclude=HLC">
                     <dependencies>
                         <dependencies-show>
@@ -684,6 +714,7 @@
                 <param id="image/camera/HLCAreaTop"
                         name="HLC Area Top"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=HLC">
                     <dependencies>
                         <dependencies-show>
@@ -698,6 +729,7 @@
                 <param id="image/camera/HLCAreaBottom"
                         name="HLC Area Bottom"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=HLC">
                     <dependencies>
                         <dependencies-show>
@@ -712,6 +744,7 @@
                 <param id="image/camera/HLCAreaLeft"
                         name="HLC Area Left"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=HLC">
                     <dependencies>
                         <dependencies-show>
@@ -726,6 +759,7 @@
                 <param id="image/camera/HLCAreaRight"
                         name="HLC Area Right"
                         dataType="Number"
+                        showRange="true"
                         aux="group=whitebalance;groupInclude=HLC">
                     <dependencies>
                         <dependencies-show>
@@ -741,7 +775,8 @@
             <group name="Exposure">
                 <param id="image/imageenhancements/Brightness"
                         name="Brightness"
-                        dataType="Number"/>
+                        dataType="Number"
+                        showRange="true"/>
                 <param id="image/camera/AutoShortShutterSpeed"
                         name="Minimum Shutter"
                         dataType="Enumeration"
@@ -752,14 +787,15 @@
                         aux="sorting=ratio"/>
                 <param id="image/camera/AFLKMode"
                         name="Anti Flicker"
-                        dataType="Enumeration"
-                        range="Off,60Hz,70Hz"/>
+                        dataType="Enumeration"/>
                 <param id="image/camera/SSNRMode"
                         name="SSNR Mode"
                         dataType="Enumeration"/>
                 <param id="image/camera/SSNRLevel"
                         name="SSNR Level"
-                        dataType="Number">
+                        dataType="Number"
+                        showRange="true"
+                        aux="group=ssnr;groupInclude=Manual">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -780,19 +816,28 @@
                         name="Mode"
                         dataType="Enumeration"
                         range="Color,B/W,Auto,External"
-                        internalRange="Color,BW,Auto,ExternalBW"/>
-                <!--<param id="root.ImageSource.I0.Sensor.ColorLevel"
-                        name="Dwell Time"
-                        dataType="Enumeration"/>-->
+                        internalRange="Color,BW,Auto,ExternalBW"
+                        aux="groupLead=dn"/>
                 <param id="image/camera/DayNightSwitchingMode"
                         name="Duration"
                         dataType="Enumeration"
-                        range="Very fast,Fast,Normal,Slow,Very slow"/>
+                        aux="group=dn;groupInclude=Auto">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/camera/DayNightMode"
+                                    condition="value=Auto"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/camera/DayNightAlarmIn"
                         name="Alarm Input"
                         dataType="Enumeration"
                         range="Open:Color/Close:BW,Open:BW/Close:Color"
-                        internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens">
+                        internalRange="SwitchToBWIfCloses,SwitchToBWIfOpens"
+                        aux="group=dn;groupInclude=External">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -807,22 +852,50 @@
             <group name="Special">
                 <param id="image/imageenhancements/SharpnessEnable"
                         name="Sharpness"
-                        dataType="Bool"/>
+                        dataType="Bool"
+                        aux="groupLead=sharpness"/>
                 <param id="image/imageenhancements/SharpnessLevel"
                         name="Sharpness Level"
-                        dataType="Number"/>
+                        dataType="Number"
+                        showRange="true"
+                        aux="group=sharpness;groupInclude=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/imageenhancements/SharpnessEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
                 <param id="image/imageenhacements/Gamma"
                         name="Gamma"
-                        dataType="Number"/>
+                        dataType="Number"
+                        showRange="true"/>
                 <param id="image/imageenhacements/Saturation"
                         name="ColorLevel"
-                        dataType="Number"/>
+                        dataType="Number"
+                        showRange="true"/>
                 <param id="image/imageenhacements/LDCEnable" 
                         name="LDC"
-                        dataType="Bool"/>
+                        dataType="Bool"
+                        aux="groupLead=ldc"/>
                 <param id="image/imageenhacements/LDCLevel"
                         name="LDC Level"
-                        dataType="Number"/>
+                        dataType="Number"
+                        showRange="true"
+                        aux="group=ldc;groupInclude=true">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/imageenhancements/LDCEnable"
+                                    condition="value=true"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
             </group>
             <group name="IR">
                 <param id="image/irled/Mode"
@@ -836,7 +909,7 @@
                         dataType="Button"
                         writeCmd="control"
                         aux="noChannel"/>
-            <param id="system/factoryreset/ExludeSettings=None"
+            <param id="system/factoryreset/ExcludeSettings=None"
                         name="Hard Reset"
                         dataType="Button"
                         writeCmd="control"

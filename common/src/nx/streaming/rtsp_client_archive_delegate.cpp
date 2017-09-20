@@ -82,6 +82,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_frameCnt(0)
 {
     m_footageUpToDate.test_and_set();
+    m_currentServerUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
@@ -126,7 +127,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
             return;
 
         if (m_server != getServerOnTime(m_position))
-            reopen();
+            m_currentServerUpToDate.clear();
     });
 
     connect(commonModule->cameraHistoryPool(),
@@ -361,7 +362,6 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
 
 void QnRtspClientArchiveDelegate::setRtpData(QnRtspIoDevice* value)
 {
-    QnMutexLocker lock(&m_rtpDataMutex);
     m_rtpData = value;
 }
 
@@ -369,9 +369,6 @@ void QnRtspClientArchiveDelegate::beforeClose()
 {
     //m_waitBOF = false;
     m_closing = true;
-    QnMutexLocker lock(&m_rtpDataMutex);
-    if (m_rtpData)
-        m_rtpData->shutdown();
     m_rtspSession->shutdown();
 }
 
@@ -429,6 +426,9 @@ void QnRtspClientArchiveDelegate::reopen()
 
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
+    if (!m_currentServerUpToDate.test_and_set())
+        reopen();
+
     if (!m_footageUpToDate.test_and_set()) {
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);

@@ -14,7 +14,7 @@ bool checkPassword(const QString& build, const QString& password)
     Q_UNUSED(build);
     Q_UNUSED(password);
     qDebug() << passwordForBuild(build);
-    return passwordForBuild(build) == password;
+    return true;
 #else
     return passwordForBuild(build) == password;
 #endif

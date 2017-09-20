@@ -3149,7 +3149,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
     {
         if( m_eventCapabilities && m_eventCapabilities->WSPullPointSupport )
         {
-            // Ignoring renew error since it does not work on some cameras (on Vista, particulary)
+            // Ignoring renew error since it does not work on some cameras (on Vista, particularly).
             NX_LOGX( lit("Ignoring renew error on %1").arg(getUrl()), cl_logDEBUG2 );
         }
         else
@@ -3781,7 +3781,7 @@ void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
     {
         QnMutexUnlocker unlock(&lock);
         // TODO: Make removePullPointSubscription and createPullPointSubscription
-        //     asynchronous, so that it does not block timer thread.
+        // asynchronous, so that it does not block timer thread.
         removePullPointSubscription();
         isSubscribed = createPullPointSubscription();
     }

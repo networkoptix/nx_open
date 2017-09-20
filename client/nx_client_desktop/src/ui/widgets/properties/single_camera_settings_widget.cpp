@@ -55,8 +55,9 @@ using namespace nx::client::desktop::ui;
 
 namespace {
 
-const QSize kFisheyeThumbnailSize(0, 0); //unlimited size for better calibration
-const QSize kSensitivityButtonSize(34, 34);
+static const QSize kFisheyeThumbnailSize(0, 0); //unlimited size for better calibration
+static const QSize kSensitivityButtonSize(34, 34);
+static const QString kRemoveCredentialsFromWebPageUrl = lit("removeCredentialsFromWebPageUrl");
 
 } // unnamed namespace
 
@@ -934,7 +935,15 @@ void QnSingleCameraSettingsWidget::at_motionRegionListChanged()
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
 {
     QUrl url(urlString);
-    if (!m_readOnly)
+
+    bool removeCredentials = false;
+    if (m_camera)
+    {
+        removeCredentials = 
+            !m_camera->getProperty(kRemoveCredentialsFromWebPageUrl).isEmpty();
+    }
+
+    if (!m_readOnly && !removeCredentials)
     {
         url.setUserName(ui->loginEdit->text());
         url.setPassword(ui->passwordEdit->text());
