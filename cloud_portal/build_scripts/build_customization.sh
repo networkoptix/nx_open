@@ -119,22 +119,6 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "Localization success"
 
-
-    echo "------------------------------"
-    echo "Branding"
-    cp $dir/branding.ts $TARGET_DIR/$CUSTOMIZATION
-    pushd $TARGET_DIR/$CUSTOMIZATION/source
-    python ../../../../build_scripts/generate_languages_json.py
-    # python ../../../../build_scripts/branding.py # do not do branding here, leave it to cms
-    rm -rf *.ts
-    popd
-    echo "Branding success"
-
-
-    echo "copy sources to root"
-    cp -rf $TARGET_DIR/$CUSTOMIZATION/source/* $TARGET_DIR/$CUSTOMIZATION/
-
-
 echo "$CUSTOMIZATION Done"
 
 # say "Cloud portal build is finished"
