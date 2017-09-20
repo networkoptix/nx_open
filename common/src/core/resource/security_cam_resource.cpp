@@ -1246,11 +1246,11 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
         switch (quality)
         {
         case Qn::StreamQuality::QualityLowest:
-            return 0.75;
+            return 0.66;
         case Qn::StreamQuality::QualityLow:
-            return 1.0;
+            return 0.8;
         case Qn::StreamQuality::QualityNormal:
-            return 1.5;
+            return 1.0;
         case Qn::StreamQuality::QualityHigh:
             return 2.0;
         case Qn::StreamQuality::QualityHighest:
