@@ -828,6 +828,10 @@ void QnNxStyle::drawPrimitive(
                 {
                     readOnly = lineEdit->isReadOnly();
                 }
+                else if (auto spinBox = qobject_cast<const QAbstractSpinBox*>(widget))
+                {
+                    readOnly = spinBox->isReadOnly();
+                }
                 else if (auto plainTextEdit = qobject_cast<const QPlainTextEdit*>(widget))
                 {
                     readOnly = plainTextEdit->isReadOnly();
