@@ -147,6 +147,8 @@
                         dataType="Number"
                         writeCmd="update"
                         showRange="true"
+                        unit="Kbit/s"
+                        notes="FPS and Bitrate for the primary stream can only be set up on the Recording tab."
                         aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true"/>
                         
                 <param id="PRIMARY%media/videoprofile/H264.GOVLength"
@@ -261,6 +263,10 @@
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;"/>
+                
+                <param id="SECONDARY%SERVICE%ResolutionSeparator"
+                    name="sep"
+                    dataType="Separator"/>
                         
                 <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
@@ -337,6 +343,7 @@
                         dataType="Number"
                         writeCmd="update"
                         showRange="true"
+                        unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"/>
                         
                 <param id="SECONDARY%media/videoprofile/H264.GOVLength"
