@@ -137,10 +137,9 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
     scrollAreaWidgetContents->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
-	scrollAreaWidgetContents->setLayout(gridLayout);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
-    for (const auto& param : params)
+    for (const auto& param: params)
     {
         auto widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
         if (!widget)
@@ -165,7 +164,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             m_paramLabelsById[param.id] = label;
         }
 
-        gridLayout->addWidget(widget, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+        gridLayout->addWidget(widget, row, 1, Qt::AlignVCenter);
 		m_paramWidgetsById[param.id] = widget;
 
 		/* Widget is disabled until it receives correct value. */
@@ -179,7 +178,9 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                 &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
         }
 	}
+
     gridLayout->setColumnStretch(1, 1);
+    gridLayout->setColumnMinimumWidth(1, style::Hints::kMinimumFormLabelWidth);
 
     for (const auto& param: params)
     {
@@ -194,7 +195,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             for (const auto& cond: dependency.conditions)
                 watches.insert(cond.paramId);
 
-            auto handler = [dependency, param, this]() -> bool
+            auto handler =
+                [dependency, param, this]() -> bool
                 {
                     const auto paramId = param.id;
                     bool allConditionsSatisfied = std::all_of(
@@ -237,7 +239,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             handlerChains[dependency.type].push_back(handler);
         }
 
-        auto runHandlerChains = [handlerChains]()
+        auto runHandlerChains =
+            [handlerChains]()
             {
                 for (const auto& chainPair: handlerChains)
                 {

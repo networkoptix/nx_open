@@ -137,9 +137,10 @@ private:
     bool m_isInteger;
 };
 
-class QnEnumerationCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
+class QnEnumerationCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget
+{
 public:
-    QnEnumerationCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
+    QnEnumerationCameraAdvancedParamWidget(const QnCameraAdvancedParameter& parameter, QWidget* parent):
         QnAbstractCameraAdvancedParamWidget(parameter, parent),
         m_comboBox(new QComboBox(this))
     {
@@ -147,11 +148,12 @@ public:
         m_comboBox->setToolTip(parameter.description);
         setReadOnly(m_comboBox, parameter.readOnly);
 
-        m_layout->insertStretch(0);
-        m_layout->insertWidget(0, m_comboBox);
-        connect(m_comboBox, &QComboBox::currentTextChanged, this, [this] {
-            emit valueChanged(m_id, value());
-        });
+        m_layout->addWidget(m_comboBox);
+        connect(m_comboBox, &QComboBox::currentTextChanged, this,
+            [this]()
+            {
+                emit valueChanged(m_id, value());
+            });
     }
 
     virtual void setRange(const QString& range)
@@ -166,16 +168,18 @@ public:
         m_comboBox->addItems(range);
     }
 
-    virtual QString value() const override	{
+    virtual QString value() const override
+    {
         return m_comboBox->currentText();
     }
 
-    virtual void setValue(const QString &newValue) override	{
+    virtual void setValue(const QString& newValue) override
+    {
         m_comboBox->setCurrentText(newValue);
     }
 
 private:
-    QComboBox* m_comboBox;
+    QComboBox* const m_comboBox = nullptr;
 };
 
 class QnButtonCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
@@ -249,7 +253,7 @@ public:
     virtual void setValue(const QString& /*newValue*/) override {}
 
 private:
-    QFrame* const m_line;
+    QFrame* const m_line = nullptr;
 };
 
 QnAbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createWidget(
