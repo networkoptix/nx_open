@@ -7,6 +7,7 @@
         <param name="ptzCapabilities" default_value="0"/>
         <param name="streamFpsSharing" default_value="noSharing"/>
         <param name="removeCredentialsFromWebPageUrl" default_value="true"/>
+        <param name="hasAdvancedSecondaryStreamControls" default_value="true"/>
     </resource>
     </oem>
 </resources>
