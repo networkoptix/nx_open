@@ -124,6 +124,16 @@ void RadassResourceManager::setMode(const QnLayoutResourcePtr& layout, RadassMod
     setMode(items, value);
 }
 
+RadassMode RadassResourceManager::mode(const QnLayoutItemIndex& item) const
+{
+    return mode(QnLayoutItemIndexList() << item);
+}
+
+void RadassResourceManager::setMode(const QnLayoutItemIndex& item, RadassMode value)
+{
+    setMode(QnLayoutItemIndexList() << item, value);
+}
+
 RadassMode RadassResourceManager::mode(const QnLayoutItemIndexList& items) const
 {
     QnLayoutItemIndexList validItems;
