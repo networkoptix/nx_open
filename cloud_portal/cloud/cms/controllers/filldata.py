@@ -6,7 +6,7 @@ import codecs
 import base64
 
 
-STATIC_DIR = 'static/{{customization}}/source/'
+SOURCE_DIR = 'static/{{customization}}/source/'
 
 
 def make_dir(filename):
@@ -30,7 +30,7 @@ def customizable_file(filename, ignore_not_english):
 
 
 def context_for_file(filename, customization_name):
-    custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
+    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
     context_name = filename.replace(custom_dir, '')
     match = re.search(r'lang_(.+?)/', context_name)
     language = None
@@ -45,12 +45,24 @@ def file_for_context(context, language, customization_name):
     file_name = context.name
     if context.translatable:
         file_name = file_name.replace('lang_{{language}}', 'lang_'+language)
-    custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
+    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
     return os.path.join(custom_dir, file_name)
 
 
+def target_file(file_name, customization, language_code, preview):
+    if language_code:
+        file_name = file_name.replace("{{language}}", language_code)
+    # write content to target place
+    if not preview:
+        target_file_name = os.path.join('static', customization.name, file_name)
+    else:
+        target_file_name = os.path.join(
+            'static', customization.name, 'preview', file_name)
+    return target_file_name
+
+
 def iterate_cms_files(customization_name, ignore_not_english):
-    custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
+    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
     for root, dirs, files in os.walk(custom_dir):
         for filename in files:
             file = os.path.join(root, filename)
@@ -114,12 +126,16 @@ def process_context_structure(customization, context, content,
     return content
 
 
-def process_file(source_file, customization, product_id, preview, version_id, global_contexts):
-    context_name, language_code = context_for_file(
-        source_file, customization.name)
+def save_content(filename, content):
+    make_dir(filename)
+    with codecs.open(filename, "w", "utf-8") as file:
+        file.write(content)
 
-    context = Context.objects.filter(
-        file_path=context_name, product_id=product_id)
+
+def process_context_for_file(source_file, context, context_path, language_code,
+                             customization, preview,
+                             version_id, global_contexts):
+
     if language_code:
         language = Language.objects.filter(code=language_code)
         if not language.exists():
@@ -132,43 +148,20 @@ def process_file(source_file, customization, product_id, preview, version_id, gl
     if context.exists() and language:
         content = process_context_structure(
             customization, context.first(), content, language, version_id, preview)
-        
+
     for global_context in global_contexts.all():
         content = process_context_structure(
             customization, global_context, content, None, version_id, preview)
 
-    filename = context_name
-    if language_code:
-        filename = filename.replace("{{language}}", language_code)
-    # write content to target place
-    if not preview:
-        target_file = os.path.join('static', customization.name, filename)
-    else:
-        target_file = os.path.join(
-            'static', customization.name, 'preview', filename)
-    make_dir(target_file)
-    with open(target_file, 'w') as file:
-        file.write(content)
+    target_file_name = target_file(context_path, customization, language_code, preview)
+    save_content(target_file_name, content)
 
 
-def generate_languages_json(customization_name, preview):
-    def save_content(filename, content):
-        if filename:
-            # proceed with branding
-            make_dir(filename)
-            with codecs.open(filename, "w", "utf-8") as file:
-                file.write(content)
-    customization = Customization.objects.get(name=customization_name)
+def generate_languages_json(customization, preview):
     languages_json = [{"name": lang.name, "language": lang.code}
                       for lang in customization.languages.all()]
-    if not preview:
-        target_file = os.path.join(
-            'static', customization.name, 'static', 'languages.json')
-    else:
-        target_file = os.path.join(
-            'static', customization.name, 'preview',
-            'static', 'languages.json')
-    save_content(target_file, json.dumps(languages_json, ensure_ascii=False))
+    target_file_name = target_file('languages.json', customization, None, preview)
+    save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
 def fill_content(customization_name='default', product='cloud_portal',
@@ -183,7 +176,7 @@ def fill_content(customization_name='default', product='cloud_portal',
     product_id = Product.objects.get(name=product).id
     customization = Customization.objects.get(name=customization_name)
 
-    global_contexts = Context.objects.filter(is_global=True)
+    global_contexts = Context.objects.filter(is_global=True, product_id=product_id)
 
     if not preview:
         if version_id is not None:
@@ -204,9 +197,9 @@ def fill_content(customization_name='default', product='cloud_portal',
         # detect their contexts
         changed_records = DataRecord.objects.\
             filter(version_id=version_id)
-        changed_contexts = changed_records.\
-            values_list('data_structure', flat=True).\
-            values_list('context', flat=True).\
+        changed_contexts = not changed_records. \
+            values_list('data_structure', flat=True). \
+            values_list('context', flat=True). \
             distinct()
         changed_global_contexts = changed_contexts.filter(is_global = True)
         if changed_global_contexts.exists():  # global context was changed - force full rebuild
@@ -215,10 +208,13 @@ def fill_content(customization_name='default', product='cloud_portal',
     # iterate all files (same way we fill structure)
     if not incremental:
         for source_file in iterate_cms_files(customization_name, False):
-            process_file(source_file, customization,
-                         product_id, preview, version_id, global_contexts)
+            context_path, language_code = context_for_file(source_file, customization.name)
+            context = Context.objects.filter(file_path=context_path)
+            process_context_for_file(source_file, context, context_path, language_code,
+                                     customization, preview,
+                                     version_id, global_contexts)
     else:
-        for context in changed_contexts:
+        for context in changed_contexts.all():
             # now we need to check what languages were changes
             # if the default language is changed - we update all languages (lazy way)
             # otherwise - update only affected languages
@@ -229,10 +225,11 @@ def fill_content(customization_name='default', product='cloud_portal',
 
             # update affected languages
             for language in changed_languages:
-                source_file = file_for_context(context, language.code)
-                process_file(source_file, customization, product_id, preview, version_id, global_contexts)
+                source_file = file_for_context(context, customization, language.code)
+                process_context_for_file(source_file, context, context.path, language.code,
+                                         customization, preview, version_id, global_contexts)
 
-    generate_languages_json(customization_name, preview)
+    generate_languages_json(customization, preview)
 
 
 def convert_b64_image_to_png(value, filename, storage_location):
