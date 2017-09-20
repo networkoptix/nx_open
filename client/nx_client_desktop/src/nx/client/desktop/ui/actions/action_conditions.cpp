@@ -1147,7 +1147,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     }
     else
     {
-        const bool anlyInacceptableItems = std::all_of(resources.begin(), resources.end(),
+        const bool onlyInacceptableItems = std::all_of(resources.begin(), resources.end(),
             [](const QnResourcePtr& resource)
             {
                 const auto flags = resource->flags();
@@ -1157,7 +1157,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
                     || flags.testFlag(Qn::io_module);
             });
 
-        if (anlyInacceptableItems)
+        if (onlyInacceptableItems)
             return InvisibleAction;
     }
     auto layoutItems = parameters.layoutItems();
