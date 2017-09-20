@@ -98,11 +98,12 @@ def read_structure_json():
             type = None
             meta = None
             advanced = False
-            if len(record) == 3:
-                label, name, value = record
-            if len(record) == 4:
-                label, name, value, description = record
-            if len(record) > 4:
+            if not isinstance(record, dict):
+                if len(record) == 3:
+                    label, name, value = record
+                if len(record) == 4:
+                    label, name, value, description = record
+            else:
                 label = record['label']
                 name = record['name']
                 value = record['value']
@@ -121,7 +122,7 @@ def read_structure_json():
 
             data_structure = find_or_add_data_stucture(
                 name, context.id, has_language)
-            print(data_structure.advanced)
+
             data_structure.label = label
             data_structure.advanced = advanced
             if description:
