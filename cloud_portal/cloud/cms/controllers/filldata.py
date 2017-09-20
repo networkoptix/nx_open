@@ -165,7 +165,8 @@ def generate_languages_json(customization, preview):
 
 
 def fill_content(customization_name='default', product='cloud_portal',
-                 preview=True, version_id=None, incremental=False):
+                 preview=True, version_id=None,
+                 incremental=False, changed_context=None):
 
     # if preview=False
     #   retrieve latest accepted version
@@ -175,6 +176,34 @@ def fill_content(customization_name='default', product='cloud_portal',
     #   else - preview specific version
     product_id = Product.objects.get(name=product).id
     customization = Customization.objects.get(name=customization_name)
+
+    if preview:  # Here we decide, if we need to change preview state
+        # if incremental was false initially - we keep it as false
+        # TODO: When sending version for review - do incremental update and change state to review
+
+        if version_id:
+            if customization.preview_status != Customization.PREVIEW_STATUS.review:
+                # When previewing awaiting version and state is draft - do full update and change state to review
+                incremental = False
+                customization.preview_status = Customization.PREVIEW_STATUS.review
+                customization.save()
+            else:
+                if incremental:
+                    return  # When previewing awaiting version and state is review - do nothing
+                pass
+        else:  # draft
+            if customization.preview_status != Customization.PREVIEW_STATUS.review:
+                # When saving draft and state is review - do incremental update
+                # applying all drafted changes and change state to draft
+                # incremental = True
+                customization.preview_status = Customization.PREVIEW_STATUS.draft
+                customization.save()
+                changed_context = None  # remove changed context so that we do full incremental update
+            else:
+                # When saving draft for context and state is draft - do incremental update only for changed context
+                # update only changed context
+                # keep incremental value
+                pass
 
     global_contexts = Context.objects.filter(is_global=True, product_id=product_id)
 
@@ -191,12 +220,20 @@ def fill_content(customization_name='default', product='cloud_portal',
             version_id = 0
             incremental = False  # no version - do full update using default values
 
-    if incremental:
+    if incremental and not changed_context:
         # filter records changed in this version
         # get their datastructures
         # detect their contexts
-        changed_records = DataRecord.objects.\
-            filter(version_id=version_id)
+
+        changed_records = DataRecord.objects.filter(version_id=version_id)
+        if not version_id:  # if version_id is None - check if records are actually latest
+            changed_records = [record for record in changed_records if
+                               record.id == DataRecord.objects.
+                               filter(language_id=record.language_id,
+                                      data_structure_id=record.data_structure_id,
+                                      customization_id=customization.id).
+                               latest('created_date').id]
+
         changed_contexts = not changed_records. \
             values_list('data_structure', flat=True). \
             values_list('context', flat=True). \
@@ -204,9 +241,16 @@ def fill_content(customization_name='default', product='cloud_portal',
         changed_global_contexts = changed_contexts.filter(is_global = True)
         if changed_global_contexts.exists():  # global context was changed - force full rebuild
             incremental = False
+        changed_contexts = changed_contexts.all()
 
-    # iterate all files (same way we fill structure)
+    if changed_context:  # if we want to update only fixed content
+        if changed_context.is_global:
+            incremental = False
+        else:
+            changed_contexts = [changed_context]
+
     if not incremental:
+        # iterate all files (same way we fill structure)
         for source_file in iterate_cms_files(customization_name, False):
             context_path, language_code = context_for_file(source_file, customization.name)
             context = Context.objects.filter(file_path=context_path)
@@ -214,7 +258,7 @@ def fill_content(customization_name='default', product='cloud_portal',
                                      customization, preview,
                                      version_id, global_contexts)
     else:
-        for context in changed_contexts.all():
+        for context in changed_contexts:
             # now we need to check what languages were changes
             # if the default language is changed - we update all languages (lazy way)
             # otherwise - update only affected languages
