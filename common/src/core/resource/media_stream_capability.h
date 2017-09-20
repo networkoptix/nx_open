@@ -31,9 +31,8 @@ struct CameraMediaCapability
 
 static const QString kCameraMediaCapabilityParamName = lit("mediaCapabilities");
 
+QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json))
+QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json))
 
 } // media
 } // nx
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::media::CameraStreamCapability, (json))
-QN_FUSION_DECLARE_FUNCTIONS(nx::media::CameraMediaCapability, (json))

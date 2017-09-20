@@ -1373,7 +1373,7 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
     else if (parameter == kBitrateControlTypeProperty)
         return toHanwhaString(defaultBitrateControlForStream(role));
     else if (parameter == kGovLengthProperty)
-        return defaultGovLengthForStream(role);
+        return QString::number(defaultGovLengthForStream(role));
     else if (parameter == kCodecProfileProperty)
         return defaultCodecProfileForStream(role);
     else if (parameter == kEntropyCoding)
