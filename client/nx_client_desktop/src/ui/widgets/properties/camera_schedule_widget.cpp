@@ -1017,6 +1017,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
             data.m_endTime = 86400;
             data.m_beforeThreshold = kDefaultBeforeThresholdSec;
             data.m_afterThreshold = kDefaultAfterThresholdSec;
+            tasks << data;
         }
     }
 
