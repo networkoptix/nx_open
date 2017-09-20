@@ -123,7 +123,7 @@ QString nxProfileName(Qn::ConnectionRole role)
         ? kHanwhaPrimaryNxProfileSuffix
         : kHanwhaSecondaryNxProfileSuffix;
 
-    auto appName = QnAppInfo::productNameShort()
+    auto appName = QnAppInfo::productNameLong()
         .mid(0, kHanwhaProfileNameMaxLength - suffix.length())
         .remove(QRegExp("[^a-zA-Z]"));
 
