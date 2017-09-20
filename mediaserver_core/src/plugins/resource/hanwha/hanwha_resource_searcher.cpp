@@ -152,7 +152,11 @@ bool HanwhaResourceSearcher::processPacket(
     }
 
     decltype(m_foundUpnpResources) foundUpnpResources;
-    createResource(devInfo, cameraMac, QAuthenticator(), foundUpnpResources);
+
+    QAuthenticator defaultAuth;
+    defaultAuth.setUser("admin");
+    defaultAuth.setPassword("4321");
+    createResource(devInfo, cameraMac, defaultAuth, foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
     m_alreadFoundMacAddresses.insert(cameraMac.toString());
