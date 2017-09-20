@@ -165,8 +165,11 @@ def generate_languages_json(customization, preview):
 
 
 def fill_content(customization_name='default', product='cloud_portal',
-                 preview=True, version_id=None,
-                 incremental=False, changed_context=None):
+                 preview=True,
+                 version_id=None,
+                 incremental=False,
+                 changed_context=None,
+                 send_to_review=False):
 
     # if preview=False
     #   retrieve latest accepted version
@@ -179,12 +182,12 @@ def fill_content(customization_name='default', product='cloud_portal',
 
     if preview:  # Here we decide, if we need to change preview state
         # if incremental was false initially - we keep it as false
-        # TODO: When sending version for review - do incremental update and change state to review
-
         if version_id:
             if customization.preview_status != Customization.PREVIEW_STATUS.review:
-                # When previewing awaiting version and state is draft - do full update and change state to review
-                incremental = False
+                # When previewing awaiting version and state is draft
+                # if we are just sending version to review - do incremental update
+                if not send_to_review:
+                    incremental = False  # otherwise - do full update and change state to review
                 customization.preview_status = Customization.PREVIEW_STATUS.review
                 customization.save()
             else:

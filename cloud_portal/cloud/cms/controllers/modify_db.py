@@ -157,8 +157,12 @@ def remove_unused_records(customization):
             record.delete()
 
 
-def generate_preview(context=None):
-    fill_content(customization_name=settings.CUSTOMIZATION, preview=True, incremental=True)
+def generate_preview(context=None, send_to_review=False):
+    fill_content(customization_name=settings.CUSTOMIZATION,
+                 preview=True,
+                 incremental=True,
+                 changed_context=context,
+                 send_to_review=send_to_review)
     return context.url + "?preview" if context else "?preview"
 
 

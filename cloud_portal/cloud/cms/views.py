@@ -192,7 +192,7 @@ def context_edit_view(request, context=None, language=None):
 @permission_required('cms.change_contentversion')
 def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
-        preview_link = "//" + request.get_host() + generate_preview()
+        preview_link = "//" + request.get_host() + generate_preview(send_to_review=True)
         return redirect(preview_link)
     elif "Publish" in request.data:
         if not request.user.has_perm('cms.publish_version'):
