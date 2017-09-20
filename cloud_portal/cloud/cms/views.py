@@ -71,18 +71,16 @@ def add_upload_error_messages(request, errors):
             request, "Upload error for {}. {}".format(error[0], error[1]))
 
 
-def check_advanced_edited(request_data, customization, data_structures, user):
+def advanced_touched_without_permission(request_data, customization, data_structures):
     for ds_label in request_data:
         data_structure = data_structures.filter(label=ds_label)
         if data_structure.exists() and data_structure[0].advanced:
             data_record = data_structure[0].datarecord_set.filter(customization=customization)
             if data_record.exists():
-                if request_data[ds_label] != data_record.latest('created_date').value\
-                        and not (user.has_perm('cms.edit_advanced') or user.is_superuser):
-                    return False
-    return True
+                if request_data[ds_label] != data_record.latest('created_date').value:
+                    return True
 
-
+    return False
 
 
 def handle_post_context_edit_view(request, context_id, language_id):
@@ -92,7 +90,8 @@ def handle_post_context_edit_view(request, context_id, language_id):
     request_files = request.FILES
     preview_link = ""
     upload_errors = []
-    if not check_advanced_edited(request_data, customization, context.datastructure_set.all(), user):
+    if not (user.is_superuser or user.has_per('cms.edit_advanced'))\
+            and advanced_touched_without_permission(request_data, customization, context.datastructure_set.all()):
         raise PermissionDenied
     if 'languageChanged' in request_data:
         if 'currentLanguage' in request_data \
