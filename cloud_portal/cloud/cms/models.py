@@ -56,6 +56,7 @@ class DataStructure(models.Model):
     default = models.TextField(default='')
     translatable = models.BooleanField(default=True)
     meta_settings = JSONField(default=dict())
+    advanced = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
