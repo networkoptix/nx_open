@@ -90,7 +90,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
     request_files = request.FILES
     preview_link = ""
     upload_errors = []
-    if not (user.is_superuser or user.has_per('cms.edit_advanced'))\
+    if not (user.is_superuser or user.has_perm('cms.edit_advanced'))\
             and advanced_touched_without_permission(request_data, customization, context.datastructure_set.all()):
         raise PermissionDenied
     if 'languageChanged' in request_data:
