@@ -33,6 +33,7 @@ static const QString kBitrateControlTypeProperty = lit("BitrateControlType");
 static const QString kGovLengthProperty = lit("GovLength");
 static const QString kCodecProfileProperty = lit("CodecProfile");
 static const QString kEntropyCoding = lit("EntropyCoding");
+static const QString kNvrDeviceType = lit("NVR");
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -410,6 +411,9 @@ void HanwhaResource::initMediaStreamCapabilities()
 
 nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::ConnectionRole role)
 {
+    if (m_isNvr)
+        return nx::media::CameraStreamCapability();
+
     nx::media::CameraStreamCapability capability;
     const auto codec = streamCodec(role);
     const auto resolution = streamResolution(role);
@@ -454,9 +458,6 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
 
 CameraDiagnostics::Result HanwhaResource::initSystem()
 {
-    if (!getFirmware().isEmpty())
-        return CameraDiagnostics::NoErrorResult();
-
     HanwhaRequestHelper helper(toSharedPointer(this));
     auto response = helper.view(lit("system/deviceinfo"));
 
@@ -469,6 +470,13 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     }
 
     const auto firmware = response.parameter<QString>(lit("FirmwareVersion"));
+    const auto deviceType = response.parameter<QString>(lit("DeviceType"));
+
+    if (!deviceType || deviceType->isEmpty())
+        m_isNvr = false;
+    else
+        m_isNvr = (*deviceType).trimmed() == kNvrDeviceType;
+    
     if (!firmware.is_initialized())
         return CameraDiagnostics::NoErrorResult();
 
@@ -517,7 +525,6 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
                 profiles.errorString()));
     }
 
-    m_isNvr = !profiles.isSuccessful();
     bool hasDualStreaming = false;
     const auto channel = getChannel();
     
