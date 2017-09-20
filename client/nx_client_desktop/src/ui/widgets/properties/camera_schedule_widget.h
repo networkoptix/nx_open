@@ -122,6 +122,9 @@ private:
 
     void setAdvancedSettingsVisible(bool value);
 
+    bool isCurrentBitrateCustom() const;
+    Qn::StreamQuality currentQualityApproximation() const;
+
     QPair<Qn::StreamQuality, bool> qualityForBitrate(qreal bitrateMbps) const;
     qreal bitrateForQuality(Qn::StreamQuality quality) const;
 

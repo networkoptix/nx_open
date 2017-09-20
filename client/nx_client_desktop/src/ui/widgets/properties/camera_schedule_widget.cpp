@@ -52,17 +52,6 @@ namespace {
 
 static constexpr qreal kKbpsInMbps = 1024.0;
 
-// Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
-// (Low, Medium, High, Best), and those constants + Qn::StreamQualityCount for invisible items
-// with asterisks (Low*, Medium*, High*, Best*).
-static Qn::StreamQuality currentItemQuality(QComboBox* box)
-{
-    auto value = box->currentData().toInt();
-    if (value >= Qn::StreamQualityCount)
-        value -= Qn::StreamQualityCount;
-    return static_cast<Qn::StreamQuality>(value);
-}
-
 void setLayoutEnabled(QLayout* layout, bool enabled)
 {
     const auto count = layout->count();
@@ -459,8 +448,7 @@ void QnCameraScheduleWidget::syncBitrateWithQuality()
     if (m_bitrateUpdating || !m_advancedSettingsSupported)
         return;
 
-    ui->bitrateSpinBox->setValue(bitrateForQuality(static_cast<Qn::StreamQuality>(
-        currentItemQuality(ui->qualityComboBox))));
+    ui->bitrateSpinBox->setValue(bitrateForQuality(currentQualityApproximation()));
 }
 
 void QnCameraScheduleWidget::syncBitrateWithFps()
@@ -471,20 +459,7 @@ void QnCameraScheduleWidget::syncBitrateWithFps()
     const auto minBitrate = bitrateForQuality(Qn::QualityLowest);
     const auto maxBitrate = bitrateForQuality(Qn::QualityHighest);
 
-    const auto quality = Qn::StreamQuality(ui->qualityComboBox->currentData().toInt());
-    if (quality < Qn::StreamQualityCount)
-    {
-        // Lock quality.
-        ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
-        ui->bitrateSpinBox->setValue(bitrateForQuality(quality));
-        const auto normalizedBitrate = normalizedValue(ui->bitrateSpinBox);
-        setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
-
-        // Force quality (in case several qualities have the same rounded bitrate value).
-        QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
-        ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality));
-    }
-    else
+    if (isCurrentBitrateCustom())
     {
         // TODO: #vkutin Maybe should lock value normalized between two qualities.
         // Currently it's normalized between minimum and maximum bitrate.
@@ -494,6 +469,19 @@ void QnCameraScheduleWidget::syncBitrateWithFps()
         ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
         setNormalizedValue(ui->bitrateSpinBox, normalizedBitrate);
         setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
+    }
+    else
+    {
+        // Lock quality.
+        const auto quality = currentQualityApproximation();
+        ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
+        ui->bitrateSpinBox->setValue(bitrateForQuality(quality));
+        const auto normalizedBitrate = normalizedValue(ui->bitrateSpinBox);
+        setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
+
+        // Force quality (in case several qualities have the same rounded bitrate value).
+        QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
+        ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality));
     }
 }
 
@@ -609,6 +597,12 @@ void QnCameraScheduleWidget::updateFromResources()
     ui->advancedSettingsButton->setVisible(m_advancedSettingsSupported);
     ui->advancedSettingsWidget->setVisible(m_advancedSettingsSupported && m_advancedSettingsVisible);
     ui->settingsGroupBox->layout()->activate();
+
+    if (!m_advancedSettingsSupported && isCurrentBitrateCustom())
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData(currentQualityApproximation()));
+    }
 
     if (m_cameras.isEmpty())
     {
@@ -830,6 +824,22 @@ void QnCameraScheduleWidget::updateMaxFPS()
 
     updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
     ui->gridWidget->setMaxFps(m_maxFps, m_maxDualStreamingFps);
+}
+
+// Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
+// (Low, Medium, High, Best), and those constants + Qn::StreamQualityCount for invisible items
+// with asterisks (Low*, Medium*, High*, Best*).
+Qn::StreamQuality QnCameraScheduleWidget::currentQualityApproximation() const
+{
+    auto value = ui->qualityComboBox->currentData().toInt();
+    if (value >= Qn::StreamQualityCount)
+        value -= Qn::StreamQualityCount;
+    return static_cast<Qn::StreamQuality>(value);
+}
+
+bool QnCameraScheduleWidget::isCurrentBitrateCustom() const
+{
+    return ui->qualityComboBox->currentData().toInt() >= Qn::StreamQualityCount;
 }
 
 void QnCameraScheduleWidget::setAdvancedSettingsVisible(bool value)
@@ -1124,10 +1134,9 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
         }
         else
         {
-            const bool customBitrate = m_advancedSettingsSupported
-                && ui->qualityComboBox->currentData().toInt() >= Qn::StreamQualityCount;
+            const bool customBitrate = m_advancedSettingsSupported && isCurrentBitrateCustom();
             brush.fps = ui->fpsSpinBox->value();
-            brush.quality = currentItemQuality(ui->qualityComboBox);
+            brush.quality = currentQualityApproximation();
             brush.bitrateMbps = customBitrate ? ui->bitrateSpinBox->value() : 0.0;
         }
 
