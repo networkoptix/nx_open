@@ -99,7 +99,7 @@ class ContentVersionAdmin(CMSAdmin):
 
     def get_queryset(self, request):  # show only users for current customization
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
-        qs = qs.filter(customization=settings.CUSTOMIZATION)
+        qs = qs.filter(customization__name=settings.CUSTOMIZATION)
         # additional filter - display only revisions from current customization
         return qs
 
