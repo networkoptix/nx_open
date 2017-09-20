@@ -98,25 +98,36 @@ public:
 
     void testProxyUrl(
         const QUrl& url,
-        nx_http::StatusCode::Value expectedReponseStatusCode = nx_http::StatusCode::ok)
+        nx_http::StatusCode::Value expectedReponseStatusCode)
+    {
+        testProxyUrl(url, {{expectedReponseStatusCode}});
+    }
+
+    void testProxyUrl(
+        const QUrl& url,
+        std::vector<nx_http::StatusCode::Value> expectedReponseStatusCodes
+            = {nx_http::StatusCode::ok})
     {
         nx_http::HttpClient httpClient;
-        testProxyUrl(&httpClient, url, expectedReponseStatusCode);
+        testProxyUrl(&httpClient, url, std::move(expectedReponseStatusCodes));
     }
 
     void testProxyUrl(
         nx_http::HttpClient* const httpClient,
         const QUrl& url,
-        nx_http::StatusCode::Value expectedReponseStatusCode)
+        std::vector<nx_http::StatusCode::Value> expectedReponseStatusCodes)
     {
         NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
         httpClient->setResponseReadTimeoutMs(1000*1000);
         ASSERT_TRUE(httpClient->doGet(url));
-        ASSERT_EQ(
-            expectedReponseStatusCode,
-            httpClient->response()->statusLine.statusCode);
+        ASSERT_TRUE(
+            std::find(
+                expectedReponseStatusCodes.begin(),
+                expectedReponseStatusCodes.end(),
+                httpClient->response()->statusLine.statusCode) != expectedReponseStatusCodes.end())
+            << "Actual: " << httpClient->response()->statusLine.statusCode;
 
-        if (expectedReponseStatusCode != nx_http::StatusCode::ok)
+        if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
             return;
 
         ASSERT_EQ(
@@ -148,29 +159,39 @@ TEST_F(Proxy, IpSpecified)
     ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
 
     // Default port
-    testProxyUrl(QUrl(lit("http://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPathAndQuery)));
+    testProxyUrl(
+        QUrl(lit("http://%1/%2%3")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().address.toString())
+            .arg(testPathAndQuery)),
+        {nx_http::StatusCode::ok});
 
     // Specified
-    testProxyUrl(QUrl(lit("http://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().toString())
-        .arg(testPathAndQuery)));
-
-    // Wrong port
-    testProxyUrl(QUrl(lit("http://%1/%2:777%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPathAndQuery)),
-        nx_http::StatusCode::serviceUnavailable);
+    testProxyUrl(
+        QUrl(lit("http://%1/%2%3")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().toString())
+            .arg(testPathAndQuery)),
+        {nx_http::StatusCode::ok});
 
     // Wrong path
-    testProxyUrl(QUrl(lit("http://%1/%2")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().toString())),
-        nx_http::StatusCode::notFound);
+    testProxyUrl(
+        QUrl(lit("http://%1/%2")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().toString())),
+        {nx_http::StatusCode::notFound});
+}
+
+TEST_F(Proxy, failure_is_returned_when_unreachable_target_endpoint_is_specified)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
+
+    testProxyUrl(
+        QUrl(lit("http://%1/%2:777%3")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().address.toString())
+            .arg(testPathAndQuery)),
+        {nx_http::StatusCode::serviceUnavailable, nx_http::StatusCode::internalServerError});
 }
 
 TEST_F(Proxy, SslEnabled)
@@ -338,7 +359,7 @@ TEST_F(Proxy, proxyByRequestUrl)
             .arg(testPathAndQuery);
     nx_http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
+    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
 }
 
 TEST_F(Proxy, proxyingChunkedBody)
@@ -352,7 +373,7 @@ TEST_F(Proxy, proxyingChunkedBody)
             .arg(checkuedTestPathAndQuery);
     nx_http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
+    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
 }
 
 TEST_F(Proxy, proxyingUndefinedContentLength)
@@ -367,7 +388,7 @@ TEST_F(Proxy, proxyingUndefinedContentLength)
 
     nx_http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
+    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
 }
 
 TEST_F(Proxy, ModRewrite)
