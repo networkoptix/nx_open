@@ -18,20 +18,13 @@
 
 #include <nx/utils/math/fuzzy.h>
 
-QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
+QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent) :
     QWidget(parent),
     m_id(parameter.id),
     m_layout(new QHBoxLayout(this))
 {
     m_layout->setContentsMargins(0, 0, 0, 0);
     setLayout(m_layout);
-
-    if (parameter.readOnly) {
-        QLabel* readOnlyLabel = new QLabel(tr("Read-Only"));
-        setWarningStyle(readOnlyLabel);
-        m_layout->addWidget(readOnlyLabel);
-    }
-
 }
 
 class QnBoolCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
@@ -90,6 +83,9 @@ public:
 
         m_spinBox->setToolTip(parameter.description);
         setReadOnly(m_spinBox, parameter.readOnly);
+
+        if (parameter.readOnly)
+            m_spinBox->setButtonSymbols(QSpinBox::NoButtons);
 
         if (!parameter.unit.isEmpty())
             m_spinBox->setSuffix(lit(" %1").arg(parameter.unit));
