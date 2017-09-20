@@ -74,11 +74,13 @@ bool DetectionPluginWrapper::hasMetadata()
     return m_detector->hasMetadata();
 }
 
+#if defined(ENABLE_DATA_PROVIDERS)
 bool DetectionPluginWrapper::pushFrame(const CLVideoDecoderOutputPtr& data)
 {
     NX_ASSERT(false, "Not implemented!");
     return false;
 }
+#endif
 
 bool DetectionPluginWrapper::pushFrame(const QnCompressedVideoDataPtr& compressedFrameData)
 {

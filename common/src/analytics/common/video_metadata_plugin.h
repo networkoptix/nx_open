@@ -8,7 +8,9 @@ namespace analytics {
 class VideoMetadataPlugin: public AbstractMetadataPlugin
 {
 public:
+#if defined(ENABLE_DATA_PROVIDERS)
     virtual bool pushFrame(const CLVideoDecoderOutputPtr& decodedFrame) = 0;
+#endif
 
     virtual bool pushFrame(const QnCompressedVideoDataPtr& compressedFrame) = 0;
 

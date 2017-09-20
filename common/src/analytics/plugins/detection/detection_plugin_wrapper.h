@@ -23,7 +23,9 @@ public:
     virtual QString id() const override;
     virtual bool hasMetadata() override;
 
+#if defined(ENABLE_DATA_PROVIDERS)
     virtual bool pushFrame(const CLVideoDecoderOutputPtr& decodedFrame) override;
+#endif
     virtual bool pushFrame(const QnCompressedVideoDataPtr& compressedFrame) override;
 
     virtual QnAbstractCompressedMetadataPtr getNextMetadata() override;
