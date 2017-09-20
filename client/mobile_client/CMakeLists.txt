@@ -82,6 +82,7 @@ if(ANDROID)
         APK_NAME "${mobile_client_distribution_name}.apk"
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+        VERSION "${mobileClientVersion.full}"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
         KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
         KEYSTORE_ALIAS "hdwitness"
