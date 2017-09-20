@@ -94,22 +94,36 @@ def read_structure_json():
         context.save()
 
         for record in context_data["values"]:
-            type = None
             description = None
+            type = None
             meta = None
+            advanced = False
             if len(record) == 3:
                 label, name, value = record
             if len(record) == 4:
                 label, name, value, description = record
-            if len(record) == 5:
-                label, name, value, description, type = record
-            if len(record) == 6:
-                label, name, value, description, type, meta = record
+            if len(record) > 4:
+                label = record['label']
+                name = record['name']
+                value = record['value']
+
+                if 'description' in record:
+                    description = record['description']
+
+                if 'type' in record:
+                    type = record['type']
+
+                if 'meta' in record:
+                    meta = record['meta']
+
+                if 'advanced' in record:
+                    advanced = record['advanced']
 
             data_structure = find_or_add_data_stucture(
                 name, context.id, has_language)
-
+            print(data_structure.advanced)
             data_structure.label = label
+            data_structure.advanced = advanced
             if description:
                 data_structure.description = description
             if type:
