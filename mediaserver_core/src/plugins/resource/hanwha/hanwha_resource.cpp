@@ -269,10 +269,6 @@ bool HanwhaResource::setParamsPhysical(
             streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo),
             streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo));
 
-        result.append(QnCameraAdvancedParamValue(
-            lit("PRIMARY%media/videoprofile/EncodingType"),
-            lit("H264")));
-
         return success;
     }
 
@@ -1267,11 +1263,11 @@ Qn::EntropyCoding HanwhaResource::defaultEntropyCodingForStream(Qn::ConnectionRo
         return Qn::EntropyCoding::undefined;
 
     const auto possibleValues = entropyCodingParameter->possibleValues();
-    if (possibleValues.contains(toHanwhaString(Qn::EntropyCoding::cabac)))
-        return Qn::EntropyCoding::cabac;
-
     if (possibleValues.contains(toHanwhaString(Qn::EntropyCoding::cavlc)))
         return Qn::EntropyCoding::cavlc;
+
+    if (possibleValues.contains(toHanwhaString(Qn::EntropyCoding::cabac)))
+        return Qn::EntropyCoding::cabac;
 
     return Qn::EntropyCoding::undefined;
 }
@@ -2199,7 +2195,8 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
     for (const auto& property: kPropertiesToSet)
     {
         const auto propertyDefaultValue = defaultValue(property, role);
-        setProperty(propertyByPrameterAndRole(property, role), propertyDefaultValue);
+        const auto nxProperty = propertyByPrameterAndRole(property, role);
+        setProperty(nxProperty, propertyDefaultValue);
     }
 
     if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)

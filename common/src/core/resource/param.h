@@ -77,7 +77,7 @@ namespace Qn
     static const QString kSecondaryStreamBitrateParamName = lit("secondaryStreamBitrate");
     static const QString kPrimaryStreamEntropyCodingParamName = lit("primaryStreamEntropyCoding");
     static const QString kSecondaryStreamEntropyCodingParamName = lit("secondaryStreamEntropyCoding");
-    static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFpsParamName");
+    static const QString kSecondaryStreamFpsParamName = lit("secondaryStreamFps");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
