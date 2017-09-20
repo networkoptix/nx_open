@@ -40,21 +40,26 @@ void QnCameraAdvancedParamWidgetsManager::clear() {
 }
 
 
-void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedParams &params) {
+void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedParams& params)
+{
 	clear();
 
 	for (const QnCameraAdvancedParamGroup &group: params.groups)
 		createGroupWidgets(group);
 
-	connect(m_groupWidget, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* current, QTreeWidgetItem *previous) {
-		Q_UNUSED(previous);
-		QWidget* target = current->data(0, Qt::UserRole).value<QWidget*>();
-		if (target && m_contentsWidget->children().contains(target))
-			m_contentsWidget->setCurrentWidget(target);
-	});
+    const auto currentItemChanged =
+        [this](QTreeWidgetItem* current)
+        {
+            if (!current)
+                return;
 
-	if (m_groupWidget->topLevelItemCount() > 0)
-		m_groupWidget->setCurrentItem(m_groupWidget->topLevelItem(0));
+            const auto target = current->data(0, Qt::UserRole).value<QWidget*>();
+            if (target && m_contentsWidget->children().contains(target))
+                m_contentsWidget->setCurrentWidget(target);
+        };
+
+    connect(m_groupWidget, &QTreeWidget::currentItemChanged, this, currentItemChanged);
+    currentItemChanged(m_groupWidget->currentItem());
 }
 
 void QnCameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList &params) {
@@ -103,6 +108,9 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
         QWidget* contentsPage = createContentsPage(group.name, group.params);
         m_contentsWidget->addWidget(contentsPage);
         item->setData(0, Qt::UserRole, qVariantFromValue(contentsPage));
+
+        if (!m_groupWidget->currentItem())
+            m_groupWidget->setCurrentItem(item);
     }
 
     for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
