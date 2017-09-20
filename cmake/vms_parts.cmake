@@ -30,6 +30,7 @@ if("${platform}" MATCHES "android|ios")
     set(_withDesktopClient OFF)
     set(_withClouds OFF)
     set(_withTests OFF)
+    set(_withTestCamera OFF)
 endif()
 
 if("${platform}" STREQUAL "macosx")
