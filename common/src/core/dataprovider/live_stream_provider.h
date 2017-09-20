@@ -38,7 +38,7 @@ class QnLiveStreamProvider;
 
 struct QnLiveStreamParams
 {
-    Qn::StreamQuality quality = Qn::QualityLowest;
+    Qn::StreamQuality quality = Qn::QualityNotDefined;
     Qn::SecondStreamQuality secondaryQuality = Qn::SSQualityLow;
     float fps = 0;
     int bitrateKbps = 0;
@@ -58,16 +58,16 @@ public:
     Qn::ConnectionRole getRole() const;
     int encoderIndex() const;
 
-    void setSecondaryQuality(Qn::SecondStreamQuality  quality);
-    virtual void setQuality(Qn::StreamQuality q);
+    void setParams(const QnLiveStreamParams& params);
+    //void setSecondaryQuality(Qn::SecondStreamQuality  quality);
+    //virtual void setQuality(Qn::StreamQuality q);
+    //virtual void setFps(float f);
     virtual void setCameraControlDisabled(bool value);
-    virtual void setDesiredLiveParams(const QnLiveStreamParams& params);
 
     // for live providers only
-    virtual void setFps(float f);
     bool isMaxFps() const;
 
-    void onPrimaryFpsUpdated(int newFps);
+    void onPrimaryParamsChanged(const QnLiveStreamParams& params);
     QnLiveStreamParams getLiveParams();
 
     bool needMetaData();
@@ -130,7 +130,6 @@ private:
     QnLiveStreamParams m_newLiveParams;
 
     bool m_prevCameraControlDisabled;
-    bool m_qualityUpdatedAtLeastOnce;
     unsigned int m_framesSinceLastMetaData;
     QTime m_timeSinceLastMetaData;
     size_t m_totalVideoFrames;

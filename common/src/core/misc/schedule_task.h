@@ -73,7 +73,7 @@ public:
                 m_streamQuality == e2.m_streamQuality &&
                 m_fps == e2.m_fps &&
                 m_doRecordAudio == e2.m_doRecordAudio &&
-                m_bitrateKbps == e2.m_beforeThreshold;
+                m_bitrateKbps == e2.m_bitrateKbps;
         }
     };
 

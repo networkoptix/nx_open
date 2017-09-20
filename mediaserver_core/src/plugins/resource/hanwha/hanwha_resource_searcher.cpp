@@ -201,9 +201,9 @@ int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource)
 
     HanwhaRequestHelper helper(resource);
     auto attributes = helper.fetchAttributes(lit("attributes/System"));
-    const auto maxProfileCount = attributes.attribute<int>(lit("System/MaxChannel"));
-    if (maxProfileCount)
-        result = *maxProfileCount;
+    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
+    if (maxChannels)
+        result = *maxChannels;
 
     m_channelsByCamera.insert(resource->getUniqueId(), result);
     return result;

@@ -38,11 +38,12 @@ QnLiveStreamParams::QnLiveStreamParams():
 {
 }
 
-bool QnLiveStreamParams::operator ==(const QnLiveStreamParams& rhs)
+bool QnLiveStreamParams::operator==(const QnLiveStreamParams& rhs)
 {
     return rhs.quality == quality
         && rhs.secondaryQuality == secondaryQuality
-        && rhs.fps == fps;
+        && rhs.fps == fps
+        && rhs.bitrateKbps == bitrateKbps;
 }
 
 bool QnLiveStreamParams::operator !=(const QnLiveStreamParams& rhs) { return !(*this == rhs); }
@@ -50,7 +51,6 @@ bool QnLiveStreamParams::operator !=(const QnLiveStreamParams& rhs) { return !(*
 QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
     m_livemutex(QnMutex::Recursive),
-    m_qualityUpdatedAtLeastOnce(false),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
     m_totalAudioFrames(0),
@@ -163,10 +163,32 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
     m_prevCameraControlDisabled = value;
 }
 
-void QnLiveStreamProvider::setDesiredLiveParams(const QnLiveStreamParams &params)
+void QnLiveStreamProvider::setParams(const QnLiveStreamParams& params)
 {
-    m_newLiveParams = params;
+    {
+        QnMutexLocker mtx(&m_livemutex);
+        if (m_newLiveParams == params)
+            return;
+        m_newLiveParams = params;
+        m_newLiveParams.fps = qBound(
+            (float) 1.0, m_newLiveParams.fps, (float) m_cameraRes->getMaxFps());
+    }
+
+    if (getRole() != Qn::CR_SecondaryLiveVideo)
+    {
+        // must be primary, so should inform secondary
+        if (auto owner = getOwner()) 
+        {
+            QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
+            if (lp)
+                lp->onPrimaryParamsChanged(m_newLiveParams);
+        }
+    }
+
+    pleaseReopenStream();
 }
+
+#if 0
 
 void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
 {
@@ -195,20 +217,46 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
     }
 }
 
-void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
+// for live providers only
+void QnLiveStreamProvider::setFps(float f)
 {
     {
-        QnMutexLocker mtx( &m_livemutex );
-        if (m_newLiveParams.quality == q && m_qualityUpdatedAtLeastOnce)
-            return; // same quality
+        QnMutexLocker mtx(&m_livemutex);
 
-        m_newLiveParams.quality = q;
-        m_qualityUpdatedAtLeastOnce = true;
+        if (std::abs(m_newLiveParams.fps - f) < 0.1)
+            return; // same fps?
 
+        m_newLiveParams.fps = qMax(1, qMin((int)f, m_cameraRes->getMaxFps()));
+        f = m_newLiveParams.fps;
+    }
+
+    if (getRole() != Qn::CR_SecondaryLiveVideo)
+    {
+        // must be primary, so should inform secondary
+        if (auto owner = getOwner()) {
+            QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
+            if (lp)
+                lp->onPrimaryFpsUpdated(f);
+        }
     }
 
     pleaseReopenStream();
 }
+
+void QnLiveStreamProvider::setQuality(Qn::StreamQuality q)
+{
+    {
+        QnMutexLocker mtx( &m_livemutex );
+        if (m_newLiveParams.quality == q)
+            return; // same quality
+
+        m_newLiveParams.quality = q;
+    }
+
+    pleaseReopenStream();
+}
+
+#endif
 
 Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
@@ -255,32 +303,6 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 bool QnLiveStreamProvider::canChangeStatus() const
 {
     return m_role == Qn::CR_LiveVideo && m_isPhysicalResource;
-}
-
-// for live providers only
-void QnLiveStreamProvider::setFps(float f)
-{
-    {
-        QnMutexLocker mtx( &m_livemutex );
-
-        if (std::abs(m_newLiveParams.fps - f) < 0.1)
-            return; // same fps?
-
-        m_newLiveParams.fps = qMax(1, qMin((int)f, m_cameraRes->getMaxFps()));
-        f = m_newLiveParams.fps;
-    }
-
-    if (getRole() != Qn::CR_SecondaryLiveVideo)
-    {
-        // must be primary, so should inform secondary
-        if (auto owner = getOwner()) {
-            QnLiveStreamProviderPtr lp = owner->getSecondaryReader();
-            if (lp)
-                lp->onPrimaryFpsUpdated(f);
-        }
-    }
-
-    pleaseReopenStream();
 }
 
 float QnLiveStreamProvider::getDefaultFps() const
@@ -451,7 +473,7 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
     }
 }
 
-void QnLiveStreamProvider::onPrimaryFpsUpdated(int newPrimaryStreamFps)
+void QnLiveStreamProvider::onPrimaryParamsChanged(const QnLiveStreamParams& primaryParams)
 {
     NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
@@ -473,7 +495,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newPrimaryStreamFps)
             m_cameraRes->desiredSecondStreamFps(),
             maxPrimaryStreamFps);
 
-        if (maxPrimaryStreamFps - newPrimaryStreamFps < 2 )
+        if (maxPrimaryStreamFps - primaryParams.fps < 2 )
         {
             newSecondaryStreamFps = qMax(
                 m_cameraRes->desiredSecondStreamFps() / 2,
@@ -484,15 +506,17 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newPrimaryStreamFps)
     {
         newSecondaryStreamFps = qMin(
             m_cameraRes->desiredSecondStreamFps(),
-            maxPrimaryStreamFps - newPrimaryStreamFps);
+            maxPrimaryStreamFps - primaryParams.fps);
     }
     else
     {
         // noSharing
         newSecondaryStreamFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxPrimaryStreamFps);
     }
-
-    setFps(qMax(1.0, newSecondaryStreamFps));
+    auto params = m_newLiveParams;
+    params.fps = qMax(1.0, newSecondaryStreamFps);
+    params.quality = m_cameraRes->getSecondaryStreamQuality();
+    setParams(params);
 }
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
