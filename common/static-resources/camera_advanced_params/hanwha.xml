@@ -243,11 +243,11 @@
                     dataType="Separator"
                     name="sep"/>
                 
-                <param id="PRIMARY%SERVICE%ResetToDefault"
+                <!--<param id="PRIMARY%SERVICE%ResetToDefault"
                     name="Reset To Default"
                     dataType="Button"
                     resync="true"
-                    aux="streamsToReopen=primary;profile=primary"/>
+                    aux="streamsToReopen=primary;profile=primary"/>-->
                 
             </group>
             
@@ -451,11 +451,11 @@
                     name="sep"
                     dataType="Separator"/>
                 
-                <param id="SECONDARY%SERVICE%ResetToDefault"
+                <!--<param id="SECONDARY%SERVICE%ResetToDefault"
                     name="Reset To Default"
                     dataType="Button"
                     resync="true"
-                    aux="streamsToReopen=secondary;profile=secondary"/>
+                    aux="streamsToReopen=secondary;profile=secondary"/>-->
             </group>
             
             <group name="WiseStream">
