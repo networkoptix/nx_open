@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
+from model_utils import Choices
 
 from django.template.defaultfilters import truncatechars
 
@@ -82,6 +83,9 @@ class Customization(models.Model):
         Language, related_name='default_in_%(class)s')
     languages = models.ManyToManyField(Language)
 
+    PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
+    preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
+
     def __str__(self):
         return self.name
 
@@ -134,7 +138,6 @@ class DataRecord(models.Model):
     @property
     def short_description(self):
         return truncatechars(self.value, 100)
-
 
     def save(self, *args, **kwargs):
         if not self.data_structure.translatable:
