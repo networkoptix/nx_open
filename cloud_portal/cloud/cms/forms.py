@@ -10,7 +10,7 @@ class CustomContextForm(forms.Form):
         super(CustomContextForm, self)
         self.fields.pop('language')
 
-    def add_fields(self, context, customization, language):
+    def add_fields(self, context, customization, language, user):
         data_structures = context.datastructure_set.all()
 
         if len(data_structures) < 1:
@@ -38,6 +38,9 @@ class CustomContextForm(forms.Form):
 
             widget_type = forms.TextInput(attrs={'size': 80})
 
+            disabled = data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced'))
+
+
             if data_structure.type == DataStructure.get_type("Long Text"):
                 widget_type = forms.Textarea
 
@@ -49,11 +52,13 @@ class CustomContextForm(forms.Form):
                 self.fields[ds_name] = forms.ImageField(label=ds_name,
                                                         help_text=ds_description,
                                                         initial=record_value,
-                                                        required=False)
+                                                        required=False,
+                                                        disabled=disabled)
                 continue
 
             self.fields[ds_name] = forms.CharField(required=False,
                                                    label=ds_name,
                                                    help_text=ds_description,
                                                    initial=record_value,
-                                                   widget=widget_type)
+                                                   widget=widget_type,
+                                                   disabled=disabled)

@@ -60,7 +60,7 @@ def handle_get_view(request, context_id, language_code):
 
     form = CustomContextForm(initial={'language': language_id})
     if context:
-        form.add_fields(context, customization, language)
+        form.add_fields(context, customization, language, request.user)
 
     return context, form, language
 
@@ -71,6 +71,20 @@ def add_upload_error_messages(request, errors):
             request, "Upload error for {}. {}".format(error[0], error[1]))
 
 
+def check_advanced_edited(request_data, customization, data_structures, user):
+    for ds_label in request_data:
+        data_structure = data_structures.filter(label=ds_label)
+        if data_structure.exists() and data_structure[0].advanced:
+            data_record = data_structure[0].datarecord_set.filter(customization=customization)
+            if data_record.exists():
+                if request_data[ds_label] != data_record.latest('created_date').value\
+                        and not (user.has_perm('cms.edit_advanced') or user.is_superuser):
+                    return False
+    return True
+
+
+
+
 def handle_post_context_edit_view(request, context_id, language_id):
     context, language, form, customization, user = get_post_parameters(
         request, context_id, language_id)
@@ -78,7 +92,8 @@ def handle_post_context_edit_view(request, context_id, language_id):
     request_files = request.FILES
     preview_link = ""
     upload_errors = []
-
+    if not check_advanced_edited(request_data, customization, context.datastructure_set.all(), user):
+        raise PermissionDenied
     if 'languageChanged' in request_data:
         if 'currentLanguage' in request_data \
            and request_data['currentLanguage']:
@@ -129,7 +144,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
         return None, None, None, None
 
-    form.add_fields(context, customization, language)
+    form.add_fields(context, customization, language, user)
 
     return context, form, language, preview_link
 

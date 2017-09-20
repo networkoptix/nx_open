@@ -93,9 +93,12 @@ def save_unrevisioned_records(customization, language, data_structures,
             # If neither case do nothing for this record
             else:
                 continue
-        else:
-            new_record_value = request_data[data_structure_name]
+        elif data_structure.label in request_data:
+            new_record_value = request_data[data_structure.label]
 
+
+        if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
+            continue
         if records.exists():
             if new_record_value == records.latest('created_date').value:
                 continue

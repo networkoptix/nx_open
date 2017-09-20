@@ -48,6 +48,10 @@ DATA_TYPES = (
 
 
 class DataStructure(models.Model):
+    class Meta:
+        permissions = (
+            ("edit_advanced", "Can edit advanced DataStructures"),
+        )
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
