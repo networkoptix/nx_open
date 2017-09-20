@@ -1261,7 +1261,8 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
             return 1.0;
         }
     };
-
+    if (role == Qn::CR_Default)
+        role = Qn::CR_LiveVideo;
     auto streamCapability = cameraMediaCapability().streamCapabilities.value(role);
     if (streamCapability.defaultBitrateKbps > 0)
     {
