@@ -3,6 +3,9 @@
 #include "ui_export_settings_dialog.h"
 
 #include <camera/single_thumbnail_loader.h>
+#include <core/resource/layout_item_data.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <ui/common/palette.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -13,6 +16,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <utils/common/event_processors.h>
+#include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 
@@ -36,6 +40,20 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, false /*isBookmark*/, parent)
 {
     setMediaResource(widget->resource());
+
+    const auto resource = widget->resource()->toResourcePtr();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto itemData = widget->item()->data();
+
+    nx::core::transcoding::Settings available;
+    available.rotation = resource->hasProperty(QnMediaResource::rotationKey())
+        ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
+        : 0;
+    available.aspectRatio = camera ? camera->aspectRatio() : QnAspectRatio();
+    available.enhancement = itemData.contrastParams;
+    available.dewarping = itemData.dewarpingParams;
+    available.zoomWindow = itemData.zoomRect;
+    d->setAvailableTranscodingSettings(available);
 
     // TODO: #vkutin #GDM Put this layout part elsewhere.
 
@@ -132,6 +150,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->bookmarkButton->setVisible(isBookmark);
     if (!isBookmark) // Just in case...
         ui->bookmarkButton->setState(ui::SelectableTextButton::State::deactivated);
+
+    connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataChanged,
+        d, &Private::setApplyFilters);
 
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setMediaFilename);
     connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);

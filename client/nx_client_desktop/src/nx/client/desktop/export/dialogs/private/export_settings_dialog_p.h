@@ -47,6 +47,8 @@ public:
     void setMediaFilename(const Filename& filename);
     void setLayoutFilename(const Filename& filename);
     void setRapidReviewFrameStep(qint64 frameStepMs);
+    void setAvailableTranscodingSettings(const nx::core::transcoding::Settings& settings);
+    void setApplyFilters(bool value);
 
     Mode mode() const;
     void setMode(Mode mode);
@@ -86,6 +88,7 @@ private:
     void updateOverlays();
     void updateTimestampText();
     void overlayPositionChanged(settings::ExportOverlayType type);
+    void updateTranscodingSettings();
 
     static QStringList generateAlerts(ExportMediaValidator::Results results);
 
@@ -97,6 +100,7 @@ private:
     ExportMediaValidator::Results m_layoutValidationResults;
     settings::ExportMediaPersistent m_exportMediaSettings;
     settings::ExportLayoutPersistent m_exportLayoutSettings;
+    nx::core::transcoding::Settings m_availableTranscodingSettings;
 
     static constexpr size_t overlayCount = size_t(settings::ExportOverlayType::overlayCount);
     std::array<ExportOverlayWidget*, overlayCount> m_overlays {};

@@ -10,6 +10,12 @@ ExportMediaSettingsWidget::ExportMediaSettingsWidget(QWidget* parent):
     ui(new Ui::ExportMediaSettingsWidget())
 {
     ui->setupUi(this);
+    connect(ui->filtersCheckBox, &QCheckBox::toggled,
+        this, &ExportMediaSettingsWidget::dataChanged);
+}
+
+ExportMediaSettingsWidget::~ExportMediaSettingsWidget()
+{
 }
 
 } // namespace desktop

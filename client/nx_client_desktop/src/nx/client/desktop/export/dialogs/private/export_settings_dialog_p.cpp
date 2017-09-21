@@ -82,6 +82,49 @@ void ExportSettingsDialog::Private::saveSettings()
     }
 }
 
+void ExportSettingsDialog::Private::setAvailableTranscodingSettings(
+    const nx::core::transcoding::Settings& settings)
+{
+    m_availableTranscodingSettings = settings;
+    if (m_exportMediaSettings.applyFilters)
+        updateTranscodingSettings();
+}
+
+void ExportSettingsDialog::Private::updateTranscodingSettings()
+{
+    // TODO: #vkutin #gdm Separate transcoding settings and overlay settings.
+    if (m_exportMediaSettings.applyFilters)
+    {
+        m_exportMediaSettings.transcodingSettings.rotation =
+            m_availableTranscodingSettings.rotation;
+        m_exportMediaSettings.transcodingSettings.aspectRatio =
+            m_availableTranscodingSettings.aspectRatio;
+        m_exportMediaSettings.transcodingSettings.enhancement =
+            m_availableTranscodingSettings.enhancement;
+        m_exportMediaSettings.transcodingSettings.dewarping =
+            m_availableTranscodingSettings.dewarping;
+        m_exportMediaSettings.transcodingSettings.zoomWindow =
+            m_availableTranscodingSettings.zoomWindow;
+    }
+    else
+    {
+        m_exportMediaSettings.transcodingSettings.rotation = 0;
+        m_exportMediaSettings.transcodingSettings.aspectRatio = QnAspectRatio();
+        m_exportMediaSettings.transcodingSettings.enhancement = ImageCorrectionParams();
+        m_exportMediaSettings.transcodingSettings.dewarping = QnItemDewarpingParams();
+        m_exportMediaSettings.transcodingSettings.zoomWindow = QRectF();
+    }
+}
+
+void ExportSettingsDialog::Private::setApplyFilters(bool value)
+{
+    if (m_exportMediaSettings.applyFilters == value)
+        return;
+
+    m_exportMediaSettings.applyFilters = value;
+    updateTranscodingSettings();
+}
+
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)
 {
     m_exportMediaSettings.mediaResource = media;
