@@ -37,7 +37,7 @@
         },
         {
           "label": "Company web site",
-          "name": "%companyUrl%",
+          "name": "%COMPANY_LINK%",
           "old_name": "{{companyUrl}}",
           "value": "http://networkoptix.com",
           "description": "Company main web site"
