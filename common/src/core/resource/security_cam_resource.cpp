@@ -435,6 +435,18 @@ bool QnSecurityCamResource::isEdge() const
     return QnMediaServerResource::isEdgeServer(resourcePool()->getResourceById(getParentId()));
 }
 
+bool QnSecurityCamResource::isSharingLicenseInGroup() const
+{
+    if (getGroupId().isEmpty())
+        return false; //< Not a multichannel device. Nothing to share
+    if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
+        return false; //< Don't allow sharing for encoders e.t.c
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
+    if (!resType)
+        return false;
+    return resType->hasParam(lit("canShareLicenseGroup"));
+}
+
 Qn::LicenseType QnSecurityCamResource::licenseType() const
 {
     if (m_cachedLicenseType == Qn::LC_Count)
