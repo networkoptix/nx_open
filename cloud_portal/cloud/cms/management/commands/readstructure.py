@@ -26,9 +26,16 @@ def find_or_add_context_by_file(file_path, product_id, has_language):
     return context
 
 
-def find_or_add_context(context_name, product_id, has_language, is_global):
+def find_or_add_context(context_name, old_name, product_id, has_language, is_global):
+    if old_name and Context.objects.filter(name=old_name, product_id=product_id).exists():
+        context = Context.objects.get(name=old_name, product_id=product_id)
+        context.name = context_name
+        context.save()
+        return context
+
     if Context.objects.filter(name=context_name, product_id=product_id).exists():
         return Context.objects.get(name=context_name, product_id=product_id)
+
     context = Context(name=context_name, file_path=context_name,
                       product_id=product_id, translatable=has_language,
                       is_global=is_global)
@@ -36,7 +43,13 @@ def find_or_add_context(context_name, product_id, has_language, is_global):
     return context
 
 
-def find_or_add_data_stucture(name, context_id, has_language):
+def find_or_add_data_stucture(name, old_name, context_id, has_language):
+    if old_name and DataStructure.objects.filter(name=old_name, context_id=context_id).exists():
+        record = DataStructure.objects.get(name=old_name, context_id=context_id)
+        record.name = name
+        record.save()
+        return record
+
     if DataStructure.objects.filter(name=name, context_id=context_id).exists():
         return DataStructure.objects.get(name=name, context_id=context_id)
     data = DataStructure(name=name, context_id=context_id,
@@ -64,7 +77,7 @@ def read_structure_file(filename, product_id):
         context = find_or_add_context_by_file(
             context_name, product_id, bool(language))
         for string in strings:
-            find_or_add_data_stucture(string, context.id, bool(language))
+            find_or_add_data_stucture(string, None, context.id, bool(language))
 
 
 def read_structure():
@@ -80,11 +93,11 @@ def read_structure_json():
     product_id = Product.objects.get(name=product_name).id
     for context_data in cms_structure['contexts']:
         has_language = context_data["translatable"]
-        is_global = False
-        if "is_global" in context_data:
-            is_global = context_data["is_global"]
+
+        is_global = context_data["is_global"] if "is_global" in context_data else False
+        old_name = context_data["old_name"] if "old_name" in context_data else None
         context = find_or_add_context(
-            context_data["name"], product_id, has_language, is_global)
+            context_data["name"], old_name, product_id, has_language, is_global)
         if "description" in context_data:
             context.description = context_data["description"]
         if "file_path" in context_data:
@@ -94,10 +107,6 @@ def read_structure_json():
         context.save()
 
         for record in context_data["values"]:
-            description = None
-            type = None
-            meta = None
-            advanced = False
             if not isinstance(record, dict):
                 if len(record) == 3:
                     label, name, value = record
@@ -107,28 +116,21 @@ def read_structure_json():
                 label = record['label']
                 name = record['name']
                 value = record['value']
-
-                if 'description' in record:
-                    description = record['description']
-
-                if 'type' in record:
-                    type = record['type']
-
-                if 'meta' in record:
-                    meta = record['meta']
-
-                if 'advanced' in record:
-                    advanced = record['advanced']
+                old_name = record['old_name'] if 'old_name' in record else None
+                description = record['description'] if 'description' in record else None
+                record_type = record['type'] if 'type' in record else None
+                meta = record['meta'] if 'meta' in record else None
+                advanced = record['advanced'] if 'advanced' in record else False
 
             data_structure = find_or_add_data_stucture(
-                name, context.id, has_language)
+                name, old_name, context.id, has_language)
 
             data_structure.label = label
             data_structure.advanced = advanced
             if description:
                 data_structure.description = description
-            if type:
-                data_structure.type = DataStructure.get_type(type)
+            if record_type:
+                data_structure.type = DataStructure.get_type(record_type)
 
             if type and type == "Image":
                 data_structure.translatable = "{{language}}" in name
