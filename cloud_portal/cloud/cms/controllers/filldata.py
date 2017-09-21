@@ -4,12 +4,12 @@ import re
 import json
 import codecs
 import base64
-from django.core.cache import caches
+from django.core.cache import cache
 
 SOURCE_DIR = 'static/{{customization}}/source/'
 
 def set_latest_customization_version_id(customization, version_id):
-    customization_cache = caches['mem']
+    customization_cache = cache
     data = customization_cache.get(customization.name)
 
     if not data:
@@ -233,8 +233,8 @@ def fill_content(customization_name='default', product='cloud_portal',
         else:
             version_id = 0
             incremental = False  # no version - do full update using default values
-
-        set_latest_customization_version_id(customization, version_id)
+        cached_id = version_id.id if versions.exists() else version_id
+        set_latest_customization_version_id(customization, cached_id)
 
     if incremental and not changed_context:
         # filter records changed in this version
