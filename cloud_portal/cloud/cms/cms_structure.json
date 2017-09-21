@@ -23,14 +23,14 @@
         },
         {
           "label": "Support Link",
-          "name": "%supportLink%",
+          "name": "%SUPPORT_LINK%",
           "old_name": "{{supportLink}}",
           "value": "/content/support",
           "description": "Support link. Use https://{{CLOUD_ADDRESS}}/content/support to use embedded page. If you use phone number here - make sure you format the link correctly like 'tel:...'"
         },
         {
           "label": "Support Link Text",
-          "name": "%supportLinkText%",
+          "name": "%SUPPORT_LINK_TEXT%",
           "old_name": "{{supportLinkText}}",
           "value": "http://support.networkoptix.com",
           "description": "Text to be shown on the support link in emails"
