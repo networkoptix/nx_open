@@ -19,6 +19,7 @@ public:
     using Parameters = std::map<QString, QString>;
 
     HanwhaRequestHelper(const QnSecurityCamResourcePtr& resource);
+    HanwhaRequestHelper(const QAuthenticator& auth, const QString& url);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
 
@@ -80,7 +81,8 @@ private:
         const QString& groupBy = QString());
 
 private:
-    const QnSecurityCamResourcePtr m_resource;
+    const QAuthenticator m_auth;
+    const QString m_url;
     bool m_allowLocks = false;
 };
 
