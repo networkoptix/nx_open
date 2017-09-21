@@ -132,15 +132,15 @@ void AnimatorGroup::updateCurrentTime(int currentTime) {
 int AnimatorGroup::estimatedDuration() const
 {
     static const auto getDuration =
-        [](AbstractAnimator *animator)
+        [](AbstractAnimator* animator)
         {
             const auto timeLimit = animator->timeLimit();
             const auto estimated = animator->estimatedDuration();
-            return timeLimit > 0 ? qMin(estimated, timeLimit) : estimated;
+            return timeLimit >= 0 ? qMin(estimated, timeLimit) : estimated;
         };
 
     int result = 0;
-    for(auto animator: m_animators)
+    for (const auto animator: m_animators)
         result = qMax(result, getDuration(animator));
 
     return result;
