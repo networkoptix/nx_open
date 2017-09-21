@@ -27,6 +27,12 @@ namespace controller {
 
 class AbstractTrafficRelay;
 
+struct ConnectToPeerRequestEx:
+    api::ConnectToPeerRequest
+{
+    SocketAddress clientEndpoint;
+};
+
 class AbstractConnectSessionManager
 {
 public:
@@ -48,7 +54,7 @@ public:
         CreateClientSessionHandler completionHandler) = 0;
 
     virtual void connectToPeer(
-        const api::ConnectToPeerRequest& request,
+        const ConnectToPeerRequestEx& request,
         ConnectToPeerHandler completionHandler) = 0;
 };
 
@@ -69,7 +75,7 @@ public:
         CreateClientSessionHandler completionHandler) override;
 
     virtual void connectToPeer(
-        const api::ConnectToPeerRequest& request,
+        const ConnectToPeerRequestEx& request,
         ConnectToPeerHandler completionHandler) override;
 
 private:

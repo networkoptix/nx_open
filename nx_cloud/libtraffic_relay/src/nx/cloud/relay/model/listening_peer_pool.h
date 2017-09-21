@@ -30,6 +30,13 @@ namespace model {
 using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
     void(api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
 
+struct ClientInfo
+{
+    std::string relaySessionId;
+    SocketAddress endpoint;
+    std::string peerName;
+};
+
 class AbstractListeningPeerPool
 {
 public:
@@ -61,6 +68,7 @@ public:
      * for some timeout for peer to establish new connection.
      */
     virtual void takeIdleConnection(
+        const ClientInfo& clientInfo,
         const std::string& peerName,
         TakeIdleConnectionHandler completionHandler) = 0;
 };
@@ -102,6 +110,7 @@ public:
      * for some timeout for peer to establish new connection.
      */
     virtual void takeIdleConnection(
+        const ClientInfo& clientInfo,
         const std::string& peerName,
         TakeIdleConnectionHandler completionHandler) override;
 
@@ -126,6 +135,7 @@ private:
 
     struct ConnectionAwaitContext
     {
+        ClientInfo clientInfo;
         std::chrono::steady_clock::time_point expirationTime;
         TakeIdleConnectionHandler handler;
         TakeIdleConnectionRequestTimers::iterator expirationTimerIter;
@@ -163,11 +173,13 @@ private:
 
     void startWaitingForNewConnection(
         const QnMutexLockerBase& lock,
+        const ClientInfo& clientInfo,
         const std::string& peerName,
         PeerContext* peerContext,
         TakeIdleConnectionHandler completionHandler);
 
     void giveAwayConnection(
+        const ClientInfo& clientInfo,
         std::unique_ptr<ConnectionContext> connectionContext,
         TakeIdleConnectionHandler completionHandler);
 

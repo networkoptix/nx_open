@@ -1,5 +1,6 @@
 #include "listening_peer_pool.h"
 
+#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
@@ -141,6 +142,7 @@ std::string ListeningPeerPool::findListeningPeerByDomain(
 }
 
 void ListeningPeerPool::takeIdleConnection(
+    const ClientInfo& clientInfo,
     const std::string& peerNameOriginal,
     TakeIdleConnectionHandler completionHandler)
 {
@@ -167,6 +169,7 @@ void ListeningPeerPool::takeIdleConnection(
     {
         startWaitingForNewConnection(
             lock,
+            clientInfo,
             peerName,
             &peerContext,
             std::move(completionHandler));
@@ -180,6 +183,7 @@ void ListeningPeerPool::takeIdleConnection(
         startPeerExpirationTimer(lock, peerContextIter->first, &peerContext);
 
     giveAwayConnection(
+        clientInfo,
         std::move(connectionContext),
         std::move(completionHandler));
 }
@@ -216,12 +220,14 @@ void ListeningPeerPool::provideConnectionToTheClient(
     startPeerExpirationTimer(lock, peerName, peerContext);
 
     giveAwayConnection(
+        awaitContext.clientInfo,
         std::move(connectionContext),
         std::move(awaitContext.handler));
 }
 
 void ListeningPeerPool::startWaitingForNewConnection(
     const QnMutexLockerBase& /*lock*/,
+    const ClientInfo& clientInfo,
     const std::string& peerName,
     PeerContext* peerContext,
     TakeIdleConnectionHandler completionHandler)
@@ -233,6 +239,7 @@ void ListeningPeerPool::startWaitingForNewConnection(
         expirationTime = std::min(expirationTime, (*peerContext->expirationTimer)->first);
 
     ConnectionAwaitContext connectionAwaitContext;
+    connectionAwaitContext.clientInfo = clientInfo;
     connectionAwaitContext.handler = std::move(completionHandler);
     connectionAwaitContext.expirationTime = expirationTime;
     peerContext->takeConnectionRequestQueue.push_back(
@@ -243,17 +250,51 @@ void ListeningPeerPool::startWaitingForNewConnection(
 }
 
 void ListeningPeerPool::giveAwayConnection(
+    const ClientInfo& clientInfo,
     std::unique_ptr<ConnectionContext> connectionContext,
     TakeIdleConnectionHandler completionHandler)
 {
+    // TODO: #ak Get rid of this struct when connectionPtr->sendAsync accepts nx::utils::MoveOnlyFunc
+    struct Context
+    {
+        std::unique_ptr<ConnectionContext> connectionContext;
+        TakeIdleConnectionHandler completionHandler;
+    };
+
+    api::OpenTunnelNotification notification;
+    notification.setClientEndpoint(clientInfo.endpoint);
+    notification.setClientPeerName(clientInfo.peerName.c_str());
+    auto openTunnelNotificationBuffer = 
+        std::make_shared<nx_http::StringType>(notification.toHttpMessage().toString());
     auto connectionPtr = connectionContext->connection.get();
-    connectionPtr->post(
-        [this, connectionContext = std::move(connectionContext),
-            completionHandler = std::move(completionHandler),
-            scopedCallGuard = m_apiCallCounter.getScopedIncrement()]() mutable
+
+    auto context = std::make_shared<Context>();
+    context->connectionContext = std::move(connectionContext);
+    context->completionHandler = std::move(completionHandler);
+
+    connectionPtr->sendAsync(
+        *openTunnelNotificationBuffer,
+        [this, 
+            clientInfo,
+            openTunnelNotificationBuffer,
+            context,
+            scopedCallGuard = m_apiCallCounter.getScopedIncrement()](
+                SystemError::ErrorCode sysErrorCode,
+                std::size_t /*bytesSent*/) mutable
         {
-            connectionContext->connection->cancelIOSync(network::aio::etNone);
-            completionHandler(api::ResultCode::ok, std::move(connectionContext->connection));
+            if (sysErrorCode != SystemError::noError)
+            {
+                NX_LOGX(lm("Session %1. Failed to send open tunnel notification to %2. %3")
+                    .arg(clientInfo.relaySessionId)
+                    .arg(context->connectionContext->connection->getForeignAddress())
+                    .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
+                return context->completionHandler(api::ResultCode::networkError, nullptr);
+            }
+
+            context->connectionContext->connection->cancelIOSync(network::aio::etNone);
+            context->completionHandler(
+                api::ResultCode::ok,
+                std::move(context->connectionContext->connection));
         });
 }
 
