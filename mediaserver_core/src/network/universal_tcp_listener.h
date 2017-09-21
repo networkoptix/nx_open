@@ -1,12 +1,12 @@
-#ifndef __UNIVERSAL_TCP_LISTENER_H__
-#define __UNIVERSAL_TCP_LISTENER_H__
+#pragma once 
+
+#include <set>
 
 #include <network/http_connection_listener.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/http_mod_manager.h>
-
 
 class CloudConnectionManager;
 
@@ -53,5 +53,3 @@ private:
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
     void updateCloudConnectState(QnMutexLockerBase* const lk);
 };
-
-#endif  //__UNIVERSAL_TCP_LISTENER_H__
