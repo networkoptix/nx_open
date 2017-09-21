@@ -54,7 +54,6 @@ do
 
             /app/env/bin/python manage.py initdb
             /app/env/bin/python manage.py readstructure
-            /app/env/bin/python manage.py initbranding
             ;;
         config)
             instantiate_configs
