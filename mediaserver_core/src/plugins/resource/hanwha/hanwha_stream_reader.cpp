@@ -6,11 +6,20 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 
+#include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace mediaserver_core {
-namespace plugins { 
+namespace plugins {
+
+namespace {
+
+static const QString kLive4NvrProfileName = lit("Live4NVR");
+static const QString kHanwhaVideoSourceStateOn = lit("On");
+static const int kHanwhaDefaultPrimaryStreamProfile = 2;
+
+} // namespace
 
 HanwhaStreamReader::HanwhaStreamReader(const HanwhaResourcePtr& res):
     QnRtpStreamReader(res),
@@ -26,29 +35,34 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params)
 {
+    if (m_hanwhaResource->isNvr() && !isVideoSourceActive(m_hanwhaResource->getChannel()))
+        return CameraDiagnostics::NoMediaStreamResult();
+
     const auto role = getRole();
     QString streamUrl;
-    int nxProfileNumber = kHanwhaInvalidProfile;
+    int profileToOpen = kHanwhaInvalidProfile;
     if (!m_hanwhaResource->isNvr())
-    {
-        nxProfileNumber = m_hanwhaResource->profileByRole(role);
-        if (nxProfileNumber == kHanwhaInvalidProfile)
-        {
-            return CameraDiagnostics::CameraInvalidParams(
-                lit("No profile for %1 stream").arg(
-                    role == Qn::ConnectionRole::CR_LiveVideo
-                    ? lit("primary")
-                    : lit("secondary")));
-        }
+        profileToOpen = m_hanwhaResource->profileByRole(role);
+    else
+        profileToOpen = chooseNvrChannelProfile(role);
 
-        if (isCameraControlRequired)
-        {
-            auto result = updateProfile(nxProfileNumber, params);
-            if (!result)
-                return result;
-        }
+    if (!isCorrectProfile(profileToOpen))
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("No profile for %1 stream").arg(
+                role == Qn::ConnectionRole::CR_LiveVideo
+                ? lit("primary")
+                : lit("secondary")));
     }
-    auto result = streamUri(nxProfileNumber, &streamUrl);
+
+    if (isCameraControlRequired)
+    {
+        auto result = updateProfile(profileToOpen, params);
+        if (!result)
+            return result;
+    }
+    
+    auto result = streamUri(profileToOpen, &streamUrl);
     if (!result)
         return result;
 
@@ -119,6 +133,12 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     int profileNumber,
     const QnLiveStreamParams& parameters)
 {
+    if (m_hanwhaResource->isNvr())
+    {
+        // TODO: #dmishin implement profile configuration for NVR if needed.
+        return CameraDiagnostics::NoErrorResult(); 
+    }   
+
     if (profileNumber == kHanwhaInvalidProfile)
     {
         return CameraDiagnostics::CameraPluginErrorResult(
@@ -126,6 +146,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setAllowLocks(true);
     const auto profileParameters = makeProfileParameters(profileNumber, parameters);
 
     m_hanwhaResource->beforeConfigureStream(getRole());
@@ -143,6 +164,79 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     return CameraDiagnostics::NoErrorResult();
 }
 
+int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
+{
+    const auto channel = m_hanwhaResource->getChannel();
+
+    HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setAllowLocks(true);
+    const auto response = helper.view(
+        lit("media/videoprofile"),
+        {{kHanwhaChannelProperty, QString::number(channel)}});
+    
+    if (!response.isSuccessful())
+        return kHanwhaInvalidProfile;
+
+    const auto profiles = parseProfiles(response);
+    if (profiles.empty())
+        return kHanwhaInvalidProfile;
+    
+    if (profiles.find(channel) == profiles.cend())
+        return kHanwhaInvalidProfile;
+
+    const auto& channelProfiles = profiles.at(channel);
+
+    if (channelProfiles.empty())
+        return kHanwhaInvalidProfile;
+
+    int bestProfile = kHanwhaInvalidProfile;
+    int bestScore = 0;
+
+    for (const auto& profileEntry: channelProfiles)
+    {
+        const auto profile = profileEntry.second;
+        const auto codecCoefficient =
+            kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
+                ? kHanwhaCodecCoefficients.at(profile.codec)
+                : -1;
+
+        const auto score = profile.resolution.width()
+            * profile.resolution.height()
+            * codecCoefficient
+            + profile.frameRate;
+
+        if (score > bestScore)
+        {
+            bestScore = score;
+            bestProfile = profile.number;
+        }
+    }
+
+    return bestProfile;
+}
+
+bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
+{
+    return profileNumber != kHanwhaInvalidProfile || m_hanwhaResource->isNvr();
+}
+
+bool HanwhaStreamReader::isVideoSourceActive(int channel) const
+{
+    HanwhaRequestHelper helper(m_hanwhaResource);
+    auto response = helper.view(lit("media/videosource"));
+
+    if (!response.isSuccessful())
+        return false;
+
+    const auto state = response.parameter<QString>(
+        lit("Channel.%1.State").arg(channel));
+
+    if (!state.is_initialized())
+        return false;
+
+    return state == kHanwhaVideoSourceStateOn;
+}
+
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)
 {
     using ParameterMap = std::map<QString, QString>;
@@ -158,10 +252,12 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
 
     if (m_hanwhaResource->isNvr())
         params.emplace(kHanwhaClientTypeProperty, "PC");
-    else
+    
+    if (profileNumber != kHanwhaInvalidProfile)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
     HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setAllowLocks(true);
     const auto response = helper.view(lit("media/streamuri"), params);
 
     if (!response.isSuccessful())

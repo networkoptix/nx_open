@@ -23,7 +23,8 @@ const QSet<QString> kKnownBuiltinProfiles = {
     lit("RightHalfView"),
     lit("FisheyeView"),
     lit("Dewarp1"),
-    lit("Dewarp2")
+    lit("Dewarp2"),
+    lit("Live4NVR")
 };
 
 } // namespace

@@ -414,10 +414,13 @@ void HanwhaResource::initMediaStreamCapabilities()
 
 nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::ConnectionRole role) const
 {
-    if (m_isNvr)
-        return nx::media::CameraStreamCapability();
-
     nx::media::CameraStreamCapability capability;
+    if (m_isNvr)
+    {
+        capability.maxFps = 1;
+        return capability;
+    }
+
     const auto codec = streamCodec(role);
     const auto resolution = streamResolution(role);
     const auto bitrateControlType = streamBitrateControl(role);
@@ -535,10 +538,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     {
         int fixedProfileCount = 0;
 
-        const auto startSequence = kHanwhaChannelPropertyTemplate.arg(channel);
+        const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: profiles.response())
         {
-            const bool isFixedProfile = entry.first.startsWith(startSequence)
+            const bool isFixedProfile = entry.first.startsWith(channelPrefix)
                 && entry.first.endsWith(kHanwhaIsFixedProfileProperty)
                 && entry.second == kHanwhaTrue;
 
@@ -556,7 +559,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         }
 
         m_maxProfileCount = *maxProfileCount;
-        hasDualStreaming = *maxProfileCount - fixedProfileCount > 1;
+        hasDualStreaming = m_maxProfileCount - fixedProfileCount > 1;
         auto result = fetchStreamLimits(&m_streamLimits);
 
         if (!result)
