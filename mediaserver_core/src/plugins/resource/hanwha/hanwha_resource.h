@@ -119,7 +119,10 @@ private:
 
     QString defaultValue(const QString& parameter, Qn::ConnectionRole role) const;
 
-    QString suggestCodecProfile(AVCodecID codec, QString desiredProfile) const;
+    QString suggestCodecProfile(
+        AVCodecID codec, 
+        Qn::ConnectionRole role, 
+        const QString& desiredProfile) const;
 
     QSize bestSecondaryResolution(
         const QSize& primaryResolution,
@@ -156,20 +159,6 @@ private:
 
     boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
 
-    boost::optional<QString> tryToGetSpecificParameterDefault(
-        const QString& parameterString,
-        const HanwhaResponse& response) const;
-
-    boost::optional<int> calculateDefaultBitrate(
-        const QString& parmeterString,
-        const HanwhaResponse& response) const;
-
-    boost::optional<int> calculateDefaultGovLength(
-        const QString& parameterString,
-        const HanwhaResponse& response) const;
-
-    std::tuple<int, int, AVCodecID> channelProfileCodec(const QString& parameterString) const;
-    
     QString toHanwhaAdvancedParameterValue(
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& parameterInfo,
@@ -203,7 +192,7 @@ private:
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
     void initMediaStreamCapabilities();
-    nx::media::CameraStreamCapability mediaCapabilityForRole(Qn::ConnectionRole role);
+    nx::media::CameraStreamCapability mediaCapabilityForRole(Qn::ConnectionRole role) const;
     bool executeServiceCommand(
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& info);
