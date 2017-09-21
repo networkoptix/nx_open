@@ -32,6 +32,8 @@ void QnClientCoreMetaTypes::initialize()
 
     qmlRegisterUncreatableType<NxGlobalsObject>(
         "Nx", 1, 0, "NxGlobals", QLatin1String("Cannot create an instance of NxGlobals."));
+    qmlRegisterUncreatableType<QnUrlHelper>(
+        "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
     qRegisterMetaType<QnUrlHelper>();
     qmlRegisterUncreatableType<QnUrlHelper>(
         "Nx", 1, 0, "UrlHelper", QLatin1String("Cannot create an instance of UrlHelper."));

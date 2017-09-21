@@ -23,6 +23,8 @@
 //!This class added to minimize creation/destruction of QByteArray and QString
 class NX_UTILS_API QnUuid
 {
+    Q_GADGET
+
 public:
     static const size_t RFC4122_SIZE = 16;
 
@@ -38,12 +40,12 @@ public:
 
     const QUuid& getQUuid() const;
 
-    bool isNull() const;
+    Q_INVOKABLE bool isNull() const;
     const QByteArray toByteArray() const;
     const QByteArray toRfc4122() const;
-    const QString toString() const;
-    /** Returns guid without {}. */
-    QString toSimpleString() const;
+    Q_INVOKABLE const QString toString() const;
+    /** @return GUID without braces */
+    Q_INVOKABLE QString toSimpleString() const;
     QByteArray toSimpleByteArray() const;
     std::string toStdString() const;
     QUuid toQUuid() const;
