@@ -573,16 +573,16 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="leftMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QnCameraAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>

@@ -70,7 +70,7 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
     const auto frameRate = m_hanwhaResource->streamFrameRate(role, parameters.fps);
     const auto govLength = m_hanwhaResource->streamGovLength(role);
     const auto bitrateControl = m_hanwhaResource->streamBitrateControl(role);
-    const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters.quality, frameRate);
+    const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters);
 
     const auto govLengthParameterName = 
         lit("%1.GOVLength").arg(toHanwhaString(codec));

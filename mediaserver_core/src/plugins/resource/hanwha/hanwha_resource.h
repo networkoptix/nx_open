@@ -54,8 +54,7 @@ public:
     int streamFrameRate(Qn::ConnectionRole role, int desiredFps) const;
     int streamGovLength(Qn::ConnectionRole role) const;
     Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;
-    int streamBitrate(Qn::ConnectionRole role, Qn::StreamQuality quality, int framerate) const;
-    int streamBitrate(Qn::ConnectionRole role, Qn::SecondStreamQuality quality, int framerate) const;
+    int streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& streamParams) const;
 
     int closestFrameRate(Qn::ConnectionRole role, int desiredFrameRate) const;
 
@@ -194,11 +193,6 @@ private:
         Qn::BitrateControl bitrateControl,
         int bitrate) const;
 
-    double bitrateCoefficient(Qn::StreamQuality quality) const;
-    double bitrateCoefficient(Qn::SecondStreamQuality quality) const;
-    
-    int streamBitrateInternal(Qn::ConnectionRole role, double coefficient, int framerate) const;
-
     QnCameraAdvancedParamValueList filterGroupParameters(
         const QnCameraAdvancedParamValueList& values);
 
@@ -208,7 +202,8 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
-
+    void initMediaStreamCapabilities();
+    nx::media::CameraStreamCapability mediaCapabilityForRole(Qn::ConnectionRole role);
     bool executeServiceCommand(
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& info);
@@ -234,6 +229,8 @@ private:
     HanwhaAttributes m_attributes;
     HanwhaCgiParameters m_cgiParameters;
     bool m_isNvr = false;
+
+    nx::media::CameraMediaCapability m_capabilities;
 };
 
 } // namespace plugins

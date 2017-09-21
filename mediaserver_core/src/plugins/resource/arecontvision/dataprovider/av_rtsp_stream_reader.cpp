@@ -59,18 +59,18 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     {
         requestStr += lit("&FPS=%1").arg((int)params.fps);
         const int desiredBitrateKbps = res->suggestBitrateKbps(
-            params.quality,
             QSize(maxResolution.width()/2, maxResolution.height()/2),
-            params.fps);
+            params,
+            getRole());
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
     }
     else
     {
         requestStr += lit("&FPS=%1").arg((int)params.fps);
         const int desiredBitrateKbps = res->suggestBitrateKbps(
-            params.quality,
             QSize(maxResolution.width(), maxResolution.height()),
-            params.fps);
+            params,
+            getRole());
         requestStr += lit("&Ratelimit=%1").arg(desiredBitrateKbps);
     }
     if (res->isAudioEnabled())

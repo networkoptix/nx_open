@@ -152,7 +152,11 @@ bool HanwhaResourceSearcher::processPacket(
     }
 
     decltype(m_foundUpnpResources) foundUpnpResources;
-    createResource(devInfo, cameraMac, QAuthenticator(), foundUpnpResources);
+
+    QAuthenticator defaultAuth;
+    defaultAuth.setUser("admin");
+    defaultAuth.setPassword("4321");
+    createResource(devInfo, cameraMac, defaultAuth, foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
     m_alreadFoundMacAddresses.insert(cameraMac.toString());
@@ -201,9 +205,9 @@ int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource)
 
     HanwhaRequestHelper helper(resource);
     auto attributes = helper.fetchAttributes(lit("attributes/System"));
-    const auto maxProfileCount = attributes.attribute<int>(lit("System/MaxChannel"));
-    if (maxProfileCount)
-        result = *maxProfileCount;
+    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
+    if (maxChannels)
+        result = *maxChannels;
 
     m_channelsByCamera.insert(resource->getUniqueId(), result);
     return result;

@@ -332,8 +332,8 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi) {
             recorderHiRes->pleaseStop();
             camera->notInUse(recorderHiRes);
-            if (providerHi)
-                providerHi->setFps(cameraRes->getMaxFps());
+            //if (providerHi)
+            //    providerHi->setFps(cameraRes->getMaxFps());
         }
 
         if (needStopLow) {
