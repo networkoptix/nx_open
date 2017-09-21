@@ -238,7 +238,6 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
             resource->setModel(firstResource->getName());
             resource->setMAC(firstResource->getMAC());
 
-            auto auth = firstResource->getAuth();
             if (!auth.isNull())
                 resource->setDefaultAuth(auth);
 
