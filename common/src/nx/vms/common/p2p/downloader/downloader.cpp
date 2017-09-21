@@ -2,6 +2,7 @@
 
 #include <QtCore/QHash>
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/delayed.h>
 
@@ -55,7 +56,6 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
-        Q_Q(Downloader);
         auto worker = new Worker(
             fileName, storage.data(), peerManagerFactory->createPeerManager());
         workers[fileName] = worker;
