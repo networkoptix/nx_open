@@ -937,7 +937,7 @@ void initialize(Manager* manager, Action* root)
     factory(MakeLayoutTourAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, All)
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
             && !condition::isSafeMode());
 
     factory()
