@@ -68,6 +68,12 @@ void ReverseTunnelAcceptor::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
+std::string ReverseTunnelAcceptor::toString() const
+{
+    return lm("Reverse connection acceptor. remote endpoints %1")
+        .container(m_targetEndpoints).toStdString();
+}
+
 void ReverseTunnelAcceptor::callAcceptHandler(
     SystemError::ErrorCode code,
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)

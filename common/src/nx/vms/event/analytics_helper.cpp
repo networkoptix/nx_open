@@ -57,7 +57,6 @@ private:
     QList<EventDescriptor>* data;
 };
 
-
 } // namespace
 
 namespace nx {
@@ -70,7 +69,7 @@ AnalyticsHelper::AnalyticsHelper(QnCommonModule* commonModule, QObject* parent):
 {
 }
 
-QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::analyticsEvents() const
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemSupportedAnaliticEvents() const
 {
     QList<EventDescriptor> result;
     AnalyticsEventTypeWithRefStorage storage(&result);
@@ -86,7 +85,7 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::analyticsEvents() const
     return result;
 }
 
-QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::analyticsEvents(
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvents(
     const QnVirtualCameraResourceList& cameras)
 {
     QList<EventDescriptor> result;

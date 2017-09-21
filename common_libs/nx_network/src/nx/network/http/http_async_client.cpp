@@ -1279,7 +1279,7 @@ bool AsyncClient::resendRequestWithAuthorization(
                 m_authType == AuthType::authDigestWithPasswordHash
                     ? userPassword.toLatin1()
                     : boost::optional<nx_http::BufferType>(),
-                m_contentLocationUrl.path().toUtf8(),
+                m_contentLocationUrl.toString(QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority).toUtf8(),
                 wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
         {

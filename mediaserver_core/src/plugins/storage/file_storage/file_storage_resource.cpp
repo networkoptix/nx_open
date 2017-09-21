@@ -216,10 +216,10 @@ QIODevice* QnFileStorageResource::open(
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)),
-            ioBlockSize,
-            ffmpegBufferSize,
-            ffmpegMaxBufferSize,
-            getId()));
+                ioBlockSize,
+                ffmpegBufferSize,
+                ffmpegMaxBufferSize,
+                getId()));
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))
         return 0;

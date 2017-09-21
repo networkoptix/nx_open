@@ -25,7 +25,9 @@ AnalyticsSdkEventModel::AnalyticsSdkEventModel(QObject* parent):
 {
 }
 
-AnalyticsSdkEventModel::~AnalyticsSdkEventModel() = default;
+AnalyticsSdkEventModel::~AnalyticsSdkEventModel()
+{
+}
 
 int AnalyticsSdkEventModel::rowCount(const QModelIndex& parent) const
 {
@@ -74,7 +76,7 @@ QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
 void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& cameras)
 {
     beginResetModel();
-    d->items = nx::vms::event::AnalyticsHelper::analyticsEvents(cameras);
+    d->items = nx::vms::event::AnalyticsHelper::supportedAnalyticsEvents(cameras);
     d->valid = !d->items.empty();
     if (!d->valid)
     {
