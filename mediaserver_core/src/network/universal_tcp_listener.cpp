@@ -219,9 +219,6 @@ void QnUniversalTcpListener::applyModToRequest(nx_http::Request* request)
 
 bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& request)
 {
-    if (request.requestLine.url.toString().contains(lit("hls")))
-        int i = 0;
-
     const auto targetHeader = request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
     if (targetHeader != request.headers.end()
         && QnUuid(targetHeader->second) != commonModule()->moduleGUID())
