@@ -185,10 +185,10 @@
     "action": "Download %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link":"{{ANDROID_APP_LINK}}"
+        "link":"%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

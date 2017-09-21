@@ -67,7 +67,7 @@
         },
         {
           "label": "IOS application link",
-          "name": "%IOS_APP_LINK%",
+          "name": "%IOS_APPLICATION_LINK%",
           "old_name": "{{IOS_APP_LINK}}",
           "value": "disabled",
           "description": "Link for iOS application in Apple AppStore",
@@ -75,7 +75,7 @@
         },
         {
           "label": "Android application link",
-          "name": "%ANDROID_APP_LINK%",
+          "name": "%ANDROID_APPLICATION_LINK%",
           "old_name": "{{ANDROID_APP_LINK}}",
           "value": "disabled",
           "description": "Link for Android application in Google Play",
