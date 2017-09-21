@@ -11,7 +11,6 @@ from .filldata import fill_content
 from api.models import Account
 from cms.models import *
 
-
 def get_context_and_language(request_data, context_id, language_id):
     context = Context.objects.get(id=context_id) if context_id else None
     language = Language.objects.get(id=language_id) if language_id else None
@@ -169,7 +168,7 @@ def generate_preview(context=None, send_to_review=False):
 def publish_latest_version(customization, user):
     publish_errors = accept_latest_draft(customization, user)
     if not publish_errors:
-        fill_content(customization_name=settings.CUSTOMIZATION, preview=False, incremental=True)
+        fill_content(customization_name=customization.name, preview=False, incremental=True)
     return publish_errors
 
 

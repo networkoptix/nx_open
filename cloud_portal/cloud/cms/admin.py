@@ -92,7 +92,7 @@ admin.site.register(DataRecord, DataRecordAdmin)
 class ContentVersionAdmin(CMSAdmin):
     list_display = ('content_version_actions', 'id', 'customization', 'name',
                     'created_date', 'created_by',
-                    'accepted_date', 'accepted_by')
+                    'accepted_date', 'accepted_by', 'state')
 
     list_display_links = ('id', )
 
