@@ -1163,17 +1163,10 @@ QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const
 
 int HanwhaResource::streamFrameRate(Qn::ConnectionRole role, int desiredFps) const
 {
-    if (role == Qn::ConnectionRole::CR_LiveVideo)
-        return closestFrameRate(role, desiredFps);
-
-    bool success = false;
-    const auto userDefinedFps = getProperty(Qn::kSecondaryStreamFpsParamName)
-        .toInt(&success);
-
-    if (!success)
-        return closestFrameRate(role, desiredSecondStreamFps());
-
-    return closestFrameRate(role, desiredFps);
+    int userDefinedFps = 0;
+    if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
+        userDefinedFps = getProperty(Qn::kSecondaryStreamFpsParamName).toInt();
+    return closestFrameRate(role, userDefinedFps ? userDefinedFps : desiredFps);
 }
 
 int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
