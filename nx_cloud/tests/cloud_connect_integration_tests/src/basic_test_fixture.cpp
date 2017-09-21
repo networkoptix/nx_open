@@ -62,6 +62,8 @@ void BasicTestFixture::SetUp()
     m_relayUrl = QUrl(lm("http://127.0.0.1:%1/")
         .arg(m_trafficRelay.moduleInstance()->httpEndpoints()[0].port).toQString());
     m_mediator.addArg(m_relayUrl.toString().toStdString().c_str());
+    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
+    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
     ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());
