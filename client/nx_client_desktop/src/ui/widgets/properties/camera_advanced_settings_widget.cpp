@@ -306,7 +306,7 @@ bool QnCameraAdvancedSettingsWidget::eventFilter(QObject* watched, QEvent* event
         : Qt::ActionsContextMenu; //< Special context menu for links.
 
     ui->webView->setContextMenuPolicy(policy);
-    return base_type::eventFilter(watched, event); // No link under cursor - use standard menu.
+    return base_type::eventFilter(watched, event);
 }
 
 void QnCameraAdvancedSettingsWidget::initWebView()
