@@ -1494,6 +1494,15 @@ UDPSocket::UDPSocket(int ipVersion):
     {
         //error
     }
+
+    struct linger lingerOptions;
+    memset(&lingerOptions, 0, sizeof(lingerOptions));
+    if (setsockopt(
+            handle(), SOL_SOCKET, SO_LINGER,
+            (const char*)&lingerOptions, sizeof(lingerOptions)) < 0) 
+    {
+        // Ignoring for now.
+    }
 }
 
 UDPSocket::~UDPSocket()

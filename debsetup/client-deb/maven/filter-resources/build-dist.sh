@@ -47,7 +47,7 @@ CLIENT_BG_PATH=${libdir}/backgrounds
 CLIENT_HELP_PATH=${ClientHelpSourceDir}
 ICONS_PATH=${customization.dir}/icons/linux/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
-BUILD_INFO_TXT=${basedir}/../../common/${arch}/build_info.txt
+BUILD_INFO_TXT=${libdir}/build_info.txt
 
 #. $CLIENT_BIN_PATH/env.sh
 

@@ -34,6 +34,7 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext():
 
 StreamingChunkTranscoder::StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags):
     m_flags(flags),
+    m_dataSourceCache(nx::utils::TimerManager::instance()),
     m_resPool(resPool)
 {
     m_transcodeThreads.resize(TRANSCODE_THREAD_COUNT);

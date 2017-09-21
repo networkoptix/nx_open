@@ -302,6 +302,19 @@ void CloudServerSocket::startAcceptor(
                 [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
                 { return a.get() == acceptorPtr; });
 
+            if (code == SystemError::noError)
+            {
+                NX_INFO(this, lm("Cloud connection (session %1) from %2 has been accepted. Info %3")
+                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
+                        acceptorPtr->toString()));
+            }
+            else
+            {
+                NX_INFO(this, lm("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
+                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
+                        SystemError::toString(code), acceptorPtr->toString()));
+            }
+
             NX_CRITICAL(it != m_acceptors.end());
             m_acceptors.erase(it);
 

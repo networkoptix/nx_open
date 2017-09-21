@@ -67,10 +67,10 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
     const auto codec = m_hanwhaResource->streamCodec(role);
     const auto codecProfile = m_hanwhaResource->streamCodecProfile(codec, role);
     const auto resolution = m_hanwhaResource->streamResolution(role);
-    const auto frameRate = m_hanwhaResource->closestFrameRate(role, parameters.fps);
+    const auto frameRate = m_hanwhaResource->streamFrameRate(role, parameters.fps);
     const auto govLength = m_hanwhaResource->streamGovLength(role);
     const auto bitrateControl = m_hanwhaResource->streamBitrateControl(role);
-    const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters.quality, frameRate);
+    const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters);
 
     const auto govLengthParameterName = 
         lit("%1.GOVLength").arg(toHanwhaString(codec));

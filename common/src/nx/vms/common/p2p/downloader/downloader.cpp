@@ -2,6 +2,7 @@
 
 #include <QtCore/QHash>
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/delayed.h>
 
@@ -33,6 +34,7 @@ private:
     QScopedPointer<Storage> storage;
     QHash<QString, Worker*> workers;
     AbstractPeerManagerFactory* peerManagerFactory = nullptr;
+    std::unique_ptr<AbstractPeerManagerFactory> peerManagerFactoryOwner;
 };
 
 DownloaderPrivate::DownloaderPrivate(Downloader* q):
@@ -54,7 +56,6 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
-        Q_Q(Downloader);
         auto worker = new Worker(
             fileName, storage.data(), peerManagerFactory->createPeerManager());
         workers[fileName] = worker;
@@ -98,10 +99,13 @@ Downloader::Downloader(
     Q_D(Downloader);
     d->storage.reset(new Storage(downloadsDirectory));
 
-    if (peerManagerFactory)
-        d->peerManagerFactory = peerManagerFactory;
-    else
-        d->peerManagerFactory = new ResourcePoolPeerManagerFactory(commonModule);
+    d->peerManagerFactory = peerManagerFactory;
+    if (!d->peerManagerFactory)
+    {
+        auto factory = std::make_unique<ResourcePoolPeerManagerFactory>(commonModule);
+        d->peerManagerFactory = factory.get();
+        d->peerManagerFactoryOwner = std::move(factory);
+    }
 
     for (const auto& fileName: d->storage->files())
         d->createWorker(fileName);

@@ -15,6 +15,12 @@
 
 #include <nx/utils/log/assert.h>
 
+namespace {
+
+static constexpr int kParameterLabelWidth = 120;
+
+} // namespace
+
 using ConditionType = QnCameraAdvancedParameterCondition::ConditionType;
 using Dependency = QnCameraAdvancedParameterDependency;
 using DependencyType = QnCameraAdvancedParameterDependency::DependencyType;
@@ -40,21 +46,26 @@ void QnCameraAdvancedParamWidgetsManager::clear() {
 }
 
 
-void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedParams &params) {
+void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedParams& params)
+{
 	clear();
 
 	for (const QnCameraAdvancedParamGroup &group: params.groups)
 		createGroupWidgets(group);
 
-	connect(m_groupWidget, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem* current, QTreeWidgetItem *previous) {
-		Q_UNUSED(previous);
-		QWidget* target = current->data(0, Qt::UserRole).value<QWidget*>();
-		if (target && m_contentsWidget->children().contains(target))
-			m_contentsWidget->setCurrentWidget(target);
-	});
+    const auto currentItemChanged =
+        [this](QTreeWidgetItem* current)
+        {
+            if (!current)
+                return;
 
-	if (m_groupWidget->topLevelItemCount() > 0)
-		m_groupWidget->setCurrentItem(m_groupWidget->topLevelItem(0));
+            const auto target = current->data(0, Qt::UserRole).value<QWidget*>();
+            if (target && m_contentsWidget->children().contains(target))
+                m_contentsWidget->setCurrentWidget(target);
+        };
+
+    connect(m_groupWidget, &QTreeWidget::currentItemChanged, this, currentItemChanged);
+    currentItemChanged(m_groupWidget->currentItem());
 }
 
 void QnCameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList &params) {
@@ -94,10 +105,19 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 	item->setData(0, Qt::ToolTipRole, group.description);
     item->setExpanded(true);
 
-	QWidget* contentsPage = createContentsPage(group.name, group.params);
-	m_contentsWidget->addWidget(contentsPage);
+    if (group.params.empty() && !group.groups.empty())
+    {
+        item->setFlags(Qt::ItemIsEnabled);
+    }
+    else
+    {
+        QWidget* contentsPage = createContentsPage(group.name, group.params);
+        m_contentsWidget->addWidget(contentsPage);
+        item->setData(0, Qt::UserRole, qVariantFromValue(contentsPage));
 
-	item->setData(0, Qt::UserRole, qVariantFromValue(contentsPage));
+        if (!m_groupWidget->currentItem())
+            m_groupWidget->setCurrentItem(item);
+    }
 
     for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
         createGroupWidgets(subGroup, item);
@@ -107,7 +127,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
 {
     auto page = new QWidget(m_contentsWidget);
     auto pageLayout = new QHBoxLayout(page);
-    pageLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargin, 0, 0, 0);
+    pageLayout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
 	auto groupBox = new QGroupBox(page);
     groupBox->setFlat(true);
@@ -123,29 +143,36 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
     scrollAreaWidgetContents->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
     auto gridLayout = new QGridLayout(scrollAreaWidgetContents);
-	scrollAreaWidgetContents->setLayout(gridLayout);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
-    for (const auto& param : params)
+    for (const auto& param: params)
     {
         auto widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
         if (!widget)
             continue;
 
-        int row = gridLayout->rowCount();
+        const auto row = gridLayout->rowCount();
+
+        if (param.dataType == QnCameraAdvancedParameter::DataType::Separator)
+        {
+            gridLayout->addWidget(widget, row, 0, 1, 2);
+            continue;
+        }
+
         if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
         {
             auto label = new QLabel(scrollAreaWidgetContents);
             label->setToolTip(param.description);
             setLabelText(label, param, param.range);
-            //label->setText(lit("%1: ").arg(param.name));
             label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             label->setBuddy(widget);
             gridLayout->addWidget(label, row, 0);
             m_paramLabelsById[param.id] = label;
+            label->setFixedWidth(kParameterLabelWidth);
+            label->setWordWrap(true);
         }
 
-        gridLayout->addWidget(widget, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
+        gridLayout->addWidget(widget, row, 1, Qt::AlignVCenter);
 		m_paramWidgetsById[param.id] = widget;
 
 		/* Widget is disabled until it receives correct value. */
@@ -158,7 +185,16 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this,
                 &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
         }
+
+        if (!param.notes.isEmpty())
+        {
+            auto label = new QLabel(scrollAreaWidgetContents);
+            label->setWordWrap(true);
+            label->setText(param.notes);
+            gridLayout->addWidget(label, row + 1, 1);
+        }
 	}
+
     gridLayout->setColumnStretch(1, 1);
 
     for (const auto& param: params)
@@ -174,7 +210,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             for (const auto& cond: dependency.conditions)
                 watches.insert(cond.paramId);
 
-            auto handler = [dependency, param, this]() -> bool
+            auto handler =
+                [dependency, param, this]() -> bool
                 {
                     const auto paramId = param.id;
                     bool allConditionsSatisfied = std::all_of(
@@ -203,7 +240,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                             return false;
 
                         widget->setRange(dependency.range);
-                        
+
                         auto label = dynamic_cast<QLabel*>(m_paramLabelsById[paramId]);
                         if (!label)
                             return false;
@@ -217,7 +254,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             handlerChains[dependency.type].push_back(handler);
         }
 
-        auto runHandlerChains = [handlerChains]()
+        auto runHandlerChains =
+            [handlerChains]()
             {
                 for (const auto& chainPair: handlerChains)
                 {
@@ -257,7 +295,7 @@ void QnCameraAdvancedParamWidgetsManager::setLabelText(
 
     if (!parameter.showRange)
     {
-        label->setText(lit("%1: ").arg(parameter.name));
+        label->setText(lit("%1").arg(parameter.name));
         return;
     }
 
@@ -267,7 +305,7 @@ void QnCameraAdvancedParamWidgetsManager::setLabelText(
 
     NX_ASSERT(parameter.dataType == QnCameraAdvancedParameter::DataType::Number);
     label->setText(
-        lit("%1 (%2-%3): ")
+        lit("%1 (%2-%3)")
             .arg(parameter.name)
             .arg(rangeSplit[0].trimmed())
             .arg(rangeSplit[1].trimmed()));

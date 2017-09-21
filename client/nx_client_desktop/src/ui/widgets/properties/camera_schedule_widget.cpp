@@ -3,6 +3,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QScopedValueRollback>
+#include <QtWidgets/QListView>
 
 // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -22,13 +23,15 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/checkbox_utils.h>
+#include <ui/common/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/globals.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/globals.h>
+#include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -37,6 +40,7 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/math/color_transformations.h>
+#include <utils/math/math.h>
 #include <utils/license_usage_helper.h>
 
 using boost::algorithm::all_of;
@@ -45,6 +49,8 @@ using boost::algorithm::any_of;
 using namespace nx::client::desktop::ui;
 
 namespace {
+
+static constexpr qreal kKbpsInMbps = 1000.0;
 
 void setLayoutEnabled(QLayout* layout, bool enabled)
 {
@@ -57,6 +63,18 @@ void setLayoutEnabled(QLayout* layout, bool enabled)
         if (const auto childLayout = layoutItem->layout())
             setLayoutEnabled(childLayout, enabled);
     }
+}
+
+template<class InputWidget>
+qreal normalizedValue(const InputWidget* widget)
+{
+    return qreal(widget->value() - widget->minimum()) / (widget->maximum() - widget->minimum());
+}
+
+template<class InputWidget>
+void setNormalizedValue(InputWidget* widget, qreal fraction)
+{
+    widget->setValue(widget->minimum() + fraction * (widget->maximum() - widget->minimum()));
 }
 
 class QnExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate
@@ -211,10 +229,23 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->enableRecordingCheckBox->setForegroundRole(QPalette::ButtonText);
 
-    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityLow), Qn::QualityLow);
-    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
-    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHigh), Qn::QualityHigh);
-    ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
+    // Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
+    // (Low, Medium, High, Best), and those constants + Qn::StreamQualityCount for invisible items
+    // with asterisks (Low*, Medium*, High*, Best*).
+    const auto addQualityItem =
+        [this](Qn::StreamQuality quality)
+        {
+            const auto text = toDisplayString(quality);
+            ui->qualityComboBox->addItem(text, quality);
+            const auto index = ui->qualityComboBox->count();
+            ui->qualityComboBox->addItem(text + lit(" *"), Qn::StreamQualityCount + quality);
+            static_cast<QListView*>(ui->qualityComboBox->view())->setRowHidden(index, true);
+        };
+
+    addQualityItem(Qn::QualityLow);
+    addQualityItem(Qn::QualityNormal);
+    addQualityItem(Qn::QualityHigh);
+    addQualityItem(Qn::QualityHighest);
     ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
     setHelpTopic(ui->archiveGroupBox, Qn::CameraSettings_Recording_ArchiveLength_Help);
@@ -276,6 +307,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     connect(ui->recordMotionButton, &QToolButton::toggled, this,
         &QnCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, this,
+        &QnCameraScheduleWidget::updateGridParams);
+    connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged, this,
         &QnCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionPlusLQButton, &QToolButton::toggled, this,
         &QnCameraScheduleWidget::updateMaxFpsValue);
@@ -356,11 +389,120 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         updateLicensesIfNeeded);
 
+    connect(ui->advancedSettingsButton, &QPushButton::clicked, this,
+        [this]() { setAdvancedSettingsVisible(!m_advancedSettingsVisible); });
+
+    auto aligner = new QnAligner(this);
+    aligner->addWidgets({ ui->fpsLabel, ui->qualityLabel, ui->bitrateLabel });
+
+    // Reset group box bottom margin to zero. Sub-widget margins defined in the ui-file rely on it.
+    ui->settingsGroupBox->ensurePolished();
+    auto margins = ui->settingsGroupBox->contentsMargins();
+    margins.setBottom(0);
+    ui->settingsGroupBox->setContentsMargins(margins);
+
+    ui->bitrateSpinBox->setSuffix(lit(" ") + tr("Mbit/s"));
+
+    ui->bitrateSlider->setProperty(style::Properties::kSliderFeatures,
+        static_cast<int>(style::SliderFeature::FillingUp));
+
+    // Sync bitrate spin box and quality combo box with bitrate slider changes.
+    connect(ui->bitrateSlider, &QSlider::valueChanged,
+        this, &QnCameraScheduleWidget::bitrateSliderChanged);
+
+    // Sync bitrate slider and quality combo box with bitrate spin box changes.
+    connect(ui->bitrateSpinBox, QnSpinboxDoubleValueChanged,
+        this, &QnCameraScheduleWidget::bitrateSpinBoxChanged);
+
+    // Sync bitrate with quality changes.
+    syncBitrateWithQuality();
+    connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged,
+        this, &QnCameraScheduleWidget::syncBitrateWithQuality);
+
+    // Sync bitrate with fps changes.
+    syncBitrateWithFps();
+    connect(ui->fpsSpinBox, QnSpinboxIntValueChanged,
+        this, &QnCameraScheduleWidget::syncBitrateWithFps);
+
+    setAdvancedSettingsVisible(false);
+
     retranslateUi();
 }
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget()
 {
+}
+
+void QnCameraScheduleWidget::syncQualityWithBitrate()
+{
+    if (!m_advancedSettingsSupported)
+        return;
+
+    const auto quality = qualityForBitrate(ui->bitrateSpinBox->value());
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality.first
+        + (quality.second ? 0 : Qn::StreamQualityCount)));
+}
+
+void QnCameraScheduleWidget::syncBitrateWithQuality()
+{
+    if (m_bitrateUpdating || !m_advancedSettingsSupported)
+        return;
+
+    ui->bitrateSpinBox->setValue(bitrateForQuality(currentQualityApproximation()));
+}
+
+void QnCameraScheduleWidget::syncBitrateWithFps()
+{
+    if (!m_advancedSettingsSupported)
+        return;
+
+    const auto minBitrate = bitrateForQuality(Qn::QualityLowest);
+    const auto maxBitrate = bitrateForQuality(Qn::QualityHighest);
+
+    if (isCurrentBitrateCustom())
+    {
+        // TODO: #vkutin Maybe should lock value normalized between two qualities.
+        // Currently it's normalized between minimum and maximum bitrate.
+
+        // Lock normalized bitrate. Use value from slider to avoid its jerking by 1px.
+        const auto normalizedBitrate = normalizedValue(ui->bitrateSlider);
+        ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
+        setNormalizedValue(ui->bitrateSpinBox, normalizedBitrate);
+        setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
+    }
+    else
+    {
+        // Lock quality.
+        const auto quality = currentQualityApproximation();
+        ui->bitrateSpinBox->setRange(minBitrate, maxBitrate);
+        ui->bitrateSpinBox->setValue(bitrateForQuality(quality));
+        const auto normalizedBitrate = normalizedValue(ui->bitrateSpinBox);
+        setNormalizedValue(ui->bitrateSlider, normalizedBitrate);
+
+        // Force quality (in case several qualities have the same rounded bitrate value).
+        QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
+        ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(quality));
+    }
+}
+
+void QnCameraScheduleWidget::bitrateSpinBoxChanged()
+{
+    if (m_bitrateUpdating)
+        return;
+
+    QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
+    setNormalizedValue(ui->bitrateSlider, normalizedValue(ui->bitrateSpinBox));
+    syncQualityWithBitrate();
+}
+
+void QnCameraScheduleWidget::bitrateSliderChanged()
+{
+    if (m_bitrateUpdating)
+        return;
+
+    QScopedValueRollback<bool> updateRollback(m_bitrateUpdating, true);
+    setNormalizedValue(ui->bitrateSpinBox, normalizedValue(ui->bitrateSlider));
+    syncQualityWithBitrate();
 }
 
 void QnCameraScheduleWidget::overrideMotionType(Qn::MotionType motionTypeOverride)
@@ -407,6 +549,8 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->recordMotionPlusLQButton, readOnly);
     setReadOnly(ui->noRecordButton, readOnly);
     setReadOnly(ui->qualityComboBox, readOnly);
+    setReadOnly(ui->bitrateSlider, readOnly);
+    setReadOnly(ui->bitrateSpinBox, readOnly);
     setReadOnly(ui->fpsSpinBox, readOnly);
     setReadOnly(ui->enableRecordingCheckBox, readOnly);
     setReadOnly(ui->gridWidget, readOnly);
@@ -446,6 +590,19 @@ void QnCameraScheduleWidget::updateFromResources()
     updateMaxFPS();
     updateMotionAvailable();
     updateRecordingParamsAvailable();
+
+    m_advancedSettingsSupported = m_cameras.size() == 1
+        && !m_cameras.front()->cameraMediaCapability().isNull();
+
+    ui->advancedSettingsButton->setVisible(m_advancedSettingsSupported);
+    ui->advancedSettingsWidget->setVisible(m_advancedSettingsSupported && m_advancedSettingsVisible);
+    ui->settingsGroupBox->layout()->activate();
+
+    if (!m_advancedSettingsSupported && isCurrentBitrateCustom())
+    {
+        ui->qualityComboBox->setCurrentIndex(
+            ui->qualityComboBox->findData(currentQualityApproximation()));
+    }
 
     if (m_cameras.isEmpty())
     {
@@ -669,6 +826,71 @@ void QnCameraScheduleWidget::updateMaxFPS()
     ui->gridWidget->setMaxFps(m_maxFps, m_maxDualStreamingFps);
 }
 
+// Quality combo box contains Qn::StreamQuality constants as user data for normal visible items
+// (Low, Medium, High, Best), and those constants + Qn::StreamQualityCount for invisible items
+// with asterisks (Low*, Medium*, High*, Best*).
+Qn::StreamQuality QnCameraScheduleWidget::currentQualityApproximation() const
+{
+    auto value = ui->qualityComboBox->currentData().toInt();
+    if (value >= Qn::StreamQualityCount)
+        value -= Qn::StreamQualityCount;
+    return static_cast<Qn::StreamQuality>(value);
+}
+
+bool QnCameraScheduleWidget::isCurrentBitrateCustom() const
+{
+    return ui->qualityComboBox->currentData().toInt() >= Qn::StreamQualityCount;
+}
+
+void QnCameraScheduleWidget::setAdvancedSettingsVisible(bool value)
+{
+    const auto text = value ? tr("Less Settings") : tr("More Settings");
+    const auto icon = qnSkin->icon(value ? lit("buttons/collapse.png") : lit("buttons/expand.png"));
+    ui->advancedSettingsButton->setText(text);
+    ui->advancedSettingsButton->setIcon(icon);
+    ui->advancedSettingsWidget->setVisible(value);
+    ui->settingsGroupBox->layout()->activate();
+    m_advancedSettingsVisible = value;
+}
+
+QPair<Qn::StreamQuality, bool> QnCameraScheduleWidget::qualityForBitrate(qreal bitrateMbps) const
+{
+    static constexpr auto kMinQuality = Qn::QualityLow;
+    static constexpr auto kMaxQuality = Qn::QualityHighest;
+
+    auto current = kMinQuality;
+    auto currentBr = bitrateForQuality(current);
+
+    for (int i = current + 1; i <= kMaxQuality; ++i)
+    {
+        const auto next = Qn::StreamQuality(i);
+        const auto nextBr = bitrateForQuality(next);
+
+        if (bitrateMbps < (currentBr + nextBr) * 0.5)
+            break;
+
+        currentBr = nextBr;
+        current = next;
+    }
+
+    return {current, qFuzzyIsNull(bitrateMbps - currentBr)};
+}
+
+qreal QnCameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) const
+{
+    if (!m_advancedSettingsSupported)
+        return 0.0;
+
+    NX_ASSERT(m_cameras.size() == 1, Q_FUNC_INFO);
+    const auto camera = m_cameras.front();
+    const auto resolution = camera->defaultStream().getResolution();
+    const auto fps = ui->fpsSpinBox->value();
+    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps) / kKbpsInMbps;
+
+    const auto roundingStep = std::pow(0.1, ui->bitrateSpinBox->decimals());
+    return qRound(bitrateMbps, roundingStep);
+}
+
 void QnCameraScheduleWidget::updateMotionAvailable()
 {
     using boost::algorithm::all_of;
@@ -731,28 +953,37 @@ QnScheduleTaskList QnCameraScheduleWidget::scheduleTasks() const
 
             Qn::RecordingType recordType = params.recordingType;
             Qn::StreamQuality streamQuality = Qn::QualityHighest;
+            int bitrateKbps = 0;
+
             if (recordType != Qn::RT_Never)
+            {
                 streamQuality = params.quality;
+                if (m_advancedSettingsSupported)
+                    bitrateKbps = qRound(params.bitrateMbps * kKbpsInMbps);
+            }
+
             int fps = params.fps;
             if (fps == 0 && recordType != Qn::RT_Never)
                 fps = 10;
 
             if (task.m_startTime == task.m_endTime)
             {
-                // an invalid one; initialize
+                // An invalid one; initialize.
                 task.m_dayOfWeek = row + 1;
-                task.m_startTime = col * 3600; // in secs from start of day
-                task.m_endTime = (col + 1) * 3600; // in secs from start of day
+                task.m_startTime = col * 3600; //< In secs from start of day.
+                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
                 task.m_recordType = recordType;
                 task.m_streamQuality = streamQuality;
+                task.m_bitrateKbps = bitrateKbps;
                 task.m_fps = fps;
                 ++col;
             }
             else if (task.m_recordType == recordType
                 && task.m_streamQuality == streamQuality
+                && task.m_bitrateKbps == bitrateKbps
                 && task.m_fps == fps)
             {
-                task.m_endTime = (col + 1) * 3600; // in secs from start of day
+                task.m_endTime = (col + 1) * 3600; //< In secs from start of day.
                 ++col;
             }
             else
@@ -779,8 +1010,15 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
     if (tasks.isEmpty())
     {
         for (int nDay = 1; nDay <= 7; ++nDay)
-            tasks.append(QnScheduleTask::Data(nDay, 0, 86400, Qn::RT_Never,
-                kDefaultBeforeThresholdSec, kDefaultAfterThresholdSec));
+        {
+            QnScheduleTask::Data data;
+            data.m_dayOfWeek = nDay;
+            data.m_startTime = 0;
+            data.m_endTime = 86400;
+            data.m_beforeThreshold = kDefaultBeforeThresholdSec;
+            data.m_afterThreshold = kDefaultAfterThresholdSec;
+            tasks << data;
+        }
     }
 
     auto task = tasks.first();
@@ -791,6 +1029,8 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
     {
         const int row = task.getDayOfWeek() - 1;
         Qn::StreamQuality quality = Qn::QualityNotDefined;
+        qreal bitrateMbps = 0.0;
+
         if (task.getRecordingType() != Qn::RT_Never)
         {
             switch (task.getStreamQuality())
@@ -800,6 +1040,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
                 case Qn::QualityHigh:
                 case Qn::QualityHighest:
                     quality = task.getStreamQuality();
+                    bitrateMbps = task.getBitrateKbps() / kKbpsInMbps;
                     break;
                 default:
                     qWarning("QnCameraScheduleWidget::setScheduleTasks(): Unhandled StreamQuality value %d.", task.getStreamQuality());
@@ -814,6 +1055,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
             params.recordingType = task.getRecordingType();
             params.quality = quality;
             params.fps = task.getFps();
+            params.bitrateMbps = m_advancedSettingsSupported ? bitrateMbps : 0.0;
             ui->gridWidget->setCellValue(cell, params);
         }
     }
@@ -841,16 +1083,6 @@ void QnCameraScheduleWidget::updateRecordThresholds(QnScheduleTaskList& tasks)
         task.setBeforeThreshold(before);
         task.setAfterThreshold(after);
     }
-}
-
-int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
-{
-    for (int i = 0; i < ui->qualityComboBox->count(); ++i)
-    {
-        if (ui->qualityComboBox->itemData(i).toInt() == q)
-            return i;
-    }
-    return 0;
 }
 
 void QnCameraScheduleWidget::updateScheduleTypeControls()
@@ -903,9 +1135,10 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
         }
         else
         {
+            const bool customBitrate = m_advancedSettingsSupported && isCurrentBitrateCustom();
             brush.fps = ui->fpsSpinBox->value();
-            int data = ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt();
-            brush.quality = static_cast<Qn::StreamQuality>(data);
+            brush.quality = currentQualityApproximation();
+            brush.bitrateMbps = customBitrate ? ui->bitrateSpinBox->value() : 0.0;
         }
 
         ui->gridWidget->setBrush(brush);
@@ -1104,7 +1337,10 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     if (params.recordingType != Qn::RT_Never)
     {
         ui->fpsSpinBox->setValue(params.fps);
-        ui->qualityComboBox->setCurrentIndex(qualityToComboIndex(params.quality));
+        if (qFuzzyIsNull(params.bitrateMbps) || !m_advancedSettingsSupported)
+            ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(params.quality));
+        else
+            ui->bitrateSpinBox->setValue(params.bitrateMbps);
     }
 
     m_disableUpdateGridParams = false;

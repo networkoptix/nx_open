@@ -53,6 +53,9 @@ public:
     bool isLive() const;
     void setLive(bool value);
 
+signals:
+    void isLiveChanged();
+
 protected:
     using base_type::setIcon;
 

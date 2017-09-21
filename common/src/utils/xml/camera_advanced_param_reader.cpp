@@ -112,7 +112,14 @@ void QnCachingCameraAdvancedParamsReader::setParams(const QnResourcePtr &resourc
     m_paramsByCameraId[resource->getId()] = params;
 }
 
-bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
+void QnCachingCameraAdvancedParamsReader::clearResourceParams(const QnResourcePtr& resource)
+{
+    NX_ASSERT(resource);
+    m_paramsByCameraId.remove(resource->getId());
+}
+
+bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource)
+{
     // TODO: #GDM Why the file is not reset to initial position? It leads to 'EOF' error in parsing.
     return true;
 
@@ -154,6 +161,9 @@ namespace QnXmlTag {
     const QString paramWriteCmd         = lit("writeCmd");
     const QString paramAux              = lit("aux");
     const QString paramShowRange        = lit("showRange");
+    const QString paramNotes            = lit("notes");
+    const QString paramUnit             = lit("unit");
+    const QString paramResync           = lit("resync");
 
     const QString dependenciesRoot      = lit("dependencies");
     const QString dependenciesShow      = lit("dependencies-ranges");
@@ -250,6 +260,9 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
     param.writeCmd      = elementXml.attribute(QnXmlTag::paramWriteCmd);
     param.aux           = elementXml.attribute(QnXmlTag::paramAux);
     param.showRange     = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramShowRange));
+    param.notes         = elementXml.attribute(QnXmlTag::paramNotes);
+    param.unit          = elementXml.attribute(QnXmlTag::paramUnit);
+    param.resync        = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
 
     auto childNodes = elementXml.childNodes();
 

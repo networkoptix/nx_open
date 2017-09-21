@@ -845,9 +845,9 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
+int QnPlOnvifResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
-    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps), role);
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(resolution, streamParams, role), role);
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
@@ -4023,18 +4023,18 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         auth.password(),
         m_timeDrift );
 
-    if (m_isRelayOutputInversed)
-        active = !active;
-
     _onvifDevice__SetRelayOutputState request;
     request.RelayOutputToken = relayOutputInfo.token;
-    request.LogicalState = active ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
+
+    const auto onvifActive = m_isRelayOutputInversed ? !active : active;
+    request.LogicalState = onvifActive ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
+    
     _onvifDevice__SetRelayOutputStateResponse response;
     const int soapCallResult = soapWrapper.setRelayOutputState( request, response );
     if( soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOGX( lit("Failed to set relay %1 output state to %2. endpoint %3").
-            arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
+        NX_LOGX( lm("Failed to set relay %1 output state to %2. endpoint %3")
+            .args(relayOutputInfo.token, onvifActive, soapWrapper.endpoint()), cl_logWARNING );
         return /*false*/;
     }
 
@@ -4050,8 +4050,8 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     }
 #endif
 
-    NX_LOGX( lit("Successfully set relay %1 output state to %2. endpoint %3").
-        arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
+    NX_LOGX( lm("Successfully set relay %1 output state to %2. endpoint %3")
+        .args(relayOutputInfo.token, onvifActive, soapWrapper.endpoint()), cl_logINFO );
     return /*true*/;
 }
 

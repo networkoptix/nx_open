@@ -182,8 +182,14 @@ void QnUniversalRequestProcessor::run()
                 auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
                 auto handler = owner->findHandler(d->protocol, d->request);
                 bool noAuth = false;
-                if (handler && !authenticate(&d->accessRights, &noAuth))
-                    return;
+                if (handler)
+                {
+                    if (owner->isAuthentificationRequired(d->request)
+                        && !authenticate(&d->accessRights, &noAuth))
+                    {
+                        return;
+                    }
+                }
 
                 isKeepAlive = isConnectionCanBePersistent();
 

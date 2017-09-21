@@ -93,7 +93,8 @@ struct QnCameraAdvancedParameter
         Number,
         Enumeration,
         Button,
-        String
+        String,
+        Separator
     };
 
     QString id;
@@ -109,6 +110,9 @@ struct QnCameraAdvancedParameter
     QString aux; //< Auxiliary driver dependent data.
     std::vector<QnCameraAdvancedParameterDependency> dependencies;
     bool showRange = false; //< Show range near parameter's label
+    QString unit;
+    QString notes;
+    bool resync = false;
 
     bool isValid() const;
     QStringList getRange() const;
@@ -139,7 +143,9 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (internalRange)\
     (aux)\
     (dependencies)\
-    (showRange)
+    (showRange)\
+    (unit)\
+    (notes)
 
 struct QnCameraAdvancedParamGroup
 {

@@ -19,6 +19,8 @@ public:
     QString updateAction() const;
     QString rangeParameter() const;
     bool isSpecific() const;
+    bool isService() const;
+    QSet<Qn::ConnectionRole> streamsToReopen() const;
 
     Qn::ConnectionRole profileDependency() const;
     bool isChannelIndependent() const;
@@ -48,6 +50,8 @@ private:
     QString m_updateAction = lit("set");
     QString m_rangeParameter;
     bool m_isSpecific = false;
+    bool m_isService = false;
+    QSet<Qn::ConnectionRole> m_streamsToReopen;
 
     Qn::ConnectionRole m_profile = Qn::ConnectionRole::CR_Default;
     bool m_channelIndependent = false;
