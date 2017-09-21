@@ -65,6 +65,11 @@ public:
         m_onClosedHandler = std::move(handler);
     }
 
+    virtual std::string toString() const override
+    {
+        return "test::OutgoingTunnelConnection";
+    }
+
 private:
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
     std::tuple<OutgoingTunnelConnectionArgs...> m_args;

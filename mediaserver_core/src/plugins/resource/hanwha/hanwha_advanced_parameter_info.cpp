@@ -18,6 +18,7 @@ static const QString kSortingAux = lit("sorting");
 static const QString kGroupAux = lit("group");
 static const QString kGroupLeadAux = lit("groupLead");
 static const QString kGropupIncludeAux = lit("groupInclude");
+static const QString kStreamsToReopenAux = lit("streamsToReopen");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -98,6 +99,16 @@ bool HanwhaAdavancedParameterInfo::isSpecific() const
     return m_isSpecific;
 }
 
+bool HanwhaAdavancedParameterInfo::isService() const
+{
+    return m_isService;
+}
+
+QSet<Qn::ConnectionRole> HanwhaAdavancedParameterInfo::streamsToReopen() const
+{
+    return m_streamsToReopen;
+}
+
 Qn::ConnectionRole HanwhaAdavancedParameterInfo::profileDependency() const
 {
     return m_profile;
@@ -160,9 +171,10 @@ QString HanwhaAdavancedParameterInfo::parameterValue() const
 
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
-    return !m_cgi.isEmpty()
+    return (!m_cgi.isEmpty()
         && !m_submenu.isEmpty()
-        && !m_parameterName.isEmpty();
+        && !m_parameterName.isEmpty())
+        || m_isService;
 }
 
 void HanwhaAdavancedParameterInfo::parseParameter(
@@ -220,12 +232,29 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
             m_group = auxValue;
             m_isGroupLead = true;
         }
+        else if (auxName == kStreamsToReopenAux)
+        {
+            m_streamsToReopen.clear();
+            const auto split = auxValue.split(L',');
+            for (const auto& streamString: split)
+            {
+                const auto role = fromString<Qn::ConnectionRole>(streamString.trimmed());
+                if (role != Qn::ConnectionRole::CR_Default)
+                    m_streamsToReopen.insert(role);
+            }
+        }
     }
 }
 
 void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 {
     m_id = idString;
+
+    if (m_id.contains(lit("SERVICE%")))
+    {
+        m_isService = true;
+        return;
+    }
 
     QString idInfoPart;
     auto split = idString.split(L'%');

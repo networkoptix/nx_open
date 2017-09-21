@@ -334,6 +334,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     supressLog(nx::utils::log::Tag(lit("__workbenchState")));
     supressLog(nx::utils::log::Tag(lit("__itemMap")));
     supressLog(QnLog::PERMISSIONS_LOG);
+    //consoleLog(lit("nx::client::desktop::RadassController::Private"));
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

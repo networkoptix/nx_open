@@ -28,8 +28,12 @@ public:
     RadassMode mode(const QnLayoutResourcePtr& layout) const;
     void setMode(const QnLayoutResourcePtr& layout, RadassMode value);
 
+    RadassMode mode(const QnLayoutItemIndex& item) const;
+    void setMode(const QnLayoutItemIndex& item, RadassMode value);
+
     RadassMode mode(const QnLayoutItemIndexList& items) const;
     void setMode(const QnLayoutItemIndexList& items, RadassMode value);
+
 
     QString cacheDirectory() const;
     void setCacheDirectory(const QString& value);

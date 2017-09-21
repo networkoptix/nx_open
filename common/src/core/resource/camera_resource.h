@@ -78,9 +78,6 @@ public:
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
-    float rawSuggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
-
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
 

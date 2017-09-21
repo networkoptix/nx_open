@@ -332,8 +332,8 @@ bool QnRecordingManager::startOrStopRecording(
         if (needStopHi) {
             recorderHiRes->pleaseStop();
             camera->notInUse(recorderHiRes);
-            if (providerHi)
-                providerHi->setFps(cameraRes->getMaxFps());
+            //if (providerHi)
+            //    providerHi->setFps(cameraRes->getMaxFps());
         }
 
         if (needStopLow) {
@@ -491,8 +491,8 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 
     beforeDeleteRecorder(recorders);
     stopRecorder(recorders);
-    qnCameraPool->removeVideoCamera(resource);
     deleteRecorder(recorders, resource);
+    qnCameraPool->removeVideoCamera(resource);
 }
 
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera) const

@@ -348,6 +348,19 @@ void CrossNatConnector::connectSessionReportSent(
         .arg(SystemError::toString(sysErrorCodeToReport)),
         cl_logDEBUG2);
 
+    if (m_connection)
+    {
+        NX_INFO(this, lm("Cloud connection (session %1) to %2 has been established. Info %3")
+            .args(m_connectSessionId, m_targetPeerAddress.toString(), m_connection->toString()));
+    }
+    else
+    {
+        NX_INFO(this, lm("Cloud connection (session %1) to %2 has failed. %3 / %4")
+            .args(m_connectSessionId, m_targetPeerAddress.toString(),
+                QnLexical::serialized(m_connectResultReport.resultCode),
+                SystemError::toString(m_connectResultReport.sysErrorCode)));
+    }
+
     auto completionHandler = std::move(m_completionHandler);
     auto tunnelConnection = std::move(m_connection);
     completionHandler(sysErrorCodeToReport, std::move(tunnelConnection));

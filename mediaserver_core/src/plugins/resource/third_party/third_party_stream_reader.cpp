@@ -171,7 +171,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( isCameraControlRequired )
         {
             const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
-            int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps( params.quality, QSize(resolution.width, resolution.height), params.fps );
+            int bitrateKbps = m_thirdPartyRes->suggestBitrateKbps(QSize(resolution.width, resolution.height), params, getRole() );
 
             nxcip::LiveStreamConfig config;
             memset(&config, 0, sizeof(nxcip::LiveStreamConfig));
@@ -225,7 +225,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
             int selectedBitrateKbps = 0;
             if( cameraEncoder.setBitrate(
-                m_thirdPartyRes->suggestBitrateKbps(params.quality, QSize(resolution.width, resolution.height), params.fps),
+                m_thirdPartyRes->suggestBitrateKbps(QSize(resolution.width, resolution.height), params, getRole()),
                     &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
             {
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));

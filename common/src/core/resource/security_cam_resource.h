@@ -21,6 +21,7 @@
 #include "core/dataconsumer/audio_data_transmitter.h"
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/combined_sensors_description.h>
+#include "media_stream_capability.h"
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -124,12 +125,13 @@ public:
     virtual QnIOPortDataList getRelayOutputList() const;
     virtual QnIOPortDataList getInputPortList() const;
 
-
+    // TODO: move this flags inside CameraMediaCapability struct
     Qn::CameraCapabilities getCameraCapabilities() const;
     bool hasCameraCapabilities(Qn::CameraCapabilities capabilities) const;
     void setCameraCapabilities(Qn::CameraCapabilities capabilities);
     void setCameraCapability(Qn::CameraCapability capability, bool value);
 
+    nx::media::CameraMediaCapability cameraMediaCapability() const;
 
     /*!
         Change output with id \a ouputID state to \a activate
@@ -295,6 +297,10 @@ public:
     virtual void analyticsEventStarted(const QString& caption, const QString& description);
     virtual void analyticsEventEnded(const QString& caption, const QString& description);
 
+    virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
+    virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
+    float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const;
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -400,6 +406,7 @@ private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
+    CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
 
 private slots:
     void resetCachedValues();
