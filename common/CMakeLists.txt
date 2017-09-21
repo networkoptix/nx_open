@@ -9,10 +9,6 @@ nx_configure_file(
     maven/filter-resources/app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-nx_configure_file(
-    maven/filter-resources/build_info.txt
-    ${CMAKE_CURRENT_BINARY_DIR})
-
 if(MACOSX)
     set(mac_sources src/utils/mac_utils.mm)
 endif()
