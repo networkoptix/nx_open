@@ -47,6 +47,8 @@ admin.site.register(Product, ProductAdmin)
 class ContextAdmin(CMSAdmin):
     list_display = ('context_actions', 'name', 'description',
                     'url', 'translatable', 'is_global')
+
+    list_display_links = ('name', )
     search_fields = ('name', 'description', 'url')
 
     def context_actions(self, obj):
@@ -91,6 +93,8 @@ class ContentVersionAdmin(CMSAdmin):
     list_display = ('content_version_actions', 'id', 'customization', 'name',
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by')
+
+    list_display_links = ('id', )
 
     def content_version_actions(self, obj):
         return format_html('<a class="button" href="{}">review version</a>',
