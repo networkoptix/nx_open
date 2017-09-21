@@ -75,8 +75,8 @@ private:
 int MediaFileOperation::getFileTypeIndex() const
 {
     return ((part2 >> 0x3e) & 0x1) == 0
-        ? DeviceFileCatalog::Chunk::FILE_INDEX_NONE
-        : DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
+        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
+        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
 }
 
 void MediaFileOperation::setFileTypeIndex(int fileTypeIndex)
@@ -85,7 +85,7 @@ void MediaFileOperation::setFileTypeIndex(int fileTypeIndex)
         fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE
         || fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
 
-    quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE ? 0x0LL : 0x1LL;
+    quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
     part2 |= (value & 0x1) << 0x3e;
 }
 
