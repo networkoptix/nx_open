@@ -229,12 +229,11 @@ def fill_content(customization_name='default', product='cloud_portal',
         versions = ContentVersion.objects.filter(
             customization_id=customization.id, accepted_date__isnull=False)
         if versions.exists():
-            version_id = versions.latest('accepted_date')
+            version_id = versions.latest('accepted_date').id
         else:
             version_id = 0
             incremental = False  # no version - do full update using default values
-        cached_id = version_id.id if versions.exists() else version_id
-        set_latest_customization_version_id(customization, cached_id)
+        set_latest_customization_version_id(customization, version_id)
 
     if incremental and not changed_context:
         # filter records changed in this version
