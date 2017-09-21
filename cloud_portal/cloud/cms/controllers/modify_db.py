@@ -93,8 +93,8 @@ def save_unrevisioned_records(customization, language, data_structures,
             # If neither case do nothing for this record
             else:
                 continue
-        elif data_structure.label in request_data:
-            new_record_value = request_data[data_structure.label]
+        elif data_structure_name in request_data:
+            new_record_value = request_data[data_structure_name]
 
 
         if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):

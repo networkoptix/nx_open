@@ -72,12 +72,12 @@ def add_upload_error_messages(request, errors):
 
 
 def advanced_touched_without_permission(request_data, customization, data_structures):
-    for ds_label in request_data:
-        data_structure = data_structures.filter(label=ds_label)
+    for ds_name in request_data:
+        data_structure = data_structures.filter(name=ds_name)
         if data_structure.exists() and data_structure[0].advanced:
             data_record = data_structure[0].datarecord_set.filter(customization=customization)
             if data_record.exists():
-                if request_data[ds_label] != data_record.latest('created_date').value:
+                if request_data[ds_name] != data_record.latest('created_date').value:
                     return True
 
     return False

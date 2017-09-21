@@ -49,14 +49,14 @@ class CustomContextForm(forms.Form):
                     attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
             if data_structure.type == DataStructure.get_type("Image"):
-                self.fields[ds_name] = forms.ImageField(label=ds_name,
+                self.fields[data_structure.name] = forms.ImageField(label=ds_name,
                                                         help_text=ds_description,
                                                         initial=record_value,
                                                         required=False,
                                                         disabled=disabled)
                 continue
 
-            self.fields[ds_name] = forms.CharField(required=False,
+            self.fields[data_structure.name] = forms.CharField(required=False,
                                                    label=ds_name,
                                                    help_text=ds_description,
                                                    initial=record_value,
