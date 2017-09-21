@@ -27,6 +27,10 @@ public:
     void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
     nx_http::HttpModManager* httpModManager() const;
     virtual void applyModToRequest(nx_http::Request* request) override;
+
+    bool isAuthentificationRequired(nx_http::Request& request);
+    void enableUnauthorizedForwarding(const QString& path);
+
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         QSharedPointer<AbstractStreamSocket> clientSocket) override;
@@ -34,6 +38,7 @@ protected:
         bool sslNeeded,
         const SocketAddress& localAddress) override;
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket) override;
+
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
@@ -42,6 +47,7 @@ private:
     bool m_boundToCloud;
     nx::hpm::api::SystemCredentials m_cloudCredentials;
     std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
+    std::set<QString> m_unauthorizedForwardingPaths;
 
     void onCloudBindingStatusChanged(
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
