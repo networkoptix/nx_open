@@ -59,7 +59,7 @@
         },
         {
           "label": "IOS application ID",
-          "name": "%iOSappID%",
+          "name": "%IOS_APPLICATION_ID%",
           "old_name": "{{iOSappID}}",
           "value": "L6FE34GJWM.com.networkoptix.NxMobile",
           "description": "App ID for iOS mobile application",

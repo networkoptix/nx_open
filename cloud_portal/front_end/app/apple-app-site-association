@@ -3,7 +3,7 @@
         "apps": [],
         "details": [
             {
-                "appID": "{{iOSappID}}",
+                "appID": "%IOS_APPLICATION_ID%",
                 "paths": [
                     "/client*",
                     "/cloud*"
