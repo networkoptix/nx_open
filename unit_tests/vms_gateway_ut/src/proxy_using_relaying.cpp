@@ -42,7 +42,7 @@ protected:
     {
         m_httpClient = std::make_unique<nx_http::AsyncClient>();
         m_httpClient->doGet(nx::network::url::Builder(m_baseUrl)
-            .addPath(lm("/%1/%2").arg(m_peerName).arg(kTestRequestPath)));
+            .appendPath(lm("/%1/%2").arg(m_peerName).arg(kTestRequestPath)));
     }
 
     void thenConnectionIsAccepted()

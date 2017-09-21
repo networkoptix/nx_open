@@ -70,7 +70,7 @@ public:
         m_url.setPath(path, mode);
         return *this;
     }
-    Builder& addPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    Builder& appendPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
     {
         m_url.setPath(normalizePath(m_url.path() + path), mode);
         return *this;

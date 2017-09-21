@@ -199,55 +199,7 @@ void ConnectSessionManager::startRelaying(
     auto relaySession = std::move(*relaySessionIter);
     m_relaySessions.erase(relaySessionIter);
     startRelaying(std::move(relaySession));
-
-    //sendOpenTunnelNotification(relaySessionIter);
 }
-
-//void ConnectSessionManager::sendOpenTunnelNotification(
-//    std::list<RelaySession>::iterator relaySessionIter)
-//{
-//    using namespace std::placeholders;
-//
-//    api::OpenTunnelNotification notification;
-//    notification.setClientEndpoint(relaySessionIter->clientConnection->getForeignAddress());
-//    notification.setClientPeerName(relaySessionIter->clientPeerName.c_str());
-//    relaySessionIter->openTunnelNotificationBuffer = notification.toHttpMessage().toString();
-//
-//    relaySessionIter->listeningPeerConnection->sendAsync(
-//        relaySessionIter->openTunnelNotificationBuffer,
-//        std::bind(&ConnectSessionManager::onOpenTunnelNotificationSent, this,
-//            _1, _2, relaySessionIter));
-//}
-//
-//void ConnectSessionManager::onOpenTunnelNotificationSent(
-//    SystemError::ErrorCode sysErrorCode,
-//    std::size_t /*bytesSent*/,
-//    std::list<RelaySession>::iterator relaySessionIter)
-//{
-//    RelaySession relaySession;
-//
-//    // TODO: #ak Make lock shorter. Handle cancellation problem:
-//    // element from m_relaySessions is removed and destructor does not wait for this session completion.
-//    QnMutexLocker lock(&m_mutex);
-//
-//    if (m_terminated)
-//        return;
-//
-//    relaySession = std::move(*relaySessionIter);
-//    m_relaySessions.erase(relaySessionIter);
-//
-//    if (sysErrorCode != SystemError::noError)
-//    {
-//        NX_LOGX(lm("Session %1. Failed to send open tunnel notification to %2 (%3). %4")
-//            .arg(relaySession.id).arg(relaySession.listeningPeerName)
-//            .arg(relaySession.listeningPeerConnection->getForeignAddress())
-//            .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
-//        return;
-//    }
-//
-//    relaySession.listeningPeerConnection->cancelIOSync(network::aio::etNone);
-//    startRelaying(std::move(relaySession));
-//}
 
 void ConnectSessionManager::startRelaying(RelaySession relaySession)
 {

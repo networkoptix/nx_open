@@ -54,10 +54,11 @@ public:
      * - Or emptyPoolTimeout has not passed since loss of the last connection.
      */
     virtual bool isPeerOnline(const std::string& peerName) const = 0;
+
     /**
      * E.g., if we have peers server1.nx.com and server2.nx.com then
-     * findListeningPeerByPrefix("nx.com") will return any of that peers.
-     * At the same time findListeningPeerByPrefix("server1.nx.com") will return server1.nx.com.
+     * findListeningPeerByDomain("nx.com") will return any of that peers.
+     * At the same time findListeningPeerByDomain("server1.nx.com") will return server1.nx.com.
      * @return Empty string if nothing found.
      */
     virtual std::string findListeningPeerByDomain(const std::string& domainName) const = 0;
@@ -89,26 +90,11 @@ public:
     virtual std::size_t getConnectionCountByPeerName(
         const std::string& peerName) const override;
 
-    /**
-     * Peer is online if:
-     * - There are active connections.
-     * - Or emptyPoolTimeout has not passed since loss of the last connection.
-     */
     virtual bool isPeerOnline(const std::string& peerName) const override;
-    /**
-     * E.g., if we have peers server1.nx.com and server2.nx.com then 
-     * findListeningPeerByPrefix("nx.com") will return any of that peers.
-     * At the same time findListeningPeerByPrefix("server1.nx.com") will return server1.nx.com.
-     * @return Empty string if nothing found.
-     */
+
     virtual std::string findListeningPeerByDomain(
         const std::string& domainName) const override;
 
-    /**
-     * If peerName is not known, then api::ResultCode::notFound is reported.
-     * If peer is found, but no connections from it at the moment, then it will wait 
-     * for some timeout for peer to establish new connection.
-     */
     virtual void takeIdleConnection(
         const ClientInfo& clientInfo,
         const std::string& peerName,

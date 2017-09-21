@@ -110,12 +110,6 @@ private:
         const std::string& listeningPeerName,
         std::unique_ptr<AbstractStreamSocket> listeningPeerConnection,
         nx_http::HttpServerConnection* httpConnection);
-    void sendOpenTunnelNotification(
-        std::list<RelaySession>::iterator relaySessionIter);
-    void onOpenTunnelNotificationSent(
-        SystemError::ErrorCode sysErrorCode,
-        std::size_t bytesSent,
-        std::list<RelaySession>::iterator relaySessionIter);
     void startRelaying(RelaySession relaySession);
 };
 
