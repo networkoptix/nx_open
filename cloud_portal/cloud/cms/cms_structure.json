@@ -130,7 +130,7 @@
       ]
     },
     {
-      "name": "EULA",
+      "name": "Eula",
       "description":"End user license agreement",
       "file_path": "static/lang_{{language}}/views/static/eula.html",
       "url": "/content/eula",
