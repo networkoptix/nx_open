@@ -313,13 +313,13 @@ struct RadassController::Private
 
         if (isForcedHqDisplay(display) && !isFFSpeed(display))
         {
-            NX_VERBOSE(this) "Forced switch to HQ" << *consumer;
+            NX_VERBOSE(this) << "Forced switch to HQ" << *consumer;
             gotoHighQuality(consumer);
         }
         else if (consumer->awaitingLqTime.isValid()
             && consumer->awaitingLqTime.hasExpired(kQualitySwitchIntervalMs))
         {
-            NX_VERBOSE(this) "Consumer had slow stream for 5 seconds" << *consumer;
+            NX_VERBOSE(this) << "Consumer had slow stream for 5 seconds" << *consumer;
             gotoLowQuality(consumer, slowLqReason(display));
         }
         else
@@ -334,7 +334,7 @@ struct RadassController::Private
 
                 if (consumer->itemIsSmallInHq.hasExpired(kLowerSmallItemQualityIntervalMs))
                 {
-                    NX_VERBOSE(this) "Consumer was small in HQ for 1 second" << *consumer;
+                    NX_VERBOSE(this) << "Consumer was small in HQ for 1 second" << *consumer;
                     gotoLowQuality(consumer, LqReason::Small);
                     addHqTry();
                 }
@@ -359,7 +359,7 @@ struct RadassController::Private
             // Is big enough item for HQ.
             && isBigItem(display))
         {
-            NX_VERBOSE(this) "Consumer is big enough to go HQ" << *consumer;
+            NX_VERBOSE(this) << "Consumer is big enough to go HQ" << *consumer;
             streamBackToNormal(consumer);
         }
     }
@@ -437,7 +437,7 @@ struct RadassController::Private
 
     void streamBackToNormal(Consumer consumer)
     {
-        NX_VERBOSE(this) "Consumer stream back to normal." << *consumer;
+        NX_VERBOSE(this) << "Consumer stream back to normal." << *consumer;
 
         // Camera do not have slow stream anymore.
         consumer->awaitingLqTime.invalidate();
@@ -462,21 +462,21 @@ struct RadassController::Private
         // Some item stuck after HQ switching. Do not switch to HQ any more.
         if (hiQualityRetryCounter >= kHighQualityRetryCounter)
         {
-            NX_VERBOSE(this) "Some item stuck after HQ switching. Ignore try." << *consumer;
+            NX_VERBOSE(this) << "Some item stuck after HQ switching. Ignore try." << *consumer;
             return;
         }
 
         // Do not try HQ for small items.
         if (isSmallOrMediumItem(display))
         {
-            NX_VERBOSE(this) "Consumer is not big enough" << *consumer;
+            NX_VERBOSE(this) << "Consumer is not big enough" << *consumer;
             return;
         }
 
         // If item go to LQ because of small, return to HQ without delay.
         if (consumer->lqReason == LqReason::Small)
         {
-            NX_VERBOSE(this) "Consumer was small, now big enough, go HQ" << *consumer;
+            NX_VERBOSE(this) << "Consumer was small, now big enough, go HQ" << *consumer;
             gotoHighQuality(consumer);
             return;
         }
