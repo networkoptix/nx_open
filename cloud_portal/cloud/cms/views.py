@@ -76,8 +76,13 @@ def advanced_touched_without_permission(request_data, customization, data_struct
         data_structure = data_structures.filter(name=ds_name)
         if data_structure.exists() and data_structure[0].advanced:
             data_record = data_structure[0].datarecord_set.filter(customization=customization)
+
             if data_record.exists():
-                if request_data[ds_name] != data_record.latest('created_date').value:
+                db_record_value = data_record.latest('created_date').value
+            else:
+                db_record_value = data_structure.default
+
+            if request_data[ds_name] != db_record_value:
                     return True
 
     return False
