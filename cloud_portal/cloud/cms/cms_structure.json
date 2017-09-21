@@ -22,13 +22,6 @@
           "description": "Name of the VMS customization. Must be short!"
         },
         {
-          "label": "Download Link",
-          "name": "%downloadLink%",
-          "old_name": "{{downloadLink}}",
-          "value": "http://www.networkoptix.com/live-demo#fulltrial",
-          "description": "Emergency link for downloading applications (in case if cloud is down)"
-        },
-        {
           "label": "Support Link",
           "name": "%supportLink%",
           "old_name": "{{supportLink}}",
@@ -167,6 +160,22 @@
           "value": "",
           "description": "Content for support page",
           "type": "HTML"
+        }
+      ]
+    },
+    {
+      "name": "Service unavailable page (503)",
+      "file_path": "static/503.html",
+      "description": "This page is visible if Cloud service is unavailable",
+      "url": "/503.html",
+      "translatable": false,
+      "values": [
+        {
+          "label": "Download Link",
+          "name": "%DOWNLOAD_LINK%",
+          "old_name": "{{downloadLink}}",
+          "value": "http://www.networkoptix.com/live-demo#fulltrial",
+          "description": "Emergency link for downloading applications (in case if cloud is down)"
         }
       ]
     },
