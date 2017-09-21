@@ -131,7 +131,7 @@
         {
           "label":"Left block text",
           "name": "%BLOCK1_CONTENT%",
-          "value": "Connect to your Systems with {{PRODUCT_NAME}} account",
+          "value": "Connect to your Systems with %PRODUCT_NAME% account",
           "description": "8-10 words",
           "type": "Long Text"
         },
