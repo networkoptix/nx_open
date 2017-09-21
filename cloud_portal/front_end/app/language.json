@@ -1,7 +1,7 @@
 {
   "language_name": "LANGUAGE_NAME",
   "productName": "%PRODUCT_NAME%",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Cancel",
