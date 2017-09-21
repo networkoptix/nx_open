@@ -31,8 +31,8 @@
     "view": "View cameras - ",
     "debug": "Debug",
     "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} for ",
+    "download": "Download %VMS_NAME%",
+    "downloadPlatform": "Download %VMS_NAME% for ",
     "pageNotFound": "Page not found"
   },
   "systemStatuses": {
@@ -132,7 +132,7 @@
     "passwordMismatch": "Wrong password",
     "cantEditYourself": "Changing own permissions is not allowed",
     "cantEditAdmin": "This user has administrator permissions",
-    "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
+    "cantOpenClient": "%VMS_NAME% application is not detected. <a href=\"/download\">Download</a>",
     "lostConnection": "Connection to {{systemName}} lost",
     "thisSystem": "the system"
   },
@@ -156,7 +156,7 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "System is unreachable",
     "offline": "System is offline",
-    "openClient": "Open in {{VMS_NAME}}",
+    "openClient": "Open in %VMS_NAME%",
     "confirmRenameTitle": "System name",
     "confirmRenameAction": "Save",
     "successRename": "System name saved",
@@ -181,8 +181,8 @@
       "saveChanges":"Save"
   },
   "downloads": {
-    "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Install %VMS_NAME% to view your System",
+    "action": "Download %VMS_NAME%",
     "mobile": {
       "ios": {
         "link": "{{IOS_APP_LINK}}"

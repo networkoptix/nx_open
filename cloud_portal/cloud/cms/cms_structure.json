@@ -15,14 +15,6 @@
           "description": "Name for cloud"
         },
         {
-          "label": "Client Protocol",
-          "name": "%CLIENT_PROTOCOL%",
-          "old_name": "{{CLIENT_PROTOCOL}}",
-          "value": "demo-vms",
-          "description": "URL protocol for calling native clients from browser",
-          "advanced": true
-        },
-        {
           "label": "VMS Name",
           "name": "%VMS_NAME%",
           "old_name": "{{VMS_NAME}}",
@@ -63,6 +55,14 @@
           "old_name": "{{COMPANY_NAME}}",
           "value": "Network Optix",
           "description": "The name of the company itself"
+        },
+        {
+          "label": "Client Protocol",
+          "name": "%CLIENT_PROTOCOL%",
+          "old_name": "{{CLIENT_PROTOCOL}}",
+          "value": "demo-vms",
+          "description": "URL protocol for calling native clients from browser",
+          "advanced": true
         },
         {
           "label": "IOS application ID",
