@@ -96,6 +96,12 @@ class ContentVersionAdmin(CMSAdmin):
         return format_html('<a class="button" href="{}">review version</a>',
                            reverse('review_version', args=[obj.id]))
 
+    def get_queryset(self, request):  # show only users for current customization
+        qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        qs = qs.filter(customization__name=settings.CUSTOMIZATION)
+        # additional filter - display only revisions from current customization
+        return qs
+
     content_version_actions.short_description = "Admin Options"
     content_version_actions.allow_tags = True
 
