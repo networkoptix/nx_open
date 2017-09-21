@@ -45,7 +45,7 @@
         {
           "label": "Company Name",
           "name": "%COMPANY_NAME%",
-          "old_name": "{{COMPANY_NAME}}",
+          "old_name": "%COMPANY_NAME%",
           "value": "Network Optix",
           "description": "The name of the company itself"
         },
