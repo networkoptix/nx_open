@@ -33,6 +33,7 @@ private:
     QScopedPointer<Storage> storage;
     QHash<QString, Worker*> workers;
     AbstractPeerManagerFactory* peerManagerFactory = nullptr;
+    std::unique_ptr<AbstractPeerManagerFactory> peerManagerFactoryOwner;
 };
 
 DownloaderPrivate::DownloaderPrivate(Downloader* q):
@@ -98,10 +99,13 @@ Downloader::Downloader(
     Q_D(Downloader);
     d->storage.reset(new Storage(downloadsDirectory));
 
-    if (peerManagerFactory)
-        d->peerManagerFactory = peerManagerFactory;
-    else
-        d->peerManagerFactory = new ResourcePoolPeerManagerFactory(commonModule);
+    d->peerManagerFactory = peerManagerFactory;
+    if (!d->peerManagerFactory)
+    {
+        auto factory = std::make_unique<ResourcePoolPeerManagerFactory>(commonModule);
+        d->peerManagerFactory = factory.get();
+        d->peerManagerFactoryOwner = std::move(factory);
+    }
 
     for (const auto& fileName: d->storage->files())
         d->createWorker(fileName);
