@@ -690,14 +690,7 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
 {
     // QnMutexLocker lk(&m_mutex); <- m_mutex is already locked down the stack.
 
-    if( action->getRuntimeParams().eventType != vms::event::cameraDisconnectEvent &&
-        action->getRuntimeParams().eventType != vms::event::networkIssueEvent )
-    {
-        return sendMailInternal(action, 1);
-    }
-
     // Aggregating by recipients and event type.
-
     SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
         action->getParams().emailAddress); //< all recipients are already computed and packed here.
 
