@@ -145,6 +145,8 @@ QVariant FileExtensionModel::data(const QModelIndex& index, int role) const
         case Qt::WhatsThisRole:
         case Qt::AccessibleDescriptionRole:
             return FilesystemStrings::description(extension);
+        case Qn::ShortTextRole:
+            return lit(".%1").arg(FilesystemStrings::suffix(extension));
         case ExtensionRole:
             return qVariantFromValue(extension);
         default:

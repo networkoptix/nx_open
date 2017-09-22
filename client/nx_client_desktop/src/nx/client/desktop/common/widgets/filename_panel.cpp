@@ -5,9 +5,14 @@
 
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+
+namespace {
+
+static constexpr int kFilterComboBoxWidth = 120;
+
+} // namespace
 
 namespace nx {
 namespace client {
@@ -26,6 +31,8 @@ FilenamePanel::FilenamePanel(QWidget* parent):
 {
     ui->setupUi(this);
     ui->extensionsComboBox->setModel(&d->model);
+    ui->extensionsComboBox->setMaximumWidth(kFilterComboBoxWidth);
+    ui->extensionsComboBox->setCustomTextRole(Qn::ShortTextRole);
 
     connect(this, &FilenamePanel::filenameChanged, this,
         [this](const Filename& filename)
