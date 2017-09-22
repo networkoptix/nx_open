@@ -4,9 +4,9 @@ from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
 from model_utils import Choices
+from util.helpers import customization_cache
 
 from django.template.defaultfilters import truncatechars
-from django.core.cache import cache
 
 
 # CMS structure (data structure). Only developers can change that
@@ -129,15 +129,9 @@ class ContentVersion(models.Model):
         if self.accepted_by == None:
             return 'in review'
 
-        customization_cache = cache
-        data = customization_cache.get(self.customization.name)
+        version_id = customization_cache(self.customization.name, 'version_id')
 
-        if not data:
-            latest_version = ContentVersion.objects.latest('accepted_date')
-            version_id = latest_version.id if latest_version.exists() else None
-            data = {'version_id': version_id}
-            customization_cache.set(self.customization.name, data)
-        elif data['version_id'] > self.id:
+        if version_id > self.id:
                 return 'old'
 
         return 'current'

@@ -34,9 +34,6 @@ admins:
         - 'Admins'
         - 'cloud-portal-admins@networkoptix.com'
 
-languages:
-    - en_US
-
 queue_name: '$INSTANCE_NAME'
 
 max_retries: 10

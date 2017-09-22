@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def register(request):
-    from .utils import detect_language_by_request
+    from util.helpers import detect_language_by_request
     logger.debug('/api/account/register called')
     lang = detect_language_by_request(request)
     data = request.data

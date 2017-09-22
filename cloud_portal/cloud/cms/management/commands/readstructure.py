@@ -12,6 +12,7 @@ import json
 import codecs
 from ...models import Product, Context, DataStructure
 from django.core.management.base import BaseCommand
+from util.helpers import customization_cache
 
 
 def iterate_cms_files(customization_name, ignore_not_english):
@@ -109,6 +110,7 @@ def read_structure_json():
     with codecs.open('cms/cms_structure.json', 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
     product_name = cms_structure['product']
+    default_language = customization_cache('default', 'default_language')
     product_id = Product.objects.get(name=product_name).id
     for context_data in cms_structure['contexts']:
         has_language = context_data["translatable"]
@@ -157,7 +159,7 @@ def read_structure_json():
 
                 #this is used to convert source images into b64 strings
                 file_path = os.path.join('static', 'default', 'source', name)
-                file_path = file_path.replace("{{language}}", settings.DEFAULT_LANGUAGE)
+                file_path = file_path.replace("{{language}}", default_language)
                 with open(file_path, 'r') as file:
                     value = encoded_string = base64.b64encode(file.read())
                         

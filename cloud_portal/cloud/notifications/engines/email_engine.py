@@ -19,7 +19,7 @@ modified_file_time_cache = {}
 
 def send(email, msg_type, message, customization):
     custom_config = get_custom_config(customization)
-    lang = get_language_for_email(email, custom_config['languages'])
+    lang = get_language_for_email(email, customization)
 
     templates_root = os.path.join(
         settings.STATIC_LOCATION, customization, "templates")
@@ -61,6 +61,10 @@ def send(email, msg_type, message, customization):
 
 def get_custom_config(customization):
     if customization not in configs_cache:
+        # TODO:
+        # languages
+        # cloud_portal.url - ???
+        # mail_from
         configs_cache[customization] = get_config(customization)
     return configs_cache[customization]
 

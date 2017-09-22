@@ -33,10 +33,6 @@ admins:
         - 'Admins'
         - 'cloud-portal-admins@networkoptix.com'
 
-languages:
-    - zh_CN
-    - zh_TW
-
 queue_name: '$INSTANCE_NAME'
 
 max_retries: 10
