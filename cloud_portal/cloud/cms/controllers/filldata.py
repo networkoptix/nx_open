@@ -227,8 +227,8 @@ def fill_content(customization_name='default', product='cloud_portal',
 
         # update affected languages
         for language in changed_languages:
-            source_file = file_for_context(context, customization, language.code)
-            process_context_for_file(source_file, context, context.path, language.code,
+            source_file = file_for_context(context, customization, language)
+            process_context_for_file(source_file, context, context.file_path, language,
                                      customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)

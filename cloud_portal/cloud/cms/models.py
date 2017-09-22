@@ -14,7 +14,7 @@ def customization_cache(customization_name, value=None):
     data = cache.get(customization_name)
     if not data:
         customization = Customization.objects.get(name=customization_name)
-        custom_config = get_config(customization)
+        custom_config = get_config(customization.name)
 
         data = {
             'version_id': customization.version_id,
