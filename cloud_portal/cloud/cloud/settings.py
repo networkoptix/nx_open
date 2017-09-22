@@ -69,13 +69,21 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'cloud.urls'
 
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /app/app
+STATIC_LOCATION = os.path.join(BASE_DIR, "static")  # this is used for email_engine to find templates
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static/common")
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': (
-            '/app/app/static/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
-            '/app/app/static/{}/templates'.format(CUSTOMIZATION),
-            '/app/app/templates'
+            STATIC_ROOT,
+            os.path.join(STATIC_LOCATION, CUSTOMIZATION),  # get rid of app/app hardcode
+            os.path.join(STATIC_LOCATION, CUSTOMIZATION, 'templates'),
+            os.path.join(BASE_DIR, 'templates')
         ),
         'APP_DIRS': True,
         'OPTIONS': {
@@ -319,10 +327,6 @@ NOTIFICATIONS_CONFIG = {
 }
 
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_LOCATION = os.path.join(BASE_DIR, "static")
-STATIC_ROOT = '/app/app/static/common/static'
 
 
 UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
