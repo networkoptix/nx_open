@@ -209,6 +209,7 @@ class DataRecord(models.Model):
         super(DataRecord, self).save(*args, **kwargs)
 
     def find_actual_value(self, customization, language=None, version_id=None):
+        content_value = None
         # try to get translated content
         if language and self.translatable:
             content_record = DataRecord.objects \
