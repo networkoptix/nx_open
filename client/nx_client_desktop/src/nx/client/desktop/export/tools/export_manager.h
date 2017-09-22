@@ -54,6 +54,8 @@ class ExportManager: public QObject
 public:
     ExportManager(QObject* parent = nullptr);
 
+    virtual ~ExportManager();
+
     QnUuid exportMedia(const ExportMediaSettings& settings);
     QnUuid exportLayout(const ExportLayoutSettings& settings);
     void stopExport(const QnUuid& exportProcessId);

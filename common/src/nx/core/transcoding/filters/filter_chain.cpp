@@ -9,6 +9,8 @@
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/rotate_image_filter.h>
 #include <transcoding/filters/time_image_filter.h>
+#include <transcoding/filters/paint_image_filter.h>
+
 #include <transcoding/transcoder.h>
 
 #include <nx/utils/log/assert.h>
@@ -80,6 +82,20 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     //TODO: #GDM implement new timestamp filters here
     //if (m_settings.timestampParams.enabled)
     //    result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_settings.layout, m_settings.timestampParams));
+
+    const auto needPaintImageFilter =
+        std::any_of(m_settings.overlays.begin(), m_settings.overlays.end(),
+            [](const OverlaySettingsPtr& settings)
+            {
+                return settings->type() == OverlaySettings::Type::timestamp
+                    || settings->type() == OverlaySettings::Type::image;
+            });
+
+    if (needPaintImageFilter)
+    {
+        const auto filter = QnAbstractImageFilterPtr(new QnPaintImageFilter());
+        push_back(filter);
+    }
 
     //verifying that output resolution is supported by codec
 

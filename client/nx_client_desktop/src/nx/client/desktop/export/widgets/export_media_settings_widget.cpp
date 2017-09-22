@@ -28,6 +28,10 @@ void ExportMediaSettingsWidget::setApplyFilters(bool value)
     ui->filtersCheckBox->setChecked(value);
 }
 
+ExportMediaSettingsWidget::~ExportMediaSettingsWidget()
+{
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

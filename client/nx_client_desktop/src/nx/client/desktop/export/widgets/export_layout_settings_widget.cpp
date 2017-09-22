@@ -12,6 +12,10 @@ ExportLayoutSettingsWidget::ExportLayoutSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 }
 
+ExportLayoutSettingsWidget::~ExportLayoutSettingsWidget()
+{
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

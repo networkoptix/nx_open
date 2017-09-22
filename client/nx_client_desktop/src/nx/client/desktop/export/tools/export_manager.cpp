@@ -89,7 +89,7 @@ struct ExportManager::Private
     ExportManager* const q;
     QMap<QnUuid, QPointer<ExportProcess>> exportProcesses;
 
-    explicit ExportManager::Private(ExportManager* owner):
+    explicit Private(ExportManager* owner):
         q(owner)
     {
     }

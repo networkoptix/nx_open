@@ -20,6 +20,8 @@ class ExportLayoutSettingsWidget: public QWidget
 public:
     ExportLayoutSettingsWidget(QWidget* parent = nullptr);
 
+    virtual ~ExportLayoutSettingsWidget();
+
 private:
     QScopedPointer<Ui::ExportLayoutSettingsWidget> ui;
 };

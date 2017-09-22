@@ -27,6 +27,8 @@ public:
 signals:
     void dataChanged(bool applyFilters);
 
+    virtual ~ExportMediaSettingsWidget();
+
 private:
     QScopedPointer<Ui::ExportMediaSettingsWidget> ui;
 };

@@ -13,9 +13,11 @@ struct ExportLayoutPersistent: public ExportLayoutSettings
 };
 #define ExportLayoutPersistent_Fields (readOnly)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ExportLayoutPersistent), (metatype)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ExportLayoutPersistent), (json))
 
 } // namespace settings
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::client::desktop::settings::ExportLayoutPersistent)

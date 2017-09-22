@@ -80,11 +80,17 @@ struct ExportMediaPersistent: public ExportMediaSettings
     (ExportImageOverlayPersistent)(ExportTextOverlayPersistent)(ExportBookmarkOverlayPersistent)\
     (RapidReviewPersistentSettings)(ExportMediaPersistent)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(EXPORT_MEDIA_PERSISTENT_TYPES, (metatype)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(EXPORT_MEDIA_PERSISTENT_TYPES, (json))
 
 } // namespace settings
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::client::desktop::settings::ExportTimestampOverlayPersistent)
+Q_DECLARE_METATYPE(nx::client::desktop::settings::ExportImageOverlayPersistent)
+Q_DECLARE_METATYPE(nx::client::desktop::settings::ExportTextOverlayPersistent)
+Q_DECLARE_METATYPE(nx::client::desktop::settings::ExportBookmarkOverlayPersistent)
+Q_DECLARE_METATYPE(nx::client::desktop::settings::ExportMediaPersistent)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::client::desktop::settings::ExportOverlayType, (metatype)(lexical))

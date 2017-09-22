@@ -68,7 +68,7 @@ struct WorkbenchExportHandler::Private
     };
     QHash<QnUuid, ExportInfo> runningExports;
 
-    WorkbenchExportHandler::Private():
+    Private():
         exportManager(new ExportManager())
     {
     }

@@ -33,6 +33,8 @@ struct OverlaySettings
     Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignTop;
 };
 
+using OverlaySettingsPtr = QSharedPointer<OverlaySettings>;
+
 struct Settings
 {
     // Forced aspect ratio, requires transcoding if not empty.
