@@ -19,7 +19,7 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "------------------------------"
     echo "Copy config"
-    cp $dir/cloud_portal.yaml $TARGET_DIR/$CUSTOMIZATION/
+    cp ../cloud/cloud_portal.yaml $TARGET_DIR/$CUSTOMIZATION/
 
 
     echo "------------------------------"
