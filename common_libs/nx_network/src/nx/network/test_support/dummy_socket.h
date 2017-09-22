@@ -60,11 +60,11 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler ) override;
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,

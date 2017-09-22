@@ -738,14 +738,14 @@ void UdtStreamSocket::connectAsync(
 
 void UdtStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler )
 {
     return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
 
 void UdtStreamSocket::sendAsync(
     const nx::Buffer& buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler )
 {
     return m_aioHelper->sendAsync(buf, std::move(handler));
 }

@@ -243,7 +243,7 @@ public:
 
     void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler)
+        IoCompletionHandler handler)
     {
         if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
             return;
@@ -268,7 +268,7 @@ public:
 
     void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler)
+        IoCompletionHandler handler)
     {
         if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
             return;
@@ -365,11 +365,11 @@ private:
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     size_t m_connectSendAsyncCallCounter;
 
-    std::function<void(SystemError::ErrorCode, size_t)> m_recvHandler;
+    IoCompletionHandler m_recvHandler;
     nx::Buffer* m_recvBuffer;
     size_t m_recvAsyncCallCounter;
 
-    std::function<void(SystemError::ErrorCode, size_t)> m_sendHandler;
+    IoCompletionHandler m_sendHandler;
     const nx::Buffer* m_sendBuffer;
     int m_sendBufPos;
 

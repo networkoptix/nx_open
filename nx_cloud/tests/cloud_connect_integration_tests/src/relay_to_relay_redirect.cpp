@@ -52,9 +52,9 @@ public:
                 [this, &requestCompletion](
                     api::ResultCode resultCode,
                     api::CreateClientSessionResponse response)
-            {
-                requestCompletion.set_value(std::make_tuple(resultCode, std::move(response)));
-            });
+                {
+                    requestCompletion.set_value(std::make_tuple(resultCode, std::move(response)));
+                });
 
             const auto result = requestCompletion.get_future().get();
             if (std::get<0>(result) == api::ResultCode::ok)
