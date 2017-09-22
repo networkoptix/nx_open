@@ -21,6 +21,7 @@ def find_or_add_context_by_file(file_path, product_id, has_language):
         return Context.objects.get(file_path=file_path, product_id=product_id)
     context = Context(name=file_path, file_path=file_path,
                       product_id=product_id, translatable=has_language,
+                      hidden=True,
                       is_global=False)
     context.save()
     return context
@@ -59,31 +60,42 @@ def find_or_add_data_stucture(name, old_name, context_id, has_language):
 
 
 def read_cms_strings(filename):
-    pattern = re.compile(r'%\S+%')
+    pattern = re.compile(r'%\S+?%')
     with open(filename, 'r') as file:
         data = file.read()
-        return re.findall(pattern, data)
+        return set(re.findall(pattern, data))
 
 
-def read_structure_file(filename, product_id):
+def read_structure_file(filename, product_id, global_strings):
     context_name, language = filldata.context_for_file(filename, 'default')
 
     if language and language != "en_US":
         return
     # now read file and get records from there.
     strings = read_cms_strings(filename)
+    if not strings:  # if there is no records at all - we ignore it
+        return
 
-    if strings:     # if there is no records at all - we ignore it
-        context = find_or_add_context_by_file(
-            context_name, product_id, bool(language))
-        for string in strings:
-            find_or_add_data_stucture(string, None, context.id, bool(language))
+    # now, here this is customization-depending file
+
+    strings = [string for string in strings if string not in global_strings]
+    context = find_or_add_context_by_file(
+        context_name, product_id, bool(language))
+
+    print(context_name)
+    for string in strings:
+        # Here we need to check if there are any unique strings (which are not global
+        print(string)
+        find_or_add_data_stucture(string, None, context.id, bool(language))
 
 
 def read_structure():
     product_id = Product.objects.get(name='cloud_portal').id
+    global_strings = DataStructure.objects.\
+        filter(context__is_global=True, context__product_id=product_id).\
+        values_list("name", flat=True)
     for file in filldata.iterate_cms_files('default', True):
-        read_structure_file(file, product_id)
+        read_structure_file(file, product_id, global_strings)
 
 
 def read_structure_json():
@@ -93,7 +105,6 @@ def read_structure_json():
     product_id = Product.objects.get(name=product_name).id
     for context_data in cms_structure['contexts']:
         has_language = context_data["translatable"]
-
         is_global = context_data["is_global"] if "is_global" in context_data else False
         old_name = context_data["old_name"] if "old_name" in context_data else None
         context = find_or_add_context(
@@ -104,6 +115,8 @@ def read_structure_json():
             context.file_path = context_data["file_path"]
         if "url" in context_data:
             context.url = context_data["url"]
+        context.is_global = is_global
+        context.hidden = False
         context.save()
 
         for record in context_data["values"]:

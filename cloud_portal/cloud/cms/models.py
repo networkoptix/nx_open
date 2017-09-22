@@ -32,6 +32,7 @@ class Context(models.Model):
     description = models.TextField()
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
+    hidden = models.BooleanField(default=False)
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
