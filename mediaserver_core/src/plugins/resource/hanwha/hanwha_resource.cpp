@@ -87,20 +87,20 @@ struct UpdateInfo
 
 bool operator<(const UpdateInfo& lhs, const UpdateInfo& rhs)
 {
-    if (lhs.cgi < rhs.cgi)
-        return true;
+    if (lhs.cgi != rhs.cgi)
+        return lhs.cgi < rhs.cgi;
 
-    if (lhs.submenu < rhs.submenu)
-        return true;
+    if (lhs.submenu != rhs.submenu)
+        return lhs.submenu < rhs.submenu;
 
-    if (lhs.action < rhs.action)
-        return true;
+    if (lhs.action != rhs.action)
+        return lhs.action < rhs.action;
 
-    if (lhs.profile < rhs.profile)
-        return true;
+    if (lhs.profile != rhs.profile)
+        return lhs.profile < rhs.profile;
 
-    if (lhs.channelIndependent && !rhs.channelIndependent)
-        return true;
+    if (lhs.channelIndependent != rhs.channelIndependent)
+        return lhs.channelIndependent < rhs.channelIndependent;
 
     return false;
 }
