@@ -14,7 +14,7 @@ def set_latest_customization_version_id(customization, version_id):
     data = customization_cache.get(customization.name)
 
     if not data:
-        data = {'version_id':version_id}
+        data = {'version_id': version_id}
     else:
         data['version_id'] = version_id
 
@@ -63,50 +63,11 @@ def target_file(file_name, customization, language_code, preview):
     return target_file_name
 
 
-def find_actual_value(record, language=None, version_id=None):
-    # try to get translated content
-    if language and record.translatable:
-        content_record = DataRecord.objects \
-            .filter(language_id=language.id,
-                    data_structure_id=record.id,
-                    customization_id=customization.id)
-
-    # if not - get record without language
-    if not content_record or not content_record.exists():
-        content_record = DataRecord.objects \
-            .filter(language_id=None,
-                    data_structure_id=record.id,
-                    customization_id=customization.id)
-
-    # if not - get default language
-    if not content_record or not content_record.exists():
-        content_record = DataRecord.objects \
-            .filter(language_id=customization.default_language_id,
-                    data_structure_id=record.id,
-                    customization_id=customization.id)
-
-    if content_record and content_record.exists():
-        if not version_id:
-            content_value = content_record.latest('created_date').value
-        else:  # Here find a datarecord with version_id
-            # which is not more than version_id
-            # filter only accepted content_records
-            content_record = content_record.filter(
-                version_id__lte=version_id)
-            if content_record.exists():
-                content_value = content_record.latest('version_id').value
-
-    if not content_value:  # if no value - use default value from structure
-        content_value = record.default
-
-    return content_value
-
-
 def process_context_structure(customization, context, content,
                               language, version_id, preview):
     for record in context.datastructure_set.all():
         content_record = None
-        content_value = find_actual_value(record, language, version_id)
+        content_value = find_actual_value(record, customization, language, version_id)
         # replace marker with value
         if record.type != DataStructure.get_type('Image'):
             content = content.replace(record.name, content_value)

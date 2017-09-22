@@ -1,49 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from api.models import Account
-from django.core.cache import cache
-from util.config import get_config
-from cms.controllers.filldata import find_actual_value
 
-
-def read_global_value(customization, value, version_id):
-    from cms.models import Product
-    product = Product.objects.get(name='cloud_portal')
-    global_contexts = product.context_set.filter(is_global=True)
-    record = None
-    for context in global_contexts:
-        records = context.datastructure_set.filter(name=value)
-        if records.exists():
-            record = records.last()
-            break
-
-    if not record:
-        return None
-    return find_actual_value(record, version=version_id)
-
-
-def customization_cache(customization_name, value=None):
-    data = cache.get(customization_name)
-    if not data:
-        from cms.models import Customization
-        customization = Customization.objects.get(name=customization_name)
-        custom_config = get_config(customization)
-
-        version_id = customization.contentversion_set.latest('accepted_date').id \
-            if customization.contentversion_set.exists() else 0
-        data = {
-            'version_id': version_id,
-            'languages': customization.languages.values_list('code', flat=True),
-            'default_language': customization.default_language.code,
-            'mail_from_name': read_global_value(customization, '%MAIL_FROM_NAME%', version_id),
-            'mail_from_email': read_global_value(customization, '%MAIL_FROM_EMAIL%', version_id),
-            'portal_url': custom_config['cloud_portal']['url']
-        }
-        cache.set(customization_name, data)
-        
-    if value:
-        return data[value] if value in data else None
-    return data
 
 
 def get_languages(customization=None):

@@ -6,7 +6,8 @@ from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
 import json
 import os
-from util.helpers import get_language_for_email, customization_cache
+from util.helpers import get_language_for_email
+from cms.models import customization_cache
 
 
 titles_cache = {}
