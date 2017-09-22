@@ -109,6 +109,12 @@ void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
     emit flagsChanged();
 }
 
+QnUuid QnWorkbenchLayout::resourceId() const
+{
+    const auto& layout = resource();
+    return layout ? layout->getId() : QnUuid();
+}
+
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const
 {
     if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(const_cast<QnWorkbenchLayout*>(this)))

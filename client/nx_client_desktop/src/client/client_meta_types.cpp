@@ -17,6 +17,8 @@
 #include <ui/customization/customization.h>
 #include <ui/customization/palette_data.h>
 #include <ui/customization/pen_data.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 
 #include <update/updates_common.h>
 #include <update/update_info.h>
@@ -31,6 +33,7 @@
 #include <api/server_rest_connection.h>
 
 #include <nx/client/desktop/ui/common/color_theme.h>
+#include <nx/client/desktop/ui/scene/models/layout_model.h>
 
 namespace {
 
@@ -162,5 +165,11 @@ void QnClientMetaTypes::initialize() {
 void QnClientMetaTypes::registerQmlTypes()
 {
     qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
+    qmlRegisterType<ui::scene::models::LayoutModel>("Nx.Models", 1, 0, "LayoutModel");
+
+    qmlRegisterUncreatableType<QnWorkbench>("Nx.Workbench", 1, 0, "Workbench",
+        lit("Cannot create instance of Workbench."));
+    qmlRegisterUncreatableType<QnWorkbench>("Nx.Workbench", 1, 0, "WorkbenchLayout",
+        lit("Cannot create instance of WorkbenchLayout."));
 }
 

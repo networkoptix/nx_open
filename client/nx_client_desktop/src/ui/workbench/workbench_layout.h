@@ -42,6 +42,8 @@ Q_DECLARE_METATYPE(QnLayoutFlags)
 class QnWorkbenchLayout: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
+    Q_PROPERTY(QnUuid resourceId READ resourceId CONSTANT)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 
 public:
     /**
@@ -88,6 +90,8 @@ public:
 
     QnLayoutFlags flags() const;
     void setFlags(QnLayoutFlags value);
+
+    QnUuid resourceId() const;
 
     /**
      * @return Name of this layout.

@@ -2,9 +2,12 @@
 
 #include <QtCore/QFileInfo>
 #include <QtQml/QQmlEngine>
+#include <QtQml/QQmlContext>
 #include <QtQml/QQmlError>
+#include <QtQuickWidgets/QQuickWidget>
 
 #include <nx/utils/log/log.h>
+#include <ui/workbench/workbench.h>
 
 namespace nx {
 namespace client {
@@ -18,6 +21,9 @@ class MainWindow::Private: public QObject
 
 public:
     Private(MainWindow* parent);
+
+public:
+    QQuickWidget* sceneWidget = nullptr;
 };
 
 MainWindow::Private::Private(MainWindow* parent):
@@ -27,21 +33,34 @@ MainWindow::Private::Private(MainWindow* parent):
 
 //-------------------------------------------------------------------------------------------------
 
-MainWindow::MainWindow(QQmlEngine* engine, QWindow* parent):
-    base_type(engine, parent),
+MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget* parent):
+    base_type(parent),
+    QnWorkbenchContextAware(context),
     d(new Private(this))
 {
-    setSource(QStringLiteral("main.qml"));
+    d->sceneWidget = new QQuickWidget(engine, this);
 
-    if (status() == Error)
+    d->sceneWidget->rootContext()->setContextProperty(lit("workbench"), workbench());
+
+    d->sceneWidget->setSource(lit("main.qml"));
+    d->sceneWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    if (d->sceneWidget->status() == QQuickWidget::Error)
     {
-        for (const auto& error: errors())
+        for (const auto& error: d->sceneWidget->errors())
             NX_ERROR(this, error.toString());
     }
+
+    d->sceneWidget->show();
 }
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    d->sceneWidget->resize(event->size());
 }
 
 } // namespace experimental

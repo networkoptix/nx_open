@@ -1007,7 +1007,8 @@ void ActionHandler::at_openNewScene_triggered()
 {
     if (!m_mainWindow)
     {
-        m_mainWindow = new experimental::MainWindow(qnClientCoreModule->mainQmlEngine());
+        m_mainWindow = new experimental::MainWindow(
+            qnClientCoreModule->mainQmlEngine(), context());
         m_mainWindow->resize(mainWindow()->size());
     }
 

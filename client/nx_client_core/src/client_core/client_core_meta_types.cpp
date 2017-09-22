@@ -10,6 +10,7 @@
 #include <ui/models/system_hosts_model.h>
 #include <ui/models/ordered_systems_model.h>
 #include <ui/models/model_data_accessor.h>
+#include <ui/positioners/grid_positioner.h>
 #include <client/forgotten_systems_manager.h>
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
@@ -29,6 +30,8 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterType<QnSystemHostsModel>("Nx.Models", 1, 0, "SystemHostsModel");
     qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
+
+    qmlRegisterType<nx::client::core::ui::positioners::Grid>("Nx.Positioners", 1, 0, "Grid");
 
     qmlRegisterUncreatableType<NxGlobalsObject>(
         "Nx", 1, 0, "NxGlobals", QLatin1String("Cannot create an instance of NxGlobals."));

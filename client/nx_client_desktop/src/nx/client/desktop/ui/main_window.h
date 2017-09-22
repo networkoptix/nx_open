@@ -1,6 +1,10 @@
 #pragma once
 
-#include <QtQuick/QQuickView>
+#include <QtWidgets/QWidget>
+
+#include <ui/workbench/workbench_context_aware.h>
+
+class QQmlEngine;
 
 namespace nx {
 namespace client {
@@ -8,14 +12,17 @@ namespace desktop {
 namespace ui {
 namespace experimental {
 
-class MainWindow: public QQuickView
+class MainWindow: public QWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QQuickView;
+    using base_type = QWidget;
 
 public:
-    MainWindow(QQmlEngine* engine, QWindow* parent = nullptr);
+    MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget* parent = nullptr);
     virtual ~MainWindow() override;
+
+protected:
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
     class Private;
