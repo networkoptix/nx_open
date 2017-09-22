@@ -16,3 +16,4 @@ def get_config(customization = None):
 
     print (join(conf_dir, customization, 'cloud_portal.yaml'))
     return yaml.safe_load(open(join(conf_dir, customization, 'cloud_portal.yaml')))
+

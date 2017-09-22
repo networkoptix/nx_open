@@ -20,7 +20,6 @@ cloud_gateway:
 
 mail_from: 'support@ioezio.com'
 
-mail_prefix: ''
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'

@@ -30,8 +30,7 @@ def send(email, msg_type, message, customization):
         'portal_url': custom_config['cloud_portal']['url']
     }
 
-    subject = custom_config["mail_prefix"] + ' ' + \
-        get_email_title(customization, lang, msg_type, templates_location)
+    subject = get_email_title(customization, lang, msg_type, templates_location)
     subject = pystache.render(subject, {"message": message, "config": config})
 
     message_html_template = read_template(msg_type, templates_location, True)
