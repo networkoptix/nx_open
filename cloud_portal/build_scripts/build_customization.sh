@@ -37,10 +37,13 @@ dir=../customizations/$CUSTOMIZATION/
 
     cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
 
-    echo "Move fonts"
-    rm -rf $TARGET_DIR/common || true
-    mkdir -p $TARGET_DIR/common/static
-    mv ../front_end/dist/fonts $TARGET_DIR/common/static/fonts
+    if [ "$CUSTOMIZATION" = "default" ]
+    then
+        echo "Move fonts  - only for default"
+        rm -rf $TARGET_DIR/common || true
+        mkdir -p $TARGET_DIR/common/static
+        mv ../front_end/dist/fonts $TARGET_DIR/common/static/fonts
+    fi
 
     echo "Move front_end to destination"
     mv ../front_end/dist $TARGET_DIR/$CUSTOMIZATION/source/static
@@ -116,8 +119,10 @@ dir=../customizations/$CUSTOMIZATION/
 
     done
     rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
-
     echo "Localization success"
+
+    echo "copy sources to root"
+    cp -rf $TARGET_DIR/$CUSTOMIZATION/source/* $TARGET_DIR/$CUSTOMIZATION/
 
 echo "$CUSTOMIZATION Done"
 
