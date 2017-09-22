@@ -19,8 +19,6 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$CLOUD_DB_HOST:3347'
 
-mail_from: 'service@networkoptix.com'
-
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
     user: 'AKIAJ6MLW7ZT7WXXXOIA'

@@ -38,7 +38,10 @@ def send(email, msg_type, message, customization):
         message_html_template, {"message": message, "config": config})
     email_txt_body = pystache.render(
         message_txt_template, {"message": message, "config": config})
-    email_from = customization_cache(customization, "mail_from")
+
+    email_from_name = customization_cache(customization, "mail_from_name")
+    email_from_email = customization_cache(customization, "mail_from_email")
+    email_from = '%s <%s>' % (email_from_name, email_from_email)
 
     msg = EmailMultiAlternatives(
         subject, email_txt_body, email_from, to=(email,))

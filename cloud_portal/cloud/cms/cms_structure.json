@@ -81,7 +81,21 @@
           "description": "Link for Android application in Google Play",
           "advanced": true
         },
-       
+        {
+          "label": "Mail from - name",
+          "name": "%MAIL_FROM_NAME%",
+          "value": "VMS Demo Cloud",
+          "description": "Sender name for emails from cloud portal"
+        },
+        {
+          "label": "Mail from - email",
+          "name": "%MAIL_FROM_EMAIL%",
+          "value": "service@networkoptix.com",
+          "description": "Sender email for emails from cloud portal. Case sensitive. (Needs to be verified by Amazon, contact Nx support team for assistance)",
+          "advanced": true
+        },
+
+
         {
           "label": "Portal header logo",
           "name": "static/images/logo.png",
