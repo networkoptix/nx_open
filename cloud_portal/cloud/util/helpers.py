@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from api.models import Account
 from django.core.cache import cache
+from util.config import get_config
 
 
 def customization_cache(customization_name, value=None):
@@ -9,12 +10,16 @@ def customization_cache(customization_name, value=None):
     if not data:
         from cms.models import Customization
         customization = Customization.objects.get(name=customization_name)
+        custom_config = get_config(customization)
+
         version_id = customization.contentversion_set.latest('accepted_date').id \
             if customization.contentversion_set.exists() else 0
         data = {
             'version_id': version_id,
             'languages': customization.languages.values_list('code', flat=True),
-            'default_language': customization.default_language.code
+            'default_language': customization.default_language.code,
+            'mail_from':  custom_config['mail_from'],
+            'portal_url':  custom_config['cloud_portal']['url']
         }
         cache.set(customization_name, data)
         

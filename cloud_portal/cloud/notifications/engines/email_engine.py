@@ -6,8 +6,7 @@ from email.MIMEImage import MIMEImage  # python 2
 from django.conf import settings
 import json
 import os
-from util.config import get_config
-from util.helpers import get_language_for_email
+from util.helpers import get_language_for_email, customization_cache
 
 
 titles_cache = {}
@@ -18,7 +17,6 @@ modified_file_time_cache = {}
 
 
 def send(email, msg_type, message, customization):
-    custom_config = get_custom_config(customization)
     lang = get_language_for_email(email, customization)
 
     templates_root = os.path.join(
@@ -27,7 +25,7 @@ def send(email, msg_type, message, customization):
     subject = msg_type
 
     config = {
-        'portal_url': custom_config['cloud_portal']['url']
+        'portal_url': customization_cache(customization, "portal_url")
     }
 
     subject = get_email_title(customization, lang, msg_type, templates_location)
@@ -40,7 +38,7 @@ def send(email, msg_type, message, customization):
         message_html_template, {"message": message, "config": config})
     email_txt_body = pystache.render(
         message_txt_template, {"message": message, "config": config})
-    email_from = custom_config["mail_from"]
+    email_from = customization_cache(customization, "mail_from")
 
     msg = EmailMultiAlternatives(
         subject, email_txt_body, email_from, to=(email,))
@@ -57,16 +55,6 @@ def send(email, msg_type, message, customization):
     msg_img.add_header('Content-ID', '<logo>')
     msg.attach(msg_img)
     return msg.send()
-
-
-def get_custom_config(customization):
-    if customization not in configs_cache:
-        # TODO:
-        # languages
-        # cloud_portal.url - ???
-        # mail_from
-        configs_cache[customization] = get_config(customization)
-    return configs_cache[customization]
 
 
 def get_email_title(customization, lang, event, templates_location):
