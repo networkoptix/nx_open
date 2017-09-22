@@ -67,6 +67,10 @@ size_t ReverseConnectionHolder::socketCount() const
 
 void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Handler handler)
 {
+    // TODO: #ak Generally, zero timeout for socket operations means "no timeout".
+    // Here it isn't so. But I'm not sure that making it so will not cause problems.
+    // Have to investigate.
+
     post(
         [this, expirationTime = std::chrono::steady_clock::now() + timeout,
             handler = std::move(handler)]() mutable

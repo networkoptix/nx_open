@@ -25,7 +25,9 @@
         ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}],
         ["templates/email_logo.png", "",
           "Logo for email. Height must be not more than 40px, width - not more than 100px",
-          "Image", {"height_le": 40, "width_le": 100}]
+          "Image", {"height_le": 40, "width_le": 100}],
+        ["%MAIL_FROM_NAME%", "", "Reserved for future use"],
+        ["%MAIL_FROM_EMAIL%", "", "Reserved for future use"]
       ]
     },
     {
