@@ -240,7 +240,7 @@ def fill_content(customization_name='default', product='cloud_portal',
                                       customization_id=customization.id).
                                latest('created_date').id]
 
-        changed_contexts = not changed_records. \
+        changed_contexts = changed_records. \
             values_list('data_structure', flat=True). \
             values_list('context', flat=True). \
             distinct()
