@@ -13,7 +13,14 @@ import codecs
 from ...models import Product, Context, DataStructure
 from django.core.management.base import BaseCommand
 
-#  from cms.controllers.readstructure import *
+
+def iterate_cms_files(customization_name, ignore_not_english):
+    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
+    for root, dirs, files in os.walk(custom_dir):
+        for filename in files:
+            file = os.path.join(root, filename)
+            if customizable_file(file, ignore_not_english):
+                yield file
 
 
 def find_or_add_context_by_file(file_path, product_id, has_language):
@@ -94,7 +101,7 @@ def read_structure():
     global_strings = DataStructure.objects.\
         filter(context__is_global=True, context__product_id=product_id).\
         values_list("name", flat=True)
-    for file in filldata.iterate_cms_files('default', True):
+    for file in iterate_cms_files('default', True):
         read_structure_file(file, product_id, global_strings)
 
 

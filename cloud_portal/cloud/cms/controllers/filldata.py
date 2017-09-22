@@ -72,15 +72,6 @@ def target_file(file_name, customization, language_code, preview):
     return target_file_name
 
 
-def iterate_cms_files(customization_name, ignore_not_english):
-    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
-    for root, dirs, files in os.walk(custom_dir):
-        for filename in files:
-            file = os.path.join(root, filename)
-            if customizable_file(file, ignore_not_english):
-                yield file
-
-
 def process_context_structure(customization, context, content,
                               language, version_id, preview):
     for record in context.datastructure_set.all():
@@ -264,29 +255,25 @@ def fill_content(customization_name='default', product='cloud_portal',
         else:
             changed_contexts = [changed_context]
 
-    if not incremental:
-        # iterate all files (same way we fill structure)
-        for source_file in iterate_cms_files(customization_name, False):
-            context_path, language_code = context_for_file(source_file, customization.name)
-            context = Context.objects.filter(file_path=context_path)
-            process_context_for_file(source_file, context, context_path, language_code,
-                                     customization, preview,
-                                     version_id, global_contexts)
-    else:
-        for context in changed_contexts:
-            # now we need to check what languages were changes
-            # if the default language is changed - we update all languages (lazy way)
-            # otherwise - update only affected languages
-            changed_languages = changed_records.values_list('language').distinct()
+    if not incremental:  # If not incremental - iterate all contexts and all languages
+        changed_contexts = Context.objects.filter(product_id=product_id).all()
+        changed_languages = customization.languages.values_list('code', flat=True)
+
+    for context in changed_contexts:
+        # now we need to check what languages were changes
+        # if the default language is changed - we update all languages (lazy way)
+        # otherwise - update only affected languages
+        if incremental:
+            changed_languages = changed_records.filter(context_id=context.id).values_list('language').distinct()
             if changed_languages.exists(language_id=customization.default_language_id):
-                # update all languages in the context
+                # if default language changes - it can affect all languages in the context
                 changed_languages = customization.languages.values_list('code', flat=True)
 
-            # update affected languages
-            for language in changed_languages:
-                source_file = file_for_context(context, customization, language.code)
-                process_context_for_file(source_file, context, context.path, language.code,
-                                         customization, preview, version_id, global_contexts)
+        # update affected languages
+        for language in changed_languages:
+            source_file = file_for_context(context, customization, language.code)
+            process_context_for_file(source_file, context, context.path, language.code,
+                                     customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
 
