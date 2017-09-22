@@ -159,7 +159,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
         [this]
         {
             /* We must always ping the same address that is displayed in the visible field. */
-            auto host = ui->ipAddressEdit->text();
+            auto host = ui->ipAddressEdit->text().split(L'?')[0];
             menu()->trigger(action::PingAction, {Qn::TextRole, host});
         });
 
