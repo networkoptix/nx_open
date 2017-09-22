@@ -8,14 +8,7 @@ import json
 import os
 from util.helpers import get_language_for_email
 from cms.models import customization_cache
-
-
-titles_cache = {}
-templates_cache = {}
-configs_cache = {}
-logos_cache = {}
-modified_file_time_cache = {}
-
+from django.core.cache import cache
 
 def send(email, msg_type, message, customization):
     lang = get_language_for_email(email, customization)
@@ -23,7 +16,6 @@ def send(email, msg_type, message, customization):
     templates_root = os.path.join(
         settings.STATIC_LOCATION, customization, "templates")
     templates_location = os.path.join(templates_root, "lang_" + lang)
-    subject = msg_type
 
     config = {
         'portal_url': customization_cache(customization, "portal_url")
@@ -62,17 +54,29 @@ def send(email, msg_type, message, customization):
 
 
 def get_email_title(customization, lang, event, templates_location):
+    global_cache = cache
+    titles_cache = global_cache.get('email_titles')
+
+    if not titles_cache:
+        titles_cache = {}
+
     if customization not in titles_cache:
         titles_cache[customization] = {}
+
     if lang not in titles_cache[customization]:
         filename = os.path.join(
             templates_location, "notifications-language.json")
         with open(filename) as data_file:
             titles_cache[customization][lang] = json.load(data_file)
+        global_cache.set('email_titles', titles_cache)
+
     return titles_cache[customization][lang][event]["emailSubject"]
 
 
 def read_template(name, location, html):
+    global_cache = cache
+    templates_cache = global_cache.get('email_templates')
+
     suffix = ''
     if not html:
         suffix = '.txt'
@@ -89,6 +93,9 @@ def read_template(name, location, html):
 
 def read_logo(filename):
     global modified_file_time_cache, logos_cache
+    global_cache = cache
+    logos_cache = global_cache.get('logos')
+    modified_file_time_cache = global_cache.get('modified_file_times')
 
     # os.stat(filename)[8] gets the modified time for the file
     # If the file is not cached then it needs to be added
