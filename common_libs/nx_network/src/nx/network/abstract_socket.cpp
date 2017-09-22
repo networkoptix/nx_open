@@ -62,7 +62,7 @@ void AbstractCommunicatingSocket::registerTimer(
 
 void AbstractCommunicatingSocket::readAsyncAtLeast(
     nx::Buffer* const buffer, size_t minimalSize,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     NX_CRITICAL(
         buffer->capacity() >= buffer->size() + static_cast<int>(minimalSize),
@@ -101,13 +101,13 @@ QString AbstractCommunicatingSocket::idForToStringFromPtr() const
 
 void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
     nx::Buffer* const buffer, size_t minimalSize,
-    std::function<void(SystemError::ErrorCode, size_t)> handler,
+    IoCompletionHandler handler,
     size_t initBufSize)
 {
     readSomeAsync(
         buffer,
         [this, buffer, minimalSize, handler = std::move(handler), initBufSize](
-            SystemError::ErrorCode code, size_t size)
+            SystemError::ErrorCode code, size_t size) mutable
         {
             if (code != SystemError::noError || size == 0 ||
                 static_cast<size_t>(buffer->size()) >= initBufSize + minimalSize)

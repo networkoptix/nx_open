@@ -22,6 +22,11 @@ RelayEngine::RelayEngine(
     registerApiHandlers(httpMessageDispatcher);
 }
 
+relay::model::ListeningPeerPool& RelayEngine::listeningPeerPool()
+{
+    return m_listeningPeerPool;
+}
+
 void RelayEngine::registerApiHandlers(
     nx_http::server::rest::MessageDispatcher* httpMessageDispatcher)
 {

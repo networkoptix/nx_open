@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/network/socket_delegate.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
@@ -37,6 +38,10 @@ public:
         addArg("-listeningPeer/disconnectedPeerTimeout", "1ms");
         addArg("-listeningPeer/takeIdleConnectionTimeout", "1ms");
         addArg("-listeningPeer/internalTimerPeriod", "1ms");
+
+        m_clientInfo.endpoint = SocketAddress(HostAddress::localhost, 12345);
+        m_clientInfo.relaySessionId = nx::utils::generateRandomName(7).toStdString();
+        m_clientInfo.peerName = nx::utils::generateRandomName(7).toStdString();
     }
 
     ~ListeningPeerPool()
@@ -81,7 +86,7 @@ protected:
 
     void givenPeerWithMultipleConnections()
     {
-        for (int i= 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
             addConnection(m_peerName);
     }
 
@@ -100,6 +105,7 @@ protected:
         using namespace std::placeholders;
 
         pool().takeIdleConnection(
+            m_clientInfo,
             m_peerName,
             std::bind(&ListeningPeerPool::onTakeIdleConnectionCompletion, this, _1, _2));
     }
@@ -162,31 +168,52 @@ protected:
 
     void thenConnectionHasBeenProvided()
     {
-        const auto result = m_takeIdleConnectionResults.pop();
-        ASSERT_EQ(api::ResultCode::ok, result.code);
-        ASSERT_NE(nullptr, result.connection);
+        thenConnectRequestHasCompleted();
+
+        ASSERT_EQ(api::ResultCode::ok, m_prevTakeIdleConnectionResult->code);
+        ASSERT_NE(nullptr, m_prevTakeIdleConnectionResult->connection);
+    }
+
+    void andOpenTunnelNotificationHasBeenSentThroughConnection()
+    {
+        auto streamSocketStub = static_cast<network::test::StreamSocketStub*>(
+            m_prevTakeIdleConnectionResult->connection.get());
+        
+        const auto buffer = streamSocketStub->read();
+
+        nx_http::Message message(nx_http::MessageType::request);
+        ASSERT_TRUE(message.request->parse(buffer));
+
+        api::OpenTunnelNotification openTunnelNotification;
+        ASSERT_TRUE(openTunnelNotification.parse(message));
+        ASSERT_EQ(
+            m_clientInfo.endpoint.toString(),
+            openTunnelNotification.clientEndpoint().toString());
+        ASSERT_EQ(m_clientInfo.peerName, openTunnelNotification.clientPeerName().toStdString());
     }
 
     void thenNoConnectionHasBeenProvided()
     {
-        const auto result = m_takeIdleConnectionResults.pop();
-        ASSERT_NE(api::ResultCode::ok, result.code);
-        ASSERT_EQ(nullptr, result.connection);
+        thenConnectRequestHasCompleted();
+
+        ASSERT_NE(api::ResultCode::ok, m_prevTakeIdleConnectionResult->code);
+        ASSERT_EQ(nullptr, m_prevTakeIdleConnectionResult->connection);
     }
 
     void thenGetConnectionRequestIs(api::ResultCode expectedResultCode)
     {
-        const auto result = m_takeIdleConnectionResults.pop();
-        ASSERT_EQ(expectedResultCode, result.code);
+        thenConnectRequestHasCompleted();
+
+        ASSERT_EQ(expectedResultCode, m_prevTakeIdleConnectionResult->code);
         if (expectedResultCode == api::ResultCode::ok)
-            ASSERT_NE(nullptr, result.connection);
+            ASSERT_NE(nullptr, m_prevTakeIdleConnectionResult->connection);
         else
-            ASSERT_EQ(nullptr, result.connection);
+            ASSERT_EQ(nullptr, m_prevTakeIdleConnectionResult->connection);
     }
 
     void thenConnectRequestHasCompleted()
     {
-        m_takeIdleConnectionResults.pop();
+        m_prevTakeIdleConnectionResult = m_takeIdleConnectionResults.pop();
     }
 
     void thenKeepAliveHasBeenEnabledOnConnection()
@@ -256,10 +283,12 @@ private:
     network::test::StreamSocketStub* m_peerConnection;
     std::vector<network::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
+    boost::optional<TakeIdleConnectionResult> m_prevTakeIdleConnectionResult;
     SettingsLoader m_settingsLoader;
     boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
     nx::utils::SyncQueue<std::string> m_peerConnectedEvents;
     nx::utils::SyncQueue<std::string> m_peerDisconnectedEvents;
+    model::ClientInfo m_clientInfo;
 
     void onTakeIdleConnectionCompletion(
         api::ResultCode resultCode,
@@ -329,14 +358,22 @@ TEST_F(
     thenPeerBecomesOffline();
 }
 
-TEST_F(ListeningPeerPool, get_idle_connection)
+TEST_F(ListeningPeerPool, provides_idle_connection)
 {
     givenConnectionFromPeer();
     whenRequestedConnection();
     thenConnectionHasBeenProvided();
 }
 
-TEST_F(ListeningPeerPool, get_idle_connection_for_unknown_peer)
+TEST_F(ListeningPeerPool, provided_connection_is_activated)
+{
+    givenConnectionFromPeer();
+    whenRequestedConnection();
+    thenConnectionHasBeenProvided();
+    andOpenTunnelNotificationHasBeenSentThroughConnection();
+}
+
+TEST_F(ListeningPeerPool, get_idle_connection_for_unknown_peer_reports_proper_result_code)
 {
     whenRequestedConnectionOfUnknownPeer();
     thenNoConnectionHasBeenProvided();

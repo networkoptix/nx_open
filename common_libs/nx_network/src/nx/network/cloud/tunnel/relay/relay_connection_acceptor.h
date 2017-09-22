@@ -6,6 +6,7 @@
 
 #include <nx/network/abstract_stream_socket_acceptor.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/reverse_connection_acceptor.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/basic_factory.h>
@@ -24,7 +25,7 @@ namespace detail {
 class NX_NETWORK_API ReverseConnection:
     public aio::BasicPollable,
     public AbstractAcceptableReverseConnection,
-    public server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public nx_http::StreamConnectionHolder
 {
     using base_type = aio::BasicPollable;
 

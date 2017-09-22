@@ -101,7 +101,13 @@ int VmsGatewayProcess::serviceMain(
             authRestrictionList,
             streeManager);
 
-        registerApiHandlers(settings, m_runTimeOptions, &httpMessageDispatcher);
+        RelayEngine relayEngine(settings.listeningPeer(), &httpMessageDispatcher);
+
+        registerApiHandlers(
+            settings,
+            m_runTimeOptions,
+            &relayEngine,
+            &httpMessageDispatcher);
 
         if (settings.http().sslSupport)
         {
@@ -111,9 +117,7 @@ int VmsGatewayProcess::serviceMain(
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
 
-        RelayEngine relayEngine(settings.listeningPeer(), &httpMessageDispatcher);
-
-        network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+       network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,
@@ -226,13 +230,17 @@ void VmsGatewayProcess::publicAddressFetched(
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
+    RelayEngine* relayEngine,
     nx_http::server::rest::MessageDispatcher* const msgDispatcher)
 {
     msgDispatcher->registerRequestProcessor<ProxyHandler>(
         nx_http::kAnyPath,
-        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
+        [&settings, &runTimeOptions, relayEngine]() -> std::unique_ptr<ProxyHandler>
         {
-            return std::make_unique<ProxyHandler>(settings, runTimeOptions);
+            return std::make_unique<ProxyHandler>(
+                settings,
+                runTimeOptions,
+                &relayEngine->listeningPeerPool());
         });
 
     if (settings.http().connectSupport)

@@ -18,6 +18,8 @@ public:
         const relay::conf::ListeningPeer& settings,
         nx_http::server::rest::MessageDispatcher* httpMessageDispatcher);
 
+    relay::model::ListeningPeerPool& listeningPeerPool();
+
 private:
     relay::model::ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<relay::controller::AbstractListeningPeerManager> m_listeningPeerManager;

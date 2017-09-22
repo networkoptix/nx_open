@@ -10,7 +10,7 @@ const char* const kRelayProtocolName = "NXRELAY/0.1";
 const char* const kServerIncomingConnectionsPath = "/relay/server/{serverId}/incoming_connections/";
 const char* const kServerClientSessionsPath = "/relay/server/{serverPeerName}/client_sessions/";
 const char* const kClientSessionConnectionsPath = "/relay/client_session/{sessionId}/connections/";
-const char* const kRelayClientPath = "/relay/client/{clientId}";
+const char* const kRelayClientPathPrefix = "/relay/client/";
 
 } // namespace api
 } // namespace relay

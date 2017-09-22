@@ -40,7 +40,7 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         m_asyncChannel->readSomeAsync(buffer, std::move(handler));
     }

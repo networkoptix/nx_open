@@ -26,7 +26,7 @@ void ConnectSessionManagerMock::createClientSession(
 }
 
 void ConnectSessionManagerMock::connectToPeer(
-    const api::ConnectToPeerRequest& request,
+    const controller::ConnectToPeerRequestEx& request,
     ConnectToPeerHandler completionHandler)
 {
     m_receivedConnectToPeerRequests->push(std::move(request));
