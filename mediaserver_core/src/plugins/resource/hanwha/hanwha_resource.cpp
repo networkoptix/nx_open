@@ -1327,7 +1327,7 @@ Qn::EntropyCoding HanwhaResource::defaultEntropyCodingForStream(Qn::ConnectionRo
 
 QString HanwhaResource::defaultCodecProfileForStream(Qn::ConnectionRole role) const
 {
-    const auto codec = defaultCodecForStream(role);
+    const auto codec = streamCodec(role);
     
     const auto codecProfileParameter = m_cgiParameters.parameter(
         lit("media/videoprofile/add_update/%1.Profile").arg(toHanwhaString(codec)));
