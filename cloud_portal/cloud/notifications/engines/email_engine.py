@@ -54,8 +54,7 @@ def send(email, msg_type, message, customization):
 
 
 def get_email_title(customization, lang, event, templates_location):
-    global_cache = cache
-    titles_cache = global_cache.get('email_titles')
+    titles_cache = cache.get('email_titles')
 
     if not titles_cache:
         titles_cache = {}
@@ -74,8 +73,7 @@ def get_email_title(customization, lang, event, templates_location):
 
 
 def read_template(name, location, html):
-    global_cache = cache
-    templates_cache = global_cache.get('email_templates')
+    templates_cache = cache.get('email_templates')
 
     suffix = ''
     if not html:
@@ -92,10 +90,8 @@ def read_template(name, location, html):
 
 
 def read_logo(filename):
-    global modified_file_time_cache, logos_cache
-    global_cache = cache
-    logos_cache = global_cache.get('logos')
-    modified_file_time_cache = global_cache.get('modified_file_times')
+    logos_cache = cache.get('logos')
+    modified_file_time_cache = cache.get('modified_file_times')
 
     # os.stat(filename)[8] gets the modified time for the file
     # If the file is not cached then it needs to be added
