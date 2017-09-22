@@ -7,12 +7,10 @@ import os
 import re
 import base64
 from ...controllers import filldata
-from cloud import settings
 import json
 import codecs
-from ...models import Product, Context, DataStructure
+from ...models import Product, Context, DataStructure, customization_cache
 from django.core.management.base import BaseCommand
-from util.helpers import customization_cache
 
 SOURCE_DIR = 'static/{{customization}}/source/'
 

@@ -10,76 +10,18 @@ from util.config import get_config
 from django.template.defaultfilters import truncatechars
 
 
-def read_global_value(customization, value, version_id):
-    from cms.models import Product
-    product = Product.objects.get(name='cloud_portal')
-    global_contexts = product.context_set.filter(is_global=True)
-    record = None
-    for context in global_contexts:
-        records = context.datastructure_set.filter(name=value)
-        if records.exists():
-            record = records.last()
-            break
-
-    if not record:
-        return None
-    return find_actual_value(record, customization, version=version_id)
-
-
-def find_actual_value(record, customization, language=None, version_id=None):
-    # try to get translated content
-    if language and record.translatable:
-        content_record = DataRecord.objects \
-            .filter(language_id=language.id,
-                    data_structure_id=record.id,
-                    customization_id=customization.id)
-
-    # if not - get record without language
-    if not content_record or not content_record.exists():
-        content_record = DataRecord.objects \
-            .filter(language_id=None,
-                    data_structure_id=record.id,
-                    customization_id=customization.id)
-
-    # if not - get default language
-    if not content_record or not content_record.exists():
-        content_record = DataRecord.objects \
-            .filter(language_id=customization.default_language_id,
-                    data_structure_id=record.id,
-                    customization_id=customization.id)
-
-    if content_record and content_record.exists():
-        if not version_id:
-            content_value = content_record.latest('created_date').value
-        else:  # Here find a datarecord with version_id
-            # which is not more than version_id
-            # filter only accepted content_records
-            content_record = content_record.filter(
-                version_id__lte=version_id)
-            if content_record.exists():
-                content_value = content_record.latest('version_id').value
-
-    if not content_value:  # if no value - use default value from structure
-        content_value = record.default
-
-    return content_value
-
-
 def customization_cache(customization_name, value=None):
     data = cache.get(customization_name)
     if not data:
-        from cms.models import Customization
         customization = Customization.objects.get(name=customization_name)
         custom_config = get_config(customization)
 
-        version_id = customization.contentversion_set.latest('accepted_date').id \
-            if customization.contentversion_set.exists() else 0
         data = {
-            'version_id': version_id,
-            'languages': customization.languages.values_list('code', flat=True),
+            'version_id': customization.version_id,
+            'languages': customization.languages_list,
             'default_language': customization.default_language.code,
-            'mail_from_name': read_global_value(customization, '%MAIL_FROM_NAME%', version_id),
-            'mail_from_email': read_global_value(customization, '%MAIL_FROM_EMAIL%', version_id),
+            'mail_from_name': customization.read_global_value('%MAIL_FROM_NAME%'),
+            'mail_from_email': customization.read_global_value('%MAIL_FROM_EMAIL%'),
             'portal_url': custom_config['cloud_portal']['url']
         }
         cache.set(customization_name, data)
@@ -175,8 +117,30 @@ class Customization(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def version_id(self):
+        return self.contentversion_set.latest('accepted_date').id if self.contentversion_set.exists() else 0
+
+    @property
+    def languages_list(self):
+        return self.languages.values_list('code', flat=True)
+
+    def read_global_value(self, record_name):
+        product = Product.objects.get(name='cloud_portal')
+        global_contexts = product.context_set.filter(is_global=True)
+        record = None
+        for context in global_contexts:
+            records = context.datastructure_set.filter(name=record_name)
+            if records.exists():
+                record = records.last()
+                break
+
+        if not record:
+            return None
+        return record.find_actual_value(self, version=self.version_id)
 
 # CMS data. Partners can change that
+
 
 class ContentVersion(models.Model):
 
@@ -243,3 +207,41 @@ class DataRecord(models.Model):
             self.language = None
 
         super(DataRecord, self).save(*args, **kwargs)
+
+    def find_actual_value(self, customization, language=None, version_id=None):
+        # try to get translated content
+        if language and self.translatable:
+            content_record = DataRecord.objects \
+                .filter(language_id=language.id,
+                        data_structure_id=self.id,
+                        customization_id=customization.id)
+
+        # if not - get record without language
+        if not content_record or not content_record.exists():
+            content_record = DataRecord.objects \
+                .filter(language_id=None,
+                        data_structure_id=self.id,
+                        customization_id=customization.id)
+
+        # if not - get default language
+        if not content_record or not content_record.exists():
+            content_record = DataRecord.objects \
+                .filter(language_id=customization.default_language_id,
+                        data_structure_id=self.id,
+                        customization_id=customization.id)
+
+        if content_record and content_record.exists():
+            if not version_id:
+                content_value = content_record.latest('created_date').value
+            else:  # Here find a datarecord with version_id
+                # which is not more than version_id
+                # filter only accepted content_records
+                content_record = content_record.filter(
+                    version_id__lte=version_id)
+                if content_record.exists():
+                    content_value = content_record.latest('version_id').value
+
+        if not content_value:  # if no value - use default value from structure
+            content_value = self.default
+
+        return content_value

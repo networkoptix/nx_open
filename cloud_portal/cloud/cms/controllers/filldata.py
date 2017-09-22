@@ -67,7 +67,7 @@ def process_context_structure(customization, context, content,
                               language, version_id, preview):
     for record in context.datastructure_set.all():
         content_record = None
-        content_value = find_actual_value(record, customization, language, version_id)
+        content_value = record.find_actual_value(customization, language, version_id)
         # replace marker with value
         if record.type != DataStructure.get_type('Image'):
             content = content.replace(record.name, content_value)
@@ -213,7 +213,7 @@ def fill_content(customization_name='default', product='cloud_portal',
 
     if not incremental:  # If not incremental - iterate all contexts and all languages
         changed_contexts = Context.objects.filter(product_id=product_id).all()
-        changed_languages = customization.languages.values_list('code', flat=True)
+        changed_languages = customization.languages_list
 
     for context in changed_contexts:
         # now we need to check what languages were changes
@@ -223,7 +223,7 @@ def fill_content(customization_name='default', product='cloud_portal',
             changed_languages = changed_records.filter(context_id=context.id).values_list('language').distinct()
             if changed_languages.exists(language_id=customization.default_language_id):
                 # if default language changes - it can affect all languages in the context
-                changed_languages = customization.languages.values_list('code', flat=True)
+                changed_languages = customization.languages_list
 
         # update affected languages
         for language in changed_languages:
