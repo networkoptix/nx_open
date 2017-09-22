@@ -132,7 +132,7 @@ QString HanwhaMixedPresetManager::freePresetNumber() const
 
     QMap<int, QString> presetsOnDevice;
     if (!fetchPresetList(&presetsOnDevice))
-        return false;
+        return QString();
 
     const int limit = m_maxPresetNumber > 0
         ? m_maxPresetNumber

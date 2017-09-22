@@ -106,7 +106,7 @@ private:
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        nx_http::AsyncMessagePipeline* connection) override
+        nx_http::AsyncMessagePipeline* /*connection*/) override
     {
         m_connectionClosureReasons.push(closeReason);
     }
