@@ -279,7 +279,6 @@ USE_ASYNC_QUEUE = True
 
 ADMINS = conf['admins']
 
-DEFAULT_FROM_EMAIL = conf['mail_from']
 EMAIL_SUBJECT_PREFIX = ''
 EMAIL_HOST = conf['smtp']['host']
 EMAIL_HOST_USER = conf['smtp']['user']
