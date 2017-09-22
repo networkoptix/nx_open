@@ -23,9 +23,14 @@ QString extractHost(const QString& url)
     int startPos = url.indexOf(lit("://"));
     startPos = startPos == -1 ? 0 : startPos + 3;
 
-    int endPos = url.indexOf(L':', startPos);
-    if (endPos == -1)
-        endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
+    static const std::array<QChar, 4> kStopChars = { L':', L'/', L'?', L'#' };
+    int endPos = -1;
+    for (const auto& stopChar: kStopChars)
+    {
+        endPos = url.indexOf(stopChar, startPos);
+        if (endPos != -1)
+            break;
+    }
 
     endPos = endPos == -1 ? url.size() : endPos;
 
