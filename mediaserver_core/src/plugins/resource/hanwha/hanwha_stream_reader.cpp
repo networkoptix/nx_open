@@ -1,5 +1,7 @@
 #if defined(ENABLE_HANWHA)
 
+#include <QtCore/QUrlQuery>
+
 #include "hanwha_stream_reader.h"
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
@@ -35,11 +37,11 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params)
 {
-    if (m_hanwhaResource->isNvr() && !isVideoSourceActive(m_hanwhaResource->getChannel()))
-        return CameraDiagnostics::NoMediaStreamResult();
+    /*if (m_hanwhaResource->isNvr() && !isVideoSourceActive(m_hanwhaResource->getChannel()))
+        return CameraDiagnostics::NoMediaStreamResult();*/
 
     const auto role = getRole();
-    QString streamUrl;
+    QString streamUrlString;
     int profileToOpen = kHanwhaInvalidProfile;
     if (!m_hanwhaResource->isNvr())
         profileToOpen = m_hanwhaResource->profileByRole(role);
@@ -62,13 +64,19 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
             return result;
     }
     
-    auto result = streamUri(profileToOpen, &streamUrl);
+    auto result = streamUri(profileToOpen, &streamUrlString);
     if (!result)
         return result;
 
+    if (m_hanwhaResource->isNvr())
+    {
+        streamUrlString.append(lit("&session=%1")
+            .arg(m_hanwhaResource->sessionKey(HanwhaSessionType::live)));
+    }
+
     m_rtpReader.setRole(role);
-    m_rtpReader.setRequest(streamUrl);
-    m_hanwhaResource->updateSourceUrl(streamUrl, role);
+    m_rtpReader.setRequest(streamUrlString);
+    m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
     return m_rtpReader.openStream();
 }

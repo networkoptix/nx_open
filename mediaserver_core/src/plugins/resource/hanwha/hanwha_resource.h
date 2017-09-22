@@ -45,6 +45,8 @@ public:
         const QnCameraAdvancedParamValueList &values,
         QnCameraAdvancedParamValueList &result) override;
 
+    QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
+
 public:
     int maxProfileCount() const;
 

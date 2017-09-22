@@ -2,9 +2,12 @@
 
 #if defined(ENABLE_HANWHA)
 
+#include <plugins/resource/hanwha/hanwha_common.h>
+
 #include <core/resource_management/resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/network/upnp/upnp_search_handler.h>
+#include <core/resource/resource_fwd.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -40,6 +43,11 @@ public:
         const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
+    QString sessionKey(
+        const HanwhaResourcePtr resource,
+        HanwhaSessionType sessionType,
+        bool generateNewOne = false) const;
+
 private:
 
     void createResource(
@@ -54,10 +62,26 @@ private:
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
 private:
+
+    struct SessionKeyData
+    {
+        QString sessionKey;
+        QnMutex lock;
+    };
+    using SessionKeyPtr = std::shared_ptr<SessionKeyData>;
+
     QnResourceList m_foundUpnpResources;
     std::set<QString> m_alreadFoundMacAddresses;
     mutable QnMutex m_mutex;
     QMap<QString, int> m_channelsByCamera;
+
+    // TODO: #dmishin make different session keys for different session types
+    // There is only one session key per group now.
+    
+    mutable QMap<QString, SessionKeyPtr> m_sessionKeys;
+    //mutable QMap<QString, QString> m_sessionKeys;
+    //mutable QMap<QString, bool> m_groupLocks;
+    //mutable QnWaitCondition m_wait;
 };
 
 } // namespace plugins
