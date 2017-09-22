@@ -14,6 +14,18 @@ from ...models import Product, Context, DataStructure
 from django.core.management.base import BaseCommand
 from util.helpers import customization_cache
 
+SOURCE_DIR = 'static/{{customization}}/source/'
+
+
+def customizable_file(filename, ignore_not_english):
+    supported_format = filename.endswith('.json') or \
+        filename.endswith('.html') or \
+        filename.endswith('.mustache') or \
+        filename.endswith('apple-app-site-association')
+    supported_directory = not ignore_not_english or \
+        "lang_" not in filename or "lang_en_US" in filename
+    return supported_format and supported_directory
+
 
 def iterate_cms_files(customization_name, ignore_not_english):
     custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
@@ -90,10 +102,8 @@ def read_structure_file(filename, product_id, global_strings):
     context = find_or_add_context_by_file(
         context_name, product_id, bool(language))
 
-    print(context_name)
     for string in strings:
         # Here we need to check if there are any unique strings (which are not global
-        print(string)
         find_or_add_data_stucture(string, None, context.id, bool(language))
 
 

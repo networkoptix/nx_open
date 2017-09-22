@@ -8,6 +8,7 @@ from django.core.cache import cache
 
 SOURCE_DIR = 'static/{{customization}}/source/'
 
+
 def set_latest_customization_version_id(customization, version_id):
     customization_cache = cache
     data = customization_cache.get(customization.name)
@@ -28,16 +29,6 @@ def make_dir(filename):
         except OSError as exc:  # Guard against race condition
             if exc.errno != errno.EEXIST:
                 raise
-
-
-def customizable_file(filename, ignore_not_english):
-    supported_format = filename.endswith('.json') or \
-        filename.endswith('.html') or \
-        filename.endswith('.mustache') or \
-        filename.endswith('apple-app-site-association')
-    supported_directory = not ignore_not_english or \
-        "lang_" not in filename or "lang_en_US" in filename
-    return supported_format and supported_directory
 
 
 def context_for_file(filename, customization_name):
