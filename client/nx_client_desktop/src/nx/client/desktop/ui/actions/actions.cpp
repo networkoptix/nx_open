@@ -745,25 +745,29 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(condition::hasTimePeriod() || condition::hasArgument(Qn::CameraBookmarkRole));
+        .condition((condition::hasTimePeriod() || condition::hasArgument(Qn::CameraBookmarkRole))
+            && condition::isTrue(ini().universalExportDialog));
 
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(new ExportCondition(true));
+        .condition(ConditionWrapper(new ExportCondition(true))
+            && !condition::isTrue(ini().universalExportDialog));
 
     factory(ExportLayoutAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Multi-Video..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(false));
+        .condition(ConditionWrapper(new ExportCondition(false))
+            && !condition::isTrue(ini().universalExportDialog));
 
     factory(ExportRapidReviewAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(true));
+        .condition(ConditionWrapper(new ExportCondition(true))
+            && !condition::isTrue(ini().universalExportDialog));
 
     factory(ThumbnailsSearchAction)
         .flags(Slider | Scene | SingleTarget)
