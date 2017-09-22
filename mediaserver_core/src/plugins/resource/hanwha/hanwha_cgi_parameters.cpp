@@ -97,6 +97,8 @@ bool HanwhaCgiParameters::parseCgis(QXmlStreamReader& reader)
             return false;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
 
     return true;
@@ -115,6 +117,8 @@ bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader, const QString&
             return false;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
 
     return true;
@@ -134,6 +138,9 @@ bool HanwhaCgiParameters::parseActions(
         if (reader.isEndElement())
         {
             reader.readNextStartElement();
+            if (reader.atEnd())
+                return !reader.hasError();
+
             continue;
         }
 
@@ -143,6 +150,8 @@ bool HanwhaCgiParameters::parseActions(
                 return false;
         }
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
 
     return true;
@@ -177,6 +186,9 @@ bool HanwhaCgiParameters::parseParameters(
         if (reader.isEndElement())
         {
             reader.readNextStartElement();
+            if (reader.atEnd())
+                return !reader.hasError();
+
             continue;
         }
 
@@ -187,6 +199,8 @@ bool HanwhaCgiParameters::parseParameters(
         }
         
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
 
     return true;
@@ -203,6 +217,8 @@ bool HanwhaCgiParameters::parseDataType(
         return false;
 
     reader.readNextStartElement();
+    if (reader.atEnd())
+        return !reader.hasError();
 
     if (reader.name() == kHanwhaEnumNodeName || reader.name() == kHanwhaCsvNodeName)
     {
@@ -240,6 +256,8 @@ bool HanwhaCgiParameters::parseDataType(
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
     else if (reader.name() == kHanwhaFloatNodeName)
     {
@@ -258,6 +276,8 @@ bool HanwhaCgiParameters::parseDataType(
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
     else if (reader.name() == kHanwhaBooleanNodeName)
     {
@@ -272,6 +292,8 @@ bool HanwhaCgiParameters::parseDataType(
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
     else if (reader.name() == kHanwhaStringNodeName)
     {
@@ -287,10 +309,14 @@ bool HanwhaCgiParameters::parseDataType(
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
 
     reader.readNextStartElement();
     reader.readNextStartElement();
+    if (reader.atEnd())
+        return !reader.hasError();
 
     return true;
 }

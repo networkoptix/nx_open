@@ -93,6 +93,8 @@ bool HanwhaAttributes::parseGroups(QXmlStreamReader& reader)
             return false;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
 
     return true;
@@ -113,6 +115,8 @@ bool HanwhaAttributes::parseCategories(
             return false;
 
         reader.readNextStartElement();
+        if (reader.atEnd())
+            return !reader.hasError();
     }
 
     return true;
@@ -136,8 +140,14 @@ bool HanwhaAttributes::parseAttributes(
                 return false;
 
             reader.readNextStartElement();
+            if (reader.atEnd())
+                return !reader.hasError();
+
             if (!parseAttributes(reader, group, channelNumber))
                 reader.readNextStartElement();
+
+            if (reader.atEnd())
+                return !reader.hasError();
         }
         else
         {
@@ -149,6 +159,8 @@ bool HanwhaAttributes::parseAttributes(
 
             reader.skipCurrentElement();
             reader.readNextStartElement();
+            if (reader.atEnd())
+                return !reader.hasError();
         }
     }
 

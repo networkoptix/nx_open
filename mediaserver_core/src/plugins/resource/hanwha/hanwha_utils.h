@@ -22,6 +22,11 @@ extern "C" {
 
 } // extern "C"
 
+inline bool operator<(const QSize& lhs, const QSize& rhs)
+{
+    return lhs.width() * lhs.height() < rhs.width() * rhs.height();
+}
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -34,6 +39,12 @@ using HanwhaChannelProfiles = std::map<HanwhaChannelNumber, HanwhaProfileMap>;
 using HanwhaProfileParameterName = QString;
 using HanwhaProfileParameterValue = QString;
 using HanwhaProfileParameters = std::map<QString, QString>;
+
+static const std::map<AVCodecID, int> kHanwhaCodecCoefficients = {
+    {AV_CODEC_ID_H264, 3},
+    {AV_CODEC_ID_H265, 2},
+    {AV_CODEC_ID_MJPEG, 1}
+};
 
 template<typename T>
 CameraDiagnostics::Result error(

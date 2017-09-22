@@ -2,11 +2,6 @@
 
 #include "hanwha_utils.h"
 
-bool operator<(const QSize& lhs, const QSize& rhs)
-{
-    return lhs.width() * lhs.height() < rhs.width() * rhs.height();
-}
-
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {

@@ -117,6 +117,10 @@ public:
     /** Returns edge, analog or digital class */
     virtual Qn::LicenseType licenseType() const;
 
+    /** 
+     * Returns true if all cameras in a same camera group should share 1 license 
+     */
+    bool isSharingLicenseInGroup() const;
 
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;

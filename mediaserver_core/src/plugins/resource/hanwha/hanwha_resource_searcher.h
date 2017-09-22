@@ -49,10 +49,10 @@ private:
         QnResourceList& result );
 
     bool isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const;
-    int getChannels(const HanwhaResourcePtr& resource);
+    int getChannels(const HanwhaResourcePtr& resource, const QAuthenticator& auth);
 
     template<typename T>
-    void addMultichannelResources(QList<T>& result);
+    void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
 private:
     QnResourceList m_foundUpnpResources;
     std::set<QString> m_alreadFoundMacAddresses;

@@ -95,8 +95,8 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     result << resource;
     const int channel = resource->getChannel();
     if (isSearchAction)
-        addMultichannelResources(result);
-    else if (channel > 0 || getChannels(resource) > 1)
+        addMultichannelResources(result, auth);
+    else if (channel > 0 || getChannels(resource, auth) > 1)
         resource->updateToChannel(channel);
     return result;
 }
@@ -193,32 +193,34 @@ void HanwhaResourceSearcher::createResource(
         resource->setDefaultAuth(auth);
 
     result << resource;
-    addMultichannelResources(result);
+
+    auto resPool = commonModule()->resourcePool();
+    auto rpRes = resPool->getNetResourceByPhysicalId(resource->getUniqueId()).dynamicCast<HanwhaResource>();
+    addMultichannelResources(result, rpRes ? rpRes->getAuth() : auth);
 }
 
-int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource)
+int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource, const QAuthenticator& auth)
 {
     auto result = m_channelsByCamera.value(resource->getUniqueId());
     if (result > 0)
         return result;
     
-
-    HanwhaRequestHelper helper(resource);
+    HanwhaRequestHelper helper(auth, resource->getUrl());
     auto attributes = helper.fetchAttributes(lit("attributes/System"));
-    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
-    if (maxChannels)
-        result = *maxChannels;
 
-    m_channelsByCamera.insert(resource->getUniqueId(), result);
+    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
+    result = maxChannels ? *maxChannels : 1;
+    if (attributes.isValid())
+        m_channelsByCamera.insert(resource->getUniqueId(), result);
     return result;
 }
 
 template <typename T>
-void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
+void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
     HanwhaResourcePtr firstResource = result.first().template dynamicCast<HanwhaResource>();
 
-    const auto channels = getChannels(firstResource);
+    const auto channels = getChannels(firstResource, auth);
     if (channels > 1)
     {
         firstResource->updateToChannel(0);
@@ -236,7 +238,6 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setModel(firstResource->getName());
             resource->setMAC(firstResource->getMAC());
 
-            auto auth = firstResource->getAuth();
             if (!auth.isNull())
                 resource->setDefaultAuth(auth);
 

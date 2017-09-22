@@ -35,6 +35,10 @@ private:
         int profileNumber,
         const QnLiveStreamParams& parameters);
 
+    int chooseNvrChannelProfile(Qn::ConnectionRole role) const;
+    bool isCorrectProfile(int profileNumber) const;
+    bool isVideoSourceActive(int channel) const;
+
     CameraDiagnostics::Result streamUri(int profileNumber, QString* outUrl);
 
     QString rtpTransport() const;

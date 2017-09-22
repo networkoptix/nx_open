@@ -85,7 +85,7 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
         return HanwhaChannelProfiles();
 
     HanwhaChannelProfiles profiles;
-    for (const auto& entry : response.response())
+    for (const auto& entry: response.response())
     {
         const auto split = entry.first.split(L'.');
         const auto splitSize = split.size();

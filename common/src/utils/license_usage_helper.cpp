@@ -466,24 +466,43 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const
         ;
 }
 
-void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLicenses,
+void QnCamLicenseUsageHelper::calculateUsedLicenses(
+    licensesArray& basicUsedLicenses,
     licensesArray& proposedToUse) const
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
     const auto& resPool = commonModule()->resourcePool();
-    for (const auto& camera : resPool->getAllCameras(QnResourcePtr(), true))
-    {
-        Qn::LicenseType lt = camera->licenseType();
-        bool requiresLicense = camera->isLicenseUsed();
-        if (requiresLicense)
-            basicUsedLicenses[lt]++;
 
-        requiresLicense &= !m_proposedToDisable.contains(camera);
-        requiresLicense |= m_proposedToEnable.contains(camera);
-        if (requiresLicense)
-            proposedToUse[lt]++;
+    auto groupId = [](const QnSecurityCamResourcePtr& camera)
+    {
+        return camera->isSharingLicenseInGroup()
+            ? camera->getGroupId()
+            : camera->getId().toString();
+    };
+
+    QMap<QString, QSet<QnSecurityCamResourcePtr>> oldCameras;
+    for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
+    {
+        if (camera->isLicenseUsed())
+            oldCameras[groupId(camera)].insert(camera);
     }
+
+    for (const auto& data : oldCameras)
+        basicUsedLicenses[(*data.begin())->licenseType()]++;
+
+    auto newCameras = oldCameras;
+    for (const auto& camera: m_proposedToEnable)
+        newCameras[groupId(camera)].insert(camera);
+    for (const auto& camera: m_proposedToDisable)
+        newCameras[groupId(camera)].remove(camera);
+
+    for (const auto& data: newCameras)
+    {
+        if (!data.isEmpty())
+            proposedToUse[(*data.begin())->licenseType()]++;
+    }
+
 }
 
 //////////////////////////////////////////////////////////////////////////
