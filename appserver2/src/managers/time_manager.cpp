@@ -504,8 +504,8 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
     //"select primary time server" means "take its local time", so resetting internet synchronization flag
     m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
     if (!m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-        m_localTimePriorityKey,
-        commonModule->globalSettings()->isSynchronizingTimeWithInternet()))
+        	m_localTimePriorityKey,
+        	commonModule->globalSettings()->isSynchronizingTimeWithInternet()))
     {
         return;
     }
@@ -518,10 +518,13 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
         elapsed,
         currentMSecsSinceEpoch(),
         m_localTimePriorityKey);
-    //resetting "synchronized with internet" flag
-    NX_LOGX(lit("Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
-        arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO);
     m_timeSynchronized = true;
+
+    NX_LOGX(lit("Selecting local server time as synchronized. "
+            "New synchronized time %1, new priority key 0x%2")
+        .arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate))
+        .arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO);
+
     //saving synchronized time to DB
     if (m_connection)
     {
@@ -609,7 +612,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
 {
     const auto& commonModule = m_messageBus->commonModule();
     NX_ASSERT( remotePeerTimePriorityKey.seed > 0 );
-    NX_LOGX( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, "
+    NX_LOGX( QString::fromLatin1("Received sync time update from peer %1, "
         "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, local sync time %5, used priority key 0x%6").
         arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
         arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(commonModule->moduleGUID().toString()).
@@ -1161,6 +1164,8 @@ void TimeSynchronizationManager::onDbManagerInitialized()
             m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - restoredTimeDelta;
             m_usedTimeSyncInfo.timePriorityKey = restoredPriorityKey;
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+            // TODO: #ak The next line is doubtful. It may be needed in case if server was down 
+            // for a long time and time priority sequence has overflowed.
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
             NX_LOGX( lit("Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
                 arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).
@@ -1296,14 +1301,30 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         qAbs(synchronizedToLocalTimeOffset) >
         duration_cast<milliseconds>(settings->maxDifferenceBetweenSynchronizedAndLocalTime()).count();
 
+    bool isTimeChanged = false;
     if (isTimeSynchronizedByThisPeerLocalTime && isSynchronizedToLocalTimeOffsetExceeded)
     {
         NX_LOGX(lm("System time is synchronized with this peer's local time. "
             "Detected time shift %1 ms. Updating synchronized time...")
             .arg(synchronizedToLocalTimeOffset), cl_logDEBUG1);
         forceTimeResync();
+        isTimeChanged = true;
     }
-    else if (m_connection && isSynchronizedToLocalTimeOffsetExceeded)
+    else if (!isSystemTimeSynchronizedWithInternet)
+    {
+        // Checking whether it is appropriate to switch to local time.
+        QnMutexLocker lk(&m_mutex);
+        if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
+                m_localTimePriorityKey, settings->isSynchronizingTimeWithInternet()))
+        {
+            selectLocalTimeAsSynchronized(&lk, m_localTimePriorityKey.sequence);
+            isTimeChanged = true;
+        }
+    }
+    
+    if (!isTimeChanged &&
+        m_connection &&
+        isSynchronizedToLocalTimeOffsetExceeded)
     {
         saveSyncTimeAsync(
             QDateTime::currentMSecsSinceEpoch() - getSyncTime(),

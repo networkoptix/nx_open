@@ -2,6 +2,8 @@
 #include "media_db.h"
 #include <cerrno>
 
+#include <recorder/device_file_catalog.h>
+
 namespace nx
 {
 namespace media_db
@@ -68,6 +70,25 @@ private:
 };
 
 } // namespace <anonymous>
+
+
+int MediaFileOperation::getFileTypeIndex() const
+{
+    return ((part2 >> 0x3e) & 0x1) == 0
+        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
+        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
+}
+
+void MediaFileOperation::setFileTypeIndex(int fileTypeIndex)
+{
+    NX_ASSERT(
+        fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE
+        || fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+
+    quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
+    part2 |= (value & 0x1) << 0x3e;
+}
+
 
 DbHelper::DbHelper(DbHelperHandler *const handler)
 : m_device(nullptr),

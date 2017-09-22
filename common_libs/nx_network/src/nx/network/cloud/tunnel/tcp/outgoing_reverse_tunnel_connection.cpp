@@ -87,6 +87,11 @@ void OutgoingReverseTunnelConnection::setControlConnectionClosedHandler(
     m_closedHandler = std::move(handler);
 }
 
+std::string OutgoingReverseTunnelConnection::toString() const
+{
+    return "Reverse connection";
+}
+
 } // namespace tcp
 } // namespace cloud
 } // namespace network
