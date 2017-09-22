@@ -23,10 +23,10 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const /*buffer*/,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual SocketAddress getForeignAddress() const override;
 
     virtual bool setKeepAlive(boost::optional<KeepAliveOptions> info) override;
@@ -40,7 +40,7 @@ public:
 
 private:
     nx::Buffer* m_readBuffer = nullptr;
-    std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
+    IoCompletionHandler m_readHandler;
     nx::network::TCPSocket m_delegatee;
     nx::utils::bstream::Pipe m_reflectingPipeline;
     SocketAddress m_foreignAddress;

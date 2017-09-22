@@ -198,6 +198,9 @@ public:
     virtual bool isInSelfAioThread() const;
 };
 
+using IoCompletionHandler = nx::utils::MoveOnlyFunc<
+    void(SystemError::ErrorCode /*errorCode*/, std::size_t /*bytesTransferred*/)>;
+
 /**
  * Interface for writing to/reading from socket.
  */
@@ -289,7 +292,7 @@ public:
      */
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
+        IoCompletionHandler handler) = 0;
 
     /**
      * Reads at least @param minimalSize bytes from socket asynchronously.
@@ -299,7 +302,7 @@ public:
      */
     void readAsyncAtLeast(
         nx::Buffer* const buffer, size_t minimalSize,
-        std::function<void(SystemError::ErrorCode, size_t)> handler);
+        IoCompletionHandler handler);
 
     /**
      * Asynchnouosly writes all bytes from input buffer.
@@ -312,7 +315,7 @@ public:
      */
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
+        IoCompletionHandler handler) = 0;
 
     /**
      * Register timer on this socket.
@@ -350,7 +353,7 @@ public:
 private:
     void readAsyncAtLeastImpl(
         nx::Buffer* const buffer, size_t minimalSize,
-        std::function<void(SystemError::ErrorCode, size_t)> handler,
+        IoCompletionHandler handler,
         size_t initBufSize);
 };
 
@@ -561,7 +564,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer& buf,
         const SocketAddress& targetAddress,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
     /**
      * Read up to bufferLen bytes data from this socket. 
      *   The given buffer is where the data will be placed.
@@ -580,7 +583,7 @@ public:
      */
     virtual void recvFromAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
     /**
      * @return Address of previous datagram read with 
      * AbstractCommunicatingSocket::recv or AbstractDatagramSocket::recvFrom.

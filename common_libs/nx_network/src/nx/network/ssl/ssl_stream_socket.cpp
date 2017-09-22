@@ -97,7 +97,7 @@ int StreamSocket::send(const void* buffer, unsigned int bufferLen)
 
 void StreamSocket::readSomeAsync(
     nx::Buffer* const buffer,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     switchToAsyncModeIfNeeded();
     m_asyncTransformingChannel->readSomeAsync(buffer, std::move(handler));
@@ -105,7 +105,7 @@ void StreamSocket::readSomeAsync(
 
 void StreamSocket::sendAsync(
     const nx::Buffer& buffer,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     switchToAsyncModeIfNeeded();
     m_asyncTransformingChannel->sendAsync(buffer, std::move(handler));
