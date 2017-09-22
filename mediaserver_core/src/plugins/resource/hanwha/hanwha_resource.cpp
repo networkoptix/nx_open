@@ -443,7 +443,7 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
         ? limits->defaultCbrBitrate
         : limits->defaultVbrBitrate;
 
-    capability.defaultFps = limits->defaultFps;
+    capability.defaultFps = limits->defaultFps > 0 ? limits->defaultFps : limits->maxFps;
     capability.maxFps = limits->maxFps;
 
     return capability;
