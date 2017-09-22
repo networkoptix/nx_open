@@ -94,6 +94,46 @@ class DataStructure(models.Model):
     def get_type(name):
         return next((type[0] for type in DATA_TYPES if type[1] == name), 0)
 
+    def find_actual_value(self, customization, language=None, version_id=None):
+        content_value = None
+        content_record = None
+        # try to get translated content
+        if language and self.translatable:
+            content_record = DataRecord.objects \
+                .filter(language_id=language.id,
+                        data_structure_id=self.id,
+                        customization_id=customization.id)
+
+        # if not - get record without language
+        if not content_record or not content_record.exists():
+            content_record = DataRecord.objects \
+                .filter(language_id=None,
+                        data_structure_id=self.id,
+                        customization_id=customization.id)
+
+        # if not - get default language
+        if not content_record or not content_record.exists():
+            content_record = DataRecord.objects \
+                .filter(language_id=customization.default_language_id,
+                        data_structure_id=self.id,
+                        customization_id=customization.id)
+
+        if content_record and content_record.exists():
+            if not version_id:
+                content_value = content_record.latest('created_date').value
+            else:  # Here find a datarecord with version_id
+                # which is not more than version_id
+                # filter only accepted content_records
+                content_record = content_record.filter(
+                    version_id__lte=version_id)
+                if content_record.exists():
+                    content_value = content_record.latest('version_id').value
+
+        if not content_value:  # if no value - use default value from structure
+            content_value = self.default
+
+        return content_value
+
 # CMS settings. Release engineer can change that
 
 
@@ -137,7 +177,7 @@ class Customization(models.Model):
 
         if not record:
             return None
-        return record.find_actual_value(self, version=self.version_id)
+        return record.find_actual_value(self, version_id=self.version_id)
 
 # CMS data. Partners can change that
 
@@ -207,42 +247,3 @@ class DataRecord(models.Model):
             self.language = None
 
         super(DataRecord, self).save(*args, **kwargs)
-
-    def find_actual_value(self, customization, language=None, version_id=None):
-        content_value = None
-        # try to get translated content
-        if language and self.translatable:
-            content_record = DataRecord.objects \
-                .filter(language_id=language.id,
-                        data_structure_id=self.id,
-                        customization_id=customization.id)
-
-        # if not - get record without language
-        if not content_record or not content_record.exists():
-            content_record = DataRecord.objects \
-                .filter(language_id=None,
-                        data_structure_id=self.id,
-                        customization_id=customization.id)
-
-        # if not - get default language
-        if not content_record or not content_record.exists():
-            content_record = DataRecord.objects \
-                .filter(language_id=customization.default_language_id,
-                        data_structure_id=self.id,
-                        customization_id=customization.id)
-
-        if content_record and content_record.exists():
-            if not version_id:
-                content_value = content_record.latest('created_date').value
-            else:  # Here find a datarecord with version_id
-                # which is not more than version_id
-                # filter only accepted content_records
-                content_record = content_record.filter(
-                    version_id__lte=version_id)
-                if content_record.exists():
-                    content_value = content_record.latest('version_id').value
-
-        if not content_value:  # if no value - use default value from structure
-            content_value = self.default
-
-        return content_value
