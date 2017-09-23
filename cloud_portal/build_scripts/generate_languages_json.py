@@ -1,14 +1,8 @@
 import os
-import re
-import xml.etree.ElementTree as eTree
-import yaml
-from os.path import join
-
 import json
 import errno
-import yaml
-import shutil
 import codecs
+import sys
 
 
 def make_dir(filename):
@@ -85,12 +79,9 @@ def generate_languages_files(languages, template_filename):
     save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
 
-# Read config - get languages there
-config = yaml.safe_load(open('../cloud_portal.yaml'))
-
-# Iterate languages
-if 'languages' not in config:
-    raise 'No languages section in cloud_portal.yaml'
+languages = sys.argv[1:]
+if not languages:
+    languages = ["en_US"]
 
 merge_json('static/language.json', 'static/web_common/commonLanguage.json', 'common')
-generate_languages_files(config['languages'], 'static/language.json')
+generate_languages_files(languages, 'static/language.json')

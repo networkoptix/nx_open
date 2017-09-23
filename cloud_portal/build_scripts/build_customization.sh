@@ -117,6 +117,11 @@ dir=../customizations/$CUSTOMIZATION/
         echo "Overwrite them with localized sources"
         cp -rf $lang_dir/web_common/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/ || true
 
+        echo "Generate language.json"
+        pushd $TARGET_DIR/$CUSTOMIZATION/source
+        python ../../../../build_scripts/generate_languages_json.py $LANG
+        popd
+
     done
     rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
     echo "Localization success"
