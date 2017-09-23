@@ -4,16 +4,19 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from api.helpers.exceptions import handle_exceptions, APINotAuthorisedException, require_params
 
-import requests, json
+import requests, json, base64
 from requests.auth import HTTPDigestAuth
 from django.http import JsonResponse
 
 
 def authenticate(request):
-    require_params(request, ('email', 'password'))
-    email = request.data['email'].lower()
-    password = request.data['password']
-    user = django.contrib.auth.authenticate(username=email, password=password)
+    user, email, password = None, None, None
+
+    if "HTTP_AUTHORIZATION" in request.META:
+        credentials = request.META['HTTP_AUTHORIZATION'].split()
+        if credentials[0].lower() == "basic":
+            email, password = base64.b64decode(credentials[1]).split(':', 1)
+            user = django.contrib.auth.authenticate(username=email, password=password)
 
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
