@@ -6,6 +6,7 @@ from api.helpers.exceptions import handle_exceptions, APINotAuthorisedException,
 
 import requests, json
 from requests.auth import HTTPDigestAuth
+from django.http import JsonResponse
 
 
 def authenticate(request):
@@ -42,10 +43,16 @@ return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 @handle_exceptions
 def nx_action(request):
     email, password = authenticate(request)
-    instance = request.data['instance']
-    call = request.data['call']
-    server_id = request.data['serverId']
-    url = instance + server_id + call
+
+    instance = "https://cloud-test.hdw.mx/gateway/"
+    system_id = request.data['systemId']
+
+    source = 'source=' + request.data['source']
+    caption = '&caption=' + request.data['caption']
+    state = '&state=' + request.data['state']
+
+    url = "%s%s%s%s%s%s%s" % (instance, system_id, '/api/createEvent?', source, caption, state)
+
     headers = {'Content-Type': 'application/json'}
     r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
 
@@ -64,4 +71,6 @@ def zap_trigger(request):
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 def ping(request):
-    return Response('ok')
+    email, password = authenticate(request)
+
+    return JsonResponse({'status': 'ok'})
