@@ -67,7 +67,7 @@ def get_email_title(customization, lang, event, templates_location):
             templates_location, "notifications-language.json")
         with open(filename) as data_file:
             titles_cache[customization][lang] = json.load(data_file)
-        global_cache.set('email_titles', titles_cache)
+        cache.set('email_titles', titles_cache)
 
     return titles_cache[customization][lang][event]["emailSubject"]
 
@@ -84,6 +84,7 @@ def read_template(name, location, html):
             # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
             with codecs.open(filename, 'r', 'utf-8') as stream:
                 templates_cache[filename] = stream.read()
+            cache.set('email_templates', templates_cache)
         except Exception as e:
             raise type(e)(e.message + ' :' + filename)
     return templates_cache[filename]
@@ -104,4 +105,8 @@ def read_logo(filename):
         # After the file has been updated safe the modified time to the
         # modified_file_time_cache
         modified_file_time_cache[filename] = os.stat(filename)[8]
+
+        cache.set('logos', logos_cache)
+        cache.set('modified_file_times', modified_file_time_cache)
+        
     return logos_cache[filename]
