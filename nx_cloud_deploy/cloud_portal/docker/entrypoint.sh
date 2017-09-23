@@ -65,7 +65,7 @@ do
         web)
             write_my_cnf
 
-            /app/env/bin/python manage.py filldata
+            #/app/env/bin/python manage.py filldata
 
             find /app/app/static | xargs touch
             exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300

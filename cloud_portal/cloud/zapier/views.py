@@ -54,7 +54,7 @@ def nx_action(request):
     caption = '&caption=' + request.data['caption']
     state = '&state=' + request.data['state']
 
-    url = "%s%s%s%s%s%s%s" % (instance, system_id, '/api/createEvent?', source, caption, state)
+    url = "%s%s%s%s%s%s" % (instance, system_id, '/api/createEvent?', source, caption, state)
 
     headers = {'Content-Type': 'application/json'}
     r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
