@@ -90,26 +90,27 @@ def save_content(filename, content):
         file.write(content)
 
 
-def process_context_for_file(source_file, context, context_path, language_code,
-                             customization, preview,
-                             version_id, global_contexts):
-
+def process_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     if language_code:
         language = Language.objects.filter(code=language_code)
         if not language.exists():
             return
-        language = language.first()
+        language = Customization.default_language
 
-    with open(source_file, 'r') as file:
-        content = file.read()
+    content = ''
+    if not context.is_global:
+        source_file = file_for_context(context, customization, language_code)
+        with open(source_file, 'r') as file:
+            content = file.read()
 
     if context.exists() and language:
         content = process_context_structure(
             customization, context.first(), content, language, version_id, preview)
 
-    for global_context in global_contexts.all():
-        content = process_context_structure(
-            customization, global_context, content, None, version_id, preview)
+    if not context.is_global:  # if corrent context is global - do not apply other contexts
+        for global_context in global_contexts.all():
+            content = process_context_structure(
+                customization, global_context, content, None, version_id, preview)
 
     target_file_name = target_file(context_path, customization, language_code, preview)
     save_content(target_file_name, content)
@@ -196,10 +197,9 @@ def fill_content(customization_name='default', product='cloud_portal',
                                       customization_id=customization.id).
                                latest('created_date').id]
 
-        changed_contexts = changed_records. \
-            values_list('data_structure', flat=True). \
-            values_list('context', flat=True). \
-            distinct()
+        changed_context_ids = list(changed_records.values_list('data_structure__context_id', flat=True).distinct())
+        changed_contexts = Context.objects.filter(id__in=changed_context_ids)
+
         changed_global_contexts = changed_contexts.filter(is_global = True)
         if changed_global_contexts.exists():  # global context was changed - force full rebuild
             incremental = False
@@ -226,10 +226,9 @@ def fill_content(customization_name='default', product='cloud_portal',
                 changed_languages = customization.languages_list
 
         # update affected languages
-        for language in changed_languages:
-            source_file = file_for_context(context, customization, language)
-            process_context_for_file(source_file, context, context.file_path, language,
-                                     customization, preview, version_id, global_contexts)
+        for language_code in changed_languages:
+            process_context(context, context.file_path, language_code,
+                            customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
 
