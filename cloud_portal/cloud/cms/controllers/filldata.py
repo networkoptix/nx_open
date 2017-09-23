@@ -116,7 +116,7 @@ def process_context(context, context_path, language_code, customization, preview
 def generate_languages_json(customization, preview):
     languages_json = [{"name": lang.name, "language": lang.code}
                       for lang in customization.languages.all()]
-    target_file_name = target_file('languages.json', customization, None, preview)
+    target_file_name = target_file('static/languages.json', customization, None, preview)
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
