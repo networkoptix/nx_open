@@ -13,6 +13,11 @@ class Command(BaseCommand):
             product='cloud_portal',
             preview=False,
             incremental=False)
+        filldata.fill_content(
+            customization_name=settings.CUSTOMIZATION,
+            product='cloud_portal',
+            preview=True,
+            incremental=False)
         # for custom in Customization.objects.all():
         #    filldata.fill_content(customization_name=custom.name, product='cloud_portal', preview=False)
         self.stdout.write(self.style.SUCCESS(

@@ -43,10 +43,10 @@ def context_for_file(filename, customization_name):
     return context_name, language
 
 
-def file_for_context(context, language, customization_name):
-    file_name = context.name
+def file_for_context(context, customization_name, language_code):
+    file_name = context.file_path
     if context.translatable:
-        file_name = file_name.replace('lang_{{language}}', 'lang_'+language)
+        file_name = file_name.replace('lang_{{language}}', 'lang_'+language_code)
     custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
     return os.path.join(custom_dir, file_name)
 
@@ -94,17 +94,15 @@ def process_context(context, context_path, language_code, customization, preview
         language = Language.objects.filter(code=language_code)
         if not language.exists():
             return
-        language = Customization.default_language
+        language = customization.default_language
 
     content = ''
     if not context.is_global:
-        source_file = file_for_context(context, customization, language_code)
+        source_file = file_for_context(context, customization.name, language_code)
         with open(source_file, 'r') as file:
             content = file.read()
 
-    if context.exists() and language:
-        content = process_context_structure(
-            customization, context.first(), content, language, version_id, preview)
+    content = process_context_structure(customization, context, content, language, version_id, preview)
 
     if not context.is_global:  # if corrent context is global - do not apply other contexts
         for global_context in global_contexts.all():
