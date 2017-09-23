@@ -1,5 +1,4 @@
 FROM debian:testing
-MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 RUN apt-get update && \
   apt-get install -y curl && \
@@ -47,3 +46,15 @@ COPY docker/entrypoint.sh /entrypoint.sh
 COPY docker/vncserver /usr/local/bin/
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+ARG VERSION
+ARG REVISION
+ARG BUILD_DATE
+ARG BUILD_HOST
+ARG BUILD_USER
+LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
+      version="$VERSION" \
+      revision="$REVISION" \
+      build-date="$BUILD_DATE" \
+      build-host="$BUILD_HOST" \
+      build-user="$BUILD_USER"

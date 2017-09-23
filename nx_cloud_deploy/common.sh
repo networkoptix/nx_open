@@ -36,7 +36,9 @@ function check_vms_dirs()
 function pack()
 {
     echo "Packing $MODULE:$VERSION to a container"
-    docker build -t $MODULE:$VERSION "${BUILD_ARGS[@]}" .
+    local COMMON_BUILD_ARGS=(--build-arg VERSION="$VERSION" --build-arg REVISION="$REVISION" --build-arg BUILD_DATE="$BUILD_DATE" --build-arg BUILD_HOST="$BUILD_HOST" --build-arg BUILD_USER="$BUILD_USER")
+    local ALL_ARGS=("${COMMON_BUILD_ARGS[@]}" "${BUILD_ARGS[@]}")
+    docker build -t $MODULE:$VERSION "${ALL_ARGS[@]}" .
 }
 
 function pushns()
