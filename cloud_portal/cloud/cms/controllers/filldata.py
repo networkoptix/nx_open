@@ -65,18 +65,17 @@ def target_file(file_name, customization, language_code, preview):
 
 def process_context_structure(customization, context, content,
                               language, version_id, preview):
-    for record in context.datastructure_set.all():
-        content_record = None
-        content_value = record.find_actual_value(customization, language, version_id)
+    for datastructure in context.datastructure_set.all():
+        content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
-        if record.type != DataStructure.get_type('Image'):
-            content = content.replace(record.name, content_value)
-        elif content_record.exists():
+        if datastructure.type != DataStructure.get_type('Image'):
+            content = content.replace(datastructure.name, content_value)
+        elif content_value:
             image_storage = os.path.join('static', customization.name)
             if preview:
                 image_storage = os.path.join(image_storage, 'preview')
             
-            file_name = record.name
+            file_name = datastructure.name
             if language:
                 file_name = file_name.replace("{{language}}", language.code)
 

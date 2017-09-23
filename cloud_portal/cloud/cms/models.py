@@ -168,16 +168,16 @@ class Customization(models.Model):
     def read_global_value(self, record_name):
         product = Product.objects.get(name='cloud_portal')
         global_contexts = product.context_set.filter(is_global=True)
-        record = None
+        data_structure = None
         for context in global_contexts:
-            records = context.datastructure_set.filter(name=record_name)
-            if records.exists():
-                record = records.last()
+            data_structures = context.datastructure_set.filter(name=record_name)
+            if data_structures.exists():
+                data_structure = data_structures.last()
                 break
 
-        if not record:
+        if not data_structure:
             return None
-        return record.find_actual_value(self, version_id=self.version_id)
+        return data_structure.find_actual_value(self, version_id=self.version_id)
 
 # CMS data. Partners can change that
 
