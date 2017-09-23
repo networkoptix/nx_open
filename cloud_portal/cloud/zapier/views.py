@@ -1,5 +1,6 @@
 import django
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from api.helpers.exceptions import handle_exceptions, APINotAuthorisedException, require_params
@@ -11,6 +12,8 @@ from django.http import JsonResponse
 
 def authenticate(request):
     user, email, password = None, None, None
+    content = {'user': unicode(request.user), 'auth': unicode(request.auth)}
+    return Response(content)
 
     if "HTTP_AUTHORIZATION" in request.META:
         credentials = request.META['HTTP_AUTHORIZATION'].split()
@@ -42,6 +45,7 @@ return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 '''
 
 @api_view(['POST'])
+@authentication_classes((BasicAuthentication, ))
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def nx_action(request):
@@ -63,6 +67,7 @@ def nx_action(request):
 
 
 @api_view(['GET', 'POST'])
+@authentication_classes((BasicAuthentication, ))
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def zap_trigger(request):
@@ -72,6 +77,7 @@ def zap_trigger(request):
 
 
 @api_view(['GET', 'POST'])
+@authentication_classes((BasicAuthentication, ))
 @permission_classes((AllowAny, ))
 def ping(request):
     email, password = authenticate(request)
