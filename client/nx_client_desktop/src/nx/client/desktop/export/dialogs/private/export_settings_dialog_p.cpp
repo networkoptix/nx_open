@@ -159,6 +159,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         thumbnailSizeLimit));
 
     m_mediaImageProvider->loadAsync();
+    validateSettings(Mode::Media);
 
     // Set defaults that depend on frame size.
     // TODO: FIXME: #vkutin Are these stored or calculated?
@@ -205,11 +206,13 @@ void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
 void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     m_exportMediaSettings.fileName = filename;
+    validateSettings(Mode::Media);
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
     m_exportLayoutSettings.filename = filename;
+    validateSettings(Mode::Layout);
 }
 
 void ExportSettingsDialog::Private::setRapidReviewFrameStep(qint64 frameStepMs)
@@ -364,6 +367,9 @@ void ExportSettingsDialog::Private::validateSettings(Mode mode)
 {
     if (mode == Mode::Media)
     {
+        if (!m_exportMediaSettings.mediaResource)
+            return;
+
         const auto results = ExportMediaValidator::validateSettings(exportMediaSettings());
         if (m_mediaValidationResults == results)
             return;

@@ -143,25 +143,25 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
 bool FilterChain::isTranscodingRequired(const QnMediaResourcePtr& resource) const
 {
     if (m_settings.aspectRatio.isValid())
-        return false;
+        return true;
 
     const auto layout = resource->getVideoLayout();
     if (layout && layout->channelCount() > 1)
-        return false;
+        return true;
 
     if (!m_settings.zoomWindow.isEmpty())
-        return false;
+        return true;
 
     if (m_settings.dewarping.enabled)
-        return false;
+        return true;
 
     if (m_settings.enhancement.enabled)
-        return false;
+        return true;
 
     if (m_settings.rotation != 0)
-        return false;
+        return true;
 
-    return m_settings.overlays.isEmpty();
+    return !m_settings.overlays.isEmpty();
 }
 
 bool FilterChain::isDownscaleRequired(const QSize& srcResolution) const

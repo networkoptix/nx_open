@@ -53,7 +53,7 @@ struct Filename
 {
     QString path;
     QString name; //< Full file name without extension.
-    FileExtension extension;
+    FileExtension extension = FileExtension::mkv;
 
     static Filename parse(const QString& filename);
 

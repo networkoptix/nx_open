@@ -107,7 +107,7 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 
     Results results;
 
-    if (!FileExtensionUtils::isExecutable(settings.fileName.extension))
+    if (FileExtensionUtils::isExecutable(settings.fileName.extension))
     {
         results.set(int(Result::transcodingInBinaryIsNotSupported));
         if (exeFileIsTooBig(settings.mediaResource, durationMs))
