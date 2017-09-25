@@ -3,6 +3,8 @@
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkReply>
+#include <QtGui/QContextMenuEvent>
+#include <QtWebKitWidgets/QWebFrame>
 
 #include <api/app_server_connection.h>
 
@@ -280,11 +282,47 @@ void QnCameraAdvancedSettingsWidget::hideEvent(QHideEvent *event)
     ui->webView->setContent(tr("Loading...").toUtf8());
 }
 
+bool QnCameraAdvancedSettingsWidget::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched != ui->webView || event->type() != QEvent::ContextMenu)
+        return base_type::eventFilter(watched, event);
+
+    const auto page = ui->webView->page();
+    if (!page)
+        return base_type::eventFilter(watched, event);
+
+    const auto frame = page->mainFrame();
+    if (!frame)
+        return base_type::eventFilter(watched, event);
+
+    const auto menuEvent = dynamic_cast<QContextMenuEvent*>(event);
+    if (!menuEvent)
+        return base_type::eventFilter(watched, event);
+
+    const auto hitTest = frame->hitTestContent(menuEvent->pos());
+
+    const auto policy = hitTest.linkUrl().isEmpty()
+        ? Qt::DefaultContextMenu
+        : Qt::ActionsContextMenu; //< Special context menu for links.
+
+    ui->webView->setContextMenuPolicy(policy);
+    return base_type::eventFilter(watched, event);
+}
+
 void QnCameraAdvancedSettingsWidget::initWebView()
 {
     NxUi::setupWebViewStyle(ui->webView);
+
+    ui->webView->installEventFilter(this);
+
     m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
+
+    // Special actions list for context menu for links.
+    ui->webView->insertActions(nullptr, QList<QAction*>()
+       << ui->webView->pageAction(QWebPage::OpenLink)
+       << ui->webView->pageAction(QWebPage::Copy)
+       << ui->webView->pageAction(QWebPage::CopyLinkToClipboard));
 
     ui->webView->setContent(tr("Loading...").toUtf8());
 

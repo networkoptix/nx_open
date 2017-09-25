@@ -76,12 +76,15 @@ private:
     void setWidget(QnMediaResourceWidget* widget);
     void setItemUnderMouse(QGraphicsWidget* item);
 
+    void updateButtonUnderCursor(QWidget* viewport, QMouseEvent* event);
+
 private:
     QBrush m_brush;
     QPen m_pen;
     QPointer<SelectionItem> m_selectionItem;
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QGraphicsWidget> m_itemUnderMouse;
+    QPointer<QGraphicsWidget> m_buttonUnderMouse;
     bool m_selectionStartedEmitted;
     bool m_isClick;
     Qt::KeyboardModifiers m_selectionModifiers;

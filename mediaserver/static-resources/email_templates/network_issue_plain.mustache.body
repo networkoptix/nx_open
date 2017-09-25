@@ -1,4 +1,4 @@
 {{&event}}
-{{aggregated}}
+{{#aggregated}}
 {{&source}} ({{&sourceIp}}) {{&reason}} {{&timestampDate}} {{&timestampTime}}
 {{/aggregated}}

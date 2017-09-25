@@ -430,6 +430,11 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, request_result_is_reported_even_if_c
     this->thenRequestFailureIsReported();
 }
 
+// TODO: Patch gtest REGISTER_TYPED_TEST_CASE_P instead.
+#if defined(__GCC__)
+    #pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
 REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
@@ -441,6 +446,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     request_scheduled_after_connection_forcibly_closed,
     scheduled_request_is_completed_after_reconnect,
     request_result_is_reported_even_if_connect_always_fails);
+
 
 } // namespace test
 } // namespace stun
