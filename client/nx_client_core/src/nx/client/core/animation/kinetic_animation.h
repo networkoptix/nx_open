@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QPointF>
 
 #include "kinetic_helper.h"

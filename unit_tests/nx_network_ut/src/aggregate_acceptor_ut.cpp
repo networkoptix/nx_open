@@ -10,6 +10,20 @@ namespace test {
 
 // TODO: #ak Move here corresponding tests from MultipleServerSocket tests.
 
+namespace {
+
+class DirectAcceptorStub:
+    public AcceptorStub
+{
+public:
+    virtual void acceptAsync(AcceptCompletionHandler handler) override
+    {
+        handler(SystemError::timedOut, nullptr);
+    }
+};
+
+} // namespace
+
 class AggregateAcceptor:
     public ::testing::Test
 {
@@ -18,12 +32,12 @@ protected:
     {
         constexpr int testAcceptorCount = 7;
         for (int i = 0; i < testAcceptorCount; ++i)
-        {
-            auto acceptor = std::make_unique<AcceptorStub>();
-            acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
-            m_acceptorStubs.push_back(acceptor.get());
-            m_aggregateAcceptor.add(std::move(acceptor));
-        }
+            addAcceptor(std::make_unique<AcceptorStub>());
+    }
+
+    void givenDirectAcceptor()
+    {
+        addAcceptor(std::make_unique<DirectAcceptorStub>());
     }
 
     void whenRemovingAnyAcceptorByPointer()
@@ -42,16 +56,58 @@ protected:
         m_aggregateAcceptor.removeAt(index);
     }
 
+    void whenAcceptInitiated()
+    {
+        using namespace std::placeholders;
+
+        m_aggregateAcceptor.acceptAsync(
+            std::bind(&AggregateAcceptor::onAccepted, this, _1, _2));
+    }
+
+    void thenAcceptHasProvidedResult()
+    {
+        m_acceptResults.pop();
+    }
+
+    void thenOtherAcceptorsWereNotStarted()
+    {
+        for (const auto& acceptor: m_acceptorStubs)
+        {
+            ASSERT_FALSE(acceptor->isAsyncAcceptInProgress());
+        }
+    }
+
     void thenAcceptorIsFreed()
     {
         ASSERT_EQ(m_acceptorToRemove, m_removedAcceptorsQueue.pop());
     }
 
 private:
+    struct AcceptResult
+    {
+        SystemError::ErrorCode systemErrorCode;
+        std::unique_ptr<AbstractStreamSocket> connection;
+    };
+
     utils::SyncQueue<AcceptorStub*> m_removedAcceptorsQueue;
     network::AggregateAcceptor m_aggregateAcceptor;
     std::vector<AcceptorStub*> m_acceptorStubs;
     AcceptorStub* m_acceptorToRemove = nullptr;
+    nx::utils::SyncQueue<AcceptResult> m_acceptResults;
+
+    void addAcceptor(std::unique_ptr<AcceptorStub> acceptor)
+    {
+        acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
+        m_acceptorStubs.push_back(acceptor.get());
+        m_aggregateAcceptor.add(std::move(acceptor));
+    }
+
+    void onAccepted(
+        SystemError::ErrorCode systemErrorCode,
+        std::unique_ptr<AbstractStreamSocket> connection)
+    {
+        m_acceptResults.push({systemErrorCode, std::move(connection)});
+    }
 };
 
 TEST_F(AggregateAcceptor, remove_by_pointer)
@@ -66,6 +122,17 @@ TEST_F(AggregateAcceptor, remove_by_index)
     givenMultipleAcceptors();
     whenRemovingAnyAcceptorByIndex();
     thenAcceptorIsFreed();
+}
+
+TEST_F(AggregateAcceptor, acceptor_invokes_handler_within_acceptAsync)
+{
+    givenDirectAcceptor();
+    givenMultipleAcceptors();
+
+    whenAcceptInitiated();
+
+    thenAcceptHasProvidedResult();
+    thenOtherAcceptorsWereNotStarted();
 }
 
 } // namespace test

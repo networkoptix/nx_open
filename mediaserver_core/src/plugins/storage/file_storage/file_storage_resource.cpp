@@ -216,10 +216,10 @@ QIODevice* QnFileStorageResource::open(
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)),
-            ioBlockSize,
-            ffmpegBufferSize,
-            ffmpegMaxBufferSize,
-            getId()));
+                ioBlockSize,
+                ffmpegBufferSize,
+                ffmpegMaxBufferSize,
+                getId()));
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))
         return 0;
@@ -869,7 +869,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     m_writeCapCached = testWriteCapInternal(); // update cached value periodically
     // write check fail is a cause to set dirty to true, thus enabling
     // remount attempt in initOrUpdate()
-    if (!m_writeCapCached)
+    if (!m_writeCapCached.get())
     {
         NX_LOG("[initOrUpdate] write test file failed", cl_logDEBUG2);
         m_valid = false;
@@ -905,7 +905,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
     else
     {
         qint64 maxSpaceLimit = local ? kMaxLocalStorageSpaceLimit : kMaxNasStorageSpaceLimit;
-        if (baseSpaceLimit > maxSpaceLimit) //< User explicitely set large spaceLimit, let's hope he knows what he's doing.
+        if (baseSpaceLimit > maxSpaceLimit) //< User explicitly set large spaceLimit, let's hope he knows what he's doing.
             return baseSpaceLimit;
         return qMin(maxSpaceLimit, qMax(m_cachedTotalSpace / kMaxSpaceLimitRatio, baseSpaceLimit));
     }

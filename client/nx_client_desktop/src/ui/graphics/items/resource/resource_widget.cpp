@@ -27,6 +27,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <ui/common/cursor_cache.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topics.h>
@@ -57,6 +59,8 @@
 #include <ui/style/nx_style.h>
 #include <nx/utils/string.h>
 
+using namespace nx::client::desktop::ui;
+
 namespace {
 const qreal kButtonsSize = 24.0;
 
@@ -72,8 +76,6 @@ const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
 /** Background color for overlay panels. */
 
 const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
-
-const qreal kSelectionOpacity = 0.2;
 
 const float noAspectRatio = -1.0;
 
@@ -103,6 +105,8 @@ bool itemBelongsToValidLayout(QnWorkbenchItem *item)
             && item->layout()->resource()->resourcePool()
             && !item->layout()->resource()->getParentId().isNull());
 }
+
+
 } // anonymous namespace
 
 // -------------------------------------------------------------------------- //
@@ -151,6 +155,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     setupHud();
+    setupSelectionOverlay();
     createButtons();
 
     executeDelayedParented([this]() { updateHud(false); }, 0, this);
@@ -165,13 +170,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
         [this](bool animated)
         {
-            const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
-            setOverlayWidgetVisible(m_statusOverlay, !isEmptyOverlay, animated);
+            const auto visibility = (m_statusController->statusOverlay() == Qn::EmptyOverlay)
+                ? Invisible
+                : Visible;
+            setOverlayWidgetVisibility(m_statusOverlay, visibility, animated);
             updateOverlayButton();
         });
 
-    addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
-    setOverlayWidgetVisible(m_statusOverlay, false, false);
+    addOverlayWidget(m_statusOverlay, detail::OverlayParams(Invisible, true, false, StatusLayer));
 
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
@@ -188,7 +194,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
 
     /* Videowall license changes helper */
-    auto videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
+    auto videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(commonModule(), this);
     connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         [this]
         {
@@ -213,7 +219,7 @@ QnResourceWidget::~QnResourceWidget()
     ensureAboutToBeDestroyedEmitted();
 }
 
-//TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
+// TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::setupHud()
 {
     addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, false, InfoLayer));
@@ -222,6 +228,11 @@ void QnResourceWidget::setupHud()
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->position(), false, /*animate=*/false);
+}
+
+void QnResourceWidget::setupSelectionOverlay()
+{
+    addOverlayWidget(new SelectionWidget(this), {Visible, false, false, SelectionLayer});
 }
 
 void QnResourceWidget::createButtons()
@@ -545,7 +556,32 @@ QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
 
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
-    QSizeF result = base_type::sizeHint(which, constraint);
+    QSizeF result;
+    switch (which)
+    {
+        case Qt::MinimumSize:
+        {
+            static const qreal kMinPartOfCell = 0.25;
+            static const qreal kMinimalWidth = qnGlobals->workbenchUnitSize() * kMinPartOfCell;
+            static const qreal kMinimalHeight = kMinimalWidth
+                / qnGlobals->defaultLayoutCellAspectRatio();
+            result = QSizeF(kMinimalWidth, kMinimalHeight);
+            break;
+        }
+        case Qt::MaximumSize:
+        {
+            static const int kMaxCells = 64;
+            static const qreal kMaximalWidth = qnGlobals->workbenchUnitSize() * kMaxCells;
+            static const qreal kMaximalHeight = kMaximalWidth
+                / qnGlobals->defaultLayoutCellAspectRatio();
+            result = QSizeF(kMaximalWidth, kMaximalHeight);
+            break;
+        }
+
+        default:
+            result = base_type::sizeHint(which, constraint);
+            break;
+    }
 
     if (!hasAspectRatio())
         return result;
@@ -877,7 +913,9 @@ bool QnResourceWidget::isHovered() const
 // -------------------------------------------------------------------------- //
 // Painting
 // -------------------------------------------------------------------------- //
-void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+void QnResourceWidget::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
 {
     const bool animate = display()->animationAllowed();
 
@@ -902,9 +940,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
         /* Draw foreground. */
         paintChannelForeground(painter, i, paintRect);
-
-        /* Draw selected / not selected overlay. */
-        paintSelection(painter, paintRect);
     }
 
     /* Update overlay. */
@@ -912,8 +947,14 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if (renderStatus == Qn::NewFrameRendered)
         m_lastNewFrameTimeMSec = QDateTime::currentMSecsSinceEpoch();
     updateStatusOverlay(animate);
-
     emit painted();
+}
+
+void QnResourceWidget::paintWindowFrame(QPainter* /*painter*/,
+    const QStyleOptionGraphicsItem* /*option*/,
+    QWidget* /*widget*/)
+{
+    // Skip standard implementation.
 }
 
 void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &)
@@ -950,72 +991,12 @@ void QnResourceWidget::updateSelectedState()
     emit selectionStateChanged(m_selectionState);
 }
 
-qreal QnResourceWidget::calculateFrameWidth() const
-{
-    static const auto kSelectedFrameWidth = 1;
-    static const auto kNormalFrameWidth = 2;
-    return (m_selectionState == SelectionState::selected
-        ? kSelectedFrameWidth
-        : kNormalFrameWidth);
-}
-
-QColor QnResourceWidget::calculateFrameColor() const
-{
-    switch (m_selectionState)
-    {
-        case SelectionState::focusedAndSelected:
-        case SelectionState::selected:
-            return qnNxStyle->mainColor(QnNxStyle::Colors::kBrand);
-        case SelectionState::focused:
-            return (m_frameDistinctionColor.isValid()
-                ? m_frameDistinctionColor.lighter()
-                : qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(4));
-        case SelectionState::inactiveFocused:
-            return (m_frameDistinctionColor.isValid()
-                ? m_frameDistinctionColor
-                : qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(3));
-        default:
-            return (m_frameDistinctionColor.isValid()
-                ? m_frameDistinctionColor
-                : Qt::transparent);
-    }
-}
-
-void QnResourceWidget::paintWindowFrame(
-    QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
-    QWidget* /*widget*/)
-{
-    const auto paintRect = option->exposedRect & rect();
-    if (!paintRect.isEmpty())
-        painter->fillRect(paintRect, palette().window());
-
-    if (qFuzzyIsNull(m_frameOpacity))
-        return;
-
-    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
-    static const int kFramePadding = 1;
-    QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
-        -calculateFrameWidth(), -kFramePadding); //< negative values for outer frame
-}
-
 Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,
     const QRectF& /*channelRect*/, const QRectF& paintRect)
 {
-    painter->fillRect(paintRect, palette().color(QPalette::Window));
+    const PainterTransformScaleStripper scaleStripper(painter);
+    painter->fillRect(scaleStripper.mapRect(paintRect), palette().color(QPalette::Window));
     return Qn::NewFrameRendered;
-}
-
-void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
-{
-    if (!isSelected())
-        return;
-
-    if (!(m_options & DisplaySelection))
-        return;
-
-    painter->fillRect(rect,
-        toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), kSelectionOpacity));
 }
 
 float QnResourceWidget::defaultAspectRatio() const

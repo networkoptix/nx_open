@@ -9,7 +9,7 @@ namespace {
 
 static const int IO_BUFFER_SIZE = 1024 * 1024;
 
-//TODO: #GDM #low move out to common place with launcher.exe
+// TODO: #GDM #low move out to common place with launcher.exe
 static const qint64 MAGIC = 0x73a0b934820d4055ll;
 
 bool appendFile(QFile& dstFile, const QString& srcFileName)
@@ -77,7 +77,12 @@ void populateFileListRecursive(QSet<QString>& result, const QDir& dir,
 QSet<QString> calculateFileList(const QDir& sourceRoot)
 {
     static const QStringList kNameFilters{lit("*.exe"), lit("*.dll")};
-    static const QStringList kExtraDirs{lit("vox"), lit("fonts"), lit("qml")};
+    static const QStringList kExtraDirs{
+        lit("vox"), 
+        lit("fonts"), 
+        lit("qml"),
+        lit("help")};
+
     static const QStringList kIgnoredFiles{
 #ifdef _DEBUG
         lit("mediaserver.exe"),

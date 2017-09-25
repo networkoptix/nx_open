@@ -54,7 +54,7 @@ public:
 
     QStringList eventDetails(const EventParameters &params) const;
 
-    //TODO: #vasilenko isPublic field is not used, why?
+    // TODO: #vasilenko isPublic field is not used, why?
     QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic) const;
 
     QString toggleStateToString(EventState state) const;
@@ -95,6 +95,9 @@ public:
     static QString defaultSoftwareTriggerName();
     static QString getSoftwareTriggerName(const QString& id);
     static QString getSoftwareTriggerName(const EventParameters& params);
+
+    QString getAnalyticsSdkEventName(const EventParameters& params,
+        const QString& locale = QString()) const;
 };
 
 } // namespace event

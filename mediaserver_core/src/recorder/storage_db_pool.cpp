@@ -2,17 +2,14 @@
 
 #include "media_server/serverutil.h"
 #include "utils/common/util.h"
+#include <common/common_module.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <nx/utils/log/log.h>
 
-QnStorageDbPool::QnStorageDbPool(const QnUuid& moduleGuid):
-    m_moduleGuid(moduleGuid)
-{
-}
 
-QString QnStorageDbPool::getLocalGuid(const QnUuid& moduleGuid)
+QnStorageDbPool::QnStorageDbPool(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
-   return moduleGuid.toSimpleString();
 }
 
 QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
@@ -29,9 +26,11 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
                     .arg(storage->getUrl()), cl_logWARNING);
             return sdb;
         }
-        QString simplifiedGUID = getLocalGuid(m_moduleGuid);
+        QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
         QString dbPath = storage->getUrl();
-        QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
+        QString fileName =
+            closeDirPath(dbPath) +
+            QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
         sdb = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
         if (sdb->open(fileName)) {

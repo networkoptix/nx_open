@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtGui/QImageReader>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
@@ -47,9 +48,14 @@ void QnThreadedImageLoaderPrivate::setOutput(const QString &filename) {
     m_outputFilename = filename;
 }
 
-void QnThreadedImageLoaderPrivate::start() {
-    if (!m_inputFilename.isEmpty()) {
-        m_input.load(m_inputFilename);
+void QnThreadedImageLoaderPrivate::start()
+{
+    if (!m_inputFilename.isEmpty())
+    {
+        // TODO: #ynikitenkov Store image file in layout with correct extension
+        QImageReader reader(m_inputFilename);
+        reader.setDecideFormatFromContent(true);
+        reader.read(&m_input);
     }
 
     QImage output = m_input;

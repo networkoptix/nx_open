@@ -94,20 +94,21 @@ void QnSelectResourcesDialogButton::at_clicked()
 {
     if (m_target == QnResourceSelectionDialog::Filter::users)
     {
-        SubjectSelectionDialog dialog(this);
+        // Dialog will be destroyed by delegate editor.
+        auto dialog = new SubjectSelectionDialog(this);
         auto ids = m_resources;
 
         // TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
-        dialog.setAllUsers(ids.remove(QnBusinessRuleViewModel::kAllUsersId));
-        dialog.setCheckedSubjects(ids);
+        dialog->setAllUsers(ids.remove(QnBusinessRuleViewModel::kAllUsersId));
+        dialog->setCheckedSubjects(ids);
 
         // TODO: #vkutin Hack till #3.2
         const bool isEmail = dynamic_cast<QnSendEmailActionDelegate*>(m_dialogDelegate) != nullptr;
-        dialog.setAllUsersSelectorEnabled(!isEmail);
+        dialog->setAllUsersSelectorEnabled(!isEmail);
 
         if (m_dialogDelegate)
         {
-            dialog.setUserValidator(
+            dialog->setUserValidator(
                 [this](const QnUserResourcePtr& user)
                 {
                     // TODO: #vkutin #3.2 This adapter is rather sub-optimal.
@@ -116,7 +117,7 @@ void QnSelectResourcesDialogButton::at_clicked()
         }
         else
         {
-            dialog.setRoleValidator(
+            dialog->setRoleValidator(
                 [this](const QnUuid& roleId)
                 {
                     return m_subjectValidation
@@ -124,7 +125,7 @@ void QnSelectResourcesDialogButton::at_clicked()
                         : QValidator::Acceptable;
                 });
 
-            dialog.setUserValidator(
+            dialog->setUserValidator(
                 [this](const QnUserResourcePtr& user)
                 {
                     return m_subjectValidation
@@ -139,39 +140,39 @@ void QnSelectResourcesDialogButton::at_clicked()
                 // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
                 if (m_dialogDelegate)
                 {
-                    dialog.showAlert(m_dialogDelegate->validationMessage(
-                        dialog.checkedSubjects()));
+                    dialog->showAlert(m_dialogDelegate->validationMessage(
+                        dialog->checkedSubjects()));
                 }
                 else
                 {
-                    dialog.showAlert(m_subjectValidation
-                        ? m_subjectValidation->calculateAlert(dialog.allUsers(),
-                            dialog.checkedSubjects())
+                    dialog->showAlert(m_subjectValidation
+                        ? m_subjectValidation->calculateAlert(dialog->allUsers(),
+                            dialog->checkedSubjects())
                         : QString());
                 }
             };
 
-        connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+        connect(dialog, &SubjectSelectionDialog::changed, this, updateAlert);
         updateAlert();
 
-        if (dialog.exec() != QDialog::Accepted)
+        if (dialog->exec() != QDialog::Accepted)
             return;
 
-        if (dialog.allUsers())
+        if (dialog->allUsers())
             m_resources = QSet<QnUuid>({ QnBusinessRuleViewModel::kAllUsersId });
         else
-            m_resources = dialog.checkedSubjects();
+            m_resources = dialog->checkedSubjects();
     }
     else
     {
-        QnResourceSelectionDialog dialog(m_target, this);
-        dialog.setSelectedResources(m_resources);
-        dialog.setDelegate(m_dialogDelegate);
+        auto dialog = new QnResourceSelectionDialog(m_target, this);
+        dialog->setSelectedResources(m_resources);
+        dialog->setDelegate(m_dialogDelegate);
 
-        if (dialog.exec() != QDialog::Accepted)
+        if (dialog->exec() != QDialog::Accepted)
             return;
 
-        m_resources = dialog.selectedResources();
+        m_resources = dialog->selectedResources();
     }
 
     emit commit();
@@ -285,7 +286,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         case Column::source:
         {
             QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-            //TODO: #GDM #Business server selection dialog?
+            // TODO: #GDM #Business server selection dialog?
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
             vms::event::EventType eventType = index.data(Qn::EventTypeRole).value<vms::event::EventType>();
@@ -293,6 +294,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
             else if (eventType == vms::event::cameraInputEvent)
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
+            else if (eventType == vms::event::analyticsSdkEvent)
+                btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAnalyticsPolicy>(btn));
 
             return btn;
         }

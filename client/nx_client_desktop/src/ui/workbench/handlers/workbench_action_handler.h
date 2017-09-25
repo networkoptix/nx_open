@@ -95,15 +95,11 @@ protected:
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
 
-    void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
-
     void openResourcesInNewWindow(const QnResourceList &resources);
 
     void openNewWindow(const QStringList &args);
 
     void rotateItems(int degrees);
-
-    void setResolutionMode(Qn::ResolutionMode resolutionMode);
 
     void setCurrentLayoutCellSpacing(Qn::CellSpacing spacing);
 
@@ -124,7 +120,6 @@ protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
-    void at_workbench_currentLayoutChanged();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
@@ -198,6 +193,8 @@ protected slots:
     void at_queueAppRestartAction_triggered();
     void at_selectTimeServerAction_triggered();
     void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
+
+    void at_convertCameraToEntropix_triggered();
 private:
     void notifyAboutUpdate();
 
@@ -241,7 +238,7 @@ private:
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
     * the user logs in. */
-    QList<MimeData> m_delayedDrops;
+    QList<QByteArray> m_delayedDrops;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;

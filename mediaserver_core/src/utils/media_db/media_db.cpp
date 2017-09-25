@@ -1,7 +1,8 @@
 #include <algorithm>
 #include "media_db.h"
-#include <nx/utils/log/log.h>
 #include <cerrno>
+
+#include <recorder/device_file_catalog.h>
 
 namespace nx
 {
@@ -22,7 +23,7 @@ QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(QDataStream* stream, Error *error)
+    RecordVisitor(FaultTolerantDataStream* stream, Error *error)
         : m_stream(stream),
           m_error(error)
     {}
@@ -64,11 +65,30 @@ public:
     }
 
 private:
-    QDataStream *m_stream;
+    FaultTolerantDataStream *m_stream;
     Error *m_error;
 };
 
 } // namespace <anonymous>
+
+
+int MediaFileOperation::getFileTypeIndex() const
+{
+    return ((part2 >> 0x3e) & 0x1) == 0
+        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
+        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
+}
+
+void MediaFileOperation::setFileTypeIndex(int fileTypeIndex)
+{
+    NX_ASSERT(
+        fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_NONE
+        || fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+
+    quint64 value = fileTypeIndex == DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION ? 0x0LL : 0x1LL;
+    part2 |= (value & 0x1) << 0x3e;
+}
+
 
 DbHelper::DbHelper(DbHelperHandler *const handler)
 : m_device(nullptr),

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <persistent_scheduler/persistent_scheduler.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
 
 namespace nx {
 namespace cdb {
@@ -30,6 +30,9 @@ public:
         m_executor(executor),
         m_scheduler(scheduler),
         m_functorId(functorId)
+    {}
+
+    void registerAsAnEventReceiver()
     {
         m_scheduler->registerEventReceiver(m_functorId, this);
     }

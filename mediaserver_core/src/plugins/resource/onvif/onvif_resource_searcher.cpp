@@ -218,9 +218,12 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
     if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
-        // Clarify resource type
         QString manufacturer = resource->getVendor();
         QString modelName = resource->getModel();
+
+        auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
+        if (resource->getMAC().isNull() && resData.value<bool>(lit("isMacAddressMandatory"), true))
+            return resList;
 
         const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(manufacturer, modelName);
         if (!forceOnvif)
@@ -244,9 +247,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             }
         }
 
-        auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
         auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
-
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
         QnUuid rt = m_informationFetcher->getOnvifResourceType(manufacturer, modelName);

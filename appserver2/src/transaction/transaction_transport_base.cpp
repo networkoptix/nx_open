@@ -40,6 +40,7 @@ namespace {
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
+static const int kMinServerVersionWithClientKeepAlive = 3031;
 
 } // namespace
 
@@ -82,8 +83,8 @@ static const int SOCKET_TIMEOUT = 1000 * 1000;
 //following value is for VERY slow networks and VERY large transactions (e.g., some large image)
     //Connection keep-alive timeout is not influenced by this value
 static const std::chrono::minutes kSocketSendTimeout(23);
-const char* QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
-const char* QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
+const char* const QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
+const char* const QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QnTransactionTransportBase::QnTransactionTransportBase(
     const QnUuid& localSystemId,
@@ -361,7 +362,7 @@ int QnTransactionTransportBase::keepAliveProbeCount() const
     return m_keepAliveProbeCount;
 }
 
-void QnTransactionTransportBase::addData(QByteArray data)
+void QnTransactionTransportBase::addDataToTheSendQueue(QByteArray data)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_base64EncodeOutgoingTransactions )
@@ -645,7 +646,7 @@ void QnTransactionTransportBase::onSomeBytesRead( SystemError::ErrorCode errorCo
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::onSomeBytesRead. errorCode = %1, bytesRead = %2").
         arg((int)errorCode).arg(bytesRead), cl_logDEBUG2 );
 
-    onSomeDataReceivedFromRemotePeer();
+    emit onSomeDataReceivedFromRemotePeer();
 
     QnMutexLocker lock( &m_mutex );
 
@@ -761,7 +762,7 @@ void QnTransactionTransportBase::receivedTransaction(
     const nx_http::HttpHeaders& headers,
     const QnByteArrayConstRef& tranData )
 {
-    onSomeDataReceivedFromRemotePeer();
+    emit onSomeDataReceivedFromRemotePeer();
 
     QnMutexLocker lock(&m_mutex);
 
@@ -1017,7 +1018,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
     DataToSend& dataCtx = m_dataToSend.front();
 
     if( m_base64EncodeOutgoingTransactions )
-        dataCtx.sourceData = dataCtx.sourceData.toBase64(); //TODO #ak should use streaming base64 encoder in addData method
+        dataCtx.sourceData = dataCtx.sourceData.toBase64(); //TODO #ak should use streaming base64 encoder in addDataToTheSendQueue method
 
     if( dataCtx.encodedSourceData.isEmpty() )
     {
@@ -1209,17 +1210,17 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
         client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
 
+    nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
+        client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
+
+    m_remotePeerEcProtoVersion =
+        ec2ProtoVersionIter == client->response()->headers.end()
+        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        : ec2ProtoVersionIter->second.toInt();
+
     if (!m_localPeer.isMobileClient())
     {
         //checking remote server protocol version
-        nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
-            client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
-
-        m_remotePeerEcProtoVersion =
-            ec2ProtoVersionIter == client->response()->headers.end()
-            ? nx_ec::INITIAL_EC2_PROTO_VERSION
-            : ec2ProtoVersionIter->second.toInt();
-
         if (m_localPeerProtocolVersion != m_remotePeerEcProtoVersion)
         {
             NX_LOG(lm("Cannot connect to server %1 because of different EC2 proto version. "
@@ -1375,7 +1376,9 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         }
 
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
-        if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
+        // Servers 3.1 and above sends keep-alive to the client
+        if (keepAliveHeaderIter != m_httpClient->response()->headers.end() && 
+            m_remotePeerEcProtoVersion >= kMinServerVersionWithClientKeepAlive)
         {
             m_remotePeerSupportsKeepAlive = true;
             nx_http::header::KeepAlive keepAliveHeader;
@@ -1412,8 +1415,8 @@ void QnTransactionTransportBase::at_httpClientDone( const nx_http::AsyncHttpClie
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
         arg((int)client->state()), cl_logDEBUG2 );
 
-    nx_http::AsyncHttpClient::State state = client->state();
-    if( state == nx_http::AsyncHttpClient::sFailed ) {
+    nx_http::AsyncClient::State state = client->state();
+    if( state == nx_http::AsyncClient::State::sFailed ) {
         cancelConnecting();
     }
 }

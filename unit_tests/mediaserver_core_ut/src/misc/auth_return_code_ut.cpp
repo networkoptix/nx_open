@@ -87,14 +87,14 @@ public:
         testServerReturnCode(
             userName,
             password,
-            nx_http::AsyncHttpClient::authDigest,
+            nx_http::AuthType::authDigest,
             nx_http::StatusCode::ok,
             boost::none);
     }
 
     void testServerReturnCodeForWrongPassword(
         const ec2::ApiUserData& userDataToUse,
-        nx_http::AsyncHttpClient::AuthType authType,
+        nx_http::AuthType authType,
         int expectedStatusCode,
         Qn::AuthResult expectedAuthResult)
     {
@@ -142,7 +142,7 @@ public:
     void testServerReturnCode(
         const QString& login,
         const QString& password,
-        nx_http::AsyncHttpClient::AuthType authType,
+        nx_http::AuthType authType,
         int expectedStatusCode,
         boost::optional<Qn::AuthResult> expectedAuthResult)
     {
@@ -193,7 +193,7 @@ TEST_F(AuthReturnCodeTest, authWhileRestart)
     mediaServerLauncher->startAsync();
     testServerReturnCodeForWrongPassword(
         userData,
-        nx_http::AsyncHttpClient::authBasic,
+        nx_http::AuthType::authBasic,
         nx_http::StatusCode::forbidden,
         Qn::Auth_Forbidden);
 }
@@ -203,7 +203,7 @@ TEST_F(AuthReturnCodeTest, noCloudConnect)
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         userData,
-        nx_http::AsyncHttpClient::authDigest,
+        nx_http::AuthType::authDigest,
         nx_http::StatusCode::unauthorized,
         Qn::Auth_CloudConnectError);
 
@@ -249,7 +249,7 @@ TEST_F(AuthReturnCodeTest, disabledUser)
     testServerReturnCode(
         userCredentials[0],
         userCredentials[1],
-        nx_http::AsyncHttpClient::authDigest,
+        nx_http::AuthType::authDigest,
         nx_http::StatusCode::unauthorized,
         Qn::Auth_DisabledUser);
 }
@@ -259,14 +259,14 @@ TEST_F(AuthReturnCodeTest, noLdapConnect)
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         ldapUserWithEmptyDigest,
-        nx_http::AsyncHttpClient::authBasicAndDigest,
+        nx_http::AuthType::authBasicAndDigest,
         nx_http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
 
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         ldapUserWithFilledDigest,
-        nx_http::AsyncHttpClient::authDigest,
+        nx_http::AuthType::authDigest,
         nx_http::StatusCode::unauthorized,
         Qn::Auth_LDAPConnectError);
 }

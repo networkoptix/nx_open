@@ -31,7 +31,7 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>Máy chủ Hệ thống</translation>
     </message>
   </context>
   <context>
@@ -85,17 +85,17 @@
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>Gấp đôi bộ nhớ đệm</translation>
     </message>
     <message>
       <location/>
       <source>Disable only if the client takes too much CPU</source>
-      <translation type="unfinished">Disable only if the client takes too much CPU</translation>
+      <translation>Chỉ vô hiệu hoá khi máy trạm dùng quá nhiều CPU</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>Độ dài lớn nhất của bộ đệm khi xem trực tuyến</translation>
     </message>
     <message>
       <location/>
@@ -110,7 +110,17 @@
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Đặt lại Tất cả Cảnh báo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation type="unfinished">Disable blur</translation>
     </message>
   </context>
   <context>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>ngay</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Lưu trữ bên ngoài mới...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation type="unfinished">Version:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>kiểm tra</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation type="unfinished">Not Checked</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation type="unfinished">Get Installed Versions</translation>
     </message>
   </context>
   <context>
@@ -219,7 +201,7 @@
     <message>
       <location/>
       <source>Sessions</source>
-      <translation type="unfinished">Sessions</translation>
+      <translation>Phiên</translation>
     </message>
     <message>
       <location/>
@@ -244,7 +226,7 @@
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>Tất cả các máy chủ đang ngoại tuyến. Dữ liệu kiểm tra không có sẵn.</translation>
     </message>
   </context>
   <context>
@@ -267,22 +249,22 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
+      <translation>Giới hạn tốc độ bit có thể dẫn đến thất bại sao lưu.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Kết thúc</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Bắt đầu</translation>
     </message>
   </context>
   <context>
@@ -290,7 +272,7 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation type="unfinished">Backup Settings</translation>
+      <translation>Cài đặt sao lưu</translation>
     </message>
     <message>
       <location/>
@@ -305,7 +287,7 @@
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>Chỉ sao lưu khi tiếp tục ghi. Quá trình sao lưu sẽ bỏ qua các cảnh quay hiện có.</translation>
     </message>
     <message>
       <location/>
@@ -315,12 +297,12 @@
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation type="unfinished">Backup Archive From</translation>
+      <translation>Lưu trữ sao lưu từ</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>Chất lượng sao lưu</translation>
     </message>
   </context>
   <context>
@@ -338,7 +320,7 @@
     <message>
       <location/>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>Thẻ:</translation>
     </message>
     <message>
       <location/>
@@ -381,7 +363,7 @@
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>Danh sách thẻ phân chia bằng dấu phẩy</translation>
     </message>
   </context>
   <context>
@@ -390,11 +372,6 @@
       <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>Làm mới</translation>
-    </message>
-    <message>
-      <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Tất cả máy chủ đang offline. Logs là không có sẵn.</translation>
     </message>
     <message>
       <location/>
@@ -442,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>Tại camera</translation>
     </message>
   </context>
   <context>
@@ -460,12 +437,17 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Event Rules</translation>
     </message>
     <message>
       <location/>
       <source>Event Log...</source>
       <translation>ghi sự kiện ...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Kiểm tra</translation>
     </message>
   </context>
   <context>
@@ -533,12 +515,12 @@
     <message>
       <location/>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>Bắt đầu IP</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>Kết thúc IP</translation>
     </message>
     <message>
       <location/>
@@ -563,7 +545,7 @@
     <message>
       <location/>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Quét</translation>
     </message>
     <message>
       <location/>
@@ -588,13 +570,8 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
-      <translation type="unfinished">Advanced settings are unavailable</translation>
+      <translation>Cài đặt nâng cao không khả dụng</translation>
     </message>
   </context>
   <context>
@@ -682,12 +659,12 @@
     <message>
       <location/>
       <source>TCP</source>
-      <translation type="unfinished">TCP</translation>
+      <translation>TCP</translation>
     </message>
     <message>
       <location/>
       <source>UDP</source>
-      <translation type="unfinished">UDP</translation>
+      <translation>UDP</translation>
     </message>
     <message>
       <location/>
@@ -702,47 +679,47 @@
     <message>
       <location/>
       <source>Motion detection control</source>
-      <translation type="unfinished">Motion detection control</translation>
+      <translation>Điều khiển phát hiện chuyển động</translation>
     </message>
     <message>
       <location/>
       <source>Force motion detection for stream:</source>
-      <translation type="unfinished">Force motion detection for stream:</translation>
+      <translation>Phát hiện chuyển động cho luồng:</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</translation>
+      <translation>Tính tốc độ bit mỗi GOP thay vì bitrate mỗi giây (Nó sẽ tăng tốc độ bit cho camera)</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera streams and profiles settings</source>
-      <translation type="unfinished">Keep camera streams and profiles settings</translation>
+      <translation>Giữ các luồng camera và cài đặt cấu hình</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;Cho phép Hệ thống để tối ưu hóa cài đặt camera&quot; bị vô hiệu trong Quản trị Hệ thống.</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation type="unfinished">Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</translation>
+      <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động hiệu năng vào hệ thống của bạn.</translation>
     </message>
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>Điều khiển PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Vô hiệu hoá cài đặt trước, sử dụng thay thế hệ thống cài đặt trước</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Cảnh báo! Cài đặt gốc camera trước sẽ không có sẵn.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Id đầu vào</translation>
     </message>
   </context>
   <context>
@@ -758,7 +735,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Thêm thiết bị...</translation>
     </message>
   </context>
   <context>
@@ -776,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Id đầu ra:</translation>
     </message>
   </context>
   <context>
@@ -789,7 +766,7 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
@@ -839,7 +816,7 @@
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Trước khi ghi</translation>
     </message>
     <message>
       <location/>
@@ -859,12 +836,12 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Kích hoạt bản quyền...</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation type="unfinished">Show Quality</translation>
+      <translation>Hiển thị Chất lượng</translation>
     </message>
     <message>
       <location/>
@@ -874,7 +851,7 @@
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>Sao chép Lịch trình</translation>
     </message>
     <message>
       <location/>
@@ -884,7 +861,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation type="unfinished">Panic Mode:</translation>
+      <translation>Chế độ pnic:</translation>
     </message>
     <message>
       <location/>
@@ -897,7 +874,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Đổi mật khẩu</translation>
     </message>
   </context>
   <context>
@@ -905,12 +882,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Giữ trạng thái đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -1005,7 +977,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Event Rules...</translation>
     </message>
   </context>
   <context>
@@ -1038,12 +1010,12 @@
     <message>
       <location/>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Kiểu Nội dung</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation type="unfinished">HTTP URL</translation>
+      <translation>URL HTTP</translation>
     </message>
   </context>
   <context>
@@ -1102,7 +1074,7 @@
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation type="unfinished">Fisheye Dewarping</translation>
+      <translation>Chế độ xem hình rộng camera 360</translation>
     </message>
     <message>
       <location/>
@@ -1112,17 +1084,17 @@
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
+      <translation>Chân đế chỉnh góc:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Y Offset</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>X Offset</translation>
     </message>
     <message>
       <location/>
@@ -1132,7 +1104,7 @@
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Xem kiểu elip</translation>
     </message>
   </context>
   <context>
@@ -1170,17 +1142,17 @@
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Thư mục chưa media</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Đầu vào âm thanh</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>Nguồn đầu tiên</translation>
     </message>
     <message>
       <location/>
@@ -1190,12 +1162,12 @@
     <message>
       <location/>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Nguồn thứ hai</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Chạy ứng dụng khi máy tính khởi động lại</translation>
     </message>
   </context>
   <context>
@@ -1208,7 +1180,7 @@
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Sao lưu và khôi phục</translation>
     </message>
   </context>
   <context>
@@ -1221,12 +1193,12 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation type="unfinished">Aspect Ratio</translation>
+      <translation>Tỉ lệ hình ảnh</translation>
     </message>
     <message>
       <location/>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Quay</translation>
     </message>
   </context>
   <context>
@@ -1244,7 +1216,7 @@
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Không có hình ảnh</translation>
     </message>
   </context>
   <context>
@@ -1320,7 +1292,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>ldap(s)://host:port</source>
-      <translation type="unfinished">ldap(s)://host:port</translation>
+      <translation>ldap (s): // host: port</translation>
     </message>
     <message>
       <location/>
@@ -1340,12 +1312,12 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>URL Máy chủ</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation type="unfinished">Admin DN</translation>
+      <translation>Quản trị DN</translation>
     </message>
     <message>
       <location/>
@@ -1355,12 +1327,12 @@
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>Cơ sở tìm kiếm</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
+      <translation>Bộ lọc Tìm kiếm</translation>
     </message>
   </context>
   <context>
@@ -1383,12 +1355,12 @@
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
+      <translation>Gán vai trò của người dùng</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
+      <translation>Vô hiệu hóa người dùng nhập</translation>
     </message>
   </context>
   <context>
@@ -1411,17 +1383,17 @@
     <message>
       <location/>
       <source>License Key:</source>
-      <translation type="unfinished">License Key:</translation>
+      <translation>Mã bản quyền:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Tính năng</translation>
     </message>
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Khóa Id phần cứng:</translation>
     </message>
   </context>
   <context>
@@ -1444,12 +1416,12 @@
     <message>
       <location/>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>Chi tiết...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>Phần mềm được cấp phép</translation>
     </message>
   </context>
   <context>
@@ -1462,7 +1434,7 @@
     <message>
       <location/>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>Vấn đề cấp phép:</translation>
     </message>
   </context>
   <context>
@@ -1471,16 +1443,6 @@
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
       <translation>Kích hoạt bằng tay</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Dán từ Clipboard</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Sao chép vào Clipboard</translation>
     </message>
     <message>
       <location/>
@@ -1510,7 +1472,7 @@
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>Kích hoạt Internet</translation>
     </message>
     <message>
       <location/>
@@ -1520,7 +1482,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Khóa bản quyền không hợp lệ</translation>
     </message>
     <message>
       <location/>
@@ -1530,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Id phần cứng</translation>
     </message>
   </context>
   <context>
@@ -1543,7 +1505,7 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Kích hoạt bản quyền...</translation>
     </message>
   </context>
   <context>
@@ -1574,12 +1536,12 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Máy chủ</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Cổng</translation>
     </message>
     <message>
       <location/>
@@ -1637,7 +1599,7 @@
     <message>
       <location/>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Chế độ</translation>
     </message>
     <message>
       <location/>
@@ -1647,17 +1609,17 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Hiển thị thông tin bổ sung trong sơ đồ cây</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
       <translation>giây</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Showreel cycle</source>
+      <translation>Chu trình ShowEel</translation>
     </message>
   </context>
   <context>
@@ -1665,7 +1627,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Không hiện lại thông báo này một lần nữa</translation>
     </message>
   </context>
   <context>
@@ -1726,7 +1688,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Người dùng xem</translation>
     </message>
   </context>
   <context>
@@ -1744,7 +1706,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Bắt buộc</translation>
     </message>
   </context>
   <context>
@@ -1762,7 +1724,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Sự kiện</translation>
     </message>
   </context>
   <context>
@@ -1833,7 +1795,7 @@
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Phím nóng:</translation>
     </message>
   </context>
   <context>
@@ -1854,7 +1816,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>Chọn phiên bản riêng</translation>
     </message>
   </context>
   <context>
@@ -1862,7 +1824,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bookmark</translation>
     </message>
   </context>
   <context>
@@ -1870,7 +1832,7 @@
     <message>
       <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>Đang cài đặt phiên bản tương thích...</translation>
     </message>
   </context>
   <context>
@@ -1901,7 +1863,7 @@
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Cho phép xem giao diện kiểu ô gạch</translation>
     </message>
   </context>
   <context>
@@ -1909,17 +1871,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Đăng nhập</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Duy trì đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -1960,7 +1917,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation type="unfinished">The new System will have password and name from System:</translation>
+      <translation>Hệ thống mới sẽ có mật khẩu và tên Hệ thống:</translation>
     </message>
   </context>
   <context>
@@ -2019,7 +1976,7 @@
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>Loại bỏ tùy chọn kết nối này có thể dẫn đến sự cố hệ thống.</translation>
     </message>
   </context>
   <context>
@@ -2042,22 +1999,22 @@
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>Đang cập nhật tới...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>Đã sao chép liên kết</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>Bạn đã cài đặt phiên bản mới nhất</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>Áp dụng cập nhật hệ thống vào cuối tuần không được khuyến khích.</translation>
     </message>
   </context>
   <context>
@@ -2098,15 +2055,7 @@
     <message>
       <location/>
       <source>Warning: file with the same name already exists!</source>
-      <translation type="unfinished">Warning: file with the same name already exists!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>máy chủ cập nhật</translation>
+      <translation>Cảnh báo: tệp có cùng tên đã tồn tại!</translation>
     </message>
   </context>
   <context>
@@ -2134,7 +2083,7 @@
     <message>
       <location/>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>Tìm kiếm người dùng</translation>
     </message>
     <message>
       <location/>
@@ -2144,7 +2093,7 @@
     <message>
       <location/>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Vô hiệu hóa</translation>
     </message>
     <message>
       <location/>
@@ -2154,7 +2103,7 @@
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Chỉnh sửa Vai trò...</translation>
     </message>
   </context>
   <context>
@@ -2198,7 +2147,7 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
@@ -2256,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Một máy tính có cấu hình mạnh được khuyến khích sử dụng để cho chất lượng và độ phân giải &quot;Best&amp;quot.</translation>
     </message>
     <message>
       <location/>
@@ -2322,7 +2271,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Nói với người dùng</translation>
     </message>
   </context>
   <context>
@@ -2343,7 +2292,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
@@ -2368,7 +2317,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Cổng</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2399,7 @@
     <message>
       <location/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
@@ -2495,7 +2444,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -2525,7 +2474,7 @@
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Âm thanh</translation>
     </message>
     <message>
       <location/>
@@ -2565,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2662,7 +2611,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Khả dụng cho</translation>
     </message>
     <message>
       <location/>
@@ -2672,7 +2621,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Biểu tượng</translation>
     </message>
   </context>
   <context>
@@ -2680,12 +2629,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>Thống kê hiện tại</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>Dự báo cho sử dụng lưu trữ đầy đủ</translation>
     </message>
     <message>
       <location/>
@@ -2695,7 +2644,7 @@
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>Server đang ẩn. Thống kê không có sẵn.</translation>
     </message>
   </context>
   <context>
@@ -2718,32 +2667,32 @@
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Nơi lưu trữ</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Lưu trữ Reindex</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>Reindexing sao lưu</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation type="unfinished">Backup Archive</translation>
+      <translation>Lưu trữ sao lưu</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation type="unfinished">Backup Settings...</translation>
+      <translation>Cài đặt sao lưu...</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Sẽ không ghi hình khi vô hiệu hóa thiết bị lưu trữ. Tuy nhiên, xóa các video cũ từ bộ nhớ vấn được.</translation>
     </message>
   </context>
   <context>
@@ -2787,22 +2736,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Vai trò</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Hiển thị tất cả người dùng</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Chọn Người dùng</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Không có gì phù hợp với tìm kiếm của bạn.</translation>
     </message>
   </context>
   <context>
@@ -2833,12 +2782,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation type="unfinished">System Time</translation>
+      <translation>Thời gian Hệ thống</translation>
     </message>
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Đồng bộ hóa thời gian với Internet</translation>
     </message>
   </context>
   <context>
@@ -2846,7 +2795,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Thay đổi mật khẩu...</translation>
     </message>
   </context>
   <context>
@@ -2864,7 +2813,7 @@
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
+      <translation>Xoá Vai trò</translation>
     </message>
   </context>
   <context>
@@ -2872,19 +2821,18 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
+      <translation>Vai trò Người dùng</translation>
     </message>
     <message>
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Chưa có vai trò người dùng tùy chỉnh nào được nêu ra. Nhấp vào nút &quot;Nhiệm vụ mới&quot; để tạo một role mới.</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <translation>Vai trò mới</translation>
     </message>
   </context>
   <context>
@@ -2892,17 +2840,17 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>Nhóm người dùng</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Vai trò</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Chỉnh sửa Vai trò...</translation>
     </message>
   </context>
   <context>

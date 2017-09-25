@@ -2,7 +2,11 @@
 
 #include <QtWidgets/QAction>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -21,6 +25,7 @@
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
+#include <nx/client/desktop/radass/radass_resource_manager.h>
 
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -39,8 +44,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>     //TODO: #GDM dependencies
-#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_export_handler.h>     // TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_videowall_handler.h>  // TODO: #GDM dependencies
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
@@ -218,7 +223,7 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     }
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
-        //TODO: #GDM #VW #LOW refactor common code to common place
+        // TODO: #GDM #VW #LOW refactor common code to common place
         NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
@@ -235,8 +240,8 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     }
     else
     {
-        //TODO: #GDM #Common check existing layouts.
-        //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
+        // TODO: #GDM #Common check existing layouts.
+        // TODO: #GDM #Common all remotes layout checking and saving should be done in one place
 
         const auto change = calculateLayoutChange(layout);
         const auto layoutOwner = layout->getParentResource();
@@ -399,6 +404,18 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     }
 
     snapshotManager()->save(newLayout);
+
+    const auto radassManager = context()->instance<RadassResourceManager>();
+    for (auto it = newUuidByOldUuid.begin(); it != newUuidByOldUuid.end(); ++it)
+    {
+        const auto mode = radassManager->mode(QnLayoutItemIndex(layout, it.key()));
+        const auto newItemIndex = QnLayoutItemIndex(newLayout, it.value());
+        radassManager->setMode(newItemIndex, mode);
+    }
+
+    if (!globalSettings()->localSystemId().isNull())
+        radassManager->saveData(globalSettings()->localSystemId(), resourcePool());
+
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
 }
@@ -804,7 +821,11 @@ bool LayoutsHandler::closeAllLayouts(bool force)
 
 void LayoutsHandler::at_newUserLayoutAction_triggered()
 {
-    QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
+    const auto parameters = menu()->currentParameters(sender());
+    auto user = parameters.hasArgument(Qn::UserResourceRole)
+        ? parameters.argument(Qn::UserResourceRole).value<QnUserResourcePtr>()
+        : parameters.resource().dynamicCast<QnUserResource>();
+
     if (!user)
         user = context()->user();
 
@@ -891,7 +912,10 @@ void LayoutsHandler::at_saveCurrentLayoutAsAction_triggered()
 
 void LayoutsHandler::at_closeLayoutAction_triggered()
 {
-    closeLayouts(menu()->currentParameters(sender()).layouts());
+    auto layouts = menu()->currentParameters(sender()).layouts();
+    if (layouts.empty() && workbench()->layouts().size() > 1)
+        layouts.push_back(workbench()->currentLayout());
+    closeLayouts(layouts);
 }
 
 void LayoutsHandler::at_closeAllButThisLayoutAction_triggered()

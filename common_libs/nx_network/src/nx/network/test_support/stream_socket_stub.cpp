@@ -35,10 +35,10 @@ void StreamSocketStub::bindToAioThread(nx::network::aio::AbstractAioThread* aioT
 
 void StreamSocketStub::readSomeAsync(
     nx::Buffer* const buffer,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     base_type::post(
-        [this, buffer, handler = std::move(handler)]()
+        [this, buffer, handler = std::move(handler)]() mutable
         {
             m_readBuffer = buffer;
             m_readHandler = std::move(handler);
@@ -47,7 +47,7 @@ void StreamSocketStub::readSomeAsync(
 
 void StreamSocketStub::sendAsync(
     const nx::Buffer& buffer,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     base_type::post(
         [this, &buffer, handler = std::move(handler)]()

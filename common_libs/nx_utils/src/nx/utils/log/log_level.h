@@ -2,7 +2,8 @@
 
 #include <map>
 #include <set>
-#include <QtCore/QString>
+
+#include <nx/utils/log/to_string.h>
 
 namespace nx {
 namespace utils {
@@ -17,7 +18,9 @@ enum class Level
     warning,
     info,
     debug,
-    verbose
+    verbose,
+
+    notConfigured = 0xFF,
 };
 
 //bool NX_UTILS_API operator<=(Level left, Level right);
@@ -30,7 +33,30 @@ QString NX_UTILS_API toString(Level level);
     static constexpr Level kDefaultLevel = Level::info;
 #endif
 
-using LevelFilters = std::map<QString, Level>;
+class NX_UTILS_API Tag
+{
+public:
+    Tag() = default;
+    Tag(const char* s) = delete;
+    Tag(const std::type_info& info);
+    explicit Tag(QString s);
+
+    template<typename T>
+    Tag(const T* pointer): m_value(::toString(pointer)) {}
+
+    bool matches(const Tag& mask) const;
+    const QString& toString() const;
+    Tag operator+(const Tag& rhs) const;
+
+    bool operator<(const Tag& rhs) const;
+    bool operator==(const Tag& rhs) const;
+    bool operator!=(const Tag& rhs) const;
+
+private:
+    QString m_value;
+};
+
+using LevelFilters = std::map<Tag, Level>;
 
 struct NX_UTILS_API LevelSettings
 {
@@ -66,8 +92,10 @@ struct NX_UTILS_API LevelSettings
     template<typename ... Args>
     void parse(const QString& arg, Args ... args)
     {
-        parse(arg);
-        parse(std::forward<Args>(args) ...);
+        if (arg.isEmpty())
+            parse(std::forward<Args>(args) ...);
+        else
+            parse(arg);
     }
 };
 

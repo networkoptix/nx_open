@@ -11,6 +11,7 @@
 #include <client/client_color_types.h>
 
 #include <ui/customization/customized.h>
+#include <nx/client/ptz/ptz_types.h>
 
 struct QnPtzTourItemModel {
     QnPtzTourItemModel(){}
@@ -121,8 +122,8 @@ public:
     void addPreset();
     void removePreset(const QString &id);
 
-    const QnPtzHotkeyHash& hotkeys() const;
-    void setHotkeys(const QnPtzHotkeyHash & hotkeys);
+    const QnPtzIdByHotkeyHash& hotkeys() const;
+    void setHotkeys(const QnPtzIdByHotkeyHash & hotkeys);
 
     const QString homePosition() const;
     void setHomePosition(const QString &homePosition);
@@ -189,7 +190,7 @@ private:
     QList<QnPtzTourItemModel> m_tours;
     QStringList m_removedTours;
 
-    QnPtzHotkeyHash m_hotkeys;
+    QnPtzIdByHotkeyHash m_hotkeys;
     QString m_homePosition;
     bool m_homePositionChanged;
 

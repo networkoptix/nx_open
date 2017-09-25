@@ -112,18 +112,17 @@ void DeviceSearcher::registerHandler( SearchHandler* handler, const QString& dev
     const auto lock = m_handlerGuard->lock();
     NX_ASSERT(lock);
 
-    // check if handler is registred without deviceType
+    // check if handler is registered without deviceType
     const auto& allDev = m_handlers[ QString() ];
     if( allDev.find( handler ) != allDev.end() )
         return;
 
     // try to register for specified deviceType
-    const auto now = QDateTime::currentDateTimeUtc().toTime_t();
-    const auto itBool = m_handlers[ deviceType ].insert( std::make_pair( handler, now ) );
+    const auto itBool = m_handlers[ deviceType ].insert( std::make_pair( handler, (uintptr_t) handler) );
     if( !itBool.second )
         return;
 
-    // if deviceType was not wspecified, delete all previous registrations with deviceType
+    // if deviceType was not specified, delete all previous registrations with deviceType
     if( deviceType.isEmpty() )
         for( auto& specDev : m_handlers )
             if( !specDev.first.isEmpty() )
@@ -196,7 +195,7 @@ void DeviceSearcher::processDiscoveredDevices( SearchHandler* handlerToUse )
         else
         {
             NX_ASSERT( false );
-            //TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
+            // TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
         }
 
         ++it;
@@ -446,11 +445,12 @@ void DeviceSearcher::startFetchDeviceXml(
             //item present in cache, no need to request xml
             info.xmlDevInfo = cacheItem->xmlDevInfo;
             info.devInfo = cacheItem->devInfo;
-            m_discoveredDevices.emplace( remoteHost, std::move(info) );
+            m_discoveredDevices.emplace( remoteHost, info);
+            processPacket(std::move(info));
             return;
         }
 
-        //TODO: #ak linear search is not among fastest ones known to humanity
+        // TODO: #ak linear search is not among fastest ones known to humanity
         for( auto
             it = m_httpClients.begin();
             it != m_httpClients.end();
@@ -523,13 +523,17 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     return &it->second;
 }
 
-void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo info )
+void DeviceSearcher::updateItemInCache(DiscoveredDeviceInfo info)
 {
     UPNPDescriptionCacheItem& cacheItem = m_upnpDescCache[info.uuid];
     cacheItem.devInfo = info.devInfo;
     cacheItem.xmlDevInfo = info.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
+    processPacket(info);
+}
 
+void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
+{
     nx::utils::concurrent::run(
         QThreadPool::globalInstance(),
         [ this, info = std::move(info), guard = m_handlerGuard.sharedGuard() ]()
@@ -571,7 +575,7 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
 
     if( httpClient->response() && httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
     {
-        //TODO: #ak check content type. Must be text/xml; charset="utf-8"
+        // TODO: #ak check content type. Must be text/xml; charset="utf-8"
         //reading message body
         const nx_http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
         processDeviceXml( *ctx, msgBody );

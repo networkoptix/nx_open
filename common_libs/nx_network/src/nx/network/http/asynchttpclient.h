@@ -14,19 +14,10 @@
 #include "nx/network/aio/timer.h"
 
 #include "auth_cache.h"
+#include "http_async_client.h"
 #include "http_stream_reader.h"
 
 namespace nx_http {
-
-struct AuthInfo
-{
-    QString username;
-    QString password;
-    QString proxyUsername;
-    QString proxyPassword;
-    SocketAddress proxyEndpoint;
-};
-
 
 class AsyncHttpClientPtr;
 
@@ -50,53 +41,12 @@ class NX_NETWORK_API AsyncHttpClient:
     Q_OBJECT
 
 public:
-    enum AuthType
-    {
-        authBasicAndDigest,
-        authDigest,
-        authDigestWithPasswordHash,
-        authBasic,
-    };
-
-    enum State
-    {
-        sInit,
-        sWaitingConnectToHost,
-        sSendingRequest,
-        sReceivingResponse,
-        sResponseReceived,
-        sReadingMessageBody,
-        sFailed,
-        sDone
-    };
-
-    /**
-     * 0 means infinity for any timeout.
-     */
-    class NX_NETWORK_API Timeouts
-    {
-    public:
-        constexpr static const std::chrono::seconds kDefaultSendTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultResponseReadTimeout =
-            std::chrono::seconds(3);
-        constexpr static const std::chrono::seconds kDefaultMessageBodyReadTimeout =
-            std::chrono::seconds::zero();  //no timeout
-
-        std::chrono::milliseconds sendTimeout;
-        std::chrono::milliseconds responseReadTimeout;
-        std::chrono::milliseconds messageBodyReadTimeout;
-
-        Timeouts(
-            std::chrono::milliseconds send = kDefaultSendTimeout,
-            std::chrono::milliseconds recv = kDefaultResponseReadTimeout,
-            std::chrono::milliseconds msgBody = kDefaultMessageBodyReadTimeout);
-
-        bool operator==(const Timeouts& rhs) const;
-    };
+    using State = AsyncClient::State;
+    using Timeouts = AsyncClient::Timeouts;
 
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
+    AsyncHttpClient();
     virtual ~AsyncHttpClient();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -107,7 +57,7 @@ public:
     virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
-    State state() const;
+    AsyncClient::State state() const;
 
     /**
      * Returns true if no response has been recevied due to transport error.
@@ -170,11 +120,6 @@ public:
         const QUrl& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
-    void doOptions(const QUrl& url);
-    void doOptions(
-        const QUrl& url,
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
-
     void doUpgrade(
         const QUrl& url,
         const StringType& protocolToUpgradeTo);
@@ -195,7 +140,7 @@ public:
     /**
      * Checks state as well as response return HTTP code (expect 2XX).
      */
-    bool hasRequestSuccesed() const;
+    bool hasRequestSucceeded() const;
 
     /**
      * Returns current message body buffer, clearing it.
@@ -221,7 +166,6 @@ public:
     void setProxyUserPassword(const QString& userPassword);
     void setAuth(const AuthInfo& auth);
     void setProxyVia(const SocketAddress& proxyEndpoint);
-    void setConnectionHeader(const StringType& value);
 
     /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
@@ -251,11 +195,7 @@ public:
     void addAdditionalHeader(const StringType& key, const StringType& value);
     void addRequestHeaders(const HttpHeaders& headers);
     void removeAdditionalHeader(const StringType& key);
-    template<class HttpHeadersRef>
-    void setAdditionalHeaders(HttpHeadersRef&& additionalHeaders)
-    {
-        m_additionalHeaders = std::forward<HttpHeadersRef>(additionalHeaders);
-    }
+    void setAdditionalHeaders(HttpHeaders additionalHeaders);
     void setAuthType(AuthType value);
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
@@ -277,7 +217,6 @@ public:
     static QString endpointWithProtocol(const QUrl& url);
 
 signals:
-    void tcpConnectionEstablished(nx_http::AsyncHttpClientPtr);
     /**
      * Invoked after request has been sent.
      * @param isRetryAfterUnauthorized set to true if request has been sent as after receiving 401 unauthorized response.
@@ -304,96 +243,17 @@ signals:
      *   To read it, call AsyncHttpClient::fetchMessageBodyBuffer.
      */
     void done(nx_http::AsyncHttpClientPtr);
-    /** Connection to server has been restored after a sudden disconnect. */
-    void reconnected(nx_http::AsyncHttpClientPtr);
 
 private:
-    State m_state;
-    Request m_request;
-    std::unique_ptr<AbstractStreamSocket> m_socket;
-    bool m_connectionClosed;
-    BufferType m_requestBuffer;
-    size_t m_requestBytesSent;
-    QUrl m_requestUrl;
-    QUrl m_contentLocationUrl;
-    HttpStreamReader m_httpStreamReader;
-    BufferType m_responseBuffer;
-    QString m_userAgent;
-    QString m_userName;
-    QString m_userPassword;
-    QString m_proxyUserName;
-    QString m_proxyUserPassword;
-    boost::optional<SocketAddress> m_proxyEndpoint;
-    bool m_authorizationTried;
-    bool m_proxyAuthorizationTried;
-    bool m_ha1RecalcTried;
-    bool m_terminated;
-    quint64 m_bytesRead; //< total read bytes per request
-    int m_totalRequests; //< total sent requests via single connection
-    bool m_contentEncodingUsed;
-    unsigned int m_sendTimeoutMs;
-    unsigned int m_responseReadTimeoutMs;
-    unsigned int m_msgBodyReadTimeoutMs;
-    AuthType m_authType;
-    HttpHeaders m_additionalHeaders;
-    int m_awaitedMessageNumber;
-    QString m_remoteEndpointWithProtocol;
-    AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
-    SystemError::ErrorCode m_lastSysErrorCode;
-    int m_requestSequence;
-    bool m_forcedEof;
-    // TODO: #ak remove this member (replace with aio::BasicPollable inheritance).
-    nx::network::aio::Timer m_aioThreadBinder;
-    bool m_precalculatedAuthorizationDisabled;
-    int m_numberOfRedirectsTried;
+    AsyncClient m_delegate;
+    nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> m_onDoneHandler;
 
-    bool m_expectOnlyBody;
+    virtual void stopWhileInAioThread();
 
-    AsyncHttpClient();
-
-    void asyncConnectDone(SystemError::ErrorCode errorCode);
-    void asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWritten);
-    void onSomeBytesReadAsync(SystemError::ErrorCode errorCode, size_t bytesRead);
-
-    void resetDataBeforeNewRequest();
-    void initiateHttpMessageDelivery();
-    void initiateTcpConnection();
-    /**
-     * @return Bytes parsed or -1 in case of error.
-     */
-    size_t parseReceivedBytes(size_t bytesRead);
-    void processReceivedBytes(
-        std::shared_ptr<AsyncHttpClient> sharedThis,
-        std::size_t bytesParsed);
-    void processResponseHeadersBytes(
-        std::shared_ptr<AsyncHttpClient> sharedThis,
-        bool* const continueReceiving);
-    bool repeatRequestIfNeeded(const Response& response);
-    bool sendRequestToNewLocation(const Response& response);
-    void processResponseMessageBodyBytes(
-        std::shared_ptr<AsyncHttpClient> sharedThis,
-        std::size_t bytesRead,
-        bool* const continueReceiving);
-    void composeRequest(const nx_http::StringType& httpMethod);
-    void serializeRequest();
-    /**
-     * @return true, if connected.
-     */
-    bool reconnectIfAppropriate();
-    /** Composes request with authorization header based on response. */
-    bool resendRequestWithAuthorization(
-        const nx_http::Response& response,
-        bool isProxy = false);
-    void doSomeCustomLogic(
-        const nx_http::Response& response,
-        Request* const request);
-    void stopWhileInAioThread();
-
-    template<typename ... Args>
-    void doHttpOperation(
-        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler,
-        void(AsyncHttpClient::*func)(Args...),
-        Args... args);
+    void onRequestHasBeenSent(bool isRetryAfterUnauthorizedResponse);
+    void onResponseReceived();
+    void onSomeMessageBodyAvailable();
+    void onDone();
 
     AsyncHttpClient(const AsyncHttpClient&);
     AsyncHttpClient& operator=(const AsyncHttpClient&);
@@ -519,7 +379,7 @@ void NX_NETWORK_API downloadFileAsync(
     const QUrl& url,
     std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-    AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
+    AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 /**
@@ -537,7 +397,7 @@ void NX_NETWORK_API downloadFileAsyncEx(
     const QUrl& url,
     std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-    AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
+    AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 void downloadFileAsyncEx(
@@ -550,21 +410,23 @@ typedef std::function<void(SystemError::ErrorCode, int httpStatus)> UploadComple
 /**
  * Uploads specified data using POST.
  */
-void NX_NETWORK_API uploadDataAsync(const QUrl &url
-    , const QByteArray &data
-    , const QByteArray &contentType
-    , const nx_http::HttpHeaders &extraHeaders
-    , const UploadCompletionHandler &callback
-    , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
-    , const QString &user = QString()
-    , const QString &password = QString());
+void NX_NETWORK_API uploadDataAsync(
+    const QUrl &url,
+    const QByteArray& data,
+    const QByteArray& contentType,
+    const nx_http::HttpHeaders& extraHeaders,
+    const UploadCompletionHandler& callback,
+    const AuthType authType = AuthType::authBasicAndDigest,
+    const QString& user = QString(),
+    const QString& password = QString());
 
-SystemError::ErrorCode NX_NETWORK_API uploadDataSync(const QUrl &url
-    , const QByteArray &data
-    , const QByteArray &contentType
-    , const QString &user
-    , const QString &password
-    , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
-    , nx_http::StatusCode::Value *httpCode = nullptr);
+SystemError::ErrorCode NX_NETWORK_API uploadDataSync(
+    const QUrl& url,
+    const QByteArray& data,
+    const QByteArray& contentType,
+    const QString& user,
+    const QString& password,
+    const AuthType authType = AuthType::authBasicAndDigest,
+    nx_http::StatusCode::Value* httpCode = nullptr);
 
 } // namespace nx_http

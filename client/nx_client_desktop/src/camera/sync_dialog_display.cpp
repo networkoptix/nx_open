@@ -19,7 +19,8 @@ QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
 }
 
 QnSignDialogDisplay::~QnSignDialogDisplay()
-{}
+{
+}
 
 void QnSignDialogDisplay::finilizeSign()
 {
@@ -34,7 +35,8 @@ void QnSignDialogDisplay::finilizeSign()
     if (m_reader)
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
-        if (aviFile) {
+        if (aviFile)
+        {
             auto signPattern = aviFile->metadata().signature;
             if (!signPattern.isEmpty())
             {
@@ -43,7 +45,7 @@ void QnSignDialogDisplay::finilizeSign()
                 QList<QByteArray> patternParams = baPattern.split(QnSignHelper::getSignPatternDelim());
 
                 baPattern.replace(0, magic.size(), magic);
-                QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*) baPattern.data(), baPattern.size());
+                QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*)baPattern.data(), baPattern.size());
                 calculatedSign = m_mdctx.result();
 
                 signFromPicture = QnSignHelper::getDigestFromSign(patternParams[0]);
@@ -52,7 +54,8 @@ void QnSignDialogDisplay::finilizeSign()
                     emit gotSignatureDescription(QString::fromUtf8(patternParams[1]), QString::fromUtf8(patternParams[2]), QString::fromUtf8(patternParams[3]));
                 }
             }
-            else {
+            else
+            {
                 calculatedSign = m_mdctx.result();
             }
         }
@@ -87,10 +90,12 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
 
         if (m_lastKeyFrame)
             m_display[0]->display(m_lastKeyFrame, true, QnFrameScaler::factor_any); // repeat last frame on the screen (may be skipped because of time check)
-        if (m_hasProcessedMedia) {
+        if (m_hasProcessedMedia)
+        {
             finilizeSign();
         }
-        else {
+        else
+        {
             emit calcSignInProgress(QByteArray(), 100);
             emit gotSignature(QByteArray(), QByteArray());
         }
@@ -100,14 +105,16 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_hasProcessedMedia = true;
 #ifndef SIGN_FRAME_ENABLED
         // update digest from current frame
-        if (media && media->dataSize() > 4) {
-            const quint8* data = (const quint8*) media->data();
+        if (media && media->dataSize() > 4)
+        {
+            const quint8* data = (const quint8*)media->data();
             QnSignHelper::updateDigest(media->context, m_mdctx, data, static_cast<int>(media->dataSize()));
         }
 #else
         // update digest from previous frames because of last frame it is sign frame itself
-        if (m_prevFrame && m_prevFrame->data.size() > 4) {
-            const quint8* data = (const quint8*) m_prevFrame->data.data();
+        if (m_prevFrame && m_prevFrame->data.size() > 4)
+        {
+            const quint8* data = (const quint8*)m_prevFrame->data.data();
             QnSignHelper::updateDigest(m_prevFrame->context, m_mdctx, data, m_prevFrame->data.size());
         }
 #endif
@@ -136,7 +143,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
             QByteArray calculatedSign = tmpctx.result();
             int progress = 100;
             if (reader)
-                progress =  (media->timestamp - reader->startTime()) / (double) (reader->endTime() - reader->startTime()) * 100;
+                progress = (media->timestamp - reader->startTime()) / (double)(reader->endTime() - reader->startTime()) * 100;
             m_lastDisplayTime2 = qnSyncTime->currentMSecsSinceEpoch();
 
             emit calcSignInProgress(calculatedSign, progress);

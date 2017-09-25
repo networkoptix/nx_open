@@ -12,16 +12,12 @@
             </div>
         </div>
     </div>
-    <camera-links ng-if="cameraLinksEnabled" system="system"
-                  position="positionProvider.playedPosition"
-                  live-mode="positionProvider.liveMode"
-                  active-camera="activeCamera" player="player" current-resolution="currentResolution"></camera-links>
     <ul class="tree nav" >
         <li ng-repeat="server in mediaServers" ng-if="server.visible">
             <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
                title="{{server.url}}"
                ng-click="toggleServerCollapsed(server)"
-               class="webclint-panel server-link collapse-group"
+               class="server-link collapse-group"
                ng-class="{offline:server.status!='Online'}">
                 <div class="pull-right">
                     <span>
@@ -30,19 +26,25 @@
                     </span>
                 </div>
                 <div class="hide-excess-text">
-                    <span class="glyphicon glyphicon-th-list"></span>
+                    <span ng-if="server.active"
+                          class="glyphicon glyphicon-server-active"></span>
+                    <span ng-if="server.status == 'Online' && !server.active"
+                          class="glyphicon glyphicon-server-online"></span>
+                    <span ng-if="server.status != 'Online' && !server.active"
+                          class="glyphicon glyphicon-server-offline"></span>
                     <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
                 </div>
             </a>
-            <ul class="nav "
-                collapse="server.collapsed" uib-collapse="server.collapsed"
-                ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy}" >
-                <li ng-repeat="camera in cameras[server.id]"
-                    ng-class="{active:activeCamera===camera}"
-                    ng-if="camera.visible"
-                    ng-include="Config.viewsDirCommon + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')">
-                </li>
-            </ul>
+            <div class="collapse-box">
+                <ul class="nav" collapse="server.collapsed" uib-collapse="server.collapsed"
+                    ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy, closing:server.collapsed}" >
+                    <li ng-repeat="camera in cameras[server.id]"
+                        ng-class="{active:activeCamera===camera}"
+                        ng-if="camera.visible"
+                        ng-include="Config.viewsDirCommon + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')">
+                    </li>
+                </ul>
+            </div>
         </li>
     </ul>
 </div>

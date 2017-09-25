@@ -11,6 +11,8 @@ namespace nx {
 namespace p2p {
 namespace test {
 
+static const int kMaxInstancesWithTimeManager = 100;
+
 int P2pMessageBusTestBase::m_instanceCounter = 0;
 static const QString kP2pTestSystemName(lit("P2pTestSystem"));
 
@@ -47,6 +49,14 @@ void P2pMessageBusTestBase::createData(
     const auto settings = connection->commonModule()->globalSettings();
     settings->setSystemName(kP2pTestSystemName);
     settings->setLocalSystemId(guidFromArbitraryData(kP2pTestSystemName));
+    settings->setAutoDiscoveryEnabled(false);
+    const bool disableTimeManager = m_servers.size() > kMaxInstancesWithTimeManager;
+    if (disableTimeManager)
+    {
+        settings->setTimeSynchronizationEnabled(false);
+        settings->setSynchronizingTimeWithInternet(false);
+    }
+
     settings->synchronizeNow();
 
     //read server list
@@ -128,7 +138,9 @@ void P2pMessageBusTestBase::createData(
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, quint16 baseTcpPort)
+Appserver2Ptr P2pMessageBusTestBase::createAppserver(
+    bool keepDbFile,
+    quint16 baseTcpPort)
 {
     auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
     if (tmpDir.isEmpty())
@@ -142,6 +154,9 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, quint16 ba
 
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
     result->addArg(dbFileArg.toStdString().c_str());
+
+    const QString p2pModeArg = lit("--p2pMode=1");
+    result->addArg(p2pModeArg.toStdString().c_str());
 
     const QString instanceArg = lit("--moduleInstance=%1").arg(m_instanceCounter);
     result->addArg(instanceArg.toStdString().c_str());
@@ -160,12 +175,12 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile, quint16 ba
     return result;
 }
 
-void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex, quint16 baseTcpPort)
+void P2pMessageBusTestBase::startServers(int count, int keepDbAtServerIndex, quint16 baseTcpPort)
 {
     QElapsedTimer t;
     t.restart();
     for (int i = 0; i < count; ++i)
-        m_servers.push_back(createAppserver(i == keekDbAtServerIndex, baseTcpPort));
+        m_servers.push_back(createAppserver(i == keepDbAtServerIndex, baseTcpPort));
 
     for (const auto& server: m_servers)
     {

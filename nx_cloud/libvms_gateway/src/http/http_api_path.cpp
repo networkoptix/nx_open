@@ -4,7 +4,7 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-const char* const kApiPathPrefix = "gateway";
+const char* const kApiPathPrefix = "/gateway";
 
 } // namespace gateway
 } // namespace cloud

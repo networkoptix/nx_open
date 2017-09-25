@@ -1,5 +1,7 @@
 #include "log_level.h"
 
+#include <QtCore/QStringBuilder>
+
 #include "assert.h"
 #include "log_message.h"
 
@@ -38,6 +40,9 @@ Level levelFromString(const QString& levelString)
     if (level == lit("verbose") || level == lit("debug2") || level == lit("v"))
         return Level::verbose;
 
+    if (level == lit("notconfigured") || level == lit("not_configured"))
+        return Level::notConfigured;
+
     return Level::undefined;
 }
 
@@ -46,34 +51,78 @@ QString toString(Level level)
     switch (level)
     {
         case Level::undefined:
-            return QLatin1String("undefined");
+            return lit("undefined");
 
         case Level::none:
-            return QLatin1String("none");
+            return lit("none");
 
         case Level::always:
-            return QLatin1String("always");
+            return lit("always");
 
         case Level::error:
-            return QLatin1String("error");
+            return lit("error");
 
         case Level::warning:
-            return QLatin1String("warning");
+            return lit("warning");
 
         case Level::info:
-            return QLatin1String("info");
+            return lit("info");
 
         case Level::debug:
-            return QLatin1String("debug");
+            return lit("debug");
 
         case Level::verbose:
-            return QLatin1String("verbose");
+            return lit("verbose");
+
+        case Level::notConfigured:
+            return lit("notConfigured");
     };
 
     NX_ASSERT(false, lm("Unknown level: %1").arg(static_cast<int>(level)));
-    return QLatin1String("unknown");
+    return lm("unknown(%1)").arg(static_cast<int>(level));
 }
 
+Tag::Tag(const std::type_info& info):
+    m_value(::toString(info))
+{
+}
+
+Tag::Tag(QString s):
+    m_value(std::move(s))
+{
+}
+
+bool Tag::matches(const Tag& mask) const
+{
+    // TODO: currently all tags are considered as prefixes, but it might be useful to support
+    // some king of regexp in future.
+    return m_value.startsWith(mask.m_value);
+}
+
+const QString& Tag::toString() const
+{
+    return m_value;
+}
+
+Tag Tag::operator+(const Tag& rhs) const
+{
+    return Tag(m_value % "::" % rhs.m_value);
+}
+
+bool Tag::operator<(const Tag& rhs) const
+{
+    return m_value < rhs.m_value;
+}
+
+bool Tag::operator==(const Tag& rhs) const
+{
+    return m_value == rhs.m_value;
+}
+
+bool Tag::operator!=(const Tag& rhs) const
+{
+    return m_value != rhs.m_value;
+}
 
 LevelSettings::LevelSettings(Level primary, LevelFilters filters):
     primary(primary),
@@ -178,10 +227,11 @@ void LevelSettings::parse(const QString& s)
 
         for (auto& t : filtersTokens)
         {
-            if (filters.find(t) != filters.end())
-                qWarning() << Q_FUNC_INFO << "redefine filter" << t;
+            Tag tag(std::move(t));
+            if (filters.find(tag) != filters.end())
+                qWarning() << Q_FUNC_INFO << "redefine filter" << tag.toString();
 
-            filters.emplace(std::move(t), level);
+            filters.emplace(std::move(tag), level);
         }
     }
 }

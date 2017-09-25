@@ -69,6 +69,9 @@ angular.module('nxCommon')
          * v0 = 2*(stop-start)/duration
          *
          * x(t) = x0 + (stop-start)* (2* time/duration - (time/duration)^2)
+         *
+         * !!! Dry resistance allows to slow down after linear movement
+         * if distance is exactly twice smaller or duration is twice larger
          */
         Animation.prototype.dryResistance = function(start,stop,time,duration){
             var proportion = time/duration;

@@ -9,9 +9,9 @@
 import pytest
 import time
 import logging
-from test_utils.utils import SimpleNamespace
+from test_utils.utils import SimpleNamespace, datetime_utc_now, bool_to_str, str_to_bool
 import server_api_data_generators as generator
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 
 
 FAILOVER_SWITCHING_PERIOD_SEC = 4*60
@@ -52,7 +52,7 @@ def env(server_factory, camera_factory, counter):
 
 
 def wait_until_servers_are_online(servers):
-    start = time.time()
+    start_time = datetime_utc_now()
     server_guids = sorted([s.ecs_guid for s in servers])
     for srv in servers:
         while True:
@@ -61,7 +61,7 @@ def wait_until_servers_are_online(servers):
             log.debug("%r online servers: %s, system servers: %s", srv, online_server_guids, server_guids)
             if server_guids == online_server_guids:
                 break
-            if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+            if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
                 assert server_guids == online_server_guids
             time.sleep(2.0)
 
@@ -156,7 +156,9 @@ def discovery(request):
 @pytest.mark.testcam
 def test_failover_and_auto_discovery(server_factory, camera_factory, counter, discovery):
     one = server_factory('one')
-    two = server_factory('two', setup_settings=dict(autoDiscoveryEnabled=discovery))
+    two = server_factory('two', setup_settings=dict(
+        systemSettings=dict(autoDiscoveryEnabled=bool_to_str(discovery))))
+    assert str_to_bool(two.settings['autoDiscoveryEnabled']) == discovery
     two.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=two.ecs_guid,
         maxCameras=2,

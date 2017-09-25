@@ -1,3 +1,5 @@
+#if defined(ENABLE_ONVIF)
+
 #include "lilin_remote_archive_manager.h"
 
 #include <vector>
@@ -120,7 +122,7 @@ std::unique_ptr<nx_http::HttpClient> LilinRemoteArchiveManager::initHttpClient()
 
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
-    httpClient->setAuthType(nx_http::AsyncHttpClient::AuthType::authBasic);
+    httpClient->setAuthType(nx_http::AuthType::authBasic);
     httpClient->setResponseReadTimeoutMs(kHttpTimeout.count());
     httpClient->setSendTimeoutMs(kHttpTimeout.count());
     httpClient->setMessageBodyReadTimeoutMs(kHttpTimeout.count());
@@ -232,3 +234,5 @@ boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dat
 } // namespace plugins
 } // namespace mediasever_core
 } // namespace nx
+
+#endif // ENABLE_ONVIF

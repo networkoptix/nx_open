@@ -40,10 +40,9 @@ extern "C"
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/pending_operation.h>
 
 #include <plugins/resource/avi/avi_resource.h>
-
-#include <redass/redass_controller.h>
 
 #include <server/server_storage_manager.h>
 
@@ -64,7 +63,6 @@ extern "C"
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
-#include <utils/common/pending_operation.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <nx/utils/string.h>
 #include <utils/common/synctime.h>
@@ -138,7 +136,11 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
-    m_sliderBookmarksRefreshOperation(new QnPendingOperation([this]() { updateSliderBookmarks(); }, kUpdateBookmarksInterval, this)),
+    m_sliderBookmarksRefreshOperation(
+        new nx::utils::PendingOperation(
+            [this]{ updateSliderBookmarks(); },
+            kUpdateBookmarksInterval,
+            this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0),
     m_hasArchive(false),
@@ -161,7 +163,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
     connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished, m_cameraDataManager, &QnCameraDataManager::clearCache);
 
-    //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
+    // TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.
     QTimer* discardCacheTimer = new QTimer(this);
     discardCacheTimer->setInterval(kDiscardCacheIntervalMs);
@@ -170,7 +172,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
     {
         if (res.dynamicCast<QnStorageResource>())
-            m_cameraDataManager->clearCache();	//TODO:#GDM #bookmarks check if should be placed into camera manager
+            m_cameraDataManager->clearCache();	// TODO:#GDM #bookmarks check if should be placed into camera manager
     });
     discardCacheTimer->start();
 
@@ -219,6 +221,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
                         archiveReader->setPlaybackMask(result);
                 }
             }
+
             if (m_timeSlider)
                 m_timeSlider->setTimePeriods(SyncedLine, timePeriodType, result);
             if (m_calendar)
@@ -1082,18 +1085,23 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing)
 // -------------------------------------------------------------------------- //
 void QnWorkbenchNavigator::updateCentralWidget()
 {
-    //TODO: #GDM get rid of central widget - it is used ONLY as a previous/current value in the layout change process
+    // TODO: #GDM get rid of central widget - it is used ONLY as a previous/current value in the layout change process
     QnResourceWidget *centralWidget = display()->widget(Qn::CentralRole);
     if (m_centralWidget == centralWidget)
         return;
 
-    if (m_centralWidget && m_centralWidget->resource())
-        disconnect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    m_centralWidgetConnections.clear();
 
     m_centralWidget = centralWidget;
 
-    if (m_centralWidget && m_centralWidget->resource())
-        connect(m_centralWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
+    if (m_centralWidget)
+    {
+        m_centralWidgetConnections = QnDisconnectHelper::create();
+        *m_centralWidgetConnections << connect(m_centralWidget->resource(),
+            &QnResource::parentIdChanged,
+            this,
+            &QnWorkbenchNavigator::updateLocalOffset);
+    }
 
     updateCurrentWidget();
 }
@@ -1110,6 +1118,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
+    m_currentWidgetConnections.clear();
+
     if (m_currentWidget)
     {
         m_timeSlider->setThumbnailsLoader(nullptr, -1);
@@ -1117,15 +1127,12 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         if (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
         {
             for (auto widget: m_syncedWidgets)
-                updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
+                updateItemDataFromSlider(widget); // TODO: #GDM #Common ask #elric: should it be done at every selection change?
         }
         else
         {
             updateItemDataFromSlider(m_currentWidget);
         }
-
-        disconnect(m_currentWidget->resource(), nullptr, this, nullptr);
-        connect(m_currentWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
     }
     else
     {
@@ -1148,7 +1155,19 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     }
 
     if (m_currentWidget)
-        connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
+    {
+        m_currentWidgetConnections = QnDisconnectHelper::create();
+
+        *m_currentWidgetConnections << connect(m_currentWidget,
+            &QnMediaResourceWidget::aspectRatioChanged,
+            this,
+            &QnWorkbenchNavigator::updateThumbnailsLoader);
+
+        *m_currentWidgetConnections << connect(m_currentWidget->resource(),
+            &QnResource::nameChanged,
+            this,
+            &QnWorkbenchNavigator::updateLines);
+    }
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
@@ -1175,7 +1194,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         const auto callback =
             [this]()
             {
-                //TODO: #rvasilenko why should we make these delayed calls at all?
+                // TODO: #rvasilenko why should we make these delayed calls at all?
                 updatePlaying();
                 updateSpeed();
             };
@@ -1375,13 +1394,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
-#ifdef Q_OS_MAC
-    // todo: MAC  got stuck in full screen mode if update slider to often! #elric: refactor it!
-    // TODO: #ynikitenkov #high WTF? Get rid of timer and check in 3.1 if everything is Ok.
-    if (mode != UpdateSliderMode::ForcedUpdate && m_updateSliderTimer.elapsed() < 33)
-        return;
-    m_updateSliderTimer.restart();
-#endif
 
     const bool keepInWindow = mode == UpdateSliderMode::KeepInWindow;
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
@@ -1420,7 +1432,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                 endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
                 startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
 
-                //TODO: #gdm refactor this safety check sometime
+                // TODO: #gdm refactor this safety check sometime
                 if (QnWorkbenchItem* item = m_currentMediaWidget->item())
                 {
                     /* And then try to read saved value - it was valid someday. */
@@ -1469,9 +1481,12 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     if (m_dayTimeWidget)
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
-    if (!m_pausedOverride)
+    const auto buffering = widgetLoaded
+        && m_currentMediaWidget->display()->camDisplay()->isBuffering();
+
+    if (!m_pausedOverride && !buffering)
     {
-        //TODO: #GDM #vkutin #refactor logic in 3.1
+        // TODO: #GDM #vkutin #refactor logic in 3.1
         auto usecTimeForWidget = [isSearch, this](QnMediaResourceWidget *mediaWidget) -> qint64
         {
             if (mediaWidget->display()->camDisplay()->isRealTimeSource())
@@ -1479,9 +1494,21 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
+            {
                 timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
+            }
+            else if (mediaWidget->resource()->toResource()->flags().testFlag(Qn::local_media))
+            {
+                // #vkutin Workaround for local files doing seek after quite a delay
+                // which caused time marker to jump back and forth.
+                // It happened even before QnCamDisplay::isBuffering became true.
+                // So for local files we use position of next frame, it seems working.
+                timeUSec = mediaWidget->display()->camDisplay()->getNextTime();
+            }
             else
+            {
                 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
+            }
 
             if (timeUSec == AV_NOPTS_VALUE)
                 timeUSec = -1;
@@ -1528,9 +1555,17 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             if (m_previousMediaPosition != timeMSec || isTimelineCatchingUp())
             {
                 qint64 delta = timeMSec - m_animatedPosition;
-                if (qAbs(delta) < m_timeSlider->msecsPerPixel() || delta * speed() < 0)
+
+                // See VMS-2657
+                const bool canOmitAnimation = m_currentWidget
+                    && m_currentWidget->resource()->flags().testFlag(Qn::local_media)
+                    && !m_currentWidget->resource()->flags().testFlag(Qn::sync);
+
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel() ||
+                    (canOmitAnimation && delta * speed() < 0))
                 {
-                    /* If distance is less than 1 pixel or we catch up backwards, do it instantly: */
+                    // If distance is less than 1 pixel or we catch up backwards on
+                    // local media file do it instantly
                     m_animatedPosition = timeMSec;
                     timelineAdvance(timeMSec);
                 }
@@ -2126,8 +2161,6 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value)
                 {
                     reader->jumpTo(value * 1000, 0);
                 }
-                //else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
-                //    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                 else
                 {
                     reader->setSkipFramesToTime(value * 1000); /* Precise seek. */
@@ -2223,8 +2256,8 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget)
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget)
 {
-    disconnect(widget, NULL, this, NULL);
-    disconnect(widget->resource(), NULL, this, NULL);
+    widget->disconnect(this);
+    widget->resource()->disconnect(this);
 
     if (widget->resource()->flags().testFlag(Qn::sync))
     {

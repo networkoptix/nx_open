@@ -18,35 +18,33 @@ TransactionTransport::TransactionTransport(
     nx::network::aio::AbstractAioThread* aioThread,
     ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
     TransactionLog* const transactionLog,
+    const ConnectionRequestAttributes& connectionRequestAttributes,
     const nx::String& systemId,
-    const nx::String& connectionId,
     const ::ec2::ApiPeerData& localPeer,
-    const ::ec2::ApiPeerData& remotePeer,
     const SocketAddress& remotePeerEndpoint,
-    const nx_http::Request& request,
-    const QByteArray& contentEncoding)
+    const nx_http::Request& request)
 :
-    ::ec2::QnTransactionTransportBase(
+    m_baseTransactionTransport(
         QnUuid(), //< localSystemId. Not used here
-        QnUuid::fromStringSafe(connectionId),
+        QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
         ::ec2::ConnectionLockGuard(
             localPeer.id,
             connectionGuardSharedState,
-            remotePeer.id,
+            connectionRequestAttributes.remotePeer.id,
             ::ec2::ConnectionLockGuard::Direction::Incoming),
         localPeer,
-        remotePeer,
+        connectionRequestAttributes.remotePeer,
         ::ec2::ConnectionType::incoming,
         request,
-        contentEncoding,
+        connectionRequestAttributes.contentEncoding,
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
         systemId,
-        remotePeer.dataFormat)),
+        connectionRequestAttributes.remotePeer.dataFormat)),
     m_systemId(systemId),
-    m_connectionId(connectionId),
+    m_connectionId(connectionRequestAttributes.connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
     m_haveToSendSyncDone(false),
     m_closed(false),
@@ -54,28 +52,35 @@ TransactionTransport::TransactionTransport(
 {
     using namespace std::placeholders;
 
-    m_commonTransportHeaderOfRemoteTransaction.connectionId = connectionId;
+    m_commonTransportHeaderOfRemoteTransaction.connectionId = 
+        connectionRequestAttributes.connectionId;
     m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
-    m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = remotePeer.id;
+    m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender = 
+        connectionRequestAttributes.remotePeer.id;
 
     bindToAioThread(aioThread);
-    setState(ReadyForStreaming);
+    m_baseTransactionTransport.setState(::ec2::QnTransactionTransportBase::ReadyForStreaming);
     //ignoring "state changed to Connected" signal
 
     QObject::connect(
-        this, &::ec2::QnTransactionTransportBase::gotTransaction,
+        &m_baseTransactionTransport, &::ec2::QnTransactionTransportBase::gotTransaction,
         this, &TransactionTransport::onGotTransaction,
         Qt::DirectConnection);
     QObject::connect(
-        this, &::ec2::QnTransactionTransportBase::stateChanged,
+        &m_baseTransactionTransport, &::ec2::QnTransactionTransportBase::stateChanged,
         this, &TransactionTransport::onStateChanged,
         Qt::DirectConnection);
+    QObject::connect(
+        &m_baseTransactionTransport, &::ec2::QnTransactionTransportBase::onSomeDataReceivedFromRemotePeer,
+        this, &TransactionTransport::restartInactivityTimer,
+        Qt::DirectConnection);
 
-    if (remotePeerSupportsKeepAlive())
+    if (m_baseTransactionTransport.remotePeerSupportsKeepAlive())
     {
         m_inactivityTimer->start(
-            connectionKeepAliveTimeout() * keepAliveProbeCount(),
+            m_baseTransactionTransport.connectionKeepAliveTimeout() 
+                * m_baseTransactionTransport.keepAliveProbeCount(),
             std::bind(&TransactionTransport::onInactivityTimeout, this));
     }
 }
@@ -93,22 +98,28 @@ TransactionTransport::~TransactionTransport()
 void TransactionTransport::bindToAioThread(
     nx::network::aio::AbstractAioThread* aioThread)
 {
-    ParentType::bindToAioThread(aioThread);
+    base_type::bindToAioThread(aioThread);
 
+    m_baseTransactionTransport.bindToAioThread(aioThread);
     m_transactionLogReader->bindToAioThread(aioThread);
     m_inactivityTimer->bindToAioThread(aioThread);
 }
 
 void TransactionTransport::stopWhileInAioThread()
 {
-    ParentType::stopWhileInAioThread();
+    base_type::stopWhileInAioThread();
 
+    m_baseTransactionTransport.stopWhileInAioThread();
     m_transactionLogReader.reset();
     m_inactivityTimer.reset();
 }
 
-void TransactionTransport::setOnConnectionClosed(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+SocketAddress TransactionTransport::remoteSocketAddr() const
+{
+    return m_baseTransactionTransport.remoteSocketAddr();
+}
+
+void TransactionTransport::setOnConnectionClosed(ConnectionClosedEventHandler handler)
 {
     m_connectionClosedEventHandler = std::move(handler);
 }
@@ -116,6 +127,73 @@ void TransactionTransport::setOnConnectionClosed(
 void TransactionTransport::setOnGotTransaction(GotTransactionEventHandler handler)
 {
     m_gotTransactionEventHandler = std::move(handler);
+}
+
+QnUuid TransactionTransport::connectionGuid() const 
+{
+    return m_baseTransactionTransport.connectionGuid();
+}
+
+const TransactionTransportHeader& 
+    TransactionTransport::commonTransportHeaderOfRemoteTransaction() const
+{
+    return m_commonTransportHeaderOfRemoteTransaction;
+}
+
+void TransactionTransport::sendTransaction(
+    TransactionTransportHeader transportHeader,
+    const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
+{
+    transportHeader.vmsTransportHeader.fillSequence(
+        m_baseTransactionTransport.localPeer().id,
+        m_baseTransactionTransport.localPeer().instanceId);
+    auto serializedTransaction = transactionSerializer->serialize(
+        m_baseTransactionTransport.remotePeer().dataFormat,
+        std::move(transportHeader),
+        highestProtocolVersionCompatibleWithRemotePeer());
+
+    post(
+        [this,
+            serializedTransaction = std::move(serializedTransaction),
+            transactionHeader = transactionSerializer->transactionHeader()]()
+        {
+            // TODO: #ak checking transaction to send queue size
+            //if (isReadyToSend(transaction.command) && queue size is too large)
+            //    setWriteSync(false);
+
+            if (m_baseTransactionTransport.isReadyToSend(transactionHeader.command))
+            {
+                m_baseTransactionTransport.addDataToTheSendQueue(std::move(serializedTransaction));
+                return;
+            }
+
+            NX_LOGX(
+                QnLog::EC2_TRAN_LOG,
+                lm("Postponing send transaction %1 to %2").arg(transactionHeader.command)
+                    .arg(m_commonTransportHeaderOfRemoteTransaction),
+                cl_logDEBUG1);
+
+            //cannot send transaction right now: updating local transaction sequence
+            const ::ec2::ApiPersistentIdData tranStateKey(
+                transactionHeader.peerID,
+                transactionHeader.persistentInfo.dbID);
+            m_tranStateToSynchronizeTo.values[tranStateKey] =
+                transactionHeader.persistentInfo.sequence;
+            //transaction will be sent later
+        });
+}
+
+void TransactionTransport::receivedTransaction(
+    const nx_http::HttpHeaders& headers,
+    const QnByteArrayConstRef& tranData)
+{
+    m_baseTransactionTransport.receivedTransaction(headers, tranData);
+}
+
+void TransactionTransport::setOutgoingConnection(
+    QSharedPointer<AbstractCommunicatingSocket> socket)
+{
+    m_baseTransactionTransport.setOutgoingConnection(std::move(socket));
 }
 
 void TransactionTransport::startOutgoingChannel()
@@ -126,13 +204,16 @@ void TransactionTransport::startOutgoingChannel()
         cl_logDEBUG1);
 
     //sending tranSyncRequest
-    ::ec2::QnTransaction<::ec2::ApiSyncRequestData>
-        requestTran(::ec2::ApiCommand::tranSyncRequest, localPeer().id);
+    ::ec2::QnTransaction<::ec2::ApiSyncRequestData> requestTran(
+        ::ec2::ApiCommand::tranSyncRequest,
+        m_baseTransactionTransport.localPeer().id);
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
 
     TransactionTransportHeader transportHeader;
-    transportHeader.vmsTransportHeader.processedPeers << remotePeer().id;
-    transportHeader.vmsTransportHeader.processedPeers << localPeer().id;
+    transportHeader.vmsTransportHeader.processedPeers
+        << m_baseTransactionTransport.remotePeer().id;
+    transportHeader.vmsTransportHeader.processedPeers
+        << m_baseTransactionTransport.localPeer().id;
 
     sendTransaction(
         std::move(requestTran),
@@ -144,19 +225,23 @@ void TransactionTransport::processSpecialTransaction(
     ::ec2::QnTransaction<::ec2::ApiSyncRequestData> data,
     TransactionProcessedHandler handler)
 {
-    setWriteSync(true);
+    m_baseTransactionTransport.setWriteSync(true);
 
     m_tranStateToSynchronizeTo = m_transactionLogReader->getCurrentState();
     m_remotePeerTranState = std::move(data.params.persistentState);
 
     //sending sync response
-    ::ec2::QnTransaction<::ec2::QnTranStateResponse>
-        tranSyncResponse(::ec2::ApiCommand::tranSyncResponse, localPeer().id);
+    ::ec2::QnTransaction<::ec2::QnTranStateResponse> tranSyncResponse(
+        ::ec2::ApiCommand::tranSyncResponse,
+        m_baseTransactionTransport.localPeer().id);
     tranSyncResponse.params.result = 0;
 
     TransactionTransportHeader transportHeader;
-    transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
-    sendTransaction(std::move(tranSyncResponse), std::move(transportHeader));
+    transportHeader.vmsTransportHeader.processedPeers.insert(
+        m_baseTransactionTransport.localPeer().id);
+    sendTransaction(
+        std::move(tranSyncResponse),
+        std::move(transportHeader));
 
     m_haveToSendSyncDone = true;
 
@@ -189,79 +274,11 @@ void TransactionTransport::processSpecialTransaction(
     //NX_ASSERT(false);
 }
 
-void TransactionTransport::sendTransaction(
-    TransactionTransportHeader transportHeader,
-    const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer)
-{
-    transportHeader.vmsTransportHeader.fillSequence(
-        localPeer().id,
-        localPeer().instanceId);
-    auto serializedTransaction = transactionSerializer->serialize(
-        remotePeer().dataFormat,
-        std::move(transportHeader),
-        highestProtocolVersionCompatibleWithRemotePeer());
-
-    post(
-        [this,
-            serializedTransaction = std::move(serializedTransaction),
-            transactionHeader = transactionSerializer->transactionHeader()]()
-        {
-            // TODO: #ak checking transaction to send queue size
-            //if (isReadyToSend(transaction.command) && queue size is too large)
-            //    setWriteSync(false);
-
-            if (isReadyToSend(transactionHeader.command))
-            {
-                addData(std::move(serializedTransaction));
-                return;
-            }
-
-            NX_LOGX(
-                QnLog::EC2_TRAN_LOG,
-                lm("Postponing send transaction %1 to %2").arg(transactionHeader.command)
-                    .arg(m_commonTransportHeaderOfRemoteTransaction),
-                cl_logDEBUG1);
-
-            //cannot send transaction right now: updating local transaction sequence
-            const ::ec2::ApiPersistentIdData tranStateKey(
-                transactionHeader.peerID,
-                transactionHeader.persistentInfo.dbID);
-            m_tranStateToSynchronizeTo.values[tranStateKey] =
-                transactionHeader.persistentInfo.sequence;
-            //transaction will be sent later
-        });
-}
-
-const TransactionTransportHeader&
-    TransactionTransport::commonTransportHeaderOfRemoteTransaction() const
-{
-    return m_commonTransportHeaderOfRemoteTransaction;
-}
-
-void TransactionTransport::fillAuthInfo(
-    const nx_http::AsyncHttpClientPtr& /*httpClient*/,
-    bool /*authByKey*/)
-{
-    //this TransactionTransport is never used to setup outgoing connection
-    NX_ASSERT(false);
-}
-
-void TransactionTransport::onSomeDataReceivedFromRemotePeer()
-{
-    NX_CRITICAL(isInSelfAioThread());
-    NX_CRITICAL(m_inactivityTimer->isInSelfAioThread());
-
-    m_inactivityTimer->cancelSync();
-    m_inactivityTimer->start(
-        connectionKeepAliveTimeout() * keepAliveProbeCount(),
-        std::bind(&TransactionTransport::onInactivityTimeout, this));
-}
-
 int TransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 {
-    return remotePeerProtocolVersion() >= kMinSupportedProtocolVersion
+    return m_baseTransactionTransport.remotePeerProtocolVersion() >= kMinSupportedProtocolVersion
         ? kMaxSupportedProtocolVersion
-        : remotePeerProtocolVersion();
+        : m_baseTransactionTransport.remotePeerProtocolVersion();
 }
 
 void TransactionTransport::onGotTransaction(
@@ -366,7 +383,7 @@ void TransactionTransport::onTransactionsReadFromLog(
                 .arg(m_systemId).arg(api::toString(resultCode))
                 .arg(m_commonTransportHeaderOfRemoteTransaction),
             cl_logDEBUG1);
-        setState(Closed);   //closing connection
+        m_baseTransactionTransport.setState(::ec2::QnTransactionTransportBase::Closed);   //closing connection
         return;
     }
 
@@ -383,11 +400,12 @@ void TransactionTransport::onTransactionsReadFromLog(
         TransactionTransportHeader transportHeader;
         transportHeader.systemId = m_systemId;
         transportHeader.vmsTransportHeader.distance = 1;
-        transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
+        transportHeader.vmsTransportHeader.processedPeers.insert(
+            m_baseTransactionTransport.localPeer().id);
 
-        addData(
+        m_baseTransactionTransport.addDataToTheSendQueue(
             tranData.serializer->serialize(
-                remotePeer().dataFormat,
+                m_baseTransactionTransport.remotePeer().dataFormat,
                 transportHeader,
                 highestProtocolVersionCompatibleWithRemotePeer()));
     }
@@ -418,7 +436,7 @@ void TransactionTransport::onTransactionsReadFromLog(
 
 void TransactionTransport::enableOutputChannel()
 {
-    setWriteSync(true);
+    m_baseTransactionTransport.setWriteSync(true);
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Enabled output channel to the peer %2")
         .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction),
@@ -429,18 +447,31 @@ void TransactionTransport::enableOutputChannel()
         m_haveToSendSyncDone = false;
 
         ::ec2::QnTransaction<::ec2::ApiTranSyncDoneData>
-            tranSyncDone(::ec2::ApiCommand::tranSyncDone, localPeer().id);
+            tranSyncDone(::ec2::ApiCommand::tranSyncDone, m_baseTransactionTransport.localPeer().id);
         tranSyncDone.params.result = 0;
 
         TransactionTransportHeader transportHeader;
-        transportHeader.vmsTransportHeader.processedPeers.insert(localPeer().id);
+        transportHeader.vmsTransportHeader.processedPeers.insert(
+            m_baseTransactionTransport.localPeer().id);
         sendTransaction(std::move(tranSyncDone), std::move(transportHeader));
     }
 }
 
+void TransactionTransport::restartInactivityTimer()
+{
+    NX_CRITICAL(isInSelfAioThread());
+    NX_CRITICAL(m_inactivityTimer->isInSelfAioThread());
+
+    m_inactivityTimer->cancelSync();
+    m_inactivityTimer->start(
+        m_baseTransactionTransport.connectionKeepAliveTimeout() 
+            * m_baseTransactionTransport.keepAliveProbeCount(),
+        std::bind(&TransactionTransport::onInactivityTimeout, this));
+}
+
 void TransactionTransport::onInactivityTimeout()
 {
-    setState(::ec2::QnTransactionTransportBase::Error);
+    m_baseTransactionTransport.setState(::ec2::QnTransactionTransportBase::Error);
 }
 
 template<class T>
@@ -455,7 +486,7 @@ void TransactionTransport::sendTransaction(
         cl_logDEBUG1);
 
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer;
-    switch (remotePeer().dataFormat)
+    switch (m_baseTransactionTransport.remotePeer().dataFormat)
     {
         case Qn::UbjsonFormat:
         {
@@ -472,7 +503,7 @@ void TransactionTransport::sendTransaction(
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Cannot send transaction in unsupported format %1 to %2")
-                .arg(QnLexical::serialized(remotePeer().dataFormat))
+                .arg(QnLexical::serialized(m_baseTransactionTransport.remotePeer().dataFormat))
                 .arg(m_commonTransportHeaderOfRemoteTransaction),
                 cl_logDEBUG1);
             // TODO: #ak close connection

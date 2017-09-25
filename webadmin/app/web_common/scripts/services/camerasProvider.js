@@ -13,18 +13,21 @@ angular.module('nxCommon')
             this.mediaServers = null;
             this.storage = $localStorage;
             this.poll = null;
+            this.serverOffsets = {};
 
             this.bothRequest = null;
         }
 
         //getters
         camerasProvider.prototype.getCamera = function(id){
-            if(!this.cameras) {
+            if(!this.cameras || ! id) {
                 return null;
             }
+            id = id.replace('{','').replace('}','');
             for(var serverId in this.cameras) {
                 var cam = _.find(this.cameras[serverId], function (camera) {
-                    return camera.id === id || camera.physicalId === id;
+                    return (camera.id.replace('{','').replace('}','') === id) ||
+                           (camera.physicalId.replace('{','').replace('}','') === id);
                 });
                 if(cam){
                     return cam;
@@ -92,8 +95,7 @@ angular.module('nxCommon')
 
             function cameraSorter(camera) {
                 camera.url = self.extractDomain(camera.url);
-                camera.preview = self.systemAPI.previewUrl(camera.physicalId, false, null, Config.webclient.leftPanelPreviewHeight);
-                camera.fullPreview = self.systemAPI.previewUrl(camera.physicalId, false, null, window.screen.availHeight);
+                camera.preview = self.systemAPI.previewUrl(camera.id, false, null, Config.webclient.leftPanelPreviewHeight);
                 camera.server = self.getServer(camera.parentId);
                 if(camera.server && camera.server.status === 'Offline'){
                     camera.status = 'Offline';
@@ -205,6 +207,7 @@ angular.module('nxCommon')
             function serverSorter(server){
                 server.url = self.extractDomain(server.url);
                 server.collapsed = self.storage.serverStates[server.id];
+                server.active = server.id == Config.currentServerId;
 
 
                 if(typeof(server.visible) === 'undefined'){
@@ -300,10 +303,28 @@ angular.module('nxCommon')
                 var serverId = tmpServerList[i].id;
                 for(var j in tmpCamerasList[serverId]){
                     if(tmpCamerasList[serverId][j] && tmpCamerasList[serverId][j].id){
-                        return tmpCamerasList[serverId][j].id;
+                        return tmpCamerasList[serverId][j];
                     }
                 }
             }
+            return null;
+        };
+
+        camerasProvider.prototype.getServerTimeOffset = function(serverId){
+            return this.serverOffsets[serverId];
+        };
+        camerasProvider.prototype.getServerTimes = function(){
+            var self = this;
+            _.each(this.mediaServers,function(server){
+                if (server.status != 'Online'){ // We can't get time from offline server
+                    return;
+                }
+                self.systemAPI.getTime(server.id).then(function(result){
+                    var serverUtcTime = parseInt(result.data.reply.utcTime);
+                    var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
+                    self.serverOffsets[server.id] = timeManager.getOffset(serverUtcTime, timeZoneOffset);
+                });
+            });
         };
 
         return {

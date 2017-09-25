@@ -15,7 +15,7 @@ namespace nx {
 namespace vms {
 namespace event {
 
-//TODO: #GDM #Business fix to resourceTypeRequired: None, Camera, Server, User, etc
+// TODO: #GDM #Business fix to resourceTypeRequired: None, Camera, Server, User, etc
 bool requiresCameraResource(ActionType actionType);
 bool requiresUserResource(ActionType actionType);
 bool requiresAdditionalUserResource(ActionType actionType);
@@ -30,15 +30,19 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
 QList<ActionType> userAvailableActions();
 QList<ActionType> allActions();
 
-class ActionData
+struct ActionData
 {
-public:
     // TODO: #EC2 Add comments. Maybe remove the flag altogether. What is it for? Which actions?
     enum Flags {
         VideoLinkExists = 1
     };
 
     ActionData(): actionType(undefinedAction), flags(0) {}
+    ActionData(const ActionData&);
+    ActionData(ActionData&&) = default;
+    ActionData& operator=(const ActionData&) = delete;
+    ActionData& operator=(ActionData&&) = default;
+
     bool hasFlags(int value) const { return flags & value; }
 
     ActionType actionType;
@@ -129,5 +133,3 @@ protected:
 
 Q_DECLARE_METATYPE(nx::vms::event::AbstractActionPtr)
 Q_DECLARE_METATYPE(nx::vms::event::AbstractActionList)
-Q_DECLARE_METATYPE(nx::vms::event::ActionDataList)
-Q_DECLARE_METATYPE(nx::vms::event::ActionDataListPtr)

@@ -138,12 +138,15 @@ void QnArchiveStreamReader::resumeMedia()
     }
     if (m_singleShot)
     {
-        emit streamResumed();
+        emit streamAboutToBeResumed();
         m_delegate->setSingleshotMode(false);
         m_singleShot = false;
         //resumeDataProcessors();
         QnMutexLocker lock( &m_jumpMtx );
         m_singleShowWaitCond.wakeAll();
+
+        lock.unlock();
+        emit streamResumed();
     }
 }
 
@@ -155,12 +158,15 @@ void QnArchiveStreamReader::pauseMedia()
     }
     if (!m_singleShot)
     {
-        emit streamPaused();
-        QnMutexLocker lock( &m_jumpMtx );
+        emit streamAboutToBePaused();
+        QnMutexLocker lock(&m_jumpMtx);
         m_singleShot = true;
         m_singleQuantProcessed = true;
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
         m_delegate->setSingleshotMode(true);
+
+        lock.unlock();
+        emit streamPaused();
     }
 }
 
@@ -409,6 +415,8 @@ begin_label:
             mFirstTime = false;
         }
         else {
+            if (m_resource->hasFlags(Qn::local))
+                mFirstTime = false; // Do not try to reopen local file if it can't be opened.
             // If media data can't be opened report 'no data'
             return createEmptyPacket(m_reverseMode);
         }

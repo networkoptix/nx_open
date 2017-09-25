@@ -21,7 +21,7 @@
         <qt.libs>core xml sql</qt.libs>
         <global.libs>-lnx_kit</global.libs>
         <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lSecur32 -lwinmm</windows.oslibs>
-        <mac.oslibs>-framework IOKit -framework CoreFoundation</mac.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz</mac.oslibs>
         <rdep.packages>openssl</rdep.packages>
         <windows.defines>_USING_V110_SDK71_</windows.defines>
     </properties>

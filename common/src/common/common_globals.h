@@ -118,7 +118,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
-        LogicalPtzCoordinateSpace
+        LogicalPtzCoordinateSpace,
+        InvalidPtzCoordinateSpace 
     };
 
     enum PtzObjectType {
@@ -173,7 +174,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
-    //TODO: #GDM split to server-only and client-only flags as they are always local
+    // TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag
     {
         network                     = 0x1,          /**< Has ip and mac. */
@@ -414,6 +415,24 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SSQualityDontUse = 4
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
+
+    enum class BitrateControl {
+        undefined,
+        cbr,
+        vbr
+    };
+
+    enum class EncodingPriority {
+        undefined,
+        framerate,
+        compressionLevel
+    };
+
+    enum class EntropyCoding {
+        undefined,
+        cavlc,
+        cabac
+    };
 
     enum StatisticsDeviceType {
         StatisticsCPU = 0,                /**< CPU load in percents. */

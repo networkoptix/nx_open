@@ -182,8 +182,14 @@ void QnUniversalRequestProcessor::run()
                 auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
                 auto handler = owner->findHandler(d->protocol, d->request);
                 bool noAuth = false;
-                if (handler && !authenticate(&d->accessRights, &noAuth))
-                    return;
+                if (handler)
+                {
+                    if (owner->isAuthentificationRequired(d->request)
+                        && !authenticate(&d->accessRights, &noAuth))
+                    {
+                        return;
+                    }
+                }
 
                 isKeepAlive = isConnectionCanBePersistent();
 
@@ -273,7 +279,8 @@ bool QnUniversalRequestProcessor::isCloudRequest(const nx_http::Request& request
 {
     return request.requestLine.url.host() == nx::network::AppInfo::defaultCloudHost() ||
            request.requestLine.url.path().startsWith("/cdb") ||
-           request.requestLine.url.path().startsWith("/nxcloud");
+           request.requestLine.url.path().startsWith("/nxcloud") ||
+           request.requestLine.url.path().startsWith("/nxlicense");
 }
 
 bool QnUniversalRequestProcessor::isProxyForCamera(

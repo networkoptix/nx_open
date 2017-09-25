@@ -36,6 +36,18 @@ to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
       <translation>Daha fazla bookmark görmek için zaman şeridine zoom yapın</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation>Yer işaretini baştan oynat</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation>Yer imini düzenle</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation>Yer imini sil</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -168,14 +180,6 @@ to view more bookmarks</source>
     <message>
       <source>New Web Page...</source>
       <translation>Yeni Web Sayfası...</translation>
-    </message>
-    <message>
-      <source>Layout Tour...</source>
-      <translation type="unfinished">Layout Tour...</translation>
-    </message>
-    <message>
-      <source>New Layout Tour...</source>
-      <translation type="unfinished">New Layout Tour...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -406,7 +410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Video Duvarını Aç</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -426,7 +430,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Video Duvarını Kaydet</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -553,16 +557,12 @@ to view more bookmarks</source>
       <translation>Ekrandan Kaldır</translation>
     </message>
     <message>
-      <source>Remove from Tour</source>
-      <translation type="unfinished">Remove from Tour</translation>
-    </message>
-    <message>
       <source>Stop Sharing Layout</source>
       <translation>Ekran düzenini paylaşmayı durdur</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Düzenle...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -729,18 +729,6 @@ to view more bookmarks</source>
       <translation>Büyük</translation>
     </message>
     <message>
-      <source>Start Tour</source>
-      <translation>Tura Başla</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Turu Durdur</translation>
-    </message>
-    <message>
-      <source>Make Layout Tour</source>
-      <translation type="unfinished">Make Layout Tour</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Ayarlar</translation>
     </message>
@@ -866,7 +854,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Yer İmi Günlüğü...</translation>
+    </message>
+    <message>
+      <source>Showreel...</source>
+      <translation>Showreel...</translation>
+    </message>
+    <message>
+      <source>New Showreel...</source>
+      <translation>Yeni Showreel...</translation>
+    </message>
+    <message>
+      <source>Remove from Showreel</source>
+      <translation>Showreel'den kaldır</translation>
+    </message>
+    <message>
+      <source>Make Showreel</source>
+      <translation>Showreel Oluştur</translation>
     </message>
   </context>
   <context>
@@ -928,35 +932,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>Lisans bulunamıyor.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Lisans devre dışı bırakıldı.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Lisans aktif değil.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Geçersiz lisans.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Deneme lisansı.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Lisans deaktif edilmek için bekleniyor. Fakat henüz deaktif edilmedi.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Bu lisans için devreden çıkarma sayısı sınırı aştı.</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <translation>Bu lisansa sahip Sunucu Donanım Kimliği, lisansın etkinleştirildiği Donanım Kimliği ile eşleşmiyor.</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1016,46 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>Aşağı Kaydır</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Showreel'i başlat</translation>
+    </message>
+  </context>
+  <context>
+    <name>LocalFiles</name>
+    <message>
+      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+      <translation>"%1" Yolu geçerli değil. Lütfen başka bir yol deneyin.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; already exists. Please try another name.</source>
+      <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1077,6 +1121,37 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>Ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation>Kamera "%1" den geçerli pozisyon alınamadı;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>Kamera online olana kadar lütfen bekleyin.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>Geçerli konum alınamadı</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation>Kamera "%1" için geçerli pozisyon ayarlanamadı;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>Geçerli konum ayarlanamadı</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>Bu pozisyon bazı turlar için kullanılıyor. Yinede silmek istiyor musunuz?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>Bu turlar geçersiz duruma gelecek.</translation>
+    </message>
+  </context>
+  <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
@@ -1123,10 +1198,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnAboutDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Panoya Kopyala</translation>
-    </message>
     <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1 Aşağıdaki Dış Kitaplıkları Kullanıyor:</translation>
@@ -1263,10 +1334,6 @@ to view more bookmarks</source>
       <translation>Seçilen Kayıtları Dosyaya Çıkart</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Denetim Günlüğünü Tekrar Oynat</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Aygıtlar</translation>
     </message>
@@ -1344,6 +1411,10 @@ to view more bookmarks</source>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
         <numerusform>Kaynaklar sistemden kaldırıldı</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Denetim Günlüğünü Tekrar Oynat</translation>
     </message>
   </context>
   <context>
@@ -1516,7 +1587,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+      <translation>Yedekleme, kameraların mevcut sunucusunda kurulmazsa, arşivleri yedeklenmez.</translation>
     </message>
   </context>
   <context>
@@ -1603,7 +1674,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>Açıklama boş olamaz</translation>
     </message>
   </context>
   <context>
@@ -1611,10 +1682,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>Yapı numarası</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>Geçersiz yapı numarası</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1667,6 +1734,13 @@ to view more bookmarks</source>
     <message>
       <source>Any Camera</source>
       <translation>Herhangi bir kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Yer imleri yöneticisi</translation>
     </message>
   </context>
   <context>
@@ -1810,10 +1884,6 @@ to view more bookmarks</source>
       <translation>Kameraları filtrele...</translation>
     </message>
     <message>
-      <source>Reset all rules to default?</source>
-      <translation>Tüm kurallar varsayılan olarak sıfırlansın mı?</translation>
-    </message>
-    <message>
       <source>Failed to retrieve rules</source>
       <translation>Kurallar getirilemedi</translation>
     </message>
@@ -1832,6 +1902,10 @@ to view more bookmarks</source>
     <message>
       <source>This action cannot be undone.</source>
       <translation>Bu işlem geri alınamaz.</translation>
+    </message>
+    <message>
+      <source>Restore all rules to default?</source>
+      <translation>Tüm Ayarları Varsayılan Ayarlara Döndür?</translation>
     </message>
   </context>
   <context>
@@ -2037,11 +2111,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation type="unfinished">I/O Module Id</translation>
+      <translation>I/O Modül kimliği</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation type="unfinished">Camera Id</translation>
+      <translation>Kamera Id</translation>
     </message>
   </context>
   <context>
@@ -2064,10 +2138,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>Panoya Kopyala</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>TAMAM</translation>
@@ -2292,6 +2362,10 @@ to view more bookmarks</source>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
       <translation>Bu kamera için maksimum haraket alanı sayısı %1. Ve %2 hareket penceresi seçili durumda.</translation>
     </message>
+    <message>
+      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+      <translation>Bu kamera için maksimum haraket hassaiyet penceresi sayısı %1. Ve %2 hareket penceresi seçili durumda.</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
@@ -2382,7 +2456,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>Kamera ayarlarında &quot;haraket&quot; algılama sekmesine gidin. Kameranın desteklediğine emin olun ve aktif hale getirin.</translation>
     </message>
     <message>
       <source>Dual-Streaming not supported for this camera</source>
@@ -2398,7 +2472,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+      <translation>Etkinleştirmek ve ayarlamak için kamera ayarlarında &quot;hareket&quot; algılama sekmesine gidin.</translation>
     </message>
   </context>
   <context>
@@ -2587,6 +2661,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1 hakkında daha fazla bilgi</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -2816,7 +2901,7 @@ to %1</source>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
-      <translation type="unfinished">This user is disabled by system administrator.</translation>
+      <translation>Bu kullanıcı sistem yöneticisi tarafından devre dışı bırakıldı.</translation>
     </message>
   </context>
   <context>
@@ -2936,7 +3021,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; için ses kodlayıcı bulunumadı;.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
@@ -2967,15 +3052,15 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; için ses kodlayıcı bulunumadı;.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
+      <translation>&quot;%1&quot; ses cihazı yüklenemedi;.</translation>
     </message>
     <message>
-      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>44.1Khz ve 48Khz ses formatları yakalama cihazı tarafından desteklenmiyor. Lütfen başka bir ses cihazı seçin yada kayıt seçeneklerinden &quot;yok&quot; u işaretleyin.</translation>
     </message>
   </context>
   <context>
@@ -3155,14 +3240,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n Kaldırılan konular</numerusform>
+        <numerusform>%n Kaldırılan konular</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation type="unfinished">Subject removed</translation>
+      <translation>Konu kaldırıldı</translation>
     </message>
   </context>
   <context>
@@ -3436,7 +3521,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation type="unfinished">Id</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3469,7 +3554,7 @@ to %1</source>
     <name>QnLayoutExportTool</name>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+      <translation>&quot;%1&quot;'ye dışa aktarma;...</translation>
     </message>
     <message>
       <source>Could not export device %1.</source>
@@ -3494,7 +3579,7 @@ to %1</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+      <translation>%1 dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -3634,10 +3719,6 @@ to %1</source>
       <translation>İzin Verilen Arşiv Akışları:</translation>
     </message>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>Panoya Kopyala</translation>
-    </message>
-    <message>
       <source>Generic:</source>
       <translation>Genel:</translation>
     </message>
@@ -3655,7 +3736,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation type="unfinished">Locked to Hardware Id</translation>
+      <translation>Donanım Kimliği'ne kaydedildi</translation>
     </message>
   </context>
   <context>
@@ -3834,61 +3915,57 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Lisansları devre dışı bırak?</numerusform>
+        <numerusform>Lisansları devre dışı bırak?</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to deactivate license</source>
-      <translation type="unfinished">Failed to deactivate license</translation>
+      <translation>Lisans devre dışı bırakılırken hata oluştu</translation>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>%n lisansları devre dışı bırakılamadı</numerusform>
+        <numerusform>%n lisansları devre dışı bırakılamadı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%n lisansın %1'i devre dışı bırakılamaz</numerusform>
+        <numerusform>%n lisansın %1'i devre dışı bırakılamaz</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>Lisanslar devre dışı bırakılamadı</numerusform>
+        <numerusform>Lisanslar devre dışı bırakılamadı</numerusform>
       </translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation type="unfinished">Cannot connect to the License Server</translation>
+      <translation>Lisans Sunucusuna bağlanılamıyor</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+      <translation>Lütfen sunucunuzun etkin İnternet bağlantısına sahip olduğundan emin olun veya güvenlik duvarı ayarlarını kontrol edin.</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation type="unfinished">License Server error</translation>
-    </message>
-    <message>
-      <source>If the problem presists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
+      <translation>Lisans Sunucusu hatası</translation>
     </message>
     <message>
       <source>License deactivated</source>
-      <translation type="unfinished">License deactivated</translation>
+      <translation>Lisans deaktif edildi</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+      <translation>
+        <numerusform>%n Lisans deaktif edildi</numerusform>
+        <numerusform>%n Lisans deaktif edildi</numerusform>
       </translation>
     </message>
     <message>
@@ -3897,24 +3974,24 @@ to %1</source>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation type="unfinished">Deactivate</translation>
+      <translation>Devre dışı bırak</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n kanal.</numerusform>
+        <numerusform>%n kanal.</numerusform>
       </translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Lütfen Destek Birimiyle İletişime Geçin.</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>%n den kalanı devre dışı bırak</numerusform>
+        <numerusform>%n den kalanı devre dışı bırak</numerusform>
       </translation>
     </message>
     <message>
@@ -3923,23 +4000,27 @@ to %1</source>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+      <translation>Lütfen Müşteri Hizmetleriyle iletişime geçip geçerli bir lisans anahtarı alın.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+      <translation>Lütfen lisans anahtarını el ile aktif etmek için Müşteri Hizmetleri ile iletişime geçin.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+      <translation>Lütfen Müşteri Hizmetleriyle iletişime geçip geçerli bir lisans anahtarı alın.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+      <translation>Bu lisans %1 hardware Id sine atanmış</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+      <translation>Bu lisans %1 hardware Id sine atanmış %2</translation>
+    </message>
+    <message>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation>Eğer problem devam ederse Müşteri Hizmetleri ile iletişime geçin.</translation>
     </message>
   </context>
   <context>
@@ -3966,15 +4047,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+      <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini e-posta olarak gönderin.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
-    </message>
-    <message>
-      <source>Hardware Id copied to clipboard</source>
-      <translation type="unfinished">Hardware Id copied to clipboard</translation>
+      <translation>Aktivasyon dosyasını almak için Lütfen %1 e ait lisans anahtarını ve donanım kimliğini gönderin.</translation>
     </message>
   </context>
   <context>
@@ -4222,7 +4299,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
+      <translation>%1 (Tur &quot;%2&quot; etkin)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4238,12 +4315,12 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+      <translation>Tetikleyici %1 (%2) çağırılamadı</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
-      <translation type="unfinished">press and hold</translation>
+      <translation>bas ve basılı tut</translation>
     </message>
   </context>
   <context>
@@ -4298,15 +4375,15 @@ to %1</source>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
-    </message>
-    <message>
-      <source>You will be reconnected</source>
-      <translation type="unfinished">You will be reconnected</translation>
+      <translation>Diğer sistemdeki sunucular, veritabanı eşitlemesi tamamlandığında kaynak ağacında görünür.</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <translation>Sistem kısa süre içinde birleştirilecek</translation>
+    </message>
+    <message>
+      <source>You will be reconnected.</source>
+      <translation>Yeniden Bağlanacaksınız.</translation>
     </message>
   </context>
   <context>
@@ -4336,7 +4413,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation type="unfinished">Set Recording to &quot;Always&quot;</translation>
+      <translation>Kaydı &quot;sürekli kayıt&quot; olarak ayarlayın;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
@@ -4348,7 +4425,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation type="unfinished">&quot;Motion + Low - Res&quot; recording option cannot be set.</translation>
+      <translation>&quot;Hareket algılama + Düşük çözünürlüklü&quot; kayıt ayarlanamadı.</translation>
     </message>
   </context>
   <context>
@@ -4390,15 +4467,15 @@ to %1</source>
     <name>QnNetworkSpeedStrings</name>
     <message>
       <source>B/s</source>
-      <translation type="unfinished">B/s</translation>
+      <translation>B/s</translation>
     </message>
     <message>
       <source>MB/s</source>
-      <translation type="unfinished">MB/s</translation>
+      <translation>MB/s</translation>
     </message>
     <message>
-      <source>kB/s</source>
-      <translation type="unfinished">kB/s</translation>
+      <source>KB/s</source>
+      <translation>KB/s</translation>
     </message>
   </context>
   <context>
@@ -4477,7 +4554,7 @@ to %1</source>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Kabul edilen</translation>
     </message>
   </context>
   <context>
@@ -4535,7 +4612,18 @@ to %1</source>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
+      <translation>PTZ, Aygıt Çıkışı, 2 Yönlü Ses, yazılımsal Tetikleyiciler.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Yer imleri yöneticisi</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
@@ -4655,11 +4743,11 @@ to %1</source>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
+      <translation>Bu ön tanımlı kısayol &quot;%1&quot; tarafından kullanılıyor;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
+      <translation>Bu tur kısayolu &quot;%1&quot; tarafından kullanılıyor;</translation>
     </message>
   </context>
   <context>
@@ -4883,6 +4971,45 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnRequiredPermissionSubjectPolicy</name>
+    <message>
+      <source>Role %1 has no %2 permission</source>
+      <comment>%1 is the name of selected role, %2 is permission name</comment>
+      <translation>%1 rolünün hiçbir %2 izni yok</translation>
+    </message>
+    <message>
+      <source>Selected roles have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Seçilen roller %1 iznine sahip değil</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no %2 permission</source>
+      <comment>%1 is number of selected roles, %2 is permission name</comment>
+      <translation>
+        <numerusform>%1 in %n i için %2 izni yok</numerusform>
+        <numerusform>%1 in %n i için %2 izni yok</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>%1 kullanıcısının hiçbir %2 izni yok</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Seçilen kullanıcıların %1 izni yok</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>
+        <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
+        <numerusform>%1 in %n i kullanıcısı için %2 izni yok</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Any Type</source>
@@ -4977,12 +5104,12 @@ to %1</source>
       <translation>Yerel Dosya</translation>
     </message>
     <message>
-      <source>Layout Tours</source>
-      <translation type="unfinished">Layout Tours</translation>
+      <source>Showreels</source>
+      <translation>Showreel</translation>
     </message>
     <message>
-      <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
+      <source>Showreel</source>
+      <translation>Showreel</translation>
     </message>
   </context>
   <context>
@@ -5076,11 +5203,11 @@ to %1</source>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Oluşturuldu</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Oluşturan</translation>
     </message>
   </context>
   <context>
@@ -5172,29 +5299,29 @@ to %1</source>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation type="unfinished">User %1 has invalid email address</translation>
+      <translation>%1 kullanıcısı için e-posta adresi geçersiz</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid email address</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+      <translation>
+        <numerusform>%n kullanıcının %1 i geçersiz e-psotaya sahip</numerusform>
+        <numerusform>%n kullanıcının %1 i geçersiz e-psotaya sahip</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Geçersiz e-posta adresi %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>%n kullanıcının %1 i geçersiz ikincil e-psotaya sahip</numerusform>
+        <numerusform>%n kullanıcının %1 i geçersiz ikincil e-psotaya sahip</numerusform>
       </translation>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation type="unfinished">Send email to %1</translation>
+      <translation>%1 e Email gönder</translation>
     </message>
   </context>
   <context>
@@ -5521,8 +5648,7 @@ to %1</source>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-      <translation type="unfinished">Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
+      <translation>Html etiketleri özel metin içinde kullanılabilir: &lt;h4&gt;Header'lar (h1-h6) &lt;/h4&gt; Ayrıca farklı &lt;font color=&quot;red&quot;&gt; renkler&lt;/font&gt; ve &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; uygulanabilir. Metin &lt;s&gt; eğik&lt;/s&gt;, &lt;u&gt; açık altı&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; veya &lt;i&gt;italic&lt;/i&gt; olabilir;</translation>
     </message>
   </context>
   <context>
@@ -5584,7 +5710,7 @@ to %1</source>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation type="unfinished">Set Recording to &quot;Always&quot;</translation>
+      <translation>Kaydı &quot;sürekli kayıt&quot; olarak ayarlayın;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
@@ -5600,7 +5726,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation type="unfinished">&quot;Motion + Low - Res&quot; recording option cannot be set.</translation>
+      <translation>&quot;Hareket algılama + Düşük çözünürlüklü&quot; kayıt ayarlanamadı.</translation>
     </message>
   </context>
   <context>
@@ -5670,7 +5796,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation type="unfinished">No preset found. Use &quot;Advanced&quot; option.</translation>
+      <translation>Ön tanımlı rota bulunamadı. &quot;Gelişmiş ayarları&quot; kullanın.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5735,38 +5861,8 @@ to %1</source>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
-      <source>Role %1 has no User Input permission</source>
-      <comment>%1 is the name of selected role</comment>
-      <translation type="unfinished">Role %1 has no User Input permission</translation>
-    </message>
-    <message>
-      <source>Selected roles have no User Input permission</source>
-      <translation type="unfinished">Selected roles have no User Input permission</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no User Input permission</source>
-      <comment>%1 is number of selected roles</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
-        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no User Input permission</source>
-      <comment>%1 is the name of selected user</comment>
-      <translation type="unfinished">User %1 has no User Input permission</translation>
-    </message>
-    <message>
-      <source>Selected users have no User Input permission</source>
-      <translation type="unfinished">Selected users have no User Input permission</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no User Input permission</source>
-      <comment>%1 is number of selected users</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
-        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
-      </translation>
+      <source>User Input</source>
+      <translation>Kullanıcı girişi</translation>
     </message>
   </context>
   <context>
@@ -5903,7 +5999,7 @@ to %1</source>
     </message>
     <message>
       <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-      <translation type="unfinished">Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</translation>
+      <translation>Yukarıdaki yedeklemeyi etkinleştirmek için &quot;yedek&quot; ten &quot;Asıla&quot; çevirin.</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
@@ -5931,11 +6027,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation type="unfinished">Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>Arşiv yedekleme tamamlandı &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation type="unfinished">Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>Bir sonraki yedekleme planlandı &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
@@ -6026,7 +6122,7 @@ to %1</source>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+      <translation>Çok küçük ve sistem bölümleri korumalıdır ve kullanılabilir yeterli alan varsa, yazma için kullanılmamaktadır.</translation>
     </message>
   </context>
   <context>
@@ -6052,7 +6148,7 @@ to %1</source>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation>\\ &lt;Computer Name&gt; &lt;Folder&gt; \;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
@@ -6129,10 +6225,6 @@ to %1</source>
       <translation>E Posta Sunucusu Ayarlanmadı</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Diğerleri İle Zaman Senkronizasyonu İçin Sunucu Seçin</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>Sistem Güvenli Modda</translation>
     </message>
@@ -6163,10 +6255,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>E Posta Sunucusu Ayarlanmadı.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Sunucu Saatleri Senkronize Edilemedi ve Ortak Saat Otomatik Olarak Algılanamadı.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -6211,32 +6299,56 @@ to %1</source>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+      <translation>Sisteminizi %1 &amp;mdash; ile her yerden erişilebilir hale getirin!</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+      <translation>Kontrol edin %1&amp;mdash; Sisteminize her yerden bağlanın!</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation type="unfinished">Some users have not set their email addresses</translation>
+      <translation>Bazı kullanıcılar için e-posta adresleri ayarlı değil</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+      <translation>E-posta ile sistem uyarılarını alamazsınız.</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation type="unfinished">Some users have not set their email addresses.</translation>
+      <translation>Bazı kullanıcılar için e-posta adresleri ayarlı değil.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+      <translation>E-posta ile sistem uyarılarını alamazlar.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation type="unfinished">Error while sending email</translation>
+      <translation>E-posta gönderirken hata oluştu</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started</source>
+      <translation>Uzak arşiv senkronizasyonu başlatıldı</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished</source>
+      <translation>Uzak arşiv senkronizasyonu tamamlandı</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is in progress</source>
+      <translation>Uzak arşiv senkronizasyonu devam ediyor</translation>
+    </message>
+    <message>
+      <source>Error occured during remote archive synchronization</source>
+      <translation>Uzak arşiv senkronizasyonu sırasında hata oluştu</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started for the following device:</source>
+      <translation>Aşağıdaki cihaz için uzak arşiv senkronizasyonu başlatıldı:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished for the following device:</source>
+      <translation>Aşağıdaki cihaz için uzak arşiv senkronizasyonu tamamlandı:</translation>
     </message>
   </context>
   <context>
@@ -6300,15 +6412,15 @@ to %1</source>
     <name>QnTimeServerSelectionWidget</name>
     <message>
       <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
+      <translation>Sistem saatini Internet üzerinden eşitler ve sunucu yerel zamanlardan bağımsızdır.</translation>
     </message>
     <message>
       <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+      <translation>Sistem saati seçilen sunucu yerel saatiyle senkronize edilir ve diğer sunuculardan bağımsızdır.</translation>
     </message>
     <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
+      <translation>Hiçbir sunucunun İnternet erişimi yok. Zaman senkronize edilmiyor.</translation>
     </message>
   </context>
   <context>
@@ -6324,67 +6436,67 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation type="unfinished">hh:mm</translation>
-    </message>
-    <message>
-      <source>hh:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">hh:mm ap</translation>
+      <translation>ss:aa</translation>
     </message>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">h ap</translation>
+      <translation>h ap</translation>
     </message>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation type="unfinished">dd</translation>
+      <translation>gg</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation type="unfinished">MMMM</translation>
+      <translation>AAAA</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
-    </message>
-    <message>
-      <source>dd MMMM yyyy hh:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
+      <translation>gg AAAA yyyy ss:dd</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+      <translation>gg AAAA yyyy ss:dd</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h ap</translation>
+      <translation>gg AAAA yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation type="unfinished">dd MMMM yyyy</translation>
+      <translation>gg AAAA yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>AAAA yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
+    </message>
+    <message>
+      <source>h:mm ap</source>
+      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+      <translation>saat: dakika ap</translation>
+    </message>
+    <message>
+      <source>dd MMMM yyyy h:mm ap</source>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+      <translation>gg AAAA yyyy s: DD ap</translation>
     </message>
   </context>
   <context>
@@ -6705,6 +6817,11 @@ to %1</source>
       <source>Apply changes before switching to another user?</source>
       <translation>Kullanıcı değiştirilirken yapılan değişiklikler uygulansın mı?</translation>
     </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation>Bu kullanıcı henüz %1 için kaydolmadı</translation>
+    </message>
   </context>
   <context>
     <name>QnUserSettingsWidget</name>
@@ -6758,7 +6875,7 @@ to %1</source>
     </message>
     <message>
       <source>Cloud user with specified email already exists.</source>
-      <translation type="unfinished">Cloud user with specified email already exists.</translation>
+      <translation>Bu isimde zaten bir bulut kullanıcı var.</translation>
     </message>
   </context>
   <context>
@@ -6800,7 +6917,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete &quot;%1&quot;?</translation>
+      <translation>Sil &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
@@ -6848,11 +6965,11 @@ to %1</source>
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation type="unfinished">URL cannot be empty.</translation>
+      <translation>URL boş olamaz.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation type="unfinished">Wrong URL format.</translation>
+      <translation>Yanlış URL formatı.</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -6948,7 +7065,7 @@ to %1</source>
     </message>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
-      <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+      <translation>&quot;%1&quot;'ye dışa aktarma;...</translation>
     </message>
     <message>
       <source>Export Layout As...</source>
@@ -7131,15 +7248,15 @@ to %1</source>
     </message>
     <message>
       <source>Connecting to the current System...</source>
-      <translation type="unfinished">Connecting to the current System...</translation>
-    </message>
-    <message>
-      <source>Server will be connected to the System shortly</source>
-      <translation type="unfinished">Server will be connected to the System shortly</translation>
+      <translation>Mevcut Sisteme Bağlanıyor...</translation>
     </message>
     <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Veritabanı eşitlemesi tamamlandığında kaynak ağacında görünür.</translation>
+    </message>
+    <message>
+      <source>Server will be connected to System shortly</source>
+      <translation>Sunucu kısa sürede Sistem'e bağlanacak</translation>
     </message>
   </context>
   <context>
@@ -7387,163 +7504,15 @@ to %1</source>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
-      <translation type="unfinished">New Web Page</translation>
+      <translation>Yeni Web Sayfası</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation type="unfinished">Edit Web Page</translation>
+      <translation>Web Sayfasını Düzenle</translation>
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n kullanıcılar</numerusform>
-        <numerusform>%n kullanıcılar</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>VERİ YOK</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the tour</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>Users</source>
-      <translation>Kullanıcılar</translation>
-    </message>
-    <message>
-      <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Tüm Kullanıcılar</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation type="unfinished">Switch with Hotkeys</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation type="unfinished">Switch on Timer</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (aktif)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (aktif)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
-    <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
-    </message>
-    <message>
-      <source>Next</source>
-      <translation>İleri</translation>
-    </message>
-    <message>
-      <source>Name is necessary</source>
-      <translation type="unfinished">Name is necessary</translation>
-    </message>
-    <message>
-      <source>Reason is necessary</source>
-      <translation type="unfinished">Reason is necessary</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>İsim</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>E Posta</translation>
-    </message>
-    <message>
-      <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
-    </message>
-    <message>
-      <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
-    </message>
-    <message>
-      <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
-    </message>
-    <message>
-      <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
-    </message>
-    <message>
-      <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::ptz</name>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>Kamera online olana kadar lütfen bekleyin.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>Geçerli konum alınamadı</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>Geçerli konum ayarlanamadı</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Bu pozisyon bazı turlar için kullanılıyor. Yinede silmek istiyor musunuz?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>Bu turlar geçersiz duruma gelecek.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::resources</name>
+    <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
       <translation>Aynı ekran düzeni isminden 1 tane daha var</translation>
@@ -7675,8 +7644,8 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>%n öğesi silinsin mi?</numerusform>
-        <numerusform>%n öğesi silinsin mi?</numerusform>
+        <numerusform>%n öğeleri silinsin mi?</numerusform>
+        <numerusform>%n öğeleri silinsin mi?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7697,7 +7666,7 @@ to %1</source>
       <source>%n I/O modules are auto-discovered.</source>
       <translation>
         <numerusform>%n I/o modülü bulundu.</numerusform>
-        <numerusform>%n I/o modülleri bulundu.</numerusform>
+        <numerusform>%n I/o modülü bulundu.</numerusform>
       </translation>
     </message>
     <message>
@@ -7705,23 +7674,33 @@ to %1</source>
       <translation>Kaldırdıktan sonra tekrar otomatik bulunabilir.</translation>
     </message>
     <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation type="unfinished">Overwrite existing layout tour?</translation>
+      <source>Overwrite existing showreel?</source>
+      <translation>Varolan showreel üstüne yazılsın mı?</translation>
     </message>
     <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation type="unfinished">There is another layout tour with the same name.</translation>
+      <source>There is another showreel with the same name.</source>
+      <translation>Bu isimde başka bir showreel düzeni mevcut.</translation>
     </message>
     <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout tour?</numerusform>
-        <numerusform>Remove %n items from layout tour?</numerusform>
+      <source>Remove %n items from showreel?</source>
+      <translation>
+        <numerusform>%n nesneleri showreelden kaldır?</numerusform>
+        <numerusform>%n nesneleri showreelden kaldır?</numerusform>
       </translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::videowall</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n kullanıcılar</numerusform>
+        <numerusform>%n kullanıcılar</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
       <translation>Aynı isimli başka bir video wall mevcut</translation>
@@ -7745,6 +7724,163 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Vide wallda yerel dosyaları görebilmek için lütfen kullandığınız bilgisayarı video wallun olduğu bilgisayara ekleyin.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopyala</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>Panoya Yapıştır</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>Yapıştır</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>Panodan Yapıştır</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopyalandı</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation>Yapıştırıldı</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>VERİ YOK</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>Düzen veya kamerayı showreele eklemek için buraya sürükleyin</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>Users</source>
+      <translation>Kullanıcılar</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation>Özelleştirilmiş kullanıcılar</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Tüm Kullanıcılar</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation>Kısayol tuşlarıyla geçiş yap</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation>Kapatma Zamanlayıcısı</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Showreel'i durdur</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Showreel'i başlat</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (aktif)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (aktif)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+      <source>Please fill up information about yourself and reason for license deactivation</source>
+      <translation>Lütfen kendinizle ilgili bilgileri doldurun ve lisans devre dışı bırakma nedenini doldurun</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>İleri</translation>
+    </message>
+    <message>
+      <source>Name is necessary</source>
+      <translation>Ad gerekiyor</translation>
+    </message>
+    <message>
+      <source>Reason is necessary</source>
+      <translation>Sebep gerekiyor</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>İsim</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>E Posta</translation>
+    </message>
+    <message>
+      <source>Reason for deactivation</source>
+      <translation>Devreden çıkarma nedeni</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation>-Birini seçin-</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation>Yanlışlıkla lisansı yanlış bir makineye atadım</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation>Diğer sebep</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation>Makinemi yeniliyorum</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation>Canlıya Git</translation>
     </message>
   </context>
   <context>
@@ -7772,27 +7908,27 @@ to %1</source>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+      <translation>Sunucu &quot;%1&quot; yanıt vermiyor.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>&quot;%1&quot; Sunucusu %n cihazlarına erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
+        <numerusform>&quot;%1&quot; Sunucusu %n cihazlarına erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>&quot;%1&quot; Sunucusu %n kameralarına erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
+        <numerusform>&quot;%1&quot; Sunucusu %n kameralarına erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>&quot;%1&quot; Sunucusu %n I/O Modüllerine erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
+        <numerusform>&quot;%1&quot; Sunucusu %n I/O Modüllerine erişim sağlayamıyor. Onları yine de taşımak istiyor musunuz?</numerusform>
       </translation>
     </message>
     <message>
@@ -7938,38 +8074,42 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>Düzeni değiştirmek için klavye oklarını kullanın. Showreel'den çıkmak için Esc tuşuna basın.</translation>
+    </message>
+    <message>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
     <message>
       <source>Switch by %1</source>
-      <translation type="unfinished">Switch by %1</translation>
+      <translation>%1 tarafından geçiş</translation>
     </message>
     <message>
       <source>Display for</source>
-      <translation type="unfinished">Display for</translation>
+      <translation>Görüntüle</translation>
     </message>
     <message>
       <source>Display selected for</source>
-      <translation type="unfinished">Display selected for</translation>
+      <translation>Seçili için görüntüle</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
-    </message>
-    <message>
-      <source>Layout Tour %1</source>
-      <translation type="unfinished">Layout Tour %1</translation>
-    </message>
-    <message>
       <source>Delete layout tour %1?</source>
-      <translation type="unfinished">Delete layout tour %1?</translation>
+      <translation>Yerleşim Turu %1 Silinsin mi?</translation>
+    </message>
+    <message>
+      <source>Showreel</source>
+      <translation>Showreel</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>Showreel %1</translation>
     </message>
   </context>
   <context>

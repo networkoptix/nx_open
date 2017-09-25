@@ -10,7 +10,8 @@ angular.module('webadminApp', [
     'tc.chartjs',
     'ngStorage',
     'typeahead-focus',
-    'ui.timepicker'
+    'ui.timepicker',
+    'angular-clipboard'
 ]).config(function ($routeProvider) {
 
     var universalResolves = {
@@ -55,14 +56,6 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'info.html',
             controller: 'InfoCtrl'
         })
-        .when('/developers/changelog', {
-            templateUrl: Config.viewsDir + 'api_changelog.html',
-            controller: 'MainCtrl'
-        })
-        .when('/developers', {
-            templateUrl: Config.viewsDir + 'developers.html',
-            controller: 'MainCtrl'
-        })
         .when('/support', {
             templateUrl: Config.viewsDir + 'support.html',
             controller: 'MainCtrl'
@@ -82,6 +75,31 @@ angular.module('webadminApp', [
             templateUrl: Config.viewsDir + 'debug.html',
             controller: 'DebugCtrl'
         })
+        .when('/developers', {
+            templateUrl: Config.viewsDir + 'devtools/developers.html',
+            controller: 'DevtoolsCtrl'
+        })
+        .when('/developers/api/:apiMethod*', {
+            templateUrl: Config.viewsDir + 'devtools/api.html',
+            controller: 'ApiToolCtrl',
+            reloadOnSearch: false
+        })
+        .when('/developers/api', {
+            templateUrl: Config.viewsDir + 'devtools/api.html',
+            controller: 'ApiToolCtrl',
+            reloadOnSearch: false
+        })
+        .when('/developers/events', {
+            templateUrl: Config.viewsDir + 'devtools/events.html',
+            controller: 'ApiToolCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.apiMethod = 'api/createEvent'; }]
+            }
+        })
+        .when('/developers/changelog', {
+            templateUrl: Config.viewsDir + 'devtools/api_changelog.html',
+            controller: 'DevtoolsCtrl'
+        })
         .when('/client', {
             templateUrl: Config.viewsDir + 'client.html',
             controller: 'ClientCtrl',
@@ -93,16 +111,6 @@ angular.module('webadminApp', [
         })
         .when('/view/:cameraId', {
             templateUrl: Config.viewsDir + 'view.html',
-            reloadOnSearch: false
-        })
-        .when('/viewdebug', {
-            templateUrl: Config.viewsDir + 'viewdebug.html',
-            controller: 'ViewdebugCtrl',
-            reloadOnSearch: false
-        })
-        .when('/viewdebug/:cameraId', {
-            templateUrl: Config.viewsDir + 'viewdebug.html',
-            controller: 'ViewdebugCtrl',
             reloadOnSearch: false
         })
         .when('/sdkeula', {

@@ -39,6 +39,11 @@ namespace LLUtil {
         std::array<bool, 2> guidCompatibilities = { false, true };
 
         QStringList macs = version >= 4 ? getMacAddressList(hardwareInfo.nics) : QStringList("");
+
+        // Workaround issue when in 2.6 hardwareid sometimes calculated without mac address
+        if (version >= 4)
+            macs << kEmptyMac;
+
         for (QString mac : macs)
         {
             QStringList hardwareIds;
@@ -64,6 +69,8 @@ namespace LLUtil {
         if (devices.empty())
             return QStringList();
 
+        // Here we first sort by device class, then by mac address
+        // So, PCI comes first, then USB, then XXX (Others).
         QnMacAndDeviceClassList devicesCopy(devices);
         std::sort(devicesCopy.begin(), devicesCopy.end(), [](const QnMacAndDeviceClass& device1, const QnMacAndDeviceClass& device2)
         {
@@ -134,7 +141,7 @@ namespace LLUtil {
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             if (macs.isEmpty())
             {
-                NX_LOG(QnLog::HWID_LOG, "No network cards detected. HardwareID can't be calculated.", cl_logERROR);
+                NX_LOG(QnLog::HWID_LOG, "No network cards detected.", cl_logERROR);
             }
 
             g_storedMac = saveMac(macs, settings);

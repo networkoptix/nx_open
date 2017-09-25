@@ -5,6 +5,11 @@
 namespace nx {
 namespace utils {
 namespace db {
+    
+QueryExecutionInfo::QueryExecutionInfo():
+    waitForExecutionDuration(std::chrono::milliseconds::zero())
+{
+}
 
 DurationStatistics::DurationStatistics():
     min(std::chrono::milliseconds::max()),

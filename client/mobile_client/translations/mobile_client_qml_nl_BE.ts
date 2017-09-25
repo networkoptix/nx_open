@@ -8,10 +8,6 @@
       <translation>Selecteer camera</translation>
     </message>
     <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
-    </message>
-    <message>
       <source>Authentication required</source>
       <translation type="unfinished">Authentication required</translation>
     </message>
@@ -24,14 +20,14 @@
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <translation>Cloud Account</translation>
     </message>
   </context>
   <context>
@@ -57,11 +53,11 @@
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Meer informatie over %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Account aanmaken</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -69,7 +65,7 @@
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan niet verbinden met %1</translation>
     </message>
     <message>
       <source>Email and password cannot be empty</source>
@@ -81,7 +77,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Incorrecte email of wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -92,7 +88,7 @@
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Verbinden met server</translation>
     </message>
     <message>
       <source>Enter server address</source>
@@ -108,7 +104,7 @@
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Verwijder verbinding?</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
@@ -123,11 +119,11 @@
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Ontwikkelaarinstellingen</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Log niveau</translation>
     </message>
   </context>
   <context>
@@ -179,7 +175,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
   </context>
   <context>
@@ -224,15 +220,15 @@
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Low-Res</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
@@ -268,6 +264,10 @@
       <source>%1 is offline</source>
       <translation type="unfinished">%1 is offline</translation>
     </message>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+    </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
@@ -280,7 +280,7 @@
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Verbinden</translation>
     </message>
   </context>
   <context>
@@ -298,7 +298,7 @@
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Geen afbeelding</translation>
     </message>
   </context>
   <context>
@@ -333,7 +333,7 @@
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>Videokwaliteit</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -372,7 +372,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Niets gevonden</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
@@ -387,7 +387,18 @@
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Zoek</translation>
+    </message>
+  </context>
+  <context>
+    <name>SelectCameraDummy</name>
+    <message>
+      <source>Select camera</source>
+      <translation type="unfinished">Select camera</translation>
+    </message>
+    <message>
+      <source>Press Ctrl + Arrow or use mouse wheel</source>
+      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
     </message>
   </context>
   <context>
@@ -417,7 +428,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Gebruikers</translation>
     </message>
   </context>
   <context>
@@ -432,18 +443,26 @@
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>INCOMPATIBELE</translation>
+    </message>
+    <message>
+      <source>UNREACHABLE</source>
+      <translation type="unfinished">UNREACHABLE</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan niet verbinden met %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -459,7 +478,7 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Verbinding maken met een andere server...</translation>
     </message>
     <message>
       <source>No Systems found</source>
@@ -532,6 +551,10 @@
       <source>Unknown</source>
       <translation>Onbekend</translation>
     </message>
+    <message>
+      <source>New Server</source>
+      <translation type="unfinished">New Server</translation>
+    </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
@@ -544,19 +567,34 @@
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Knippen</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopiëren</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Plakken</translation>
     </message>
     <message>
       <source>Select All</source>
       <translation>Alles selecteren</translation>
+    </message>
+  </context>
+  <context>
+    <name>TransformationsNotSupportedWarning</name>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+    </message>
+    <message>
+      <source>Show as is</source>
+      <translation type="unfinished">Show as is</translation>
+    </message>
+    <message>
+      <source>(Space)</source>
+      <translation type="unfinished">(Space)</translation>
     </message>
   </context>
   <context>
@@ -583,6 +621,18 @@
     <message>
       <source>Cannot load video</source>
       <translation type="unfinished">Cannot load video</translation>
+    </message>
+    <message>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation type="unfinished">Cannot play any video stream</translation>
     </message>
   </context>
   <context>
@@ -611,20 +661,12 @@
       <source>Information</source>
       <translation>Informatie</translation>
     </message>
-    <message>
-      <source>Select camera</source>
-      <translation>Selecteer camera</translation>
-    </message>
-    <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
-    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Overslaan</translation>
     </message>
   </context>
 </TS>

@@ -11,24 +11,25 @@ skip_sign = '${windows.skip.sign}' == 'true'
 build_nxtool = '${nxtool}' == 'true'
 build_paxton = ('${arch}' == 'x86' and '${paxton}' == 'true')
 
-bin_source_dir = '${libdir}/bin/${build.configuration}'
+bin_source_dir = '${bin_source_dir}'
+installer_target_dir = '${installer.target.dir}'
 
-server_msi_folder = 'bin/msi'
-server_msi_strip_folder = 'bin/strip'
-server_exe_folder = 'bin/exe'
+server_msi_folder = '${installer.target.dir}/msi'
+server_msi_strip_folder = '${installer.target.dir}/strip'
+server_exe_folder = '${installer.target.dir}/exe'
 
-client_msi_folder = 'bin/msi'
-client_msi_strip_folder = 'bin/strip'
-client_exe_folder = 'bin/exe'
+client_msi_folder = '${installer.target.dir}/msi'
+client_msi_strip_folder = '${installer.target.dir}/strip'
+client_exe_folder = '${installer.target.dir}/exe'
 
-full_exe_folder = 'bin/exe'
-nxtool_exe_folder = 'bin/exe'
+full_exe_folder = '${installer.target.dir}/exe'
+nxtool_exe_folder = '${installer.target.dir}/exe'
 
-paxton_msi_folder = 'bin/msi'
-paxton_msi_strip_folder = 'bin/strip'
-paxton_exe_folder = 'bin/exe'
+paxton_msi_folder = '${installer.target.dir}/msi'
+paxton_msi_strip_folder = '${installer.target.dir}/strip'
+paxton_exe_folder = '${installer.target.dir}/exe'
 
-nxtool_msi_folder = 'bin/msi'
+nxtool_msi_folder = '${installer.target.dir}/msi'
 
 
 wix_pdb = 'wixsetup.wixpdb'
@@ -84,6 +85,7 @@ def get_candle_command(project, suffix, args, components):
     command.append('-dServerMsiName={}'.format(server_msi_name))
     command.append('-dNxtoolMsiName={}'.format(nxtool_msi_name))
     command.append('-dPaxtonMsiName={}'.format(paxton_msi_name))
+    command.append('-dInstallerTargetDir={}'.format(installer_target_dir))
 
     add_components(command, components)
 
@@ -117,12 +119,16 @@ def get_candle_command(project, suffix, args, components):
 def get_light_command(folder, msi, suffix):
     command = ['light']
     command.append('-sice:ICE07')
+    command.append('-sice:ICE38')
+    command.append('-sice:ICE43')
+    command.append('-sice:ICE57')
     command.append('-sice:ICE60')
+    command.append('-sice:ICE64')
     command.append('-sice:ICE69')
     command.append('-sice:ICE91')
     command.append('-cultures:${installer.cultures}')
     command.append('-cc')
-    command.append('${libdir}/bin/${build.configuration}/cab')
+    command.append('{0}/cab'.format(bin_source_dir))
     command.append('-reusecab')
     command.append('-loc')
     command.append('OptixTheme_${installer.language}.wxl')
@@ -245,7 +251,7 @@ def add_build_nxtool_commands(commands):
                 None,
                 nxtool_components, nxtool_exe_components,
                 engine_tmp_folder)
-              
+
 def add_build_paxton_commands(commands):
     add_build_commands_msi_exe_generic(commands, 'paxton', 'paxton-exe',
                 paxton_msi_strip_folder, paxton_msi_name,

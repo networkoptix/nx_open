@@ -29,7 +29,7 @@
     "restorePassword":"Jelszó visszaállítása -",
     "restorePasswordSuccess":"Jelszó elmentve -",
     "restorePasswordCode":"Jelszó visszaállítása -",
-    "view":"View cameras - ",
+    "view":"Kamerák megtekintése - ",
     "contentPage":"",
     "debug":"Hibakeresés",
     "login":"Bejelentkezés -",
@@ -72,7 +72,7 @@
     },
     "Custom":{
       "label":"Egyéni",
-      "description":"Egyéni engedélyek konfigurálásához használja a {{PRODUCT_NAME}} klienst"
+      "description":"Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     },
     "cloudAdmin":{
       "label":"Adminisztrátor",
@@ -81,6 +81,26 @@
     "customRole":{
       "label":"Egyéni szerepkör",
       "description":"Rendszerben megadott egyéni szerepkör"
+    },
+    "owner":{
+      "label":"Tulajdonos",
+      "description":"Korlátlan jog, mely tartalmazza a felhőhöz való csatlakozást, megosztást, leválasztást"
+    },
+    "viewer":{
+      "label":"Felhasználó",
+      "description":"Élő videó megtekintése és rögzített visszajátszása"
+    },
+    "liveViewer":{
+      "label":"Felhasználó (élő)",
+      "description":"Csak élőkép megtekintése"
+    },
+    "advancedViewer":{
+      "label":"Speciális felhasználó",
+      "description":"Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+    },
+    "custom":{
+      "label":"Egyéni",
+      "description":"Egyéni engedélyek konfigurálásához használjon {{PRODUCT_NAME}} klienst"
     }
   },
   "errorCodes":{
@@ -117,7 +137,7 @@
     "cantEditAdmin":"Ez a felhasználó rendszergazdai jogokkal rendelkezik",
     "cantOpenClient":"{{VMS_NAME}} nincs törölve. <a href=\"/download\">Letöltés</a>",
     "lostConnection":"{{systemName}} kapcsolat megszakadt",
-    "thisSystem":"the system"
+    "thisSystem":"a rendszer"
   },
   "passwordRequirements":{
     "minLengthMessage":"A jelszónak legalább 8 karakterből kell állnia",
@@ -214,7 +234,7 @@
     "createAccount":"Fiók létrehozása"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"Minden rendszer",
     "systems":"Rendszerek"
   }
 }

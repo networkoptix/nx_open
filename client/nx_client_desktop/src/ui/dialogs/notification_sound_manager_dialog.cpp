@@ -2,11 +2,11 @@
 #include "ui_notification_sound_manager_dialog.h"
 
 #include <QtCore/QFileInfo>
-#include <QtWidgets/QInputDialog>
 
 #include <client/client_settings.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>
@@ -68,7 +68,7 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked()
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked()
 {
-    //TODO: #GDM #Common progressbar required
+    // TODO: #GDM #Common progressbar required
 
     QString supportedFormats = tr("Sound Files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
@@ -116,22 +116,24 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked()
 
     QString title = m_model->titleByFilename(filename);
 
-    QString newTitle = QInputDialog::getText(this,
+    const auto newTitle = QnInputDialog::getText(this,
         tr("Rename sound"),
         tr("Enter New Title:"),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         QLineEdit::Normal,
+        QString(),
         title);
+
     if (newTitle.isEmpty())
         return;
 
     if (!context()->instance<ServerNotificationCache>()->updateTitle(filename, newTitle))
         QnMessageBox::warning(this, tr("Failed to set new title"));
-
 }
 
 void QnNotificationSoundManagerDialog::at_deleteButton_clicked()
 {
-    //TODO: #GDM #Common progressbar required
+    // TODO: #GDM #Common progressbar required
     if (!ui->listView->currentIndex().isValid())
         return;
 

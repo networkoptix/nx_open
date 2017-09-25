@@ -82,13 +82,22 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>雲端系統只可以與非雲端系統合併. 系統名稱和密碼將取自雲端系統.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>系統事件</translation>
     </message>
   </context>
   <context>
@@ -123,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>從伺服器 %1: "%2" 接收到錯誤回應.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -147,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>I/O發生錯誤. 錯誤訊息為: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -171,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>設備請求&quot;%1&quot; 失敗, 錯誤訊息 &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>攝影機請求&quot;%1&quot; 失敗, 錯誤訊息 &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -215,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I/O模組請求&quot;%1&quot; 失敗, 錯誤訊息 &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -303,7 +312,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>攝影機是從錄影資料中找回的. 刪除相機並重加一遍以瀏覽即時影像.</translation>
     </message>
   </context>
   <context>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>試用</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>類比</translation>
     </message>
@@ -403,11 +408,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>類比編碼器</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>測試用授權</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>可用授權</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>時效性</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation>時效性授權</translation>
     </message>
   </context>
   <context>
@@ -537,7 +546,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>找不到符合硬體ID的伺服器</translation>
     </message>
   </context>
   <context>
@@ -641,10 +650,6 @@
       <translation>未知</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>測試用授權</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>免費授權</translation>
     </message>
@@ -658,7 +663,11 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>硬體 Id: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation>時效性授權</translation>
     </message>
   </context>
   <context>
@@ -1194,7 +1203,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>伺服器 &quot;%1&quot; 故障</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1208,19 +1217,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>伺服器 &quot;%1&quot; 衝突</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>伺服器 &quot;%1&quot; 已啟動</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>伺服器 &quot;%1&quot; 有授權問題</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>伺服器 &quot;%1&quot; 已完成錄影資料備份</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1232,7 +1241,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>發生了多個%1事件</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1274,18 +1283,18 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>觸發器：%1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n 次, 第一次: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1348,11 +1357,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD &quot;%1&quot; 已滿. 硬碟裡包含太多非VMS資料.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>系統磁碟 &quot;%1&quot; 幾乎已滿.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1436,7 +1445,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>所有管理者</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1448,23 +1457,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>觸發按鈕</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>觸發按鈕 %1 在 %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>觸發按鈕 %1 已被觸發多次</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>傳送電子郵件</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>確認</translation>
     </message>
   </context>
   <context>

@@ -15,9 +15,8 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx/streaming/abstract_data_packet.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
-
-class QnMediaStreamEventReceiver;
 
 namespace detail {
 
@@ -66,11 +65,8 @@ public:
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
-    void addEventReceiver( QnMediaStreamEventReceiver* keyFrameEventReceiver );
-    /*!
-        \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
-    */
-    void removeEventReceiver( QnMediaStreamEventReceiver* keyFrameEventReceiver );
+    nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/>& keyFrameFoundSubscription();
+    nx::utils::Subscription<>& streamTimeDiscontinuityFoundSubscription();
 
     //!Prevents data starting with \a timestamp from removal
     /*!
@@ -121,10 +117,10 @@ private:
     //!In micros
     qint64 m_prevPacketSrcTimestamp;
     size_t m_cacheSizeInBytes;
-    //!map<event receiver id, function>
-    std::set<QnMediaStreamEventReceiver* > m_eventReceivers;
     std::map<int, quint64> m_dataBlockings;
     mutable QElapsedTimer m_inactivityTimer;
+    nx::utils::Subscription<quint64 /*currentPacketTimestampUSec*/> m_onKeyFrame;
+    nx::utils::Subscription<> m_onDiscontinue;
 
     void clearCacheIfNeeded(QnMutexLockerBase* const lk);
 };

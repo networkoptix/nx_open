@@ -111,7 +111,7 @@ void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF& enclosingGe
 // -------------------------------------------------------------------------- //
 QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
-    m_defaultActionIdx(-1),    
+    m_defaultActionIdx(-1),
     m_verticalLayout(new QGraphicsLinearLayout(Qt::Vertical)),
     m_primaryLayout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
@@ -192,7 +192,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
 QnNotificationWidget::~QnNotificationWidget()
 {
-    //TODO: #GDM #Business if our sound is playing at the moment - stop it
+    // TODO: #GDM #Business if our sound is playing at the moment - stop it
 }
 
 QString QnNotificationWidget::text() const
@@ -259,12 +259,6 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
     m_closeButton->setGeometry(buttonGeometry);
 }
 
-void QnNotificationWidget::setCloseButtonUnavailable()
-{
-    m_closeButtonAvailable = false;
-    m_closeButton->hide();
-}
-
 void QnNotificationWidget::addActionButton(
     const QIcon& icon,
     ActionType actionId,
@@ -325,6 +319,20 @@ void QnNotificationWidget::addTextButton(
     m_verticalLayout->addItem(rowLayout);
 }
 
+bool QnNotificationWidget::isCloseButtonAvailable() const
+{
+    return m_closeButtonAvailable;
+}
+
+void QnNotificationWidget::setCloseButtonAvailable(bool value)
+{
+    m_closeButtonAvailable = value;
+    if (value)
+        m_closeButton->show();
+    else
+        m_closeButton->hide();
+}
+
 void QnNotificationWidget::triggerDefaultAction()
 {
     if (m_defaultActionIdx < 0)
@@ -356,7 +364,7 @@ void QnNotificationWidget::paint(QPainter* painter, const QStyleOptionGraphicsIt
 
     painter->drawLine(rect.bottomLeft(), rect.bottomRight());
 
-    //TODO: #GDM #Business draw corresponding image
+    // TODO: #GDM #Business draw corresponding image
 }
 
 void QnNotificationWidget::hideToolTip()

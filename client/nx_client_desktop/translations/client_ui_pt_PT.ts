@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation type="unfinished">Reset All Warnings</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation type="unfinished">Disable blur</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>Instantâneo</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Adicionar Armazenamento Externo...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation type="unfinished">Version:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Verificar</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation type="unfinished">Not Checked</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation type="unfinished">Get Installed Versions</translation>
     </message>
   </context>
   <context>
@@ -393,11 +375,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Todos os servidores estão offline. Os Log's não estão disponíveis.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Log de bookmarks</translation>
     </message>
@@ -466,6 +443,11 @@
       <location/>
       <source>Event Log...</source>
       <translation>Log de eventos...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Testar</translation>
     </message>
   </context>
   <context>
@@ -588,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation type="unfinished">Advanced settings are unavailable</translation>
     </message>
@@ -906,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1474,16 +1446,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Colar do Clipboard</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Copiar para o Clipboard</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Seleccionar ficheiro de licença...</translation>
     </message>
@@ -1651,13 +1613,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <source>seconds</source>
+      <translation>segundos</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>segundos</translation>
+      <source>Showreel cycle</source>
+      <translation type="unfinished">Showreel cycle</translation>
     </message>
   </context>
   <context>
@@ -1916,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation type="unfinished">Stay logged in</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2099,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation type="unfinished">Warning: file with the same name already exists!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>Actualizar Servidores</translation>
     </message>
   </context>
   <context>

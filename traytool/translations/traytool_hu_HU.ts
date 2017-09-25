@@ -87,19 +87,19 @@
     </message>
     <message>
       <source>stopped</source>
-      <translation>lellítva</translation>
+      <translation>leállítva</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation>elindítva</translation>
+      <translation>indul</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation>leállás</translation>
+      <translation>leáll</translation>
     </message>
     <message>
       <source>started</source>
-      <translation>indulás</translation>
+      <translation>fut</translation>
     </message>
     <message>
       <source>resuming</source>

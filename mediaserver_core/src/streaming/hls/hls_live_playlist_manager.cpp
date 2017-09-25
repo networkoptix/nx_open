@@ -24,10 +24,18 @@ namespace nx_hls
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),
         m_blockID( -1 ),
-        m_removedChunksToKeepCount(removedChunksToKeepCount)
+        m_removedChunksToKeepCount(removedChunksToKeepCount),
+        m_onKeyFrameSubscriptionId(nx::utils::kInvalidSubscriptionId),
+        m_onDiscontinueSubscriptionId(nx::utils::kInvalidSubscriptionId)
     {
         using namespace std::placeholders;
-        m_mediaStreamCache->addEventReceiver( this );
+
+        m_mediaStreamCache->keyFrameFoundSubscription().subscribe(
+            std::bind(&HLSLivePlaylistManager::onKeyFrame, this, _1),
+            &m_onKeyFrameSubscriptionId);
+        m_mediaStreamCache->streamTimeDiscontinuityFoundSubscription().subscribe(
+            std::bind(&HLSLivePlaylistManager::onDiscontinue, this),
+            &m_onDiscontinueSubscriptionId);
 
         m_inactivityTimer.restart();
     }
@@ -39,7 +47,9 @@ namespace nx_hls
             m_mediaStreamCache->unblockData( m_blockID );
             m_blockID = -1;
         }
-        m_mediaStreamCache->removeEventReceiver( this );
+
+        m_mediaStreamCache->streamTimeDiscontinuityFoundSubscription().removeSubscription(m_onDiscontinueSubscriptionId);
+        m_mediaStreamCache->keyFrameFoundSubscription().removeSubscription(m_onKeyFrameSubscriptionId);
     }
 
     //!Same as \a generateChunkList, but returns \a chunksToGenerate last chunks of available data

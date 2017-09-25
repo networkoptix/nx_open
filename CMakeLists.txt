@@ -12,29 +12,41 @@ option(rdepSync
     "Whether rdep should sync packages or use only existing copies"
     ON)
 
+option(addQtPdb
+    "Whether add Qt PDB files to debug libs"
+    OFF)
+
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
 set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")
 
+if(targetDevice STREQUAL "none")
+    set(targetDevice "")
+endif()
+
 # Early loading rdep to download a toolchain if needed.
 include(build_utils/cmake/find_python.cmake)
 include(build_utils/cmake/rdep.cmake)
 nx_rdep_configure()
 
-if(targetDevice)
+if(targetDevice AND NOT targetDevice STREQUAL "ios")
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
     include(cmake/sync_toolchain.cmake)
 endif()
 
 project(vms VERSION 3.1.0)
 
+if(targetDevice STREQUAL "ios")
+    include(cmake/ios.cmake)
+endif()
+
 set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
 
-set(mobileClientVersion 17.2)
+set(mobileClientVersion 17.3)
 set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -58,7 +70,6 @@ include(test_utils)
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
-set(static_customization_dir "$ENV{environment}/customization/${customization}")
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
@@ -99,6 +110,8 @@ endif()
 
 if(ANDROID)
     include(android-apk)
+elseif(IOS)
+    include(ios_app)
 endif()
 
 link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
@@ -114,12 +127,6 @@ find_package(Qt5
         Sql
         Concurrent
         Multimedia)
-
-if(withDesktopClient OR withTrayTool)
-    find_package(Qt5
-        COMPONENTS
-            Widgets)
-endif()
 
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
@@ -140,6 +147,9 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_subdirectory(wixsetup)
+    endif()
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
@@ -157,6 +167,10 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
 endif()
 
+if(withTestCamera)
+    add_subdirectory(testcamera)
+endif()
+
 if(withTrayTool)
     add_subdirectory(traytool)
 endif()
@@ -170,4 +184,12 @@ if(withTests)
     add_subdirectory(tests)
 endif()
 
+if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+    add_subdirectory(edge_firmware)
+endif()
+
 include(fix_qt_vars)
+
+nx_configure_file(
+    build_variables/maven/filter-resources/build_info.txt
+    ${CMAKE_CURRENT_BINARY_DIR})

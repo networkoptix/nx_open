@@ -33,6 +33,7 @@
 #include <database/migrations/add_history_attributes_to_transaction.h>
 #include <database/migrations/reparent_videowall_layouts.h>
 #include <database/migrations/add_default_webpages_migration.h>
+#include <database/migrations/cleanup_removed_transactions.h>
 
 #include <network/system_helpers.h>
 
@@ -468,7 +469,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
         QSqlQuery queryAdminUser(m_sdb);
         queryAdminUser.setForwardOnly(true);
-        queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'"); //TODO: #GDM check owner permission instead
+        queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'"); // TODO: #GDM check owner permission instead
         execSQLQuery(&queryAdminUser, Q_FUNC_INFO);
         if (queryAdminUser.next())
         {
@@ -646,8 +647,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 userResource->getRealm() != nx::network::AppInfo::realm() ||
                 !userResource->isEnabled())
             {
-                userResource->setPassword(defaultAdminPassword);
-                userResource->generateHash();
+                userResource->setPasswordAndGenerateHash(defaultAdminPassword);
                 userResource->setEnabled(true);
                 updateUserResource = true;
             }
@@ -972,12 +972,29 @@ bool QnDbManager::updateGuids()
         return false;
 
     // update default rules
-    guids = getGuidList("SELECT id, id from vms_businessrule WHERE (id between 1 and 19) or (id between 10020 and 10023) ORDER BY id", CM_INT, "DEFAULT_BUSINESS_RULES");
+    guids = getGuidList(
+        R"sql(
+            SELECT id, id
+            FROM vms_businessrule
+            WHERE (id between 1 and 19) or (id between 10020 and 10023)
+            ORDER BY id
+        )sql",
+        CM_INT,
+        nx::vms::event::Rule::kGuidPostfix);
+
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
     // update user's rules
-    guids = getGuidList("SELECT id, id from vms_businessrule WHERE guid is null ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
+    guids = getGuidList(
+        R"sql(
+            SELECT id, id
+            FROM vms_businessrule
+            WHERE guid is null
+            ORDER BY id
+        )sql",
+        CM_INT,
+        QnUuid::createUuid().toByteArray());
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
@@ -1343,7 +1360,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName.endsWith(lit("/07_videowall.sql")))
     {
-        //TODO: #GDM move to migration?
+        // TODO: #GDM move to migration?
         auto guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
         return updateTableGuids("vms_resourcetype", "guid", guids);
     }
@@ -1371,7 +1388,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/32_default_business_rules.sql")))
     {
-        //TODO: #GDM move to migration
+        // TODO: #GDM move to migration
         for (const auto& rule: vms::event::Rule::getSystemRules())
         {
             ApiBusinessRuleData ruleData;
@@ -1402,7 +1419,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/43_add_business_rules.sql")))
     {
-        //TODO: #GDM move to migration
+        // TODO: #GDM move to migration
         for (const auto& rule: vms::event::Rule::getRulesUpd43())
         {
             ApiBusinessRuleData ruleData;
@@ -1415,7 +1432,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/48_add_business_rules.sql")))
     {
-        //TODO: #GDM move to migration
+        // TODO: #GDM move to migration
         for (const auto& rule: vms::event::Rule::getRulesUpd48())
         {
             ApiBusinessRuleData ruleData;
@@ -1466,19 +1483,19 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return ec2::db::migrateRulesToV30(m_sdb) && resyncIfNeeded(ResyncRules);
 
     if (updateName.endsWith(lit("/52_fix_onvif_mt.sql")))
-        return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
+        return removeWrongSupportedMotionTypeForONVIF(); // TODO: #rvasilenko consistency break
 
     if (updateName.endsWith(lit("/65_transaction_log_add_fields.sql")))
         return resyncIfNeeded(ResyncLog);
 
     if (updateName.endsWith(lit("/68_add_transaction_type.sql")))
-        return migration::addTransactionType::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+        return migration::addTransactionType::migrate(&m_sdb); // TODO: #rvasilenko namespaces consistency break
 
     if (updateName.endsWith(lit("/68_cleanup_db.sql")))
         return resyncIfNeeded({ClearLog, ResyncLog});
 
     if (updateName.endsWith(lit("/70_make_transaction_timestamp_128bit.sql")))
-        return migration::timestamp128bit::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+        return migration::timestamp128bit::migrate(&m_sdb); // TODO: #rvasilenko namespaces consistency break
 
     if (updateName.endsWith(lit("/73_encrypt_kvpairs.sql")))
         return encryptKvPairs();
@@ -1530,6 +1547,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
         return ec2::db::migrateEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
+        return ec2::db::cleanupClientInfoList(m_sdb);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -1958,7 +1978,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
-    }
+    }   
 
     return ErrorCode::ok;
 }
@@ -1984,10 +2004,10 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
     const auto query = m_insertCameraScheduleQuery.get(m_sdb, R"sql(
         INSERT INTO vms_scheduletask (
             camera_attrs_id, start_time, end_time, do_record_audio, record_type,
-            day_of_week, before_threshold, after_threshold, stream_quality, fps
+            day_of_week, before_threshold, after_threshold, stream_quality, fps, bitrate_kbps
         ) VALUES (
             :internalId, :startTime, :endTime, :recordAudio, :recordingType,
-            :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps
+            :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps, :bitrateKbps
         ))sql");
 
     query->bindValue(":internalId", internalId);
@@ -2242,17 +2262,6 @@ ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::dbError;
     }
-}
-
-qint32 QnDbManager::getBusinessRuleInternalId( const QnUuid& guid )
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT id from vms_businessrule where guid = :guid");
-    query.bindValue(":guid", guid.toRfc4122());
-    if (!query.exec() || !query.next())
-        return 0;
-    return query.value("id").toInt();
 }
 
 ErrorCode QnDbManager::removeUser( const QnUuid& guid )
@@ -3381,7 +3390,8 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
             st.before_threshold as beforeThreshold,\
             st.after_threshold as afterThreshold,  \
             st.stream_quality as streamQuality,    \
-            st.fps                                 \
+            st.fps,                                \
+            st.bitrate_kbps as bitrateKbps         \
         FROM vms_scheduletask st \
         JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id \
         LEFT JOIN vms_resource r2 on r2.guid = r.camera_guid \
@@ -4305,6 +4315,8 @@ bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
 {
     if (!m_dbJustCreated)
         m_resyncFlags |= flags;
+    if (flags.testFlag(ResyncWebPages))
+        m_resyncFlags |= ResyncWebPages; //< Resync web pages always. Media servers could have different list even it started with empty DB.
     return true;
 }
 

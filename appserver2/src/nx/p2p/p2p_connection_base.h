@@ -53,17 +53,16 @@ public:
     ConnectionBase(
         const QnUuid& remoteId,
         const ApiPeerDataEx& localPeer,
-        ConnectionLockGuard connectionLockGuard,
         const QUrl& remotePeerUrl,
         const std::chrono::seconds& keepAliveTimeout,
-        std::unique_ptr<QObject> opaqueObject);
+        std::unique_ptr<QObject> opaqueObject,
+        std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
     ConnectionBase(
         const ApiPeerDataEx& remotePeer,
         const ApiPeerDataEx& localPeer,
-        ConnectionLockGuard connectionLockGuard,
         nx::network::WebSocketPtr webSocket,
-        const Qn::UserAccessData& userAccessData,
-        std::unique_ptr<QObject> opaqueObject);
+        std::unique_ptr<QObject> opaqueObject,
+        std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
     virtual ~ConnectionBase();
 
     static const SendCounters& sendCounters() { return m_sendCounters;  }
@@ -71,13 +70,13 @@ public:
     /** Peer that opens this connection */
     Direction direction() const { return m_direction; }
 
-    virtual const ApiPeerData& localPeer() const override { return m_localPeer; }
-    virtual const ApiPeerData& remotePeer() const override { return m_remotePeer; }
+    virtual const ApiPeerDataEx& localPeer() const override { return m_localPeer; }
+    virtual const ApiPeerDataEx& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
     virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
 
     State state() const;
-    void setState(State state);
+    virtual void setState(State state);
 
     void sendMessage(MessageType messageType, const nx::Buffer& data);
     void sendMessage(const nx::Buffer& data);
@@ -87,14 +86,17 @@ public:
 
     QObject* opaqueObject();
 
-    const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual QUrl remoteAddr() const override;
+    const nx::network::WebSocket* webSocket() const;
+    void stopWhileInAioThread();
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
     void allDataSent(QWeakPointer<ConnectionBase> connection);
 protected:
     virtual void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey) = 0;
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    nx::network::WebSocket* webSocket();
 private:
     void cancelConnecting(State state, const QString& reason);
 
@@ -129,15 +131,13 @@ private:
 
     Direction m_direction;
     QUrl m_remotePeerUrl;
-    const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
-
-    std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
 
     static SendCounters m_sendCounters;
 
     network::aio::Timer m_timer;
     std::chrono::seconds m_keepAliveTimeout;
     std::unique_ptr<QObject> m_opaqueObject;
+    std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
 
     int m_sendSequence = 0;
     int m_lastReceivedSequence = 0;

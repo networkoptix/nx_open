@@ -22,6 +22,7 @@
 #include <utils/common/util.h>
 #include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
+#include <media_server/media_server_module.h>
 
 namespace
 {
@@ -80,7 +81,12 @@ int QnStorageSpaceRestHandler::executeGet(
 QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
 {
     QList<QString> result;
-    for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    auto pluginManager = qnServerModule->pluginManager();
+    NX_ASSERT(pluginManager, "There should be common module.");
+    if (!pluginManager)
+        return result;
+
+    for (const auto storagePlugin : pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         result.push_back(storagePlugin->storageType());
     result.push_back(lit("smb"));
     return result;

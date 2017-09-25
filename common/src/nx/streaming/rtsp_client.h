@@ -32,7 +32,7 @@ class QnRtspClient;
 
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
-static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
+static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
@@ -185,6 +185,9 @@ public:
         QPair<int,int> interleaved;
 
         QnRtspIoDevice* ioDevice;
+
+        bool isBackChannel = false;
+        int timeBase = 0;
     };
 
     static QString mediaTypeToStr(TrackType tt);
@@ -288,7 +291,7 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
 
-    void sendBynaryResponse(quint8* buffer, int size);
+    void sendBynaryResponse(const quint8* buffer, int size);
 
     QnRtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
     int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
@@ -301,6 +304,8 @@ public:
 
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
+    
+    void setTrackInfo(const TrackMap& tracks);
 
     AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
     void setUserAgent(const QString& value);

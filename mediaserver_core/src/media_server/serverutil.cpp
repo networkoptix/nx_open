@@ -108,6 +108,9 @@ bool updateUserCredentials(
         return false;
     }
 
+    ec2::ApiUserData apiOldUser;
+    fromResourceToApi(userRes, apiOldUser);
+
     //generating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
         data.cryptSha512Hash = linuxCryptSha512(data.password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH));
@@ -131,8 +134,7 @@ bool updateUserCredentials(
     if (!data.password.isEmpty())
     {
         /* set new password */
-        updatedUser->setPassword(data.password);
-        updatedUser->generateHash();
+        updatedUser->setPasswordAndGenerateHash(data.password);
     }
     else if (!data.passwordHash.isEmpty())
     {
@@ -145,6 +147,10 @@ bool updateUserCredentials(
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(updatedUser, apiUser);
+
+    if (apiOldUser == apiUser)
+        return true; //< Nothing to update.
+
     auto errCode = connection->getUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)
@@ -153,7 +159,7 @@ bool updateUserCredentials(
             *errString = lit("Internal server database error: %1").arg(toString(errCode));
         return false;
     }
-    updatedUser->setPassword(QString());
+    updatedUser->resetPassword();
 
     HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedUser);
     return true;

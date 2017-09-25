@@ -85,6 +85,7 @@ public:
         OnNewConnectionHandler handler) override;
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+    virtual std::string toString() const override;
 
 private:
     typedef nx::network::server::BaseStreamProtocolConnectionEmbeddable<

@@ -44,6 +44,8 @@ angular.module('nxCommon')
             this.urlBase = this._getUrlBase();
         }
 
+        ServerConnection.emptyId = '{00000000-0000-0000-0000-000000000000}';
+
         // Connections cache
         var connections = {};
         function connect (userEmail, systemId, serverId, unauthorizedCallBack){
@@ -56,6 +58,9 @@ angular.module('nxCommon')
         ServerConnection.prototype.connect = connect;
 
 
+        function cleanId(id){
+            return id.replace('{','').replace('}','');
+        }
         /* Helpers */
         ServerConnection.prototype._getUrlBase = function(){
             var urlBase = '';
@@ -67,6 +72,12 @@ angular.module('nxCommon')
                 urlBase += '/proxy/' + this.serverId;
             }
             return urlBase;
+        };
+        ServerConnection.prototype.apiHost = function(){
+            if(this.systemId){
+                return window.location.host + Config.gatewayUrl + '/' + this.systemId;
+            }
+            return window.location.host;
         };
         ServerConnection.prototype._wrapRequest = function(method, url, data, repeat){
             var self = this;
@@ -80,9 +91,7 @@ angular.module('nxCommon')
                 method: method,
                 url: requestUrl,
                 data: postData,
-                config: {
-                    timeout: canceler.promise
-                }
+                timeout: canceler.promise
             });
 
             var promise = request.catch(function(error){
@@ -93,12 +102,12 @@ angular.module('nxCommon')
                         return self.unauthorizedCallBack(error).then(function(){
                             return self._wrapRequest(method, url, data, true);
                         },function(){
-                            $rootScope.$broadcast("unauthirosed_" + self.systemId);
+                            $rootScope.$broadcast("unauthorized_" + self.systemId);
                             return $q.reject(error);
                         });
                     }
                     // Not authorised request - we lost connection to the system, broadcast this for active controller to handle the situation if needed
-                    $rootScope.$broadcast("unauthirosed_" + self.systemId);
+                    $rootScope.$broadcast("unauthorized_" + self.systemId);
                 }
                 if(!repeat && error.status == 503){ // Repeat the request once again for 503 error
                     return self._wrapRequest(method, url, data, true);
@@ -120,7 +129,7 @@ angular.module('nxCommon')
 
             return promise;
         };
-        ServerConnection.prototype._setGetParams = function(url, data, auth){
+        ServerConnection.prototype._setGetParams = function(url, data, auth, absoluteUrl){
             if(auth){
                 data = data || {}
                 data.auth = auth;
@@ -129,7 +138,14 @@ angular.module('nxCommon')
                 url += (url.indexOf('?')>0)?'&':'?';
                 url += $.param(data);
             }
-            return this.urlBase + url;
+            url = this.urlBase + url;
+            if(absoluteUrl){
+                var host = window.location.protocol + "//" +
+                           window.location.hostname +
+                           (window.location.port ? ':' + window.location.port: '');
+                url = host + url;
+            }
+            return url;
         };
         ServerConnection.prototype._get = function(url, data){
             return this._wrapRequest('GET', url, data);
@@ -174,9 +190,19 @@ angular.module('nxCommon')
             return this.userRequest;
         };
 
+        ServerConnection.prototype.getRolePermissions = function(roleId) {
+            return this._get('/ec2/getUserRoles', {id:roleId});
+        };
+
         ServerConnection.prototype.checkPermissions = function(flag){
             // TODO: getCurrentUser will not work on portal for 3.0 systems, think of something
+            var self = this;
             return this.getCurrentUser().then(function(user) {
+                if(!user.isAdmin && !self.isEmptyId(user.userRoleId)){
+                    return self.getRolePermissions(user.userRoleId).then(function(role){
+                        return role.data[0].permissions.indexOf(flag)>=0;
+                    });
+                }
                 return user.isAdmin ||
                        user.permissions.indexOf(flag)>=0;
             });
@@ -199,7 +225,10 @@ angular.module('nxCommon')
         /* End of Authentication  */
 
         /* Server settings */
-        ServerConnection.prototype.getTime = function(){
+        ServerConnection.prototype.getTime = function(serverId){
+            if(serverId){
+                return this._get('/proxy/http/' + serverId + '/api/gettime?local');
+            }
             return this._get('/api/gettime?local');
         };
         /* End of Server settings */
@@ -213,7 +242,10 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.deleteUser = function(userId){
             return this._post('/ec2/removeUser', {id:userId});
-        }
+        };
+        ServerConnection.prototype.isEmptyId = function(id){
+            return !id || id === ServerConnection.emptyId;
+        };
         ServerConnection.prototype.cleanUserObject = function(user){ // Remove unnesesary fields from the object
             var cleanedUser = {};
             if(user.id){
@@ -225,7 +257,7 @@ angular.module('nxCommon')
                 cleanedUser[supportedFields[i]] = user[supportedFields[i]];
             }
             if(!cleanedUser.userRoleId){
-                cleanedUser.userRoleId = '{00000000-0000-0000-0000-000000000000}';
+                cleanedUser.userRoleId = ServerConnection.emptyId;
             }
             cleanedUser.email = cleanedUser.email.toLowerCase();
             cleanedUser.name = cleanedUser.name.toLowerCase();
@@ -241,7 +273,7 @@ angular.module('nxCommon')
                 'isCloud': true,
                 'isEnabled': true,
 
-                'userRoleId': '{00000000-0000-0000-0000-000000000000}',
+                'userRoleId': ServerConnection.emptyId,
                 'permissions': '',
 
                 //TODO: Remove the trash below after #VMS-2968
@@ -252,15 +284,12 @@ angular.module('nxCommon')
         /* End of Working with users */
 
         /* Cameras and Servers */
-        ServerConnection.prototype._cleanId = function(id) {
-            return id.replace('{','').replace('}','');
-        };
         ServerConnection.prototype.getCameras = function(id){
-            var params = id?{id:this._cleanId(id)}:null;
+            var params = id?{id:cleanId(id)}:null;
             return this._get('/ec2/getCamerasEx',params);
         };
         ServerConnection.prototype.getMediaServers = function(id){
-            var params = id?{id:this._cleanId(id)}:null;
+            var params = id?{id:cleanId(id)}:null;
             return this._get('/ec2/getMediaServersEx',params);
         };
         ServerConnection.prototype.getMediaServersAndCameras = function(){
@@ -272,9 +301,9 @@ angular.module('nxCommon')
         /* End of Cameras and Servers */
 
         /* Formatting urls */
-        ServerConnection.prototype.previewUrl = function(cameraPhysicalId, time, width, height){
+        ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
             var data = {
-                    physicalId:cameraPhysicalId,
+                    cameraId:cleanId(cameraId),
                     time:time  || 'LATEST'
                 };
 
@@ -291,7 +320,7 @@ angular.module('nxCommon')
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/hls/' + cameraId + '.m3u8?' + resolution, data, this.authGet());
+            return this._setGetParams('/hls/' + cleanId(cameraId) + '.m3u8?' + resolution, data, this.authGet(), true);
         };
         ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
             var data = {
@@ -300,12 +329,12 @@ angular.module('nxCommon')
             if(position){
                 data.pos = position;
             }
-            return this._setGetParams('/media/' + cameraId + '.webm?rt' , data, this.authGet());
+            return this._setGetParams('/media/' + cleanId(cameraId) + '.webm?rt' , data, this.authGet());
         };
         /* End of formatting urls */
 
         /* Working with archive*/
-        ServerConnection.prototype.getRecords = function(physicalId, startTime, endTime, detail, limit, label, periodsType){
+        ServerConnection.prototype.getRecords = function(cameraId, startTime, endTime, detail, limit, label, periodsType){
             var d = new Date();
             if(typeof(startTime)==='undefined'){
                 startTime = d.getTime() - 30*24*60*60*1000;
@@ -321,7 +350,7 @@ angular.module('nxCommon')
                 periodsType = 0;
             }
             var params={
-                physicalId: physicalId,
+                cameraId: cleanId(cameraId),
                 startTime: startTime,
                 endTime: endTime,
                 detail: detail,
@@ -340,7 +369,7 @@ angular.module('nxCommon')
             if(this.systemId){
                 systemLink = '/systems/' + this.systemId;
             }
-            $location.path(systemLink + '/view/' + cameraId, false);
+            $location.path(systemLink + '/view/' + cleanId(cameraId), false);
         };
 
         if(Config.webadminSystemApiCompatibility){

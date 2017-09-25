@@ -45,7 +45,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
 
     setupShowWebServerLink();
 
-    //TODO: #GDM #access connect to resource pool to check if server was deleted
+    // TODO: #GDM #access connect to resource pool to check if server was deleted
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
         [this](const QnResourceList& resources)

@@ -313,20 +313,22 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
         }
 
         m_formatContext = avformat_alloc_context();
-        m_formatContext->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
-        if (!m_ioContext) {
+        m_formatContext->pb = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
+        if (!m_formatContext->pb) {
             close();
             m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
-        if (!m_initialized ) {
+        if (!m_initialized)
+        {
             close();
             m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
 
+        initMetadata();
         getVideoLayout();
     }
     m_resource->setStatus(Qn::Online);
@@ -348,14 +350,12 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
-    if (m_formatContext)
-        avformat_close_input(&m_formatContext);
-
-    if (m_ioContext)
-    {
-        QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
-        m_ioContext = 0;
-    }
+	if (m_formatContext)
+	{
+		QnFfmpegHelper::closeFfmpegIOContext(m_formatContext->pb);
+		m_formatContext->pb = 0;
+		avformat_close_input(&m_formatContext);
+	}
 
     m_contexts.clear();
     m_formatContext = 0;
@@ -394,27 +394,16 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     if (!m_initialized)
         return defaultVideoLayout;
 
-    //TODO: #rvasilenko why do we read metadata in the getVideoLayout() method (which must be const semantically)
+    // TODO: #rvasilenko why do we init video layout in the semantically const method?
     if (!m_videoLayout)
     {
         m_videoLayout.reset( new QnCustomResourceVideoLayout(QSize(1, 1)) );
-
-        m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
-
-        if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())
-        {
-            if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
-                aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
-        }
 
         if (!m_metadata.videoLayoutSize.isEmpty())
         {
             m_videoLayout->setSize(m_metadata.videoLayoutSize);
             m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
         }
-
-        if (auto aviRes = m_resource.dynamicCast<QnAviResource>())
-            aviRes->setAviMetadata(m_metadata);
 
         if (m_useAbsolutePos)
         {
@@ -535,6 +524,25 @@ void QnAviArchiveDelegate::initLayoutStreams()
         default:
             break;
         }
+    }
+}
+
+void QnAviArchiveDelegate::initMetadata()
+{
+    auto aviRes = m_resource.dynamicCast<QnAviResource>();
+    if (aviRes && aviRes->hasAviMetadata())
+    {
+        m_metadata = aviRes->aviMetadata();
+        return;
+    }
+
+    m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
+
+    if (aviRes)
+    {
+        aviRes->setAviMetadata(m_metadata);
+        if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
+            aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
     }
 }
 

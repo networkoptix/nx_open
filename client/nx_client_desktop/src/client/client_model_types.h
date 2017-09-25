@@ -99,35 +99,6 @@ Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
 QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream)(metatype));
 
 // -------------------------------------------------------------------------- //
-// QnPtzHotkey
-// -------------------------------------------------------------------------- //
-struct QnPtzHotkey {
-    enum {
-        NoHotkey = -1
-    };
-
-    QnPtzHotkey(): hotkey(NoHotkey) {}
-    QnPtzHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
-
-    QString id;
-    int hotkey;
-};
-
-typedef QHash<int, QString> QnPtzHotkeyHash;
-
-QN_FUSION_DECLARE_FUNCTIONS(QnPtzHotkey, (json)(metatype));
-
-inline bool deserialize(const QString& value, QnPtzHotkeyHash* target)
-{
-    Q_UNUSED(value);
-    Q_UNUSED(target);
-    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
-    return false;
-}
-
-
-
-// -------------------------------------------------------------------------- //
 // QnBackgroundImage
 // -------------------------------------------------------------------------- //
 /**

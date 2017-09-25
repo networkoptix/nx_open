@@ -667,7 +667,7 @@ void QnResource::setId(const QnUuid& id)
 {
     QnMutexLocker mutexLocker(&m_mutex);
 
-    //TODO: #dmishin it seems really wrong. Think about how to do it in another way.
+    // TODO: #dmishin it seems really wrong. Think about how to do it in another way.
     NX_ASSERT(
         dynamic_cast<QnSecurityCamResource*>(this) || m_locallySavedProperties.size() == 0,
         lit("Only camera resources are allowed to set properties if id is not set."));
@@ -882,7 +882,7 @@ QString QnResource::getResourceProperty(
     const QnUuid &resourceId,
     const QnUuid &resourceTypeId)
 {
-    //TODO: #GDM think about code duplication
+    // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
     NX_EXPECT(commonModule);
@@ -1095,17 +1095,14 @@ bool QnResource::init()
         QnMutexLocker lk(&m_mutex);
         m_prevInitializationResult = initResult;
     }
+
     m_initializationAttemptCount.fetchAndAddOrdered(1);
 
     bool changed = m_initialized;
     if (m_initialized)
-    {
         initializationDone();
-    }
     else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
-    {
         setStatus(Qn::Offline);
-    }
 
     m_initMutex.unlock();
 

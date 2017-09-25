@@ -4,6 +4,7 @@
 var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
     viewsDirCommon: 'web_common/views/',
+    developersFeedbackForm: 'https://docs.google.com/forms/d/e/1FAIpQLSdN0Woxlo2UgHFF243604gsae9ol9J_N24CtPdRk8EgMFyG4A/viewform?usp=pp_url&entry.1099959647={{PRODUCT}}',
     webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
@@ -34,15 +35,12 @@ var Config = {
     },
 
     dateSettingsFormat:'dd MMMM yyyy',
+    dateInternalFormat:'yyyy-MM-ddThh:mm:ss',
 
     visualLog: false,
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
-        video: true, // videowindow.js - disable loader, allow rightclick
-        videoFormat: false,//'flashls', // videowindow.js - force video player
         chunksOnTimeline: false, // timeline.js - draw debug events
-        jshlsHideError: true, //components\jshls.js - Hide errors used in local env
-        jshlsDebug: false //components\jshls.js - Create hls player in debug mode
     },
     helpLinks: [
         // Additional Links to show in help
@@ -122,7 +120,17 @@ var Config = {
         useServerTime: true,
         disableVolume: true,
         reloadInterval: 5*1000,
-        leftPanelPreviewHeight: 38 // 38px is the height for previews in the left panel
+        leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
+        resetDisplayedTextTimer: 3 * 1000,
+        hlsLoadingTimeout: 60 * 1000,
+            // One minute timeout for manifest:
+            // * 30 seconds for server to init camera
+            // * 20 seconds for chunks
+            // * 10 seconds extra
+        updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
+        flashChromelessPath: "components/flashlsChromeless.swf",
+        flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
+        staticResources: "web_common/"
     },
     debugEvents: {
         events: [
@@ -160,9 +168,9 @@ var Config = {
             'BackupCancelled'
         ],
         states: [
-            '',
-            'Inactive',
-            'Active'
+            {label: 'Instant', value: null},
+            {label: 'Inactive', value: 'Inactive'},
+            {label: 'Active', value: 'Active'}
         ]
     },
 

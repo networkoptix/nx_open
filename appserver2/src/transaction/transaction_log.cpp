@@ -257,18 +257,20 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
     if (m_state.values.value(key) >= sequence)
         return ErrorCode::ok;
 
+#if 0
     static const int kMaxSequenceHole = 50;
     int prevValue = std::max(m_commitData.state.values.value(key), m_state.values.value(key));
     if (sequence - prevValue > kMaxSequenceHole)
     {
         NX_WARNING(
             this,
-            lm("Peer %1 has got suspicious sequence gap %1 --> %2 from peer %3")
+            lm("Peer %1 has got suspicious sequence gap %2 --> %3 from peer %4")
             .arg(qnStaticCommon->moduleDisplayName(m_dbManager->commonModule()->moduleGUID()))
             .arg(prevValue)
             .arg(sequence)
             .arg(qnStaticCommon->moduleDisplayName(peerID)));
     }
+#endif
 
     const auto query = m_updateSequenceQuery.get(m_dbManager->getDB(),
         "INSERT OR REPLACE INTO transaction_sequence values (?, ?, ?)");

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# VERSION: ${release.version}.${buildNumber}
+# VERSION: @release.version@.@buildNumber@
 import RPi.GPIO as GPIO
 import time
 

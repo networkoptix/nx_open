@@ -159,15 +159,11 @@ public:
         const nx_http::StringType& serializedTimeSync,
         boost::optional<qint64> requestRttMillis);
     void resyncTimeWithPeer(const QnUuid& peerId);
+
 signals:
-    /**
-     * Emitted when there is ambiguity while choosing primary time server automatically.
-     * User SHOULD call TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually..
-     * This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
-     */
-    void primaryTimeServerSelectionRequired();
     /** Emitted when synchronized time has been changed. */
     void timeChanged( qint64 syncTime );
+
 private:
     struct RemotePeerTimeInfo
     {
@@ -248,6 +244,8 @@ private:
     int m_internetSynchronizationFailureCount;
     std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
     Settings* m_settings;
+    std::atomic<size_t> m_asyncOperationsInProgress;
+    QnWaitCondition m_asyncOperationsWaitCondition;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,

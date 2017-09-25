@@ -144,7 +144,7 @@ private:
     mutable QnMutex m_mutex;
     quint64 m_timerID;
     nx::utils::AsyncOperationGuard m_handlerGuard;
-    std::map< QString, std::map< SearchHandler*, uint > > m_handlers;
+    std::map< QString, std::map< SearchHandler*, uintptr_t > > m_handlers;
     mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
@@ -187,6 +187,8 @@ private:
         \note MUST be called with \a m_mutex locked
     */
     void updateItemInCache( DiscoveredDeviceInfo devInfo );
+
+    void processPacket(DiscoveredDeviceInfo info);
 
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );

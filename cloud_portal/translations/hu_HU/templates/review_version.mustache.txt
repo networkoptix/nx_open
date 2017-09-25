@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+{{ message.product }} egy újabb revíziója elérhető
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+Kattintson a linkre {{ message.product }} {{ message.id }} vázlatának megtekintéséhez
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Link a felülvizsgálatjhoz: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+Ezen az oldalon
+1) Készíthet egy előnézetet a legutóbbi változtatások megtekintéséhez.
+2) Kiadja ezt a verziót, amely frissíti az összes tartalmat.
+3) A kontextusok szerkesztéséhez kattintson a szerkesztési gombra. A módosítások megtekintéséhez új verziót kell létrehoznia.

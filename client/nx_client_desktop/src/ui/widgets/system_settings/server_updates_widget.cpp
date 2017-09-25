@@ -185,6 +185,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->longUpdateWarning->setVisible(false);
 
     ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
+    ui->releaseDescriptionLabel->setText(QString());
+    ui->releaseDescriptionLabel->setVisible(false);
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -256,6 +258,7 @@ void QnServerUpdatesWidget::initDropdownActions()
         {
             setMode(Mode::LatestVersion);
             m_targetVersion = QnSoftwareVersion();
+            m_targetChangeset = QString();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_latestVersion);
 
@@ -277,6 +280,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             setMode(Mode::SpecificBuild);
             QnSoftwareVersion version = qnStaticCommon->engineVersion();
             m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
+            m_targetChangeset = dialog.changeset();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_targetVersion);
 
@@ -320,14 +324,14 @@ void QnServerUpdatesWidget::initDownloadActions()
         [this]()
         {
             QDesktopServices::openUrl(
-                m_updateTool->generateUpdatePackageUrl(m_targetVersion));
+                m_updateTool->generateUpdatePackageUrl(m_targetVersion, m_targetChangeset));
         });
 
     downloadLinkMenu->addAction(tr("Copy Link to Clipboard"),
         [this]()
         {
             qApp->clipboard()->setText(
-                m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+                m_updateTool->generateUpdatePackageUrl(m_targetVersion, m_targetChangeset).toString());
 
             ui->linkCopiedWidget->show();
             fadeWidget(ui->linkCopiedWidget, 1.0, 0.0, kLinkCopiedMessageTimeoutMs, 1.0,
@@ -456,7 +460,7 @@ void QnServerUpdatesWidget::discardChanges()
             this);
 
         const auto cancelUpdateButton = dialog.addButton(
-            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
         dialog.addButton(
             tr("Continue in Background"), QDialogButtonBox::RejectRole);
 
@@ -482,13 +486,13 @@ bool QnServerUpdatesWidget::hasChanges() const
 
 bool QnServerUpdatesWidget::canApplyChanges() const
 {
-    //TODO: #GDM now this prevents other tabs from saving their changes
+    // TODO: #GDM now this prevents other tabs from saving their changes
     return !isUpdating();
 }
 
 bool QnServerUpdatesWidget::canDiscardChanges() const
 {
-    //TODO: #GDM now this prevents other tabs from discarding their changes
+    // TODO: #GDM now this prevents other tabs from discarding their changes
     return canCancelUpdate();
 }
 
@@ -620,6 +624,9 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
     m_releaseNotesUrl = result.releaseNotesUrl;
     ui->releaseNotesLabel->setVisible(!m_releaseNotesUrl.isEmpty());
+
+    ui->releaseDescriptionLabel->setText(result.description);
+    ui->releaseDescriptionLabel->setVisible(!result.description.isEmpty());
 
     ui->targetVersionLabel->setText(versionText);
 
@@ -804,7 +811,7 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
+    dialog.addCustomWidget(new QnResourceListView(failedServers, &dialog));
     dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
     const auto result = dialog.exec();

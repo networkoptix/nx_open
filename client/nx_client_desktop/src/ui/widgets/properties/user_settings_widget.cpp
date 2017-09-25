@@ -315,11 +315,10 @@ void QnUserSettingsWidget::applyChanges()
 
         //empty text means 'no change'
         const QString newPassword = ui->passwordInputField->text().trimmed();
-        if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) //TODO: #GDM #access implement correct check
+        if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) // TODO: #GDM #access implement correct check
         {
-            m_model->user()->setPassword(newPassword);
-            m_model->user()->generateHash();
-            m_model->user()->setPassword(QString());
+            m_model->user()->setPasswordAndGenerateHash(newPassword);
+            m_model->user()->resetPassword();
         }
 
         if (permissions.testFlag(Qn::WriteEmailPermission))

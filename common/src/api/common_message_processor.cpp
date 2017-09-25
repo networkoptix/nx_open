@@ -88,7 +88,7 @@ ec2::AbstractECConnectionPtr QnCommonMessageProcessor::connection() const
 
 void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
-    /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
+    /* // TODO: #GDM #c++14 re-enable when generic lambdas will be supported
     auto on_resourceUpdated = [this](const auto& resource)
     {
         updateResource(resource);
@@ -164,7 +164,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(storedFileManager, &ec2::AbstractStoredFileNotificationManager::removed,            this, &QnCommonMessageProcessor::fileRemoved, Qt::DirectConnection);
 
     auto timeManager = connection->getTimeNotificationManager();
-    connect(timeManager, &ec2::AbstractTimeNotificationManager::timeServerSelectionRequired,    this, &QnCommonMessageProcessor::timeServerSelectionRequired);
     connect(timeManager, &ec2::AbstractTimeNotificationManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
 
     auto discoveryManager = connection->getDiscoveryNotificationManager();
@@ -211,7 +210,7 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoD
 {
     onGotInitialNotification(fullData);
 
-    //TODO: #GDM #3.1 logic is not perfect, who will clean them on disconnect?
+    // TODO: #GDM #3.1 logic is not perfect, who will clean them on disconnect?
     on_businessRuleReset(fullData.rules);
 }
 
@@ -506,7 +505,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
     for (const QnResourcePtr &resource: resourcePool()->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
 
-    /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported
+    /* // TODO: #GDM #c++14 re-enable when generic lambdas will be supported
     auto updateResources = [this, &remoteResources](const auto& source)
     {
         for (const auto& resource : source)
@@ -731,11 +730,11 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
-    qnCamera->setCommonModule(commonModule());
 
     NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
     {
+        qnCamera->setCommonModule(commonModule());
         fromApiToResource(camera, qnCamera);
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getUniqueId()),
             Q_FUNC_INFO,

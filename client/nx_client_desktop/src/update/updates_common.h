@@ -34,6 +34,7 @@ struct QnCheckForUpdateResult
     QnSoftwareVersion version;
     bool clientInstallerRequired = false;
     QUrl releaseNotesUrl;
+    QString description;
     QString cloudHost;
 };
 Q_DECLARE_METATYPE(QnCheckForUpdateResult)

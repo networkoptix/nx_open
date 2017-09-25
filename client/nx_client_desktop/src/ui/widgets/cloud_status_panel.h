@@ -14,6 +14,9 @@ public:
     explicit QnCloudStatusPanel(QWidget* parent = nullptr);
     ~QnCloudStatusPanel();
 
+    virtual QSize minimumSizeHint() const override;
+    virtual QSize sizeHint() const override;
+
 private:
     QScopedPointer<QnCloudStatusPanelPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnCloudStatusPanel)

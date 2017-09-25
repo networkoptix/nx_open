@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_ONVIF)
+
 #include <QtXml/QDomElement>
 
 #include <nx/network/http/http_client.h>
@@ -27,7 +29,8 @@ private:
     QUrl hikvisionRequestUrlFromPath(const QString& path) const;
 
     QSize chooseResolution(
-        const hikvision::ChannelCapabilities& channelCapabilities) const;
+        const hikvision::ChannelCapabilities& channelCapabilities,
+        const QSize& primaryResolution) const;
 
     QString chooseCodec(
         const hikvision::ChannelCapabilities& channelCapabilities) const;
@@ -72,3 +75,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // ENABLE_ONVIF

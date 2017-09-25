@@ -96,7 +96,11 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 } // namespace
 
-TEST_F(QnFusionTestFixture, integralTypes)
+class QnJsonTextFixture: public QnFusionTestFixture
+{
+};
+
+TEST_F(QnJsonTextFixture, integralTypes)
 {
     ASSERT_EQ("5", QJson::serialized(5));
     ASSERT_EQ(5, QJson::deserialized<int>("5"));
@@ -104,19 +108,19 @@ TEST_F(QnFusionTestFixture, integralTypes)
     ASSERT_EQ(-12, QJson::deserialized<int>("-12"));
 }
 
-TEST_F(QnFusionTestFixture, QtStringTypes)
+TEST_F(QnJsonTextFixture, QtStringTypes)
 {
     //ASSERT_EQ(kHelloWorld, QJson::serialized(kHelloWorld.toUtf8())); -- not supported, returns base64
     ASSERT_EQ(str(kHelloWorld), QJson::serialized(kHelloWorld));
 }
 
-TEST_F(QnFusionTestFixture, stdStringTypes)
+TEST_F(QnJsonTextFixture, stdStringTypes)
 {
     // ASSERT_EQ(kHelloWorld, QJson::serialized("hello world")); -- not supported, return "true"
     ASSERT_EQ(str(kHelloWorld), QJson::serialized(kHelloWorld.toStdString()));
 }
 
-TEST_F(QnFusionTestFixture, enumValue)
+TEST_F(QnJsonTextFixture, enumValue)
 {
     const auto value = str("Flag0");
     nx::TestFlag flag = nx::Flag0;
@@ -124,7 +128,7 @@ TEST_F(QnFusionTestFixture, enumValue)
     ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value));
 }
 
-TEST_F(QnFusionTestFixture, enumValueCaseSensitive)
+TEST_F(QnJsonTextFixture, enumValueCaseSensitive)
 {
     const auto value = str("Flag0");
     nx::TestFlag flag = nx::Flag0;
@@ -132,7 +136,7 @@ TEST_F(QnFusionTestFixture, enumValueCaseSensitive)
     ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value.toUpper()));
 }
 
-TEST_F(QnFusionTestFixture, flagsValue)
+TEST_F(QnJsonTextFixture, flagsValue)
 {
     const auto value = str("Flag1|Flag2");
     nx::TestFlags flags = nx::Flag1 | nx::Flag2;
@@ -140,7 +144,7 @@ TEST_F(QnFusionTestFixture, flagsValue)
     ASSERT_EQ(flags, QJson::deserialized<nx::TestFlags>(value));
 }
 
-TEST_F(QnFusionTestFixture, invalidFlagsLexical)
+TEST_F(QnJsonTextFixture, invalidFlagsLexical)
 {
     const auto value = str("Flag7");
     nx::TestFlags flags = nx::Flag0;
@@ -148,7 +152,7 @@ TEST_F(QnFusionTestFixture, invalidFlagsLexical)
     ASSERT_EQ(nx::Flag0, flags);
 }
 
-TEST_F(QnFusionTestFixture, flagsNumeric)
+TEST_F(QnJsonTextFixture, flagsNumeric)
 {
     const auto value = str("3");
     nx::TestFlags flags = nx::Flag0;
@@ -156,7 +160,7 @@ TEST_F(QnFusionTestFixture, flagsNumeric)
     ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
 }
 
-TEST_F(QnFusionTestFixture, bitArray)
+TEST_F(QnJsonTextFixture, bitArray)
 {
     QBitArray value(17);
     value.setBit(1);
@@ -174,7 +178,7 @@ TEST_F(QnFusionTestFixture, bitArray)
     ASSERT_EQ(value, target);
 }
 
-TEST_F(QnFusionTestFixture, deserializeStruct)
+TEST_F(QnJsonTextFixture, deserializeStruct)
 {
     const IntMockData data(113, 115, 117);
 
@@ -191,7 +195,7 @@ TEST_F(QnFusionTestFixture, deserializeStruct)
     ASSERT_EQ(data, deserializedData);
 }
 
-TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedFields)
+TEST_F(QnJsonTextFixture, deserializeStructWithDeprecatedFields)
 {
     const IntMockData data(113, 115, 117);
 
@@ -208,7 +212,7 @@ TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedFields)
     ASSERT_EQ(data, deserializedData);
 }
 
-TEST_F(QnFusionTestFixture, serializeStructBriefId)
+TEST_F(QnJsonTextFixture, serializeStructBriefId)
 {
     BriefMockData data{QnUuid(), kHelloWorld};
     const QByteArray jsonStr = QString(R"json({"str":"%1"})json").arg(kHelloWorld).toUtf8();
@@ -216,7 +220,7 @@ TEST_F(QnFusionTestFixture, serializeStructBriefId)
     ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeStructBriefStr)
+TEST_F(QnJsonTextFixture, serializeStructBriefStr)
 {
     BriefMockData data{kTestId, QString()};
     const QByteArray jsonStr = QString(R"json({"id":"%1"})json").arg(kTestId.toString()).toUtf8();
@@ -224,7 +228,7 @@ TEST_F(QnFusionTestFixture, serializeStructBriefStr)
     ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeStructBriefBoth)
+TEST_F(QnJsonTextFixture, serializeStructBriefBoth)
 {
     BriefMockData data;
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
@@ -232,7 +236,7 @@ TEST_F(QnFusionTestFixture, serializeStructBriefBoth)
     ASSERT_EQ(data, QJson::deserialized<BriefMockData>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeStructListBrief)
+TEST_F(QnJsonTextFixture, serializeStructListBrief)
 {
     std::vector<BriefMockData> data;
     data.emplace_back(QnUuid(), kHelloWorld);
@@ -246,7 +250,7 @@ TEST_F(QnFusionTestFixture, serializeStructListBrief)
     ASSERT_EQ(data, QJson::deserialized<std::vector<BriefMockData>>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeVectorBrief)
+TEST_F(QnJsonTextFixture, serializeVectorBrief)
 {
     BriefMockDataWithVector data;
     data.items.push_back(kHelloWorld);
@@ -259,7 +263,7 @@ TEST_F(QnFusionTestFixture, serializeVectorBrief)
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithVector>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeEmptyVectorBrief)
+TEST_F(QnJsonTextFixture, serializeEmptyVectorBrief)
 {
     BriefMockDataWithVector data;
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
@@ -267,7 +271,7 @@ TEST_F(QnFusionTestFixture, serializeEmptyVectorBrief)
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithVector>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeQListBrief)
+TEST_F(QnJsonTextFixture, serializeQListBrief)
 {
     BriefMockDataWithQList data;
     data.items.push_back(kHelloWorld);
@@ -280,7 +284,7 @@ TEST_F(QnFusionTestFixture, serializeQListBrief)
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
 }
 
-TEST_F(QnFusionTestFixture, serializeEmptyQListBrief)
+TEST_F(QnJsonTextFixture, serializeEmptyQListBrief)
 {
     BriefMockDataWithQList data;
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();

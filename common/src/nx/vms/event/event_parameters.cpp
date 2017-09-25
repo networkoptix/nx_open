@@ -58,6 +58,29 @@ QnUuid EventParameters::getParamsHash() const
     return guidFromArbitraryData(paramKey);
 }
 
+QnUuid EventParameters::analyticsEventId() const
+{
+    return QnUuid::fromStringSafe(inputPortId);
+}
+
+void EventParameters::setAnalyticsEventId(const QnUuid& id)
+{
+    inputPortId = id.toString();
+}
+
+QnUuid EventParameters::analyticsDriverId() const
+{
+    return metadata.instigators.empty()
+        ? QnUuid()
+        : metadata.instigators.front();
+}
+
+void EventParameters::setAnalyticsDriverId(const QnUuid& id)
+{
+    metadata.instigators.clear();
+    metadata.instigators.push_back(id);
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (EventMetaData)(EventParameters),
     (ubjson)(json)(eq)(xml)(csv_record), _Fields, (brief, true))

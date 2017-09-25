@@ -1,7 +1,11 @@
 #include "async_client.h"
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
+
+#include "stun_types.h"
 
 namespace nx {
 namespace stun {
@@ -21,10 +25,12 @@ AsyncClient::AsyncClient(
     :
     AsyncClient(timeouts)
 {
-    m_endpoint = tcpConnection->getForeignAddress();
-
-    bindToAioThread(tcpConnection->getAioThread());
-    initializeMessagePipeline(std::move(tcpConnection));
+    if (tcpConnection)
+    {
+        m_endpoint = tcpConnection->getForeignAddress();
+        bindToAioThread(tcpConnection->getAioThread());
+        initializeMessagePipeline(std::move(tcpConnection));
+    }
 }
 
 void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -39,15 +45,25 @@ void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 }
 
 void AsyncClient::connect(
-    SocketAddress endpoint,
-    bool useSsl,
-    ConnectHandler handler)
+    const QUrl& url,
+    ConnectHandler completionHandler)
 {
+    if (url.scheme() != nx::stun::kUrlSchemeName && url.scheme() != nx::stun::kSecureUrlSchemeName)
+    {
+        return post(
+            [completionHandler = std::move(completionHandler)]()
+            {
+                completionHandler(SystemError::invalidData);
+            });
+    }
+
+    const auto endpoint = nx::network::url::getEndpoint(url);
+
     QnMutexLocker lock(&m_mutex);
     m_endpoint = std::move(endpoint);
-    m_useSsl = useSsl;
+    m_useSsl = url.scheme() == nx::stun::kSecureUrlSchemeName;
     NX_ASSERT(!m_connectCompletionHandler);
-    m_connectCompletionHandler = std::move(handler);
+    m_connectCompletionHandler = std::move(completionHandler);
     openConnectionImpl(&lock);
 }
 
@@ -170,16 +186,15 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
     dispatch(
         [this, options = std::move(options)]()
         {
-            if (!m_baseConnection)
+            NX_LOGX(lm("Set keep alive to: %1").arg(options), cl_logDEBUG1);
+            if (!m_baseConnection ||
+                !m_baseConnection->socket()->setKeepAlive(std::move(options)))
             {
-                NX_LOGX(lm("Unable to set keep alive, connection is probably closed."),
-                    cl_logDEBUG1);
+                auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_LOGX(lm("Unable to set keep alive, connection is probably closed. %1")
+                    .arg(SystemError::toString(systemErrorCode)), cl_logDEBUG1);
                 return;
             }
-
-            NX_LOGX(lm("Set keep alive: %1").arg(options), cl_logDEBUG1);
-            const auto keepAlive = m_baseConnection->socket()->setKeepAlive(std::move(options));
-            NX_ASSERT(keepAlive, SystemError::getLastOSErrorText());
         });
 }
 
@@ -435,6 +450,9 @@ void AsyncClient::processMessage(Message message)
         case MessageClass::indication:
         {
             auto it = m_indicationHandlers.find( message.header.method );
+            if (it == m_indicationHandlers.end())
+                it = m_indicationHandlers.find(kEveryIndicationMethod); //< Default indication handler.
+
             if( it != m_indicationHandlers.end() )
             {
                 auto handler = it->second;

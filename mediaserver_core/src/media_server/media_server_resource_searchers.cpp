@@ -18,6 +18,7 @@
 #include <plugins/resource/flir/flir_resource_searcher.h>
 #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
 #include <plugins/resource/isd/isd_resource_searcher.h>
+#include <plugins/resource/hanwha/hanwha_resource_searcher.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
@@ -38,7 +39,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
 #ifdef ENABLE_DESKTOP_CAMERA
     m_searchers << new QnDesktopCameraResourceSearcher(commonModule);
 
-    //TODO: #GDM it this the best place for this class instance? Why not place it directly to the searcher?
+    // TODO: #GDM it this the best place for this class instance? Why not place it directly to the searcher?
     QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(this);
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
@@ -69,6 +70,9 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     #ifdef ENABLE_ISD
         m_searchers << new QnPlISDResourceSearcher(commonModule);
     #endif
+#ifdef ENABLE_HANWHA
+        m_searchers << new nx::mediaserver_core::plugins::HanwhaResourceSearcher(commonModule);
+#endif
 
     #ifdef ENABLE_ADVANTECH
         m_searchers << new QnAdamResourceSearcher(commonModule);

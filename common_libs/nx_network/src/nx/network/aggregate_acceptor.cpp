@@ -57,18 +57,23 @@ void AggregateAcceptor::acceptAsync(AcceptCompletionHandler handler)
                         nullptr, SystemError::timedOut, nullptr));
             }
 
+            m_acceptAsyncIsBeingInvoked = true;
             for (auto& source: m_acceptors)
             {
-                if (!source.isAccepting)
-                {
-                    source.isAccepting = true;
-                    NX_LOGX(lm("Accept on source(%1)").arg(&source), cl_logDEBUG2);
+                if (source.isAccepting)
+                    continue;
 
-                    using namespace std::placeholders;
-                    source.acceptor->acceptAsync(std::bind(
-                        &AggregateAcceptor::accepted, this, &source, _1, _2));
-                }
+                source.isAccepting = true;
+                NX_LOGX(lm("Accept on source(%1)").arg(&source), cl_logDEBUG2);
+
+                using namespace std::placeholders;
+                source.acceptor->acceptAsync(std::bind(
+                    &AggregateAcceptor::accepted, this, &source, _1, _2));
+
+                if (!source.isAccepting)
+                    break; //< Accept handler has been invoked within acceptAsync call.
             }
+            m_acceptAsyncIsBeingInvoked = false;
         });
 }
 
@@ -182,8 +187,8 @@ void AggregateAcceptor::accepted(
         m_timer.cancelSync(); //< Will not block, we are in an aio thread.
     }
 
-    auto handler = std::move(m_acceptHandler);
-    m_acceptHandler = nullptr;
+    decltype(m_acceptHandler) handler;
+    handler.swap(m_acceptHandler);
     NX_ASSERT(handler, "acceptAsync was not canceled in time");
 
     // TODO: #ak Better not cancel accepts on every socket accepted.
@@ -192,7 +197,18 @@ void AggregateAcceptor::accepted(
     for (auto& socketContext: m_acceptors)
         socketContext.stopAccepting();
 
-    handler(code, std::move(socket));
+    if (m_acceptAsyncIsBeingInvoked)
+    {
+        post(
+            [handler = std::move(handler), code, socket = std::move(socket)]() mutable
+            {
+                handler(code, std::move(socket));
+            });
+    }
+    else
+    {
+        handler(code, std::move(socket));
+    }
 }
 
 void AggregateAcceptor::cancelIoFromAioThread()

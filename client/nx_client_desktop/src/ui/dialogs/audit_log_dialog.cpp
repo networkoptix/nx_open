@@ -416,7 +416,7 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
     else if(hasChecked)
         checkState = Qt::Checked;
 
-    //TODO: #GDM get rid of this magic and use common setupTristateCheckbox framework
+    // TODO: #GDM get rid of this magic and use common setupTristateCheckbox framework
     QSignalBlocker blocker(ui->selectAllCheckBox);
     ui->selectAllCheckBox->setCheckState(checkState);
 
@@ -653,7 +653,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->addFlags(Qn::local);
     layout->setId(QnUuid::createUuid());
-    layout->setName(tr("Audit log replay"));
+    layout->setName(tr("Audit trail replay"));
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 

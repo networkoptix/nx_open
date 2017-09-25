@@ -13,11 +13,13 @@ namespace nx {
 namespace utils {
 namespace db {
 
-struct QueryExecutionInfo
+struct NX_UTILS_API QueryExecutionInfo
 {
     boost::optional<DBResult> result;
     std::chrono::milliseconds waitForExecutionDuration;
     boost::optional<std::chrono::milliseconds> executionDuration;
+
+    QueryExecutionInfo();
 };
 
 struct NX_UTILS_API DurationStatistics

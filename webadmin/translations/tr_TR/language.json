@@ -1,5 +1,5 @@
 {
-  "language_name":"Türk",
+  "language_name":"DİL ADI",
   "dialogs":{
     "okButton":"Tamam",
     "openLink":"Bu bağlantıyı ziyaret edin",
@@ -41,9 +41,12 @@
     "confirmDisconnectFromCloud":"{{CLOUD_NAME}} ile Bağlanıtıyı kes",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Tüm bulut kullanıcıları silinecek.</span><br><br>Sisteme sadece yerel yönetici hesabı erişebilecektir.",
     "confirmDisconnectFromCloudAction":"Bağlantıyı kes",
-    "disconnectedSuccess":"Sistemden çıkış başarılı",
+    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
+    "confirmDisconnectFromSystem":"Detach server from current system",
+    "confirmDisconnectFromSystemTitle":"",
+    "confirmDisconnectFromSystemAction":"Detach",
+    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
     "connectedSuccess":"Sistem bağlantısı başarılı",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Yerel yönetici oluştur",
     "confirmChangePassword":"Yönetici parolasını değiştir",
     "confirmChangePasswordTitle":"Sistem şifresi değiştirilsin mi? Bu işlem 'admin' kullanıcısının kök kullanıcıların şifrelerini etkileyebilir",
@@ -109,6 +112,6 @@
     "reserved":"Rezerve"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"{{PRODUCT_NAME}} web arayüzü"
   }
 }

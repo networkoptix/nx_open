@@ -42,7 +42,7 @@ if(ANDROID OR IOS)
     set(enableAllVendors OFF)
 endif()
 
-if(box MATCHES "isd")
+if(box MATCHES "isd|edge1")
     set(enableAllVendors OFF)
     remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
     add_definitions(-DEDGE_SERVER)
@@ -62,6 +62,7 @@ if(enableAllVendors)
         -DENABLE_ISD
         -DENABLE_PULSE_CAMERA
         -DENABLE_FLIR
+        -DENABLE_HANWHA
     )
 endif()
 
@@ -108,6 +109,12 @@ if(WINDOWS)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags}")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
     set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
+        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
+        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
+    endif()
     unset(_extra_linker_flags)
 endif()
 
@@ -135,7 +142,7 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    if(NOT "${arch}" STREQUAL "arm")
+    if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
     add_compile_options(
@@ -145,6 +152,7 @@ if(LINUX)
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
+    # TODO: #dmishin ask #dklychkov about this condition.
     if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
@@ -152,7 +160,7 @@ if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
+        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
 endif()
 
 if(MACOSX)
@@ -160,10 +168,27 @@ if(MACOSX)
         -msse4.1
         -Wno-unused-local-typedef
     )
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-option(qml_debug "Enable QML debugger" ON)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(_qml_debug ON)
+else()
+    set(_qml_debug OFF)
+endif()
+
+option(qml_debug "Enable QML debugger" ${_qml_debug})
+unset(_qml_debug)
 if(qml_debug)
     add_definitions(-DQT_QML_DEBUG)
 endif()
+
+set(strip_binaries ON)
+if(targetDevice MATCHES "bpi|bananapi|rpi"
+    OR targetDevice STREQUAL "linux-x64"
+    OR targetDevice STREQUAL "linux-x86"
+    OR (targetDevice STREQUAL "" AND platform STREQUAL "linux")
+)
+    set(strip_binaries OFF)
+endif()
+
+option(stripBinaries "Strip the resulting binaries" ${strip_binaries})

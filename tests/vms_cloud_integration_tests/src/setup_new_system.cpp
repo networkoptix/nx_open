@@ -3,8 +3,7 @@
 #include "mediaserver_cloud_integration_test_setup.h"
 
 class FtConfiguringNewSystem:
-    public MediaServerCloudIntegrationTest,
-    public ::testing::Test
+    public MediaServerCloudIntegrationTest
 {
 public:
     FtConfiguringNewSystem()
@@ -95,17 +94,21 @@ private:
     }
 };
 
-TEST_F(FtConfiguringNewSystem, DISABLED_cloud_system)
+TEST_P(FtConfiguringNewSystem, DISABLED_cloud_system)
 {
     givenSystemCredentialsRegisteredInCloud();
     whenConfiguredMediaServerAsCloudSystem();
     thenSystemMustBeAccessibleWithCloudOwnerCredentials();
 }
 
-TEST_F(FtConfiguringNewSystem, DISABLED_reconfiguring_cloud_system)
+TEST_P(FtConfiguringNewSystem, DISABLED_reconfiguring_cloud_system)
 {
     configureCloudSystem();
     detachSystemFromCloud();
     assertSystemAcceptsDefaultCredentials();
     configureCloudSystem();
 }
+
+INSTANTIATE_TEST_CASE_P(P2pMode, FtConfiguringNewSystem,
+    ::testing::Values(TestParams(false), TestParams(true)
+));

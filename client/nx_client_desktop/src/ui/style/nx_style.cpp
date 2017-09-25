@@ -40,6 +40,9 @@
 
 #include <QtWidgets/private/qabstractitemview_p.h>
 
+#include <nx/client/desktop/ui/common/detail/base_input_field.h>
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+
 #include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>
 #include <ui/common/link_hover_processor.h>
@@ -58,9 +61,10 @@
 #include <utils/math/color_transformations.h>
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/client/desktop/ui/common/detail/base_input_field.h>
+
 
 using namespace style;
+using namespace nx::client::desktop::ui;
 
 namespace
 {
@@ -539,7 +543,7 @@ QnNxStylePrivate::QnNxStylePrivate() :
 QnNxStyle::QnNxStyle() :
     base_type(*(new QnNxStylePrivate()))
 {
-    //TODO: Think through how to make it better
+    // TODO: Think through how to make it better
     /* Temporary fix for graphics items not receiving ungrabMouse when graphics view deactivates.
      * Menu popups do not cause deactivation but steal focus so we should handle that too. */
     installEventHandler(qApp, { QEvent::WindowDeactivate, QEvent::FocusOut }, this,
@@ -823,6 +827,10 @@ void QnNxStyle::drawPrimitive(
                 else if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
                 {
                     readOnly = lineEdit->isReadOnly();
+                }
+                else if (auto spinBox = qobject_cast<const QAbstractSpinBox*>(widget))
+                {
+                    readOnly = spinBox->isReadOnly();
                 }
                 else if (auto plainTextEdit = qobject_cast<const QPlainTextEdit*>(widget))
                 {
@@ -3601,7 +3609,7 @@ int QnNxStyle::styleHint(
         case SH_FocusFrame_AboveWidget:
             return 1;
         case SH_DialogButtonLayout:
-            return QDialogButtonBox::KdeLayout;            
+            return QDialogButtonBox::KdeLayout;
         case SH_ScrollBar_ContextMenu:
             return 0;
         default:
@@ -4245,12 +4253,11 @@ void QnNxStyle::setGroupBoxContentTopMargin(QGroupBox* box, int margin)
 
 namespace {
 
-template<class Rect>
-void paintRectFrame(QPainter* painter, const Rect& rect,
+void paintRectFrame(QPainter* painter, const QRectF& rect,
     const QColor& color, int width, int shift)
 {
-    Rect outerRect = rect.adjusted(shift, shift, -shift, -shift);
-    Rect innerRect = outerRect.adjusted(width, width, -width, -width);
+    QRectF outerRect = rect.adjusted(shift, shift, -shift, -shift);
+    QRectF innerRect = outerRect.adjusted(width, width, -width, -width);
 
     if (width < 0) //< if outer frame
     {
@@ -4258,10 +4265,10 @@ void paintRectFrame(QPainter* painter, const Rect& rect,
         width = -width;
     }
 
-    const Rect topRect(outerRect.left(), outerRect.top(), outerRect.width(), width);
-    const Rect leftRect(outerRect.left(), innerRect.top(), width, innerRect.height());
-    const Rect rightRect(innerRect.right() + 1, innerRect.top(), width, innerRect.height());
-    const Rect bottomRect(outerRect.left(), innerRect.bottom() + 1, outerRect.width(), width);
+    const QRectF topRect(outerRect.left(), outerRect.top(), outerRect.width(), width);
+    const QRectF leftRect(outerRect.left(), innerRect.top(), width, innerRect.height());
+    const QRectF rightRect(innerRect.left() + innerRect.width(), innerRect.top(), width, innerRect.height());
+    const QRectF bottomRect(outerRect.left(), innerRect.top() + innerRect.height(), outerRect.width(), width);
 
     const QBrush brush(color);
     painter->fillRect(topRect, brush);
@@ -4278,43 +4285,8 @@ void QnNxStyle::paintCosmeticFrame(QPainter* painter, const QRectF& rect,
     if (width == 0)
         return;
 
-    const auto& transform = painter->transform();
-    const auto type = transform.type();
-
-    /* 1. The simplest case: only translate & scale. */
-    if (type <= QTransform::TxScale)
-    {
-        const QRect deviceRect = transform.mapRect(rect).toAlignedRect();
-        const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-        const QnScopedPainterTransformRollback transformRollback(painter, QTransform());
-        paintRectFrame(painter, deviceRect, color, width, shift);
-        return;
-    }
-
-    /* 2. More complicated case: with possible rotation. */
-    if (type <= QTransform::TxRotate)
-    {
-        const auto sx = std::hypot(transform.m11(), transform.m12());
-        const auto sy = std::hypot(transform.m21(), transform.m22());
-
-        if (qFuzzyEquals(qAbs(sx), qAbs(sy))) //< uniform scale, no shear; possible mirroring
-        {
-            if (qFuzzyIsNull(sx)) //< just in case
-                return;
-
-            /* Strip transformation of scale: */
-            const QnScopedPainterTransformRollback transformRollback(painter, QTransform(
-                transform.m11() / sx, transform.m12() / sx,
-                transform.m21() / sy, transform.m22() / sy,
-                transform.dx(), transform.dy()));
-
-            const QRectF scaledRect = QTransform::fromScale(sx, sy).mapRect(rect);
-            const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-            paintRectFrame(painter, scaledRect, color, width, shift);
-            return;
-        }
-    }
-
-    /* 3. The most complicated case: non-conformal mapping. */
-    NX_ASSERT(false, Q_FUNC_INFO, "Non-conformal mapping is not supported.");
+    const PainterTransformScaleStripper scaleStripper(painter);
+    const bool antialiasingRequired = scaleStripper.type() > QTransform::TxScale;
+    const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, antialiasingRequired);
+    paintRectFrame(painter, scaleStripper.mapRect(rect), color, width, shift);
 }

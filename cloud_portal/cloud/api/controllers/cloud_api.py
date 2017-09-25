@@ -6,8 +6,7 @@ from cloud import settings
 from api.helpers.exceptions import validate_response, ErrorCodes, APIRequestException, APINotAuthorisedException
 
 import logging
-
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 
@@ -22,9 +21,9 @@ def lower_case_email(func):
 @validate_response
 def ping():
     url = CLOUD_DB_URL + "/ping"
-    log.info('Making ping request to {}'.format(url))
+    logger.info('Making ping request to {}'.format(url))
     response = requests.get(url)
-    log.info('Ping request finished')
+    logger.info('Ping request finished')
     return response
 
 
@@ -153,15 +152,18 @@ class Account(object):
     @staticmethod
     @lower_case_email
     def register(email, password, first_name, last_name, code=None):
+        logger.debug('cloud_api.Account.register: ' + email)
 
         @validate_response
         def _update(login, password, params):
             request = CLOUD_DB_URL + '/account/update'
+            logger.debug('cloud_api.Account.register - making request: ' + request)
             return requests.post(request, json=params, auth=HTTPDigestAuth(login, password))
 
         @validate_response
         def _register(params):
             request = CLOUD_DB_URL + '/account/register'
+            logger.debug('cloud_api.Account.register - making request: ' + request)
             return requests.post(request, json=params)
 
         customization = settings.CLOUD_CONNECT['customization']

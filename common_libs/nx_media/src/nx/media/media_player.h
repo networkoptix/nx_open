@@ -43,10 +43,6 @@ class Player: public QObject
 {
     Q_OBJECT
 
-    Q_ENUMS(State)
-    Q_ENUMS(MediaStatus)
-    Q_ENUMS(VideoQuality)
-
     /**
      * Source url to open. In order to support multiserver archive, media player supports
      * non-standard URL scheme 'camera'. Example to open: "camera://media/<camera_id>".
@@ -91,6 +87,8 @@ class Player: public QObject
      */
     Q_PROPERTY(int videoQuality READ videoQuality WRITE setVideoQuality NOTIFY videoQualityChanged)
 
+    Q_PROPERTY(bool allowOverlay READ allowOverlay WRITE setAllowOverlay NOTIFY allowOverlayChanged)
+
     /**
      * Is (0, 0) if no video is playing or the resolution is not available.
      */
@@ -111,10 +109,12 @@ public:
         Paused,
         Previewing,
     };
+    Q_ENUM(State)
 
     enum class MediaStatus
     {
         Unknown,
+        NoVideoStreams,
         NoMedia,
         Loading,
         Loaded,
@@ -125,6 +125,7 @@ public:
         EndOfMedia,
         InvalidMedia,
     };
+    Q_ENUM(MediaStatus)
 
     enum VideoQuality
     {
@@ -134,6 +135,17 @@ public:
         LowIframesOnlyVideoQuality = 2, //< Native stream, low quality, I-frames only.
         CustomVideoQuality //< A number greater or equal to this is treated as a number of lines.
     };
+    Q_ENUM(VideoQuality)
+
+    enum TranscodingSupportStatus
+    {
+        TranscodingDisabled,
+        TranscodingSupported,
+        TranscodingNotSupported,
+        TranscodingNotSupportedForServersOlder30,
+        TranscodingNotSupportedForArmServers,
+    };
+    Q_ENUM(TranscodingSupportStatus)
 
 public:
     Player(QObject *parent = nullptr);
@@ -180,6 +192,7 @@ public:
 
     int videoQuality() const;
     void setVideoQuality(int videoQuality);
+
     /**
      * @return Video quality of the video stream being played back. May differ from videoQuality().
      */
@@ -193,7 +206,12 @@ public:
      */
     Q_INVOKABLE QList<int> availableVideoQualities(const QList<int>& videoQualities) const;
 
+    bool allowOverlay() const;
+    void setAllowOverlay(bool allowOverlay);
+
     QSize currentResolution() const;
+
+    Q_INVOKABLE TranscodingSupportStatus transcodingStatus() const;
 
     QRect videoGeometry() const;
     void setVideoGeometry(const QRect& rect);
@@ -225,6 +243,7 @@ signals:
     void liveModeChanged();
     void aspectRatioChanged();
     void videoQualityChanged();
+    void allowOverlayChanged();
     void videoGeometryChanged();
     void currentResolutionChanged();
     void audioEnabledChanged();
@@ -234,6 +253,9 @@ protected: //< for tests
     void testSetCamera(const QnResourcePtr& camera);
 
     virtual QnCommonModule* commonModule() const = 0;
+
+private:
+    bool checkReadyToPlay();
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;

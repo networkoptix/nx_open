@@ -12,3 +12,7 @@ target_compile_definitions(udt
 if(WINDOWS)
     target_link_libraries(udt ws2_32)
 endif()
+
+if(LINUX AND NOT ANDROID)
+    target_link_libraries(udt rt pthread)
+endif()

@@ -47,8 +47,9 @@ void pointize(const QRect& region, PointContainer* points)
     }
 }
 
-static const auto kItemMapTag(lit("__itemMap"));
-static const auto kFreeSlotTag(lit("__freeSlot"));
+// TODO: these tags are better to be bound to QnWorkbenchLayout.
+static const nx::utils::log::Tag kItemMapTag(lit("__itemMap"));
+static const nx::utils::log::Tag kFreeSlotTag(lit("__freeSlot"));
 
 } // namespace
 
@@ -178,9 +179,14 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr& resource)
     {
         auto item = this->item(data.uuid);
         if (!item)
-            addItem(new QnWorkbenchItem(data, this));
+        {
+            if (const auto resource = resourcePool()->getResourceByDescriptor(data.resource))
+                addItem(new QnWorkbenchItem(resource, data, this));
+        }
         else
+        {
             result &= item->update(data);
+        }
     }
 
     /* Some items may have been removed. */

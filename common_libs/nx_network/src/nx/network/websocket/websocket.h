@@ -48,10 +48,16 @@ public:
 
     ~WebSocket();
 
-    virtual void readSomeAsync(nx::Buffer* const buffer, HandlerType handler) override;
-    virtual void sendAsync(const nx::Buffer& buffer, HandlerType handler) override;
+    virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
+    virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
+    /**
+     * Should be called before first read/send. Typically after instantiation and bindToAioThread().
+     * If you need to call it on working socket, first call cancelIOSync().
+     */
+    void start();
 
     /**
      * Makes sense only in multiFrameMessage mode.
@@ -60,23 +66,12 @@ public:
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
     /**
-     * After this timeout expired without any read activity
-     * read handler (if any) will be invoked with SystemError::timedOut.
+     * After this timeout expired without any read activity read handler (if any) will be invoked
+     * with SystemError::timedOut. Should be called before start().
      */
     void setAliveTimeout(std::chrono::milliseconds timeout);
-    /**
-     * @param timeout - stream socket recv timeout
-     * @param multiplier - affect internal ping pong timeout.
-     *
-     * Default multiplier is 4. Ping timeout = timeout / multiplier.
-     */
-    void setAliveTimeoutEx(std::chrono::milliseconds timeout, int multiplier);
     AbstractStreamSocket* socket() { return m_socket.get(); }
-
-protected:
-    int m_pingsReceived = 0;
-    int m_pongsReceived = 0;
-    std::chrono::milliseconds m_pingTimeout;
+    const AbstractStreamSocket* socket() const { return m_socket.get(); }
 
 private:
     virtual void stopWhileInAioThread() override;
@@ -91,21 +86,21 @@ private:
     /** Own helper functions*/
     void processReadData();
     bool isDataFrame() const;
-    void sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler);
+    void sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoCompletionHandler handler);
     void sendControlResponse(FrameType requestType, FrameType responseType);
     void sendControlRequest(FrameType type);
     void readWithoutAddingToQueueSync();
     void readWithoutAddingToQueue();
     void handlePingTimer();
+    void handleAliveTimer();
     void handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead);
     void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
-    void resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> afterHandler);
-    void resetPingTimeoutBySocketTimeoutSync();
-    void setPingTimeout();
     void reportErrorIfAny(
         SystemError::ErrorCode ecode,
         size_t bytesRead,
         std::function<void(bool)> continueHandler);
+    std::chrono::milliseconds pingTimeout() const;
+    void restartTimers();
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
@@ -121,9 +116,10 @@ private:
     nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
+    std::unique_ptr<nx::network::aio::Timer> m_aliveTimer;
+    std::chrono::milliseconds m_aliveTimeout;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     SystemError::ErrorCode m_lastError;
-    int m_pingTimeoutMultiplier;
 };
 
 } // namespace websocket

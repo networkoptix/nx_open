@@ -9,6 +9,10 @@ namespace test {
 
 TEST(LogLevel, FromString)
 {
+    ASSERT_EQ(Level::undefined, levelFromString("wtf"));
+    ASSERT_EQ(Level::undefined, levelFromString(""));
+    ASSERT_EQ(Level::undefined, levelFromString("hello world"));
+
     ASSERT_EQ(Level::none, levelFromString("none"));
     ASSERT_EQ(Level::none, levelFromString("NONE"));
     ASSERT_EQ(Level::none, levelFromString("n"));
@@ -42,9 +46,9 @@ TEST(LogLevel, FromString)
     ASSERT_EQ(Level::verbose, levelFromString("DEBUG2"));
     ASSERT_EQ(Level::verbose, levelFromString("v"));
 
-    ASSERT_EQ(Level::undefined, levelFromString("wtf"));
-    ASSERT_EQ(Level::undefined, levelFromString(""));
-    ASSERT_EQ(Level::undefined, levelFromString("hello world"));
+    ASSERT_EQ(Level::notConfigured, levelFromString("notConfigured"));
+    ASSERT_EQ(Level::notConfigured, levelFromString("not_configured"));
+    ASSERT_EQ(Level::notConfigured, levelFromString("NOT_CONFIGURED"));
 }
 
 TEST(LogLevel, ToString)
@@ -57,13 +61,19 @@ TEST(LogLevel, ToString)
     ASSERT_EQ("info", toString(Level::info));
     ASSERT_EQ("debug", toString(Level::debug));
     ASSERT_EQ("verbose", toString(Level::verbose));
+    ASSERT_EQ("notConfigured", toString(Level::notConfigured));
 }
 
-void testParsing(const QString& s, Level p, LevelFilters f = {})
+void testParsing(const QString& s, Level p, std::map<const char*, Level> fs = {})
 {
     LevelSettings settings;
     settings.parse(s);
-    EXPECT_EQ(LevelSettings(p, f), settings) << s.toStdString();
+
+    LevelFilters filters;
+    for (const auto& f: fs)
+        filters.emplace(Tag(QString::fromUtf8(f.first)), f.second);
+
+    EXPECT_EQ(LevelSettings(p, filters), settings) << s.toStdString();
 }
 
 TEST(LogLevelSettings, Parse)

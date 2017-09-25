@@ -1,0 +1,66 @@
+<div class="container">
+    <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
+    <div ng-if="developersFeedbackForm">
+        <h2>开发者工具</h2>
+        <p>
+            你对于整合开发感到开心吗? 让我们知道.
+        </p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">留下您的反馈信息</a></p>
+    </div>
+
+    <div>
+        <h3>通用事件生成器</h3>
+        <p>
+            通用事件是供第三方系统触发VMS动作的特殊事件。
+            要创建Generic Event集成系统需要向服务器发出HTTP请求（使用Server API）。
+            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+        </p>
+        <p><a href="#/developers/events">通用事件生成器</a></p>
+    </div>
+    <div>
+        <h3>服务器 API</h3>
+        <p>
+            伺服器 API 提供一套标准的 API 供第三方厂家呼叫. 让开发者几乎可取用所有在标准 Client 上能操作的系统功能: 调阅/管理系统资源 (伺服器, 摄像机, 使用者, 权限), 从系统中拉取实时流或录像资料, 生成事件, 建立规则, 操控 PTZ 摄像机以及更多.
+        </p>
+        <p>
+            <a href="#/developers/api"><b> API测试工具（新） </b></a>
+            - 用于测试API调用的工具的互动式文档<br>
+            <a href="#/developers/changelog"> API更改日志</a>
+            - 重大变更的API列表 <br> 
+            <a id="api-doc" href="api.xml" target="_blank"> API文档</a>
+        </p>
+
+    </div>
+    <div>
+        <h3>摄像机详细信息面板</h3>
+        <p>
+            用于显示摄像机附加信息的web客户端的特殊面板：
+        </p>
+        <ul>
+            <li>摄像头 ID</li>
+            <li>所有可用视频流的链接</li>
+            <li>从浏览器直接导出视频</li>
+        </ul>
+        <p>
+            打开摄像机详细信息面板 - 打开<a href="#/view">web 客户端</a> ，选择摄像机，
+            设置图标（齿轮），然后选择 “相机详细信息”
+        </p>
+        <p><a href="#/view/?cameraLinks">开启摄像机详细信息面板</a></p>
+    </div>
+    <div>
+        <h3>视频源集成 SDK</h3>
+        <p>
+            影像源整合 SDK 提供整合几乎任何实时流或录影装置的能力
+            (IP摄像机, NVR, DVR等等.) SDK 可使得搜寻, 显示, 分析以及录存影像变得可能. 这也支援整合设备的 I/O 端口和移动侦测资讯.
+        </p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >获取 SDK</a></p>
+    </div>
+
+    <div>
+        <h3>存储 SDK</h3>
+        <p>
+            存储装置 SDK 提供整合存储装置进入系统. 这使得开发人员可读取或写入任何存储装置︰本地, 远端或云端. 建立一个存储装置插件须可执行标准功能如：I/O串流, 档案是否存在, 删除档案, 列出资料夹所有档案等等. 存储装置 SDK 还包含如何使 FTP 服务器成为存储装置的范例.
+        </p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >获取 SDK</a></p>
+    </div>
+</div>

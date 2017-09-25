@@ -23,6 +23,10 @@
 
 #include <vms_gateway_embeddable.h>
 
+#include <nx/client/desktop/ui/common/clipboard_button.h>
+
+using namespace nx::client::desktop::ui;
+
 namespace {
 
 bool isStatusValid(Qn::ResourceStatus status)
@@ -30,7 +34,7 @@ bool isStatusValid(Qn::ResourceStatus status)
     return status == Qn::Online || status == Qn::Recording;
 }
 
-}
+} // namespace
 
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /* = 0*/):
     base_type(parent),
@@ -46,6 +50,15 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 
     ui->secondaryStreamUrlInputField->setTitle(tr("Secondary Stream"));
     ui->secondaryStreamUrlInputField->setReadOnly(true);
+
+    auto cameraIdLineEdit = ui->cameraIdInputField->findChild<QLineEdit*>();
+    auto primaryLineEdit = ui->primaryStreamUrlInputField->findChild<QLineEdit*>();
+    auto secondaryLineEdit = ui->secondaryStreamUrlInputField->findChild<QLineEdit*>();
+    NX_ASSERT(cameraIdLineEdit && primaryLineEdit && secondaryLineEdit);
+
+    ClipboardButton::createInline(cameraIdLineEdit, ClipboardButton::StandardType::copy);
+    ClipboardButton::createInline(primaryLineEdit, ClipboardButton::StandardType::copy);
+    ClipboardButton::createInline(secondaryLineEdit, ClipboardButton::StandardType::copy);
 
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());

@@ -28,9 +28,10 @@ struct ModuleEndpoint: QnModuleInformation
 class Manager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
+    using base_type = QObject;
 
 public:
-    Manager(QnCommonModule* commonModule, bool clientMode, QnResourcePool* resourcePool);
+    Manager(bool clientMode, QObject* parent = nullptr);
     virtual ~Manager() override;
 
     void setReconnectPolicy(network::RetryPolicy value);
@@ -87,7 +88,6 @@ private:
     void updateEndpoints(const QnMediaServerResource* server);
 
 private:
-    QnResourcePool* const m_resourcePool;
     std::atomic<bool> isRunning;
 
     mutable QnMutex m_mutex;

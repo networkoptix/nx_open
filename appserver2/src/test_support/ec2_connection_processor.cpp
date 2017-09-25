@@ -7,6 +7,9 @@
 #include <rest/server/rest_connection_processor.h>
 #include <nx/network/app_info.h>
 #include "appserver2_process.h"
+#include <common/common_module.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
@@ -49,6 +52,26 @@ bool Ec2ConnectionProcessor::authenticate()
         addAuthHeader(
             d->response);
         return false;
+    }
+
+    const auto findUserByName =
+        [this](const QString& userName)
+        {
+            const auto userNameLower = userName.toLower();
+            for (const auto& user: commonModule()->resourcePool()->getResources<QnUserResource>())
+            {
+                if (user->getName().toLower() == userNameLower)
+                    return user;
+            }
+            return QnUserResourcePtr();
+        };
+
+    nx_http::header::Authorization authorizationHeader;
+    if (authorizationHeader.parse(authorization))
+    {
+        const QByteArray userName = authorizationHeader.userid();
+        if (auto userRes = findUserByName(QString::fromUtf8(userName)))
+            d->accessRights = Qn::UserAccessData(userRes->getId());
     }
 
     return true;
@@ -121,7 +144,8 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     else
         return false;
 
-    d->accessRights = Qn::kSystemAccess;
+    if (d->accessRights.userId.isNull())
+        d->accessRights = Qn::kSystemAccess;
 
     auto restProcessor = dynamic_cast<QnRestConnectionProcessor*>(m_processor);
     if (restProcessor)

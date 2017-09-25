@@ -13,6 +13,7 @@ COPY docker/docker-compose /usr/local/bin
 COPY docker/kubectl /usr/local/bin
 COPY docker/aws_config /root/.aws/config
 COPY docker/aws_credentials /root/.aws/credentials
+COPY nxcloud_run_config.yaml /root/nxcloud_run_config.yaml
 
 ARG NXCLOUD_VERSION
 ARG VERSION
@@ -20,8 +21,21 @@ ARG MODULES
 
 RUN /app/env/bin/pip install --no-cache-dir nxcloud==${NXCLOUD_VERSION}
 
+ENV NXCLOUD_RUN_CONFIG /root/nxcloud_run_config.yaml
 ENV PATH /app/env/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV VERSION ${VERSION}
 ENV MODULES "${MODULES}"
 
 ENTRYPOINT ["/app/env/bin/nxcloud", "--mode=agent"]
+
+ARG VERSION
+ARG REVISION
+ARG BUILD_DATE
+ARG BUILD_HOST
+ARG BUILD_USER
+LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
+      version="$VERSION" \
+      revision="$REVISION" \
+      build-date="$BUILD_DATE" \
+      build-host="$BUILD_HOST" \
+      build-user="$BUILD_USER"

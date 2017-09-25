@@ -571,7 +571,7 @@ quint64 DecodedPictureToOpenGLUploader::UploadedPicture::pts() const
     return m_pts;
 }
 
-QnMetaDataV1Ptr DecodedPictureToOpenGLUploader::UploadedPicture::metadata() const
+QnAbstractCompressedMetadataPtr DecodedPictureToOpenGLUploader::UploadedPicture::metadata() const
 {
     return m_metadata;
 }
@@ -1947,7 +1947,7 @@ static int glRGBFormat(AVPixelFormat format )
             case AV_PIX_FMT_RGB24:
                 return GL_RGB;
             case AV_PIX_FMT_BGR24:
-                return GL_BGRA_EXT; //TODO: #asinaisky
+                return GL_BGRA_EXT; // TODO: #asinaisky
             default:
                 break;
         }
@@ -2331,7 +2331,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         emptyPictureBuf->setColorFormat( AV_PIX_FMT_RGBA );
 
-        //TODO: #ak free memory immediately for still images
+        // TODO: #ak free memory immediately for still images
     }
 
     //TODO/IMPL should place fence here and in getUploadedPicture should take only that picture, whose m_glFence is signaled

@@ -7,7 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_data.h>
 
-//TODO: #GDM replace with ec2::ApiLayoutData
+// TODO: #GDM replace with ec2::ApiLayoutData
 class QnWorkbenchLayoutSnapshot
 {
 public:

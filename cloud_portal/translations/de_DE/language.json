@@ -81,6 +81,26 @@
     "customRole":{
       "label":"Benutzerdefinierte Rolle",
       "description":"Benutzerdefinierte Benutzerrolle im System festgelegt"
+    },
+    "owner":{
+      "label":"Besitzer",
+      "description":"Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen und Systeme von der Cloud zu verbinden/trennen"
+    },
+    "viewer":{
+      "label":"Betrachter",
+      "description":"Kann Livevideos ansehen und das Archiv durchsuchen"
+    },
+    "liveViewer":{
+      "label":"Live-Betrachter",
+      "description":"Kann nur Livevideos ansehen"
+    },
+    "advancedViewer":{
+      "label":"Erweiterter Betrachter",
+      "description":"Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
+    },
+    "custom":{
+      "label":"Benutzerdefiniert",
+      "description":"Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
     }
   },
   "errorCodes":{

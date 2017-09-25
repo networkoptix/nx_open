@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>Alle Warnungen zurücksetzen</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>Intel HD Grafik kann Probleme aufweisen, wenn die Trübung aktiviert ist. Wir empfehlen dringend die Option so zu belassen.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>Trübung deaktivieren</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>Sofort</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Externen Speicher hinzufügen...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Version:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Überprüfen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>Nicht überprüft</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>Installierte Versionen anzeigen</translation>
     </message>
   </context>
   <context>
@@ -393,11 +375,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Alle Server sind offline. Protokolle sind nicht verfügbar.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Lesezeichenprotokoll</translation>
     </message>
@@ -466,6 +443,11 @@
       <location/>
       <source>Event Log...</source>
       <translation>Ereignisprotokoll...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -588,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Erweiterte Einstellungen sind nicht verfügbar</translation>
     </message>
@@ -732,17 +709,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZ-Steuerung</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Deaktivieren Sie native Presets, verwenden Sie stattdessen Systemvorgaben</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Warnung! Native Kamerapresets sind nicht verfügbar.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Input-ID</translation>
     </message>
   </context>
   <context>
@@ -776,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Output-ID:</translation>
     </message>
   </context>
   <context>
@@ -906,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Angemeldet bleiben</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Ihr Benutzername und Passwort stimmen nicht überein</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Gebunden an Hardware-ID:</translation>
     </message>
   </context>
   <context>
@@ -1474,16 +1446,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Aus Zwischenablage einfügen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Lizenzdatei auswählen...</translation>
     </message>
@@ -1530,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Hardware-ID</translation>
     </message>
   </context>
   <context>
@@ -1651,13 +1613,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Tourzyklus</translation>
+      <source>seconds</source>
+      <translation>Sekunden</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>Sekunden</translation>
+      <source>Showreel cycle</source>
+      <translation>Demoband-Zyklus</translation>
     </message>
   </context>
   <context>
@@ -1916,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>Angemeldet bleiben</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Ihr Benutzername und Passwort stimmen nicht überein</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2099,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>Warnung: Datei mit diesem Namen existiert bereits!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>Server werden aktualisiert</translation>
     </message>
   </context>
   <context>

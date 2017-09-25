@@ -6,7 +6,7 @@
 
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-CUSTOMIZATION=${customization}
+CUSTOMIZATION=@deb.customization.company.name@
 
 # m h dom mon dow user	command
 17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly

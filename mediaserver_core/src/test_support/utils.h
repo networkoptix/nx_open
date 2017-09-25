@@ -10,11 +10,11 @@ namespace cfg {
 
 struct Config
 {
-    /** Every test tmp work dir. */
+    /** Temporary working directory for all tests. */
     QString tmpDir;
-
-    /** Storage tests ftp and smb storages urls. */
+    /** Ftp storage url. */
     QString ftpUrl;
+    /** Samba storage url. */
     QString smbUrl;
 };
 
@@ -30,7 +30,7 @@ namespace utils {
 boost::optional<QString> createRandomDir();
 
 /**
- * Creates specified directory in the constructor and removes it in the destructor.
+ * Creates the specified directory in the constructor and removes it in the destructor.
  */
 class WorkDirResource
 {

@@ -48,15 +48,15 @@ public:
         QnWorkbenchContextAware(context),
         m_camera(resource.dynamicCast<QnVirtualCameraResource>()),
         m_resourceId(resource->getId()),
-        m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzHotkeyHash>())
+        m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>())
     {
     }
 
     ~QnSingleCameraPtzHotkeysDelegate() {}
 
-    virtual QnPtzHotkeyHash hotkeys() const override
+    virtual QnPtzIdByHotkeyHash hotkeys() const override
     {
-        QnPtzHotkeyHash result;
+        QnPtzIdByHotkeyHash result;
 
         if (!m_camera)
             return result;
@@ -71,7 +71,7 @@ public:
         return result;
     }
 
-    virtual void updateHotkeys(const QnPtzHotkeyHash &value) override
+    virtual void updateHotkeys(const QnPtzIdByHotkeyHash &value) override
     {
         if (!m_camera)
             return;
@@ -90,7 +90,7 @@ public:
 private:
     QnVirtualCameraResourcePtr m_camera;
     QnUuid m_resourceId;
-    std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzHotkeyHash>> m_propertyHandler;
+    std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzIdByHotkeyHash>> m_propertyHandler;
     mutable QnMutex m_mutex;
 };
 
@@ -165,7 +165,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    //TODO: #GDM #PTZ fix the text
+    // TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
         messages::Ptz::failedToGetPosition(mainWindow(),
@@ -193,7 +193,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 
     if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
     {
-        //TODO: #GDM #PTZ show appropriate error message?
+        // TODO: #GDM #PTZ show appropriate error message?
         return;
     }
 
@@ -310,9 +310,8 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered()
     auto hotkeysDelegate =
         new QnSingleCameraPtzHotkeysDelegate(res, context());
 
-    dialog->setResource(res);
+    dialog->setWidget(widget);
     dialog->setHotkeysDelegate(hotkeysDelegate);
-    dialog->setController(widget->ptzController());
     dialog->show();
 }
 
@@ -322,6 +321,8 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
     if (!widget)
         return;
     QPointer<const QnMediaResourceWidget> guard(widget);
+    QPointer<QnWorkbenchItem> itemGuard(widget->item());
+
     QnPtzControllerPtr controller = widget->ptzController();
 
     QVector3D position;
@@ -340,12 +341,15 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
         QTimer::singleShot(10000, &loop, SLOT(quit()));
         loop.exec();
 
-        if (!guard)
+        if (!guard || !itemGuard)
             break;
 
         QVector3D cameraPosition;
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
+
+        if (!guard || !itemGuard)
+            break;
 
         menu()->trigger(action::TakeScreenshotAction, action::Parameters(widget)
             .withArgument(Qn::FileNameRole, lit("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
@@ -377,7 +381,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
         messages::Ptz::failedToSetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
-    //TODO: #GDM #PTZ check other cases
+    // TODO: #GDM #PTZ check other cases
 }
 
 void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()

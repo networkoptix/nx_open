@@ -64,6 +64,8 @@ public:
 
     void setCurrentTab(Tab tab);
 
+    void selectNodeByUuid(const QnUuid& id);
+    void selectResource(const QnResourcePtr& resource);
     QnResourceList selectedResources() const;
 
     QnLayoutItemIndexList selectedLayoutItems() const;
@@ -123,6 +125,8 @@ private:
     void handleItemActivated(const QModelIndex& index, bool withMouse);
 
     void setTooltipResource(const QnResourcePtr& camera);
+
+    void selectIndices(const QModelIndexList& indices);
 
 private slots:
     void updateFilter(bool force = false);

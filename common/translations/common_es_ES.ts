@@ -82,13 +82,22 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>El Sistema de la nube sólo puede ser combinado con la no nube. El nombre del sistema y la contraseña son tomados del Sistema de la Nube.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Eventos del Sistema</translation>
     </message>
   </context>
   <context>
@@ -123,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>Recibió una mala respuesta del Servidor %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -147,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Error de entrada / salida. Mensaje del sistema operativo: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -171,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Petición de dispositivo &quot;%1&quot; falla con error &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>La solicitud de cámara &quot;%1&quot; falló con error &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>Prueba</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>Análogo</translation>
     </message>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>Codificador analógico</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>Las licencias de prueba</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>Licencia gratuita</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Tiempo</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation type="unfinished">Time Licenses</translation>
     </message>
   </context>
   <context>
@@ -651,10 +660,6 @@
       <translation>Desconocido</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>Las licencias de prueba</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>Licencia GRATIS</translation>
     </message>
@@ -669,6 +674,10 @@
     <message>
       <source>Hardware Id: %1</source>
       <translation type="unfinished">Hardware Id: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation type="unfinished">Time License</translation>
     </message>
   </context>
   <context>

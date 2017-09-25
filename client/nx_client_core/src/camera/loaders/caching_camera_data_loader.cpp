@@ -60,7 +60,7 @@ bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &reso
 }
 
 void QnCachingCameraDataLoader::init() {
-    //TODO: #GDM 2.4 move to camera history
+    // TODO: #GDM 2.4 move to camera history
     if(m_resource.dynamicCast<QnNetworkResource>()) {
         connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
     }
@@ -98,10 +98,8 @@ void QnCachingCameraDataLoader::initLoaders() {
             connect(loader, &QnAbstractCameraDataLoader::failed, this,
                 [this, dataType]()
                 {
-                    if (dataType == Qn::RecordingContent)
-                    {
-                        NX_LOG("Chunks: failed to load" , cl_logDEBUG1);
-                    }
+                    NX_VERBOSE(this, lm("Chunks %1: failed to load")
+                        .arg(dataType == Qn::RecordingContent ? lit("rec") : lit("mot")));
                     emit loadingFailed();
                 });
         }
@@ -236,7 +234,7 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
 
 void QnCachingCameraDataLoader::discardCachedData()
 {
-    NX_LOG("Chunks: clear local cache" , cl_logDEBUG1);
+    NX_VERBOSE(this) << "Chunks: clear local cache";
     for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
 
         Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
@@ -254,7 +252,7 @@ void QnCachingCameraDataLoader::discardCachedData()
 }
 
 void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodType, bool forced) {
-    //TODO: #GDM #2.4 make sure we are not sending requests while loader is disabled
+    // TODO: #GDM #2.4 make sure we are not sending requests while loader is disabled
     if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs))
     {
         if (forced)
@@ -269,9 +267,11 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodTy
 
 void QnCachingCameraDataLoader::trace(const QString& message, Qn::TimePeriodContent periodType)
 {
-    if (periodType != Qn::RecordingContent)
-        return;
-
-    QString name = m_resource ? m_resource->toResourcePtr()->getName() : lit("_invalid_camera_");
-    NX_LOG(lit("Chunks: (cached) (%1) %2").arg(name).arg(message), cl_logDEBUG1);
+    if (m_resource)
+    {
+        NX_VERBOSE(this, lm("Chunks (cached) %1: (%2) %3")
+            .arg(periodType == Qn::RecordingContent ? lit("rec") : lit("mot"))
+            .arg(m_resource->toResourcePtr()->getName())
+            .arg(message));
+    }
 }

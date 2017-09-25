@@ -11,7 +11,6 @@ namespace log {
 
 void NX_UTILS_API initialize(
     const Settings& settings,
-    const QString& dataDir,
     const QString& applicationName,
     const QString& binaryPath = QString(),
     const QString& baseName = QLatin1String("log_file"),

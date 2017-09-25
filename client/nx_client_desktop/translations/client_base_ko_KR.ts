@@ -36,6 +36,18 @@ to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
       <translation>더 많은 북마크를 보려면 타임 라인을 확대/축소</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation>처음부터 북마크를 재생</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation>북마크 편집</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation>북마크 삭제</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -168,14 +180,6 @@ to view more bookmarks</source>
     <message>
       <source>New Web Page...</source>
       <translation>웹 페이지...</translation>
-    </message>
-    <message>
-      <source>Layout Tour...</source>
-      <translation type="unfinished">Layout Tour...</translation>
-    </message>
-    <message>
-      <source>New Layout Tour...</source>
-      <translation type="unfinished">New Layout Tour...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -406,7 +410,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>비디오 월 열기</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -551,10 +555,6 @@ to view more bookmarks</source>
     <message>
       <source>Remove from Layout</source>
       <translation>레이아웃 제거</translation>
-    </message>
-    <message>
-      <source>Remove from Tour</source>
-      <translation type="unfinished">Remove from Tour</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
@@ -729,18 +729,6 @@ to view more bookmarks</source>
       <translation>크게</translation>
     </message>
     <message>
-      <source>Start Tour</source>
-      <translation>전환 시작</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>전환 멈춤</translation>
-    </message>
-    <message>
-      <source>Make Layout Tour</source>
-      <translation type="unfinished">Make Layout Tour</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>설정</translation>
     </message>
@@ -867,6 +855,22 @@ to view more bookmarks</source>
     <message>
       <source>Bookmark Log...</source>
       <translation type="unfinished">Bookmark Log...</translation>
+    </message>
+    <message>
+      <source>Showreel...</source>
+      <translation type="unfinished">Showreel...</translation>
+    </message>
+    <message>
+      <source>New Showreel...</source>
+      <translation type="unfinished">New Showreel...</translation>
+    </message>
+    <message>
+      <source>Remove from Showreel</source>
+      <translation type="unfinished">Remove from Showreel</translation>
+    </message>
+    <message>
+      <source>Make Showreel</source>
+      <translation type="unfinished">Make Showreel</translation>
     </message>
   </context>
   <context>
@@ -1015,6 +1019,44 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>LocalFiles</name>
+    <message>
+      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; already exists. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+    </message>
+  </context>
+  <context>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
@@ -1077,6 +1119,37 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>Ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>현재 위치를 가져오는 데 실패</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>현재 위치를 설정 하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>튜어 기능에 할당되어 있는 Preset입니다. 그래도 삭제 하실건가요?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>이 튜어 설정은 유효하지 않습니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
@@ -1123,10 +1196,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnAboutDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>상세보기 복사</translation>
-    </message>
     <message>
       <source>%1 uses the following external libraries:</source>
       <translation>다음 외부 라이브러리에 %1 사용:</translation>
@@ -1262,10 +1331,6 @@ to view more bookmarks</source>
       <translation>선택된 정보 파일로 저장</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>감사 로고 재생</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>장치</translation>
     </message>
@@ -1338,6 +1403,10 @@ to view more bookmarks</source>
       <translation>
         <numerusform>이 리소스는 시스템에서 제거 됩니다.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation type="unfinished">Audit trail replay</translation>
     </message>
   </context>
   <context>
@@ -1605,10 +1674,6 @@ to view more bookmarks</source>
       <translation>빌드 번호</translation>
     </message>
     <message>
-      <source>Invalid build number</source>
-      <translation>잘못 된 빌드 번호</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>비밀번호</translation>
     </message>
@@ -1656,6 +1721,13 @@ to view more bookmarks</source>
     <message>
       <source>Any Camera</source>
       <translation>모든 카메라</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation type="unfinished">Manage Bookmarks</translation>
     </message>
   </context>
   <context>
@@ -1797,10 +1869,6 @@ to view more bookmarks</source>
       <translation>카메라 장치에 의한 구분...</translation>
     </message>
     <message>
-      <source>Reset all rules to default?</source>
-      <translation>모든 항목을 기본값으로 다시 설정하시겠습니까?</translation>
-    </message>
-    <message>
       <source>Failed to retrieve rules</source>
       <translation>규칙을 검색 하지 못했습니다.</translation>
     </message>
@@ -1819,6 +1887,10 @@ to view more bookmarks</source>
     <message>
       <source>This action cannot be undone.</source>
       <translation>이 작업은 취소할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Restore all rules to default?</source>
+      <translation type="unfinished">Restore all rules to default?</translation>
     </message>
   </context>
   <context>
@@ -2048,10 +2120,6 @@ to view more bookmarks</source>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>상세 정보 복사</translation>
-    </message>
-    <message>
       <source>OK</source>
       <translation>확인</translation>
     </message>
@@ -2270,6 +2338,10 @@ to view more bookmarks</source>
     <message>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
       <translation>현재 카메라에 대 한 모션 분야의 최대 수는 %1, 그리고 %2 모션 영역 현재 선택.</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+      <translation type="unfinished">Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</translation>
     </message>
   </context>
   <context>
@@ -2560,6 +2632,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>%1에 대 한 자세한 내용은</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -2947,8 +3030,8 @@ to %1</source>
       <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -3600,10 +3683,6 @@ to %1</source>
       <translation>저장 스트림 허용:</translation>
     </message>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>상세보기 복사</translation>
-    </message>
-    <message>
       <source>Generic:</source>
       <translation>일반:</translation>
     </message>
@@ -3836,10 +3915,6 @@ to %1</source>
       <translation type="unfinished">License Server error</translation>
     </message>
     <message>
-      <source>If the problem presists please contact Customer Support.</source>
-      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
-    </message>
-    <message>
       <source>License deactivated</source>
       <translation type="unfinished">License deactivated</translation>
     </message>
@@ -3897,6 +3972,10 @@ to %1</source>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
       <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
     </message>
+    <message>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -3927,10 +4006,6 @@ to %1</source>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
       <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
-    </message>
-    <message>
-      <source>Hardware Id copied to clipboard</source>
-      <translation type="unfinished">Hardware Id copied to clipboard</translation>
     </message>
   </context>
   <context>
@@ -4253,12 +4328,12 @@ to %1</source>
       <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
     </message>
     <message>
-      <source>You will be reconnected</source>
-      <translation type="unfinished">You will be reconnected</translation>
+      <source>Systems will be merged shortly</source>
+      <translation>시스템은 곧 병합 완료 됩니다.</translation>
     </message>
     <message>
-      <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <source>You will be reconnected.</source>
+      <translation>재 연결 됩니다.</translation>
     </message>
   </context>
   <context>
@@ -4349,8 +4424,8 @@ to %1</source>
       <translation type="unfinished">MB/s</translation>
     </message>
     <message>
-      <source>kB/s</source>
-      <translation type="unfinished">kB/s</translation>
+      <source>KB/s</source>
+      <translation type="unfinished">KB/s</translation>
     </message>
   </context>
   <context>
@@ -4487,6 +4562,17 @@ to %1</source>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
       <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation type="unfinished">Manage Bookmarks</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
@@ -4828,6 +4914,43 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnRequiredPermissionSubjectPolicy</name>
+    <message>
+      <source>Role %1 has no %2 permission</source>
+      <comment>%1 is the name of selected role, %2 is permission name</comment>
+      <translation type="unfinished">Role %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected roles have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected roles have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no %2 permission</source>
+      <comment>%1 is number of selected roles, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation type="unfinished">User %1 has no %2 permission</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation type="unfinished">Selected users have no %1 permission</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation type="unfinished">
+        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Any Type</source>
@@ -4922,12 +5045,12 @@ to %1</source>
       <translation>로컬 파일</translation>
     </message>
     <message>
-      <source>Layout Tours</source>
-      <translation type="unfinished">Layout Tours</translation>
+      <source>Showreels</source>
+      <translation type="unfinished">Showreels</translation>
     </message>
     <message>
-      <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
     </message>
   </context>
   <context>
@@ -5674,36 +5797,8 @@ to %1</source>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
-      <source>Role %1 has no User Input permission</source>
-      <comment>%1 is the name of selected role</comment>
-      <translation type="unfinished">Role %1 has no User Input permission</translation>
-    </message>
-    <message>
-      <source>Selected roles have no User Input permission</source>
-      <translation type="unfinished">Selected roles have no User Input permission</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no User Input permission</source>
-      <comment>%1 is number of selected roles</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected roles have no User Input permission</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no User Input permission</source>
-      <comment>%1 is the name of selected user</comment>
-      <translation type="unfinished">User %1 has no User Input permission</translation>
-    </message>
-    <message>
-      <source>Selected users have no User Input permission</source>
-      <translation type="unfinished">Selected users have no User Input permission</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no User Input permission</source>
-      <comment>%1 is number of selected users</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users have no User Input permission</numerusform>
-      </translation>
+      <source>User Input</source>
+      <translation>사용자 입력</translation>
     </message>
   </context>
   <context>
@@ -6065,10 +6160,6 @@ to %1</source>
       <translation>이메일서버 설정 안됨</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>서버끼리 동기화를 위해 서버 선택하세요</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>시스템 안전모드 상태 입니다</translation>
     </message>
@@ -6099,10 +6190,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>이메일서버 설정안됨</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>서버 시간이 동기화 되지 않았으며 공용시간이 자동으로 검색되지 않았습니다.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -6173,6 +6260,30 @@ to %1</source>
     <message>
       <source>Error while sending email</source>
       <translation type="unfinished">Error while sending email</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started</source>
+      <translation type="unfinished">Remote archive synchronization has been started</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished</source>
+      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is in progress</source>
+      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+    </message>
+    <message>
+      <source>Error occured during remote archive synchronization</source>
+      <translation type="unfinished">Error occured during remote archive synchronization</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started for the following device:</source>
+      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished for the following device:</source>
+      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
     </message>
   </context>
   <context>
@@ -6263,11 +6374,6 @@ to %1</source>
       <translation type="unfinished">hh:mm</translation>
     </message>
     <message>
-      <source>hh:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation type="unfinished">hh:mm ap</translation>
-    </message>
-    <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
       <translation type="unfinished">h ap</translation>
@@ -6293,11 +6399,6 @@ to %1</source>
       <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
-      <source>dd MMMM yyyy hh:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
@@ -6321,6 +6422,16 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation type="unfinished">yyyy</translation>
+    </message>
+    <message>
+      <source>h:mm ap</source>
+      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+      <translation type="unfinished">h:mm ap</translation>
+    </message>
+    <message>
+      <source>dd MMMM yyyy h:mm ap</source>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6634,6 +6745,11 @@ to %1</source>
     <message>
       <source>Apply changes before switching to another user?</source>
       <translation>다른 사용자로 전환 하기 전에 변경 내용을 적용?</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">This user has not yet signed up for %1</translation>
     </message>
   </context>
   <context>
@@ -7062,12 +7178,12 @@ to %1</source>
       <translation type="unfinished">Connecting to the current System...</translation>
     </message>
     <message>
-      <source>Server will be connected to the System shortly</source>
-      <translation type="unfinished">Server will be connected to the System shortly</translation>
-    </message>
-    <message>
       <source>It will appear in the resource tree when the database synchronization is finished.</source>
       <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+    </message>
+    <message>
+      <source>Server will be connected to System shortly</source>
+      <translation type="unfinished">Server will be connected to System shortly</translation>
     </message>
   </context>
   <context>
@@ -7318,154 +7434,7 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>SubjectSelectionDialog::RoleListDelegate</name>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n 사용자</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>데이터 없음</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
-    <message>
-      <source>Drag layout or camera here to add it to the tour</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>Users</source>
-      <translation>사용자</translation>
-    </message>
-    <message>
-      <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>모든 사용자</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
-    <message>
-      <source>Switch with Hotkeys</source>
-      <translation type="unfinished">Switch with Hotkeys</translation>
-    </message>
-    <message>
-      <source>Switch on Timer</source>
-      <translation type="unfinished">Switch on Timer</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (활성화)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (활성화)</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
-    <message>
-      <source>Please fill up information about yourself and reason for license deactivation</source>
-      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
-    </message>
-    <message>
-      <source>Next</source>
-      <translation>다음</translation>
-    </message>
-    <message>
-      <source>Name is necessary</source>
-      <translation type="unfinished">Name is necessary</translation>
-    </message>
-    <message>
-      <source>Reason is necessary</source>
-      <translation type="unfinished">Reason is necessary</translation>
-    </message>
-    <message>
-      <source>Name</source>
-      <translation>이름</translation>
-    </message>
-    <message>
-      <source>Email</source>
-      <translation>이메일</translation>
-    </message>
-    <message>
-      <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
-    </message>
-    <message>
-      <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
-    </message>
-    <message>
-      <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
-    </message>
-    <message>
-      <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
-    </message>
-    <message>
-      <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
-    <message>
-      <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::ptz</name>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>현재 위치를 가져오는 데 실패</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>현재 위치를 설정 하지 못했습니다.</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>튜어 기능에 할당되어 있는 Preset입니다. 그래도 삭제 하실건가요?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>이 튜어 설정은 유효하지 않습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::resources</name>
+    <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
       <translation>같은 이름으로 다른 레이아웃 있음.</translation>
@@ -7548,7 +7517,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
@@ -7611,22 +7580,31 @@ to %1</source>
       <translation>제거 후 다시 자동 발견 있을 수 있습니다</translation>
     </message>
     <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation type="unfinished">Overwrite existing layout tour?</translation>
+      <source>Overwrite existing showreel?</source>
+      <translation type="unfinished">Overwrite existing showreel?</translation>
     </message>
     <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation type="unfinished">There is another layout tour with the same name.</translation>
+      <source>There is another showreel with the same name.</source>
+      <translation type="unfinished">There is another showreel with the same name.</translation>
     </message>
     <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
+      <source>Remove %n items from showreel?</source>
       <translation type="unfinished">
-        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from showreel?</numerusform>
       </translation>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::videowall</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n 사용자</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>Videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
       <translation>같은 이름의 비디오월이 존재 합니다.</translation>
@@ -7650,6 +7628,163 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>비디오 월에 로컬 파일을 표시 하려면 main 비디오월이 설정된 Pc에 파일을 입력하세요</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>복사</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>클립보드 복사</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>붙여넣기</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>클립보드 붙여넣기</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation type="unfinished">Copied</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation type="unfinished">Pasted</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>데이터 없음</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>Users</source>
+      <translation>사용자</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>모든 사용자</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation type="unfinished">Switch with Hotkeys</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation type="unfinished">Switch on Timer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation type="unfinished">Stop Showreel</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation type="unfinished">Start Showreel</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (활성화)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (활성화)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+      <source>Please fill up information about yourself and reason for license deactivation</source>
+      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>다음</translation>
+    </message>
+    <message>
+      <source>Name is necessary</source>
+      <translation type="unfinished">Name is necessary</translation>
+    </message>
+    <message>
+      <source>Reason is necessary</source>
+      <translation type="unfinished">Reason is necessary</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>이름</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>이메일</translation>
+    </message>
+    <message>
+      <source>Reason for deactivation</source>
+      <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation type="unfinished">- Choose one -</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation type="unfinished">Other Reason</translation>
+    </message>
+    <message>
+      <source>I am upgrading my machine</source>
+      <translation type="unfinished">I am upgrading my machine</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation type="unfinished">Go to Live</translation>
     </message>
   </context>
   <context>
@@ -7836,8 +7971,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+    </message>
+    <message>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>
@@ -7858,16 +7997,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Layout Tour</source>
-      <translation type="unfinished">Layout Tour</translation>
-    </message>
-    <message>
-      <source>Layout Tour %1</source>
-      <translation type="unfinished">Layout Tour %1</translation>
-    </message>
-    <message>
       <source>Delete layout tour %1?</source>
       <translation type="unfinished">Delete layout tour %1?</translation>
+    </message>
+    <message>
+      <source>Showreel</source>
+      <translation type="unfinished">Showreel</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation type="unfinished">Showreel %1</translation>
     </message>
   </context>
   <context>

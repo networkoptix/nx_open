@@ -340,9 +340,9 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     return true;
 }
 
-void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const
+void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& streamParams) const
 {
-
+    QnLiveStreamParams params = streamParams;
     auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     bool useEncodingInterval = resData.value<bool>
         (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
@@ -381,14 +381,14 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
         else
         {
             int fpsBase = resData.value<int>(Qn::FPS_BASE_PARAM_NAME);
-            int closestAvailableFps = m_onvifRes->getClosestAvailableFps(params.fps);
+            params.fps = m_onvifRes->getClosestAvailableFps(params.fps);
             encoder.RateControl->FrameRateLimit = fpsBase;
             encoder.RateControl->EncodingInterval = static_cast<int>(
-                fpsBase / closestAvailableFps + 0.5);
+                fpsBase / params.fps + 0.5);
         }
 
         encoder.RateControl->BitrateLimit = m_onvifRes
-            ->suggestBitrateKbps(quality, resolution, encoder.RateControl->FrameRateLimit, getRole());
+            ->suggestBitrateKbps(resolution, params, getRole());
     }
 
 
@@ -508,7 +508,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if( !encoderParamsToSet )
         return CameraDiagnostics::RequestFailedResult( QLatin1String("fetchVideoEncoder"), QString() );
 
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     info.videoEncoderId = QString::fromStdString(encoderParamsToSet->token);
 
     if (!isCameraControlRequired || m_mustNotConfigureResource)
@@ -535,7 +535,7 @@ VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response,
     for (;iter != response.Configurations.end(); ++iter)
     {
         VideoEncoder* conf = *iter;
-        //TODO: #vasilenko UTF unuse std::string
+        // TODO: #vasilenko UTF unuse std::string
         if (conf && id == QString::fromStdString(conf->token)) {
             /*
             if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec())
@@ -823,7 +823,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(MediaSoap
     if( !result )
         return CameraDiagnostics::RequestFailedResult( QLatin1String("fetchAudioEncoder"), QString() );
 
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     info.audioEncoderId = QString::fromStdString(result->token);
 
     if (!isCameraControlRequired)
@@ -842,7 +842,7 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
 
     std::vector<onvifXsd__AudioEncoderConfiguration*>::const_iterator iter = response.Configurations.begin();
     for (; iter != response.Configurations.end(); ++iter) {
-        //TODO: #vasilenko UTF unuse std::string
+        // TODO: #vasilenko UTF unuse std::string
         if (*iter && id == QString::fromStdString((*iter)->token)) {
             return *iter;
         }
@@ -933,7 +933,7 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
 
     std::vector<AudioSource*>::const_iterator it = response.Configurations.begin();
     for (; it != response.Configurations.end(); ++it) {
-        //TODO: #vasilenko UTF unuse std::string
+        // TODO: #vasilenko UTF unuse std::string
         if (*it && id == QString::fromStdString((*it)->token)) {
             return *it;
         }

@@ -21,6 +21,8 @@
 
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
+#include <client/client_module.h>
+
 #include <common/common_meta_types.h>
 
 #include <core/resource_access/resource_access_filter.h>
@@ -30,7 +32,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
-#include <redass/redass_controller.h>
+#include <nx/client/desktop/radass/radass_controller.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
@@ -96,7 +98,10 @@
 
 #include <nx/utils/log/log.h>
 
+#include <ini.h>
+
 using namespace nx;
+using namespace nx::client::desktop;
 using namespace client::desktop::ui;
 
 namespace {
@@ -125,8 +130,14 @@ void calculateExpansionValues(qreal start, qreal end, qreal center, qreal newLen
 /** Size multiplier for raised widgets. */
 const qreal focusExpansion = 100.0;
 
-/** Maximal expanded size of a raised widget, relative to viewport size. */
-const qreal maxExpandedSize = 0.5;
+// Raised widget will take 50% of the viewport.
+static constexpr qreal kRaisedWidgetViewportPercentage = 0.5;
+
+// Raised widget in videowall mode will take 80% of the viewport.
+static constexpr qreal kVideoWallRaisedWidgetViewportPercentage = 0.8;
+
+// Raised widget in E-Mapping mode will take 33% of the viewport.
+static constexpr qreal kEMappingRaisedWidgetViewportPercentage = 0.33;
 
 /** The amount of z-space that one layer occupies. */
 const qreal layerZSize = 10000000.0;
@@ -140,6 +151,9 @@ const int splashPeriodMs = 500;
 
 /** How long splashes should be painted on items when notification appears.  */
 const int splashTotalLengthMs = 1000;
+
+/** Viewport lower size boundary, in scene coordinates. */
+static const QSizeF kViewportLowerSizeBound(500.0, 500.0);
 
 enum
 {
@@ -723,20 +737,25 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 
 QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const
 {
-    QRectF occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
-    QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
+    const auto occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
+    const auto viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
+
     QSizeF newWidgetSize = occupiedGeometry.size() * focusExpansion;
 
-    qreal magicConst = maxExpandedSize;
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-        magicConst = 0.8;   //TODO: #Elric magic const
-    else
-        if (
-            canShowLayoutBackground() &&
-            (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
-            )
-            magicConst = 0.33;  //TODO: #Elric magic const
-    QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
+    qreal viewportPercentage = kRaisedWidgetViewportPercentage;
+
+    if (qnRuntime->isVideoWallMode())
+    {
+        viewportPercentage = kVideoWallRaisedWidgetViewportPercentage;
+    }
+    else if (canShowLayoutBackground()
+        && workbench()->currentLayout()->resource()
+        && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+    {
+        viewportPercentage = kEMappingRaisedWidgetViewportPercentage;
+    }
+
+    QSizeF maxWidgetSize = viewportGeometry.size() * viewportPercentage;
 
     QPointF viewportCenter = viewportGeometry.center();
 
@@ -746,10 +765,20 @@ QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal ro
 
     /* Calculate expansion values. Expand towards the screen center. */
     qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
-    calculateExpansionValues(occupiedGeometry.left(), occupiedGeometry.right(), viewportCenter.x(), newWidgetSize.width(), &xp1, &xp2);
-    calculateExpansionValues(occupiedGeometry.top(), occupiedGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
+    calculateExpansionValues(occupiedGeometry.left(),
+        occupiedGeometry.right(),
+        viewportCenter.x(),
+        newWidgetSize.width(),
+        &xp1,
+        &xp2);
+    calculateExpansionValues(occupiedGeometry.top(),
+        occupiedGeometry.bottom(),
+        viewportCenter.y(),
+        newWidgetSize.height(),
+        &yp1,
+        &yp2);
 
-    return rotated(occupiedGeometry.adjusted(xp1, yp1, xp2, yp2), -rotation);
+    return widgetGeometry.adjusted(xp1, yp1, xp2, yp2);
 }
 
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
@@ -1167,13 +1196,13 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
                 }
             }
+
+            // Zoom windows must not be controlled by radass.
+            if (!mediaWidget->isZoomWindow())
+                qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
         }
-        if (qnRedAssController)
-            qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
-
-    updateWidgetsFrameOpacity();
     return true;
 }
 
@@ -1216,10 +1245,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
     if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-    {
-        if (qnRedAssController)
-            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
-    }
+        qnClientModule->radassController()->unregisterConsumer(mediaWidget->display()->camDisplay());
 
     if (destroyWidget)
     {
@@ -1303,17 +1329,17 @@ bool QnWorkbenchDisplay::removeZoomLinksInternal(QnWorkbenchItem *item)
     return true;
 }
 
-QMargins QnWorkbenchDisplay::viewportMargins() const
+QMargins QnWorkbenchDisplay::viewportMargins(Qn::MarginTypes marginTypes) const
 {
-    return m_viewportAnimator->viewportMargins();
+    return m_viewportAnimator->viewportMargins(marginTypes);
 }
 
-void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins)
+void QnWorkbenchDisplay::setViewportMargins(const QMargins &margins, Qn::MarginType marginType)
 {
-    if (viewportMargins() == margins)
+    if (viewportMargins(marginType) == margins)
         return;
 
-    m_viewportAnimator->setViewportMargins(margins);
+    m_viewportAnimator->setViewportMargins(margins, marginType);
 
     synchronizeSceneBoundsExtension();
 }
@@ -1370,15 +1396,6 @@ void QnWorkbenchDisplay::updateCurrentMarginFlags()
     m_viewportAnimator->setMarginFlags(flags);
 
     synchronizeSceneBoundsExtension();
-}
-
-void QnWorkbenchDisplay::updateWidgetsFrameOpacity()
-{
-    // Opacity for all widgets frames
-    const auto normalOpacity = qFuzzyIsNull(workbench()->mapper()->spacing()) ? 0.0 : 1.0;
-
-    for (auto widget: m_widgets)
-        widget->setFrameOpacity(widget->isSelected() ? 1.0 : normalOpacity);
 }
 
 // -------------------------------------------------------------------------- //
@@ -1498,7 +1515,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
 
-    QRectF minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRectF>();
+    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
     if (!minimalBoundingRect.isEmpty())
         sceneBoundingRect = sceneBoundingRect.united(minimalBoundingRect);
 
@@ -1521,12 +1538,13 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const
         : QRectF();
 }
 
-QRectF QnWorkbenchDisplay::boundedViewportGeometry() const
+QRectF QnWorkbenchDisplay::boundedViewportGeometry(Qn::MarginTypes marginTypes) const
 {
     if (m_view == NULL)
         return QRectF();
 
-    QRect boundedRect = QnGeometry::eroded(m_view->viewport()->rect(), viewportMargins());
+    const auto boundedRect = QnGeometry::eroded(m_view->viewport()->rect(),
+        viewportMargins(marginTypes));
     return QnSceneTransformations::mapRectToScene(m_view, boundedRect);
 }
 
@@ -1700,9 +1718,13 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
         ? itemGeometry(zoomedItem)
         : fitInViewGeometry();
 
+    static const QSizeF viewportLowerSizeBound(ini().enableUnlimitedZoom
+        ? QSizeF(0.1, 0.1)
+        : kViewportLowerSizeBound);
+
     m_boundingInstrument->setPositionBounds(m_view, sizeRect);
     m_boundingInstrument->setSizeBounds(m_view,
-        qnGlobals->viewportLowerSizeBound(),
+        viewportLowerSizeBound,
         Qt::KeepAspectRatioByExpanding,
         sizeRect.size(),
         Qt::KeepAspectRatioByExpanding);
@@ -2267,8 +2289,6 @@ void QnWorkbenchDisplay::at_scene_selectionChanged()
     {
         workbench()->setItem(Qn::SingleSelectedRole, NULL);
     }
-
-    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_view_destroyed()
@@ -2299,7 +2319,6 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
     synchronizeAllGeometries(false);
     synchronizeSceneBounds();
     fitInView(false);
-    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)

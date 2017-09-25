@@ -66,7 +66,7 @@ QString QnVirtualCameraResource::toSearchString() const
         << " "
         << getFirmware()
         << " "
-        << getVendor(); //TODO: #Elric evil!
+        << getVendor(); // TODO: #Elric evil!
     return result;
 }
 
@@ -76,34 +76,6 @@ QnPhysicalCameraResource::QnPhysicalCameraResource(QnCommonModule* commonModule)
 {
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
-}
-
-float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
-{
-    float lowEnd = 0.1f;
-    float hiEnd = 1.0f;
-
-    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
-
-    float resolutionFactor = 0.009f * pow(resolution.width() * resolution.height(), 0.7f);
-
-    float frameRateFactor = fps/1.0f;
-
-    float result = qualityFactor*frameRateFactor * resolutionFactor;
-
-    return qMax(192.0, result);
-}
-
-int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
-{
-    QN_UNUSED(role);
-
-    auto result = rawSuggestBitrateKbps(quality, resolution, fps);
-
-    if (bitratePerGopType() != Qn::BPG_None)
-        result = result * (30.0 / (qreal)fps);
-
-    return (int) result;
 }
 
 int QnPhysicalCameraResource::getChannel() const
@@ -413,7 +385,7 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
         ++it;
     }
 
-         //TODO: #GDM change to bool transcodingAvailable variable check
+         // TODO: #GDM change to bool transcodingAvailable variable check
 #ifdef TRANSCODING_AVAILABLE
     static const char* WEBM_TRANSPORT_NAME = "webm";
 
@@ -586,14 +558,26 @@ CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
 
 QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
+    using nx::vms::common::core::resource::SensorDescription;
+
     qreal customAr = customAspectRatio();
     if (!qFuzzyIsNull(customAr))
-        return QnAspectRatio::closestStandardRatio(customAr);
+        return QnAspectRatio::closestStandardRatio(static_cast<float>(customAr));
 
     const auto stream = defaultStream();
     const QSize size = stream.getResolution();
-    if (!size.isEmpty())
-        return QnAspectRatio(size.width(), size.height());
+    if (size.isEmpty())
+        return QnAspectRatio();
 
-    return QnAspectRatio();
+    const auto& sensor = combinedSensorsDescription().mainSensor();
+    if (!sensor.isValid())
+        return QnAspectRatio(size);
+
+    const auto& sensorSize = sensor.geometry.size();
+
+    const QSize realSensorSize = QSize(
+        static_cast<int>(size.width() * sensorSize.width()),
+        static_cast<int>(size.height() * sensorSize.height()));
+
+    return QnAspectRatio(realSensorSize);
 }

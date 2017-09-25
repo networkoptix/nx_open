@@ -1,7 +1,7 @@
 {
-  "language_name":"简体中文",
+  "language_name":"LANGUAGE_NAME",
   "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
+  "clientProtocol":"{{CLIENT_PROTOCOL}}",
   "dialogs":{
     "okButton":"确定",
     "cancelButton":"取消",
@@ -13,7 +13,7 @@
     "logoutAuthorisedLogoutButton":"退出登录"
   },
   "pageTitles":{
-    "template":"{{title}} {{PRODUCT_NAME}}",
+    "template":"{{title}}{{PRODUCT_NAME}}",
     "default":"{{PRODUCT_NAME}}",
     "registerSuccess":"欢迎来到",
     "register":"创建帐户中",
@@ -29,7 +29,7 @@
     "restorePassword":"重置密码-",
     "restorePasswordSuccess":"保存的密码-",
     "restorePasswordCode":"重置密码-",
-    "view":"View cameras - ",
+    "view":"查看相机 - ",
     "contentPage":"",
     "debug":"调试",
     "login":"登录-",
@@ -81,6 +81,26 @@
     "customRole":{
       "label":"自定义角色",
       "description":"在系统中指定的自定义用户角色"
+    },
+    "owner":{
+      "label":"所有者",
+      "description":"不受限制地的访问包括共享和从云连接或断开系统的能力"
+    },
+    "viewer":{
+      "label":"浏览者",
+      "description":"可以查看实时视频和浏览存档"
+    },
+    "liveViewer":{
+      "label":"实时浏览者",
+      "description":"只能查看实时视频"
+    },
+    "advancedViewer":{
+      "label":"高级浏览者",
+      "description":"可以查看实时视频，浏览存档，配置摄像头，控制云台等"
+    },
+    "custom":{
+      "label":"自定义",
+      "description":"使用 {{PRODUCT_NAME}} 客户端应用程序设置自定义权限"
     }
   },
   "errorCodes":{
@@ -117,7 +137,7 @@
     "cantEditAdmin":"此用户具有管理员权限",
     "cantOpenClient":"{{VMS_NAME}} 应用程序未检测到。<a href=\"/download\"> 下载</a>",
     "lostConnection":"连接到 {{systemName}} 失去了",
-    "thisSystem":"the system"
+    "thisSystem":"系统"
   },
   "passwordRequirements":{
     "minLengthMessage":"密码必须包含至少 8 个字符",
@@ -136,7 +156,7 @@
   },
   "system":{
     "yourSystem":"您的系统",
-    "mySystemSearch":"IMeMyMine",
+    "mySystemSearch":"我的",
     "unavailable":"系统无法访问",
     "offline":"系统处于离线状态",
     "openClient":"在 {{VMS_NAME}} 中打开",
@@ -214,7 +234,7 @@
     "createAccount":"创建帐户"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"所有系统",
     "systems":"系统"
   }
 }

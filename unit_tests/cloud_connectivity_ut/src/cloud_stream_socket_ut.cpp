@@ -519,7 +519,7 @@ public:
 protected:
     virtual void SetUp() override
     {
-        nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
+        nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
         base_type::SetUp();
 

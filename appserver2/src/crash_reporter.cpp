@@ -241,7 +241,7 @@ ReportData::ReportData(const QFileInfo& crashFile, QSettings* settings,
 
 void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
 {
-    if (!httpClient->hasRequestSuccesed())
+    if (!httpClient->hasRequestSucceeded())
     {
         NX_LOGX(lit("Sending %1 to %2 has failed")
                 .arg(m_crashFile.absoluteFilePath())

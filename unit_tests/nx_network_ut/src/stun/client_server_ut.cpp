@@ -6,13 +6,14 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
+#include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
-#include <nx/network/stun/message_dispatcher.h>
+#include <nx/network/stun/stun_types.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
-#include <nx/utils/test_support/sync_queue.h>
-
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
 namespace stun {
@@ -144,7 +145,7 @@ TEST_F(StunClientServerTest, Connectivity)
 
     const auto address = startServer();
     server.reset();
-    client->connect(address);
+    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
     auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
 
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
@@ -200,7 +201,7 @@ TEST_F(StunClientServerTest, RequestResponse)
     const auto t1 = std::chrono::steady_clock::now();
 
     const auto address = startServer();
-    client->connect(address);
+    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
     {
         Message request(Header(MessageClass::request, MethodType::bindingMethod));
 
@@ -250,7 +251,7 @@ TEST_F(StunClientServerTest, Indications)
     const auto address = startServer();
 
     utils::TestSyncQueue<Message> recvWaiter;
-    client->connect(address);
+    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
     client->setIndicationHandler(0xAB, recvWaiter.pusher());
     client->setIndicationHandler(0xCD, recvWaiter.pusher());
 
@@ -291,7 +292,7 @@ static const size_t REQUEST_RATIO = 5;
 TEST_F(StunClientServerTest, AsyncClientUser)
 {
     const auto address = startServer();
-    client->connect(address);
+    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
     for (size_t uc = 0; uc <USER_COUNT; ++uc)
     {
         auto user = std::make_shared<TestUser>(client);
@@ -316,7 +317,7 @@ TEST_F(StunClientServerTest, cancellation)
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
     auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
-    client->connect(address);
+    client->connect(nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(address));
     client->addOnReconnectedHandler(reconnectHandler);
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
 

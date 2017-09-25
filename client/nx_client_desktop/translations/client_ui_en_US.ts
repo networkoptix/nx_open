@@ -112,6 +112,16 @@
         <source>Reset All Warnings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable blur</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
         <location/>
         <source>Instant</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-        <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-        <source>Add External Storage...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Version:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Check</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Not Checked</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get Installed Versions</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -393,11 +375,6 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Bookmark Log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -465,6 +442,11 @@
     <message>
         <location/>
         <source>Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Test</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -588,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-        <source>about:blank</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Advanced settings are unavailable</source>
         <translation type="unfinished"></translation>
     </message>
@@ -905,11 +882,6 @@
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
         <source>Stay logged in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1474,16 +1446,6 @@
     </message>
     <message>
         <location/>
-        <source>Paste from Clipboard</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Copy to Clipboard</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Select License File...</source>
         <translation></translation>
     </message>
@@ -1651,12 +1613,12 @@
     </message>
     <message>
         <location/>
-        <source>Tour cycle</source>
+        <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>seconds</source>
+        <source>Showreel cycle</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1916,11 +1878,6 @@
         <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location/>
-        <source>Incorrect email or password</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2099,14 +2056,6 @@
         <location/>
         <source>Warning: file with the same name already exists!</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnUpdateDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/update_dialog.ui"/>
-        <source>Update Servers</source>
-        <translation></translation>
     </message>
 </context>
 <context>

@@ -107,6 +107,11 @@ public:
         m_onClosedHandler = std::move(handler);
     }
 
+    virtual std::string toString() const override
+    {
+        return "DummyConnection";
+    }
+
     void ignoreConnectRequests()
     {
         m_ignoreConnectRequest = true;
@@ -504,6 +509,7 @@ TEST_F(OutgoingTunnel, general)
         {
             ConnectionCompletedPromise connectedPromise;
             tunnel.establishNewConnection(
+                AbstractOutgoingTunnel::kNoTimeout,
                 SocketAttributes(),
                 [&connectedPromise](
                     SystemError::ErrorCode errorCode,
@@ -582,6 +588,7 @@ TEST_F(OutgoingTunnel, singleShotConnection)
     {
         ConnectionCompletedPromise connectedPromise;
         tunnel.establishNewConnection(
+            AbstractOutgoingTunnel::kNoTimeout,
             SocketAttributes(),
             [&connectedPromise](
                 SystemError::ErrorCode errorCode,
@@ -626,6 +633,7 @@ TEST_F(OutgoingTunnel, handlersQueueingWhileInConnectingState)
     {
         auto& connectedPromise = promises[i];
         tunnel.establishNewConnection(
+            AbstractOutgoingTunnel::kNoTimeout,
             SocketAttributes(),
             [&connectedPromise](
                 SystemError::ErrorCode errorCode,
@@ -678,6 +686,7 @@ TEST_F(OutgoingTunnel, cancellation)
 
             ConnectionCompletedPromise connectedPromise;
             tunnel.establishNewConnection(
+                AbstractOutgoingTunnel::kNoTimeout,
                 SocketAttributes(),
                 [&connectedPromise](
                     SystemError::ErrorCode errorCode,
@@ -827,6 +836,8 @@ TEST_F(OutgoingTunnel, pool)
     }
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class OutgoingTunnelCancellation:
     public OutgoingTunnel
 {
@@ -871,6 +882,7 @@ protected:
     void requestNewConnectionFromTunnel()
     {
         m_tunnel->establishNewConnection(
+            AbstractOutgoingTunnel::kNoTimeout,
             SocketAttributes(),
             [](
                 SystemError::ErrorCode,
@@ -899,6 +911,7 @@ private:
         auto tunnel = std::make_unique<cloud::OutgoingTunnel>(AddressEntry("example.com:80"));
         nx::utils::promise<void> tunnelOpened;
         tunnel->establishNewConnection(
+            AbstractOutgoingTunnel::kNoTimeout,
             SocketAttributes(),
             [&tunnelOpened](
                 SystemError::ErrorCode,

@@ -77,4 +77,10 @@ void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePt
         connect(resource, &QnResource::parentIdChanged, this,
             &QnPermissionsResourceAccessProvider::updateAccessToResource);
     }
+
+    if (resource->hasFlags(Qn::desktop_camera))
+    {
+        connect(resource, &QnResource::nameChanged, this,
+            &QnPermissionsResourceAccessProvider::updateAccessToResource);
+    }
 }

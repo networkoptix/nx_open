@@ -75,7 +75,7 @@ void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResource
             checkUser(user);
         };
 
-    //TODO: #GDM change signal signature
+    // TODO: #GDM change signal signature
     connect(user, &QnUserResource::emailChanged, this, safeCheck);
     connect(user, &QnUserResource::enabledChanged, this, &QnWorkbenchUserEmailWatcher::checkUser);
     checkUser(user);

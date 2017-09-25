@@ -21,6 +21,7 @@
 #include <plugins/resource/flir/flir_onvif_resource.h>
 #include <plugins/resource/vivotek/vivotek_resource.h>
 #include <plugins/resource/lilin/lilin_resource.h>
+#include <plugins/resource/hanwha/hanwha_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -57,7 +58,9 @@ static const char* IGNORE_VENDORS[][2] =
     {"*", "DWCS-*"},       // NEW ISD cameras rebranded to DW
     {"Network Optix", "*"}, // Nx cameras
     {"Digital Watchdog", "XPM-FL72-48MP"}, //For some reasons we want to use ISD resource instead Onvif Digital Watchdog one.
-    {"Network Optix", "*"} // Nx Cameras
+    {"Network Optix", "*"}, // Nx Cameras
+    {"Hanwha Techwin", "*" },
+    {"Samsung Techwin", "*" }
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -103,6 +106,8 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule*
 
     m_hookChain.registerHook(searcher_hooks::commonHooks);
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
+    m_hookChain.registerHook(searcher_hooks::manufacturerReplacementByModel);
+    m_hookChain.registerHook(searcher_hooks::pelcoModelNormalization);
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
@@ -201,7 +206,7 @@ void OnvifResourceInformationFetcher::findResources(
     QString model = info.name;
     QString firmware;
     QHostAddress sender(QUrl(endpoint).host());
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = resourcePool()->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
@@ -229,7 +234,7 @@ void OnvifResourceInformationFetcher::findResources(
     if (m_shouldStop)
         return;
 
-    //Trying to get name and manufacturer
+    bool isAuthorized = false;
     if (existResource)
     {
         if (model.isEmpty())
@@ -240,11 +245,14 @@ void OnvifResourceInformationFetcher::findResources(
             mac = existResource->getMAC().toString();
         if (firmware.isEmpty())
             firmware = existResource->getFirmware();
+        if (existResource->getStatus() != Qn::Unauthorized)
+            isAuthorized = true;
     }
 
     if (model.isEmpty() || manufacturer.isEmpty() ||
-        (!existResource && firmware.isEmpty()) || //< Optional field
-        (!existResource && QnMacAddress(mac).isNull())) //< Optional field
+        // Optional fields are to be updated only if the camera is authorized, to prevent brute force
+        // attacks for unauthorized cameras (Hikvision blocks after several attempts).
+        (isAuthorized && (firmware.isEmpty() || QnMacAddress(mac).isNull())))
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
@@ -400,7 +408,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 
 QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
 {
-    //TODO: #vasilenko UTF unuse std::string
+    // TODO: #vasilenko UTF unuse std::string
     return response.HardwareId.empty()
         ? QString()
         : QString::fromStdString(response.HardwareId) + QLatin1String("::") +
@@ -441,6 +449,10 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new VivotekResource());
 	else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
         resource = QnPlOnvifResourcePtr(new LilinResource());
+    else if (manufacture.toLower().contains(QLatin1String("samsung techwin")))
+        resource = QnPlOnvifResourcePtr(new HanwhaResource());
+    else if (manufacture.toLower().contains(QLatin1String("hanwha techwin")))
+        resource = QnPlOnvifResourcePtr(new HanwhaResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

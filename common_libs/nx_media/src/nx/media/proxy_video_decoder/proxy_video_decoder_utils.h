@@ -26,7 +26,7 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("ProxyVideoDecoder.ini") {}
 
     NX_INI_FLAG(0, disable, "Fully disable ProxyVideoDecoder: isCompatible() -> false.");
-    NX_INI_FLAG(1, largeOnly, "isCompatible() will allow only width > 640.");
+    NX_INI_FLAG(0, alwaysAllowOverlay, "Prevent ProxyVideoDecoder isCompatible() returning false if MediaPlayer::allowOverlay is set.");
 
     // Debug output.
     NX_INI_FLAG(0, enableOutput, "");

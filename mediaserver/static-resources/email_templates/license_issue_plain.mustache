@@ -1,0 +1,22 @@
+{{#systemName}}
+{{&systemName}}
+{{#systemSignature}}
+{{&systemSignature}}
+{{/systemSignature}}
+{{#cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
+{{/cloudOwnerEmail}}
+{{/systemName}}
+
+{{&event}}
+{{#aggregated}}
+{{&reason}}
+
+Camera: {{.}}
+Time: {{&timestampDate}} {{&timestampTime}}
+{{/aggregated}}
+
+
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
+

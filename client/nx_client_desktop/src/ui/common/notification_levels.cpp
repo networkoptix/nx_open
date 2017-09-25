@@ -29,6 +29,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::Abstra
         case vms::event::cameraInputEvent:
         case vms::event::serverStartEvent:
         case vms::event::softwareTriggerEvent:
+        case vms::event::analyticsSdkEvent:
             return Value::CommonNotification;
 
         /* Yellow notifications */
@@ -86,7 +87,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
         case QnSystemHealth::UsersEmailIsEmpty:
-        case QnSystemHealth::NoPrimaryTimeServer:
         case QnSystemHealth::SystemIsReadOnly:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildCanceled:

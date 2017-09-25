@@ -8,7 +8,7 @@
 namespace QnSystemHealth {
 
 // enum order change is forbidden as leads to stored settings failure.
-//TODO: #GDM refactor settings storage
+// TODO: #GDM refactor settings storage
 enum MessageType
 {
     // These messages are generated on the client
@@ -16,7 +16,7 @@ enum MessageType
     NoLicenses,
     SmtpIsNotSet,
     UsersEmailIsEmpty,  /*< Other user's email is empty. */
-    NoPrimaryTimeServer,
+    NoPrimaryTimeServer, //< Message is not used any more. Leaving here to avoid protocol change.
     SystemIsReadOnly,
 
     /* These messages are sent from server */

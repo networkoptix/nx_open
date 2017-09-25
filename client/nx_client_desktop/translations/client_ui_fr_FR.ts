@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>Réinitialiser les avertissements</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>L'affichage 'Intel HD Graphics' peut rencontrer des problèmes si le flou est activé. Nous vous recommandons fortement de laisser l'option telle quelle.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>Désactiver le flou</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>Immédiat</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Ajouter stockage externe...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Version:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Vérifier</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>Non vérifié</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>Obtenir version installée</translation>
     </message>
   </context>
   <context>
@@ -393,11 +375,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Tous les serveurs sont hors ligne, Journal non disponibles.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Journal Signet</translation>
     </message>
@@ -466,6 +443,11 @@
       <location/>
       <source>Event Log...</source>
       <translation>Journal d'événement...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -588,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation>about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Paramètres avancés non disponibles</translation>
     </message>
@@ -732,17 +709,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>Contrôle PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Désactiver les préréglages natives, utiliser plutôt les préréglages du système</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Attention! Les préréglages de caméras natifs ne seront pas disponibles.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>ID d'entrée</translation>
     </message>
   </context>
   <context>
@@ -776,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>ID de sortie:</translation>
     </message>
   </context>
   <context>
@@ -906,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Rester connecté</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Courriel ou mot de passe incorrect</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Verrouillé sur ID Matériel:</translation>
     </message>
   </context>
   <context>
@@ -1474,16 +1446,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Coller du Presse-Papier</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Copier vers Presse-Papier</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Sélectionner un fichier licence...</translation>
     </message>
@@ -1530,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>ID Matériel</translation>
     </message>
   </context>
   <context>
@@ -1651,13 +1613,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>Cycle de tour</translation>
+      <source>seconds</source>
+      <translation>secondes</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>secondes</translation>
+      <source>Showreel cycle</source>
+      <translation>Cycle Showreel</translation>
     </message>
   </context>
   <context>
@@ -1916,11 +1878,6 @@
       <source>Stay logged in</source>
       <translation>Rester connecté</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Courriel ou mot de passe incorrect</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -2099,14 +2056,6 @@
       <location/>
       <source>Warning: file with the same name already exists!</source>
       <translation>Attention : un fichier avec le même nom existe déjà!</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>MàJ Serveurs</translation>
     </message>
   </context>
   <context>

@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>すべての警告をリセット</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>Blurオプションが有効になっていると、Intel HDグラフィックスディスプレイに問題が発生することがあります。オプションを使用しない事を強くお勧めします</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>Blurを無効にする</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>実行</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>外部ストレージの追加...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>バージョン：</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>チェック</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>チェックされていません</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>インストール済のバージョン</translation>
     </message>
   </context>
   <context>
@@ -393,11 +375,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>全サーバーがオフラインの為ログが表示できません.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>ブックマークログ</translation>
     </message>
@@ -442,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>デバイス</translation>
     </message>
   </context>
   <context>
@@ -466,6 +443,11 @@
       <location/>
       <source>Event Log...</source>
       <translation>イベントログ...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>テスト</translation>
     </message>
   </context>
   <context>
@@ -588,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>アドバンス設定は利用できません</translation>
     </message>
@@ -722,7 +699,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;カメラの設定の最適化有効&quot;はシステムアドミニストレーションで無効になっています</translation>
     </message>
     <message>
       <location/>
@@ -732,17 +709,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZコントロール</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>カメラのプリセットを無効にし、システムプリセットを使用</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>警告！カメラのプリセットは使用できません</translation>
     </message>
   </context>
   <context>
@@ -750,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>入力ID</translation>
     </message>
   </context>
   <context>
@@ -776,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>出力ID：</translation>
     </message>
   </context>
   <context>
@@ -906,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>ハードウェアID:</translation>
     </message>
   </context>
   <context>
@@ -1474,16 +1446,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>クリップボードから貼付け</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>クリップボードにコピー</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>ライセンスファイル選択...</translation>
     </message>
@@ -1530,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>ハードウェア Id</translation>
     </message>
   </context>
   <context>
@@ -1651,13 +1613,13 @@
     </message>
     <message>
       <location/>
-      <source>Tour cycle</source>
-      <translation>ツアーサイクル</translation>
+      <source>seconds</source>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
-      <source>seconds</source>
-      <translation>秒</translation>
+      <source>Showreel cycle</source>
+      <translation>シーケンス表示サイクル</translation>
     </message>
   </context>
   <context>
@@ -1726,7 +1688,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>ユーザー</translation>
     </message>
   </context>
   <context>
@@ -1744,7 +1706,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>要確認</translation>
     </message>
   </context>
   <context>
@@ -1915,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -2102,14 +2059,6 @@
     </message>
   </context>
   <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>更新サーバー</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2256,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>&quot;最高&quot;の画質と解像度には、スペックの高いPCを推奨します</translation>
     </message>
     <message>
       <location/>
@@ -2322,7 +2271,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2565,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>テキストラベル</translation>
     </message>
   </context>
   <context>
@@ -2662,7 +2611,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>役割</translation>
     </message>
     <message>
       <location/>
@@ -2672,7 +2621,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>アイコン</translation>
     </message>
   </context>
   <context>
@@ -2787,22 +2736,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>役割</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>すべてのユーザーを表示</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>ユーザを選択</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>検索で一致するものはありません</translation>
     </message>
   </context>
   <context>
@@ -2838,7 +2787,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>インターネットで時刻同期</translation>
     </message>
   </context>
   <context>
@@ -2878,8 +2827,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>カスタムユーザーの役割はまだありません　 &quot;新しい役割&quot;ボタンをクリックして作成してください</translation>
     </message>
     <message>
       <location/>

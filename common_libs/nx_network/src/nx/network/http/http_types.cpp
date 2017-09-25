@@ -16,6 +16,9 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 
 namespace nx_http {
 
+const char* const kUrlSchemeName = "http";
+const char* const kSecureUrlSchemeName = "https";
+
 int strcasecmp(const StringType& one, const StringType& two)
 {
     if (one.size() < two.size())
@@ -31,9 +34,9 @@ int strcasecmp(const StringType& one, const StringType& two)
 
 int defaultPortForScheme(const StringType& scheme)
 {
-    if (strcasecmp(scheme, StringType("http")) == 0)
+    if (strcasecmp(scheme, StringType(kUrlSchemeName)) == 0)
         return DEFAULT_HTTP_PORT;
-    if (strcasecmp(scheme, StringType("https")) == 0)
+    if (strcasecmp(scheme, StringType(kSecureUrlSchemeName)) == 0)
         return DEFAULT_HTTPS_PORT;
     return -1;
 }
@@ -249,6 +252,7 @@ bool isMessageBodyAllowed(int statusCode)
     {
         case noContent:
         case notModified:
+        case found:
             return false;
 
         default:
@@ -882,7 +886,40 @@ bool DigestCredentials::parse(const BufferType& str, char separator)
 
 void DigestCredentials::serialize(BufferType* const dstBuffer) const
 {
-    nx::utils::serializeNameValuePairs(params, dstBuffer);
+    const static std::array<const char*, 5> predefinedOrder =
+    {
+        "username",
+        "realm",
+        "nonce",
+        "uri",
+        "response"
+    };
+
+    bool isFirst = true;
+    auto serializeParam = [&isFirst, dstBuffer](const BufferType& name, const BufferType& value)
+    {
+         if (!isFirst)
+            dstBuffer->append(", ");
+        dstBuffer->append(name);
+        dstBuffer->append("=\"");
+        dstBuffer->append(value);
+        dstBuffer->append("\"");
+        isFirst = false;
+    };
+
+    auto params = this->params;
+    for (const char* name: predefinedOrder)
+    {
+        auto itr = params.find(name);
+        if (itr != params.end())
+        {
+            serializeParam(itr.key(), itr.value());
+            params.erase(itr);
+        }
+    }
+    for (auto itr = params.begin(); itr != params.end(); ++itr)
+        serializeParam(itr.key(), itr.value());
+
 }
 
 

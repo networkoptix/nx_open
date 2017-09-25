@@ -14,6 +14,10 @@ public:
     QnResourceTitleItem(QGraphicsItem* parent = nullptr);
     virtual ~QnResourceTitleItem();
 
+    virtual void paint(QPainter* painter,
+        const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
+
     void setSimpleMode(bool isSimpleMode, bool animate);
 
     QnImageButtonBar* leftButtonsBar();

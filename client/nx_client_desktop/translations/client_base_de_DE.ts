@@ -36,6 +36,18 @@ to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
       <translation>In Zeitachse hineinzoomen, um mehrere Lesezeichen anzuzeigen</translation>
     </message>
+    <message>
+      <source>Play bookmark from the beginning</source>
+      <translation>Lesezeichen von Anfang an anzeigen</translation>
+    </message>
+    <message>
+      <source>Edit bookmark</source>
+      <translation>Lesezeichen bearbeiten</translation>
+    </message>
+    <message>
+      <source>Delete bookmark</source>
+      <translation>Lesezeichen löschen</translation>
+    </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
@@ -168,14 +180,6 @@ to view more bookmarks</source>
     <message>
       <source>New Web Page...</source>
       <translation>Neue Webseite...</translation>
-    </message>
-    <message>
-      <source>Layout Tour...</source>
-      <translation>Layout-Tour...</translation>
-    </message>
-    <message>
-      <source>New Layout Tour...</source>
-      <translation>Neue Layout-Tour...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -553,10 +557,6 @@ to view more bookmarks</source>
       <translation>Aus Layout entfernen</translation>
     </message>
     <message>
-      <source>Remove from Tour</source>
-      <translation>Von Tour entfernen</translation>
-    </message>
-    <message>
       <source>Stop Sharing Layout</source>
       <translation>Layoutfreigabe stoppen</translation>
     </message>
@@ -729,18 +729,6 @@ to view more bookmarks</source>
       <translation>Groß</translation>
     </message>
     <message>
-      <source>Start Tour</source>
-      <translation>Tour starten</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Tour stoppen</translation>
-    </message>
-    <message>
-      <source>Make Layout Tour</source>
-      <translation>Layout-Tour machen</translation>
-    </message>
-    <message>
       <source>Settings</source>
       <translation>Einstellungen</translation>
     </message>
@@ -866,7 +854,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Lesezeichenprotokoll...</translation>
+    </message>
+    <message>
+      <source>Showreel...</source>
+      <translation>Demoband...</translation>
+    </message>
+    <message>
+      <source>New Showreel...</source>
+      <translation>Neues Demoband...</translation>
+    </message>
+    <message>
+      <source>Remove from Showreel</source>
+      <translation>Vom Demoband entfernen</translation>
+    </message>
+    <message>
+      <source>Make Showreel</source>
+      <translation>Demoband erstellen</translation>
     </message>
   </context>
   <context>
@@ -956,7 +960,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation type="unfinished">Hardware Id of Server with this license does not match Hardware Id on which license was activated.</translation>
+      <translation>Hardware-ID vom Server mit dieser Lizenz stimmt nicht mit der Hardware-ID überein auf der die Lizenz aktiviert wurde.</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1016,46 @@ to view more bookmarks</source>
     <message>
       <source>Scroll Down</source>
       <translation>Nach unten scrollen</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutTourTextFactory</name>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Demoband starten</translation>
+    </message>
+  </context>
+  <context>
+    <name>LocalFiles</name>
+    <message>
+      <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
+      <translation>Pfad &quot;%1&quot; ist ungültig. Bitte versuchen Sie einen anderen Pfad.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; already exists. Please try another name.</source>
+      <translation>Datei &quot;%1&quot; ist bereits vorhanden. Bitte versuchen Sie einen anderen Namen.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1077,6 +1121,37 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>Ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation>Die aktuelle Position von Kamera &quot;%1&quot; kann nicht abgerufen werden</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>Bitte warten Sie bis die Kamera online ist.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>Fehler beim Abrufen der aktuellen Position</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation>Die aktuelle Position von Kamera &quot;%1&quot; kann nicht festgelegt werden</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>Fehler beim Festlegen der aktuellen Position</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>Der Preset wird von einigen Touren verwendet. Trotzdem löschen?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>Diese Touren werden ungültig.</translation>
+    </message>
+  </context>
+  <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
@@ -1123,10 +1198,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnAboutDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
-    </message>
     <message>
       <source>%1 uses the following external libraries:</source>
       <translation>%1 verwendet folgende externe Libraries:</translation>
@@ -1263,10 +1334,6 @@ to view more bookmarks</source>
       <translation>Exportiere ausgewählte Aufnahmen</translation>
     </message>
     <message>
-      <source>Audit log replay</source>
-      <translation>Überwachungsprotokoll wiedergeben</translation>
-    </message>
-    <message>
       <source>Devices</source>
       <translation>Geräte</translation>
     </message>
@@ -1344,6 +1411,10 @@ to view more bookmarks</source>
         <numerusform>Diese Ressource wurde vom System entfernt</numerusform>
         <numerusform>Diese Ressourcen wurden vom System entfernt</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Audit trail replay</source>
+      <translation>Überwachungsprotokoll wiedergeben</translation>
     </message>
   </context>
   <context>
@@ -1613,10 +1684,6 @@ to view more bookmarks</source>
       <translation>Versionsnummer</translation>
     </message>
     <message>
-      <source>Invalid build number</source>
-      <translation>Ungültige Versionsnummer</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Passwort</translation>
     </message>
@@ -1667,6 +1734,13 @@ to view more bookmarks</source>
     <message>
       <source>Any Camera</source>
       <translation>Jede Kamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnBusinessRuleItemDelegate</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Lesezeichen verwalten</translation>
     </message>
   </context>
   <context>
@@ -1810,10 +1884,6 @@ to view more bookmarks</source>
       <translation>Filtern nach Kameras...</translation>
     </message>
     <message>
-      <source>Reset all rules to default?</source>
-      <translation>Alle Regeln auf Standardwerte zurücksetzen?</translation>
-    </message>
-    <message>
       <source>Failed to retrieve rules</source>
       <translation>Fehler beim Abrufen der Regeln</translation>
     </message>
@@ -1832,6 +1902,10 @@ to view more bookmarks</source>
     <message>
       <source>This action cannot be undone.</source>
       <translation>Diese Aktion kann nicht rückgängig gemacht werden.</translation>
+    </message>
+    <message>
+      <source>Restore all rules to default?</source>
+      <translation>Alle Regeln auf Standardwerte zurücksetzen?</translation>
     </message>
   </context>
   <context>
@@ -2037,11 +2111,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation type="unfinished">I/O Module Id</translation>
+      <translation>I/O-Modul-ID</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation type="unfinished">Camera Id</translation>
+      <translation>Kamera-ID</translation>
     </message>
   </context>
   <context>
@@ -2064,10 +2138,6 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraDiagnosticsDialog</name>
-    <message>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
-    </message>
     <message>
       <source>OK</source>
       <translation>Ok</translation>
@@ -2291,6 +2361,10 @@ to view more bookmarks</source>
     <message>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
       <translation>Die maximale Anzahl an Bewegungsbereichen der aktuellen Kamera beträgt %1, und %2 Bewegungsbereiche sind derzeit ausgewählt.</translation>
+    </message>
+    <message>
+      <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
+      <translation>Die maximale Anzahl an Bewegungsempfindlichkeitseinstellungen für jeden Sensor der aktuellen Kamera beträgt %1, und %2 Bewegungsempfindlichkeitseinstellungen sind derzeit ausgewählt.</translation>
     </message>
   </context>
   <context>
@@ -2587,6 +2661,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Erfahren Sie mehr über %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -2974,8 +3059,8 @@ to %1</source>
       <translation>Audiogerät &quot;%1&quot; konnte nicht initialisiert werden.</translation>
     </message>
     <message>
-      <source>44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">44.1khz and 48khz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>44,1 kHz und 48 kHz Audioformate werden vom Tonaufnahmegerät nicht unterstützt! Bitte wählen Sie ein anderes Audiogerät oder &quot;Keine&quot; in den Aufnahmeeinstellungen.</translation>
     </message>
   </context>
   <context>
@@ -3436,7 +3521,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation type="unfinished">Id</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3634,10 +3719,6 @@ to %1</source>
       <translation>Archivstreams erlaubt:</translation>
     </message>
     <message>
-      <source>Copy to Clipboard</source>
-      <translation>In Zwischenablage kopieren</translation>
-    </message>
-    <message>
       <source>Generic:</source>
       <translation>Allgemein:</translation>
     </message>
@@ -3655,7 +3736,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation type="unfinished">Locked to Hardware Id</translation>
+      <translation>Gebunden an Hardware-ID</translation>
     </message>
   </context>
   <context>
@@ -3877,10 +3958,6 @@ to %1</source>
       <translation>Lizenzserver-Fehler</translation>
     </message>
     <message>
-      <source>If the problem presists please contact Customer Support.</source>
-      <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
-    </message>
-    <message>
       <source>License deactivated</source>
       <translation>Lizenz deaktiviert</translation>
     </message>
@@ -3935,11 +4012,15 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 verbunden</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 auf %2 verbunden</translation>
+    </message>
+    <message>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
     </message>
   </context>
   <context>
@@ -3966,15 +4047,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+      <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
-    </message>
-    <message>
-      <source>Hardware Id copied to clipboard</source>
-      <translation type="unfinished">Hardware Id copied to clipboard</translation>
+      <translation>Senden Sie den Lizenzschlüssel und die Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
   </context>
   <context>
@@ -4298,15 +4375,15 @@ to %1</source>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
-    </message>
-    <message>
-      <source>You will be reconnected</source>
-      <translation type="unfinished">You will be reconnected</translation>
+      <translation>Server aus dem anderen System werden in der Objektleiste angezeigt, wenn die Datenbanksynchronisation beendet ist.</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation type="unfinished">Systems will be merged shortly</translation>
+      <translation>Systeme werden bald zusammengefasst</translation>
+    </message>
+    <message>
+      <source>You will be reconnected.</source>
+      <translation>Sie werden wieder verbunden.</translation>
     </message>
   </context>
   <context>
@@ -4397,8 +4474,8 @@ to %1</source>
       <translation>MB/s</translation>
     </message>
     <message>
-      <source>kB/s</source>
-      <translation type="unfinished">kB/s</translation>
+      <source>KB/s</source>
+      <translation>KB/s</translation>
     </message>
   </context>
   <context>
@@ -4536,6 +4613,17 @@ to %1</source>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
       <translation>PTZ, Geräteausgang, 2-Wege Audio, Softwaretrigger.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPopupBusinessActionWidget</name>
+    <message>
+      <source>Manage Bookmarks</source>
+      <translation>Lesezeichen verwalten</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
@@ -4883,6 +4971,45 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnRequiredPermissionSubjectPolicy</name>
+    <message>
+      <source>Role %1 has no %2 permission</source>
+      <comment>%1 is the name of selected role, %2 is permission name</comment>
+      <translation>Rolle %1 hat keine %2 Berechtigung</translation>
+    </message>
+    <message>
+      <source>Selected roles have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Ausgewählte Rollen haben keine %1 Berechtigung</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected roles have no %2 permission</source>
+      <comment>%1 is number of selected roles, %2 is permission name</comment>
+      <translation>
+        <numerusform>%n von %1 ausgewählte Rolle hat keine %2 Berechtigungen</numerusform>
+        <numerusform>%n von %1 ausgewählte Rollen haben keine %2 Berechtigungen</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>User %1 has no %2 permission</source>
+      <comment>%1 is the name of selected user, %2 is permission name</comment>
+      <translation>Benutzer %1 hat keine %2 Berechtigung</translation>
+    </message>
+    <message>
+      <source>Selected users have no %1 permission</source>
+      <comment>%1 is permission name</comment>
+      <translation>Ausgewählte Benutzer haben keine %1 Berechtigung</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 selected users have no %2 permission</source>
+      <comment>%1 is number of selected users, %2 is permission name</comment>
+      <translation>
+        <numerusform>%n von %1 ausgewählter Benutzer hat keine %2 Berechtigungen</numerusform>
+        <numerusform>%n von %1 ausgewählte Benutzer haben keine %2 Berechtigungen</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Any Type</source>
@@ -4977,12 +5104,12 @@ to %1</source>
       <translation>Lokale Dateien</translation>
     </message>
     <message>
-      <source>Layout Tours</source>
-      <translation>Layout-Tour</translation>
+      <source>Showreels</source>
+      <translation>Demobänder</translation>
     </message>
     <message>
-      <source>Layout Tour</source>
-      <translation>Layout-Tour</translation>
+      <source>Showreel</source>
+      <translation>Demoband</translation>
     </message>
   </context>
   <context>
@@ -5735,38 +5862,8 @@ to %1</source>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
-      <source>Role %1 has no User Input permission</source>
-      <comment>%1 is the name of selected role</comment>
-      <translation>Rolle %1 hat keine Benutzereingabenberechtigungen</translation>
-    </message>
-    <message>
-      <source>Selected roles have no User Input permission</source>
-      <translation>Ausgewählte Rollen haben keine Benutzereingabenberechtigungen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected roles have no User Input permission</source>
-      <comment>%1 is number of selected roles</comment>
-      <translation>
-        <numerusform>%n von %1 ausgewählten Rollen haben keine Benutzereingabenberechtigungen</numerusform>
-        <numerusform>%n von %1 ausgewählten Rollen haben keine Benutzereingabenberechtigungen</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>User %1 has no User Input permission</source>
-      <comment>%1 is the name of selected user</comment>
-      <translation>Benutzer %1 hat keine Benutzereingabenberechtigungen</translation>
-    </message>
-    <message>
-      <source>Selected users have no User Input permission</source>
-      <translation>Ausgewählte Benutzer haben keine Benutzereingabenberechtigungen</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 selected users have no User Input permission</source>
-      <comment>%1 is number of selected users</comment>
-      <translation>
-        <numerusform>%n von %1 ausgewählten Benutzern hat keine Benutzereingabenberechtigungen</numerusform>
-        <numerusform>%n von %1 ausgewählten Benutzern hat keine Benutzereingabenberechtigungen</numerusform>
-      </translation>
+      <source>User Input</source>
+      <translation>Benutzereingabe</translation>
     </message>
   </context>
   <context>
@@ -6129,10 +6226,6 @@ to %1</source>
       <translation>Emailserver ist nicht festgelegt</translation>
     </message>
     <message>
-      <source>Select server for others to synchronize time with</source>
-      <translation>Wählen Sie einen Server, um die Zeit für andere zu synchronisieren</translation>
-    </message>
-    <message>
       <source>System is in safe mode</source>
       <translation>System ist im abgesicherten Modus</translation>
     </message>
@@ -6163,10 +6256,6 @@ to %1</source>
     <message>
       <source>Email server is not set.</source>
       <translation>Emailserver ist nicht festgelegt.</translation>
-    </message>
-    <message>
-      <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Serverzeiten sind nicht synchronisiert und der Zeitpunkt konnte nicht automatisch ermittelt werden.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -6237,6 +6326,30 @@ to %1</source>
     <message>
       <source>Error while sending email</source>
       <translation>Fehler beim Senden der Email</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started</source>
+      <translation>Die Remote-Archivsynchronisation wurde gestartet</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished</source>
+      <translation>Die Remote-Archivsynchronisation wurde beendet</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization is in progress</source>
+      <translation>Die Remote-Archivsynchronisation ist im Gange</translation>
+    </message>
+    <message>
+      <source>Error occured during remote archive synchronization</source>
+      <translation>Bei der Remote-Archivsynchronisation ist ein Fehler aufgetreten</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been started for the following device:</source>
+      <translation>Die Remote-Archivsynchronisation wurde für folgendes Gerät gestartet:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization has been finished for the following device:</source>
+      <translation>Die Remote-Archivsynchronisation wurde für folgendes Gerät abgeschlossen:</translation>
     </message>
   </context>
   <context>
@@ -6327,11 +6440,6 @@ to %1</source>
       <translation>hh:mm</translation>
     </message>
     <message>
-      <source>hh:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>hh:mm ap</translation>
-    </message>
-    <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
       <translation>h ap</translation>
@@ -6357,11 +6465,6 @@ to %1</source>
       <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
-      <source>dd MMMM yyyy hh:mm ap</source>
-      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm ap</translation>
-    </message>
-    <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
       <translation>dd MMMM yyyy hh:mm</translation>
@@ -6385,6 +6488,16 @@ to %1</source>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
       <translation>yyyy</translation>
+    </message>
+    <message>
+      <source>h:mm ap</source>
+      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+      <translation>h:mm ap</translation>
+    </message>
+    <message>
+      <source>dd MMMM yyyy h:mm ap</source>
+      <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6704,6 +6817,11 @@ to %1</source>
     <message>
       <source>Apply changes before switching to another user?</source>
       <translation>Übernehmen Sie die Änderungen vor dem Wechsel zu einem anderen Benutzer?</translation>
+    </message>
+    <message>
+      <source>This user has not yet signed up for %1</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation>Dieser Benutzer hat sich noch nicht für %1 angemeldet</translation>
     </message>
   </context>
   <context>
@@ -7134,12 +7252,12 @@ to %1</source>
       <translation>Mit dem aktuellem System verbinden...</translation>
     </message>
     <message>
-      <source>Server will be connected to the System shortly</source>
-      <translation type="unfinished">Server will be connected to the System shortly</translation>
+      <source>It will appear in the resource tree when the database synchronization is finished.</source>
+      <translation>Es wird in der Objektleiste angezeigt, wenn die Datenbanksynchronisation beendet ist.</translation>
     </message>
     <message>
-      <source>It will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+      <source>Server will be connected to System shortly</source>
+      <translation>Der Server wird in Kürze mit dem System verbunden werden</translation>
     </message>
   </context>
   <context>
@@ -7395,6 +7513,184 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>Resources</name>
+    <message>
+      <source>There is another layout with the same name</source>
+      <translation>Es gibt ein anderes Layout mit dem gleichen Namen</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation>Sie sind nicht berechtigt, es zu überschreiben.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout?</source>
+      <translation>Vorhandenes Layout überschreiben?</translation>
+    </message>
+    <message>
+      <source>There is another layout with the same name.</source>
+      <translation>Es gibt ein anderes Layout mit dem gleichen Namen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>User will still have access to %n removed resources:</source>
+      <translation>
+        <numerusform>Benutzer haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
+        <numerusform>Benutzer haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To remove access, please go to User Settings.</source>
+      <translation>Um Zugriffe zu entfernen, bitte die Benutzereinstellungen aufrufen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will get access to %n resources:</source>
+      <translation>
+        <numerusform>Alle Benutzer mit dieser Rolle erhalten Zugriff auf %n Ressourcen:</numerusform>
+        <numerusform>Alle Benutzer mit dieser Rolle erhalten Zugriff auf %n Ressourcen:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To remove access, please go to Role Settings.</source>
+      <translation>Um Zugriffe zu entfernen, bitte die Rolleneinstellungen aufrufen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will still have access to %n removed resources:</source>
+      <translation>
+        <numerusform>Alle Benutzer mit dieser Rolle haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
+        <numerusform>Alle Benutzer mit dieser Rolle haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Changes will affect other users</source>
+      <translation>Änderungen wirken sich auch auf andere Benutzer aus</translation>
+    </message>
+    <message>
+      <source>This layout is shared with other users, so you change it for them too.</source>
+      <translation>Dieses Layout ist auch für andere Benutzer freigegeben, sodass Sie es auch für diese ändern.</translation>
+    </message>
+    <message numerus="yes">
+      <source>User will lose access to %n resources:</source>
+      <translation>
+        <numerusform>Benutzer wird den Zugriff zu %n Ressourcen verlieren:</numerusform>
+        <numerusform>Benutzer wird den Zugriff zu %n Ressourcen verlieren:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>All users with this role will lose access to %n resources:</source>
+      <translation>
+        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff zu %n Ressourcen verlieren:</numerusform>
+        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff zu %n Ressourcen verlieren:</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n shared layouts?</source>
+      <translation>
+        <numerusform>%n freigegebene Layouts löschen?</numerusform>
+        <numerusform>%n freigegebene Layouts löschen?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
+      <translation>
+        <numerusform>Diese %n Layouts sind für andere Benutzer freigegeben. Layouts werden auch bei diesen Benutzern gelöscht.</numerusform>
+        <numerusform>Diese %n Layouts sind für andere Benutzer freigegeben. Layouts werden auch bei diesen Benutzern gelöscht.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout?</source>
+      <translation>
+        <numerusform>%n Items vom Layout entfernen?</numerusform>
+        <numerusform>%n Items vom Layout entfernen?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Löschen</translation>
+    </message>
+    <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation>Sie sind dabei Ressourcen zu löschen auf welche Sie nur von der Videowand Zugriff haben. Danach werden Sie sie nicht mehr in der Ressourcenliste sehen und es wird auch nicht möglich sein diese der Videowand neu hinzuzufügen.</translation>
+    </message>
+    <message>
+      <source>You will lose access to following resources:</source>
+      <translation>Sie verlieren den Zugriff auf folgende Ressourcen:</translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n users?</source>
+      <translation>
+        <numerusform>%n Benutzer löschen?</numerusform>
+        <numerusform>%n Benutzer löschen?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n devices?</source>
+      <translation>
+        <numerusform>%n Geräte löschen?</numerusform>
+        <numerusform>%n Geräte löschen?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n cameras?</source>
+      <translation>
+        <numerusform>%n Kameras löschen?</numerusform>
+        <numerusform>%n Kameras löschen?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n I/O Modules?</source>
+      <translation>
+        <numerusform>%n I/O-Module löschen?</numerusform>
+        <numerusform>%n I/O-Module löschen?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Delete %n items?</source>
+      <translation>
+        <numerusform>%n Item löschen?</numerusform>
+        <numerusform>%n Items löschen?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of them are auto-discovered.</source>
+      <translation>
+        <numerusform>%n von denen werden automatisch erkannt.</numerusform>
+        <numerusform>%n von denen werden automatisch erkannt.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras are auto-discovered.</source>
+      <translation>
+        <numerusform>%n Kameras werden automatisch erkannt.</numerusform>
+        <numerusform>%n Kameras werden automatisch erkannt.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules are auto-discovered.</source>
+      <translation>
+        <numerusform>%n I/O-Module werden automatisch erkannt.</numerusform>
+        <numerusform>%n I/O-Module werden automatisch erkannt.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>They may be auto-discovered again after removing.</source>
+      <translation>Sie können nach dem Entfernen wieder automatisch erkannt werden.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing showreel?</source>
+      <translation>Vorhandenes Demoband überschreiben?</translation>
+    </message>
+    <message>
+      <source>There is another showreel with the same name.</source>
+      <translation>Es gibt ein anderes Demoband mit dem gleichen Namen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from showreel?</source>
+      <translation>
+        <numerusform>%n Item vom Demoband entfernen?</numerusform>
+        <numerusform>%n Items vom Demoband entfernen?</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
@@ -7402,6 +7698,64 @@ to %1</source>
         <numerusform>%n Benutzer</numerusform>
         <numerusform>%n Benutzer</numerusform>
       </translation>
+    </message>
+  </context>
+  <context>
+    <name>Videowall</name>
+    <message>
+      <source>There is another video wall with the same name</source>
+      <translation>Eine Videowand mit diesem Namen ist bereits vorhanden</translation>
+    </message>
+    <message>
+      <source>Close %1 before starting Video Wall?</source>
+      <translation>%1 vor dem Starten der Videowand schließen?</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>Schließen</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behalten</translation>
+    </message>
+    <message>
+      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+      <translation>Lokale Dateien können nicht auf dem Videowandbildschirm auf einem anderen Computer hinzugefügt werden</translation>
+    </message>
+    <message>
+      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+      <translation>Um lokale Dateien auf der Videowand anzuzeigen, bitte auf dem Computer hinzufügen auf dem die Videowand gehostet wird.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ClipboardButton</name>
+    <message>
+      <source>Copy</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopieren</translation>
+    </message>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>In Zwischenablage kopieren</translation>
+    </message>
+    <message>
+      <source>Paste</source>
+      <comment>from Clipboard</comment>
+      <translation>Einfügen</translation>
+    </message>
+    <message>
+      <source>Paste from Clipboard</source>
+      <translation>Aus Zwischenablage einfügen</translation>
+    </message>
+    <message>
+      <source>Copied</source>
+      <comment>to Clipboard</comment>
+      <translation>Kopiert</translation>
+    </message>
+    <message>
+      <source>Pasted</source>
+      <comment>from Clipboard</comment>
+      <translation>Eingefügt</translation>
     </message>
   </context>
   <context>
@@ -7414,8 +7768,8 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout or camera here to add it to the tour</source>
-      <translation>Ziehen Sie das Layout oder die Kamera hierher, um es der Tour hinzuzufügen</translation>
+      <source>Drag layout or camera here to add it to the showreel</source>
+      <translation>Ziehen Sie das Layout oder die Kamera hierher, um es dem Demoband hinzuzufügen</translation>
     </message>
   </context>
   <context>
@@ -7442,6 +7796,25 @@ to %1</source>
     <message>
       <source>Switch on Timer</source>
       <translation>Umschalten nach Zeitplan</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
+    <message>
+      <source>Stop Showreel</source>
+      <translation>Demoband stoppen</translation>
+    </message>
+    <message>
+      <source>Start Showreel</source>
+      <translation>Demoband starten</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
     </message>
   </context>
   <context>
@@ -7509,242 +7882,6 @@ to %1</source>
     <message>
       <source>Go to Live</source>
       <translation>Live gehen</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::ptz</name>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation>Die aktuelle Position von Kamera &quot;%1&quot; kann nicht abgerufen werden</translation>
-    </message>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>Bitte warten Sie bis die Kamera online ist.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>Fehler beim Abrufen der aktuellen Position</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>Die aktuelle Position von Kamera &quot;%1&quot; kann nicht festgelegt werden</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>Fehler beim Festlegen der aktuellen Position</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Der Preset wird von einigen Touren verwendet. Trotzdem löschen?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>Diese Touren werden ungültig.</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::resources</name>
-    <message>
-      <source>There is another layout with the same name</source>
-      <translation>Es gibt ein anderes Layout mit dem gleichen Namen</translation>
-    </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation>Sie sind nicht berechtigt, es zu überschreiben.</translation>
-    </message>
-    <message>
-      <source>Overwrite existing layout?</source>
-      <translation>Vorhandenes Layout überschreiben?</translation>
-    </message>
-    <message>
-      <source>There is another layout with the same name.</source>
-      <translation>Es gibt ein anderes Layout mit dem gleichen Namen.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Benutzer haben weiterhin Zugriff auf %n gelöschte Ressource:</numerusform>
-        <numerusform>Benutzer haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to User Settings.</source>
-      <translation>Um Zugriffe zu entfernen, bitte die Benutzereinstellungen aufrufen.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will get access to %n resources:</source>
-      <translation>
-        <numerusform>Alle Benutzer mit dieser Rolle erhalten Zugriff auf %n Ressource:</numerusform>
-        <numerusform>Alle Benutzer mit dieser Rolle erhalten Zugriff auf %n Ressourcen:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To remove access, please go to Role Settings.</source>
-      <translation>Um Zugriffe zu entfernen, bitte die Rolleneinstellungen aufrufen.</translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will still have access to %n removed resources:</source>
-      <translation>
-        <numerusform>Alle Benutzer mit dieser Rolle haben weiterhin Zugriff auf %n gelöschte Ressource:</numerusform>
-        <numerusform>Alle Benutzer mit dieser Rolle haben weiterhin Zugriff auf %n gelöschte Ressourcen:</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Changes will affect other users</source>
-      <translation>Änderungen wirken sich auch auf andere Benutzer aus</translation>
-    </message>
-    <message>
-      <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>Dieses Layout ist auch für andere Benutzer freigegeben, sodass Sie es auch für diese ändern.</translation>
-    </message>
-    <message numerus="yes">
-      <source>User will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Benutzer wird den Zugriff zu %n Ressource verlieren:</numerusform>
-        <numerusform>Benutzer wird den Zugriff zu %n Ressourcen verlieren:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>All users with this role will lose access to %n resources:</source>
-      <translation>
-        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff zu %n Ressource verlieren:</numerusform>
-        <numerusform>Alle Benutzer mit dieser Rolle werden den Zugriff zu %n Ressourcen verlieren:</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n shared layouts?</source>
-      <translation>
-        <numerusform>%n freigegebenes Layout löschen?</numerusform>
-        <numerusform>%n freigegebene Layouts löschen?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation>
-        <numerusform>Dieses %n Layout ist für andere Benutzer freigegeben. Layout wird auch bei diesen Benutzern gelöscht.</numerusform>
-        <numerusform>Diese %n Layouts sind für andere Benutzer freigegeben. Layouts werden auch bei diesen Benutzern gelöscht.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout?</source>
-      <translation>
-        <numerusform>%n Item vom Layout entfernen?</numerusform>
-        <numerusform>%n Items vom Layout entfernen?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Remove</source>
-      <translation>Entfernen</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>Sie sind dabei Ressourcen zu löschen auf welche Sie nur von der Videowand Zugriff haben. Danach werden Sie sie nicht mehr in der Ressourcenliste sehen und es wird auch nicht möglich sein diese der Videowand neu hinzuzufügen.</translation>
-    </message>
-    <message>
-      <source>You will lose access to following resources:</source>
-      <translation>Sie verlieren den Zugriff auf folgende Ressourcen:</translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n users?</source>
-      <translation>
-        <numerusform>%n Benutzer löschen?</numerusform>
-        <numerusform>%n Benutzer löschen?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n devices?</source>
-      <translation>
-        <numerusform>%n Gerät löschen?</numerusform>
-        <numerusform>%n Geräte löschen?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n cameras?</source>
-      <translation>
-        <numerusform>%n Kamera löschen?</numerusform>
-        <numerusform>%n Kameras löschen?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n I/O Modules?</source>
-      <translation>
-        <numerusform>%n I/O-Modul löschen?</numerusform>
-        <numerusform>%n I/O-Module löschen?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Delete %n items?</source>
-      <translation>
-        <numerusform>%n Item löschen?</numerusform>
-        <numerusform>%n Items löschen?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of them are auto-discovered.</source>
-      <translation>
-        <numerusform>%n von denen wird automatisch erkannt.</numerusform>
-        <numerusform>%n von denen werden automatisch erkannt.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n cameras are auto-discovered.</source>
-      <translation>
-        <numerusform>%n Kamera wird automatisch erkannt.</numerusform>
-        <numerusform>%n Kameras werden automatisch erkannt.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n I/O modules are auto-discovered.</source>
-      <translation>
-        <numerusform>%n I/O-Modul wird automatisch erkannt.</numerusform>
-        <numerusform>%n I/O-Module werden automatisch erkannt.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>They may be auto-discovered again after removing.</source>
-      <translation>Sie können nach dem Entfernen wieder automatisch erkannt werden.</translation>
-    </message>
-    <message>
-      <source>Overwrite existing layout tour?</source>
-      <translation>Vorhandene Layout-Tour überschreiben?</translation>
-    </message>
-    <message>
-      <source>There is another layout tour with the same name.</source>
-      <translation>Es gibt eine andere Layout-Tour mit dem gleichen Namen.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Remove %n items from layout tour?</source>
-      <translation>
-        <numerusform>%n Item von Layout-Tour entfernen?</numerusform>
-        <numerusform>%n Items von Layout-Tour entfernen?</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::videowall</name>
-    <message>
-      <source>There is another video wall with the same name</source>
-      <translation>Eine Videowand mit diesem Namen ist bereits vorhanden</translation>
-    </message>
-    <message>
-      <source>Close %1 before starting Video Wall?</source>
-      <translation>%1 vor dem Starten der Videowand schließen?</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>Schliessen</translation>
-    </message>
-    <message>
-      <source>Keep</source>
-      <translation>Behalten</translation>
-    </message>
-    <message>
-      <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
-      <translation>Lokale Dateien können nicht auf dem Videowandbildschirm auf einem anderen Computer hinzugefügt werden</translation>
-    </message>
-    <message>
-      <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
-      <translation>Um lokale Dateien auf der Videowand anzuzeigen, bitte auf dem Computer hinzufügen auf dem die Videowand gehostet wird.</translation>
     </message>
   </context>
   <context>
@@ -7938,8 +8075,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
-      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
-      <translation>Verwenden Sie Pfeiltasten, um Layouts zu wechseln. Die Tour kann durch drücken von ESC beendet werden.</translation>
+      <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
+      <translation>Verwenden Sie Pfeiltasten, um Layouts zu wechseln. Das Demoband kann durch drücken von ESC beendet werden.</translation>
+    </message>
+    <message>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>
@@ -7960,16 +8101,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Layout Tour</source>
-      <translation>Layout-Tour</translation>
-    </message>
-    <message>
-      <source>Layout Tour %1</source>
-      <translation>Layout-Tour %1</translation>
-    </message>
-    <message>
       <source>Delete layout tour %1?</source>
       <translation>Layout-Tour %1 löschen?</translation>
+    </message>
+    <message>
+      <source>Showreel</source>
+      <translation>Demoband</translation>
+    </message>
+    <message>
+      <source>Showreel %1</source>
+      <translation>Demoband %1</translation>
     </message>
   </context>
   <context>

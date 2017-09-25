@@ -30,11 +30,12 @@ QString sTemporaryDirectoryPath;
 
 } // namespace
 
-VmsGatewayFunctionalTest::VmsGatewayFunctionalTest():
+VmsGatewayFunctionalTest::VmsGatewayFunctionalTest(int flags):
     m_httpPort(0)
 {
     //starting clean test
-    nx::network::SocketGlobalsHolder::instance()->reinitialize();
+    if ((flags & doNotReinitialiseSocketGlobals) == 0)
+        nx::network::SocketGlobalsHolder::instance()->reinitialize();
     m_testHttpServer = std::make_unique<TestHttpServer>();
 
     m_tmpDir = 

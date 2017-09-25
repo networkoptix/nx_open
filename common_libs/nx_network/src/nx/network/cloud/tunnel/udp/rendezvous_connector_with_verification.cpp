@@ -1,8 +1,3 @@
-/**********************************************************
-* Apr 14, 2016
-* akolesnikov
-***********************************************************/
-
 #include "rendezvous_connector_with_verification.h"
 
 #include <nx/utils/log/log.h>
@@ -11,7 +6,6 @@
 
 #include "nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h"
 #include "nx/network/cloud/data/tunnel_connection_chosen_data.h"
-
 
 namespace nx {
 namespace network {
@@ -87,11 +81,13 @@ void RendezvousConnectorWithVerification::notifyAboutChoosingConnection(
     m_requestPipeline->sendMessage(std::move(tunnelConnectionChosenMessage));
 
     if (m_timeout > std::chrono::milliseconds::zero())
+    {
         m_aioThreadBinder.start(
             m_timeout,
             std::bind(
                 &RendezvousConnectorWithVerification::onTimeout, this,
                 "tunnelConnectionChosenResponse"));
+    }
 }
 
 std::unique_ptr<nx::network::UdtStreamSocket>
@@ -120,6 +116,8 @@ void RendezvousConnectorWithVerification::closeConnection(
 void RendezvousConnectorWithVerification::onConnectCompleted(
     SystemError::ErrorCode errorCode)
 {
+    using namespace std::placeholders;
+
     std::unique_ptr<UdtStreamSocket> connection = RendezvousConnector::takeConnection();
 
     NX_LOGX(lm("cross-nat %1 completed. result: %2")
@@ -128,18 +126,16 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
 
     if (errorCode != SystemError::noError)
     {
-        auto connectCompletionHandler = std::move(m_connectCompletionHandler);
-        connectCompletionHandler(errorCode);
+        nx::utils::swapAndCall(m_connectCompletionHandler, errorCode);
         return;
     }
 
-    //verifying connection id
+    // Verifying connection id.
 
     connection->bindToAioThread(getAioThread());
     m_requestPipeline = std::make_unique<stun::MessagePipeline>(
         this,
         std::move(connection));
-    using namespace std::placeholders;
     m_requestPipeline->setMessageHandler(
         std::bind(&RendezvousConnectorWithVerification::onMessageReceived, this, _1));
     m_requestPipeline->startReadingConnection();
@@ -150,11 +146,13 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
     m_requestPipeline->sendMessage(std::move(synRequestMessage));
 
     if (m_timeout > std::chrono::milliseconds::zero())
+    {
         m_aioThreadBinder.start(
             m_timeout,
             std::bind(
                 &RendezvousConnectorWithVerification::onTimeout, this,
                 "UdpHolePunchingSynResponse"));
+    }
 }
 
 void RendezvousConnectorWithVerification::onMessageReceived(
@@ -211,9 +209,7 @@ void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
         .arg(connectSessionId()).arg(remoteAddress().toString()),
         cl_logDEBUG2);
 
-    //success!
-    auto connectCompletionHandler = std::move(m_connectCompletionHandler);
-    connectCompletionHandler(SystemError::noError);
+    nx::utils::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
 
 void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
@@ -233,9 +229,7 @@ void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
         .arg(connectSessionId()).arg(remoteAddress().toString()),
         cl_logDEBUG2);
 
-    //success!
-    auto connectCompletionHandler = std::move(m_connectCompletionHandler);
-    connectCompletionHandler(SystemError::noError);
+    nx::utils::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
 
 void RendezvousConnectorWithVerification::onTimeout(nx::String requestName)
@@ -252,8 +246,8 @@ void RendezvousConnectorWithVerification::processError(
     NX_ASSERT(errorCode != SystemError::noError);
 
     m_requestPipeline.reset();
-    auto connectCompletionHandler = std::move(m_connectCompletionHandler);
-    connectCompletionHandler(errorCode);
+
+    nx::utils::swapAndCall(m_connectCompletionHandler, errorCode);
 }
 
 } // namespace udp

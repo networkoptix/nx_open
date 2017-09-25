@@ -18,6 +18,13 @@ static const QString checkuedTestPathAndQuery(lit("%1?%2&chunked").arg(testPath)
 static const nx_http::BufferType testMsgBody("bla-bla-bla");
 static const nx_http::BufferType testMsgContentType("text/plain");
 
+class UndefinedContentLengthBufferSource: public nx_http::BufferSource
+{
+public:
+    UndefinedContentLengthBufferSource(): nx_http::BufferSource(testMsgContentType, testMsgBody) {}
+    virtual boost::optional<uint64_t> contentLength() const override { return boost::none; }
+};
+
 class VmsGatewayProxyTestHandler:
     public nx_http::AbstractHttpRequestHandler
 {
@@ -44,23 +51,24 @@ public:
         if (request.requestLine.url.path() == testPath &&
             requestQuery.hasQueryItem(testQuery))
         {
+            std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource;
             if (requestQuery.hasQueryItem("chunked"))
             {
                 response->headers.emplace("Transfer-Encoding", "chunked");
-                completionHandler(
-                    nx_http::RequestResult(
-                        nx_http::StatusCode::ok,
-                        std::make_unique< nx_http::BufferSource >(
-                            testMsgContentType,
-                            nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n")));
+                bodySource = std::make_unique<nx_http::BufferSource>(testMsgContentType,
+                    nx_http::QnChunkedTransferEncoder::serializeSingleChunk(testMsgBody)+"0\r\n\r\n");
+            }
+            else if (requestQuery.hasQueryItem("undefinedContentLength"))
+            {
+                bodySource = std::make_unique<UndefinedContentLengthBufferSource>();
             }
             else
             {
-                completionHandler(
-                    nx_http::RequestResult(
-                        nx_http::StatusCode::ok,
-                        std::make_unique< nx_http::BufferSource >(testMsgContentType, testMsgBody)));
+                bodySource = std::make_unique<nx_http::BufferSource>(testMsgContentType, testMsgBody);
             }
+
+            completionHandler(nx_http::RequestResult(
+                nx_http::StatusCode::ok, std::move(bodySource)));
         }
         else
         {
@@ -90,25 +98,36 @@ public:
 
     void testProxyUrl(
         const QUrl& url,
-        nx_http::StatusCode::Value expectedReponseStatusCode = nx_http::StatusCode::ok)
+        nx_http::StatusCode::Value expectedReponseStatusCode)
+    {
+        testProxyUrl(url, {{expectedReponseStatusCode}});
+    }
+
+    void testProxyUrl(
+        const QUrl& url,
+        std::vector<nx_http::StatusCode::Value> expectedReponseStatusCodes
+            = {nx_http::StatusCode::ok})
     {
         nx_http::HttpClient httpClient;
-        testProxyUrl(&httpClient, url, expectedReponseStatusCode);
+        testProxyUrl(&httpClient, url, std::move(expectedReponseStatusCodes));
     }
 
     void testProxyUrl(
         nx_http::HttpClient* const httpClient,
         const QUrl& url,
-        nx_http::StatusCode::Value expectedReponseStatusCode)
+        std::vector<nx_http::StatusCode::Value> expectedReponseStatusCodes)
     {
         NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
         httpClient->setResponseReadTimeoutMs(1000*1000);
         ASSERT_TRUE(httpClient->doGet(url));
-        ASSERT_EQ(
-            expectedReponseStatusCode,
-            httpClient->response()->statusLine.statusCode);
+        ASSERT_TRUE(
+            std::find(
+                expectedReponseStatusCodes.begin(),
+                expectedReponseStatusCodes.end(),
+                httpClient->response()->statusLine.statusCode) != expectedReponseStatusCodes.end())
+            << "Actual: " << httpClient->response()->statusLine.statusCode;
 
-        if (expectedReponseStatusCode != nx_http::StatusCode::ok)
+        if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
             return;
 
         ASSERT_EQ(
@@ -140,29 +159,39 @@ TEST_F(Proxy, IpSpecified)
     ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
 
     // Default port
-    testProxyUrl(QUrl(lit("http://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPathAndQuery)));
+    testProxyUrl(
+        QUrl(lit("http://%1/%2%3")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().address.toString())
+            .arg(testPathAndQuery)),
+        {nx_http::StatusCode::ok});
 
     // Specified
-    testProxyUrl(QUrl(lit("http://%1/%2%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().toString())
-        .arg(testPathAndQuery)));
-
-    // Wrong port
-    testProxyUrl(QUrl(lit("http://%1/%2:777%3")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().address.toString())
-        .arg(testPathAndQuery)),
-        nx_http::StatusCode::serviceUnavailable);
+    testProxyUrl(
+        QUrl(lit("http://%1/%2%3")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().toString())
+            .arg(testPathAndQuery)),
+        {nx_http::StatusCode::ok});
 
     // Wrong path
-    testProxyUrl(QUrl(lit("http://%1/%2")
-        .arg(endpoint().toString())
-        .arg(testHttpServer()->serverAddress().toString())),
-        nx_http::StatusCode::notFound);
+    testProxyUrl(
+        QUrl(lit("http://%1/%2")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().toString())),
+        {nx_http::StatusCode::notFound});
+}
+
+TEST_F(Proxy, failure_is_returned_when_unreachable_target_endpoint_is_specified)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
+
+    testProxyUrl(
+        QUrl(lit("http://%1/%2:777%3")
+            .arg(endpoint().toString())
+            .arg(testHttpServer()->serverAddress().address.toString())
+            .arg(testPathAndQuery)),
+        {nx_http::StatusCode::serviceUnavailable, nx_http::StatusCode::internalServerError});
 }
 
 TEST_F(Proxy, SslEnabled)
@@ -330,7 +359,7 @@ TEST_F(Proxy, proxyByRequestUrl)
             .arg(testPathAndQuery);
     nx_http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
+    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
 }
 
 TEST_F(Proxy, proxyingChunkedBody)
@@ -344,7 +373,22 @@ TEST_F(Proxy, proxyingChunkedBody)
             .arg(checkuedTestPathAndQuery);
     nx_http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
-    testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
+    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
+}
+
+TEST_F(Proxy, proxyingUndefinedContentLength)
+{
+    addArg("-http/allowTargetEndpointInUrl", "true");
+    addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
+    ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
+
+    const QUrl targetUrl =
+        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
+        .arg(lit("%1?%2&undefinedContentLength").arg(testPath).arg(testQuery));
+
+    nx_http::HttpClient httpClient;
+    httpClient.setProxyVia(endpoint());
+    testProxyUrl(&httpClient, targetUrl, {nx_http::StatusCode::ok});
 }
 
 TEST_F(Proxy, ModRewrite)

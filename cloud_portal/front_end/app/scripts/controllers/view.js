@@ -4,7 +4,6 @@ angular.module('cloudApp')
     .controller('ViewPageCtrl', ['$scope', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
     '$location', '$q', '$poll',
     function ($scope, account, system, $routeParams, systemAPI, dialogs, $location, $q, $poll) {
-        var currentSystem;
         account.requireLogin().then(function(account){
             $scope.currentSystem = system($routeParams.systemId, account.email);
             var systemInfoRequest = $scope.currentSystem.getInfo();
@@ -14,7 +13,8 @@ angular.module('cloudApp')
                 $scope.system = $scope.currentSystem.mediaserver;
                 delayedUpdateSystemInfo();
             },function(){
-                dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
+                dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
+                               $scope.currentSystem.name || L.errorCodes.thisSystem), 'warning');
                 $location.path("/systems");
             });
         });
@@ -29,9 +29,10 @@ angular.module('cloudApp')
             });
         }
 
-        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId,function(event,data){
-             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
-             $location.path("/systems");
+        var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId,function(event,data){
+            dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
+                           $scope.currentSystem.info.name || L.errorCodes.thisSystem), 'warning');
+            $location.path("/systems");
         });
 
         $scope.$on('$destroy', function( event ) {

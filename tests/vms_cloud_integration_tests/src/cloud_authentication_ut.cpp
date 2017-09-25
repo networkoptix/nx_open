@@ -20,12 +20,11 @@
 
 using namespace nx::cdb;
 
-class FtCloudAuthentication:
-    public MediaServerCloudIntegrationTest,
-    public ::testing::Test
+class CloudAuthentication:
+    public MediaServerCloudIntegrationTest
 {
 public:
-    FtCloudAuthentication()
+    CloudAuthentication()
     {
         connectSystemToCloud();
     }
@@ -34,6 +33,21 @@ protected:
     void givenCloudNonce()
     {
         getCloudNonce(&m_cloudNonceData);
+    }
+
+    void givenTemporaryCloudCredentials()
+    {
+        nx::cdb::api::TemporaryCredentialsParams temporaryCredentialsParams;
+        temporaryCredentialsParams.type = "long";
+        nx::cdb::api::TemporaryCredentials temporaryCredentials;
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            cdb()->createTemporaryCredentials(
+                accountEmail(), accountPassword(),
+                temporaryCredentialsParams, &temporaryCredentials));
+
+        m_customCredentials = 
+            std::make_pair(temporaryCredentials.login, temporaryCredentials.password);
     }
 
     void whenIssuedHttpRequestSignedWithThatNonce()
@@ -72,7 +86,11 @@ protected:
 
     void assertServerAuthorizesCloudUserCredentials()
     {
-        ASSERT_TRUE(userRequestIsAuthorizedByServer(accountEmail(), accountPassword()));
+        auto credentials = m_customCredentials
+            ? *m_customCredentials
+            : std::make_pair(accountEmail(), accountPassword());
+
+        ASSERT_TRUE(userRequestIsAuthorizedByServer(credentials.first, credentials.second));
     }
 
     bool userRequestIsAuthorizedByServer(std::string userName, std::string password)
@@ -92,6 +110,7 @@ protected:
 private:
     api::NonceData m_cloudNonceData;
     nx_http::Message m_responseMessage;
+    boost::optional<std::pair<std::string, std::string>> m_customCredentials;
 
     void getCloudNonce(api::NonceData* nonceData)
     {
@@ -152,23 +171,29 @@ private:
     }
 };
 
-TEST_F(FtCloudAuthentication, authorize_api_request_with_cloud_credentials)
+TEST_P(CloudAuthentication, authorize_api_request_with_cloud_credentials)
 {
     assertServerAuthorizesCloudUserCredentials();
 }
 
-TEST_F(FtCloudAuthentication, one_step_digest_authentication_using_nonce_received_from_cloud)
+TEST_P(CloudAuthentication, one_step_digest_authentication_using_nonce_received_from_cloud)
 {
     givenCloudNonce();
     whenIssuedHttpRequestSignedWithThatNonce();
     thenRequestShouldBeFulfilled();
 }
 
-//-------------------------------------------------------------------------------------------------
-// FtCloudAuthenticationInviteUser
+TEST_P(CloudAuthentication, authenticating_on_mediaserver_using_temporary_cloud_credentials)
+{
+    givenTemporaryCloudCredentials();
+    assertServerAuthorizesCloudUserCredentials();
+}
 
-class FtCloudAuthenticationInviteUser:
-    public FtCloudAuthentication
+//-------------------------------------------------------------------------------------------------
+// CloudAuthenticationInviteUser
+
+class CloudAuthenticationInviteUser:
+    public CloudAuthentication
 {
 public:
 
@@ -190,13 +215,13 @@ protected:
         ASSERT_EQ(
             api::ResultCode::ok,
             cdb()->addAccount(&newAccount, &m_inivitedUserPassword, &accountConfirmationCode));
-        
+
         std::string resultEmail;
         ASSERT_EQ(
             api::ResultCode::ok,
             cdb()->activateAccount(accountConfirmationCode, &resultEmail));
     }
-    
+
     void assertInvitedUserIsAuthenticatedSuccessfully()
     {
         while (!userRequestIsAuthorizedByServer(m_inivitedUserEmail, m_inivitedUserPassword))
@@ -210,8 +235,12 @@ private:
     std::string m_inivitedUserPassword;
 };
 
-TEST_F(FtCloudAuthenticationInviteUser, invited_user_is_authorized_by_mediaserver)
+TEST_P(CloudAuthenticationInviteUser, invited_user_is_authorized_by_mediaserver)
 {
     inviteCloudUser();
     assertInvitedUserIsAuthenticatedSuccessfully();
 }
+
+INSTANTIATE_TEST_CASE_P(P2pMode, CloudAuthenticationInviteUser,
+    ::testing::Values(TestParams(false), TestParams(true)
+));

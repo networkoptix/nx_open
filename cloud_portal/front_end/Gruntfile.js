@@ -726,16 +726,23 @@ module.exports = function (grunt) {
                 }
             }
         },
-
         shell:{
             updateTest:{
                 command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
             },
-            merge:{
-                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; python ../../../devtools/util/merge_dev.py -t default; hg push;'
-            },
             pull:{
-                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; hg push;'
+                branch:'',
+                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r <%= shell.pull.branch %>'
+            },
+            push:{
+                branch:'',
+                command: 'python ../../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
+            },
+            up_3_2:{
+                command: 'hg up vms_3.2_dev'
+            },
+            up_3_1:{
+                command: 'hg up vms_3.1_web'
             },
             version: {
                 command: 'hg parent > dist/version.txt'
@@ -785,7 +792,7 @@ module.exports = function (grunt) {
             'autoprefixer',
             'protractor_webdriver:notkeepalive',
             'shell:print_version',
-            'protractor:'+ specsuit,
+            'protractor:' + specsuit,
             'clean:server'
         );
     });
@@ -926,12 +933,37 @@ module.exports = function (grunt) {
         'shell:updateTest'
     ]);
 
+    grunt.registerTask('pull', function(branch){
+        grunt.config.set('shell.pull.branch', branch);
+        grunt.task.run([
+            'shell:pull'
+        ]);
+    });
 
-    grunt.registerTask('merge', [
-        'shell:merge'
-    ]);
+    grunt.registerTask('push', function(branch){
+        grunt.config.set('shell.push.branch', branch);
+        grunt.task.run([
+            'shell:push'
+        ]);
+    });
 
-    grunt.registerTask('pull', [
-        'shell:pull'
-    ]);
+    grunt.registerTask('merge', function(branch){
+        grunt.task.run([
+            'pull:' + branch,
+            'push:' + branch
+        ]);
+    });
+
+
+
+    /*grunt.registerTask('pushdef', function(branch){
+        grunt.task.run([
+            'pull:vms_3.1',
+            'push:vms_3.1',
+            'shell:up_3_2',
+            'pull:vms_3.1',
+            'push:default',
+            'shell:up_3_1'
+        ]);
+    });*/
 };

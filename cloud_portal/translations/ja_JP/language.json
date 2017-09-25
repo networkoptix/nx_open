@@ -29,7 +29,7 @@
     "restorePassword":"パスワードリセット -",
     "restorePasswordSuccess":"パスワードを保存 -",
     "restorePasswordCode":"パスワードリセット -",
-    "view":"View cameras - ",
+    "view":"カメラを表示 - ",
     "contentPage":"",
     "debug":"デバッグ",
     "login":"ログイン -",
@@ -81,6 +81,26 @@
     "customRole":{
       "label":"カスタムの役割",
       "description":"システムで指定されたカスタムのユーザーの役割"
+    },
+    "owner":{
+      "label":"Owner",
+      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+    },
+    "viewer":{
+      "label":"Viewer",
+      "description":"Can view live video and browse the archive"
+    },
+    "liveViewer":{
+      "label":"Live Viewer",
+      "description":"Can only view live video"
+    },
+    "advancedViewer":{
+      "label":"Advanced Viewer",
+      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+    },
+    "custom":{
+      "label":"Custom",
+      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
     }
   },
   "errorCodes":{
@@ -117,7 +137,7 @@
     "cantEditAdmin":"このユーザーは管理者権限を持っています",
     "cantOpenClient":"{{VMS_NAME}} アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
     "lostConnection":"{{systemName}} への接続が失われました",
-    "thisSystem":"the system"
+    "thisSystem":"システム"
   },
   "passwordRequirements":{
     "minLengthMessage":"パスワードは8文字以上必要です",
@@ -176,8 +196,8 @@
     },
     "groups":{
       "windows":{
-        "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "label":"ウィンドウズ",
+        "supported":"Vista、7,8,10、Server 2003、Server 2008、Server 2012"
       },
       "mac":{
         "label":"Mac OS",
@@ -186,7 +206,7 @@
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS、12.04 LTS、10.04 LTS"
       }
     },
     "platforms":{
@@ -214,7 +234,7 @@
     "createAccount":"アカウント作成"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"すべてのシステム",
     "systems":"システム"
   }
 }

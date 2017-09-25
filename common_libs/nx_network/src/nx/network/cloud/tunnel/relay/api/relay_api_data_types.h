@@ -52,9 +52,17 @@ struct CreateClientSessionResponse
 {
     std::string sessionId;
     std::chrono::seconds sessionTimeout;
+    /**
+     * This url can be different from the initial one in case of redirect to another relay instance.
+     */
+    std::string actualRelayUrl;
 };
 
 #define CreateClientSessionResponse_Fields (sessionId)(sessionTimeout)
+
+NX_NETWORK_API bool serializeToHeaders(
+    nx_http::HttpHeaders* where,
+    const CreateClientSessionResponse& what);
 
 struct ConnectToPeerRequest
 {

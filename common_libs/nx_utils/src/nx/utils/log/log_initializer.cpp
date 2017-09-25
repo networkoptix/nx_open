@@ -14,17 +14,16 @@ static std::atomic<bool> isInitializedGlobally(false);
 
 void initialize(
     const Settings& settings,
-    const QString& dataDir,
     const QString& applicationName,
     const QString& binaryPath,
     const QString& baseName,
     std::shared_ptr<Logger> logger)
 {
+    if (settings.level.primary == Level::undefined || settings.level.primary == Level::notConfigured)
+        return;
+
     if (!logger)
         logger = mainLogger();
-
-    if (settings.level.primary == Level::undefined)
-        return;
 
     // Can not be reinitialized if initialized globally.
     if (!isInitializedGlobally.load())
@@ -33,14 +32,12 @@ void initialize(
         logger->setLevelFilters(settings.level.filters);
         if (baseName != QLatin1String("-"))
         {
-            const auto logDir = settings.directory.isEmpty()
-                ? (dataDir + QLatin1String("/log"))
-                : settings.directory;
-
             File::Settings fileSettings;
-            fileSettings.name = dataDir.isEmpty() ? baseName : (logDir + lit("/") + baseName);
             fileSettings.size = settings.maxFileSize;
             fileSettings.count = settings.maxBackupCount;
+            fileSettings.name = settings.directory.isEmpty()
+                ? baseName
+                : (settings.directory + lit("/") + baseName);
 
             logger->setWriter(std::make_unique<File>(fileSettings));
         }
@@ -50,7 +47,8 @@ void initialize(
         }
     }
 
-    const auto write = [&](const Message& message) { logger->log(Level::always, "START", message); };
+    const nx::utils::log::Tag kStart(lit("START"));
+    const auto write = [&](const Message& message) { logger->log(Level::always, kStart, message); };
     write(QByteArray(80, '='));
     write(lm("%1 started, version: %2, revision: %3").args(
         applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));

@@ -36,11 +36,14 @@ public:
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    virtual std::string toString() const override;
+
 private:
     const nx::hpm::api::ConnectionParameters m_connectionParameters;
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_tunnelConnection;
     std::unique_ptr<aio::Timer> m_inactivityTimer;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onTunnelClosedHandler;
+    SystemError::ErrorCode m_statusCode = SystemError::noError;
 
     void launchInactivityTimer();
     void closeTunnel(SystemError::ErrorCode reason);

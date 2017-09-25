@@ -72,6 +72,9 @@ namespace
 
     const QString kCloudConnectRelayingEnabled(lit("cloudConnectRelayingEnabled"));
     const bool kCloudConnectRelayingEnabledDefault = true;
+
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
 }
 
 using namespace nx::settings_names;
@@ -258,6 +261,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors()
 {
+    using namespace std::chrono;
+
     QList<QnAbstractResourcePropertyAdaptor*> timeSynchronizationAdaptors;
     m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         kNameTimeSynchronizationEnabled,
@@ -270,6 +275,20 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         true,
         this);
     timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
+    
+    m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = 
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kMaxDifferenceBetweenSynchronizedAndInternetTime,
+            duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndInternetDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
+
+    m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            kMaxDifferenceBetweenSynchronizedAndLocalTime,
+            duration_cast<milliseconds>(kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault).count(),
+            this);
+    timeSynchronizationAdaptors << m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
 
     for (auto adaptor: timeSynchronizationAdaptors)
     {
@@ -317,6 +336,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
     m_autoUpdateThumbnailsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoUpdateThumbnails, true, this);
+    m_useTextEmailFormatAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kUseTextEmailFormat, false, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
     m_auditTrailPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kAuditTrailPeriodDaysName,
@@ -382,6 +402,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_eventLogPeriodDaysAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::eventLogPeriodDaysChanged,           Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_autoUpdateThumbnailsAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoUpdateThumbnailsChanged,         Qt::QueuedConnection);
+    connect(m_useTextEmailFormatAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::useTextEmailFormatChanged,           Qt::QueuedConnection);
     connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
@@ -393,7 +414,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         m_cloudConnectRelayingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
         Qt::QueuedConnection);
-    
+
     QnGlobalSettings::AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -401,6 +422,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_autoUpdateThumbnailsAdaptor
+        << m_useTextEmailFormatAdaptor
         << m_auditTrailEnabledAdaptor
         << m_auditTrailPeriodDaysAdaptor
         << m_eventLogPeriodDaysAdaptor
@@ -455,6 +477,16 @@ bool QnGlobalSettings::isAutoUpdateThumbnailsEnabled() const
 void QnGlobalSettings::setAutoUpdateThumbnailsEnabled(bool value)
 {
     m_autoUpdateThumbnailsAdaptor->setValue(value);
+}
+
+bool QnGlobalSettings::isUseTextEmailFormat() const
+{
+    return m_useTextEmailFormatAdaptor->value();
+}
+
+void QnGlobalSettings::setUseTextEmailFormat(bool value)
+{
+    m_useTextEmailFormatAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isAuditTrailEnabled() const
@@ -846,6 +878,11 @@ bool QnGlobalSettings::isTimeSynchronizationEnabled() const
     return m_timeSynchronizationEnabledAdaptor->value();
 }
 
+void QnGlobalSettings::setTimeSynchronizationEnabled(bool value)
+{
+    m_timeSynchronizationEnabledAdaptor->setValue(value);
+}
+
 bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
 {
     return m_synchronizeTimeWithInternetAdaptor->value();
@@ -854,6 +891,18 @@ bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
 void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
 {
     m_synchronizeTimeWithInternetAdaptor->setValue(value);
+}
+
+std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndInternetTime() const
+{
+    return std::chrono::milliseconds(
+        m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor->value());
+}
+
+std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndLocalTime() const
+{
+    return std::chrono::milliseconds(
+        m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor->value());
 }
 
 QString QnGlobalSettings::cloudAccountName() const

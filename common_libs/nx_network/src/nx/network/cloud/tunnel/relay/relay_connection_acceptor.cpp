@@ -73,7 +73,12 @@ void ReverseConnection::connectToOriginator(
 void ReverseConnection::waitForOriginatorToStartUsingConnection(
     ReverseConnectionCompletionHandler handler)
 {
-    m_onConnectionActivated = std::move(handler);
+    post(
+        [this, handler = std::move(handler)]() mutable
+        {
+            m_onConnectionActivated = std::move(handler);
+            m_httpPipeline->startReadingConnection();
+        });
 }
 
 api::BeginListeningResponse ReverseConnection::beginListeningResponse() const
@@ -120,7 +125,6 @@ void ReverseConnection::onConnectDone(
             this, std::move(streamSocket));
         m_httpPipeline->setMessageHandler(
             std::bind(&ReverseConnection::relayNotificationReceived, this, _1));
-        m_httpPipeline->startReadingConnection();
         m_beginListeningResponse = response;
     }
 
@@ -143,6 +147,7 @@ void ReverseConnection::relayNotificationReceived(
         m_httpPipeline->takeSocket(),
         openTunnelNotification.clientEndpoint());
     m_httpPipeline.reset();
+
     nx::utils::swapAndCall(m_onConnectionActivated, SystemError::noError);
 }
 
@@ -178,7 +183,22 @@ void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
             SystemError::ErrorCode sysErrorCode,
             std::unique_ptr<detail::ReverseConnection> connection) mutable
         {
-            handler(sysErrorCode, toStreamSocket(std::move(connection)));
+            std::unique_ptr<AbstractStreamSocket> acceptedSocket;
+            if (connection)
+                acceptedSocket = toStreamSocket(std::move(connection));
+
+            if (acceptedSocket)
+            {
+                NX_INFO(this, lm("Cloud connection from %1 has been accepted. Info: relay %2")
+                    .args(acceptedSocket->getForeignAddress(), m_relayUrl));
+            }
+            else
+            {
+                NX_INFO(this, lm("Cloud connection accept error (%1). Info: relay %2")
+                    .args(SystemError::toString(sysErrorCode), m_relayUrl));
+            }
+
+            handler(sysErrorCode, std::move(acceptedSocket));
         });
 }
 

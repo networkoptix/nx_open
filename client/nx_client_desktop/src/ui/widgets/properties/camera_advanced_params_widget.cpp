@@ -97,12 +97,17 @@ void QnCameraAdvancedParamsWidget::initSplitter() {
 }
 
 void QnCameraAdvancedParamsWidget::initialize() {
+
     initSplitter();
 
     updateCameraAvailability();
 
     /* Clean state. */
     setState(State::Init);
+
+    if (m_camera)
+        m_advancedParamsReader->clearResourceParams(m_camera);
+
     m_paramRequestHandle = 0;
     m_currentValues.clear();
     m_loadedValues.clear();
@@ -139,7 +144,7 @@ void QnCameraAdvancedParamsWidget::loadValues() {
     auto serverConnection = getServerConnection();
     if (!serverConnection) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -157,7 +162,7 @@ void QnCameraAdvancedParamsWidget::saveSingleValue(const QnCameraAdvancedParamVa
     auto serverConnection = getServerConnection();
     if (!serverConnection) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -176,7 +181,7 @@ void QnCameraAdvancedParamsWidget::saveValues() {
     auto serverConnection = getServerConnection();
     if (!serverConnection) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -184,7 +189,7 @@ void QnCameraAdvancedParamsWidget::saveValues() {
     QnCameraAdvancedParamValueList modifiedValues = m_currentValues.difference(m_loadedValues);
     if (modifiedValues.isEmpty()) {
         /* Notify user about error. */
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 
@@ -217,7 +222,7 @@ bool QnCameraAdvancedParamsWidget::isCameraAvailable() const {
     if (!m_camera)
         return false;
 
-    //TODO: #GDM check special capability flag
+    // TODO: #GDM check special capability flag
     return m_camera->getStatus() == Qn::Online || m_camera->getStatus() == Qn::Recording;
 }
 
@@ -299,7 +304,7 @@ void QnCameraAdvancedParamsWidget::at_advancedParam_saved(int status, const QnCa
 
     /* Show error if something was not correct. */
     if (status != 0) {
-        //TODO: #GDM
+        // TODO: #GDM
         return;
     }
 

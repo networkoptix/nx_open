@@ -8,6 +8,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/resourcenameset.h>
@@ -67,9 +68,17 @@ public:
         m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl())
     {
         // Preparing compatibility data.
-        m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, "http");
-        m_moduleToDefaultUrlScheme.emplace(kConnectionMediatorModuleName, "stun");
-        m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, "http");
+        m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, nx_http::kUrlSchemeName);
+        m_moduleToDefaultUrlScheme.emplace(kConnectionMediatorModuleName, nx::stun::kUrlSchemeName);
+        m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, nx_http::kUrlSchemeName);
+    }
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+
+        if (m_httpClient)
+            m_httpClient->bindToAioThread(aioThread);
     }
 
     virtual void stopWhileInAioThread() override
@@ -162,15 +171,16 @@ protected:
             const auto it = m_moduleToDefaultUrlScheme.find(
                 nameset().findResourceByID(moduleAttrName).name);
 
-            static const auto kHttpScheme = lit("http");
-            static const auto kHttpsScheme = lit("https");
             if (it != m_moduleToDefaultUrlScheme.end())
                 url.setScheme(it->second);
             else
-                url.setScheme(kHttpScheme);
+                url.setScheme(QLatin1String(nx_http::kUrlSchemeName));
 
-            if ((url.scheme() == kHttpScheme) && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
-                url.setScheme(kHttpsScheme);
+            if ((url.scheme() == QLatin1String(nx_http::kUrlSchemeName))
+                && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
+            {
+                url.setScheme(QLatin1String(nx_http::kSecureUrlSchemeName));
+            }
         }
 
         return url;
@@ -187,6 +197,8 @@ private:
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client)
     {
+        NX_ASSERT(isInSelfAioThread());
+
         QnMutexLocker lk(&m_mutex);
 
         m_httpClient.reset();
