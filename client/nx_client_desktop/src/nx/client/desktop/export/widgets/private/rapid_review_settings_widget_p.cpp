@@ -139,9 +139,12 @@ void RapidReviewSettingsWidgetPrivate::setSourcePeriodLengthMs(qint64 lengthMs)
     if (m_sourcePeriodLengthMs == lengthMs)
         return;
 
-    m_sourceRangeValid = lengthMs >= RapidReviewSettingsWidget::minimalSourcePeriodLengthMs();
-
     m_sourcePeriodLengthMs = lengthMs;
+
+    m_sourceRangeValid = lengthMs >= RapidReviewSettingsWidget::minimalSourcePeriodLengthMs();
+    if (!m_sourceRangeValid)
+        return;
+
     m_maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
 
     updateUnitsModel();
