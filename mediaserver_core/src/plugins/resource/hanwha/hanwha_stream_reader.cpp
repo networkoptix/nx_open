@@ -18,7 +18,6 @@ namespace plugins {
 namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
-static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
 
 } // namespace
@@ -37,9 +36,6 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params)
 {
-    /*if (m_hanwhaResource->isNvr() && !isVideoSourceActive(m_hanwhaResource->getChannel()))
-        return CameraDiagnostics::NoMediaStreamResult();*/
-
     const auto role = getRole();
     QString streamUrlString;
     int profileToOpen = kHanwhaInvalidProfile;
@@ -226,23 +222,6 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
 {
     return profileNumber != kHanwhaInvalidProfile || m_hanwhaResource->isNvr();
-}
-
-bool HanwhaStreamReader::isVideoSourceActive(int channel) const
-{
-    HanwhaRequestHelper helper(m_hanwhaResource);
-    auto response = helper.view(lit("media/videosource"));
-
-    if (!response.isSuccessful())
-        return false;
-
-    const auto state = response.parameter<QString>(
-        lit("Channel.%1.State").arg(channel));
-
-    if (!state.is_initialized())
-        return false;
-
-    return state == kHanwhaVideoSourceStateOn;
 }
 
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)

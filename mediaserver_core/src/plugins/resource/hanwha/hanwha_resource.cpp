@@ -40,6 +40,7 @@ static const QString kBitrateProperty = lit("Bitrate");
 static const QString kFramePriorityProperty = lit("PriorityType");
 
 static const QString kNvrDeviceType = lit("NVR");
+static const QString kHanwhaVideoSourceStateOn = lit("On");
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -371,6 +372,23 @@ QString HanwhaResource::sessionKey(
     return searcher->sessionKey(toSharedPointer(this), sessionType, generateNewOne);
 }
 
+bool HanwhaResource::isVideoSourceActive()
+{
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    auto response = helper.view(lit("media/videosource"));
+
+    if (!response.isSuccessful())
+        return false;
+
+    const auto state = response.parameter<QString>(
+        lit("Channel.%1.State").arg(getChannel()));
+
+    if (!state.is_initialized())
+        return false;
+
+    return state == kHanwhaVideoSourceStateOn;
+}
+
 int HanwhaResource::maxProfileCount() const
 {
     return m_maxProfileCount;
@@ -605,6 +623,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         result = createNxProfiles();
         if (!result)
             return result;
+    }
+    else if (!isVideoSourceActive())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Video source is not active"));
     }
 
     const bool hasAudio = m_attributes.attribute<int>(

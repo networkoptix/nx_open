@@ -47,7 +47,8 @@ public:
 
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
-public:
+    bool isVideoSourceActive();
+
     int maxProfileCount() const;
 
     AVCodecID streamCodec(Qn::ConnectionRole role) const;
