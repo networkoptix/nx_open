@@ -199,7 +199,6 @@ CLVideoDecoderOutputPtr QnPaintImageFilter::updateImage(const CLVideoDecoderOutp
 
 QSize QnPaintImageFilter::updatedResolution(const QSize& sourceSize)
 {
-    qDebug() << "---------------------" << sourceSize;
     d->updateSourceSize(sourceSize);
     return sourceSize;
 }

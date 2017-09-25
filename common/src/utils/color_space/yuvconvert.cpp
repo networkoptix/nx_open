@@ -171,8 +171,8 @@ void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
                             const unsigned int dst_stride, const unsigned int y_stride,
                             const unsigned int uv_stride, quint8 alpha)
 {
-   // NX_ASSERT(qPower2Ceil(width, 16) <= y_stride);
-   // NX_ASSERT(qPower2Ceil(width*4,64) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= y_stride);
+    NX_ASSERT(qPower2Ceil(width*4,64) <= dst_stride);
 
     __m128i sse_alpha_intrs = _mm_setr_epi8(alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha, alpha); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;

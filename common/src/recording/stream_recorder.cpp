@@ -194,7 +194,7 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
             context->fileFormat,
             placeholder,
             QnSignHelper::getSignFromDigest(getSignature()));
-        //NX_ASSERT(tagUpdated, "SignVideo: signature tag was not updated");
+        NX_ASSERT(tagUpdated, "SignVideo: signature tag was not updated");
     }
 
     // Update new metadata.
@@ -213,7 +213,7 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
         context->fileFormat,
         signPlaceholder.toBase64(),
         metadata.signature.toBase64());
-//    NX_ASSERT(metadataUpdated, "SignVideo: metadata tag was not updated");
+    NX_ASSERT(metadataUpdated, "SignVideo: metadata tag was not updated");
 }
 
 void QnStreamRecorder::close()
@@ -393,16 +393,12 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
     if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && m_EofDateTime > m_startDateTime)
     {
-        qint64 tms = md->timestamp;
-        qint64 current = tms - m_startDateTime;
-        qint64 range = m_EofDateTime - m_startDateTime;
         int progress = ((md->timestamp - m_startDateTime) * 100ll) / (m_EofDateTime - m_startDateTime);
         if (progress != m_lastProgress)
         {
             emit recordingProgress(progress);
             m_lastProgress = progress;
         }
-
     }
 
     return true;

@@ -47,7 +47,7 @@ ExportProcess::ExportProcess(AbstractExportTool* tool, QObject* parent):
         [this](int value)
         {
             m_info.progressValue = qBound(m_info.rangeStart, value, m_info.rangeEnd);
-            //NX_EXPECT(m_info.progressValue == value, "Value not in range");
+            NX_EXPECT(m_info.progressValue == value, "Value not in range");
             emit infoChanged(m_info);
         });
 
