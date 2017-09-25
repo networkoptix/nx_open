@@ -279,8 +279,9 @@ void ExportSettingsDialog::setupSettingsButtons()
     connect(ui->speedButton, &ui::SelectableTextButton::stateChanged, this,
         [this](ui::SelectableTextButton::State state)
         {
-            d->setStoredRapidReviewSettings({state!= ui::SelectableTextButton::State::deactivated,
-                d->storedRapidReviewSettings().speed});
+            const bool enabled = state != ui::SelectableTextButton::State::deactivated;
+            d->setRapidReviewFrameStep(enabled ? ui->rapidReviewSettingsPage->frameStepMs() : 0);
+            d->setStoredRapidReviewSettings({enabled, d->storedRapidReviewSettings().speed});
         });
 
     ui->bookmarkButton->setDeactivatable(true);
