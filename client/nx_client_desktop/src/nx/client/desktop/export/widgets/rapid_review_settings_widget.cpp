@@ -7,6 +7,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -49,13 +50,19 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
 
     ui->resultLengthUnitsComboBox->setModel(d->unitsModel);
 
+    setWarningStyle(ui->tooShortPeriodWarningLabel);
+    ui->tooShortPeriodWarningLabel->setText(tr("For exporting as Rapid Review "
+        "video length should be at least %n seconds.", "",
+        minimalSourcePeriodLengthMs() / 1000));
+
     connect(ui->speedSpinBox, QnSpinboxIntValueChanged, this,
         [this](int absoluteValue)
         {
             if (!m_updating)
                 setSpeed(absoluteValue);
 
-            emit speedChanged(absoluteValue, frameStepMs());
+            if (d->isSourceRangeValid())
+                emit speedChanged(absoluteValue, frameStepMs());
         });
 
     connect(ui->speedSlider, &QSlider::valueChanged, this,
@@ -94,7 +101,7 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
             updateControls();
         });
 
-    setSourcePeriodLengthMs(minimalSourcePeriodLength());
+    setSourcePeriodLengthMs(minimalSourcePeriodLengthMs());
 
     ui->deleteButton->setIcon(qnSkin->icon(lit("buttons/trash.png")));
 
@@ -119,7 +126,7 @@ void RapidReviewSettingsWidget::setSpeed(int absoluteValue)
 
 int RapidReviewSettingsWidget::speed() const
 {
-    return ui->speedSpinBox->value();
+    return d->isSourceRangeValid() ? ui->speedSpinBox->value() : 1;
 }
 
 qint64 RapidReviewSettingsWidget::sourcePeriodLengthMs() const
@@ -141,11 +148,17 @@ void RapidReviewSettingsWidget::setSourcePeriodLengthMs(qint64 lengthMs)
     updateControls();
 
     ui->initialLengthText->setText(durationMsToString(lengthMs));
+
+    ui->modeStackedWidget->setCurrentWidget(
+        d->isSourceRangeValid() ? ui->mainPage : ui->specialPage);
+
+    if (!d->isSourceRangeValid())
+        emit speedChanged(1, 0);
 }
 
 qint64 RapidReviewSettingsWidget::frameStepMs() const
 {
-    return d->frameStepMs();
+    return d->isSourceRangeValid() ? d->frameStepMs() : 0;
 }
 
 void RapidReviewSettingsWidget::updateRanges()
@@ -169,7 +182,7 @@ void RapidReviewSettingsWidget::updateControls()
     ui->framesIntervalText->setText(durationMsToString(d->frameStepMs()));
 }
 
-qint64 RapidReviewSettingsWidget::minimalSourcePeriodLength()
+qint64 RapidReviewSettingsWidget::minimalSourcePeriodLengthMs()
 {
     return RapidReviewSettingsWidgetPrivate::kMinimalLengthMs
         * RapidReviewSettingsWidgetPrivate::kMinimalSpeed;

@@ -139,6 +139,8 @@ void RapidReviewSettingsWidgetPrivate::setSourcePeriodLengthMs(qint64 lengthMs)
     if (m_sourcePeriodLengthMs == lengthMs)
         return;
 
+    m_sourceRangeValid = lengthMs >= RapidReviewSettingsWidget::minimalSourcePeriodLengthMs();
+
     m_sourcePeriodLengthMs = lengthMs;
     m_maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
 
@@ -149,6 +151,11 @@ void RapidReviewSettingsWidgetPrivate::setSourcePeriodLengthMs(qint64 lengthMs)
         m_absoluteSpeed = kMinimalSpeed;
     m_sliderSpeed = toSliderScale(m_absoluteSpeed);
     updateExpectedLength();
+}
+
+bool RapidReviewSettingsWidgetPrivate::isSourceRangeValid() const
+{
+    return m_sourceRangeValid;
 }
 
 qreal RapidReviewSettingsWidgetPrivate::resultLengthInSelectedUnits() const

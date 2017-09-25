@@ -135,15 +135,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     d->setTimePeriod(timePeriod);
 
-    if (timePeriod.durationMs < RapidReviewSettingsWidget::minimalSourcePeriodLength())
-    {
-        ui->speedButton->setState(ui::SelectableTextButton::State::deactivated);
-        ui->speedButton->setDisabled(true); //TODO: #vkutin #gdm Also show alert.
-    }
-    else
-    {
-        ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
-    }
+    ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
 
     ui->mediaFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Media));
     ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Layout));
@@ -153,6 +145,10 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->bookmarkButton->setVisible(isBookmark);
     if (!isBookmark) // Just in case...
         ui->bookmarkButton->setState(ui::SelectableTextButton::State::deactivated);
+
+    ui->speedButton->setState(d->storedRapidReviewSettings().enabled
+        ? ui::SelectableTextButton::State::unselected
+        : ui::SelectableTextButton::State::deactivated);
 
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataChanged,
         d, &Private::setApplyFilters);
@@ -178,6 +174,12 @@ ExportSettingsDialog::ExportSettingsDialog(
             d->setRapidReviewFrameStep(frameStepMs);
             ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Speed")).arg(absoluteSpeed).
                 arg(QChar(L'\x2013'))); //< N-dash
+
+            if (frameStepMs) //< 0 would mean rapid review is off due to impossibility.
+            {
+                d->setStoredRapidReviewSettings({
+                    d->storedRapidReviewSettings().enabled, absoluteSpeed});
+            }
         };
 
     connect(ui->rapidReviewSettingsPage, &RapidReviewSettingsWidget::speedChanged,
@@ -274,6 +276,12 @@ void ExportSettingsDialog::setupSettingsButtons()
         lit("buttons/rapid_review_selected.png")));
     ui->speedButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->rapidReviewSettingsPage));
+    connect(ui->speedButton, &ui::SelectableTextButton::stateChanged, this,
+        [this](ui::SelectableTextButton::State state)
+        {
+            d->setStoredRapidReviewSettings({state!= ui::SelectableTextButton::State::deactivated,
+                d->storedRapidReviewSettings().speed});
+        });
 
     ui->bookmarkButton->setDeactivatable(true);
     ui->bookmarkButton->setDeactivatedText(tr("Add Bookmark Info"));
@@ -390,6 +398,7 @@ void ExportSettingsDialog::updateSettingsWidgets()
     ui->bookmarkSettingsPage->setData(d->exportMediaSettings().bookmarkOverlay);
     ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
     ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
+    ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
     ui->mediaFilenamePanel->setFilename(d->exportMediaSettings().fileName);
     ui->layoutFilenamePanel->setFilename(d->exportLayoutSettings().filename);
 }

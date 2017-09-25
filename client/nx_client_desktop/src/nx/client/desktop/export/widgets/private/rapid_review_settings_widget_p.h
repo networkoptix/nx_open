@@ -45,6 +45,8 @@ public:
 
     qint64 frameStepMs() const;
 
+    bool isSourceRangeValid() const;
+
 private:
     void updateUnitsModel();
     void updateExpectedLength();
@@ -65,6 +67,7 @@ private:
     qreal m_resultLengthInSelectedUnits;
     qreal m_minResultLengthInSelectedUnits;
     qreal m_maxResultLengthInSelectedUnits;
+    bool m_sourceRangeValid = true;
 };
 
 } // namespace desktop

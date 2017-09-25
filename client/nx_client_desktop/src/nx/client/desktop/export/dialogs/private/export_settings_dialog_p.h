@@ -64,6 +64,9 @@ public:
     LayoutThumbnailLoader* layoutImageProvider() const;
     QSize fullFrameSize() const;
 
+    const settings::RapidReviewPersistentSettings& storedRapidReviewSettings() const;
+    void setStoredRapidReviewSettings(const settings::RapidReviewPersistentSettings& value);
+
     // Makes overlay visible and raised and enables its border.
     void selectOverlay(settings::ExportOverlayType type);
     void hideOverlay(settings::ExportOverlayType type);

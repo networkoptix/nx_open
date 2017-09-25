@@ -20,12 +20,12 @@ public:
 
     qint64 sourcePeriodLengthMs() const;
     void setSourcePeriodLengthMs(qint64 lengthMs);
-    static qint64 minimalSourcePeriodLength();
+    static qint64 minimalSourcePeriodLengthMs();
 
     void setSpeed(int value);
     int speed() const;
 
-    qint64 frameStepMs() const;
+    qint64 frameStepMs() const; //< 0 means source frame step.
 
     /* Magic knowledge. We know that the result will be generated with 30 fps. --rvasilenko */
     static const int kResultFps = 30;

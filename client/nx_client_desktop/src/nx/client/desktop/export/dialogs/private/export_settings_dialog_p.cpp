@@ -227,6 +227,18 @@ void ExportSettingsDialog::Private::setRapidReviewFrameStep(qint64 frameStepMs)
     validateSettings(Mode::Media);
 }
 
+const settings::RapidReviewPersistentSettings&
+    ExportSettingsDialog::Private::storedRapidReviewSettings() const
+{
+    return m_exportMediaSettings.rapidReview;
+}
+
+void ExportSettingsDialog::Private::setStoredRapidReviewSettings(
+    const settings::RapidReviewPersistentSettings& value)
+{
+    m_exportMediaSettings.rapidReview = value;
+}
+
 ExportSettingsDialog::Mode ExportSettingsDialog::Private::mode() const
 {
     return m_mode;

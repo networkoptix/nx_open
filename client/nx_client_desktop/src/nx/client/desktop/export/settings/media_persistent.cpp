@@ -65,6 +65,12 @@ void ExportMediaPersistent::updateRuntimeSettings()
         transcodingSettings.overlays << createRuntimeSettings(type);
 }
 
+RapidReviewPersistentSettings::RapidReviewPersistentSettings(bool enabled, int speed) :
+    enabled(enabled),
+    speed(speed)
+{
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(EXPORT_MEDIA_PERSISTENT_TYPES, (json), _Fields)
 
 } // namespace settings
