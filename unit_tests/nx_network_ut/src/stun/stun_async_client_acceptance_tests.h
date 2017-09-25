@@ -4,10 +4,12 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
@@ -27,6 +29,24 @@ public:
     virtual std::size_t connectionCount() const = 0;
 };
 
+class BasicStunAsyncClientAcceptanceTest:
+    public ::testing::Test
+{
+public:
+    ~BasicStunAsyncClientAcceptanceTest();
+
+protected:
+    void setSingleShotUnconnectableSocketFactory();
+
+private:
+    boost::optional<SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
+    QnMutex m_mutex;
+
+    std::unique_ptr<AbstractStreamSocket> createUnconnectableStreamSocket(
+        bool /*sslRequired*/,
+        nx::network::NatTraversalSupport /*natTraversalRequired*/);
+};
+
 /**
  * @param AsyncClientTestTypes It is a struct with following nested types:
  * - ClientType Type that inherits nx::stun::AbstractAsyncClient.
@@ -34,7 +54,7 @@ public:
  */
 template<typename AsyncClientTestTypes>
 class StunAsyncClientAcceptanceTest:
-    public ::testing::Test
+    public BasicStunAsyncClientAcceptanceTest
 {
 public:
     ~StunAsyncClientAcceptanceTest()
@@ -98,6 +118,8 @@ protected:
 
     void givenClientFailedToConnect()
     {
+        setSingleShotUnconnectableSocketFactory();
+
         nx::utils::promise<SystemError::ErrorCode> connectCompleted;
         initializeClient(
             [&connectCompleted](SystemError::ErrorCode systemErrorCode)
@@ -408,6 +430,11 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, request_result_is_reported_even_if_c
     this->thenRequestFailureIsReported();
 }
 
+// TODO: Patch gtest REGISTER_TYPED_TEST_CASE_P instead.
+#if defined(__GCC__)
+    #pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+
 REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
@@ -419,6 +446,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     request_scheduled_after_connection_forcibly_closed,
     scheduled_request_is_completed_after_reconnect,
     request_result_is_reported_even_if_connect_always_fails);
+
 
 } // namespace test
 } // namespace stun

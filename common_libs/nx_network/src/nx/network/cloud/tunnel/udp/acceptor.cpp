@@ -89,6 +89,12 @@ void TunnelAcceptor::pleaseStop(
         });
 }
 
+std::string TunnelAcceptor::toString() const
+{
+    return lm("UDP hole punching acceptor. remote endpoints %1")
+        .container(m_peerAddresses).toStdString();
+}
+
 void TunnelAcceptor::connectionAckResult(
     nx::hpm::api::ResultCode code)
 {

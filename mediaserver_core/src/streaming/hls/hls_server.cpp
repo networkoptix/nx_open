@@ -742,15 +742,14 @@ namespace nx_hls
         nx_http::Response* const response )
     {
         HlsRequestParams params = readRequestParams(requestParams);
-        const auto microseconds = [](std::chrono::microseconds t) { return (quint64) t.count(); };
 
         quint64 startTimestamp = 0;
         if (params.startTimestamp)
-            startTimestamp = microseconds(*params.startTimestamp);
+            startTimestamp = *params.startTimestamp;
 
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
         if (params.duration)
-            chunkDuration = microseconds(*params.duration);
+            chunkDuration = params.duration->count();
 
         bool requestIsAPartOfHlsSession = false;
         {
@@ -763,7 +762,7 @@ namespace nx_hls
                 if (hlsSession)
                 {
                     requestIsAPartOfHlsSession = true;
-                    hlsSession->updateAuditInfo((qint64) startTimestamp);
+                    hlsSession->updateAuditInfo(startTimestamp);
                     if (params.alias)
                         hlsSession->getChunkByAlias(params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
                 }
@@ -775,7 +774,7 @@ namespace nx_hls
             params.channel,
             params.containerFormat,
             params.alias ? *params.alias : QString(),
-            std::chrono::microseconds(startTimestamp),
+            startTimestamp,
             std::chrono::microseconds(chunkDuration),
             params.streamQuality,
             requestParams);
@@ -909,7 +908,6 @@ namespace nx_hls
         }
 
         HlsRequestParams params = readRequestParams(requestParams);
-        const auto microseconds = [](std::chrono::microseconds t) { return (quint64) t.count(); };
 
         using namespace std::chrono;
 
@@ -948,7 +946,7 @@ namespace nx_hls
                 nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager =
                     std::make_shared<ArchivePlaylistManager>(
                         camResource,
-                        microseconds(*params.startTimestamp),
+                        params.startTimestamp.get(),
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
                         newHlsSession->targetDurationMS() * USEC_IN_MSEC,
                         quality );
@@ -1060,8 +1058,7 @@ namespace nx_hls
 
         if (startTimestampIter != requestParams.end())
         {
-            result.startTimestamp = std::chrono::microseconds(
-                startTimestampIter->second.toULongLong());
+            result.startTimestamp = startTimestampIter->second.toULongLong();
         }
         else
         {
@@ -1072,8 +1069,7 @@ namespace nx_hls
                 // Converting startDatetime to startTimestamp.
                 // This is secondary functionality, not used by this 
                 //   HLS implementation (since all chunks are referenced by npt timestamps).
-                result.startTimestamp = std::chrono::microseconds(
-                    nx::utils::parseDateTime(startDatetimeIter->second));
+                result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
             }
             else
             {
@@ -1081,10 +1077,7 @@ namespace nx_hls
                 std::multimap<QString, QString>::const_iterator startDatetimeIter =
                     requestParams.find(QLatin1String(StreamingParams::START_DATETIME_PARAM_NAME));
                 if (startDatetimeIter != requestParams.end())
-                {
-                    result.startTimestamp = std::chrono::microseconds(
-                        nx::utils::parseDateTime(startDatetimeIter->second));
-                }
+                    result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
             }
         }
 

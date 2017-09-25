@@ -1,4 +1,3 @@
-[basic]
 set(defaultSkin "dark_orange")
 set(parent.customization "digitalwatchdog")
 
@@ -39,8 +38,8 @@ set(customization.serverUpgradeCode "{7A6B77AA-E139-4F23-B8FD-2379E9A69E87}")
 set(customization.clientBundleUpgradeCode "{3C05AA84-9E80-418D-9558-0BA6729AB6EA}")
 set(customization.serverBundleUpgradeCode "{110DF587-DBCE-4CEF-ABBF-2C502A4A3723}")
 set(customization.fullBundleUpgradeCode "{E20892D8-1438-478E-94EF-A23380B96A01}")
-set(#customization.nxtoolBundleUpgradeCode "")
-set(#customization.axBundleUpgradeCode "")
+#set(customization.nxtoolBundleUpgradeCode "")
+#set(customization.axBundleUpgradeCode "")
 
 set(deb.customization.company.name "hanwha")
 
