@@ -1572,7 +1572,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
     server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
-    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) 
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
 
     QFile hddList(Qn::HDD_LIST_FILE);
@@ -2677,12 +2677,12 @@ void MediaServerProcess::run()
         auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
-    
+
     connect(
-        ec2Connection->getTimeNotificationManager().get(), 
+        ec2Connection->getTimeNotificationManager().get(),
         &ec2::AbstractTimeNotificationManager::timeChanged,
-        this, 
-        &MediaServerProcess::at_timeChanged, 
+        this,
+        &MediaServerProcess::at_timeChanged,
         Qt::QueuedConnection);
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
