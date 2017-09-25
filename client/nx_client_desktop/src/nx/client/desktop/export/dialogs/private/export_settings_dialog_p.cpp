@@ -56,6 +56,8 @@ void ExportSettingsDialog::Private::loadSettings()
     const auto used = m_exportMediaSettings.usedOverlays;
     for (const auto type: used)
         selectOverlay(type);
+
+    updateTranscodingSettings();
 }
 
 void ExportSettingsDialog::Private::saveSettings()
@@ -86,8 +88,11 @@ void ExportSettingsDialog::Private::setAvailableTranscodingSettings(
     const nx::core::transcoding::Settings& settings)
 {
     m_availableTranscodingSettings = settings;
-    if (m_exportMediaSettings.applyFilters)
-        updateTranscodingSettings();
+    if (!m_exportMediaSettings.applyFilters)
+        return;
+
+    updateTranscodingSettings();
+    validateSettings(Mode::Media);
 }
 
 void ExportSettingsDialog::Private::updateTranscodingSettings()
@@ -123,6 +128,7 @@ void ExportSettingsDialog::Private::setApplyFilters(bool value)
 
     m_exportMediaSettings.applyFilters = value;
     updateTranscodingSettings();
+    validateSettings(Mode::Media);
 }
 
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)

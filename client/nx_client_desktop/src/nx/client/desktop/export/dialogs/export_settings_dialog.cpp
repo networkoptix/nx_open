@@ -44,12 +44,15 @@ ExportSettingsDialog::ExportSettingsDialog(
     const auto resource = widget->resource()->toResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     const auto itemData = widget->item()->data();
+    const auto customAr = widget->resource()->customAspectRatio();
 
     nx::core::transcoding::Settings available;
     available.rotation = resource->hasProperty(QnMediaResource::rotationKey())
         ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
         : 0;
-    available.aspectRatio = camera ? camera->aspectRatio() : QnAspectRatio();
+    available.aspectRatio = qFuzzyIsNull(customAr)
+        ? QnAspectRatio()
+        : QnAspectRatio::closestStandardRatio(customAr);
     available.enhancement = itemData.contrastParams;
     available.dewarping = itemData.dewarpingParams;
     available.zoomWindow = itemData.zoomRect;
@@ -382,6 +385,7 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 
 void ExportSettingsDialog::updateSettingsWidgets()
 {
+    ui->exportMediaSettingsPage->setApplyFilters(d->exportMediaSettings().applyFilters);
     ui->timestampSettingsPage->setData(d->exportMediaSettings().timestampOverlay);
     ui->bookmarkSettingsPage->setData(d->exportMediaSettings().bookmarkOverlay);
     ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);

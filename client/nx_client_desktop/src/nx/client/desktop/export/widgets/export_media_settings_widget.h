@@ -21,6 +21,9 @@ public:
     ExportMediaSettingsWidget(QWidget* parent = nullptr);
     virtual ~ExportMediaSettingsWidget() override;
 
+    bool applyFilters() const;
+    void setApplyFilters(bool value);
+
 signals:
     void dataChanged(bool applyFilters);
 

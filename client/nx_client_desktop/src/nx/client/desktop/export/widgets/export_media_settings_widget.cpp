@@ -18,6 +18,16 @@ ExportMediaSettingsWidget::~ExportMediaSettingsWidget()
 {
 }
 
+bool ExportMediaSettingsWidget::applyFilters() const
+{
+    return ui->filtersCheckBox->isChecked();
+}
+
+void ExportMediaSettingsWidget::setApplyFilters(bool value)
+{
+    ui->filtersCheckBox->setChecked(value);
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
