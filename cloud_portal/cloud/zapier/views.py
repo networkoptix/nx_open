@@ -104,7 +104,7 @@ def create_zap_webhook(request):
 @handle_exceptions
 def remove_zap_webhook(request):
     user, email, password = authenticate(request)
-    event = request.data['event']
+    target = request.data['target_url']
 
     user_hooks = Hook.objects.filter(user=user, target=target)
     if not user_hooks.exists():
