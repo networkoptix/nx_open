@@ -133,8 +133,20 @@ bool HanwhaCgiParameters::parseActions(
     {
         auto actionName = reader.attributes().value(kHanwhaNameAttribute).toString();
         actionName.replace(L'/', L'_');
+        
+        while (!reader.hasError() && !reader.atEnd())
+        {
+            const auto tokenType = reader.readNext();
+            const bool isElement = tokenType == QXmlStreamReader::EndElement
+                || tokenType == QXmlStreamReader::StartElement;
 
-        reader.readNext();
+            if (isElement)
+                break;
+        }
+
+        if (reader.atEnd())
+            return reader.hasError();
+
         if (reader.isEndElement())
         {
             reader.readNextStartElement();
@@ -182,7 +194,16 @@ bool HanwhaCgiParameters::parseParameters(
         parameter.setIsRequestParameter(isRequestParameter);
         parameter.setIsResponseParameter(isResponseParameter);
 
-        reader.readNext();
+        while (!reader.hasError() && !reader.atEnd())
+        {
+            const auto tokenType = reader.readNext();
+            bool isElement = tokenType == QXmlStreamReader::EndElement
+                || tokenType == QXmlStreamReader::StartElement;
+
+            if (isElement)
+                break;
+        }
+        
         if (reader.isEndElement())
         {
             reader.readNextStartElement();
@@ -219,6 +240,12 @@ bool HanwhaCgiParameters::parseDataType(
     reader.readNextStartElement();
     if (reader.atEnd())
         return !reader.hasError();
+
+    if (reader.name() == kHanwhaDataTypeNodeName)
+    {
+        reader.skipCurrentElement();
+        return true;
+    }
 
     if (reader.name() == kHanwhaEnumNodeName || reader.name() == kHanwhaCsvNodeName)
     {
