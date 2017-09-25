@@ -1,6 +1,6 @@
 'use strict';
 var RestorePasswordPage = require('./po.js');
-describe('Restore password page', function () {
+fdescribe('Restore password page', function () {
 
     var p = new RestorePasswordPage();
 
@@ -31,16 +31,6 @@ describe('Restore password page', function () {
         p.alert.catchAlert(p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger);
     });
 
-    p.passwordField.check(function(){
-        var deferred = protractor.promise.defer();
-        p.getRestorePassLink(p.helper.userEmail).then(function(url){
-            p.helper.get(url);
-            browser.sleep(500);
-            deferred.fulfill();
-        });
-        return deferred.promise;
-    }, p);
-
     it("restores password", function() {
         p.helper.restorePassword(p.helper.userEmail, p.helper.userPassword);
     });
@@ -65,26 +55,6 @@ describe('Restore password page', function () {
         p.helper.get('/restore_password/success');
         expect(browser.getCurrentUrl()).not.toContain("/restore_password/success");
     });
-
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-        p.emailInput.clear();
-        p.emailInput.sendKeys(p.helper.userEmailWrong);
-        p.submitButton.click();
-        deferred.fulfill();
-        return deferred.promise;
-    }, p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger, false);
-
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-        p.getRestorePassLink(p.helper.userEmail).then( function(url) {
-            p.helper.get(url);
-            p.setNewPassword(p.helper.userPassword);
-            p.verifySecondAttemptFails(url, p.helper.userPassword);
-            deferred.fulfill();
-        });
-        return deferred.promise;
-    }, p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger, false);
 
     it("should set new password, login with new password", function () {
         p.getRestorePassLink(p.helper.userEmail).then(function(url) {

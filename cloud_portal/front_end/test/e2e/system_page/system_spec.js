@@ -10,6 +10,7 @@ describe('System suite', function () {
 
     it("has system name, owner and OpenInNx button visible on every system page", function() {
         p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
+        browser.sleep(2000);
 
         p.systemsList.map(function (elem, index) {
             return {
