@@ -113,6 +113,7 @@ private:
     QScopedPointer<QnSingleThumbnailLoader> m_mediaImageProvider;
     QScopedPointer<LayoutThumbnailLoader> m_layoutImageProvider;
     QSize m_fullFrameSize;
+    qreal m_overlayScale = 1.0;
 };
 
 } // namespace desktop

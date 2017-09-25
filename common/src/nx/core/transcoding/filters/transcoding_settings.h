@@ -41,7 +41,7 @@ struct Settings
     QnAspectRatio aspectRatio;
 
     // Forced rotation, requires transcoding if not zero.
-    int rotation;
+    int rotation = 0;
 
     // Zoom window region, requires transcoding if not empty.
     QRectF zoomWindow;

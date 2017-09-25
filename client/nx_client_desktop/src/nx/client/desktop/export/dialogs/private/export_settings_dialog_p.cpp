@@ -149,10 +149,10 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());
 
-    const auto overlayScale = qMin(coefficients.first, coefficients.second);
+    m_overlayScale = qMin(coefficients.first, coefficients.second);
 
     for (size_t i = 0; i != overlayCount; ++i)
-        m_overlays[i]->setScale(overlayScale);
+        m_overlays[i]->setScale(m_overlayScale);
 
     const auto thumbnailSizeLimit = coefficients.first >= coefficients.second
         ? QSize(m_previewSize.width(), 0)
@@ -290,7 +290,7 @@ void ExportSettingsDialog::Private::overlayPositionChanged(settings::ExportOverl
         return;
 
     // TODO: #vkutin Calculate alignment depending on position in widget's parent.
-    settings->position = overlayWidget->pos();
+    settings->position = overlayWidget->pos() / m_overlayScale;
     settings->alignment = Qt::AlignLeft | Qt::AlignTop;
 }
 
@@ -416,10 +416,10 @@ void ExportSettingsDialog::Private::updateOverlays()
 void ExportSettingsDialog::Private::updateOverlay(settings::ExportOverlayType type)
 {
     const auto positionOverlay =
-        [](QWidget* overlay, const ExportOverlaySettings& data)
+        [this](QWidget* overlay, const ExportOverlaySettings& data)
         {
             // TODO: #vkutin Alignment.
-            overlay->move(data.position);
+            overlay->move(data.position * m_overlayScale);
         };
 
     auto overlay = this->overlay(type);
