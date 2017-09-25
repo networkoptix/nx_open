@@ -2,11 +2,14 @@ import django
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from api.helpers.exceptions import handle_exceptions, APINotAuthorisedException, require_params
+from api.helpers.exceptions import handle_exceptions, APINotAuthorisedException
 
 import requests, json, base64
 from requests.auth import HTTPDigestAuth
 from django.http import JsonResponse
+
+from rest_hooks.models import Hook
+from rest_hooks.signals import raw_hook_event
 
 
 def authenticate(request):
@@ -21,7 +24,7 @@ def authenticate(request):
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
-    return email, password
+    return user, email, password
 
 
 '''
@@ -45,7 +48,7 @@ return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def nx_action(request):
-    email, password = authenticate(request)
+    user, email, password = authenticate(request)
 
     instance = "https://cloud-test.hdw.mx/gateway/"
     system_id = request.data['systemId']
@@ -62,18 +65,49 @@ def nx_action(request):
     return json.loads(r.text)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def zap_trigger(request):
-    email, password = authenticate(request)
-
-    return Response('ok')
+def fire_zap_webhook(request):
+    user, email, password = authenticate(request)
+    event = request.data['event']
+    raw_hook_event.send(sender=None, event_name=event, payload={'data': request.data}, user=user)
+    return Response({'message': "webhook fired for " + event}, status=200)
 
 
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 def ping(request):
-    email, password = authenticate(request)
-
+    authenticate(request)
     return JsonResponse({'status': 'ok'})
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def create_zap_webhook(request):
+    user, email, password = authenticate(request)
+    event = request.data['event']
+    target = request.data['target_url']
+
+    user_hooks = Hook.objects.filter(user=user, target=target)
+    if user_hooks.exists():
+        return Response({'message': 'There is already a webhook for ' + event}, status=500)
+
+    zap_hook = Hook(user=user, event=event, target=target)
+    zap_hook.save()
+    return Response({'message': 'Webhook created for ' + event}, status=200)
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def remove_zap_webhook(request):
+    user, email, password = authenticate(request)
+    event = request.data['event']
+
+    user_hooks = Hook.objects.filter(user=user, target=target)
+    if not user_hooks.exists():
+        return Response({'message': "Webhook for " + event + " does not exist"}, status=500)
+    user_hooks.delete()
+    return Response({'message': 'Webhook deleted for ' + event}, status=200)
