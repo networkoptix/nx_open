@@ -348,7 +348,7 @@ namespace detail
             setResult( ResultCode::downloadFailure );
             setErrorText( httpClient->response() ? httpClient->response()->statusLine.reasonPhrase : "FAILURE" );    //TODO proper error text
 
-            if( !m_outFile.get() )  //TODO: #ak this condition should be replaced with one more state
+            if( !m_outFile.get() )  // TODO: #ak this condition should be replaced with one more state
             {
                 m_state = State::sFinished;
                 lk.unlock();
@@ -390,7 +390,7 @@ namespace detail
 
         if( entryPath.endsWith(".gz") )     //remote file is compressed, compressed size is of no interest to us
         {
-            //TODO: #ak can check last 4 bytes of remote file to get uncompressed file size
+            // TODO: #ak can check last 4 bytes of remote file to get uncompressed file size
             m_remoteFileSize = -1;
             return true;
         }

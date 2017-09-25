@@ -2,9 +2,9 @@ import time
 import logging
 import pytest
 from datetime import datetime
-from test_utils.utils import SimpleNamespace
+from test_utils.utils import SimpleNamespace, datetime_utc_now
 from test_utils.server import TimePeriod
-from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT
 import pytz
 
 
@@ -48,17 +48,18 @@ def nat_env(box, server_factory, http_schema):
 
 def wait_for_servers_return_same_results_to_api_call(env, method, api_object, api_method):
     log.info('TEST for %s %s.%s:', method, api_object, api_method)
-    start = time.time()
+    start_time = datetime_utc_now()
     while True:
         result_in_front = env.in_front.rest_api.get_api_fn(method, api_object, api_method)()
         result_behind = env.behind.rest_api.get_api_fn(method, api_object, api_method)()
         if result_in_front == result_behind:
             return
-        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
             assert result_in_front == result_behind
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0)
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_merged_servers_should_return_same_results_to_certain_api_calls
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
         ('GET', 'ec2', 'getStorages'),
@@ -80,6 +81,7 @@ def assert_both_servers_are_online(env):
             server, len(online_servers))
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_proxy_requests
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_proxy_requests(env):
@@ -106,6 +108,7 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
         assert metadata.height == sample_media_file.height
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_get_streams
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_get_streams(artifact_factory, env, camera, sample_media_file, stream_type):

@@ -16,7 +16,7 @@
 
 #include <nx/utils/uuid.h>
 
-//TODO: #GDM create an application-wide set of thumbnails managers with different options: VMS-6759
+// TODO: #GDM create an application-wide set of thumbnails managers with different options: VMS-6759
 class QnCameraThumbnailManager: public QnImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT

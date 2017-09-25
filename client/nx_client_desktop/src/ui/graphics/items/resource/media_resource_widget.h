@@ -34,6 +34,9 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 namespace nx {
 namespace client {
 namespace desktop {
+
+class EntropixImageEnhancer;
+
 namespace ui {
 namespace graphics {
 
@@ -45,7 +48,7 @@ class SoftwareTriggerButton;
 } // namespace client
 } // namespace nx
 
-//TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
+// TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
 using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
 
 class QnResourceDisplay;
@@ -190,6 +193,7 @@ protected:
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
+    void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
     void ensureMotionSensitivity() const;
     Q_SLOT void invalidateMotionSensitivity();
@@ -236,11 +240,16 @@ private slots:
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
+    void at_entropixEnhancementButton_clicked();
+    void at_entropixImageLoaded(const QImage& image);
+
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 
     void at_eventRuleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
     void at_eventRuleRemoved(const QnUuid& ruleId);
+
+    void clearEntropixEnhancedImage();
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
@@ -268,10 +277,13 @@ private:
 
     void setupHud();
 
-    void initSoftwareTriggers();
-
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
+
+    Qn::RenderStatus paintVideoTexture(QPainter* painter,
+        int channel,
+        const QRectF& sourceSubRect,
+        const QRectF& targetRect);
 
 private:
     struct SoftwareTriggerInfo
@@ -296,11 +308,21 @@ private:
         QnUuid overlayItemId;
     };
 
+    void initSoftwareTriggers();
+
     SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
     void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
         std::function<void()> clientSideHandler = std::function<void()>());
     void resetTriggers();
+
+    void updateTriggersAvailability();
+    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
+    void updateTriggerButtonTooltip(
+        QnSoftwareTriggerButton* button,
+        const SoftwareTriggerInfo& info,
+        bool enabledBySchedule);
+
 
 private:
     struct ResourceStates
@@ -382,6 +404,10 @@ private:
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
+
+    QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
+    QImage m_entropixEnhancedImage;
+    int m_entropixProgress = -1;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

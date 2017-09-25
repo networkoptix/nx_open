@@ -20,7 +20,7 @@
         <buildLib>sharedlib</buildLib>
 
         <qt.libs>core gui network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lcloud_db_client -lnx_kit</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lcloud_db_client -lnx_kit -lnx_fusion</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
 

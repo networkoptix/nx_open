@@ -1,10 +1,10 @@
 #include "vms_gateway_process.h"
 
 #include <nx/network/http/auth_restriction_list.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/network/url/url_parse_helper.h>
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -19,6 +19,7 @@
 #include "http/http_api_path.h"
 #include "http/proxy_handler.h"
 #include "libvms_gateway_app_info.h"
+#include "relay_engine.h"
 #include "stree/cdb_ns.h"
 
 static int registerQtResources()
@@ -91,7 +92,7 @@ int VmsGatewayProcess::serviceMain(
             attrNameSet,
             settings.auth().rulesXmlPath);
 
-        nx_http::MessageDispatcher httpMessageDispatcher;
+        nx_http::server::rest::MessageDispatcher httpMessageDispatcher;
 
         // TODO: #ak Move following to stree xml.
         nx_http::AuthMethodRestrictionList authRestrictionList;
@@ -100,7 +101,13 @@ int VmsGatewayProcess::serviceMain(
             authRestrictionList,
             streeManager);
 
-        registerApiHandlers(settings, m_runTimeOptions, &httpMessageDispatcher);
+        RelayEngine relayEngine(settings.listeningPeer(), &httpMessageDispatcher);
+
+        registerApiHandlers(
+            settings,
+            m_runTimeOptions,
+            &relayEngine,
+            &httpMessageDispatcher);
 
         if (settings.http().sslSupport)
         {
@@ -110,7 +117,7 @@ int VmsGatewayProcess::serviceMain(
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
 
-        network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
+       network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,
@@ -151,8 +158,8 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
         nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
+        nx::network::SocketGlobals::mediatorConnector().enable(true);
     }
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     m_endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
@@ -223,13 +230,17 @@ void VmsGatewayProcess::publicAddressFetched(
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
-    nx_http::MessageDispatcher* const msgDispatcher)
+    RelayEngine* relayEngine,
+    nx_http::server::rest::MessageDispatcher* const msgDispatcher)
 {
     msgDispatcher->registerRequestProcessor<ProxyHandler>(
         nx_http::kAnyPath,
-        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
+        [&settings, &runTimeOptions, relayEngine]() -> std::unique_ptr<ProxyHandler>
         {
-            return std::make_unique<ProxyHandler>(settings, runTimeOptions);
+            return std::make_unique<ProxyHandler>(
+                settings,
+                runTimeOptions,
+                &relayEngine->listeningPeerPool());
         });
 
     if (settings.http().connectSupport)
@@ -239,13 +250,16 @@ void VmsGatewayProcess::registerApiHandlers(
 
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
             nx_http::kAnyPath,
-            [&settings, &runTimeOptions]() -> std::unique_ptr<ConnectHandler> {
+            [&settings, &runTimeOptions]() -> std::unique_ptr<ConnectHandler>
+            {
                 return std::make_unique<ConnectHandler>(settings, runTimeOptions);
             },
             nx_http::StringType("CONNECT"));
     }
 
-    msgDispatcher->addModRewriteRule(lm("/%1/").arg(kApiPathPrefix), lit("/"));
+    msgDispatcher->addModRewriteRule(
+        nx::network::url::normalizePath(lm("/%1/").arg(kApiPathPrefix)),
+        lit("/"));
 }
 
 } // namespace cloud

@@ -34,6 +34,7 @@ angular.module('webadminApp')
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
                     Config.cloud.systemId = data.cloudSystemId;
                     Config.protoVersion = data.protoVersion;
+                    Config.currentServerId = data.id;
                 }
 
                 var ips = _.filter(data.remoteAddresses,function(address){
@@ -332,6 +333,9 @@ angular.module('webadminApp')
                 return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
             },
+            disconnectFromSystem:function(){
+                return wrapPost(proxy + '/web/api/detachFromSystem');
+            },
             restoreFactoryDefaults:function(){
                 return wrapPost(proxy + '/web/api/restoreState');
             },
@@ -475,16 +479,35 @@ angular.module('webadminApp')
                 });
             },
 
-            debugFunctionUrl:function(url,getParams){
+            debugFunctionUrl:function(url, getParams, credentials){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
-                return proxy + url + delimeter + $.param(getParams);
+                var params = '';
+
+                credentials = credentials ? (credentials.login + ":" + credentials.password + "@") : "";
+                var host = window.location.protocol + "//" +
+                           credentials +
+                           window.location.hostname +
+                           (window.location.port ? ':' + window.location.port: '');
+
+                if(getParams && !_.isEmpty(getParams)){
+                    params = delimeter + $.param(getParams);
+                }
+
+                url = proxy + url + params;
+                if(url.indexOf('/')!==0){
+                    url = '/' + url;
+                }
+                url = url.replace('//','/');
+                return host + url;
             },
-            debugFunction:function(method,url,getParams,postParams){
+            debugFunction:function(method, url, getParams, postParams, binary){
                 switch(method){
                     case 'GET':
-                        return $http.get(this.debugFunctionUrl(url,getParams));
+                        return $http.get(this.debugFunctionUrl(url,getParams),
+                                         binary?{responseType: 'arraybuffer'}:null);
                     case 'POST':
-                        return $http.post(this.debugFunctionUrl(url,getParams), postParams);
+                        return $http.post(this.debugFunctionUrl(url,getParams), postParams,
+                                          binary?{responseType: 'arraybuffer'}:null);
 
                 }
             },
@@ -513,11 +536,15 @@ angular.module('webadminApp')
                     return serverInfo.flags.hasInternet;
                 });
             },
+
             createEvent:function(params){
                 return wrapGet(proxy + '/web/api/createEvent',params);
             },
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
+            },
+            getApiMethods:function(){
+                return wrapGet('api.json');
             },
             getLanguages:function(){
                 return wrapGet('languages.json').then(function(data){

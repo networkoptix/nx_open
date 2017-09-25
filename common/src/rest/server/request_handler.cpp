@@ -2,9 +2,75 @@
 
 #include <QtCore/QDebug>
 
+RestRequest::RestRequest(
+    QString path, QnRequestParamList params, const QnRestConnectionProcessor* owner)
+:
+    path(std::move(path)), params(std::move(params)), owner(owner)
+{
+}
+
+RestContent::RestContent(QByteArray type, QByteArray body):
+    type(std::move(type)), body(std::move(body))
+
+{
+}
+
+RestResponse::RestResponse(
+    nx_http::StatusCode::Value statusCode, RestContent content, bool isUndefinedContentLength)
+:
+    statusCode(statusCode), content(std::move(content)),
+    isUndefinedContentLength(isUndefinedContentLength)
+{
+}
+
 QnRestRequestHandler::QnRestRequestHandler():
     m_permissions(Qn::NoGlobalPermissions)
 {
+}
+
+RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)
+{
+    RestResponse result;
+    result.statusCode = (nx_http::StatusCode::Value) executeGet(
+        request.path, request.params, result.content.body, result.content.type, request.owner);
+
+    return result;
+}
+
+RestResponse QnRestRequestHandler::executeDelete(const RestRequest& request)
+{
+    RestResponse result;
+    result.statusCode = (nx_http::StatusCode::Value) executeDelete(
+        request.path, request.params, result.content.body, result.content.type, request.owner);
+
+    return result;
+}
+
+RestResponse QnRestRequestHandler::executePost(
+    const RestRequest& request, const RestContent& content)
+{
+    RestResponse result;
+    result.statusCode = (nx_http::StatusCode::Value) executePost(
+        request.path, request.params, content.body, content.type,
+        result.content.body, result.content.type, request.owner);
+
+    return result;
+}
+
+RestResponse QnRestRequestHandler::executePut(
+    const RestRequest& request, const RestContent& content)
+{
+    RestResponse result;
+    result.statusCode = (nx_http::StatusCode::Value) executePost(
+        request.path, request.params, content.body, content.type,
+        result.content.body, result.content.type, request.owner);
+
+    return result;
+}
+
+void QnRestRequestHandler::afterExecute(const RestRequest& request, const QByteArray& response)
+{
+    afterExecute(request.path, request.params, response, request.owner);
 }
 
 QString QnRestRequestHandler::extractAction(const QString& path) const
@@ -95,6 +161,14 @@ int QnRestRequestHandler::executePut(
 {
     return executePost(
         path, params, body, srcBodyContentType, result, resultContentType, owner);
+}
+
+void QnRestRequestHandler::afterExecute(
+    const QString& /*path*/,
+    const QnRequestParamList& /*params*/,
+    const QByteArray& /*body*/,
+    const QnRestConnectionProcessor* /*owner*/)
+{
 }
 
 void QnRestGUIRequestHandler::methodExecutor()

@@ -21,7 +21,9 @@
 
 #include <nx/network/http/http_content_type.h>
 #include <nx/network/hls/hls_types.h>
+#include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/string.h>
 #include <nx/utils/system_error.h>
 #include <utils/media/ffmpeg_helper.h>
@@ -726,7 +728,7 @@ namespace nx_hls
             playlist.chunks.push_back( hlsChunk );
         }
 
-        //playlist.allowCache = !session->isLive(); //TODO: #ak uncomment when done
+        //playlist.allowCache = !session->isLive(); // TODO: #ak uncomment when done
 
         *serializedPlaylist = playlist.toString();
         return nx_http::StatusCode::ok;
@@ -739,58 +741,15 @@ namespace nx_hls
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
-        std::multimap<QString, QString>::const_iterator hiQualityIter = requestParams.find( StreamingParams::HI_QUALITY_PARAM_NAME );
-        std::multimap<QString, QString>::const_iterator loQualityIter = requestParams.find( StreamingParams::LO_QUALITY_PARAM_NAME );
-        const MediaQuality streamQuality = (hiQualityIter != requestParams.end()) || (loQualityIter == requestParams.end())  //hi quality is default
-            ? MEDIA_Quality_High
-            : MEDIA_Quality_Low;
-
-        //reading parameters, generating cache key
-        std::multimap<QString, QString>::const_iterator channelIter = requestParams.find(QLatin1String(StreamingParams::CHANNEL_PARAM_NAME));
-        std::multimap<QString, QString>::const_iterator containerIter = requestParams.find(QLatin1String(StreamingParams::CONTAINER_FORMAT_PARAM_NAME));
-        QString containerFormat;
-        if( containerIter != requestParams.end() )
-            containerFormat = containerIter->second;
-        else
-            containerFormat = "mpegts";
-        std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(QLatin1String(StreamingParams::START_TIMESTAMP_PARAM_NAME));
-        //std::multimap<QString, QString>::const_iterator endTimestampIter = requestParams.find(QLatin1String(StreamingParams::STOP_TIMESTAMP_PARAM_NAME));
-        std::multimap<QString, QString>::const_iterator durationUSecIter = requestParams.find(QLatin1String(StreamingParams::DURATION_USEC_PARAM_NAME));
-        std::multimap<QString, QString>::const_iterator durationSecIter = requestParams.find(QLatin1String(StreamingParams::DURATION_SEC_PARAM_NAME));
-        //std::multimap<QString, QString>::const_iterator pictureSizeIter = requestParams.find(QLatin1String(StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME));
-        //std::multimap<QString, QString>::const_iterator audioCodecIter = requestParams.find(QLatin1String(StreamingParams::AUDIO_CODEC_PARAM_NAME));
-        //std::multimap<QString, QString>::const_iterator videoCodecIter = requestParams.find(QLatin1String(StreamingParams::VIDEO_CODEC_PARAM_NAME));
-        std::multimap<QString, QString>::const_iterator aliasIter = requestParams.find(QLatin1String(StreamingParams::ALIAS_PARAM_NAME));
+        HlsRequestParams params = readRequestParams(requestParams);
 
         quint64 startTimestamp = 0;
-        if( startTimestampIter != requestParams.end() )
-        {
-            startTimestamp = startTimestampIter->second.toULongLong();
-        }
-        else
-        {
-            std::multimap<QString, QString>::const_iterator startDatetimeIter =
-                requestParams.find(QLatin1String(StreamingParams::START_POS_PARAM_NAME));
-            if( startDatetimeIter != requestParams.end() )
-            {
-                //converting startDatetime to startTimestamp
-                    //this is secondary functionality, not used by this HLS implementation (since all chunks are referenced by npt timestamps)
-                startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
-            }
-            else
-            {
-                //trying compatibility parameter "startDatetime"
-                std::multimap<QString, QString>::const_iterator startDatetimeIter =
-                    requestParams.find( QLatin1String( StreamingParams::START_DATETIME_PARAM_NAME ) );
-                if( startDatetimeIter != requestParams.end() )
-                    startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
-            }
-        }
+        if (params.startTimestamp)
+            startTimestamp = *params.startTimestamp;
+
         quint64 chunkDuration = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
-        if( durationUSecIter != requestParams.end() )
-            chunkDuration = durationUSecIter->second.toLongLong();
-        else if( durationSecIter != requestParams.end() )
-            chunkDuration = durationSecIter->second.toLongLong() * MSEC_IN_SEC * USEC_IN_MSEC;
+        if (params.duration)
+            chunkDuration = params.duration->count();
 
         bool requestIsAPartOfHlsSession = false;
         {
@@ -804,26 +763,25 @@ namespace nx_hls
                 {
                     requestIsAPartOfHlsSession = true;
                     hlsSession->updateAuditInfo(startTimestamp);
-                    if (aliasIter != requestParams.end())
-                        hlsSession->getChunkByAlias(streamQuality, aliasIter->second, &startTimestamp, &chunkDuration);
+                    if (params.alias)
+                        hlsSession->getChunkByAlias(params.streamQuality, *params.alias, &startTimestamp, &chunkDuration);
                 }
             }
         }
 
         StreamingChunkCacheKey currentChunkKey(
             uniqueResourceID.toString(),
-            channelIter != requestParams.end()
-                ? channelIter->second.toInt()
-                : 0,   //any channel
-            containerFormat,
-            aliasIter != requestParams.end() ? aliasIter->second : QString(),
+            params.channel,
+            params.containerFormat,
+            params.alias ? *params.alias : QString(),
             startTimestamp,
             std::chrono::microseconds(chunkDuration),
-            streamQuality,
-            requestParams );
+            params.streamQuality,
+            requestParams);
 
         if (!currentChunkKey.live() &&
-            !commonModule()->resourceAccessManager()->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
+            !commonModule()->resourceAccessManager()->hasGlobalPermission(
+                d_ptr->accessRights, Qn::GlobalViewArchivePermission))
         {
             return nx_http::StatusCode::forbidden;
         }
@@ -949,28 +907,7 @@ namespace nx_hls
             requiredQualities.push_back( MEDIA_Quality_Low );
         }
 
-        boost::optional<quint64> startTimestamp;
-        std::multimap<QString, QString>::const_iterator startTimestampIter = requestParams.find(StreamingParams::START_TIMESTAMP_PARAM_NAME);
-        if( startTimestampIter != requestParams.end() )
-        {
-            startTimestamp = startTimestampIter->second.toULongLong();
-        }
-        else
-        {
-            std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(StreamingParams::START_POS_PARAM_NAME);
-            if( startDatetimeIter != requestParams.end() )
-            {
-                startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
-            }
-            else
-            {
-                //trying compatibility parameter "startDatetime"
-                std::multimap<QString, QString>::const_iterator startDatetimeIter =
-                    requestParams.find( StreamingParams::START_DATETIME_PARAM_NAME );
-                if( startDatetimeIter != requestParams.end() )
-                    startTimestamp = nx::utils::parseDateTime( startDatetimeIter->second );
-            }
-        }
+        HlsRequestParams params = readRequestParams(requestParams);
 
         using namespace std::chrono;
 
@@ -978,7 +915,7 @@ namespace nx_hls
             new HLSSession(
                 sessionID,
                 duration_cast<milliseconds>(qnServerModule->settings()->hlsTargetDuration()).count(),
-                !startTimestamp,   //if no start date specified, providing live stream
+                !params.startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera,
                 authSession()) );
@@ -1009,7 +946,7 @@ namespace nx_hls
                 nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager =
                     std::make_shared<ArchivePlaylistManager>(
                         camResource,
-                        startTimestamp.get(),
+                        params.startTimestamp.get(),
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
                         newHlsSession->targetDurationMS() * USEC_IN_MSEC,
                         quality );
@@ -1093,5 +1030,72 @@ namespace nx_hls
                 QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );
             }
         }
+    }
+
+    HlsRequestParams QnHttpLiveStreamingProcessor::readRequestParams(
+        const std::multimap<QString, QString>& requestParams)
+    {
+        HlsRequestParams result;
+
+        std::multimap<QString, QString>::const_iterator hiQualityIter =
+            requestParams.find(StreamingParams::HI_QUALITY_PARAM_NAME);
+        std::multimap<QString, QString>::const_iterator loQualityIter =
+            requestParams.find(StreamingParams::LO_QUALITY_PARAM_NAME);
+        result.streamQuality = (hiQualityIter != requestParams.end()) || (loQualityIter == requestParams.end())  //hi quality is default
+            ? MEDIA_Quality_High
+            : MEDIA_Quality_Low;
+
+        std::multimap<QString, QString>::const_iterator channelIter =
+            requestParams.find(QLatin1String(StreamingParams::CHANNEL_PARAM_NAME));
+        if (channelIter != requestParams.end())
+            result.channel = channelIter->second.toInt();
+        std::multimap<QString, QString>::const_iterator containerIter =
+            requestParams.find(QLatin1String(StreamingParams::CONTAINER_FORMAT_PARAM_NAME));
+        if (containerIter != requestParams.end())
+            result.containerFormat = containerIter->second;
+        std::multimap<QString, QString>::const_iterator startTimestampIter =
+            requestParams.find(QLatin1String(StreamingParams::START_TIMESTAMP_PARAM_NAME));
+
+        if (startTimestampIter != requestParams.end())
+        {
+            result.startTimestamp = startTimestampIter->second.toULongLong();
+        }
+        else
+        {
+            std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                requestParams.find(QLatin1String(StreamingParams::START_POS_PARAM_NAME));
+            if (startDatetimeIter != requestParams.end())
+            {
+                // Converting startDatetime to startTimestamp.
+                // This is secondary functionality, not used by this 
+                //   HLS implementation (since all chunks are referenced by npt timestamps).
+                result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
+            }
+            else
+            {
+                // Trying compatibility parameter "startDatetime".
+                std::multimap<QString, QString>::const_iterator startDatetimeIter =
+                    requestParams.find(QLatin1String(StreamingParams::START_DATETIME_PARAM_NAME));
+                if (startDatetimeIter != requestParams.end())
+                    result.startTimestamp = nx::utils::parseDateTime(startDatetimeIter->second);
+            }
+        }
+
+        std::multimap<QString, QString>::const_iterator durationUSecIter =
+            requestParams.find(QLatin1String(StreamingParams::DURATION_USEC_PARAM_NAME));
+        std::multimap<QString, QString>::const_iterator durationSecIter =
+            requestParams.find(QLatin1String(StreamingParams::DURATION_SEC_PARAM_NAME));
+
+        if (durationUSecIter != requestParams.end())
+            result.duration = std::chrono::microseconds(durationUSecIter->second.toLongLong());
+        else if (durationSecIter != requestParams.end())
+            result.duration = std::chrono::seconds(durationSecIter->second.toLongLong());
+
+        std::multimap<QString, QString>::const_iterator aliasIter =
+            requestParams.find(QLatin1String(StreamingParams::ALIAS_PARAM_NAME));
+        if (aliasIter != requestParams.end())
+            result.alias = aliasIter->second;
+
+        return result;
     }
 }

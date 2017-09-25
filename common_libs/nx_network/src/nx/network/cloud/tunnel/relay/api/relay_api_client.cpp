@@ -63,6 +63,7 @@ void ClientImpl::beginListening(
 
     issueUpgradeRequest<
         BeginListeningRequest, nx::String, BeginListeningHandler, BeginListeningResponse>(
+            nx_http::Method::post,
             kRelayProtocolName,
             std::move(request),
             kServerIncomingConnectionsPath,
@@ -81,11 +82,31 @@ void ClientImpl::startSession(
     request.desiredSessionId = desiredSessionId.toStdString();
     request.targetPeerName = targetPeerName.toStdString();
 
+    const auto requestPath = nx_http::rest::substituteParameters(
+        kServerClientSessionsPath, {targetPeerName});
+
     issueRequest<CreateClientSessionRequest, CreateClientSessionResponse>(
         std::move(request),
         kServerClientSessionsPath,
         {targetPeerName},
-        std::move(completionHandler));
+        [completionHandler = std::move(completionHandler), requestPath](
+            const std::string contentLocationUrl,
+            ResultCode resultCode,
+            CreateClientSessionResponse response)
+        {
+            response.actualRelayUrl = contentLocationUrl;
+            // Removing request path from the end of response.actualRelayUrl 
+            // so that we have basic relay url.
+            NX_ASSERT(
+                response.actualRelayUrl.find(requestPath.toStdString()) != std::string::npos);
+            NX_ASSERT(
+                response.actualRelayUrl.find(requestPath.toStdString()) + requestPath.size() ==
+                response.actualRelayUrl.size());
+
+            response.actualRelayUrl.erase(
+                response.actualRelayUrl.size() - requestPath.size());
+            completionHandler(resultCode, std::move(response));
+        });
 }
 
 void ClientImpl::openConnectionToTheTargetHost(
@@ -99,11 +120,17 @@ void ClientImpl::openConnectionToTheTargetHost(
 
     issueUpgradeRequest<
         ConnectToPeerRequest, nx::String, OpenRelayConnectionHandler>(
+            nx_http::Method::post,
             kRelayProtocolName,
             std::move(request),
             kClientSessionConnectionsPath,
             {sessionId},
             std::move(completionHandler));
+}
+
+QUrl ClientImpl::url() const
+{
+    return m_baseUrl;
 }
 
 SystemError::ErrorCode ClientImpl::prevRequestSysErrorCode() const
@@ -123,6 +150,7 @@ template<
     typename ... Response
 >
 void ClientImpl::issueUpgradeRequest(
+    nx_http::Method::ValueType httpMethod,
     const nx_http::StringType& protocolToUpgradeTo,
     Request request,
     const char* requestPathTemplate,
@@ -138,11 +166,12 @@ void ClientImpl::issueUpgradeRequest(
         std::move(requestPathArguments));
 
     post(
-        [this, protocolToUpgradeTo, httpClient = std::move(httpClient),
+        [this, httpMethod, protocolToUpgradeTo, httpClient = std::move(httpClient),
             completionHandler = std::move(completionHandler)]() mutable
         {
             executeUpgradeRequest<
                 decltype(httpClient), decltype(completionHandler), Response...>(
+                    httpMethod,
                     protocolToUpgradeTo,
                     std::move(httpClient),
                     std::move(completionHandler));
@@ -199,6 +228,7 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
 
 template<typename HttpClient, typename CompletionHandler, typename ... Response>
 void ClientImpl::executeUpgradeRequest(
+    nx_http::Method::ValueType httpMethod,
     const nx_http::StringType& protocolToUpgradeTo,
     HttpClient httpClient,
     CompletionHandler completionHandler)
@@ -206,6 +236,7 @@ void ClientImpl::executeUpgradeRequest(
     auto httpClientPtr = httpClient.get();
     m_activeRequests.push_back(std::move(httpClient));
     httpClientPtr->executeUpgrade(
+        httpMethod,
         protocolToUpgradeTo,
         [this, httpClientPtr,
             httpClientIter = std::prev(m_activeRequests.end()),
@@ -215,6 +246,7 @@ void ClientImpl::executeUpgradeRequest(
                 Response ... response) mutable
         {
             auto connection = httpClientPtr->takeSocket();
+            auto httpClient = std::move(*httpClientIter);
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toUpgradeResultCode(sysErrorCode, httpResponse);
             m_activeRequests.erase(httpClientIter);
@@ -240,10 +272,12 @@ void ClientImpl::executeRequest(
                 const nx_http::Response* httpResponse,
                 Response response) mutable
         {
+            auto contentLocationUrl = 
+                httpClientPtr->httpClient().contentLocationUrl().toString().toStdString();
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toResultCode(sysErrorCode, httpResponse);
             m_activeRequests.erase(httpClientIter);
-            completionHandler(resultCode, std::move(response));
+            completionHandler(contentLocationUrl, resultCode, std::move(response));
         });
 }
 

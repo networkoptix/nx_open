@@ -565,7 +565,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     /* Access to videowall layouts. */
     const auto videowall = resourcePool()->getResourceById<QnVideoWallResource>(ownerId);
 
-    //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
+    // TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
     auto checkReadOnly =
         [this](Qn::Permissions permissions)
         {
@@ -898,7 +898,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
     if (userResource->getHash() != update.hash)
         requiredPermissions |= Qn::WritePasswordPermission;
 
-    //TODO: #rvasilenko describe somewhere password changing logic, it looks like hell to me
+    // TODO: #rvasilenko describe somewhere password changing logic, it looks like hell to me
     if (userResource->getDigest() != update.digest)
         requiredPermissions |= Qn::WritePasswordPermission;
 

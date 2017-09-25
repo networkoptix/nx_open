@@ -60,9 +60,9 @@ private:
     void showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
 
-    void handleShowPopupAction(
-        const nx::vms::event::AbstractActionPtr& action,
-        QnNotificationWidget* widget);
+    void addAcknoledgeButtonIfNeeded(QnNotificationWidget* widget,
+        const QnVirtualCameraResourcePtr& camera,
+        const nx::vms::event::AbstractActionPtr& action);
 
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
     void hideEventAction(const nx::vms::event::AbstractActionPtr& businessAction);

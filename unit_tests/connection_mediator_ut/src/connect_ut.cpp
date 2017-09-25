@@ -22,6 +22,7 @@
 
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
+#include <relay/relay_cluster_client.h>
 
 #include "mediator_mocks.h"
 
@@ -37,11 +38,14 @@ protected:
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
+        relayClusterClient = std::make_unique<RelayClusterClient>(settings);
+
         listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
             settings,
             &cloud,
             &stunMessageDispatcher,
-            &listeningPeerPool);
+            &listeningPeerPool,
+            relayClusterClient.get());
         server = std::make_unique<network::server::MultiAddressServer<stun::SocketServer>>(
             &stunMessageDispatcher,
             false,
@@ -53,7 +57,7 @@ protected:
         EXPECT_TRUE(server->endpoints().size());
         m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
         network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
-            nx::network::url::Builder().setScheme("stun").setEndpoint(m_address));
+            nx::network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_address));
     }
 
     nx::stun::MessageDispatcher stunMessageDispatcher;
@@ -61,6 +65,7 @@ protected:
     CloudDataProviderMock cloud;
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
+    std::unique_ptr<RelayClusterClient> relayClusterClient;
     std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
     std::unique_ptr<network::server::MultiAddressServer<stun::SocketServer>> server;
 
@@ -88,7 +93,9 @@ TEST_F( ConnectTest, BindConnect )
     stun::AsyncClient msClient;
     auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
-    msClient.connect( address() );
+    msClient.connect(
+        nx::network::url::Builder()
+            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(address()));
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
                                              stun::extension::methods::bind ) );

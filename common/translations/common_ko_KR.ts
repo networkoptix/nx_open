@@ -82,6 +82,15 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>기간한정</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>아날로그</translation>
     </message>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>아날로그 인코더</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>기간제한 인증키</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>무료 라이센스</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>시간</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation type="unfinished">Time Licenses</translation>
     </message>
   </context>
   <context>
@@ -641,10 +650,6 @@
       <translation>알수 없음</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>기간한정 인증키</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>무료 인증키</translation>
     </message>
@@ -659,6 +664,10 @@
     <message>
       <source>Hardware Id: %1</source>
       <translation type="unfinished">Hardware Id: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation type="unfinished">Time License</translation>
     </message>
   </context>
   <context>

@@ -3,7 +3,7 @@
   "dialogs":{
     "okButton":"Ok",
     "openLink":"Látogassa meg ezt a linket",
-    "openLinkWithTitle":"{{title}} - Látogassa meg ezt a linket"
+    "openLinkWithTitle":"Látogassa meg ezt a linket - {{title}}"
   },
   "setup":{
     "createAccount":"fiók létrehozása",
@@ -41,9 +41,12 @@
     "confirmDisconnectFromCloud":"{{CLOUD_NAME}} kapcsolat megszűnt",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Minden felhasználó törölve lesz.</span><br><br>A rendszer a helyi hálózatból a helyi adminisztrátor fiókkal lesz elérhető.",
     "confirmDisconnectFromCloudAction":"Szétkapcsolás",
-    "disconnectedSuccess":"Rendszer sikeresen leválasztva",
+    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
+    "confirmDisconnectFromSystem":"Detach server from current system",
+    "confirmDisconnectFromSystemTitle":"",
+    "confirmDisconnectFromSystemAction":"Detach",
+    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
     "connectedSuccess":"Rendszer sikeresen csatlakoztatva",
-    "createLocalOwner":"",
     "createLocalOwnerTitle":"Helyi adminisztrátor létrehozása",
     "confirmChangePassword":"Admin jelszó módosítása",
     "confirmChangePasswordTitle":"Megváltoztatja a renszerjelszót? Ez hatással lesz az 'admin', és a root jelszavakra egyes szervereken",

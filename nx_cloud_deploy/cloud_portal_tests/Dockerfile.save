@@ -1,0 +1,49 @@
+FROM debian:testing
+MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
+
+RUN apt-get update && \
+  apt-get install -y curl && \
+  curl http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb \
+  -o /tmp/deb-multimedia-keyring_2015.6.1_all.deb && \
+  dpkg -i /tmp/deb-multimedia-keyring_2015.6.1_all.deb && \
+  rm /tmp/deb-multimedia-keyring_2015.6.1_all.deb && \
+  echo "deb http://www.deb-multimedia.org stretch main non-free" >> /etc/apt/sources.list && \
+  apt-get install -y \
+    openjdk-8-jre \
+    xvfb \
+    x11vnc \
+    ratpoison \
+    procps \
+    net-tools \
+    xterm \
+    libgconf-2-4 \
+    libexif12 \
+    chromium \
+    netcat-traditional \
+    curl \
+    ffmpeg \
+    gnupg && \
+  apt-get --reinstall install xfonts-base && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+  apt-get update && \
+  apt-get install -y nodejs && \
+  rm -rf /var/lib/apt/lists/*
+
+COPY stage /usr/src/app
+WORKDIR /usr/src/app
+
+RUN npm install
+RUN npm install -g grunt
+RUN node_modules/protractor/bin/webdriver-manager update
+docker run --add-host="cloud-local:172.17.0.1" --cap-add=SYS_ADMIN --rm -ti cloud_portal_tests:1.4 cloud-local
+
+RUN useradd -m -s /bin/bash qa && chown -R qa /usr/src/app
+
+COPY docker/vncpasswd /home/qa/.vnc/passwd
+COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker/vncserver /usr/local/bin/
+
+ENTRYPOINT ["/entrypoint.sh"]

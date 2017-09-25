@@ -110,9 +110,11 @@ Ptz::Traits ResourcePtzController::auxTraits() const
 
 int ResourcePtzController::presetsCount() const
 {
-    return getCapabilities().testFlag(Ptz::PresetsPtzCapability)
-        ? core::ptz::helpers::getSortedPresets(this).size()
-        : 0;
+    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
+        return 0;
+
+    QnPtzPresetList presets;
+    return core::ptz::helpers::getSortedPresets(this, presets) ? presets.size() : 0;
 }
 
 int ResourcePtzController::activePresetIndex() const
@@ -124,8 +126,8 @@ int ResourcePtzController::activePresetIndex() const
     if (!getActiveObject(&activeObject) || activeObject.type != Qn::PresetPtzObject)
         return -1;
 
-    const auto presets = core::ptz::helpers::getSortedPresets(this);
-    if (presets.isEmpty())
+    QnPtzPresetList presets;
+    if (!core::ptz::helpers::getSortedPresets(this, presets) || presets.isEmpty())
         return -1;
 
     for (int i = 0; i != presets.count(); ++i)
@@ -136,6 +138,11 @@ int ResourcePtzController::activePresetIndex() const
     return -1;
 }
 
+int ResourcePtzController::capabilities() const
+{
+    return (int) getCapabilities();
+}
+
 bool ResourcePtzController::setPresetByIndex(int index)
 {
     if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability)
@@ -144,9 +151,9 @@ bool ResourcePtzController::setPresetByIndex(int index)
         return false;
     }
 
-    const auto presets = core::ptz::helpers::getSortedPresets(this);
-    return !presets.isEmpty() && activatePreset(presets.at(index).id,
-        QnAbstractPtzController::MaxPtzSpeed);
+    QnPtzPresetList presets;
+    return core::ptz::helpers::getSortedPresets(this, presets) && !presets.isEmpty()
+        && activatePreset(presets.at(index).id, QnAbstractPtzController::MaxPtzSpeed);
 }
 
 bool ResourcePtzController::setPresetById(const QString& id)
@@ -154,8 +161,8 @@ bool ResourcePtzController::setPresetById(const QString& id)
     if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
         return false;
 
-    const auto presets = core::ptz::helpers::getSortedPresets(this);
-    if (presets.isEmpty())
+    QnPtzPresetList presets;
+    if (!core::ptz::helpers::getSortedPresets(this, presets) || presets.isEmpty())
         return false;
 
     const bool found = std::find_if(presets.begin(), presets.end(),
@@ -166,7 +173,10 @@ bool ResourcePtzController::setPresetById(const QString& id)
 
 int ResourcePtzController::indexOfPreset(const QString& id) const
 {
-    const auto presets = core::ptz::helpers::getSortedPresets(this);
+    QnPtzPresetList presets;
+    if (!core::ptz::helpers::getSortedPresets(this, presets) || presets.isEmpty())
+        return -1;
+
     const auto it = std::find_if(presets.begin(), presets.end(),
         [id](const QnPtzPreset& preset) { return id == preset.id; });
 

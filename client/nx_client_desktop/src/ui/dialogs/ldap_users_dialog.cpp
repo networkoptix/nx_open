@@ -28,7 +28,7 @@
 
 namespace {
 
-//TODO: #GDM move timeout constant to more common module
+// TODO: #GDM move timeout constant to more common module
 static const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
 
 static const int kUpdateFilterDelayMs = 200;
@@ -40,7 +40,9 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui(new Ui::LdapUsersDialog),
     m_timeoutTimer(new QTimer(this)),
     m_rolesModel(new QnUserRolesModel(this,
-        QnUserRolesModel::StandardRoleFlag | QnUserRolesModel::UserRoleFlag))
+        QnUserRolesModel::StandardRoleFlag
+      | QnUserRolesModel::UserRoleFlag
+      | QnUserRolesModel::AssignableFlag))
 {
     ui->setupUi(this);
 
@@ -356,7 +358,7 @@ void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
             m_importButton->setEnabled(header->checkState() != Qt::Unchecked);
         };
 
-    //TODO: #GDM model should notify about its check state changes
+    // TODO: #GDM model should notify about its check state changes
     connect(header, &QnCheckBoxedHeaderView::checkStateChanged, this, updateButton);
     updateButton();
 

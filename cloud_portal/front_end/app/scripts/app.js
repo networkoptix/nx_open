@@ -111,14 +111,6 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
             }
         })
-        .when('/activate/sent', {
-            title: L.pageTitles.activateSent,
-            templateUrl: Config.viewsDir + 'activeActions.html',
-            controller: 'ActivateRestoreCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.reactivatingSuccess = true; }]
-            }
-        })
         .when('/activate/success',{
             title: L.pageTitles.activateSuccess,
             templateUrl: Config.viewsDir + 'activeActions.html',
@@ -162,7 +154,7 @@ angular.module('cloudApp', [
             controller: 'ActivateRestoreCtrl'
         })
         .when('/content/:page', {
-            title: L.pageTitles.contentPage,
+            title: "" /*L.pageTitles.contentPage*/,
             templateUrl: Config.viewsDir + 'static.html',
             controller: 'StaticCtrl'
         })
@@ -193,7 +185,7 @@ angular.module('cloudApp', [
             controller: 'DownloadCtrl'
         })
         .when('/', {
-            title: L.pageTitles.startPage,
+            title: "" /*L.pageTitles.startPage*/,
             templateUrl: Config.viewsDir + 'startPage.html',
             controller: 'StartPageCtrl'
         })

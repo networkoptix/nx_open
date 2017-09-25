@@ -24,11 +24,16 @@ public:
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    virtual std::string toString() const override;
+
+    bool isStarted() const;
+
 protected:
     virtual void stopWhileInAioThread() override;
 
 private:
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
+    bool m_isStarted = false;
 };
 
 } // namespace test

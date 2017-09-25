@@ -239,6 +239,9 @@ void initLog(const QString& logLevel)
 {
     nx::utils::log::Settings logSettings;
     logSettings.level.parse(logLevel);
+    if (*ini().logLevel)
+        logSettings.level.parse(QString::fromUtf8(ini().logLevel));
+
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
 
@@ -246,7 +249,6 @@ void initLog(const QString& logLevel)
     {
         nx::utils::log::initialize(
             logSettings,
-            /*dataDir*/ QString(),
             /*applicationName*/ lit("mobile_client"),
             /*binaryPath*/ QString(),
             /*baseName*/
@@ -254,7 +256,7 @@ void initLog(const QString& logLevel)
                 ? QString::fromUtf8(ini().logFile)
                 : QnAppInfo::isAndroid()
                     ? lit("-")
-                    : (QString::fromUtf8(ini().iniFileDir()) + lit("log_file")));
+                    : (QString::fromUtf8(ini().iniFileDir()) + lit("mobile_client")));
     }
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
@@ -262,7 +264,6 @@ void initLog(const QString& logLevel)
     {
         nx::utils::log::initialize(
             logSettings,
-            /*dataDir*/ QString(),
             /*applicationName*/ lit("mobile_client"),
             /*binaryPath*/ QString(),
             /*baseName*/

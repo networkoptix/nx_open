@@ -20,7 +20,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <nx/client/desktop/radass/radass_types.h>
+#include <nx/client/desktop/radass/radass_resource_manager.h>
+
+#include <nx/client/ptz/ptz_helpers.h>
+#include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -86,6 +92,13 @@ QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*par
         if (layout->isServiceLayout())
             continue;
 
+        // TODO: #GDM do not add preview search layouts to the resource pool
+        if (layout->data().contains(Qn::LayoutSearchStateRole))
+        {
+            if (!QnWorkbenchLayout::instance(layout))
+                continue; /* Not opened. */
+        }
+
         if (!accessController()->hasPermissions(layout, Qn::ReadPermission))
             continue;
 
@@ -118,17 +131,14 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
         return result;
 
     QnPtzPresetList presets;
+    // In case of error empty list will be returned.
+    nx::client::core::ptz::helpers::getSortedPresets(widget->ptzController(), presets);
+
     QnPtzTourList tours;
     QnPtzObject activeObject;
-    widget->ptzController()->getPresets(&presets);
+
     widget->ptzController()->getTours(&tours);
     widget->ptzController()->getActiveObject(&activeObject);
-
-    std::sort(presets.begin(), presets.end(),
-        [](const QnPtzPreset& l, const QnPtzPreset& r)
-        {
-            return nx::utils::naturalStringLess(l.name, r.name);
-        });
 
     std::sort(tours.begin(), tours.end(),
         [](const QnPtzTour& l, const QnPtzTour& r)
@@ -136,9 +146,9 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
             return nx::utils::naturalStringLess(l.name, r.name);
         });
 
-    QnPtzHotkeysResourcePropertyAdaptor adaptor;
+    nx::client::core::ptz::PtzHotkeysResourcePropertyAdaptor adaptor;
     adaptor.setResource(widget->resource()->toResourcePtr());
-    QnPtzHotkeyHash idByHotkey = adaptor.value();
+    QnPtzIdByHotkeyHash idByHotkey = adaptor.value();
 
     for (const auto& preset: presets)
     {
@@ -148,8 +158,8 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
         else
             action->setText(preset.name);
 
-        int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::NoHotkey);
-        if (hotkey != QnPtzHotkey::NoHotkey)
+        int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::kNoHotkey);
+        if (hotkey != QnPtzHotkey::kNoHotkey)
             action->setShortcut(Qt::Key_0 + hotkey);
 
         connect(action, &QAction::triggered, this,
@@ -180,8 +190,8 @@ QList<QAction*> PtzPresetsToursFactory::newActions(const Parameters& parameters,
         else
             action->setText(tour.name);
 
-        int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::NoHotkey);
-        if (hotkey != QnPtzHotkey::NoHotkey)
+        int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::kNoHotkey);
+        if (hotkey != QnPtzHotkey::kNoHotkey)
             action->setShortcut(Qt::Key_0 + hotkey);
 
         connect(action, &QAction::triggered, this,
@@ -290,6 +300,44 @@ QList<QAction*> LayoutTourSettingsFactory::newActions(const Parameters& paramete
         actionGroup->addAction(action);
     }
     return actionGroup->actions();
+}
+
+QList<QAction*> AnalyticsModeActionFactory::newActions(const Parameters& parameters,
+    QObject* parent)
+{
+    QList<QAction*> result;
+
+    static const int kMinMatrixSize = 2;
+    static const int kMaxMatrixSize = 4;
+
+    for (int i = kMinMatrixSize; i <= kMaxMatrixSize; ++i)
+    {
+        auto action = new QAction(parent);
+        action->setText(lit("%1x%1").arg(i));
+
+        connect(action, &QAction::triggered, this,
+            [this, parameters, i]
+            {
+                menu()->trigger(action::StartAnalyticsAction,
+                    Parameters(parameters).withArgument(Qn::IntRole, i));
+            });
+
+        result << action;
+    }
+
+    {
+        auto action = new QAction(parent);
+        action->setText(tr("Dynamic"));
+        connect(action, &QAction::triggered, this,
+            [this, parameters]
+            {
+                menu()->trigger(action::StartAnalyticsAction, Parameters(parameters));
+            });
+
+        result << action;
+    }
+
+    return result;
 }
 
 } // namespace action

@@ -4,6 +4,7 @@
 
 #include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/future.h>
 
@@ -68,7 +69,7 @@ protected:
     {
         nx::utils::promise<SystemError::ErrorCode> done;
         m_client.connect(
-            network::url::Builder().setScheme("stun").setEndpoint(m_stunServer.address()),
+            network::url::Builder().setScheme(nx::stun::kUrlSchemeName).setEndpoint(m_stunServer.address()),
             [&done](SystemError::ErrorCode sysErrorCode)
             {
                 done.set_value(sysErrorCode);
@@ -129,10 +130,20 @@ TEST_F(AsyncClientWithHttpTunneling, regular_stun_connection)
 
 //-------------------------------------------------------------------------------------------------
 
+namespace {
+
+struct AsyncClientWithHttpTunnelingTestTypes
+{
+    using ClientType = stun::AsyncClientWithHttpTunneling;
+    using ServerType = StunOverHttpServer;
+};
+
+} // namespace
+
 INSTANTIATE_TYPED_TEST_CASE_P(
     StunAsyncClientWithHttpTunneling,
     StunAsyncClientAcceptanceTest,
-    stun::AsyncClientWithHttpTunneling);
+    AsyncClientWithHttpTunnelingTestTypes);
 
 } // namespace test
 } // namespace stun

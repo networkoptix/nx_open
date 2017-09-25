@@ -31,7 +31,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg qtsingleguiapplication roboto-ttf</rdep.packages>
+        <rdep.packages>openssl ffmpeg qtsingleguiapplication roboto-fonts</rdep.packages>
         <rdep.windows.packages>quazip openal</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>
@@ -39,7 +39,8 @@
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>
-        <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+        <provisioning_profiles_dir>${packages.dir}/any/certificates-${customization}/mobile_client/ios/provisioning_profiles</provisioning_profiles_dir>
+        <provisioning_profile>${provisioning_profiles_dir}/testing.mobileprovision</provisioning_profile>
         <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
         <provisioning_profile_id/>
     </properties>
@@ -138,7 +139,7 @@
             <properties>
                 <buildLib>staticlib</buildLib>
                 <android.keystore>${customization.dir}/mobile_client/key.store</android.keystore>
-                <!-- Exclude roboto-ttf package because the font is present on the every android device. -->
+                <!-- Exclude roboto-fonts package because the font is present on the every android device. -->
                 <rdep.packages>openssl ffmpeg qtsingleguiapplication</rdep.packages>
             </properties>
             <build>
@@ -174,7 +175,7 @@
                 </property>
             </activation>
             <properties>
-                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+                <provisioning_profile>${provisioning_profiles_dir}/testing.mobileprovision</provisioning_profile>
                 <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
             </properties>
         </profile>
@@ -267,9 +268,9 @@
                 </property>
             </activation>
             <properties>
-                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+                <provisioning_profile>${provisioning_profiles_dir}/production.mobileprovision</provisioning_profile>
                 <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
             </properties>
-        </profile>        
+        </profile>
     </profiles>
 </project>

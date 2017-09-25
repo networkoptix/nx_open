@@ -1,13 +1,18 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls admin_static %}
+{% load static %}
+{% load cms_filters %}
+
+{% block extrahead %}
+    <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
+{% endblock %}
 
 {% block extrastyle %}
-    {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
+    {{ block.super }}
 {% endblock %}
 
 {% block content%}
-<h1>{{ context.name }} for {{ context.product.name }}</h1>
 <fieldset>
     <div>{{ context.description }}</div>
     {% if context.url %}
@@ -22,26 +27,30 @@
     {% for field in form %}
         <div class="form-row">
             {{ field.label_tag }}
-            {{ field }}
-            
-            {% if field.help_text %}
-            <p class="help">{{ field.help_text }}</p>
-            {% endif %}
-            
-            <div>
-                <p>Image preview</p>
-                <img style="width: 400px" src="data:image/png;base64,{{field.value}}"
-                     onerror="this.parentNode.parentNode.removeChild(this.parentNode);">
+            <div id="{{field.label}}" style="display:inline-block;">
+                {% if field|is_ImageField and field.value%}
+                <div>
+                    <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
+                </div>
+                {% endif %}
+                {{ field }}
+                
+                {% if field.help_text %}
+                <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
             </div>
         </div>
     {% endfor %}
 
+    {% if perms.cms.edit_content %}
     <div class="submit-row">
         <button class="button" type="submit" name="SaveDraft">Save Draft</button>
         <button class="button" type="submit" name="Preview">Save and Preview</button>
         <button class="button" type="submit" name="SendReview">Send for Review</button>
         <button class="button" type="reset"  name="Reset">Reset</button>
     </div>
+    {% endif %}
+
 </form>
 
 {% if preview_link %}
@@ -54,18 +63,32 @@
 {% endif %}-->
 <script>
     function openPreview(){
-        window.open("{{ preview_link }}");
+        window.open("//{{ preview_link }}");
     }
 
     function wasTouched(){
-        var touched = false;
         var inputs = document.getElementsByTagName('input');
+        var textareas = document.getElementsByTagName('textarea');
+        var htmlEditors = tinymce.editors;
+
         for(i=0;i<inputs.length;++i){
             if(inputs[i].defaultValue != inputs[i].value){
-                touched = true;
+                return true;
             }
         }
-        return touched;
+
+        for (i=0;i<textareas.length;++i){
+            if(textareas[i].defaultValue != textareas[i].value){
+                return true;
+            }
+        }
+
+        for (i=0;i<htmlEditors.length;++i){
+            if(htmlEditors[i].startContent != htmlEditors[i].getContent()){
+                return true;
+            }
+        }
+        return false;
     }
     function languageChanged(){
         if(wasTouched() && confirm('Do you want to save changes?')){
@@ -79,5 +102,18 @@
     if(langSelector){
         langSelector.addEventListener('change', languageChanged, false);
     }
+
+    tinymce.init({
+        selector: '.tinymce',
+        menubar: false,
+        resize: 'both',
+        theme:'advanced',
+        theme_advanced_buttons1: 'undo,redo,separator,insert,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent',
+        theme_advanced_toolbar_location: 'top',
+        theme_advanced_toolbar_align: 'left',
+        theme_advanced_resizing: true,
+        paste_text_sticky: true,
+        paste_text_sticky_default : true
+    });
 </script>
 {% endblock%}

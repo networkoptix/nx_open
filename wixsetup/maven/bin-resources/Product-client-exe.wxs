@@ -2,13 +2,14 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
     <?include BuildVars.wxi ?>
 
     <Bundle
             Name="$(var.productName) Client"
             Manufacturer="$(var.companyName)"
             Version="$(var.releaseVersionFull)"
-            IconSourceFile="favicon.ico"
+            IconSourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"
             UpgradeCode="$(var.clientBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
@@ -18,14 +19,14 @@
         <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
 
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
-            <Payload SourceFile="License.html" />
-            <Payload SourceFile="installer_bg.png" />
-            <Payload SourceFile="logo-102x102.png" />
-            <Payload SourceFile="logo-64x64.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/wixsetup/License.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
 
             <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"
-                LicenseUrl="License.html" 
+                LicenseUrl="License.html"
                 ShowFilesInUse="yes"
                 SuppressRepair="yes"
                 SuppressDowngradeFailure="yes"

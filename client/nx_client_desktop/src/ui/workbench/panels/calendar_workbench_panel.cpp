@@ -106,6 +106,14 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_pinButton->setFocusProxy(item);
     m_pinButton->setZValue(ControlItemZOrder);
 
+    connect(action(action::PinCalendarAction), &QAction::toggled, this,
+        [this](bool checked)
+        {
+            if (checked)
+                setOpened(true);
+            emit geometryChanged();
+        });
+
     const auto toggleCalendarAction = action(action::ToggleCalendarAction);
     toggleCalendarAction->setChecked(settings.state == Qn::PaneState::Opened);
     connect(toggleCalendarAction, &QAction::toggled, this,

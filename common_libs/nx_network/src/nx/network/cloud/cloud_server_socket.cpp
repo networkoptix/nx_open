@@ -8,12 +8,6 @@
 #include "tunnel/udp/acceptor.h"
 #include "tunnel/tcp/reverse_tunnel_acceptor.h"
 
-#define DEBUG_LOG(MESSAGE) do \
-{ \
-    if (nx::network::SocketGlobals::debugIni().cloudServerSocket) \
-        NX_LOGX(MESSAGE, cl_logDEBUG1); \
-} while (0)
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -155,6 +149,8 @@ aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
+    base_type::bindToAioThread(aioThread);
+
     NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
@@ -180,7 +176,7 @@ void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
                 case State::readyToListen:
                     m_state = State::registeringOnMediator;
                     m_savedAcceptHandler = std::move(handler);
-                    DEBUG_LOG("Register on mediator from acceptAsync()");
+                    NX_VERBOSE(this, "Register on mediator from acceptAsync()");
                     issueRegistrationRequest();
                     break;
 
@@ -226,7 +222,7 @@ void CloudServerSocket::cancelIOSync()
     }
 }
 
-bool CloudServerSocket::isInSelfAioThread()
+bool CloudServerSocket::isInSelfAioThread() const
 {
     return m_mediatorRegistrationRetryTimer.isInSelfAioThread();
 }
@@ -298,13 +294,26 @@ void CloudServerSocket::startAcceptor(
             std::unique_ptr<AbstractIncomingTunnelConnection> connection)
         {
             NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
-            DEBUG_LOG(lm("Acceptor %1 returned %2: %3")
+            NX_VERBOSE(this, lm("Acceptor %1 returned %2: %3")
                 .args((void*)acceptorPtr, (void*)connection.get(), SystemError::toString(code)));
 
             const auto it = std::find_if(
                 m_acceptors.begin(), m_acceptors.end(),
                 [&](const std::unique_ptr<AbstractTunnelAcceptor>& a)
                 { return a.get() == acceptorPtr; });
+
+            if (code == SystemError::noError)
+            {
+                NX_INFO(this, lm("Cloud connection (session %1) from %2 has been accepted. Info %3")
+                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
+                        acceptorPtr->toString()));
+            }
+            else
+            {
+                NX_INFO(this, lm("Cloud connection (session %1) from %2 has not been accepted with error %3. Info %4")
+                    .args(acceptorPtr->connectionId(), acceptorPtr->remotePeerId(),
+                        SystemError::toString(code), acceptorPtr->toString()));
+            }
 
             NX_CRITICAL(it != m_acceptors.end());
             m_acceptors.erase(it);
@@ -516,7 +525,7 @@ void CloudServerSocket::onConnectionRequested(
     hpm::api::ConnectionRequestedEvent event)
 {
     event.connectionMethods &= m_supportedConnectionMethods;
-    DEBUG_LOG(lm("Connection request '%1' from %2 with methods: %3")
+    NX_VERBOSE(this, lm("Connection request '%1' from %2 with methods: %3")
         .args(event.connectSessionId, event.originatingPeerID,
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
@@ -525,7 +534,7 @@ void CloudServerSocket::onConnectionRequested(
         event);
     for (auto& acceptor: acceptors)
     {
-        DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")
+        NX_VERBOSE(this, lm("Create acceptor '%1' by connection request %2 from %3")
             .args(acceptor, event.connectSessionId, event.originatingPeerID));
 
         acceptor->setConnectionInfo(
@@ -542,6 +551,8 @@ void CloudServerSocket::onMediatorConnectionRestored()
 
     if (m_state == State::listening)
     {
+        m_aggregateAcceptor.cancelIOSync();
+
         m_state = State::registeringOnMediator;
         m_mediatorRegistrationRetryTimer.reset();
 
@@ -585,9 +596,9 @@ std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
 {
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
-    if (response.trafficRelayUrl)
+    for (const auto& trafficRelayUrl: response.trafficRelayUrls)
     {
-        QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(*response.trafficRelayUrl);
+        QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(trafficRelayUrl);
         trafficRelayUrlWithCredentials.setUserName(credentials.hostName());
         trafficRelayUrlWithCredentials.setPassword(credentials.key);
         acceptors.push_back(

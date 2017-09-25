@@ -237,7 +237,7 @@ void QnServerStorageManager::checkStoragesStatus( const QnMediaServerResourcePtr
 }
 
 
-//TODO: #GDM SafeMode
+// TODO: #GDM SafeMode
 void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages )
 {
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
@@ -260,7 +260,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     invalidateRequests();
 }
 
-//TODO: #GDM SafeMode
+// TODO: #GDM SafeMode
 void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids )
 {
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();

@@ -92,20 +92,19 @@ bool DeviceDescriptionHandler::charactersInDevice( const QString& ch )
 
     if( m_paramElement == lit("deviceType") )
         lastDev.deviceType = fromUpnpUrn( ch, lit("device") );
-    else
-    if( m_paramElement == lit("friendlyName") )
+    else if( m_paramElement == lit("friendlyName") )
         lastDev.friendlyName = ch;
-    else
-    if( m_paramElement == lit("manufacturer") )
+    else if( m_paramElement == lit("manufacturer") )
         lastDev.manufacturer = ch;
-    else
-    if( m_paramElement == lit("modelName") )
+    else if (m_paramElement == lit("manufacturerURL"))
+        lastDev.manufacturerUrl = ch;
+    else if( m_paramElement == lit("modelName") )
         lastDev.modelName = ch;
-    else
-    if( m_paramElement == lit("serialNumber") )
+    else if( m_paramElement == lit("serialNumber") )
         lastDev.serialNumber = ch;
-    else
-    if( m_paramElement == lit("presentationURL") )
+    else if (m_paramElement == lit("UDN"))
+        lastDev.udn = ch;
+    else if( m_paramElement == lit("presentationURL") )
         lastDev.presentationUrl = ch.endsWith( lit("/") ) ? ch.left( ch.length() - 1) : ch;
     else
         return false; // was not useful

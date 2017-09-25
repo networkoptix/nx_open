@@ -16,6 +16,7 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
+        <rdep.dependencies>any/roboto-fonts</rdep.dependencies>
     </properties>
 
     <dependencies>

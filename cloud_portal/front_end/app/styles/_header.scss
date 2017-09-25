@@ -113,25 +113,22 @@ $header-collapsing-width-1: 1px;
                 padding-right:0;
 
                 border-bottom: $active-border-width solid $brand_core;
-                padding-bottom: $vertical-spacing - $active-border-width;
+                padding-bottom: $vertical-spacing - $active-border-width + 1px;
                 &:hover{
                     background-color: transparent !important;
                 }
             }
         }
+        &>a>span{
+            &.glyphicon{
+                margin-left: -2px;
+                margin-right: 14px;
+            }
 
-        &.dropdown{
-            &>a>span{
-                &.glyphicon{
-                    margin-left: -2px;
-                    margin-right: 14px;
-                }
-
-                &.icon-caret{
-                    margin-left: 14px;
-                    margin-right: -2px;
-                    margin-bottom: -2px;
-                }
+            &.icon-caret{
+                margin-left: 14px;
+                margin-right: -2px;
+                margin-bottom: -2px;
             }
         }
     }

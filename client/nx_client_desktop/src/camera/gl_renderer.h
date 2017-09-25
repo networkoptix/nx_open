@@ -66,6 +66,9 @@ public:
     */
     void beforeDestroy();
 
+    bool isBlurEnabled() const;
+    void setBlurEnabled(bool value);
+
     /**
      * Set blur in range [0..1]
      */
@@ -77,7 +80,7 @@ public:
 
     qint64 lastDisplayedTime() const;
 
-    QnMetaDataV1Ptr lastFrameMetadata() const;
+    QnAbstractCompressedMetadataPtr lastFrameMetadata() const;
     bool isHardwareDecoderUsed() const;
 
     bool isYV12ToRgbShaderUsed() const;
@@ -106,7 +109,7 @@ private:
     qreal m_hue;
     qreal m_saturation;
     qint64 m_lastDisplayedTime;
-    QnMetaDataV1Ptr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
+    QnAbstractCompressedMetadataPtr m_lastDisplayedMetadata; // TODO: #Elric get rid of this
     unsigned m_lastDisplayedFlags;
     unsigned int m_prevFrameSequence;
 
@@ -122,7 +125,6 @@ private:
     QnFisheyePtzController* m_fisheyeController;
     QRectF m_displayedRect;
 
-    void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
     void drawVideoTextureDirectly(
         const QRectF& tex0Coords,
@@ -171,9 +173,7 @@ private:
      * \param tx_array texture vertexes array
      */
     void drawBindedTexture( QnGLShaderProgram* shader , const float* v_array, const float* tx_array );
-    void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
-    bool isYuvFormat() const;
-    int glRGBFormat() const;
+
     Qn::RenderStatus drawVideoData(
         const QRectF &sourceRect,
         const QRectF &targetRect,
@@ -201,6 +201,8 @@ private:
     std::unique_ptr<QOpenGLFramebufferObject> m_blurBufferB;
     qreal m_blurFactor;
     qreal m_prevBlurFactor;
+
+    bool m_blurEnabled = true;
 };
 
 #endif //QN_GL_RENDERER_H

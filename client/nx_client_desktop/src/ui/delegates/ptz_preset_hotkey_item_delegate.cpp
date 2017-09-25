@@ -117,7 +117,7 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(
 
     const auto rowNumber = ptzModel->rowNumber(existing);
     const auto existingIndex = ptzModel->index(rowNumber, QnPtzManageModel::HotkeyColumn);
-    model->setData(existingIndex, QnPtzHotkey::NoHotkey, Qt::EditRole);
+    model->setData(existingIndex, QnPtzHotkey::kNoHotkey, Qt::EditRole);
     model->setData(index, hotkey, Qt::EditRole);
 }
 

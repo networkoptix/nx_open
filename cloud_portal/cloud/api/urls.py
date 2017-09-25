@@ -6,7 +6,7 @@ from api.views import account, systems, common, utils
 urlpatterns = [
     url(r'^utils/visitedKey',           utils.visited_key),
     url(r'^utils/language',             utils.language),
-    url(r'^utils/downloads',             utils.downloads),
+    url(r'^utils/downloads',            utils.downloads),
 
 
     url(r'^account/activate',           account.activate),

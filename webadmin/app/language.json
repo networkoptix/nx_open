@@ -39,20 +39,22 @@
         "confirmRestoreSettingsNotNetwork": "Reset server configuration? Archive and network settings will be saved.",
         "unavailable": "Unavailable",
         "unsafePortConfirm": "It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
+
         "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
         "confirmDisconnectFromCloudAction": "Disconnect",
-        "disconnectedSuccess": "System was disconnected successfully",
+        "disconnectedFromCloudSuccess": "System was disconnected from {{CLOUD_NAME}} successfully",
+
+        "confirmDisconnectFromSystem":"Detach server from current system",
+        "confirmDisconnectFromSystemTitle": "",
+        "confirmDisconnectFromSystemAction": "Detach",
+        "disconnectedFromSystemSuccess": "Server was detached from the system successfully",
+
         "connectedSuccess": "System was connected successfully",
-
-        "createLocalOwner":null,
         "createLocalOwnerTitle":"Create local administrator",
-
-
         "confirmChangePassword": "Change admin password",
         "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Save new password",
-
         "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
 
     },

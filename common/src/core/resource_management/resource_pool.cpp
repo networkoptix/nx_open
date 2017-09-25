@@ -84,30 +84,35 @@ void QnResourcePool::commit()
     m_tmpResources.clear();
 }
 
-void QnResourcePool::addResource(const QnResourcePtr& resource, bool instantly)
+void QnResourcePool::addResource(const QnResourcePtr& resource, AddResourceFlags flags)
 {
-    if (!instantly && m_tranInProgress)
+    if (!flags.testFlag(SkipAddingTransaction) && m_tranInProgress)
         m_tmpResources << resource;
     else
-        addResources(QnResourceList() << resource);
+        addResources({{resource}}, flags);
 }
 
 void QnResourcePool::addIncompatibleServer(const QnMediaServerResourcePtr& server)
 {
-    addResources(QnResourceList() << server, false);
+    addResources({{server}}, UseIncompatibleServerPool);
 }
 
-void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool)
+void QnResourcePool::addNewResources(const QnResourceList& resources, AddResourceFlags flags)
 {
-    QnMutexLocker resourcesLock( &m_resourcesMtx );
+    addResources(resources.filtered(
+        [](const QnResourcePtr& resource) { return resource->resourcePool() == nullptr; }));
+}
 
-    for (const QnResourcePtr &resource: resources)
+void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFlags flags)
+{
+    QnMutexLocker resourcesLock(&m_resourcesMtx);
+
+    for (const auto& resource: resources)
     {
-        NX_ASSERT(resource->toSharedPointer()); /* Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer? */
+        // Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer?
+        NX_ASSERT(resource->toSharedPointer());
         NX_ASSERT(!resource->getId().isNull());
-
-        if(resource->resourcePool() != NULL)
-            qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
+        NX_ASSERT(!resource->resourcePool() || resource->resourcePool() == this);
         resource->setResourcePool(this);
     }
 
@@ -125,7 +130,7 @@ void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool
             continue;
         }
 
-        if (mainPool)
+        if (!flags.testFlag(UseIncompatibleServerPool))
         {
             if (insertOrUpdateResource(resource, &m_resources))
             {
@@ -202,15 +207,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
     QnMutexLocker lk( &m_resourcesMtx );
 
-    for (const QnResourcePtr &resource: resources)
+    for (const QnResourcePtr& resource: resources)
     {
-        if (!resource)
+        if (!resource || resource->resourcePool() != this)
             continue;
 
-        disconnect(resource, nullptr, this, nullptr);
+        resource->disconnect(this);
 
         resource->addFlags(Qn::removed);
-        NX_EXPECT(resource->resourcePool() == this);
 
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&

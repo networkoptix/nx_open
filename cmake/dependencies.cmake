@@ -14,13 +14,21 @@ function(detect_package_versions)
     set(_gtest_version "1.7.0")
     set(_gmock_version "1.7.0")
     set(_directx_version "JUN2010")
+    set(_cassandra_version "2.7.0")
 
     if(WINDOWS)
         set(_qt_version "5.6.1-1")
     endif()
 
+    if(LINUX AND box STREQUAL "none")
+        set(_qt_version "5.6.2-2")
+    endif()
+
     if(MACOSX)
-        set(_quazip_version "0.7.2")
+        set(_qt_version "5.6.2-2")
+        set(_ffmpeg_version "3.1.1-2")
+        set(_openssl_version "1.0.2e-2")
+        set(_quazip_version "0.7.3")
         set(_festival_version "2.1")
     endif()
 
@@ -50,13 +58,18 @@ function(detect_package_versions)
         set(_qt_version "5.6.1")
         set(_quazip_version "0.7.2")
         set(_openssl_version "1.0.0j")
-        set(_festival_version "2.1")
     endif()
 
     if(box STREQUAL "edge1")
         set(_qt_version "5.6.1")
         set(_openssl_version "1.0.1f")
         set(_quazip_version "0.7.2")
+    endif()
+    
+    if(box STREQUAL "tx1")
+        set(_festival_version "2.1x")
+        set(_openssl_version "1.0.0j")
+        set(_quazip_version "0.7")
     endif()
 
     set(qt_version ${_qt_version} CACHE STRING "")
@@ -75,14 +88,18 @@ function(detect_package_versions)
     set(gtest_version ${_gtest_version} CACHE STRING "")
     set(gmock_version ${_gmock_version} CACHE STRING "")
     set(directx_version ${_directx_version} CACHE STRING "")
+    set(cassandra_version ${_cassandra_version} CACHE STRING "")
     set(server-external_version "" CACHE STRING "")
-
     set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
 
 function(get_dependencies)
     if (WINDOWS OR (LINUX AND NOT ANDROID))
         set(haveServer TRUE)
+    endif()
+
+    if ((LINUX AND arch STREQUAL "x64") OR (WINDOWS AND arch STREQUAL "x64") OR MACOSX)
+        nx_rdep_add_package(cassandra)
     endif()
 
     if (WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|tx1"))
@@ -111,12 +128,18 @@ function(get_dependencies)
     endif()
 
     nx_rdep_add_package(any/nx_kit)
+    nx_rdep_add_package(any/detection_plugin_interface)
 
     nx_rdep_add_package(openssl)
     nx_rdep_add_package(ffmpeg)
 
     if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
+        nx_rdep_add_package(opengl-es-mali)
+    endif()
+
+    if(box MATCHES "rpi")
+        nx_rdep_add_package(cifs-utils)
     endif()
 
     if(haveTests)
@@ -134,6 +157,9 @@ function(get_dependencies)
 
     if(WINDOWS)
         nx_rdep_add_package(directx)
+        nx_rdep_add_package("vcredist-2015" PATH_VARIABLE VC14RedistPath)
+        set(VC14RedistPath ${VC14RedistPath} PARENT_SCOPE)
+        nx_rdep_add_package("vmaxproxy-2.1")
     endif()
 
     if(box STREQUAL "edge1")
@@ -153,7 +179,7 @@ function(get_dependencies)
         nx_rdep_add_package(any/roboto-fonts)
     endif()
 
-    if(haveServer OR haveDesktopClient)
+    if((haveServer OR haveDesktopClient) AND NOT box STREQUAL "edge1")
         nx_rdep_add_package(festival)
         if(NOT "${festival-vox_version}" STREQUAL "system")
             nx_rdep_add_package(any/festival-vox)
@@ -191,8 +217,24 @@ function(get_dependencies)
 
     if(box STREQUAL "bpi")
         nx_rdep_add_package(libvdpau-sunxi-1.0-deb7)
-        nx_rdep_add_package(opengl-es-mali)
+        nx_rdep_add_package(proxy-decoder-deb7)
+        nx_rdep_add_package(ldpreloadhook-1.0-deb7)
+        nx_rdep_add_package(libpixman-0.34.0-deb7)
+        nx_rdep_add_package(libcedrus-1.0-deb7)
+
+        nx_rdep_add_package(libstdc++-6.0.19)
+
+        nx_rdep_add_package(fontconfig-2.11.0)
+        nx_rdep_add_package(additional-fonts)
+        nx_rdep_add_package(libvdpau-1.0.4.1)
+
+        nx_rdep_add_package(read-edid-3.0.2)
+        nx_rdep_add_package(a10-display)
+        nx_rdep_add_package(uboot-2014.04-10733-gbb5691c-dirty-vanilla)
     endif()
+
+    nx_rdep_add_package("any/certificates-${customization}" PATH_VARIABLE certificates_path)
+    set(certificates_path ${certificates_path} PARENT_SCOPE)
 endfunction()
 
 detect_package_versions()

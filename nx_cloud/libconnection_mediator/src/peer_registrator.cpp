@@ -6,8 +6,9 @@
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/utils/log/log.h>
 
-#include "listening_peer_pool.h"
 #include "data/listening_peer.h"
+#include "listening_peer_pool.h"
+#include "relay/abstract_relay_cluster_client.h"
 
 namespace nx {
 namespace hpm {
@@ -16,11 +17,13 @@ PeerRegistrator::PeerRegistrator(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
-    ListeningPeerPool* const listeningPeerPool)
+    ListeningPeerPool* const listeningPeerPool,
+    AbstractRelayClusterClient* const relayClusterClient)
 :
     RequestProcessor(cloudData),
     m_settings(settings),
-    m_listeningPeerPool(listeningPeerPool)
+    m_listeningPeerPool(listeningPeerPool),
+    m_relayClusterClient(relayClusterClient)
 {
     using namespace std::placeholders;
     const auto result =
@@ -39,7 +42,6 @@ PeerRegistrator::PeerRegistrator(
                     std::move(connection),
                     std::move(message));
             } ) &&
-
 
         dispatcher->registerRequestProcessor(
             stun::extension::methods::getConnectionState,
@@ -87,6 +89,11 @@ PeerRegistrator::PeerRegistrator(
 
     // TODO: NX_LOG
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
+}
+
+PeerRegistrator::~PeerRegistrator()
+{
+    m_counter.wait();
 }
 
 data::ListeningPeers PeerRegistrator::getListeningPeers() const
@@ -179,34 +186,32 @@ void PeerRegistrator::listen(
         return;
     }
 
-    std::vector<nx::stun::Message> clientBindIndications;
-    {
-        QnMutexLocker lk(&m_mutex);
-        for (const auto& client: m_boundClients)
-            clientBindIndications.push_back(makeIndication(client.first, client.second));
+    auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
+        connection,
+        MediaserverData(requestData.systemId, requestData.serverId));
 
-        auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
-            connection,
-            MediaserverData(requestData.systemId, requestData.serverId));
+    peerDataLocker.value().isListening = true;
+    peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
 
-        peerDataLocker.value().isListening = true;
-        peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
+    NX_LOGX(lit("Peer %1.%2 started to listen")
+        .arg(QString::fromUtf8(requestData.serverId))
+        .arg(QString::fromUtf8(requestData.systemId)),
+        cl_logDEBUG1);
 
-        NX_LOGX(lit("Peer %1.%2 started to listen")
-            .arg(QString::fromUtf8(requestData.serverId))
-            .arg(QString::fromUtf8(requestData.systemId)),
-            cl_logDEBUG1);
-    }
-
-    api::ListenResponse response;
-    if (!m_settings.trafficRelay().url.isEmpty())
-        response.trafficRelayUrl = m_settings.trafficRelay().url.toUtf8();
-    response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
-    response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
-    completionHandler(api::ResultCode::ok, std::move(response));
-
-    for (auto& indication: clientBindIndications)
-        connection->sendMessage(std::move(indication));
+    m_relayClusterClient->selectRelayInstanceForListeningPeer(
+        lm("%1.%2").arg(requestData.serverId).arg(requestData.systemId).toStdString(),
+        [this, connection, completionHandler = std::move(completionHandler),
+            asyncCallLocker = m_counter.getScopedIncrement()](
+                nx::cloud::relay::api::ResultCode resultCode,
+                QUrl relayInstanceUrl)
+        {
+            sendListenResponse(
+                connection,
+                resultCode == nx::cloud::relay::api::ResultCode::ok
+                    ? boost::make_optional(relayInstanceUrl)
+                    : boost::none,
+                std::move(completionHandler));
+        });
 }
 
 void PeerRegistrator::checkOwnState(
@@ -364,7 +369,38 @@ void PeerRegistrator::clientBind(
             connection->sendMessage(indication);
 }
 
-nx::stun::Message PeerRegistrator::makeIndication(const String& id, const ClientBindInfo& info) const
+void PeerRegistrator::sendListenResponse(
+    const ConnectionStrongRef& connection,
+    boost::optional<QUrl> trafficRelayInstanceUrl,
+    std::function<void(api::ResultCode, api::ListenResponse)> responseSender)
+{
+    api::ListenResponse response;
+    if (trafficRelayInstanceUrl)
+        response.trafficRelayUrl = trafficRelayInstanceUrl->toString().toUtf8();
+    response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
+    response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
+    responseSender(api::ResultCode::ok, std::move(response));
+
+    sendClientBindIndications(connection);
+}
+
+void PeerRegistrator::sendClientBindIndications(
+    const ConnectionStrongRef& connection)
+{
+    std::vector<nx::stun::Message> clientBindIndications;
+    {
+        QnMutexLocker lk(&m_mutex);
+        for (const auto& client: m_boundClients)
+            clientBindIndications.push_back(makeIndication(client.first, client.second));
+    }
+
+    for (auto& indication: clientBindIndications)
+        connection->sendMessage(std::move(indication));
+}
+
+nx::stun::Message PeerRegistrator::makeIndication(
+    const String& id,
+    const ClientBindInfo& info) const
 {
     api::ConnectionRequestedEvent event;
     event.originatingPeerID = id;

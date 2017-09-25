@@ -6,25 +6,25 @@
                 <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                 <ul uib-dropdown-menu>
                     <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">设置</a></li>
-                    <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+                    <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">查看</a></li>
                 </ul>
             </li>
         </ul>
 
         <div class="navbar-header">
-            <a class="navbar-brand product-name add-version" href="/"><img src="static/images/logo.png"></a>
+            <a class="navbar-brand product-name add-version" href="/"><img ng-src="{{$root.C.previewPath}}/static/images/logo.png"></a>{{$root.C.previewPath}}
         </div>
 
         <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
             <li class="vertical-bar margin-right"></li>
             <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">设置</a></li>
-            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">查看</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
             <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
-                                             ng-click="login();$event.preventDefault();">Log In</a></span><span
-                    class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
+                                             ng-click="login();$event.preventDefault();">登入</a></span><span
+                    class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >创建帐号</a></span></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-visible margin-right">
@@ -58,6 +58,9 @@
                     <li><a href="/account/">帐户设置</a></li>
                     <li><a href="/account/password/">更改密码</a></li>
                     <li><a href="" ng-click="logout()">退出登录</a></li>
+
+                    <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
+                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">门户管理</a></li>
                 </ul>
             </li>
             <li class="vertical-bar"></li>

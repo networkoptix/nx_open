@@ -120,9 +120,6 @@ LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Arra
 // -------------------------------------------------------------------------- //
 // QnLicense
 // -------------------------------------------------------------------------- //
-QnLicense::QnLicense()
-{
-}
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
     m_rawLicense(licenseBlock)
@@ -130,8 +127,21 @@ QnLicense::QnLicense(const QByteArray& licenseBlock):
     loadLicenseBlock(licenseBlock);
 }
 
-QnLicense::~QnLicense()
-{
+QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
+{ 
+    QList<QByteArray> params;
+    params << QByteArray("NAME=").append(value.name);
+    params << QByteArray("SERIAL=").append(value.key);
+    params << QByteArray("HWID=").append(value.hardwareId);
+    params << QByteArray("COUNT=").append(QByteArray::number(value.cameraCount));
+    params << QByteArray("CLASS=").append(value.licenseType);
+    params << QByteArray("VERSION=").append(value.version);
+    params << QByteArray("BRAND=").append(value.brand);
+    params << QByteArray("EXPIRATION=").append(value.expiration);
+    params << QByteArray("SIGNATURE2=").append(value.signature);
+
+    auto licenseBlock = params.join('\n');
+    loadLicenseBlock(licenseBlock);
 }
 
 bool QnLicense::isInfoMode() const
@@ -168,13 +178,20 @@ QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
     return QnLicensePtr(new QnLicense(licenseBlock));
 }
 
+QnLicensePtr QnLicense::createFromKey(const QByteArray& key)
+{
+    QnLicense* result = new QnLicense();
+    result->m_key = key;
+    return QnLicensePtr(result);
+}
+
 QString QnLicense::displayName() const {
     return QnLicense::displayName(type());
 }
 
 QString QnLicense::displayName(Qn::LicenseType licenseType) {
     switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Trial");
+    case Qn::LC_Trial:          return tr("Time");
     case Qn::LC_Analog:         return tr("Analog");
     case Qn::LC_Professional:   return tr("Professional");
     case Qn::LC_Edge:           return tr("Edge");
@@ -197,7 +214,7 @@ QString QnLicense::longDisplayName() const {
 
 QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     switch (licenseType) {
-    case Qn::LC_Trial:          return tr("Trial Licenses");
+    case Qn::LC_Trial:          return tr("Time Licenses");
     case Qn::LC_Analog:         return tr("Analog Licenses");
     case Qn::LC_Professional:   return tr("Professional Licenses");
     case Qn::LC_Edge:           return tr("Edge Licenses");
@@ -457,7 +474,7 @@ QnLicensePool::QnLicensePool(QObject* parent):
     QObject(parent),
     QnCommonModuleAware(parent),
     m_mutex(QnMutex::Recursive),
-    m_licenseValidator(new QnLicenseValidator(this))
+    m_licenseValidator(new QnLicenseValidator(commonModule(), this))
 {
     if (!qApp)
         return;

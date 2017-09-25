@@ -4,11 +4,11 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <?include BuildVars.wxi ?>
 
-    <Bundle 
+    <Bundle
             Name="$(var.productName) Bundle"
             Manufacturer="$(var.companyName)"
             Version="$(var.releaseVersionFull)"
-            IconSourceFile="favicon.ico"
+            IconSourceFile="$(var.CustomizationDir)/icons/all/favicon.ico"
             UpgradeCode="$(var.fullBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
@@ -17,12 +17,12 @@
         <util:ProductSearchRef Id='ClientMsiSearch' />
 
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
-            <Payload SourceFile="License.html" />
-            <Payload SourceFile="installer_bg.png" />
-            <Payload SourceFile="logo-102x102.png" />
-            <Payload SourceFile="logo-64x64.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/wixsetup/License.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
 
-            <bal:WixExtendedBootstrapperApplication 
+            <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="no"
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"

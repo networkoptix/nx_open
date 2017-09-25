@@ -5,82 +5,82 @@
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Powodzenie.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Nieprawidłowy login lub hasło.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Żądana operacja nie jest dozwolona dla tych danych logowania.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>To konto nie jest aktywne. Proszę sprawdzić e-mail.</translation>
     </message>
     <message>
       <source>This account is blocked.</source>
-      <translation type="unfinished">This account is blocked.</translation>
+      <translation>To konto jest zablokowane.</translation>
     </message>
     <message>
       <source>Requested feature is not implemented.</source>
-      <translation type="unfinished">Requested feature is not implemented.</translation>
+      <translation>Żądana funkcja nie jest zaimplementowana.</translation>
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation type="unfinished">Unknown realm.</translation>
+      <translation>Nieznany obszar.</translation>
     </message>
     <message>
       <source>Bad request.</source>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Nieprawidłowe zapytanie.</translation>
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation type="unfinished">Invalid nonce.</translation>
+      <translation>Nieprawidłowe dane tymczasowe.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Dane logowania są już nieważne.</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Otrzymano nieprawidłowe dane.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Nieznany błąd.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Unexpected network error. Please check your Internet connection and try again.</translation>
+      <translation>Nieoczekiwany błąd sieciowy. Sprawdź połączenie internetowe i spróbuj ponownie.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Nieprawidłowy login.</translation>
     </message>
     <message>
       <source>Requested object is not found.</source>
-      <translation type="unfinished">Requested object is not found.</translation>
+      <translation>Nie można odnaleźć żądanego obiektu.</translation>
     </message>
     <message>
       <source>Object already exists.</source>
-      <translation type="unfinished">Object already exists.</translation>
+      <translation>Obiekt już istnieje.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Błąd wewnętrzny %1. Skontaktuj się z działem wsparcia technicznego.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</translation>
+      <translation>Przepraszamy, usługa %1 jest tymczasowo niedostępna. Robimy wszystko, aby przywrócić jej działanie. Spróbuj ponownie później.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Sorry, %1 Service could not process your request. Please try again in a few moments.</translation>
+      <translation>Przepraszamy, usługa %1 nie może przetworzyć tego zapytania. Spróbuj ponownie później.</translation>
     </message>
   </context>
   <context>
@@ -88,23 +88,23 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Właściciel: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Twój system</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
+      <translation>System (%1)</translation>
     </message>
   </context>
   <context>
@@ -112,11 +112,11 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Właściciel: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Twój system</translation>
     </message>
   </context>
 </TS>

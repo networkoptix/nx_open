@@ -3,6 +3,7 @@
 #include <atomic>
 
 #include <nx/network/system_socket.h>
+#include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {
@@ -20,6 +21,9 @@ public:
     void start();
     void stop();
 
+    void waitForAtLeastOneConnection();
+    AbstractStreamSocket* anyConnection();
+
 protected:
     virtual void processConnection(AbstractStreamSocket* connection) = 0;
 
@@ -27,6 +31,7 @@ private:
     nx::utils::thread m_thread;
     nx::network::TCPServerSocket m_serverSocket;
     std::atomic<bool> m_stopped;
+    nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_connection;
 
     void threadMain();
 };

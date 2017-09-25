@@ -9,6 +9,20 @@ namespace nx {
 namespace vms {
 namespace event {
 
+ActionData::ActionData(const ActionData& src):
+    actionType(src.actionType),
+    actionParams(src.actionParams),
+    eventParams(src.eventParams),
+    businessRuleId(src.businessRuleId),
+    aggregationCount(src.aggregationCount),
+    flags(src.flags),
+    compareString(src.compareString)
+{
+    NX_EXPECT(false, "ActionData must never be copied. Constructor must exist up to C++17. "
+        "See forced NRVO in the server_rest_connection.cpp pipml (parseMessageBody(), "
+        "'deserialized' method call).");
+}
+
 bool requiresCameraResource(ActionType actionType)
 {
     switch (actionType)

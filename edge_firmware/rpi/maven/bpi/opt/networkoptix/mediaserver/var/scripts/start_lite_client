@@ -1,54 +1,100 @@
 #!/bin/bash
+set -u #< Prohibit undefined variables.
 
-CUSTOMIZATION=${deb.customization.company.name}
+CUSTOMIZATION="@deb.customization.company.name@"
+
+INSTALL_DIR="/opt/$CUSTOMIZATION"
+MEDIASERVER_DIR="$INSTALL_DIR/mediaserver"
+LITE_CLIENT_DIR="$INSTALL_DIR/lite_client"
+LIBS_DIR="$INSTALL_DIR/lib"
 BIN_NAME="mobile_client"
-BIN_PATH="/opt/$CUSTOMIZATION/lite_client/bin/$BIN_NAME"
-LIBS_PATH="/opt/$CUSTOMIZATION/lib"
-LOGS_PATH="/opt/$CUSTOMIZATION/mediaserver/var/log"
-LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
+BIN_FILE="$LITE_CLIENT_DIR/bin/$BIN_NAME"
+LOGS_DIR="$MEDIASERVER_DIR/var/log"
+
+# Touch .flag file to capture all mobile_client output to a file.
+MOBILE_CLIENT_OUT_FLAG="$LOGS_DIR/mobile_client-out.flag"
+MOBILE_CLIENT_OUT_LOG="$LOGS_DIR/mobile_client-out.log"
+
 MOBILE_CLIENT_INI="/tmp/mobile_client.ini"
 
-export LESS_TERMCAP_ue=
-export vcs_info_msg_1_=
-export PAGER="less"
-export LESS_TERMCAP_us=
-export VDPAU_OSD=1
-export vcs_info_msg_0_=
-export LANG="en_US.UTF-8"
-export SHLVL=3
-export LESS_TERMCAP_so=
-export DISPLAY=":0"
-export VDPAU_DRIVER="sunxi"
-export COLORTERM="yes"
-export LESS_TERMCAP_se=
+#--------------------------------------------------------------------------------------------------
 
-killall gpm
+logArgs() # "$@"
+{
+    echo "Script [$0] started with pid $$ (parent pid $PPID), with $# arg(s):"
+    echo "{"
+    for ARG in "$@"; do
+        echo "    [$ARG]"
+    done
+    echo "}"
+    echo ""
+}
 
-# Failed to determine EDID on some TVs, so commenting this section
-#if ! (get-edid | parse-edid | grep -Fxq 'Section "Monitor"') 2>/dev/null; then
-#    AUTO_LOGIN_MODE="--auto-login=disabled"
-#fi
+# Close all open file descriptors, so Lite Client does not inherit any.
+closeInheritedFileDescriptors()
+{
+    local FD
+    for FD in $(\ls /proc/self/fd); do
+        if [ $FD -gt 2 ]; then
+            eval "exec $FD>&-"
+        fi
+    done
+}
 
-cd "/opt/$CUSTOMIZATION/lite_client/bin"
+#--------------------------------------------------------------------------------------------------
 
-if [ -f "$LOG_OUTPUT_FLAG" ]; then
-    REDIRECT_OUTPUT="$LOGS_PATH/mobile_client-out.log"
-    
-    # Turn on NX_LOG for mobile_client via .ini-file, if it does not exist.
-    if [ ! -f "$MOBILE_CLIENT_INI" ]; then
-        echo "enableLog=true" >>"$MOBILE_CLIENT_INI"
-        echo "logFile=$LOGS_PATH/mobile_client" >>"$MOBILE_CLIENT_INI"
+main()
+{
+    logArgs "$@"
+    closeInheritedFileDescriptors
+
+    export LESS_TERMCAP_ue=""
+    export vcs_info_msg_1_=""
+    export PAGER="less"
+    export LESS_TERMCAP_us=""
+    export VDPAU_OSD=1
+    export vcs_info_msg_0_=""
+    export LANG="en_US.UTF-8"
+    export SHLVL=3
+    export LESS_TERMCAP_so=""
+    export DISPLAY=":0"
+    export VDPAU_DRIVER="sunxi"
+    export COLORTERM="yes"
+    export LESS_TERMCAP_se=""
+
+    killall gpm
+
+    # Failed to determine EDID on some TVs, thus, never disabling auto-login based on edid.
+    #if ! (get-edid | parse-edid | grep -Fxq 'Section "Monitor"') 2>/dev/null; then
+    #    local -r AUTO_LOGIN_MODE="--auto-login=disabled"
+    #else
+        local -r AUTO_LOGIN_MODE=""
+    #fi
+
+    cd "$LITE_CLIENT_DIR/bin"
+
+    if [ -f "$MOBILE_CLIENT_OUT_FLAG" ]; then
+        local -r REDIRECT_OUTPUT="$MOBILE_CLIENT_OUT_LOG"
+
+        # Turn on NX_LOG for mobile_client via .ini-file, if it does not exist.
+        if [ ! -f "$MOBILE_CLIENT_INI" ]; then
+            echo "enableLog=true" >>"$MOBILE_CLIENT_INI"
+            echo "logFile=$LOGS_DIR/mobile_client" >>"$MOBILE_CLIENT_INI"
+        fi
+    else
+        local -r REDIRECT_OUTPUT="/dev/null"
     fi
-else
-    REDIRECT_OUTPUT="/dev/null"
-fi
 
-echo "$(basename $0): Starting Lite Client, outputting to $REDIRECT_OUTPUT, with command:"
-set -x
-LD_PRELOAD="$LIBS_PATH/ldpreloadhook.so" "$BIN_PATH" "$@" "$AUTO_LOGIN_MODE" >>$REDIRECT_OUTPUT 2>&1
-{ set +x; } 2>/dev/null
+    echo "$(basename $0): Starting Lite Client, outputting to $REDIRECT_OUTPUT, with command:"
+    set -x #< Log the following command.
+    LD_PRELOAD="$LIBS_DIR/ldpreloadhook.so" \
+        "$BIN_FILE" "$@" "$AUTO_LOGIN_MODE" >>$REDIRECT_OUTPUT 2>&1
+    { set +x; } 2>/dev/null
 
-if ! pgrep mobile_client >/dev/null; then
-    echo "Turning the screen blank because Lite Client is terminated"
-    echo "1" >/sys/class/graphics/fb0/blank
-fi    
+    if ! pgrep mobile_client >/dev/null; then
+        echo "Turning the screen blank because Lite Client is terminated"
+        echo "1" >/sys/class/graphics/fb0/blank
+    fi
+}
+
+main "$@"

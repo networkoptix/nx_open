@@ -5,7 +5,7 @@
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Alle camera 's</translation>
     </message>
   </context>
 </TS>

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
+    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage,
                                           cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
         if(mediaserver.hasProxy()){
@@ -156,6 +156,7 @@ angular.module('webadminApp')
             dialogs.alert (L.settings.connnetionError);
             return false;
         }
+        var changedPort = false;
         function resultHandler (r, message){
             var data = r.data;
 
@@ -175,7 +176,7 @@ angular.module('webadminApp')
             } else {
                 dialogs.alert(message || L.settings.settingsSaved).finally(function(){
                     if(!message) {
-                        if ($scope.settings.port != window.location.port) {
+                        if (changedPort) {
                             window.location.href =
                                 window.location.protocol + '//' +
                                 window.location.hostname + ':' +
@@ -194,9 +195,11 @@ angular.module('webadminApp')
         $scope.save = function () {
             if($scope.settings.port <= 1024){
                 dialogs.confirm(L.settings.unsafePortConfirm).then(function(){
+                    changedPort = true;
                     mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
                 });
             }else {
+                changedPort = true;
                 mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
             }
         };
@@ -314,23 +317,53 @@ angular.module('webadminApp')
                     //1. Check password
                     return mediaserver.checkCurrentPassword(oldPassword).then(function() {
                         // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
-                        mediaserver.changeAdminPassword($scope.settings.rootPassword).then(resultHandler, errorHandler);
+                        mediaserver.changeAdminPassword($scope.settings.rootPassword).then(function(result){
+                            resultHandler(result);
+                            if($localStorage.login == Config.defaultLogin){
+                                mediaserver.login($localStorage.login, $scope.settings.rootPassword);
+                            }
+                        }, errorHandler);
                     },function(){
                         dialogs.alert(L.settings.wrongPassword);
                     });
                 });
         };
-        $scope.disconnectFromCloud = function() { // Disconnect from Cloud
 
+        $scope.disconnectFromSystem = function(){ // Detach server from the system
+            dialogs.confirmWithPassword(
+                L.settings.confirmDisconnectFromSystemTitle,
+                L.settings.confirmDisconnectFromSystem,
+                L.settings.confirmDisconnectFromSystemAction,
+                'danger').then(function (oldPassword) {
+                    //1. Check password
+                    return mediaserver.checkCurrentPassword(oldPassword).
+                        then(function(){
+                            return mediaserver.disconnectFromSystem().then(function(){
+                                return dialogs.alert(L.settings.disconnectedFromSystemSuccess).
+                                    finally(function(){
+                                        window.location.reload();
+                                    });
+                            }, function(error){
+                                dialogs.alert(L.settings.unexpectedError);
+                                console.error(error);
+                            });
+                        },function(){
+                            dialogs.alert(L.settings.wrongPassword);
+                        });
+                });
+        };
+
+        $scope.disconnectFromCloud = function() { // Disconnect from Cloud
             function doDisconnect(localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
-                    dialogs.alert(L.settings.disconnectedSuccess).finally(function(){
-                        window.location.reload();
-                    });
+                    dialogs.alert(L.settings.disconnectedFromCloudSuccess.replace("{{CLOUD_NAME}}",
+                                  Config.cloud.productName)).finally(function(){
+                                      window.location.reload();
+                                  });
                 }, function(error){
-                    console.error(error);
                     dialogs.alert(L.settings.unexpectedError);
+                    console.error(error);
                 });
             }
             dialogs.confirmWithPassword(
@@ -347,7 +380,7 @@ angular.module('webadminApp')
                         });
                         if(!localAdmin){
                             // Request for login and password
-                            dialogs.createUser(L.settings.createLocalOwner, L.settings.createLocalOwnerTitle).then(function(data){
+                            dialogs.createUser( null /*L.settings.createLocalOwner*/, L.settings.createLocalOwnerTitle).then(function(data){
                                 doDisconnect(data.login,data.password);
                             })
                         }else{

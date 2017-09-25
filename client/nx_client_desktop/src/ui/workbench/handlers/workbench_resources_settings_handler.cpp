@@ -107,7 +107,6 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
     QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
-    user->addFlags(Qn::local);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
     if (!m_userSettingsDialog)

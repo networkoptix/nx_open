@@ -82,13 +82,22 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Das Cloudsystem kann nur mit einer nicht-Cloud zusammengeführt werden. Systemname und Passwort werden vom Cloudsystem übernommen.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Systemereignis</translation>
     </message>
   </context>
   <context>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>Testversion</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>Analog</translation>
     </message>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>Analoger Encoder</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>Trial-Lizenz(en)</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>Kostenlose Lizenz</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Zeit</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation>Zeitlizenzen</translation>
     </message>
   </context>
   <context>
@@ -541,7 +550,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Server mit passender Hardware-ID wurde nicht gefunden</translation>
     </message>
   </context>
   <context>
@@ -651,10 +660,6 @@
       <translation>Unbekannt</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>Test-Lizenz</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>FREE-Lizenz</translation>
     </message>
@@ -668,7 +673,11 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Hardware-ID: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation>Zeitlizenz</translation>
     </message>
   </context>
   <context>

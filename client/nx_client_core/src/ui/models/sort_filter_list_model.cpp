@@ -462,7 +462,7 @@ void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
         d, &QnSortFilterListModelPrivate::handleResetSourceModel);
 
     d->updateSourceRowsCount();
-    //TODO: #ynikitenkov Make filling of model with data in reset model mode.
+    // TODO: #ynikitenkov Make filling of model with data in reset model mode.
     d->refresh();
 }
 

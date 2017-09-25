@@ -89,6 +89,9 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     dismissButton: hold
                 });
             },
+            dismissNotifications:function(){
+                return ngToast.dismiss();
+            },
             alert:function(message, title){
                 return openDialog({
                     title:title,
@@ -171,7 +174,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
             },
             noClientDetected:function(){
                 // message, title, actionLabel, actionType
-                return this.confirm(L.downloads.noClientDetectedMessage,
+                return this.confirm(null /*L.downloads.noClientDetectedMessage*/,
                     L.downloads.noClientDetectedTitle, L.downloads.action)
                     .then(function(){
                         $location.path('/download');

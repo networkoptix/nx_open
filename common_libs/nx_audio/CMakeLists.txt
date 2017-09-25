@@ -1,4 +1,4 @@
-nx_add_target(nx_audio LIBRARY PUBLIC_LIBS common)
+nx_add_target(nx_audio LIBRARY PUBLIC_LIBS common nx_utils)
 
 if(APPLE)
     find_library(OpenAL_LIBRARY OpenAL)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/cloud/cdb/managers/system_sharing_manager.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace cdb {
@@ -20,6 +21,13 @@ public:
 
     virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
+
+    void add(api::SystemSharingEx sharing);
+
+private:
+    mutable QnMutex m_mutex;
+    // map<pair<accountEmail, systemId>, sharing>
+    std::map<std::pair<std::string, std::string>, api::SystemSharingEx> m_sharings;
 };
 
 } // namespace test

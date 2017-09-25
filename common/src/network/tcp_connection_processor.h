@@ -73,6 +73,7 @@ public:
     int redirectTo(const QByteArray& page, QByteArray& contentType);
     int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
+
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
@@ -82,8 +83,14 @@ protected:
     //inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     //void clearBuffer();
 
-    QByteArray createResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug = false);
-    void sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), const QByteArray& multipartBoundary = QByteArray(), bool displayDebug = false);
+    QByteArray createResponse(int httpStatusCode, const QByteArray& contentType,
+        const QByteArray& contentEncoding, const QByteArray& multipartBoundary,
+        bool displayDebug = false, bool isUndefinedContentLength = false);
+
+    void sendResponse(int httpStatusCode, const QByteArray& contentType,
+        const QByteArray& contentEncoding = {}, const QByteArray& multipartBoundary = {},
+        bool displayDebug = false, bool isUndefinedContentLength = false);
+
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);

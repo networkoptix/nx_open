@@ -316,15 +316,16 @@
         "colors": {
             "inacceptable":      "red_core",
             "acceptable":        "yellow_core",
-            "good":              "green_core"
+            "good":              "green_core",
+            "text":              "dark5"
         }
     },
 
     "QnResourcePreviewWidget": {
         "palette": {
             "default": {
-                "window":        "dark7",
-                "dark":          "dark9",
+                "shadow":        "dark7",
+                "window":        "dark9",
                 "windowText":    "light16"
             }
         }

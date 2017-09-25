@@ -335,7 +335,7 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
         kJsonContentType,
         kSendStatUser,
         kSendStatPass,
-        nx_http::AsyncHttpClient::authBasicAndDigest,
+        nx_http::AuthType::authBasicAndDigest,
         &httpCode);
 
     return error == SystemError::noError

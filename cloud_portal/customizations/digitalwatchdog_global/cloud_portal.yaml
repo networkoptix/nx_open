@@ -21,7 +21,7 @@ cloud_gateway:
 
 mail_from: 'DW Spectrum Web Portal <dw-tech@dwcc.tv>'
 
-mail_prefix: '[DW Spectrum Web Portal]'
+mail_prefix: ''
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
@@ -47,7 +47,11 @@ languages:
     - tr_TR
     - zh_CN
     - zh_TW
+    - he_IL
     - hu_HU
+    - nl_NL
+    - pl_PL
+    - vi_VN
 
 queue_name: '$INSTANCE_NAME'
 

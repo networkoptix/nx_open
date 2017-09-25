@@ -42,7 +42,7 @@ public:
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
     //void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
 
-    //TODO: #Elric remove magic const from the function
+    // TODO: #Elric remove magic const from the function
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
     static void updateDigest(const QnConstMediaContextPtr& context, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
@@ -50,10 +50,12 @@ public:
 
     /** Return initial signature as filler */
     static QByteArray getSignPattern(QnLicensePool* licensePool);
-    static int getMaxSignSize();
     static char getSignPatternDelim();
 
     static QByteArray getSignMagic();
+
+    /** Fix signature to make it precisely signSize() bytes length, filled with spaces. */
+    static QByteArray makeSignature(QByteArray source);
 
     void setVersionStr(const QString& value);
     void setHwIdStr(const QString& value);

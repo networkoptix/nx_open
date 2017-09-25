@@ -239,7 +239,7 @@ QSize QnIoPortItemDelegate::sizeHint(QWidget* widget, const QModelIndex& index) 
     if (!lineEdit || !lineEdit->isReadOnly())
         return size;
 
-    //TODO: Currently we rely on this assumption of how our style lays out LineEdit contents.
+    // TODO: Currently we rely on this assumption of how our style lays out LineEdit contents.
     static const int kFrameWidth = 1;
     size.setWidth(lineEdit->fontMetrics().width(lineEdit->text())
         + (style::Metrics::kStandardPadding + kFrameWidth) * 2);

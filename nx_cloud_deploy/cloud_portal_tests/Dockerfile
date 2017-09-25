@@ -1,5 +1,4 @@
 FROM debian:testing
-MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 RUN apt-get update && \
   apt-get install -y curl && \
@@ -10,7 +9,9 @@ RUN apt-get update && \
   echo "deb http://www.deb-multimedia.org stretch main non-free" >> /etc/apt/sources.list && \
   apt-get install -y \
     openjdk-8-jre \
+    wget \
     xvfb \
+    lsof \
     x11vnc \
     ratpoison \
     procps \
@@ -27,6 +28,12 @@ RUN apt-get update && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
 
+# RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - 
+# RUN sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+# RUN apt-get update
+# RUN apt-get install google-chrome-stable
+
+
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
   apt-get update && \
   apt-get install -y nodejs && \
@@ -39,11 +46,23 @@ RUN npm install
 RUN npm install -g grunt
 RUN node_modules/protractor/bin/webdriver-manager update
 
-
 RUN useradd -m -s /bin/bash qa && chown -R qa /usr/src/app
 
 COPY docker/vncpasswd /home/qa/.vnc/passwd
 COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker/test-by-test.sh /test-by-test.sh
 COPY docker/vncserver /usr/local/bin/
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+ARG VERSION
+ARG REVISION
+ARG BUILD_DATE
+ARG BUILD_HOST
+ARG BUILD_USER
+LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
+      version="$VERSION" \
+      revision="$REVISION" \
+      build-date="$BUILD_DATE" \
+      build-host="$BUILD_HOST" \
+      build-user="$BUILD_USER"

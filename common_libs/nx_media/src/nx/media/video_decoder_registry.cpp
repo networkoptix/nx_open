@@ -24,14 +24,15 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
 }
 
 VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution)
+    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
 {
     QMutexLocker lock(&mutex);
 
     static std::map<AbstractVideoDecoder*, Metadata*> decodersInUse;
     for (auto& plugin: m_plugins)
     {
-        if (plugin.useCount < plugin.maxUseCount && plugin.isCompatible(codec, resolution))
+        if (plugin.useCount < plugin.maxUseCount
+            && plugin.isCompatible(codec, resolution, allowOverlay))
         {
             auto videoDecoder = VideoDecoderPtr(
                 plugin.createVideoDecoder(plugin.allocator, resolution),
@@ -55,7 +56,9 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
 }
 
 bool VideoDecoderRegistry::hasCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution,
+    const AVCodecID codec,
+    const QSize& resolution,
+    bool allowOverlay,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
     auto codecString =
@@ -86,7 +89,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
             continue;
         }
 
-        if (!plugin.isCompatible(codec, resolution))
+        if (!plugin.isCompatible(codec, resolution, allowOverlay))
         {
             NX_LOGX(
                 lm("Plugin %1 is not compatible with codec %2").arg(plugin.name).arg(codecString()),

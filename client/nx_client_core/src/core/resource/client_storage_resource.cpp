@@ -12,7 +12,7 @@ QnClientStorageResource::QnClientStorageResource(QnCommonModule* commonModule)
     , m_writable(false)
     , m_active(false)
 {
-
+    addFlags(Qn::remote);
 }
 
 QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaServerResourcePtr &parentServer, const QString &url ) {

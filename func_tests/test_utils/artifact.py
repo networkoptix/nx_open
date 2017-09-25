@@ -9,10 +9,11 @@ log = logging.getLogger(__name__)
 
 class Artifact(object):
 
-    def __init__(self, path_root, ext=None, name=None, is_error=None, type_name=None, content_type=None):
+    def __init__(self, path_root, ext=None, name=None, full_name=None, is_error=None, type_name=None, content_type=None):
         self.path_root = path_root  # path without extension
         self.ext = ext
         self.name = name
+        self.full_name = full_name
         self.is_error = is_error
         self.type_name = type_name
         self.content_type = content_type
@@ -34,12 +35,13 @@ class ArtifactFactory(object):
         self._artifact_set = artifact_set
         self._artifact = artifact
 
-    def __call__(self, path_part_list=None, ext=None, name=None, is_error=None, type_name=None, content_type=None):
+    def __call__(self, path_part_list=None, ext=None, name=None, full_name=None, is_error=None, type_name=None, content_type=None):
         assert path_part_list is None or is_list_inst(path_part_list, str), repr(path_part_list)
         path_root = '-'.join([self._artifact.path_root] + (path_part_list or []))
         artifact = Artifact(path_root,
                             ext or self._artifact.ext,
                             name or self._artifact.name,
+                            full_name or self._artifact.full_name,
                             is_error if is_error is not None else self._artifact.is_error,
                             type_name or self._artifact.type_name,
                             content_type or self._artifact.content_type)
@@ -48,6 +50,12 @@ class ArtifactFactory(object):
     def produce_file_path(self):
         self._artifact_set.add(self._artifact)
         return self._artifact.path
+
+    def write_file(self, contents):
+        path = self.produce_file_path()
+        with open(path, 'w') as f:
+            f.write(contents)
+        return path
 
     def release(self):
         repo = self._db_capture_repository
@@ -60,5 +68,6 @@ class ArtifactFactory(object):
                 continue
             with open(artifact.path, 'rb') as f:
                 data = f.read()
-            at = repo.artifact_type(artifact.type_name, artifact.content_type)
-            repo.add_artifact_with_session(self._current_test_run, artifact.name, at, data, artifact.is_error or False)
+            at = repo.artifact_type(artifact.type_name, artifact.content_type, artifact.ext)
+            repo.add_artifact_with_session(
+                self._current_test_run, artifact.name, artifact.full_name or artifact.name, at, data, artifact.is_error or False)

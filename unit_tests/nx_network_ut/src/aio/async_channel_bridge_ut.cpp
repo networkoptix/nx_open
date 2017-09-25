@@ -175,8 +175,8 @@ private:
 
     void initializeFixedDataInput()
     {
-        m_leftSource = std::make_unique<utils::bstream::ReflectingPipeline>(m_originalData);
-        m_rightSource = std::make_unique<utils::bstream::ReflectingPipeline>(m_originalData);
+        m_leftSource = std::make_unique<utils::bstream::Pipe>(m_originalData);
+        m_rightSource = std::make_unique<utils::bstream::Pipe>(m_originalData);
     }
 
     void initializeInfiniteDataInput()
@@ -291,13 +291,13 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const /*buffer*/,
-        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+        IoCompletionHandler /*handler*/) override
     {
     }
 
     virtual void sendAsync(
         const nx::Buffer& /*buffer*/,
-        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+        IoCompletionHandler /*handler*/) override
     {
     }
 

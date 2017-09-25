@@ -15,10 +15,20 @@ class GeneralConnectivity:
     using base_type = BasicTestFixture;
 
 protected:
+    void givenListeningCloudServer()
+    {
+        assertConnectionCanBeEstablished();
+    }
+
     void whenConnectToThePeerUsingDomainName()
     {
         setRemotePeerName(cloudSystemCredentials().systemId);
         assertConnectionCanBeEstablished();
+    }
+
+    void whenConnectionToMediatorIsBroken()
+    {
+        restartMediator();
     }
 
     void thenClientSocketProvidesRemotePeerFullName()
@@ -27,7 +37,12 @@ protected:
         ASSERT_NE(nullptr, cloudStreamSocket);
         ASSERT_EQ(
             cloudSystemCredentials().hostName(),
-            cloudStreamSocket->getForeignHostFullCloudName());
+            cloudStreamSocket->getForeignHostName());
+    }
+
+    void thenConnectionToMediatorIsRestored()
+    {
+        waitUntilServerIsRegisteredOnMediator();
     }
 
 private:
@@ -48,6 +63,16 @@ TEST_F(GeneralConnectivity, remote_peer_full_name_is_known_on_client_side)
 {
     whenConnectToThePeerUsingDomainName();
     thenClientSocketProvidesRemotePeerFullName();
+}
+
+TEST_F(GeneralConnectivity, server_accepts_connections_after_reconnect_to_mediator)
+{
+    givenListeningCloudServer();
+
+    whenConnectionToMediatorIsBroken();
+
+    thenConnectionToMediatorIsRestored();
+    assertConnectionCanBeEstablished();
 }
 
 //-------------------------------------------------------------------------------------------------

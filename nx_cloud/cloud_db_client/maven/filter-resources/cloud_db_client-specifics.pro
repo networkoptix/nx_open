@@ -4,5 +4,5 @@ INCLUDEPATH -= $$ROOT_DIR/common/src
 
 linux {
     QMAKE_CXXFLAGS += -Werror
+    QMAKE_LFLAGS += -Wl,--no-undefined
 }
-

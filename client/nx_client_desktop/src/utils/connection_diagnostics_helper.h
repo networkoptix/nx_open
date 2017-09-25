@@ -27,7 +27,7 @@ public:
         ec2::ErrorCode errorCode,
         QWidget* parentWidget);
 
-    //TODO: #GDM think about refactoring
+    // TODO: #GDM think about refactoring
     /** Another check of connection, used from 'Test connection' dialog. */
     static TestConnectionResult validateConnectionTest(
         const QnConnectionInfo &connectionInfo,
@@ -49,8 +49,7 @@ private:
         const QString& serverVersion);
 
     static QString getDiffVersionFullExtras(
-        const QString& clientVersion,
-        const QString& serverVersion,
+        const QnConnectionInfo& serverInfo,
         const QString& extraText);
 
     static void showValidateConnectionErrorMessage(
@@ -64,7 +63,7 @@ private:
         const QnConnectionInfo &connectionInfo,
         QWidget* parentWidget);
 
-    //TODO: #GDM move all duplicating strings here
+    // TODO: #GDM move all duplicating strings here
     enum class ErrorStrings
     {
         ContactAdministrator,

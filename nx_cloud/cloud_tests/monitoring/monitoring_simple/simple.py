@@ -1,5 +1,6 @@
 # Specification is at https://networkoptix.atlassian.net/wiki/display/SD/Auto-test+for+cloud+portal+backend
 
+import time
 import sys
 import requests
 import logging
@@ -30,23 +31,31 @@ def testclass(cls):
     return cls
 
 
-def testmethod(f):
-    def wrapper(self):
-        try:
-            log.info('Running test {}: {}'.format(wrapper.testmethod_index, f.__name__))
-            f(self)
-            log.info('Test {}: success'.format(f.__name__))
-        except AssertionError as e:
-            log.error('Test {}: failure. Message: '.format(f.__name__))
-            log.error(e)
-        except:
-            log.error('Test {}: failure'.format(f.__name__))
-            raise
+def testmethod(delay=0):
+    def _testmethod(f):
+        def wrapper(self):
+            try:
+                if delay:
+                    log.info('Test {}: {}. Sleeping for {} seconds'.format(wrapper.testmethod_index, f.__name__, delay))
+                    time.sleep(delay)
 
-    wrapper.testmethod_index = testmethod.counter
-    testmethod.counter += 1
+                log.info('Running test {}: {}'.format(wrapper.testmethod_index, f.__name__))
+                f(self)
+                log.info('Test {}: success'.format(f.__name__))
+            except AssertionError as e:
+                log.error('Test {}: failure. Message: '.format(f.__name__))
+                log.error(e)
+                raise
+            except:
+                log.error('Test {}: failure'.format(f.__name__))
+                raise
 
-    return wrapper
+        wrapper.testmethod_index = testmethod.counter
+        testmethod.counter += 1
+
+        return wrapper
+
+    return _testmethod
 
 testmethod.counter = 1
 
@@ -132,21 +141,21 @@ class CloudSession(object):
     def assert_response_has_cookie(self, response, cookie):
         assert cookie in response.cookies, 'Response doesn\'t containt cookie {}'.format(cookie)
 
-    @testmethod
+    @testmethod()
     def restore_password(self):
         r = self.post('/api/account/restorePassword', {"user_email": self.email})
 
         self.assert_response_text_is_ok(r)
         assert self.wait_for_message('noptixqa-owner-queue'), "Timeout waiting for e-mail to arrive"
 
-    @testmethod
+    @testmethod()
     def login(self):
         r = self.post('/api/account/login', {'email': self.email, 'password': self.password, 'remember': True})
 
         self.assert_response_has_cookie(r, 'csrftoken')
         self.assert_response_has_cookie(r, 'sessionid')
 
-    @testmethod
+    @testmethod()
     def list_systems(self):
         r = self.get('/api/systems')
         data = r.json()
@@ -155,7 +164,7 @@ class CloudSession(object):
 
         self.system_id = data[0]['id']
 
-    @testmethod
+    @testmethod()
     def share_system(self):
         request_data = {
             "email": self.user_email,
@@ -176,7 +185,7 @@ class CloudSession(object):
         data = r.json()
         assert 'id' in data, 'No ID'
 
-    @testmethod
+    @testmethod(delay=10)
     def check_system_users(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -190,14 +199,14 @@ class CloudSession(object):
         assert user is not None, 'No users returned'
         self.vms_user_id = user['vmsUserId']
 
-    @testmethod
+    @testmethod()
     def remove_user(self):
         request_data = {'id': self.vms_user_id}
         auth = HTTPDigestAuth(self.email, self.password)
         self.post('/gateway/{system_id}/ec2/removeUser'.format(system_id=self.system_id),
                   request_data, auth=auth)
 
-    @testmethod
+    @testmethod(delay=10)
     def check_vasily_is_absent(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -209,7 +218,7 @@ class CloudSession(object):
 
         assert next(filter(lambda x: x['accountEmail'] == self.user_email, data), None) is None, 'User still exists'
 
-    @testmethod
+    @testmethod()
     def test_cloud_connect(self):
         command = '--http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers'.format(
             user=quote(self.email),

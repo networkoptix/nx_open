@@ -1,0 +1,218 @@
+{
+    "driverId": "{6541F47D-99B8-4049-BF55-697BD6DD1BBD}",
+    "driverName": {
+        "value": "Hanwha metadata driver",
+        "localization": {
+        }
+    },
+    "outputEventTypes": [
+        {
+            "eventTypeId": "{5DFC6D1B-3B92-4E55-A627-0DB2A2422DB3}",
+            "eventName": {
+                "value": "Face detection",
+                "localization": {
+                }
+            },
+            "internalName": "FaceDetection",
+            "description": "Face %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{67EDDD6A-A31F-41C4-91B6-B6298FE257A1}",
+            "eventName": {
+                "value": "Virtual line crossing",
+                "localization": {
+                }
+            },
+            "internalName": "VideoAnalytics.Passing",
+            "description": "Virtual line #%1 was crossed",
+            "flags": "regionDependent",
+            "regionDescription": "#%1"
+        },
+        {
+            "eventTypeId": "{6F602403-CCA4-4F85-8777-F340E8239A23}",
+            "eventName": {
+                "value": "Entering the area",
+                "localization": {
+                }
+            },
+            "internalName": "VideoAnalytics.Entering",
+            "description": "Object has entered %1",
+            "flags": "regionDependent",
+            "regionDescription": " the region #%1"
+        },
+        {
+            "eventTypeId": "{2C218743-604C-475D-AED9-A848F40F13F9}",
+            "eventName": {
+                "value": "Exiting the area",
+                "localization": {
+                }
+            },
+            "internalName": "VideoAnalytics.Exiting",
+            "description": "Object has exited %1",
+            "flags": "regionDependent",
+            "regionDescription": " the region #%1"
+        },
+        {
+            "eventTypeId": "{A452E49A-D1D8-44EA-84DA-F581414E8153}",
+            "eventName": {
+                "value": "Appearing in the area",
+                "localization": {
+                }
+            },
+            "internalName": "VideoAnalytics.AppearDisappear",
+            "description": "Object %1 ",
+            "positiveState": "appeared",
+            "negativeState": "disappeared",
+            "flags": "stateDependent",
+            "regionDescription": "  in the region #%1"
+        },
+        {
+            "eventTypeId": "{42D4994A-A267-4C39-98AA-CBC4D41CA42B}",
+            "eventName": {
+                "value": "Intrusion in the area",
+                "localization": {
+                }
+            },
+            "internalName": "VideoAnalytics.Intrusion",
+            "description": "Intrusion %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{CABB4644-F6C2-4F09-8EDF-E0FAFCC4F833}",
+            "eventName": {
+                "value": "Audio detection",
+                "localization": {
+                }
+            },
+            "internalName": "AudioDetection",
+            "description": "The audio volume level is %1 the threshold",
+            "positiveState": "above",
+            "negativeState": "below",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{657B39C2-36C1-4644-9357-58593658D567}",
+            "eventName": {
+                "value": "Tampering detection",
+                "localization": {
+                }
+            },
+            "internalName": "Tampering",
+            "description": "Tampering %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{216668D9-EA9B-483A-A43E-9414ED760A01}",
+            "eventName": {
+                "value": "Defocusing detection",
+                "localization": {
+                }
+            },
+            "internalName": "DefocusDetection",
+            "description": "Defocusing %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}",
+            "eventName": {
+                "value": "Dry contact input",
+                "localization": {
+                }
+            },
+            "internalName": "DryContactInput",
+            "description": "Dry contact input has been %1",
+            "positiveState": "activated",
+            "negativeState": "deactivated",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{F1F723BB-20C8-453A-AFCE-86F318CBF097}",
+            "eventName": {
+                "value": "Motion detection",
+                "localization": {
+                }
+            },
+            "internalName": "MotionDetection",
+            "description": "Motion %1%2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent | regionDependent",
+            "regionDescription": "  in the region #%1"
+        },
+        {
+            "eventTypeId": "{79F03CE5-AFD1-4942-905C-46A981942422}",
+            "eventName": {
+                "value": "Sound - Scream",
+                "localization": {
+                }
+            },
+            "internalName": "AudioAnalytics.Scream",
+            "description": "Scream %1",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{02567E19-33AC-440B-8647-16D95EF6B295}",
+            "eventName": {
+                "value": "Sound - Gun shot",
+                "localization": {
+                }
+            },
+            "internalName": "AudioAnalytics.Gunshot",
+            "description": "Gun shot %1",
+            "positiveState": "has been detected",
+            "negativeState": "sound has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{BD275A24-F758-4FD5-9239-FBE87B1331CE}",
+            "eventName": {
+                "value": "Sound - Explosion",
+                "localization": {
+                }
+            },
+            "internalName": "AudioAnalytics.Explosion",
+            "description": "Explosion %1",
+            "positiveState": "has been detected",
+            "negativeState": "sound has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{BA9DFE3C-55E6-4298-BC8E-CAA947CB9440}",
+            "eventName": {
+                "value": "Sound - Glass break",
+                "localization": {
+                }
+            },
+            "internalName": "AudioAnalytics.GlassBreak",
+            "description": "Glass break %1",
+            "positiveState": "has been detected",
+            "negativeState": "sound has ended",
+            "flags": "stateDependent"
+        },
+        {
+            "eventTypeId": "{1B541CB7-E377-4818-8801-323281530E7B}",
+            "eventName": {
+                "value": "Loitering detected",
+                "localization": {
+                }
+            },
+            "internalName": "VideoAnalytics.Loitering",
+            "description": "Loitering %1%2",
+            "positiveState": "has been detected",
+            "negativeState": "has ended",
+            "flags": "stateDependent | regionDependent",
+            "regionDescription": " in the region #%1"
+        }
+    ]
+}

@@ -69,6 +69,7 @@ protected:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     void initLayoutStreams();
+    void initMetadata();
     AVFormatContext* getFormatContext();
 
 private:
@@ -97,7 +98,6 @@ private:
     bool m_useAbsolutePos = true;
     qint64 m_durationUs = AV_NOPTS_VALUE;
 
-    AVIOContext* m_ioContext = nullptr;
     bool m_eofReached = false;
     QnMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;

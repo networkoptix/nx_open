@@ -103,6 +103,7 @@
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 #include <utils/common/delayed.h>
+#include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -444,6 +445,11 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(action::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(action::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     connect(action(action::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+        [this](bool on)
+        {
+            m_motionSelectionInstrument->setEnabled(!on);
+        });
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);
@@ -724,7 +730,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
             int hotkey = e->key() - Qt::Key_0;
 
-            QnPtzHotkeysResourcePropertyAdaptor adaptor;
+            nx::client::core::ptz::PtzHotkeysResourcePropertyAdaptor adaptor;
             adaptor.setResource(widget->resource()->toResourcePtr());
 
             QString objectId = adaptor.value().value(hotkey);
@@ -1090,7 +1096,6 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView* /*view*/,
     QnMediaResourceWidget* widget)
 {
-    NX_EXPECT(menu()->canTrigger(action::StartSmartSearchAction, widget));
     if (!menu()->canTrigger(action::StartSmartSearchAction, widget))
         return;
 

@@ -155,7 +155,9 @@ TEST_F(Account, reactivation)
         ASSERT_EQ(api::ResultCode::notFound, result);
 
         if (i == 0)
+        {
             ASSERT_TRUE(restart());
+        }
     }
 }
 
@@ -486,7 +488,9 @@ TEST_F(Account, reset_password_general)
         ASSERT_EQ(api::ResultCode::ok, result);
 
         if (i == 1)
+        {
             ASSERT_TRUE(restart());  //checking that code is valid after cloud_db restart
+        }
 
         //confirmation code has format base64(tmp_password:email)
         const auto tmpPasswordAndEmail = QByteArray::fromBase64(
@@ -562,7 +566,9 @@ TEST_F(Account, reset_password_expiration)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
 
         api::AccountUpdateData update;
         update.passwordHa1 = nx_http::calcHa1(
@@ -634,7 +640,9 @@ TEST_F(Account, reset_password_links_expiration_after_changing_password)
         }
 
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
     }
 }
 
@@ -674,7 +682,9 @@ TEST_F(Account, reset_password_authorization)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
 
         //verifying that only /account/update is allowed with this temporary password
         api::AccountData accountData;
@@ -827,7 +837,9 @@ TEST_F(Account, created_while_sharing)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
 
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -892,6 +904,23 @@ protected:
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
+    void whenRestartedCloudDb()
+    {
+        ASSERT_TRUE(restart());
+    }
+
+    void whenRequestAccountInfo()
+    {
+        api::AccountData accountData;
+        m_prevResultCode = getAccount(m_account.email, m_account.password, &accountData);
+    }
+
+    void whenRequestSystemList()
+    {
+        std::vector<api::SystemDataEx> systems;
+        m_prevResultCode = getSystems(m_account.email, m_account.password, &systems);
+    }
+
     void assertRegistrationTimestampIsCorrect()
     {
         using namespace std::chrono;
@@ -918,9 +947,10 @@ protected:
             nx::utils::floor<milliseconds>(m_activationTimeRange.second));
     }
 
-    void whenRestartedCloudDb()
+    void thenResultCodeIs(api::ResultCode expectedResultCode)
     {
-        ASSERT_TRUE(restart());
+        ASSERT_TRUE(m_prevResultCode);
+        ASSERT_EQ(expectedResultCode, *m_prevResultCode);
     }
 
     const AccountWithPassword& account() const
@@ -937,6 +967,7 @@ private:
     api::AccountConfirmationCode m_activationCode;
     TimeRange m_registrationTimeRange;
     TimeRange m_activationTimeRange;
+    boost::optional<api::ResultCode> m_prevResultCode;
 
     api::AccountData getFreshAccountCopy()
     {
@@ -964,6 +995,17 @@ TEST_F(AccountNewTest, account_timestamps)
 
     assertRegistrationTimestampIsCorrect();
     assertActivationTimestampIsCorrect();
+}
+
+TEST_F(AccountNewTest, proper_error_code_is_reported_when_using_not_activated_account)
+{
+    givenNotActivatedAccount();
+
+    whenRequestAccountInfo();
+    thenResultCodeIs(api::ResultCode::accountNotActivated);
+
+    whenRequestSystemList();
+    thenResultCodeIs(api::ResultCode::accountNotActivated);
 }
 
 //-------------------------------------------------------------------------------------------------

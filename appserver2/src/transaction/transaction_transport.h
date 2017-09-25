@@ -119,19 +119,19 @@ public:
         {
         case Qn::JsonFormat:
             if (remotePeer().peerType == Qn::PT_OldMobileClient)
-                addData(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
+                addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
             else
-                addData(m_bus->jsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
+                addDataToTheSendQueue(m_bus->jsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
             break;
             //case Qn::BnsFormat:
-            //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            //    addDataToTheSendQueue(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             //    break;
         case Qn::UbjsonFormat:
-            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
+            addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
             break;
         default:
             qWarning() << "Client has requested data in an unsupported format" << remotePeer().dataFormat;
-            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
+            addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(transaction, header));
             break;
         }
     }

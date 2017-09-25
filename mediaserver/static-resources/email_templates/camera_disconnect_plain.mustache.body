@@ -1,0 +1,7 @@
+{{&event}}
+
+{{&source}} ({{&sourceIp}}) 
+
+{{#aggregated}}
+{{&timestampDate}} {{&timestampTime}}
+{{/aggregated}}

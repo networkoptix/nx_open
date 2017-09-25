@@ -5,11 +5,20 @@ from django.conf import settings
 notifications_config = settings.NOTIFICATIONS_CONFIG
 
 
-def send(user_email, msg_type, message, customization):
+def find_message(external_id):
+    # trying to find message and expect None otherwise
+    msg = Message.objects.filter(external_id=external_id).first()
+    if not msg:
+        return None
+    return msg
+
+
+def send(user_email, msg_type, message, customization, external_id=None):
 
     django.core.validators.validate_email(user_email)
 
-    msg = Message(user_email=user_email, type=msg_type, message=message, customization=customization)
+    msg = Message(user_email=user_email, type=msg_type,
+                  message=message, customization=customization)
 
     # TODO: validate email among existing users
 

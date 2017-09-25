@@ -1,0 +1,31 @@
+project_identifier: nx-witness
+api_key: 42f3cd326fea96b19ad3bf2eb9009b45
+base_path: ..
+preserve_hierarchy: true
+
+files:
+  -
+    source: '/cloud_portal/front_end/app/language.json'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/language.json'
+  -
+    source: '/cloud_portal/front_end/app/views/**/*.*'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/views/**/%original_file_name%'
+    ignore:
+      - /cloud_portal/front_end/app/views/debug.html
+      - /cloud_portal/front_end/app/views/view.html
+      - /cloud_portal/front_end/app/views/static/eula.html
+  -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.json'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
+  -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.html'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
+  -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.txt'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
+  -
+    source: '/webadmin/app/web_common/commonLanguage.json'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/web_common/commonLanguage.json'
+  -
+    source: '/webadmin/app/web_common/views/**/*.*'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'

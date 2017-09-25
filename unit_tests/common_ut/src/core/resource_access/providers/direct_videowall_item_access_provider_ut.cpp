@@ -24,14 +24,6 @@ protected:
     {
         return new QnVideoWallItemAccessProvider(Mode::direct, commonModule());
     }
-
-    QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)
-    {
-        auto layout = createLayout();
-        layout->setParentId(videoWall->getId());
-        resourcePool()->addResource(layout);
-        return layout;
-    }
 };
 
 TEST_F(QnDirectVideoWallItemAccessProviderTest, checkSource)
@@ -132,6 +124,10 @@ TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoW
 
     resourcePool()->addResource(layout);
 
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
+
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -149,6 +145,10 @@ TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
     item.resource.uniqueId = target->getUniqueId();
     layout->addItem(item);
     resourcePool()->addResource(layout);
+
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videoWall->items()->addItem(vwitem);
 
     layout->setParentId(videoWall->getId());
 

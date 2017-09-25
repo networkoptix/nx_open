@@ -6,3 +6,7 @@ INCLUDEPATH += ${root.dir}/common_libs/nx_network/src/
 INCLUDEPATH += ${root.dir}/common_libs/nx_speech_synthesizer/src/
 
 SOURCES += ${project.build.directory}/mediaserver_core_app_info_impl.cpp
+
+linux {
+    QMAKE_LFLAGS -= -Wl,--no-undefined
+}

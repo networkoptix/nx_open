@@ -32,7 +32,7 @@ Item
 
             if (displayMode === LiteClientLayoutHelper.SingleCamera)
             {
-                if (stackView.currentItem.objectName != "videoScreen")
+                if (stackView.currentItem.objectName !== "videoScreen")
                 {
                     var item = Workflow.openVideoScreen(singleCameraId)
                     item.layoutHelper = gridLayoutHelper
@@ -42,6 +42,8 @@ Item
             else
             {
                 Workflow.openResourcesScreen()
+                if (grid.currentItem)
+                    grid.currentItem.showControls()
             }
         }
     }
@@ -77,7 +79,13 @@ Item
             layoutY: Math.floor(index / grid.columns)
 
             onClicked: grid.currentIndex = index
-            onDoubleClicked: gridLayoutHelper.displayCell = Qt.point(layoutX, layoutY)
+
+            onDoubleClicked:
+            {
+                gridLayoutHelper.displayCell = Qt.point(layoutX, layoutY)
+                showTransformationsWarningIfNeeded()
+            }
+
             onNextCameraRequested:
             {
                 gridLayoutHelper.setCameraIdOnCell(
@@ -108,4 +116,13 @@ Item
     }
 
     Component.onCompleted: grid.forceActiveFocus()
+
+    function showTransformationsWarningIfNeeded()
+    {
+        var item = stackView.currentItem
+        if (!item || item.objectName !== "videoScreen")
+            return
+
+        item.start()
+    }
 }

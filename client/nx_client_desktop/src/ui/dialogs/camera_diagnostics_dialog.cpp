@@ -19,6 +19,9 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <nx/client/desktop/ui/common/clipboard_button.h>
+
+using namespace nx::client::desktop::ui;
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -30,9 +33,10 @@ QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::Window
     ui->setupUi(this);
     retranslateUi();
 
-    QPushButton *copyButton = new QPushButton(tr("Copy to Clipboard"), this);
+    auto copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     ui->buttonBox->addButton(copyButton, QDialogButtonBox::HelpRole);
-    connect(copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
+    connect(copyButton, &QPushButton::clicked,
+        this, &QnCameraDiagnosticsDialog::at_copyButton_clicked);
 
     setHelpTopic(this, Qn::CameraDiagnostics_Help);
 }

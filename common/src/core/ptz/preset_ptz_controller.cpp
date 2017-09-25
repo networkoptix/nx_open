@@ -1,48 +1,16 @@
 #include "preset_ptz_controller.h"
+#include "ptz_preset.h"
 
 #include <nx/fusion/model_functions.h>
 #include <api/app_server_connection.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
-#include "ptz_preset.h"
-
 bool deserialize(const QString& /*value*/, QnPtzPresetRecordHash* /*target*/)
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
     return false;
 }
-
-namespace
-{
-const QString kPresetsPropertyKey = lit("ptzPresets");
-}
-
-// -------------------------------------------------------------------------- //
-// Model Data
-// -------------------------------------------------------------------------- //
-
-struct QnPtzPresetData
-{
-    QnPtzPresetData(): space(Qn::DevicePtzCoordinateSpace) {}
-
-    QVector3D position;
-    Qn::PtzCoordinateSpace space;
-};
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
-
-struct QnPtzPresetRecord
-{
-    QnPtzPresetRecord() {}
-    QnPtzPresetRecord(const QnPtzPreset &preset, const QnPtzPresetData &data): preset(preset), data(data) {}
-
-    QnPtzPreset preset;
-    QnPtzPresetData data;
-};
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
-
-Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
-
 
 // -------------------------------------------------------------------------- //
 // QnPresetPtzController

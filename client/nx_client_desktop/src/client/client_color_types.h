@@ -307,13 +307,12 @@ struct QnResourceItemColors
 
 struct QnPasswordStrengthColors
 {
-    QnPasswordStrengthColors();
-
-    QColor inacceptable;
-    QColor acceptable;
-    QColor good;
+    QColor inacceptable = Qt::red;
+    QColor acceptable = Qt::yellow;
+    QColor good = Qt::green;
+    QColor text = Qt::black;
 };
-#define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
+#define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)(text)
 
 #define QN_CLIENT_COLOR_TYPES \
     (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors) \

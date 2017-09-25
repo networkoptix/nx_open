@@ -4,7 +4,9 @@
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
+
 #include <client/client_runtime_settings.h>
+#include <client/client_settings.h>
 
 #include <nx/streaming/config.h>
 
@@ -70,6 +72,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
             renderingTools.uploader = new DecodedPictureToOpenGLUploader( m_glContext );
             renderingTools.uploader->setForceSoftYUV( qnRuntime->isSoftwareYuv() );
             renderingTools.renderer = new QnGLRenderer( m_glContext, *renderingTools.uploader );
+            renderingTools.renderer->setBlurEnabled(qnSettings->isGlBlurEnabled());
             renderingTools.renderer->setScreenshotInterface(m_screenshotInterface);
             renderingTools.uploader->setYV12ToRgbShaderUsed(renderingTools.renderer->isYV12ToRgbShaderUsed());
             renderingTools.uploader->setNV12ToRgbShaderUsed(renderingTools.renderer->isNV12ToRgbShaderUsed());
@@ -172,13 +175,15 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
     return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
 }
 
-QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
+QnAbstractCompressedMetadataPtr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 {
     if (m_channelRenderers.size() <= static_cast<size_t>(channel))
-        return QnMetaDataV1Ptr();
+        return QnAbstractCompressedMetadataPtr();
 
     const RenderingTools& ctx = m_channelRenderers[channel];
-    return ctx.renderer ? ctx.renderer->lastFrameMetadata() : QnMetaDataV1Ptr();
+    return ctx.renderer
+        ? ctx.renderer->lastFrameMetadata()
+        : QnAbstractCompressedMetadataPtr();
 }
 
 void QnResourceWidgetRenderer::setBlurFactor(qreal value)
@@ -410,7 +415,7 @@ QSize QnResourceWidgetRenderer::getMostFrequentChannelSourceSize() const
 
 int QnResourceWidgetRenderer::getMostFrequentSize(std::map<int, int>& sizeMap) const
 {
-    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(), 
+    auto maxSize = std::max_element(sizeMap.begin(), sizeMap.end(),
         [](const std::pair<int, int>& l, const std::pair<int, int>& r)
         {
             return l.second < r.second;

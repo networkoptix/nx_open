@@ -117,6 +117,7 @@ enum AttributeType
     isPersistent,
     isListening,
     trafficRelayUrl,
+    trafficRelayUrlList,
 
     udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
     rendezvousConnectTimeout,

@@ -82,13 +82,22 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>Rendszereseménye</translation>
     </message>
   </context>
   <context>
@@ -99,7 +108,7 @@
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>A szerver leállt.</translation>
+      <translation>A szerver leállíva.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
@@ -123,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>Rossz válasz érkezett: %1: &quot;%2&quot; szervertől.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -147,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>Egy bemeneti/kimeneti hiba történt. OS üzenete: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -171,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Eszközkérelem &quot;%1&quot; hiba miatt sikertelen &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Kamerakérelem &quot;%1&quot; hiba miatt sikertelen &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -215,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I/O modul kérelem &quot;%1&quot; hiba miatt sikertelen &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -303,7 +312,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Kamera archívból helyreállítva. Törölje a kamerát, és adja hozzá újra az élő videó megtekintéséhez.</translation>
     </message>
   </context>
   <context>
@@ -390,10 +399,6 @@
   <context>
     <name>QnLicense</name>
     <message>
-      <source>Trial</source>
-      <translation>Próba</translation>
-    </message>
-    <message>
       <source>Analog</source>
       <translation>Analóg</translation>
     </message>
@@ -403,11 +408,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -424,10 +429,6 @@
     <message>
       <source>Analog Encoder</source>
       <translation>Analóg enkóder</translation>
-    </message>
-    <message>
-      <source>Trial Licenses</source>
-      <translation>Próbalicenc</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -476,6 +477,14 @@
     <message>
       <source>Free license</source>
       <translation>Ingyenes licenc</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Idő</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation>Idő licencek</translation>
     </message>
   </context>
   <context>
@@ -541,7 +550,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>Nem található szerver egyező hardver ID-vel</translation>
     </message>
   </context>
   <context>
@@ -651,10 +660,6 @@
       <translation>Ismeretlen</translation>
     </message>
     <message>
-      <source>Trial License</source>
-      <translation>Próbalicenc</translation>
-    </message>
-    <message>
       <source>FREE License</source>
       <translation>Ingyenes licence</translation>
     </message>
@@ -668,7 +673,11 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>Hardver ID: %1</translation>
+    </message>
+    <message>
+      <source>Time License</source>
+      <translation>Idő licenc</translation>
     </message>
   </context>
   <context>
@@ -704,12 +713,12 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Legalacsonyabb</translation>
+      <translation>La</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Alacsony</translation>
+      <translation>A</translation>
     </message>
     <message>
       <source>Me</source>
@@ -719,7 +728,7 @@
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Magas</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>Bst</source>
@@ -1219,7 +1228,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>&quot;%1&quot; szerver hiba</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1233,19 +1242,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>&quot;%1&quot; szerver ütközés</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>&quot;%1&quot; szerver elindult</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>&quot;%1&quot; szervernek licencproblémája van</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>&quot;%1&quot; szerver befejezte az archív biztonsági másolatot</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1257,7 +1266,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>Több %1 esemény történt</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1299,17 +1308,17 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Eseményindító: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
@@ -1376,11 +1385,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>&quot;%1&quot; HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>&quot;%1&quot; rendszerlemez majdnem megtelt.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1444,7 +1453,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Eseményindító neve</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1466,7 +1475,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Minden adminisztrátor</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1478,23 +1487,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Szoft eseményindítás</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Soft Trigger %1:%2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>%1 soft eseményindító többször is aktiválódott</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>E-mail küldése</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Nyugtázás</translation>
     </message>
   </context>
   <context>

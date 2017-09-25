@@ -636,7 +636,7 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
     if (scope != action::TreeScope)
         return action::Parameters();
 
-    //TODO: #GDM #3.1 refactor to a simple switch by node type
+    // TODO: #GDM #3.1 refactor to a simple switch by node type
 
     QItemSelectionModel* selectionModel = currentSelectionModel();
     QModelIndex index = selectionModel->currentIndex();
@@ -677,6 +677,16 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
     QnUserResourcePtr user;
     QnUuid uuid = index.data(Qn::UuidRole).value<QnUuid>();
 
+    switch (nodeType)
+    {
+        case Qn::SharedLayoutsNode:
+            user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+            uuid = parentIndex.data(Qn::UuidRole).value<QnUuid>();
+            break;
+        default:
+            break;
+    }
+
     switch (parentNodeType)
     {
         case Qn::LayoutsNode:
@@ -694,8 +704,12 @@ action::Parameters QnResourceBrowserWidget::currentParameters(action::ActionScop
             break;
     }
 
-    result.setArgument(Qn::UserResourceRole, user);
-    result.setArgument(Qn::UuidRole, uuid);
+    if (user)
+        result.setArgument(Qn::UserResourceRole, user);
+
+    if (!uuid.isNull())
+        result.setArgument(Qn::UuidRole, uuid);
+
     result.setArgument(Qn::NodeTypeRole, nodeType);
     return result;
 }
@@ -1039,4 +1053,69 @@ void QnResourceBrowserWidget::setQuery(const QnResourceSearchQuery& query)
     int typeIndex = ui->typeComboBox->findData((int)query.flags);
     NX_EXPECT(typeIndex >= 0);
     ui->typeComboBox->setCurrentIndex(typeIndex);
+}
+
+void QnResourceBrowserWidget::selectNodeByUuid(const QnUuid& id)
+{
+    if (currentTab() != ResourcesTab)
+        return;
+
+    NX_EXPECT(!id.isNull());
+    if (id.isNull())
+        return;
+
+    auto model = ui->resourceTreeWidget->searchModel();
+    NX_EXPECT(model);
+    if (!model)
+        return;
+
+    selectIndices(model->match(model->index(0, 0),
+        Qn::UuidRole,
+        qVariantFromValue(id),
+        1,
+        Qt::MatchExactly | Qt::MatchRecursive));
+}
+
+void QnResourceBrowserWidget::selectResource(const QnResourcePtr& resource)
+{
+    if (currentTab() != ResourcesTab)
+        return;
+
+    NX_EXPECT(resource);
+    if (!resource)
+        return;
+
+    auto model = ui->resourceTreeWidget->searchModel();
+    NX_EXPECT(model);
+    if (!model)
+        return;
+
+    selectIndices(model->match(model->index(0, 0),
+        Qn::ResourceRole,
+        qVariantFromValue(resource),
+        1,
+        Qt::MatchExactly | Qt::MatchRecursive));
+}
+
+void QnResourceBrowserWidget::selectIndices(const QModelIndexList& indices)
+{
+    if (indices.empty())
+        return;
+
+    for (const auto& index: indices)
+    {
+        auto parent = index.parent();
+        while (parent.isValid())
+        {
+            ui->resourceTreeWidget->expand(parent);
+            parent = parent.parent();
+        }
+    }
+
+    if (auto selection = ui->resourceTreeWidget->selectionModel())
+    {
+        selection->clear();
+        for (const auto& index: indices)
+            selection->select(index, QItemSelectionModel::Select);
+    }
 }

@@ -32,12 +32,12 @@ MediatorProcess::MediatorProcess(int argc, char **argv):
 {
 }
 
-const std::vector<SocketAddress>& MediatorProcess::httpEndpoints() const
+std::vector<SocketAddress> MediatorProcess::httpEndpoints() const
 {
-    return m_httpServer->m_httpEndpoints;
+    return m_httpServer->httpEndpoints();
 }
 
-const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
+std::vector<SocketAddress> MediatorProcess::stunEndpoints() const
 {
     return m_stunServer->endpoints();
 }
@@ -45,6 +45,16 @@ const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
 ListeningPeerPool* MediatorProcess::listeningPeerPool() const
 {
     return &m_controller->listeningPeerPool();
+}
+
+Controller& MediatorProcess::controller()
+{
+    return *m_controller;
+}
+
+const Controller& MediatorProcess::controller() const
+{
+    return *m_controller;
 }
 
 std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
@@ -68,7 +78,10 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
         &stunServer->dispatcher());
     m_controller = &controller;
 
-    http::Server httpServer(settings, controller.listeningPeerRegistrator());
+    http::Server httpServer(
+        settings,
+        controller.listeningPeerRegistrator(),
+        &controller.discoveredPeerPool());
     m_httpServer = &httpServer;
 
     // TODO: #ak Following call should be removed. 

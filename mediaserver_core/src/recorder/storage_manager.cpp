@@ -435,8 +435,7 @@ QnStorageManager::QnStorageManager(
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
     m_camInfoWriterHandler(this, commonModule->resourcePool()),
-    m_camInfoWriter(&m_camInfoWriterHandler),
-    m_lowSysStorageSpaceWarnShown(false)
+    m_camInfoWriter(&m_camInfoWriterHandler)
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
@@ -624,8 +623,10 @@ bool QnStorageManager::getSqlDbPath(
     QString storageUrl = storage->getUrl();
     QString dbRefFilePath;
 
-    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(
-        commonModule()->moduleGUID()));
+    dbRefFilePath =
+        closeDirPath(storageUrl) +
+        dbRefFileName.arg(commonModule()->moduleGUID().toSimpleString());
+
     QByteArray dbRefGuidStr;
 
     //checking for file db_ref.guid existence
@@ -660,7 +661,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     if (!getSqlDbPath(storage, dbPath))
         return;
 
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule()->moduleGUID());
+    QString simplifiedGUID = commonModule()->moduleGUID().toSimpleString();
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName =
         closeDirPath(dbPath) +
@@ -1537,18 +1538,10 @@ void QnStorageManager::checkSystemStorageSpace()
     qint64 bigStorageThreshold = 0;
     for (const auto& storage: getAllStorages())
     {
-        if (storage->getStatus() == Qn::Online && storage->isSystem())
+        if (storage->getStatus() == Qn::Online && storage->isSystem()
+            && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
         {
-            if (!m_lowSysStorageSpaceWarnShown
-                && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
-            {
-                m_lowSysStorageSpaceWarnShown = true;
-                emit storageFailure(storage, nx::vms::event::EventReason::systemStorageFull);
-            }
-            else if (storage->getFreeSpace() > kMinSystemStorageFreeSpace * 2)
-            {
-                m_lowSysStorageSpaceWarnShown = false;
-            }
+            emit storageFailure(storage, nx::vms::event::EventReason::systemStorageFull);
         }
     }
 }
@@ -2033,7 +2026,7 @@ void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resour
     for(const DeviceFileCatalogPtr& catalogLow: m_devFileCatalog[QnServer::LowQualityCatalog])
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 
-    //TODO: #vasilenko should we delete bookmarks here too?
+    // TODO: #vasilenko should we delete bookmarks here too?
 }
 
 bool QnStorageManager::isWritableStoragesAvailable() const

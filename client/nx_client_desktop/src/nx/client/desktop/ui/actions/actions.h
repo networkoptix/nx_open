@@ -143,6 +143,12 @@ enum IDType
     SelectionChangeAction,
 
     /**
+     * Select newly created item (webpage, layout tour, user, videowall) in the resource tree. Open
+     * on the scene if possible.
+     */
+    SelectNewItemAction,
+
+    /**
      * Enters "what's this" mode.
      */
     WhatsThisAction,
@@ -447,6 +453,11 @@ enum IDType
     OpenVideoWallReviewAction,
 
     /**
+     * Opens given camera in analytics mode.
+     */
+    StartAnalyticsAction,
+
+    /**
      * Menu containing all layouts belonging to the current user.
      */
     OpenCurrentUserLayoutMenu,
@@ -590,6 +601,8 @@ enum IDType
      */
     CameraDiagnosticsAction,
 
+    ConvertCameraToEntropix,
+
     /**
      * Opens current layout settings dialog.
      */
@@ -676,19 +689,9 @@ enum IDType
     ToggleInfoAction,
 
     /**
-     * Changes RADASS mode to auto.
+     * Changes RADASS mode for the given layout or item. Mode provided with ResolutionModeRole.
      */
-    RadassAutoAction,
-
-    /**
-     * Changes RADASS mode to high resolution.
-     */
-    RadassHighAction,
-
-    /**
-     * Changes RADASS mode to low resolution.
-     */
-    RadassLowAction,
+    RadassAction,
 
     /**
      * Connect incompatible server to current system

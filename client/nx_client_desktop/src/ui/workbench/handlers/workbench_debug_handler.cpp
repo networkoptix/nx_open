@@ -15,15 +15,21 @@
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+
+#include <nx/api/analytics/driver_manifest.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
+
 #include <finders/test_systems_finder.h>
 #include <finders/system_tiles_test_case.h>
 #include <finders/systems_finder.h>
@@ -31,8 +37,12 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/api/analytics/supported_events.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/random.h>
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
@@ -122,6 +132,7 @@ public:
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
+                messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 
@@ -129,7 +140,11 @@ public:
             {
                 auto messageBox = new QnMessageBox(mainWindow());
                 messageBox->setWindowFlags(Qt::Window);
-                messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(), messageBox));
+
+                messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(),
+                    QnResourceListView::SortByNameOption,
+                    messageBox));
+                messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 
@@ -139,6 +154,86 @@ public:
                 runTilesTest();
                 close();
             });
+
+        addButton(lit("Generate analytics manifests"),
+            [this]()
+            {
+                auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
+                if (servers.empty())
+                    return;
+
+                int serverIndex = 0;
+
+                for (int i = 0; i < 5; ++i)
+                {
+                    nx::api::AnalyticsDriverManifest manifest;
+                    manifest.driverId = QnUuid::createUuid();
+                    manifest.driverName.value = lit("Driver %1").arg(i);
+                    manifest.driverName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
+                    for (int j = 0; j < 3; ++j)
+                    {
+                        nx::api::AnalyticsEventType eventType;
+                        eventType.eventTypeId = QnUuid::createUuid();
+                        eventType.eventName.value = lit("Event %1").arg(j);
+                        eventType.eventName.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
+                        manifest.outputEventTypes.push_back(eventType);
+                    }
+
+                    auto server = servers[serverIndex];
+                    auto manifests = server->analyticsDrivers();
+                    manifests.push_back(manifest);
+                    server->setAnalyticsDrivers(manifests);
+                    server->saveParamsAsync();
+
+                    serverIndex = (serverIndex + 1) % servers.size();
+                }
+
+                for (auto server: servers)
+                {
+                    auto drivers = server->analyticsDrivers();
+                    drivers.push_back(nx::api::AnalyticsDriverManifest()); //< Some cameras will not have driver.
+
+                    for (auto camera: resourcePool()->getAllCameras(server, true))
+                    {
+                        const auto randomDriver = nx::utils::random::choice(drivers);
+                        if (randomDriver.driverId.isNull()) //< dummy driver
+                        {
+                            camera->setAnalyticsSupportedEvents({});
+                        }
+                        else
+                        {
+                            nx::api::AnalyticsSupportedEvents supported;
+                            std::transform(randomDriver.outputEventTypes.cbegin(),
+                                randomDriver.outputEventTypes.cend(),
+                                std::back_inserter(supported),
+                                [](const nx::api::AnalyticsEventType& eventType)
+                                {
+                                    return eventType.eventTypeId;
+                                });
+                            camera->setAnalyticsSupportedEvents(supported);
+                        }
+
+                        camera->saveParamsAsync();
+                    }
+                }
+            });
+
+        addButton(lit("Clear analytics manifests"),
+            [this]()
+            {
+                for (auto camera: resourcePool()->getAllCameras({}))
+                {
+                    camera->setAnalyticsSupportedEvents({});
+                    camera->saveParamsAsync();
+                }
+
+                for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
+                {
+                    server->setAnalyticsDrivers({});
+                    server->saveParamsAsync();
+                }
+            });
+
 
     }
 
@@ -210,7 +305,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     QnWorkbenchContextAware(parent)
 {
 #ifdef DEBUG_ACTIONS
-    //TODO: #GDM #High remove before release
+    // TODO: #GDM #High remove before release
     qDebug() << "------------- Debug actions ARE ACTIVE -------------";
     connect(action(action::DebugControlPanelAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
@@ -220,24 +315,26 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
 #endif
 
-    auto supressLog = [](const QString& tag)
+    auto supressLog = [](const nx::utils::log::Tag& tag)
         {
             const auto logger = nx::utils::log::addLogger({tag});
             logger->setDefaultLevel(nx::utils::log::Level::none);
             logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
         };
 
-    auto consoleLog = [](const QString& tag)
+    auto consoleLog = [](const nx::utils::log::Tag& tag)
         {
             const auto logger = nx::utils::log::addLogger({tag});
             logger->setDefaultLevel(nx::utils::log::Level::verbose);
             logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
         };
 
-    supressLog(lit("__freeSlot"));
-    supressLog(lit("__workbenchState"));
-    supressLog(lit("__itemMap"));
+    // Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.
+    supressLog(nx::utils::log::Tag(lit("__freeSlot")));
+    supressLog(nx::utils::log::Tag(lit("__workbenchState")));
+    supressLog(nx::utils::log::Tag(lit("__itemMap")));
     supressLog(QnLog::PERMISSIONS_LOG);
+    //consoleLog(lit("nx::client::desktop::RadassController::Private"));
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()

@@ -134,7 +134,7 @@ public:
     //! QUrl for connection to a given system.
     QUrl connectionUrl() const;
 
-    //TODO: #GDM when fusion will be moved out to separate library, change to QnLexical
+    // TODO: #GDM when fusion will be moved out to separate library, change to QnLexical
     static QString toString(SystemUri::Scope value);
     static QString toString(SystemUri::Protocol value);
     static QString toString(SystemUri::ClientCommand value);

@@ -208,20 +208,20 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(
     const QnCameraBookmark &bookmark,
     OperationCallbackType callback)
 {
-    addCameraBookmarkInternal(bookmark, nx::vms::event::AbstractActionPtr(), callback);
+    addCameraBookmarkInternal(bookmark, QnUuid(), callback);
 }
 
 void QnCameraBookmarksManagerPrivate::acknowledgeEvent(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::AbstractActionPtr& action,
+    const QnUuid& eventRuleId,
     OperationCallbackType callback)
 {
-    addCameraBookmarkInternal(bookmark, action, callback);
+    addCameraBookmarkInternal(bookmark, eventRuleId, callback);
 }
 
 void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     const QnCameraBookmark& bookmark,
-    const nx::vms::event::AbstractActionPtr& action,
+    const QnUuid& eventRuleId,
     OperationCallbackType callback)
 {
     NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
@@ -240,15 +240,17 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
     }
 
     setEnabled(true); // Forcefully enable on modifying operation
-    const int handle = action
+
+    const auto operationType = !eventRuleId.isNull()
+        ? OperationInfo::OperationType::Acknowledge
+        : OperationInfo::OperationType::Add;
+
+    const int handle = operationType == OperationInfo::OperationType::Acknowledge
         ? server->apiConnection()->acknowledgeEventAsync(
-            bookmark, action, this, SLOT(handleBookmarkOperation(int, int)))
+            bookmark, eventRuleId, this, SLOT(handleBookmarkOperation(int, int)))
         : server->apiConnection()->addBookmarkAsync(
             bookmark, this, SLOT(handleBookmarkOperation(int, int)));
 
-    const auto operationType = action
-        ? OperationInfo::OperationType::Acknowledge
-        : OperationInfo::OperationType::Add;
     m_operations[handle] = OperationInfo(operationType, bookmark.guid, callback);
 
     addUpdatePendingBookmark(bookmark);
@@ -585,10 +587,15 @@ void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(const QnCameraBo
 
             auto it = findBookmark(bookmarks, info.bookmark.guid);
             if (it != bookmarks.end())
-                bookmarks.erase(it);
+            {
+                *it = info.bookmark;
+            }
+            else
+            {
+                it = std::lower_bound(bookmarks.begin(), bookmarks.end(), info.bookmark);
+                bookmarks.insert(it, info.bookmark);
+            }
 
-            it = std::lower_bound(bookmarks.begin(), bookmarks.end(), info.bookmark);
-            bookmarks.insert(it, info.bookmark);
         }
     }
 }

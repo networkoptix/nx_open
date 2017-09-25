@@ -9,6 +9,7 @@
 #include <nx/network/m3u/m3u_playlist.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/ssl_socket.h>
 
 #include <vms_gateway_process.h>
 
@@ -31,7 +32,7 @@ class TestCloudStreamSocket:
     using base_type = nx::network::cloud::CloudStreamSocket;
 
 public:
-    virtual QString getForeignHostFullCloudName() const override
+    virtual QString getForeignHostName() const override
     {
         return m_foreignHostFullCloudName;
     }
@@ -64,6 +65,11 @@ public:
     }
 
 protected:
+    void setSslEnabled(bool val)
+    {
+        m_sslEnabled = val;
+    }
+
     void whenReceivedHlsPlaylistViaProxy()
     {
         nx_http::BufferType msgBody;
@@ -118,6 +124,7 @@ private:
     QString m_cloudSystemId;
     QString m_cloudServerId;
     SocketFactory::CreateStreamSocketFuncType m_socketFactoryBak;
+    bool m_sslEnabled = false;
 
     virtual void SetUp() override
     {
@@ -172,12 +179,16 @@ private:
     }
 
     std::unique_ptr<AbstractStreamSocket> createStreamSocket(
-        bool /*sslRequired*/,
+        bool sslRequired,
         nx::network::NatTraversalSupport /*natTraversalRequired*/)
     {
         auto socket = std::make_unique<TestCloudStreamSocket>();
         socket->setForeignHostFullCloudName(m_hlsServerFullCloudName);
-        return std::move(socket);
+
+        if (m_sslEnabled && sslRequired)
+            return std::make_unique<nx::network::deprecated::SslSocket>(std::move(socket), false);
+        else
+            return std::move(socket);
     }
 };
 
@@ -191,6 +202,14 @@ TEST_F(HlsProxy, playlist_urls_are_modified)
 
 TEST_F(HlsProxy, subsequent_requests_are_forwarded_to_the_same_server)
 {
+    whenReceivedHlsPlaylistViaProxy();
+    thenAllPlaylistItemsPointToTheExactServer();
+}
+
+TEST_F(HlsProxy, subsequent_requests_are_forwarded_to_the_same_server_when_ssl_is_used)
+{
+    setSslEnabled(true);
+
     whenReceivedHlsPlaylistViaProxy();
     thenAllPlaylistItemsPointToTheExactServer();
 }

@@ -2,6 +2,8 @@
 
 #include <UIKit/UIKit.h>
 #include <QtGui/QWindow>
+#include <QtGui/QScreen>
+#include <QtGui/QGuiApplication>
 
 void prepareWindow()
 {
@@ -22,13 +24,27 @@ void showSystemUi() {
     [UIApplication sharedApplication].statusBarHidden = NO;
 }
 
-int statusBarHeight() {
+int statusBarHeight()
+{
+    const auto orientation = qApp->primaryScreen()->orientation();
+    const bool isLandscape = orientation == Qt::LandscapeOrientation
+        || orientation == Qt::InvertedLandscapeOrientation;
+
+    // iOS phone does not have status bar in landscape mode
+    if (isPhone() && isLandscape)
+        return 0;
+
     CGSize size = [[UIApplication sharedApplication] statusBarFrame].size;
     return qMin(size.width, size.height);
 }
 
 int navigationBarHeight() {
     return 0;
+}
+
+bool isLeftSideNavigationBar()
+{
+    return false;
 }
 
 bool isPhone() {

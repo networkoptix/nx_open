@@ -24,6 +24,9 @@ struct NX_NETWORK_API QnInterfaceAndAddr
     {
     }
 
+    QHostAddress networkAddress() const;
+    QHostAddress broadcastAddress() const;
+
     QString name;
     QHostAddress address;
     QHostAddress netMask;
@@ -51,13 +54,28 @@ NX_NETWORK_API QString MACToString(const unsigned char *mac);
 NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
-// returns list of interfaces.rkjybhjdfybtr
+// returns list of interfaces.
 // Set allowItfWithoutAddress to <true> to get list with interfaces without any ip
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
 QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(bool allowItfWithoutAddress = false);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
-QList<QHostAddress> NX_NETWORK_API allLocalAddresses();
+QList<QHostAddress> NX_NETWORK_API allLocalIpV4Addresses();
+
+/** Filter mask for allLocalAddresses()*/
+enum AddressFilter
+{
+    ipV4 = 1 << 0,
+    ipV6 = 1 << 1,
+    noLocal = 1 << 2,
+    noLoopback = 1 << 3
+};
+Q_DECLARE_FLAGS(AddressFilters, AddressFilter)
+Q_DECLARE_OPERATORS_FOR_FLAGS(AddressFilters)
+/**
+ * returns list of all IP addresses of current machine. Filters result by filter param.
+ */
+QList<HostAddress> NX_NETWORK_API allLocalAddresses(AddressFilters filter);
 
 //returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time;
 QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
@@ -66,9 +84,6 @@ QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
  * Set filter for interface list
  */
 void NX_NETWORK_API setInterfaceListFilter(const QList<QHostAddress>& ifList);
-
-// return true if succeded
-bool NX_NETWORK_API getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
 
 void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 

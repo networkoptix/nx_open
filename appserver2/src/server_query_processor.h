@@ -3,6 +3,7 @@
 #include <utils/common/scoped_thread_rollback.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/concurrent.h>
+#include <nx/utils/scope_guard.h>
 
 #include "ec2_thread_pool.h"
 #include <database/db_manager.h>
@@ -12,6 +13,10 @@
 #include <api/app_server_connection.h>
 #include <ec_connection_notification_manager.h>
 #include "ec_connection_audit_manager.h"
+
+#include <nx/vms/event/rule.h>
+#include "nx_ec/data/api_conversion_functions.h"
+
 #include "utils/common/threadqueue.h"
 #include <transaction/message_bus_adapter.h>
 
@@ -19,9 +24,7 @@ namespace ec2 {
 
 typedef QnSafeQueue<std::function<void()>> PostProcessList;
 
-namespace detail {
-    class ServerQueryProcessor;
-} // detail
+namespace detail { class ServerQueryProcessor; }
 
 struct ServerQueryProcessorAccess
 {
@@ -46,36 +49,7 @@ private:
 };
 
 namespace detail {
-
 namespace aux {
-template<typename Handler>
-struct ScopeHandlerGuard
-{
-    const ErrorCode *ecode;
-    Handler handler;
-
-    ScopeHandlerGuard(const ErrorCode *ecode, Handler handler):
-        ecode(ecode),
-        handler(std::move(handler))
-    {}
-
-    ScopeHandlerGuard(const ScopeHandlerGuard<Handler>&) = delete;
-    ScopeHandlerGuard<Handler>& operator=(const ScopeHandlerGuard<Handler>&) = delete;
-
-    ScopeHandlerGuard(ScopeHandlerGuard<Handler>&&) = default;
-    ScopeHandlerGuard<Handler>& operator=(ScopeHandlerGuard<Handler>&&) = default;
-
-    ~ScopeHandlerGuard()
-    {
-        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
-    }
-};
-
-template<typename Handler>
-ScopeHandlerGuard<Handler> createScopeHandlerGuard(ErrorCode& errorCode, Handler handler)
-{
-    return ScopeHandlerGuard<Handler>(&errorCode, handler);
-}
 
 struct AuditData
 {
@@ -115,8 +89,9 @@ void triggerNotification(
     // Notification manager is null means startReceivingNotification isn't called yet
     if (auditData.notificationManager)
         auditData.notificationManager->triggerNotification(tran, NotificationSource::Local);
-}
-}
+
+} // namespace aux
+} // namespace detail
 
 struct PostProcessTransactionFunction
 {
@@ -160,15 +135,18 @@ public:
     void processUpdateAsync(
         QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0)
     {
-        using namespace std::placeholders;
-        doAsyncExecuteTranCall(
-            tran,
-            handler,
-            [this](
-                QnTransaction<QueryDataType>& tran,
-                PostProcessList* const transactionsPostProcessList) -> ErrorCode
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
+            [self = *this, tran = std::move(tran), handler = std::move(handler)]() mutable
             {
-                return processUpdateSync(tran, transactionsPostProcessList);
+                self.executeTranCall(
+                    tran,
+                    handler,
+                    [self](
+                        QnTransaction<QueryDataType>& tran,
+                        PostProcessList* const transactionsPostProcessList) mutable -> ErrorCode
+                    {
+                        return self.processUpdateSync(tran, transactionsPostProcessList);
+                    });
             });
     }
 
@@ -382,13 +360,13 @@ private:
      *     PostProcessList*)
      */
     template<class QueryDataType, class CompletionHandlerType, class SyncFunctionType>
-    void doAsyncExecuteTranCall(
+    void executeTranCall(
         QnTransaction<QueryDataType>& tran,
         CompletionHandlerType completionHandler,
         SyncFunctionType syncFunction)
     {
         ErrorCode errorCode = ErrorCode::ok;
-        auto scopeGuard = aux::createScopeHandlerGuard(errorCode, completionHandler);
+        auto scopeGuard = makeScopeGuard([&](){ completionHandler(errorCode); });
 
         PostProcessList* transactionsPostProcessList = m_owner->postProcessList();
         // Starting transaction.
@@ -441,7 +419,7 @@ private:
         HandlerType handler)
     {
         using namespace std::placeholders;
-        doAsyncExecuteTranCall(
+        executeTranCall(
             tran,
             handler,
             std::bind(&ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2));
@@ -638,6 +616,7 @@ private:
         return processUpdateSync(tran, transactionsPostProcessList, 0);
     }
 
+public:
     ErrorCode processUpdateSync(
         QnTransaction<ApiResetBusinessRuleData>& tran,
         PostProcessList* const transactionsPostProcessList,
@@ -648,13 +627,17 @@ private:
             tran.transactionType,
             m_db.getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsPostProcessList);
-        if(errorCode != ErrorCode::ok)
+
+        if (errorCode != ErrorCode::ok)
             return errorCode;
+
+        ApiBusinessRuleDataList defaultRules;
+        fromResourceListToApi(nx::vms::event::Rule::getDefaultRules(), defaultRules);
 
         return processMultiUpdateSync(
             ApiCommand::saveEventRule,
             tran.transactionType,
-            tran.params.defaultRules,
+            defaultRules,
             transactionsPostProcessList);
     }
 
@@ -765,18 +748,21 @@ private:
         HandlerType handler,
         ApiCommand::Value subCommand)
     {
-        using namespace std::placeholders;
-        doAsyncExecuteTranCall(
-            multiTran,
-            handler,
-            [this, subCommand](
-                QnTransaction<QueryDataType>& multiTran,
-                PostProcessList* const transactionsPostProcessList) -> ErrorCode
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
+            [self = *this, multiTran = std::move(multiTran), handler = std::move(handler), subCommand]() mutable
             {
-                return processMultiUpdateSync(
-                    subCommand, multiTran.transactionType, multiTran.params,
-                    transactionsPostProcessList);
-            });
+                self.executeTranCall(
+                    multiTran,
+                    handler,
+                    [self, subCommand](
+                        QnTransaction<QueryDataType>& multiTran,
+                        PostProcessList* const transactionsPostProcessList) mutable -> ErrorCode
+                    {
+                        return self.processMultiUpdateSync(
+                            subCommand, multiTran.transactionType, multiTran.params,
+                            transactionsPostProcessList);
+                    });
+        });
     }
 
 

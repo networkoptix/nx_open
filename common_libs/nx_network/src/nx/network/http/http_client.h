@@ -16,7 +16,7 @@ namespace nx_http {
  * Synchronous http client.
  * This is a synchronous wrapper on top of AsyncHttpClient.
  * @note This class is not thread-safe.
- * WARNING: Message body is read ascynhronously to some internal buffer.
+ * WARNING: Message body is read asynchronously to some internal buffer.
  */
 class NX_NETWORK_API HttpClient:
     public QObject
@@ -96,10 +96,11 @@ public:
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
-    void setAuthType(AsyncHttpClient::AuthType value);
+    void setAuthType(AuthType value);
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
+    void setAllowLocks(bool allowLocks);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
 
@@ -127,9 +128,10 @@ private:
     boost::optional<QString> m_userPassword;
     std::size_t m_maxInternalBufferSize;
     boost::optional<SocketAddress> m_proxyEndpoint;
-    boost::optional<AsyncHttpClient::AuthType> m_authType;
+    boost::optional<AuthType> m_authType;
 
-    bool m_expectOnlyBody;
+    bool m_expectOnlyBody = false;
+    bool m_allowLocks = false;
 
     void instantiateHttpClient();
     template<typename AsyncClientFunc>

@@ -1,0 +1,26 @@
+{{#systemName}}
+{{&systemName}}
+{{#systemSignature}}
+{{&systemSignature}}
+{{/systemSignature}}
+{{#cloudOwnerEmail}}
+{{&cloudOwnerEmail}}
+{{/cloudOwnerEmail}}
+{{/systemName}}
+
+{{&event}} {{#source}}on {{&source}}{{/source}} 
+{{#aggregated}}
+
+{{#msConflicts}}
+Number: {{&number}}
+Server IP: {{&ip}}
+Camera Physical ID: {{&mac}}
+{{/msConflicts}}
+
+{{&timestampDate}} {{&timestampTime}}
+{{/aggregated}}
+
+
+Website: {{&companyUrl}}
+Support: {{&supportLinkText}}
+

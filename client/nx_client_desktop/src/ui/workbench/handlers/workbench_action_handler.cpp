@@ -12,7 +12,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
@@ -79,14 +78,13 @@
 
 #include <recording/time_period_list.h>
 
-#include <redass/redass_controller.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/failover_priority_dialog.h>
@@ -129,7 +127,7 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-#include <ui/workbench/handlers/workbench_layouts_handler.h>    //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_layouts_handler.h>    // TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -160,6 +158,7 @@
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
+#include <nx/utils/app_info.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -214,7 +213,6 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
-    connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
 
     connect(action(action::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
@@ -295,6 +293,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(action::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
 
+    connect(action(action::ConvertCameraToEntropix), &QAction::triggered,
+        this, &ActionHandler::at_convertCameraToEntropix_triggered);
+
     connect(action(action::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
         [this]
         {
@@ -323,9 +324,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::Rotate90Action), &QAction::triggered, this, [this] { rotateItems(90); });
     connect(action(action::Rotate180Action), &QAction::triggered, this, [this] { rotateItems(180); });
     connect(action(action::Rotate270Action), &QAction::triggered, this, [this] { rotateItems(270); });
-    connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::AutoResolution); });
-    connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::LowResolution); });
-    connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { setResolutionMode(Qn::HighResolution); });
     connect(action(action::SetAsBackgroundAction), SIGNAL(triggered()), this, SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(action::WhatsThisAction), SIGNAL(triggered()), this, SLOT(at_whatsThisAction_triggered()));
     connect(action(action::EscapeHotkeyAction), SIGNAL(triggered()), this, SLOT(at_escapeHotkeyAction_triggered()));
@@ -484,14 +482,9 @@ void ActionHandler::rotateItems(int degrees) {
     }
 }
 
-void ActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMode) {
-    if (qnRedAssController)
-        qnRedAssController->setMode(resolutionMode);
-}
-
 void ActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
 {
-    //TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
+    // TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
     // There at_workbench_cellSpacingChanged will also use this method
     auto actionId = [spacing]
         {
@@ -556,20 +549,20 @@ void ActionHandler::submitDelayedDrops()
 
     for (const auto& data: m_delayedDrops)
     {
-        const auto ids = data.getIds();
-        resources.append(resourcePool()->getResources(ids));
-        for (const auto& tour: layoutTourManager()->tours(ids))
+        MimeData mimeData = MimeData::deserialized(data, resourcePool());
+
+        for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
             tours.push_back(tour);
 
-        const auto urls = data.getUrls();
-        resources.append(QnFileProcessor::createResourcesForFiles(
-            QnFileProcessor::findAcceptedFiles(urls)));
+        resources.append(mimeData.resources());
     }
 
     m_delayedDrops.clear();
 
     if (resources.empty() && tours.empty())
         return;
+
+    resourcePool()->addNewResources(resources);
 
     workbench()->clear();
     if (!resources.empty())
@@ -633,12 +626,6 @@ void ActionHandler::at_workbench_cellSpacingChanged()
         action(action::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
 }
 
-void ActionHandler::at_workbench_currentLayoutChanged() {
-    action(action::RadassAutoAction)->setChecked(true);
-    if (qnRedAssController)
-        qnRedAssController->setMode(Qn::AutoResolution);
-}
-
 void ActionHandler::at_nextLayoutAction_triggered()
 {
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
@@ -659,6 +646,20 @@ void ActionHandler::at_previousLayoutAction_triggered()
 
 void ActionHandler::at_openInLayoutAction_triggered()
 {
+    /**
+     * When we add widget (possibliy with animation) to the scene, whole scene may loose
+     * ability to handle hover events.
+     * TODO: #ynikitenkov. Investigate problem and get rid of this ugly workaround
+     */
+    const auto uglyMacOsHoverWorkaround = nx::utils::AppInfo::isMacOsX()
+        ? QnRaiiGuard::create(
+            []() { QCursor::setPos(QPoint(0, 0)); },
+            [this, mp = QCursor::pos()]()
+            {
+                executeDelayedParented([mp]() { QCursor::setPos(mp); }, 0, this);
+            })
+        : QnRaiiGuardPtr();
+
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
@@ -855,7 +856,7 @@ void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
 
     MimeData data;
-    data.setIds({id});
+    data.setEntities({id});
     openNewWindow({lit("--delayed-drop"), data.serialized()});
 }
 
@@ -947,6 +948,38 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
         });
 }
 
+void ActionHandler::at_convertCameraToEntropix_triggered()
+{
+    using nx::vms::common::core::resource::SensorDescription;
+    using nx::vms::common::core::resource::CombinedSensorsDescription;
+
+    const auto& parameters = menu()->currentParameters(sender());
+    const auto& resources = parameters.resources();
+
+    for (const auto& resource: resources)
+    {
+        const auto& camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+
+        if (camera->hasCombinedSensors())
+        {
+            camera->setCombinedSensorsDescription(CombinedSensorsDescription());
+        }
+        else
+        {
+            camera->setCombinedSensorsDescription(
+                CombinedSensorsDescription{
+                    SensorDescription(
+                        QRectF(0, 0, 0.5, 1.0), SensorDescription::Type::blackAndWhite),
+                    SensorDescription(
+                        QRectF(0.5, 0, 0.5, 1.0))
+                });
+        }
+        camera->saveParamsAsync();
+    }
+}
+
 void ActionHandler::at_moveCameraAction_triggered() {
     const auto parameters = menu()->currentParameters(sender());
 
@@ -1017,40 +1050,34 @@ void ActionHandler::at_dropResourcesAction_triggered()
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
-void ActionHandler::at_delayedDropResourcesAction_triggered() {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    MimeData mimeData;
-    stream >> mimeData;
-    if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
-        return;
-
-    m_delayedDrops.push_back(mimeData);
+void ActionHandler::at_delayedDropResourcesAction_triggered()
+{
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
+        Qn::SerializedDataRole);
+    m_delayedDrops.push_back(data);
 
     submitDelayedDrops();
 }
 
 void ActionHandler::at_instantDropResourcesAction_triggered()
 {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
-    QDataStream stream(&data, QIODevice::ReadOnly);
-    MimeData mimeData;
-    stream >> mimeData;
-    if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
+        Qn::SerializedDataRole);
+    MimeData mimeData = MimeData::deserialized(data, resourcePool());
+
+    if (mimeData.resources().empty())
         return;
 
-    const auto ids = mimeData.getIds();
-    auto resources = resourcePool()->getResources(ids);
-
-    const auto urls = mimeData.getUrls();
-    resources.append(QnFileProcessor::createResourcesForFiles(
-        QnFileProcessor::findAcceptedFiles(urls)));
-
-    if (resources.empty())
-        return;
+    resourcePool()->addNewResources(mimeData.resources());
 
     workbench()->clear();
-    menu()->trigger(action::OpenInNewTabAction, resources);
+    bool dropped = menu()->triggerIfPossible(action::OpenInNewTabAction, mimeData.resources());
+    if (dropped)
+        action(action::ResourcesModeAction)->setChecked(true);
+
+    // Security check - just in case.
+    if (workbench()->layouts().empty())
+        menu()->trigger(action::OpenNewTabAction);
 }
 
 void ActionHandler::at_openFileAction_triggered() {
@@ -1186,8 +1213,44 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
 
 void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)
 {
+    auto newFileName = newName;
+    if (nx::utils::AppInfo::isWindows())
+    {
+        while (newFileName.endsWith(QChar(L' ')) || newFileName.endsWith(QChar(L'.')))
+            newFileName.resize(newFileName.size() - 1);
+
+        const QSet<QString> kReservedFilenames{
+            lit("CON"), lit("PRN"), lit("AUX"), lit("NUL"),
+            lit("COM1"), lit("COM2"), lit("COM3"), lit("COM4"),
+            lit("COM5"), lit("COM6"), lit("COM7"), lit("COM8"), lit("COM9"),
+            lit("LPT1"), lit("LPT2"), lit("LPT3"), lit("LPT4"), lit("LPT5"),
+            lit("LPT6"), lit("LPT7"), lit("LPT8"), lit("LPT9") };
+
+        const auto upperCaseName = newFileName.toUpper();
+        if (kReservedFilenames.contains(upperCaseName))
+        {
+            messages::LocalFiles::reservedFilename(mainWindow(), upperCaseName);
+            return;
+        }
+    }
+
+    static const QString kForbiddenChars =
+        nx::utils::AppInfo::isWindows() ? lit("\\|/:*?\"<>")
+      : nx::utils::AppInfo::isLinux()   ? lit("/")
+      : nx::utils::AppInfo::isMacOsX()  ? lit("/:")
+      : QString();
+
+    for (const auto character: newFileName)
+    {
+        if (kForbiddenChars.contains(character))
+        {
+            messages::LocalFiles::invalidChars(mainWindow(), kForbiddenChars);
+            return;
+        }
+    }
+
     QFileInfo fi(resource->getUrl());
-    QString filePath = fi.absolutePath() + L'/' + newName;
+    QString filePath = fi.absolutePath() + QDir::separator() + newFileName;
 
     if (QFileInfo::exists(filePath))
     {
@@ -1202,6 +1265,15 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         return;
     }
 
+    QFile writabilityTest(filePath);
+    if (!writabilityTest.open(QIODevice::WriteOnly))
+    {
+        messages::LocalFiles::fileCannotBeWritten(mainWindow(), filePath);
+        return;
+    }
+
+    writabilityTest.remove();
+
     // If video is opened right now, it is quite hard to close it synchronously.
     static const int kTimeToCloseResourceMs = 300;
 
@@ -1210,10 +1282,11 @@ void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString
         [this, resource, filePath]()
         {
             QnResourcePtr result = resource;
+            const auto oldPath = resource->getUrl();
 
-            if (!QFile::rename(resource->getUrl(), filePath))
+            if (!QFile::rename(oldPath, filePath))
             {
-                messages::LocalFiles::fileIsBusy(mainWindow(), filePath);
+                messages::LocalFiles::fileIsBusy(mainWindow(), oldPath);
             }
             else
             {
@@ -1505,6 +1578,12 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
+    /**
+     * TODO: #GDM #3.2
+     * Adding layout to the resource pool is not needed, moreover it requires to add a lot of
+     * additional checks in different places. But to remove this line we need to implement a
+     * mechanism to cleanup QnResourceRuntimeDataManager layout item data.
+    */
     resourcePool()->addResource(layout);
     menu()->trigger(action::OpenInNewTabAction, layout);
 }
@@ -1732,19 +1811,21 @@ void ActionHandler::at_renameAction_triggered()
         ? camera->getGroupName()
         : resource->getName();
 
+    // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
         bool ok = false;
         do
         {
-            name = QInputDialog::getText(mainWindow(),
+            name = QnInputDialog::getText(mainWindow(),
                 tr("Rename"),
                 tr("Enter new name for the selected item:"),
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                 QLineEdit::Normal,
-                oldName,
-                &ok)
-                .trimmed();
-            if (!ok || name.isEmpty() || name == oldName)
+                QString(),
+                oldName).trimmed();
+
+            if (name.isEmpty() || name == oldName)
                 return;
 
         } while (!validateResourceName(resource, name));
@@ -1782,13 +1863,21 @@ void ActionHandler::at_renameAction_triggered()
     {
         qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) { camera->setName(name); });
     }
-    else if (QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>())
+    else if (auto videowall = resource.dynamicCast<QnVideoWallResource>())
     {
-        qnResourcesChangesManager->saveVideoWall(videowall, [name](const QnVideoWallResourcePtr &videowall) { videowall->setName(name); });
+        qnResourcesChangesManager->saveVideoWall(videowall,
+            [name](const QnVideoWallResourcePtr& videowall)
+            {
+                videowall->setName(name);
+            });
     }
-    else if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+    else if (auto webPage = resource.dynamicCast<QnWebPageResource>())
     {
-        qnResourcesChangesManager->saveWebPage(webPage, [name](const QnWebPageResourcePtr &webPage) {  webPage->setName(name); });
+        qnResourcesChangesManager->saveWebPage(webPage,
+            [name](const QnWebPageResourcePtr& webPage)
+            {
+                webPage->setName(name);
+            });
     }
     else if (auto archive = resource.dynamicCast<QnAbstractArchiveResource>())
     {
@@ -1902,7 +1991,7 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == ServerFileCache::OperationResult::sizeLimitExceeded)
         {
-            //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+            // TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
             //Important: maximumFileSize() is hardcoded in 1024-base
             const auto maxFileSize = ServerFileCache::maximumFileSize() / (1024 * 1024);
             QnMessageBox::warning(mainWindow(),
@@ -2177,7 +2266,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
                 return false;
 
             const auto result = restartClient();
-            if (result == api::ResultType::ok)
+            if (result == applauncher::api::ResultType::Value::ok)
                 return true;
 
             static const int kMaxTries = 5;
@@ -2185,7 +2274,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
             {
                 QThread::msleep(100);
                 qApp->processEvents();
-                if (restartClient() == api::ResultType::ok)
+                if (restartClient() == applauncher::api::ResultType::ok)
                     return true;
             }
             return false;

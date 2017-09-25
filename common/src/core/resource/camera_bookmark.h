@@ -132,12 +132,12 @@ struct QnCameraBookmarkSearchFilter
     qint64 startTimeMs;
 
     /** Maximum end time for the bookmark. */
-    qint64 endTimeMs; //TODO: #GDM #Bookmarks now works as maximum start time
+    qint64 endTimeMs; // TODO: #GDM #Bookmarks now works as maximum start time
 
     /** Text-search filter string. */
     QString text;
 
-    int limit; //TODO: #GDM #Bookmarks works in merge function only
+    int limit; // TODO: #GDM #Bookmarks works in merge function only
 
     QnBookmarkSparsingOptions sparsing;
 

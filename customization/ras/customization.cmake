@@ -48,13 +48,13 @@ set(ios.skip.sign "false")
 set(ios.bundle_identifier "com.rassecurity.probox")
 set(ios.new_bundle_identifier "com.rassecurity.proboxmobile")
 set(ios.group_identifier "group.com.rassecurity.probox")
-set(ios.sign.identity "iPhone Distribution: ioEZ INC. (MXZQG6QD9L)")
+set(ios.sign.identity "iPhone Distribution: RAS Bvba (CJ7G58V6NE)")
 set(ios.old_app_appstore_id "")
 
 set(mac.skip.sign "false")
-set(mac.sign.identity "Developer ID Application: ioEZ INC. (MXZQG6QD9L)")
-set(mac.app.sign.identity "3rd Party Mac Developer Application: ioEZ INC. (MXZQG6QD9L)")
-set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: ioEZ INC. (MXZQG6QD9L)")
+set(mac.sign.identity "Developer ID Application: RAS Bvba (CJ7G58V6NE)")
+set(mac.app.sign.identity "3rd Party Mac Developer Application: RAS Bvba (CJ7G58V6NE)")
+set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: RAS Bvba (CJ7G58V6NE)")
 set(mac.bundle.identifier "com.rassecurity.probox2")
 set(mac.protocol_handler_bundle.identifier "com.probox.protocol_handler")
 
@@ -70,4 +70,20 @@ set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)
-set(additionalTranslations en_GB fr_FR de_DE ru_RU es_ES ja_JP ko_KR tr_TR zh_CN zh_TW he_IL hu_HU)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_NL
+    pl_PL
+    vi_VN
+)

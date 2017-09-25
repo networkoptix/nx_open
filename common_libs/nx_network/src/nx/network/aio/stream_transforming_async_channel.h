@@ -13,7 +13,7 @@ namespace nx {
 namespace network {
 namespace aio {
 
-using UserIoHandler = std::function<void(SystemError::ErrorCode, size_t)>;
+using UserIoHandler = IoCompletionHandler;
 
 /**
  * Delegates read/write calls to the wrapped AbstractAsyncChannel 

@@ -4,6 +4,7 @@
 #include <nx/utils/software_version.h>
 #include <utils/common/app_info.h>
 #include <mobile_client/mobile_client_app_info.h>
+#include <nx/utils/app_info.h>
 
 QnMobileAppInfo::QnMobileAppInfo(QObject* parent)
     : QObject(parent)
@@ -23,14 +24,10 @@ QString QnMobileAppInfo::organizationName() const
 
 QString QnMobileAppInfo::version() const
 {
-    if (QnAppInfo::beta())
-    {
-        return lit("%1.%2 (rev: %3)").arg(
-            QnMobileClientAppInfo::applicationVersion(),
-            QString::number(nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()).build()),
-            QnAppInfo::applicationRevision());
-    }
-    return QnAppInfo::applicationVersion();
+    return lit("%1.%2 (rev: %3)").arg(
+        QnMobileClientAppInfo::applicationVersion(),
+        QString::number(nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()).build()),
+        QnAppInfo::applicationRevision());
 }
 
 QString QnMobileAppInfo::cloudName() const

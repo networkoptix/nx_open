@@ -1,14 +1,11 @@
 #include "workbench_videowall_handler.h"
 
-#include <QtCore/QProcess>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -22,12 +19,10 @@
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_app_info.h>
 #include <client/client_installations_manager.h>
 #include <client/client_startup_parameters.h>
 
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -35,14 +30,9 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_type.h>
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -53,8 +43,6 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
-#include <redass/redass_controller.h>
-
 #include <recording/time_period.h>
 
 #include <nx_ec/data/api_videowall_data.h>
@@ -62,7 +50,8 @@
 #include <nx_ec/managers/abstract_videowall_manager.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
+#include <nx/client/desktop/radass/radass_types.h>
+#include <ui/dialogs/layout_name_dialog.h> // TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -84,9 +73,6 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 
@@ -103,6 +89,7 @@
 #include <utils/common/uuid_pool.h>
 #include <nx/utils/counter.h>
 #include <utils/unity_launcher_workaround.h>
+#include <utils/common/delayed.h>
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
@@ -111,6 +98,7 @@
 //#define RECEIVER_DEBUG
 
 using nx::client::desktop::utils::UnityLauncherWorkaround;
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -128,6 +116,7 @@ PARAM_KEY(speed)
 PARAM_KEY(geometry)
 PARAM_KEY(zoomRect)
 PARAM_KEY(checkedButtons)
+PARAM_KEY(items)
 
 #if defined(SENDER_DEBUG) || defined(RECEIVER_DEBUG)
 static QByteArray debugRole(int role)
@@ -262,7 +251,7 @@ const qreal defaultReviewAR = 1920.0 / 1080.0;
 
 const QnUuid uuidPoolBase("621992b6-5b8a-4197-af04-1657baab71f0");
 
-//TODO: #GDM think about code duplication
+// TODO: #GDM think about code duplication
 QString toWindowsRegistryFormat(const QString& path)
 {
     return L'"' + QDir::toNativeSeparators(path).toLower() + L'"';
@@ -281,7 +270,7 @@ QString binaryPath()
     return QString();
 }
 
-//TODO: #GDM #VW clean nonexistent videowalls sometimes
+// TODO: #GDM #VW clean nonexistent videowalls sometimes
 void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
 {
     auto commonModule = qnClientCoreModule->commonModule();
@@ -335,7 +324,7 @@ auto offlineItemOnThisPc = []
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_licensesHelper(new QnVideoWallLicenseUsageHelper(this))
+    m_licensesHelper(new QnVideoWallLicenseUsageHelper(commonModule(), this))
 #ifdef _DEBUG
     /* Limit by reasonable size. */
     , m_uuidPool(new QnUuidPool(uuidPoolBase, 256))
@@ -626,7 +615,7 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
         else
         {
             /* Avoiding double swap */
-            //TODO: #GDM refactor it
+            // TODO: #GDM refactor it
             bool bothSuccess = true;
             nx::utils::Counter *counter = new nx::utils::Counter(2);
             connect(counter, &nx::utils::Counter::reachedZero, this, [callback, &bothSuccess, counter]()
@@ -740,7 +729,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     }
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
-    updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
+    updateMainWindowGeometry(item.screenSnaps); // TODO: #GDM check if it is needed at all
 
     QnLayoutResourcePtr layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
 
@@ -861,7 +850,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             if (workbench()->currentLayout()->item(uuid))
                 return;
 
-            //TODO: #GDM Allow dropping of the local files outside of media folders.
+            // TODO: #GDM Allow dropping of the local files outside of media folders.
             QString resourceUid = message[resourceKey];
             const auto resource = resourcePool()->getResourceByUniqueId(resourceUid);
             if (!resource)
@@ -1077,9 +1066,20 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         }
         case QnVideoWallControlMessage::RadassModeChanged:
         {
-            Qn::ResolutionMode resolutionMode = static_cast<Qn::ResolutionMode>(message[valueKey].toInt());
-            if (qnRedAssController)
-                qnRedAssController->setMode(resolutionMode);
+            int mode = message[valueKey].toInt();
+            const auto items = QJson::deserialized<std::vector<QnUuid>>(message[itemsKey].toUtf8());
+
+            const auto layout = workbench()->currentLayout()->resource();
+            if (!layout)
+                return;
+
+            QnLayoutItemIndexList layoutItems;
+            for (const auto& id: items)
+                layoutItems.push_back(QnLayoutItemIndex(layout, id));
+
+            ui::action::Parameters parameters(layoutItems);
+            parameters.setArgument(Qn::ResolutionModeRole, mode);
+            menu()->trigger(ui::action::RadassAction, parameters);
             break;
         }
         default:
@@ -1173,9 +1173,8 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     QnWorkbenchLayout* layout = workbench()->currentLayout();
     if (active)
     {
-        connect(action(action::RadassAutoAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::AutoResolution); });
-        connect(action(action::RadassLowAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::LowResolution); });
-        connect(action(action::RadassHighAction), &QAction::triggered, this, [this] { controlResolutionMode(Qn::HighResolution); });
+        connect(action(action::RadassAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_radassAction_triggered);
 
         connect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         connect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1190,7 +1189,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
 
         m_controlMode.active = active;
         m_controlMode.cacheTimer->start();
-        sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));  //TODO: #GDM #VW start control when item goes online
+        sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));  // TODO: #GDM #VW start control when item goes online
 
         QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
         localInfo.data.videoWallControlSession = layoutResource->getId();
@@ -1200,9 +1199,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
     }
     else
     {
-        disconnect(action(action::RadassAutoAction), NULL, this, NULL);
-        disconnect(action(action::RadassLowAction), NULL, this, NULL);
-        disconnect(action(action::RadassHighAction), NULL, this, NULL);
+        action(action::RadassAction)->disconnect(this);
 
         disconnect(workbench(), &QnWorkbench::itemChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         disconnect(layout, &QnWorkbenchLayout::itemAdded, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -1245,16 +1242,6 @@ void QnWorkbenchVideoWallHandler::updateMode()
             control = true;
     }
     setControlMode(control);
-}
-
-void QnWorkbenchVideoWallHandler::controlResolutionMode(Qn::ResolutionMode resolutionMode)
-{
-    if (!m_controlMode.active)
-        return;
-
-    QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
-    message[valueKey] = QString::number(resolutionMode);
-    sendMessage(message);
 }
 
 void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
@@ -1465,9 +1452,11 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
         return;
 
     // Deleting one-by-one to avoid invalid layouts which cannot be deleted for whatever reason
-    NX_ASSERT(menu()->canTrigger(action::RemoveFromServerAction, layoutsToDelete));
     for (auto layout: layoutsToDelete)
-        menu()->trigger(action::RemoveFromServerAction, layout);
+    {
+        if (!menu()->triggerIfPossible(action::RemoveFromServerAction, layout))
+            resourcePool()->removeResource(layout);
+    }
 }
 
 /*------------------------------------ HANDLERS ------------------------------------------*/
@@ -1482,13 +1471,13 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
             tr("Video Wall license required"),
             tr("To enable Video Wall, please activate a Video Wall license."));
         return;
-    } //TODO: #GDM add "Licenses" button
+    } // TODO: #GDM add "Licenses" button
 
     QStringList usedNames;
     foreach(const QnResourcePtr &resource, resourcePool()->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
 
-    //TODO: #GDM #VW refactor to corresponding dialog
+    // TODO: #GDM #VW refactor to corresponding dialog
     QString proposedName = nx::utils::generateUniqueString(usedNames, tr("Video Wall"), tr("Video Wall %1"));
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
@@ -1519,11 +1508,22 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     videoWall->setId(QnUuid::createUuid());
     videoWall->setName(proposedName);
 
-    qnResourcesChangesManager->saveVideoWall(videoWall,
-        [](const QnVideoWallResourcePtr &videoWall)
+    // No need to backup newly created videowall.
+    auto applyChangesFunction = QnResourcesChangesManager::VideoWallChangesFunction();
+    auto callbackFunction =
+        [this](bool success, const QnVideoWallResourcePtr& videoWall)
         {
-            Q_UNUSED(videoWall);
-        });
+            // Cannot capture the resource directly because real resource pointer may differ if the
+            // transaction is received before the request callback.
+            NX_EXPECT(videoWall);
+            if (success && videoWall)
+            {
+                menu()->trigger(action::SelectNewItemAction, videoWall);
+                menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
+            }
+        };
+
+    qnResourcesChangesManager->saveVideoWall(videoWall, applyChangesFunction, callbackFunction);
 }
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered()
@@ -1852,8 +1852,14 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     menu()->trigger(action::OpenInNewTabAction, layout);
 
-    // new layout should not be marked as changed
-    saveVideowallAndReviewLayout(videoWall, layout);
+    // New layout should not be marked as changed, make sure it will be done after layout opening.
+    executeDelayedParented(
+        [this, videoWall, layout]
+        {
+            saveVideowallAndReviewLayout(videoWall, layout);
+        },
+        kDefaultDelay,
+        this);
 }
 
 void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered()
@@ -2156,6 +2162,25 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
     saveVideowalls(videoWalls);
 }
 
+void QnWorkbenchVideoWallHandler::at_radassAction_triggered()
+{
+    if (!m_controlMode.active)
+        return;
+
+    const auto parameters = menu()->currentParameters(sender());
+
+    const auto mode = parameters.argument(Qn::ResolutionModeRole).toInt();
+
+    std::vector<QnUuid> items;
+    for (const auto& item: parameters.layoutItems())
+        items.push_back(item.uuid());
+
+    QnVideoWallControlMessage message(QnVideoWallControlMessage::RadassModeChanged);
+    message[valueKey] = QString::number(mode);
+    message[itemsKey] = QString::fromUtf8(QJson::serialized(items));
+    sendMessage(message);
+}
+
 void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &resource)
 {
     /* Exclude from pool all existing resources ids. */
@@ -2255,7 +2280,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcAdded(const QnVideoWallResource
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
 {
-    //TODO: #GDM #VW implement screen size changes handling
+    // TODO: #GDM #VW implement screen size changes handling
     QN_UNUSED(videoWall);
     QN_UNUSED(pc);
 }
@@ -2315,7 +2340,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
     const QnVideoWallItem& item)
 {
-    //TODO: #GDM #VW implement screen size changes handling
+    // TODO: #GDM #VW implement screen size changes handling
 
     /* Check if item's layout was changed. */
     QnUuid controller = getLayoutController(item.layout);
@@ -2380,7 +2405,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const e
     }
 
     // all messages should go one-by-one
-    //TODO: #GDM #VW what if one message is lost forever? timeout?
+    // TODO: #GDM #VW what if one message is lost forever? timeout?
     if (!m_videoWallMode.sequenceByPcUuid.contains(controllerUuid) ||
         (sequence - m_videoWallMode.sequenceByPcUuid[controllerUuid] > 1))
     {
@@ -2763,7 +2788,7 @@ void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& vi
     if (saveLayout && QnWorkbenchLayout::instance(videowall))
         saveVideowallAndReviewLayout(videowall);
     else
-        qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
+        qnResourcesChangesManager->saveVideoWall(videowall);
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout)
@@ -2804,9 +2829,9 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(QnWorkbenchLayout *layout, st
         videowalls << videowall;
     }
 
-    //TODO: #GDM #VW refactor saving to simplier logic
-    //TODO: #GDM #VW sometimes saving is not required
-    //TODO: #GDM SafeMode
+    // TODO: #GDM #VW refactor saving to simplier logic
+    // TODO: #GDM #VW sometimes saving is not required
+    // TODO: #GDM SafeMode
     for (const QnVideoWallResourcePtr &videowall : videowalls)
     {
         ec2::ApiVideowallData apiVideowall;
@@ -3070,7 +3095,7 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& in
 
 bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const
 {
-    //TODO: #GDM add "Licenses" button
+    // TODO: #GDM add "Licenses" button
     if (!m_licensesHelper->isValid())
     {
         QnMessageBox::warning(mainWindow(), tr("More Video Wall licenses required"), detail);
@@ -3121,5 +3146,5 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
             return;
     }
 
-    qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
+    qnResourcesChangesManager->saveVideoWall(videowall);
 }

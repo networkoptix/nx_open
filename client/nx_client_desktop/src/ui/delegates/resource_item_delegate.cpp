@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QLineEdit>
 
 #include <common/common_globals.h>
 #include <common/common_module.h>
@@ -39,6 +40,7 @@ namespace {
 
 constexpr int kSeparatorItemHeight = 16;
 constexpr int kExtraTextMargin = 5;
+static constexpr int kMaxResourceNameLength = 120; // TODO: #GDM Think about common place to use.
 
 } // namespace
 
@@ -393,6 +395,9 @@ QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptio
 {
     /* Create editor: */
     QWidget* editor = base_type::createEditor(parent, option, index);
+
+    if (auto lineEdit = qobject_cast<QLineEdit*>(editor))
+        lineEdit->setMaxLength(kMaxResourceNameLength);
 
     /* Change editor font: */
     QFont font(editor->font());

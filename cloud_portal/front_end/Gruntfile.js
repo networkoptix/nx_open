@@ -580,10 +580,30 @@ module.exports = function (grunt) {
                 options: {
                     args: {specs: ['test/e2e/_restore-all-passwords/*spec.js']}
                 }
+            },            
+            userclean1: {
+                options: {
+                    args: {specs: ['test/e2e/_restore-all-passwords/create-users_spec.js']}
+                }
+            },
+            userclean2: {
+                options: {
+                    args: {specs: ['test/e2e/_restore-all-passwords/spec.js']}
+                }
             },
             account: {
                 options: {
                     args: {specs: ['test/e2e/account/*spec.js']}
+                }
+            },
+            account1: {
+                options: {
+                    args: {specs: ['test/e2e/account/account_spec.js']}
+                }
+            },
+            account2: {
+                options: {
+                    args: {specs: ['test/e2e/account/change-pass_spec.js']}
                 }
             },
             login: {
@@ -591,14 +611,59 @@ module.exports = function (grunt) {
                     args: {specs: ['test/e2e/login/*spec.js']}
                 }
             },
+            login1: {
+                options: {
+                    args: {specs: ['test/e2e/login/login_spec.js']}
+                }
+            },
+            login2: {
+                options: {
+                    args: {specs: ['test/e2e/login/all_places_negative_spec.js']}
+                }
+            },
+            login3: {
+                options: {
+                    args: {specs: ['test/e2e/login/all_places_positive_spec.js']}
+                }
+            },
             register: {
                 options: {
                     args: {specs: ['test/e2e/register/*spec.js']}
                 }
             },
+            register1: {
+                options: {
+                    args: {specs: ['test/e2e/register/register_spec.js']}
+                }
+            },
+            register2: {
+                options: {
+                    args: {specs: ['test/e2e/register/activate_spec.js']}
+                }
+            },
+            register3: {
+                options: {
+                    args: {specs: ['test/e2e/register/common-form_spec.js']}
+                }
+            },
             restorepass: {
                 options: {
                     args: {specs: ['test/e2e/restore_pass/*spec.js']}
+                }
+            },
+            restorepass1: {
+                options: {
+                    args: {specs: ['test/e2e/restore_pass/restore_pass_spec.js']}
+                }
+            },
+            restorepass2: {
+                options: {
+                    args: {specs: ['test/e2e/restore_pass/restore_pass_ext_spec.js']}
+                }
+            },
+            restorepass3: {
+                options: {
+                    args: {specs: ['test/e2e/restore_pass/email_spec.js']}
                 }
             },
             syspage: {
@@ -661,16 +726,23 @@ module.exports = function (grunt) {
                 }
             }
         },
-
         shell:{
             updateTest:{
                 command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
             },
-            merge:{
-                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; python ../../../devtools/util/merge_dev.py -t default; hg push;'
-            },
             pull:{
-                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; hg push;'
+                branch:'',
+                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r <%= shell.pull.branch %>'
+            },
+            push:{
+                branch:'',
+                command: 'python ../../../devtools/util/merge_dev.py -t <%= shell.push.branch %>'
+            },
+            up_3_2:{
+                command: 'hg up vms_3.2_dev'
+            },
+            up_3_1:{
+                command: 'hg up vms_3.1_web'
             },
             version: {
                 command: 'hg parent > dist/version.txt'
@@ -720,7 +792,7 @@ module.exports = function (grunt) {
             'autoprefixer',
             'protractor_webdriver:notkeepalive',
             'shell:print_version',
-            'protractor:'+ specsuit,
+            'protractor:' + specsuit,
             'clean:server'
         );
     });
@@ -861,12 +933,37 @@ module.exports = function (grunt) {
         'shell:updateTest'
     ]);
 
+    grunt.registerTask('pull', function(branch){
+        grunt.config.set('shell.pull.branch', branch);
+        grunt.task.run([
+            'shell:pull'
+        ]);
+    });
 
-    grunt.registerTask('merge', [
-        'shell:merge'
-    ]);
+    grunt.registerTask('push', function(branch){
+        grunt.config.set('shell.push.branch', branch);
+        grunt.task.run([
+            'shell:push'
+        ]);
+    });
 
-    grunt.registerTask('pull', [
-        'shell:pull'
-    ]);
+    grunt.registerTask('merge', function(branch){
+        grunt.task.run([
+            'pull:' + branch,
+            'push:' + branch
+        ]);
+    });
+
+
+
+    /*grunt.registerTask('pushdef', function(branch){
+        grunt.task.run([
+            'pull:vms_3.1',
+            'push:vms_3.1',
+            'shell:up_3_2',
+            'pull:vms_3.1',
+            'push:default',
+            'shell:up_3_1'
+        ]);
+    });*/
 };

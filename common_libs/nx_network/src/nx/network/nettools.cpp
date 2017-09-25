@@ -16,7 +16,6 @@
 
 #include "nettools.h"
 #include "ping.h"
-#include "netstate.h"
 
 #if defined(Q_OS_LINUX)
 #   include <arpa/inet.h>
@@ -52,13 +51,27 @@
 #endif
 
 namespace {
-    static QList<QHostAddress> allowedInterfaces;
+
+static QList<QHostAddress> allowedInterfaces;
+
 } // namespace
 
 
 void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
     allowedInterfaces = ifList;
+}
+
+QHostAddress QnInterfaceAndAddr::broadcastAddress() const
+{
+    quint32 broadcastIpv4 = address.toIPv4Address() | ~netMask.toIPv4Address();
+    return QHostAddress(broadcastIpv4);
+}
+
+QHostAddress QnInterfaceAndAddr::networkAddress() const
+{
+    quint32 networkIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
+    return QHostAddress(networkIpv4);
 }
 
 QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
@@ -124,7 +137,55 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
     return result;
 }
 
-QList<QHostAddress> allLocalAddresses()
+namespace {
+
+/** Qt on linux returns ipv6 address with "%enp0s3" suffix. */
+static QString fixIpv6AddressString(const QString& ipv6Str)
+{
+    int unexpectedSuffixPos = ipv6Str.indexOf('%');
+    if (unexpectedSuffixPos == -1)
+        return ipv6Str;
+    return ipv6Str.mid(0, unexpectedSuffixPos);
+}
+
+} // namespace
+
+QList<HostAddress> allLocalAddresses(AddressFilters filter)
+{
+    QList<HostAddress> result;
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface : interfaces)
+    {
+        if (!(iface.flags() & QNetworkInterface::IsUp))
+            continue;
+
+        if ((iface.flags().testFlag(QNetworkInterface::IsLoopBack)) && (filter.testFlag(AddressFilter::noLoopback)))
+            continue;
+
+        for (const QNetworkAddressEntry& address: iface.addressEntries())
+        {
+            const bool isIpV4 = (address.ip().protocol() == QAbstractSocket::IPv4Protocol);
+            const bool isIpV6 = (address.ip().protocol() == QAbstractSocket::IPv6Protocol);
+            const bool isLocalIpV6 = isIpV6 && (address.ip() == QHostAddress::LocalHostIPv6);
+            const bool isLocalIpV4 = isIpV4 && (address.ip() == QHostAddress::LocalHost);
+            const bool isLocalHost = isLocalIpV6 || isLocalIpV4;
+
+            if (isLocalHost && (filter.testFlag(AddressFilter::noLocal)))
+                continue;
+
+            if (isIpV4 && (filter.testFlag(AddressFilter::ipV4)))
+                result << HostAddress(address.ip().toString());
+
+            if (isIpV6 && (filter.testFlag(AddressFilter::ipV6)))
+                result << HostAddress(fixIpv6AddressString(address.ip().toString()));
+        }
+    }
+
+    return result;
+}
+
+
+QList<QHostAddress> allLocalIpV4Addresses()
 {
     QList<QHostAddress> rez;
 
@@ -296,48 +357,6 @@ bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_e
 
     }
     return false;
-
-}
-
-bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
-{
-
-    quint32 curr = state.currHostAddress.toIPv4Address();
-    quint32 maxaddr = state.maxHostAddress.toIPv4Address();
-
-    quint32 original = curr;
-
-    CLPing ping;
-
-    while(1)
-    {
-
-        ++curr;
-        if (curr>maxaddr)
-        {
-            quint32 minaddr = state.minHostAddress.toIPv4Address();
-            curr = minaddr; // start from min
-        }
-
-        if (curr==original)
-            return false; // all addresses are busy
-
-        if (busy_lst.contains(curr))// this ip is already in use
-            continue;
-
-        if (!ping.ping(QHostAddress(curr).toString(), 2, ping_timeout))
-        {
-            // is this free addr?
-            // let's check with ARP request also; might be it's not pingable device
-
-            //if (getMacByIP(QHostAddress(curr)).isEmpty()) // to long
-            break;
-
-        }
-    }
-
-    state.currHostAddress = QHostAddress(curr);
-    return true;
 
 }
 

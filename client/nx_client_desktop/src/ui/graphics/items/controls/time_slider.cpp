@@ -38,6 +38,7 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
+#include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topics.h>
 
@@ -45,7 +46,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/pending_operation.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
@@ -466,7 +466,7 @@ Q_GLOBAL_STATIC(QnTimeSliderStepStorage, timeSteps);
 // QnTimeSlider::KineticHandlerBase
 // -------------------------------------------------------------------------- //
 
-class QnTimeSlider::KineticHandlerBase : public KineticProcessHandler
+class QnTimeSlider::KineticHandlerBase: public KineticProcessHandler
 {
 public:
     KineticHandlerBase(QnTimeSlider* slider): m_slider(slider) {}
@@ -483,15 +483,20 @@ public:
         updateKineticProcessor();
     }
 
-    virtual void updateKineticProcessor() {}
-
-    virtual void finishKinetic() override
+    void unhurry()
     {
         if (!m_hurried)
             return;
 
         m_hurried = false;
         updateKineticProcessor();
+    }
+
+    virtual void updateKineticProcessor() {}
+
+    virtual void finishKinetic() override
+    {
+        unhurry();
     }
 
 protected:
@@ -703,44 +708,51 @@ bool QnTimeSlider::isWindowBeingDragged() const
 
 QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
 {
-    const auto bookmarksAtLocationFunc = [this](qint64 location) -> QnCameraBookmarkList
-    {
-        if (m_options.testFlag(StillBookmarksViewer))
-            location = valueFromPosition(QPointF(location, 0));
-
-        return (m_bookmarksHelper ? m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel)
-            : QnCameraBookmarkList());
-    };
-
-    const auto getPosFunc = [this](qint64 location) -> QnBookmarksViewer::PosAndBoundsPair
-    {
-        if (m_options.testFlag(StillBookmarksViewer))
+    const auto bookmarksAtLocationFunc =
+        [this](qint64 location)
         {
-            if (location >= rect().width())
-                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
-        }
-        else
+            if (!m_bookmarksHelper)
+                return QnCameraBookmarkList();
+
+            if (m_options.testFlag(StillBookmarksViewer))
+                location = valueFromPosition(QPointF(location, 0));
+
+            static const auto searchOptions = QnBookmarkMergeHelper::OnlyTopmost
+                | QnBookmarkMergeHelper::ExpandArea;
+
+            return m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel, searchOptions);
+        };
+
+    const auto getPosFunc =
+        [this](qint64 location)
         {
-            if (!windowContains(location))
-                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
-        }
+            if (m_options.testFlag(StillBookmarksViewer))
+            {
+                if (location >= rect().width())
+                    return QnBookmarksViewer::PosAndBoundsPair();   //< Out of window
+            }
+            else
+            {
+                if (!windowContains(location))
+                    return QnBookmarksViewer::PosAndBoundsPair();   //< Out of window
+            }
 
-        const auto viewer = bookmarksViewer();
+            const auto viewer = bookmarksViewer();
 
-        qreal pos = m_options.testFlag(StillBookmarksViewer) ?
-            static_cast<qreal>(location) :
-            positionFromValue(location).x();
+            qreal pos = m_options.testFlag(StillBookmarksViewer) ?
+                static_cast<qreal>(location) :
+                positionFromValue(location).x();
 
-        const auto target = QPointF(pos, lineBarRect().top());
+            const auto target = QPointF(pos, lineBarRect().top());
 
-        Q_D(const GraphicsSlider);
+            Q_D(const GraphicsSlider);
 
-        const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
-        const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
-        const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
-        const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
-        return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
-    };
+            const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
+            const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
+            const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
+            const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
+            return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
+        };
 
     return new QnBookmarksViewer(bookmarksAtLocationFunc, getPosFunc, this);
 }
@@ -753,7 +765,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
 {
     static const QString hmFormat = tr("hh:mm",
         "Format for displaying hours and minutes on timeline.");
-    static const QString hmApFormat = tr("hh:mm ap",
+    static const QString hmApFormat = tr("h:mm ap",
         "Format for displaying hours and minutes on timeline, with am/pm indicator.");
     static const QString hApFormat = tr("h ap",
         "Format for displaying hours on timeline, with am/pm indicator.");
@@ -765,7 +777,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
         "Format for displaying years on timeline");
     static const QString dateMinsFormat = tr("dd MMMM yyyy hh:mm",
         "Format for displaying minute caption in timeline's header, without am/pm indicator.");
-    static const QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap",
+    static const QString dateMinsApFormat = tr("dd MMMM yyyy h:mm ap",
         "Format for displaying minute caption in timeline's header, with am/pm indicator.");
     static const QString dateHoursFormat = tr("dd MMMM yyyy hh:mm",
         "Format for displaying hour caption in timeline's header, without am/pm indicator.");
@@ -842,6 +854,20 @@ void QnTimeSlider::enumerateSteps(QVector<QnTimeStep>& steps)
 {
     for (int i = 0; i < steps.size(); i++)
         steps[i].index = i;
+}
+
+void QnTimeSlider::setupShowAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::TimelineTooltipShow);
+}
+
+void QnTimeSlider::setupHideAnimator(VariantAnimator* animator) const
+{
+    using namespace nx::client::desktop::ui::workbench;
+    qnWorkbenchAnimations->setupAnimator(animator,
+        Animations::Id::TimelineTooltipHide);
 }
 
 void QnTimeSlider::invalidateWindow()
@@ -1188,7 +1214,7 @@ QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const
 
 void QnTimeSlider::setThumbnailsLoader(QnThumbnailsLoader* loader, qreal aspectRatio)
 {
-    if (m_thumbnailsLoader.data() == loader)
+    if (m_thumbnailsLoader.data() == loader && qFuzzyEquals(m_thumbnailsAspectRatio, aspectRatio))
         return;
 
     clearThumbnails();
@@ -1711,7 +1737,7 @@ void QnTimeSlider::updateToolTipText()
     if (!m_options.testFlag(UpdateToolTip))
         return;
 
-    qint64 pos = sliderPosition();
+    const auto pos = sliderPosition();
 
     QString line1;
     QString line2;
@@ -1723,8 +1749,12 @@ void QnTimeSlider::updateToolTipText()
     else
     {
         static const QString tooltipFormatDate = lit("dd MMMM yyyy");
-        static const QString tooltipFormatTime = lit("hh:mm:ss");
+        static const QString tooltipFormatTimeLong = lit("hh:mm:ss");
+        static const QString tooltipFormatTimeLongAP = lit("h:mm:ss ap");
         static const QString tooltipFormatTimeShort = lit("mm:ss");
+
+        const bool ampm = m_locale.timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
+        const auto tooltipFormatTime = ampm ? tooltipFormatTimeLongAP : tooltipFormatTimeLong;
 
         if (m_options.testFlag(UseUTC))
         {
@@ -1734,9 +1764,9 @@ void QnTimeSlider::updateToolTipText()
         }
         else
         {
-            const QString& format = maximum() >= 60ll * 60ll * 1000ll ? /* Longer than 1 hour? */
-                tooltipFormatTime :
-                tooltipFormatTimeShort;
+            const auto& format = maximum() >= 60ll * 60ll * 1000ll /* Longer than 1 hour? */
+                ? tooltipFormatTimeLong
+                : tooltipFormatTimeShort;
 
             line1 = m_locale.toString(msecsToTime(pos), format);
         }
@@ -2219,6 +2249,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     if (qFuzzyIsNull(m_totalLineStretch))
     {
         drawSolidBackground(painter, rect());
+        painter->fillRect(lineBarRect, m_colors.pastRecording);
     }
     else
     {
@@ -2239,8 +2270,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
-                lineRect
-            );
+                lineRect);
 
             lineTop += lineHeight;
         }
@@ -2619,7 +2649,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         if (!m_steps[highlightIndex].longFormat.isEmpty() && m_steps[highlightIndex].stepMSecs / m_msecsPerPixel >= highlightSpanPixels)
             break;
 
-    highlightIndex = qMin(highlightIndex, stepCount - 1); //TODO: #Elric remove this line.
+    highlightIndex = qMin(highlightIndex, stepCount - 1); // TODO: #Elric remove this line.
     const QnTimeStep& highlightStep = m_steps[highlightIndex];
 
     qreal topMargin = qFloor((rect.height() - kDateTextFontHeight) * 0.5);
@@ -2771,7 +2801,7 @@ void QnTimeSlider::drawThumbnail(QPainter* painter, const ThumbnailData& data, c
     painter->setOpacity(opacity);
 }
 
-//TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
+// TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
 void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
 {
     if (!m_bookmarksVisible)
@@ -2792,16 +2822,12 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QFont font(m_pixmapCache->defaultFont());
     font.setWeight(kBookmarkFontWeight);
 
-    qint64 hoverValue = valueFromPosition(m_hoverMousePos, false);
-    int hoveredBookmarkItem = -1;
+    qint64 hoverValueMs = valueFromPosition(m_hoverMousePos, false);
 
-    /* Find the topmost (the latest) hovered bookmark: */
-    for (int i = 0; i < bookmarks.size(); ++i)
-    {
-        const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
-        if (hoverValue >= bookmarkItem.startTimeMs() && hoverValue <= bookmarkItem.endTimeMs())
-            hoveredBookmarkItem = i;
-    }
+    int hoveredBookmarkItem = QnBookmarkMergeHelper::indexAtPosition(bookmarks,
+        hoverValueMs,
+        m_msecsPerPixel,
+        QnBookmarkMergeHelper::OnlyTopmost | QnBookmarkMergeHelper::ExpandArea);
 
     /* Draw bookmarks: */
     for (int i = 0; i < bookmarks.size(); ++i)
@@ -3035,9 +3061,11 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
      * in eighths (1/8s) of a degree. */
     const qreal degrees = event->delta() / 8.0;
 
-    if (event->modifiers().testFlag(Qt::ControlModifier))
+    if (event->modifiers().testFlag(Qt::ControlModifier)
+        || event->modifiers().testFlag(Qt::ShiftModifier))
     {
         /* Kinetic drag: */
+        m_kineticScrollHandler->unhurry();
         m_kineticScrollHandler->kineticProcessor()->shift(degrees / kWheelDegreesFor1PixelScroll);
         m_kineticScrollHandler->kineticProcessor()->start();
     }
@@ -3056,6 +3084,7 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
                 m_zoomAnchor = m_windowEnd;
         }
 
+        m_kineticZoomHandler->unhurry();
         m_kineticZoomHandler->kineticProcessor()->shift(degrees);
         m_kineticZoomHandler->kineticProcessor()->start();
     }
@@ -3376,6 +3405,7 @@ void QnTimeSlider::dragMove(DragInfo* info)
         const auto prevWindowStart = m_windowStart;
         shiftWindow(relativeDelta, false);
 
+        m_kineticScrollHandler->unhurry();
         m_kineticScrollHandler->kineticProcessor()->shift(qreal(m_windowStart - prevWindowStart) / m_msecsPerPixel);
         return;
     }

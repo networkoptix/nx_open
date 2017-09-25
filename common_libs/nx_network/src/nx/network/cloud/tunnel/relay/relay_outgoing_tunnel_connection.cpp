@@ -66,10 +66,16 @@ void OutgoingTunnelConnection::establishNewConnection(
             m_activeRequests.back()->timer.bindToAioThread(getAioThread());
             auto requestIter = --m_activeRequests.end();
         
-            auto relayClient =
-                m_relayApiClient
-                ? std::move(m_relayApiClient)
-                : nx::cloud::relay::api::ClientFactory::create(m_relayUrl);
+            std::unique_ptr<nx::cloud::relay::api::Client> relayClient;
+            if (m_relayApiClient)
+            {
+                m_relayApiClient.swap(relayClient);
+                if (relayClient->url() != m_relayUrl)
+                    relayClient.reset();
+            }
+            if (!relayClient)
+                relayClient = nx::cloud::relay::api::ClientFactory::create(m_relayUrl);
+
             relayClient->bindToAioThread(getAioThread());
             relayClient->openConnectionToTheTargetHost(
                 m_relaySessionId,
@@ -92,6 +98,11 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_tunnelClosedHandler = std::move(handler);
+}
+
+std::string OutgoingTunnelConnection::toString() const
+{
+    return lm("Relaying. Relay server in use: %1").args(m_relayUrl).toStdString();
 }
 
 void OutgoingTunnelConnection::setInactivityTimeout(std::chrono::milliseconds timeout)

@@ -23,7 +23,7 @@ Logger::Logger(Level defaultLevel, std::unique_ptr<AbstractWriter> writer):
         m_writers.push_back(std::move(writer));
 }
 
-void Logger::log(Level level, const QString& tag, const QString& message)
+void Logger::log(Level level, const Tag& tag, const QString& message)
 {
     QnMutexLocker lock(&m_mutex);
     if (!isToBeLogged(level, tag))
@@ -32,13 +32,13 @@ void Logger::log(Level level, const QString& tag, const QString& message)
     logForced(level, tag, message);
 }
 
-void Logger::logForced(Level level, const QString& tag, const QString& message)
+void Logger::logForced(Level level, const Tag& tag, const QString& message)
 {
     QnMutexLocker lock(&m_mutex);
     static const QString kTemplate = QLatin1String("%1 %2 %3 %4: %5");
     const auto output = kTemplate
         .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz")).arg(thisThreadId(), 6)
-        .arg(toString(level).toUpper(), 7, QLatin1Char(' ')).arg(tag).arg(message);
+        .arg(toString(level).toUpper(), 7, QLatin1Char(' ')).arg(tag.toString()).arg(message);
 
     for (auto& writer: m_writers)
         writer->write(level, output);
@@ -50,12 +50,12 @@ void Logger::logForced(Level level, const QString& tag, const QString& message)
     }
 }
 
-bool Logger::isToBeLogged(Level level, const QString& tag)
+bool Logger::isToBeLogged(Level level, const Tag& tag)
 {
     QnMutexLocker lock(&m_mutex);
     for (const auto& filter: m_levelFilters)
     {
-        if (tag.startsWith(filter.first))
+        if (tag.matches(filter.first))
             return level <= filter.second;
     }
 

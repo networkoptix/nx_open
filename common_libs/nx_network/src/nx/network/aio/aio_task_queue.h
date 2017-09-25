@@ -258,7 +258,7 @@ private:
     std::deque<SocketAddRemoveTask> m_postedCalls;
     std::deque<SocketAddRemoveTask> m_pollSetModificationQueue;
 
-    void addSockToPollset(
+    void addSocketToPollset(
         Pollable* socket,
         aio::EventType eventType,
         int timeout,

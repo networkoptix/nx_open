@@ -29,7 +29,7 @@ QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     m_mediaPort(nx_rtsp::DEFAULT_RTSP_PORT),
     m_probablyNeedToUpdateStatus(false)
 {
-    //TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
+    // TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
     addFlags(Qn::network);
 }
 
@@ -118,7 +118,7 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     const QnUuid &resourceId,
     const QnUuid &resourceTypeId)
 {
-    //TODO: #GDM think about code duplication
+    // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(
         commonModule,
@@ -196,7 +196,7 @@ QString QnNetworkResource::toSearchString() const
         + L' ' + getMAC().toString()
         + L' ' + getHostAddress()
         + L' ' + lit("live")
-        ; //TODO: #Elric evil!
+        ; // TODO: #Elric evil!
 }
 
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)

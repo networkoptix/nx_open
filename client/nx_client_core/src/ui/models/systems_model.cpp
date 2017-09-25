@@ -11,6 +11,8 @@
 #include <network/connection_validator.h>
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/address_resolver.h>
 
 namespace
 {
@@ -28,9 +30,9 @@ namespace
         {QnSystemsModel::IsRunningRoleId, "isRunning"},
         {QnSystemsModel::IsReachableRoleId, "isReachable"},
         {QnSystemsModel::IsConnectableRoleId, "isConnectable"},
-        {QnSystemsModel::IsCompatibleRoleId, "isCompatible"},
+        {QnSystemsModel::IsCompatibleToMobileClient, "isCompatibleToMobileClient"},
         {QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion"},
-        {QnSystemsModel::IsCompatibleInternalRoleId, "isCompatibleInternal"},
+        {QnSystemsModel::IsCompatibleToDesktopClient, "isCompatibleToDesktopClient"},
 
         {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"}};
@@ -157,7 +159,11 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             QString hosts;
             for (const auto& moduleInfo : system->servers())
             {
-                hosts.append(system->getServerHost(moduleInfo.id).host());
+                const auto host = system->getServerHost(moduleInfo.id).host();
+                if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
+                    continue;
+
+                hosts.append(host);
                 hosts.append(lit(" "));
             }
 
@@ -200,9 +206,9 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->isReachable();
         case IsConnectableRoleId:
             return system->isConnectable();
-        case IsCompatibleRoleId:
+        case IsCompatibleToMobileClient:
             return d->isCompatibleSystem(system);
-        case IsCompatibleInternalRoleId:
+        case IsCompatibleToDesktopClient:
             return d->isCompatibleInternal(system);
         case IsCompatibleVersionRoleId:
             return d->isCompatibleVersion(system);
@@ -517,8 +523,9 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
             if (!minimalVersion.isNull() && serverInfo.version < minimalVersion)
                 return false;
 
-            auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult == Qn::SuccessConnectionResult;
+            const auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
+            return connectionResult == Qn::SuccessConnectionResult
+                || connectionResult == Qn::IncompatibleCloudHostConnectionResult;
         });
 }
 

@@ -532,7 +532,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
 
     // init stage, cannot stop the process
     if (m_processUuid.isNull())
-        return; //TODO: #GDM #CameraAddition do something
+        return; // TODO: #GDM #CameraAddition do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
     ui->progressBar->setFormat(lit("%1\t").arg(tr("Finishing searching...")));

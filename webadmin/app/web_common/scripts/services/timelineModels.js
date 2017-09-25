@@ -67,15 +67,16 @@ timeManager.translate = function(date, reverse){
 };
 timeManager.nowLocal = function(){
     return (new Date()).getTime();
-}
+};
 timeManager.debug = function(message, date){
     console.log(message, {
         display: new Date(date),
         toServer: new Date(this.displayToServer(date)),
         toLocal: new Date(this.displayToLocal(date))
     });
-}
-timeManager.init = function(useServerTime, serverTime, serverTimeZoneOffset){
+};
+timeManager.getOffset = function(serverTime, serverTimeZoneOffset){
+    // Calculate server offset comparing with local time
     var minTimeLag = 2000;// Two seconds
     var clientDate = new Date();
     var clientTime = clientDate.getTime();
@@ -83,14 +84,23 @@ timeManager.init = function(useServerTime, serverTime, serverTimeZoneOffset){
     if(Math.abs(clientTime - serverTime) > minTimeLag){
         latency = clientTime - serverTime;
     }
-
+    return {
+        latency:latency,
+        serverTimeZoneOffset: serverTimeZoneOffset
+    };
+};
+timeManager.setOffset = function(offset){
+    // Set previously calculated server offset
+    this.timeLatency = offset.latency; // time latency handles the situation when time is not synchronised
+    this.serverTimeZoneOffset = offset.serverTimeZoneOffset;
+    this.timeZoneOffset = this.clientTimeZoneOffset - this.serverTimeZoneOffset;
+};
+timeManager.init = function(useServerTime){
+    // Init time manager - get client's timezone
     this.useServerTime = useServerTime;
-    this.timeLatency = latency; // time latency handles the situation when time is not synchronised
-    this.serverTimeZoneOffset = serverTimeZoneOffset;
+    var clientDate = new Date();
     this.clientTimeZoneOffset = -clientDate.getTimezoneOffset() * 60000;
     // For some reason local timezone offset has wrong sign, so we sum them instead of subtractions
-
-    this.timeZoneOffset = this.clientTimeZoneOffset - this.serverTimeZoneOffset;
 };
 
 //Record
@@ -251,8 +261,8 @@ var RulerModel = {
      * @type {{detailization: number}[]}
      */
     levels: [
-        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy' , marksW:15, smallW: 40, middleW: 400, width: 4000 , topW: 0, topFormat:'yyyy' }, // root
-        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy' , marksW:15, smallW: 40, middleW: 400, width: 9000 },
+        { name:'Age'        , interval:  new Interval(  0, 0, 0, 0, 0, 0,100), format:'yyyy'                    , marksW:15, smallW: 40, middleW: 400,      width: 4000 , topW: 0, topFormat:'yyyy' }, // root
+        { name:'Decade'     , interval:  new Interval(  0, 0, 0, 0, 0, 0, 10), format:'yyyy'                    , marksW:15, smallW: 40, middleW: 400,      width: 9000 },
         {
             name:'Year', //Years
             format:'yyyy',//Format string for date
@@ -264,22 +274,22 @@ var RulerModel = {
             topW: 100, // minimal width for label above timeline
             topFormat:'yyyy'//Format string for label above timeline
         },
-        { name:'6Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 360, width: 3600 },
-        { name:'3Months'   , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 1800, width: 9000 },
-        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm' , marksW:15, smallW: 60, middleW: 100000,   width: 600 , topW: 170, topFormat:'mmmm yyyy'},
-        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'   , marksW:5,  smallW: 20, middleW: 100,      width: 200 , topW: 170, topFormat:'d mmmm yyyy' ,contained:1},
-        { name:'12h'   , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 200,      width: 1200},
-        { name:'6h'    , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 600,      width: 1800 },
-        { name:'3h'    , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 900 },
-        { name:'1h'       , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 },
-        { name:'30m' , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 300,      width: 1500 },
-        { name:'10m' , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
-        { name:'5m'  , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 250,      width: 500 },
-        { name:'1m'   , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format:'HH:MM', marksW:15, smallW: 50, middleW: 100,      width: 300 , topW: 170, topFormat:'d mmmm yyyy HH:MM'},
-        { name:'30s' , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 300,      width: 1500},
-        { name:'10s' , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 500,      width: 1000 },
-        { name:'5s'  , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 250,      width: 100000 },
-        { name:'1s'   , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 , topW: 200, topFormat:'d mmmm yyyy HH:MM:ss'}
+        { name:'6Months'    , interval:  new Interval(  0, 0, 0, 0, 0, 6, 0), format:'mmmm'                     , marksW:15, smallW: 60, middleW: 360,      width: 3600 },
+        { name:'3Months'    , interval:  new Interval(  0, 0, 0, 0, 0, 3, 0), format:'mmmm'                     , marksW:15, smallW: 60, middleW: 1800,     width: 9000 },
+        { name:'Month'      , interval:  new Interval(  0, 0, 0, 0, 0, 1, 0), format:'mmmm'                     , marksW:15, smallW: 60, middleW: 100000,   width: 600  , topW: 170, topFormat:'mmmm yyyy'},
+        { name:'Day'        , interval:  new Interval(  0, 0, 0, 0, 1, 0, 0), format:'dd'                       , marksW:5,  smallW: 20, middleW: 100,      width: 200  , topW: 170, topFormat:'d mmmm yyyy', contained:1},
+        { name:'12h'        , interval:  new Interval(  0, 0, 0,12, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 200,      width: 1200 },
+        { name:'6h'         , interval:  new Interval(  0, 0, 0, 6, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 600,      width: 1800 },
+        { name:'3h'         , interval:  new Interval(  0, 0, 0, 3, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 300,      width: 900  },
+        { name:'1h'         , interval:  new Interval(  0, 0, 0, 1, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 100,      width: 300  },
+        { name:'30m'        , interval:  new Interval(  0, 0,30, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 300,      width: 1500 },
+        { name:'10m'        , interval:  new Interval(  0, 0,10, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5m'         , interval:  new Interval(  0, 0, 5, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 250,      width: 500  },
+        { name:'1m'         , interval:  new Interval(  0, 0, 1, 0, 0, 0, 0), format: TimelineConfig.hourFormat , marksW:15, smallW: 50, middleW: 100,      width: 300  , topW: 170, topFormat: TimelineConfig.dateFormat + ' ' + TimelineConfig.hourFormat},
+        { name:'30s'        , interval:  new Interval(  0,30, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 300,      width: 1500 },
+        { name:'10s'        , interval:  new Interval(  0,10, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 500,      width: 1000 },
+        { name:'5s'         , interval:  new Interval(  0, 5, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 250,      width: 100000 },
+        { name:'1s'         , interval:  new Interval(  0, 1, 0, 0, 0, 0, 0), format:'ss"s"'                    , marksW:15, smallW: 50, middleW: 100000,   width: 100000, topW: 200, topFormat: TimelineConfig.dateFormat + ' ' + TimelineConfig.timeFormat}
         //{ name:'500ms'     , interval:  new Interval(500, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 250,      width: 100000},
         //{ name:'100ms'     , interval:  new Interval(100, 0, 0, 0, 0, 0, 0), format:'l"ms"', marksW:15, smallW: 50, middleW: 100000,   width: 100000 }
     ],
@@ -320,39 +330,37 @@ var RulerModel = {
 };
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras, mediaserver, $q, width) {
-
+function CameraRecordsProvider(cameras, mediaserver, width) {
     this.cameras = cameras;
+    this.width = width;
     this.mediaserver = mediaserver;
-    this.$q = $q;
+}
+
+CameraRecordsProvider.prototype.init = function(){
     this.chunksTree = null;
     this.requestedCache = [];
     var self = this;
     //1. request first detailization to get initial bounds
 
-    var archiveReadyDefer = $q.defer();
-    this.archiveReadyPromise = archiveReadyDefer.promise;
     this.lastRequested = timeManager.nowToServer(); // lastrequested is always servertime
-    this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
+    return this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
         if(!self.chunksTree){
-            archiveReadyDefer.resolve(false);
-            return; //No chunks for this camera
+            return false; //No chunks for this camera
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start,width);
-        if(nextLevel<RulerModel.levels.length-1) {
-            self.requestInterval(timeManager.displayToServer(self.chunksTree.start),
-                                 timeManager.nowToServer(),
-                                 nextLevel + 1).then(function(){
-                                    archiveReadyDefer.resolve(true);
-                                 });
+        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start, self.width);
+
+        if(nextLevel < RulerModel.levels.length - 1) {
+            nextLevel ++;
         }
+        return self.requestInterval(timeManager.displayToServer(self.chunksTree.start),
+                                    timeManager.nowToServer(),
+                                    nextLevel).then(function(){
+                                        return true;
+                                    });
     });
-
-    //2. getCameraHistory
-}
-
+};
 CameraRecordsProvider.prototype.cacheRequestedInterval = function (start, end, level){
     for(var i=0;i<level+1;i++){
         if(i >= this.requestedCache.length){
@@ -366,35 +374,46 @@ CameraRecordsProvider.prototype.cacheRequestedInterval = function (start, end, l
                 continue;
             }
 
-            if(this.requestedCache[i][j].start > end){ // no intersection - just add
+            if(this.requestedCache[i][j].start > end){ // no intersection - just add to the beginning
                 this.requestedCache[i].splice(j,0,{start:start,end:end});
                 break;
             }
 
+            // Intersection - unite two intervals together
             this.requestedCache[i][j].start = Math.min(start, this.requestedCache[i][j].start);
             this.requestedCache[i][j].end = Math.max(end, this.requestedCache[i][j].end);
             break;
+        }
+        if(j == this.requestedCache[i].length){
+            // We need to add our requested interval to the end of an array
+            this.requestedCache[i].push({start:start,end:end});
         }
     }
 };
 CameraRecordsProvider.prototype.getBlindSpotsInCache = function(start,end,level){
     if(typeof(this.requestedCache[level])=='undefined'){
-        return [{start:start,end:end}]; // One large blind spot
+        return [{start:start, end:end, blindSpotsInCache:true}]; // One large blind spot
     }
     var result = [];
 
     var levelCache = this.requestedCache[level];
     for(var i = 0;i < levelCache.length;i++) {
-
-        if(start < levelCache[i].start){
-            result.push ({start:start,end:levelCache[i].start,blindSpotsInCache:true});
+        if(levelCache[i].end < start){
+            continue; // Ignore this cached interval - not relevant
         }
 
-        start = Math.max(start,levelCache[i].end);//Move start
+        if(levelCache[i].start > start){ // Calculate blank spot
+            result.push ({start:start, end: Math.min(levelCache[i].start, end), blindSpotsInCache:true});
+        }
 
-        if(end < levelCache[i].end){
+        start = levelCache[i].end; // start of the next blind spot
+
+        if(start >= end){ // Time to stop, we got the whole interval covered
             break;
         }
+    }
+    if(start < end){ // We did not cover the whole interval - so we add one more blind spot
+        result.push({start:start, end:end, blindSpotsInCache:true});
     }
     return result;
 };
@@ -405,14 +424,14 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start, e
     }
     var levelCache = this.requestedCache[level];
 
-    for(var i=0;i < levelCache.length;i++) {
-        if(start < levelCache[i].start){
+    for(var i=0; i < levelCache.length; i++) {
+        if(start < levelCache[i].start){ // there is a blind spot in cache
             return false;
         }
 
-        start = Math.max(start,levelCache[i].end);//Move start
+        start = Math.max(start, levelCache[i].end); // Move start
 
-        if(end < levelCache[i].end){
+        if(end <= start){ // No need to move forward - there is no blind spot in cache
             return true;
         }
     }
@@ -439,26 +458,20 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     if(start > end){
         console.error("Start is more than end, that is impossible");
     }
-
-    // requestInterval operates with server time always
-    var deferred = this.$q.defer();
-    //this.start = start;
-    //this.end = end;
     this.level = level;
+    if(this.currentRequest){
+        return this.currentRequest;
+    }
+
     var levelData = RulerModel.levels[level];
     var detailization = levelData.interval.getMilliseconds();
 
     var self = this;
-    //1. Request records for interval
-    // And do we need to request it?
 
-    if(self.currentRequest){
-        return;
-    }
+    //1. Request records for interval
     self.currentRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
 
-    self.currentRequest.then(function (data) {
-
+    return self.currentRequest.then(function (data) {
             self.currentRequest = null;//Unlock requests - we definitely have chunkstree here
             var chunks = data.data.reply;
             //if(chunks.length == 0){} // No chunks for this camera
@@ -476,24 +489,22 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
             }
             for (var i = 0; i < chunksToIterate; i++) {
                 var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
-                if (chunks[i].durationMs < 0) {
+                if (chunks[i].durationMs < 0 || endChunk > timeManager.nowToDisplay()) {
                     endChunk = timeManager.nowToDisplay();// current moment
                 }
+
+                if(chunks[i].startTimeMs > endChunk){
+                    continue; // Chunk is from future - do not add
+                }
+
                 var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
                 self.addChunk(addchunk, null);
             }
 
             self.cacheRequestedInterval(timeManager.serverToDisplay(start), timeManager.serverToDisplay(end), level);
 
-            deferred.resolve(self.chunksTree);
-
-        }, function (error) {
-            deferred.reject(error);
+            return self.chunksTree;
         });
-
-    this.ready = deferred.promise;
-    //3. return promise
-    return this.ready;
 };
 /**
  * Request records for interval, add it to cache, update visibility splice
@@ -703,12 +714,10 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     }
 
     // iterate blind spots:
-    var blindSpots = this.getBlindSpotsInCache(parent.start, parent.end, parent.level + 1);
+    var blindSpots = this.getBlindSpotsInCache(start, end, parent.level + 1);
+
     for (i = 0; i < blindSpots.length; i++) {
-        var spot = blindSpots[i];
-        if (spot.start >= start || spot.end <= end) {
-            result.push(spot);
-        }
+        result.push(blindSpots[i]);
     }
 };
 
@@ -717,10 +726,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras, mediaserver, $q){
-
-    this.$q = $q;
-
+function ShortCache(cameras, mediaserver){
     this.mediaserver = mediaserver;
     this.cameras = cameras;
 
@@ -865,6 +871,10 @@ ShortCache.prototype.checkPlayingDate = function(positionDate){
 ShortCache.prototype.setPlayingPosition = function(position){
     // This function translate playing position (in millisecond) into actual date. Should be used while playing video only. Position must be in current buffered video
 
+    if(this.liveMode){ // In live mode ignore whatever they have to say
+        this.playedPosition = timeManager.nowToDisplay();
+        return;
+    }
     var oldPosition =  this.playedPosition;
 
     this.played = position;
@@ -906,19 +916,20 @@ ShortCache.prototype.setPlayingPosition = function(position){
         }
     }
 
-    if(!this.liveMode && this.currentDetailization.length>0
-        && (this.currentDetailization[this.currentDetailization.length - 1].durationMs
-            + this.currentDetailization[this.currentDetailization.length - 1].startTimeMs
-            < Math.round(this.playedPosition) + this.updateInterval)) { // It's time to update
-
-        // TODO: update live detailization?
-
-        this.update();
+    if(!this.liveMode && this.currentDetailization.length>0){
+        var archiveEnd = this.currentDetailization[this.currentDetailization.length - 1].durationMs +
+                         this.currentDetailization[this.currentDetailization.length - 1].startTimeMs;
+        if (archiveEnd < Math.round(this.playedPosition) + this.updateInterval && this.lastArchiveEnd != archiveEnd) {
+            // It's time to update
+            // And last update get new information
+            this.lastArchiveEnd = archiveEnd;
+            this.update();
+        }
     }
 
     if(position > this.lastPlayedPosition){
         this.lastPlayedPosition = position; // Save the boundaries of uploaded cache
-        this.lastPlayedDate =  this.playedPosition; // Save the boundaries of uploaded cache
+        this.lastPlayedDate = this.playedPosition; // Save the boundaries of uploaded cache
     }
 
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
@@ -933,7 +944,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
-                       lastMinuteInterval, minPixelsPerLevel, minScrollBarWidth, $q){
+                       lastMinuteInterval, minPixelsPerLevel, minScrollBarWidth, pixelAspectRatio, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.minScrollBarWidth = minScrollBarWidth;
@@ -941,7 +952,15 @@ function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initial
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
+    this.pixelAspectRatio = pixelAspectRatio || 1;
     this.$q = $q;
+
+    this.watch = {
+        playing: false,
+        live: false,
+        forcedToStop:false
+    };
+
 
     this.levels = {
         top:  {index:0,level:RulerModel.levels[0]},
@@ -979,8 +998,15 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.start = start; //Start is always right
     this.updateTotalInterval();
 };
-ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
-    var needZoomOut = !this.checkZoomOut();
+ScaleManager.prototype.setEnd = function(){ // Update right end of the timeline. Live mode must be supported here
+    var needZoomOut = this.checkZoomedOutNow();
+
+    var end = timeManager.nowToDisplay();
+    if(this.playedPosition >= this.end || this.playedPosition >= end){
+        // Something strange is happening here - playing position in future
+        end = this.playedPosition;
+    }
+
     this.end = end;
 
     this.updateTotalInterval();
@@ -1006,7 +1032,6 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.msPerPixel = this.bound(this.minMsPerPixel, this.msPerPixel, this.maxMsPerPixel);
     this.anchorPoint = this.bound(0, this.anchorPoint, 1);
     this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
-
 
     this.visibleStart = Math.round(this.anchorDate - this.msPerPixel * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
@@ -1034,68 +1059,79 @@ ScaleManager.prototype.updateCurrentInterval = function(){
 
 
 ScaleManager.prototype.stopWatching = function(){
-    this.watchPlayingPosition = false;
-    this.wasForcedToStopWatchPlaying = true;
+    this.watch.playing = false;
+    this.watch.live = false;
+    this.watch.forcedToStop = true;
 };
 
 ScaleManager.prototype.releaseWatching = function(){
-    this.wasForcedToStopWatchPlaying = false;
+    this.watch.forcedToStop = false;
 };
 
-ScaleManager.prototype.watchPlaying = function(date, liveMode){
-    this.watchPlayingPosition = true;
-    this.wasForcedToStopWatchPlaying = false;
+ScaleManager.prototype.watchPosition = function(date, livePosition){
+    this.watch.playing = !livePosition;
+    this.watch.live = livePosition;
+    this.watch.forcedToStop = false;
 
-    if(!date){
+    if(!date){ // Date not specified - do nothing
         return;
     }
     var targetPoint = this.dateToScreenCoordinate(date) / this.viewportWidth;
-    if(targetPoint > 1){
+    if(targetPoint > 1){  // Try to set playing position in the middle of the screen
         targetPoint = 0.5;
-    }
-    if(liveMode){
-        targetPoint = 1;
     }
     this.setAnchorDateAndPoint(date, targetPoint);
 };
 
-ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
-    var targetPoint = this.dateToScreenCoordinate(date)/this.viewportWidth;
-
-    if(this.anchorDate == date){
-        this.watchPlaying(date);
+ScaleManager.prototype.checkWatch = function(liveOnly){
+    if(!liveOnly && this.watch.forcedToStop){
+        return;  // was forced to stop - wait for release
     }
 
-    if(0 <= targetPoint && targetPoint <= 1 ){ 
-        this.watchPlaying(date); // Let's watch
+    // Logic:
+    // We are playing?
+    //      yes: playing position is visible?
+    //              yes: watch playing and return
+    //      no: live position is visible or close to right border?
+    //           yes: watch live and return
+
+    if(!liveOnly && this.playing){
+        // check current playing position is visible
+        var playingPoint = this.dateToScreenCoordinate(this.playedPosition);
+        if(0 <= playingPoint && playingPoint <= this.viewportWidth - 1){ // playing position is visible on the screen
+            return this.watchPosition(this.playedPosition, false);
+        }
     }
 
-    if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
-        this.watchPlaying(date, liveMode);
+    // playing position is outside the screen - try to watch live
+    if(this.end - this.visibleEnd < this.stickToLiveMs ){
+        // Watch live!
+        return this.watchPosition(this.end, true);
     }
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
-    this.playedPosition = playing;
+ScaleManager.prototype.updateWatching = function(){
+    if(this.watch.forcedToStop){
+        return; // Was forced to stop - do nothing
+    }
+    if(this.watch.live){ // watching live position - set anchor to end
+        return this.setAnchorDateAndPoint(this.end, 1);
+    }
+    if(this.watch.playing){ // watching position - update anchor point
+        return this.setAnchorDateAndPoint(this.playedPosition, this.anchorPoint); //updateWatching
+    }
+    this.checkWatch(); // not watching now - check if we can now
+};
+
+ScaleManager.prototype.updatePlayingState = function(playedPosition, liveMode, playing){
     this.liveMode = liveMode;
-
-    if(this.anchorDate == playing){
-        return;
+    this.playing = playing;
+    if(playedPosition !== null){
+        this.playedPosition = playedPosition;
     }
 
-    var end = timeManager.nowToDisplay();
-    if(playing > this.end && liveMode){
-        this.setEnd(playing);
-    }else if(end > this.end){
-        this.setEnd(end);
-    }
-
-    if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
-        this.checkWatchPlaying(playing, liveMode);
-    }
-    if(this.watchPlayingPosition){
-        this.setAnchorDateAndPoint(playing, liveMode ? 1:this.anchorPoint);
-    }
+    this.setEnd();
+    this.updateWatching();
 };
 
 
@@ -1109,6 +1145,12 @@ ScaleManager.prototype.tryToRestoreAnchorDate = function(date){
     }
 };
 
+ScaleManager.prototype.clickedCoordinate = function(coordinate){
+    if(typeof(coordinate) != 'undefined'){
+        this.clickedCoordinateValue = coordinate;
+    }
+    return this.clickedCoordinateValue;
+};
 ScaleManager.prototype.setAnchorCoordinate = function(coordinate){ // Set anchor date
     var position = this.screenCoordinateToDate(coordinate);
     this.setAnchorDateAndPoint(position, coordinate / this.viewportWidth);
@@ -1174,7 +1216,7 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
 
         levels.events = {index:i,level:level};
 
-        if (pixelsPerLevel <= this.minPixelsPerLevel) {
+        if (pixelsPerLevel <= this.minPixelsPerLevel / this.pixelAspectRatio) {
             // minMsPerPixel
             break;
         }
@@ -1206,8 +1248,9 @@ ScaleManager.prototype.dateToCoordinate = function(date){
     return  (date - this.start) / this.msPerPixel;
 };
 
-ScaleManager.prototype.dateToScreenCoordinate = function(date){
-    return this.dateToCoordinate(date) - this.dateToCoordinate(this.visibleStart);
+ScaleManager.prototype.dateToScreenCoordinate = function(date, pixelAspectRatio){
+    pixelAspectRatio = pixelAspectRatio || 1;
+    return pixelAspectRatio * (this.dateToCoordinate(date) - this.dateToCoordinate(this.visibleStart));
 };
 ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
     return this.coordinateToDate(coordinate + this.dateToCoordinate(this.visibleStart));
@@ -1237,7 +1280,7 @@ ScaleManager.prototype.canScroll = function(left){
     }
 
     return this.visibleEnd != this.end
-        && !(this.watchPlayingPosition && this.liveMode);
+        && !((this.watch.playing || this.watch.live) && this.liveMode); // canScroll
 };
 ScaleManager.prototype.scrollSlider = function(){
     var relativeWidth =  this.getRelativeWidth();
@@ -1294,6 +1337,10 @@ ScaleManager.prototype.scroll = function(value){
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
     return this.bound(0,this.scroll() + pixels * this.getRelativeWidth() / this.viewportWidth,1);
+};
+
+ScaleManager.prototype.getScrollTarget = function(pixels){
+    return this.bound(0, pixels / this.viewportWidth,1);
 };
 
 ScaleManager.prototype.scrollByPixels = function(pixels){
@@ -1360,27 +1407,32 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
-ScaleManager.prototype.checkZoomOut = function(){
+ScaleManager.prototype.checkZoomedOutNow = function(){
     var invisibleInterval = (this.end - this.start) - (this.visibleEnd-this.visibleStart);
+    return invisibleInterval <= this.zoomAccuracyMs;
+};
+ScaleManager.prototype.checkZoomOut = function(zoomTarget){
+    // Anticipate visible interval after setting zoomTarget
+    var msPerPixel = this.zoomToMs(zoomTarget);
+    var visibleInterval = msPerPixel  * this.viewportWidth;
+    var invisibleInterval = (this.end - this.start) - visibleInterval;
     this.disableZoomOut = invisibleInterval <= this.zoomAccuracyMs;
-    return !this.disableZoomOut;
-
 };
-ScaleManager.prototype.checkZoomIn = function(){
-    this.disableZoomIn = this.zoom() <= this.fullZoomInValue();
+ScaleManager.prototype.checkZoomIn = function(zoomTarget){
+    this.disableZoomIn = zoomTarget <= this.fullZoomInValue();
 };
-ScaleManager.prototype.checkZoom = function(){
-    this.checkZoomOut();
-    this.checkZoomIn();
+ScaleManager.prototype.checkZoom = function(zoomTarget){
+    this.checkZoomOut(zoomTarget);
+    this.checkZoomIn(zoomTarget);
 };
-ScaleManager.prototype.checkZoomAsync = function(){
+ScaleManager.prototype.checkZoomAsync = function(zoomTarget){
     var self = this;
     var result = self.$q.defer();
     setTimeout(function(){
         var oldDisableZoomOut = self.disableZoomOut;
         var oldDisableZoomIn = self.disableZoomIn;
 
-        self.checkZoom();
+        self.checkZoom(zoomTarget);
 
         if(oldDisableZoomOut != self.disableZoomOut ||
             oldDisableZoomIn != self.disableZoomIn){

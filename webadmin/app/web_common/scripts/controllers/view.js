@@ -27,15 +27,18 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.canViewArchive = false;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
-        if(!$routeParams.cameraId &&  $scope.storage.cameraId){
-            $scope.toggleCameraPanel = false;
+        $scope.isWebAdmin = Config.webadminSystemApiCompatibility;
+        $scope.cameraLinks = {enabled: $location.search().cameraLinks};
+
+        if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);
         }
 
         $scope.positionProvider = null;
         $scope.activeVideoRecords = null;
-        $scope.liveOnly = true;
         $scope.activeCamera = null;
+
+        $scope.showCameraPanel = true;
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
@@ -49,7 +52,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             'webm': 'video/webm',
             'flv': 'video/x-flv',
             'mp4': 'video/mp4',
-            'mjpeg':'video/x-motion-jpeg'
+            'mjpeg':'video/x-motion-jpeg',
+            'jpeg': 'image/jpeg'
         };
 
         $scope.activeFormat = 'Auto';
@@ -78,12 +82,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return true;
             });
             $scope.hasMobileApp = !!found;
-            if(!$scope.storage.cameraId){
-                $scope.toggleCameraPanel = true;
-            }
-
         }
-
 
         var supportsHls = browserSupports('hls',true,true),
             supportsWebm = browserSupports('webm', true, true);
@@ -115,6 +114,9 @@ angular.module('nxCommon').controller('ViewCtrl',
         }
 
         function formatSupported(type, nativeOnly){
+            if(type == 'preview'){
+                return true;
+            }
             return cameraSupports(type) && browserSupports(type, true, nativeOnly);
         }
 
@@ -197,14 +199,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             position = position?parseInt(position):oldTimePosition;
 
             if ($scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI, 640);
-                $scope.liveOnly = true;
-                if($scope.canViewArchive) {
-                    $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
-                        $scope.liveOnly = !hasArchive;
-                    });
-                }
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.id], systemAPI);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.id], systemAPI, 640);
                 updateVideoSource(position);
                 $scope.switchPlaying(true);
             }
@@ -213,33 +209,41 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.playerReady = function(API){
             $scope.playerAPI = API;
             if(API) {
-                setTimeout(function(){
+                $timeout(function(){
                     $scope.switchPlaying($scope.positionProvider.playing);
-                    $scope.playerAPI.volume($scope.volumeLevel);
-                },100);
+                    if($scope.playerAPI){
+                        $scope.playerAPI.volume($scope.volumeLevel);
+                    }
+                }, 100);
             }
         };
 
-        function updateVideoSource(playing) {
+        function updateVideoSource(playingPosition) {
             if($scope.playerAPI) {
                 // Pause playing
                 $scope.playerAPI.pause();
             }
             updateAvailableResolutions();
-            var live = !playing;
+            var live = !playingPosition;
 
-            $scope.positionSelected = !!playing;
+            $scope.positionSelected = !!playingPosition;
             if(!$scope.positionProvider){
                 return;
             }
 
-            $scope.positionProvider.init(playing, $scope.positionProvider.playing);
+            $scope.positionProvider.init(playingPosition, $scope.positionProvider.playing);
+            var salt = '';
             if(live){
-                playing = (new Date()).getTime();
+                salt = '&' + Math.random();
+                playingPosition = timeManager.nowToDisplay();
             }else{
-                playing = Math.round(playing);
+                playingPosition = Math.round(playingPosition);
             }
-            var cameraId = $scope.activeCamera.physicalId;
+
+            if(!$scope.activeCamera){
+                return;
+            }
+            var cameraId = $scope.activeCamera.id;
             var serverUrl = '';
 
             var resolution = $scope.activeResolution;
@@ -253,11 +257,14 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.currentResolution = $scope.player == "webm" ? resolution : resolutionHls;
             $scope.activeVideoSource = _.filter([
-                { src: systemAPI.hlsUrl(cameraId, !live && playing, resolutionHls), type: mimeTypes.hls, transport:'hls'},
-                { src: systemAPI.webmUrl(cameraId, !live && playing, resolution), type: mimeTypes.webm, transport:'webm' }
+                { src: systemAPI.hlsUrl(cameraId, !live && playingPosition, resolutionHls) + salt, type: mimeTypes.hls, transport:'hls'},
+                { src: systemAPI.webmUrl(cameraId, !live && playingPosition, resolution) + salt, type: mimeTypes.webm, transport:'webm' },
+                { src: systemAPI.previewUrl(cameraId, !live && playingPosition, null, window.screen.availHeight) + salt, type: mimeTypes.jpeg, transport:'preview'}
             ],function(src){
                 return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
             });
+
+            $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
         }
 
 
@@ -356,7 +363,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
         //timeFromUrl is used if we have a time from the url if not then set to false
-        var timeFromUrl = null;
+        var timeFromUrl = $routeParams.time || null;
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera){
                 return;
@@ -382,31 +389,36 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
+        timeManager.init(Config.webclient.useServerTime);
 
-        systemAPI.getTime().then(function(result){
-            var serverUtcTime = parseInt(result.data.reply.utcTime);
-            var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            timeManager.init(Config.webclient.useServerTime, serverUtcTime, timeZoneOffset);
-        });
+        //if camera doesnt exist get from camerasProvider
+        function setActiveCamera(camera){
+            $scope.activeCamera = camera;
+            if(!$scope.activeCamera){
+                $scope.activeCamera = $scope.camerasProvider.getFirstCam();
+            }
 
-        function requestResources(){
-            $scope.camerasProvider.requestResources().then(function(res){
-                if(!$scope.storage.cameraId)
-                {
-                    $scope.storage.cameraId = $scope.camerasProvider.getFirstCam();
+            // User server time offset of current server (server camera belongs to)
+            var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
+            if(serverOffset){
+                timeManager.setOffset(serverOffset);
+            }
 
-                }
-                $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
-
-                $scope.ready = true;
-                $timeout(updateHeights);
-                $scope.camerasProvider.startPoll();
-            });
+            $scope.showCameraPanel = !$scope.activeCamera;
         }
 
         systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
             $scope.canViewArchive = result;
-            requestResources();
+            return $scope.camerasProvider.requestResources();
+        }).then(function(){
+            // instead of requesting gettime once - we request it for all servers to know each timezone
+            return $scope.camerasProvider.getServerTimes();
+        }).then(function(){
+            setActiveCamera($scope.camerasProvider.getCamera($scope.storage.cameraId));
+
+            $scope.ready = true;
+            $timeout(updateHeights);
+            $scope.camerasProvider.startPoll();
         });
 
         // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
@@ -459,12 +471,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             $timeout(updateHeights,50);
         };
 
-        $('.video-icon.pull-left-5').dropdown();
-
-
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             timeFromUrl = $location.search().time;
-            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+
+            setActiveCamera($scope.camerasProvider.getCamera(next.params.cameraId));
         });
 
         $('html').addClass('webclient-page');

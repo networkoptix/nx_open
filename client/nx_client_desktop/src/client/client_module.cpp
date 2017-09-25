@@ -35,6 +35,8 @@
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
 
+#include <camera/video_decoder_factory.h>
+
 #include <cloud/cloud_connection.h>
 
 #include <core/resource/client_camera_factory.h>
@@ -65,7 +67,8 @@
 #include <plugins/storage/file_storage/qtfile_storage_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
-#include <redass/redass_controller.h>
+#include <nx/client/desktop/radass/radass_controller.h>
+#include <analytics/metadata_analytics_controller.h>
 
 #include <server/server_storage_manager.h>
 
@@ -77,7 +80,7 @@
 
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
-#include <utils/server_interface_watcher.h>
+#include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 
@@ -102,6 +105,8 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#include <ini.h>
+
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -120,7 +125,8 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_EXPECT(!msg.contains(lit("QObject::connect")), msg);
+    NX_EXPECT(!msg.contains(lit("QString:")), msg);
+    NX_EXPECT(!msg.contains(lit("QObject:")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 
@@ -162,6 +168,8 @@ namespace
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
     QObject(parent)
 {
+    ini().reload();
+
     initThread();
     initMetaInfo();
     initApplication();
@@ -320,7 +328,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnGlobals());
 
-    commonModule->store(new QnRedAssController());
+    m_radassController = commonModule->store(new RadassController());
+    commonModule->store(new QnMetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -378,7 +387,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         }
     }
 
-    //TODO: #GDM Should we always overwrite persistent setting with command-line values? o_O
+    // TODO: #GDM Should we always overwrite persistent setting with command-line values? o_O
     qnSettings->setVSyncEnabled(!startupParams.vsyncDisabled);
     qnSettings->setClientUpdateDisabled(startupParams.clientUpdateDisabled);
 
@@ -397,9 +406,9 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
     }
 
-    //TODO: #GDM fix it
+    // TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
-#ifndef __arm__
+#if !defined(__arm__) && !defined(__aarch64__)
     QnPerformanceTest::detectLightMode();
 #else
     // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
@@ -440,10 +449,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     {
         int idx = qnClientInstanceManager->instanceIndex();
         if (idx > 0)
-            logFileNameSuffix = L'_' + QString::number(idx) + L'_';
+            logFileNameSuffix = L'_' + QString::number(idx);
     }
-
-    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
@@ -451,11 +458,11 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     nx::utils::log::Settings logSettings;
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;
+    logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
     nx::utils::log::initialize(
         logSettings,
-        dataLocation,
         qApp->applicationName(),
         qApp->applicationFilePath(),
         lit("log_file") + logFileNameSuffix);
@@ -466,7 +473,6 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logSettings.level.parse(ec2TranLogLevel);
         nx::utils::log::initialize(
             logSettings,
-            dataLocation,
             qApp->applicationName(),
             qApp->applicationFilePath(),
             lit("ec2_tran") + logFileNameSuffix,
@@ -475,7 +481,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
 
     {
         // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
-        const auto logger = nx::utils::log::addLogger({lit("DecodedPictureToOpenGLUploader")});
+        const auto logger = nx::utils::log::addLogger({
+            nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))});
         logger->setDefaultLevel(nx::utils::log::Level::info);
     }
 
@@ -560,13 +567,15 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
-    commonModule->store(new PluginManager());
     // client uses ordinary QT file to access file system
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
+    auto pluginManager = commonModule->store(new PluginManager(nullptr));
+
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
+    QnVideoDecoderFactory::setPluginManager(pluginManager);
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 
@@ -593,6 +602,11 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+nx::client::desktop::RadassController* QnClientModule::radassController() const
+{
+    return m_radassController;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)

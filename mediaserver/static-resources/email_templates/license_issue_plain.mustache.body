@@ -1,0 +1,7 @@
+{{&event}}
+{{#aggregated}}
+{{&reason}}
+
+Camera: {{.}}
+Time: {{&timestampDate}} {{&timestampTime}}
+{{/aggregated}}

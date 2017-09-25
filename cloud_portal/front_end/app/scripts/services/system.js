@@ -104,7 +104,10 @@ angular.module('cloudApp')
                 return self.info;
             });
         };
-        system.prototype.getInfo = function(){
+        system.prototype.getInfo = function(force){
+            if(force){
+                this.infoPromise = null;
+            }
             if(!this.infoPromise){
                 var deferred = $q.defer();
                 var self = this;

@@ -219,12 +219,23 @@ void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst)
     dst.afterThreshold = src.getAfterThreshold();
     dst.streamQuality = src.getStreamQuality();
     dst.fps = src.getFps();
+    dst.bitrateKbps = src.getBitrateKbps();
 }
 
 void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst, const QnUuid& resourceId)
 {
-    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType,
-                         src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
+    dst = QnScheduleTask(
+        resourceId, 
+        src.dayOfWeek, 
+        src.startTime, 
+        src.endTime, 
+        src.recordingType,
+        src.beforeThreshold, 
+        src.afterThreshold, 
+        src.streamQuality, 
+        src.fps, 
+        src.recordAudio, 
+        src.bitrateKbps);
 }
 
 void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst)
@@ -506,11 +517,11 @@ void fromApiToResource(const ApiLicenseData& src, QnLicensePtr& dst)
 void fromResourceToApi(const QnLicensePtr& src, ApiDetailedLicenseData& dst)
 {
     dst.key = src->key();
-    dst.licenseBlock = src->rawLicense();
+    dst.signature = src->signature();
     dst.name = src->name();
     dst.cameraCount = src->cameraCount();
     dst.hardwareId = src->hardwareId();
-    dst.licenseType = src->displayName();
+    dst.licenseType = src->xclass();
     dst.version = src->version();
     dst.brand = src->brand();
     dst.expiration = src->expiration();

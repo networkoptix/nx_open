@@ -197,6 +197,11 @@ public:
         return this->m_target->getForeignAddress();
     }
 
+    virtual QString getForeignHostName() const override
+    {
+        return this->m_target->getForeignHostName();
+    }
+
     virtual bool isConnected() const override
     {
         return this->m_target->isConnected();
@@ -211,14 +216,14 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->sendAsync(buffer, std::move(handler));
     }
@@ -271,13 +276,13 @@ class NX_NETWORK_API StreamServerSocketDelegate:
 public:
     StreamServerSocketDelegate(AbstractStreamServerSocket* target);
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler);
-    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true);
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
-    virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(AcceptCompletionHandler handler);
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler);
-    virtual void cancelIOSync();
+    virtual AbstractStreamSocket* accept() override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void cancelIOSync() override;
 };
 
 } // namespace network

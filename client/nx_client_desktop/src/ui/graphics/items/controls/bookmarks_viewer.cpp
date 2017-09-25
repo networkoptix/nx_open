@@ -371,40 +371,47 @@ namespace
         return placeLabel(tagsControl, commonTextColor, layout, insertionIndex, kTagsIndex);
     }
 
-    QGraphicsLinearLayout *BookmarkToolTipFrame::createButtonsLayout(const QnCameraBookmark &bookmark)
+    QGraphicsLinearLayout* BookmarkToolTipFrame::createButtonsLayout(const QnCameraBookmark &bookmark)
     {
         auto buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
         buttonsLayout->setMinimumWidth(kBookmarkFrameWidth - kBaseMargin * 2);
         buttonsLayout->setSpacing(0);
 
         const auto createButton =
-            [this, bookmark](const char *iconName , int eventId)
-        {
-            enum { kSize = 30 };
+            [this, bookmark](const char* iconName, int eventId, const QString& toolTip)
+            {
+                enum { kSize = 30 };
 
-            auto button = new QnImageButtonWidget(this);
-            button->setIcon(qnSkin->icon(iconName));
-            button->setClickableButtons(Qt::LeftButton);
-            button->setMaximumSize(kSize, kSize);
+                auto button = new QnImageButtonWidget(this);
+                button->setIcon(qnSkin->icon(iconName));
+                button->setClickableButtons(Qt::LeftButton);
+                button->setMaximumSize(kSize, kSize);
+                button->setToolTip(toolTip);
 
-            enum { kAnimationInstantSpeed = 1000 };
-            button->setAnimationSpeed(kAnimationInstantSpeed);    // For instant hover state change
+                enum { kAnimationInstantSpeed = 1000 };
+                button->setAnimationSpeed(kAnimationInstantSpeed);    // For instant hover state change
 
-            QObject::connect(button, &QnImageButtonWidget::clicked, button
-                , [this, eventId, bookmark]() { m_emitBookmarkEvent(bookmark, eventId); });
+                QObject::connect(button, &QnImageButtonWidget::clicked, button,
+                    [this, eventId, bookmark]() { m_emitBookmarkEvent(bookmark, eventId); });
 
-            return button;
-        };
+                return button;
+            };
 
-        buttonsLayout->addItem(createButton("bookmark/tooltip/play.png", kBookmarkPlayActionEventId));
+        buttonsLayout->addItem(createButton("bookmark/tooltip/play.png",
+            kBookmarkPlayActionEventId,
+            tr("Play bookmark from the beginning")));
 
         if (!m_viewer->readOnly())
         {
-            buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png", kBookmarkEditActionEventId));
+            buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png",
+                kBookmarkEditActionEventId,
+                tr("Edit bookmark")));
 
             enum { kSpacerStretch = 1000 };
             buttonsLayout->addStretch(kSpacerStretch);
-            buttonsLayout->addItem(createButton("bookmark/tooltip/delete.png", kBookmarkRemoveActionEventId));
+            buttonsLayout->addItem(createButton("bookmark/tooltip/delete.png",
+                kBookmarkRemoveActionEventId,
+                tr("Delete bookmark")));
         }
         return buttonsLayout;
     }

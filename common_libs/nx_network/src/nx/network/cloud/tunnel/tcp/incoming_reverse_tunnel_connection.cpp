@@ -47,7 +47,7 @@ void IncomingReverseTunnelConnection::start(
 }
 
 void IncomingReverseTunnelConnection::setHttpTimeouts(
-    nx_http::AsyncHttpClient::Timeouts timeouts)
+    nx_http::AsyncClient::Timeouts timeouts)
 {
     m_httpTimeouts = timeouts;
 }
@@ -101,10 +101,18 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
             NX_LOGX(lm("Connector(%1) event: %2").arg(connector)
                 .arg(SystemError::toString(code)), cl_logDEBUG2);
 
-            if (code != SystemError::noError
-                && m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); }))
+            if (code != SystemError::noError)
             {
-                return; //< Ignore, better luck next time.
+                if (m_timer->timeToEvent())
+                    return; //< Retry is already scheduled.
+
+                if (m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); }))
+                {
+                    NX_LOGX(lm("Sheduled retry in %1").arg(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            *m_timer->timeToEvent())), cl_logDEBUG2);
+                    return;
+                }
             }
 
             nx::utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
@@ -113,10 +121,17 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
                 return;
 
             if (code == SystemError::noError)
+            {
+                m_timer->cancelSync();
+                m_timer->reset();
                 return saveConnection(std::move(connector));
+            }
 
             if (isExhausted())
+            {
+                NX_LOGX(lm("Exhausted tunnel: %1").arg(SystemError::toString(code)), cl_logDEBUG1);
                 utils::moveAndCallOptional(m_acceptHandler, code, nullptr);
+            }
         });
 }
 

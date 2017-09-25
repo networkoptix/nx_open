@@ -32,6 +32,7 @@ namespace settings_names {
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
+const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
 const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
@@ -48,6 +49,10 @@ const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
 const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
+const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
+    lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
+const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
+    lit("maxDifferenceBetweenSynchronizedAndLocalTimeMs"));
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -123,6 +128,12 @@ public:
     bool isAutoUpdateThumbnailsEnabled() const;
     void setAutoUpdateThumbnailsEnabled(bool value);
 
+    /**
+     * Send text email instead of HTML email in event rules/actions
+     */
+    bool isUseTextEmailFormat() const;
+    void setUseTextEmailFormat(bool value);
+
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
     int auditTrailPeriodDays() const;
@@ -192,11 +203,15 @@ public:
     void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
+
     bool isTimeSynchronizationEnabled() const;
+    void setTimeSynchronizationEnabled(bool value);
 
     bool isSynchronizingTimeWithInternet() const;
     void setSynchronizingTimeWithInternet(bool value);
 
+    std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
+    std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -261,6 +276,7 @@ signals:
     void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoUpdateThumbnailsChanged();
+    void useTextEmailFormatChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
@@ -291,6 +307,7 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor;
@@ -300,6 +317,8 @@ private:
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor;
+    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor;
+    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
 

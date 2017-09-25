@@ -28,6 +28,10 @@ public:
     };
     Q_DECLARE_FLAGS(Controls, Control);
 
+    virtual void paint(QPainter* painter,
+        const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
+
     void setVisibleControls(Controls controls);
 
     void setIconOverlayPixmap(const QPixmap& pixmap);
@@ -60,6 +64,9 @@ private:
     QnViewportBoundWidget* const m_preloaderHolder;
     QnViewportBoundWidget* const m_centralHolder;
     QnViewportBoundWidget* const m_extrasHolder;
+
+    QWidget* const m_centralContainer;
+    QWidget* const m_extrasContainer;
 
     // Preloader
     QnBusyIndicatorGraphicsWidget* m_preloader;

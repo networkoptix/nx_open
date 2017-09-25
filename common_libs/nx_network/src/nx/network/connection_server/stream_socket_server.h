@@ -93,12 +93,43 @@ public:
         m_connections.emplace(connection.get(), std::move(connection));
     }
 
+    template<typename Func>
+    void forEachConnection(Func func)
+    {
+        QnMutexLocker lk(&m_mutex);
+        for (const auto& connection: m_connections)
+            func(connection.first);
+    }
+
 private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     int m_connectionsBeingClosedCount;
     //TODO #ak this map types seems strange. Replace with std::set?
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
+};
+
+template<typename Connection>
+struct MessageSender
+{
+    MessageSender(typename Connection::MessageType message):
+        m_message(std::move(message))
+    {
+    }
+
+    void operator()(Connection* connection)
+    {
+        connection->post(
+            [message = m_message, connection]() mutable
+            {
+                connection->sendMessage(
+                    std::move(message),
+                    [](SystemError::ErrorCode) {});
+            });
+    }
+
+private:
+    typename Connection::MessageType m_message;
 };
 
 // TODO: #ak It seems to make sense to decouple 

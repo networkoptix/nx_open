@@ -191,7 +191,7 @@ class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 
 public:
 
-    //TODO:UTF unuse std::string
+    // TODO:UTF unuse std::string
     DeviceSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~DeviceSoapWrapper();
 

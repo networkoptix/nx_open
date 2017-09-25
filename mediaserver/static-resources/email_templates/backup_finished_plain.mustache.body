@@ -1,0 +1,4 @@
+{{&event}}{{#source}} on {{&source}}{{/source}}
+
+Reason: {{&reason}}
+Time: {{&timestampDate}} {{&timestampTime}}

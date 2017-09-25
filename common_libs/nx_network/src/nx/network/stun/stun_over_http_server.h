@@ -14,6 +14,9 @@ namespace stun {
 class NX_NETWORK_API StunOverHttpServer
 {
 public:
+    using StunConnectionPool = 
+        nx::network::server::StreamServerConnectionHolder<nx::stun::ServerConnection>;
+
     static const char* const kStunProtocolName;
 
     StunOverHttpServer(nx::stun::MessageDispatcher* stunMessageDispatcher);
@@ -24,8 +27,7 @@ public:
         const nx_http::StringType& stunOverHttpPath)
     {
         using namespace std::placeholders;
-        using CreateStunOverHttpConnectionHandler =
-            nx_http::server::handler::CreateTunnelHandler<nx::stun::ServerConnection>;
+        using CreateStunOverHttpConnectionHandler = nx_http::server::handler::CreateTunnelHandler;
 
         httpMessageDispatcher->template registerRequestProcessor<CreateStunOverHttpConnectionHandler>(
             stunOverHttpPath,
@@ -37,10 +39,11 @@ public:
             });
     }
 
+    StunConnectionPool& stunConnectionPool();
+    const StunConnectionPool& stunConnectionPool() const;
+
 private:
-    nx::network::server::StreamServerConnectionHolder<
-        nx::stun::ServerConnection
-    > m_stunConnectionPool;
+    StunConnectionPool m_stunConnectionPool;
     nx::stun::MessageDispatcher* m_dispatcher;
 
     void createStunConnection(std::unique_ptr<AbstractStreamSocket> connection);

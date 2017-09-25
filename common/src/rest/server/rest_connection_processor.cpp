@@ -113,12 +113,11 @@ void QnRestConnectionProcessor::run()
     d->response.messageBody.clear();
 
     QUrl url = getDecodedUrl();
-    QString path = url.path();
-    QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded);
-    int rez = CODE_OK;
-    QByteArray contentType = "application/xml";
-    auto owner = static_cast<QnHttpConnectionListener*>(d->owner);
-    QnRestRequestHandlerPtr handler = owner->processorPool()->findHandler(url.path());
+    RestRequest request{url.path(),  QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded), this};
+    RestResponse response;
+
+    QnRestRequestHandlerPtr handler = static_cast<QnHttpConnectionListener*>(d->owner)
+        ->processorPool()->findHandler(request.path);
     if (handler)
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
@@ -136,56 +135,64 @@ void QnRestConnectionProcessor::run()
             }
         }
 
-        if (d->request.requestLine.method.toUpper() == "GET")
+        const auto requestContentType = nx_http::getHeaderValue(d->request.headers, "Content-Type");
+        const auto method = d->request.requestLine.method.toUpper();
+        if (method == nx_http::Method::get)
         {
-            rez = handler->executeGet(url.path(), params,
-                d->response.messageBody, contentType, this);
+            response = handler->executeGet(request);
         }
-        else if (d->request.requestLine.method.toUpper() == "POST")
+        else
+        if (method == nx_http::Method::post)
         {
-            rez = handler->executePost(url.path(), params, d->requestBody,
-                nx_http::getHeaderValue(d->request.headers, "Content-Type"),
-                d->response.messageBody, contentType, this);
+            response = handler->executePost(request, {requestContentType, d->requestBody});
         }
-        else if (d->request.requestLine.method.toUpper() == "PUT")
+        else
+        if (method == nx_http::Method::put)
         {
-            rez = handler->executePut(url.path(), params, d->requestBody,
-                nx_http::getHeaderValue(d->request.headers, "Content-Type"),
-                d->response.messageBody, contentType, this);
+            response = handler->executePut(request, {requestContentType, d->requestBody});
         }
-        else if (d->request.requestLine.method.toUpper() == "DELETE")
+        else
+        if (method == nx_http::Method::delete_)
         {
-            rez = handler->executeDelete(url.path(), params,
-                d->response.messageBody, contentType, this);
+            response = handler->executeDelete(request);
         }
         else
         {
-            NX_WARNING(this, lm("Unknown REST method %1").arg(d->request.requestLine.method));
-            contentType = "text/plain";
-            d->response.messageBody = "Invalid HTTP method";
-            rez = nx_http::StatusCode::notFound;
+            NX_WARNING(this, lm("Unknown REST method %1").arg(method));
+            response.statusCode = nx_http::StatusCode::notFound;
+            response.content.type = "text/plain";
+            response.content.body = "Invalid HTTP method";
         }
     }
     else
     {
-        rez = redirectTo(QnTcpListener::defaultPage(), contentType);
+        response.statusCode = (nx_http::StatusCode::Value)
+            redirectTo(QnTcpListener::defaultPage(), response.content.type);
     }
 
     QByteArray contentEncoding;
-    QByteArray uncompressedResponse = d->response.messageBody;
-    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty() && rez == CODE_OK)
+    if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip")
+        && !response.content.body.isEmpty() && response.statusCode == nx_http::StatusCode::ok
+        && !response.content.type.contains("image"))
     {
-        if (!contentType.contains("image")) {
-            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
+            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(response.content.body);
             contentEncoding = "gzip";
-        }
     }
+    else
+    {
+        d->response.messageBody = response.content.body;
+    }
+
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"));
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Cache-Control", "post-check=0, pre-check=0"));
     nx_http::insertHeader(&d->response.headers, nx_http::HttpHeader("Pragma", "no-cache"));
-    sendResponse(rez, contentType, contentEncoding);
+
+    sendResponse(response.statusCode, response.content.type, contentEncoding,
+        /*multipartBoundary*/ QByteArray(), /*displayDebug*/ false,
+        response.isUndefinedContentLength);
+
     if (handler)
-        handler->afterExecute(url.path(), params, uncompressedResponse, this);
+        handler->afterExecute(request, response.content.body);
 }
 
 Qn::UserAccessData QnRestConnectionProcessor::accessRights() const

@@ -96,7 +96,7 @@ public:
             decltype(m_socketAttributes.nonBlockingMode)(false),
             val);
     }
-    virtual bool getMtu(unsigned int* mtuValue) const
+    virtual bool getMtu(unsigned int* mtuValue) const override
     {
         if (!m_delegate)
         {

@@ -27,7 +27,7 @@ void ReverseConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_httpClient.bindToAioThread(aioThread);
 }
 
-void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
+void ReverseConnector::setHttpTimeouts(nx_http::AsyncClient::Timeouts timeouts)
 {
     m_httpClient.setSendTimeout(timeouts.sendTimeout);
     m_httpClient.setResponseReadTimeout(timeouts.responseReadTimeout);
@@ -62,7 +62,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
         };
 
     m_httpClient.doUpgrade(
-        url::Builder().setScheme("http").setEndpoint(endpoint).toUrl(),
+        url::Builder().setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint).toUrl(),
         kNxRc,
         std::move(onHttpDone));
 }

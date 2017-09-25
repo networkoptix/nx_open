@@ -5,16 +5,13 @@
         </div>
         <div class="col-md-8 col-md-pull-4">
             <alert type="danger" ng-if="settings.flags.noHDD">
-                This device is intended to work with hard disk drive installed.<br>
-                Please turn off the device and install a hard disk drive.
+                Thiết bị này được thiết kế để làm việc với ổ cứng đã được cài đặt. <br> Vui lòng tắt thiết bị và cài đặt một ổ đĩa cứng.
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network ot Internet
+                Thiết bị này cần kết nối mạng để hoạt động. <br> Vui lòng kết nối nó với mạng nội bộ của Internet
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
-                This device has wrong network configuration.<br>
-                Please connect it to the network or set a correct IP address.
+                Thiết bị này đã cấu hình mạng sai. <br> Hãy kết nối nó với mạng hoặc thiết lập một địa chỉ IP chính xác.
             </alert>
 
 
@@ -22,25 +19,32 @@
                 <tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>Cổng</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Cổng" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
 
                                 <div class="col-xs-6">
-                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">Change port</button>
+                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">Thay đổi cổng</button>
                                 </div>
                             </div>
                         </form>
                     </div>
 
                     <div>
-                        <h3>Reset server</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration). The server will be detached from the current system. Video archive will remain intact.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <h3>Khởi động lại máy chủ</h3>
+                        <p>This action will revert this server to defaults (clear the database and reset configuration).
+                            The server will be detached from the current system. Video archive will remain intact.</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Khôi phục mặc định của nhà sản xuât</button></p>
+                    </div>
+                    <div>
+                        <h3>Detach server from the system</h3>
+                        <p>This action will detach server from the system keeping database, local users and configuration.
+                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
                     </div>
                     <div>
                         <h3>Restart</h3>
@@ -48,7 +52,7 @@
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>Change admin password</h3>
                             <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
                                 Otherwise this will change the recovery password only.</p>
@@ -73,15 +77,15 @@
                             </div>
 
                             <div class="col-md-6">
-                                <button type="button" class="btn btn-default" ng-click="renameSystem()">Rename system</button>
+                                <button type="button" class="btn btn-default" ng-click="renameSystem()">Đổi tên hệ thống</button>
                             </div>
                         </div>
                     </div>
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>Hợp nhất hệ thống</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Hợp nhất hệ thống</button></p>
                         </form>
                     </div>
 
@@ -89,45 +93,41 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>This system is linked to {{Config.cloud.productName}}, system owner: <b>{{cloudAccountName}}</b></p>
-                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Disconnect from {{Config.cloud.productName}}</button></p>
+                            <p>Hệ thống này được liên kết đến {{Config.cloud.productName}}, chủ hệ thống: <b> {{cloudAccountName}} </b></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Ngắt kết nối khỏi {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
-                                  target="_blank">Go to {{Config.cloud.productName}} Portal</a></p>
+                                  target="_blank">Đi tới cổng {{Config.cloud.productName}}</a></p>
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">This system is not linked to {{Config.cloud.productName}}
-                                <a ng-if="!mode.liteClient"
+                            <alert type="warning">Hệ thống này không được liên kết đến {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Learn more</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Connect the server to the Internet to perform setup {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet connection required to connect System to {{Config.cloud.productName}}</alert>
+                                   target="_blank"> Tìm hiểu thêm </a></alert>
+                            <alert type="error" ng-if="!hasInternetOnServer">Kết nối máy chủ với Internet để thực hiện cài đặt {{Config.cloud.productName}}</alert>
+                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Cần kết nối Internet để kết nối Hệ thống với {{Config.cloud.productName}}</alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
-                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
-                                <a ng-if="!mode.liteClient"  class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient"> Kết nối với {{Config.cloud.productName}} </button> <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
-                                   target="_blank">Create {{Config.cloud.productName}} Account</a></p>
+                                   target="_blank"> Tạo {{Config.cloud.productName}} Tài khoản </a></p>
                         </div>
                     </div>
                 </tab>
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
-                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <h3> Cài đặt mạng thiết bị </h3> <network-settings settings="networkSettings[0]" ng-if="networkSettings"> </network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()"> Lưu cài đặt và khởi động lại thiết bị </button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
-                        <h3>Date and Time</h3>
+                        <h3>Ngày tháng</h3>
                         <form name="timeSettings">
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td><label for="timeZone">Time zone</label></td>
+                                        <td><label for="timeZone">Múi giờ</label></td>
                                         <td><label for="date">ngày tháng</label></td>
-                                        <td><label for="time">thời gian</label></td>
+                                        <td><label for="time">Thời gian</label></td>
                                         <td></td>
                                     </tr>
                                     <tr>
@@ -161,18 +161,16 @@
                                 </tbody>
                             </table>
                         </form>
-                        <button class="btn btn-default" ng-click="saveDateTime()">Save Date and Time</button>
+                        <button class="btn btn-default" ng-click="saveDateTime()">Lưu ngày và giờ</button>
                     </div>
                     <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
-                        <h3>Restore Server Settings</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Full Restore</button>
-                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restore Everything But Network</button></p>
+                        <h3>Khôi phục Cài đặt Máy chủ</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()"> Phục hồi đầy đủ </button> <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()"> Phục hồi Mọi thứ Nhưng Mạng </button></p>
                     </div>
                     <div ng-if="canRunClient || canStopClient">
-                        <h3>Run client application on server</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">Run client</button>
-                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Stop client</button></p>
-                        <p>Use a keyboard/mouse or mobile application to control it.</p>
+                        <h3>Chạy ứng dụng máy trạm trên máy chủ</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()"> Chạy máy trạm </button> <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()"> Ngừng máy trạm </button></p>
+                        <p>Sử dụng bàn phím / chuột hoặc ứng dụng di động để kiểm soát nó.</p>
                     </div>
                 </tab>
             </tabset>

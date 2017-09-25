@@ -3,6 +3,7 @@
 #include <api/runtime_info_manager.h>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource/user_resource.h>
 
@@ -14,7 +15,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/synctime.h>
-#include <utils/common/delayed.h>
 
 namespace {
 
@@ -37,50 +37,33 @@ static const int kMessagesDelayMs = 5000;
 
 QnWorkbenchLicenseNotifier::QnWorkbenchLicenseNotifier(QObject *parent):
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_checked(false)
+    QnWorkbenchContextAware(parent)
 {
-    auto checkLicensesDelayed =
-        [this, guard = QPointer<QnWorkbenchLicenseNotifier>(this)]()
-        {
-            if (!guard)
-                return;
-
-            executeDelayedParented([this]{ checkLicenses(); }, kMessagesDelayMs, this);
-        };
-
-    connect(licensePool(), &QnLicensePool::licensesChanged, this, checkLicensesDelayed);
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        checkLicensesDelayed);
-    connect(context(), &QnWorkbenchContext::userChanged, this,
-        &QnWorkbenchLicenseNotifier::at_context_userChanged);
 }
 
 QnWorkbenchLicenseNotifier::~QnWorkbenchLicenseNotifier()
 {
 }
 
-void QnWorkbenchLicenseNotifier::checkLicenses()
+void QnWorkbenchLicenseNotifier::checkLicenses() const
 {
     if (context()->closingDown())
+        return;
+
+    if (!qnRuntime->isDesktopMode())
         return;
 
     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
-    if (m_checked)
-        return;
+    auto licenseWarningStates = qnSettings->licenseWarningStates();
 
-     m_checked = true;
-
-    QnLicenseWarningStateHash licenseWarningStates = qnSettings->licenseWarningStates();
-
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    const auto currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QList<QnLicensePtr> licenses;
-    bool warn = false;
+    auto warn = false;
 
-    bool someLicenseWillBeBlocked = false;
+    auto someLicenseWillBeBlocked = false;
     for (const auto& runtimeInfo: runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.prematureLicenseExperationDate)
@@ -92,7 +75,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
 
     for (const auto& license: licensePool()->getLicenses())
     {
-        QnLicenseErrorCode errorCode = licensePool()->validateLicense(license);
+        const auto errorCode = licensePool()->validateLicense(license);
 
         if (someLicenseWillBeBlocked
             && errorCode != QnLicenseErrorCode::NoError
@@ -104,27 +87,27 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
             continue;
         }
 
-        qint64 expirationTime = license->expirationTime();
+        const auto expirationTime = license->expirationTime();
         // skip infinite license
         if (expirationTime < 0)
             continue;
 
-        QnLicenseWarningState licenseWarningState = licenseWarningStates.value(license->key());
+        const auto licenseWarningState = licenseWarningStates.value(license->key());
         // skip already notified expired license
-        qint64 lastTimeLeft = expirationTime - licenseWarningState.lastWarningTime;
+        const auto lastTimeLeft = expirationTime - licenseWarningState.lastWarningTime;
         if (lastTimeLeft < 0)
             continue;
         // skip license that didn't pass the maximum pre-notification interval
-        qint64 timeLeft = expirationTime - currentTime;
+        const auto timeLeft = expirationTime - currentTime;
         if (timeLeft > kWarningTimes[0])
             continue;
 
         licenses.push_back(license);
 
-        int lastWarningIndex = 0;
+        auto lastWarningIndex = 0;
         for (; kWarningTimes[lastWarningIndex] > lastTimeLeft; lastWarningIndex++);
 
-        int warningIndex = 0;
+        auto warningIndex = 0;
         for (; kWarningTimes[warningIndex] > timeLeft
             && kWarningTimes[warningIndex] > 0; warningIndex++);
 
@@ -138,17 +121,11 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
 
     if (warn && mainWindow())
     {
-        QScopedPointer<QnLicenseNotificationDialog> dialog(new QnLicenseNotificationDialog(mainWindow()));
+        QScopedPointer<QnLicenseNotificationDialog> dialog(
+            new QnLicenseNotificationDialog(mainWindow()));
         dialog->setLicenses(licenses);
         dialog->exec();
 
         qnSettings->setLicenseWarningStates(licenseWarningStates);
     }
-}
-
-void QnWorkbenchLicenseNotifier::at_context_userChanged()
-{
-    /* Clear flag if we have logged out. */
-    if (!context()->user())
-        m_checked = false;
 }

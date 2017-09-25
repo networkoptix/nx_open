@@ -3,6 +3,7 @@
     Classes and utilities to work with transaction log JSON structure returned by server
 '''
 
+import json
 from functools import total_ordering
 
 
@@ -68,10 +69,28 @@ class Transaction(object):
                 (other.peer_id, other.db_id, other.sequence))
 
     def __str__(self):
-        return "Transaction(from: %s, timestamp: %s, command: %s)" % (self.peer_id, self.timestamp, self.command)
+        return ('Transaction(peer_id=%s db_id=%s sequence=%s timestamp=%s command=%s)' %
+                    (self.peer_id, self.db_id, self.sequence, self.timestamp, self.command))
 
     def __repr__(self):
         return '%s' % self
+
+    # trying to keep same structure as from_json, but with only those fields we compare by
+    def to_dict(self):
+        return dict(
+            tran=dict(
+                peerID=self.peer_id,
+                persistentInfo=dict(
+                    dbID=self.db_id,
+                    sequence=self.sequence)))
+
+
+class TransactionJsonEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, Transaction):
+            return obj.to_dict()
+        return json.JSONEncoder.default(self, obj)
 
 
 def transactions_from_json(json_data):

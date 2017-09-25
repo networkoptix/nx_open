@@ -15,8 +15,7 @@ QString getBookmarkCreatorName(
 
 QnCameraBookmark bookmarkFromAction(
     const nx::vms::event::AbstractActionPtr& action,
-    const QnSecurityCamResourcePtr& camera,
-    QnCommonModule* commonModule);
+    const QnSecurityCamResourcePtr& camera);
 
 QnCameraBookmarkList bookmarksAtPosition(const QnCameraBookmarkList& bookmarks,
     qint64 posMs);

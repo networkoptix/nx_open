@@ -6,6 +6,7 @@ Allows running commands or working with files on local or remote hosts transpare
 import abc
 import os
 import os.path
+import datetime
 import logging
 import threading
 import subprocess
@@ -20,7 +21,7 @@ from .utils import quote, is_list_inst
 log = logging.getLogger(__name__)
 
 
-PROCESS_TIMEOUT_SEC = 60*60  # 1 hour
+PROCESS_TIMEOUT = datetime.timedelta(hours=1)
 
 
 class ProcessError(subprocess.CalledProcessError):
@@ -34,11 +35,12 @@ class ProcessError(subprocess.CalledProcessError):
 
 class ProcessTimeoutError(subprocess.CalledProcessError):
 
-    def __init__(self, cmd):
+    def __init__(self, cmd, timeout):
         subprocess.CalledProcessError.__init__(self, returncode=None, cmd=cmd)
+        self.timeout = timeout
 
     def __str__(self):
-        return 'Command "%s" was timed out (timeout is %s seconds)' % (self.cmd, PROCESS_TIMEOUT_SEC)
+        return 'Command "%s" was timed out (timeout is %s)' % (self.cmd, self.timeout)
 
     def __repr__(self):
         return 'ProcessTimeoutError(%s)' % self
@@ -62,12 +64,14 @@ class SshHostConfig(object):
         assert isinstance(d, dict), 'ssh location should be dict: %r'  % d
         assert 'host' in d, '"host" is required parameter for host location'
         return cls(
+            name=d.get('name') or d['host'],
             host=d['host'],
             user=d.get('user'),
             key_file_path=d.get('key_file'),
             )
 
-    def __init__(self, host, user=None, key_file_path=None):
+    def __init__(self, name, host, user=None, key_file_path=None):
+        self.name = name
         self.host = host
         self.user = user
         self.key_file_path = key_file_path
@@ -78,7 +82,7 @@ class SshHostConfig(object):
 
 def host_from_config(config):
     if config:
-        return RemoteSshHost(config.host, config.user, config.key_file_path)
+        return RemoteSshHost(config.name, config.host, config.user, config.key_file_path)
     else:
         return LocalHost()
 
@@ -89,11 +93,16 @@ class Host(object):
 
     @property
     @abc.abstractmethod
+    def name(self):
+        pass
+
+    @property
+    @abc.abstractmethod
     def host(self):
         pass
 
     @abc.abstractmethod
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         pass
 
     @abc.abstractmethod
@@ -161,11 +170,16 @@ class LocalHost(Host):
         return 'LocalHost'
 
     @property
+    def name(self):
+        return 'localhost'
+
+    @property
     def host(self):
         return 'localhost'
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         assert is_list_inst(args, (str, unicode)), repr(args)
+        timeout = timeout or PROCESS_TIMEOUT
         args = map(str, args)
         if input:
             log.debug('executing: %s (with %d bytes input)', subprocess.list2cmdline(args), len(input))
@@ -204,12 +218,12 @@ class LocalHost(Host):
                             raise
                     pipe.stdin.close()
             finally:
-                stdout_thread.join(timeout=PROCESS_TIMEOUT_SEC)
+                stdout_thread.join(timeout=timeout.total_seconds())
                 if not stdout_thread.isAlive():
-                    stderr_thread.join(timeout=PROCESS_TIMEOUT_SEC)
+                    stderr_thread.join(timeout=timeout.total_seconds())
                 if stdout_thread.isAlive() or stderr_thread.isAlive():
                     pipe.kill()
-                    raise ProcessTimeoutError(subprocess.list2cmdline(args))
+                    raise ProcessTimeoutError(subprocess.list2cmdline(args), timeout)
         finally:
             stdout_thread.join()
             stderr_thread.join()
@@ -296,10 +310,11 @@ class LocalHost(Host):
 
 class RemoteSshHost(Host):
 
-    def __init__(self, host, user, key_file_path=None, ssh_config_path=None, proxy_host=None):
+    def __init__(self, name, host, user, key_file_path=None, ssh_config_path=None, proxy_host=None):
         assert proxy_host is None or isinstance(proxy_host, Host), repr(proxy_host)
         self._proxy_host = proxy_host or LocalHost()
-        self._host = host
+        self._name = name
+        self._host = host  # may be different from name, for example, IP address
         self._user = user
         self._key_file_path = key_file_path
         self._ssh_config_path = ssh_config_path
@@ -312,14 +327,18 @@ class RemoteSshHost(Host):
         return 'RemoteSshHost(%s)' % self
 
     @property
+    def name(self):
+        return self._name
+
+    @property
     def host(self):
         return self._host
 
-    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True, timeout=None):
         ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
         if cwd:
             args = [subprocess.list2cmdline(['cd', cwd, '&&'] + args)]
-        return self._local_host.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output)
+        return self._local_host.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output, timeout=timeout)
 
     def file_exists(self, path):
         output = self.run_command(['[', '-f', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()

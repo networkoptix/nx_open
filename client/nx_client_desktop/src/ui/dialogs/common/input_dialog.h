@@ -4,36 +4,48 @@
 
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QLineEdit>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 namespace Ui {
-    class InputDialog;
-}
+class InputDialog;
+} // namespace Ui
 
 /**
  * Text input dialog that will be automatically closed on client disconnect.
  * Also supports input validation and error text display.
  */
-class QnInputDialog: public QnSessionAwareButtonBoxDialog {
+class QnInputDialog: public QnSessionAwareButtonBoxDialog
+{
     Q_OBJECT
+    using base_type = QnSessionAwareButtonBoxDialog;
 
-    typedef QnSessionAwareButtonBoxDialog base_type;
 public:
-    QnInputDialog(QWidget *parent = NULL);
-    virtual ~QnInputDialog();
+    QnInputDialog(QWidget* parent = nullptr);
+    virtual ~QnInputDialog() override;
 
     QString caption() const;
-    void setCaption(const QString &caption);
+    void setCaption(const QString& caption);
 
     QString value() const;
-    void setValue(const QString &value);
+    void setValue(const QString& value);
 
     QString placeholderText() const;
-    void setPlaceholderText(const QString &placeholderText);
+    void setPlaceholderText(const QString& placeholderText);
+
+    QLineEdit::EchoMode echoMode() const;
+    void setEchoMode(QLineEdit::EchoMode echoMode);
 
     QDialogButtonBox::StandardButtons buttons() const;
     void setButtons(QDialogButtonBox::StandardButtons buttons);
+
+    static QString getText(QWidget* parent,
+        const QString& title, const QString& label,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QLineEdit::EchoMode echoMode = QLineEdit::Normal,
+        const QString& placeholder = QString(),
+        const QString& initialText = QString());
 
 private:
     void validateInput();

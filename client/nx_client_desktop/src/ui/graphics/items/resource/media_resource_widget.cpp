@@ -7,6 +7,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+
 #include <api/app_server_connection.h>
 #include <api/server_rest_connection.h>
 
@@ -51,9 +53,13 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
+#include <nx/client/desktop/utils/entropix_image_enhancer.h>
+
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/text_pixmap_cache.h>
+#include <ui/common/geometry.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -307,6 +313,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::updateDisplay);
     connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
         &QnMediaResourceWidget::updateFisheye);
+    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
+        &QnMediaResourceWidget::dewarpingParamsChanged);
     connect(item, &QnWorkbenchItem::imageEnhancementChanged, this,
         &QnMediaResourceWidget::at_item_imageEnhancementChanged);
     connect(this, &QnMediaResourceWidget::dewarpingParamsChanged, this,
@@ -461,6 +469,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
+
+    connect(this, &QnMediaResourceWidget::positionChanged, this,
+        &QnMediaResourceWidget::clearEntropixEnhancedImage);
+    connect(this, &QnMediaResourceWidget::zoomRectChanged, this,
+        &QnMediaResourceWidget::clearEntropixEnhancedImage);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -482,6 +495,16 @@ void QnMediaResourceWidget::initSoftwareTriggers()
     if (!display()->camDisplay()->isRealTimeSource())
         return;
 
+    if (item()->layout()->isSearchLayout())
+        return;
+
+    static const auto kUpdateTriggersInterval = 1000;
+    const auto updateTriggersAvailabilityTimer = new QTimer(this);
+    updateTriggersAvailabilityTimer->setInterval(kUpdateTriggersInterval);
+    connect(updateTriggersAvailabilityTimer, &QTimer::timeout,
+        this, &QnMediaResourceWidget::updateTriggersAvailability);
+    updateTriggersAvailabilityTimer->start();
+
     resetTriggers();
 
     auto eventRuleManager = commonModule()->eventRuleManager();
@@ -494,6 +517,47 @@ void QnMediaResourceWidget::initSoftwareTriggers()
 
     connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
+}
+
+void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
+{
+    if (!rule)
+        return;
+
+    const auto triggerIt = m_softwareTriggers.find(rule->id());
+    if (triggerIt == m_softwareTriggers.end())
+        return;
+
+    const auto button = qobject_cast<QnSoftwareTriggerButton*>(
+        m_triggersContainer->item(triggerIt.value().overlayItemId));
+
+    if (!button)
+        return;
+
+    const bool buttonEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime())
+        || !button->isLive();
+
+    if (button->isEnabled() == buttonEnabled)
+        return;
+
+    const auto info = triggerIt.value().info;
+
+    if (!buttonEnabled)
+    {
+        const bool longPressed = info.prolonged &&
+            button->state() == QnSoftwareTriggerButton::State::Waiting;
+        if (longPressed)
+            button->setState(QnSoftwareTriggerButton::State::Failure);
+    }
+
+    button->setEnabled(buttonEnabled);
+    updateTriggerButtonTooltip(button, info, buttonEnabled);
+}
+
+void QnMediaResourceWidget::updateTriggersAvailability()
+{
+    for (auto ruleId: m_softwareTriggers.keys())
+        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(ruleId));
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -555,7 +619,7 @@ void QnMediaResourceWidget::createButtons()
     }
 
     {
-        QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enchancement"));
+        QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enhancement"));
         enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
         enhancementButton->setCheckable(true);
         enhancementButton->setToolTip(tr("Image Enhancement"));
@@ -592,6 +656,16 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
     }
 
+    {
+        auto entropixEnhancementButton =
+            createStatisticAwareButton(lit("media_widget_entropix_enhancement"));
+        entropixEnhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
+        entropixEnhancementButton->setToolTip(lit("Entropix Image Enhancement"));
+        connect(entropixEnhancementButton, &QnImageButtonWidget::clicked, this,
+            &QnMediaResourceWidget::at_entropixEnhancementButton_clicked);
+        titleBar()->rightButtonsBar()->addButton(
+            Qn::EntropixEnhancementButton, entropixEnhancementButton);
+    }
 }
 
 void QnMediaResourceWidget::createPtzController()
@@ -658,13 +732,21 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     if (!qFuzzyIsNull(result))
         return result;
 
+    const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+
     if (m_renderer && !m_renderer->sourceSize().isEmpty())
     {
-        const QSize sourceSize = m_renderer->sourceSize();
+        auto sourceSize = m_renderer->sourceSize();
+        if (camera)
+        {
+            const auto& sensor = camera->combinedSensorsDescription().mainSensor();
+            if (sensor.isValid())
+                sourceSize = QnGeometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
+        }
         return QnGeometry::aspectRatio(sourceSize);
     }
 
-    if (const auto camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
+    if (camera)
     {
         const auto cameraAr = camera->aspectRatio();
         if (cameraAr.isValid())
@@ -752,6 +834,33 @@ void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visi
         return;
 
     m_textOverlayWidget->addItem(text, options, id);
+}
+
+Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
+    QPainter* painter,
+    int channel,
+    const QRectF& sourceSubRect,
+    const QRectF& targetRect)
+{
+    QnGlNativePainting::begin(m_renderer->glContext(), painter);
+
+    qreal opacity = effectiveOpacity();
+    bool opaque = qFuzzyCompare(opacity, 1.0);
+    // always use blending for images --gdm
+    if (!opaque || (base_type::resource()->flags() & Qn::still_image))
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    m_renderer->setBlurFactor(m_statusOverlay->opacity());
+    const auto result = m_renderer->paint(channel, sourceSubRect, targetRect, effectiveOpacity());
+    m_paintedChannels[channel] = true;
+
+    /* There is no need to restore blending state before invoking endNativePainting. */
+    QnGlNativePainting::end(painter);
+
+    return result;
 }
 
 void QnMediaResourceWidget::setupHud()
@@ -1165,6 +1274,16 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
                     updateIoModuleVisibility(animationAllowed());
             });
 
+        if (const auto archiveReader = m_display->archiveReader())
+        {
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamPaused,
+                this, &QnMediaResourceWidget::updateButtonsVisibility);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
+                this, &QnMediaResourceWidget::updateButtonsVisibility);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,
+                this, &QnMediaResourceWidget::clearEntropixEnhancedImage);
+        }
+
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
@@ -1179,6 +1298,8 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
     const bool canRotate = accessController()->hasPermissions(item()->layout()->resource(),
         Qn::WritePermission);
     setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo() || !canRotate);
+
+    clearEntropixEnhancedImage();
 
     emit displayChanged();
 }
@@ -1270,26 +1391,40 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     updateInfoTextLater();
 }
 
-Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect)
+Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
+    QPainter* painter,
+    int channel,
+    const QRectF& channelRect,
+    const QRectF& paintRect)
 {
-    QnGlNativePainting::begin(m_renderer->glContext(), painter);
+    QRectF sourceSubRect = toSubRect(channelRect, paintRect);
 
-    qreal opacity = effectiveOpacity();
-    bool opaque = qFuzzyCompare(opacity, 1.0);
-    // always use blending for images --gdm
-    if (!opaque || (base_type::resource()->flags() & Qn::still_image))
+    if (m_camera && m_camera->hasCombinedSensors())
     {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        const auto& sensor = m_camera->combinedSensorsDescription().mainSensor();
+        if (sensor.isValid())
+            sourceSubRect = subRect(sensor.geometry, sourceSubRect);
     }
 
-    QRectF sourceRect = toSubRect(channelRect, paintRect);
-    m_renderer->setBlurFactor(m_statusOverlay->opacity());
-    Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
-    m_paintedChannels[channel] = true;
+    Qn::RenderStatus result = Qn::NothingRendered;
 
-    /* There is no need to restore blending state before invoking endNativePainting. */
-    QnGlNativePainting::end(painter);
+    if (!m_entropixEnhancedImage.isNull())
+    {
+        const PainterTransformScaleStripper scaleStripper(painter);
+        painter->drawImage(
+            scaleStripper.mapRect(paintRect),
+            m_entropixEnhancedImage,
+            m_entropixEnhancedImage.rect());
+        result = Qn::NewFrameRendered;
+    }
+    else
+    {
+        const PainterTransformScaleStripper scaleStripper(painter);
+        result = paintVideoTexture(painter,
+            channel,
+            sourceSubRect,
+            scaleStripper.mapRect(paintRect));
+    }
 
     if (result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
         base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
@@ -1303,7 +1438,16 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     {
         ensureMotionSelectionCache();
 
-        paintMotionGrid(painter, channel, rect, m_renderer->lastFrameMetadata(channel));
+        auto metadata = m_renderer->lastFrameMetadata(channel);
+        if (!metadata || metadata->dataType != QnAbstractMediaData::DataType::META_V1)
+            return;
+
+        paintMotionGrid(
+            painter,
+            channel,
+            rect,
+            std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+
         paintMotionSensitivity(painter, channel, rect);
 
         /* Motion selection. */
@@ -1313,6 +1457,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
     }
+
+    if (m_entropixProgress >= 0)
+        paintProgress(painter, rect, m_entropixProgress);
 }
 
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion)
@@ -1403,6 +1550,28 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
     painter->scale(rect.width() / Qn::kMotionGridWidth, rect.height() / Qn::kMotionGridHeight);
     painter->setPen(QPen(penColor, 0.0));
     painter->drawPath(path);
+}
+
+void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect, int progress)
+{
+    QnScopedPainterBrushRollback brushRollback(painter, Qt::transparent);
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette().color(QPalette::Light)));
+
+    const PainterTransformScaleStripper scaleStripper(painter);
+
+    const auto& widgetRect = scaleStripper.mapRect(rect);
+
+    constexpr int kProgressBarPadding = 32;
+    constexpr int kProgressBarHeight = 32;
+
+    QRectF progressBarRect(
+        widgetRect.x() + kProgressBarPadding, widgetRect.center().y() - kProgressBarHeight / 2,
+        widgetRect.width() - kProgressBarPadding * 2, kProgressBarHeight);
+
+    painter->drawRect(progressBarRect);
+    painter->fillRect(
+        subRect(progressBarRect, QRectF(0, 0, progress / 100.0, 1)),
+        palette().highlight());
 }
 
 void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect)
@@ -1719,7 +1888,15 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result |= Qn::EnhancementButton;
 
     if (isZoomWindow())
+    {
+        if (m_display && m_display->isPaused()
+            && m_camera && m_camera->hasCombinedSensors())
+        {
+            result |= Qn::EntropixEnhancementButton;
+        }
+
         return result;
+    }
 
     if (hasVideo && base_type::resource()->hasFlags(Qn::motion))
     {
@@ -1869,7 +2046,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     Qn::ResourceStatusOverlay statusOverlay) const
 {
-    if (!m_camera)
+    if (!m_camera || !m_camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
 
     const bool canChangeSettings = accessController()->hasPermissions(m_camera,
@@ -1927,6 +2104,8 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
         updateCustomAspectRatio();
     else if (key == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
         ensureTwoWayAudioWidget();
+    else if (key == Qn::kCombinedSensorsDescriptionParamName)
+        updateAspectRatio();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
@@ -2057,6 +2236,27 @@ void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
         updateTitleText();
 }
 
+void QnMediaResourceWidget::at_entropixEnhancementButton_clicked()
+{
+    using nx::client::desktop::EntropixImageEnhancer;
+
+    m_entropixEnhancer.reset(new EntropixImageEnhancer(m_camera));
+    connect(m_entropixEnhancer, &EntropixImageEnhancer::cameraScreenshotReady,
+        this, &QnMediaResourceWidget::at_entropixImageLoaded);
+    connect(m_entropixEnhancer, &EntropixImageEnhancer::progressChanged, this,
+        [this](int progress)
+        {
+            m_entropixProgress = progress < 100 ? progress : -1;
+        });
+
+    m_entropixEnhancer->requestScreenshot(m_display->currentTimeUSec() / 1000, zoomRect());
+}
+
+void QnMediaResourceWidget::at_entropixImageLoaded(const QImage& image)
+{
+    m_entropixEnhancedImage = image;
+}
+
 void QnMediaResourceWidget::updateDewarpingParams()
 {
     if (m_dewarpingParams == m_resource->getDewarpingParams())
@@ -2069,7 +2269,9 @@ void QnMediaResourceWidget::updateDewarpingParams()
 void QnMediaResourceWidget::updateFisheye()
 {
     QnItemDewarpingParams itemParams = item()->dewarpingParams();
-    bool enabled = itemParams.enabled;
+
+    // Zoom windows have no own "dewarping" button, so counting it always pressed.
+    bool enabled = isZoomWindow() || itemParams.enabled;
 
     bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
@@ -2366,6 +2568,12 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
     const auto button = new QnSoftwareTriggerButton(this);
     configureTriggerButton(button, info, clientSideHandler);
 
+    connect(button, &QnSoftwareTriggerButton::isLiveChanged, this,
+        [this, button, rule]()
+        {
+            updateTriggerAvailability(rule);
+        });
+
     // TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
     const auto overlayItemId = m_triggersContainer->insertItem(0, button);
 
@@ -2395,17 +2603,40 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
     return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
 }
 
+void QnMediaResourceWidget::updateTriggerButtonTooltip(
+    QnSoftwareTriggerButton* button,
+    const SoftwareTriggerInfo& info,
+    bool enabledBySchedule)
+{
+    if (!button)
+    {
+        NX_EXPECT(false, "Trigger button is null");
+        return;
+    }
+
+    if (enabledBySchedule)
+    {
+        const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
+        button->setToolTip(info.prolonged
+            ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
+            : name);
+        return;
+    }
+    else
+    {
+        button->setToolTip(tr("Disabled by schedule"));
+    }
+
+}
+
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
     NX_EXPECT(button);
 
-    const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
-    button->setToolTip(info.prolonged
-        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
-        : name);
+    updateTriggerButtonTooltip(button, info, true);
 
     const auto resultHandler =
         [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)
@@ -2520,6 +2751,8 @@ void QnMediaResourceWidget::resetTriggers()
     /* Create new relevant triggers: */
     for (const auto& rule: commonModule()->eventRuleManager()->rules())
         createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
+
+    updateTriggersAvailability();
 }
 
 void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
@@ -2530,6 +2763,14 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 
     m_triggersContainer->deleteItem(iter->overlayItemId);
     m_softwareTriggers.erase(iter);
+}
+
+void QnMediaResourceWidget::clearEntropixEnhancedImage()
+{
+    if (m_entropixEnhancer)
+        m_entropixEnhancer->cancelRequest();
+    if (!m_entropixEnhancedImage.isNull())
+        m_entropixEnhancedImage = QImage();
 };
 
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
@@ -2548,6 +2789,8 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
         /* Recreate trigger if the rule is still relevant: */
         createTriggerIfRelevant(rule);
     }
+
+    updateTriggerAvailability(rule);
 };
 
 rest::Handle QnMediaResourceWidget::invokeTrigger(

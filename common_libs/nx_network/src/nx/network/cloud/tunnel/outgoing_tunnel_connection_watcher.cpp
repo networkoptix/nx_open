@@ -77,10 +77,16 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     using namespace std::placeholders;
-
     m_onTunnelClosedHandler = std::move(handler);
     m_tunnelConnection->setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
+}
+
+std::string OutgoingTunnelConnectionWatcher::toString() const
+{
+    return m_tunnelConnection
+        ? m_tunnelConnection->toString()
+        : std::string();
 }
 
 void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
@@ -88,6 +94,7 @@ void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
     NX_ASSERT(isInSelfAioThread());
 
     m_inactivityTimer.reset();
+    m_statusCode = reason;
 
     decltype(m_tunnelConnection) tunnelConnection;
     tunnelConnection.swap(m_tunnelConnection);

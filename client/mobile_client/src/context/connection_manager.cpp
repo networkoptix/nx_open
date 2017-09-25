@@ -240,7 +240,7 @@ void QnConnectionManager::disconnectFromServer()
         return;
     }
 
-    if (d->connectionState == Disconnected || d->connectionState == Connecting)
+    if (d->connectionState == Disconnected)
         return;
 
     d->wasConnected = false;

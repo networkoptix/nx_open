@@ -44,8 +44,8 @@ nx_add_target(nx_client_desktop LIBRARY
     OTHER_SOURCES
         ${QML_FILES}
     PUBLIC_LIBS
-        Qt5::Widgets Qt5::OpenGL Qt5::WebKit Qt5::WebKitWidgets
-        Qt5::Qml Qt5::QuickWidgets
+        Qt5::Core Qt5::Widgets Qt5::Network Qt5::OpenGL Qt5::WebKit Qt5::WebKitWidgets
+        Qt5::Qml Qt5::QuickWidgets Qt5::Xml Qt5::Multimedia Qt5::Concurrent
         nx_client_core nx_speech_synthesizer nx_audio libvms_gateway
 )
 
@@ -69,9 +69,22 @@ target_include_directories(nx_client_desktop
         ${Qt5Widgets_PRIVATE_INCLUDE_DIRS})
 
 if(LINUX)
-    target_link_libraries(nx_client_desktop PRIVATE Qt5::X11Extras Xss Xfixes X11)
+    target_link_libraries(nx_client_desktop PRIVATE Qt5::X11Extras Xss Xfixes X11 GL GLU)
 endif()
 
 if(WINDOWS)
     target_link_libraries(nx_client_desktop PRIVATE d3d9 Winmm)
+endif()
+
+if(MACOSX)
+    find_library(CoreServices_LIBRARY CoreServices)
+    mark_as_advanced(CoreServices_LIBRARY)
+
+    find_library(IOKit_LIBRARY IOKit)
+    mark_as_advanced(IOKit_LIBRARY)
+
+    find_library(OpenGL_LIBRARY OpenGL)
+    mark_as_advanced(OpenGL_LIBRARY)
+
+    target_link_libraries(nx_client_desktop PRIVATE ${CoreServices_LIBRARY} ${IOKit_LIBRARY} ${OpenGL_LIBRARY})
 endif()

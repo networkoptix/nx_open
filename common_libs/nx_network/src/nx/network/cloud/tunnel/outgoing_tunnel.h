@@ -1,23 +1,48 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/async_stoppable.h>
+#include <nx/network/system_socket.h>
+#include <nx/utils/basic_factory.h>
 
 #include "abstract_tunnel_connector.h"
 #include "cross_nat_connector.h"
-#include "nx/network/aio/basic_pollable.h"
-#include "nx/network/aio/timer.h"
-#include "nx/network/system_socket.h"
 #include "tunnel.h"
 #include "tunnel_attributes.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
+
+class NX_NETWORK_API AbstractOutgoingTunnel:
+    public aio::BasicPollable
+{
+public:
+    using NewConnectionHandler = nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        TunnelAttributes tunnelAttributes,
+        std::unique_ptr<AbstractStreamSocket>)>;
+
+    static constexpr std::chrono::milliseconds kNoTimeout = std::chrono::milliseconds::zero();
+
+    virtual ~AbstractOutgoingTunnel() = default;
+
+    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+
+    /**
+     * Establish new connection.
+     * @param timeout Zero means no timeout.
+     * @param socketAttributes attribute values to apply to a newly-created socket.
+     * @note This method is re-enterable. So, it can be called in different threads simultaneously.
+     */
+    virtual void establishNewConnection(
+        std::chrono::milliseconds timeout,
+        SocketAttributes socketAttributes,
+        NewConnectionHandler handler) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * @note OutgoingTunnel instance can be safely freed only after 
@@ -27,13 +52,13 @@ namespace cloud {
  * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call
  */
 class NX_NETWORK_API OutgoingTunnel:
-    public aio::BasicPollable
+    public AbstractOutgoingTunnel
 {
-    typedef aio::BasicPollable BaseType;
+    using base_type = AbstractOutgoingTunnel;
 
 public:
-    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,
-        std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
+    using SocketHandler = nx::utils::MoveOnlyFunc<
+        void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)>;
 
     enum class State
     {
@@ -42,11 +67,6 @@ public:
         connected,
         closed
     };
-
-    typedef nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        TunnelAttributes tunnelAttributes,
-        std::unique_ptr<AbstractStreamSocket>)> NewConnectionHandler;
 
     OutgoingTunnel(AddressEntry targetPeerAddress);
     virtual ~OutgoingTunnel();
@@ -57,23 +77,12 @@ public:
      */
     virtual void stopWhileInAioThread() override;
 
-    void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
 
-    /**
-     * Establish new connection.
-     * @param timeout Zero means no timeout
-     * @param socketAttributes attribute values to apply to a newly-created socket
-     * @note This method is re-enterable. So, it can be called in
-     *       different threads simultaneously
-     */
-    void establishNewConnection(
+    virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
-        NewConnectionHandler handler);
-    /** Same as above, but no timeout. */
-    void establishNewConnection(
-        SocketAttributes socketAttributes,
-        NewConnectionHandler handler);
+        NewConnectionHandler handler) override;
 
     static QString stateToString(State state);
 
@@ -102,6 +111,10 @@ private:
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
     TunnelAttributes m_attributes;
 
+    void postponeConnectTask(
+        std::chrono::milliseconds timeout,
+        SocketAttributes socketAttributes,
+        NewConnectionHandler handler);
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
         QnMutexLockerBase* const /*lock*/,
@@ -118,6 +131,25 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
     void setTunnelConnection(std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+using OutgoingTunnelFactoryFunction = std::unique_ptr<AbstractOutgoingTunnel>(const AddressEntry&);
+
+class NX_NETWORK_API OutgoingTunnelFactory:
+    public nx::utils::BasicFactory<OutgoingTunnelFactoryFunction>
+{
+    using base_type = nx::utils::BasicFactory<OutgoingTunnelFactoryFunction>;
+
+public:
+    OutgoingTunnelFactory();
+
+    static OutgoingTunnelFactory& instance();
+
+private:
+    std::unique_ptr<AbstractOutgoingTunnel> defaultFactoryFunction(
+        const AddressEntry& address);
 };
 
 } // namespace cloud

@@ -36,12 +36,12 @@
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <nx_cassandra.guid>{585CA31B-4D3E-40D6-B759-DD1616D7BC8A}</nx_cassandra.guid>
         <nx_fusion.guid>{0ac7e9d9-df58-456f-a568-0bd7ca5eacda}</nx_fusion.guid>
         <nx_vms_utils.guid>{c4174ab7-1537-498b-8c4d-091d05e4735a}</nx_vms_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
-        <nx_bpi_videonode_plugin.guid>{5e528d46-180a-4ea2-85b0-eeccef76ef79}</nx_bpi_videonode_plugin.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <appserver2_ut.guid>{9ad34f32-99ec-4174-9991-1dedc7177123}</appserver2_ut.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
@@ -87,6 +87,8 @@
         <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
         <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
         <vms_cloud_integration_tests.guid>{45F679BE-E497-40AD-9E0E-5401D3BE1C6D}</vms_cloud_integration_tests.guid>
+        <hanwha_metadata_plugin.guid>{414bb961-a348-4e39-ac20-4e65e1d246ca}</hanwha_metadata_plugin.guid>
+        <stub_metadata_plugin.guid>{8f5484ec-6bea-4a9c-8746-9e49d6fea726}</stub_metadata_plugin.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -121,6 +123,8 @@
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
         <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
         <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
+        <hanwha_metadata_plugin.name>${company.name} Hanwha metadata plugin</hanwha_metadata_plugin.name>
+        <stub_metadata_plugin.name>${company.name} Stub metadata plugin</stub_metadata_plugin.name>
 
         <product.display.title>${product.title}</product.display.title>
 
@@ -146,6 +150,7 @@
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <paxton>false</paxton>
+        <addQtPdb>false</addQtPdb>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -157,7 +162,8 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-        <ClientHelpSourceDir>${packages.dir}/any/help-${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</ClientHelpSourceDir>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
+        <ClientHelpSourceDir>${packages.dir}/any/help-${help.version}/bin/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
@@ -181,7 +187,6 @@
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
         <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
-        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -203,7 +208,7 @@
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <cloudGroup>test</cloudGroup>
-        <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
+        <certificates_dir>${packages.dir}/any/certificates-${customization}</certificates_dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
         <toolchain.version>none</toolchain.version>
@@ -253,7 +258,7 @@
         <artifact.name.version>${release.version}.${buildNumber}</artifact.name.version>
         <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform>
         <!-- will be defined in each platform separately -->
-        <artifact.name.beta.suffix/>
+        <artifact.name.beta.suffix>-beta</artifact.name.beta.suffix>
         <!-- will be defined in artifact-name-beta profile -->
         <artifact.name.cloud.suffix/>
         <!-- will be defined in artifact-name-cloud profile -->
@@ -277,6 +282,7 @@
         <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
         <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
+        <artifact.name.qt_debug>${artifact.name.prefix}-qt_debug-${artifact.name.suffix}</artifact.name.qt_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
         <nxcloud.version>latest</nxcloud.version>
@@ -321,7 +327,6 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/license.properties</file>
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
@@ -336,9 +341,10 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/customization/default-values.properties</file>
+                                <file>${root.dir}/.customization.properties</file>
                                 <file>${root.dir}/.ec_protocol.properties</file>
                                 <file>${root.dir}/.cloudHost.properties</file>
-                                <file>${root.dir}/.customization.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>
@@ -527,6 +533,7 @@
                 <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
+                <module>plugins/metadata/hanwha_metadata_plugin</module>
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
@@ -669,6 +676,7 @@
                 <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>nx_cloud/traffic_relay</module>
                 <module>client/minilauncher</module>
@@ -719,7 +727,6 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
-                <festival.version>2.1</festival.version>
             </properties>
         </profile>
         <profile>
@@ -776,7 +783,11 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
+                <festival.version>2.1</festival.version>
+                <openssl.version>1.0.2e-2</openssl.version>
+                <quazip.version>0.7.3</quazip.version>
+                <ffmpeg.version>3.1.1-2</ffmpeg.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -784,6 +795,7 @@
                 <module>macsetup/client-dmg</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>client/mobile_client</module>
             </modules>
@@ -810,6 +822,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/libtraffic_relay</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>media_db_util</module>
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
@@ -823,7 +836,7 @@
             </modules>
             <properties>
                 <modification>ubuntu</modification>
-                <qt.version>5.6.2</qt.version>
+                <qt.version>5.6.2-2</qt.version>
             </properties>
         </profile>
 
@@ -869,7 +882,7 @@
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA DISABLE_SOFTWARE_MOTION_DETECTION EDGE_SERVER debug_in_release</additional.defines>
                 <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
                 <rdep.packages>cpro</rdep.packages>
@@ -898,7 +911,6 @@
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <festival.version>2.1x-SNAPSHOT</festival.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -930,7 +942,6 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
-                <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
@@ -940,7 +951,6 @@
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
-                <module>common_libs/nx_bpi_videonode_plugin</module>
                 <module>edge_firmware/rpi</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
@@ -950,7 +960,6 @@
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
-                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
@@ -1093,6 +1102,7 @@
                 <beta_status />
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
+                <artifact.name.beta.suffix/>
             </properties>
         </profile>
 
@@ -1241,19 +1251,6 @@
         </profile>
 
         <!-- Artifact naming profiles -->
-
-        <profile>
-            <id>artifact-name-beta</id>
-            <activation>
-                <property>
-                    <name>beta</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <artifact.name.beta.suffix>-beta</artifact.name.beta.suffix>
-            </properties>
-        </profile>
 
         <profile>
             <id>artifact-name-cloud</id>

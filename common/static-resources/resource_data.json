@@ -385,7 +385,7 @@
                 }
             ],
             "unauthorizedTimeoutSec": 185
-        },        
+        },
         {
             "keys": [
                 "Axis|*"
@@ -462,7 +462,33 @@
                 "Samsung*|SPE-101",
                 "Samsung*|SPE-1600*",
                 "BOSCH|VIDEO JET multi 4000",
-                "DW-CP16|Digital Watchdog*"                
+                "DW-CP16|Digital Watchdog*",
+                "*|EXVA-HD-216",
+                "*|WH-D5216A",
+                "Dahua|DHI-HCVR*",
+                "Dahua|DHI-XVR*",
+                "Dahua|X21A2E",
+                "DW|DW-VF4",
+                "DW|DW-VF8",
+                "DW|DW-VF16",
+                "DW|N8Fx-OLAH4",
+                "Geovision|GV-VS2400",
+                "*|HE-DV5216W",
+                "NVX-6206|HITRON_NVX-6206",
+                "*|EZHD-TVL16",
+                "*|HAVR-08LT",
+                "*|NSC-265S-BTZ",
+                "*|NV872AME-IR",
+                "Network Digital Video|AS-IPHMC3",
+                "Network Digital Video|HDIPC-2S38",
+                "*|NTH-IPPTZ30XIR",
+                "Pravis*|HDR-1600",
+                "Customer|9534E2",
+                "*|NVR201-08LP",
+                "UNIVIEW|NVR302-08E-P8",
+                "Samsung Techwin|SPE-400*",
+                "VIVOTEK|VS8102",
+                "TCS-300|TCAM"
             ],
             "analogEncoder": true
         },
@@ -641,7 +667,8 @@
                 "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
                 "H264|N51820L",
                 "onvif|v047-1",
-                "iPIXA|*"
+                "iPIXA|*",
+                "Rhodium|RBU-PZ-4461-EB"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -761,8 +788,22 @@
             }
         },
         {
-            "keys": ["Hikvision|DS-2CD63C2F-IS"],
+            "keys": [
+                "Hikvision|DS-2CD63C2F-IS",
+                "Hikvision|DS-2CD2132F-IWS",
+                "Hikvision|DS-2DE4A220IW-DE",
+                "Hikvision|DS-2CD4A26FWD-IZS",
+                "HIKVISION|DS-2DE4A220IW-DE",
+                "HIKVISION|DS-2CD4A26FWD-IZS"
+            ],
             "parseOnvifNotificationsWithHttpReader": true
+        },
+        {
+            "keys": [
+                "Hikvision|DS-2CD2132F-IWS"
+            ],
+            "relayOutputInversed": true,
+            "portNamePrefixToIgnore": "AlarmOut"
         },
         {
             "keys": [
@@ -1489,7 +1530,7 @@
             ]
         },
         {
-            "keys": ["Samsung*|SNP-6320RH", "Samsung*|SNO-7084R"], 
+            "keys": ["Samsung*|SNP-6320RH", "Samsung*|SNO-7084R"],
             "forcedOnvifParams": {
                 "profiles": ["H.264,MOBILE"]
             }
@@ -1557,6 +1598,14 @@
 			"controlFpsViaEncodingInterval": true,
 			"forcedSecondaryStreamResolution": "352x288",
 			"fpsBase": 25
+        },
+        {
+            "keys": [
+                "*|IMM12018*",
+                "*|IMM12027*",
+                "*|IMM12036*"
+            ],
+            "onvifManufacturerReplacement": "PelcoOptera"
         },
 		{
 			"keys": [
@@ -1881,7 +1930,7 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
                         "logical": [1, 20],
-                        "logicalMultiplier": 32,
+                        "logicalMultiplier": 30,
                         "space": "35MmEquiv"
                     }
                 }
@@ -1961,7 +2010,8 @@
         },
         {
             "keys": [
-                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P"
+                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P",
+                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A"
             ],
             "2WayAudio":
             {
@@ -1972,7 +2022,7 @@
                 "contentType": "Audio/G.711A",
                 "noAuth": true
             }
-            
+
         },
         {
             "keys": [
@@ -1986,7 +2036,7 @@
                 "urlPath": "/cgi-bin/audio.cgi?action=postAudio&httptype=singlepart&channel=1",
                 "contentType": "Audio/G.711A"
             }
-            
+
         },
         {
             "keys": [
@@ -2013,6 +2063,12 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "DW|DW-CPUHD*"
+            ],
+            "isMacAddressMandatory": false
         }
     ]
 }

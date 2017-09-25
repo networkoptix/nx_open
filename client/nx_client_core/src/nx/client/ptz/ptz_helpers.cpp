@@ -2,6 +2,7 @@
 
 #include <nx/utils/string.h>
 #include <core/ptz/abstract_ptz_controller.h>
+#include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 
 namespace nx {
 namespace client {
@@ -9,29 +10,59 @@ namespace core {
 namespace ptz {
 namespace helpers {
 
-QnPtzPresetList getSortedPresets(const QnAbstractPtzController* controller)
+bool getSortedPresets(const QnAbstractPtzController* controller, QnPtzPresetList& presets)
 {
     if (!controller)
-        return QnPtzPresetList();
+        return false;
 
-    QnPtzPresetList presets;
     if (!controller->getPresets(&presets))
-        return QnPtzPresetList();
+        return false;
 
-    return sortedPresets(presets);
+    presets = sortedPresets(controller->resource(), presets);
+    return true;
 }
 
-QnPtzPresetList getSortedPresets(const QnPtzControllerPtr& controller)
+bool getSortedPresets(const QnPtzControllerPtr& controller, QnPtzPresetList& presets)
 {
-    return getSortedPresets(controller.data());
+    return getSortedPresets(controller.data(), presets);
 }
 
-QnPtzPresetList sortedPresets(QnPtzPresetList presets)
+QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList presets)
 {
-    std::sort(presets.begin(), presets.end(),
-        [](const QnPtzPreset &l, const QnPtzPreset &r)
+    PtzHotkeysResourcePropertyAdaptor adaptor;
+    adaptor.setResource(resource);
+
+    const auto presetIdHotkeyHash =
+        [&adaptor]()
         {
-            return nx::utils::naturalStringLess(l.name, r.name);
+            QHash<QString, int> result;
+            const auto hotkeyPresetIdHash = adaptor.value();
+            for (auto hotkey: hotkeyPresetIdHash.keys())
+                result.insert(hotkeyPresetIdHash.value(hotkey), hotkey);
+            return result;
+        }();
+
+    const auto getPtzPresetHotkeyNumber =
+        [presetIdHotkeyHash](const QString& id) -> int
+        {
+            /**
+             * Since we have only digit hotkeys (0-9) we suppose that invalid preset number is
+             * large enought to make sorting easer: each preset with hotkey is always less than
+             * preset without it.
+             */
+            static const int kNoPresetNumberValue = 10;
+            const auto it = presetIdHotkeyHash.find(id);
+            return it == presetIdHotkeyHash.end() ? kNoPresetNumberValue : it.value();
+        };
+
+    std::sort(presets.begin(), presets.end(),
+        [getPtzPresetHotkeyNumber](const QnPtzPreset& left, const QnPtzPreset& right)
+        {
+            const int leftPresetNumber = getPtzPresetHotkeyNumber(left.id);
+            const int rightPresetNumber = getPtzPresetHotkeyNumber(right.id);
+            return leftPresetNumber == rightPresetNumber
+                ? nx::utils::naturalStringLess(left.name, right.name)
+                : leftPresetNumber < rightPresetNumber;
         });
 
     return presets;

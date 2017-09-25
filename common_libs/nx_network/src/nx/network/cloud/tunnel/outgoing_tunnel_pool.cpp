@@ -38,15 +38,15 @@ void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHa
         });
     decltype(m_pool) pool;
     m_pool.swap(pool);
-    for (std::pair<const QString, TunnelContext>& tunnelData: pool)
+    for (auto& tunnelData: pool)
     {
         auto tunnelContext = std::move(tunnelData.second);
-        auto tunnelPtr = tunnelContext.tunnel.get();
+        auto tunnelPtr = tunnelContext->tunnel.get();
         tunnelPtr->pleaseStop(
             [handler = tunnelsStoppedFuture.fork(),
                 tunnelContext = std::move(tunnelContext)]() mutable
             {
-                tunnelContext.tunnel.reset();
+                tunnelContext->tunnel.reset();
                 handler();
             });
     }
@@ -56,7 +56,7 @@ void OutgoingTunnelPool::establishNewConnection(
     const AddressEntry& targetHostAddress,
     std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
-    OutgoingTunnel::NewConnectionHandler handler)
+    AbstractOutgoingTunnel::NewConnectionHandler handler)
 {
     using namespace std::placeholders;
 
@@ -133,22 +133,23 @@ OutgoingTunnelPool::TunnelContext&
 {
     const auto iterAndInsertionResult = m_pool.emplace(
         targetHostAddress.host.toString(),
-        TunnelContext());
+        nullptr);
     if (!iterAndInsertionResult.second)
-        return iterAndInsertionResult.first->second;
+        return *iterAndInsertionResult.first->second;
 
     NX_LOGX(
         lm("Creating outgoing tunnel to host %1").
             arg(targetHostAddress.host.toString()),
         cl_logDEBUG1);
 
-    auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
+    auto tunnel = OutgoingTunnelFactory::instance().create(targetHostAddress);
     tunnel->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
     tunnel->setOnClosedHandler(
         std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));
 
-    iterAndInsertionResult.first->second.tunnel = std::move(tunnel);
-    return iterAndInsertionResult.first->second;
+    iterAndInsertionResult.first->second = std::make_unique<TunnelContext>();
+    iterAndInsertionResult.first->second->tunnel = std::move(tunnel);
+    return *iterAndInsertionResult.first->second;
 }
 
 void OutgoingTunnelPool::reportConnectionResult(
@@ -156,9 +157,9 @@ void OutgoingTunnelPool::reportConnectionResult(
     TunnelAttributes tunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection,
     TunnelContext* tunnelContext,
-    std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter)
+    std::list<AbstractOutgoingTunnel::NewConnectionHandler>::iterator handlerIter)
 {
-    OutgoingTunnel::NewConnectionHandler userHandler;
+    AbstractOutgoingTunnel::NewConnectionHandler userHandler;
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -172,12 +173,12 @@ void OutgoingTunnelPool::reportConnectionResult(
         std::move(connection));
 }
 
-void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
+void OutgoingTunnelPool::onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr)
 {
     const auto callLocker = m_counter.getScopedIncrement();
 
-    std::list<OutgoingTunnel::NewConnectionHandler> userHandlers;
-    std::unique_ptr<OutgoingTunnel> tunnel;
+    std::list<AbstractOutgoingTunnel::NewConnectionHandler> userHandlers;
+    std::unique_ptr<AbstractOutgoingTunnel> tunnel;
     QString remoteHostName;
 
     {
@@ -186,7 +187,7 @@ void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
         TunnelDictionary::iterator tunnelIter = m_pool.end();
         for (auto it = m_pool.begin(); it != m_pool.end(); ++it)
         {
-            if (it->second.tunnel.get() == tunnelPtr)
+            if (it->second->tunnel.get() == tunnelPtr)
             {
                 tunnelIter = it;
                 break;
@@ -197,8 +198,8 @@ void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
             return; //tunnel is being cancelled?
 
         NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
-        tunnel.swap(tunnelIter->second.tunnel);
-        userHandlers.swap(tunnelIter->second.handlers);
+        tunnel.swap(tunnelIter->second->tunnel);
+        userHandlers.swap(tunnelIter->second->handlers);
         remoteHostName = tunnelIter->first;
         m_pool.erase(tunnelIter);
     }

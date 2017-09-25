@@ -1,11 +1,14 @@
 #include "bookmark_merge_helper.h"
 
+#include <QtCore/QSharedPointer>
+
 #include <boost/optional/optional.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include <core/resource/camera_bookmark.h>
 
 #include <nx/utils/datetime.h>
+#include <nx/utils/log/assert.h>
 
 namespace {
 
@@ -13,10 +16,9 @@ struct BookmarkItem;
 typedef QSharedPointer<BookmarkItem> BookmarkItemPtr;
 typedef QList<BookmarkItemPtr> BookmarkItemList;
 
-enum {
-    kDefaultMergeDistanseDpix = 100,
-    kDefaultMergeSpacingDpix = 20
-};
+static constexpr int kExpandAreaDpix = 20;
+static constexpr int kDefaultMergeDistanseDpix = 100;
+static constexpr int kDefaultMergeSpacingDpix = 20;
 
 struct BookmarkItem
 {
@@ -149,8 +151,59 @@ QnTimelineBookmarkItemList QnBookmarkMergeHelper::bookmarks(qint64 msecsPerDp) c
     return result;
 }
 
-QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, int msecsPerDp, bool onlyTopmost) const
+int QnBookmarkMergeHelper::indexAtPosition(
+    const QnTimelineBookmarkItemList& bookmarks,
+    qint64 timeMs,
+    int msecsPerDp,
+    BookmarkSearchOptions options)
 {
+    // Calculate distance to the center of a bookmark to reach total active area of 20 px.
+    auto bookmarkDistance =
+        [&bookmarks, timeMs](int index)
+        {
+            const QnTimelineBookmarkItem& bookmarkItem = bookmarks[index];
+            return std::abs((bookmarkItem.startTimeMs() + bookmarkItem.endTimeMs()) / 2 - timeMs);
+        };
+
+    int foundItemIndex = -1; //< There is an item on the given position.
+    int nearestItemIndex = -1;
+
+    // We are not interested in bookmarks that are too far away.
+    int nearestBookmarkDistance = kExpandAreaDpix * msecsPerDp / 2;
+
+    for (int i = 0; i < bookmarks.size(); ++i)
+    {
+        const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
+        if (timeMs >= bookmarkItem.startTimeMs() && timeMs <= bookmarkItem.endTimeMs())
+        {
+            foundItemIndex = i;
+
+            // The topmost is the latest
+            if (!options.testFlag(OnlyTopmost))
+                return i;
+        }
+
+        if (foundItemIndex < 0 && options.testFlag(ExpandArea))
+        {
+            const auto distance = bookmarkDistance(i);
+            if (distance < nearestBookmarkDistance)
+            {
+                nearestItemIndex = i;
+                nearestBookmarkDistance = distance;
+            }
+        }
+    }
+
+    return foundItemIndex < 0
+        ? nearestItemIndex
+        : foundItemIndex;
+}
+
+QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, int msecsPerDp,
+    BookmarkSearchOptions options) const
+{
+    const bool onlyTopmost = options.testFlag(OnlyTopmost);
+
     Q_D(const QnBookmarkMergeHelper);
 
     const DetailLevel &level = d->detailLevels[d->detailLevel(msecsPerDp)];
@@ -159,13 +212,14 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, i
 
     if (onlyTopmost)
     {
-        for (const BookmarkItemPtr& item : level.items | boost::adaptors::reversed)
+        for (const auto& item: level.items | boost::adaptors::reversed)
         {
             if (timeMs >= item->startTimeMs && timeMs <= item->endTimeMs)
             {
-                for (const BookmarkItemPtr& bookmarkItem : d->bookmarksForItem(item))
+                for (const auto& bookmarkItem: d->bookmarksForItem(item))
                 {
-                    NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO, "Zero level item should contain real bookmarks");
+                    NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO,
+                        "Zero level item should contain real bookmarks");
                     if (bookmarkItem->bookmark)
                         result.append(bookmarkItem->bookmark.get());
                 }
@@ -177,7 +231,7 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, i
     }
     else
     {
-        for (const BookmarkItemPtr& item : level.items)
+        for (const auto& item: level.items)
         {
             if (item->startTimeMs > timeMs || item->endTimeMs <= timeMs)
                 continue;
@@ -186,6 +240,24 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, i
             for (const BookmarkItemPtr& bookmarkItem : bookmarkItems)
             {
                 NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO, "Zero level item should contain real bookmarks");
+                if (bookmarkItem->bookmark)
+                    result.append(bookmarkItem->bookmark.get());
+            }
+        }
+    }
+
+    if (result.empty() && options.testFlag(ExpandArea))
+    {
+        const auto items = bookmarks(msecsPerDp);
+        NX_EXPECT(items.size() == level.items.size());
+        int nearestItemIndex = indexAtPosition(items, timeMs, msecsPerDp, options);
+        if (nearestItemIndex >= 0)
+        {
+            auto item = level.items[nearestItemIndex];
+            for (const auto& bookmarkItem: d->bookmarksForItem(item))
+            {
+                NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO,
+                    "Zero level item should contain real bookmarks");
                 if (bookmarkItem->bookmark)
                     result.append(bookmarkItem->bookmark.get());
             }

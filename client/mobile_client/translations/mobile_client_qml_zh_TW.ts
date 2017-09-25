@@ -8,10 +8,6 @@
       <translation>選取攝影機</translation>
     </message>
     <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation>按下 Ctrl + 方向鍵或使用滑鼠滾輪</translation>
-    </message>
-    <message>
       <source>Authentication required</source>
       <translation>需要身份驗證</translation>
     </message>
@@ -31,7 +27,7 @@
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation>雲端帳號</translation>
+      <translation>雲帳號</translation>
     </message>
   </context>
   <context>
@@ -81,7 +77,7 @@
     </message>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>不正確的電子郵件或密碼</translation>
     </message>
   </context>
   <context>
@@ -100,7 +96,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>刪除帳號 &quot;%1&quot;？</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -268,6 +264,10 @@
       <source>%1 is offline</source>
       <translation>%1 已離線</translation>
     </message>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+    </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>點擊圖像以放置攝影機</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>取消</translation>
     </message>
   </context>
   <context>
@@ -319,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>預設點</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ預設點</translation>
     </message>
   </context>
   <context>
@@ -391,6 +391,17 @@
     </message>
   </context>
   <context>
+    <name>SelectCameraDummy</name>
+    <message>
+      <source>Select camera</source>
+      <translation type="unfinished">Select camera</translation>
+    </message>
+    <message>
+      <source>Press Ctrl + Arrow or use mouse wheel</source>
+      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+    </message>
+  </context>
+  <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
@@ -434,6 +445,14 @@
       <source>INCOMPATIBLE</source>
       <translation>不相容</translation>
     </message>
+    <message>
+      <source>UNREACHABLE</source>
+      <translation type="unfinished">UNREACHABLE</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+    </message>
   </context>
   <context>
     <name>SessionsScreen</name>
@@ -447,7 +466,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>請檢查您的網路連接或按 &quot;%1&quot; 按鈕來輸入已知的伺服器位址.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -467,7 +486,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>無法連接到系統 &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -532,6 +551,10 @@
       <source>Unknown</source>
       <translation>未知</translation>
     </message>
+    <message>
+      <source>New Server</source>
+      <translation type="unfinished">New Server</translation>
+    </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
@@ -560,6 +583,21 @@
     </message>
   </context>
   <context>
+    <name>TransformationsNotSupportedWarning</name>
+    <message>
+      <source>Software image rotation is not supported in fullscreen mode</source>
+      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+    </message>
+    <message>
+      <source>Show as is</source>
+      <translation type="unfinished">Show as is</translation>
+    </message>
+    <message>
+      <source>(Space)</source>
+      <translation type="unfinished">(Space)</translation>
+    </message>
+  </context>
+  <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
@@ -584,6 +622,18 @@
       <source>Cannot load video</source>
       <translation>無法載入影像</translation>
     </message>
+    <message>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Cannot play any video stream</source>
+      <translation type="unfinished">Cannot play any video stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -598,7 +648,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
+      <translation>d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -610,14 +660,6 @@
     <message>
       <source>Information</source>
       <translation>資訊</translation>
-    </message>
-    <message>
-      <source>Select camera</source>
-      <translation>選取攝影機</translation>
-    </message>
-    <message>
-      <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation>按下 Ctrl + 方向鍵或使用滑鼠滾輪</translation>
     </message>
   </context>
   <context>

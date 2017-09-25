@@ -17,6 +17,14 @@ class Product(models.Model):
 
 
 class Context(models.Model):
+
+    class Meta:
+        verbose_name = 'page'
+        verbose_name_plural = 'pages'
+        permissions = (
+            ("edit_content", "Can edit content and send for review"),
+        )
+
     product = models.ForeignKey(Product, null=True)
     name = models.CharField(max_length=1024)
     description = models.TextField()
@@ -36,13 +44,14 @@ DATA_TYPES = (
     (3, 'Long Text')
 )
 
+
 class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
 
     type = models.IntegerField(choices=DATA_TYPES, default=0)
-    default = models.CharField(max_length=1024, default='')
+    default = models.TextField(default='')
     translatable = models.BooleanField(default=True)
     meta_settings = JSONField(default=dict())
 
@@ -55,6 +64,7 @@ class DataStructure(models.Model):
 
 # CMS settings. Release engineer can change that
 
+
 class Language(models.Model):
     name = models.CharField(max_length=255, unique=True)
     code = models.CharField(max_length=8, unique=True)
@@ -65,7 +75,8 @@ class Language(models.Model):
 
 class Customization(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    default_language = models.ForeignKey(Language, related_name='default_in_%(class)s')
+    default_language = models.ForeignKey(
+        Language, related_name='default_in_%(class)s')
     languages = models.ManyToManyField(Language)
 
     def __str__(self):
@@ -75,15 +86,26 @@ class Customization(models.Model):
 # CMS data. Partners can change that
 
 class ContentVersion(models.Model):
+
+    class Meta:
+        verbose_name = 'revision'
+        verbose_name_plural = 'revisions'
+        permissions = (
+            ("publish_version", "Can publish content to production"),
+        )
+
     customization = models.ForeignKey(Customization)
     name = models.CharField(max_length=1024)
 
     created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_%(class)s')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True,
+        blank=True, related_name='created_%(class)s')
 
     accepted_date = models.DateTimeField(null=True, blank=True)
-    accepted_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
-                                    related_name='accepted_%(class)s')
+    accepted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        related_name='accepted_%(class)s')
 
     def __str__(self):
         return str(self.id)
@@ -91,25 +113,28 @@ class ContentVersion(models.Model):
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
-    language = models.ForeignKey(Language, null=True)
+    language = models.ForeignKey(Language, null=True, blank=True)
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
     created_date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_%(class)s')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True,
+        blank=True, related_name='created_%(class)s')
 
     value = models.TextField()
 
     def __str__(self):
         return self.value
 
-    #added for images base64 encoding makes the field really long
+    # added for images base64 encoding makes the field really long
     @property
     def short_description(self):
         return truncatechars(self.value, 100)
 
 
-class Blank(models.Model):
+    def save(self, *args, **kwargs):
+        if not self.data_structure.translatable:
+            self.language = None
 
-    def get_fields(self):
-        return None
+        super(DataRecord, self).save(*args, **kwargs)

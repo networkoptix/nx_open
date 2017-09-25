@@ -22,7 +22,7 @@
         <targetName>cloud_db</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lappserver2 -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lappserver2 -lnx_utils -lnx_fusion</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 

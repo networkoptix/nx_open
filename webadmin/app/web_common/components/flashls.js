@@ -3,7 +3,7 @@ function FlashlsAPI (flashObject) {
         window[p] = function(eventName, args) {
             flo.embedHandler();
             if(flo.flashlsEvents[eventName]) {
-              flo.flashlsEvents[eventName].apply(flo, args);
+                flo.flashlsEvents[eventName].apply(flo, args);
             }
         };
     }
@@ -15,7 +15,7 @@ function FlashlsAPI (flashObject) {
         }
     };
 
-    this.init = function(id,readyHandler,errorHandler, positionHandler) {
+    this.init = function(id, readyHandler,errorHandler, positionHandler) {
         this.id = id;
         this.readyHandler = readyHandler;
         this.errorHandler = errorHandler;
@@ -52,7 +52,7 @@ function FlashlsAPI (flashObject) {
             //console.log('videoSize',width, height);
         },
         complete: function() {
-            this.positionHandler(null);
+            this.positionHandler(null, null);
         },
         error: function(code, url, message) {
             this.errorHandler({message:message,code:code,url:url});
@@ -82,6 +82,7 @@ function FlashlsAPI (flashObject) {
 }
 
 FlashlsAPI.prototype.kill = function(){
+    delete window[this.id];
     this.flashObject = null;
 };
 

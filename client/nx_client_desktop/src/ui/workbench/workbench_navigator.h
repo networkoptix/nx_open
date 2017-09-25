@@ -25,6 +25,8 @@
 #include <utils/threaded_chunks_merge_tool.h>
 #include <camera/thumbnails_loader.h>
 
+#include <nx/utils/disconnect_helper.h>
+
 class QAction;
 class QCompleter;
 
@@ -44,8 +46,9 @@ class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class QnSearchQueryStrategy;
-class QnPendingOperation;
 class VariantAnimator;
+
+namespace nx { namespace utils { class PendingOperation; }}
 
 class QnWorkbenchNavigator:
     public Connective<QObject>,
@@ -315,7 +318,7 @@ private:
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
-    QnPendingOperation *m_sliderBookmarksRefreshOperation;
+    nx::utils::PendingOperation *m_sliderBookmarksRefreshOperation;
 
     QnCameraDataManager* m_cameraDataManager;
 
@@ -340,6 +343,9 @@ private:
 
     /** Timeline position animator. */
     VariantAnimator* m_positionAnimator;
+
+    QnDisconnectHelperPtr m_currentWidgetConnections;
+    QnDisconnectHelperPtr m_centralWidgetConnections;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

@@ -92,14 +92,15 @@ angular.module('nxCommon')
             getCredentials:function(){
                 return this.getCredentialsRaw().then(function(authObject){
                     if (typeof authObject === 'string' || authObject instanceof String) {
-                        $log.log("got string from client, try to decode JSON: " + authObject);
+                        $log.log("got string from client, try to decode JSON");
                         try {
                             authObject = JSON.parse(authObject);
                         } catch (a) {
                             $log("could not decode JSON from string: " + authObject);
                         }
                     }
-                    $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
+                    $log.log("got credentials from client. cloudEmail: " + authObject.cloudEmail +
+                             " localLogin:" + authObject.localLogin);
                     return authObject;
                 });
             },

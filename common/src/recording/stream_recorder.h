@@ -32,6 +32,7 @@ extern "C"
 #include <recording/stream_recorder_data.h>
 #include <boost/optional.hpp>
 #include <common/common_module_aware.h>
+#include <plugins/resource/avi/avi_archive_metadata.h>
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
@@ -43,7 +44,7 @@ class QnStreamRecorder:
     public QnCommonModuleAware
 {
     Q_OBJECT
-    
+
     using MotionHandler = std::function<bool(const QnConstMetaDataV1Ptr& motion)>;
 public:
     static QString errorString(StreamRecorderError errCode);
@@ -157,9 +158,26 @@ protected:
     virtual bool isUtcOffsetAllowed() const { return true; }
 
 private:
-    void updateSignatureAttr(size_t i);
+    struct StreamRecorderContext
+    {
+        QString fileName;
+        AVFormatContext* formatCtx = nullptr;
+        QnStorageResourcePtr storage;
+        qint64 totalWriteTimeNs = 0;
+        QnAviArchiveMetadata metadata;
+        QnAviArchiveMetadata::Format fileFormat = QnAviArchiveMetadata::Format::custom;
+
+        StreamRecorderContext(const QString& fileName, const QnStorageResourcePtr& storage);
+    };
+
+    /**
+     * It is impossible to write avi/mkv attribute in the end, so write magic on startup, then
+     * update it.
+     */
+    void updateSignatureAttr(StreamRecorderContext* context);
     qint64 findNextIFrame(qint64 baseTime);
     void cleanFfmpegContexts();
+
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;

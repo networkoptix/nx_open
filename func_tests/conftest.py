@@ -20,6 +20,7 @@ from test_utils.server_physical_host import PhysicalInstallationCtl
 from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
 from test_utils.server_factory import ServerFactory
 from test_utils.camera import SampleMediaFile, CameraFactory
+from test_utils.lightweight_servers_factory import LWS_BINARY_NAME, LightweightServersFactory
 
 
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
@@ -27,7 +28,7 @@ JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
-DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
+DEFAULT_WORK_DIR = '/tmp/funtest'
 DEFAULT_MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # in bin dir
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
@@ -44,6 +45,10 @@ MEDIA_STREAM_FPATH = 'sample.testcam-stream.data'
 log = logging.getLogger(__name__)
 
 
+def expand_path(path):
+    if path is None: return None
+    return os.path.expandvars(os.path.expanduser(path))
+
 def pytest_addoption(parser):
     log_levels = [logging.getLevelName(logging.DEBUG),
                   logging.getLevelName(logging.INFO),
@@ -56,16 +61,19 @@ def pytest_addoption(parser):
     parser.addoption('--customization', default=DEFAULT_CUSTOMIZATION,
                      help='Customization; will be used for requesting cloud host from ireg.hdw.mx;'
                           ' default is %r' % DEFAULT_CUSTOMIZATION)
-    parser.addoption('--work-dir', default=DEFAULT_WORK_DIR,
+    parser.addoption('--autotest-email-password',
+                     help='Password for accessing service account via IMAP protocol. '
+                          'Used for activation cloud accounts for different cloud groups and customizations.')
+    parser.addoption('--work-dir', default=DEFAULT_WORK_DIR, type=expand_path,
                      help='working directory for tests: all generated files will be placed there')
-    parser.addoption('--bin-dir',
+    parser.addoption('--bin-dir', type=expand_path,
                      help='directory with binary files for tests:'
                           ' debian distributive and media sample are expected there')
-    parser.addoption('--mediaserver-dist-path',
+    parser.addoption('--mediaserver-dist-path', type=expand_path,
                      help='path to mediaserver distributive (.deb), default is %s in bin-dir' % DEFAULT_MEDIASERVER_DIST_FNAME)
-    parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH,
+    parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH, type=expand_path,
                      help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_FPATH)
-    parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH,
+    parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH, type=expand_path,
                      help='media sample test camera stream file path, default is %s at binary directory' % MEDIA_STREAM_FPATH)
     parser.addoption('--no-servers-reset', action='store_true',
                      help='skip servers reset/cleanup on test setup')
@@ -105,6 +113,7 @@ def run_options(request):
     vm_host = request.config.getoption('--vm-host')
     if vm_host:
         vm_ssh_host_config = SshHostConfig(
+            name='vm_host',
             host=vm_host,
             user=request.config.getoption('--vm-host-user'),
             key_file_path=request.config.getoption('--vm-host-key'))
@@ -113,8 +122,6 @@ def run_options(request):
     bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
     mediaserver_dist_path = request.config.getoption('--mediaserver-dist-path')
-    if mediaserver_dist_path:
-        mediaserver_dist_path = os.path.expandvars(os.path.expanduser(mediaserver_dist_path))
     mediaserver_dist_path = os.path.join(bin_dir, mediaserver_dist_path or DEFAULT_MEDIASERVER_DIST_FNAME)
     assert os.path.isfile(mediaserver_dist_path), 'Mediaserver distributive is missing at %r' % mediaserver_dist_path
     tests_config = TestsConfig.merge_config_list(
@@ -124,6 +131,7 @@ def run_options(request):
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
+        autotest_email_password=request.config.getoption('--autotest-email-password'),
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
         mediaserver_dist_path=mediaserver_dist_path,
@@ -252,10 +260,19 @@ def server_factory(run_options, init_logging, artifact_factory, customization_co
     yield server_factory
     server_factory.release()
 
+@pytest.fixture
+def lightweight_servers_factory(run_options, artifact_factory, physical_installation_ctl):
+    test_binary_path = os.path.join(run_options.bin_dir, LWS_BINARY_NAME)
+    assert os.path.isfile(test_binary_path), 'Test binary for lightweight servers is missing at %s' % test_binary_path
+    lwsf = LightweightServersFactory(artifact_factory, physical_installation_ctl, test_binary_path)
+    yield lwsf
+    lwsf.release()
+
 # CloudHost instance    
 @pytest.fixture
 def cloud_host(run_options, cloud_host_host):
-    cloud_host = create_cloud_host(run_options.cloud_group, run_options.customization, cloud_host_host)
+    cloud_host = create_cloud_host(
+        run_options.cloud_group, run_options.customization, cloud_host_host, run_options.autotest_email_password)
     cloud_host.check_is_ready_for_tests()
     return cloud_host
 
@@ -285,13 +302,18 @@ def sample_media_file(run_options):
 def pytest_pyfunc_call(pyfuncitem):
     # look up for server factory fixture
     server_factory = None
+    lws_factory = None
     for name in pyfuncitem._request.fixturenames:
         value = pyfuncitem._request.getfixturevalue(name)
         if isinstance(value, ServerFactory):
             server_factory = value
+        if isinstance(value, LightweightServersFactory):
+            lws_factory = value
     # run the test
     outcome = yield
     # perform post-checks if passed and have our server factory in fixtures
     passed = outcome.excinfo is None
     if passed and server_factory:
         server_factory.perform_post_checks()
+    if passed and lws_factory:
+        lws_factory.perform_post_checks()

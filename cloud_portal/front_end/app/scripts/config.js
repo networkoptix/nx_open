@@ -2,6 +2,7 @@
 
 var Config = {
     viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+    previewPath: '',
     viewsDirCommon: 'static/web_common/views/',
     gatewayUrl: '/gateway',
     googleTagsCode: 'GTM-5MRNWP',
@@ -199,17 +200,24 @@ var Config = {
         useServerTime: true,
         disableVolume: true,
         reloadInterval: 5*1000,
-        leftPanelPreviewHeight: 38 // 38px is the height for previews in the left panel
+        leftPanelPreviewHeight: 38, // 38px is the height for previews in the left panel
+        resetDisplayedTextTimer: 3 * 1000,
+        hlsLoadingTimeout: 90 * 1000,
+            // One minute timeout for manifest:
+            // * 30 seconds for gateway to open connection
+            // * 30 seconds for server to init camera
+            // * 20 seconds for chunks
+            // * 10 seconds extra
+        updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
+        flashChromelessPath: "components/flashlsChromeless.swf",
+        flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
+        staticResources: "static/web_common/"
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
     globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
-        video: true, // videowindow.js - disable loader, allow rightclick
-        videoFormat: false,//'flashls', // videowindow.js - force video player
         chunksOnTimeline: false, // timeline.js - draw debug events
-        jshlsHideError: true, //components\jshls.js - Hide errors used in local env
-        jshlsDebug: false //components\jshls.js - Create hls player in debug mode
     },
 };

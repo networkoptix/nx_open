@@ -5,113 +5,113 @@
     <name>QObject</name>
     <message>
       <source>System Tray</source>
-      <translation type="unfinished">System Tray</translation>
+      <translation>Zasobnik systemowy</translation>
     </message>
     <message>
       <source>There is no system tray on this system.</source>
-      <translation type="unfinished">There is no system tray on this system.</translation>
+      <translation>W tym systemie nie ma zasobnika systemowego.</translation>
     </message>
     <message>
       <source>Application will now quit.</source>
-      <translation type="unfinished">Application will now quit.</translation>
+      <translation>Aplikacja zostanie teraz zamknięta.</translation>
     </message>
   </context>
   <context>
     <name>QnElevationChecker</name>
     <message>
       <source>Insufficient rights to manage services.</source>
-      <translation type="unfinished">Insufficient rights to manage services.</translation>
+      <translation>Niewystarczające uprawnienia do zarządzania usługami.</translation>
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation type="unfinished">UAC must be enabled to request privileges for non-admin users.</translation>
+      <translation>Kontrola konta użytkownika musi być włączona, aby można było przekazać użytkownikowi uprawnienia administracyjne.</translation>
     </message>
   </context>
   <context>
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation type="unfinished">Access denied.</translation>
+      <translation>Odmowa dostępu.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
-      <translation type="unfinished">Specified database does not exist.</translation>
+      <translation>Określona baza danych nie istnieje.</translation>
     </message>
     <message>
       <source>Specified parameter is invalid.</source>
-      <translation type="unfinished">Specified parameter is invalid.</translation>
+      <translation>Określony parametr jest nieprawidłowy.</translation>
     </message>
     <message>
       <source>Could not access installed services</source>
-      <translation type="unfinished">Could not access installed services</translation>
+      <translation>Nie można uzyskać dostępu do zainstalowanych usług</translation>
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation type="unfinished">No %1 services installed</translation>
+      <translation>Brak zainstalowanych usług %1</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation type="unfinished">&amp;Quit</translation>
+      <translation>&amp;Zakończ</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
-      <translation type="unfinished">An error has occurred while trying to access installed services:</translation>
+      <translation>Wystąpił błąd podczas próby dostępu do zainstalowanych usług:</translation>
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>Serwer został zatrzymany</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>Serwer został uruchomiony</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation type="unfinished">Server will be stopped. Continue?</translation>
+      <translation>Serwer zostanie zatrzymany. Kontynuować?</translation>
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>Pokaż dziennik serwera</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>Uruchom serwer</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>Zatrzymaj serwer</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Strona WWW serwera</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>zatrzymany</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>uruchamianie</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>zatrzymywanie</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>uruchomiony</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>wznawianie</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>wstrzymany</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>wstrzymywanie</translation>
     </message>
   </context>
 </TS>

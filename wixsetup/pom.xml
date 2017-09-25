@@ -19,12 +19,14 @@
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <nxtool>false</nxtool>
-        <target_bin_path>${libdir}\bin\${build.configuration}</target_bin_path>
-        <NxtoolQuickControlsDir>${target_bin_path}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
-        <ClientFontsDir>${target_bin_path}\fonts</ClientFontsDir>
-        <ClientQmlDir>${target_bin_path}\qml</ClientQmlDir>
+        <bin_source_dir>${libdir}\bin\${build.configuration}</bin_source_dir>
+        <NxtoolQuickControlsDir>${bin_source_dir}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
+        <ClientFontsDir>${bin_source_dir}\fonts</ClientFontsDir>
+        <ClientQmlDir>${bin_source_dir}\qml</ClientQmlDir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
-        <rdep.packages>vcredist-2015 vmaxproxy-2.1 any/help</rdep.packages>
+        <certificates_path>${packages.dir}/any/certificates-${customization}</certificates_path>
+        <installer.target.dir>bin</installer.target.dir>
+        <rdep.packages>vcredist-2015 vmaxproxy-2.1 any/help any/certificates-${customization}</rdep.packages>
     </properties>
 
     <dependencies>
@@ -239,7 +241,6 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.client_update}</finalName>
                         </configuration>
@@ -270,7 +271,6 @@
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.server_update}</finalName>
                         </configuration>
@@ -286,7 +286,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.client_debug}</finalName>
                         </configuration>
@@ -302,7 +301,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.server_debug}</finalName>
                         </configuration>
@@ -318,7 +316,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-misc.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.misc_debug}</finalName>
                         </configuration>
@@ -334,7 +331,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-libs.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.libs_debug}</finalName>
                         </configuration>
@@ -350,7 +346,6 @@
                                 <descriptor>${project.build.directory}/assembly-debug-cloud.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.cloud_debug}</finalName>
                         </configuration>
@@ -391,6 +386,43 @@
             <properties>
                 <paxton>true</paxton>
             </properties>
+        </profile>
+        <profile>
+            <id>add-qt-pdb</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>addQtPdb</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.2</version>
+                        <executions>
+                            <execution>
+                                <id>pack-debug-qt.xml</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>${project.build.directory}/assembly-debug-qt.xml</descriptor>
+                                    </descriptors>
+                                    <outputDirectory>${project.build.directory}/pack</outputDirectory>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <finalName>${artifact.name.qt_debug}</finalName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

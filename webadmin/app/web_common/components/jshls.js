@@ -2,14 +2,14 @@
 
 function JsHlsAPI(){
     var events, stats, fmp4Data,
-    hideError, //Hiding errors mostlikey caused by proxy in local env
     debugMode, //Create the jshls player in debug mode
     enableWorker = true,
     //levelCapping = -1,
-    defaultAudioCodec = undefined,
-    dumpfMP4 = false;
+    dumpfMP4 = false,
+    autoRecoverError = true;
 
     this.initHlsEvents = function(hls){
+        var jshlsApi = this;
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
         });
@@ -109,10 +109,6 @@ function JsHlsAPI(){
             };
             events.load.push(event);
             events.bitrate.push({time : performance.now() - events.t0, bitrate : event.bw , duration : data.frag.duration, level : event.id});
-            if(hls.bufferTimer === undefined) {
-                events.buffer.push({ time : 0, buffer : 0, pos: 0});
-                hls.bufferTimer = window.setInterval(this.checkBuffer, 100);
-            }
 
             var latency = data.stats.tfirst - data.stats.trequest,
             parsing = data.stats.tparsed - data.stats.tload,
@@ -228,21 +224,18 @@ function JsHlsAPI(){
             stats.fragAvgDecryptTime = this.totalDecryptTime / stats.fragDecrypted;
         });
         hls.on(Hls.Events.ERROR, function(event,data) {
-            if(hideError){
-                return;
-            }
             console.warn(data);
 
             switch(data.details) {
                 case Hls.ErrorDetails.MANIFEST_LOAD_ERROR:
                     try {
-                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + url + "</a><br>HTTP response code:" + data.response.code + " <br>" + data.response.text);
+                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + data.context.url + "</a><br>HTTP response code:" + data.response.code + " <br>" + data.response.text);
                         if(data.response.code === 0) {
                             console.log("this might be a CORS issue, consider installing <a href=\"https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi\">Allow-Control-Allow-Origin</a> Chrome Extension");
                         }
                     }
                     catch(err) {
-                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + url + "</a><br>Reason:Load " + data.response.text);
+                        console.log("cannot Load <a href=\"" + data.context.url + "\">" + data.context.url + "</a><br>Reason:Load " + data.response.text);
                     }
                     break;
                 case Hls.ErrorDetails.MANIFEST_LOAD_TIMEOUT:
@@ -290,6 +283,10 @@ function JsHlsAPI(){
                 case Hls.ErrorDetails.BUFFER_APPENDING_ERROR:
                     console.log("Buffer Appending Error");
                     break;
+                /*case Hls.ErrorDetails.BUFFER_STALLED_ERROR:
+                    console.log("Buffer Stalled Error");
+                    console.log(jshlsApi.hls.streamController._bufferedFrags);
+                    //jshlsApi.hls.handleMediaError();*/
                 default:
                     break;
             }
@@ -297,7 +294,7 @@ function JsHlsAPI(){
                 console.log('fatal error :' + data.details);
                 switch(data.type) {
                     case Hls.ErrorTypes.MEDIA_ERROR:
-                        this.handleMediaError();
+                        jshlsApi.handleMediaError();
                         break;
                     case Hls.ErrorTypes.NETWORK_ERROR:
                         console.log(",network error ...");
@@ -307,7 +304,7 @@ function JsHlsAPI(){
                         hls.destroy();
                         break;
                 }
-                console.log(console.log());
+                jshlsApi.errorHandler("Fatal Error");
             }
             if(!stats) stats = {};
             // track all errors independently
@@ -350,18 +347,13 @@ function JsHlsAPI(){
         });
     };
 
-    this.init = function(element, jshlsHideError, jshlsDebugMode, readyHandler, errorHandler){
+    this.init = function(element, loadingTimeOut, jshlsDebugMode, readyHandler, errorHandler){
         this.video = element[0];
         
-        hideError = jshlsHideError;
         debugMode = jshlsDebugMode;
         if(Hls.isSupported()) {
             if(this.hls) {
                 this.hls.destroy();
-                if(this.hls.bufferTimer) {
-                    window.clearInterval(this.hls.bufferTimer);
-                    this.hls.bufferTimer = undefined;
-                }
                 this.hls = null;
             }
         }
@@ -369,10 +361,17 @@ function JsHlsAPI(){
         recoverDecodingErrorDate = recoverSwapAudioCodecDate = null;
         fmp4Data = { 'audio': [], 'video': [] };
 
-        this.hls = new Hls({debug:debugMode, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
+        this.hls = new Hls({
+            debug: debugMode,
+            enableWorker: enableWorker,
+            manifestLoadingTimeOut: loadingTimeOut,
+            levelLoadingTimeOut: loadingTimeOut, // used by playlist-loader
+            fragLoadingTimeOut: loadingTimeOut
+        });
 
         this.initHlsEvents(this.hls);        
         this.initVideoHandlers();
+        this.errorHandler = errorHandler;
         this.readyHandler = readyHandler;
         this.readyHandler(this);
     };
@@ -441,7 +440,7 @@ function JsHlsAPI(){
     };
 
     var recoverDecodingErrorDate,recoverSwapAudioCodecDate;
-    this.handleMediaError= function(){
+    this.handleMediaError = function(){
         if(autoRecoverError) {
             var now = performance.now();
             if(!recoverDecodingErrorDate || (now - recoverDecodingErrorDate) > 3000) {
@@ -460,13 +459,6 @@ function JsHlsAPI(){
             }
         }
     };
-
-    this.checkBuffer = function(){
-        var v = this.video.buffered;
-        if (v) {
-            events.buffer.push();
-        }
-    };
 }
 
 JsHlsAPI.prototype.kill = function(){
@@ -474,11 +466,11 @@ JsHlsAPI.prototype.kill = function(){
 };
 
 JsHlsAPI.prototype.play = function(offset){
-    this.video.play();
+    return this.video.play();
 };
 
 JsHlsAPI.prototype.pause = function(){
-    this.video.pause();
+    return this.video.pause();
 };
 
 JsHlsAPI.prototype.volume = function(volumeLevel){
@@ -493,23 +485,25 @@ JsHlsAPI.prototype.load = function(url){
 };
 
 JsHlsAPI.prototype.initVideoHandlers = function(){
-    this.video.addEventListener('resize', this.handleVideoEvent);
-    this.video.addEventListener('seeking', this.handleVideoEvent);
-    this.video.addEventListener('seeked', this.handleVideoEvent);
-    this.video.addEventListener('pause', this.handleVideoEvent);
-    this.video.addEventListener('play', this.handleVideoEvent);
-    this.video.addEventListener('canplay', this.handleVideoEvent);
-    this.video.addEventListener('canplaythrough', this.handleVideoEvent);
-    this.video.addEventListener('ended', this.handleVideoEvent);
-    this.video.addEventListener('playing', this.handleVideoEvent);
-    this.video.addEventListener('error', this.handleVideoEvent);
-    this.video.addEventListener('loadedmetadata', this.handleVideoEvent);
-    this.video.addEventListener('loadeddata', this.handleVideoEvent);
-    this.video.addEventListener('durationchange', this.handleVideoEvent);
+    this.addEventListener('resize', this.handleVideoEvent);
+    this.addEventListener('seeking', this.handleVideoEvent);
+    this.addEventListener('seeked', this.handleVideoEvent);
+    this.addEventListener('pause', this.handleVideoEvent);
+    this.addEventListener('play', this.handleVideoEvent);
+    this.addEventListener('canplay', this.handleVideoEvent);
+    this.addEventListener('canplaythrough', this.handleVideoEvent);
+    this.addEventListener('ended', this.handleVideoEvent);
+    this.addEventListener('playing', this.handleVideoEvent);
+    this.addEventListener('error', this.handleVideoEvent);
+    this.addEventListener('loadedmetadata', this.handleVideoEvent);
+    this.addEventListener('loadeddata', this.handleVideoEvent);
+    this.addEventListener('durationchange', this.handleVideoEvent);
 };
 
 JsHlsAPI.prototype.addEventListener = function(event, handler){
-    if(this.video){
+    this.handlers = this.handlers || {};
+    if(this.video && this.handlers[event] !== handler){
         this.video.addEventListener(event,handler);
+        this.handlers[event] = handler;
     }
 };

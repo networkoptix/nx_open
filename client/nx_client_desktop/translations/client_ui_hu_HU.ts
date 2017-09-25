@@ -112,6 +112,16 @@
       <source>Reset All Warnings</source>
       <translation>Minden figyelmeztetés visszaállítása</translation>
     </message>
+    <message>
+      <location/>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>Az Intel HD Graphics megjelenítésének problémái lehetnek, ha az elmosódás engedélyezve van. Javasoljuk, hogy hagyja el az opciót alapbeállításon.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable blur</source>
+      <translation>Elmosódás letiltása</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -134,34 +144,6 @@
       <location/>
       <source>Instant</source>
       <translation>Azonnali</translation>
-    </message>
-  </context>
-  <context>
-    <name>ApplauncherControlDialog</name>
-    <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
-      <source>Add External Storage...</source>
-      <translation>Külső tárhely hozzáadása...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version:</source>
-      <translation>Verzió:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Check</source>
-      <translation>Ellenőrzés</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not Checked</source>
-      <translation>Nem ellenőrzött</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Get Installed Versions</source>
-      <translation>A telepített verzió beszerzése</translation>
     </message>
   </context>
   <context>
@@ -393,11 +375,6 @@
     </message>
     <message>
       <location/>
-      <source>All Servers are offline. Logs are not available.</source>
-      <translation>Minden szerver offline. Nincs elérhető eseménylista.</translation>
-    </message>
-    <message>
-      <location/>
       <source>Bookmark Log</source>
       <translation>Könyvjelző logok</translation>
     </message>
@@ -442,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>@</translation>
     </message>
   </context>
   <context>
@@ -466,6 +443,11 @@
       <location/>
       <source>Event Log...</source>
       <translation>Eseménynapló...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Test</source>
+      <translation>Teszt</translation>
     </message>
   </context>
   <context>
@@ -588,11 +570,6 @@
     <name>CameraAdvancedSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>about:blank</source>
-      <translation type="unfinished">about:blank</translation>
-    </message>
-    <message>
-      <location/>
       <source>Advanced settings are unavailable</source>
       <translation>Haladó beállítások nem elérhetők</translation>
     </message>
@@ -722,7 +699,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot;Kamera beállítások optimalizálásának engedélyezése a rendszernek&quot; ki van kapcsolva a Rendszer Kezelésben.</translation>
     </message>
     <message>
       <location/>
@@ -732,17 +709,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZ vezérlés</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>A natív presetek tiltása. Helyettük használja a rendszer preseteket</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Figyelem! A natív kamera presetek nem lesznek elérhetők.</translation>
     </message>
   </context>
   <context>
@@ -750,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Bemenet ID</translation>
     </message>
   </context>
   <context>
@@ -776,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Kimenet ID:</translation>
     </message>
   </context>
   <context>
@@ -906,11 +883,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Maradjon bejelentkezve</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -1421,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Hozzárendelt hardver ID:</translation>
     </message>
   </context>
   <context>
@@ -1474,16 +1446,6 @@
     </message>
     <message>
       <location/>
-      <source>Paste from Clipboard</source>
-      <translation>Beillesztés vágólapról</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Copy to Clipboard</source>
-      <translation>Másolás vágólapra</translation>
-    </message>
-    <message>
-      <location/>
       <source>Select License File...</source>
       <translation>Válaszzon licenc fájlt...</translation>
     </message>
@@ -1530,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Hardver ID</translation>
     </message>
   </context>
   <context>
@@ -1647,17 +1609,17 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>További információk megjelenítése a faszerkezetben</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Tour cycle</source>
-      <translation>Túra ciklus</translation>
+      <translation>Kiegészítő információk megjelenítése az eszközfában</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
       <translation>másodperc</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Showreel cycle</source>
+      <translation>Showreel ciklus</translation>
     </message>
   </context>
   <context>
@@ -1726,7 +1688,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Lejátszás felhasználóknak</translation>
     </message>
   </context>
   <context>
@@ -1744,7 +1706,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Nyugtázás kényszerítése</translation>
     </message>
   </context>
   <context>
@@ -1915,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>Maradjon bejelentkezve</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
     </message>
   </context>
   <context>
@@ -2102,14 +2059,6 @@
     </message>
   </context>
   <context>
-    <name>QnUpdateDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/update_dialog.ui"/>
-      <source>Update Servers</source>
-      <translation>Szerverek frissítése</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2256,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Nagy teljesítményű számítógép ajánlott a &quot;Legjobb&quot; minőség és felbontás használatához.</translation>
     </message>
     <message>
       <location/>
@@ -2322,7 +2271,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Beszéd felhasználókhoz</translation>
     </message>
   </context>
   <context>
@@ -2335,7 +2284,7 @@
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation>&amp;Globális Email beállítások...</translation>
+      <translation>&amp;Globális e-mail beállítások...</translation>
     </message>
   </context>
   <context>
@@ -2565,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
+      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2601,7 +2550,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation>Kimenő Email beállítások</translation>
+      <translation>Kimenő e-mail beállítások</translation>
     </message>
     <message>
       <location/>
@@ -2662,7 +2611,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Elérhető:</translation>
     </message>
     <message>
       <location/>
@@ -2672,7 +2621,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Ikon</translation>
     </message>
   </context>
   <context>
@@ -2787,22 +2736,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Szerepkörök</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Összes felhasználó mutatása</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Felhasználók kiválasztása</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Nincs a keresésnek megfelelő találat.</translation>
     </message>
   </context>
   <context>
@@ -2838,7 +2787,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Idő szinkronizálása az Internettel</translation>
     </message>
   </context>
   <context>
@@ -2878,8 +2827,8 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>Nincsenek egyéni felhasználói szerepkörök.
+Kattintson az &quot;Új szerepkör&quot; gombra a létrehozáshoz.</translation>
     </message>
     <message>
       <location/>

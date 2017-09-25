@@ -23,10 +23,6 @@ public:
 
     virtual QnUuid getGuid() const override;
 
-    /*
-    * How long to keep event log in usecs
-    */
-    void setEventLogPeriod(qint64 periodUsec);
     virtual void prepareAdditionActionParams(const vms::event::AbstractActionPtr& action) override;
 
 protected slots:

@@ -1,6 +1,6 @@
 $icon-font-path: "../fonts/";
 
-@import '../bower_components/sass-bootstrap/lib/_variables.scss';
+@import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
 @import '../web_common/styles/common';
 
 .webclient{
@@ -621,4 +621,17 @@ h3 {
   .btn-default{
     background-color: transparent;
   }
+}
+
+
+.api-description-strip *{
+    display:none; /* Do not show info about post method */
+}
+.highlighted{
+    display:inline;
+    background-color:yellow;
+}
+.api-view{
+    overflow-x:auto;
+    padding:5px;
 }

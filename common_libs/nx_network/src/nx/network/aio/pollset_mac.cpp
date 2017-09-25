@@ -164,7 +164,7 @@ namespace aio {
 
     void* PollSet::const_iterator::userData()
     {
-        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->eventTypeToUserData[eventType()];
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->monitoredEvents[eventType()].userData;
     }
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -238,7 +238,7 @@ namespace aio {
         EV_SET( &_newEvent, sock->handle(), kfilterType, EV_ADD | EV_ENABLE, 0, 0, sock );
         if( kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL ) == 0 )
         {
-            sock->impl()->eventTypeToUserData[eventType] = userData;
+            sock->impl()->monitoredEvents[eventType].userData = userData;
             return true;
         }
 
@@ -269,7 +269,7 @@ namespace aio {
         }
 
         //TODO #ak must not save user data in socket
-        sock->impl()->eventTypeToUserData[eventType] = NULL;
+        sock->impl()->monitoredEvents[eventType].userData = NULL;
     }
 
     size_t PollSet::size() const

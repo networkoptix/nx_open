@@ -29,7 +29,7 @@
     "restorePassword":"重置密碼 -",
     "restorePasswordSuccess":"密碼已儲存 -",
     "restorePasswordCode":"重置密碼 -",
-    "view":"View cameras - ",
+    "view":"查看攝影機 - ",
     "contentPage":"",
     "debug":"除錯",
     "login":"登入 -",
@@ -81,6 +81,26 @@
     "customRole":{
       "label":"自訂角色",
       "description":"在系統中指定的自訂使用者角色"
+    },
+    "owner":{
+      "label":"擁有者",
+      "description":"不受限權限包括共用及從雲端連接/斷開系統的能力"
+    },
+    "viewer":{
+      "label":"瀏覽者",
+      "description":"可以瀏覽即時影像和回放錄影資料"
+    },
+    "liveViewer":{
+      "label":"即時影像瀏覽者",
+      "description":"只能瀏覽即時影像"
+    },
+    "advancedViewer":{
+      "label":"進階瀏覽者",
+      "description":"可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
+    },
+    "custom":{
+      "label":"自訂",
+      "description":"使用 {{PRODUCT_NAME}} 用戶端應用程式以設置自訂權限"
     }
   },
   "errorCodes":{
@@ -117,7 +137,7 @@
     "cantEditAdmin":"此使用者具有管理員權限",
     "cantOpenClient":"{{VMS_NAME}} 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
     "lostConnection":"與 {{systemName}} 的連線斷開了",
-    "thisSystem":"the system"
+    "thisSystem":"系統"
   },
   "passwordRequirements":{
     "minLengthMessage":"密碼必須包含至少 8 個字元",
@@ -136,7 +156,7 @@
   },
   "system":{
     "yourSystem":"您的系統",
-    "mySystemSearch":"IMeMyMine",
+    "mySystemSearch":"我的",
     "unavailable":"無法連接至系統",
     "offline":"系統處於離線狀態",
     "openClient":"在 {{VMS_NAME}} 中打開",
@@ -214,7 +234,7 @@
     "createAccount":"新建帳號"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"所有系統",
     "systems":"系統"
   }
 }

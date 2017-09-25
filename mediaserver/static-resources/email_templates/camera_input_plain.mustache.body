@@ -1,0 +1,10 @@
+Input signal{{#source}} on {{&source}}{{/source}}
+
+Input Port: {{&inputPort}}
+Time: {{&timestampDate}} {{&timestampTime}}
+
+{{#urlint}}
+Play archive from the local network: {{&urlint}}
+{{/urlint}} {{#urlext}}
+Play archive from the web: {{&urlext}}
+{{/urlext}}

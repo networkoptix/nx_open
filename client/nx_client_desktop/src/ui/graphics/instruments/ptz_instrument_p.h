@@ -206,27 +206,27 @@ public:
         m_manipulatorWidget = new PtzManipulatorWidget(this);
 
         m_zoomInButton = new PtzImageButtonWidget(this);
-        m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
+        m_zoomInButton->setIcon(qnSkin->icon("ptz/zoom_in.png"));
         m_zoomInButton->setToolTip(tr("Zoom In"));
 
         m_zoomOutButton = new PtzImageButtonWidget(this);
-        m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
+        m_zoomOutButton->setIcon(qnSkin->icon("ptz/zoom_out.png"));
         m_zoomOutButton->setToolTip(tr("Zoom Out"));
 
         m_focusInButton = new PtzImageButtonWidget(this);
-        m_focusInButton->setIcon(qnSkin->icon("item/ptz_focus_in.png"));
+        m_focusInButton->setIcon(qnSkin->icon("ptz/focus_in.png"));
         m_focusInButton->setToolTip(tr("Focus Far"));
         m_focusInButton->setFrameShape(Qn::CustomFrame);
         m_focusInButton->setCustomFramePath(upRoundPath);
 
         m_focusOutButton = new PtzImageButtonWidget(this);
-        m_focusOutButton->setIcon(qnSkin->icon("item/ptz_focus_out.png"));
+        m_focusOutButton->setIcon(qnSkin->icon("ptz/focus_out.png"));
         m_focusOutButton->setToolTip(tr("Focus Near"));
         m_focusOutButton->setFrameShape(Qn::CustomFrame);
         m_focusOutButton->setCustomFramePath(downRoundPath);
 
         m_focusAutoButton = new PtzImageButtonWidget(this);
-        m_focusAutoButton->setIcon(qnSkin->icon("item/ptz_focus_auto.png"));
+        m_focusAutoButton->setIcon(qnSkin->icon("ptz/focus_auto.png"));
         m_focusAutoButton->setToolTip(tr("Auto Focus"));
         m_focusAutoButton->setFrameShape(Qn::RectangularFrame);
 
@@ -366,10 +366,8 @@ private:
         QPointF xStep(unit, 0), yStep(0, unit);
         QSizeF size = QnGeometry::toSize(xStep + yStep);
 
-        QN_UNUSED(left);
-
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
-        m_modeButton->setGeometry(QRectF(right - xStep * 4.0 - yStep * 1.5, 3.0 * size));
+        m_modeButton->setGeometry(QRectF(left + xStep - yStep * 1.5, 3.0 * size));
 
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));

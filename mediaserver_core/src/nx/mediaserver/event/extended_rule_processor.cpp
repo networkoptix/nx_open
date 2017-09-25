@@ -117,6 +117,7 @@ static const QString tpReasonContext(lit("reasonContext"));
 static const QString tpAggregated(lit("aggregated"));
 static const QString tpInputPort(lit("inputPort"));
 static const QString tpTriggerName(lit("triggerName"));
+static const QString tpAnalyticsSdkEventType(lit("analyticsSdkEventType"));
 static const QString tpHasCameras(lit("hasCameras"));
 static const QString tpCameras(lit("cameras"));
 static const QString tpUser(lit("user"));
@@ -188,6 +189,10 @@ struct EmailAttachmentData
             case vms::event::backupFinishedEvent:
                 templatePath = lit(":/email_templates/backup_finished.mustache");
                 imageName = lit("server.png");
+                break;
+            case vms::event::analyticsSdkEvent:
+                templatePath = lit(":/email_templates/analytics_event.mustache");
+                imageName = lit("camera.png");
                 break;
             case vms::event::userDefinedEvent:
                 templatePath = lit(":/email_templates/generic_event.mustache");
@@ -503,7 +508,7 @@ bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActi
     if (!camera || !fixActionTimeFields(action))
         return false;
 
-    const auto bookmark = helpers::bookmarkFromAction(action, camera, commonModule());
+    const auto bookmark = helpers::bookmarkFromAction(action, camera);
     return qnServerDb->addBookmark(bookmark);
 }
 
@@ -595,20 +600,31 @@ void ExtendedRuleProcessor::sendEmailAsync(
     vms::event::SendMailActionPtr action,
     QStringList recipients, int aggregatedResCount)
 {
+    bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
+
     QnEmailAttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
-    EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
+    EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  // TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
     QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
 
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
-    contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    if (isHtml)
+    {
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+
+        contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
+        contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    }
+
     if (!cloudOwnerAccount.isEmpty())
     {
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
-        contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+        if (isHtml)
+        {
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
+            contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+        }
+
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
         const auto allUsers = resourcePool()->getResources<QnUserResource>();
@@ -624,7 +640,6 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
     QnEmailAddress supportEmail(emailSettings.supportEmail);
 
-//    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
     contextMap[tpSupportLink] = supportEmail.isValid()
@@ -641,7 +656,14 @@ void ExtendedRuleProcessor::sendEmailAsync(
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
-    renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
+    if (isHtml)
+        renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
+
+    QString messagePlainBody;
+    QFileInfo fileInfo(attachmentData.templatePath);
+    QString plainTemplatePath = fileInfo.dir().path() + lit("/") + fileInfo.baseName() + lit("_plain.mustache");
+    renderTemplateFromFile(plainTemplatePath, contextMap, &messagePlainBody);
+
 
     // TODO: #vkutin #gdm Need to refactor aggregation entirely.
     // I can't figure a proper abstraction for it at this point.
@@ -657,6 +679,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
         recipients,
         subject,
         messageBody,
+        messagePlainBody,
         emailSettings.timeout,
         attachments);
 
@@ -790,6 +813,44 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             break;
         }
 
+        case vms::event::analyticsSdkEvent:
+        {
+            contextMap[tpAnalyticsSdkEventType] = helper.getAnalyticsSdkEventName(params);
+
+            const auto aggregationCount = action->getAggregationCount();
+
+            if (aggregationCount > 1)
+                contextMap[tpCount] = QString::number(aggregationCount);
+
+            contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
+            contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
+            contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
+
+            auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
+                params.eventResourceId);
+
+            cameraHistoryPool()->updateCameraHistorySync(camera);
+            if (camera->hasVideo(nullptr))
+            {
+                QByteArray screenshotData = getEventScreenshotEncoded(params.eventResourceId,
+                    params.eventTimestampUsec, SCREENSHOT_SIZE);
+                if (!screenshotData.isNull())
+                {
+                    contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId,
+                        params.eventTimestampUsec, false);
+                    contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId,
+                        params.eventTimestampUsec, true);
+
+                    QBuffer screenshotStream(&screenshotData);
+                    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot,
+                        screenshotStream, lit("image/jpeg"))));
+                    contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                }
+            }
+
+            break;
+        }
+
         case vms::event::userDefinedEvent:
         {
             auto metadata = action->getRuntimeParams().metadata;
@@ -860,11 +921,19 @@ QVariantList ExtendedRuleProcessor::aggregatedEventDetailsMap(
     int index = 0;
     QVariantList result;
 
-    for (const auto& detail: aggregationDetailList)
+    auto sortedList = aggregationDetailList;
+    std::sort(sortedList.begin(), sortedList.end(),
+        [](const vms::event::InfoDetail& left, const vms::event::InfoDetail& right)
+        {
+            return left.runtimeParams().eventTimestampUsec
+                < right.runtimeParams().eventTimestampUsec;
+        });
+
+    for (const auto& detail: sortedList)
     {
         auto detailsMap = eventDetailsMap(action, detail, detailLevel);
         detailsMap[tpIndex] = (++index);
-        result << eventDetailsMap(action, detail, detailLevel);
+        result << detailsMap;
     }
 
     return result;

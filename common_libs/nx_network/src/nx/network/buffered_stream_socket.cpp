@@ -92,7 +92,7 @@ int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 void BufferedStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_internalRecvBuffer.isEmpty())
         return m_socket->readSomeAsync(buf, std::move(handler));
