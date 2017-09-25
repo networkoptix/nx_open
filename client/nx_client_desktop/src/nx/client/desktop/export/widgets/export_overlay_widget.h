@@ -16,6 +16,7 @@ class ExportOverlayWidget: public QWidget
 
 public:
     ExportOverlayWidget(QWidget* parent = nullptr);
+    virtual ~ExportOverlayWidget();
 
     QString text() const;
     void setText(const QString& value);

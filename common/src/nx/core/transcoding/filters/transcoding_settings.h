@@ -29,7 +29,7 @@ struct OverlaySettings
     virtual ~OverlaySettings() {}
     virtual Type type() const = 0;
 
-    QPointF position;
+    QPoint position;
     Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignTop;
 };
 

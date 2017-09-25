@@ -83,17 +83,15 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     //if (m_settings.timestampParams.enabled)
     //    result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_settings.layout, m_settings.timestampParams));
 
-    const auto needPaintImageFilter =
-        std::any_of(m_settings.overlays.begin(), m_settings.overlays.end(),
-            [](const OverlaySettingsPtr& settings)
-            {
-                return settings->type() == OverlaySettings::Type::timestamp
-                    || settings->type() == OverlaySettings::Type::image;
-            });
-
-    if (needPaintImageFilter)
+    for (const auto overlaySettings: m_settings.overlays)
     {
-        const auto filter = QnAbstractImageFilterPtr(new QnPaintImageFilter());
+        const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(overlaySettings.data());
+        if (!imageFilterSetting)
+            continue;
+
+        const auto paintFilter = new QnPaintImageFilter();
+        const auto filter = QnAbstractImageFilterPtr(paintFilter);
+        paintFilter->setImage(imageFilterSetting->image, imageFilterSetting->position);
         push_back(filter);
     }
 

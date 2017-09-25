@@ -111,6 +111,10 @@ RapidReviewSettingsWidget::RapidReviewSettingsWidget(QWidget* parent):
     setHelpTopic(this, Qn::Rapid_Review_Help);
 }
 
+RapidReviewSettingsWidget::~RapidReviewSettingsWidget()
+{
+}
+
 void RapidReviewSettingsWidget::setSpeed(int absoluteValue)
 {
     NX_ASSERT(!m_updating, Q_FUNC_INFO,

@@ -24,6 +24,7 @@ private:
     qint64 calcHash(const quint8* data, int width, int height, int linesize);
 private:
     QFont m_timeFont;
+    QPoint m_dateTimePos;
     int m_dateTimeXOffs;
     int m_dateTimeYOffs;
     int m_bufXOffs;

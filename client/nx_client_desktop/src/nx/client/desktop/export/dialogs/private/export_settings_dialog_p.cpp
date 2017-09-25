@@ -419,7 +419,7 @@ void ExportSettingsDialog::Private::updateOverlay(settings::ExportOverlayType ty
         [](QWidget* overlay, const ExportOverlaySettings& data)
         {
             // TODO: #vkutin Alignment.
-            overlay->move(data.position.toPoint());
+            overlay->move(data.position);
         };
 
     auto overlay = this->overlay(type);

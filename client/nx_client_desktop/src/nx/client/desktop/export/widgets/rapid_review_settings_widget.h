@@ -18,6 +18,8 @@ class RapidReviewSettingsWidget: public QWidget
 public:
     RapidReviewSettingsWidget(QWidget* parent = nullptr);
 
+    virtual ~RapidReviewSettingsWidget();
+
     qint64 sourcePeriodLengthMs() const;
     void setSourcePeriodLengthMs(qint64 lengthMs);
     static qint64 minimalSourcePeriodLengthMs();

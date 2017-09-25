@@ -65,6 +65,10 @@ ExportOverlayWidget::ExportOverlayWidget(QWidget* parent):
         parent->installEventFilter(this);
 }
 
+ExportOverlayWidget::~ExportOverlayWidget()
+{
+}
+
 qreal ExportOverlayWidget::scale() const
 {
     return d->scale;

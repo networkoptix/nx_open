@@ -19,15 +19,13 @@ class ExportMediaSettingsWidget: public QWidget
 
 public:
     ExportMediaSettingsWidget(QWidget* parent = nullptr);
-    virtual ~ExportMediaSettingsWidget() override;
+    virtual ~ExportMediaSettingsWidget();
 
     bool applyFilters() const;
     void setApplyFilters(bool value);
 
 signals:
     void dataChanged(bool applyFilters);
-
-    virtual ~ExportMediaSettingsWidget();
 
 private:
     QScopedPointer<Ui::ExportMediaSettingsWidget> ui;
