@@ -89,9 +89,12 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
         if (!imageFilterSetting)
             continue;
 
-        const auto paintFilter = new QnPaintImageFilter();
+        const auto paintFilter = new nx::transcoding::filters::PaintImageFilter();
         const auto filter = QnAbstractImageFilterPtr(paintFilter);
-        paintFilter->setImage(imageFilterSetting->image, imageFilterSetting->position);
+        paintFilter->setImage(imageFilterSetting->image,
+            imageFilterSetting->position,
+            imageFilterSetting->alignment);
+
         push_back(filter);
     }
 

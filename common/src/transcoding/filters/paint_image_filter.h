@@ -3,23 +3,35 @@
 
 #include <transcoding/filters/abstract_image_filter.h>
 
-class QImage;
+namespace nx {
+namespace transcoding {
+namespace filters {
 
-class QnPaintImageFilter: public QnAbstractImageFilter
+namespace detail {
+
+class ImageToFramePainter;
+
+} // namespace detail
+
+class PaintImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnPaintImageFilter();
+    PaintImageFilter();
 
-    virtual ~QnPaintImageFilter();
+    virtual ~PaintImageFilter();
 
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
     virtual QSize updatedResolution(const QSize& sourceSize) override;
 
     void setImage(
         const QImage& image,
-        const QPoint& position);
+        const QPoint& position,
+        Qt::Alignment alignment);
 
 private:
-    class Internal;
-    const QScopedPointer<Internal> d;
+    const QScopedPointer<detail::ImageToFramePainter> m_painter;
 };
+
+} // namespace filters
+} // namespace transcoding
+} // namesapce nx
