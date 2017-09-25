@@ -27,6 +27,8 @@ public:
     Filename filename() const;
     void setFilename(const Filename& value);
 
+    bool validate();
+
 signals:
     bool filenameChanged(const Filename& filename);
 

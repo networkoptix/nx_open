@@ -448,6 +448,17 @@ void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
     updateSettingsWidgets();
 }
 
+void ExportSettingsDialog::accept()
+{
+    if (d->mode() == Mode::Media && !ui->mediaFilenamePanel->validate())
+        return;
+
+    if (d->mode() == Mode::Layout && !ui->layoutFilenamePanel->validate())
+        return;
+
+    base_type::accept();
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

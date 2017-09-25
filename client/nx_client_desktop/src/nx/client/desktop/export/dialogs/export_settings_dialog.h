@@ -53,6 +53,8 @@ public:
     ExportMediaSettings exportMediaSettings() const;
     ExportLayoutSettings exportLayoutSettings() const;
 
+    virtual void accept() override;
+
 private:
     ExportSettingsDialog(const QnTimePeriod& timePeriod, bool isBookmark, QWidget* parent = nullptr);
 

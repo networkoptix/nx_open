@@ -3,6 +3,7 @@
 
 #include <client/client_settings.h>
 
+#include <ui/common/aligner.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/utils/app_info.h>
@@ -34,13 +35,22 @@ FilenamePanel::FilenamePanel(QWidget* parent):
     ui->extensionsComboBox->setMaximumWidth(kFilterComboBoxWidth);
     ui->extensionsComboBox->setCustomTextRole(Qn::ShortTextRole);
 
+    const auto aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidgets({ui->folderInputField, ui->nameInputField});
+
+    ui->folderInputField->setTitle(tr("Folder"));
+    ui->folderInputField->setReadOnly(true);
+    ui->nameInputField->setTitle(tr("Name"));
+    ui->nameInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Name cannot be empty.")));
+
     connect(this, &FilenamePanel::filenameChanged, this,
         [this](const Filename& filename)
         {
-            ui->filenameLineEdit->setToolTip(filename.completeFileName());
+            ui->nameInputField->setToolTip(filename.completeFileName());
         });
 
-    connect(ui->filenameLineEdit, &QLineEdit::textChanged, this,
+    connect(ui->nameInputField, &QnInputField::textChanged, this,
         [this](const QString& text)
         {
             d->filename.name = text;
@@ -63,7 +73,7 @@ FilenamePanel::FilenamePanel(QWidget* parent):
                 return;
 
             d->filename.path = folder;
-            ui->folderLineEdit->setText(folder);
+            ui->folderInputField->setText(folder);
             emit filenameChanged(filename());
         });
 
@@ -108,9 +118,9 @@ void FilenamePanel::setFilename(const Filename& value)
     if (d->filename.path.isEmpty())
         d->filename.path = qnSettings->mediaFolder();
 
-    ui->folderLineEdit->setText(d->filename.path);
+    ui->folderInputField->setText(d->filename.path);
 
-    ui->filenameLineEdit->setText(d->filename.name);
+    ui->nameInputField->setText(d->filename.name);
     updateExtension();
 
     emit filenameChanged(filename());
@@ -132,6 +142,11 @@ void FilenamePanel::updateExtension()
     {
         ui->extensionsComboBox->setCurrentIndex(index);
     }
+}
+
+bool FilenamePanel::validate()
+{
+    return ui->nameInputField->validate();
 }
 
 } // namespace desktop
