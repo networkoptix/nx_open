@@ -901,6 +901,7 @@ vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& r
 
         if (actionData.eventParams.eventType == vms::event::cameraMotionEvent
             || actionData.eventParams.eventType == vms::event::cameraInputEvent
+            || actionData.eventParams.eventType == vms::event::analyticsSdkEvent
             || actionData.actionType == vms::event::ActionType::bookmarkAction
             || actionData.actionType == vms::event::ActionType::acknowledgeAction)
         {
