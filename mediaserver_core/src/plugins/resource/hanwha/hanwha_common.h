@@ -40,7 +40,17 @@ enum class HanwhaClientType
     mobile
 };
 
+enum class HanwhaSessionType
+{
+    undefined,
+    live,
+    playback,
+    backup
+};
+
 //TODO: #dmishin consider using Fusion instead of custom methods.
+
+static const QString kHanwhaManufacturerName("Hanwha Techwin");
 static const int kHanwhaInvalidProfile = -1;
 static const int kHanwhaInvalidGovLength = -1;
 static const int kHanwhaInvalidFps = -1;

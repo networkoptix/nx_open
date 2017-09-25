@@ -70,9 +70,9 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     #ifdef ENABLE_ISD
         m_searchers << new QnPlISDResourceSearcher(commonModule);
     #endif
-#ifdef ENABLE_HANWHA
+    #ifdef ENABLE_HANWHA
         m_searchers << new nx::mediaserver_core::plugins::HanwhaResourceSearcher(commonModule);
-#endif
+    #endif
 
     #ifdef ENABLE_ADVANTECH
         m_searchers << new QnAdamResourceSearcher(commonModule);

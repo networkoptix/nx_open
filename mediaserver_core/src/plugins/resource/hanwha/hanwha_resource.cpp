@@ -6,18 +6,21 @@
 #include "hanwha_request_helper.h"
 #include "hanwha_stream_reader.h"
 #include "hanwha_ptz_controller.h"
+#include "hanwha_resource_searcher.h"
 
 #include <QtCore/QMap>
 
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <core/resource/camera_advanced_param.h>
 #include <camera/camera_pool.h>
+#include <common/common_module.h>
 
 #include <nx/utils/log/log.h>
 #include <plugins/resource/onvif/onvif_audio_transmitter.h>
 #include <core/resource/media_stream_capability.h>
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
+#include <core/resource_management/resource_discovery_manager.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -351,6 +354,23 @@ bool HanwhaResource::setParamsPhysical(
     return success;
 }
 
+QString HanwhaResource::sessionKey(
+    HanwhaSessionType sessionType,
+    bool generateNewOne)
+{
+    auto discoveryManager = commonModule()->resourceDiscoveryManager();
+    if (!discoveryManager)
+        return QString();
+
+    auto searcher = dynamic_cast<HanwhaResourceSearcher*>(
+        discoveryManager->searcherByManufacture(kHanwhaManufacturerName));
+
+    if (!searcher)
+        return QString();
+
+    return searcher->sessionKey(toSharedPointer(this), sessionType, generateNewOne);
+}
+
 int HanwhaResource::maxProfileCount() const
 {
     return m_maxProfileCount;
@@ -443,7 +463,7 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
         ? limits->defaultCbrBitrate
         : limits->defaultVbrBitrate;
 
-    capability.defaultFps = limits->defaultFps;
+    capability.defaultFps = limits->defaultFps > 0 ? limits->defaultFps : limits->maxFps;
     capability.maxFps = limits->maxFps;
 
     return capability;

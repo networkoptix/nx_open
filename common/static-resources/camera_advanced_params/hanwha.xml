@@ -270,6 +270,7 @@
                 <param id="SECONDARY%media/videoprofile/FrameRate"
                     name="Frame Rate"
                     dataType="Number"
+                    writeCmd="update"
                     aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
                 </param>
 
