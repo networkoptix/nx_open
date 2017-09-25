@@ -21,6 +21,8 @@ public:
     */
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) override;
 
+    static bool hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras);
+
 signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
 
@@ -34,7 +36,6 @@ private:
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(const QnResourcePtr& res);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
-    bool hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras) const;
 private:
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_resourceDiscoveryCounter;
