@@ -80,8 +80,7 @@ struct WorkbenchExportHandler::Private
         if (!QFileInfo(completeFilename).exists())
             return;
 
-        auto existing = resourcePool->getResourceByUrl(completeFilename);
-        NX_ASSERT(!existing);
+        const auto existing = resourcePool->getResourceByUrl(completeFilename);
         if (existing)
             resourcePool->removeResource(existing);
 
@@ -112,8 +111,6 @@ struct WorkbenchExportHandler::Private
                 break;
         }
     }
-
-
 };
 
 
