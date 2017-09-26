@@ -113,9 +113,9 @@ def check_customizable(file_path, root, structure):
     return True
 
 
-def read_file(root, filename, context=None):
-    file_path = os.path.join(root, filename)
-    short_path = file_path.replace(DIRECTORY, '')
+def read_file(root, directory, filename, context=None):
+    file_path = os.path.join(directory, filename)
+    short_path = file_path.replace(root, '')
     extension = os.path.splitext(filename)[1][1:]
 
     meta = OrderedDict(format=extension)
@@ -138,9 +138,9 @@ def read_root_directory(directory, structure):
             context = find_context(name, None, structure)
             for root, dirs, files in os.walk(context_path):
                 for filename in files:
-                    read_file(root, filename, context)
+                    read_file(directory, root, filename, context)
         else:
-            read_file(directory, name, root_context)
+            read_file(directory, directory, name, root_context)
 
 
 cms_structure = load_structure(STRUCTURE_FILE)
