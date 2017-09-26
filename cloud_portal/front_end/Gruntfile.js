@@ -671,6 +671,21 @@ module.exports = function (grunt) {
                     args: {specs: ['test/e2e/system_page/*spec.js']}
                 }
             },
+            syspage1: {
+                options: {
+                    args: {specs: ['test/e2e/system_page/share_spec.js']}
+                }
+            },
+            syspage2: {
+                options: {
+                    args: {specs: ['test/e2e/system_page/system_spec.js']}
+                }
+            },
+            syspage3: {
+                options: {
+                    args: {specs: ['test/e2e/system_page/users_spec.js']}
+                }
+            },
             systems: {
                 options: {
                     args: {specs: ['test/e2e/systems/*spec.js']}
