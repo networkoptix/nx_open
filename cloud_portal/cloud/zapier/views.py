@@ -2,7 +2,9 @@ import django
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from api.helpers.exceptions import handle_exceptions, APINotAuthorisedException
+
+from api.helpers.exceptions import handle_exceptions, api_success, APINotAuthorisedException
+from api.controllers import cloud_api
 
 import requests, json, base64
 from requests.auth import HTTPDigestAuth
@@ -36,13 +38,16 @@ https://cloud-test.hdw.mx/gateway/
 
 system
 9aeb4e34-d495-4e93-8ae5-3af9630ffc0e
-
-apicall
-/ec2/getUsers
-
-to send requests to cloud test
-return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 '''
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def get_systems(request):
+    user, email, password = authenticate(request)
+    data = cloud_api.System.list(email, password)
+    return api_success(data['systems'])
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
@@ -55,7 +60,7 @@ def nx_action(request):
 
     source = 'source=' + request.data['source']
     caption = '&caption=' + request.data['caption']
-    state = '&state=' + request.data['state']
+    state = '&description=' + request.data['description']
 
     url = "%s%s%s%s%s%s" % (instance, system_id, '/api/createEvent?', source, caption, state)
 
@@ -65,17 +70,18 @@ def nx_action(request):
     return json.loads(r.text)
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def fire_zap_webhook(request):
-    event = request.query_params['system_id'] + ' ' + request.query_params['event']
+    caption = request.query_params['caption']
+    event = request.query_params['system_id'] + ' ' + caption
     hooks_event = Hook.objects.filter(event=event)
 
     if hooks_event.exists():
         for hook in hooks_event:
-            raw_hook_event.send(sender=None, event_name=event, payload={'data': request.data}, user=hook.user)
-    return Response({'message': "webhook fired for " + event}, status=200)
+            raw_hook_event.send(sender=None, event_name=event, payload={'data': {'caption': caption}}, user=hook.user)
+    return Response({'message': "webhook fired for " + caption}, status=200)
 
 
 @api_view(['GET', 'POST'])
@@ -91,18 +97,18 @@ def ping(request):
 def create_zap_webhook(request):
     user, email, password = authenticate(request)
     system_id = request.query_params['system_id']
-    event = request.query_params['event']
+    caption = request.query_params['caption']
     target = request.data['target_url']
-    hook_key = system_id + " " + event
+    event = system_id + " " + caption
 
     user_hooks = Hook.objects.filter(user=user, target=target)
     if user_hooks.exists():
-        return Response({'message': 'There is already a webhook for ' + hook_key, 'link': None}, status=500)
+        return Response({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
 
-    url_link = '/firehook/?system_id=%s&event=%s' %(system_id, target)
+    url_link = '/firehook/?system_id=%s&caption=%s' %(system_id, target)
     zap_hook = Hook(user=user, event=event, target=target)
     zap_hook.save()
-    return Response({'message': 'Webhook created for ' + hook_key, 'link': url_link}, status=200)
+    return Response({'message': 'Webhook created for ' + caption, 'link': url_link}, status=200)
 
 
 @api_view(['POST'])
@@ -115,5 +121,6 @@ def remove_zap_webhook(request):
     user_hooks = Hook.objects.filter(user=user, target=target)
     if not user_hooks.exists():
         return Response({'message': "Webhook for " + target + " does not exist"}, status=500)
+    event = user_hooks.event
     user_hooks.delete()
-    return Response({'message': 'Webhook deleted for ' + target}, status=200)
+    return Response({'message': 'Webhook deleted for ' + event}, status=200)
