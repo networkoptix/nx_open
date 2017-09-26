@@ -53,7 +53,7 @@ TimestampFilter::Internal::Internal(const core::transcoding::TimestampOverlaySet
 
 void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& frame)
 {
-    const qint64 displayTime = frame->pts / 1000 + m_params.serverTimeDisplayOffset;
+    const qint64 displayTime = frame->pts / 1000 + m_params.serverTimeDisplayOffsetMs;
     if (m_currentTimeMs == displayTime)
         return;
 
@@ -74,7 +74,7 @@ void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& f
     path.addText(0, m_fontMetrics.ascent(), m_font, timeString);
     painter.setBrush(m_params.foreground);
     painter.drawPath(path);
-    painter.strokePath(path, m_params.shadow);
+    painter.strokePath(path, m_params.outline);
 
     m_painter.setImage(image, m_params.position, m_params.alignment);
 }
