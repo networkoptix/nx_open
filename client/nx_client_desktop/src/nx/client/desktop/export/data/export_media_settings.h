@@ -24,7 +24,6 @@ struct ExportMediaSettings
 };
 
 using ExportOverlaySettings = nx::core::transcoding::OverlaySettings;
-using ExportTextOverlaySettings = nx::core::transcoding::TextOverlaySettings;
 using ExportImageOverlaySettings = nx::core::transcoding::ImageOverlaySettings;
 using ExportTimestampOverlaySettings = nx::core::transcoding::TimestampOverlaySettings;
 

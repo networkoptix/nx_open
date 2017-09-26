@@ -110,12 +110,12 @@ void ImageOverlaySettingsWidget::updateControls()
     ui->nameEdit->setText(m_data.name);
 }
 
-const settings::ExportImageOverlayPersistent& ImageOverlaySettingsWidget::data() const
+const ExportImageOverlayPersistentSettings& ImageOverlaySettingsWidget::data() const
 {
     return m_data;
 }
 
-void ImageOverlaySettingsWidget::setData(const settings::ExportImageOverlayPersistent& data)
+void ImageOverlaySettingsWidget::setData(const ExportImageOverlayPersistentSettings& data)
 {
     m_data = data;
     updateControls();

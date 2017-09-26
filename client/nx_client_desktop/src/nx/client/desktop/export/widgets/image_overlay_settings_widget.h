@@ -3,7 +3,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <nx/client/desktop/export/settings/media_persistent.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 
 namespace Ui { class ImageOverlaySettingsWidget; }
 
@@ -20,14 +20,14 @@ public:
     ImageOverlaySettingsWidget(QWidget* parent = nullptr);
     virtual ~ImageOverlaySettingsWidget() override;
 
-    const settings::ExportImageOverlayPersistent& data() const;
-    void setData(const settings::ExportImageOverlayPersistent& data);
+    const ExportImageOverlayPersistentSettings& data() const;
+    void setData(const ExportImageOverlayPersistentSettings& data);
 
     int maxOverlayWidth() const;
     void setMaxOverlayWidth(int value);
 
 signals:
-    void dataChanged(const settings::ExportImageOverlayPersistent& data);
+    void dataChanged(const ExportImageOverlayPersistentSettings& data);
     void deleteClicked();
 
 private:
@@ -36,7 +36,7 @@ private:
 
 private:
     QScopedPointer<Ui::ImageOverlaySettingsWidget> ui;
-    settings::ExportImageOverlayPersistent m_data;
+    ExportImageOverlayPersistentSettings m_data;
     QString m_lastImageDir;
 };
 

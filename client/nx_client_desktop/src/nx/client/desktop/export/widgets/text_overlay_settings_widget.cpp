@@ -78,12 +78,12 @@ void TextOverlaySettingsWidget::updateControls()
     ui->widthSlider->setValue(m_data.overlayWidth);
 }
 
-const settings::ExportTextOverlayPersistent& TextOverlaySettingsWidget::data() const
+const ExportTextOverlayPersistentSettings& TextOverlaySettingsWidget::data() const
 {
     return m_data;
 }
 
-void TextOverlaySettingsWidget::setData(const settings::ExportTextOverlayPersistent& data)
+void TextOverlaySettingsWidget::setData(const ExportTextOverlayPersistentSettings& data)
 {
     m_data = data;
     updateControls();

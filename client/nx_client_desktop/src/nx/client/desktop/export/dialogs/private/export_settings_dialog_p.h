@@ -9,8 +9,8 @@
 
 #include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
-#include <nx/client/desktop/export/settings/media_persistent.h>
-#include <nx/client/desktop/export/settings/layout_persistent.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/client/desktop/export/tools/export_media_validator.h>
 #include <nx/client/desktop/export/widgets/export_overlay_widget.h>
 #include <nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.h>
@@ -47,6 +47,7 @@ public:
     void setMediaFilename(const Filename& filename);
     void setLayoutFilename(const Filename& filename);
     void setRapidReviewFrameStep(qint64 frameStepMs);
+    void setServerTimeOffsetMs(qint64 offsetMs);
     void setAvailableTranscodingSettings(const nx::core::transcoding::Settings& settings);
     void setApplyFilters(bool value);
 
@@ -55,8 +56,8 @@ public:
 
     static FileExtensionList allowedFileExtensions(Mode mode);
 
-    const settings::ExportMediaPersistent& exportMediaSettings() const;
-    const settings::ExportLayoutPersistent& exportLayoutSettings() const;
+    const ExportMediaPersistentSettings& exportMediaSettings() const;
+    const ExportLayoutPersistentSettings& exportLayoutSettings() const;
 
     void createOverlays(QWidget* overlayContainer);
 
@@ -64,33 +65,33 @@ public:
     LayoutThumbnailLoader* layoutImageProvider() const;
     QSize fullFrameSize() const;
 
-    const settings::RapidReviewPersistentSettings& storedRapidReviewSettings() const;
-    void setStoredRapidReviewSettings(const settings::RapidReviewPersistentSettings& value);
+    const ExportRapidReviewPersistentSettings& storedRapidReviewSettings() const;
+    void setStoredRapidReviewSettings(const ExportRapidReviewPersistentSettings& value);
 
     // Makes overlay visible and raised and enables its border.
-    void selectOverlay(settings::ExportOverlayType type);
-    void hideOverlay(settings::ExportOverlayType type);
-    bool isOverlayVisible(settings::ExportOverlayType type) const;
+    void selectOverlay(ExportOverlayType type);
+    void hideOverlay(ExportOverlayType type);
+    bool isOverlayVisible(ExportOverlayType type) const;
 
-    void setTimestampOverlaySettings(const settings::ExportTimestampOverlayPersistent& settings);
-    void setImageOverlaySettings(const settings::ExportImageOverlayPersistent& settings);
-    void setTextOverlaySettings(const settings::ExportTextOverlayPersistent& settings);
-    void setBookmarkOverlaySettings(const settings::ExportBookmarkOverlayPersistent& settings);
+    void setTimestampOverlaySettings(const ExportTimestampOverlayPersistentSettings& settings);
+    void setImageOverlaySettings(const ExportImageOverlayPersistentSettings& settings);
+    void setTextOverlaySettings(const ExportTextOverlayPersistentSettings& settings);
+    void setBookmarkOverlaySettings(const ExportBookmarkOverlayPersistentSettings& settings);
 
     void validateSettings(Mode mode);
 
 signals:
     void validated(Mode mode, const QStringList& alerts);
-    void overlaySelected(settings::ExportOverlayType type);
+    void overlaySelected(ExportOverlayType type);
 
 private:
-    ExportOverlayWidget* overlay(settings::ExportOverlayType type);
-    const ExportOverlayWidget* overlay(settings::ExportOverlayType type) const;
+    ExportOverlayWidget* overlay(ExportOverlayType type);
+    const ExportOverlayWidget* overlay(ExportOverlayType type) const;
 
-    void updateOverlay(settings::ExportOverlayType type);
+    void updateOverlay(ExportOverlayType type);
     void updateOverlays();
     void updateTimestampText();
-    void overlayPositionChanged(settings::ExportOverlayType type);
+    void overlayPositionChanged(ExportOverlayType type);
     void updateTranscodingSettings();
 
     static QStringList generateAlerts(ExportMediaValidator::Results results);
@@ -101,11 +102,11 @@ private:
     ExportSettingsDialog::Mode m_mode = Mode::Media;
     ExportMediaValidator::Results m_mediaValidationResults;
     ExportMediaValidator::Results m_layoutValidationResults;
-    settings::ExportMediaPersistent m_exportMediaSettings;
-    settings::ExportLayoutPersistent m_exportLayoutSettings;
+    ExportMediaPersistentSettings m_exportMediaSettings;
+    ExportLayoutPersistentSettings m_exportLayoutSettings;
     nx::core::transcoding::Settings m_availableTranscodingSettings;
 
-    static constexpr size_t overlayCount = size_t(settings::ExportOverlayType::overlayCount);
+    static constexpr size_t overlayCount = size_t(ExportOverlayType::overlayCount);
     std::array<ExportOverlayWidget*, overlayCount> m_overlays {};
 
     QPointer<ExportOverlayWidget> m_selectedOverlay;

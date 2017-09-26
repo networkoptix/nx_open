@@ -3,7 +3,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <nx/client/desktop/export/settings/media_persistent.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 
 namespace Ui { class BookmarkOverlaySettingsWidget; }
 
@@ -20,14 +20,14 @@ public:
     BookmarkOverlaySettingsWidget(QWidget* parent = nullptr);
     virtual ~BookmarkOverlaySettingsWidget() override;
 
-    const settings::ExportBookmarkOverlayPersistent& data() const;
-    void setData(const settings::ExportBookmarkOverlayPersistent& data);
+    const ExportBookmarkOverlayPersistentSettings& data() const;
+    void setData(const ExportBookmarkOverlayPersistentSettings& data);
 
     int maxOverlayWidth() const;
     void setMaxOverlayWidth(int value);
 
 signals:
-    void dataChanged(const settings::ExportBookmarkOverlayPersistent& data);
+    void dataChanged(const ExportBookmarkOverlayPersistentSettings& data);
     void deleteClicked();
 
 private:
@@ -35,7 +35,7 @@ private:
 
 private:
     QScopedPointer<Ui::BookmarkOverlaySettingsWidget> ui;
-    settings::ExportBookmarkOverlayPersistent m_data;
+    ExportBookmarkOverlayPersistentSettings m_data;
 };
 
 } // namespace desktop

@@ -25,8 +25,8 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/client/desktop/export/settings/media_persistent.h>
-#include <nx/client/desktop/export/settings/layout_persistent.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/client/desktop/export/settings/export_layout_persistent_settings.h>
 
 class QSettings;
 
@@ -182,8 +182,8 @@ protected:
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
-    using ExportMediaSettings = nx::client::desktop::settings::ExportMediaPersistent;
-    using ExportLayoutSettings = nx::client::desktop::settings::ExportLayoutPersistent;
+    using ExportMediaSettings = nx::client::desktop::ExportMediaPersistentSettings;
+    using ExportLayoutSettings = nx::client::desktop::ExportLayoutPersistentSettings;
 
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)

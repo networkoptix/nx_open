@@ -77,12 +77,12 @@ void BookmarkOverlaySettingsWidget::updateControls()
     ui->widthSlider->setValue(m_data.overlayWidth);
 }
 
-const settings::ExportBookmarkOverlayPersistent& BookmarkOverlaySettingsWidget::data() const
+const ExportBookmarkOverlayPersistentSettings& BookmarkOverlaySettingsWidget::data() const
 {
     return m_data;
 }
 
-void BookmarkOverlaySettingsWidget::setData(const settings::ExportBookmarkOverlayPersistent& data)
+void BookmarkOverlaySettingsWidget::setData(const ExportBookmarkOverlayPersistentSettings& data)
 {
     m_data = data;
     updateControls();

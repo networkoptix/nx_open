@@ -23,7 +23,7 @@
 #include <nx/fusion/model_functions.h>
 #include <utils/ping_utility.h>
 #include <nx/client/desktop/utils/server_file_cache.h>
-#include <nx/client/desktop/export/settings/media_persistent.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
@@ -123,7 +123,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<nx::cdb::api::SystemData>();
     qRegisterMetaType<rest::QnConnectionPtr>();
 
-    qRegisterMetaType<nx::client::desktop::settings::ExportMediaPersistent>();
+    qRegisterMetaType<nx::client::desktop::ExportMediaPersistentSettings>();
 
     QMetaType::registerComparators<QnUuid>();
 

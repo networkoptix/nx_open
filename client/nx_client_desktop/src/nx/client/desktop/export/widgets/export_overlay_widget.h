@@ -9,6 +9,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+// TODO: #vkutin Remove all complicated painting, now duplicated
+// in export media persistent settings structures (in createRuntimeSettings methods).
+// Keep only image (for text, bookmark and image overlays) and timestamp painting.
+
 class ExportOverlayWidget: public QWidget
 {
     Q_OBJECT

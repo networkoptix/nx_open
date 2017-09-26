@@ -3,7 +3,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <nx/client/desktop/export/settings/media_persistent.h>
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 
 namespace Ui { class TextOverlaySettingsWidget; }
 
@@ -20,14 +20,14 @@ public:
     TextOverlaySettingsWidget(QWidget* parent = nullptr);
     virtual ~TextOverlaySettingsWidget() override;
 
-    const settings::ExportTextOverlayPersistent& data() const;
-    void setData(const settings::ExportTextOverlayPersistent& data);
+    const ExportTextOverlayPersistentSettings& data() const;
+    void setData(const ExportTextOverlayPersistentSettings& data);
 
     int maxOverlayWidth() const;
     void setMaxOverlayWidth(int value);
 
 signals:
-    void dataChanged(const settings::ExportTextOverlayPersistent& data);
+    void dataChanged(const ExportTextOverlayPersistentSettings& data);
     void deleteClicked();
 
 private:
@@ -35,7 +35,7 @@ private:
 
 private:
     QScopedPointer<Ui::TextOverlaySettingsWidget> ui;
-    settings::ExportTextOverlayPersistent m_data;
+    ExportTextOverlayPersistentSettings m_data;
 };
 
 } // namespace desktop

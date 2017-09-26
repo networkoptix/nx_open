@@ -15,6 +15,8 @@
 #include <ui/widgets/common/alert_bar.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
@@ -40,6 +42,8 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, false /*isBookmark*/, parent)
 {
     setMediaResource(widget->resource());
+    d->setServerTimeOffsetMs(widget->context()->instance<QnWorkbenchServerTimeWatcher>()->
+        displayOffset(widget->resource()));
 
     const auto resource = widget->resource()->toResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -239,7 +243,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->timestampButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->timestampSettingsPage));
     ui->timestampButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(settings::ExportOverlayType::timestamp));
+        qVariantFromValue(ExportOverlayType::timestamp));
 
     ui->imageButton->setDeactivatable(true);
     ui->imageButton->setDeactivatedText(tr("Add Image"));
@@ -252,7 +256,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->imageButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->imageSettingsPage));
     ui->imageButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(settings::ExportOverlayType::image));
+        qVariantFromValue(ExportOverlayType::image));
 
     ui->textButton->setDeactivatable(true);
     ui->textButton->setDeactivatedText(tr("Add Text"));
@@ -265,7 +269,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->textButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->textSettingsPage));
     ui->textButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(settings::ExportOverlayType::text));
+        qVariantFromValue(ExportOverlayType::text));
 
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Speed Up"));
@@ -295,20 +299,20 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->bookmarkButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->bookmarkSettingsPage));
     ui->bookmarkButton->setProperty(kOverlayPropertyName,
-        qVariantFromValue(settings::ExportOverlayType::bookmark));
+        qVariantFromValue(ExportOverlayType::bookmark));
 
     const auto buttonForType =
-        [this](settings::ExportOverlayType type)
+        [this](ExportOverlayType type)
         {
             switch (type)
             {
-                case settings::ExportOverlayType::timestamp:
+                case ExportOverlayType::timestamp:
                     return ui->timestampButton;
-                case settings::ExportOverlayType::image:
+                case ExportOverlayType::image:
                     return ui->imageButton;
-                case settings::ExportOverlayType::text:
+                case ExportOverlayType::text:
                     return ui->textButton;
-                case settings::ExportOverlayType::bookmark:
+                case ExportOverlayType::bookmark:
                     return ui->bookmarkButton;
                 default:
                     return static_cast<ui::SelectableTextButton*>(nullptr);
@@ -316,7 +320,7 @@ void ExportSettingsDialog::setupSettingsButtons()
         };
 
     connect(d, &Private::overlaySelected, this,
-        [buttonForType](settings::ExportOverlayType type)
+        [buttonForType](ExportOverlayType type)
         {
             auto button = buttonForType(type);
             if (button && button->state() != ui::SelectableTextButton::State::selected)
@@ -347,9 +351,9 @@ void ExportSettingsDialog::setupSettingsButtons()
         {
             NX_EXPECT(button);
             const auto overlayTypeVariant = button->property(kOverlayPropertyName);
-            const auto overlayType = overlayTypeVariant.canConvert<settings::ExportOverlayType>()
-                ? overlayTypeVariant.value<settings::ExportOverlayType>()
-                : settings::ExportOverlayType::none;
+            const auto overlayType = overlayTypeVariant.canConvert<ExportOverlayType>()
+                ? overlayTypeVariant.value<ExportOverlayType>()
+                : ExportOverlayType::none;
 
             switch (button->state())
             {
