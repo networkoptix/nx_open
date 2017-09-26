@@ -51,6 +51,7 @@ public:
     void setServerTimeOffsetMs(qint64 offsetMs);
     void setAvailableTranscodingSettings(const nx::core::transcoding::Settings& settings);
     void setApplyFilters(bool value);
+    void setLayoutReadOnly(bool value);
 
     Mode mode() const;
     void setMode(Mode mode);

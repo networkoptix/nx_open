@@ -139,6 +139,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataChanged,
         d, &Private::setApplyFilters);
 
+    connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
+        d, &Private::setLayoutReadOnly);
+
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setMediaFilename);
     connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);
 
@@ -380,6 +383,7 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 
 void ExportSettingsDialog::updateSettingsWidgets()
 {
+    ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
     ui->exportMediaSettingsPage->setApplyFilters(d->exportMediaPersistentSettings().applyFilters);
     ui->timestampSettingsPage->setData(d->exportMediaPersistentSettings().timestampOverlay);
     ui->bookmarkSettingsPage->setData(d->exportMediaPersistentSettings().bookmarkOverlay);

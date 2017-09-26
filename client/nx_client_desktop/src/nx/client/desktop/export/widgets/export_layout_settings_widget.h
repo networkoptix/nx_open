@@ -19,8 +19,13 @@ class ExportLayoutSettingsWidget: public QWidget
 
 public:
     ExportLayoutSettingsWidget(QWidget* parent = nullptr);
-
     virtual ~ExportLayoutSettingsWidget();
+
+    bool isLayoutReadOnly() const;
+    void setLayoutReadOnly(bool value);
+
+signals:
+    void dataChanged(bool isLayoutReadOnly);
 
 private:
     QScopedPointer<Ui::ExportLayoutSettingsWidget> ui;

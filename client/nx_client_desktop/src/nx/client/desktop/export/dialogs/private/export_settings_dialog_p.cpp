@@ -160,6 +160,11 @@ void ExportSettingsDialog::Private::setApplyFilters(bool value)
     validateSettings(Mode::Media);
 }
 
+void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
+{
+    m_exportLayoutPersistentSettings.readOnly = value;
+}
+
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media)
 {
     m_exportMediaSettings.mediaResource = media;

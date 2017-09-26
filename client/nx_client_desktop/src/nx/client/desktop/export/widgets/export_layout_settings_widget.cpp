@@ -10,10 +10,22 @@ ExportLayoutSettingsWidget::ExportLayoutSettingsWidget(QWidget* parent):
     ui(new Ui::ExportLayoutSettingsWidget())
 {
     ui->setupUi(this);
+    connect(ui->readOnlyCheckBox, &QCheckBox::toggled,
+        this, &ExportLayoutSettingsWidget::dataChanged);
 }
 
 ExportLayoutSettingsWidget::~ExportLayoutSettingsWidget()
 {
+}
+
+bool ExportLayoutSettingsWidget::isLayoutReadOnly() const
+{
+    return ui->readOnlyCheckBox->isChecked();
+}
+
+void ExportLayoutSettingsWidget::setLayoutReadOnly(bool value)
+{
+    ui->readOnlyCheckBox->setChecked(value);
 }
 
 } // namespace desktop
