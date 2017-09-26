@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QScopedValueRollback>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -18,6 +19,27 @@
 #include <nx/fusion/serialization/json_functions.h>
 
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+
+namespace {
+
+struct Position
+{
+    int offset = 0;
+    Qt::AlignmentFlag anchor = Qt::AlignmentFlag();
+
+    Position() = default;
+    Position(int offset, Qt::AlignmentFlag anchor):
+        offset(offset), anchor(anchor)
+    {
+    }
+
+    bool operator < (const Position& other) const
+    {
+        return qAbs(offset) < qAbs(other.offset);
+    }
+};
+
+} // namespace
 
 namespace nx {
 namespace client {
@@ -296,9 +318,23 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
     if (!settings)
         return;
 
-    // TODO: #vkutin Calculate alignment depending on position in widget's parent.
-    settings->position = overlayWidget->pos() / m_overlayScale;
-    settings->alignment = Qt::AlignLeft | Qt::AlignTop;
+    const auto geometry = overlayWidget->geometry();
+    const auto beg = geometry.topLeft() / m_overlayScale;
+    const auto end = geometry.bottomRight() / m_overlayScale;
+    const auto mid = geometry.center() / m_overlayScale;
+
+    const auto horizontal = std::min({
+        Position(beg.x(), Qt::AlignLeft),
+        Position(mid.x() - m_fullFrameSize.width() / 2, Qt::AlignHCenter),
+        Position(m_fullFrameSize.width() - end.x(), Qt::AlignRight)});
+
+    const auto vertical = std::min({
+        Position(beg.y(), Qt::AlignTop),
+        Position(mid.y() - m_fullFrameSize.height() / 2, Qt::AlignVCenter),
+        Position(m_fullFrameSize.height() - end.y(), Qt::AlignBottom)});
+
+    settings->offset = QPoint(horizontal.offset, vertical.offset);
+    settings->anchors = horizontal.anchor | vertical.anchor;
 }
 
 ExportMediaSettings ExportSettingsDialog::Private::exportMediaSettings() const
@@ -440,8 +476,25 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
     const auto positionOverlay =
         [this](QWidget* overlay, const ExportOverlayPersistentSettings& data)
         {
-            // TODO: #vkutin Alignment.
-            overlay->move(data.position * m_overlayScale);
+            QPoint position;
+            const auto& size = m_fullFrameSize;
+
+            if (data.anchors.testFlag(Qt::AlignHCenter))
+                position.setX((size.width() * m_overlayScale - overlay->width()) * 0.5);
+            else if (data.anchors.testFlag(Qt::AlignRight))
+                position.setX((size.width() - data.offset.x()) * m_overlayScale - overlay->width());
+            else
+                position.setX(data.offset.x() * m_overlayScale);
+
+            if (data.anchors.testFlag(Qt::AlignVCenter))
+                position.setY((size.height() * m_overlayScale - overlay->height()) * 0.5);
+            else if (data.anchors.testFlag(Qt::AlignBottom))
+                position.setY((size.height() - data.offset.x()) * m_overlayScale - overlay->height());
+            else
+                position.setY(data.offset.y() * m_overlayScale);
+
+            QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
+            overlay->move(position);
         };
 
     auto overlay = this->overlay(type);
@@ -523,7 +576,11 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
             [this, type]() { selectOverlay(type); });
 
         installEventHandler(m_overlays[index], { QEvent::Resize, QEvent::Move, QEvent::Show }, this,
-            [this, type]() { overlayPositionChanged(type); });
+            [this, type]()
+            {
+                if (!m_positionUpdating)
+                    overlayPositionChanged(type);
+            });
     }
 
     setPaletteColor(overlay(ExportOverlayType::image), QPalette::Window, Qt::transparent);

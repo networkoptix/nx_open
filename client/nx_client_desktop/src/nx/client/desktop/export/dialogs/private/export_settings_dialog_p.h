@@ -127,6 +127,8 @@ private:
     QScopedPointer<LayoutThumbnailLoader> m_layoutImageProvider;
     QSize m_fullFrameSize;
     qreal m_overlayScale = 1.0;
+
+    bool m_positionUpdating = false;
 };
 
 } // namespace desktop
