@@ -38,7 +38,8 @@ void AnyAccessibleAddressConnector::connectAsync(
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Connecting to %1").arg(containerString(m_entries)), cl_logDEBUG2);
+    NX_VERBOSE(this,
+        lm("Connecting to %1 with timeout %2").args(containerString(m_entries), timeout));
 
     m_timeout = timeout;
     m_handler = std::move(handler);

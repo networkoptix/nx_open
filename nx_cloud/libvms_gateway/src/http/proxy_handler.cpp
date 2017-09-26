@@ -224,7 +224,8 @@ void ProxyHandler::onConnected(
                 : nx_http::StatusCode::serviceUnavailable);
     }
 
-    if (!connection->setRecvTimeout(m_settings.tcp().recvTimeout))
+    if (!connection->setRecvTimeout(m_settings.tcp().recvTimeout) ||
+        !connection->setSendTimeout(m_settings.tcp().sendTimeout))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_INFO(this, lm("Failed to set socket options. %1").arg(SystemError::toString(osErrorCode)));
