@@ -491,6 +491,9 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     qint64 serverTimeZone = QnWorkbenchServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
+    QnLegacyTranscodingSettings settings;
+    settings.resource = m_currentCamera->resource();
+
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
         lit("mkv"),
@@ -498,8 +501,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         role,
         serverTimeZone,
         0,
-        QnLegacyTranscodingSettings()
-    );
+        settings);
 
     return true;
 }

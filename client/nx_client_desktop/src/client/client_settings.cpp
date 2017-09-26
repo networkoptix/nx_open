@@ -437,6 +437,7 @@ bool QnClientSettings::isWritable() const
     return m_settings->isWritable();
 }
 
-QSettings* QnClientSettings::rawSettings() {
+QSettings* QnClientSettings::rawSettings()
+{
     return m_settings;
 }

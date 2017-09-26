@@ -213,7 +213,6 @@ void WorkbenchExportHandler::handleExportVideoAction()
             const auto settings = dialog->exportMediaSettings();
             exportProcessId = d->exportManager->exportMedia(settings);
             filename = settings.fileName;
-            // TODO: #GDM immediately check status, export may not start in some cases.
             break;
         }
         case ExportSettingsDialog::Mode::Layout:

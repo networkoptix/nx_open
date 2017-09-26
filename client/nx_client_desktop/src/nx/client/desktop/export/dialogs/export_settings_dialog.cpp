@@ -62,7 +62,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     :
     ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, parent)
 {
-    ui->layoutTab->setVisible(false);
+    ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->layoutTab));
     setMediaResourceWidget(widget);
 }
 

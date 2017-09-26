@@ -611,12 +611,11 @@ void ExportSettingsDialog::Private::updateBookmarkText()
 
 void ExportSettingsDialog::Private::updateTimestampText()
 {
-    // TODO: FIXME: #vkutin Change to beginning of selection
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(m_exportMediaSettings.timePeriod.startTimeMs
+        + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs)
+        .toOffsetFromUtc(qnSyncTime->currentDateTime().offsetFromUtc());
 
-    auto currentDayTime = qnSyncTime->currentDateTime();
-    currentDayTime = currentDayTime.toOffsetFromUtc(currentDayTime.offsetFromUtc());
-
-    overlay(ExportOverlayType::timestamp)->setText(currentDayTime.toString(
+    overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
         m_exportMediaPersistentSettings.timestampOverlay.format));
 }
 

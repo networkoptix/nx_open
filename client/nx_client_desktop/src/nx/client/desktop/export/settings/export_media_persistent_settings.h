@@ -109,6 +109,9 @@ struct ExportMediaPersistentSettings
     ExportTimestampOverlayPersistentSettings timestampOverlay;
     ExportBookmarkOverlayPersistentSettings bookmarkOverlay;
 
+    ExportMediaPersistentSettings() = default;
+    ExportMediaPersistentSettings(const QVector<ExportOverlayType>& used): usedOverlays(used) {}
+
     ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type);
     const ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type) const;
 
