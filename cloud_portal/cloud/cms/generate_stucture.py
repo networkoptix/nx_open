@@ -26,7 +26,7 @@ STRUCTURE_FILE = 'vms_structure.json'
 PRODUCT_NAME = 'vms'
 
 IGNORE_DIRECTORIES = ('help',)
-IGNORE_FORMATS = ('DS_Store')
+IGNORE_FORMATS = ('DS_Store',)
 IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
 
 
@@ -71,7 +71,7 @@ def find_context(name, file_path, structure):
     return context
 
 
-def find_structure(name, context, type, meta=None, description=""):
+def find_structure(name, context, structure_type, meta=None, description=""):
     data_structure = next((structure for structure in context["values"] if structure["name"] == name), None)
     if not data_structure:
         data_structure = OrderedDict([
@@ -79,10 +79,10 @@ def find_structure(name, context, type, meta=None, description=""):
             ("name", name),
             ("value", ""),
             ("description", description),
-            ("type", type)
+            ("type", structure_type)
         ])
         if meta:
-            data_structure.update({"meta":meta})
+            data_structure.update({"meta": meta})
         context["values"].append(data_structure)
 
     return data_structure

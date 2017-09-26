@@ -66,7 +66,7 @@ def process_context_structure(customization, context, content,
             if language:
                 file_name = file_name.replace("{{language}}", language.code)
 
-            convert_b64_image_to_png(content_value, file_name, image_storage)
+            save_b64_to_file(content_value, file_name, image_storage)
     return content
 
 
@@ -217,7 +217,7 @@ def fill_content(customization_name='default', product='cloud_portal',
     generate_languages_json(customization, preview)
 
 
-def convert_b64_image_to_png(value, filename, storage_location):
+def save_b64_to_file(value, filename, storage_location):
     if not value:
         return
 

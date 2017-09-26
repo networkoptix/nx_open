@@ -174,12 +174,12 @@ def read_structure_json(filename):
             if type and type == "Image":
                 data_structure.translatable = "{{language}}" in name
 
-                #this is used to convert source images into b64 strings
+                # this is used to convert source images into b64 strings
                 file_path = os.path.join('static', 'default', 'source', name)
                 file_path = file_path.replace("{{language}}", default_language)
                 try:
                     with open(file_path, 'r') as file:
-                        value = encoded_string = base64.b64encode(file.read())
+                        value = base64.b64encode(file.read())
                 except IOError:
                     print("No file to read")
 

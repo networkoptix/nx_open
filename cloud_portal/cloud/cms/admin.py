@@ -54,11 +54,11 @@ admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('context_actions', 'name', 'description',
+    list_display = ('context_actions', 'product', 'name', 'description',
                     'url', 'translatable', 'is_global')
 
     list_display_links = ('name', )
-    search_fields = ('name', 'description', 'url')
+    search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
         return format_html('<a class="button" href="{}">edit content</a>',
@@ -93,7 +93,7 @@ class DataRecordAdmin(CMSAdmin):
                     'data_structure', 'short_description', 'version')
     list_filter = ('data_structure', 'customization', 'language')
     search_fields = ('data_structure__name', 'customization__name',
-                     'data_structure__short_description', 'value', 'language__code')
+                     'data_structure__description', 'value', 'language__code')
 
 admin.site.register(DataRecord, DataRecordAdmin)
 
