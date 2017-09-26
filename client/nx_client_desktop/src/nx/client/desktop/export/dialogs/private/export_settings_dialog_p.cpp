@@ -440,7 +440,10 @@ void ExportSettingsDialog::Private::validateSettings(Mode mode)
             return;
 
         m_mediaValidationResults = results;
-        emit validated(Mode::Media, generateAlerts(results));
+
+        QStringList weakAlerts, severeAlerts;
+        generateAlerts(results, weakAlerts, severeAlerts);
+        emit validated(Mode::Media, weakAlerts, severeAlerts);
     }
     else
     {
@@ -452,7 +455,10 @@ void ExportSettingsDialog::Private::validateSettings(Mode mode)
             return;
 
         m_layoutValidationResults = results;
-        emit validated(Mode::Layout, generateAlerts(results));
+
+        QStringList weakAlerts, severeAlerts;
+        generateAlerts(results, weakAlerts, severeAlerts);
+        emit validated(Mode::Layout, weakAlerts, severeAlerts);
     }
 }
 
@@ -632,7 +638,8 @@ QSize ExportSettingsDialog::Private::fullFrameSize() const
     return m_fullFrameSize;
 }
 
-QStringList ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results results)
+void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results results,
+    QStringList& weakAlerts, QStringList& severeAlerts)
 {
     const auto alertText =
         [](ExportMediaValidator::Result res) -> QString
@@ -670,14 +677,21 @@ QStringList ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::
             }
         };
 
-    QStringList alerts;
+    const auto isSevere =
+        [](ExportMediaValidator::Result code)
+        {
+            return code != ExportMediaValidator::Result::transcoding;
+        };
+
     for (int i = 0; i < int(ExportMediaValidator::Result::count); ++i)
     {
         if (results.test(i))
-            alerts << alertText(ExportMediaValidator::Result(i));
+        {
+            const auto code = ExportMediaValidator::Result(i);
+            auto& list = isSevere(code) ? severeAlerts : weakAlerts;
+            list << alertText(code);
+        }
     }
-
-    return alerts;
 }
 
 } // namespace desktop

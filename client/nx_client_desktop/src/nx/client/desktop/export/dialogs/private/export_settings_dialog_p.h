@@ -86,7 +86,7 @@ public:
     void validateSettings(Mode mode);
 
 signals:
-    void validated(Mode mode, const QStringList& alerts);
+    void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void overlaySelected(ExportOverlayType type);
 
 private:
@@ -100,7 +100,8 @@ private:
     void overlayPositionChanged(ExportOverlayType type);
     void updateTranscodingSettings();
 
-    static QStringList generateAlerts(ExportMediaValidator::Results results);
+    static void generateAlerts(ExportMediaValidator::Results results,
+        QStringList& weakAlerts, QStringList& severeAlerts);
 
 private:
     const QSize m_previewSize;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>848</width>
-    <height>470</height>
+    <height>475</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -291,9 +291,12 @@
        </item>
        <item>
         <widget class="QWidget" name="mediaAlertsWidget" native="true">
-         <layout class="QVBoxLayout" name="mediaAlertsLayout">
+         <layout class="QVBoxLayout" name="verticalLayout_6">
           <property name="spacing">
            <number>1</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
           </property>
           <property name="topMargin">
            <number>0</number>
@@ -304,6 +307,20 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item>
+           <layout class="QVBoxLayout" name="weakMediaAlertsLayout">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="severeMediaAlertsLayout">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>
@@ -493,7 +510,7 @@
        </item>
        <item>
         <widget class="QWidget" name="layoutAlertsWidget" native="true">
-         <layout class="QVBoxLayout" name="layoutAlertsLayout">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="spacing">
            <number>1</number>
           </property>
@@ -509,6 +526,20 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item>
+           <layout class="QVBoxLayout" name="weakLayoutAlertsLayout">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="severeLayoutAlertsLayout">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>

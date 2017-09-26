@@ -72,7 +72,9 @@ private:
     void setupSettingsButtons();
     void updateSettingsWidgets();
     void updateMode();
-    void updateAlerts(Mode mode, const QStringList& texts);
+    void updateTabWidgetSize();
+    void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
+    void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
 
 private:
     class Private;

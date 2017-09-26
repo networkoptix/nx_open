@@ -106,8 +106,8 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->mediaExportSettingsWidget->setMaximumHeight(ui->mediaFrame->maximumHeight());
     ui->layoutExportSettingsWidget->setMaximumHeight(ui->layoutFrame->maximumHeight());
 
-    autoResizePagesToContents(ui->tabWidget,
-        QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed), true);
+    autoResizePagesToContents(ui->tabWidget, QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed),
+        true, [this]() { updateTabWidgetSize(); });
 
     d->createOverlays(ui->mediaPreviewWidget);
 
@@ -396,6 +396,11 @@ void ExportSettingsDialog::updateSettingsWidgets()
     ui->layoutFilenamePanel->setFilename(d->exportLayoutSettings().filename);
 }
 
+void ExportSettingsDialog::updateTabWidgetSize()
+{
+    ui->tabWidget->setMaximumSize(ui->tabWidget->minimumSizeHint());
+}
+
 void ExportSettingsDialog::updateMode()
 {
     const auto currentMode = ui->tabWidget->currentWidget() == ui->cameraTab
@@ -405,11 +410,28 @@ void ExportSettingsDialog::updateMode()
     d->setMode(currentMode);
 }
 
-void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& texts)
+void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts,
+    const QStringList& severeAlerts)
 {
-    QLayout* layout = (mode == Mode::Media)
-        ? ui->mediaAlertsLayout
-        : ui->layoutAlertsLayout;
+    switch (mode)
+    {
+        case Mode::Media:
+            updateAlertsInternal(ui->weakMediaAlertsLayout, weakAlerts, false);
+            updateAlertsInternal(ui->severeMediaAlertsLayout, severeAlerts, true);
+            break;
+
+        case Mode::Layout:
+            updateAlertsInternal(ui->weakLayoutAlertsLayout, weakAlerts, false);
+            updateAlertsInternal(ui->severeLayoutAlertsLayout, severeAlerts, true);
+            break;
+    }
+}
+
+void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
+    const QStringList& texts, bool severe)
+{
+    // TODO: #vkutin #gdm Properly separate in the future.
+    using QnMessageBar = QnPromoBar;
 
     const auto newCount = texts.count();
     const auto oldCount = layout->count();
@@ -428,7 +450,7 @@ void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& texts)
     {
         // Add new alert bars.
         for (int i = oldCount; i < newCount; ++i)
-            layout->addWidget(new QnAlertBar());
+            layout->addWidget(severe ? new QnAlertBar() : new QnMessageBar());
     }
     else
     {
