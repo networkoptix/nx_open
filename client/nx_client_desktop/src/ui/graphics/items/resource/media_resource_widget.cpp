@@ -341,7 +341,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
         });
 
-    connect(accessController(), &QnWorkbenchAccessController::userChanged,
+    connect(context, &QnWorkbenchContext::userChanged,
         this, &QnMediaResourceWidget::resetTriggers);
 
     updateDisplay();
