@@ -37,7 +37,9 @@ struct ExportImageOverlayPersistentSettings: public ExportOverlayPersistentSetti
     ExportImageOverlayPersistentSettings();
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
 };
-#define ExportImageOverlayPersistentSettings_Fields (name)(overlayWidth)(opacity)
+#define ExportImageOverlayPersistentSettings_Fields \
+    ExportOverlayPersistentSettings_Fields \
+    (name)(overlayWidth)(opacity)
 
 struct ExportTextOverlayPersistentSettingsBase: public ExportOverlayPersistentSettings
 {
@@ -51,12 +53,15 @@ struct ExportTextOverlayPersistentSettingsBase: public ExportOverlayPersistentSe
 
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
 };
-#define ExportTextOverlayPersistentSettingsBase_Fields (fontSize)(overlayWidth)(indent)
+#define ExportTextOverlayPersistentSettingsBase_Fields \
+    ExportOverlayPersistentSettings_Fields \
+    (fontSize)(overlayWidth)(indent)
 
 struct ExportTextOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
 {
 };
-#define ExportTextOverlayPersistentSettings_Fields (text)
+#define ExportTextOverlayPersistentSettings_Fields \
+    ExportTextOverlayPersistentSettingsBase_Fields (text)
 
 struct ExportBookmarkOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
 {
@@ -64,7 +69,8 @@ struct ExportBookmarkOverlayPersistentSettings: public ExportTextOverlayPersiste
 
     ExportBookmarkOverlayPersistentSettings();
 };
-#define ExportBookmarkOverlayPersistentSettings_Fields (includeDescription)
+#define ExportBookmarkOverlayPersistentSettings_Fields \
+    ExportTextOverlayPersistentSettingsBase_Fields (includeDescription)
 
 struct ExportTimestampOverlayPersistentSettings: public ExportOverlayPersistentSettings
 {
@@ -76,7 +82,9 @@ struct ExportTimestampOverlayPersistentSettings: public ExportOverlayPersistentS
 
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
 };
-#define ExportTimestampOverlayPersistentSettings_Fields (format)(fontSize)
+#define ExportTimestampOverlayPersistentSettings_Fields \
+    ExportOverlayPersistentSettings_Fields \
+    (format)(fontSize)
 
 struct ExportRapidReviewPersistentSettings
 {
@@ -103,7 +111,7 @@ struct ExportMediaPersistentSettings: public ExportMediaSettings
 
     ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type);
 
-    // Update low-level settings from hi-level UI PersistentSettingssettings.
+    // Update low-level settings from hi-level UI persistent settings.
     void updateRuntimeSettings();
 };
 #define ExportMediaPersistentSettings_Fields (applyFilters)(rapidReview)\
@@ -112,7 +120,6 @@ struct ExportMediaPersistentSettings: public ExportMediaSettings
 #define EXPORT_MEDIA_PERSISTENT_TYPES \
     (ExportTimestampOverlayPersistentSettings)\
     (ExportImageOverlayPersistentSettings)\
-    (ExportTextOverlayPersistentSettingsBase)\
     (ExportTextOverlayPersistentSettings)\
     (ExportBookmarkOverlayPersistentSettings)\
     (ExportRapidReviewPersistentSettings)\
@@ -126,7 +133,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(EXPORT_MEDIA_PERSISTENT_TYPES, (json))
 
 Q_DECLARE_METATYPE(nx::client::desktop::ExportTimestampOverlayPersistentSettings)
 Q_DECLARE_METATYPE(nx::client::desktop::ExportImageOverlayPersistentSettings)
-Q_DECLARE_METATYPE(nx::client::desktop::ExportTextOverlayPersistentSettingsBase)
 Q_DECLARE_METATYPE(nx::client::desktop::ExportTextOverlayPersistentSettings)
 Q_DECLARE_METATYPE(nx::client::desktop::ExportBookmarkOverlayPersistentSettings)
 Q_DECLARE_METATYPE(nx::client::desktop::ExportRapidReviewPersistentSettings)
