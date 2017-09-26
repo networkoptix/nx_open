@@ -10,6 +10,7 @@
 #include <transcoding/filters/rotate_image_filter.h>
 #include <transcoding/filters/time_image_filter.h>
 #include <transcoding/filters/paint_image_filter.h>
+#include <transcoding/filters/timestamp_filter.h>
 
 #include <transcoding/transcoder.h>
 
@@ -85,17 +86,24 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
 
     for (const auto overlaySettings: m_settings.overlays)
     {
-        const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(overlaySettings.data());
-        if (!imageFilterSetting)
-            continue;
+        if (const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(
+            overlaySettings.data()))
+        {
+            const auto paintFilter = new nx::transcoding::filters::PaintImageFilter();
+            const auto filter = QnAbstractImageFilterPtr(paintFilter);
+            paintFilter->setImage(imageFilterSetting->image,
+                imageFilterSetting->position,
+                imageFilterSetting->alignment);
 
-        const auto paintFilter = new nx::transcoding::filters::PaintImageFilter();
-        const auto filter = QnAbstractImageFilterPtr(paintFilter);
-        paintFilter->setImage(imageFilterSetting->image,
-            imageFilterSetting->position,
-            imageFilterSetting->alignment);
+            push_back(filter);
+        }
+        else if (const auto timestampFilterSettings = dynamic_cast<TimestampOverlaySettings*>(
+            overlaySettings.data()))
+        {
+            push_back(QnAbstractImageFilterPtr(new nx::transcoding::filters::TimestampFilter(
+                *timestampFilterSettings)));
+        }
 
-        push_back(filter);
     }
 
     //verifying that output resolution is supported by codec

@@ -17,7 +17,6 @@ class PaintImageFilter: public QnAbstractImageFilter
 {
 public:
     PaintImageFilter();
-
     virtual ~PaintImageFilter();
 
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
@@ -34,4 +33,4 @@ private:
 
 } // namespace filters
 } // namespace transcoding
-} // namesapce nx
+} // namespace nx

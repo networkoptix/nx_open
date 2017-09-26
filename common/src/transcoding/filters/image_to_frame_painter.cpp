@@ -97,7 +97,6 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPt
     return frame;
 }
 
-
 void ImageToFramePainter::clearImages()
 {
     m_croppedImage = QImage();
