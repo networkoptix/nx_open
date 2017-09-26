@@ -34,7 +34,7 @@ public:
     }
 
     virtual void findRelayInstancePeerIsListeningOn(
-        const std::string& peerId,
+        const std::string& /*peerId*/,
         RelayInstanceSearchCompletionHandler completionHandler)
     {
         m_pendingRequestHandler = std::move(completionHandler);
