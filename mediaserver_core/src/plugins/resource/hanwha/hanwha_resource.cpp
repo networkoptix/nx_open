@@ -2119,6 +2119,26 @@ bool HanwhaResource::isNvr() const
     return m_isNvr;
 }
 
+QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
+{
+    const auto nxProfileNameParameter = m_cgiParameters
+        .parameter(lit("media/videoprofile/add_update/Name"));
+
+    const auto maxLength = nxProfileNameParameter && nxProfileNameParameter->maxLength() > 0
+        ? nxProfileNameParameter->maxLength()
+        : kHanwhaProfileNameMaxLength;
+        
+    auto suffix = role == Qn::ConnectionRole::CR_LiveVideo
+        ? kHanwhaPrimaryNxProfileSuffix
+        : kHanwhaSecondaryNxProfileSuffix;
+
+    auto appName = QnAppInfo::productNameLong()
+        .mid(0, maxLength - suffix.length())
+        .remove(QRegExp("[^a-zA-Z]"));
+
+    return appName + suffix;
+}
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx

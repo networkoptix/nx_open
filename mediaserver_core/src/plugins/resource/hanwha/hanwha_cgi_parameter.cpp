@@ -176,6 +176,16 @@ void HanwhaCgiParameter::setFormatInfo(const QString& formatInfo)
     m_formatInfo = formatInfo;
 }
 
+int HanwhaCgiParameter::maxLength() const
+{
+    return m_maxLength;
+}
+
+void HanwhaCgiParameter::setMaxLength(int maxLength)
+{
+    m_maxLength = maxLength;
+}
+
 QStringList HanwhaCgiParameter::possibleValues() const
 {
     return m_possibleValues;

@@ -329,9 +329,11 @@ bool HanwhaCgiParameters::parseDataType(
         const auto attributes = reader.attributes();
         const auto formatInfo = attributes.value(kHanwhaFormatInfoAttribute).toString();
         const auto format = attributes.value(kHanwhaFormatAttribute).toString();
+        const auto maxLength = attributes.value(kHanwhaMaxLengthAttribute).toInt();
 
         parameter.setFormatInfo(formatInfo);
         parameter.setFormatString(format);
+        parameter.setMaxLength(maxLength);
 
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 

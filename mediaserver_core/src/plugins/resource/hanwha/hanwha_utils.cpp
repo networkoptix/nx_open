@@ -117,25 +117,6 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
     return profiles;
 }
 
-QString nxProfileName(Qn::ConnectionRole role)
-{
-    auto suffix = role == Qn::ConnectionRole::CR_LiveVideo
-        ? kHanwhaPrimaryNxProfileSuffix
-        : kHanwhaSecondaryNxProfileSuffix;
-
-    auto appName = QnAppInfo::productNameLong()
-        .mid(0, kHanwhaProfileNameMaxLength - suffix.length())
-        .remove(QRegExp("[^a-zA-Z]"));
-
-    return appName + suffix;
-}
-
-bool isNxProfile(const QString& profileName)
-{
-    return profileName == nxProfileName(Qn::ConnectionRole::CR_LiveVideo)
-        || profileName == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo);
-}
-
 template<>
 int fromHanwhaString<int>(const QString& str, bool* outSuccess)
 {

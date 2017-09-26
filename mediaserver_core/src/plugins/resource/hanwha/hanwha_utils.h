@@ -78,10 +78,6 @@ boost::optional<QSize> toQSize(const boost::optional<QString>& str);
 
 HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
 
-QString nxProfileName(Qn::ConnectionRole role);
-
-bool isNxProfile(const QString& profileName);
-
 template<typename T>
 T fromHanwhaString(const QString& str)
 {

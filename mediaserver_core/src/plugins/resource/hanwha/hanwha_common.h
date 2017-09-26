@@ -175,6 +175,7 @@ static const QString kHanwhaTrueValueAttribute = lit("true");
 static const QString kHanwhaFalseValueAttribute = lit("false");
 static const QString kHanwhaFormatInfoAttribute = lit("formatInfo");
 static const QString kHanwhaFormatAttribute = lit("format");
+static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
 

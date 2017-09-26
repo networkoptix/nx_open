@@ -76,6 +76,9 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
+
+    QString nxProfileName(Qn::ConnectionRole role) const;
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
