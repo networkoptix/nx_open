@@ -740,10 +740,12 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ExportVideoAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget | ResourceTarget)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget)
         .text(ContextMenu::tr("Export Video..."))
+        .conditionalText(ContextMenu::tr("Export Bookmark..."),
+            condition::hasArgument(Qn::CameraBookmarkRole))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(condition::hasTimePeriod());
+        .condition(condition::hasTimePeriod() || condition::hasArgument(Qn::CameraBookmarkRole));
 
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)

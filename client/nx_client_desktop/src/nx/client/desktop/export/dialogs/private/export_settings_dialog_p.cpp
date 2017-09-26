@@ -5,6 +5,7 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/single_thumbnail_loader.h>
 #include <client/client_settings.h>
@@ -22,10 +23,11 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-ExportSettingsDialog::Private::Private(bool isBookmark, const QSize& previewSize, QObject* parent):
+ExportSettingsDialog::Private::Private(const QnCameraBookmark& bookmark, const QSize& previewSize, QObject* parent):
     base_type(parent),
     m_previewSize(previewSize),
-    m_isBookmark(isBookmark)
+    m_bookmarkName(bookmark.name),
+    m_bookmarkDescription(bookmark.description)
 {
     m_exportLayoutSettings.mode = ExportLayoutSettings::Mode::Export;
 }
@@ -36,11 +38,11 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::loadSettings()
 {
-    m_exportMediaSettings = m_isBookmark
-        ? qnSettings->exportBookmarkSettings()
-        : qnSettings->exportMediaSettings();
+    m_exportMediaPersistentSettings = m_bookmarkName.isEmpty()
+        ? qnSettings->exportMediaSettings()
+        : qnSettings->exportBookmarkSettings();
 
-    m_exportLayoutSettings = qnSettings->exportLayoutSettings();
+    m_exportLayoutPersistentSettings = qnSettings->exportLayoutSettings();
 
     auto lastExportDir = qnSettings->lastExportDir();
     if (lastExportDir.isEmpty())
@@ -53,7 +55,7 @@ void ExportSettingsDialog::Private::loadSettings()
 
     updateOverlays();
 
-    const auto used = m_exportMediaSettings.usedOverlays;
+    const auto used = m_exportMediaPersistentSettings.usedOverlays;
     for (const auto type: used)
         selectOverlay(type);
 
@@ -66,10 +68,10 @@ void ExportSettingsDialog::Private::saveSettings()
     {
         case Mode::Media:
         {
-            if (m_isBookmark)
-                qnSettings->setExportBookmarkSettings(m_exportMediaSettings);
+            if (m_bookmarkName.isEmpty())
+                qnSettings->setExportMediaSettings(m_exportMediaPersistentSettings);
             else
-                qnSettings->setExportMediaSettings(m_exportMediaSettings);
+                qnSettings->setExportBookmarkSettings(m_exportMediaPersistentSettings);
 
             qnSettings->setLastExportDir(m_exportMediaSettings.fileName.path);
             break;
@@ -77,7 +79,7 @@ void ExportSettingsDialog::Private::saveSettings()
 
         case Mode::Layout:
         {
-            qnSettings->setExportLayoutSettings(m_exportLayoutSettings);
+            qnSettings->setExportLayoutSettings(m_exportLayoutPersistentSettings);
             qnSettings->setLastExportDir(m_exportLayoutSettings.filename.path);
             break;
         }
@@ -86,14 +88,14 @@ void ExportSettingsDialog::Private::saveSettings()
 
 void ExportSettingsDialog::Private::setServerTimeOffsetMs(qint64 offsetMs)
 {
-    m_exportMediaSettings.timestampOverlay.serverTimeDisplayOffsetMs = offsetMs;
+    m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs = offsetMs;
 }
 
 void ExportSettingsDialog::Private::setAvailableTranscodingSettings(
     const nx::core::transcoding::Settings& settings)
 {
     m_availableTranscodingSettings = settings;
-    if (!m_exportMediaSettings.applyFilters)
+    if (!m_exportMediaPersistentSettings.applyFilters)
         return;
 
     updateTranscodingSettings();
@@ -103,7 +105,7 @@ void ExportSettingsDialog::Private::setAvailableTranscodingSettings(
 void ExportSettingsDialog::Private::updateTranscodingSettings()
 {
     // TODO: #vkutin #gdm Separate transcoding settings and overlay settings.
-    if (m_exportMediaSettings.applyFilters)
+    if (m_exportMediaPersistentSettings.applyFilters)
     {
         m_exportMediaSettings.transcodingSettings.rotation =
             m_availableTranscodingSettings.rotation;
@@ -128,10 +130,10 @@ void ExportSettingsDialog::Private::updateTranscodingSettings()
 
 void ExportSettingsDialog::Private::setApplyFilters(bool value)
 {
-    if (m_exportMediaSettings.applyFilters == value)
+    if (m_exportMediaPersistentSettings.applyFilters == value)
         return;
 
-    m_exportMediaSettings.applyFilters = value;
+    m_exportMediaPersistentSettings.applyFilters = value;
     updateTranscodingSettings();
     validateSettings(Mode::Media);
 }
@@ -175,17 +177,17 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     // Set defaults that depend on frame size.
     // TODO: FIXME: #vkutin Are these stored or calculated?
     /*
-    m_exportMediaSettings.timestampOverlay.fontSize = m_fullFrameSize.height() / 20;
+    m_exportMediaPersistentSettings.timestampOverlay.fontSize = m_fullFrameSize.height() / 20;
 
-    m_exportMediaSettings.textOverlay.fontSize = m_fullFrameSize.height() / 30;
-    m_exportMediaSettings.textOverlay.overlayWidth = m_fullFrameSize.width() / 4;
+    m_exportMediaPersistentSettings.textOverlay.fontSize = m_fullFrameSize.height() / 30;
+    m_exportMediaPersistentSettings.textOverlay.overlayWidth = m_fullFrameSize.width() / 4;
 
-    m_exportMediaSettings.bookmarkOverlay.fontSize = m_exportMediaSettings.textOverlay.fontSize;
-    m_exportMediaSettings.bookmarkOverlay.overlayWidth =
-        m_exportMediaSettings.textOverlay.overlayWidth;
+    m_exportMediaPersistentSettings.bookmarkOverlay.fontSize = m_exportMediaPersistentSettings.textOverlay.fontSize;
+    m_exportMediaPersistentSettings.bookmarkOverlay.overlayWidth =
+        m_exportMediaPersistentSettings.textOverlay.overlayWidth;
     */
     // TODO: #vkutin #gdm Required?
-    //emit exportMediaSettingsChanged(m_exportLayoutSettings);
+    //emit exportMediaSettingsChanged(m_exportLayoutPersistentSettings);
 }
 
 void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
@@ -235,13 +237,13 @@ void ExportSettingsDialog::Private::setRapidReviewFrameStep(qint64 frameStepMs)
 const ExportRapidReviewPersistentSettings&
     ExportSettingsDialog::Private::storedRapidReviewSettings() const
 {
-    return m_exportMediaSettings.rapidReview;
+    return m_exportMediaPersistentSettings.rapidReview;
 }
 
 void ExportSettingsDialog::Private::setStoredRapidReviewSettings(
     const ExportRapidReviewPersistentSettings& value)
 {
-    m_exportMediaSettings.rapidReview = value;
+    m_exportMediaPersistentSettings.rapidReview = value;
 }
 
 ExportSettingsDialog::Mode ExportSettingsDialog::Private::mode() const
@@ -289,7 +291,7 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
     if (!overlayWidget || overlayWidget->isHidden())
         return;
 
-    auto settings = m_exportMediaSettings.overlaySettings(type);
+    auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
     NX_EXPECT(settings);
     if (!settings)
         return;
@@ -299,14 +301,30 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
     settings->alignment = Qt::AlignLeft | Qt::AlignTop;
 }
 
-const ExportMediaPersistentSettings& ExportSettingsDialog::Private::exportMediaSettings() const
+ExportMediaSettings ExportSettingsDialog::Private::exportMediaSettings() const
 {
-    return m_exportMediaSettings;
+    auto runtimeSettings = m_exportMediaSettings;
+    m_exportMediaPersistentSettings.updateRuntimeSettings(runtimeSettings);
+    return runtimeSettings;
 }
 
-const ExportLayoutPersistentSettings& ExportSettingsDialog::Private::exportLayoutSettings() const
+const ExportMediaPersistentSettings&
+    ExportSettingsDialog::Private::exportMediaPersistentSettings() const
 {
-    return m_exportLayoutSettings;
+    return m_exportMediaPersistentSettings;
+}
+
+ExportLayoutSettings ExportSettingsDialog::Private::exportLayoutSettings() const
+{
+    auto runtimeSettings = m_exportLayoutSettings;
+    m_exportLayoutPersistentSettings.updateRuntimeSettings(runtimeSettings);
+    return runtimeSettings;
+}
+
+const ExportLayoutPersistentSettings&
+    ExportSettingsDialog::Private::exportLayoutPersistentSettings() const
+{
+    return m_exportLayoutPersistentSettings;
 }
 
 bool ExportSettingsDialog::Private::isOverlayVisible(ExportOverlayType type) const
@@ -325,18 +343,16 @@ void ExportSettingsDialog::Private::selectOverlay(ExportOverlayType type)
         m_selectedOverlay->setBorderVisible(false);
 
     const auto visibilityChanged = newSelection && newSelection->isHidden();
-    m_exportMediaSettings.usedOverlays.removeOne(type);
+    m_exportMediaPersistentSettings.usedOverlays.removeOne(type);
     m_selectedOverlay = newSelection;
 
     if (m_selectedOverlay)
     {
-        m_exportMediaSettings.usedOverlays.push_back(type);
+        m_exportMediaPersistentSettings.usedOverlays.push_back(type);
         m_selectedOverlay->setVisible(true);
         m_selectedOverlay->setBorderVisible(true);
         m_selectedOverlay->raise();
     }
-
-    m_exportMediaSettings.updateRuntimeSettings(); //< TODO: sub-optimal.
 
     emit overlaySelected(type);
 
@@ -351,8 +367,7 @@ void ExportSettingsDialog::Private::hideOverlay(ExportOverlayType type)
         return;
 
     overlayWidget->setHidden(true);
-    m_exportMediaSettings.usedOverlays.removeOne(type);
-    m_exportMediaSettings.updateRuntimeSettings(); //< TODO: sub-optimal.
+    m_exportMediaPersistentSettings.usedOverlays.removeOne(type);
 
     validateSettings(Mode::Media);
 }
@@ -360,29 +375,29 @@ void ExportSettingsDialog::Private::hideOverlay(ExportOverlayType type)
 void ExportSettingsDialog::Private::setTimestampOverlaySettings(
     const ExportTimestampOverlayPersistentSettings& settings)
 {
-    m_exportMediaSettings.timestampOverlay = settings;
+    m_exportMediaPersistentSettings.timestampOverlay = settings;
     updateOverlay(ExportOverlayType::timestamp);
 }
 
 void ExportSettingsDialog::Private::setImageOverlaySettings(
     const ExportImageOverlayPersistentSettings& settings)
 {
-    m_exportMediaSettings.imageOverlay = settings;
+    m_exportMediaPersistentSettings.imageOverlay = settings;
     updateOverlay(ExportOverlayType::image);
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
     const ExportTextOverlayPersistentSettings& settings)
 {
-    m_exportMediaSettings.textOverlay = settings;
+    m_exportMediaPersistentSettings.textOverlay = settings;
     updateOverlay(ExportOverlayType::text);
 }
 
 void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
     const ExportBookmarkOverlayPersistentSettings& settings)
 {
-    m_exportMediaSettings.bookmarkOverlay = settings;
-    // TODO: #vkutin Generate text from bookmark information and passed settings
+    m_exportMediaPersistentSettings.bookmarkOverlay = settings;
+    updateBookmarkText();
     updateOverlay(ExportOverlayType::bookmark);
 }
 
@@ -434,7 +449,7 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
     {
         case ExportOverlayType::timestamp:
         {
-            const auto& data = m_exportMediaSettings.timestampOverlay;
+            const auto& data = m_exportMediaPersistentSettings.timestampOverlay;
             auto font = overlay->font();
             font.setPixelSize(data.fontSize);
             overlay->setFont(font);
@@ -451,7 +466,7 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
 
         case ExportOverlayType::image:
         {
-            const auto& data = m_exportMediaSettings.imageOverlay;
+            const auto& data = m_exportMediaPersistentSettings.imageOverlay;
             overlay->setImage(data.image);
             overlay->setOverlayWidth(data.overlayWidth);
             overlay->setOpacity(data.opacity);
@@ -463,8 +478,8 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
         case ExportOverlayType::text:
         {
             const auto& data = (type == ExportOverlayType::text)
-                ? static_cast<const ExportTextOverlayPersistentSettingsBase&>(m_exportMediaSettings.textOverlay)
-                : m_exportMediaSettings.bookmarkOverlay;
+                ? static_cast<const ExportTextOverlayPersistentSettingsBase&>(m_exportMediaPersistentSettings.textOverlay)
+                : m_exportMediaPersistentSettings.bookmarkOverlay;
 
             overlay->setText(data.text);
             overlay->setTextIndent(data.indent);
@@ -520,6 +535,18 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
     timestampOverlay->setShadow(Qt::black, QPointF(), kShadowBlurRadius);
 }
 
+void ExportSettingsDialog::Private::updateBookmarkText()
+{
+    const auto description = m_exportMediaPersistentSettings.bookmarkOverlay.includeDescription
+        ? m_bookmarkDescription
+        : QString();
+
+    static const auto kBookmarkTemplate = lit("<p><font size=5>%1</font></p>%2");
+    const auto text = kBookmarkTemplate.arg(m_bookmarkName).arg(description);
+    m_exportMediaPersistentSettings.bookmarkOverlay.text = text;
+    overlay(ExportOverlayType::bookmark)->setText(text);
+}
+
 void ExportSettingsDialog::Private::updateTimestampText()
 {
     // TODO: FIXME: #vkutin Change to beginning of selection
@@ -528,7 +555,7 @@ void ExportSettingsDialog::Private::updateTimestampText()
     currentDayTime = currentDayTime.toOffsetFromUtc(currentDayTime.offsetFromUtc());
 
     overlay(ExportOverlayType::timestamp)->setText(currentDayTime.toString(
-        m_exportMediaSettings.timestampOverlay.format));
+        m_exportMediaPersistentSettings.timestampOverlay.format));
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)

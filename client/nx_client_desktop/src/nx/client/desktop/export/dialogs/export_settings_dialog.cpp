@@ -6,6 +6,7 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <ui/common/palette.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -39,28 +40,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     QWidget* parent)
     :
-    ExportSettingsDialog(timePeriod, false /*isBookmark*/, parent)
+    ExportSettingsDialog(timePeriod, QnCameraBookmark(), parent)
 {
-    setMediaResource(widget->resource());
-    d->setServerTimeOffsetMs(widget->context()->instance<QnWorkbenchServerTimeWatcher>()->
-        displayOffset(widget->resource()));
-
-    const auto resource = widget->resource()->toResourcePtr();
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    const auto itemData = widget->item()->data();
-    const auto customAr = widget->resource()->customAspectRatio();
-
-    nx::core::transcoding::Settings available;
-    available.rotation = resource->hasProperty(QnMediaResource::rotationKey())
-        ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
-        : 0;
-    available.aspectRatio = qFuzzyIsNull(customAr)
-        ? QnAspectRatio()
-        : QnAspectRatio::closestStandardRatio(customAr);
-    available.enhancement = itemData.contrastParams;
-    available.dewarping = itemData.dewarpingParams;
-    available.zoomWindow = itemData.zoomRect;
-    d->setAvailableTranscodingSettings(available);
+    setMediaResourceWidget(widget);
 
     // TODO: #vkutin #GDM Put this layout part elsewhere.
 
@@ -74,23 +56,23 @@ ExportSettingsDialog::ExportSettingsDialog(
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
-    const QnMediaResourcePtr& media,
-    const QnTimePeriod& timePeriod,
+    QnMediaResourceWidget* widget,
+    const QnCameraBookmark& bookmark,
     QWidget* parent)
     :
-    ExportSettingsDialog(timePeriod, true /*isBookmark*/, parent)
+    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, parent)
 {
     ui->layoutTab->setVisible(false);
-    setMediaResource(media);
+    setMediaResourceWidget(widget);
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
-    bool isBookmark,
+    const QnCameraBookmark& bookmark,
     QWidget* parent)
     :
     base_type(parent),
-    d(new Private(isBookmark, kPreviewSize)),
+    d(new Private(bookmark, kPreviewSize)),
     ui(new Ui::ExportSettingsDialog)
 {
     ui->setupUi(this);
@@ -146,8 +128,8 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     updateSettingsWidgets();
 
-    ui->bookmarkButton->setVisible(isBookmark);
-    if (!isBookmark) // Just in case...
+    ui->bookmarkButton->setVisible(bookmark.isValid());
+    if (!bookmark.isValid()) // Just in case...
         ui->bookmarkButton->setState(ui::SelectableTextButton::State::deactivated);
 
     ui->speedButton->setState(d->storedRapidReviewSettings().enabled
@@ -398,11 +380,11 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 
 void ExportSettingsDialog::updateSettingsWidgets()
 {
-    ui->exportMediaSettingsPage->setApplyFilters(d->exportMediaSettings().applyFilters);
-    ui->timestampSettingsPage->setData(d->exportMediaSettings().timestampOverlay);
-    ui->bookmarkSettingsPage->setData(d->exportMediaSettings().bookmarkOverlay);
-    ui->imageSettingsPage->setData(d->exportMediaSettings().imageOverlay);
-    ui->textSettingsPage->setData(d->exportMediaSettings().textOverlay);
+    ui->exportMediaSettingsPage->setApplyFilters(d->exportMediaPersistentSettings().applyFilters);
+    ui->timestampSettingsPage->setData(d->exportMediaPersistentSettings().timestampOverlay);
+    ui->bookmarkSettingsPage->setData(d->exportMediaPersistentSettings().bookmarkOverlay);
+    ui->imageSettingsPage->setData(d->exportMediaPersistentSettings().imageOverlay);
+    ui->textSettingsPage->setData(d->exportMediaPersistentSettings().textOverlay);
     ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
     ui->mediaFilenamePanel->setFilename(d->exportMediaSettings().fileName);
     ui->layoutFilenamePanel->setFilename(d->exportLayoutSettings().filename);
@@ -454,9 +436,10 @@ void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& texts)
         setAlertText(i, texts[i]);
 }
 
-void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
+void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 {
-    d->setMediaResource(media);
+    const auto mediaResource = widget->resource();
+    d->setMediaResource(mediaResource);
     ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
     ui->bookmarkSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
@@ -464,6 +447,26 @@ void ExportSettingsDialog::setMediaResource(const QnMediaResourcePtr& media)
     ui->textSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
 
     updateSettingsWidgets();
+
+    d->setServerTimeOffsetMs(
+        widget->context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(mediaResource));
+
+    const auto resource = mediaResource->toResourcePtr();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto itemData = widget->item()->data();
+    const auto customAr = mediaResource->customAspectRatio();
+
+    nx::core::transcoding::Settings available;
+    available.rotation = resource->hasProperty(QnMediaResource::rotationKey())
+        ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
+        : 0;
+    available.aspectRatio = qFuzzyIsNull(customAr)
+        ? QnAspectRatio()
+        : QnAspectRatio::closestStandardRatio(customAr);
+    available.enhancement = itemData.contrastParams;
+    available.dewarping = itemData.dewarpingParams;
+    available.zoomWindow = itemData.zoomRect;
+    d->setAvailableTranscodingSettings(available);
 }
 
 void ExportSettingsDialog::accept()

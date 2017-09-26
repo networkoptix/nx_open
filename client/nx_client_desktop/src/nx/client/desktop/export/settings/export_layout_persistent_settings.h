@@ -7,8 +7,11 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-struct ExportLayoutPersistentSettings: public ExportLayoutSettings
+struct ExportLayoutPersistentSettings
 {
+    bool readOnly = false;
+
+    void updateRuntimeSettings(ExportLayoutSettings& runtimeSettings) const;
 };
 #define ExportLayoutPersistentSettings_Fields (readOnly)
 

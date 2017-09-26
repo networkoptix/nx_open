@@ -35,7 +35,8 @@ class ExportSettingsDialog::Private: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    explicit Private(bool isBookmark, const QSize& previewSize, QObject* parent = nullptr);
+    explicit Private(const QnCameraBookmark& bookmark, const QSize& previewSize,
+        QObject* parent = nullptr);
     virtual ~Private() override;
 
     void loadSettings();
@@ -56,8 +57,11 @@ public:
 
     static FileExtensionList allowedFileExtensions(Mode mode);
 
-    const ExportMediaPersistentSettings& exportMediaSettings() const;
-    const ExportLayoutPersistentSettings& exportLayoutSettings() const;
+    ExportMediaSettings exportMediaSettings() const;
+    const ExportMediaPersistentSettings& exportMediaPersistentSettings() const;
+
+    ExportLayoutSettings exportLayoutSettings() const;
+    const ExportLayoutPersistentSettings& exportLayoutPersistentSettings() const;
 
     void createOverlays(QWidget* overlayContainer);
 
@@ -90,6 +94,7 @@ private:
 
     void updateOverlay(ExportOverlayType type);
     void updateOverlays();
+    void updateBookmarkText();
     void updateTimestampText();
     void overlayPositionChanged(ExportOverlayType type);
     void updateTranscodingSettings();
@@ -98,12 +103,19 @@ private:
 
 private:
     const QSize m_previewSize;
-    const bool m_isBookmark = false;
+    const QString m_bookmarkName;
+    const QString m_bookmarkDescription;
     ExportSettingsDialog::Mode m_mode = Mode::Media;
+
     ExportMediaValidator::Results m_mediaValidationResults;
     ExportMediaValidator::Results m_layoutValidationResults;
-    ExportMediaPersistentSettings m_exportMediaSettings;
-    ExportLayoutPersistentSettings m_exportLayoutSettings;
+
+    ExportMediaSettings m_exportMediaSettings;
+    ExportMediaPersistentSettings m_exportMediaPersistentSettings;
+
+    ExportLayoutSettings m_exportLayoutSettings;
+    ExportLayoutPersistentSettings m_exportLayoutPersistentSettings;
+
     nx::core::transcoding::Settings m_availableTranscodingSettings;
 
     static constexpr size_t overlayCount = size_t(ExportOverlayType::overlayCount);

@@ -8,6 +8,7 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
@@ -184,17 +185,21 @@ void WorkbenchExportHandler::handleExportVideoAction()
     const auto parameters = menu()->currentParameters(sender());
 
     const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
     const auto widget = extractMediaWidget(display(), parameters);
-    const auto mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
-    NX_ASSERT(widget || mediaResource);
-    if (!widget && !mediaResource)
+    NX_ASSERT(widget);
+    if (!widget) //< Media resource widget is mandatory.
+        return;
+
+    NX_ASSERT(period.isValid() || bookmark.isValid());
+    if (!period.isValid() && !bookmark.isValid())
         return;
 
     QScopedPointer<ExportSettingsDialog> dialog;
-    dialog.reset(widget
-        ? new ExportSettingsDialog(widget, period, mainWindow())
-        : new ExportSettingsDialog(mediaResource, period, mainWindow()));
+    dialog.reset(bookmark.isValid()
+        ? new ExportSettingsDialog(widget, bookmark, mainWindow())
+        : new ExportSettingsDialog(widget, period, mainWindow()));
 
     if (dialog->exec() != QDialog::Accepted)
         return;

@@ -96,7 +96,7 @@ struct ExportRapidReviewPersistentSettings
 };
 #define ExportRapidReviewPersistentSettings_Fields (enabled)(speed)
 
-struct ExportMediaPersistentSettings: public ExportMediaSettings
+struct ExportMediaPersistentSettings
 {
     bool applyFilters = false;
 
@@ -110,9 +110,9 @@ struct ExportMediaPersistentSettings: public ExportMediaSettings
     ExportBookmarkOverlayPersistentSettings bookmarkOverlay;
 
     ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type);
+    const ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type) const;
 
-    // Update low-level settings from hi-level UI persistent settings.
-    void updateRuntimeSettings();
+    void updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const;
 };
 #define ExportMediaPersistentSettings_Fields (applyFilters)(rapidReview)\
     (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)

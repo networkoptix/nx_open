@@ -1690,6 +1690,19 @@ ConditionWrapper hasTimePeriod()
         });
 }
 
+ConditionWrapper hasArgument(int key, int targetTypeId)
+{
+    return new CustomBoolCondition(
+        [key, targetTypeId](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+        {
+            if (!parameters.hasArgument(key))
+                return false;
+
+            return targetTypeId < 0 //< If targetTypeId < 0, type check is omitted.
+                || parameters.argument(key).canConvert(targetTypeId);
+        });
+}
+
 ConditionWrapper isEntropixCamera()
 {
     return new CustomBoolCondition(

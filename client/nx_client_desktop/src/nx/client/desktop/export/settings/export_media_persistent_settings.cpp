@@ -134,13 +134,33 @@ ExportOverlayPersistentSettings* ExportMediaPersistentSettings::overlaySettings(
     }
 }
 
-void ExportMediaPersistentSettings::updateRuntimeSettings()
+const ExportOverlayPersistentSettings* ExportMediaPersistentSettings::overlaySettings(
+    ExportOverlayType type) const
 {
-    transcodingSettings.overlays.clear();
-    transcodingSettings.overlays.reserve(usedOverlays.size());
+    switch (type)
+    {
+        case ExportOverlayType::timestamp:
+            return &timestampOverlay;
+        case ExportOverlayType::image:
+            return &imageOverlay;
+        case ExportOverlayType::text:
+            return &textOverlay;
+        case ExportOverlayType::bookmark:
+            return &bookmarkOverlay;
+        default:
+            return nullptr;
+    }
+}
+
+void ExportMediaPersistentSettings::updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const
+{
+    auto& overlays = runtimeSettings.transcodingSettings.overlays;
+
+    overlays.clear();
+    overlays.reserve(usedOverlays.size());
 
     for (const auto type: usedOverlays)
-        transcodingSettings.overlays << overlaySettings(type)->createRuntimeSettings();
+        overlays << overlaySettings(type)->createRuntimeSettings();
 }
 
 ExportRapidReviewPersistentSettings::ExportRapidReviewPersistentSettings(bool enabled, int speed):

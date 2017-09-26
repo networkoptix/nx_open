@@ -10,6 +10,7 @@ namespace Ui { class ExportSettingsDialog; }
 
 class QnMediaResourceWidget;
 class QnTimePeriod;
+struct QnCameraBookmark;
 
 namespace nx {
 namespace client {
@@ -41,9 +42,9 @@ public:
         const QnTimePeriod& timePeriod,
         QWidget* parent = nullptr);
 
-    /** Media mode. Will have only "Single camera" tab. */
-    ExportSettingsDialog(const QnMediaResourcePtr& media,
-        const QnTimePeriod& timePeriod,
+    /** Bookmark mode. Will have only "Single camera" tab. */
+    ExportSettingsDialog(QnMediaResourceWidget* widget,
+        const QnCameraBookmark& bookmark,
         QWidget* parent = nullptr);
 
     virtual ~ExportSettingsDialog() override;
@@ -56,10 +57,11 @@ public:
     virtual void accept() override;
 
 private:
-    ExportSettingsDialog(const QnTimePeriod& timePeriod, bool isBookmark, QWidget* parent = nullptr);
+    ExportSettingsDialog(const QnTimePeriod& timePeriod, const QnCameraBookmark& bookmark,
+        QWidget* parent = nullptr);
 
+    void setMediaResourceWidget(QnMediaResourceWidget* widget);
     void setupSettingsButtons();
-    void setMediaResource(const QnMediaResourcePtr& media);
     void updateSettingsWidgets();
     void updateMode();
     void updateAlerts(Mode mode, const QStringList& texts);
