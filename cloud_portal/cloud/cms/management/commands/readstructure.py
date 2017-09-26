@@ -142,7 +142,7 @@ def read_structure_json(filename):
         if "url" in context_data:
             context.url = context_data["url"]
         context.is_global = is_global
-        context.hidden = False
+        context.hidden = context_data["hidden"] if "hidden" in context_data else False
         context.save()
 
         for record in context_data["values"]:

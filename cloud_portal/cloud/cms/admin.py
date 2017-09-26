@@ -64,6 +64,13 @@ class ContextAdmin(CMSAdmin):
         return format_html('<a class="button" href="{}">edit content</a>',
                            reverse('context_editor', args=[obj.id]))
 
+    def get_queryset(self, request):  # show only users for current customization
+        qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        if not request.user.is_superuser:
+            qs = qs.filter(hidden=False)  ## only superuser sees hidden contexts
+        # additional filter - display only revisions from current customization
+        return qs
+
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
 
