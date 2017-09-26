@@ -163,7 +163,7 @@ def fill_content(customization_name='default', product='cloud_portal',
         else:
             version_id = 0
             incremental = False  # no version - do full update using default values
-        models.customization_cache(customization, force=True)
+        customization_cache(customization, force=True)
 
     if incremental and not changed_context:
         # filter records changed in this version
