@@ -76,7 +76,7 @@ void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& f
     painter.drawPath(path);
     painter.strokePath(path, m_params.outline);
 
-    m_painter.setImage(image, m_params.position, m_params.alignment);
+    m_painter.setImage(image, m_params.offset, m_params.anchors);
 }
 
 detail::ImageToFramePainter& TimestampFilter::Internal::painter()

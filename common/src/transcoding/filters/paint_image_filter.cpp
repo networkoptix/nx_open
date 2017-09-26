@@ -28,10 +28,10 @@ QSize PaintImageFilter::updatedResolution(const QSize& sourceSize)
 
 void PaintImageFilter::setImage(
     const QImage& image,
-    const QPoint& position,
-    Qt::Alignment alignment)
+    const QPoint& offset,
+    Qt::Alignment anchors)
 {
-    m_painter->setImage(image, position, alignment);
+    m_painter->setImage(image, offset, anchors);
 }
 
 } // namespace filters

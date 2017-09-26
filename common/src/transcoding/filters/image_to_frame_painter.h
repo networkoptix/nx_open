@@ -20,8 +20,8 @@ public:
 
     void setImage(
         const QImage& image,
-        const QPoint& position,
-        Qt::Alignment alignment);
+        const QPoint& offset,
+        Qt::Alignment anchors);
 
     void updateSourceSize(const QSize& sourceSize);
 
@@ -36,7 +36,8 @@ private:
     using AlignedBufferPtr = std::shared_ptr<quint8>;
 
     QImage m_image;
-    QPoint m_initialPosition;
+    QPoint m_offset;
+    Qt::Alignment m_anchors;
 
     QSize m_sourceSize;
     QImage m_croppedImage;

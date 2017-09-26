@@ -18,6 +18,32 @@ AlignedBufferPtr createAlignedBuffer(size_t size)
         });
 }
 
+QPoint calculateFinalPosition(
+    const QPoint& offset,
+    Qt::Alignment anchors,
+    const QSize& frameSize)
+{
+    QPoint result = offset;
+    if (anchors.testFlag(Qt::AlignAbsolute))
+        return result;
+
+    if (anchors.testFlag(Qt::AlignHCenter))
+        result.setX(frameSize.width() / 2 + offset.x());
+    else if (anchors.testFlag(Qt::AlignRight) || anchors.testFlag(Qt::AlignTrailing))
+        result.setX(frameSize.width() - offset.x());
+    else
+        result.setX(offset.x()); //< Set left offset by default.
+
+    if (anchors.testFlag(Qt::AlignVCenter))
+        result.setY(frameSize.height() / 2 + offset.y());
+    else if (anchors.testFlag(Qt::AlignBottom))
+        result.setY(frameSize.height() - offset.y());
+    else
+        result.setY(offset.y()); //< Set top offset by default
+
+    return result;
+}
+
 } // namespace
 
 namespace nx {
@@ -35,16 +61,13 @@ ImageToFramePainter::~ImageToFramePainter()
 
 void ImageToFramePainter::setImage(
     const QImage& image,
-    const QPoint& position,
-    Qt::Alignment alignment)
+    const QPoint& offset,
+    Qt::Alignment anchors)
 {
-    const auto correctedPos = QPoint(std::max(position.x(), 0), std::max(position.y(), 0));
-
     m_image = image;
-    m_initialPosition = position;
-    m_bufferOffset = QPoint(
-        qPower2Floor(correctedPos.x(), CL_MEDIA_ALIGNMENT),
-        qPower2Floor(correctedPos.y(), 2));
+
+    m_anchors = anchors;
+    m_offset = offset;
 
     updateTargetImage();
 }
@@ -112,12 +135,21 @@ void ImageToFramePainter::updateTargetImage()
         return;
     }
 
-    const auto initialImageRect = QRect(m_initialPosition, m_image.size());
+    const auto finalPosition = calculateFinalPosition(m_offset, m_anchors, m_sourceSize);
+
+    const auto correctedPos = QPoint(
+        std::max(finalPosition.x(), 0), std::max(finalPosition.y(), 0));
+    m_bufferOffset = QPoint(
+        qPower2Floor(correctedPos.x(), CL_MEDIA_ALIGNMENT),
+        qPower2Floor(correctedPos.y(), 2));
+
+
+    const auto initialImageRect = QRect(finalPosition, m_image.size());
     const auto sourceRect = QRect(QPoint(0, 0), m_sourceSize);
     const auto targetImageRect = sourceRect.intersected(initialImageRect);
     const auto sourceImageRect = QRect(
-        targetImageRect.topLeft() - m_initialPosition,
-        targetImageRect.bottomRight() - m_initialPosition);
+        targetImageRect.topLeft() - finalPosition,
+        targetImageRect.bottomRight() - finalPosition);
 
     if (sourceImageRect.isValid())
     {
