@@ -18,7 +18,9 @@ var AlertSuite = function () {
         changePassWrongCurrent: 'Cannot save password: Current password is incorrect',
         changePassSuccess: 'Your account is successfully saved',
         systemAccessError: 'System info is unavailable: Some unexpected error has happened',
-        systemAccessRestricted: 'System info is unavailable: You don\'t have access to this system.',
+        systemAccessRestricted: 'Failed to access System\nThis link is broken,\n'+
+        'System may be disconnected from Nx Cloud,\nAccess to this System may be revoked,\n'+
+        'or you may be logged into a different account',
         permissionDeleteSuccess: 'Permissions were removed from ',
         permissionAddSuccess: 'New permissions saved'
     };

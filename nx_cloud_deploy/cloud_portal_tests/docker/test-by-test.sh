@@ -1,30 +1,36 @@
 #!/bin/bash  
-grunt testportal:userclean1:default | tee log-userclean1.txt
+grunt testportal:userclean1:default
 kill $(lsof -t -i :4444)
-grunt testportal:userclean2:default | tee log-userclean2.txt
+grunt testportal:userclean2:default
 kill $(lsof -t -i :4444)
-grunt testportal:account1:default | tee log-account1.txt
+grunt testportal:account1:default
 kill $(lsof -t -i :4444)
-grunt testportal:account2:default | tee log-account2.txt
+grunt testportal:account2:default
 kill $(lsof -t -i :4444)
-grunt testportal:login1:default | tee log-login1.txt
+grunt testportal:login1:default
 kill $(lsof -t -i :4444)
-grunt testportal:login2:default | tee log-login2.txt
+grunt testportal:login2:default
 kill $(lsof -t -i :4444)
-grunt testportal:login3:default | tee log-login3.txt
+grunt testportal:login3:default
 kill $(lsof -t -i :4444)
-grunt testportal:register1:default | tee log-register1.txt
+grunt testportal:register1:default
 kill $(lsof -t -i :4444)
-grunt testportal:register2:default | tee log-register2.txt
+grunt testportal:register2:default
 kill $(lsof -t -i :4444)
-grunt testportal:register3:default | tee log-register3.txt
+grunt testportal:register3:default
 kill $(lsof -t -i :4444)
-grunt testportal:restorepass1:default | tee log-restorepass1.txt
+grunt testportal:restorepass1:default
 kill $(lsof -t -i :4444)
-grunt testportal:restorepass2:default | tee log-restorepass2.txt
+grunt testportal:restorepass2:default
 kill $(lsof -t -i :4444)
-grunt testportal:restorepass3:default | tee log-restorepass3.txt
+grunt testportal:restorepass3:default
 kill $(lsof -t -i :4444)
-grunt testportal:systems:default | tee log-systems.txt
+grunt testportal:syspage1:default
 kill $(lsof -t -i :4444)
-grunt testportal:smoke:default | tee log-smoke.txt
+grunt testportal:syspage2:default
+kill $(lsof -t -i :4444)
+grunt testportal:syspage3:default
+kill $(lsof -t -i :4444)
+grunt testportal:systems:default
+kill $(lsof -t -i :4444)
+grunt testportal:smoke:default

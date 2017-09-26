@@ -9,7 +9,7 @@ describe('System suite', function () {
     });
 
     it("has system name, owner and OpenInNx button visible on every system page", function() {
-        p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailAdmin, p.helper.userPassword);
         browser.sleep(2000);
 
         p.systemsList.map(function (elem, index) {
@@ -38,7 +38,7 @@ describe('System suite', function () {
         p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
         var offlineSystems = p.systemsList.filter(function(elem) {
             // First filter systems that are not activated or offline
-            return elem.getInnerHtml().then(function(content) {
+            return elem.getText().then(function(content) {
                 return (p.helper.isSubstr(content, 'not activated') || p.helper.isSubstr(content, 'offline'))
             });
         });
@@ -59,10 +59,9 @@ describe('System suite', function () {
         p.ownedSystem.click();
         p.ownerDeleteButton.click();
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
-        expect(p.disconnectDialog.getText()).toContain('Cloud?\n'+
-        'System will be unavailable through the cloud. The only possible way to connect to the system will '+
-        'be addressing it directly(host address and port). If you don\'t have local administator account,'+
-        ' you will have to create it the first time when you connect to the system.');
+        expect(p.disconnectDialog.getText()).toContain('Disconnect System from Nx Cloud?\n'+
+            'All cloud users will be deleted.\n'+
+            'System will be accessible through local network with local administrator account.');
         p.cancelDisconnectButton.click();
     });
 
@@ -71,7 +70,7 @@ describe('System suite', function () {
         p.ownedSystem.click();
         p.userDeleteButton.click();
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
-        expect(p.disconnectDialog.getText()).toContain('Disconnect System?\n You are about to disconnect this System '+
+        expect(p.disconnectDialog.getText()).toContain('Disconnect System?\nYou are about to disconnect this System '+
             'from your account. You will not be able to access this System anymore. Are you sure?');
         p.cancelDisconnectButton.click();
     });
@@ -124,7 +123,6 @@ describe('System suite', function () {
         // Check that system page is not displayed and login form pops up
 
         //Error alert used to be here. Now it's not
-        //p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
 
         expect(p.systemNameElem.getText()).not.toContain(p.systemName);
         expect(p.loginButton.isPresent()).toBe(true);
@@ -138,8 +136,7 @@ describe('System suite', function () {
 
         //p.helper.getSysPage(p.systemLink);
         browser.get(p.url + p.systemLink);
-        p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
-        expect(p.systemNameElem.isPresent()).toBe(false);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.systemAccessRestricted)
     });
 
     it("should open System page by link not authorized user, and show alert if logs in and has no permission", function() {
@@ -153,8 +150,7 @@ describe('System suite', function () {
         expect(p.loginButton.isPresent()).toBe(true);
         // Fill data into login page
         p.helper.loginFromCurrPage(p.helper.userEmailNoPerm, p.helper.userPassword);
-        p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
-        expect(p.systemNameElem.isPresent()).toBe(false);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.systemAccessRestricted)
     });
 
     it("should display same user data as user provided during registration (stress to cyrillic)", function() {
