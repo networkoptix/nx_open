@@ -17,7 +17,7 @@ exports.config = {
     capabilities: {
         'browserName': 'chrome',
         'chromeOptions': {
-            'args': ['--test-type']
+            'args': ['--test-type','--ignore-certificate-errors']
         }
     },
     seleniumAddress: 'http://localhost:4444/wd/hub',

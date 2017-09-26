@@ -47,7 +47,7 @@ describe('Sharing.', function () {
 
     it ("Sharing link for anonimous - first ask login, then show share dialog", function() {
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
-        expect(p.helper.forms.login.dialoghg .isDisplayed()).toBe(true);
+        expect(p.helper.forms.login.dialog.isDisplayed()).toBe(true);
         //expect(p.permDialog.isDisplayed()).toBe(false);
         p.helper.loginFromCurrPage(p.helper.userEmailOwner);
         expect(p.permDialog.isPresent()).toBe(true);

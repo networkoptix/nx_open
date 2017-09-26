@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=monitoring_simple
-VERSION=1.6
+VERSION=1.7
 BUILD_ARGS=(--build-arg CACHE_DATE=$(date +%s) --build-arg VERSION=${VERSION})
 
 function stage()

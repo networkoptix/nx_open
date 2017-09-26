@@ -27,3 +27,15 @@ ENV VERSION ${VERSION}
 ENV MODULES "${MODULES}"
 
 ENTRYPOINT ["/app/env/bin/nxcloud", "--mode=agent"]
+
+ARG VERSION
+ARG REVISION
+ARG BUILD_DATE
+ARG BUILD_HOST
+ARG BUILD_USER
+LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
+      version="$VERSION" \
+      revision="$REVISION" \
+      build-date="$BUILD_DATE" \
+      build-host="$BUILD_HOST" \
+      build-user="$BUILD_USER"
