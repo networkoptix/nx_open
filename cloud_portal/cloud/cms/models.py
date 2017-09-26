@@ -167,6 +167,19 @@ class Customization(models.Model):
     def languages_list(self):
         return self.languages.values_list('code', flat=True)
 
+    def change_preview_status(self, new_status):
+        self.preview_status = new_status
+        self.save()
+
+    def save(self, *args, **kwargs):
+        need_update = self.preview_status == self.__original_preview_status
+        # if anything changed about customization except preview_status
+
+        super(models.Model, self).save(*args, **kwargs)
+        if need_update:
+            customization_cache(self.name, force=True)  # invalidate cache
+            # TODO: need to update all static right here
+
     def read_global_value(self, record_name):
         product = Product.objects.get(name='cloud_portal')
         global_contexts = product.context_set.filter(is_global=True)
@@ -208,7 +221,6 @@ class ContentVersion(models.Model):
 
     def __str__(self):
         return str(self.id)
-
 
     @property
     def state(self):

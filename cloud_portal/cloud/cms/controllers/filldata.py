@@ -131,8 +131,7 @@ def fill_content(customization_name='default', product='cloud_portal',
                 # if we are just sending version to review - do incremental update
                 if not send_to_review:
                     incremental = False  # otherwise - do full update and change state to review
-                customization.preview_status = Customization.PREVIEW_STATUS.review
-                customization.save()
+                customization.change_preview_status(Customization.PREVIEW_STATUS.review)
             else:
                 if incremental:
                     return  # When previewing awaiting version and state is review - do nothing
@@ -142,8 +141,7 @@ def fill_content(customization_name='default', product='cloud_portal',
                 # When saving draft and state is review - do incremental update
                 # applying all drafted changes and change state to draft
                 # incremental = True
-                customization.preview_status = Customization.PREVIEW_STATUS.draft
-                customization.save()
+                customization.change_preview_status(Customization.PREVIEW_STATUS.draft)
                 changed_context = None  # remove changed context so that we do full incremental update
             else:
                 # When saving draft for context and state is draft - do incremental update only for changed context
