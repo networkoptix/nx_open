@@ -29,7 +29,7 @@ describe('On account page,', function () {
         var dropdownToggle = p.helper.forms.logout.dropdownToggle;
 
         dropdownToggle.click();
-        expect(p.helper.forms.logout.dropdownParent.getText()).toContain(email);
+        expect(p.helper.forms.logout.dropdownParent.getText()).toContain(p.helper.userEmail);
         expect(dropdownMenu.getText()).toContain('Account Settings');
         expect(dropdownMenu.getText()).toContain('Change Password');
         expect(dropdownMenu.getText()).toContain('Log Out');
