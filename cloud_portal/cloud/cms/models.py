@@ -10,9 +10,9 @@ from util.config import get_config
 from django.template.defaultfilters import truncatechars
 
 
-def customization_cache(customization_name, value=None):
+def customization_cache(customization_name, value=None, force=False):
     data = cache.get(customization_name)
-    if not data:
+    if not data or force:
         customization = Customization.objects.get(name=customization_name)
         custom_config = get_config(customization.name)
 
@@ -28,6 +28,7 @@ def customization_cache(customization_name, value=None):
 
     if value:
         return data[value] if value in data else None
+
     return data
 
 
