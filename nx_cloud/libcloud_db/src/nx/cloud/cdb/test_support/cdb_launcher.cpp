@@ -92,6 +92,9 @@ CdbLauncher::~CdbLauncher()
 
 bool CdbLauncher::waitUntilStarted()
 {
+    constexpr const std::chrono::seconds kRequestTimeout = std::chrono::seconds(3);
+    constexpr const int kRetryCount = 3;
+
     if (!utils::test::ModuleLauncher<CloudDbServicePublic>::waitUntilStarted())
         return false;
 
@@ -102,15 +105,22 @@ bool CdbLauncher::waitUntilStarted()
 
     m_connectionFactory->setCloudUrl(lit("http://127.0.0.1:%1").arg(m_port).toStdString());
 
-    //retrieving module info
-    auto connection = m_connectionFactory->createConnection();
-    api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
-        std::bind(
-            &nx::cdb::api::Connection::ping,
-            connection.get(),
-            std::placeholders::_1));
-    return result == api::ResultCode::ok;
+    // Retrieving module info.
+    for (int i = 0; i < kRetryCount; ++i)
+    {
+        auto connection = m_connectionFactory->createConnection();
+        connection->setRequestTimeout(kRequestTimeout);
+        api::ResultCode result = api::ResultCode::ok;
+        std::tie(result, m_moduleInfo) = makeSyncCall<api::ResultCode, api::ModuleInfo>(
+            std::bind(
+                &nx::cdb::api::Connection::ping,
+                connection.get(),
+                std::placeholders::_1));
+        if (result == api::ResultCode::ok)
+            return true;
+    }
+
+    return false;
 }
 
 SocketAddress CdbLauncher::endpoint() const
