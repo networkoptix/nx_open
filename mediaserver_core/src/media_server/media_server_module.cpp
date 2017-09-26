@@ -132,6 +132,7 @@ QnMediaServerModule::QnMediaServerModule(
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
             commonModule()->resourcePool(),
+            nullptr, //< TODO: #ak pass videoCameraPool here. Currently, it is created later.
             StreamingChunkTranscoder::fBeginOfRangeInclusive));
 
     m_streamingChunkCache = store(new StreamingChunkCache(

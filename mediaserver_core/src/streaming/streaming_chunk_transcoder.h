@@ -21,6 +21,7 @@
 class StreamingChunkCacheKey;
 class StreamingChunkTranscoderThread;
 class QnTranscoder;
+class QnVideoCameraPool;
 
 /**
  * Reads source stream (from archive or media cache) and transcodes it to required format.
@@ -57,7 +58,10 @@ public:
     /**
      * @param flags Combination of input flags.
      */
-    StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags);
+    StreamingChunkTranscoder(
+        QnResourcePool* resPool,
+        QnVideoCameraPool* videoCameraPool,
+        Flags flags);
     ~StreamingChunkTranscoder();
 
     /**
@@ -88,17 +92,18 @@ private:
         TranscodeContext();
     };
 
-    bool m_terminated{ false };
+    QnResourcePool* m_resPool = nullptr;
+    QnVideoCameraPool* m_videoCameraPool = nullptr;
     Flags m_flags;
+    bool m_terminated = false;
     QnMutex m_mutex;
     /** map<transcoding id, data>. */
     std::map<int, TranscodeContext> m_scheduledTranscodings;
     /** map<task id, transcoding id>. */
     std::map<quint64, int> m_taskIDToTranscode;
-    QAtomicInt m_transcodeIDSeq{ 1 };
+    QAtomicInt m_transcodeIDSeq = 1;
     std::vector<StreamingChunkTranscoderThread*> m_transcodeThreads;
     DataSourceCache m_dataSourceCache;
-    QnResourcePool* m_resPool{ nullptr };
 
     DataSourceContextPtr prepareDataSourceContext(
         QnSecurityCamResourcePtr cameraResource,

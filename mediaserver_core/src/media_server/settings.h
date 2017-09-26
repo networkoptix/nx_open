@@ -126,7 +126,9 @@ public:
         const QString& rwSettingsPath = QString());
 
     QSettings* roSettings();
+    const QSettings* roSettings() const;
     QSettings* runTimeSettings();
+    const QSettings* runTimeSettings() const;
 
     std::chrono::milliseconds hlsTargetDuration() const;
 

@@ -2479,7 +2479,9 @@ void MediaServerProcess::run()
     std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
         new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
-    std::unique_ptr<QnVideoCameraPool> videoCameraPool( new QnVideoCameraPool(commonModule()) );
+    auto videoCameraPool = std::make_unique<QnVideoCameraPool>(
+        *qnServerModule->settings(),
+        commonModule()->resourcePool());
 
     std::unique_ptr<QnMotionHelper> motionHelper(new QnMotionHelper());
 

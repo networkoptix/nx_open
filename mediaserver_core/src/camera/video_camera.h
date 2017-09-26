@@ -5,27 +5,29 @@
 
 #include <QScopedPointer>
 
-#include <server/server_globals.h>
-
 #include <nx/streaming/abstract_data_consumer.h>
-#include <core/resource/resource_consumer.h>
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <streaming/hls/hls_live_playlist_manager.h>
-#include <core/dataprovider/live_stream_provider.h>
-#include <api/helpers/thumbnail_request_data.h>
 
+#include <api/helpers/thumbnail_request_data.h>
+#include <core/resource/resource_consumer.h>
+#include <core/dataprovider/live_stream_provider.h>
+#include <server/server_globals.h>
+#include <streaming/hls/hls_live_playlist_manager.h>
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
+class MSSettings;
 
 class QnVideoCamera: public QObject, public QnAbstractVideoCamera
 {
     Q_OBJECT
 
 public:
-    QnVideoCamera(const QnResourcePtr& resource);
+    QnVideoCamera(
+        const MSSettings& settings,
+        const QnResourcePtr& resource);
     virtual ~QnVideoCamera();
 
     QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog, bool ensureInitialized = true);
@@ -84,12 +86,15 @@ public:
     */
     bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec );
     QnResourcePtr resource() const { return m_resource; }
+
 private:
     void createReader(QnServer::ChunksCatalog catalog);
     void stop();
+
 private:
     QnMutex m_readersMutex;
     QnMutex m_getReaderMutex;
+    const MSSettings& m_settings;
     QnResourcePtr m_resource;
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;

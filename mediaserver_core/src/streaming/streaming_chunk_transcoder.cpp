@@ -32,10 +32,15 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext():
 {
 }
 
-StreamingChunkTranscoder::StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags):
+StreamingChunkTranscoder::StreamingChunkTranscoder(
+    QnResourcePool* resPool,
+    QnVideoCameraPool* videoCameraPool,
+    Flags flags)
+    :
+    m_resPool(resPool),
+    m_videoCameraPool(videoCameraPool),
     m_flags(flags),
-    m_dataSourceCache(nx::utils::TimerManager::instance()),
-    m_resPool(resPool)
+    m_dataSourceCache(nx::utils::TimerManager::instance())
 {
     m_transcodeThreads.resize(TRANSCODE_THREAD_COUNT);
     for (size_t i = 0; i < m_transcodeThreads.size(); ++i)
@@ -95,7 +100,9 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
     }
 
-    auto camera = qnCameraPool->getVideoCamera(cameraResource);
+    // TODO: #ak Fix it after fixing initialization order.
+    auto videoCameraPool = m_videoCameraPool ? m_videoCameraPool : qnCameraPool;
+    auto camera = videoCameraPool->getVideoCamera(cameraResource);
     NX_ASSERT(camera);
 
     // If requested stream time range is in the future for not futher than MAX_CHUNK_TIMESTAMP_ADVANCE
