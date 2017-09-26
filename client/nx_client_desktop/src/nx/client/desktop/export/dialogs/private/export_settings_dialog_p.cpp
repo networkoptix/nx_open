@@ -262,7 +262,11 @@ ExportSettingsDialog::Mode ExportSettingsDialog::Private::mode() const
 
 void ExportSettingsDialog::Private::setMode(Mode mode)
 {
+    if (m_mode == mode)
+        return;
+
     m_mode = mode;
+    validateSettings(m_mode);
 }
 
 FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode)
