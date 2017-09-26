@@ -85,15 +85,11 @@ void AnalyticsSdkEventWidget::paramsChanged()
         return;
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    auto eventParams = model()->eventParams();
-    eventParams.caption = ui->captionEdit->text();
-    eventParams.description = ui->descriptionEdit->text();
-    eventParams.setAnalyticsEventId(ui->sdkEventTypeComboBox->currentData(
-        AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>());
-    eventParams.setAnalyticsDriverId(ui->sdkEventTypeComboBox->currentData(
-        AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>());
-
-    model()->setEventParams(eventParams);
+    model()->setEventParams(createEventParameters(
+        ui->sdkEventTypeComboBox->currentData(
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>(),
+        ui->sdkEventTypeComboBox->currentData(
+            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>()));
 }
 
 void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
@@ -109,6 +105,17 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
 {
     QnUuid driverId = model()->eventParams().analyticsDriverId();
     QnUuid eventTypeId = model()->eventParams().analyticsEventId();
+
+    if (driverId.isNull() || eventTypeId.isNull())
+    {
+        driverId = ui->sdkEventTypeComboBox->itemData(0,
+            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+
+        eventTypeId = ui->sdkEventTypeComboBox->itemData(0,
+            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>();
+
+        model()->setEventParams(createEventParameters(driverId, eventTypeId));
+    }
 
     int index = 0;
     for (int i = 0; i < ui->sdkEventTypeComboBox->count(); ++i)
@@ -128,7 +135,20 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
         break;
     }
 
-    ui->sdkEventTypeComboBox->setCurrentIndex(index);
+    ui->sdkEventTypeComboBox->setCurrentIndex(index);    
+}
+
+nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(
+    const QnUuid& driverId,
+    const QnUuid& analyticsEventTypeId)
+{
+    auto eventParams = model()->eventParams();
+    eventParams.caption = ui->captionEdit->text();
+    eventParams.description = ui->descriptionEdit->text();
+    eventParams.setAnalyticsEventId(analyticsEventTypeId);
+    eventParams.setAnalyticsDriverId(driverId);
+
+    return eventParams;
 }
 
 } // namespace ui
