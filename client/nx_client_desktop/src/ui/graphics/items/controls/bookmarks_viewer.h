@@ -32,6 +32,8 @@ public:
 
     void setReadOnly(bool readonly);
 
+    void setAllowExport(bool allowExport);
+
     virtual int helpTopicAt(const QPointF &pos) const override;
 
 signals:

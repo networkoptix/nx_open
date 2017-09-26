@@ -228,12 +228,13 @@ namespace
         Q_DECLARE_TR_FUNCTIONS(BookmarkToolTipFrame)
 
     public:
-        BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks
-            , bool showMoreTooltip
-            , const QnBookmarkColors &colors
-            , const EmitTagEventFunc &emitTagEvent
-            , const EmitBookmarkEventFunc &emitBookmarkEvent
-            , QnBookmarksViewer *viewer);
+        BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks,
+            bool showMoreTooltip,
+            bool allowExport,
+            const QnBookmarkColors &colors,
+            const EmitTagEventFunc &emitTagEvent,
+            const EmitBookmarkEventFunc &emitBookmarkEvent,
+            QnBookmarksViewer *viewer);
 
         virtual ~BookmarkToolTipFrame();
 
@@ -259,25 +260,28 @@ namespace
     private:
         const EmitTagEventFunc m_emitTagEvent;
         const EmitBookmarkEventFunc m_emitBookmarkEvent;
+        const bool m_allowExport;
         QnBookmarksViewer * const m_viewer;
         QGraphicsLinearLayout *m_mainLayout;
         QnBookmarksViewer::PosAndBoundsPair m_posOnTimeline;
     };
 
-    BookmarkToolTipFrame::BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks
-        , bool showMoreTooltip
-        , const QnBookmarkColors &colors
-        , const EmitTagEventFunc &emitTagEvent
-        , const EmitBookmarkEventFunc &emitBookmarkEvent
-        , QnBookmarksViewer *viewer)
-
-        : QnToolTipWidget(viewer)
-
-        , m_emitTagEvent(emitTagEvent)
-        , m_emitBookmarkEvent(emitBookmarkEvent)
-        , m_viewer(viewer)
-        , m_mainLayout(new QGraphicsLinearLayout(Qt::Vertical))
-        , m_posOnTimeline()
+    BookmarkToolTipFrame::BookmarkToolTipFrame(
+        const QnCameraBookmarkList &bookmarks,
+        bool showMoreTooltip,
+        bool allowExport,
+        const QnBookmarkColors &colors,
+        const EmitTagEventFunc &emitTagEvent,
+        const EmitBookmarkEventFunc &emitBookmarkEvent,
+        QnBookmarksViewer *viewer)
+        :
+        QnToolTipWidget(viewer),
+        m_emitTagEvent(emitTagEvent),
+        m_emitBookmarkEvent(emitBookmarkEvent),
+        m_allowExport(allowExport),
+        m_viewer(viewer),
+        m_mainLayout(new QGraphicsLinearLayout(Qt::Vertical)),
+        m_posOnTimeline()
     {
         setMaximumWidth(kBookmarkFrameWidth);
         setMinimumWidth(kBookmarkFrameWidth);
@@ -410,7 +414,7 @@ namespace
                 tr("Edit bookmark")));
         }
 
-        if (true) // TODO: #ynikitenkov Check access rights.
+        if (m_allowExport) // TODO: #ynikitenkov Check access rights.
         {
             buttonsLayout->addItem(createButton("bookmark/tooltip/export.png",
                 kBookmarkExportActionEventId,
@@ -574,6 +578,8 @@ public:
 
     void setReadOnly(bool readonly);
 
+    void setAllowExport(bool allowExport);
+
     void setTargetLocation(qint64 location);
 
     void updateOnWindowChange();
@@ -615,6 +621,7 @@ private:
 
     QnCameraBookmarkList m_bookmarks;
     bool m_readonly;
+    bool m_allowExport = false;
 
     typedef QScopedPointer<QTimer> QTimerPtr;
     QTimerPtr m_updateDelayedTimer;
@@ -696,6 +703,11 @@ bool QnBookmarksViewer::Impl::readOnly() const
 void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
 {
     m_readonly = readonly;
+}
+
+void QnBookmarksViewer::Impl::setAllowExport(bool allowExport)
+{
+    m_allowExport = allowExport;
 }
 
 void QnBookmarksViewer::Impl::updateLocationInternal(qint64 location)
@@ -821,7 +833,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
         };
 
         m_tooltip = new BookmarkToolTipFrame(trimmedBookmarks, (bookmarksLeft > 0),
-            m_colors, emitTagEventFunc, emitBookmarkEventFunc, m_owner);
+            m_allowExport, m_colors, emitTagEventFunc, emitBookmarkEventFunc, m_owner);
     }
 
     if (m_tooltip)
@@ -905,6 +917,11 @@ bool QnBookmarksViewer::readOnly() const
 void QnBookmarksViewer::setReadOnly(bool readonly)
 {
     m_impl->setReadOnly(readonly);
+}
+
+void QnBookmarksViewer::setAllowExport(bool allowExport)
+{
+    m_impl->setAllowExport(allowExport);
 }
 
 int QnBookmarksViewer::helpTopicAt(const QPointF &pos) const
