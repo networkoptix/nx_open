@@ -417,7 +417,7 @@ private:
         const AbstractECConnectionPtr& connection,
         PostProcessList* const transactionsPostProcessList);
 
-    ErrorCode removeObjAccessRightsHelper(
+    ErrorCode removeUserAccessRightsHelper(
         const QnUuid& id,
         PostProcessList* const transactionsPostProcessList);
 
@@ -533,6 +533,24 @@ private:
                         transactionsPostProcessList),
                     lit("Remove user child resources failed"));
 
+
+                RUN_AND_CHECK_ERROR(
+                    removeUserAccessRightsHelper(
+                        tran.params.id,
+                        transactionsPostProcessList),
+                    lit("Remove user access rights failed"));
+
+                break;
+            }
+
+            case ApiObjectUserRole:
+            {
+                RUN_AND_CHECK_ERROR(
+                    removeUserAccessRightsHelper(
+                        tran.params.id,
+                        transactionsPostProcessList),
+                    lit("Remove user access rights failed"));
+
                 break;
             }
 
@@ -554,12 +572,6 @@ private:
             default:
                 NX_ASSERT(0);
         }
-
-        RUN_AND_CHECK_ERROR(
-            removeObjAccessRightsHelper(
-                tran.params.id,
-                transactionsPostProcessList),
-            lit("Remove resource access rights failed"));
 
         if(errorCode != ErrorCode::ok)
             return errorCode;
@@ -632,6 +644,8 @@ private:
                 return removeResourceSync(tran, ApiObject_Storage, transactionsPostProcessList);
             case ApiCommand::removeVideowall:
                 return removeResourceSync(tran, ApiObject_Videowall, transactionsPostProcessList);
+            case ApiCommand::removeUserRole:
+                return removeResourceSync(tran, ApiObjectUserRole, transactionsPostProcessList);
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
