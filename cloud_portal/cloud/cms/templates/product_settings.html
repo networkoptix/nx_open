@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls admin_static %}
+{% load static %}
+{% load cms_filters %}
+
+{% block extrahead %}
+    <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
+{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
+    {{ block.super }}
+{% endblock %}
+
+{% block content%}
+
+<form id="productForm" action="{% url 'product_settings' product.id %}"
+      method="post" class="aligned" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-row">
+            {{ field.label_tag }}
+            <div id="{{field.label}}" style="display:inline-block;">
+                {{ field }}
+                
+                {% if field.help_text %}
+                <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if perms.cms.edit_content %}
+    <div class="submit-row">
+        <button class="button" type="submit" name="Upload">Upload</button>
+    </div>
+    {% endif %}
+
+</form>
+{% endblock%}

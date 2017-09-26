@@ -68,7 +68,8 @@ DATA_TYPES = (
     (0, 'Text'),
     (1, 'Image'),
     (2, 'HTML'),
-    (3, 'Long Text')
+    (3, 'Long Text'),
+    (4, 'File')
 )
 
 

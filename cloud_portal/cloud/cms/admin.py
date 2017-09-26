@@ -39,7 +39,16 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(CMSAdmin):
-    list_display = ('name',)
+    list_display = ('context_actions', 'name',)
+    list_display_links = ('name',)
+
+    def context_actions(self, obj):
+        return format_html('<a class="button" href="{}">settings</a>',
+                           reverse('product_settings', args=[obj.id]))
+
+    context_actions.short_description = 'Admin Options'
+    context_actions.allow_tags = True
+
 
 admin.site.register(Product, ProductAdmin)
 

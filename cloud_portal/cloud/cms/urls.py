@@ -7,6 +7,9 @@ urlpatterns = [
     url(r'context_editor/(?P<context>.+?)/',
         context_edit_view, name="context_editor"),
 
+    url(r'product_settings/(?P<product_id>.+?)/',
+        product_settings, name="product_settings"),
+
     url(r'review_version_request/', review_version_request,
         name="review_page_actions"),
 

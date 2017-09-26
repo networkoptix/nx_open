@@ -62,3 +62,9 @@ class CustomContextForm(forms.Form):
                                                    initial=record_value,
                                                    widget=widget_type,
                                                    disabled=disabled)
+
+
+class ProductSettingsForm(forms.Form):
+    zip = forms.FileField(
+        label="Zip archive",
+        help_text="Archive with static files and images for content")
