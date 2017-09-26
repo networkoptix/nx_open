@@ -32,11 +32,11 @@ IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
 def image_meta(filepath, extension):
     with Image.open(filepath) as img:
         width, height = img.size
-    return OrderedDict(width=width, height=height, format=extension)
+    return OrderedDict([('width', width), ('height', height), ('format', extension)])
 
 
 def load_structure(filename, ignore=True):
-    structure = {'product': PRODUCT_NAME, 'contexts': []}
+    structure = OrderedDict([('product', PRODUCT_NAME), ('contexts', [])])
 
     if not ignore:
         try:
