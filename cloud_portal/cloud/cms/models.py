@@ -78,6 +78,9 @@ class DataStructure(models.Model):
         permissions = (
             ("edit_advanced", "Can edit advanced DataStructures"),
         )
+        index_together = [
+            ["context", "order"],
+        ]
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
@@ -88,6 +91,7 @@ class DataStructure(models.Model):
     translatable = models.BooleanField(default=True)
     meta_settings = JSONField(default=dict())
     advanced = models.BooleanField(default=False)
+    order = models.IntegerField(default=100000)
 
     def __str__(self):
         return self.name

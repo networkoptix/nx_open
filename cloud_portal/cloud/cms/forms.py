@@ -11,7 +11,7 @@ class CustomContextForm(forms.Form):
         self.fields.pop('language')
 
     def add_fields(self, context, customization, language, user):
-        data_structures = context.datastructure_set.all()
+        data_structures = context.datastructure_set.order_by('order').all()
 
         if len(data_structures) < 1:
             return

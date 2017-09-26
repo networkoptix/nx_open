@@ -104,12 +104,12 @@ def read_structure_file(filename, product_id, global_strings):
 
     # now, here this is customization-depending file
 
+    # Here we check if there are any unique strings (which are not global)
     strings = [string for string in strings if string not in global_strings]
     context = find_or_add_context_by_file(
         context_name, product_id, bool(language))
 
     for string in strings:
-        # Here we need to check if there are any unique strings (which are not global
         find_or_add_data_stucture(string, None, context.id, bool(language))
 
 
@@ -128,6 +128,7 @@ def read_structure_json(filename):
     product_name = cms_structure['product']
     default_language = customization_cache('default', 'default_language')
     product_id = find_or_add_product(product_name).id
+    order = 0
 
     for context_data in cms_structure['contexts']:
         has_language = context_data["translatable"]
@@ -164,6 +165,8 @@ def read_structure_json(filename):
             data_structure = find_or_add_data_stucture(
                 name, old_name, context.id, has_language)
 
+            data_structure.order = order
+            order += 1
             data_structure.label = label if label else name
             data_structure.advanced = advanced
             if description:

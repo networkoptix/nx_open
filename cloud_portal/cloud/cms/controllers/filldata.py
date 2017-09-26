@@ -52,7 +52,7 @@ def target_file(file_name, customization, language_code, preview):
 
 def process_context_structure(customization, context, content,
                               language, version_id, preview):
-    for datastructure in context.datastructure_set.all():
+    for datastructure in context.datastructure_set.order_by('order').all():
         content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
         if datastructure.type != DataStructure.get_type('Image'):
