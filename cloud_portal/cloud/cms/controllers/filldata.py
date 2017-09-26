@@ -55,7 +55,7 @@ def process_context_structure(customization, context, content,
     for datastructure in context.datastructure_set.order_by('order').all():
         content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
-        if datastructure.type != DataStructure.get_type('Image'):
+        if datastructure.type != DataStructure.DATA_TYPES.image:
             content = content.replace(datastructure.name, content_value)
         elif content_value:
             image_storage = os.path.join('static', customization.name)

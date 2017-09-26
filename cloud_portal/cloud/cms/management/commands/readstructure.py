@@ -174,7 +174,7 @@ def read_structure_json(filename):
             if record_type:
                 data_structure.type = DataStructure.get_type(record_type)
 
-            if type and type == "Image":
+            if data_structure.type == DataStructure.DATA_TYPES.image:
                 data_structure.translatable = "{{language}}" in name
 
                 # this is used to convert source images into b64 strings
@@ -184,7 +184,7 @@ def read_structure_json(filename):
                     with open(file_path, 'r') as file:
                         value = base64.b64encode(file.read())
                 except IOError:
-                    print("No file to read")
+                    print("No file to read", file_path)
 
             data_structure.meta_settings = meta if meta else {}
             data_structure.default = value

@@ -64,15 +64,6 @@ class Context(models.Model):
         return self.name
 
 
-DATA_TYPES = (
-    (0, 'Text'),
-    (1, 'Image'),
-    (2, 'HTML'),
-    (3, 'Long Text'),
-    (4, 'File')
-)
-
-
 class DataStructure(models.Model):
     class Meta:
         permissions = (
@@ -86,7 +77,13 @@ class DataStructure(models.Model):
     description = models.TextField()
     label = models.CharField(max_length=1024)
 
-    type = models.IntegerField(choices=DATA_TYPES, default=0)
+    DATA_TYPES = Choices((0, 'text', 'Text'),
+                         (1, 'image', 'Image'),
+                         (2, 'html', 'HTML'),
+                         (3, 'long_text', 'Long Text'),
+                         (4, 'file', 'File'))
+
+    type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='')
     translatable = models.BooleanField(default=True)
     meta_settings = JSONField(default=dict())
@@ -98,7 +95,8 @@ class DataStructure(models.Model):
 
     @staticmethod
     def get_type(name):
-        return next((type[0] for type in DATA_TYPES if type[1] == name), 0)
+        return next((data_type[0] for data_type in DataStructure.DATA_TYPES if name in data_type),
+                    DataStructure.DATA_TYPES.text)
 
     def find_actual_value(self, customization, language=None, version_id=None):
         content_value = None
@@ -176,10 +174,12 @@ class Customization(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        need_update = self.preview_status == self.__original_preview_status
+        orig = Customization.objects.get(pk=self.pk)
+
+        need_update = self.preview_status == orig.preview_status
         # if anything changed about customization except preview_status
 
-        super(models.Model, self).save(*args, **kwargs)
+        super(Customization, self).save(*args, **kwargs)
         if need_update:
             customization_cache(self.name, force=True)  # invalidate cache
             # TODO: need to update all static right here

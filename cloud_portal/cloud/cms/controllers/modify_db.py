@@ -11,6 +11,7 @@ from .filldata import fill_content
 from api.models import Account
 from cms.models import *
 
+
 def get_context_and_language(request_data, context_id, language_id):
     context = Context.objects.get(id=context_id) if context_id else None
     language = Language.objects.get(id=language_id) if language_id else None
@@ -65,7 +66,7 @@ def save_unrevisioned_records(customization, language, data_structures,
         new_record_value = ""
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
-        if data_structure.get_type('Image') == data_structure.type:
+        if data_structure.type == DataStructure.DATA_TYPES.image:
             # If a file has been uploaded try to save it
             if data_structure_name in request_files:
                 new_record_value, dimensions, invalid_file_type = handle_image_upload(

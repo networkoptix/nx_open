@@ -124,7 +124,7 @@ def read_file(root, directory, filename, context=None):
     structure_type = 'File'
     if extension in IMAGES_EXTENSIONS:
         meta = image_meta(file_path, extension)
-        structure_type = 'Image'
+        structure_type = 'image'
     elif check_customizable(file_path, root, cms_structure):
         return
     find_structure(short_path, context, structure_type, meta=meta)

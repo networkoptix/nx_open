@@ -265,12 +265,10 @@ def product_settings(request, product_id):
                 continue
             structure = structure.first()
 
-            # TODO: if data structure is not FILE or IMAGE - print to log and ignore
-
-            #if DataStructure.get_type("Image") == structure.type:
-            #    print("IMAGE", short_name)
-            #else:
-            #    print("FILE", short_name)
+            # if data structure is not FILE or IMAGE - print to log and ignore
+            if structure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
+                print("NOT FILE", short_name)
+                continue
 
             data = zip_file.read(name)
             data64 = base64.b64encode(data)

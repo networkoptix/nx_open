@@ -41,14 +41,14 @@ class CustomContextForm(forms.Form):
             disabled = data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced'))
 
 
-            if data_structure.type == DataStructure.get_type("Long Text"):
+            if data_structure.type == DataStructure.DATA_TYPES.long_text:
                 widget_type = forms.Textarea
 
-            if data_structure.type == DataStructure.get_type("HTML"):
+            if data_structure.type == DataStructure.DATA_TYPES.html:
                 widget_type = forms.Textarea(
                     attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
-            if data_structure.type == DataStructure.get_type("Image"):
+            if data_structure.type == DataStructure.DATA_TYPES.image:
                 self.fields[data_structure.name] = forms.ImageField(label=ds_name,
                                                         help_text=ds_description,
                                                         initial=record_value,
