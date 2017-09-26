@@ -1,10 +1,12 @@
 #pragma once
 
+#include <functional>
+
 #include <core/resource/resource_fwd.h>
-
 #include <ui/dialogs/common/button_box_dialog.h>
-
 #include <utils/common/connective.h>
+
+#include <nx/client/desktop/common/utils/filesystem.h>
 
 namespace Ui { class ExportSettingsDialog; }
 
@@ -37,14 +39,18 @@ public:
         Layout,
     };
 
+    using IsFilenameValid = std::function<bool (const Filename&)>;
+
     /** Default mode. Will have both "Single camera" and "Layout" tabs. */
     ExportSettingsDialog(QnMediaResourceWidget* widget,
         const QnTimePeriod& timePeriod,
+        IsFilenameValid isFilenameValid,
         QWidget* parent = nullptr);
 
     /** Bookmark mode. Will have only "Single camera" tab. */
     ExportSettingsDialog(QnMediaResourceWidget* widget,
         const QnCameraBookmark& bookmark,
+        IsFilenameValid isFilenameValid,
         QWidget* parent = nullptr);
 
     virtual ~ExportSettingsDialog() override;
@@ -57,7 +63,9 @@ public:
     virtual void accept() override;
 
 private:
-    ExportSettingsDialog(const QnTimePeriod& timePeriod, const QnCameraBookmark& bookmark,
+    ExportSettingsDialog(const QnTimePeriod& timePeriod,
+        const QnCameraBookmark& bookmark,
+        IsFilenameValid isFilenameValid,
         QWidget* parent = nullptr);
 
     void setMediaResourceWidget(QnMediaResourceWidget* widget);
@@ -70,6 +78,7 @@ private:
     class Private;
     QScopedPointer<Private> d;
     QScopedPointer<Ui::ExportSettingsDialog> ui;
+    IsFilenameValid isFilenameValid;
 };
 
 } // namespace desktop

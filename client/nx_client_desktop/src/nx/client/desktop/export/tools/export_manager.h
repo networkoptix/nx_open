@@ -18,6 +18,7 @@ struct ExportProcessInfo
     int rangeEnd = 100;
     int progressValue = 0;
     ExportProcessStatus status = ExportProcessStatus::initial;
+    ExportProcessError error = ExportProcessError::noError;
 };
 
 class ExportProcess: public Connective<QObject>
@@ -33,6 +34,8 @@ public:
 
     virtual void start();
     virtual void stop();
+
+    static QString errorString(ExportProcessError error);
 
 signals:
     void infoChanged(const ExportProcessInfo& info);

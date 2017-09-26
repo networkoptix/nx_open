@@ -200,21 +200,6 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
 
     m_mediaImageProvider->loadAsync();
     validateSettings(Mode::Media);
-
-    // Set defaults that depend on frame size.
-    // TODO: FIXME: #vkutin Are these stored or calculated?
-    /*
-    m_exportMediaPersistentSettings.timestampOverlay.fontSize = m_fullFrameSize.height() / 20;
-
-    m_exportMediaPersistentSettings.textOverlay.fontSize = m_fullFrameSize.height() / 30;
-    m_exportMediaPersistentSettings.textOverlay.overlayWidth = m_fullFrameSize.width() / 4;
-
-    m_exportMediaPersistentSettings.bookmarkOverlay.fontSize = m_exportMediaPersistentSettings.textOverlay.fontSize;
-    m_exportMediaPersistentSettings.bookmarkOverlay.overlayWidth =
-        m_exportMediaPersistentSettings.textOverlay.overlayWidth;
-    */
-    // TODO: #vkutin #gdm Required?
-    //emit exportMediaSettingsChanged(m_exportLayoutPersistentSettings);
 }
 
 void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
@@ -230,9 +215,6 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
     m_layoutImageProvider->loadAsync();
 
     // TODO: #vkutin #GDM Further init.
-
-    // TODO: #vkutin #gdm Required?
-    //validateSettings(Mode::Layout);
 }
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)

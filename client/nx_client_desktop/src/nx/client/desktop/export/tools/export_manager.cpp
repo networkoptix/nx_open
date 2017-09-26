@@ -55,6 +55,7 @@ ExportProcess::ExportProcess(AbstractExportTool* tool, QObject* parent):
         [this](ExportProcessStatus status)
         {
             m_info.status = status;
+            m_info.error = m_tool->lastError();
             emit infoChanged(m_info);
         });
 
@@ -143,6 +144,34 @@ ExportProcessInfo ExportManager::info(const QnUuid& exportProcessId) const
     if (const auto process = d->exportProcesses.value(exportProcessId))
         return process->info();
     return ExportProcessInfo();
+}
+
+QString ExportProcess::errorString(ExportProcessError error)
+{
+    // TODO: #gdm Better texts.
+    switch (error)
+    {
+        case ExportProcessError::noError:
+            return QString();
+
+        case ExportProcessError::unsupportedMedia:
+            return tr("Unsupported media for data export.");
+
+        case ExportProcessError::unsupportedFormat:
+            return tr("Selected format is not supported by FFMPEG library.");
+
+        case ExportProcessError::ffmpegError:
+            return tr("FFMPEG library error.");
+
+        case ExportProcessError::incompatibleCodec:
+            return tr("Video or audio codec is incompatible with selected format.");
+
+        case ExportProcessError::fileAccess:
+            return tr("File write error.");
+    }
+
+    NX_ASSERT(false, Q_FUNC_INFO, "All ExportProcessError codes must be handled.");
+    return QString();
 }
 
 } // namespace desktop

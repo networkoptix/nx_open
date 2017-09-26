@@ -58,6 +58,8 @@ struct Filename
     static Filename parse(const QString& filename);
 
     QString completeFileName() const;
+
+    bool operator==(const Filename& other) const;
 };
 
 } // namespace desktop

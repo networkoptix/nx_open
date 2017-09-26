@@ -177,6 +177,12 @@ QString Filename::completeFileName() const
     return folder.absoluteFilePath(fullName);
 }
 
+bool Filename::operator==(const Filename& other) const
+{
+    const auto cs = utils::AppInfo::isWindows() ? Qt::CaseInsensitive : Qt::CaseSensitive;
+    return completeFileName().compare(other.completeFileName(), cs) == 0;
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

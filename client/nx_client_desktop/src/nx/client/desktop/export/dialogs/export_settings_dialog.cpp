@@ -38,13 +38,12 @@ static constexpr int kNoDataDefaultFontSize = 18;
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnTimePeriod& timePeriod,
+    IsFilenameValid isFilenameValid,
     QWidget* parent)
     :
-    ExportSettingsDialog(timePeriod, QnCameraBookmark(), parent)
+    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFilenameValid, parent)
 {
     setMediaResourceWidget(widget);
-
-    // TODO: #vkutin #GDM Put this layout part elsewhere.
 
     const auto layout = widget->item()->layout()->resource();
     d->setLayout(layout);
@@ -58,9 +57,10 @@ ExportSettingsDialog::ExportSettingsDialog(
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnCameraBookmark& bookmark,
+    IsFilenameValid isFilenameValid,
     QWidget* parent)
     :
-    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, parent)
+    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFilenameValid, parent)
 {
     ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->layoutTab));
     setMediaResourceWidget(widget);
@@ -69,11 +69,13 @@ ExportSettingsDialog::ExportSettingsDialog(
 ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     const QnCameraBookmark& bookmark,
+    IsFilenameValid isFilenameValid,
     QWidget* parent)
     :
     base_type(parent),
     d(new Private(bookmark, kPreviewSize)),
-    ui(new Ui::ExportSettingsDialog)
+    ui(new Ui::ExportSettingsDialog),
+    isFilenameValid(isFilenameValid)
 {
     ui->setupUi(this);
 
@@ -475,10 +477,14 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
 void ExportSettingsDialog::accept()
 {
-    if (d->mode() == Mode::Media && !ui->mediaFilenamePanel->validate())
+    auto filenamePanel = d->mode() == Mode::Media
+        ? ui->mediaFilenamePanel
+        : ui->layoutFilenamePanel;
+
+    if (!filenamePanel->validate())
         return;
 
-    if (d->mode() == Mode::Layout && !ui->layoutFilenamePanel->validate())
+    if (isFilenameValid && !isFilenameValid(filenamePanel->filename()))
         return;
 
     base_type::accept();

@@ -33,6 +33,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -69,9 +70,18 @@ struct WorkbenchExportHandler::Private
     };
     QHash<QnUuid, ExportInfo> runningExports;
 
-    Private():
-        exportManager(new ExportManager())
+    Private(): exportManager(new ExportManager())
     {
+    }
+
+    bool isInRunningExports(const Filename& filename) const
+    {
+        for (const auto& running: runningExports)
+        {
+            if (running.filename == filename)
+                return true;
+        }
+        return false;
     }
 
     static void addResourceToPool(const Filename& filename, QnResourcePool* resourcePool)
@@ -160,24 +170,14 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             QnMessageBox::success(mainWindow(), tr("Export completed"));
             break;
         case ExportProcessStatus::failure:
-            // TODO: #GDM show full error message
-            QnMessageBox::warning(mainWindow(), tr("Export failed"));
+            QnMessageBox::warning(mainWindow(), tr("Export failed"),
+                ExportProcess::errorString(info.error));
             break;
         case ExportProcessStatus::cancelled:
             break;
         default:
             NX_ASSERT(false, "Invalid state");
     }
-
-    /*
-    else if (tool->status() != StreamRecorderError::noError)
-    {
-        QnMessageBox::critical(mainWindow(),
-            tr("Failed to export video"),
-            QnStreamRecorder::errorString(tool->status()));
-     *
-     */
-
 }
 
 void WorkbenchExportHandler::handleExportVideoAction()
@@ -196,10 +196,30 @@ void WorkbenchExportHandler::handleExportVideoAction()
     if (!period.isValid() && !bookmark.isValid())
         return;
 
+    const auto isFilenameValid =
+        [this](const Filename& filename) -> bool
+        {
+            if (d->isInRunningExports(filename))
+            {
+                QnMessageBox::warning(mainWindow(), tr("Cannot write file"),
+                    tr("%1 is in use by another export.", "%1 is file name")
+                        .arg(filename.completeFileName()));
+                return false;
+            }
+
+            if (QFileInfo::exists(filename.completeFileName()))
+            {
+                if (!QnFileMessages::confirmOverwrite(mainWindow(), filename.completeFileName()))
+                    return false;
+            }
+
+            return true;
+        };
+
     QScopedPointer<ExportSettingsDialog> dialog;
     dialog.reset(bookmark.isValid()
-        ? new ExportSettingsDialog(widget, bookmark, mainWindow())
-        : new ExportSettingsDialog(widget, period, mainWindow()));
+        ? new ExportSettingsDialog(widget, bookmark, isFilenameValid, mainWindow())
+        : new ExportSettingsDialog(widget, period, isFilenameValid, mainWindow()));
 
     if (dialog->exec() != QDialog::Accepted)
         return;

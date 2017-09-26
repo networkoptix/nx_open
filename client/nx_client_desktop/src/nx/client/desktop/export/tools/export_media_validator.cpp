@@ -3,6 +3,7 @@
 #include <client/client_module.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
@@ -146,8 +147,12 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     {
         // TODO: #GDM estimated binary size for layout.
         //if (exeFileIsTooBig(settings.layout, durationMs))
-            results.set(int(Result::tooBigExeFile));
+        //    results.set(int(Result::tooBigExeFile));
     }
+
+    // Rough estimation.
+    if (settings.period.durationMs * settings.layout->getItems().size() > 1000 * 60 * 30)
+        results.set(int(Result::tooLong));
 
     return results;
 }
