@@ -33,7 +33,7 @@ exports.config = {
         defaultTimeoutInterval: 120000
     },
 
-    allScriptsTimeout: 8000, // by default it is 11s. See Waiting For Page Sync http://www.protractortest.org/#/timeouts
+    allScriptsTimeout: 30000, // by default it is 11s. See Waiting For Page Sync http://www.protractortest.org/#/timeouts
 
     onPrepare: function () {
         var CustomReporter = require('./custom_reporter.js');
