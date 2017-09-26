@@ -46,8 +46,14 @@ system
 @handle_exceptions
 def get_systems(request):
     user, email, password = authenticate(request)
-    data = cloud_api.System.list(email, password)
-    return api_success(data['systems'])
+    data = cloud_api.System.list(email,password)
+    zap_list = {'systems': []}
+
+    for i in range(data['systems']):
+        zap_list['systems'].append({'id': i, 'system_id': data['systems'][i]})
+
+    return api_success(zap_list)
+    #format needs to be {'systems': [{'id': '1', 'system_id': 'a'}, {'id': '2', 'system_id': 'b'}]}
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
