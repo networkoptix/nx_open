@@ -51,6 +51,10 @@ signals:
     /// Closes tooltip after emittance
     void playBookmark(const QnCameraBookmark &bookmark);
 
+    /// @brief Export bookmark action
+    /// Closes tooltip after emittance
+    void exportBookmarkClicked(const QnCameraBookmark &bookmark);
+
 public slots:
     /// @brief Set abstract location for bookmarks extraction
     /// It can be for example timeline coordinate or a timestamp.

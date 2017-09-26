@@ -56,6 +56,7 @@ namespace
         , kBookmarkEditActionEventId
         , kBookmarkRemoveActionEventId
         , kBookmarkPlayActionEventId
+        , kBookmarkExportActionEventId
     };
 
     enum LabelParamIds
@@ -401,12 +402,23 @@ namespace
             kBookmarkPlayActionEventId,
             tr("Play bookmark from the beginning")));
 
-        if (!m_viewer->readOnly())
+        const bool editable = !m_viewer->readOnly();
+        if (editable)
         {
             buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png",
                 kBookmarkEditActionEventId,
                 tr("Edit bookmark")));
+        }
 
+        if (true) // TODO: #ynikitenkov Check access rights.
+        {
+            buttonsLayout->addItem(createButton("bookmark/tooltip/export.png",
+                kBookmarkExportActionEventId,
+                tr("Export bookmark")));
+        }
+
+        if (editable)
+        {
             enum { kSpacerStretch = 1000 };
             buttonsLayout->addStretch(kSpacerStretch);
             buttonsLayout->addItem(createButton("bookmark/tooltip/delete.png",
@@ -833,29 +845,32 @@ bool QnBookmarksViewer::Impl::event(QEvent *event)
     const int eventType = event->type();
     switch(eventType)
     {
-    case kTagClickedActionEventId:
-    {
-        const auto tagActionevent = static_cast<TagActionEvent*>(event);
-        emit m_owner->tagClicked(tagActionevent->tag());
-        break;
-    }
-    case kBookmarkEditActionEventId:
-    case kBookmarkRemoveActionEventId:
-    case kBookmarkPlayActionEventId:
-    {
-        const auto bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
-        const auto &bookmark = bookmarkActionEvent->bookmark();
+        case kTagClickedActionEventId:
+        {
+            const auto tagActionevent = static_cast<TagActionEvent*>(event);
+            emit m_owner->tagClicked(tagActionevent->tag());
+            break;
+        }
+        case kBookmarkEditActionEventId:
+        case kBookmarkRemoveActionEventId:
+        case kBookmarkPlayActionEventId:
+        case kBookmarkExportActionEventId:
+        {
+            const auto bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
+            const auto &bookmark = bookmarkActionEvent->bookmark();
 
-        if (eventType == kBookmarkEditActionEventId)
-            emit m_owner->editBookmarkClicked(bookmark);
-        else if (eventType == kBookmarkRemoveActionEventId)
-            emit m_owner->removeBookmarkClicked(bookmark);
-        else
-            emit m_owner->playBookmark(bookmark);
-        break;
-    }
-    default:
-        return QObject::event(event);
+            if (eventType == kBookmarkEditActionEventId)
+                emit m_owner->editBookmarkClicked(bookmark);
+            else if (eventType == kBookmarkRemoveActionEventId)
+                emit m_owner->removeBookmarkClicked(bookmark);
+            else if (eventType == kBookmarkExportActionEventId)
+                emit m_owner->exportBookmarkClicked(bookmark);
+            else
+                emit m_owner->playBookmark(bookmark);
+            break;
+        }
+        default:
+            return QObject::event(event);
     }
 
     resetBookmarks();
