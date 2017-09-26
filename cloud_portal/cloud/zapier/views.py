@@ -69,9 +69,12 @@ def nx_action(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def fire_zap_webhook(request):
-    user, email, password = authenticate(request)
-    event = request.data['event']
-    raw_hook_event.send(sender=None, event_name=event, payload={'data': request.data}, user=user)
+    event = request.query_params['system_id'] + ' ' + request.query_params['event']
+    hooks_event = Hook.objects.filter(event=event)
+
+    if hooks_event.exists():
+        for hook in hooks_event:
+            raw_hook_event.send(sender=None, event_name=event, payload={'data': request.data}, user=hook.user)
     return Response({'message': "webhook fired for " + event}, status=200)
 
 
@@ -87,16 +90,19 @@ def ping(request):
 @handle_exceptions
 def create_zap_webhook(request):
     user, email, password = authenticate(request)
-    event = request.data['event']
+    system_id = request.query_params['system_id']
+    event = request.query_params['event']
     target = request.data['target_url']
+    hook_key = system_id + " " + event
 
     user_hooks = Hook.objects.filter(user=user, target=target)
     if user_hooks.exists():
-        return Response({'message': 'There is already a webhook for ' + event}, status=500)
+        return Response({'message': 'There is already a webhook for ' + hook_key, 'link': None}, status=500)
 
+    url_link = '/firehook/?system_id=%s&event=%s' %(system_id, target)
     zap_hook = Hook(user=user, event=event, target=target)
     zap_hook.save()
-    return Response({'message': 'Webhook created for ' + event}, status=200)
+    return Response({'message': 'Webhook created for ' + hook_key, 'link': url_link}, status=200)
 
 
 @api_view(['POST'])
@@ -108,6 +114,6 @@ def remove_zap_webhook(request):
 
     user_hooks = Hook.objects.filter(user=user, target=target)
     if not user_hooks.exists():
-        return Response({'message': "Webhook for " + event + " does not exist"}, status=500)
+        return Response({'message': "Webhook for " + target + " does not exist"}, status=500)
     user_hooks.delete()
-    return Response({'message': 'Webhook deleted for ' + event}, status=200)
+    return Response({'message': 'Webhook deleted for ' + target}, status=200)
