@@ -25,7 +25,8 @@ DIRECTORY = '../../../customization/default/'
 STRUCTURE_FILE = 'vms_structure.json'
 PRODUCT_NAME = 'vms'
 
-IGNORE = ('help',)
+IGNORE_DIRECTORIES = ('help',)
+IGNORE_FORMATS = ('DS_Store')
 IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
 
 
@@ -117,7 +118,8 @@ def read_file(root, directory, filename, context=None):
     file_path = os.path.join(directory, filename)
     short_path = file_path.replace(root, '')
     extension = os.path.splitext(filename)[1][1:]
-
+    if extension in IGNORE_FORMATS:
+        return
     meta = OrderedDict(format=extension)
     structure_type = 'File'
     if extension in IMAGES_EXTENSIONS:
@@ -129,13 +131,13 @@ def read_file(root, directory, filename, context=None):
 
 
 def read_root_directory(directory, structure):
-    root_context = find_context('root', None, structure)
+    root_context = find_context('root', '.', structure)
     for name in os.listdir(directory):
-        if name in IGNORE:
+        if name in IGNORE_DIRECTORIES:
             continue
         context_path = os.path.join(directory, name)
         if os.path.isdir(context_path):
-            context = find_context(name, None, structure)
+            context = find_context(name, name, structure)
             for root, dirs, files in os.walk(context_path):
                 for filename in files:
                     read_file(directory, root, filename, context)

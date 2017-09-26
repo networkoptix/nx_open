@@ -34,6 +34,14 @@ def iterate_cms_files(customization_name, ignore_not_english):
                 yield file
 
 
+def find_or_add_product(name):
+    if Product.objects.filter(name=name).exists():
+        return Product.objects.get(name=name)
+    product = Product(name=name)
+    product.save()
+    return product
+
+
 def find_or_add_context_by_file(file_path, product_id, has_language):
     if Context.objects.filter(file_path=file_path, product_id=product_id).exists():
         return Context.objects.get(file_path=file_path, product_id=product_id)
@@ -114,12 +122,13 @@ def read_structure():
         read_structure_file(file, product_id, global_strings)
 
 
-def read_structure_json():
-    with codecs.open('cms/cms_structure.json', 'r', 'utf-8') as file_descriptor:
+def read_structure_json(filename):
+    with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
     product_name = cms_structure['product']
     default_language = customization_cache('default', 'default_language')
-    product_id = Product.objects.get(name=product_name).id
+    product_id = find_or_add_product(product_name).id
+
     for context_data in cms_structure['contexts']:
         has_language = context_data["translatable"]
         is_global = context_data["is_global"] if "is_global" in context_data else False
@@ -155,7 +164,7 @@ def read_structure_json():
             data_structure = find_or_add_data_stucture(
                 name, old_name, context.id, has_language)
 
-            data_structure.label = label
+            data_structure.label = label if label else name
             data_structure.advanced = advanced
             if description:
                 data_structure.description = description
@@ -168,9 +177,12 @@ def read_structure_json():
                 #this is used to convert source images into b64 strings
                 file_path = os.path.join('static', 'default', 'source', name)
                 file_path = file_path.replace("{{language}}", default_language)
-                with open(file_path, 'r') as file:
-                    value = encoded_string = base64.b64encode(file.read())
-                        
+                try:
+                    with open(file_path, 'r') as file:
+                        value = encoded_string = base64.b64encode(file.read())
+                except IOError:
+                    print("No file to read")
+
             data_structure.meta_settings = meta if meta else {}
             data_structure.default = value
             data_structure.save()
@@ -181,7 +193,11 @@ class Command(BaseCommand):
      the database (contexts, datastructure)'
 
     def handle(self, *args, **options):
-        read_structure_json()
+        read_structure_json('cms/cms_structure.json')
         read_structure()
+        try:
+            read_structure_json('cms/vms_structure.json')
+        except IOError:
+            print("No vms_structure to read")
         self.stdout.write(self.style.SUCCESS(
             'Successfully initiated data structure for CMS'))

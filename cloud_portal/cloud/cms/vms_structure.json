@@ -1,0 +1,1696 @@
+{
+    "product": "vms",
+    "contexts": [
+        {
+            "name": "root",
+            "description": "",
+            "file_path": ".",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "license.properties",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "properties"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "client-dmg",
+            "description": "",
+            "file_path": "client-dmg",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "client-dmg/default.p12",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "p12"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "client-dmg/dmg-folder/.background/dmgBackground.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 600,
+                        "height": 400,
+                        "format": "png"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "customization.cmake",
+            "description": "",
+            "file_path": "customization.cmake",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "%CUSTOMIZATION%",
+                    "value": "",
+                    "description": "set(parent.customization \"%CUSTOMIZATION%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SKIN%",
+                    "value": "",
+                    "description": "set(defaultSkin \"%SKIN%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%VMS_NAME%",
+                    "value": "",
+                    "description": "set(display.product.name \"%VMS_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%MOBILE_NAME%",
+                    "value": "",
+                    "description": "set(display.mobile.name \"%MOBILE_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%COMPANY_NAME%",
+                    "value": "",
+                    "description": "set(company.name \"%COMPANY_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%COMPANY_SHORT_NAME%",
+                    "value": "",
+                    "description": "set(short.company.name \"%COMPANY_SHORT_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%LITE_DEVICE_NAME%",
+                    "value": "",
+                    "description": "set(liteDeviceName \"%LITE_DEVICE_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%CLOUD_NAME%",
+                    "value": "",
+                    "description": "set(cloudName \"%CLOUD_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%CLIENT_PROTOCOL%",
+                    "value": "",
+                    "description": "set(uri.protocol \"%CLIENT_PROTOCOL%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%COMPANY_LINK%",
+                    "value": "",
+                    "description": "set(companyUrl \"%COMPANY_LINK%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%PRODUCT_LINK%",
+                    "value": "",
+                    "description": "set(productUrl \"%PRODUCT_LINK%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SUPPORT_LINK%",
+                    "value": "",
+                    "description": "set(supportUrl \"%SUPPORT_LINK%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SUPPORT_EMAIL%",
+                    "value": "",
+                    "description": "set(supportEmail \"%SUPPORT_EMAIL%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SUPPORT_PHONE%",
+                    "value": "",
+                    "description": "set(supportPhone \"%SUPPORT_PHONE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%LICENCE_EMAIL%",
+                    "value": "",
+                    "description": "set(licenseEmail \"%LICENCE_EMAIL%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%INSTALLER_NAME%",
+                    "value": "",
+                    "description": "set(installer.name \"%INSTALLER_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%ANDROID_PACKAGE_NAME%",
+                    "value": "",
+                    "description": "set(android.packageName \"%ANDROID_PACKAGE_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%ANDROID_OLD_PACKAGE_NAME%",
+                    "value": "",
+                    "description": "set(android.oldPackageName \"%ANDROID_OLD_PACKAGE_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%ANDROID_ALIAS%",
+                    "value": "",
+                    "description": "set(android.alias \"%ANDROID_ALIAS%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%ANDROID_STORE_PASS%",
+                    "value": "",
+                    "description": "set(android.storepass \"%ANDROID_STORE_PASS%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%ANDROID_KEY_PASS%",
+                    "value": "",
+                    "description": "set(android.keypass \"%ANDROID_KEY_PASS%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.upgradeCode \"%UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%CLIENT_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.clientUpgradeCode \"%CLIENT_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SERVER_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.serverUpgradeCode \"%SERVER_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%CLIENT_BUNDLE_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.clientBundleUpgradeCode \"%CLIENT_BUNDLE_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SERVER_BUNDLE_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.serverBundleUpgradeCode \"%SERVER_BUNDLE_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%FULL_BUNDLE_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.fullBundleUpgradeCode \"%FULL_BUNDLE_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%NXTOOL_BUNDLE_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.nxtoolBundleUpgradeCode \"%NXTOOL_BUNDLE_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_BUNDLE_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(customization.axBundleUpgradeCode \"%AX_BUNDLE_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%CUSTOMIZATION_COMPANY_NAME%",
+                    "value": "",
+                    "description": "set(deb.customization.company.name \"%CUSTOMIZATION_COMPANY_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_CLASS_NAME%",
+                    "value": "",
+                    "description": "set(ax.className \"%AX_CLASS_NAME%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_CLASS_ID%",
+                    "value": "",
+                    "description": "set(ax.classId \"%AX_CLASS_ID%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_INTERFACE_ID%",
+                    "value": "",
+                    "description": "set(ax.interfaceId \"%AX_INTERFACE_ID%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_EVENTS_ID%",
+                    "value": "",
+                    "description": "set(ax.eventsId \"%AX_EVENTS_ID%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_TYPE_LIB_ID%",
+                    "value": "",
+                    "description": "set(ax.typeLibId \"%AX_TYPE_LIB_ID%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_APP_ID%",
+                    "value": "",
+                    "description": "set(ax.appId \"%AX_APP_ID%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%AX_UPGRADE_CODE%",
+                    "value": "",
+                    "description": "set(ax.upgradeCode \"%AX_UPGRADE_CODE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%IOS_BUNDLE_IDENTIFIER%",
+                    "value": "",
+                    "description": "set(ios.bundle_identifier \"%IOS_BUNDLE_IDENTIFIER%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%IOS_NEW_BUNDLE_IDENTIFIER%",
+                    "value": "",
+                    "description": "set(ios.new_bundle_identifier \"%IOS_NEW_BUNDLE_IDENTIFIER%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%IOS_GROUP_IDENTIFIER%",
+                    "value": "",
+                    "description": "set(ios.group_identifier \"%IOS_GROUP_IDENTIFIER%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%IOS_SIGN_IDENTIFY%",
+                    "value": "",
+                    "description": "set(ios.sign.identity \"%IOS_SIGN_IDENTIFY%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%IOS_OLD_APPSTORE_ID%",
+                    "value": "",
+                    "description": "set(ios.old_app_appstore_id \"%IOS_OLD_APPSTORE_ID%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%MAC_SKIP_SIGN%",
+                    "value": "",
+                    "description": "set(mac.skip.sign %MAC_SKIP_SIGN%)",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%MAC_SIGN_IDENTITY%",
+                    "value": "",
+                    "description": "set(mac.sign.identity \"%MAC_SIGN_IDENTITY%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%MAC_APP_SIGN_IDENTITY%",
+                    "value": "",
+                    "description": "set(mac.app.sign.identity \"%MAC_APP_SIGN_IDENTITY%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%MAC_PKG_SIGN_IDENTITY%",
+                    "value": "",
+                    "description": "set(mac.pkg.sign.identity \"%MAC_PKG_SIGN_IDENTITY%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%MAC_BUNDLE_IDENTIFIER%",
+                    "value": "",
+                    "description": "set(mac.bundle.identifier \"%MAC_BUNDLE_IDENTIFIER%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%MAC_PROTOCOL_HANDLER_BUNDLE%",
+                    "value": "",
+                    "description": "set(mac.protocol_handler_bundle.identifier \"%MAC_PROTOCOL_HANDLER_BUNDLE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%FREE_LICENSE_IS_TRIAL%",
+                    "value": "",
+                    "description": "set(freeLicenseIsTrial %FREE_LICENSE_IS_TRIAL%)",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%FREE_LICENSE_COUNT%",
+                    "value": "",
+                    "description": "set(freeLicenseCount %FREE_LICENSE_COUNT%)",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%FREE_LICENSE_KEY%",
+                    "value": "",
+                    "description": "set(freeLicenseKey %FREE_LICENSE_KEY%)",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SIGN_PASSWORD%",
+                    "value": "",
+                    "description": "set(sign.password \"%SIGN_PASSWORD%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SIGN_CERTIFICATE%",
+                    "value": "",
+                    "description": "set(sign.cer \"%SIGN_CERTIFICATE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%SIGN_INTERMEDIATE_CERTIFICATE%",
+                    "value": "",
+                    "description": "set(sign.intermediate.cer \"%SIGN_INTERMEDIATE_CERTIFICATE%\")",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%DEFAULT_LANGUAGE%",
+                    "value": "",
+                    "description": "set(defaultTranslation %DEFAULT_LANGUAGE%)",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%ADDITIONAL_LANGUAGES%",
+                    "value": "",
+                    "description": "set(additionalTranslations %ADDITIONAL_LANGUAGES%)",
+                    "type": "Text"
+                }
+            ]
+        },
+        {
+            "name": "icons",
+            "description": "",
+            "file_path": "icons",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "icons/all/favicon.ico",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "ico"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/all/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/all/videowall.ico",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "ico"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-hdpi/ic_launcher.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 72,
+                        "height": 72,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-hdpi/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 384,
+                        "height": 384,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-ldpi/ic_launcher.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 36,
+                        "height": 36,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-ldpi/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 192,
+                        "height": 192,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-mdpi/ic_launcher.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 48,
+                        "height": 48,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-mdpi/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-xhdpi/ic_launcher.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 96,
+                        "height": 96,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-xhdpi/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 512,
+                        "height": 512,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-xxhdpi/ic_launcher.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 144,
+                        "height": 144,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-xxhdpi/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 768,
+                        "height": 768,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-xxxhdpi/ic_launcher.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 192,
+                        "height": 192,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/android/android/res/drawable-xxxhdpi/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 1024,
+                        "height": 1024,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_120x120.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 120,
+                        "height": 120,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_152x152.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 152,
+                        "height": 152,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_167x167.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 167,
+                        "height": 167,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_180x180.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 180,
+                        "height": 180,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_29x29.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 29,
+                        "height": 29,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_58x58.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 58,
+                        "height": 58,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_60x60.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 60,
+                        "height": 60,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_76x76.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 76,
+                        "height": 76,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_80x80.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 80,
+                        "height": 80,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/icon_87x87.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 87,
+                        "height": 87,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/logo@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 512,
+                        "height": 512,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/ios/ios/images/logo@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 768,
+                        "height": 768,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/linux/hicolor/16x16/apps/vmsclient.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 16,
+                        "height": 16,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/linux/hicolor/22x22/apps/vmsclient.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 22,
+                        "height": 22,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/linux/hicolor/24x24/apps/vmsclient.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 24,
+                        "height": 24,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/linux/hicolor/32x32/apps/vmsclient.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 32,
+                        "height": 32,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/linux/hicolor/48x48/apps/vmsclient.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 48,
+                        "height": 48,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/linux/hicolor/scalable/apps/vmsclient.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 128,
+                        "height": 128,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/macosx/logo.icns",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "icns"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/windows/installer_bg.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 349,
+                        "height": 252,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/windows/logo-102x102.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 102,
+                        "height": 102,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/windows/logo-64x64.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 64,
+                        "height": 64,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/windows/nxtool-logo-64x64.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 64,
+                        "height": 64,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "icons/windows/nxtool.ico",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "ico"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "mediaserver_core",
+            "description": "",
+            "file_path": "mediaserver_core",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "mediaserver_core/resources/skin/email_attachments/productLogo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 272,
+                        "height": 80,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mediaserver_core/resources/static/customization/styles-native.css",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "css"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mediaserver_core/resources/static/customization/styles.css",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "css"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mediaserver_core/resources/static/customization/webadmin_logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 142,
+                        "height": 40,
+                        "format": "png"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "mediaserver_core/resources/static/customization/config.js",
+            "description": "",
+            "file_path": "mediaserver_core/resources/static/customization/config.js",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "%VMS_NAME%",
+                    "value": "",
+                    "description": "Config.productName = '%VMS_NAME%';",
+                    "type": "Text"
+                },
+                {
+                    "label": "",
+                    "name": "%CLOUD_NAME%",
+                    "value": "",
+                    "description": "Config.cloud.productName = '%CLOUD_NAME%';",
+                    "type": "Text"
+                }
+            ]
+        },
+        {
+            "name": "mediaserver_core/resources/static/customization/sdkeula.html",
+            "description": "",
+            "file_path": "mediaserver_core/resources/static/customization/sdkeula.html",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "%SDK_EULA%",
+                    "value": "",
+                    "description": "%SDK_EULA%",
+                    "type": "Text"
+                }
+            ]
+        },
+        {
+            "name": "mediaserver_core/resources/static/customization/support.html",
+            "description": "",
+            "file_path": "mediaserver_core/resources/static/customization/support.html",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "%CONTENT%",
+                    "value": "",
+                    "description": "%CONTENT%",
+                    "type": "Text"
+                }
+            ]
+        },
+        {
+            "name": "mobile_client",
+            "description": "",
+            "file_path": "mobile_client",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "mobile_client/key.store",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "store"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/ios/provisioning_profiles/production.mobileprovision",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "mobileprovision"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/ios/provisioning_profiles/testing.mobileprovision",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "mobileprovision"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 24,
+                        "height": 24,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 48,
+                        "height": 48,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 72,
+                        "height": 72,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 96,
+                        "height": 96,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_big.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 64,
+                        "height": 64,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_big@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 128,
+                        "height": 128,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_big@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 192,
+                        "height": 192,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_big@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_disabled.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 24,
+                        "height": 24,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_disabled@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 48,
+                        "height": 48,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_disabled@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 72,
+                        "height": 72,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_disabled@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 96,
+                        "height": 96,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_logged_in.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 24,
+                        "height": 24,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_logged_in@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 48,
+                        "height": 48,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_logged_in@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 72,
+                        "height": 72,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_logged_in@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 96,
+                        "height": 96,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_not_logged_in.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 24,
+                        "height": 24,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_not_logged_in@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 48,
+                        "height": 48,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_not_logged_in@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 72,
+                        "height": 72,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_not_logged_in@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 96,
+                        "height": 96,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_unavailable.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 24,
+                        "height": 24,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_unavailable@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 48,
+                        "height": 48,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_unavailable@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 72,
+                        "height": 72,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/cloud_unavailable@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 96,
+                        "height": 96,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/cursor_handle.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 22,
+                        "height": 26,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/cursor_handle@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 44,
+                        "height": 52,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/cursor_handle@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 66,
+                        "height": 78,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/cursor_handle@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 88,
+                        "height": 104,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_end_handle.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 22,
+                        "height": 22,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_end_handle@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 44,
+                        "height": 44,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_end_handle@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 66,
+                        "height": 66,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_end_handle@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 88,
+                        "height": 88,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_start_handle.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 22,
+                        "height": 22,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_start_handle@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 44,
+                        "height": 44,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_start_handle@3x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 66,
+                        "height": 66,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "mobile_client/resources/images/controls/selection_start_handle@4x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 88,
+                        "height": 88,
+                        "format": "png"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "nx_client_desktop",
+            "description": "",
+            "file_path": "nx_client_desktop",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "nx_client_desktop/resources/skin/background.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 2160,
+                        "height": 2160,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "nx_client_desktop/resources/skin/intro.mkv",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "mkv"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "nx_client_desktop/resources/skin/welcome_page/logo.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 120,
+                        "height": 120,
+                        "format": "png"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "nx_client_desktop/resources/skin/welcome_page/logo@2x.png",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 240,
+                        "height": 240,
+                        "format": "png"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "wixsetup",
+            "description": "",
+            "file_path": "wixsetup",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "wixsetup/License.rtf",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "rtf"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/Binary/eve/eve_logo-493x312.bmp",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 493,
+                        "height": 312,
+                        "format": "bmp"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/Binary/eve/eve_logo-493x58.bmp",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 493,
+                        "height": 58,
+                        "format": "bmp"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/nxtool/logo_493x312.bmp",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 493,
+                        "height": 312,
+                        "format": "bmp"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/nxtool/logo_493x58.bmp",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 493,
+                        "height": 58,
+                        "format": "bmp"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/resources/License.rtf",
+                    "value": "",
+                    "description": "",
+                    "type": "File",
+                    "meta": {
+                        "format": "rtf"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/resources/logo.ico",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 256,
+                        "height": 256,
+                        "format": "ico"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/resources/logo_493x312.bmp",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 493,
+                        "height": 312,
+                        "format": "bmp"
+                    }
+                },
+                {
+                    "label": "",
+                    "name": "wixsetup/resources/logo_493x58.bmp",
+                    "value": "",
+                    "description": "",
+                    "type": "Image",
+                    "meta": {
+                        "width": 493,
+                        "height": 58,
+                        "format": "bmp"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "wixsetup/License.html",
+            "description": "",
+            "file_path": "wixsetup/License.html",
+            "translatable": false,
+            "values": [
+                {
+                    "label": "",
+                    "name": "%CONTENT%",
+                    "value": "",
+                    "description": "%CONTENT%",
+                    "type": "Text"
+                }
+            ]
+        }
+    ]
+}
