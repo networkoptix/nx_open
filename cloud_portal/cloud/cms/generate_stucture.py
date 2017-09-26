@@ -16,33 +16,36 @@ If that directory already has cms_structure.json file - then script should merge
 # 2. create context for each
 import os
 import codecs
+import re
 import json
 from collections import OrderedDict
 from PIL import Image  # get Pillow
 
 DIRECTORY = '../../../customization/default/'
-IGNORE = ('help',)
 STRUCTURE_FILE = 'vms_structure.json'
-IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
 PRODUCT_NAME = 'vms'
 
+IGNORE = ('help',)
+IMAGES_EXTENSIONS = ('ico', 'png', 'bmp', 'icns')
 
-def image_meta(filepath):
+
+def image_meta(filepath, extension):
     with Image.open(filepath) as img:
         width, height = img.size
-    extension = os.path.splitext(filepath)[1]
     return OrderedDict(width=width, height=height, format=extension)
 
 
-def load_structure(filename):
+def load_structure(filename, ignore=True):
     structure = {'product': PRODUCT_NAME, 'contexts': []}
-    try:
-        with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
-            structure = json.load(file_descriptor, object_pairs_hook=OrderedDict)
-    except IOError:
-        print("No existing file, create new one")
-    except ValueError:
-        print("Malformatted file, create new one")
+
+    if not ignore:
+        try:
+            with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
+                structure = json.load(file_descriptor, object_pairs_hook=OrderedDict)
+        except IOError:
+            print("No existing file, create new one")
+        except ValueError:
+            print("Malformatted file, create new one")
     return structure
 
 
@@ -67,47 +70,79 @@ def find_context(name, file_path, structure):
     return context
 
 
-def find_structure(name, context, type, meta):
+def find_structure(name, context, type, meta=None, description=""):
     data_structure = next((structure for structure in context["values"] if structure["name"] == name), None)
     if not data_structure:
         data_structure = OrderedDict([
             ("label", ""),
             ("name", name),
             ("value", ""),
-            ("description", ""),
-            ("type", type),
-            ("meta", meta)
+            ("description", description),
+            ("type", type)
         ])
+        if meta:
+            data_structure.update({"meta":meta})
         context["values"].append(data_structure)
 
     return data_structure
 
 
+def read_cms_strings(filename):
+    pattern = re.compile(r'^(.*(%\S+?%).*)$', re.MULTILINE)
+    # with open(filename, 'r') as file:
+    try:
+        with codecs.open(filename, 'r', 'utf-8') as file:
+            data = file.read()
+            # if 'html' in filename:
+            #    print(data)
+            return re.findall(pattern, data)
+    except UnicodeDecodeError:
+        return None
+
+
+def check_customizable(file_path, root, structure):
+    strings = read_cms_strings(file_path)
+    if not strings:
+        return False
+
+    # customizable file creates new structure
+    context = find_context(file_path.replace(root, ''), file_path.replace(root, ''), structure)
+    for match in strings:
+        find_structure(match[1], context, 'Text', description=match[0])
+
+    return True
+
+
+def read_file(root, filename, context=None):
+    file_path = os.path.join(root, filename)
+    short_path = file_path.replace(DIRECTORY, '')
+    extension = os.path.splitext(filename)[1][1:]
+
+    meta = OrderedDict(format=extension)
+    structure_type = 'File'
+    if extension in IMAGES_EXTENSIONS:
+        meta = image_meta(file_path, extension)
+        structure_type = 'Image'
+    elif check_customizable(file_path, root, cms_structure):
+        return
+    find_structure(short_path, context, structure_type, meta=meta)
+
+
+def read_root_directory(directory, structure):
+    root_context = find_context('root', None, structure)
+    for name in os.listdir(directory):
+        if name in IGNORE:
+            continue
+        context_path = os.path.join(directory, name)
+        if os.path.isdir(context_path):
+            context = find_context(name, None, structure)
+            for root, dirs, files in os.walk(context_path):
+                for filename in files:
+                    read_file(root, filename, context)
+        else:
+            read_file(directory, name, root_context)
+
+
 cms_structure = load_structure(STRUCTURE_FILE)
-
-for name in os.listdir(DIRECTORY):
-    if name in IGNORE:
-        continue
-    context_path = os.path.join(DIRECTORY, name)
-    if os.path.isdir(context_path):
-        context = find_context(name, None, cms_structure)
-
-        for root, dirs, files in os.walk(context_path):
-            # print(root, dirs, files)
-            cutroot = root.replace(DIRECTORY, '')
-            for filename in files:
-                filepath = os.path.join(root, filename)
-                cutpath = os.path.join(cutroot, filename)
-                extension = os.path.splitext(filename)[1][1:]
-
-                meta = OrderedDict(format=extension)
-                type = 'File'
-                if extension in IMAGES_EXTENSIONS:
-                    meta = image_meta(filepath)
-                    type = 'Image'
-
-                find_structure(cutpath, context, type, meta)
-                pass
-
-
+read_root_directory(DIRECTORY, cms_structure)
 save_structure(STRUCTURE_FILE, cms_structure)
