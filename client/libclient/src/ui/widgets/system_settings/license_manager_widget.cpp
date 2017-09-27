@@ -431,7 +431,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     }
 
     const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
-    NX_LOGX(licenseRequestLogString(messageBody, licenseKey), cl_logALWAYS);
+    NX_LOGX(licenseRequestLogString(messageBody, licenseKey), cl_logINFO);
     QNetworkReply *reply = m_httpClient->post(request, messageBody);
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
@@ -616,7 +616,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
     QByteArray replyData = reply->readAll();
 
-    NX_LOGX(licenseReplyLogString(reply, replyData, licenseKey), cl_logALWAYS);
+    NX_LOGX(licenseReplyLogString(reply, replyData, licenseKey), cl_logINFO);
 
     // TODO: #Elric use JSON mapping here.
     // If we can deserialize JSON it means there is an error.
