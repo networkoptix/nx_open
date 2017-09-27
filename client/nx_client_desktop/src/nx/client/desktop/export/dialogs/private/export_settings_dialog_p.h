@@ -102,6 +102,8 @@ private:
     void updateTranscodingSettings();
     QString cachedImageFileName() const;
 
+    void setFrameSize(const QSize& size);
+
     static void generateAlerts(ExportMediaValidator::Results results,
         QStringList& weakAlerts, QStringList& severeAlerts);
 

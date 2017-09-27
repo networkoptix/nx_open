@@ -190,7 +190,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
 
     // TODO: FIXME: #vkutin #gdm Handle non-camera resources.
 
-    m_fullFrameSize = QnCameraThumbnailManager::sizeHintForCamera(camera, QSize());
+    setFrameSize(QnCameraThumbnailManager::sizeHintForCamera(camera, QSize()));
 
     const QPair<qreal, qreal> coefficients(
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
@@ -208,11 +208,34 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_mediaImageProvider.reset(new QnSingleThumbnailLoader(
         camera,
         m_exportMediaSettings.timePeriod.startTimeMs,
-        QnThumbnailRequestData::kDefaultRotation,
-        thumbnailSizeLimit));
+        QnThumbnailRequestData::kDefaultRotation));
+
+    connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,
+        this, &Private::setFrameSize);
 
     m_mediaImageProvider->loadAsync();
     validateSettings(Mode::Media);
+}
+
+void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
+{
+    if (m_fullFrameSize == size)
+        return;
+
+    m_fullFrameSize = size;
+
+    const QPair<qreal, qreal> coefficients(
+        qreal(m_previewSize.width()) / m_fullFrameSize.width(),
+        qreal(m_previewSize.height()) / m_fullFrameSize.height());
+
+    m_overlayScale = qMin(coefficients.first, coefficients.second);
+
+    QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
+
+    for (size_t i = 0; i != overlayCount; ++i)
+        m_overlays[i]->setScale(m_overlayScale);
+
+    updateOverlays();
 }
 
 void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
