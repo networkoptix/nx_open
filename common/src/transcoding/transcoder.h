@@ -16,6 +16,7 @@ extern "C"
 #include "nx/streaming/video_data_packet.h"
 #include "filters/abstract_image_filter.h"
 
+#include <common/common_globals.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 class CLVideoDecoderOutput;
