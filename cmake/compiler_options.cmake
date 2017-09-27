@@ -62,6 +62,7 @@ if(enableAllVendors)
         -DENABLE_ISD
         -DENABLE_PULSE_CAMERA
         -DENABLE_FLIR
+        -DENABLE_ADVANTECH
     )
 endif()
 
