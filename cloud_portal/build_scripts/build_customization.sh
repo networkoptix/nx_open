@@ -119,10 +119,15 @@ dir=../customizations/$CUSTOMIZATION/
 
         echo "Generate language.json"
         pushd $TARGET_DIR/$CUSTOMIZATION/source
-        python ../../../../build_scripts/generate_languages_json.py $LANG
+        python ../../../../build_scripts/generate_language_json.py $LANG
         popd
 
     done
+
+    pushd $TARGET_DIR/$CUSTOMIZATION/source
+    python ../../../../build_scripts/generate_all_languages_json.py
+    popd
+
     rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
     echo "Localization success"
 
