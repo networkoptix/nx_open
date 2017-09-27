@@ -1,5 +1,6 @@
 #include "hanwha_cgi_parameters.h"
 #include "hanwha_common.h"
+#include "hanwha_utils.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -96,9 +97,7 @@ bool HanwhaCgiParameters::parseCgis(QXmlStreamReader& reader)
         if (!parseSubmenus(reader, cgiName))
             return false;
 
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -116,9 +115,7 @@ bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader, const QString&
         if (!parseActions(reader, cgi, submenuName))
             return false;
 
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -149,10 +146,7 @@ bool HanwhaCgiParameters::parseActions(
 
         if (reader.isEndElement())
         {
-            reader.readNextStartElement();
-            if (reader.atEnd())
-                return !reader.hasError();
-
+            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
             continue;
         }
 
@@ -161,9 +155,8 @@ bool HanwhaCgiParameters::parseActions(
             if (!parseParameters(reader, cgi, submenu, actionName))
                 return false;
         }
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -206,10 +199,7 @@ bool HanwhaCgiParameters::parseParameters(
         
         if (reader.isEndElement())
         {
-            reader.readNextStartElement();
-            if (reader.atEnd())
-                return !reader.hasError();
-
+            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
             continue;
         }
 
@@ -219,9 +209,7 @@ bool HanwhaCgiParameters::parseParameters(
                 return false;
         }
         
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -237,9 +225,7 @@ bool HanwhaCgiParameters::parseDataType(
     if (reader.name() != kHanwhaDataTypeNodeName)
         return false;
 
-    reader.readNextStartElement();
-    if (reader.atEnd())
-        return !reader.hasError();
+    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
 
     if (reader.name() == kHanwhaDataTypeNodeName)
     {
@@ -282,9 +268,7 @@ bool HanwhaCgiParameters::parseDataType(
 
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
     else if (reader.name() == kHanwhaFloatNodeName)
     {
@@ -302,9 +286,7 @@ bool HanwhaCgiParameters::parseDataType(
 
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
     else if (reader.name() == kHanwhaBooleanNodeName)
     {
@@ -318,9 +300,7 @@ bool HanwhaCgiParameters::parseDataType(
         
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
     else if (reader.name() == kHanwhaStringNodeName)
     {
@@ -337,15 +317,11 @@ bool HanwhaCgiParameters::parseDataType(
 
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
-        if (reader.atEnd())
-            return !reader.hasError();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
-    reader.readNextStartElement();
-    reader.readNextStartElement();
-    if (reader.atEnd())
-        return !reader.hasError();
+    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
 
     return true;
 }

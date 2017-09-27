@@ -27,6 +27,13 @@ inline bool operator<(const QSize& lhs, const QSize& rhs)
     return lhs.width() * lhs.height() < rhs.width() * rhs.height();
 }
 
+#define READ_NEXT_AND_RETURN_IF_NEEDED(reader)\
+{\
+    (reader).readNextStartElement();\
+    if ((reader).atEnd())\
+        return !(reader).hasError();\
+}
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
