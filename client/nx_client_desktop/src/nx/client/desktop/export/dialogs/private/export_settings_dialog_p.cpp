@@ -1,6 +1,5 @@
 #include "export_settings_dialog_p.h"
 
-#include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
@@ -82,7 +81,7 @@ void ExportSettingsDialog::Private::loadSettings()
     auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
     if (!imageOverlay.name.trimmed().isEmpty())
     {
-        const QImage cachedImage(imageCacheDir().absoluteFilePath(cachedImageFileName()));
+        const QImage cachedImage(cachedImageFileName());
         if (cachedImage.isNull())
             imageOverlay.name = QString();
         else
@@ -432,7 +431,7 @@ void ExportSettingsDialog::Private::setImageOverlaySettings(
     if (settings.image.isNull() || settings.name.trimmed().isEmpty())
         return;
 
-    settings.image.save(imageCacheDir().absoluteFilePath(cachedImageFileName()), "png");
+    settings.image.save(cachedImageFileName(), "png");
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
@@ -725,9 +724,11 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
 
 QString ExportSettingsDialog::Private::cachedImageFileName() const
 {
-    return m_bookmarkName.isEmpty()
+    const auto baseName = m_bookmarkName.isEmpty()
         ? kCachedMediaOverlayImageName
         : kCachedBookmarkOverlayImageName;
+
+    return imageCacheDir().absoluteFilePath(baseName);
 }
 
 QDir ExportSettingsDialog::Private::imageCacheDir()
