@@ -3,6 +3,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QStandardPaths>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -15,12 +16,15 @@
 #include <utils/common/synctime.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
-
+#include <nx/utils/file_system.h>
 #include <nx/fusion/serialization/json_functions.h>
-
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 
 namespace {
+
+static const auto kImageCacheDirName = lit("export_image_overlays");
+static const auto kCachedMediaOverlayImageName = lit("export_media_image_overlay.png");
+static const auto kCachedBookmarkOverlayImageName = lit("export_bookmark_image_overlay.png");
 
 struct Position
 {
@@ -74,6 +78,16 @@ void ExportSettingsDialog::Private::loadSettings()
 
     m_exportMediaSettings.fileName.path = lastExportDir;
     m_exportLayoutSettings.filename.path = lastExportDir;
+
+    auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
+    if (!imageOverlay.name.trimmed().isEmpty())
+    {
+        const QImage cachedImage(imageCacheDir().absoluteFilePath(cachedImageFileName()));
+        if (cachedImage.isNull())
+            imageOverlay.name = QString();
+        else
+            imageOverlay.image = cachedImage;
+    }
 
     updateOverlays();
 
@@ -414,6 +428,11 @@ void ExportSettingsDialog::Private::setImageOverlaySettings(
 {
     m_exportMediaPersistentSettings.imageOverlay = settings;
     updateOverlay(ExportOverlayType::image);
+
+    if (settings.image.isNull() || settings.name.trimmed().isEmpty())
+        return;
+
+    settings.image.save(imageCacheDir().absoluteFilePath(cachedImageFileName()), "png");
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
@@ -702,6 +721,24 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
             list << alertText(code);
         }
     }
+}
+
+QString ExportSettingsDialog::Private::cachedImageFileName() const
+{
+    return m_bookmarkName.isEmpty()
+        ? kCachedMediaOverlayImageName
+        : kCachedBookmarkOverlayImageName;
+}
+
+QDir ExportSettingsDialog::Private::imageCacheDir()
+{
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
+        + QDir::separator() + kImageCacheDirName);
+
+    if (!nx::utils::file_system::ensureDir(dir))
+        return QDir();
+
+    return dir;
 }
 
 } // namespace desktop

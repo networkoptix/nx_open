@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+#include <QtCore/QDir>
 
 #include <core/resource/resource_fwd.h>
 
@@ -99,9 +100,12 @@ private:
     void updateTimestampText();
     void overlayPositionChanged(ExportOverlayType type);
     void updateTranscodingSettings();
+    QString cachedImageFileName() const;
 
     static void generateAlerts(ExportMediaValidator::Results results,
         QStringList& weakAlerts, QStringList& severeAlerts);
+
+    static QDir imageCacheDir();
 
 private:
     const QSize m_previewSize;
