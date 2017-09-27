@@ -25,6 +25,11 @@
 namespace ec2
 {
 
+namespace db
+{
+    bool migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManager* db);
+}
+
 namespace aux {
 bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin);
 }
@@ -80,7 +85,7 @@ namespace detail
         friend class ::ec2::QnDbManagerAccess;
         friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id);
         friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id);
-
+        friend bool ::ec2::db::migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManager* db);
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -633,6 +638,7 @@ namespace detail
 
         /** Raise flags if db is not just created. Always returns true. */
         bool resyncIfNeeded(ResyncFlags flags);
+        bool rebuildUserAccessRightsTransactions();
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

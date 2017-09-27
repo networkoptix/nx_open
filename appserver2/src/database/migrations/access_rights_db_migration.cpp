@@ -17,90 +17,6 @@ using namespace nx::utils::db;
 namespace ec2 {
 namespace db {
 
-bool cleanupOldData(const QSqlDatabase& database)
-{
-    // migrate transaction log
-    QSqlQuery query(database);
-    query.setForwardOnly(true);
-    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return false;
-    }
-
-    QSqlQuery delQuery(database);
-    delQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
-
-    while (query.next()) 
-    {
-        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
-        QnAbstractTransaction abstractTran;
-        QByteArray srcData = query.value(1).toByteArray();
-        QnUbjsonReader<QByteArray> stream(&srcData);
-        if (!QnUbjson::deserialize(&stream, &abstractTran)) 
-        {
-            NX_WARNING("migrateAccessRightsToUbjsonFormat", "Can' deserialize transaction from transaction log");
-            return false;
-        }
-        if (abstractTran.command == ApiCommand::removeAccessRights
-            || abstractTran.command == ApiCommand::setAccessRights)
-        {
-            delQuery.addBindValue(QnSql::serialized_field(tranGuid));
-            if (!delQuery.exec())
-            {
-                NX_WARNING("migrateAccessRightsToUbjsonFormat", query.lastError().text());
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool addNewRemoveUserAccessRights(const QSqlDatabase& database, detail::QnDbManager* db)
-{
-    // migrate transaction log
-    QSqlQuery query(database);
-    query.setForwardOnly(true);
-    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return false;
-    }
-
-    while (query.next())
-    {
-        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
-        QnAbstractTransaction abstractTran;
-        QByteArray srcData = query.value(1).toByteArray();
-        QnUbjsonReader<QByteArray> stream(&srcData);
-        if (!QnUbjson::deserialize(&stream, &abstractTran))
-        {
-            NX_WARNING("migrateAccessRightsToUbjsonFormat", "Can't deserialize transaction from transaction log");
-            return false;
-        }
-        if (abstractTran.command != ApiCommand::removeUser)
-            continue;
-        ApiIdData data;
-        if (!QnUbjson::deserialize(&stream, &data))
-        {
-            NX_WARNING("migrateAccessRightsToUbjsonFormat", "Can't deserialize transaction from transaction log");
-            return false;
-        }
-
-        QnTransaction<ApiIdData> transaction(
-            ApiCommand::removeAccessRights,
-            db->commonModule()->moduleGUID(),
-            data);
-        db->transactionLog()->fillPersistentInfo(transaction);
-        if (db->transactionLog()->saveTransaction(transaction) != ErrorCode::ok)
-            return false;
-
-    }
-
-    return true;
-}
-
 bool loadOldAccessRightList(const QSqlDatabase& database, ApiAccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(database);
@@ -142,23 +58,13 @@ bool loadOldAccessRightList(const QSqlDatabase& database, ApiAccessRightsDataLis
 
 bool migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManager* db)
 {
-    if (!cleanupOldData(database))
-        return false;
-    if (!addNewRemoveUserAccessRights(database, db))
-        return false;
-
     ApiAccessRightsDataList accessRightsList;
     if (!loadOldAccessRightList(database, accessRightsList))
         return false;
 
     for (const auto& data: accessRightsList)
     {
-        QnTransaction<ApiAccessRightsData> tran(
-            ApiCommand::setAccessRights,
-            db->commonModule()->moduleGUID(),
-            data);
-        db->transactionLog()->fillPersistentInfo(tran);
-        if (db->executeTransactionNoLock(tran, QnUbjson::serialized(tran)) != ErrorCode::ok)
+        if (db->setAccessRights(data) != ErrorCode::ok)
             return false;
     }
 

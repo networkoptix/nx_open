@@ -534,6 +534,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
             
             if (m_resyncFlags.testFlag(ResyncUserAccessRights))
             {
+                if (!rebuildUserAccessRightsTransactions())
+                    return false;
                 if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
                     return false;
             }
@@ -4466,6 +4468,75 @@ bool QnDbManager::updateId()
 QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 {
     return &m_tran;
+}
+
+bool QnDbManager::rebuildUserAccessRightsTransactions()
+{
+    // migrate transaction log
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+
+    QVector<QnUuid> recordsToDelete;
+    QVector<ApiIdData> recordsToAdd;
+    while (query.next())
+    {
+        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        QnAbstractTransaction abstractTran;
+        QByteArray srcData = query.value(1).toByteArray();
+        QnUbjsonReader<QByteArray> stream(&srcData);
+        if (!QnUbjson::deserialize(&stream, &abstractTran))
+        {
+            NX_WARNING(this, "Can't deserialize transaction from transaction log");
+            return false;
+        }
+
+        if (abstractTran.command == ApiCommand::removeAccessRights 
+            || abstractTran.command == ApiCommand::setAccessRights)
+        {
+            recordsToDelete << tranGuid;
+        }
+        else if (abstractTran.command == ApiCommand::removeUser 
+            || abstractTran.command == ApiCommand::removeUserRole)
+        {
+            ApiIdData data;
+            if (!QnUbjson::deserialize(&stream, &data))
+            {
+                NX_WARNING("migrateAccessRightsToUbjsonFormat", "Can't deserialize transaction from transaction log");
+                return false;
+            }
+            recordsToAdd << data;
+        }
+    }
+    
+    for (const auto& data: recordsToDelete)
+    {
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
+        delQuery.addBindValue(QnSql::serialized_field(data));
+        if (!delQuery.exec())
+        {
+            NX_WARNING("migrateAccessRightsToUbjsonFormat", query.lastError().text());
+            return false;
+        }
+    }
+
+    for (const auto& data: recordsToAdd)
+    {
+        QnTransaction<ApiIdData> transaction(
+            ApiCommand::removeAccessRights,
+            commonModule()->moduleGUID(),
+            data);
+        transactionLog()->fillPersistentInfo(transaction);
+        if (transactionLog()->saveTransaction(transaction) != ErrorCode::ok)
+            return false;
+    }
+
+    return true;
 }
 } // namespace detail
 
