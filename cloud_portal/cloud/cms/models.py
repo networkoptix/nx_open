@@ -27,7 +27,7 @@ def customization_cache(customization_name, value=None, force=False):
 
     data = cache.get(customization_name)
 
-    if 'version_id' in data and data['version_id'] != global_id:
+    if data and 'version_id' in data and data['version_id'] != global_id:
         force = True
 
     if not data or force:
