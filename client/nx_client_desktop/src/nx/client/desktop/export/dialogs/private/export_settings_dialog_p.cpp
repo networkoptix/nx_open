@@ -586,6 +586,9 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
         return;
     }
 
+    installEventHandler(overlayContainer, QEvent::Resize,
+        this, &ExportSettingsDialog::Private::updateOverlays);
+
     for (size_t index = 0; index != overlayCount; ++index)
     {
         m_overlays[index] = new ExportOverlayWidget(overlayContainer);
