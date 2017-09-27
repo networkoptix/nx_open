@@ -138,16 +138,37 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
             sizeof(kMagicBytes)) == 0))
     {
         const std::string cloudNonceBase(nonce.constData(), nonce.size() - kNonceTrailerLength);
+        auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool->newestMostCommonNonce();
+        if (cloudPreviouslyProvidedNonce && nonce.startsWith(*cloudPreviouslyProvidedNonce))
+        {
+            NX_VERBOSE(this, lm("Approving nonce %1 since it has been found in cloud user pool")
+                .args(nonce));
+            return true;
+        }
+
         const auto cloudSystemCredentials = m_cloudConnectionManager->getSystemCredentials();
         if (!cloudSystemCredentials)
         {
-            NX_VERBOSE(this, "NO cloud system credentials");
+            NX_VERBOSE(this, lm("Rejecting nonce %1 since no cloud system id known").args(nonce));
             return false;   //we can't say if that nonce is ok for us
         }
-        return nx::cdb::api::isValidCloudNonceBase(
-            cloudNonceBase,
-            cloudSystemCredentials->systemId.constData());
+
+        if (nx::cdb::api::isValidCloudNonceBase(
+                cloudNonceBase,
+                cloudSystemCredentials->systemId.constData()))
+        {
+            NX_VERBOSE(this, lm("Approving nonce %1 as a valid cloud nonce for cloud system %2")
+                .args(nonce, cloudSystemCredentials->systemId));
+            return true;
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("Rejecting nonce %1 as invalid for cloud system %2")
+                .args(nonce, cloudSystemCredentials->systemId));
+            return false;
+        }
     }
+
     NX_VERBOSE(this, "Nonce size < trailer size or trailer is not magic");
     return false;
 }
