@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <map>
 
 #include <QtCore/QUrl>
@@ -90,3 +92,4 @@ private:
 } // namespace mediaserver_core
 } // namespace nx
 
+#endif // defined(ENABLE_HANWHA)

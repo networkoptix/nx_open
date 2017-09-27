@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 
@@ -487,3 +489,5 @@ bool ratioComparator(const QString& lhs, const QString& rhs)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

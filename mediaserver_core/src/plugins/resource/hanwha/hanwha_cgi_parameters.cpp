@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_cgi_parameters.h"
 #include "hanwha_common.h"
 #include "hanwha_utils.h"
@@ -329,3 +331,5 @@ bool HanwhaCgiParameters::parseDataType(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

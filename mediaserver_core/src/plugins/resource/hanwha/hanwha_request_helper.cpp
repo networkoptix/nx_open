@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_request_helper.h"
 #include "hanwha_utils.h"
 
@@ -193,3 +195,5 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <map>
 
 #include <boost/optional/optional.hpp>
@@ -85,3 +87,5 @@ boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& param
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

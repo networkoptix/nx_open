@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <QtCore/QSize>
 
 #include <boost/optional/optional.hpp>
@@ -58,3 +60,5 @@ struct HanwhaVideoProfile
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

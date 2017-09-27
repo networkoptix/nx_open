@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_cgi_parameter.h"
 
 #include <nx/utils/log/assert.h>
@@ -199,3 +201,5 @@ void HanwhaCgiParameter::setPossibleValues(QStringList possibleValues)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

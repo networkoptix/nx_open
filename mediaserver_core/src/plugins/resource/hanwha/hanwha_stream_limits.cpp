@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_stream_limits.h"
 #include "hanwha_utils.h"
 
@@ -118,3 +120,5 @@ bool HanwhaStreamLimits::setIntegerLimits(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)
