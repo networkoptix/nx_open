@@ -21,11 +21,11 @@ enum class ExportOverlayType
 struct ExportOverlayPersistentSettings
 {
     QPoint offset;
-    Qt::Alignment anchors = Qt::AlignLeft | Qt::AlignTop;
+    Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignTop;
 
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const = 0;
 };
-#define ExportOverlayPersistentSettings_Fields (offset)(anchors)
+#define ExportOverlayPersistentSettings_Fields (offset)(alignment)
 
 struct ExportImageOverlayPersistentSettings: public ExportOverlayPersistentSettings
 {

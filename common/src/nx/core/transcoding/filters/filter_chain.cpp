@@ -92,7 +92,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
                 const auto filter = QnAbstractImageFilterPtr(paintFilter);
                 paintFilter->setImage(imageFilterSetting->image,
                     imageFilterSetting->offset,
-                    imageFilterSetting->anchors);
+                    imageFilterSetting->alignment);
                 push_back(filter);
                 break;
             }

@@ -25,11 +25,11 @@ namespace {
 struct Position
 {
     int offset = 0;
-    Qt::AlignmentFlag anchor = Qt::AlignmentFlag();
+    Qt::AlignmentFlag alignment = Qt::AlignmentFlag();
 
     Position() = default;
-    Position(int offset, Qt::AlignmentFlag anchor):
-        offset(offset), anchor(anchor)
+    Position(int offset, Qt::AlignmentFlag alignment):
+        offset(offset), alignment(alignment)
     {
     }
 
@@ -325,7 +325,7 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
         Position(m_fullFrameSize.height() - end.y(), Qt::AlignBottom)});
 
     settings->offset = QPoint(horizontal.offset, vertical.offset);
-    settings->anchors = horizontal.anchor | vertical.anchor;
+    settings->alignment = horizontal.alignment | vertical.alignment;
 }
 
 ExportMediaSettings ExportSettingsDialog::Private::exportMediaSettings() const
@@ -476,16 +476,16 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
             QPoint position;
             const auto& size = m_fullFrameSize;
 
-            if (data.anchors.testFlag(Qt::AlignHCenter))
+            if (data.alignment.testFlag(Qt::AlignHCenter))
                 position.setX((size.width() * m_overlayScale - overlay->width()) * 0.5);
-            else if (data.anchors.testFlag(Qt::AlignRight))
+            else if (data.alignment.testFlag(Qt::AlignRight))
                 position.setX((size.width() - data.offset.x()) * m_overlayScale - overlay->width());
             else
                 position.setX(data.offset.x() * m_overlayScale);
 
-            if (data.anchors.testFlag(Qt::AlignVCenter))
+            if (data.alignment.testFlag(Qt::AlignVCenter))
                 position.setY((size.height() * m_overlayScale - overlay->height()) * 0.5);
-            else if (data.anchors.testFlag(Qt::AlignBottom))
+            else if (data.alignment.testFlag(Qt::AlignBottom))
                 position.setY((size.height() - data.offset.x()) * m_overlayScale - overlay->height());
             else
                 position.setY(data.offset.y() * m_overlayScale);

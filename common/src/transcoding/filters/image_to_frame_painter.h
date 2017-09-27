@@ -21,7 +21,7 @@ public:
     void setImage(
         const QImage& image,
         const QPoint& offset,
-        Qt::Alignment anchors);
+        Qt::Alignment alignment);
 
     void updateSourceSize(const QSize& sourceSize);
 
@@ -37,7 +37,7 @@ private:
 
     QImage m_image;
     QPoint m_offset;
-    Qt::Alignment m_anchors;
+    Qt::Alignment m_alignment;
 
     QSize m_sourceSize;
     QImage m_croppedImage;

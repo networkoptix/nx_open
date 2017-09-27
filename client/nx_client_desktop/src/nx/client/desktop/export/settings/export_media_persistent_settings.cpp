@@ -31,7 +31,7 @@ OverlaySettingsPtr ExportImageOverlayPersistentSettings::createRuntimeSettings()
     QScopedPointer<nx::core::transcoding::ImageOverlaySettings> runtimeSettings(
         new nx::core::transcoding::ImageOverlaySettings());
     runtimeSettings->offset = offset;
-    runtimeSettings->anchors = anchors;
+    runtimeSettings->alignment = alignment;
 
     if (image.width() == overlayWidth && qFuzzyIsNull(opacity - 1.0)
         && image.format() == QImage::Format_ARGB32_Premultiplied)
@@ -88,7 +88,7 @@ OverlaySettingsPtr ExportTextOverlayPersistentSettingsBase::createRuntimeSetting
     QScopedPointer<nx::core::transcoding::ImageOverlaySettings> runtimeSettings(
         new nx::core::transcoding::ImageOverlaySettings());
     runtimeSettings->offset = offset;
-    runtimeSettings->anchors = anchors;
+    runtimeSettings->alignment = alignment;
     runtimeSettings->image = targetImage;
 
     return OverlaySettingsPtr(runtimeSettings.take());
@@ -106,7 +106,7 @@ OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettin
         new nx::core::transcoding::TimestampOverlaySettings());
 
     runtimeSettings->offset = offset;
-    runtimeSettings->anchors = anchors;
+    runtimeSettings->alignment = alignment;
     runtimeSettings->format = format;
     runtimeSettings->serverTimeDisplayOffsetMs = serverTimeDisplayOffsetMs;
     runtimeSettings->fontSize = fontSize;

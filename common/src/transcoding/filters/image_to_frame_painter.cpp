@@ -20,23 +20,23 @@ AlignedBufferPtr createAlignedBuffer(size_t size)
 
 QPoint calculateFinalPosition(
     const QPoint& offset,
-    Qt::Alignment anchors,
+    Qt::Alignment alignment,
     const QSize& frameSize)
 {
     QPoint result = offset;
-    if (anchors.testFlag(Qt::AlignAbsolute))
+    if (alignment.testFlag(Qt::AlignAbsolute))
         return result;
 
-    if (anchors.testFlag(Qt::AlignHCenter))
+    if (alignment.testFlag(Qt::AlignHCenter))
         result.setX(frameSize.width() / 2 + offset.x());
-    else if (anchors.testFlag(Qt::AlignRight) || anchors.testFlag(Qt::AlignTrailing))
+    else if (alignment.testFlag(Qt::AlignRight) || alignment.testFlag(Qt::AlignTrailing))
         result.setX(frameSize.width() - offset.x());
     else
         result.setX(offset.x()); //< Set left offset by default.
 
-    if (anchors.testFlag(Qt::AlignVCenter))
+    if (alignment.testFlag(Qt::AlignVCenter))
         result.setY(frameSize.height() / 2 + offset.y());
-    else if (anchors.testFlag(Qt::AlignBottom))
+    else if (alignment.testFlag(Qt::AlignBottom))
         result.setY(frameSize.height() - offset.y());
     else
         result.setY(offset.y()); //< Set top offset by default
@@ -62,11 +62,11 @@ ImageToFramePainter::~ImageToFramePainter()
 void ImageToFramePainter::setImage(
     const QImage& image,
     const QPoint& offset,
-    Qt::Alignment anchors)
+    Qt::Alignment alignment)
 {
     m_image = image;
 
-    m_anchors = anchors;
+    m_alignment = alignment;
     m_offset = offset;
 
     updateTargetImage();
@@ -135,7 +135,7 @@ void ImageToFramePainter::updateTargetImage()
         return;
     }
 
-    const auto finalPosition = calculateFinalPosition(m_offset, m_anchors, m_sourceSize);
+    const auto finalPosition = calculateFinalPosition(m_offset, m_alignment, m_sourceSize);
 
     const auto correctedPos = QPoint(
         std::max(finalPosition.x(), 0), std::max(finalPosition.y(), 0));

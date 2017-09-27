@@ -29,7 +29,7 @@ struct OverlaySettings
     virtual Type type() const = 0;
 
     QPoint offset;
-    Qt::Alignment anchors = Qt::AlignLeft | Qt::AlignTop;
+    Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignTop;
 };
 
 using OverlaySettingsPtr = QSharedPointer<OverlaySettings>;

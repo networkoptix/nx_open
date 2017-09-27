@@ -25,7 +25,7 @@ public:
     void setImage(
         const QImage& image,
         const QPoint& offset,
-        Qt::Alignment anchors);
+        Qt::Alignment alignment);
 
 private:
     const QScopedPointer<detail::ImageToFramePainter> m_painter;
