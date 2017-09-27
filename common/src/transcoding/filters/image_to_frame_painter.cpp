@@ -110,7 +110,7 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPt
         yPlaneStride, uvPlaneStride, kOpaqueAlpha);
 
     QPainter painter(&m_finalImage);
-    painter.drawImage(0, 0, m_croppedImage);
+    painter.drawImage(m_imageOffsetInBuffer, m_croppedImage);
 
     static const auto kNoFlip = false;
     bgra_to_yv12_simd_intr(m_finalImageBytes.get(), targetStride,
@@ -144,7 +144,7 @@ void ImageToFramePainter::updateTargetImage()
     m_bufferOffset = QPoint(
         qPower2Floor(correctedPos.x(), CL_MEDIA_ALIGNMENT),
         qPower2Floor(correctedPos.y(), 2));
-
+    m_imageOffsetInBuffer = finalPosition - m_bufferOffset;
 
     const auto initialImageRect = QRect(finalPosition, m_image.size());
     const auto sourceRect = QRect(QPoint(0, 0), m_sourceSize);

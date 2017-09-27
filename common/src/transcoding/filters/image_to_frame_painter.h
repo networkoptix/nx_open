@@ -43,6 +43,7 @@ private:
     QImage m_croppedImage;
 
     QPoint m_bufferOffset;
+    QPoint m_imageOffsetInBuffer;
 
     AlignedBufferPtr m_finalImageBytes;
     QImage m_finalImage;
