@@ -20,7 +20,72 @@ class QnVideoCameraGopKeeper;
 class MediaStreamCache;
 class MSSettings;
 
-class QnVideoCamera: public QObject, public QnAbstractVideoCamera
+/**
+ * TODO: #ak Have to introduce this class since QnAbstractVideoCamera 
+ * is in common and thus cannot dependend on mediaserver's types.
+ * TODO: #ak QnAbstractMediaServerVideoCamera is better be nx::vms::mediaserver::AbstractVideoCamera.
+ */
+class QnAbstractMediaServerVideoCamera:
+    public QnAbstractVideoCamera
+{
+public:
+    virtual QnLiveStreamProviderPtr getLiveReader(
+        QnServer::ChunksCatalog catalog,
+        bool ensureInitialized = true) = 0;
+
+    virtual int copyLastGop(
+        bool primaryLiveStream,
+        qint64 skipTime,
+        QnDataPacketQueue& dstQueue,
+        int cseq,
+        bool iFramesOnly) = 0;
+
+    virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
+        bool primaryLiveStream,
+        int channel) const = 0;
+    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const = 0;
+
+    virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
+        bool primaryLiveStream,
+        qint64 time,
+        int channel,
+        QnThumbnailRequestData::RoundMethod roundMethod) const = 0;
+
+    virtual void beforeStop() = 0;
+    virtual bool isSomeActivity() const = 0;
+    /**
+     * Stop reading from camera if no active DataConsumers left.
+     */
+    virtual void stopIfNoActivity() = 0;
+    virtual void updateActivity() = 0;
+
+    /**
+     * @return cache holding several last seconds of media stream. Can be null.
+     */
+    virtual const MediaStreamCache* liveCache(MediaQuality streamQuality) const = 0;
+    virtual MediaStreamCache* liveCache(MediaQuality streamQuality) = 0;
+
+    /**
+     * TODO: #ak Should remove it from here.
+     */
+    virtual nx_hls::HLSLivePlaylistManagerPtr hlsLivePlaylistManager(
+        MediaQuality streamQuality) const = 0;
+
+    /**
+     * Starts caching live stream, if not started.
+     * @return true, if started, false if failed to start.
+     */
+    virtual bool ensureLiveCacheStarted(
+        MediaQuality streamQuality,
+        qint64 targetDurationUSec) = 0;
+    virtual QnResourcePtr resource() const = 0;
+};
+
+typedef QnSharedResourcePointer<QnAbstractMediaServerVideoCamera> QnVideoCameraPtr;
+
+class QnVideoCamera:
+    public QObject,
+    public QnAbstractMediaServerVideoCamera
 {
     Q_OBJECT
 
@@ -30,62 +95,43 @@ public:
         const QnResourcePtr& resource);
     virtual ~QnVideoCamera();
 
-    QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog, bool ensureInitialized = true);
+    virtual QnLiveStreamProviderPtr getLiveReader(
+        QnServer::ChunksCatalog catalog,
+        bool ensureInitialized = true) override;
     virtual QnLiveStreamProviderPtr getPrimaryReader() override;
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
-    int copyLastGop(
+    virtual int copyLastGop(
         bool primaryLiveStream,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
         int cseq,
-        bool iFramesOnly);
+        bool iFramesOnly) override;
 
-    //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
-    //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
-    QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream, int channel) const;
-    QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
+    virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
+        bool primaryLiveStream,
+        int channel) const override;
+    virtual QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const override;
 
-    std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
+    virtual std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
         bool primaryLiveStream,
         qint64 time,
         int channel,
-        QnThumbnailRequestData::RoundMethod roundMethod) const;
+        QnThumbnailRequestData::RoundMethod roundMethod) const override;
 
-    Q_SLOT void at_camera_resourceChanged();
-    void beforeStop();
-
-    bool isSomeActivity() const;
-
-    /* stop reading from camera if no active DataConsumers left */
-    void stopIfNoActivity();
-
-    void updateActivity();
-
-    /* Mark some camera activity (RTSP client connection for example) */
+    virtual void beforeStop() override;
+    virtual bool isSomeActivity() const override;
+    virtual void stopIfNoActivity() override;
+    virtual void updateActivity() override;
     virtual void inUse(void* user) override;
-
-    /* Unmark some camera activity (RTSP client connection for example) */
     virtual void notInUse(void* user) override;
 
-    //!Returns cache holding several last seconds of media stream
-    /*!
-        \return Can be NULL
-    */
-    const MediaStreamCache* liveCache( MediaQuality streamQuality ) const;
-    MediaStreamCache* liveCache( MediaQuality streamQuality );
+    virtual const MediaStreamCache* liveCache( MediaQuality streamQuality ) const override;
+    virtual MediaStreamCache* liveCache( MediaQuality streamQuality ) override;
+    virtual bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec ) override;
+    virtual nx_hls::HLSLivePlaylistManagerPtr hlsLivePlaylistManager(MediaQuality streamQuality) const override;
 
-    /*!
-        \todo Should remove it from here
-    */
-    nx_hls::HLSLivePlaylistManagerPtr hlsLivePlaylistManager( MediaQuality streamQuality ) const;
-
-    //!Starts caching live stream, if not started
-    /*!
-        \return true, if started, false if failed to start
-    */
-    bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec );
-    QnResourcePtr resource() const { return m_resource; }
+    virtual QnResourcePtr resource() const override;
 
 private:
     void createReader(QnServer::ChunksCatalog catalog);
@@ -118,8 +164,9 @@ private:
         const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
     QElapsedTimer m_lastActivityTimer;
-};
 
-typedef QnSharedResourcePointer<QnVideoCamera> QnVideoCameraPtr;
+private slots:
+    void at_camera_resourceChanged();
+};
 
 #endif // __VIDEO_CAMERA_H__

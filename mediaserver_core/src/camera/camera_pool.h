@@ -46,6 +46,7 @@ public:
     */
     QnVideoCameraPtr getVideoCamera(const QnResourcePtr& res) const;
     QnVideoCameraPtr addVideoCamera(const QnResourcePtr& res);
+    bool addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera);
     void removeVideoCamera(const QnResourcePtr& res);
     void updateActivity();
 

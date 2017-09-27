@@ -34,6 +34,16 @@
     NX_GTEST_ASSERT_EQ(false, expected); \
 } while (0)
 
+#define NX_GTEST_ASSERT_GT(actual, expected) do \
+{ \
+    NX_GTEST_ASSERT_TRUE(actual > expected); \
+} while (0)
+
+#define NX_GTEST_ASSERT_LT(actual, expected) do \
+{ \
+    NX_GTEST_ASSERT_TRUE(actual < expected); \
+} while (0)
+
 #define NX_GTEST_ASSERT_NO_THROW(expression) do \
 { \
     try \

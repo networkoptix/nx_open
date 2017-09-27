@@ -720,6 +720,11 @@ nx_hls::HLSLivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQu
         : nx_hls::HLSLivePlaylistManagerPtr();
 }
 
+QnResourcePtr QnVideoCamera::resource() const
+{
+    return m_resource;
+}
+
 //!Starts caching live stream, if not started
 /*!
     \return true, if started, false if failed to start

@@ -8,7 +8,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <media_server/settings.h>
 #include <streaming/streaming_chunk_transcoder.h>
+#include <streaming/streaming_params.h>
 #include <test_support/resource/camera_resource_stub.h>
+
+#include "../camera/video_camera_mock.h"
 
 namespace nx {
 namespace vms {
@@ -38,7 +41,8 @@ protected:
         auto cameraResource = QnResourcePtr(new CameraResourceStub());
         cameraResource->setId(m_cameraResourceId);
         m_resourcePool.addResource(cameraResource);
-        m_videoCameraPool.addVideoCamera(cameraResource);
+        ASSERT_TRUE(m_videoCameraPool.addVideoCamera(
+            cameraResource, QnVideoCameraPtr(new MediaServerVideoCameraMock())));
 
         m_streamingChunkKey = StreamingChunkCacheKey(
             m_cameraResourceId.toSimpleString(),
@@ -48,7 +52,7 @@ protected:
             0,
             std::chrono::seconds(1),
             MediaQuality::MEDIA_Quality_Low,
-            {});
+            {{StreamingParams::LIVE_PARAM_NAME, QString()}});
 
         m_streamingChunk = std::make_shared<StreamingChunk>(
             m_streamingChunkKey,

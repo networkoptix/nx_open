@@ -81,6 +81,15 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
     return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
 }
 
+bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)
+{
+    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
+        return false;
+    QnMutexLocker lock(&m_mutex);
+    m_cameras.insert(res, camera);
+    return true;
+}
+
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
     QnMutexLocker lock( &m_mutex );
