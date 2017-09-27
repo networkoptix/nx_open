@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iterator>
+
 namespace nx {
 namespace utils {
 namespace algorithm {
