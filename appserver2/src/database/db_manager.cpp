@@ -971,8 +971,16 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "xtype_guid", guids))
         return false;
 
+    if (!updateBusinessRulesGuids())
+        return false;
+
+    return true;
+}
+
+bool QnDbManager::updateBusinessRulesGuids()
+{
     // update default rules
-    guids = getGuidList(
+    auto guids = getGuidList(
         R"sql(
             SELECT id, id
             FROM vms_businessrule
@@ -1550,6 +1558,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
         return ec2::db::cleanupClientInfoList(m_sdb);
+
+    if (updateName.endsWith(lit("/103_update_business_rules_guids.sql")))
+        return updateBusinessRulesGuids();
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;

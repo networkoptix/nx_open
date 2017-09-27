@@ -1,16 +1,11 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cdb_nonce_fetcher.h"
 
 #include <algorithm>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
-#include <nx/utils/sync_call.h>
 
 #include "cloud/cloud_connection_manager.h"
 
@@ -24,18 +19,17 @@ constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::minute
 } // namespace
 
 CdbNonceFetcher::CdbNonceFetcher(
-    CloudConnectionManager* const cloudConnectionManager,
+    nx::utils::StandaloneTimerManager* timerManager,
+    AbstractCloudConnectionManager* const cloudConnectionManager,
+    AbstractCloudUserInfoPool* cloudUserInfoPool,
     AbstractNonceProvider* defaultGenerator)
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(defaultGenerator),
     m_randomEngine(m_rd()),
     m_nonceTrailerRandomGenerator('a', 'z'),
-    m_timerManager(nx::utils::TimerManager::instance()),
-    m_cloudUserInfoPool(
-        std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(
-            new CloudUserInfoPoolSupplier(
-                cloudConnectionManager->commonModule())))
+    m_timerManager(timerManager),
+    m_cloudUserInfoPool(cloudUserInfoPool)
 {
     m_monotonicClock.restart();
 
@@ -53,11 +47,6 @@ CdbNonceFetcher::CdbNonceFetcher(
                 std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
                 std::chrono::milliseconds::zero()));
     }
-}
-
-const CloudUserInfoPool& CdbNonceFetcher::cloudUserInfoPool() const
-{
-    return m_cloudUserInfoPool;
 }
 
 CdbNonceFetcher::~CdbNonceFetcher()
@@ -87,13 +76,14 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer(std::function<short()> genFunc)
 
 nx::Buffer CdbNonceFetcher::generateNonceTrailer()
 {
+    // TODO: #ak std::default_random_engine can throw. And it really happens!
     return generateNonceTrailer(
         [this]() { return m_nonceTrailerRandomGenerator(m_randomEngine); });
 }
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
-    auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
+    auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool->newestMostCommonNonce();
     if (cloudPreviouslyProvidedNonce)
         return *cloudPreviouslyProvidedNonce + generateNonceTrailer();
 
@@ -148,16 +138,37 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
             sizeof(kMagicBytes)) == 0))
     {
         const std::string cloudNonceBase(nonce.constData(), nonce.size() - kNonceTrailerLength);
+        auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool->newestMostCommonNonce();
+        if (cloudPreviouslyProvidedNonce && nonce.startsWith(*cloudPreviouslyProvidedNonce))
+        {
+            NX_VERBOSE(this, lm("Approving nonce %1 since it has been found in cloud user pool")
+                .args(nonce));
+            return true;
+        }
+
         const auto cloudSystemCredentials = m_cloudConnectionManager->getSystemCredentials();
         if (!cloudSystemCredentials)
         {
-            NX_VERBOSE(this, "NO cloud system credentials");
+            NX_VERBOSE(this, lm("Rejecting nonce %1 since no cloud system id known").args(nonce));
             return false;   //we can't say if that nonce is ok for us
         }
-        return nx::cdb::api::isValidCloudNonceBase(
-            cloudNonceBase,
-            cloudSystemCredentials->systemId.constData());
+
+        if (nx::cdb::api::isValidCloudNonceBase(
+                cloudNonceBase,
+                cloudSystemCredentials->systemId.constData()))
+        {
+            NX_VERBOSE(this, lm("Approving nonce %1 as a valid cloud nonce for cloud system %2")
+                .args(nonce, cloudSystemCredentials->systemId));
+            return true;
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("Rejecting nonce %1 as invalid for cloud system %2")
+                .args(nonce, cloudSystemCredentials->systemId));
+            return false;
+        }
     }
+
     NX_VERBOSE(this, "Nonce size < trailer size or trailer is not magic");
     return false;
 }
@@ -329,6 +340,6 @@ void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
 {
     QnMutexLocker lock(&m_mutex);
     if (!boundToCloud)
-        m_cloudUserInfoPool.clear();
+        m_cloudUserInfoPool->clear(); //< TODO: #ak Remove it from here!
     cloudBindingStatusChangedUnsafe(lock, boundToCloud);
 }

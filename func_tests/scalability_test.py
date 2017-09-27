@@ -68,7 +68,10 @@ def lightweight_servers(metrics_saver, lightweight_servers_factory, config):
 def servers(metrics_saver, server_factory, lightweight_servers, config):
     server_count = config.SERVER_COUNT - len(lightweight_servers)
     log.info('Creating %d servers:', server_count)
-    setup_settings = dict(systemSettings=dict(autoDiscoveryEnabled=utils.bool_to_str(False)))
+    setup_settings = dict(systemSettings=dict(
+        autoDiscoveryEnabled=utils.bool_to_str(False),
+        synchronizeTimeWithInternet=utils.bool_to_str(False),
+        ))
     start_time = utils.datetime_utc_now()
     server_list = [server_factory('server_%04d' % (idx + 1),
                            setup_settings=setup_settings,

@@ -73,6 +73,7 @@ void QnWorkbenchAccessController::setUser(const QnUserResourcePtr& user)
 {
     if (m_user == user)
         return;
+
     m_user = user;
     recalculateAllPermissions();
 }

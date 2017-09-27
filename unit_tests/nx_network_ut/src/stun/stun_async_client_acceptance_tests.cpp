@@ -38,8 +38,8 @@ void BasicStunAsyncClientAcceptanceTest::setSingleShotUnconnectableSocketFactory
 
 std::unique_ptr<AbstractStreamSocket> 
 BasicStunAsyncClientAcceptanceTest::createUnconnectableStreamSocket(
-    bool sslRequired,
-    nx::network::NatTraversalSupport natTraversalRequired)
+    bool /*sslRequired*/,
+    nx::network::NatTraversalSupport /*natTraversalRequired*/)
 {
     QnMutexLocker lock(&m_mutex);
 
