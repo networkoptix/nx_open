@@ -53,6 +53,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/log/log.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
@@ -456,7 +457,9 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         params.addQueryItem(lit("serial"), runtimeData.nx1serial);
     }
 
-    QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
+    const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
+    NX_LOGX(licenseRequestLogString(messageBody, licenseKey), cl_logINFO);
+    QNetworkReply *reply = m_httpClient->post(request, messageBody);
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
     connect(reply, &QNetworkReply::finished, this, [this, licenseKey, infoMode, url, reply]
@@ -882,6 +885,8 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
     QList<QnLicensePtr> licenses;
 
     QByteArray replyData = reply->readAll();
+
+    NX_LOGX(licenseReplyLogString(reply, replyData, licenseKey), cl_logINFO);
 
     // TODO: #Elric use JSON mapping here.
     // If we can deserialize JSON it means there is an error.
