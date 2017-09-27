@@ -184,7 +184,13 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
         if (transcodeParams.live())
         {
             dataSourceCtx->videoCameraLocker = 
-                qnCameraPool()->getVideoCameraLockerByResourceId(cameraResource->getId());
+                qnCameraPool->getVideoCameraLockerByResourceId(cameraResource->getId());
+            if (!dataSourceCtx->videoCameraLocker)
+            {
+                NX_DEBUG(this, lm("Could not lock camera %1 (%2)")
+                    .args(cameraResource->getId(), cameraResource->getName()));
+                return nullptr;
+            }
             mediaDataProvider = createLiveMediaDataProvider(
                 *dataSourceCtx->videoCameraLocker,
                 camera,
