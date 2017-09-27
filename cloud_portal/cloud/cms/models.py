@@ -174,9 +174,11 @@ class Customization(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        orig = Customization.objects.get(pk=self.pk)
-
-        need_update = self.preview_status == orig.preview_status
+        if self.pk is None:
+            need_update = True
+        else:
+            orig = Customization.objects.get(pk=self.pk)
+            need_update = self.preview_status == orig.preview_status
         # if anything changed about customization except preview_status
 
         super(Customization, self).save(*args, **kwargs)
