@@ -9,9 +9,11 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import admin
-from zipfile import ZipFile
+from django.http.response import HttpResponse, HttpResponseBadRequest
 
 from cloud import settings
+import json
+from .controllers import structure, generate_structure
 
 from .controllers.modify_db import *
 from .forms import *
@@ -232,73 +234,47 @@ def review_version_view(request, version_id=None):
                                                    })
 
 
+def response_attachment(data, filename, content_type):
+    response = HttpResponse(data, content_type=content_type)
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+
+
 @api_view(["GET", "POST"])
 @permission_required('cms.edit_content')
 def product_settings(request, product_id):
-    set_defaults = False
     product = Product.objects.get(pk=product_id)
+    form = None
     if request.method == "POST":
-        zip_file = request.FILES["zip"]
+        form = ProductSettingsForm(request.POST, request.FILES)
+        if not form.is_valid():
+            form = None
 
-        zip_file = ZipFile(zip_file)
-        # zip_file.printdir()
-        root = None
-        for name in zip_file.namelist():
-            if name.startswith('__'):  ## Ignore trash in archive from MACs
-                continue
+    if form:
+        generate_json = form.cleaned_data['generate_json']
+        update_structure = form.cleaned_data['update_structure']
+        update_defaults = form.cleaned_data['update_defaults']
+        update_content = form.cleaned_data['generate_json']
 
-            if name.endswith('/'):
-                if not root:  # find root directory to ignore
-                    root = name
-                continue  # not a file - ignore it
+        file = request.FILES["file"]
 
-            short_name = name.replace(root, '')
+        if file.name.endswith('json'):
+            if not update_structure:
+                return HttpResponseBadRequest('json is acceptable only for Updating structure')
+            cms_structure = json.load(file)
+            structure.update_from_object(cms_structure)
+        else:
+            if not file.name.endswith('zip'):
+                return HttpResponseBadRequest('zip archive is expected')
+            if generate_json:
+                data = generate_structure.from_zip(file, product.name)
+                content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
+                return response_attachment(content, 'structure.json', 'application/json')
+            else:
+                structure.process_zip(file, request.user, update_structure, update_defaults, update_content)
+    else:
+        form = ProductSettingsForm()
 
-            if short_name.startswith('help/'):  ## Ignore help
-                continue
-
-            # now we have name
-            # find relevant data structure
-            structure = DataStructure.objects.filter(name=short_name)
-            if not structure.exists():
-                print("NOT EXISTS", short_name)
-                continue
-            structure = structure.first()
-
-            # if data structure is not FILE or IMAGE - print to log and ignore
-            if structure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-                print("NOT FILE", short_name)
-                continue
-
-            data = zip_file.read(name)
-            data64 = base64.b64encode(data)
-
-            if set_defaults or not structure.default:
-                # if set_defaults or data structure has no default value - save it
-                structure.default = data64
-                structure.save()
-
-            customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-
-            # get latest value
-            latest_value = structure.find_actual_value(customization)
-            # check if file was changed
-            if latest_value == data64:
-                print("not changed", short_name)
-                continue
-
-            print("add new record", short_name)
-            # add new dataRecrod
-            record = DataRecord(
-                data_structure=structure,
-                customization=customization,
-                value=data64,
-                created_by=request.user
-            )
-            record.save()
-            pass
-
-    form = ProductSettingsForm()
     return render(request, 'product_settings.html',
                   {'product': product,
                    'form': form,

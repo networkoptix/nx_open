@@ -5,12 +5,10 @@
 # create report: added vs outdated
 import os
 import re
-import base64
-from ...controllers import filldata
-import json
-import codecs
-from ...models import Product, Context, DataStructure, customization_cache
+from ...controllers import filldata, structure
+from ...models import Product, Context, DataStructure
 from django.core.management.base import BaseCommand
+
 
 SOURCE_DIR = 'static/{{customization}}/source/'
 
@@ -34,14 +32,6 @@ def iterate_cms_files(customization_name, ignore_not_english):
                 yield file
 
 
-def find_or_add_product(name):
-    if Product.objects.filter(name=name).exists():
-        return Product.objects.get(name=name)
-    product = Product(name=name)
-    product.save()
-    return product
-
-
 def find_or_add_context_by_file(file_path, product_id, has_language):
     if Context.objects.filter(file_path=file_path, product_id=product_id).exists():
         return Context.objects.get(file_path=file_path, product_id=product_id)
@@ -51,38 +41,6 @@ def find_or_add_context_by_file(file_path, product_id, has_language):
                       is_global=False)
     context.save()
     return context
-
-
-def find_or_add_context(context_name, old_name, product_id, has_language, is_global):
-    if old_name and Context.objects.filter(name=old_name, product_id=product_id).exists():
-        context = Context.objects.get(name=old_name, product_id=product_id)
-        context.name = context_name
-        context.save()
-        return context
-
-    if Context.objects.filter(name=context_name, product_id=product_id).exists():
-        return Context.objects.get(name=context_name, product_id=product_id)
-
-    context = Context(name=context_name, file_path=context_name,
-                      product_id=product_id, translatable=has_language,
-                      is_global=is_global)
-    context.save()
-    return context
-
-
-def find_or_add_data_stucture(name, old_name, context_id, has_language):
-    if old_name and DataStructure.objects.filter(name=old_name, context_id=context_id).exists():
-        record = DataStructure.objects.get(name=old_name, context_id=context_id)
-        record.name = name
-        record.save()
-        return record
-
-    if DataStructure.objects.filter(name=name, context_id=context_id).exists():
-        return DataStructure.objects.get(name=name, context_id=context_id)
-    data = DataStructure(name=name, context_id=context_id,
-                         translatable=has_language, default=name)
-    data.save()
-    return data
 
 
 def read_cms_strings(filename):
@@ -110,11 +68,11 @@ def read_structure_file(filename, product_id, global_strings):
         context_name, product_id, bool(language))
 
     for string in strings:
-        find_or_add_data_stucture(string, None, context.id, bool(language))
+        structure.find_or_add_data_structure(string, None, context.id, bool(language))
 
 
-def read_structure():
-    product_id = Product.objects.get(name='cloud_portal').id
+def read_structure(product_name):
+    product_id = Product.objects.get(name=product_name).id
     global_strings = DataStructure.objects.\
         filter(context__is_global=True, context__product_id=product_id).\
         values_list("name", flat=True)
@@ -122,84 +80,15 @@ def read_structure():
         read_structure_file(file, product_id, global_strings)
 
 
-def read_structure_json(filename):
-    with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
-        cms_structure = json.load(file_descriptor)
-    product_name = cms_structure['product']
-    default_language = customization_cache('default', 'default_language')
-    product_id = find_or_add_product(product_name).id
-    order = 0
-
-    for context_data in cms_structure['contexts']:
-        has_language = context_data["translatable"]
-        is_global = context_data["is_global"] if "is_global" in context_data else False
-        old_name = context_data["old_name"] if "old_name" in context_data else None
-        context = find_or_add_context(
-            context_data["name"], old_name, product_id, has_language, is_global)
-        if "description" in context_data:
-            context.description = context_data["description"]
-        if "file_path" in context_data:
-            context.file_path = context_data["file_path"]
-        if "url" in context_data:
-            context.url = context_data["url"]
-        context.is_global = is_global
-        context.hidden = context_data["hidden"] if "hidden" in context_data else False
-        context.save()
-
-        for record in context_data["values"]:
-            if not isinstance(record, dict):
-                if len(record) == 3:
-                    label, name, value = record
-                if len(record) == 4:
-                    label, name, value, description = record
-            else:
-                label = record['label']
-                name = record['name']
-                value = record['value']
-                old_name = record['old_name'] if 'old_name' in record else None
-                description = record['description'] if 'description' in record else None
-                record_type = record['type'] if 'type' in record else None
-                meta = record['meta'] if 'meta' in record else None
-                advanced = record['advanced'] if 'advanced' in record else False
-
-            data_structure = find_or_add_data_stucture(
-                name, old_name, context.id, has_language)
-
-            data_structure.order = order
-            order += 1
-            data_structure.label = label if label else name
-            data_structure.advanced = advanced
-            if description:
-                data_structure.description = description
-            if record_type:
-                data_structure.type = DataStructure.get_type(record_type)
-
-            if data_structure.type == DataStructure.DATA_TYPES.image:
-                data_structure.translatable = "{{language}}" in name
-
-                # this is used to convert source images into b64 strings
-                file_path = os.path.join('static', 'default', 'source', name)
-                file_path = file_path.replace("{{language}}", default_language)
-                try:
-                    with open(file_path, 'r') as file:
-                        value = base64.b64encode(file.read())
-                except IOError:
-                    print("No file to read", file_path)
-
-            data_structure.meta_settings = meta if meta else {}
-            data_structure.default = value
-            data_structure.save()
-
-
 class Command(BaseCommand):
-    help = 'Creates initial structure for CMS in\
-     the database (contexts, datastructure)'
+    help = 'Creates initial structure for CMS in ' \
+           'the database (contexts, datastructure)'
 
     def handle(self, *args, **options):
-        read_structure_json('cms/cms_structure.json')
-        read_structure()
+        structure.read_structure_json('cms/cms_structure.json')
+        read_structure('cloud_portal')
         try:
-            read_structure_json('cms/vms_structure.json')
+            structure.read_structure_json('cms/vms_structure.json')
         except IOError:
             print("No vms_structure to read")
         self.stdout.write(self.style.SUCCESS(
