@@ -2,12 +2,15 @@
 #include "private/export_settings_dialog_p.h"
 #include "ui_export_settings_dialog.h"
 
+#include <limits>
+
 #include <camera/single_thumbnail_loader.h>
+#include <client/client_runtime_settings.h>
 #include <core/resource/layout_item_data.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-
 #include <ui/common/palette.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
@@ -22,6 +25,7 @@
 #include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace client {
@@ -38,10 +42,10 @@ static constexpr int kNoDataDefaultFontSize = 18;
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnTimePeriod& timePeriod,
-    IsFilenameValid isFilenameValid,
+    IsFileNameValid isFileNameValid,
     QWidget* parent)
     :
-    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFilenameValid, parent)
+    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
 {
     setMediaResourceWidget(widget);
 
@@ -52,15 +56,22 @@ ExportSettingsDialog::ExportSettingsDialog(
     const auto palette = ui->layoutPreviewWidget->palette();
     d->layoutImageProvider()->setItemBackgroundColor(palette.color(QPalette::Window));
     d->layoutImageProvider()->setFontColor(palette.color(QPalette::WindowText));
+
+    auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
+    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
+        baseName = tr("exported");
+    Filename baseFileName = d->exportLayoutSettings().filename;
+    baseFileName.name = baseName;
+    ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnCameraBookmark& bookmark,
-    IsFilenameValid isFilenameValid,
+    IsFileNameValid isFileNameValid,
     QWidget* parent)
     :
-    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFilenameValid, parent)
+    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFileNameValid, parent)
 {
     ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->layoutTab));
     setMediaResourceWidget(widget);
@@ -69,13 +80,13 @@ ExportSettingsDialog::ExportSettingsDialog(
 ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     const QnCameraBookmark& bookmark,
-    IsFilenameValid isFilenameValid,
+    IsFileNameValid isFileNameValid,
     QWidget* parent)
     :
     base_type(parent),
     d(new Private(bookmark, kPreviewSize)),
     ui(new Ui::ExportSettingsDialog),
-    isFilenameValid(isFilenameValid)
+    isFileNameValid(isFileNameValid)
 {
     ui->setupUi(this);
 
@@ -495,6 +506,30 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
     available.dewarping = itemData.dewarpingParams;
     available.zoomWindow = itemData.zoomRect;
     d->setAvailableTranscodingSettings(available);
+
+    const auto currentSettings = d->exportMediaSettings();
+    const auto namePart = resource->getName();
+    QString timePart;
+    if (resource->flags().testFlag(Qn::utc))
+    {
+        const auto& ts = d->exportMediaPersistentSettings().timestampOverlay;
+        timePart = QDateTime::fromMSecsSinceEpoch(currentSettings.timePeriod.startTimeMs
+            + ts.serverTimeDisplayOffsetMs).toString(ts.format);
+    }
+    else
+    {
+        timePart = QTime(0, 0, 0, 0).addMSecs(currentSettings.timePeriod.startTimeMs)
+            .toString(Qt::SystemLocaleShortDate);
+    }
+
+    if (utils::AppInfo::isWindows())
+        timePart.replace(L':', L'-');
+
+    Filename baseFileName = currentSettings.fileName;
+    baseFileName.name = nx::utils::replaceNonFileNameCharacters(
+        namePart + lit(" - ") + timePart, L' ');
+
+    ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
 
 void ExportSettingsDialog::accept()
@@ -506,10 +541,28 @@ void ExportSettingsDialog::accept()
     if (!filenamePanel->validate())
         return;
 
-    if (isFilenameValid && !isFilenameValid(filenamePanel->filename()))
+    if (isFileNameValid && !isFileNameValid(filenamePanel->filename(), false))
         return;
 
     base_type::accept();
+}
+
+Filename ExportSettingsDialog::suggestedFileName(const Filename& baseName) const
+{
+    if (!isFileNameValid)
+        return baseName;
+
+    Filename suggested = baseName;
+    for (int i = 1; i < std::numeric_limits<int>::max(); ++i)
+    {
+        if (isFileNameValid(suggested, true))
+            return suggested;
+
+        suggested.name = lit("%1 (%2)").arg(baseName.name).arg(i);
+    }
+
+    NX_ASSERT(false, Q_FUNC_INFO, "Failed to generate suggested filename");
+    return baseName;
 }
 
 } // namespace desktop

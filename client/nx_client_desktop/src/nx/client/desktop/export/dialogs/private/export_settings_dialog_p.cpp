@@ -213,8 +213,6 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
         layout, m_previewSize, m_exportLayoutSettings.period.startTimeMs));
 
     m_layoutImageProvider->loadAsync();
-
-    // TODO: #vkutin #GDM Further init.
 }
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
@@ -288,11 +286,15 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode
             break;
     }
 
-    // Both media and layout can be exported to binary.
-    if (utils::AppInfo::isWin64())
-        result << FileExtension::exe64;
-    else if (utils::AppInfo::isWin32())
-        result << FileExtension::exe86;
+    // TODO: #vkutin Enable binary for media export when it's ready.
+    if (mode == Mode::Layout)
+    {
+        // Both media and layout can be exported to binary.
+        if (utils::AppInfo::isWin64())
+            result << FileExtension::exe64;
+        else if (utils::AppInfo::isWin32())
+            result << FileExtension::exe86;
+    }
 
     return result;
 }

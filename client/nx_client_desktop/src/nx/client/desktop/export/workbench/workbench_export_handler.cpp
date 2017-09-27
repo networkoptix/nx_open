@@ -196,20 +196,25 @@ void WorkbenchExportHandler::handleExportVideoAction()
     if (!period.isValid() && !bookmark.isValid())
         return;
 
-    const auto isFilenameValid =
-        [this](const Filename& filename) -> bool
+    const bool isBookmark = bookmark.isValid();
+
+    const auto isFileNameValid =
+        [this](const Filename& filename, bool quiet) -> bool
         {
             if (d->isInRunningExports(filename))
             {
-                QnMessageBox::warning(mainWindow(), tr("Cannot write file"),
-                    tr("%1 is in use by another export.", "%1 is file name")
-                        .arg(filename.completeFileName()));
+                if (!quiet)
+                {
+                    QnMessageBox::warning(mainWindow(), tr("Cannot write file"),
+                        tr("%1 is in use by another export.", "%1 is file name")
+                            .arg(filename.completeFileName()));
+                }
                 return false;
             }
 
             if (QFileInfo::exists(filename.completeFileName()))
             {
-                if (!QnFileMessages::confirmOverwrite(mainWindow(), filename.completeFileName()))
+                if (quiet || !QnFileMessages::confirmOverwrite(mainWindow(), filename.completeFileName()))
                     return false;
             }
 
@@ -217,9 +222,9 @@ void WorkbenchExportHandler::handleExportVideoAction()
         };
 
     QScopedPointer<ExportSettingsDialog> dialog;
-    dialog.reset(bookmark.isValid()
-        ? new ExportSettingsDialog(widget, bookmark, isFilenameValid, mainWindow())
-        : new ExportSettingsDialog(widget, period, isFilenameValid, mainWindow()));
+    dialog.reset(isBookmark
+        ? new ExportSettingsDialog(widget, bookmark, isFileNameValid, mainWindow())
+        : new ExportSettingsDialog(widget, period, isFileNameValid, mainWindow()));
 
     if (dialog->exec() != QDialog::Accepted)
         return;
