@@ -121,11 +121,11 @@ struct ExportMediaPersistentSettings
     (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)
 
 #define EXPORT_MEDIA_PERSISTENT_TYPES \
-    (ExportTimestampOverlayPersistentSettings)\
-    (ExportImageOverlayPersistentSettings)\
-    (ExportTextOverlayPersistentSettings)\
-    (ExportBookmarkOverlayPersistentSettings)\
-    (ExportRapidReviewPersistentSettings)\
+    (ExportTimestampOverlayPersistentSettings) \
+    (ExportImageOverlayPersistentSettings) \
+    (ExportTextOverlayPersistentSettings) \
+    (ExportBookmarkOverlayPersistentSettings) \
+    (ExportRapidReviewPersistentSettings) \
     (ExportMediaPersistentSettings)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(EXPORT_MEDIA_PERSISTENT_TYPES, (json))
