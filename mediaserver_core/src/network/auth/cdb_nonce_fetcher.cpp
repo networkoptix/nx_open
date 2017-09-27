@@ -1,16 +1,11 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cdb_nonce_fetcher.h"
 
 #include <algorithm>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
-#include <nx/utils/sync_call.h>
 
 #include "cloud/cloud_connection_manager.h"
 
@@ -24,18 +19,17 @@ constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::minute
 } // namespace
 
 CdbNonceFetcher::CdbNonceFetcher(
-    CloudConnectionManager* const cloudConnectionManager,
+    nx::utils::StandaloneTimerManager* timerManager,
+    AbstractCloudConnectionManager* const cloudConnectionManager,
+    AbstractCloudUserInfoPool* cloudUserInfoPool,
     AbstractNonceProvider* defaultGenerator)
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(defaultGenerator),
     m_randomEngine(m_rd()),
     m_nonceTrailerRandomGenerator('a', 'z'),
-    m_timerManager(nx::utils::TimerManager::instance()),
-    m_cloudUserInfoPool(
-        std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(
-            new CloudUserInfoPoolSupplier(
-                cloudConnectionManager->commonModule())))
+    m_timerManager(timerManager),
+    m_cloudUserInfoPool(cloudUserInfoPool)
 {
     m_monotonicClock.restart();
 
@@ -53,11 +47,6 @@ CdbNonceFetcher::CdbNonceFetcher(
                 std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
                 std::chrono::milliseconds::zero()));
     }
-}
-
-const CloudUserInfoPool& CdbNonceFetcher::cloudUserInfoPool() const
-{
-    return m_cloudUserInfoPool;
 }
 
 CdbNonceFetcher::~CdbNonceFetcher()
@@ -87,13 +76,14 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer(std::function<short()> genFunc)
 
 nx::Buffer CdbNonceFetcher::generateNonceTrailer()
 {
+    // TODO: #ak std::default_random_engine can throw. And it really happens!
     return generateNonceTrailer(
         [this]() { return m_nonceTrailerRandomGenerator(m_randomEngine); });
 }
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
-    auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
+    auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool->newestMostCommonNonce();
     if (cloudPreviouslyProvidedNonce)
         return *cloudPreviouslyProvidedNonce + generateNonceTrailer();
 
@@ -329,6 +319,6 @@ void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
 {
     QnMutexLocker lock(&m_mutex);
     if (!boundToCloud)
-        m_cloudUserInfoPool.clear();
+        m_cloudUserInfoPool->clear(); //< TODO: #ak Remove it from here!
     cloudBindingStatusChangedUnsafe(lock, boundToCloud);
 }
