@@ -40,8 +40,46 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/log/log.h>
 
 namespace {
+
+QString licenseReplyLogString(
+    QNetworkReply* reply,
+    const QByteArray& replyBody,
+    const QByteArray& licenseKey)
+{
+    if (!reply)
+        return QString();
+
+    static const auto kReplyLogTemplate =
+        lit("\nReceived response from license server (license key is %1):\n"
+            "Response: %2 (%3)\n"
+            "Headers:\n%4\n"
+            "Body:\n%5\n");
+
+    QStringList headers;
+    for (const auto header: reply->rawHeaderPairs())
+    {
+        headers.push_back(lit("%1: %2").arg(
+            QString::fromLatin1(header.first),
+            QString::fromLatin1(header.second)));
+    }
+
+    return kReplyLogTemplate.arg(
+        QString::fromLatin1(licenseKey),
+        QString::number(reply->error()), reply->errorString(),
+        headers.join(lit("\n")),
+        QString::fromLatin1(replyBody));
+}
+
+QString licenseRequestLogString(const QByteArray& body, const QByteArray& licenseKey)
+{
+    static const auto kRequestLogTemplate =
+        lit("\nSending request to license server (license key is %1).\nBody:\n%2\n");
+    return kRequestLogTemplate.arg(
+        QString::fromLatin1(licenseKey), QString::fromUtf8(body));
+}
 
 class QnLicenseListSortProxyModel : public QSortFilterProxyModel
 {
@@ -392,7 +430,9 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         params.addQueryItem(lit("serial"), runtimeData.nx1serial);
     }
 
-    QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
+    const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
+    NX_LOGX(licenseRequestLogString(messageBody, licenseKey), cl_logALWAYS);
+    QNetworkReply *reply = m_httpClient->post(request, messageBody);
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
     connect(reply, &QNetworkReply::finished, this, [this, licenseKey, infoMode, url, reply]
@@ -575,6 +615,8 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
     QList<QnLicensePtr> licenses;
 
     QByteArray replyData = reply->readAll();
+
+    NX_LOGX(licenseReplyLogString(reply, replyData, licenseKey), cl_logALWAYS);
 
     // TODO: #Elric use JSON mapping here.
     // If we can deserialize JSON it means there is an error.
