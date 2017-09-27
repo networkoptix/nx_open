@@ -293,7 +293,7 @@ QString HanwhaResourceSearcher::sessionKey(
     if (data->sessionKey.isEmpty())
     {
         HanwhaRequestHelper helper(resource);
-        helper.setAllowLocks(true);
+        helper.setIgnoreMutexAnalyzer(true);
         const auto response = helper.view(lit("media/sessionkey"));
         if (!response.isSuccessful())
             return QString();

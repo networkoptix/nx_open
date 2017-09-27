@@ -57,7 +57,7 @@ public:
         const QString& path,
         const Parameters& parameters = Parameters());
 
-    void setAllowLocks(bool allowLocks);
+    void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
 
 private:
     QUrl buildRequestUrl(
@@ -83,7 +83,7 @@ private:
 private:
     const QAuthenticator m_auth;
     const QString m_url;
-    bool m_allowLocks = false;
+    bool m_ignoreMutexAnalyzer = false;
 };
 
 } // namespace plugins

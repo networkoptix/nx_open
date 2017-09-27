@@ -111,9 +111,9 @@ HanwhaResponse HanwhaRequestHelper::control(const QString& path, const Parameter
     return splitAndDoRequest(lit("control"), path, parameters);
 }
 
-void HanwhaRequestHelper::setAllowLocks(bool allowLocks)
+void HanwhaRequestHelper::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
 {
-    m_allowLocks = allowLocks;
+    m_ignoreMutexAnalyzer = ignoreMutexAnalyzer;
 }
 
 QUrl HanwhaRequestHelper::buildRequestUrl(
@@ -159,7 +159,7 @@ bool HanwhaRequestHelper::doRequestInternal(
 
     nx_http::HttpClient httpClient;
 
-    httpClient.setAllowLocks(m_allowLocks);
+    httpClient.setIgnoreMutexAnalyzer(m_ignoreMutexAnalyzer);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
     httpClient.setSendTimeoutMs(kHttpTimeout.count());

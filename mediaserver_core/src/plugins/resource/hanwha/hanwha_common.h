@@ -59,7 +59,7 @@ static const int kHanwhaInvalidFps = -1;
 static const int kHanwhaInvalidBitrate = -1;
 static const int kHanwhaInvalidChannel = -1;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
-static const int kHanwhaMaxPresetNumber = 1000;
+static const int kHanwhaDefaultMaxPresetNumber = 1000;
 static const int kHanwhaProfileNameMaxLength = 12;
 
 const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");

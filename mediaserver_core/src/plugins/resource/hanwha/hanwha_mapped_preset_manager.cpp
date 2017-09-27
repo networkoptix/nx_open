@@ -191,7 +191,7 @@ QString HanwhaMappedPresetManager::freePresetNumber() const
     
     const int limit = m_maxPresetNumber > 0
         ? m_maxPresetNumber
-        : kHanwhaMaxPresetNumber;
+        : kHanwhaDefaultMaxPresetNumber;
 
     for (auto i = 1; i < limit; ++i)
     {

@@ -218,9 +218,9 @@ void HttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
     m_expectOnlyBody = expectOnlyBody;
 }
 
-void HttpClient::setAllowLocks(bool allowLocks)
+void HttpClient::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
 {
-    m_allowLocks = allowLocks;
+    m_ignoreMutexAnalyzer = ignoreMutexAnalyzer;
 }
 
 const std::unique_ptr<AbstractStreamSocket>& HttpClient::socket()
@@ -297,7 +297,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         // Have to re-establish connection if the previous message has not been read up to the end.
         if (m_asyncHttpClient)
         {
-            m_asyncHttpClient->pleaseStopSync(!m_allowLocks);
+            m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
             m_asyncHttpClient.reset();
         }
         instantiateHttpClient();
@@ -355,7 +355,7 @@ void HttpClient::onResponseReceived()
             cl_logWARNING);
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync(!m_allowLocks);
+        m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
     }
     m_cond.wakeAll();
 }
@@ -372,7 +372,7 @@ void HttpClient::onSomeMessageBodyAvailable()
             cl_logWARNING);
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync(!m_allowLocks);
+        m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
     }
     m_cond.wakeAll();
 }

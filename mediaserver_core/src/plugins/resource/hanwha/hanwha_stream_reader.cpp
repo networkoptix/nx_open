@@ -150,7 +150,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource);
-    helper.setAllowLocks(true);
+    helper.setIgnoreMutexAnalyzer(true);
     const auto profileParameters = makeProfileParameters(profileNumber, parameters);
 
     m_hanwhaResource->beforeConfigureStream(getRole());
@@ -173,7 +173,7 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
     const auto channel = m_hanwhaResource->getChannel();
 
     HanwhaRequestHelper helper(m_hanwhaResource);
-    helper.setAllowLocks(true);
+    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(
         lit("media/videoprofile"),
         {{kHanwhaChannelProperty, QString::number(channel)}});
@@ -244,7 +244,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
     HanwhaRequestHelper helper(m_hanwhaResource);
-    helper.setAllowLocks(true);
+    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/streamuri"), params);
 
     if (!response.isSuccessful())
