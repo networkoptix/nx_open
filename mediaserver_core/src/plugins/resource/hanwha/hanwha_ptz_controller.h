@@ -2,7 +2,7 @@
 
 #if defined(ENABLE_HANWHA)
 
-#include <plugins/resource/hanwha/hanwha_mixed_preset_manager.h>
+#include <plugins/resource/hanwha/hanwha_mapped_preset_manager.h>
 
 #include <core/ptz/basic_ptz_controller.h>
 #include <core/resource/resource_fwd.h>
@@ -83,7 +83,7 @@ private:
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
-    mutable std::unique_ptr<HanwhaMixedPresetManager> m_presetManager;
+    mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;
 
 };
 
