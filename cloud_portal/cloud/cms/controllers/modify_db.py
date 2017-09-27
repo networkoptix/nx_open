@@ -76,8 +76,9 @@ def save_unrevisioned_records(customization, language, data_structures,
                 if invalid_file_type:
                     upload_errors.append(
                         (data_structure_name,
-                         'Invalid file type. Should be ' + data_structure.meta_settings['format'])
-                    )
+                         "Invalid file type. Uploaded file is {}. It should be {}."\
+                         .format(request_files[data_structure_name].content_type,
+                                 data_structure.meta_settings['format'])))
                     continue
 
                 # Gets the meta_settings form the DataStructure to check if the sizes are valid
@@ -224,9 +225,7 @@ def handle_file_upload(file, data_structure):
     encoded_string = base64.b64encode(file.read())
     file_type = file.content_type
 
-    print "File type: {}\tMeta Type: {}".format(file_type, data_structure.meta_settings['format'])
-
-    if data_structure.meta_settings['format'] not in file_type:
+    if 'format' in data_structure.meta_settings and data_structure.meta_settings['format'] not in file_type:
         return None, None, True
 
     if data_structure.type == DataStructure.DATA_TYPES.image:

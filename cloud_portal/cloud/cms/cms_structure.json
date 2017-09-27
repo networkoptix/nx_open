@@ -102,7 +102,10 @@
           "value": "",
           "description": "Logo for branding. Height must be equal 64px",
           "type": "Image",
-          "meta": {"height": 64}
+          "meta": {
+            "format": "png",
+            "height": 64
+          }
         },
         {
           "label": "Email Logo",
@@ -111,6 +114,7 @@
           "description": "Logo for email. Height must be not more than 40px, width - not more than 100px",
           "type": "Image",
           "meta": {
+            "format": "png",
             "height_le": 40,
             "width_le": 100
           }
@@ -129,7 +133,10 @@
           "value": "",
           "description": "Image for the front page. Image must have transparent background, recommended height is 200px (that is minimal height).",
           "type": "Image",
-          "meta": {"height_ge": 200}
+          "meta": {
+            "format": "png",
+            "height_ge": 200
+          }
         },
         ["Subtitle", "%SUBTITLE%","Welcome!",
           "Text under product name on landing page. One line (50-100 symbols)"],
