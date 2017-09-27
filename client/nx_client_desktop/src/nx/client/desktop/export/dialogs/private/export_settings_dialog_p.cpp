@@ -33,7 +33,7 @@ struct Position
     {
     }
 
-    bool operator < (const Position& other) const
+    bool operator<(const Position& other) const
     {
         return qAbs(offset) < qAbs(other.offset);
     }
