@@ -5,14 +5,10 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 
-#include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <database/db_manager.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/log/log_main.h>
 #include <common/common_module.h>
-
-using namespace nx::utils::db;
 
 namespace ec2 {
 namespace db {
@@ -28,11 +24,11 @@ bool loadOldAccessRightList(const QSqlDatabase& database, ApiAccessRightsDataLis
         ORDER BY rights.guid
     )";
     
-    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!query.prepare(queryStr) || !query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return false;
-
-    if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
-        return false;
+    }
 
     ApiAccessRightsData current;
     while (query.next())
@@ -68,7 +64,7 @@ bool migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManag
             return false;
     }
 
-    return SqlQueryExecutionHelper::execSQLScript(
+    return QnDbHelper::execSQLScript(
         "DROP TABLE vms_access_rights_tmp;",
         database);
 }

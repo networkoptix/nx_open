@@ -2,5 +2,5 @@
 # if somebody also updates the protocol version.
 # Prefer to use issue number and title as a comment.
 
-#VMS-5388: Some data is not shown if log in to Server with Cloud account
-set(nxec.ec2ProtoVersion "3025")
+#VMS-7280: Server can't correctly process transactions
+set(nxec.ec2ProtoVersion "3026")

@@ -4491,7 +4491,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
         QnUbjsonReader<QByteArray> stream(&srcData);
         if (!QnUbjson::deserialize(&stream, &abstractTran))
         {
-            NX_WARNING(this, "Can't deserialize transaction from transaction log");
+            NX_LOG("Can't deserialize transaction from transaction log", cl_logWARNING);
             return false;
         }
 
@@ -4506,7 +4506,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
             ApiIdData data;
             if (!QnUbjson::deserialize(&stream, &data))
             {
-                NX_WARNING("migrateAccessRightsToUbjsonFormat", "Can't deserialize transaction from transaction log");
+                NX_LOG(lit("Can't deserialize transaction from transaction log"), cl_logWARNING);
                 return false;
             }
             recordsToAdd << data;
@@ -4520,7 +4520,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
         delQuery.addBindValue(QnSql::serialized_field(data));
         if (!delQuery.exec())
         {
-            NX_WARNING("migrateAccessRightsToUbjsonFormat", query.lastError().text());
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
             return false;
         }
     }
@@ -4529,10 +4529,9 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
     {
         QnTransaction<ApiIdData> transaction(
             ApiCommand::removeAccessRights,
-            commonModule()->moduleGUID(),
             data);
-        transactionLog()->fillPersistentInfo(transaction);
-        if (transactionLog()->saveTransaction(transaction) != ErrorCode::ok)
+        transactionLog->fillPersistentInfo(transaction);
+        if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }
 
