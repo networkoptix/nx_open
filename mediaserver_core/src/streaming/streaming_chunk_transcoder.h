@@ -129,6 +129,7 @@ private:
     std::unique_ptr<QnTranscoder> createTranscoder(
         const QnSecurityCamResourcePtr& mediaResource,
         const StreamingChunkCacheKey& transcodeParams);
+    QnVideoCameraPool* videoCameraPool();
 
 private slots:
     void onTranscodingFinished(

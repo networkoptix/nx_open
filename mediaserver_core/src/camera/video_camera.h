@@ -29,6 +29,8 @@ class QnAbstractMediaServerVideoCamera:
     public QnAbstractVideoCamera
 {
 public:
+    virtual ~QnAbstractMediaServerVideoCamera() override = default;
+
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
         bool ensureInitialized = true) = 0;
@@ -93,7 +95,7 @@ public:
     QnVideoCamera(
         const MSSettings& settings,
         const QnResourcePtr& resource);
-    virtual ~QnVideoCamera();
+    virtual ~QnVideoCamera() override;
 
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,

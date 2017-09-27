@@ -526,3 +526,9 @@ void StreamingChunkTranscoder::onResourceRemoved(const QnResourcePtr& resource)
         StreamingChunkCacheKey(resourceIDStr),
         StreamingChunkCacheKey(nextResourceIDStr));
 }
+
+QnVideoCameraPool* StreamingChunkTranscoder::videoCameraPool()
+{
+    // TODO: #ak Fix it after fixing initialization order in MediaServerModule.
+    return m_videoCameraPool ? m_videoCameraPool : qnCameraPool;
+}
