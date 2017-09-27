@@ -1,18 +1,17 @@
 #include "export_media_validator.h"
 
 #include <client/client_module.h>
-
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
-
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
 #include <nx/core/transcoding/filters/filter_chain.h>
-
 #include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/data/export_layout_settings.h>
@@ -148,6 +147,17 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
         // TODO: #GDM estimated binary size for layout.
         //if (exeFileIsTooBig(settings.layout, durationMs))
         //    results.set(int(Result::tooBigExeFile));
+    }
+
+    const auto resPool = qnClientCoreModule->commonModule()->resourcePool();
+    for (const auto& item: settings.layout->getItems())
+    {
+        const auto resource = resPool->getResourceByDescriptor(item.resource);
+        if (resource && !resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            results.set(int(Result::nonCameraResources));
+            break;
+        }
     }
 
     // Rough estimation.

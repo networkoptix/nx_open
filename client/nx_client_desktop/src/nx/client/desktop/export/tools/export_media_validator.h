@@ -21,6 +21,7 @@ public:
         tooLong,
         tooBigExeFile,
         transcodingInBinaryIsNotSupported,
+        nonCameraResources,
 
         count
     };

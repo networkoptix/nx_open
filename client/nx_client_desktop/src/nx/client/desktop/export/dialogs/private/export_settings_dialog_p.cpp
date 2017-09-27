@@ -671,6 +671,10 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                 case ExportMediaValidator::Result::transcodingInBinaryIsNotSupported:
                     return ExportSettingsDialog::tr("Settings are not available for .EXE files.");
 
+                case ExportMediaValidator::Result::nonCameraResources:
+                    return ExportSettingsDialog::tr("Layout contains non-camera resources. "
+                        "They will be exported as \"NO DATA\" placeholders.");
+
                 default:
                     NX_EXPECT(false);
                     return QString();
