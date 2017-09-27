@@ -12,7 +12,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
@@ -87,6 +86,7 @@
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/local_settings_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
+#include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/failover_priority_dialog.h>
@@ -1828,19 +1828,21 @@ void ActionHandler::at_renameAction_triggered()
         ? camera->getGroupName()
         : resource->getName();
 
+    // TODO: #vkutin #gdm Is the following block of code still in use?
     if (name.isEmpty())
     {
         bool ok = false;
         do
         {
-            name = QInputDialog::getText(mainWindow(),
+            name = QnInputDialog::getText(mainWindow(),
                 tr("Rename"),
                 tr("Enter new name for the selected item:"),
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                 QLineEdit::Normal,
-                oldName,
-                &ok)
-                .trimmed();
-            if (!ok || name.isEmpty() || name == oldName)
+                QString(),
+                oldName).trimmed();
+
+            if (name.isEmpty() || name == oldName)
                 return;
 
         } while (!validateResourceName(resource, name));
