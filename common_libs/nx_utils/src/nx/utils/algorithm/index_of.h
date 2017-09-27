@@ -21,7 +21,7 @@ int index_of(Iterator first, Iterator last, Predicate pred)
 template<class Range, class Predicate> inline
 int index_of(Range range, Predicate pred)
 {
-    return index_of(std::cbegin(range), std::cend(range), pred);
+    return index_of(std::begin(range), std::end(range), pred);
 }
 
 } // namespace algorithm
