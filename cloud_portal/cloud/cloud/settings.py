@@ -23,7 +23,10 @@ sys.setdefaultencoding("utf-8")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 conf = get_config()
-CUSTOMIZATION = conf['customization']
+
+CUSTOMIZATION = os.getenv('CUSTOMIZATION')
+if not CUSTOMIZATION:
+    CUSTOMIZATION = conf['customization']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
