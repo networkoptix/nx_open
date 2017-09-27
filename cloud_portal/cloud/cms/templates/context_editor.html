@@ -28,11 +28,18 @@
         <div class="form-row">
             {{ field.label_tag }}
             <div id="{{field.label}}" style="display:inline-block;">
-                {% if field|is_ImageField and field.value%}
+                {% if field|is_ImageField and field.value %}
                 <div>
                     <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
                 </div>
                 {% endif %}
+
+                {% if field|is_FileField and field.value %}
+                <div>
+                    <a href="{% url 'download_file' field|get_FileName %}" download>Download</a>
+                </div>
+                {% endif %}
+
                 {{ field }}
                 
                 {% if field.help_text %}

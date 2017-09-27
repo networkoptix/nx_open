@@ -285,3 +285,17 @@ def product_settings(request, product_id):
                    'site_header': admin.site.site_header,
                    'site_title': admin.site.site_title,
                    'title': 'Settings for %s' % product.name})
+
+
+import base64, os
+@api_view(["GET"])
+def download_file(request, path):
+    data_records = DataRecord.objects.filter(data_structure__name=path)
+
+    if data_records.exists():
+        file = base64.b64decode(data_records.last().value)
+        response = HttpResponse(file, content_type="application")
+        response['Content-Disposition'] = 'inline; filename=' + os.path.basename(path)
+        return response
+
+    return Response("File does not exist", status=404)
