@@ -1,6 +1,7 @@
 #include <functional>
 #include <future>
 #include <atomic>
+#include <thread>
 #include <gtest/gtest.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/socket_delegate.h>
@@ -24,11 +25,13 @@ public:
             m_target->post([handler = std::move(handler)]() { handler(SystemError::connectionAbort, 0); });
             return;
         }
+
         if (m_zeroRead)
         {
             m_target->post([handler = std::move(handler)]() { handler(SystemError::noError, 0); });
             return;
         }
+
         m_target->readSomeAsync(buf, handler);
     }
 
@@ -39,6 +42,7 @@ public:
             m_target->post([handler = std::move(handler)]() { handler(SystemError::connectionAbort, 0); });
             return;
         }
+
         m_target->sendAsync(buf, handler);
     }
 
@@ -47,16 +51,13 @@ public:
 
 private:
     std::atomic<bool> m_terminated{false};
-    std::atomic<bool> m_zeroRead{ false };
+    std::atomic<bool> m_zeroRead{false};
 };
 
 class TestWebSocket : public nx::network::WebSocket
 {
 public:
     using WebSocket::WebSocket;
-    int pingCount() { return m_pingsReceived; }
-    int pongCount() { return m_pongsReceived; }
-    std::chrono::milliseconds pingTimeout() const { return m_pingTimeout; }
     TestStreamSocketDelegate* socket() { return dynamic_cast<TestStreamSocketDelegate*>(WebSocket::socket()); }
 };
 
@@ -75,6 +76,15 @@ protected:
             new TestStreamSocketDelegate(SocketFactory::createStreamSocket().release()));
         clientSocket2->setNonBlockingMode(true);
 
+        startFuture = startPromise.get_future();
+        readyFuture = readyPromise.get_future();
+
+        std::thread(
+            [this]()
+            {
+                ASSERT_TRUE(clientSocket2->connect(m_acceptor->getLocalAddress()));
+            }).detach();
+
         m_acceptor->acceptAsync(
             [this](SystemError::ErrorCode ecode, std::unique_ptr<AbstractStreamSocket> clientSocket)
             {
@@ -86,35 +96,38 @@ protected:
                     new TestStreamSocketDelegate(clientSocket.release()));
                 clientSocket1->setNonBlockingMode(true);
 
-                clientWebSocket.reset(
-                    new TestWebSocket(
-                        std::move(clientSocket1),
-                        clientSendMode,
-                        clientReceiveMode));
-
-                serverWebSocket.reset(
-                    new TestWebSocket(
-                        std::move(clientSocket2),
-                        serverSendMode,
-                        serverReceiveMode,
-                        serverRole));
-
                 startPromise.set_value();
             });
 
-        startFuture = startPromise.get_future();
-        readyFuture = readyPromise.get_future();
-
+        startFuture.wait();
     }
 
-    void givenPingTimeout(std::chrono::milliseconds timeout)
+    void givenServerClientWebSockets(std::chrono::milliseconds clientTimeout,
+        std::chrono::milliseconds serverTimeout)
     {
-        kPingTimeout = timeout;
+        clientWebSocket.reset(new TestWebSocket(std::move(clientSocket1), clientSendMode,
+                clientReceiveMode));
+
+        serverWebSocket.reset(new TestWebSocket(std::move(clientSocket2), serverSendMode,
+                serverReceiveMode, serverRole));
+
+        clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+        clientWebSocket->setAliveTimeout(clientTimeout);
+        serverWebSocket->setAliveTimeout(serverTimeout);
+        clientWebSocket->start();
+        serverWebSocket->start();
     }
 
-    void givenTCPConnectionEstablished()
+    void givenServerClientWebSockets()
     {
-        ASSERT_TRUE(clientSocket2->connect(m_acceptor->getLocalAddress()));
+        givenServerClientWebSockets(kAliveTimeout, kAliveTimeout);
+    }
+
+    void givenServerClientWebSocketsWithDifferentTimeouts()
+    {
+        givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+        givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+        givenServerClientWebSockets(kAliveTimeout, kAliveTimeout * 100);
     }
 
     void givenClientTestDataPrepared(int size)
@@ -142,9 +155,8 @@ protected:
     void givenClientServerExchangeMessagesCallbacks()
     {
         clientSendCb =
-            [this](SystemError::ErrorCode ecode, size_t)
+            [this](SystemError::ErrorCode, size_t)
             {
-                ASSERT_EQ(ecode, SystemError::noError);
                 if (doneCount == kIterations)
                     return;
                 clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
@@ -187,17 +199,57 @@ protected:
             };
     }
 
-    void whenSocketsBoundToOneThreadAndReadWriteScheduled()
+    void whenServerDoesntAnswerPings() {}
+
+    void whenReadWriteScheduled()
     {
-        whenSocketsBoundToOneThread();
+        serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+    }
+
+    template<typename SendAction>
+    void assertCbErrorCode(SystemError::ErrorCode desiredEcode, SendAction sendAction)
+    {
+        auto p = std::make_shared<nx::utils::promise<void>>();
+        auto f = p->get_future();
+        SystemError::ErrorCode error = SystemError::noError;
+
+        clientWebSocket->readSomeAsync(&clientReadBuf,
+            [this, &error, p](SystemError::ErrorCode ecode, size_t) mutable
+            {
+                error = ecode;
+                p->set_value();
+            });
+
+        sendAction();
+        f.wait();
+        ASSERT_EQ(desiredEcode, error);
+    }
+
+    void thenClientSocketShouldReceiveTimeoutErrorInReadHandler()
+    {
+        assertCbErrorCode(SystemError::timedOut, [](){});
+    }
+
+    void whenServerStartsAnsweringPings()
+    {
+        serverReadCb = [this](SystemError::ErrorCode, size_t) {};
         serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
     }
 
-    void whenSocketsBoundToOneThread()
+    void thenNoNewErrorsShouldHappen()
     {
-        clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
-        clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+        assertCbErrorCode(SystemError::noError,
+            [this]()
+            {
+                serverSendBuf = "hello";
+                serverWebSocket->sendAsync(serverSendBuf,
+                    [this](SystemError::ErrorCode ecode, size_t)
+                    {
+                        NX_ASSERT(ecode == SystemError::noError);
+                    });
+            });
     }
 
     void givenClientManyMessagesWithServerRespondingCallbacks()
@@ -205,10 +257,10 @@ protected:
         clientSendCb =
             [this](SystemError::ErrorCode ecode, size_t)
             {
-            if (ecode == SystemError::connectionAbort)
-            {
-                try { readyPromise.set_value(); } catch (...) {}
-            }
+                if (ecode == SystemError::connectionAbort)
+                {
+                    try { readyPromise.set_value(); } catch (...) {}
+                }
                 if (ecode != SystemError::noError)
                     return;
                 if (doneCount == kIterations)
@@ -265,6 +317,7 @@ protected:
 
     virtual void TearDown() override
     {
+        m_tearDownInProgress = true;
         if (clientWebSocket)
             clientWebSocket->pleaseStopSync();
         if (serverWebSocket)
@@ -321,6 +374,9 @@ protected:
     std::future<void> readyFuture;
 
     Role serverRole = Role::undefined;
+    bool m_tearDownInProgress = false;
+
+    const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
 };
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
@@ -330,10 +386,9 @@ TEST_F(WebSocket, MultipleMessages_twoWay)
     givenClientServerExchangeMessagesCallbacks();
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
-    startFuture.wait();
-    whenSocketsBoundToOneThreadAndReadWriteScheduled();
+    whenReadWriteScheduled();
 
     readyFuture.wait();
 }
@@ -345,11 +400,9 @@ TEST_F(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
     givenClientServerExchangeMessagesCallbacks();
     givenClientModes(SendMode::singleMessage, ReceiveMode::frame);
     givenServerModes(SendMode::singleMessage, ReceiveMode::frame);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
-    startFuture.wait();
     clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
-    clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
 
     clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
     serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
@@ -364,11 +417,9 @@ TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
     givenClientManyMessagesWithServerRespondingCallbacks();
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
-    startFuture.wait();
-
-    whenSocketsBoundToOneThreadAndReadWriteScheduled();
+    whenReadWriteScheduled();
     clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
 
     readyFuture.wait();
@@ -465,10 +516,8 @@ TEST_F(WebSocket, Wrappers)
     givenClientTestDataPrepared(1 * 1024 * 1024);
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-    givenTCPConnectionEstablished();
-    startFuture.wait();
-    clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
-    clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+    givenServerClientWebSockets();
+
     auto readFuture = websocketTestReader(serverWebSocket, 10);
     auto writeFuture = websocketTestWriter(clientWebSocket, clientSendBuf, 10);
     cf::when_all(readFuture, writeFuture).wait();
@@ -484,28 +533,24 @@ protected:
         givenClientModes(SendMode::singleMessage, ReceiveMode::message);
         givenServerModes(SendMode::singleMessage, ReceiveMode::message);
         givenClientTestDataPrepared(1024 * 1024 * 3);
-        givenTCPConnectionEstablished();
 
         clientSendCb =
             [&](SystemError::ErrorCode ecode, size_t)
         {
             if (ecode != SystemError::noError)
             {
-                //std::cout << "Client send error: " << ecode << std::endl;
-                pongCount = clientWebSocket->pongCount();
-                clientWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    clientWebSocket.reset();
                 processError(ecode);
                 return;
             }
 
             ++sentMessageCount;
-            //std::cout << "Message count: " << sentMessageCount << std::endl;
 
             if (sentMessageCount >= kTotalMessageCount)
             {
-                pongCount = clientWebSocket->pongCount();
-
-                clientWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    clientWebSocket.reset();
                 try { readyPromise.set_value(); } catch (...) {}
                 return;
             }
@@ -518,8 +563,8 @@ protected:
         {
             if (ecode != SystemError::noError || transferred == 0)
             {
-                //std::cout << "Client read error: " << ecode << std::endl;
-                clientWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    clientWebSocket.reset();
                 processError(ecode);
 
                 return;
@@ -535,13 +580,12 @@ protected:
 
             if (ecode != SystemError::noError)
             {
-                //std::cout << "server send error: " << ecode << std::endl;
-                serverWebSocket.reset();
+                if (!m_tearDownInProgress)
+                    serverWebSocket.reset();
                 processError(ecode);
                 return;
             }
 
-            //std::cout << "server send cb. Success." << std::endl;
             if (!sendQueue.empty())
             {
                 auto bufToSend = sendQueue.front();
@@ -556,16 +600,15 @@ protected:
 
             if (ecode != SystemError::noError || transferred == 0)
             {
-                //std::cout << "server read error: " << ecode << std::endl;
-                serverWebSocket.reset();
-                //std::cout << "server destroyed" << std::endl;
+                if (!m_tearDownInProgress)
+                    serverWebSocket.reset();
                 processError(ecode);
 
                 return;
             }
 
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
-            if (isServerResponds)
+            if (isServerResponding)
             {
                 if (sendQueue.empty())
                     serverWebSocket->sendAsync(serverReadBuf, serverSendCb);
@@ -574,11 +617,6 @@ protected:
             }
             serverReadBuf.clear();
         };
-
-        startFuture.wait();
-        clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
-        clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
-        clientWebSocket->setAliveTimeout(kAliveTimeout);
     }
 
     void processError(SystemError::ErrorCode ecode)
@@ -592,7 +630,8 @@ protected:
     void start()
     {
         clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
-        clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        if (isClientSending)
+            clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
         serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
 
         if (beforeWaitAction)
@@ -602,37 +641,54 @@ protected:
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
+    void whenConnectionIsIdleForSomeTime()
+    {
+        std::thread(
+            [this]()
+            {
+                std::this_thread::sleep_for(kAliveTimeout * 2);
+                try { readyPromise.set_value(); } catch (...) {}
+            }).detach();
+
+        start();
+    }
+
+    void thenItsBeenKeptAliveByThePings()
+    {
+        ASSERT_FALSE(isTimeoutError);
+    }
 
     std::function<void()> beforeWaitAction;
 
-    bool isServerResponds = true;
+    bool isServerResponding = true;
+    bool isClientSending = true;
     bool isTimeoutError = false;
     int sentMessageCount = 0;
     const int kTotalMessageCount = 100;
     std::queue<nx::Buffer> sendQueue;
-    const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
-    int pongCount = 0;
 };
 
 TEST_F(WebSocket_PingPong, PingPong_noPingsBecauseOfData)
 {
+    givenServerClientWebSockets();
     start();
     ASSERT_FALSE(isTimeoutError);
-    ASSERT_EQ(pongCount, 0);
 }
 
 TEST_F(WebSocket_PingPong, PingPong_pingsBecauseOfNoData)
 {
-    isServerResponds = false;
-    start();
+    isServerResponding = false;
+    isClientSending = false;
 
-    ASSERT_FALSE(isTimeoutError);
-    ASSERT_GT(pongCount, 0);
+    givenServerClientWebSockets();
+    whenConnectionIsIdleForSomeTime();
+    thenItsBeenKeptAliveByThePings();
 }
 
 
 TEST_F(WebSocket_PingPong, Close)
 {
+    givenServerClientWebSockets();
     beforeWaitAction =
         [this]()
     {
@@ -646,11 +702,21 @@ TEST_F(WebSocket_PingPong, Close)
     ASSERT_FALSE(serverWebSocket);
 }
 
+TEST_F(WebSocket, ContinueWorkAfterTimeout)
+{
+    givenServerClientWebSocketsWithDifferentTimeouts();
+    whenServerDoesntAnswerPings();
+    thenClientSocketShouldReceiveTimeoutErrorInReadHandler();
+
+    whenServerStartsAnsweringPings();
+    thenNoNewErrorsShouldHappen();
+}
+
 TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
 {
     givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::message);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
     int frameCount = 0;
     int sentMessageCount = 0;
@@ -664,17 +730,11 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
         {
             ASSERT_EQ(ecode, SystemError::noError);
             frameCount++;
-            if (frameCount == kMessageFrameCount - 1)
-                clientWebSocket->setIsLastFrame();
-            else if (frameCount == kMessageFrameCount)
+            if (frameCount == kMessageFrameCount)
             {
+                clientWebSocket->setIsLastFrame();
                 frameCount = 0;
                 sentMessageCount++;
-            }
-            if (sentMessageCount >= kTotalMessageCount)
-            {
-                readyPromise.set_value();
-                return;
             }
             clientWebSocket->sendAsync(kFrameBuffer, clientSendCb);
         };
@@ -684,28 +744,35 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
         {
             if (ecode != SystemError::noError || transferred == 0)
                 return;
-            ASSERT_EQ(serverReadBuf.size(), kFrameBuffer.size()*kMessageFrameCount);
+
+            ASSERT_EQ(kFrameBuffer.size()*kMessageFrameCount, serverReadBuf.size());
+
             receivedMessageCount++;
+            if (receivedMessageCount >= kTotalMessageCount)
+            {
+                readyPromise.set_value();
+                return;
+            }
+
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
-    startFuture.wait();
-    whenSocketsBoundToOneThread();
 
-    clientWebSocket->sendAsync(kFrameBuffer, clientSendCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    whenReadWriteScheduled();
 
     readyFuture.wait();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
+    serverWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
 
-    ASSERT_EQ(receivedMessageCount, kTotalMessageCount);
+    ASSERT_EQ(kTotalMessageCount, receivedMessageCount);
+    ASSERT_GE(sentMessageCount, receivedMessageCount);
 }
 
 TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
 {
     givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::frame);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
     int frameCount = 0;
     int sentMessageCount = 0;
@@ -744,9 +811,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
-    startFuture.wait();
 
-    whenSocketsBoundToOneThread();
     clientWebSocket->sendAsync(kFrameBuffer, clientSendCb);
     serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
 
@@ -761,7 +826,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
     givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::stream);
     givenClientTestDataPrepared(16384 + 17);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
     int frameCount = 0;
     int sentMessageCount = 0;
@@ -792,7 +857,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
         {
             if (ecode != SystemError::noError || transferred == 0)
                 return;
-            receivedDataSize += transferred;
+            receivedDataSize += (int)transferred;
             serverReadBuf.clear();
 
             if (receivedDataSize == kReceiveAmount)
@@ -802,8 +867,8 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
             }
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
-    startFuture.wait();
-    whenSocketsBoundToOneThreadAndReadWriteScheduled();
+
+    whenReadWriteScheduled();
 
     readyFuture.wait();
     ASSERT_TRUE(true);
@@ -814,7 +879,7 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
     givenClientModes(SendMode::singleMessage, ReceiveMode::frame);
     givenServerModes(SendMode::multiFrameMessage, ReceiveMode::stream);
     givenClientTestDataPrepared(1000 * 1000 * 10);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
     int sentMessageCount = 0;
     int receivedDataSize = 0;
@@ -838,7 +903,7 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
         {
             if (ecode != SystemError::noError || transferred == 0)
                 return;
-            receivedDataSize += transferred;
+            receivedDataSize += (int)transferred;
             serverReadBuf.clear();
             if (receivedDataSize == kReceiveAmount)
             {
@@ -847,14 +912,15 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
             }
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
-    startFuture.wait();
-    whenSocketsBoundToOneThreadAndReadWriteScheduled();
+
+    whenReadWriteScheduled();
     readyFuture.wait();
     ASSERT_TRUE(true);
 }
 
 TEST_F(WebSocket_PingPong, UnexpectedClose_deleteFromCb_send)
 {
+    givenServerClientWebSockets();
     beforeWaitAction =
         [this]()
     {
@@ -870,6 +936,7 @@ TEST_F(WebSocket_PingPong, UnexpectedClose_deleteFromCb_send)
 
 TEST_F(WebSocket_PingPong, UnexpectedClose_deleteFromCb_receive)
 {
+    givenServerClientWebSockets();
     beforeWaitAction =
         [this]()
     {
@@ -889,7 +956,7 @@ TEST_F(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
     givenClientTestDataPrepared(1684*1024 + 17);
     serverRole = Role::server;
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
     int sentMessageCount = 0;
     const int kTotalMessageCount = 100;
@@ -924,8 +991,8 @@ TEST_F(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
-    startFuture.wait();
-    whenSocketsBoundToOneThreadAndReadWriteScheduled();
+
+    whenReadWriteScheduled();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
     readyFuture.wait();
@@ -938,7 +1005,7 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     givenClientModes(SendMode::singleMessage, ReceiveMode::message);
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
     givenClientTestDataPrepared(1684 * 1024 + 17);
-    givenTCPConnectionEstablished();
+    givenServerClientWebSockets();
 
     int sentMessageCount = 0;
     const int kTotalMessageCount = 100;
@@ -975,8 +1042,8 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
         serverReadBuf.clear();
         serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
     };
-    startFuture.wait();
-    whenSocketsBoundToOneThreadAndReadWriteScheduled();
+
+    whenReadWriteScheduled();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     serverWebSocket->socket()->setZeroRead();
 
@@ -985,14 +1052,5 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     ASSERT_TRUE(!serverWebSocket);
 }
 
-TEST_F(WebSocket_PingPong, calcPingTimeoutBySocketTimeout)
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    ASSERT_EQ(clientWebSocket->pingTimeout(), kAliveTimeout / 4);
-    unsigned recvTimeout;
-    clientWebSocket->socket()->getRecvTimeout(&recvTimeout);
-    ASSERT_EQ(recvTimeout, kAliveTimeout.count());
-}
-
-}
+} // namespace test
 
