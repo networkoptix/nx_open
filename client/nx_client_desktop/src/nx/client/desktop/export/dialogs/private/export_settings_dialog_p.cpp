@@ -312,21 +312,22 @@ void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType typ
         return;
 
     const auto geometry = overlayWidget->geometry();
-    const auto beg = geometry.topLeft() / m_overlayScale;
-    const auto end = geometry.bottomRight() / m_overlayScale;
-    const auto mid = geometry.center() / m_overlayScale;
+    const auto space = overlayWidget->parentWidget()->size();
+    const auto beg = geometry.topLeft();
+    const auto end = geometry.bottomRight();
+    const auto mid = geometry.center();
 
     const auto horizontal = std::min({
         Position(beg.x(), Qt::AlignLeft),
-        Position(mid.x() - m_fullFrameSize.width() / 2, Qt::AlignHCenter),
-        Position(m_fullFrameSize.width() - end.x(), Qt::AlignRight)});
+        Position(mid.x() - space.width() / 2, Qt::AlignHCenter),
+        Position(space.width() - end.x() - 1, Qt::AlignRight)});
 
     const auto vertical = std::min({
         Position(beg.y(), Qt::AlignTop),
-        Position(mid.y() - m_fullFrameSize.height() / 2, Qt::AlignVCenter),
-        Position(m_fullFrameSize.height() - end.y(), Qt::AlignBottom)});
+        Position(mid.y() - space.height() / 2, Qt::AlignVCenter),
+        Position(space.height() - end.y() - 1, Qt::AlignBottom)});
 
-    settings->offset = QPoint(horizontal.offset, vertical.offset);
+    settings->offset = QPoint(horizontal.offset, vertical.offset) / m_overlayScale;
     settings->alignment = horizontal.alignment | vertical.alignment;
 }
 
@@ -475,25 +476,28 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
     const auto positionOverlay =
         [this](QWidget* overlay, const ExportOverlayPersistentSettings& data)
         {
-            QPoint position;
-            const auto& size = m_fullFrameSize;
+            QPointF position;
+            const auto& space = m_fullFrameSize;
+            const auto size = QSizeF(overlay->size()) / m_overlayScale;
 
             if (data.alignment.testFlag(Qt::AlignHCenter))
-                position.setX((size.width() * m_overlayScale - overlay->width()) * 0.5);
+                position.setX((space.width() - size.width()) * 0.5 + data.offset.x());
             else if (data.alignment.testFlag(Qt::AlignRight))
-                position.setX((size.width() - data.offset.x()) * m_overlayScale - overlay->width());
+                position.setX(space.width() - size.width() - data.offset.x());
             else
-                position.setX(data.offset.x() * m_overlayScale);
+                position.setX(data.offset.x());
 
             if (data.alignment.testFlag(Qt::AlignVCenter))
-                position.setY((size.height() * m_overlayScale - overlay->height()) * 0.5);
+                position.setY((space.height() - size.height()) * 0.5 + data.offset.y());
             else if (data.alignment.testFlag(Qt::AlignBottom))
-                position.setY((size.height() - data.offset.x()) * m_overlayScale - overlay->height());
+                position.setY(space.height() - size.height() - data.offset.y());
             else
-                position.setY(data.offset.y() * m_overlayScale);
+                position.setY(data.offset.y());
 
             QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
-            overlay->move(position);
+            overlay->move(
+                qRound(position.x() * m_overlayScale),
+                qRound(position.y() * m_overlayScale));
         };
 
     auto overlay = this->overlay(type);
