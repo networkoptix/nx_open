@@ -69,7 +69,7 @@ bool migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManag
     }
 
     return SqlQueryExecutionHelper::execSQLScript(
-        "DROP TABLE vms_access_rights_tmp",
+        "DROP TABLE vms_access_rights_tmp;",
         database);
 }
 
