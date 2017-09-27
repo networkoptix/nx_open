@@ -20,6 +20,6 @@ def create_core_file_traceback(host, bin_path, lib_dir, core_path):
     host.mk_dir(WORK_DIR)
     commands_path = os.path.join(WORK_DIR, 'gdb_commands.%s' % os.urandom(3).encode('hex'))
     host.write_file(commands_path, gdb_commands)
-    traceback = host.run_command(['gdb',  '--quiet', '-x', commands_path],
+    traceback = host.run_command(['gdb',  '--quiet', '--command=%s' % commands_path],
                                  cwd=WORK_DIR, timeout=GDB_TIMEOUT, log_output=False)
     return traceback

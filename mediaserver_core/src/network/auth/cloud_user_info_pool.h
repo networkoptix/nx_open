@@ -2,15 +2,16 @@
 
 #include <cstdint>
 #include <vector>
+
 #include <boost/optional.hpp>
+
 #include <nx/network/http/http_types.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <core/resource/resource_fwd.h>
-#include <common/common_module_aware.h>
-#include <common/common_globals.h>
 
+#include <core/resource/resource_fwd.h>
+#include <common/common_globals.h>
 
 namespace nx {
 namespace cdb {
@@ -18,9 +19,11 @@ namespace api {
 
 class AuthInfo;
 
-}
-}
-}
+} // namespace api
+} // namespace cdb
+} // namespace nx
+
+class QnResourcePool;
 
 namespace detail {
 
@@ -50,6 +53,8 @@ using CloudUserRecordInfoRecordList = std::vector<CloudUserInfoRecord>;
 
 class AbstractCloudUserInfoPool;
 
+// TODO: #ak Break dependency loop between AbstractCloudUserInfoPoolSupplier and AbstractCloudUserInfoPool.
+
 class AbstractCloudUserInfoPoolSupplier
 {
 public:
@@ -60,25 +65,32 @@ public:
 class AbstractCloudUserInfoPool
 {
 public:
+    virtual ~AbstractCloudUserInfoPool() = default;
+
+    virtual boost::optional<nx::Buffer> newestMostCommonNonce() const = 0;
+    // TODO: #ak Likely, this method has to be removed after corresponding fix in CdbNonceFetcher.
+    virtual void clear() = 0;
+
+    // TODO: #ak Looks like dependency inversion make be of some use here. 
+    // It will break dependency loop also.
     virtual void userInfoChanged(
         const nx::Buffer& userName,
         const nx::cdb::api::AuthInfo& authInfo) = 0;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) = 0;
-    virtual ~AbstractCloudUserInfoPool() {}
 };
 
 class CloudUserInfoPoolSupplier:
     public QObject,
     public Qn::EnableSafeDirectConnection,
-    public QnCommonModuleAware,
     public AbstractCloudUserInfoPoolSupplier
 {
     Q_OBJECT
 public:
-    virtual void setPool(AbstractCloudUserInfoPool* pool) override;
-    CloudUserInfoPoolSupplier(QnCommonModule* commonModule);
+    CloudUserInfoPoolSupplier(QnResourcePool* resourcePool);
     ~CloudUserInfoPoolSupplier();
+
+    virtual void setPool(AbstractCloudUserInfoPool* pool) override;
 
 private:
     void onNewResource(const QnResourcePtr& resource);
@@ -87,20 +99,22 @@ private:
     void connectToResourcePool();
 
 private:
+    QnResourcePool* m_resourcePool;
     AbstractCloudUserInfoPool* m_pool;
 };
 
-
-class CloudUserInfoPool : public AbstractCloudUserInfoPool
+class CloudUserInfoPool:
+    public AbstractCloudUserInfoPool
 {
 public:
     CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier);
 
+    virtual boost::optional<nx::Buffer> newestMostCommonNonce() const override;
+    virtual void clear() override;
+
     Qn::AuthResult authenticate(
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authHeader) const;
-    boost::optional<nx::Buffer> newestMostCommonNonce() const;
-    void clear();
 
 private:
     virtual void userInfoChanged(
@@ -123,4 +137,3 @@ protected:
     nx::Buffer m_nonce;
     mutable QnMutex m_mutex;
 };
-

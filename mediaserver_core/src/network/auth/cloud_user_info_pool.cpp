@@ -14,9 +14,8 @@
 static const QString kCloudAuthInfoKey = nx::cdb::api::kVmsUserAuthInfoAttributeName;
 
 // CloudUserInfoPoolSupplier
-CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModule)
-    :
-    QnCommonModuleAware(commonModule),
+CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnResourcePool* resourcePool):
+    m_resourcePool(resourcePool),
     m_pool(nullptr)
 {
     connectToResourcePool();
@@ -35,12 +34,12 @@ CloudUserInfoPoolSupplier::~CloudUserInfoPoolSupplier()
 void CloudUserInfoPoolSupplier::connectToResourcePool()
 {
     Qn::directConnect(
-        resourcePool(),
+        m_resourcePool,
         &QnResourcePool::resourceAdded,
         this,
         &CloudUserInfoPoolSupplier::onNewResource);
     Qn::directConnect(
-        resourcePool(),
+        m_resourcePool,
         &QnResourcePool::resourceRemoved,
         this,
         &CloudUserInfoPoolSupplier::onRemoveResource);
