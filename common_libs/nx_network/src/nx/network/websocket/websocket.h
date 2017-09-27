@@ -54,24 +54,29 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
-     * Should be called before first read/send. Typically after instantiation and bindToAioThread().
-     * If you need to call it on working socket, first call cancelIOSync().
-     */
-    void start();
-
-    /**
      * Makes sense only in multiFrameMessage mode.
      * Indicates that the next sendAsync will close current message
      */
     void setIsLastFrame();
     void sendCloseAsync(); /**< Send close frame */
     /**
-     * After this timeout expired without any read activity read handler (if any) will be invoked
-     * with SystemError::timedOut. Should be called before start().
+     * After this timeout expired without any read activity
+     * read handler (if any) will be invoked with SystemError::timedOut.
      */
     void setAliveTimeout(std::chrono::milliseconds timeout);
+    /**
+     * @param timeout - stream socket recv timeout
+     * @param multiplier - affect internal ping pong timeout.
+     *
+     * Default multiplier is 4. Ping timeout = timeout / multiplier.
+     */
+    void setAliveTimeoutEx(std::chrono::milliseconds timeout, int multiplier);
     AbstractStreamSocket* socket() { return m_socket.get(); }
-    const AbstractStreamSocket* socket() const { return m_socket.get(); }
+
+protected:
+    int m_pingsReceived = 0;
+    int m_pongsReceived = 0;
+    std::chrono::milliseconds m_pingTimeout;
 
 private:
     virtual void stopWhileInAioThread() override;
@@ -92,15 +97,14 @@ private:
     void readWithoutAddingToQueueSync();
     void readWithoutAddingToQueue();
     void handlePingTimer();
-    void handleAliveTimer();
     void handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead);
     void handleSocketWrite(SystemError::ErrorCode ecode, size_t bytesSent);
+    void resetPingTimeoutBySocketTimeoutSync();
+    void setPingTimeout();
     void reportErrorIfAny(
         SystemError::ErrorCode ecode,
         size_t bytesRead,
         std::function<void(bool)> continueHandler);
-    std::chrono::milliseconds pingTimeout() const;
-    void restartTimers();
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
@@ -116,10 +120,9 @@ private:
     nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
-    std::unique_ptr<nx::network::aio::Timer> m_aliveTimer;
-    std::chrono::milliseconds m_aliveTimeout;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     SystemError::ErrorCode m_lastError;
+    int m_pingTimeoutMultiplier;
 };
 
 } // namespace websocket
