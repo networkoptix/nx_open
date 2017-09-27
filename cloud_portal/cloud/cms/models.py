@@ -9,9 +9,27 @@ from util.config import get_config
 
 from django.template.defaultfilters import truncatechars
 
+from django.core.cache import caches
+
+
+def update_global_cache(customization, version_id):
+    global_cache = caches['global']
+    global_cache.set(customization, version_id)
+
+
+def get_global_cache(customization):
+    global_cache = caches['global']
+    return global_cache.get(customization)
+
 
 def customization_cache(customization_name, value=None, force=False):
+    global_id = get_global_cache(customization_name)
+
     data = cache.get(customization_name)
+
+    if 'version_id' in data and data['version_id'] != global_id:
+        force = True
+
     if not data or force:
         customization = Customization.objects.get(name=customization_name)
         custom_config = get_config(customization.name)
@@ -25,6 +43,7 @@ def customization_cache(customization_name, value=None, force=False):
             'portal_url': custom_config['cloud_portal']['url']
         }
         cache.set(customization_name, data)
+        update_global_cache(customization, data['version_id'])
 
     if value:
         return data[value] if value in data else None

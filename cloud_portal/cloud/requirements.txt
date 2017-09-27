@@ -32,3 +32,5 @@ pycurl==7.43.0
 pillow==4.2.1
 django-tinymce==2.6.0
 django-csv-exports==1.0.3
+django-redis==4.8.0
+redis==2.10.6
