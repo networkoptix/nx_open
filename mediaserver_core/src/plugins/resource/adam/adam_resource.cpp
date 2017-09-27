@@ -75,6 +75,7 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
     QnIOPortDataList outputPorts = getRelayOutputList();
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
+    m_portTypes.clear();
     for (const auto& port: allPorts)
         m_portTypes[port.id] = port.portType;
 
