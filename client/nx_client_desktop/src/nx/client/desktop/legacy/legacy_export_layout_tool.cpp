@@ -413,6 +413,9 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
 
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
 
+    QnLegacyTranscodingSettings legacySettings;
+    legacySettings.resource = m_currentCamera->resource();
+
     m_currentCamera->exportMediaPeriodToFile(m_settings.period,
         uniqId,
         lit("mkv"),
@@ -420,8 +423,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
         role,
         serverTimeZone,
         0,
-        QnLegacyTranscodingSettings()
-    );
+        legacySettings);
 
     emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;
