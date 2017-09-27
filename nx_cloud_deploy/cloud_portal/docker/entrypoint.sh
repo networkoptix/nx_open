@@ -50,7 +50,6 @@ do
             echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
             yes "yes" | /app/env/bin/python manage.py migrate
-            yes "yes" | /app/env/bin/python manage.py createcachetable
 
             /app/env/bin/python manage.py initdb
             /app/env/bin/python manage.py readstructure

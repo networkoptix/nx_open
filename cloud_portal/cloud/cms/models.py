@@ -23,11 +23,10 @@ def get_global_cache(customization):
 
 
 def customization_cache(customization_name, value=None, force=False):
-    global_id = get_global_cache(customization_name)
 
     data = cache.get(customization_name)
 
-    if data and 'version_id' in data and data['version_id'] != global_id:
+    if data and 'version_id' in data and data['version_id'] != get_global_cache(customization_name):
         force = True
 
     if not data or force:

@@ -132,8 +132,7 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'portal_cache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
     },
     "global": {
         "BACKEND": "django_redis.cache.RedisCache",
