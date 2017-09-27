@@ -170,7 +170,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             QnMessageBox::success(mainWindow(), tr("Export completed"));
             break;
         case ExportProcessStatus::failure:
-            QnMessageBox::warning(mainWindow(), tr("Export failed"),
+            QnMessageBox::critical(mainWindow(), tr("Export failed"),
                 ExportProcess::errorString(info.error));
             break;
         case ExportProcessStatus::cancelled:
