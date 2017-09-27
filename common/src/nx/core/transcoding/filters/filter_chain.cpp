@@ -80,35 +80,30 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     if (m_settings.rotation != 0)
         push_back(QnAbstractImageFilterPtr(new QnRotateImageFilter(m_settings.rotation)));
 
+    //TODO: #GDM implement new timestamp filters here
+    //if (m_settings.timestampParams.enabled)
+    //    result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_settings.layout, m_settings.timestampParams));
+
     for (const auto overlaySettings: m_settings.overlays)
     {
-        switch (overlaySettings->type())
+        if (const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(
+            overlaySettings.data()))
         {
-            case OverlaySettings::Type::image:
-            {
-                const auto imageFilterSetting =
-                    static_cast<ImageOverlaySettings*>(overlaySettings.data());
-                const auto paintFilter = new nx::transcoding::filters::PaintImageFilter();
-                const auto filter = QnAbstractImageFilterPtr(paintFilter);
-                paintFilter->setImage(imageFilterSetting->image,
-                    imageFilterSetting->offset,
-                    imageFilterSetting->alignment);
-                push_back(filter);
-                break;
-            }
+            const auto paintFilter = new nx::transcoding::filters::PaintImageFilter();
+            const auto filter = QnAbstractImageFilterPtr(paintFilter);
+            paintFilter->setImage(imageFilterSetting->image,
+                imageFilterSetting->offset,
+                imageFilterSetting->alignment);
 
-            case OverlaySettings::Type::timestamp:
-            {
-                const auto timestampFilterSettings =
-                    static_cast<TimestampOverlaySettings*>(overlaySettings.data());
-                push_back(QnAbstractImageFilterPtr(new nx::transcoding::filters::TimestampFilter(
-                    *timestampFilterSettings)));
-                break;
-            }
-
-            default:
-                NX_ASSERT(false, Q_FUNC_INFO, "Unknown overlay type");
+            push_back(filter);
         }
+        else if (const auto timestampFilterSettings = dynamic_cast<TimestampOverlaySettings*>(
+            overlaySettings.data()))
+        {
+            push_back(QnAbstractImageFilterPtr(new nx::transcoding::filters::TimestampFilter(
+                *timestampFilterSettings)));
+        }
+
     }
 
     //verifying that output resolution is supported by codec

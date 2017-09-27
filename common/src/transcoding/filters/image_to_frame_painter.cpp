@@ -21,6 +21,7 @@ AlignedBufferPtr createAlignedBuffer(size_t size)
 QPoint calculateFinalPosition(
     const QPoint& offset,
     Qt::Alignment alignment,
+    const QSize& imageSize,
     const QSize& frameSize)
 {
     QPoint result = offset;
@@ -28,16 +29,16 @@ QPoint calculateFinalPosition(
         return result;
 
     if (alignment.testFlag(Qt::AlignHCenter))
-        result.setX(frameSize.width() / 2 + offset.x());
+        result.setX((frameSize.width() - imageSize.width())/ 2 + offset.x());
     else if (alignment.testFlag(Qt::AlignRight) || alignment.testFlag(Qt::AlignTrailing))
-        result.setX(frameSize.width() - offset.x());
+        result.setX(frameSize.width() - offset.x() - imageSize.width());
     else
         result.setX(offset.x()); //< Set left offset by default.
 
     if (alignment.testFlag(Qt::AlignVCenter))
-        result.setY(frameSize.height() / 2 + offset.y());
+        result.setY((frameSize.height() - imageSize.height()) / 2 + offset.y());
     else if (alignment.testFlag(Qt::AlignBottom))
-        result.setY(frameSize.height() - offset.y());
+        result.setY(frameSize.height() - offset.y() - imageSize.height());
     else
         result.setY(offset.y()); //< Set top offset by default
 
@@ -135,7 +136,8 @@ void ImageToFramePainter::updateTargetImage()
         return;
     }
 
-    const auto finalPosition = calculateFinalPosition(m_offset, m_alignment, m_sourceSize);
+    const auto finalPosition = calculateFinalPosition(
+        m_offset, m_alignment, m_image.size(), m_sourceSize);
 
     const auto correctedPos = QPoint(
         std::max(finalPosition.x(), 0), std::max(finalPosition.y(), 0));
