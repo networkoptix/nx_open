@@ -4627,11 +4627,15 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
     // migrate transaction log
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log"));
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    if (!SqlQueryExecutionHelper::prepareSQLQuery(
+        &query,
+        lit("SELECT tran_guid, tran_data from transaction_log"),
+        Q_FUNC_INFO))
+    {
         return false;
     }
+    if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
 
     QVector<QnUuid> recordsToDelete;
     QVector<ApiIdData> recordsToAdd;
@@ -4658,7 +4662,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
             ApiIdData data;
             if (!QnUbjson::deserialize(&stream, &data))
             {
-                NX_WARNING("migrateAccessRightsToUbjsonFormat", "Can't deserialize transaction from transaction log");
+                NX_WARNING(this, "Can't deserialize transaction from transaction log");
                 return false;
             }
             recordsToAdd << data;
@@ -4668,13 +4672,17 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
     for (const auto& data: recordsToDelete)
     {
         QSqlQuery delQuery(m_sdb);
-        delQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
-        delQuery.addBindValue(QnSql::serialized_field(data));
-        if (!delQuery.exec())
+        if (!SqlQueryExecutionHelper::prepareSQLQuery(
+            &delQuery,
+            lit("DELETE FROM transaction_log WHERE tran_guid = ?"),
+            Q_FUNC_INFO))
         {
-            NX_WARNING("migrateAccessRightsToUbjsonFormat", query.lastError().text());
             return false;
         }
+
+        delQuery.addBindValue(QnSql::serialized_field(data));
+        if (!SqlQueryExecutionHelper::execSQLQuery(&delQuery, Q_FUNC_INFO))
+            return false;
     }
 
     for (const auto& data: recordsToAdd)
