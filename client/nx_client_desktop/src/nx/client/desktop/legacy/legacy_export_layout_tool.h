@@ -1,11 +1,12 @@
-#ifndef WORKBENCH_LAYOUT_EXPORT_TOOL_H
-#define WORKBENCH_LAYOUT_EXPORT_TOOL_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
+
+#include <nx/client/desktop/export/data/export_layout_settings.h>
 
 #include <recording/time_period.h>
 #include <recording/stream_recorder.h>
@@ -14,32 +15,21 @@
 
 class QnClientVideoCamera;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace legacy {
+
 /**
- * @brief The QnLayoutExportTool class          Utility class for exporting multi-video layouts.
- *                                              New instance of the class should be created for every new export process.
- *                                              Correct behaviour while re-using is not guarantied.
- *                                              Notifies about progress of the process.
+ * Utility class for exporting multi-video layouts. New instance of the class should be created for
+ * every new export process. Correct behaviour while re-using is not guarantied. Notifies about
+ * progress of the process.
  */
-class QnLayoutExportTool : public QObject, public QnWorkbenchContextAware
+class ExportLayoutTool : public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
-    /**
-     * @brief QnLayoutExportTool                Constructor method.
-     * @param layout                            Layout that should be exported.
-     * @param period                            Time period to export.
-     * @param filename                          Target filename.
-     * @param mode                              Mode of exporting: save over existing file,
-     *                                          save it to other location or add new exported layout.
-     * @param readOnly                          Read mode for new layout: full access or read-only.
-     * @param parent                            Owner object.
-     */
-    explicit QnLayoutExportTool(const QnLayoutResourcePtr &layout,
-                                const QnTimePeriod& period,
-                                const QString& filename,
-                                Qn::LayoutExportMode mode,
-                                bool readOnly,
-                                QObject *parent = 0);
+    explicit ExportLayoutTool(ExportLayoutSettings settings, QObject* parent = nullptr);
 
     /**
      * @brief start                             Start exporting. Async.
@@ -50,19 +40,20 @@ public:
     /**
      * @brief stop                              Stop exporting. Async.
      */
-    Q_SLOT void stop();
+    void stop();
 
     /**
      * @brief mode                              Current export mode.
      * @return
      */
-    Qn::LayoutExportMode mode() const;
+    ExportLayoutSettings::Mode mode() const;
 
     /**
      * @brief errorMessage                      Last error message. Filled if process finished incorrectly.
      * @return
      */
     QString errorMessage() const;
+
 signals:
     /**
      * @brief rangeChanged                      This signal is emitted when progress range of the process is changed.
@@ -88,6 +79,7 @@ signals:
      * @param success                           True if the process is finished successfully, false otherwise.
      */
     void finished(bool success, const QString &filename);
+
 private slots:
     bool exportMediaResource(const QnMediaResourcePtr& resource);
 
@@ -122,7 +114,10 @@ private:
 
     bool tryAsync(std::function<bool()> handler);
     bool writeData(const QString &fileName, const QByteArray &data);
+
 private:
+    const ExportLayoutSettings m_settings;
+
     /** Copy of the provided layout. */
     QnLayoutResourcePtr m_layout;
 
@@ -132,31 +127,22 @@ private:
     /** External file storage. */
     QnStorageResourcePtr m_storage;
 
-    /** Exported time period. */
-    QnTimePeriod m_period;
-
-    /** Name of the file the layout should be exported to. */
-    QString m_targetFilename;
-
     /** Name of the file we are writing. May differ from target filename if target file is busy. */
     QString m_realFilename;
 
-    /** Current export mode. */
-    Qn::LayoutExportMode m_mode;
-
-    /** Access status of the target layout. */
-    bool m_readOnly;
-
     /** Stage field, used to show correct progress in multi-video layout. */
-    int m_offset;
+    int m_offset = -1;
 
     /** Last error message. */
     QString m_errorMessage;
 
     /** Additional flag, set to true when the process is stopped from outside. */
-    bool m_stopped;
+    bool m_stopped = false;
 
-    QnClientVideoCamera *m_currentCamera;
+    QnClientVideoCamera* m_currentCamera = nullptr;
 };
 
-#endif // WORKBENCH_LAYOUT_EXPORT_TOOL_H
+} // namespace legacy
+} // namespace desktop
+} // namespace client
+} // namespace nx

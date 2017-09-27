@@ -25,6 +25,9 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
+#include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/client/desktop/export/settings/export_layout_persistent_settings.h>
+
 class QSettings;
 
 class QnClientSettings: public QnPropertyStorage, public Singleton<QnClientSettings> {
@@ -146,6 +149,11 @@ public:
 
         LAST_LOCAL_CONNECTION_URL,
         KNOWN_SERVER_URLS,
+
+        EXPORT_MEDIA_SETTINGS,
+        EXPORT_LAYOUT_SETTINGS,
+        EXPORT_BOOKMARK_SETTINGS,
+
         VARIABLE_COUNT
     };
 
@@ -174,6 +182,9 @@ protected:
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
+    using ExportMediaSettings = nx::client::desktop::ExportMediaPersistentSettings;
+    using ExportLayoutSettings = nx::client::desktop::ExportLayoutPersistentSettings;
+
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
         QN_DECLARE_RW_PROPERTY(int,                         maxPreviewSearchItems,  setMaxPreviewSearchItems,   MAX_PREVIEW_SEARCH_ITEMS,   16)
@@ -220,8 +231,9 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isGlBlurEnabled,        setGlBlurEnabled,           GL_BLUR,                    true)
         QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
-        // TODO: #GDM #3.1 replace with full set of export parameters in json
-        //QN_DECLARE_RW_PROPERTY(Qt::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
+        QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportMediaSettings,    setExportMediaSettings,     EXPORT_MEDIA_SETTINGS,      ExportMediaSettings())
+        QN_DECLARE_RW_PROPERTY(ExportLayoutSettings,        exportLayoutSettings,   setExportLayoutSettings,    EXPORT_LAYOUT_SETTINGS,     ExportLayoutSettings())
+        QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportBookmarkSettings, setExportBookmarkSettings,  EXPORT_BOOKMARK_SETTINGS,   ExportMediaSettings({nx::client::desktop::ExportOverlayType::bookmark}))
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())

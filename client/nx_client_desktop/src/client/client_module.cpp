@@ -14,6 +14,8 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
+#include <camera/camera_data_manager.h>
+
 #include <nx/utils/crash_dump/systemexcept.h>
 
 #include <camera/camera_bookmarks_manager.h>
@@ -42,7 +44,6 @@
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource_management/layout_tour_manager.h>
 
@@ -50,7 +51,6 @@
 
 #include <finders/systems_finder.h>
 #include <nx/vms/discovery/manager.h>
-#include <network/router.h>
 
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
@@ -361,6 +361,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnQtbugWorkaround());
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
+    m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
+
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
@@ -595,6 +597,11 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+QnCameraDataManager* QnClientModule::cameraDataManager() const
+{
+    return m_cameraDataManager;
 }
 
 nx::client::desktop::RadassController* QnClientModule::radassController() const

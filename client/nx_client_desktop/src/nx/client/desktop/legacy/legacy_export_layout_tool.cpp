@@ -1,9 +1,10 @@
-#include "workbench_layout_export_tool.h"
+#include "legacy_export_layout_tool.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QEventLoop>
 
 #include <client/client_settings.h>
+#include <client/client_module.h>
 
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
@@ -33,64 +34,54 @@
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <client_core/client_core_module.h>
 
+#include <nx/utils/app_info.h>
+
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
 #endif
-
-using namespace nx::client::desktop;
 
 namespace {
     const int retryTimes = 3;
     const int retryDelayMs = 500;
 }
 
-QnLayoutExportTool::ItemInfo::ItemInfo()
+namespace nx {
+namespace client {
+namespace desktop {
+namespace legacy {
+
+ExportLayoutTool::ItemInfo::ItemInfo()
     : name()
     , timezone(0)
 {}
 
-QnLayoutExportTool::ItemInfo::ItemInfo( const QString name, qint64 timezone )
+ExportLayoutTool::ItemInfo::ItemInfo( const QString name, qint64 timezone )
     : name(name)
     , timezone(timezone)
 {}
 
 
-QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
-                                       const QnTimePeriod &period,
-                                       const QString &filename,
-                                       Qn::LayoutExportMode mode,
-                                       bool readOnly,
-                                       QObject *parent) :
+ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_period(period),
-    m_targetFilename(filename),
-    m_realFilename(m_targetFilename),
-    m_mode(mode),
-    m_readOnly(readOnly),
-    m_offset(-1),
-    m_stopped(false),
-    m_currentCamera(0)
+    m_settings(settings),
+    m_realFilename(m_settings.filename.completeFileName())
 {
-    NX_ASSERT(!filename.startsWith(lit("layout:")));
     m_layout.reset(new QnLayoutResource());
-    m_layout->setId(layout->getId()); //before update() uuid's must be the same
-    m_layout->update(layout);
+    m_layout->setId(m_settings.layout->getId()); //before update() uuid's must be the same
+    m_layout->update(m_settings.layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
-    if (mode != Qn::LayoutLocalSave)
+    if (m_settings.mode != ExportLayoutSettings::Mode::LocalSave)
         m_layout->setId(QnUuid::createUuid());
 }
 
 
-bool QnLayoutExportTool::prepareStorage()
+bool ExportLayoutTool::prepareStorage()
 {
-    const bool isExeFile =
-#ifdef Q_OS_WIN
-        m_targetFilename.endsWith(lit(".exe"));
-#else
-        false;
-#endif
+    const auto isExeFile = nx::utils::AppInfo::isWindows()
+        && FileExtensionUtils::isExecutable(m_settings.filename.extension);
+
     if (isExeFile || m_realFilename == m_layout->getUrl())
     {
         // can not override opened layout. save to tmp file, then rename
@@ -104,7 +95,7 @@ bool QnLayoutExportTool::prepareStorage()
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != QnNovLauncher::ErrorCode::Ok)
         {
             m_errorMessage = tr("File \"%1\" is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).completeBaseName());
-            emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
+            emit finished(false, m_settings.filename.completeFileName());   //file is not created, finishExport() is not required
             return false;
         }
     }
@@ -119,7 +110,7 @@ bool QnLayoutExportTool::prepareStorage()
     return true;
 }
 
-QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout()
+ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
 {
     ItemInfoList result;
 
@@ -157,7 +148,7 @@ QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout()
 }
 
 
-bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &items) {
+bool ExportLayoutTool::exportMetadata(const ExportLayoutTool::ItemInfoList &items) {
 
     /* Names of exported resources. */
     {
@@ -196,13 +187,13 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
 
     /* Exported period. */
     {
-        if (!writeData(lit("range.bin"), m_period.serialize()))
+        if (!writeData(lit("range.bin"), m_settings.period.serialize()))
             return false;
     }
 
     /* Additional flags. */
     {
-        quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
+        quint32 flags = m_settings.readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
         for (const QnMediaResourcePtr resource: m_resources) {
             if (resource->toResource()->hasFlags(Qn::utc)) {
                 flags |= QnLayoutFileStorageResource::ContainsCameras;
@@ -230,10 +221,10 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
     for (const QnMediaResourcePtr &resource: m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        auto loader = context()->instance<QnCameraDataManager>()->loader(resource);
+        auto loader = qnClientModule->cameraDataManager()->loader(resource);
         if (!loader)
             continue;
-        QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);
+        QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_settings.period);
         QByteArray data;
         periods.encode(data);
 
@@ -271,15 +262,15 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
     return true;
 }
 
-bool QnLayoutExportTool::start() {
+bool ExportLayoutTool::start() {
     if (!prepareStorage())
         return false;
 
     ItemInfoList items = prepareLayout();
 
     if (!exportMetadata(items)) {
-        m_errorMessage = tr("Could not create output file %1...").arg(m_targetFilename);
-        emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
+        m_errorMessage = tr("Could not create output file %1...").arg(m_settings.filename.completeFileName());
+        emit finished(false, m_settings.filename.completeFileName());   //file is not created, finishExport() is not required
         return false;
     }
 
@@ -288,7 +279,7 @@ bool QnLayoutExportTool::start() {
     return exportNextCamera();
 }
 
-void QnLayoutExportTool::stop() {
+void ExportLayoutTool::stop() {
     m_stopped = true;
     m_resources.clear();
     m_errorMessage = QString(); //suppress error by manual canceling
@@ -301,15 +292,15 @@ void QnLayoutExportTool::stop() {
     }
 }
 
-Qn::LayoutExportMode QnLayoutExportTool::mode() const {
-    return m_mode;
+ExportLayoutSettings::Mode ExportLayoutTool::mode() const {
+    return m_settings.mode;
 }
 
-QString QnLayoutExportTool::errorMessage() const {
+QString ExportLayoutTool::errorMessage() const {
     return m_errorMessage;
 }
 
-bool QnLayoutExportTool::exportNextCamera() {
+bool ExportLayoutTool::exportNextCamera() {
     if (m_stopped)
         return false;
 
@@ -322,24 +313,24 @@ bool QnLayoutExportTool::exportNextCamera() {
     }
 }
 
-void QnLayoutExportTool::finishExport(bool success)
+void ExportLayoutTool::finishExport(bool success)
 {
     if (!success)
     {
         QFile::remove(m_realFilename);
-        emit finished(false, m_targetFilename);
+        emit finished(false, m_settings.filename.completeFileName());
         return;
     }
 
-    if (m_realFilename != m_targetFilename)
-        m_storage->renameFile(m_storage->getUrl(), m_targetFilename);
+    if (m_realFilename != m_settings.filename.completeFileName())
+        m_storage->renameFile(m_storage->getUrl(), m_settings.filename.completeFileName());
 
-    auto existing = resourcePool()->getResourceByUrl(m_targetFilename)
+    auto existing = resourcePool()->getResourceByUrl(m_settings.filename.completeFileName())
         .dynamicCast<QnLayoutResource>();
 
-    switch (m_mode)
+    switch (m_settings.mode)
     {
-        case Qn::LayoutLocalSave:
+        case ExportLayoutSettings::Mode::LocalSave:
         {
             /* Update existing layout. */
             NX_ASSERT(existing);
@@ -350,8 +341,8 @@ void QnLayoutExportTool::finishExport(bool success)
             }
             break;
         }
-        case Qn::LayoutLocalSaveAs:
-        case Qn::LayoutExport:
+        case ExportLayoutSettings::Mode::LocalSaveAs:
+        case ExportLayoutSettings::Mode::Export:
         {
             /* Existing is present if we did 'Save As..' with another existing layout name. */
             if (existing)
@@ -363,7 +354,7 @@ void QnLayoutExportTool::finishExport(bool success)
                 /* Something went wrong */
                 m_errorMessage = tr("Unknown error has occurred.");
                 QFile::remove(m_realFilename);
-                emit finished(false, m_targetFilename);
+                emit finished(false, m_settings.filename.completeFileName());
                 return;
             }
             resourcePool()->addResource(layout);
@@ -372,7 +363,7 @@ void QnLayoutExportTool::finishExport(bool success)
         default:
             break;
     }
-    emit finished(success, m_targetFilename);
+    emit finished(success, m_settings.filename.completeFileName());
 
     /*
     else if (m_mode == Qn::LayoutLocalSaveAs)
@@ -402,10 +393,10 @@ void QnLayoutExportTool::finishExport(bool success)
 
 }
 
-bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
+bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
     m_currentCamera = new QnClientVideoCamera(resource);
     connect(m_currentCamera,    SIGNAL(exportProgress(int)),            this,   SLOT(at_camera_progressChanged(int)));
-    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &QnLayoutExportTool::at_camera_exportFinished);
+    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &ExportLayoutTool::at_camera_exportFinished);
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
     for (int i = 0; i < numberOfChannels; ++i) {
@@ -422,21 +413,23 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
 
-    m_currentCamera->exportMediaPeriodToFile(m_period,
-                                    uniqId,
-                                    lit("mkv"),
-                                    m_storage,
-                                    role,
-                                    serverTimeZone,
-                                    0,
-                                    QnImageFilterHelper()
-                                    );
+    QnLegacyTranscodingSettings legacySettings;
+    legacySettings.resource = m_currentCamera->resource();
 
-    emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));
+    m_currentCamera->exportMediaPeriodToFile(m_settings.period,
+        uniqId,
+        lit("mkv"),
+        m_storage,
+        role,
+        serverTimeZone,
+        0,
+        legacySettings);
+
+    emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_settings.filename.completeFileName()).fileName()));
     return true;
 }
 
-void QnLayoutExportTool::at_camera_exportFinished(const StreamRecorderErrorStruct& status,
+void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct& status,
     const QString& filename)
 {
     Q_UNUSED(filename)
@@ -491,18 +484,18 @@ void QnLayoutExportTool::at_camera_exportFinished(const StreamRecorderErrorStruc
     }
 }
 
-void QnLayoutExportTool::at_camera_exportStopped() {
+void ExportLayoutTool::at_camera_exportStopped() {
     if (m_currentCamera)
         m_currentCamera->deleteLater();
 
     finishExport(false);
 }
 
-void QnLayoutExportTool::at_camera_progressChanged(int progress) {
+void ExportLayoutTool::at_camera_progressChanged(int progress) {
     emit valueChanged(m_offset * 100 + progress);
 }
 
-bool QnLayoutExportTool::tryAsync( std::function<bool()> handler ) {
+bool ExportLayoutTool::tryAsync( std::function<bool()> handler ) {
     if (!handler)
         return false;
 
@@ -533,7 +526,7 @@ bool QnLayoutExportTool::tryAsync( std::function<bool()> handler ) {
     return false;
 }
 
-bool QnLayoutExportTool::writeData( const QString &fileName, const QByteArray &data ) {
+bool ExportLayoutTool::writeData( const QString &fileName, const QByteArray &data ) {
     return tryAsync([this, fileName, data] {
         QScopedPointer<QIODevice> file(m_storage->open(fileName, QIODevice::WriteOnly));
         if (!file)
@@ -542,3 +535,8 @@ bool QnLayoutExportTool::writeData( const QString &fileName, const QByteArray &d
         return true;
     } );
 }
+
+} // namespace legacy
+} // namespace desktop
+} // namespace client
+} // namespace nx

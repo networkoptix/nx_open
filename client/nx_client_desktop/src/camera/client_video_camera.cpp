@@ -10,67 +10,12 @@
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
 
 #include <recording/time_period.h>
 #include <plugins/resource/avi/thumbnails_stream_reader.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
-
-// input video with steps between frames in timeStepUsec translated to output video with 30 fps (kOutputDeltaUsec between frames)
-
-class QnTimeLapseRecorder: public QnStreamRecorder
-{
-    static const qint64 kOutputDeltaUsec = 1000000ll / 30; //< 30 fps
-
-public:
-    QnTimeLapseRecorder(
-        const QnResourcePtr& resource,
-        qint64 timeStepUsec)
-        :
-        QnStreamRecorder(resource),
-        m_currentRelativeTimeUsec(0),
-        m_currentAbsoluteTimeUsec(std::numeric_limits<qint64>::min()),
-        m_timeStepUsec(timeStepUsec)
-    {
-
-    }
-
-    virtual ~QnTimeLapseRecorder()
-    {
-        stop();
-    }
-
-protected:
-
-    virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override
-    {
-        QnAbstractMediaData* nonConstMd = const_cast<QnAbstractMediaData*> (md.get());
-        // we can use non const object if only 1 consumer
-        Q_ASSERT(nonConstMd->dataProvider->processorsCount() <= 1);
-
-        if (m_currentAbsoluteTimeUsec < md->timestamp)
-            m_currentAbsoluteTimeUsec = md->timestamp;
-        else
-            m_currentAbsoluteTimeUsec += m_timeStepUsec;
-
-        nonConstMd->timestamp = m_currentAbsoluteTimeUsec;
-        return QnStreamRecorder::saveData(md);
-    }
-
-    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override
-    {
-        Q_UNUSED(md);
-        qint64 result = m_currentRelativeTimeUsec;
-        m_currentRelativeTimeUsec += kOutputDeltaUsec;
-        return result;
-    }
-
-    virtual bool isUtcOffsetAllowed() const override { return false; }
-private:
-    qint64 m_currentRelativeTimeUsec;
-    qint64 m_currentAbsoluteTimeUsec;
-    qint64 m_timeStepUsec;
-};
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
     base_type(nullptr),
@@ -191,12 +136,13 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 }
 
 void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
-												  const  QString& fileName, const QString& format,
-                                            QnStorageResourcePtr storage,
-                                            StreamRecorderRole role,
-                                            qint64 serverTimeZoneMs,
-                                            qint64 timelapseFrameStepMs,
-                                            QnImageFilterHelper transcodeParams)
+    const  QString& fileName,
+    const QString& format,
+    QnStorageResourcePtr storage,
+    StreamRecorderRole role,
+    qint64 serverTimeZoneMs,
+    qint64 timelapseFrameStepMs,
+    const QnLegacyTranscodingSettings& transcodeParams)
 {
     qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -257,9 +203,14 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         });
 
         if (timelapseFrameStepUs > 0)
-            m_exportRecorder = new QnTimeLapseRecorder(m_resource->toResourcePtr(), timelapseFrameStepUs);
+        {
+            m_exportRecorder = new nx::client::desktop::ExportTimelapseRecorder(
+                m_resource->toResourcePtr(), timelapseFrameStepUs);
+        }
         else
+        {
             m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
+        }
 
 
         connect(m_exportRecorder, &QnStreamRecorder::finished, this, [this]()
@@ -275,8 +226,10 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             sender()->deleteLater();
         });
 
+        const auto filterChain = QnImageFilterHelper::createFilterChain(transcodeParams,
+            QSize());
 
-        m_exportRecorder->setExtraTranscodeParams(transcodeParams);
+        m_exportRecorder->setTranscodeFilters(filterChain);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

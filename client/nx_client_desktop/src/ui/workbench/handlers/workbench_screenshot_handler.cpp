@@ -46,6 +46,7 @@
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
 #include "transcoding/filters/abstract_image_filter.h"
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -57,12 +58,7 @@ namespace {
     const qint64 latestScreenshotTime = -1;
 }
 
-QnScreenshotParameters::QnScreenshotParameters():
-    utcTimestampMsec(0),
-    isUtc(false),
-    displayTimeMsec(0),
-    customAspectRatio(0.0),
-    rotationAngle(0.0)
+QnScreenshotParameters::QnScreenshotParameters()
 {
     timestampParams.enabled = true;
     timestampParams.corner = Qt::BottomRightCorner;
@@ -180,15 +176,13 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
 
-    QnImageFilterHelper imageProcessingParams;
-    QnMediaResourcePtr mediaRes = display->mediaResource();
-    if (mediaRes)
-        imageProcessingParams.setVideoLayout(layout);
-    imageProcessingParams.setSrcRect(parameters.zoomRect);
-    imageProcessingParams.setContrastParams(parameters.imageCorrectionParams);
-    imageProcessingParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-    imageProcessingParams.setRotation(parameters.rotationAngle);
-    imageProcessingParams.setCustomAR(parameters.customAspectRatio);
+    QnLegacyTranscodingSettings imageProcessingParams;
+    imageProcessingParams.resource = display->mediaResource();
+    imageProcessingParams.zoomWindow = parameters.zoomRect;
+    imageProcessingParams.contrastParams = parameters.imageCorrectionParams;
+    imageProcessingParams.itemDewarpingParams = parameters.itemDewarpingParams;
+    imageProcessingParams.rotation = parameters.rotationAngle;
+    imageProcessingParams.forcedAspectRatio = parameters.customAspectRatio;
 
     QImage screenshot = display->camDisplay()->getScreenshot(imageProcessingParams, anyQuality);
     if (screenshot.isNull())
@@ -299,7 +293,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         Key timeKey(keyStack, lit("_") + parameters.timeString());
 
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-        parameters.mediaDewarpingParams = widget->dewarpingParams();
+        parameters.resource = widget->resource();
         parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
 
         for (const ImageCorrectionParams &imageCorr: imageCorrList) {
@@ -375,7 +369,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.filename = filename;
    // parameters.timestampPosition = qnSettings->timestampCorner(); // TODO: #GDM #3.1 store full screenshot settings
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-    parameters.mediaDewarpingParams = widget->dewarpingParams();
+    parameters.resource = widget->resource();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
@@ -514,14 +508,17 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
             ? QDateTime::currentMSecsSinceEpoch()
             : parameters.displayTimeMsec;
 
-        QnImageFilterHelper transcodeParams;
+        QnLegacyTranscodingSettings transcodeParams;
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
-        transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-        transcodeParams.setContrastParams(parameters.imageCorrectionParams);
-        transcodeParams.setTimeStampParams(parameters.timestampParams);
-        transcodeParams.setRotation(parameters.rotationAngle);
-        transcodeParams.setSrcRect(parameters.zoomRect);
-        QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(result.size());
+        transcodeParams.itemDewarpingParams = parameters.itemDewarpingParams;
+        transcodeParams.resource = parameters.resource;
+        transcodeParams.contrastParams = parameters.imageCorrectionParams;
+        transcodeParams.timestampParams = parameters.timestampParams;
+        transcodeParams.rotation = parameters.rotationAngle;
+        transcodeParams.zoomWindow = parameters.zoomRect;
+        QList<QnAbstractImageFilterPtr> filters = QnImageFilterHelper::createFilterChain(
+            transcodeParams,
+            result.size());
 
         if (!filters.isEmpty()) {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
@@ -606,15 +603,17 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     QnScreenshotParameters localParameters = parameters;
 
     // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
-    if (localParameters.itemDewarpingParams.enabled && localParameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
+    if (localParameters.itemDewarpingParams.enabled
+        && widget->resource()->getDewarpingParams().viewMode == QnMediaDewarpingParams::VerticalDown)
+    {
         localParameters.rotationAngle -= 180;
+    }
 
     QnResourceDisplayPtr display = widget->display();
     QnImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
     if (imageProvider) {
         // avoiding post-processing duplication
         localParameters.imageCorrectionParams.enabled = false;
-        localParameters.mediaDewarpingParams.enabled = false;
         localParameters.itemDewarpingParams.enabled = false;
         localParameters.zoomRect = QRectF();
         localParameters.customAspectRatio = 0.0;

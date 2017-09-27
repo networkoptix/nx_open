@@ -1139,27 +1139,6 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     if (!layout)
         return InvisibleAction;
 
-    const auto resources = parameters.resources();
-    if (resources.isEmpty())
-    {
-        if (layout->flags().testFlag(Qn::exported_layout))
-            return InvisibleAction;
-    }
-    else
-    {
-        const bool onlyInacceptableItems = std::all_of(resources.begin(), resources.end(),
-            [](const QnResourcePtr& resource)
-            {
-                const auto flags = resource->flags();
-                return flags.testFlag(Qn::local)
-                    || flags.testFlag(Qn::server)
-                    || flags.testFlag(Qn::web_page)
-                    || flags.testFlag(Qn::io_module);
-            });
-
-        if (onlyInacceptableItems)
-            return InvisibleAction;
-    }
     auto layoutItems = parameters.layoutItems();
     const bool supported = layoutItems.empty()
         ? isRadassSupported(layout, MatchMode::Any)
@@ -1691,6 +1670,39 @@ ConditionWrapper canSavePtzPosition()
         });
 }
 
+ConditionWrapper hasTimePeriod()
+{
+    return new CustomCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+        {
+            if (!parameters.hasArgument(Qn::TimePeriodRole))
+                return InvisibleAction;
+
+            QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+            if (periodType(period) != NormalTimePeriod)
+                return DisabledAction;
+
+            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
+            if (!periods.intersects(period))
+                return DisabledAction;
+
+            return EnabledAction;
+        });
+}
+
+ConditionWrapper hasArgument(int key, int targetTypeId)
+{
+    return new CustomBoolCondition(
+        [key, targetTypeId](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+        {
+            if (!parameters.hasArgument(key))
+                return false;
+
+            return targetTypeId < 0 //< If targetTypeId < 0, type check is omitted.
+                || parameters.argument(key).canConvert(targetTypeId);
+        });
+}
+
 ConditionWrapper isEntropixCamera()
 {
     return new CustomBoolCondition(
@@ -1711,6 +1723,7 @@ ConditionWrapper isEntropixCamera()
 }
 
 } // namespace condition
+
 
 } // namespace action
 } // namespace ui

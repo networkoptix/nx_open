@@ -384,15 +384,6 @@ namespace Qn
         NewFrameRendered    /**< New frame was rendered. */
     };
 
-    /**
-     * Modes of layout export.
-     */
-    enum LayoutExportMode
-    {
-        LayoutLocalSave,
-        LayoutLocalSaveAs,
-        LayoutExport
-    };
 
     /**
      * Flags describing the client light mode.

@@ -620,7 +620,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     QnConstAbstractMediaDataPtr media,
     AVCodecID transcodeToCodec,
     const QSize& videoSize,
-    const QnImageFilterHelper& extraTranscodeParams)
+    const QnLegacyTranscodingSettings& extraTranscodeParams)
 :
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_outputPos(0),
@@ -641,7 +641,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 
     if (media->dataType == QnAbstractMediaData::VIDEO) {
-        m_transcoder.setExtraTranscodeParams(extraTranscodeParams);
+        m_transcoder.setTranscodingSettings(extraTranscodeParams);
         m_transcoder.setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
     }
     else {

@@ -301,8 +301,9 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setParams(params);
             ffmpegTranscoder->setQuality(quality);
             ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
-            m_extraTranscodeParams.setCodec(codec);
-            ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
+           // m_transcodingSettings.codec = codec;
+            ffmpegTranscoder->setFilterList(QnImageFilterHelper::createFilterChain(
+                m_transcodingSettings, resolution));
 
             if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
@@ -480,10 +481,9 @@ const QVector<int>& QnTranscoder::getPacketsSize()
     return m_outputPacketSize;
 }
 
-void QnTranscoder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)
+void QnTranscoder::setTranscodingSettings(const QnLegacyTranscodingSettings& settings)
 {
-    m_extraTranscodeParams = extraParams;
+    m_transcodingSettings = settings;
 }
 
 #endif // ENABLE_DATA_PROVIDERS
-

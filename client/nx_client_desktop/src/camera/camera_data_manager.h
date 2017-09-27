@@ -17,7 +17,7 @@ class QnCameraDataManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    explicit QnCameraDataManager(QObject *parent = 0);
+    explicit QnCameraDataManager(QnCommonModule* commonModule, QObject* parent = nullptr);
     virtual ~QnCameraDataManager();
 
     QnCachingCameraDataLoaderPtr loader(const QnMediaResourcePtr &resource, bool createIfNotExists = true);

@@ -199,6 +199,23 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 defaultValue.value<QnWorkbenchStateList>()));
         }
 
+        case EXPORT_MEDIA_SETTINGS:
+        case EXPORT_BOOKMARK_SETTINGS:
+        {
+            const auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<ExportMediaSettings>(asJson,
+                defaultValue.value<ExportMediaSettings>()));
+        }
+
+        case EXPORT_LAYOUT_SETTINGS:
+        {
+            const auto asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<ExportLayoutSettings>(asJson,
+                defaultValue.value<ExportLayoutSettings>()));
+        }
+
         case BACKGROUND_IMAGE:
         {
             QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
@@ -312,6 +329,21 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             break;
         }
 
+        case EXPORT_MEDIA_SETTINGS:
+        case EXPORT_BOOKMARK_SETTINGS:
+        {
+            const auto asJson = QString::fromUtf8(QJson::serialized(value.value<ExportMediaSettings>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case EXPORT_LAYOUT_SETTINGS:
+        {
+            const auto asJson = QString::fromUtf8(QJson::serialized(value.value<ExportLayoutSettings>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
         case EXTRA_INFO_IN_TREE:
         {
             Qn::ResourceInfoLevel level = value.value<Qn::ResourceInfoLevel>();
@@ -405,6 +437,7 @@ bool QnClientSettings::isWritable() const
     return m_settings->isWritable();
 }
 
-QSettings* QnClientSettings::rawSettings() {
+QSettings* QnClientSettings::rawSettings()
+{
     return m_settings;
 }

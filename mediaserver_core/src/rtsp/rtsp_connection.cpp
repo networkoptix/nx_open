@@ -639,10 +639,10 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
 
     qreal customAR = getResource()->customAspectRatio();
 
-    QnImageFilterHelper extraTranscodeParams;
-    extraTranscodeParams.setVideoLayout(vLayout);
-    extraTranscodeParams.setRotation(rotation);
-    extraTranscodeParams.setCustomAR(customAR);
+    QnLegacyTranscodingSettings extraTranscodeParams;
+    extraTranscodeParams.resource = getResource();
+    extraTranscodeParams.rotation = rotation;
+    extraTranscodeParams.forcedAspectRatio = customAR;
 
     switch (dstCodec)
     {

@@ -25,11 +25,11 @@ namespace {
 
 const QByteArray kTestMessage("Ping");
 const std::chrono::milliseconds kTestTimeout(5000);
-static size_t testClientCount() { return nx::utils::TestOptions::applyLoadMode<size_t>(10); }
+static inline size_t testClientCount() { return nx::utils::TestOptions::applyLoadMode<size_t>(10); }
 static std::string lastError() { return SystemError::getLastOSErrorText().toStdString(); }
 
 const bool kEnableTestDebugOutput = false;
-static void testDebugOutput(const utils::log::Message& message)
+static inline void testDebugOutput(const utils::log::Message& message)
 {
     if (kEnableTestDebugOutput)
         NX_LOG(lm("nx::network::test: %1").arg(message), cl_logDEBUG1);
@@ -254,7 +254,7 @@ void socketTransferSync(
     clientThread.join();
 }
 
-static void testWouldBlockLastError()
+static inline void testWouldBlockLastError()
 {
     const auto code = SystemError::getLastOSErrorCode();
     ASSERT_TRUE(code == SystemError::wouldBlock || code == SystemError::again)
@@ -484,7 +484,7 @@ void socketTransferAsync(
     }
 }
 
-static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+static inline void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
     ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
 
@@ -505,7 +505,7 @@ static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket
     promise.get_future().wait();
 }
 
-static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+static inline void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
     nx::utils::promise<void> promise;
     sender->sendAsync(
@@ -523,7 +523,7 @@ static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket
     promise.get_future().wait();
 }
 
-static void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+static inline void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
     ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
 
@@ -531,7 +531,7 @@ static void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* rec
     EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size(), MSG_WAITALL)) << lastError();
 }
 
-static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+static inline void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
     nx::utils::promise<void> sendPromise;
     sender->sendAsync(

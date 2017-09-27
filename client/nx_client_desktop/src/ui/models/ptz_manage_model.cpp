@@ -5,7 +5,7 @@
 #include <ui/style/globals.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <nx/utils/collection.h>
+#include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/string.h>
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
@@ -396,7 +396,8 @@ Qt::ItemFlags QnPtzManageModel::flags(const QModelIndex &index) const {
 }
 
 void QnPtzManageModel::updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots) {
-    int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) { return model.tour.id == tourId; });
+    int idx = nx::utils::algorithm::index_of(m_tours,
+        [&](const QnPtzTourItemModel &model) { return model.tour.id == tourId; });
     if (idx < 0)
         return;
 
@@ -634,12 +635,16 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
     return QVariant();
 }
 
-int QnPtzManageModel::presetIndex(const QString &id) const {
-    return qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) {return id == model.preset.id; });
+int QnPtzManageModel::presetIndex(const QString &id) const
+{
+    return nx::utils::algorithm::index_of(m_presets,
+        [&](const QnPtzPresetItemModel &model) {return id == model.preset.id; });
 }
 
-int QnPtzManageModel::tourIndex(const QString &id) const {
-    return qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) {return id == model.tour.id; });
+int QnPtzManageModel::tourIndex(const QString &id) const
+{
+    return nx::utils::algorithm::index_of(m_tours,
+        [&](const QnPtzTourItemModel &model) {return id == model.tour.id; });
 }
 
 bool QnPtzManageModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {

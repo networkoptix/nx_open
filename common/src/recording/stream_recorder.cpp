@@ -690,11 +690,12 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             return false;
         }
 
-        const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
+        const QnMediaResourcePtr mediaDev = m_device.dynamicCast<QnMediaResource>();
 
         // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
         // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-        bool isTranscode = !m_extraTranscodeParams.isEmpty() || (m_dstVideoCodec != AV_CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType);
+        const bool isTranscode = m_transcodeFilters.isTranscodingRequired(mediaDev)
+            || (m_dstVideoCodec != AV_CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType);
 
         const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
 
@@ -773,7 +774,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);
-                    m_videoTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(m_videoTranscoder->getResolution()));
+                    m_transcodeFilters.prepare(mediaDev, m_videoTranscoder->getResolution());
+                    m_videoTranscoder->setFilterList(m_transcodeFilters);
                     m_videoTranscoder->setQuality(Qn::QualityHighest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
 
@@ -1158,9 +1160,9 @@ void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
     m_motionHandler = handler;
 }
 
-void QnStreamRecorder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)
+void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
 {
-    m_extraTranscodeParams = extraParams;
+    m_transcodeFilters = filters;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

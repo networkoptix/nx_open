@@ -5,26 +5,39 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <nx/client/desktop/export/data/export_layout_settings.h>
+
+#include <utils/common/connective.h>
+
 class QnTimePeriod;
 class QnAbstractStreamDataProvider;
 class QnMediaResourceWidget;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace legacy {
+
 /**
- * @brief The QnWorkbenchExportHandler class            Handler for video and layout export related actions.
+ * @brief Legacy handler for video and layout export related actions.
  */
-class QnWorkbenchExportHandler: public QObject, public QnWorkbenchContextAware
+class WorkbenchExportHandler: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 public:
-    QnWorkbenchExportHandler(QObject *parent = NULL);
-
-    bool saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target = NULL, const char *slot = NULL);
-
-    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode);
+    WorkbenchExportHandler(QObject *parent = NULL);
 
 private:
+    bool saveLocalLayout(const QnLayoutResourcePtr& layout,
+        bool readOnly,
+        bool cancellable);
+
+    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod,
+        const QnLayoutResourcePtr& layout,
+        ExportLayoutSettings::Mode mode);
+
     QString binaryFilterName() const;
 
     bool validateItemTypes(const QnLayoutResourcePtr &layout); // used for export local layouts. Disable cameras and local items for same layout
@@ -32,11 +45,9 @@ private:
     bool saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
         const QnTimePeriod& exportPeriod,
         const QString& layoutFileName,
-        Qn::LayoutExportMode mode,
+        ExportLayoutSettings::Mode mode,
         bool readOnly,
-        bool cancellable,
-        QObject *target = NULL,
-        const char *slot = NULL);
+        bool cancellable);
 
     bool lockFile(const QString &filename);
     void unlockFile(const QString &filename);
@@ -44,9 +55,9 @@ private:
     bool isBinaryExportSupported() const;
 
     QnMediaResourceWidget* extractMediaWidget(
-        const nx::client::desktop::ui::action::Parameters& parameters);
+        const ui::action::Parameters& parameters);
 
-    void exportTimeSelection(const nx::client::desktop::ui::action::Parameters& parameters,
+    void exportTimeSelection(const ui::action::Parameters& parameters,
         qint64 timelapseFrameStepMs = 0);
 
     void exportTimeSelectionInternal(
@@ -63,10 +74,12 @@ private:
     /** Check if exe file will be greater than 4 Gb. */
     bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, const QnTimePeriod& period) const;
 
-    private slots:
+private slots:
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
     void at_exportRapidReviewAction_triggered();
+    void at_saveLocalLayoutAction_triggered();
+    void at_saveLocalLayoutAsAction_triggered();
 
     void at_layout_exportFinished(bool success, const QString &filename);
     void at_camera_exportFinished(bool success, const QString &fileName);
@@ -83,3 +96,8 @@ private:
 private:
     QSet<QString> m_filesIsUse;
 };
+
+} // namespace legacy
+} // namespace desktop
+} // namespace client
+} // namespace nx
