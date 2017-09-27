@@ -18,6 +18,9 @@ namespace {
 
 static const QString kUpnpBasicDeviceType("Basic");
 static const QString kHanwhaCameraName("Hanwha_Common");
+static const QString kHanwhaResourceTypeName = lit("Hanwha_Sunapi");
+static const QString kHanwhaDefaultUser = lit("admin");
+static const QString kHanwhaDefaultPassword = lit("4321");
 
 } // namespace
 
@@ -32,7 +35,9 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
-QnResourcePtr HanwhaResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr HanwhaResourceSearcher::createResource(
+    const QnUuid &resourceTypeId,
+    const QnResourceParams& /*params*/)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())
@@ -63,7 +68,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();
 
-    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+    auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
@@ -149,15 +154,18 @@ bool HanwhaResourceSearcher::processPacket(
 
 	{
 		QnMutexLocker lock(&m_mutex);
-		if (m_alreadFoundMacAddresses.find(cameraMac.toString()) != m_alreadFoundMacAddresses.end())
+        const bool alreadyFound = m_alreadFoundMacAddresses.find(cameraMac.toString())
+            != m_alreadFoundMacAddresses.end();
+
+		if (alreadyFound)
             return true;
     }
 
     decltype(m_foundUpnpResources) foundUpnpResources;
 
     QAuthenticator defaultAuth;
-    defaultAuth.setUser("admin");
-    defaultAuth.setPassword("4321");
+    defaultAuth.setUser(kHanwhaDefaultUser);
+    defaultAuth.setPassword(kHanwhaDefaultPassword);
     createResource(devInfo, cameraMac, defaultAuth, foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
@@ -174,11 +182,14 @@ void HanwhaResourceSearcher::createResource(
     QnResourceList& result)
 {
 
-    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+    auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
+    QnResourceData resourceData = qnStaticCommon
+        ->dataPool()
+        ->data(devInfo.manufacturer, devInfo.modelName);
+
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
@@ -197,11 +208,15 @@ void HanwhaResourceSearcher::createResource(
     result << resource;
 
     auto resPool = commonModule()->resourcePool();
-    auto rpRes = resPool->getNetResourceByPhysicalId(resource->getUniqueId()).dynamicCast<HanwhaResource>();
+    auto rpRes = resPool->getNetResourceByPhysicalId(
+        resource->getUniqueId()).dynamicCast<HanwhaResource>();
+
     addMultichannelResources(result, rpRes ? rpRes->getAuth() : auth);
 }
 
-int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource, const QAuthenticator& auth)
+int HanwhaResourceSearcher::getChannels(
+    const HanwhaResourcePtr& resource,
+    const QAuthenticator& auth)
 {
     auto result = m_channelsByCamera.value(resource->getUniqueId());
     if (result > 0)
@@ -230,7 +245,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
         {
             HanwhaResourcePtr resource(new HanwhaResource());
 
-            auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+            auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
             if (rt.isNull())
                 return;
 
