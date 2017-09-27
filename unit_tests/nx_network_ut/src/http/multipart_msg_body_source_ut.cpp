@@ -71,7 +71,7 @@ protected:
         ASSERT_EQ(expectedBody, m_msgBody);
     }
 
-    void thenEofStreamIsReported()
+    void thenEndOfStreamIsReported()
     {
         while (!m_eofReported)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -118,7 +118,7 @@ TEST_F(HttpMultipartMessageBodySourceTest, general)
 
         thenSerializedMessageBodyIsEqualTo(testData);
         if (closeMultipartBody)
-            thenEofStreamIsReported();
+            thenEndOfStreamIsReported();
     }
 }
 
