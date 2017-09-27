@@ -241,7 +241,7 @@ def response_attachment(data, filename, content_type):
 
 
 @api_view(["GET", "POST"])
-@permission_required('cms.edit_content')
+@permission_required('cms.change_product')
 def product_settings(request, product_id):
     product = Product.objects.get(pk=product_id)
     form = None
@@ -263,6 +263,7 @@ def product_settings(request, product_id):
                 return HttpResponseBadRequest('json is acceptable only for Updating structure')
             cms_structure = json.load(file)
             structure.update_from_object(cms_structure)
+            messages.success(request._request, "Structure updated")
         else:
             if not file.name.endswith('zip'):
                 return HttpResponseBadRequest('zip archive is expected')
@@ -270,8 +271,8 @@ def product_settings(request, product_id):
                 data = generate_structure.from_zip(file, product.name)
                 content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
                 return response_attachment(content, 'structure.json', 'application/json')
-            else:
-                structure.process_zip(file, request.user, update_structure, update_defaults, update_content)
+            structure.process_zip(file, request.user, update_structure, update_defaults, update_content)
+            messages.success(request._request, "File uploaded")
     else:
         form = ProductSettingsForm()
 

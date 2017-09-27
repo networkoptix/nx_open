@@ -17,15 +17,27 @@ def image_meta(data, extension):
     return OrderedDict([('width', width), ('height', height), ('format', extension)])
 
 
-def find_context(name, file_path, structure):
+def find_context(name, file_path, structure, product_name):
     context = next((context for context in structure["contexts"]
                    if context["name"] == name or file_path and context["file_path"] == file_path), None)
     if not context:
+        db_context = Context.objects.filter(file_path=file_path, product__name=product_name)
+        translatable = False
+        hidden = True
+        description = ""
+        if db_context.exists():
+            db_context = db_context.first()
+            name = db_context.name
+            description = db_context.description
+            translatable = db_context.translatable
+            hidden = db_context.hidden
+
         context = OrderedDict([
             ("name", name),
-            ("description", ""),
+            ("description", description),
             ("file_path", file_path),
-            ("translatable", False),
+            ("translatable", translatable),
+            ("hidden", hidden),
             ("values", [])
         ])
         structure["contexts"].append(context)
@@ -72,19 +84,19 @@ def read_cms_strings(data):
         return None
 
 
-def check_if_customizable(data, short_name, structure):
+def check_if_customizable(data, short_name, structure, product_name):
     strings = read_cms_strings(data)
     if not strings:
         return False
 
     # customizable file creates new structure
-    context = find_context(short_name, short_name, structure)
+    context = find_context(short_name, short_name, structure, product_name)
     for match in strings:
         find_structure(match[1], context, 'Text', description=match[0])
     return True
 
 
-def read_data(data, short_name, context, cms_structure):
+def read_data(data, short_name, context, cms_structure, product_name):
     extension = os.path.splitext(short_name)[1][1:]
     if short_name.endswith('DS_Store'):
         return
@@ -93,7 +105,7 @@ def read_data(data, short_name, context, cms_structure):
     if extension in IMAGES_EXTENSIONS:
         meta = image_meta(data, extension)
         structure_type = 'image'
-    elif check_if_customizable(data, short_name, cms_structure):
+    elif check_if_customizable(data, short_name, cms_structure, product_name):
         return
     find_structure(short_name, context, structure_type, meta=meta)
 
@@ -153,10 +165,10 @@ def iterate_contexts(file_iterator):
 
 def process_files(file_iterator, product_name):
     structure = OrderedDict([('product', product_name), ('contexts', [])])
-    root_context = find_context('root', '.', structure)
+    root_context = find_context('root', '.', structure, product_name)
     for short_name, context_name, data in iterate_contexts(file_iterator):
-        context = find_context(context_name, context_name, structure)
-        read_data(data, short_name, context, structure)
+        context = find_context(context_name, context_name, structure, product_name)
+        read_data(data, short_name, context, structure, product_name)
     return structure
 
 

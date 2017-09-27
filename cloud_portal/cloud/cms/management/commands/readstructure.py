@@ -87,9 +87,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         structure.read_structure_json('cms/cms_structure.json')
         read_structure('cloud_portal')
-        try:
-            structure.read_structure_json('cms/vms_structure.json')
-        except IOError:
-            print("No vms_structure to read")
         self.stdout.write(self.style.SUCCESS(
             'Successfully initiated data structure for CMS'))
