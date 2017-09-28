@@ -96,7 +96,7 @@ private:
     ExportOverlayWidget* overlay(ExportOverlayType type);
     const ExportOverlayWidget* overlay(ExportOverlayType type) const;
 
-    void updateOverlay(ExportOverlayType type);
+    void updateOverlay(ExportOverlayType type, bool keepAbsolutePosition = false);
     void updateOverlays();
     void updateBookmarkText();
     void updateTimestampText();

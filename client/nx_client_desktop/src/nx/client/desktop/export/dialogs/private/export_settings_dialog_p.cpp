@@ -448,14 +448,14 @@ void ExportSettingsDialog::Private::setTimestampOverlaySettings(
     const ExportTimestampOverlayPersistentSettings& settings)
 {
     m_exportMediaPersistentSettings.timestampOverlay = settings;
-    updateOverlay(ExportOverlayType::timestamp);
+    updateOverlay(ExportOverlayType::timestamp, true);
 }
 
 void ExportSettingsDialog::Private::setImageOverlaySettings(
     const ExportImageOverlayPersistentSettings& settings)
 {
     m_exportMediaPersistentSettings.imageOverlay = settings;
-    updateOverlay(ExportOverlayType::image);
+    updateOverlay(ExportOverlayType::image, true);
 
     if (settings.image.isNull() || settings.name.trimmed().isEmpty())
         return;
@@ -467,7 +467,7 @@ void ExportSettingsDialog::Private::setTextOverlaySettings(
     const ExportTextOverlayPersistentSettings& settings)
 {
     m_exportMediaPersistentSettings.textOverlay = settings;
-    updateOverlay(ExportOverlayType::text);
+    updateOverlay(ExportOverlayType::text, true);
 }
 
 void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
@@ -475,7 +475,7 @@ void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
 {
     m_exportMediaPersistentSettings.bookmarkOverlay = settings;
     updateBookmarkText();
-    updateOverlay(ExportOverlayType::bookmark);
+    updateOverlay(ExportOverlayType::bookmark, true);
 }
 
 void ExportSettingsDialog::Private::validateSettings(Mode mode)
@@ -518,7 +518,8 @@ void ExportSettingsDialog::Private::updateOverlays()
         updateOverlay(static_cast<ExportOverlayType>(i));
 }
 
-void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
+void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type,
+    bool keepAbsolutePosition)
 {
     const auto positionOverlay =
         [this](QWidget* overlay, const ExportOverlayPersistentSettings& data)
@@ -563,7 +564,8 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
             overlay->setPalette(palette);
 
             updateTimestampText();
-            positionOverlay(overlay, data);
+            if (!keepAbsolutePosition)
+                positionOverlay(overlay, data);
             break;
         }
 
@@ -573,7 +575,8 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
             overlay->setImage(data.image);
             overlay->setOverlayWidth(data.overlayWidth);
             overlay->setOpacity(data.opacity);
-            positionOverlay(overlay, data);
+            if (!keepAbsolutePosition)
+                positionOverlay(overlay, data);
             break;
         }
 
@@ -597,7 +600,8 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
             palette.setColor(QPalette::Text, data.foreground);
             palette.setColor(QPalette::Window, data.background);
             overlay->setPalette(palette);
-            positionOverlay(overlay, data);
+            if (!keepAbsolutePosition)
+                positionOverlay(overlay, data);
             break;
         }
 
@@ -605,6 +609,9 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
             NX_ASSERT(false); //< Should not happen.
             break;
     }
+
+    if (keepAbsolutePosition)
+        overlayPositionChanged(type);
 }
 
 void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
