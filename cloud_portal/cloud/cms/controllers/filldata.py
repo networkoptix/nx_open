@@ -47,7 +47,7 @@ def process_context_structure(customization, context, content,
     for datastructure in context.datastructure_set.order_by('order').all():
         content_value = datastructure.find_actual_value(customization, language, version_id)
         # replace marker with value
-        if datastructure.type != DataStructure.DATA_TYPES.image:
+        if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
             content = content.replace(datastructure.name, content_value)
         elif content_value:
             image_storage = os.path.join('static', customization.name)
@@ -69,6 +69,7 @@ def save_content(filename, content):
 
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
+    language = None
     if language_code:
         language = Language.objects.filter(code=language_code)
         if not language.exists():
@@ -82,6 +83,44 @@ def process_context(context, language_code, customization, preview, version_id, 
                 customization, global_context, content, None, version_id, preview)
 
     return content
+
+
+def read_customized_file(filename, customization_name, language_code=None, version_id=None, preview=False):
+    # 1. try to find context for this file
+    customization = Customization.objects.get(name=customization_name)
+    clean_name = filename.replace(language_code, "{{language}}") if language_code else filename
+    context = Context.objects.filter(file_path=clean_name)
+    if context.exists():
+        # success -> return process_context
+        context = context.first()
+        global_contexts = Context.objects.filter(is_global=True, product_id=context.product_id)
+        return process_context(context, language_code, customization, preview, version_id, global_contexts)
+
+    # 2. try to find datastructure for this file
+    # TODO: name is not unique
+    data_structure = DataStructure.objects.filter(name=clean_name)
+    if data_structure.exists():
+        # success -> return actual value
+        data_structure = data_structure.first()
+        value = data_structure.find_actual_value(customization,
+                                                 Language.objects.get(code=language_code) if language_code else None,
+                                                 version_id)
+        return base64.b64decode(value)
+
+    # fail - try to read file from drive
+    filename = filename.replace("{{language}}", language_code)
+    file_path = os.path.join(settings.STATIC_LOCATION, customization.name, filename)
+    try:  # try to read file as text
+        with codecs.open(filename, 'r', 'utf-8') as file:
+            return file.read()
+    except IOError:
+        pass
+
+    try:  # try to read binary file
+        with open(file_path, "rb") as file:
+            return file.read()
+    except IOError:
+        return None  # nothing helps
 
 
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
@@ -199,8 +238,7 @@ def fill_content(customization_name='default', product='cloud_portal',
 
         # update affected languages
         for language_code in changed_languages:
-            save_context(context, context.file_path, language_code,
-                            customization, preview, version_id, global_contexts)
+            save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
 

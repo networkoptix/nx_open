@@ -36,7 +36,7 @@
 
                 {% if field|is_FileField and field.value %}
                 <div>
-                    <a href="{% url 'download_file' context.id field.name %}" download>Download</a>
+                    <a href="{% url 'download_file' field.name %}" download>Download</a>
                 </div>
                 {% endif %}
 

@@ -11,12 +11,14 @@ from django.urls import reverse
 from django.contrib import admin
 from django.http.response import HttpResponse, HttpResponseBadRequest
 
+import os
 from cloud import settings
 import json
 from .controllers import structure, generate_structure
 
 from .controllers.modify_db import *
 from .forms import *
+from .controllers import filldata
 
 from django.contrib.admin import AdminSite
 
@@ -288,15 +290,12 @@ def product_settings(request, product_id):
                    'title': 'Settings for %s' % product.name})
 
 
-import base64, os
 @api_view(["GET"])
-def download_file(request, context_id, path):
-    data_records = DataRecord.objects.filter(data_structure__context_id=context_id, data_structure__name=path)
-
-    if data_records.exists():
-        file = base64.b64decode(data_records.last().value)
-        response = HttpResponse(file, content_type="application")
-        response['Content-Disposition'] = 'inline; filename=' + os.path.basename(path)
-        return response
-
+def download_file(request, path):
+    language_code = request.GET['lang'] if 'lang' in request.GET else None
+    version_id = request.GET['version_id'] if 'version_id' in request.GET else None
+    preview = 'draft' in request.GET
+    file = filldata.read_customized_file(path, settings.CUSTOMIZATION, language_code, version_id, preview)
+    if file:
+        return response_attachment(file, os.path.basename(path), "application")
     return Response("File does not exist", status=404)
