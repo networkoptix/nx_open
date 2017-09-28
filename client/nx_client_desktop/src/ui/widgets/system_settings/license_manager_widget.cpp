@@ -67,6 +67,43 @@ namespace {
 static const auto kHtmlDelimiter = lit("<br>");
 static const auto kEmptyLine = lit("%1%1").arg(kHtmlDelimiter);
 
+QString licenseReplyLogString(
+    QNetworkReply* reply,
+    const QByteArray& replyBody,
+    const QByteArray& licenseKey)
+{
+    if (!reply)
+        return QString();
+
+    static const auto kReplyLogTemplate =
+        lit("\nReceived response from license server (license key is %1):\n"
+            "Response: %2 (%3)\n"
+            "Headers:\n%4\n"
+            "Body:\n%5\n");
+
+    QStringList headers;
+    for (const auto header: reply->rawHeaderPairs())
+    {
+        headers.push_back(lit("%1: %2").arg(
+            QString::fromLatin1(header.first),
+            QString::fromLatin1(header.second)));
+    }
+
+    return kReplyLogTemplate.arg(
+        QString::fromLatin1(licenseKey),
+        QString::number(reply->error()), reply->errorString(),
+        headers.join(lit("\n")),
+        QString::fromLatin1(replyBody));
+}
+
+QString licenseRequestLogString(const QByteArray& body, const QByteArray& licenseKey)
+{
+    static const auto kRequestLogTemplate =
+        lit("\nSending request to license server (license key is %1).\nBody:\n%2\n");
+    return kRequestLogTemplate.arg(
+        QString::fromLatin1(licenseKey), QString::fromUtf8(body));
+}
+
 using DeactivationErrors =
     nx::client::desktop::license::Deactivator::Deactivator::LicenseErrorHash;
 DeactivationErrors filterDeactivationErrors(const DeactivationErrors& errors)
