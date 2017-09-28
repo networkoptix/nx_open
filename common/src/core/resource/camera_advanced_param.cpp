@@ -28,6 +28,7 @@ const QString kNumberDataType = lit("Number");
 const QString kEnumerationDataType = lit("Enumeration");
 const QString kButtonDataType = lit("Button");
 const QString kStringDataType = lit("String");
+const QString kSeparatorDataType = lit("Separator");
 
 } //< anonymous namespace
 
@@ -91,6 +92,8 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value)
             return kButtonDataType;
         case DataType::String:
             return kStringDataType;
+        case DataType::Separator:
+            return kSeparatorDataType;
         default:
             return QString();
     }
@@ -103,7 +106,9 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
 		<< DataType::Number
 		<< DataType::Enumeration
 		<< DataType::Button
-		<< DataType::String;
+		<< DataType::String
+        << DataType::Separator;
+
 	for (auto dataType: allDataTypes)
 		if (dataTypeToString(dataType) == value)
 			return dataType;
@@ -119,6 +124,7 @@ bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)
 	case DataType::String:
 		return true;
 	case DataType::Button:
+    case DataType::Separator:
         return false;
     default:
         return false;
@@ -436,6 +442,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
     (QnCameraAdvancedParameter::DataType::Enumeration, "Enumeration")
     (QnCameraAdvancedParameter::DataType::Number, "Number")
     (QnCameraAdvancedParameter::DataType::Button, "Button")
+    (QnCameraAdvancedParameter::DataType::Separator, "Separator")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, ConditionType,

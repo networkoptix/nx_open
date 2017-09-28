@@ -176,11 +176,11 @@ QnStreamRecorder::~QnStreamRecorder()
 
 void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
 {
-    NX_VERBOSE(this) "SignVideo: update signature at" << context->fileName;
+    NX_VERBOSE(this) << "SignVideo: update signature at" << context->fileName;
     QScopedPointer<QIODevice> file(context->storage->open(context->fileName, QIODevice::ReadWrite));
     if (!file)
     {
-        NX_VERBOSE(this) "SignVideo: could not open the file";
+        NX_VERBOSE(this) << "SignVideo: could not open the file";
         return;
     }
 
@@ -617,7 +617,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
                 if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
                     m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
                 AVCodecContext* srcCodec = m_recordingContextVector[i].formatCtx->streams[streamIndex]->codec;
-                NX_VERBOSE(this) "SignVideo: add video packet of size" << avPkt.size;
+                NX_VERBOSE(this) << "SignVideo: add video packet of size" << avPkt.size;
                 QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
                 //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
             }
@@ -1045,7 +1045,7 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
     {
         m_mdctx.reset();
         m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
-        NX_VERBOSE(this) "SignVideo: init";
+        NX_VERBOSE(this) << "SignVideo: init";
     }
 }
 
@@ -1060,7 +1060,7 @@ bool QnStreamRecorder::addSignatureFrame()
     QByteArray signText = QnSignHelper::getSignPattern(licensePool());
     if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
         signText.append(QByteArray::number(m_serverTimeZoneMs)); // I've included server timezone to sign to prevent modification this attribute
-    NX_VERBOSE(this) "SignVideo: add signature";
+    NX_VERBOSE(this) << "SignVideo: add signature";
     QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*)signText.data(), signText.size());
 #else
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;

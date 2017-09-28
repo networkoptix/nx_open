@@ -18,7 +18,9 @@
         <product.title>${company.name} nx_audio</product.title>
 
         <qt.libs>core</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_utils</global.libs>
+        <linux.oslibs>-lopenal</linux.oslibs>
+        <mac.oslibs>-framework OpenAL</mac.oslibs>
         <ios.oslibs>-framework OpenAL</ios.oslibs>
         <rdep.windows.packages>openal</rdep.windows.packages>
         <rdep.android.packages>openal</rdep.android.packages>

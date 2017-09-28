@@ -1,6 +1,7 @@
 #include "reverse_acceptor.h"
 
 #include <nx/network/http/empty_message_body_source.h>
+#include <nx/network/socket_delegate.h>
 
 #include "reverse_headers.h"
 
@@ -8,6 +9,36 @@ namespace nx {
 namespace network {
 namespace cloud {
 namespace tcp {
+
+namespace {
+
+class AcceptedReverseConnection:
+    public StreamSocketDelegate
+{
+    using base_type = StreamSocketDelegate;
+
+public:
+    AcceptedReverseConnection(
+        QString foreignHostName,
+        std::unique_ptr<AbstractStreamSocket> connection)
+        :
+        base_type(connection.get()),
+        m_foreignHostName(foreignHostName),
+        m_connection(std::move(connection))
+    {
+    }
+
+    virtual QString getForeignHostName() const override
+    {
+        return m_foreignHostName;
+    }
+
+private:
+    QString m_foreignHostName;
+    std::unique_ptr<AbstractStreamSocket> m_connection;
+};
+
+} // namespace
 
 ReverseAcceptor::ReverseAcceptor(ConnectHandler connectHandler):
     m_connectHandler(std::move(connectHandler)),
@@ -92,7 +123,9 @@ void ReverseAcceptor::fillNxRcHeaders(nx_http::HttpHeaders* headers) const
 
 void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnection* connection)
 {
-    auto socket = connection->takeSocket();
+    auto socket = std::make_unique<AcceptedReverseConnection>(
+        hostName,
+        connection->takeSocket());
     connection->closeConnection(SystemError::badDescriptor);
 
     {

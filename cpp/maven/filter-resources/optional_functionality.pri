@@ -47,7 +47,9 @@
   !contains( DEFINES, DISABLE_FLIR) {
     DEFINES += ENABLE_FLIR
   }
-
+  !contains( DEFINES, DISABLE_NAHWHA) {
+    DEFINES += ENABLE_HANWHA
+  }
 }
 
 !contains( DEFINES, DISABLE_MDNS) {

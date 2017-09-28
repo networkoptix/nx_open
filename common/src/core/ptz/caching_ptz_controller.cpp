@@ -53,38 +53,6 @@ Ptz::Capabilities QnCachingPtzController::getCapabilities() const
         : capabilities;
 }
 
-bool QnCachingPtzController::continuousMove(const QVector3D& speed)
-{
-    return base_type::continuousMove(speed);
-}
-
-bool QnCachingPtzController::continuousFocus(qreal speed)
-{
-    return base_type::continuousFocus(speed);
-}
-
-bool QnCachingPtzController::absoluteMove(
-    Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
-    qreal speed)
-{
-    return base_type::absoluteMove(space, position, speed);
-}
-
-bool QnCachingPtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed)
-{
-    return base_type::viewportMove(aspectRatio, viewport, speed);
-}
-
-bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
-{
-    /* We don't cache position => no need to check cache here. */
-    return base_type::getPosition(space, position);
-}
-
 bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
 {
     if (!base_type::getLimits(space, limits))
@@ -128,26 +96,6 @@ bool QnCachingPtzController::getFlip(Qt::Orientations* flip) const
     return true;
 }
 
-bool QnCachingPtzController::createPreset(const QnPtzPreset& preset)
-{
-    return base_type::createPreset(preset); 
-}
-
-bool QnCachingPtzController::updatePreset(const QnPtzPreset& preset)
-{
-    return base_type::updatePreset(preset);
-}
-
-bool QnCachingPtzController::removePreset(const QString& presetId)
-{
-    return base_type::removePreset(presetId);
-}
-
-bool QnCachingPtzController::activatePreset(const QString& presetId, qreal speed)
-{
-    return base_type::activatePreset(presetId, speed);
-}
-
 bool QnCachingPtzController::getPresets(QnPtzPresetList* presets) const
 {
     if (!base_type::getPresets(presets))
@@ -159,21 +107,6 @@ bool QnCachingPtzController::getPresets(QnPtzPresetList* presets) const
 
     *presets = m_data.presets;
     return true;
-}
-
-bool QnCachingPtzController::createTour(const QnPtzTour& tour)
-{
-    return base_type::createTour(tour); 
-}
-
-bool QnCachingPtzController::removeTour(const QString& tourId)
-{
-    return base_type::removeTour(tourId); 
-}
-
-bool QnCachingPtzController::activateTour(const QString& tourId)
-{
-    return base_type::activateTour(tourId); 
 }
 
 bool QnCachingPtzController::getTours(QnPtzTourList* tours) const
@@ -202,11 +135,6 @@ bool QnCachingPtzController::getActiveObject(QnPtzObject* activeObject) const
     return true;
 }
 
-bool QnCachingPtzController::updateHomeObject(const QnPtzObject& homeObject)
-{
-    return base_type::updateHomeObject(homeObject); 
-}
-
 bool QnCachingPtzController::getHomeObject(QnPtzObject* homeObject) const
 {
     if (!base_type::getHomeObject(homeObject))
@@ -231,13 +159,6 @@ bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryT
 
     *auxilaryTraits = m_data.auxilaryTraits;
     return true;
-}
-
-bool QnCachingPtzController::runAuxilaryCommand(
-    const QnPtzAuxilaryTrait& trait,
-    const QString& data)
-{
-    return base_type::runAuxilaryCommand(trait, data); 
 }
 
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
@@ -402,6 +323,6 @@ Qn::PtzDataFields QnCachingPtzController::updateCacheLocked(const QnPtzData &dat
     if (fields & Qn::ActiveObjectPtzField)   changedFields |= updateCacheLocked(Qn::ActiveObjectPtzField,    &QnPtzData::activeObject,   data.activeObject);
     if (fields & Qn::HomeObjectPtzField)     changedFields |= updateCacheLocked(Qn::HomeObjectPtzField,      &QnPtzData::homeObject,     data.homeObject);
     if (fields & Qn::AuxilaryTraitsPtzField) changedFields |= updateCacheLocked(Qn::AuxilaryTraitsPtzField,  &QnPtzData::auxilaryTraits, data.auxilaryTraits);
-    
+
     return changedFields;
 }

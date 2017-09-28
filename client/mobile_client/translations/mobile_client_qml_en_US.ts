@@ -264,6 +264,10 @@
         <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Software image rotation is not supported in fullscreen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LiveVideoNavigation</name>
@@ -441,6 +445,14 @@
         <source>INCOMPATIBLE</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>UNREACHABLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to this server from web browser or through desktop client to set it up</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SessionsScreen</name>
@@ -537,6 +549,10 @@
     <name>SystemInformationBlock</name>
     <message>
         <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -8,9 +8,11 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/listening_peer_manager.h>
 
 #include "connect_session_manager_mock.h"
+#include "listening_peer_manager_mock.h"
 #include "../basic_component_test.h"
 
 namespace nx {
@@ -49,8 +51,10 @@ protected:
     }
 
 private:
-    controller::ConnectSessionManagerFactory::FactoryFunc m_factoryFuncBak;
+    controller::ConnectSessionManagerFactory::FactoryFunc m_connectionSessionManagerFactoryFuncBak;
+    controller::ListeningPeerManagerFactory::Function m_listeningPeerManagerFactoryFuncBak;
     ConnectSessionManagerMock* m_connectSessionManager = nullptr;
+    ListeningPeerManagerMock* m_listeningPeerManager = nullptr;
     nx::utils::SyncQueue<api::ResultCode> m_apiResponse;
     std::unique_ptr<api::Client> m_relayClient;
 
@@ -58,10 +62,16 @@ private:
     {
         using namespace std::placeholders;
 
-        m_factoryFuncBak =
+        m_connectionSessionManagerFactoryFuncBak =
             controller::ConnectSessionManagerFactory::setFactoryFunc(
                 std::bind(&HttpApi::createConnectSessionManager, this,
                     _1, _2, _3, _4));
+
+        m_listeningPeerManagerFactoryFuncBak =
+            controller::ListeningPeerManagerFactory::instance().setCustomFunc(
+                std::bind(&HttpApi::createListeningPeerManager, this,
+                    _1, _2));
+
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
@@ -72,7 +82,7 @@ private:
         stop();
 
         controller::ConnectSessionManagerFactory::setFactoryFunc(
-            std::move(m_factoryFuncBak));
+            std::move(m_connectionSessionManagerFactoryFuncBak));
     }
 
     std::unique_ptr<controller::AbstractConnectSessionManager> 
@@ -84,11 +94,22 @@ private:
     {
         auto connectSessionManager = 
             std::make_unique<ConnectSessionManagerMock>(
-                &m_receivedBeginListeningRequests,
                 &m_receivedCreateClientSessionRequests,
                 &m_receivedConnectToPeerRequests);
         m_connectSessionManager = connectSessionManager.get();
         return std::move(connectSessionManager);
+    }
+
+    std::unique_ptr<controller::AbstractListeningPeerManager>
+        createListeningPeerManager(
+            const conf::ListeningPeer& /*settings*/,
+            model::ListeningPeerPool* /*listeningPeerPool*/)
+    {
+        auto listeningPeerManager =
+            std::make_unique<ListeningPeerManagerMock>(
+                &m_receivedBeginListeningRequests);
+        m_listeningPeerManager = listeningPeerManager.get();
+        return std::move(listeningPeerManager);
     }
 };
 

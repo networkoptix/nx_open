@@ -20,6 +20,10 @@ constexpr int nonRecoverableError = -3;
 
 } // namespace StreamIoError
 
+/**
+ * Interface of class that can be used as an output for some byte stream.
+ * E.g., it can write stream to some file or send via network.
+ */
 class NX_UTILS_API AbstractOutput
 {
 public:
@@ -31,6 +35,10 @@ public:
     virtual int write(const void* data, size_t count) = 0;
 };
 
+/**
+ * Output that converts byte stream and passes it to another output.
+ * Can be used to organize chains of converters.
+ */
 class NX_UTILS_API AbstractOutputConverter:
     public AbstractOutput
 {
@@ -54,12 +62,12 @@ public:
     virtual int read(void* data, size_t count) = 0;
 };
 
-class NX_UTILS_API TwoWayPipeline:
-    public AbstractInput,
-    public AbstractOutputConverter
+class NX_UTILS_API AbstractInputConverter:
+    public AbstractInput
 {
 public:
-    TwoWayPipeline();
+    AbstractInputConverter();
+    virtual ~AbstractInputConverter() = default;
 
     virtual void setInput(AbstractInput*);
 
@@ -67,8 +75,18 @@ protected:
     AbstractInput* m_inputStream;
 };
 
+/**
+ * Iterface of class that allows byte stream in both directions while converting it if needed.
+ */
+class NX_UTILS_API AbstractTwoWayConverter:
+    public AbstractInputConverter,
+    public AbstractOutputConverter
+{
+};
+
+// TODO: #ak Get rid of this class.
 class NX_UTILS_API Converter:
-    public TwoWayPipeline
+    public AbstractTwoWayConverter
 {
 public:
     virtual bool eof() const = 0;
@@ -76,19 +94,11 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-// ProxyPipeline
-
-class NX_UTILS_API ProxyPipeline:
-    public TwoWayPipeline
-{
-public:
-    virtual int read(void* data, size_t count) override;
-    virtual int write(const void* data, size_t count) override;
-};
-
-//-------------------------------------------------------------------------------------------------
 // ProxyConverter
 
+/**
+ * Just forwards every call to another object.
+ */
 class NX_UTILS_API ProxyConverter:
     public Converter
 {
@@ -113,17 +123,21 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// ReflectingPipeline
+// Pipe
 
-class NX_UTILS_API ReflectingPipeline:
-    public TwoWayPipeline
+/**
+ * Data that is written to object of this class with AbstractOutput::write, 
+ * becomes available through AbstractInput::read.
+ */
+class NX_UTILS_API Pipe:
+    public AbstractInput, public AbstractOutput
 {
 public:
-    ReflectingPipeline(QByteArray initialData = QByteArray());
+    Pipe(QByteArray initialData = QByteArray());
 
     virtual int write(const void* data, size_t count) override;
     /**
-     * Reads data that has previously been written with ReflectingPipeline::write.
+     * Reads data that has previously been written with Pipe::write.
      */
     virtual int read(void* data, size_t count) override;
     QByteArray readAll();
@@ -172,15 +186,14 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// Pipeline with template functor.
 
 template<typename WriteFunc>
-class CustomOutputPipeline:
+class CustomOutput:
     public AbstractOutput
 {
 public:
     template<typename WriteFuncRef>
-    CustomOutputPipeline(WriteFuncRef&& func):
+    CustomOutput(WriteFuncRef&& func):
         m_func(std::forward<WriteFuncRef>(func))
     {
     }
@@ -195,20 +208,20 @@ private:
 };
 
 template<typename WriteFunc>
-std::unique_ptr<CustomOutputPipeline<WriteFunc>>
-    makeCustomOutputPipeline(WriteFunc func)
+std::unique_ptr<CustomOutput<WriteFunc>> makeCustomOutput(WriteFunc func)
 {
-    return std::make_unique<CustomOutputPipeline<WriteFunc>>(std::move(func));
+    return std::make_unique<CustomOutput<WriteFunc>>(std::move(func));
 }
 
+//-------------------------------------------------------------------------------------------------
 
 template<typename WriteFunc>
-class CustomInputPipeline:
+class CustomInput:
     public AbstractInput
 {
 public:
     template<typename WriteFuncRef>
-    CustomInputPipeline(WriteFuncRef&& func):
+    CustomInput(WriteFuncRef&& func):
         m_func(std::forward<WriteFuncRef>(func))
     {
     }
@@ -223,10 +236,9 @@ private:
 };
 
 template<typename ReadFunc>
-std::unique_ptr<CustomInputPipeline<ReadFunc>>
-    makeCustomInputPipeline(ReadFunc func)
+std::unique_ptr<CustomInput<ReadFunc>> makeCustomInput(ReadFunc func)
 {
-    return std::make_unique<CustomInputPipeline<ReadFunc>>(std::move(func));
+    return std::make_unique<CustomInput<ReadFunc>>(std::move(func));
 }
 
 } // namespace pipeline

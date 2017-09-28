@@ -52,13 +52,11 @@ Object
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
-        property bool resumeOnActivate: false
-        property bool resumeOnOnline: false
+        property bool playing: false
+
         property real lastPosition: -1
         property bool waitForLastPosition: false
         property bool waitForFirstPosition: true
-        property string previousResourceId: ""
-        property bool firstResource: true
 
         function savePosition()
         {
@@ -71,16 +69,10 @@ Object
             if (!Utils.isMobile())
                 return
 
-            if (applicationActive)
-            {
-                if (d.resumeOnActivate)
-                    mediaPlayer.play()
-            }
-            else
-            {
-                d.resumeOnActivate = mediaPlayer.playing
+            if (!applicationActive)
                 mediaPlayer.pause()
-            }
+            else if (d.playing)
+                mediaPlayer.play()
         }
     }
 
@@ -118,34 +110,39 @@ Object
         }
     }
 
+    Timer
+    {
+        id: tryPlayTimer
+
+        interval: 0
+        onTriggered:
+        {
+            // We try to play even if camera is offline.
+            if (!cameraUnauthorized && d.playing && !mediaPlayer.playing)
+                mediaPlayer.play()
+        }
+    }
+
     onFailedChanged:
     {
         if (failed)
-        {
-            d.resumeOnOnline = offline
             mediaPlayer.stop()
-        }
     }
 
-    onOfflineChanged:
-    {
-        if (!offline && d.resumeOnOnline)
-        {
-            d.resumeOnOnline = false
-            mediaPlayer.play()
-        }
-    }
+    onCameraUnauthorizedChanged: tryPlayTimer.restart()
 
     onResourceIdChanged:
     {
-        if (d.previousResourceId)
-            d.firstResource = false
-        d.previousResourceId = resourceId
+        tryPlayTimer.restart();
 
         playerJump(d.lastPosition)
         mediaPlayer.position = d.lastPosition
 
-        if (resourceHelper.resourceStatus !== MediaResourceHelper.Online)
+        if (mediaPlayer.position == -1)
+        {
+            d.waitForFirstPosition = false
+        }
+        else if (resourceHelper.resourceStatus !== MediaResourceHelper.Online)
         {
             d.waitForFirstPosition = false
             gotFirstPosition(mediaPlayer.position)
@@ -169,23 +166,28 @@ Object
 
     function play()
     {
+        d.playing = true
         mediaPlayer.play()
         d.savePosition()
     }
 
     function playLive()
     {
+        d.playing = true
         mediaPlayer.playLive()
     }
 
     function stop()
     {
+        d.playing = false
         mediaPlayer.stop()
     }
 
     function pause()
     {
+        d.playing = false
         mediaPlayer.pause()
+        d.savePosition();
     }
 
     function preview()

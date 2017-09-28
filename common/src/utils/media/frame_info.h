@@ -200,7 +200,7 @@ public:
     /** Number of the video channel in video layout. */
     int channel;
 
-    QnMetaDataV1Ptr metadata; // addition data associated with video frame
+    QnAbstractCompressedMetadataPtr metadata; // addition data associated with video frame
 
 private:
     bool invalidScaleParameters(const QSize& size) const;

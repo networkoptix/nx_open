@@ -31,13 +31,16 @@ extern const char* const kPingPath;
 
 extern const char* const kEstablishEc2TransactionConnectionPath;
 extern const char* const kDeprecatedEstablishEc2TransactionConnectionPath;
+extern const char* const kEstablishEc2P2pTransactionConnectionPath;
 
 // Maintenance.
 extern const char* const kMaintenanceGetVmsConnections;
 extern const char* const kMaintenanceGetTransactionLog;
 extern const char* const kMaintenanceGetStatistics;
 
-extern const char* const kCloudModuleXmlPath;
+extern const char* const kDeprecatedCloudModuleXmlPath;
+
+extern const char* const kDiscoveryCloudModuleXmlPath;
 
 } // namespace cdb
 } // namespace nx

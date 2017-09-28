@@ -178,7 +178,10 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _ur
     deleteRemoveUrlById(peer);
 
     QUrl url(_url);
-    url.setPath(ConnectionProcessor::kUrlPath);
+    if (peer == kCloudPeerId)
+        url.setPath(ConnectionProcessor::kCloudPathPrefix + ConnectionProcessor::kUrlPath);
+    else
+        url.setPath(ConnectionProcessor::kUrlPath);
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
@@ -218,10 +221,10 @@ void MessageBus::gotConnectionFromRemotePeer(
         commonModule(),
         remotePeer,
         localPeerEx(),
-        std::move(connectionLockGuard),
         std::move(webSocket),
         userAccessData,
-        std::make_unique<nx::p2p::ConnectionContext>()));
+        std::make_unique<nx::p2p::ConnectionContext>(),
+        std::move(connectionLockGuard)));
 
     QnMutexLocker lock(&m_mutex);
     const auto remoteId = connection->remotePeer().id;
@@ -231,7 +234,7 @@ void MessageBus::gotConnectionFromRemotePeer(
     connectSignals(connection);
     startReading(connection);
 
-    if (!remotePeer.isServer())
+    if (remotePeer.isClient())
     {
         // Clients use simplified logic. They are started and subscribed to all updates immediately.
         context(connection)->isLocalStarted = true;
@@ -248,13 +251,24 @@ void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
     {
         QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
         tran.command = ApiCommand::getFullInfo;
-        if (!readApiFullInfoData(connection->userAccessData(), connection->remotePeer(), &tran.params))
+        if (!readApiFullInfoData(connection.staticCast<Connection>()->userAccessData(),
+            connection->remotePeer(), &tran.params))
         {
             connection->setState(Connection::State::Error);
             return;
         }
         sendTransactionImpl(connection, tran, TransportHeader());
     }
+}
+
+void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
+{
+    if (!m_db)
+        return;
+    auto data = serializeSubscribeAllRequest(m_db->transactionLog()->getTransactionsState());
+    data.data()[0] = (quint8) MessageType::subscribeAll;
+    connection->sendMessage(data);
+    context(connection)->isLocalStarted = true;
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -312,9 +326,9 @@ void MessageBus::createOutgoingConnections(
                 commonModule(),
                 remoteConnection.peerId,
                 localPeerEx(),
-                std::move(connectionLockGuard),
                 remoteConnection.url,
-                std::make_unique<ConnectionContext>()));
+                std::make_unique<ConnectionContext>(),
+                std::move(connectionLockGuard)));
             m_outgoingConnections.insert(remoteConnection.peerId, connection);
             ++m_connectionTries;
             connectSignals(connection);
@@ -816,6 +830,9 @@ void MessageBus::at_stateChanged(
                 startReading(connection);
             }
             emit newDirectConnectionEstablished(connection.data());
+            if (connection->remotePeer().peerType == Qn::PT_CloudServer)
+                sendInitialDataToCloud(connection);
+
             break;
         case Connection::State::Unauthorized:
         case Connection::State::Error:
@@ -862,7 +879,10 @@ void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
     if (context(connection)->sendDataInProgress)
-        selectAndSendTransactions(connection, context(connection)->remoteSubscription);
+        selectAndSendTransactions(
+            connection,
+            context(connection)->remoteSubscription,
+            context(connection)->remoteAddImplicitData);
 }
 
 void MessageBus::at_gotMessage(
@@ -922,6 +942,9 @@ void MessageBus::at_gotMessage(
         break;
     case MessageType::subscribeForDataUpdates:
         result = handleSubscribeForDataUpdates(connection, payload);
+        break;
+    case MessageType::subscribeAll:
+        result = handleSubscribeForAllDataUpdates(connection, payload);
         break;
     case MessageType::pushTransactionData:
         result = handlePushTransactionData(connection, payload, TransportHeader());
@@ -1098,7 +1121,7 @@ struct SendTransactionToTransportFastFuction
         const QByteArray& serializedTran,
         const P2pConnectionPtr& connection) const
     {
-        if (connection->userAccessData().userId != Qn::kSystemAccess.userId)
+        if (connection.staticCast<Connection>()->userAccessData().userId != Qn::kSystemAccess.userId)
         {
             NX_VERBOSE(
                 this,
@@ -1141,10 +1164,10 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
         NX_ASSERT(!id.isNull());
         newSubscription.values.insert(id, shortPeer.sequence);
     }
+    context(connection)->remoteAddImplicitData = false;
 
     // merge current and new subscription
     QnTranState& oldSubscription = context(connection)->remoteSubscription;
-
     auto itrOldSubscription = oldSubscription.values.begin();
     for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
     {
@@ -1156,6 +1179,8 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
             itr.value() = std::max(itr.value(), itrOldSubscription.value());
         }
     }
+
+
     NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(connection->remotePeer()));
     if (context(connection)->sendDataInProgress)
     {
@@ -1163,10 +1188,31 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
     }
     else
     {
-        if (!selectAndSendTransactions(connection, std::move(newSubscription)))
+        if (!selectAndSendTransactions(connection, std::move(newSubscription), false))
             return false;
     }
     sendRuntimeData(connection, context(connection)->remoteSubscription.values.keys());
+    return true;
+}
+
+bool MessageBus::handleSubscribeForAllDataUpdates(
+    const P2pConnectionPtr& connection,
+    const QByteArray& data)
+{
+    NX_ASSERT(connection->remotePeer().peerType == Qn::PT_CloudServer);
+    context(connection)->remoteAddImplicitData = true;
+    bool success = false;
+    QnTranState newSubscription = deserializeSubscribeAllRequest(data, &success);
+
+    if (context(connection)->sendDataInProgress)
+    {
+        context(connection)->remoteSubscription = newSubscription;
+    }
+    else
+    {
+        if (!selectAndSendTransactions(connection, std::move(newSubscription), true))
+            return false;
+    }
     return true;
 }
 
@@ -1182,16 +1228,28 @@ bool MessageBus::pushTransactionList(
 
 bool MessageBus::selectAndSendTransactions(
     const P2pConnectionPtr& connection,
-    QnTranState newSubscription)
+    QnTranState newSubscription,
+    bool addImplicitData)
 {
 
     QList<QByteArray> serializedTransactions;
     bool isFinished = true;
+    if (addImplicitData)
+    {
+        // Add all implicit records from 0 sequence.
+        for (const auto& key: m_db->transactionLog()->getTransactionsState().values.keys())
+        {
+            if (!newSubscription.values.contains(key))
+                newSubscription.values.insert(key, 0);
+        }
+    }
+
     if (m_db)
     {
+        const bool isCloudServer = connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer;
         const ErrorCode errorCode = m_db->transactionLog()->getExactTransactionsAfter(
             &newSubscription,
-            connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
+            isCloudServer,
             serializedTransactions,
             kMaxSelectDataSize,
             &isFinished);
@@ -1406,7 +1464,7 @@ void MessageBus::gotTransaction(
 
             QByteArray serializedTran =
                 m_ubjsonTranSerializer->serializedTransaction(tran);
-            ErrorCode errorCode = dbManager(m_db, connection->userAccessData())
+            ErrorCode errorCode = dbManager(m_db, connection.staticCast<Connection>()->userAccessData())
                 .executeTransactionNoLock(tran, serializedTran);
             switch (errorCode)
             {

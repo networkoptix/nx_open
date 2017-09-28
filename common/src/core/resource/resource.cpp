@@ -1095,17 +1095,14 @@ bool QnResource::init()
         QnMutexLocker lk(&m_mutex);
         m_prevInitializationResult = initResult;
     }
+
     m_initializationAttemptCount.fetchAndAddOrdered(1);
 
     bool changed = m_initialized;
     if (m_initialized)
-    {
         initializationDone();
-    }
     else if (getStatus() == Qn::Online || getStatus() == Qn::Recording)
-    {
         setStatus(Qn::Offline);
-    }
 
     m_initMutex.unlock();
 
@@ -1257,6 +1254,11 @@ QnCommonModule* QnResource::commonModule() const
         return pool->commonModule();
 
     return nullptr;
+}
+
+QString QnResource::idForToStringFromPtr() const
+{
+    return getId().toSimpleString();
 }
 
 bool QnResource::saveParams()

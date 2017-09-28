@@ -36,6 +36,7 @@
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <nx_cassandra.guid>{585CA31B-4D3E-40D6-B759-DD1616D7BC8A}</nx_cassandra.guid>
         <nx_fusion.guid>{0ac7e9d9-df58-456f-a568-0bd7ca5eacda}</nx_fusion.guid>
         <nx_vms_utils.guid>{c4174ab7-1537-498b-8c4d-091d05e4735a}</nx_vms_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
@@ -86,6 +87,8 @@
         <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
         <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
         <vms_cloud_integration_tests.guid>{45F679BE-E497-40AD-9E0E-5401D3BE1C6D}</vms_cloud_integration_tests.guid>
+        <hanwha_metadata_plugin.guid>{414bb961-a348-4e39-ac20-4e65e1d246ca}</hanwha_metadata_plugin.guid>
+        <stub_metadata_plugin.guid>{8f5484ec-6bea-4a9c-8746-9e49d6fea726}</stub_metadata_plugin.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -120,6 +123,8 @@
         <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
         <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
         <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
+        <hanwha_metadata_plugin.name>${company.name} Hanwha metadata plugin</hanwha_metadata_plugin.name>
+        <stub_metadata_plugin.name>${company.name} Stub metadata plugin</stub_metadata_plugin.name>
 
         <product.display.title>${product.title}</product.display.title>
 
@@ -528,6 +533,7 @@
                 <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
+                <module>plugins/metadata/hanwha_metadata_plugin</module>
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
@@ -670,6 +676,7 @@
                 <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>nx_cloud/traffic_relay</module>
                 <module>client/minilauncher</module>
@@ -788,6 +795,7 @@
                 <module>macsetup/client-dmg</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/libtraffic_relay</module>
                 <module>client/mobile_client</module>
             </modules>
@@ -814,6 +822,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/libtraffic_relay</module>
+                <module>common_libs/nx_cassandra</module>
                 <module>media_db_util</module>
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>

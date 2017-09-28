@@ -10,7 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_pipeline.h>
 
-#include <controller/traffic_relay.h>
+#include <nx/cloud/relay/controller/traffic_relay.h>
 
 namespace nx {
 namespace cloud {
@@ -90,7 +90,7 @@ protected:
 private:
     struct ChannelContext
     {
-        utils::bstream::ReflectingPipeline input;
+        utils::bstream::Pipe input;
         utils::bstream::test::NotifyingOutput output;
         std::unique_ptr<AsyncChannel> channel;
         AsyncChannel* channelPtr;

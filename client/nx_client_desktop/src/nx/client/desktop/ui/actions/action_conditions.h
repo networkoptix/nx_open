@@ -419,10 +419,11 @@ public:
     virtual ActionVisibility check(const QnLayoutItemIndexList& layoutItems, QnWorkbenchContext* context) override;
 };
 
-class ChangeResolutionCondition: public VideoWallReviewModeCondition
+class ChangeResolutionCondition: public Condition
 {
 public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
+    virtual ActionVisibility check(const Parameters& parameters,
+        QnWorkbenchContext* context) override;
 };
 
 class BrowseLocalFilesCondition: public Condition

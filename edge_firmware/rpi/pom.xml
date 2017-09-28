@@ -102,7 +102,7 @@
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>mobile_client</artifactId>
-                    <version>17.2.4-SNAPSHOT</version>
+                    <version>17.3-SNAPSHOT</version>
                     <type>pom</type>
                     <scope>system</scope>
                     <systemPath>${root.dir}/client/mobile_client/pom.xml</systemPath>

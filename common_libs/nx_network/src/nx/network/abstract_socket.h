@@ -198,6 +198,9 @@ public:
     virtual bool isInSelfAioThread() const;
 };
 
+using IoCompletionHandler = nx::utils::MoveOnlyFunc<
+    void(SystemError::ErrorCode /*errorCode*/, std::size_t /*bytesTransferred*/)>;
+
 /**
  * Interface for writing to/reading from socket.
  */
@@ -256,6 +259,10 @@ public:
      */
     virtual SocketAddress getForeignAddress() const = 0;
     /**
+     * @return Text name of the remote host. By default, getForeignAddress().address.toString().
+     */
+    virtual QString getForeignHostName() const;
+    /**
      * Returns true, if connection has been established, false otherwise.
      */
     virtual bool isConnected() const = 0;
@@ -285,7 +292,7 @@ public:
      */
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
+        IoCompletionHandler handler) = 0;
 
     /**
      * Reads at least @param minimalSize bytes from socket asynchronously.
@@ -295,7 +302,7 @@ public:
      */
     void readAsyncAtLeast(
         nx::Buffer* const buffer, size_t minimalSize,
-        std::function<void(SystemError::ErrorCode, size_t)> handler);
+        IoCompletionHandler handler);
 
     /**
      * Asynchnouosly writes all bytes from input buffer.
@@ -308,7 +315,7 @@ public:
      */
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
+        IoCompletionHandler handler) = 0;
 
     /**
      * Register timer on this socket.
@@ -341,10 +348,12 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
+
 private:
     void readAsyncAtLeastImpl(
         nx::Buffer* const buffer, size_t minimalSize,
-        std::function<void(SystemError::ErrorCode, size_t)> handler,
+        IoCompletionHandler handler,
         size_t initBufSize);
 };
 
@@ -495,6 +504,8 @@ public:
      * NOTE: If called within socket's aio thread, then does not block.
      */
     virtual void cancelIOSync() = 0;
+
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
@@ -553,7 +564,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer& buf,
         const SocketAddress& targetAddress,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
     /**
      * Read up to bufferLen bytes data from this socket. 
      *   The given buffer is where the data will be placed.
@@ -572,7 +583,7 @@ public:
      */
     virtual void recvFromAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
     /**
      * @return Address of previous datagram read with 
      * AbstractCommunicatingSocket::recv or AbstractDatagramSocket::recvFrom.

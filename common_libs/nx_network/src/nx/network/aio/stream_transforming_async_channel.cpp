@@ -16,9 +16,9 @@ StreamTransformingAsyncChannel::StreamTransformingAsyncChannel(
 {
     using namespace std::placeholders;
 
-    m_inputPipeline = utils::bstream::makeCustomInputPipeline(
+    m_inputPipeline = utils::bstream::makeCustomInput(
         std::bind(&StreamTransformingAsyncChannel::readRawBytes, this, _1, _2));
-    m_outputPipeline = utils::bstream::makeCustomOutputPipeline(
+    m_outputPipeline = utils::bstream::makeCustomOutput(
         std::bind(&StreamTransformingAsyncChannel::writeRawBytes, this, _1, _2));
     m_converter->setInput(m_inputPipeline.get());
     m_converter->setOutput(m_outputPipeline.get());

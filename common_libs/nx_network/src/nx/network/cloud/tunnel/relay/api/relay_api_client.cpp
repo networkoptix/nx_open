@@ -246,6 +246,7 @@ void ClientImpl::executeUpgradeRequest(
                 Response ... response) mutable
         {
             auto connection = httpClientPtr->takeSocket();
+            auto httpClient = std::move(*httpClientIter);
             m_prevSysErrorCode = sysErrorCode;
             const auto resultCode = toUpgradeResultCode(sysErrorCode, httpResponse);
             m_activeRequests.erase(httpClientIter);

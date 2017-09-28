@@ -18,6 +18,7 @@
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
 #include <mediaserver_endpoint_tester.h>
+#include <relay/relay_cluster_client.h>
 
 #include "mediator_mocks.h"
 
@@ -27,12 +28,14 @@ namespace test {
 
 using namespace stun;
 
-class StunCustomTest : public testing::Test
+class StunCustomTest:
+    public testing::Test
 {
 protected:
     StunCustomTest():
         mediaserverApi(&cloudData, &stunMessageDispatcher),
-        listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool),
+        relayClusterClient(settings),
+        listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool, &relayClusterClient),
         server(
             &stunMessageDispatcher,
             false,
@@ -55,6 +58,7 @@ protected:
     CloudDataProviderMock cloudData;
     MediaserverEndpointTesterMock mediaserverApi;
     conf::Settings settings;
+    RelayClusterClient relayClusterClient;
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator;
     network::server::MultiAddressServer<SocketServer> server;

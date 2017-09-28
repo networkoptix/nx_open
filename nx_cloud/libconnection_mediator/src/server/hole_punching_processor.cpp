@@ -27,11 +27,13 @@ HolePunchingProcessor::HolePunchingProcessor(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* listeningPeerPool,
+    AbstractRelayClusterClient* relayClusterClient,
     stats::AbstractCollector* statisticsCollector)
 :
     RequestProcessor(cloudData),
     m_settings(settings),
     m_listeningPeerPool(listeningPeerPool),
+    m_relayClusterClient(relayClusterClient),
     m_statisticsCollector(statisticsCollector)
 {
     // TODO #ak: decouple STUN message handling and logic.
@@ -131,7 +133,8 @@ void HolePunchingProcessor::connect(
                     this,
                     std::move(connectionFsmIterAndFlag.first),
                     std::placeholders::_1),
-                m_settings);
+                m_settings,
+                m_relayClusterClient);
     }
     else
     {

@@ -35,8 +35,6 @@
 #include <http/p2p_connection_listener.h>
 #include <transaction/message_bus_adapter.h>
 
-#include <ini.h>
-
 namespace ec2 {
 
 static const char* const kIncomingTransactionsPath = "ec2/forward_events";
@@ -44,7 +42,8 @@ static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnCommonModule* commonModule)
+    QnCommonModule* commonModule,
+    bool isP2pMode)
 :
     QnCommonModuleAware(commonModule),
     // dbmanager is initialized by direct connection.
@@ -54,7 +53,8 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
-    m_remoteQueryProcessor(commonModule)
+    m_remoteQueryProcessor(commonModule),
+    m_p2pMode(isP2pMode)
 {
     if (peerType == Qn::PT_Server)
     {
@@ -78,7 +78,7 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
 
     if (peerType == Qn::PT_Server)
     {
-        m_bus->init(ini().isP2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
+        m_bus->init(m_p2pMode ? MessageBusType::P2pMode : MessageBusType::LegacyMode);
         if (auto messageBus = m_bus->dynamicCast<QnTransactionMessageBus*>())
             m_distributedMutexManager.reset(new QnDistributedMutexManager(messageBus));
         m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
@@ -1774,7 +1774,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
     connectionInfo->ecDbReadOnly = m_settingsInstance.dbReadOnly();
     connectionInfo->newSystem = commonModule()->globalSettings()->isNewSystem();
-    connectionInfo->p2pMode = ini().isP2pMode;
+    connectionInfo->p2pMode = m_p2pMode;
     if (response)
     {
         connectionInfo->effectiveUserName =

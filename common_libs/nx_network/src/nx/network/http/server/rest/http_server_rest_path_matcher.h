@@ -9,6 +9,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#include "../../http_types.h"
+
 namespace nx_http {
 namespace server {
 namespace rest {

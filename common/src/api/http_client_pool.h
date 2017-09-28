@@ -15,7 +15,7 @@ public:
     struct Request
     {
         Request():
-            authType(nx_http::AsyncHttpClient::authBasicAndDigest)
+            authType(nx_http::AuthType::authBasicAndDigest)
         {
         }
 
@@ -29,7 +29,7 @@ public:
         nx_http::HttpHeaders headers;
         nx_http::StringType contentType;
         nx_http::StringType messageBody;
-        nx_http::AsyncHttpClient::AuthType authType;
+        nx_http::AuthType authType;
     };
 
     ClientPool(QObject *parent = nullptr);

@@ -196,7 +196,7 @@ describe('Registration suite', function () {
             var oldWindowHandle = handles[0];
             browser.switchTo().window(newWindowHandle).then(function () {
                 expect(browser.getCurrentUrl()).toContain('content/eula'); // Check that url is correct
-                expect(p.helper.htmlBody.getText()).toContain('END USER LICENSE AGREEMENT'); // Check that it is Terms and conditions page
+                expect(p.helper.htmlBody.getText()).toContain('TERMS OF SERVICE'); // Check that it is Terms and conditions page
                 browser.close();
             });
             browser.switchTo().window(oldWindowHandle);

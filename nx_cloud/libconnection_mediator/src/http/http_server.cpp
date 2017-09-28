@@ -12,13 +12,14 @@ namespace http {
 
 Server::Server(
     const conf::Settings& settings,
-    const PeerRegistrator& peerRegistrator)
+    const PeerRegistrator& peerRegistrator,
+    nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool)
     :
     m_settings(settings)
 {
     NX_ASSERT(!m_settings.http().addrToListenList.empty());
 
-    if (!launchHttpServerIfNeeded(m_settings, peerRegistrator))
+    if (!launchHttpServerIfNeeded(m_settings, peerRegistrator, registeredPeerPool))
         throw std::runtime_error("Failed to initialize http server");
 }
 
@@ -37,18 +38,24 @@ void Server::listen()
         .arg(containerString(m_settings.http().addrToListenList)), cl_logALWAYS);
 }
 
-nx_http::MessageDispatcher& Server::messageDispatcher()
+nx_http::server::rest::MessageDispatcher& Server::messageDispatcher()
 {
     return *m_httpMessageDispatcher;
 }
 
+std::vector<SocketAddress> Server::httpEndpoints() const
+{
+    return m_httpEndpoints;
+}
+
 bool Server::launchHttpServerIfNeeded(
     const conf::Settings& settings,
-    const PeerRegistrator& peerRegistrator)
+    const PeerRegistrator& peerRegistrator,
+    nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool)
 {
     NX_LOGX("Bringing up HTTP server", cl_logINFO);
 
-    m_httpMessageDispatcher = std::make_unique<nx_http::MessageDispatcher>();
+    m_httpMessageDispatcher = std::make_unique<nx_http::server::rest::MessageDispatcher>();
 
     // Registering HTTP handlers.
     m_httpMessageDispatcher->registerRequestProcessor<http::GetListeningPeerListHandler>(
@@ -76,6 +83,10 @@ bool Server::launchHttpServerIfNeeded(
         {
             server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
         });
+
+    m_discoveryHttpServer = std::make_unique<nx::cloud::discovery::HttpServer>(
+        m_httpMessageDispatcher.get(),
+        registeredPeerPool);
 
     return true;
 }

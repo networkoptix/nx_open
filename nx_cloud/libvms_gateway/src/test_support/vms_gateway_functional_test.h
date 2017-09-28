@@ -20,7 +20,12 @@ class VmsGatewayFunctionalTest:
     public utils::test::ModuleLauncher<VmsGatewayProcessPublic>
 {
 public:
-    VmsGatewayFunctionalTest();
+    enum Flags
+    {
+        doNotReinitialiseSocketGlobals = 1,
+    };
+
+    VmsGatewayFunctionalTest(int flags = 0);
     virtual ~VmsGatewayFunctionalTest();
 
     virtual bool startAndWaitUntilStarted() override;

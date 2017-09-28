@@ -180,12 +180,12 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.cameras-panel-toggle{
+.cameras-panel-wrapper{
   width: 320px;
 
-  transition-timing-function: ease-in-out;
-  -webkit-transition-duration: 1s;
-  transition-duration: 1s;
+  @include transition-property(width);
+  @include transition-duration(.35s);
+  @include transition-timing-function(ease);
 }
 
 .cameras-panel{
@@ -736,6 +736,11 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
+.blur-preview{
+  -webkit-filter: blur(5px);
+  filter: blur(5px);
+}
+
 .video-preview{
   background-color: $dark1;
   max-width: 100%;
@@ -838,8 +843,8 @@ table.webclient-window>tbody>tr>td{
     display: inline-block !important;
   }
 
-  .cameras-panel-toggle{
-    z-index: 10;
+  .cameras-panel-wrapper{
+    z-index: 2000;
     position: absolute;
     width: 100% !important;
   }
@@ -916,4 +921,20 @@ table.webclient-window>tbody>tr>td{
   height: 44px;
   width: 40px;
   display: block;
+}
+
+.collapse-box{
+    /*
+        Trick to fix WEB-561 - when collapsing we are making content for collapsing box move up while height is decreasing
+    */
+
+    overflow:hidden;
+
+    .collapsing.closing{ /* Additional animation for collapsing */
+        margin-top:-100px;
+        transform: translate3d(0, 0, 0); /* Enable hardware acceleration */
+        @include transition-property(height,visibility,margin-top);
+        @include transition-duration(.35s);
+        @include transition-timing-function(ease);
+    }
 }

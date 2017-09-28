@@ -1,5 +1,10 @@
 #include "lexical_functions.h"
 
+#include <QtCore/QStringBuilder>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QRect>
+#include <QtCore/QRectF>
+
 void serialize(const bool &value, QString *target)
 {
     *target = value ? QLatin1String("true") : QLatin1String("false");
@@ -243,4 +248,79 @@ bool deserialize(const QString& value, QBitArray* target)
         target->setBit(i, byteArray[i / 8] & (1 << (i % 8)));
 
     return true;
+}
+
+
+bool serialize(const QRect& value, QString* target)
+{
+    *target =
+        QString::number(value.x())
+        % ","
+        % QString::number(value.y())
+        % ","
+        % QString::number(value.width())
+        % "x"
+        % QString::number(value.height());
+    return true;
+}
+
+bool deserialize(const QString& value, QRect* target)
+{
+    QRegularExpression re("^(\\d+),(\\d+),(\\d+)x(\\d+)$");
+    const auto match = re.match(value);
+    if (!match.hasMatch())
+        return false;
+
+    bool ok = true;
+    target->setX(match.captured(1).toInt(&ok));
+    if (!ok)
+        return false;
+
+    target->setY(match.captured(2).toInt(&ok));
+    if (!ok)
+        return false;
+
+    target->setWidth(match.captured(3).toInt(&ok));
+    if (!ok)
+        return false;
+
+    target->setHeight(match.captured(4).toInt(&ok));
+    return ok;
+}
+
+bool serialize(const QRectF& value, QString* target)
+{
+    *target =
+        QString::number(value.x())
+        % ","
+        % QString::number(value.y())
+        % ","
+        % QString::number(value.width())
+        % "x"
+        % QString::number(value.height());
+    return true;
+}
+
+bool deserialize(const QString& value, QRectF* target)
+{
+    QRegularExpression re("^(.+),(.+),(.+)x(.+)$");
+    const auto match = re.match(value);
+    if (!match.hasMatch())
+        return false;
+
+    bool ok = true;
+    target->setX(match.captured(1).toDouble(&ok));
+    if (!ok)
+        return false;
+
+    target->setY(match.captured(2).toDouble(&ok));
+    if (!ok)
+        return false;
+
+    target->setWidth(match.captured(3).toDouble(&ok));
+    if (!ok)
+        return false;
+
+    target->setHeight(match.captured(4).toDouble(&ok));
+    return ok;
 }

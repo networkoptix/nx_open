@@ -21,6 +21,7 @@ from django.views.generic.base import TemplateView
 
 
 admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
+admin.site.index_template = 'admin/index.html'
 
 
 def redirect_login(request):

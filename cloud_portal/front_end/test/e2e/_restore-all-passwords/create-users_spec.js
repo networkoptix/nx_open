@@ -36,9 +36,14 @@ describe('Create user', function () {
         var userEmail = self.helper.userEmailCustom;
 
         self.helper.createUser(null, null, userEmail);
+    });    
+    it("no permissions", function () {
+        var userEmail = self.helper.userEmailNoPerm;
+
+        self.helper.createUser(null, null, userEmail);
     });
     it("+1", function () {
-        var userEmail = self.helper.userEmailCustom;
+        var userEmail = self.helper.userEmail;
 
         self.helper.createUser(null, null, userEmail);
     });

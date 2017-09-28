@@ -12,7 +12,6 @@
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/p2p/p2p_connection.h>
-#include <ini.h>
 #include <nx/p2p/p2p_serialization.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx/utils/argument_parser.h>
@@ -204,7 +203,6 @@ protected:
         m_servers.clear();
         m_instanceCounter = 0;
 
-        const_cast<bool&>(ec2::ini().isP2pMode) = true;
         const int instanceCount = getIntParam(args, kServerCountParamName, kDefaultInstanceCount);
         const int serverPort = getIntParam(args, kServerPortParamName);
         startServers(instanceCount, keepDbAtServerIndex, serverPort);

@@ -267,7 +267,7 @@ void BaseHttpAudioTransmitter::at_requestHeadersHasBeenSent(
 
 void BaseHttpAudioTransmitter::at_httpDone(nx_http::AsyncHttpClientPtr httpClient)
 {
-    if (httpClient->state() == nx_http::AsyncHttpClient::State::sFailed)
+    if (httpClient->state() == nx_http::AsyncClient::State::sFailed)
     {
         QnMutexLocker lock(&m_mutex);
         m_state = TransmitterState::Failed;

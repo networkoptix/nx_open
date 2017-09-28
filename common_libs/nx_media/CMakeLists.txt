@@ -1,7 +1,7 @@
 nx_add_target(nx_media LIBRARY
     PUBLIC_LIBS
         nx_kit
-        nx_audio common
+        nx_audio common nx_fusion nx_utils
 )
 
 target_include_directories(nx_media PRIVATE ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS})

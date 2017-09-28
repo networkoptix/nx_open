@@ -619,10 +619,11 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     // Stores local credentials for successful connection
     if (helpers::isLocalUser(url.userName()) && !cloudConnection && options.testFlag(StoreSession))
     {
-        NX_DEBUG("CredentialsManager", lm("Store connection record of %1 to the system %2")
-            .arg(url.userName()).arg(localId));
+        NX_DEBUG(nx::client::core::helpers::kCredentialsLogTag,
+            lm("Store connection record of %1 to the system %2").args(url.userName(), localId));
+
         NX_ASSERT(!url.password().isEmpty());
-        NX_DEBUG("CredentialsManager", storePassword
+        NX_DEBUG(nx::client::core::helpers::kCredentialsLogTag, storePassword
             ? "Password is set"
             : "Password must be cleared");
 
@@ -637,8 +638,8 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (autoLogin)
     {
         NX_ASSERT(!url.password().isEmpty());
-        NX_DEBUG("CredentialsManager", lm("Saving last used connection of %1 to the system %2")
-            .arg(url.userName()).arg(url.host()));
+        NX_DEBUG(nx::client::core::helpers::kCredentialsLogTag,
+            lm("Saving last used connection of %1 to the system %2").args(url.userName(), url.host()));
 
         const auto lastUsed = QnConnectionData(info.systemName, url, localId);
         qnSettings->setLastUsedConnection(lastUsed);
@@ -729,7 +730,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
 {
     const auto resourceModeAction = action(action::ResourcesModeAction);
 
-    NX_DEBUG(this) "State changed" << logicalValue << physicalValue;
+    NX_DEBUG(this) << "State changed" << logicalValue << physicalValue;
     switch (logicalValue)
     {
         case LogicalState::disconnected:

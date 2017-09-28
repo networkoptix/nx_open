@@ -8,8 +8,8 @@ Popup
 {
     id: popup
 
-    width: parent.width
-    height: parent.height
+    width: mainWindow.width
+    height: mainWindow.height
     background: null
     modal: false
     focus: true

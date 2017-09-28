@@ -28,8 +28,12 @@ if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
     
+if(LINUX AND NOT ANDROID)
+    target_link_libraries(nx_utils PRIVATE pthread)
+endif()
+    
 if(MACOSX)
     find_library(Foundation_LIBRARY Foundation)
     mark_as_advanced(Foundation_LIBRARY)
-    target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY})
+    target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY} z)
 endif()

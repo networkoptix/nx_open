@@ -14,7 +14,7 @@ struct PingCollector
 {
     QnMutex mutex;
     size_t expected;
-    std::list< SocketAddress > endpoints;
+    std::list<SocketAddress> endpoints;
     ConnectionWeakRef connection;
 
     PingCollector(
@@ -156,7 +156,7 @@ void MediaserverEndpointTester::pingServer(
                 m_httpClients.erase(httpClient);
             }
 
-            if (!httpClient->hasRequestSuccesed())
+            if (!httpClient->hasRequestSucceeded())
             {
                 NX_LOGX(lit("Response from %1 has failed")
                     .arg(address.toString()), cl_logDEBUG1);

@@ -10,14 +10,21 @@ namespace nx_http {
 namespace server {
 namespace handler {
 
-template<typename TunnelledConnection>
+using TunnelCreatedHandler = 
+    nx::utils::MoveOnlyFunc<void(
+        std::unique_ptr<AbstractStreamSocket>,
+        std::vector<StringType> /*REST request parameters values*/)>;
+
+/**
+ * Upgrades HTTP connection to the protocol specified.
+ */
 class CreateTunnelHandler:
     public AbstractHttpRequestHandler
 {
 public:
     CreateTunnelHandler(
         const StringType& protocolToUpgradeTo,
-        nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> onTunnelCreated)
+        TunnelCreatedHandler onTunnelCreated)
         :
         m_protocolToUpgradeTo(protocolToUpgradeTo),
         m_onTunnelCreated(std::move(onTunnelCreated))
@@ -40,20 +47,21 @@ public:
             return completionHandler(nx_http::StatusCode::badRequest);
         }
 
-        nx_http::RequestResult requestResult(
-            nx_http::StatusCode::switchingProtocols);
+        nx_http::RequestResult requestResult(nx_http::StatusCode::switchingProtocols);
         requestResult.connectionEvents.onResponseHasBeenSent = 
-            [onTunnelCreated = std::move(m_onTunnelCreated)](
+            [onTunnelCreated = std::move(m_onTunnelCreated), restParams = requestPathParams()](
                 HttpServerConnection* httpConnection)
             {
-                onTunnelCreated(httpConnection->takeSocket());
+                onTunnelCreated(
+                    httpConnection->takeSocket(),
+                    std::move(restParams));
             };
         completionHandler(std::move(requestResult));
     }
 
 private:
     const StringType m_protocolToUpgradeTo;
-    nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> m_onTunnelCreated;
+    TunnelCreatedHandler m_onTunnelCreated;
 };
 
 } // namespace handler

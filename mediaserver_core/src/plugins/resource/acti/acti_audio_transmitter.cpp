@@ -106,7 +106,7 @@ void ActiAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& 
     // if we don't add authorization info to the first request all subsequent 
     // requests will fail with "401 Unauthorized", so we have to add authorization 
     // to the first request.
-    httpClient->setAuthType(nx_http::AsyncHttpClient::AuthType::authBasic);
+    httpClient->setAuthType(nx_http::AuthType::authBasic);
 }
 
 bool ActiAudioTransmitter::isReadyForTransmission(

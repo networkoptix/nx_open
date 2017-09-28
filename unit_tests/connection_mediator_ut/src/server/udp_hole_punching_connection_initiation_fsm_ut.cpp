@@ -14,6 +14,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
+#include <relay/relay_cluster_client.h>
 #include <server/udp_hole_punching_connection_initiation_fsm.h>
 #include <settings.h>
 
@@ -29,7 +30,8 @@ class UDPHolePunchingConnectionInitiationFsm:
     public ::testing::Test
 {
 public:
-    UDPHolePunchingConnectionInitiationFsm()
+    UDPHolePunchingConnectionInitiationFsm():
+        m_relayClusterClient(m_settings)
     {
         using namespace std::placeholders;
 
@@ -47,7 +49,8 @@ public:
             m_connectSessionId,
             listeningPeerData,
             std::bind(&UDPHolePunchingConnectionInitiationFsm::connectFsmFinished, this, _1),
-            m_settings);
+            m_settings,
+            &m_relayClusterClient);
     }
 
     ~UDPHolePunchingConnectionInitiationFsm()
@@ -111,6 +114,7 @@ private:
     std::shared_ptr<TestServerConnection> m_listeningPeerConnection;
     std::shared_ptr<TestServerConnection> m_connectingPeerConnection;
     conf::Settings m_settings;
+    RelayClusterClient m_relayClusterClient;
     QByteArray m_connectSessionId;
     nx::utils::promise<void> m_fsmFinishedPromise;
     nx::utils::SyncQueue<std::tuple<api::ResultCode, api::ConnectResponse>> m_connectResponseQueue;

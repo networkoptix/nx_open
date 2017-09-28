@@ -19,24 +19,25 @@ void initialize(
     const QString& baseName,
     std::shared_ptr<Logger> logger)
 {
+    if (settings.level.primary == Level::undefined || settings.level.primary == Level::notConfigured)
+        return;
+
     if (!logger)
         logger = mainLogger();
-
-    if (settings.level == Level::undefined)
-        return;
 
     // Can not be reinitialized if initialized globally.
     if (!isInitializedGlobally.load())
     {
-        logger->setDefaultLevel(settings.level);
-        logger->setExceptionFilters(settings.exceptionFilers);
+        logger->setDefaultLevel(settings.level.primary);
+        logger->setLevelFilters(settings.level.filters);
         if (baseName != QLatin1String("-"))
         {
             File::Settings fileSettings;
             fileSettings.size = settings.maxFileSize;
             fileSettings.count = settings.maxBackupCount;
             fileSettings.name = settings.directory.isEmpty()
-                ? baseName : (settings.directory + lit("/") + baseName);
+                ? baseName
+                : (settings.directory + lit("/") + baseName);
 
             logger->setWriter(std::make_unique<File>(fileSettings));
         }
@@ -46,7 +47,8 @@ void initialize(
         }
     }
 
-    const auto write = [&](const Message& message) { logger->log(Level::always, "START", message); };
+    const nx::utils::log::Tag kStart(lit("START"));
+    const auto write = [&](const Message& message) { logger->log(Level::always, kStart, message); };
     write(QByteArray(80, '='));
     write(lm("%1 started, version: %2, revision: %3").args(
         applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
@@ -55,9 +57,10 @@ void initialize(
         write(lm("Binary path: %1").arg(binaryPath));
 
     const auto filePath = logger->filePath();
-    write(lm("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").args(
-        toString(settings.level).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
-        settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
+    write(lm("Log level: %1").arg(settings.level));
+    write(lm("Log maxFileSize: %2, maxBackupCount: %3, file: %4").args(
+        nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
+        filePath ? *filePath : lit("-")));
 }
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
@@ -67,18 +70,10 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 
     if (const auto value = arguments.get("log-level", "ll"))
     {
-        const auto level = levelFromString(*value);
-        NX_CRITICAL(level != Level::undefined);
-        logger->setDefaultLevel(level);
-    }
-
-    if (const auto value = arguments.get("log-exception-filters", "lef"))
-    {
-        std::set<QString> filters;
-        for (const auto f: value->split(QLatin1String(",")))
-            filters.insert(f);
-
-        logger->setExceptionFilters(filters);
+        LevelSettings level;
+        level.parse(*value);
+        logger->setDefaultLevel(level.primary);
+        logger->setLevelFilters(level.filters);
     }
 
     if (const auto value = arguments.get("log-file", "lf"))

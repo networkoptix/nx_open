@@ -17,7 +17,7 @@ public:
         m_file(nx::utils::TestOptions::temporaryDirectoryPath() + QLatin1String("/db.sqlite")),
         m_db(QSqlDatabase::addDatabase("QSQLITE", "db"))
     {
-        NX_INFO(this) "Database" << m_file;
+        NX_INFO(this) << "Database" << m_file;
         QDir(".").remove(m_file);
 
         m_db.setDatabaseName(m_file);
@@ -44,7 +44,7 @@ public:
     QSqlQuery execute(const QString& s) { return execute(query(s)); }
     QSqlQuery execute(QSqlQuery q)
     {
-        NX_VERBOSE(this) q.lastQuery();
+        NX_VERBOSE(this) << q.lastQuery();
         NX_ASSERT(q.exec(), q.lastError().text());
         return q;
     }
@@ -54,13 +54,13 @@ public:
     public:
         Transaction(QSqlDatabase* db): m_db(db)
         {
-            NX_DEBUG(this) "Begin";
+            NX_DEBUG(this) << "Begin";
             NX_ASSERT(m_db->transaction(), m_db->lastError().text());
         }
 
         ~Transaction()
         {
-            NX_DEBUG(this) "Commit";
+            NX_DEBUG(this) << "Commit";
             NX_ASSERT(m_db->commit(), m_db->lastError().text());
         }
 
@@ -79,13 +79,13 @@ public:
         for (size_t i = 0; i < count; ++i)
             records << lm("('%1')").arg(nx::utils::random::generate(10).toHex());
 
-        NX_DEBUG(this) lm("Insert %1 records").arg(count);
+        NX_DEBUG(this) << lm("Insert %1 records").arg(count);
         return execute(lm("INSERT INTO t (d) VALUES %1").arg(records.join(", ")));
     }
 
     void insertX(size_t count)
     {
-        NX_DEBUG(this) lm("Insert %1 records by one").arg(count);
+        NX_DEBUG(this) << lm("Insert %1 records by one").arg(count);
         for (size_t i = 0; i < count; ++i)
         {
             execute(lm("INSERT INTO t (d) VALUES ('%1')")
@@ -96,7 +96,7 @@ public:
     void logSize() const
     {
         for (const auto& name: {m_file, m_file + "-wal"})
-            NX_DEBUG(this) name << "size:" << nx::utils::bytesToString(QFileInfo(name).size());
+            NX_DEBUG(this) << name << "size:" << nx::utils::bytesToString(QFileInfo(name).size());
     }
 
 private:
@@ -135,7 +135,7 @@ TEST_F(DataBase, Test2)
     auto q = execute("SELECT * FROM t");
     EXPECT_TRUE(q.next()) << q.lastError().text().toStdString();
     EXPECT_EQ(1, q.value(0).toInt());
-    NX_DEBUG(this) "---- SELECT";
+    NX_DEBUG(this) << "---- SELECT";
 
     for(int i = 0; i < 5; ++i)
     {
@@ -145,7 +145,7 @@ TEST_F(DataBase, Test2)
     }
 
     logSize();
-    NX_DEBUG(this) "---- FINISH";
+    NX_DEBUG(this) << "---- FINISH";
     q.finish();
 
     for(int i = 0; i < 5; ++i)

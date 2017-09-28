@@ -1,14 +1,12 @@
-<h1>Welcome to {{PRODUCT_NAME}}</h1>
+<h1>Witamy w {{PRODUCT_NAME}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> is inviting you to join <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>
-and shared his system {{message.system_name}} with you.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> zaprasza Cię do przyłączenia się do <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}</a>  i udostępnia Ci swój system {{message.system_name}}.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>You are invited you to join <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>.
-The system {{message.system_name}} was shared with you.</p>
+<p>Zapraszamy Cię dołącz do <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>. Został Ci udostępniony system {{message.system_name}}.</p>
 {{/message.sharer_name}}
 
-<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Register and view the system</a>
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Zarejestruj się i przejrzyj system</a>
 

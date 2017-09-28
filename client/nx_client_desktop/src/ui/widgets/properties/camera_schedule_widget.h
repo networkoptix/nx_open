@@ -114,7 +114,19 @@ private:
     void updateMaxFPS();
     void updateMotionAvailable();
 
-    int qualityToComboIndex(const Qn::StreamQuality& q);
+    void syncQualityWithBitrate();
+    void syncBitrateWithQuality();
+    void syncBitrateWithFps();
+    void bitrateSpinBoxChanged();
+    void bitrateSliderChanged();
+
+    void setAdvancedSettingsVisible(bool value);
+
+    bool isCurrentBitrateCustom() const;
+    Qn::StreamQuality currentQualityApproximation() const;
+
+    QPair<Qn::StreamQuality, bool> qualityForBitrate(qreal bitrateMbps) const;
+    qreal bitrateForQuality(Qn::StreamQuality quality) const;
 
     void retranslateUi();
 
@@ -148,10 +160,14 @@ private:
      */
     int m_maxDualStreamingFps;
 
+    bool m_advancedSettingsSupported = false;
+    bool m_advancedSettingsVisible = false;
+
     Qn::MotionType m_motionTypeOverride;
 
     QString m_scheduleAlert;
     QString m_archiveLengthAlert;
 
-    bool m_updating;
+    bool m_updating = false;
+    bool m_bitrateUpdating = false;
 };

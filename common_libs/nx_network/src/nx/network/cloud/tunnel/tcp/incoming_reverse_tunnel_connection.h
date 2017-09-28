@@ -32,7 +32,7 @@ public:
      * @param handler is called when tunnel is ready to use or failed.
      */
     void start(RetryPolicy policy, StartHandler handler);
-    void setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts);
+    void setHttpTimeouts(nx_http::AsyncClient::Timeouts timeouts);
 
     void accept(AcceptHandler handler) override;
 
@@ -41,7 +41,7 @@ private:
     const String m_targetHostName;
     const SocketAddress m_proxyServiceEndpoint;
 
-    nx_http::AsyncHttpClient::Timeouts m_httpTimeouts;
+    nx_http::AsyncClient::Timeouts m_httpTimeouts;
     size_t m_expectedPoolSize = 1;
     boost::optional<KeepAliveOptions> m_keepAliveOptions;
 

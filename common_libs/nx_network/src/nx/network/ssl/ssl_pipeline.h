@@ -23,10 +23,10 @@ public:
      * @param sslContext Caller may use different contexts on client & server sides.
      */
     Pipeline(SSL_CTX* sslContext);
-    virtual ~Pipeline() override;
+    ~Pipeline() = default;
 
-    virtual int write(const void* data, size_t count) override;
-    virtual int read(void* data, size_t count) override;
+    virtual int write(const void* data, size_t size) override;
+    virtual int read(void* data, size_t size) override;
 
     virtual bool eof() const override;
     virtual bool failed() const override;
@@ -56,7 +56,7 @@ private:
     void initSslBio(SSL_CTX* sslContext);
 
     template<typename Func, typename Data>
-        int performSslIoOperation(Func sslFunc, Data* data, size_t count);
+        int performSslIoOperation(Func sslFunc, Data* data, size_t size);
     int doHandshake();
     int bioRead(void* buffer, unsigned int bufferLen);
     int bioWrite(const void* buffer, unsigned int bufferLen);

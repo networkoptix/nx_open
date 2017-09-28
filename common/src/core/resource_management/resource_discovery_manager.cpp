@@ -263,7 +263,7 @@ QSet<QString> QnResourceDiscoveryManager::lastDiscoveredIds() const
 
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
 {
-    QList<QHostAddress> localAddresses = allLocalAddresses();
+    QList<QHostAddress> localAddresses = allLocalIpV4Addresses();
     if (localAddresses != m_allLocalAddresses)
     {
         // Skip first time.

@@ -44,12 +44,12 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Password reset instructions are sent to Email <br>{{data.email}}
+            Wachtwoordherstelinstructies worden verzonden naar het volgende emailadres: <br> {{data.email}}
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>Reset Password</h1>
+        <h1>Wachtwoord resetten</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-4 control-label">E-mailadres</label>
@@ -61,8 +61,7 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vul alstublieft een geldige e-mailadres in </span>
                 </div>
             </div>
             <div class="form-group">
@@ -76,12 +75,11 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Password successfully saved<br>
-            <a href="/login">Log In</a>
+            Wachtwoord succesvol opgeslagen <br> <a href="/login"> Inloggen </a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1>Set New Password</h1>
+            <h1> Stel nieuw wachtwoord in </h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">

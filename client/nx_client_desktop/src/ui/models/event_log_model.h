@@ -13,7 +13,16 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace nx { namespace vms { namespace event { class StringsHelper; }}}
+namespace nx {
+namespace vms {
+namespace event {
+
+class StringsHelper;
+class AnalyticsHelper;
+
+} // namespace event
+} // namespace vms
+} // namespace nx
 
 class QnEventLogModel: public QAbstractItemModel, public QnWorkbenchContextAware
 {
@@ -35,7 +44,7 @@ public:
     QnEventLogModel(QObject* parent = nullptr);
     virtual ~QnEventLogModel();
 
-    void setEvents(const QVector<nx::vms::event::ActionDataListPtr> &events);
+    void setEvents(nx::vms::event::ActionDataList events);
 
     QList<Column> columns() const;
     void setColumns(const QList<Column>& columns);
@@ -75,7 +84,7 @@ private:
     QString getSubjectNameById(const QnUuid& id) const;
     QString getSubjectsText(const std::vector<QnUuid>& ids) const;
 
-    static QString getResourceNameString(const QnUuid& id);
+    QString getResourceNameString(const QnUuid& id) const;
 
     bool hasVideoLink(const nx::vms::event::ActionData& action) const;
     bool hasAccessToCamera(const QnUuid& cameraId) const;
@@ -85,5 +94,6 @@ private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QScopedPointer<DataIndex> m_index;
-    std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
+    std::unique_ptr<nx::vms::event::StringsHelper> m_stringsHelper;
+    std::unique_ptr<nx::vms::event::AnalyticsHelper> m_analyticsHelper;
 };

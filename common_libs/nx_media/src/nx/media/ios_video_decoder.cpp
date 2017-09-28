@@ -22,6 +22,7 @@ extern "C" {
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
+#include "ios_device_info.h"
 #endif
 
 #include <QtMultimedia/QAbstractVideoBuffer>
@@ -295,11 +296,26 @@ bool IOSVideoDecoder::isCompatible(
 
 QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
 {
-    //todo: implement me. Need detect at runtime.
-    if (codec == AV_CODEC_ID_H264)
-        return QSize(1920, 1080);
-    else
-        return QSize(1280, 720);
+    static const QSize kHdReadyResolution(1280, 720);
+    static const QSize kFullHdResolution(1920, 1080);
+    static const QSize kUhd4kResolution(3840, 2160);
+
+    if (codec != AV_CODEC_ID_H264)
+        return kHdReadyResolution;
+
+    const auto& deviceInfo = iosDeviceInformation();
+    if (deviceInfo.type == IosDeviceInformation::Type::iPhone)
+    {
+        if (deviceInfo.majorVersion >= 7) //< iPhone 6 and newer.
+            return kUhd4kResolution;
+    }
+    else if (deviceInfo.type == IosDeviceInformation::Type::iPad)
+    {
+        if (deviceInfo.majorVersion >= 5) //< iPad Air 2 / iPad Mini 4 or newer.
+            return kUhd4kResolution;
+    }
+
+    return kFullHdResolution;
 }
 
 int IOSVideoDecoder::decode(

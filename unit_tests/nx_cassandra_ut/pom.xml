@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>build_ut</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>../build_ut</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nx_cassandra_ut</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Network Unit Tests</name>
+
+    <properties>
+        <guid>${nx_network_ut.guid}</guid>
+        <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
+        <global.libs>-lnxcassandra -lnx_utils</global.libs>
+        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
+
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
+        <rdep.packages>gtest gmock openssl cassandra</rdep.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_cassandra</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_cassandra/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>

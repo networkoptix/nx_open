@@ -2,6 +2,9 @@
 
 #include <array>
 #include <atomic>
+#include <chrono>
+
+#include <boost/optional.hpp>
 
 #include <nx/network/aio/event_type.h>
 
@@ -11,20 +14,28 @@ namespace nx {
 namespace network {
 
 class Pollable;
+namespace aio { class AIOThread; }
 
-namespace aio {
-    class AIOThread;
-}   //aio
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx
 
 class NX_NETWORK_API CommonSocketImpl
 {
 public:
+    struct MonitoringContext
+    {
+        bool isUsed = false;
+        boost::optional<std::chrono::milliseconds> timeout;
+        void* userData = nullptr;
+    };
+
     std::atomic<nx::network::aio::AIOThread*> aioThread;
-    std::array<void*, nx::network::aio::etMax> eventTypeToUserData;
+    std::array<MonitoringContext, nx::network::aio::etMax> monitoredEvents;
     std::atomic<int> terminated;
-    //!This socket sequence is unique even after socket destruction (socket pointer is not unique after delete call)
+    /**
+     * This socket sequence is unique even after socket destruction 
+     * (socket pointer is not unique after delete call).
+     */
     SocketSequenceType socketSequence;
     bool isUdtSocket;
 

@@ -124,6 +124,7 @@ private:
         EventManager* const eventManager,
         ec2::ConnectionManager* const ec2ConnectionManager,
         MaintenanceManager* const maintenanceManager,
+        const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
         const CloudModuleUrlProvider& cloudModuleUrlProvider);
 
     /** input & output */
@@ -151,6 +152,13 @@ private:
 
     template<typename ManagerType>
     void registerHttpHandler(
+        const char* handlerPath,
+        typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
+        ManagerType* manager);
+
+    template<typename ManagerType>
+    void registerHttpHandler(
+        nx_http::Method::ValueType method,
         const char* handlerPath,
         typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
         ManagerType* manager);

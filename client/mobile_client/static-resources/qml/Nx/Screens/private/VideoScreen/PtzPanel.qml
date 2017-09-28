@@ -11,6 +11,8 @@ Item
 {
     id: control
 
+    property alias preloaders: preloadersPanel
+
     readonly property PtzController controller: PtzController
     {
         property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
@@ -29,6 +31,33 @@ Item
 
     implicitWidth: content.width
     implicitHeight: content.height
+
+    PreloadersPanel
+    {
+        id: preloadersPanel
+
+        focusPressed: focusControl.focusInPressed || focusControl.focusOutPressed
+        zoomInPressed: zoomControl.zoomInPressed
+        zoomOutPressed: zoomControl.zoomOutPressed
+        moveDirection: joystick.direction
+        customRotation: control.customRotation
+
+        Connections
+        {
+            target: focusControl
+            onAutoFocusClicked: preloadersPanel.showCommonPreloader()
+        }
+        Connections
+        {
+            target: presetsItem
+            onGoToPreset: preloadersPanel.showCommonPreloader()
+        }
+        Connections
+        {
+            target: presetsButton
+            onPresetChoosen: preloadersPanel.showCommonPreloader()
+        }
+    }
 
     Column
     {

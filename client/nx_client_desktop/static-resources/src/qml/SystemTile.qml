@@ -12,7 +12,7 @@ BaseTile
     property string ownerDescription;
 
     property bool factorySystem: false;
-    property bool isCompatibleInternal: false;
+    property bool isCompatible: false;
     property bool safeMode: false;
     property bool isFactoryTile: impl.isFactoryTile;
 
@@ -30,7 +30,7 @@ BaseTile
         if (impl.isFactoryTile)
             return true;
 
-        if (wrongVersion || !isCompatibleInternal)
+        if (wrongVersion || !isCompatible)
             return false;
 
         return control.isConnectable;
@@ -54,11 +54,11 @@ BaseTile
     property QtObject primaryIndicatorProperties: QtObject
     {
         property bool visible: control.wrongVersion || control.compatibleVersion
-            || !control.isConnectable || !isCompatibleInternal
+            || !control.isConnectable || !isCompatible
 
         property string text:
         {
-            if (!isCompatibleInternal)
+            if (!isCompatible)
                 return qsTr("INCOMPATIBLE");
             if (wrongVersion)
                 return wrongVersion.toString(SoftwareVersion.BugfixFormat);
@@ -74,7 +74,7 @@ BaseTile
 
         property color textColor:
         {
-           if (wrongVersion || compatibleVersion || !isCompatibleInternal)
+           if (wrongVersion || compatibleVersion || !isCompatible)
                return Style.colors.shadow;
            else
                return Style.colors.windowText;
@@ -82,7 +82,7 @@ BaseTile
 
         property color color:
         {
-            if (wrongVersion || !isCompatibleInternal)
+            if (wrongVersion || !isCompatible)
                 return Style.colors.red_main;
             else if (compatibleVersion)
                 return Style.colors.yellow_main;

@@ -4,7 +4,7 @@
 
 #include <string>
 
-#define OUTPUT_PREFIX "tegra_video<Stub>: "
+#define OUTPUT_PREFIX "[tegra_video_stub #" << m_id << "] "
 #include <nx/utils/debug_utils.h>
 
 #include "config.h"
@@ -26,17 +26,20 @@ public:
     virtual bool hasMetadata() const override;
 
 private:
+    const std::string m_id;
     const std::string m_modelFile;
     const std::string m_deployFile;
     const std::string m_cacheFile;
 };
 
 Stub::Stub(const Params& params):
+    m_id(params.id),
     m_modelFile(params.modelFile),
     m_deployFile(params.deployFile),
     m_cacheFile(params.cacheFile)
 {
     OUTPUT << "Stub(): created:";
+    OUTPUT << "    id: " << m_id;
     OUTPUT << "    modelFile: " << m_modelFile;
     OUTPUT << "    deployFile: " << m_deployFile;
     OUTPUT << "    cacheFile: " << m_cacheFile;

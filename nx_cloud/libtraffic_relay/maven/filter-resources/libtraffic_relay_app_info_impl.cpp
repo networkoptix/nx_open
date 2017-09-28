@@ -1,7 +1,7 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#include <libtraffic_relay_app_info.h>
+#include <nx/cloud/relay/libtraffic_relay_app_info.h>
 
 namespace nx {
 namespace cloud {

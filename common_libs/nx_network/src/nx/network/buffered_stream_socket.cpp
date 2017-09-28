@@ -92,7 +92,7 @@ int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 void BufferedStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_internalRecvBuffer.isEmpty())
         return m_socket->readSomeAsync(buf, std::move(handler));
@@ -113,6 +113,11 @@ void BufferedStreamSocket::readSomeAsync(
             NX_LOGX(lm("readSomeAsync internalSize=%1").arg(recvSize), cl_logDEBUG2);
             handler(SystemError::noError, (size_t)recvSize);
         });
+}
+
+QString BufferedStreamSocket::idForToStringFromPtr() const
+{
+    return toString(m_socket);
 }
 
 void BufferedStreamSocket::triggerCatchRecvEvent(SystemError::ErrorCode resultCode)

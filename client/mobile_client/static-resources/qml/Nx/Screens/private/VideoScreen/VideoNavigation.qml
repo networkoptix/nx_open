@@ -13,9 +13,10 @@ Item
 
     property string resourceId
     property var videoScreenController
-    property bool paused: videoScreenController.mediaPlayer.playbackState !== MediaPlayer.Playing
+    property bool paused: true
     property bool ptzAvailable: false
     property real controlsOpacity: 1.0
+    property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
 
     signal ptzButtonClicked()
 
@@ -23,20 +24,39 @@ Item
     implicitHeight: navigator.height + navigationPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
+    Connections
+    {
+        target: videoScreenController.mediaPlayer
+
+        onPlaybackStateChanged:
+        {
+            var state = videoScreenController.mediaPlayer.playbackState
+            if (state == MediaPlayer.Previewing)
+                return //< In case of previewing we do not change paused state.
+
+            videoNavigation.paused = state != MediaPlayer.Playing
+        }
+    }
+
     QtObject
     {
         id: d
 
+        property bool loaded: videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded
         property bool playbackStarted: false
         property bool controlsNeeded:
-            !cameraChunkProvider.loading || (playbackStarted
-                && videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded)
+            !cameraChunkProvider.loading || (playbackStarted && loaded)
 
         property real controlsOpacity:
             Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
 
         property real controlsOpacityInternal: controlsNeeded ? 1.0 : 0.0
-        Behavior on controlsOpacityInternal { NumberAnimation { duration: 200 } }
+        Behavior on controlsOpacityInternal
+        {
+            id: playbackControlsOpacityBehaviour
+
+            NumberAnimation { duration: 200 }
+        }
 
         property real timelineOpacity: cameraChunkProvider.loading ? 0.0 : 1.0
         Behavior on timelineOpacity
@@ -369,6 +389,9 @@ Item
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("LIVE")
+                labelPadding: 0
+                rightPadding: 0
+                leftPadding: 0
                 flat: true
                 onClicked:
                 {
@@ -474,7 +497,7 @@ Item
             anchors.verticalCenterOffset: -150
             anchors.horizontalCenter: parent.horizontalCenter
 
-            loading: !paused && (videoScreenController.mediaPlayer.loading || timeline.dragging)
+            loading: videoScreenController.mediaPlayer.loading || timeline.dragging
             paused: videoNavigation.paused
 
             opacity: d.controlsOpacity

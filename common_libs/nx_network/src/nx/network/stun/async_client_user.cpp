@@ -36,15 +36,17 @@ void AsyncClientUser::sendRequest(
             SystemError::ErrorCode code, Message message) mutable
         {
             if (auto lock = guard->lock())
+            {
                 return post(
                     [this, handler = std::move(handler), code, 
                         message = std::move(message)]() mutable
                     {
                         handler(code, std::move(message));
                     });
+            }
 
             NX_LOG(lm("AsyncClientUser(%1). Ignore response %2 handler")
-                .arg(this).arg(message.header.transactionId.toHex()), cl_logDEBUG1);
+                .arg((void*)this).arg(message.header.transactionId.toHex()), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -61,7 +63,7 @@ bool AsyncClientUser::setIndicationHandler(
                 return post(std::bind(std::move(handler), std::move(message)));
 
             NX_LOG(lm("AsyncClientUser(%1). Ignore indication %2 handler")
-                .arg(this).arg(message.header.method), cl_logDEBUG1);
+                .arg((void*)this).arg(message.header.method), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -76,7 +78,7 @@ void AsyncClientUser::setOnReconnectedHandler(
                 return post(std::move(handler));
 
             NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
-                .arg(this), cl_logDEBUG1);
+                .arg((void*)this), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -92,7 +94,7 @@ bool AsyncClientUser::setConnectionTimer(
                 return post(std::move(handler));
 
             NX_LOG(lm("AsyncClientUser(%1). Ignoring timer handler")
-                .arg(this), cl_logDEBUG1);
+                .arg((void*)this), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -127,8 +129,8 @@ void AsyncClientUser::disconnectFromClient()
             guard.reset();
         });
 
-    m_asyncGuard.reset();
     NX_LOG(lm("AsyncClientUser(%1). Disconnected from client").arg(this), cl_logDEBUG2);
+    m_asyncGuard.reset();
 }
 
 } // namespace stun

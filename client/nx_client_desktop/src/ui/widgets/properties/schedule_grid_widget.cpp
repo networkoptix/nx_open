@@ -36,7 +36,8 @@ static const Qn::RecordingType kDefaultRecordingType = Qn::RT_Always;
 QnScheduleGridWidget::CellParams::CellParams():
     fps(kDefaultFps),
     quality(Qn::QualityNormal),
-    recordingType(kDefaultRecordingType)
+    recordingType(kDefaultRecordingType),
+    bitrateMbps(0.0)
 {
 }
 
@@ -44,7 +45,8 @@ bool QnScheduleGridWidget::CellParams::operator==(const CellParams& other) const
 {
     return fps == other.fps
         && quality == other.quality
-        && recordingType == other.recordingType;
+        && recordingType == other.recordingType
+        && qFuzzyIsNull(bitrateMbps - other.bitrateMbps);
 }
 
 QnScheduleGridWidget::QnScheduleGridWidget(QWidget* parent):
@@ -333,6 +335,8 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
 
             paintFunction(cellParams.recordingType)(&p, &option, this);
 
+            const auto suffix = qFuzzyIsNull(cellParams.bitrateMbps) ? QString() : lit("*");
+
             // draw text parameters
             if (cellParams.recordingType != Qn::RT_Never)
             {
@@ -352,7 +356,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
                         p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)),
                             Qt::AlignCenter, fps);
                         p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)),
-                            Qt::AlignCenter, toShortDisplayString(quality));
+                            Qt::AlignCenter, toShortDisplayString(quality) + suffix);
                     }
                     else
                     {
@@ -364,7 +368,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent* event)
                 else if (m_showQuality)
                 {
                     p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)),
-                        Qt::AlignCenter, toShortDisplayString(quality));
+                        Qt::AlignCenter, toShortDisplayString(quality) + suffix);
                 }
             }
 

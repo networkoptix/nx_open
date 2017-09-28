@@ -7,4 +7,8 @@ macx: {
   LIBS += -lobjc -framework Foundation -framework AppKit
 }
 
+linux {
+    QMAKE_LFLAGS += -Wl,--no-undefined
+}
+
 SOURCES += ${project.build.directory}/app_info_impl.cpp

@@ -9,6 +9,7 @@
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
 
 #include "message_body_converter.h"
 
@@ -32,7 +33,7 @@ public:
  */
 class ProxyWorker:
     public nx::network::aio::BasicPollable,
-    public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public nx_http::StreamConnectionHolder
 {
     using base_type = nx::network::aio::BasicPollable;
 

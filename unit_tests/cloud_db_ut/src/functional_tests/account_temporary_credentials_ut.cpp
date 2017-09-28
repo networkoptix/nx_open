@@ -120,7 +120,9 @@ TEST_F(AccountTemporaryCredentials, verify_temporary_credentials_are_accepted_by
         for (int j = 0; j < 2; ++j)
         {
             if (j == 1)
+            {
                 ASSERT_TRUE(restart());
+            }
 
             result = getAccount(
                 temporaryCredentials.login,
@@ -181,7 +183,9 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_expiration)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
 
         result = getAccount(
             temporaryCredentials.login,

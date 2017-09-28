@@ -1441,7 +1441,16 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     {
         ensureMotionSelectionCache();
 
-        paintMotionGrid(painter, channel, rect, m_renderer->lastFrameMetadata(channel));
+        auto metadata = m_renderer->lastFrameMetadata(channel);
+        if (!metadata || metadata->dataType != QnAbstractMediaData::DataType::META_V1)
+            return;
+
+        paintMotionGrid(
+            painter,
+            channel,
+            rect,
+            std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+
         paintMotionSensitivity(painter, channel, rect);
 
         /* Motion selection. */

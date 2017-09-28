@@ -1,4 +1,5 @@
 import QtQuick 2.6
+
 import Nx 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
@@ -37,6 +38,7 @@ PageBase
             if (offline)
             {
                 offlineStatusDelay.restart()
+                ptzPanel.moveOnTapMode = false
             }
             else
             {
@@ -54,6 +56,7 @@ PageBase
 
         property var videoNavigation: navigationLoader.item
 
+        property bool animatePlaybackControls: true
         property bool showOfflineStatus: false
         property bool cameraWarningVisible:
             (showOfflineStatus
@@ -180,7 +183,9 @@ PageBase
                         "activeQuality": player.videoQuality,
                         "customQualities": customQualities,
                         "availableVideoQualities":
-                            player.availableVideoQualities(allVideoQualities)
+                            player.availableVideoQualities(allVideoQualities),
+                        "transcodingSupportStatus":
+                            player.transcodingStatus()
                     }
                 )
 
@@ -201,11 +206,24 @@ PageBase
         }
     }
 
+    MouseArea
+    {
+        id: toggleMouseArea
+
+        anchors.fill: parent
+        onClicked:
+        {
+            if (!ptzPanel.moveOnTapMode)
+                toggleUi()
+        }
+    }
+
     Loader
     {
         id: video
 
         y: -header.height
+        x: -mainWindow.leftPadding
         width: mainWindow.width
         height: mainWindow.height
 
@@ -233,18 +251,13 @@ PageBase
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
-            onClicked:
-            {
-                if (!ptzPanel.moveOnTapMode)
-                    toggleUi()
-            }
         }
     }
 
     Component
     {
         id: fisheyeVideoComponent
-        FisheyeVideo 
+        FisheyeVideo
         {
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
@@ -256,10 +269,11 @@ PageBase
     Image
     {
         id: screenshot
-        width: parent.width
+        width: mainWindow.width
         height: width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
-        visible: status == Image.Ready
+        x: -mainWindow.leftPadding
+        visible: status == Image.Ready && !dummyLoader.visible
         opacity: d.cameraUiOpacity
     }
 
@@ -287,7 +301,14 @@ PageBase
         Loader
         {
             id: dummyLoader
-            anchors.fill: parent
+
+            readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
+
+            y: needOffset ? -header.height : 0
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
+            height: mainWindow.height - toolBar.statusBarHeight - (needOffset ? 0 : header.height)
+
             visible: active
             active: d.cameraWarningVisible
 
@@ -295,9 +316,12 @@ PageBase
             {
                 VideoDummy
                 {
-                    y: -header.height
-                    width: mainWindow.width
-                    height: mainWindow.height
+                    readonly property bool onlyCompactTitleIsVisible:
+                        compact && title != "" && description == "" && buttonText == ""
+
+                    rightPadding: 8 + mainWindow.rightPadding
+                    leftPadding: 8 + mainWindow.leftPadding
+                    compact: videoScreen.height < 540
                     state: videoScreenController.dummyState
 
                     MouseArea
@@ -311,14 +335,17 @@ PageBase
 
         Image
         {
-            width: parent.width
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
             height: sourceSize.height
             anchors.bottom: parent.bottom
-            sourceSize.height: 56 * 2
+            anchors.bottomMargin: videoScreen.height - mainWindow.height
+
+            sourceSize.height: 56 * 2 - anchors.bottomMargin
             source: lp("/images/timeline_gradient.png")
 
             visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || ptzPanel.moveOnTapMode || navigationLoader.visible;
+                || ptzPanel.moveOnTapMode || navigationLoader.visible
             opacity: visible ? 1 : 0
 
             Behavior on opacity
@@ -330,6 +357,11 @@ PageBase
         PtzPanel
         {
             id: ptzPanel
+
+            preloaders.parent: video.item
+            preloaders.height: video.item.fitSize ? video.item.fitSize.height : 0
+            preloaders.x: (video.item.width - preloaders.width) / 2
+            preloaders.y: (video.item.height - preloaders.height) / 3
 
             width: parent.width
             anchors.bottom: parent.bottom
@@ -402,6 +434,9 @@ PageBase
         {
             id: moveOnTapOverlay
 
+            x: -mainWindow.leftPadding
+            width: mainWindow.width
+            height: mainWindow.height
             parent: videoScreen
         }
 
@@ -455,6 +490,7 @@ PageBase
 
                 VideoNavigation
                 {
+                    animatePlaybackControls: d.animatePlaybackControls
                     videoScreenController: d.controller
                     controlsOpacity: d.cameraUiOpacity
                     ptzAvailable: ptzPanel.controller.available
@@ -487,7 +523,7 @@ PageBase
         color: ColorTheme.base3
         width: mainWindow.width - parent.width
         height: video.height
-        anchors.left: parent.right
+        x: mainWindow.leftPadding ? -mainWindow.leftPadding : parent.width
         anchors.top: video.top
         opacity: Math.min(navigationLoader.opacity, d.cameraUiOpacity)
     }
@@ -511,9 +547,11 @@ PageBase
         {
             script:
             {
+                d.animatePlaybackControls = false
                 videoScreen.resourceId = cameraSwitchAnimation.newResourceId
                 initialScreenshot = cameraSwitchAnimation.thumbnail
                 video.clear()
+                d.animatePlaybackControls = true
             }
         }
 

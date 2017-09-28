@@ -47,7 +47,7 @@ private:
     }
 };
 
-TEST_F(FtEc2MserverCloudSynchronization, general)
+TEST_P(FtEc2MserverCloudSynchronization, general)
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -63,11 +63,13 @@ TEST_F(FtEc2MserverCloudSynchronization, general)
         testSynchronizingUserFromMediaServerToCloud();
 
         if (i == 0)
+        {
             ASSERT_TRUE(cdb()->restart());
+        }
     }
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, reconnecting)
+TEST_P(FtEc2MserverCloudSynchronization, reconnecting)
 {
     constexpr const int minDelay = 0;
     constexpr const int maxDelay = 100;
@@ -92,7 +94,7 @@ TEST_F(FtEc2MserverCloudSynchronization, reconnecting)
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, adding_user_locally_while_offline)
+TEST_P(FtEc2MserverCloudSynchronization, adding_user_locally_while_offline)
 {
     // Sharing system with some account.
     api::AccountData account2;
@@ -149,7 +151,7 @@ TEST_F(FtEc2MserverCloudSynchronization, adding_user_locally_while_offline)
     }
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, merging_offline_changes)
+TEST_P(FtEc2MserverCloudSynchronization, merging_offline_changes)
 {
     constexpr const int kTestAccountNumber = 10;
 
@@ -200,7 +202,7 @@ TEST_F(FtEc2MserverCloudSynchronization, merging_offline_changes)
     }
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally)
+TEST_P(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally)
 {
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -246,7 +248,7 @@ TEST_F(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_local
         fetchCloudTransactionLog(&transactionList));
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, sync_from_cloud)
+TEST_P(FtEc2MserverCloudSynchronization, sync_from_cloud)
 {
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -267,7 +269,7 @@ TEST_F(FtEc2MserverCloudSynchronization, sync_from_cloud)
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, rebinding_system_to_cloud)
+TEST_P(FtEc2MserverCloudSynchronization, rebinding_system_to_cloud)
 {
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -300,7 +302,7 @@ TEST_F(FtEc2MserverCloudSynchronization, rebinding_system_to_cloud)
     }
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
+TEST_P(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
 {
     api::AccountData testAccount;
     std::string testAccountPassword;
@@ -343,7 +345,7 @@ TEST_F(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
     }
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, rename_system)
+TEST_P(FtEc2MserverCloudSynchronization, rename_system)
 {
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
@@ -393,7 +395,7 @@ TEST_F(FtEc2MserverCloudSynchronization, rename_system)
     }
 }
 
-TEST_F(Ec2MserverCloudSynchronization, adding_cloud_user_with_not_registered_email)
+TEST_P(Ec2MserverCloudSynchronization, adding_cloud_user_with_not_registered_email)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -438,7 +440,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_cloud_user_with_not_registered_ema
         cdb()->resetAccountPassword(testEmail, &confirmationCode));
 }
 
-TEST_F(Ec2MserverCloudSynchronization, migrate_transactions)
+TEST_P(Ec2MserverCloudSynchronization, migrate_transactions)
 {
     const std::string preRegisteredCloudAccountEmail =
         "akolesnikov@networkoptix.com";
@@ -478,7 +480,7 @@ TEST_F(Ec2MserverCloudSynchronization, migrate_transactions)
     waitForCloudAndVmsToSyncUsers();
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, transaction_timestamp)
+TEST_P(FtEc2MserverCloudSynchronization, transaction_timestamp)
 {
     appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
     waitForCloudAndVmsToSyncUsers();
@@ -529,7 +531,7 @@ TEST_F(FtEc2MserverCloudSynchronization, transaction_timestamp)
     }
 }
 
-TEST_F(FtEc2MserverCloudSynchronization, user_fullname_modification_pushed_to_vms_from_cloud)
+TEST_P(FtEc2MserverCloudSynchronization, user_fullname_modification_pushed_to_vms_from_cloud)
 {
     establishConnectionBetweenVmsAndCloud();
     waitForCloudAndVmsToSyncUsers();
@@ -542,6 +544,10 @@ TEST_F(FtEc2MserverCloudSynchronization, user_fullname_modification_pushed_to_vm
 
     waitForCloudAndVmsToSyncUsers();
 }
+
+INSTANTIATE_TEST_CASE_P(P2pMode, FtEc2MserverCloudSynchronization,
+    ::testing::Values(TestParams(false), TestParams(true)
+));
 
 } // namespace cdb
 } // namespace nx

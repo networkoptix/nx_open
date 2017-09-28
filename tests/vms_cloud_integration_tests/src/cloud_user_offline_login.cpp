@@ -28,8 +28,7 @@ static bool resourceParamPresent(
 } // namespace
 
 class CloudUserOfflineLogin:
-    public MediaServerCloudIntegrationTest,
-    public ::testing::Test
+    public MediaServerCloudIntegrationTest
 {
 protected:
     void givenUserInvitedFromDesktopClient()
@@ -41,7 +40,7 @@ protected:
     {
         changeCloudOwnerAccountPassword();
     }
-    
+
     void whenCloudDataHasBeenSynchronizedToTheServer()
     {
         waitForCloudDataSynchronizedToTheMediaServer();
@@ -89,7 +88,7 @@ protected:
             nx::cdb::api::ResultCode::ok,
             cdb()->getAccount(
                 m_invitedAccount.email,
-                m_invitedAccount.password, 
+                m_invitedAccount.password,
                 &m_invitedAccount));
     }
 
@@ -174,13 +173,13 @@ private:
     }
 };
 
-TEST_F(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
+TEST_P(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
 {
     whenSystemWentOffline();
     thenUserCanStillLogin();
 }
 
-TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
+TEST_P(CloudUserOfflineLogin, multiple_users_can_login)
 {
     whenAddedMultipleCloudUsers();
     whenSystemWentOffline();
@@ -188,11 +187,11 @@ TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
     thenAllUsersCanStillLogin();
 }
 
-// TEST_F(CloudUserOfflineLogin, multiple_users_different_history_depth)
+// TEST_P(CloudUserOfflineLogin, multiple_users_different_history_depth)
 
-// TEST_F(CloudUserOfflineLogin, cloud_user_added_while_system_is_offline_cannot_login_while_others_can)
+// TEST_P(CloudUserOfflineLogin, cloud_user_added_while_system_is_offline_cannot_login_while_others_can)
 
-TEST_F(CloudUserOfflineLogin, user_can_login_after_password_change)
+TEST_P(CloudUserOfflineLogin, user_can_login_after_password_change)
 {
     whenCloudUserPasswordHasBeenChanged();
     whenSystemWentOffline();
@@ -200,7 +199,7 @@ TEST_F(CloudUserOfflineLogin, user_can_login_after_password_change)
     thenUserCanStillLogin();
 }
 
-TEST_F(CloudUserOfflineLogin, invited_user_can_login_after_completing_registration_in_cloud)
+TEST_P(CloudUserOfflineLogin, invited_user_can_login_after_completing_registration_in_cloud)
 {
     givenUserInvitedFromDesktopClient();
 
@@ -209,3 +208,7 @@ TEST_F(CloudUserOfflineLogin, invited_user_can_login_after_completing_registrati
 
     thenInvitedUserCanLoginToTheSystem();
 }
+
+INSTANTIATE_TEST_CASE_P(P2pMode, CloudUserOfflineLogin,
+    ::testing::Values(TestParams(false), TestParams(true)
+));

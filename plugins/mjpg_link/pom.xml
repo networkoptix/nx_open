@@ -18,7 +18,7 @@
         <guid>${mjpg_link.guid}</guid>
 
         <qt.libs>core network</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib</windows.oslibs>
 
         <rdep.packages>openssl</rdep.packages>

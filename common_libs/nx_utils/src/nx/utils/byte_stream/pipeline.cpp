@@ -20,29 +20,15 @@ void AbstractOutputConverter::setOutput(AbstractOutput* outputStream)
 }
 
 //-------------------------------------------------------------------------------------------------
-// TwoWayPipeline
+// AbstractTwoWayConverter
 
-TwoWayPipeline::TwoWayPipeline():
-    m_inputStream(nullptr)
+AbstractInputConverter::AbstractInputConverter()
 {
 }
 
-void TwoWayPipeline::setInput(AbstractInput* inputStream)
+void AbstractInputConverter::setInput(AbstractInput* inputStream)
 {
     m_inputStream = inputStream;
-}
-
-//-------------------------------------------------------------------------------------------------
-// ProxyPipeline
-
-int ProxyPipeline::read(void* data, size_t count)
-{
-    return m_inputStream->read(data, count);
-}
-
-int ProxyPipeline::write(const void* data, size_t count)
-{
-    return m_outputStream->write(data, count);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -97,9 +83,9 @@ void ProxyConverter::setDelegatee(Converter* delegatee)
 }
 
 //-------------------------------------------------------------------------------------------------
-// ReflectingPipeline
+// Pipe
 
-ReflectingPipeline::ReflectingPipeline(QByteArray initialData):
+Pipe::Pipe(QByteArray initialData):
     m_buffer(std::move(initialData)),
     m_totalBytesThrough(0),
     m_maxSize(0),
@@ -107,7 +93,7 @@ ReflectingPipeline::ReflectingPipeline(QByteArray initialData):
 {
 }
 
-int ReflectingPipeline::write(const void* data, size_t count)
+int Pipe::write(const void* data, size_t count)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -119,7 +105,7 @@ int ReflectingPipeline::write(const void* data, size_t count)
     return count;
 }
 
-int ReflectingPipeline::read(void* data, size_t count)
+int Pipe::read(void* data, size_t count)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -133,7 +119,7 @@ int ReflectingPipeline::read(void* data, size_t count)
     return bytesToRead;
 }
 
-QByteArray ReflectingPipeline::readAll()
+QByteArray Pipe::readAll()
 {
     QnMutexLocker lock(&m_mutex);
     QByteArray result;
@@ -141,24 +127,24 @@ QByteArray ReflectingPipeline::readAll()
     return result;
 }
 
-void ReflectingPipeline::setMaxBufferSize(std::size_t maxSize)
+void Pipe::setMaxBufferSize(std::size_t maxSize)
 {
     m_maxSize = maxSize;
 }
 
-std::size_t ReflectingPipeline::totalBytesThrough() const
+std::size_t Pipe::totalBytesThrough() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_totalBytesThrough;
 }
 
-QByteArray ReflectingPipeline::internalBuffer() const
+QByteArray Pipe::internalBuffer() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_buffer;
 }
 
-void ReflectingPipeline::writeEof()
+void Pipe::writeEof()
 {
     QnMutexLocker lock(&m_mutex);
     m_eof = true;

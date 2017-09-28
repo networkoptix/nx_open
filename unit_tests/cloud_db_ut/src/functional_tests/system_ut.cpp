@@ -698,7 +698,9 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
             if (i == 0)
             {
                 if (testOption == TestOption::withRestart)
+                {
                     ASSERT_TRUE(restart());
+                }
                 continue;
             }
             else if (i == 1)
@@ -740,7 +742,9 @@ TEST_F(FtSystem, rename)
         const bool restartRequired = j == 1;
 
         if (restartRequired)
+        {
             ASSERT_TRUE(restart());
+        }
 
         // Checking system1 name.
         api::SystemDataEx systemData;
@@ -845,7 +849,9 @@ static void validateSystemsOrder(
     {
         ASSERT_EQ(systemId, systems[i].id);
         if (prevSortingOrder)
+        {
             ASSERT_GT(prevSortingOrder, systems[i].usageFrequency);
+        }
         prevSortingOrder = systems[i].usageFrequency;
         ++i;
     }
@@ -1111,7 +1117,9 @@ TEST_F(FtSystemSortingOrder, persistence_after_sharing_update)
         if (updateSharing)
             shareSystemEx(account1, system1, account2, api::SystemAccessRole::advancedViewer);
         if (needRestart)
+        {
             ASSERT_TRUE(restart());
+        }
 
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
@@ -1161,7 +1169,9 @@ TEST_F(FtSystem, update)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
 
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(

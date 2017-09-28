@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-#include <settings.h>
+#include <nx/cloud/relay/settings.h>
 
 namespace nx {
 namespace cloud {

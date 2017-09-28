@@ -11,6 +11,9 @@ namespace client {
 namespace core {
 namespace helpers {
 
+struct Credentials {};
+const utils::log::Tag kCredentialsLogTag(typeid(Credentials));
+
 void storeConnection(const QnUuid& localSystemId, const QString& systemName, const QUrl& url)
 {
     const auto cleanUrl = QnUrlHelper(url).cleanUrl();
@@ -46,10 +49,10 @@ void removeConnection(const QnUuid& localSystemId, const QUrl& url)
 
 void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& credentials)
 {
-    NX_DEBUG("CredentialsManager", lm("Saving credentials of %1 to the system %2")
-        .arg(credentials.user).arg(localSystemId));
+    NX_DEBUG(kCredentialsLogTag, lm("Saving credentials of %1 to the system %2")
+        .args(credentials.user, localSystemId));
 
-    NX_DEBUG("CredentialsManager", credentials.decodedPassword().isEmpty()
+    NX_DEBUG(kCredentialsLogTag, credentials.decodedPassword().isEmpty()
         ? "Password is empty"
         : "Password is filled");
 
@@ -72,8 +75,8 @@ void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& c
 
 void removeCredentials(const QnUuid& localSystemId, const QString& userName)
 {
-    NX_DEBUG("CredentialsManager", lm("Removing credentials of %1 to the system %2")
-        .arg(userName).arg(localSystemId));
+    NX_DEBUG(kCredentialsLogTag, lm("Removing credentials of %1 to the system %2")
+        .args(userName, localSystemId));
 
     auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
 

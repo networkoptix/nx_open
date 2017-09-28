@@ -1,5 +1,7 @@
 #include "proxy_handler.h"
 
+#include <typeinfo>
+
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
@@ -16,10 +18,12 @@ constexpr const int kSocketTimeoutMs = 29*1000;
 
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
-    const conf::RunTimeOptions& runTimeOptions)
+    const conf::RunTimeOptions& runTimeOptions,
+    nx::cloud::relay::model::AbstractListeningPeerPool* listeningPeerPool)
 :
     m_settings(settings),
-    m_runTimeOptions(runTimeOptions)
+    m_runTimeOptions(runTimeOptions),
+    m_listeningPeerPool(listeningPeerPool)
 {
 }
 
@@ -30,6 +34,8 @@ void ProxyHandler::processRequest(
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
 {
+    using namespace std::placeholders;
+
     m_targetHost = cutTargetFromRequest(*connection, &request);
     if (!nx_http::StatusCode::isSuccessCode(m_targetHost.status))
     {
@@ -45,29 +51,18 @@ void ProxyHandler::processRequest(
     }
 
     // TODO: #ak avoid request loop by using Via header.
-
-    m_targetPeerSocket = SocketFactory::createStreamSocket(
-        m_targetHost.sslMode == conf::SslMode::enabled);
-
-    m_targetPeerSocket->bindToAioThread(connection->getAioThread());
-    if (!m_targetPeerSocket->setNonBlockingMode(true) ||
-        !m_targetPeerSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
-        !m_targetPeerSocket->setSendTimeout(m_settings.tcp().sendTimeout))
-    {
-        const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_INFO(this, lm("Failed to set socket options. %1")
-            .arg(SystemError::toString(osErrorCode)));
-        completionHandler(nx_http::StatusCode::internalServerError);
-        return;
-    }
+    m_sslConnectionRequired = m_targetHost.sslMode == conf::SslMode::enabled;
 
     m_requestCompletionHandler = std::move(completionHandler);
     m_request = std::move(request);
 
-    // TODO: #ak updating request (e.g., Host header).
-    m_targetPeerSocket->connectAsync(
-        m_targetHost.target,
-        std::bind(&ProxyHandler::onConnected, this, m_targetHost.target, std::placeholders::_1));
+    m_targetPeerConnector = std::make_unique<TargetPeerConnector>(
+        m_listeningPeerPool,
+        m_targetHost.target);
+    m_targetPeerConnector->bindToAioThread(connection->getAioThread());
+    m_targetPeerConnector->setTimeout(m_settings.tcp().sendTimeout);
+    m_targetPeerConnector->connectAsync(
+        std::bind(&ProxyHandler::onConnected, this, m_targetHost.target, _1, _2));
 }
 
 void ProxyHandler::sendResponse(
@@ -215,38 +210,56 @@ TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
 
 void ProxyHandler::onConnected(
     const SocketAddress& targetAddress,
-    SystemError::ErrorCode errorCode)
+    SystemError::ErrorCode errorCode,
+    std::unique_ptr<AbstractStreamSocket> connection)
 {
-    static const auto isSsl =
-        [](const std::unique_ptr<AbstractStreamSocket>& s)
-        {
-            return (bool) dynamic_cast<nx::network::deprecated::SslSocket*>(s.get());
-        };
-
     if (errorCode != SystemError::noError)
     {
         NX_DEBUG(this, lm("Failed to establish connection to %1 (path %2) with SSL=%3. %4")
-            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket),
+            .args(targetAddress, m_request.requestLine.url, m_sslConnectionRequired,
                 SystemError::toString(errorCode)));
 
-        auto handler = std::move(m_requestCompletionHandler);
-        return handler(
+        return nx::utils::swapAndCall(
+            m_requestCompletionHandler,
             (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreach)
                 ? nx_http::StatusCode::notFound
                 : nx_http::StatusCode::serviceUnavailable);
     }
 
-    NX_VERBOSE(this,
-        lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
-        .args(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
-            m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)));
+    if (!connection->setRecvTimeout(m_settings.tcp().recvTimeout) ||
+        !connection->setSendTimeout(m_settings.tcp().sendTimeout))
+    {
+        const auto osErrorCode = SystemError::getLastOSErrorCode();
+        NX_INFO(this, lm("Failed to set socket options. %1")
+            .arg(SystemError::toString(osErrorCode)));
+        return nx::utils::swapAndCall(
+            m_requestCompletionHandler,
+            nx_http::StatusCode::internalServerError);
+    }
 
-    m_targetPeerSocket->cancelIOSync(nx::network::aio::etNone);
+    if (m_sslConnectionRequired)
+    {
+        connection = std::make_unique<nx::network::deprecated::SslSocket>(
+            std::move(connection),
+            false);
+        if (!connection->setNonBlockingMode(true))
+        {
+            return nx::utils::swapAndCall(
+                m_requestCompletionHandler,
+                nx_http::StatusCode::internalServerError);
+        }
+    }
+
+    NX_VERBOSE(this,
+        lm("Successfully established connection to %1(%2, full name %3, path %4) from %5 with SSL=%6")
+        .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(),
+            m_request.requestLine.url, connection->getLocalAddress(), m_sslConnectionRequired));
+
     m_requestProxyWorker = std::make_unique<ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,
-        std::move(m_targetPeerSocket));
+        std::move(connection));
 }
 
 } // namespace gateway

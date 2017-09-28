@@ -181,12 +181,12 @@ nx::utils::db::DBResult TransactionLog::fetchTransactionState(
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(
         R"sql(
-        SELECT tl.system_id as system_id, 
-               tss.timestamp_hi as settings_timestamp_hi, 
-               peer_guid, 
-               db_guid, 
-               sequence, 
-               tran_hash, 
+        SELECT tl.system_id as system_id,
+               tss.timestamp_hi as settings_timestamp_hi,
+               peer_guid,
+               db_guid,
+               sequence,
+               tran_hash,
                tl.timestamp_hi as timestamp_hi,
                timestamp
         FROM transaction_log tl
@@ -196,7 +196,7 @@ nx::utils::db::DBResult TransactionLog::fetchTransactionState(
 
     if (!selectTransactionStateQuery.exec())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Error loading transaction log. %1")
             .arg(selectTransactionStateQuery.lastError().text()), cl_logERROR);
         return nx::utils::db::DBResult::ioError;
@@ -350,7 +350,7 @@ void TransactionLog::onDbTransactionCompleted(
     const nx::String& systemId,
     nx::utils::db::DBResult dbResult)
 {
-    DbTransactionContext currentDbTranContext = 
+    DbTransactionContext currentDbTranContext =
         m_dbTransactionContexts.take(std::make_pair(queryContext, systemId));
     TransactionLogContext* vmsTransactionLogData = nullptr;
     {

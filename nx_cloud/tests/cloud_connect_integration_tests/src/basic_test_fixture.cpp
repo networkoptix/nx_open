@@ -8,12 +8,17 @@
 #include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
-#include <libtraffic_relay/src/model/listening_peer_pool.h>
+#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
+#include <nx/cloud/relay/model/listening_peer_pool.h>
+#include <nx/cloud/relay/model/model.h>
 
 namespace nx {
 namespace network {
 namespace cloud {
 namespace test {
+
+using namespace nx::cloud::relay;
 
 static const char* const kCloudModulesXmlPath = "/cloud_modules.xml";
 
@@ -23,7 +28,7 @@ void PredefinedCredentialsProvider::setCredentials(
     m_cloudSystemCredentials = std::move(cloudSystemCredentials);
 }
 
-boost::optional<hpm::api::SystemCredentials> 
+boost::optional<hpm::api::SystemCredentials>
     PredefinedCredentialsProvider::getSystemCredentials() const
 {
     return m_cloudSystemCredentials;
@@ -31,13 +36,56 @@ boost::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
-BasicTestFixture::BasicTestFixture():
+cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
+    const std::string& domainName,
+    const std::string& relayHost)
+{
+    m_relayTest->peerAdded(domainName, relayHost);
+    return cf::make_ready_future(true);
+}
+
+cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
+{
+    m_relayTest->peerRemoved(domainName);
+    return cf::make_ready_future(true);
+}
+
+cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
+    const std::string& /*domainName*/) const
+{
+    auto redirectToEndpoint = m_relayTest->relayInstanceEndpoint(0).toStdString();
+    return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
+}
+
+BasicTestFixture::BasicTestFixture(
+    int relayCount,
+    boost::optional<std::chrono::seconds> disconnectedPeerTimeout)
+    :
     m_staticMsgBody("Hello, hren!"),
     m_mediator(
         nx::hpm::MediatorFunctionalTest::allFlags &
             ~nx::hpm::MediatorFunctionalTest::initializeConnectivity),
-    m_unfinishedRequestsLeft(0)
+    m_unfinishedRequestsLeft(0),
+    m_relayCount(relayCount),
+    m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
+}
+
+void BasicTestFixture::setUpPublicIpFactoryFunc()
+{
+    auto discoverFunc = []() {return HostAddress("127.0.0.1"); };
+    controller::PublicIpDiscoveryService::setDiscoverFunc(discoverFunc);
+}
+
+void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
+{
+    using namespace nx::cloud::relay::model;
+    auto createRemoteRelayPeerPoolFunc =
+        [this](const conf::Settings&)
+        {
+            return std::make_unique<MemoryRemoteRelayPeerPool>(this);
+        };
+    RemoteRelayPeerPoolFactory::setFactoryFunc(createRemoteRelayPeerPoolFunc);
 }
 
 BasicTestFixture::~BasicTestFixture()
@@ -54,14 +102,53 @@ BasicTestFixture::~BasicTestFixture()
     m_httpServer.reset();
 }
 
+void BasicTestFixture::setInitFlags(int flags)
+{
+    m_initFlags = flags;
+}
+
+SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
+{
+    return m_relays[index]->moduleInstance()->httpEndpoints()[0];
+}
+
+void BasicTestFixture::startRelays()
+{
+    for (int i = 0; i < m_relayCount; ++i)
+        startRelay(i);
+}
+
+void BasicTestFixture::startRelay(int index)
+{
+    auto newRelay = std::make_unique<Relay>();
+
+    std::string endpointString = "127.0.0.1:0";
+    newRelay->addArg("-http/listenOn", endpointString.c_str());
+
+    std::string dataDirString = std::string("relay_") + std::to_string(index);
+    newRelay->addArg("-dataDir", dataDirString.c_str());
+
+    if ((bool) m_disconnectedPeerTimeout)
+    {
+        newRelay->addArg(
+            "-listeningPeer/disconnectedPeerTimeout",
+            std::to_string(m_disconnectedPeerTimeout->count()).c_str());
+    }
+
+    ASSERT_TRUE(newRelay->startAndWaitUntilStarted());
+    m_relays.push_back(std::move(newRelay));
+}
+
+
 void BasicTestFixture::SetUp()
 {
-    ASSERT_TRUE(m_trafficRelay.startAndWaitUntilStarted());
+    setUpPublicIpFactoryFunc();
+    setUpRemoteRelayPeerPoolFactoryFunc();
+    startRelays();
+    ASSERT_GE(m_relays.size(), 1U);
 
     m_mediator.addArg("-trafficRelay/url");
-    m_relayUrl = QUrl(lm("http://127.0.0.1:%1/")
-        .arg(m_trafficRelay.moduleInstance()->httpEndpoints()[0].port).toQString());
-    m_mediator.addArg(m_relayUrl.toString().toStdString().c_str());
+    m_mediator.addArg(relayUrl().toString().toStdString().c_str());
     m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
     m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 
@@ -79,11 +166,14 @@ void BasicTestFixture::SetUp()
             break;
     }
 
-    SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
-        nx::network::url::Builder().setScheme("http")
-            .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
-            .setPath(kCloudModulesXmlPath));
-    SocketGlobals::mediatorConnector().enable(true);
+    if ((m_initFlags & doNotInitializeMediatorConnection) == 0)
+    {
+        SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
+            nx::network::url::Builder().setScheme("http")
+                .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
+                .setPath(kCloudModulesXmlPath));
+        SocketGlobals::mediatorConnector().enable(true);
+    }
 }
 
 void BasicTestFixture::startServer()
@@ -99,9 +189,19 @@ void BasicTestFixture::startServer()
     startHttpServer();
 }
 
-QUrl BasicTestFixture::relayUrl() const
+void BasicTestFixture::stopServer()
 {
-    return m_relayUrl;
+    m_httpServer.reset();
+}
+
+QUrl BasicTestFixture::relayUrl(int relayNum) const
+{
+    NX_ASSERT(relayNum < (int) m_relays.size());
+
+    auto relayUrlString = lm("http://%1/")
+        .arg(m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].toStdString()).toQString();
+
+    return QUrl(relayUrlString);
 }
 
 void BasicTestFixture::restartMediator()
@@ -115,7 +215,7 @@ void BasicTestFixture::assertConnectionCanBeEstablished()
     auto clientSocketGuard = makeScopeGuard([this]() { m_clientSocket->pleaseStopSync(); });
     ASSERT_TRUE(m_clientSocket->setNonBlockingMode(true));
 
-    nx::String targetAddress = 
+    nx::String targetAddress =
         m_remotePeerName
         ? *m_remotePeerName
         : serverSocketCloudAddress();
@@ -165,7 +265,7 @@ nx::hpm::MediatorFunctionalTest& BasicTestFixture::mediator()
 
 nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
 {
-    return m_trafficRelay;
+    return *m_relays[0];
 }
 
 nx::String BasicTestFixture::serverSocketCloudAddress() const
@@ -194,11 +294,30 @@ void BasicTestFixture::waitUntilServerIsRegisteredOnMediator()
 
 void BasicTestFixture::waitUntilServerIsRegisteredOnTrafficRelay()
 {
-    while (!m_trafficRelay.moduleInstance()->listeningPeerPool().isPeerOnline(
-        m_cloudSystemCredentials.systemId.toStdString()))
-    {
+    waitForServerStatusOnRelay(ServerRelayStatus::registered);
+}
+
+void BasicTestFixture::waitUntilServerIsUnRegisteredOnTrafficRelay()
+{
+    waitForServerStatusOnRelay(ServerRelayStatus::unregistered);
+}
+
+void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
+{
+    const auto& listeningPool = m_relays[0]->moduleInstance()->listeningPeerPool();
+    auto serverId = m_cloudSystemCredentials.systemId.toStdString();
+    auto getServerStatus = [&]() { return listeningPool.isPeerOnline(serverId); };
+
+    auto shouldWaitMore =
+        [&]()
+        {
+            return
+                (status == ServerRelayStatus::registered && !getServerStatus())
+                || (status == ServerRelayStatus::unregistered && getServerStatus());
+        };
+
+    while (shouldWaitMore())
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
 }
 
 void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)
@@ -277,7 +396,7 @@ void BasicTestFixture::onHttpRequestDone(
     HttpRequestResult result;
     if (httpClient->response())
     {
-        result.statusCode = 
+        result.statusCode =
             (nx_http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
         result.msgBody = httpClient->fetchMessageBodyBuffer();
     }

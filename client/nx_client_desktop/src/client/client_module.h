@@ -5,6 +5,8 @@
 
 #include <client/client_startup_parameters.h>
 
+#include <nx/client/desktop/radass/radass_fwd.h>
+
 #include <nx/utils/singleton.h>
 
 class QGLWidget;
@@ -27,6 +29,8 @@ public:
     QnNetworkProxyFactory* networkProxyFactory() const;
     QnCloudStatusWatcher* cloudStatusWatcher() const;
 
+    nx::client::desktop::RadassController* radassController() const;
+
     QnStartupParameters startupParameters() const;
 
 private:
@@ -47,6 +51,7 @@ private:
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;
     QnCloudStatusWatcher* m_cloudStatusWatcher;
+    nx::client::desktop::RadassController* m_radassController;
 };
 
 #define qnClientModule QnClientModule::instance()

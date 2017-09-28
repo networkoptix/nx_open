@@ -5,7 +5,7 @@
                 Wszyscy użytkownicy chmury zostaną usunięci.
             </p>
             <p>
-                System will be accessible through local network with local administrator account.
+                System będzie dostępny w sieci lokalnej dla lokalnego konta administratora.
             </p>
             <p>
                 Wprowadź hasło, aby kontynuować.
@@ -17,7 +17,7 @@
                        name="password" type="password" required autofocus>
                 <p class="help-block" >
                     <span ng-if="disconnectForm.password.$touched && disconnectForm.password.$error.required">
-                        Password is required
+                        Hasło jest wymagane
                     </span>
                 </p>
             </div>
@@ -28,7 +28,7 @@
                             action-type="'danger'"
                             button-text="$root.L.system.confirmDisconnectAction"></process-button>
 
-            <button type="button" class="btn btn-default" ng-click="close()" >Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="close()" >Anuluj</button>
         </div>
     </form>
 </div>

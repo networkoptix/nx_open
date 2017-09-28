@@ -17,6 +17,8 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/settings.h>
 
+#include "discovery/discovery_settings.h"
+
 namespace nx {
 namespace hpm {
 namespace conf {
@@ -106,6 +108,7 @@ public:
     const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
     const TrafficRelay& trafficRelay() const;
+    const nx::cloud::discovery::conf::Discovery& discovery() const;
 
 private:
     General m_general;
@@ -117,6 +120,7 @@ private:
     nx::utils::db::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
     TrafficRelay m_trafficRelay;
+    nx::cloud::discovery::conf::Discovery m_discovery;
 
     virtual void loadSettings() override;
 

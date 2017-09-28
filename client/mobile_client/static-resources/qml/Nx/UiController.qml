@@ -21,7 +21,7 @@ Object
 
             clearLastUsedConnection()
             sideNavigation.close()
-            connectionManager.disconnectFromServer(false)
+            connectionManager.disconnectFromServer()
 
             if (liteMode)
                 Workflow.openLiteClientWelcomeScreen()

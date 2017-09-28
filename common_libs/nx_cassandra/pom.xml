@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>common_libs</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nx_cassandra</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Cassandra DB cpp wrapper</name>
+
+    <properties>
+        <guid>${nx_cassandra.guid}</guid>
+        <template>lib</template>
+
+
+        <qt.libs>core</qt.libs>
+        <global.libs>-lnx_utils</global.libs>
+
+        <buildLib>sharedLib</buildLib>
+        <rdep.windows.packages>cassandra-2.7.0</rdep.windows.packages>
+        <rdep.linux.packages>cassandra-2.7.0</rdep.linux.packages>
+        <rdep.mac.packages>cassandra-2.7.0</rdep.mac.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>

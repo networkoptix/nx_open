@@ -54,7 +54,6 @@ signals:
     void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnManualCameraSearchReply &reply, int handle, const QString &errorString);
-    void finished(int status, const nx::vms::event::ActionDataListPtr &reply, int handle, const QString &errorString);
     void finished(int status, const QImage &reply, int handle, const QString &errorString);
     void finished(int status, const QString &reply, int handle, const QString &errorString);
     void finished(int status, const QnPtzPresetList &reply, int handle, const QString &errorString);

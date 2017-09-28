@@ -78,6 +78,11 @@ public:
         return m_settings.value("dbFile", "ecs.sqlite").toString();
     }
 
+    bool isP2pMode() const
+    {
+        return m_settings.value("p2pMode", false).toBool();
+    }
+
     int moduleInstance() const
     {
         return m_settings.value("moduleInstance").toInt();
@@ -302,7 +307,11 @@ int Appserver2Process::exec()
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, nx::utils::TimerManager::instance(), m_commonModule.get()));
+        ec2ConnectionFactory(getConnectionFactory(
+            Qn::PT_Server,
+            nx::utils::TimerManager::instance(),
+            m_commonModule.get(),
+            settings.isP2pMode()));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));

@@ -2,10 +2,6 @@
 
 #include <QtWidgets/QAction>
 
-#include <boost/algorithm/cxx11/all_of.hpp>
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/range/algorithm/count_if.hpp>
-
 #include <api/app_server_connection.h>
 
 #include <common/common_module.h>
@@ -41,7 +37,10 @@
 
 #include <recording/time_period.h>
 
+#include <nx/client/desktop/condition/generic_condition.h>
+#include <nx/client/desktop/radass/radass_support.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -223,58 +222,25 @@ public:
     ActionVisibility check(const QnResourceList& resources,
         QnWorkbenchContext* /*context*/)
     {
-        return checkInternal<QnResourcePtr>(resources) ? EnabledAction : InvisibleAction;
+        return GenericCondition::check<QnResourcePtr>(resources, m_matchMode,
+            [this](const QnResourcePtr& resource) { return m_delegate(resource); })
+            ? EnabledAction
+            : InvisibleAction;
     }
 
     ActionVisibility check(const QnResourceWidgetList& widgets,
         QnWorkbenchContext* /*context*/)
     {
-        return checkInternal<QnResourceWidget*>(widgets) ? EnabledAction : InvisibleAction;
+        return GenericCondition::check<QnResourceWidget*>(widgets, m_matchMode,
+            [this](QnResourceWidget* widget)
+            {
+                if (auto resource = ParameterTypes::resource(widget))
+                    return m_delegate(resource);
+                return false;
+            })
+            ? EnabledAction
+            : InvisibleAction;
     }
-
-     template<class Item, class ItemSequence>
-     bool checkInternal(const ItemSequence &sequence)
-     {
-         int count = 0;
-
-         for (const Item& item : sequence)
-         {
-             bool matches = checkOne(item);
-
-             if (matches && m_matchMode == Any)
-                 return true;
-
-             if (!matches && m_matchMode == All)
-                 return false;
-
-             if (matches)
-                 count++;
-         }
-
-         if (m_matchMode == Any)
-             return false;
-
-         if (m_matchMode == All)
-             return true;
-
-         if (m_matchMode == ExactlyOne)
-             return count == 1;
-
-         NX_EXPECT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(m_matchMode)));
-         return false;
-     }
-
-     bool checkOne(const QnResourcePtr &resource)
-     {
-         return m_delegate(resource);
-     }
-
-     bool checkOne(QnResourceWidget* widget)
-     {
-         if (auto resource = ParameterTypes::resource(widget))
-             return m_delegate(resource);
-         return false;
-     }
 
 private:
     CheckDelegate m_delegate;
@@ -1166,22 +1132,40 @@ ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters
     return (connected ? InvisibleAction : EnabledAction);
 }
 
-ActionVisibility ChangeResolutionCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
+    QnWorkbenchContext* context)
 {
-    if (isVideoWallReviewMode(context))
-        return InvisibleAction;
-
-    if (!context->user())
-        return InvisibleAction;
-
     QnLayoutResourcePtr layout = context->workbench()->currentLayout()->resource();
     if (!layout)
         return InvisibleAction;
 
-    if (layout->isFile())
-        return InvisibleAction;
+    const auto resources = parameters.resources();
+    if (resources.isEmpty())
+    {
+        if (layout->flags().testFlag(Qn::exported_layout))
+            return InvisibleAction;
+    }
+    else
+    {
+        const bool onlyInacceptableItems = std::all_of(resources.begin(), resources.end(),
+            [](const QnResourcePtr& resource)
+            {
+                const auto flags = resource->flags();
+                return flags.testFlag(Qn::local)
+                    || flags.testFlag(Qn::server)
+                    || flags.testFlag(Qn::web_page)
+                    || flags.testFlag(Qn::io_module);
+            });
 
-    return EnabledAction;
+        if (onlyInacceptableItems)
+            return InvisibleAction;
+    }
+    auto layoutItems = parameters.layoutItems();
+    const bool supported = layoutItems.empty()
+        ? isRadassSupported(layout, MatchMode::Any)
+        : isRadassSupported(layoutItems, MatchMode::Any);
+
+    return supported ? EnabledAction : DisabledAction;
 }
 
 PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):
@@ -1602,22 +1586,7 @@ ActionVisibility CloudServerCondition::check(const QnResourceList& resources, Qn
             return nx::network::isCloudServer(resource.dynamicCast<QnMediaServerResource>());
         };
 
-    bool success = false;
-    switch (m_matchMode)
-    {
-        case Any:
-            success = any_of(resources, isCloudServer);
-            break;
-        case All:
-            success = all_of(resources, isCloudServer);
-            break;
-        case ExactlyOne:
-            success = (boost::count_if(resources, isCloudServer) == 1);
-            break;
-        default:
-            break;
-    }
-
+    bool success = GenericCondition::check<QnResourcePtr>(resources, m_matchMode, isCloudServer);
     return success ? EnabledAction : InvisibleAction;
 }
 

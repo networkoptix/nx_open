@@ -23,6 +23,15 @@ Page
     leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
 
+    ResourceHelper
+    {
+        id: resourceHelper
+        resourceId: clientId
+    }
+
+
+    title: "%1 (%2)".arg(applicationInfo.liteDeviceName()).arg(resourceHelper.resourceName)
+
     titleControls:
     [
         Switch
@@ -43,7 +52,7 @@ Page
     {
         id: d
 
-        readonly property real minimumHeight: 300 + bottomLoader.height + header.height
+        readonly property real minimumHeight: 316 + bottomLoader.height + header.height
 
         property int activeItemIndex: 0
 
@@ -59,6 +68,12 @@ Page
 
         property string currentResourceId: (screenItem && screenItem.activeItem
             ? screenItem.activeItem.resourceId : "")
+    }
+
+    MediaResourceHelper
+    {
+        id: currentResourceHelper
+        resourceId: d.currentResourceId
     }
 
     QnLiteClientController
@@ -128,6 +143,22 @@ Page
             horizontalAlignment: Text.AlignHCenter
 
             text: d.screenItem && d.screenItem.activeItem ? d.screenItem.activeItem.resourceName : ""
+        }
+
+        Text
+        {
+            width: parent.width
+            font.pixelSize: 13
+            color: ColorTheme.red_main
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+
+            text: qsTr("Software image rotation is not supported in fullscreen mode")
+
+            visible: liteClientControlScreen.state === "SingleCamera"
+                && d.currentResourceHelper !== ""
+                && (currentResourceHelper.customRotation !== 0
+                    || currentResourceHelper.customAspectRatio !== 0.0)
         }
     }
 

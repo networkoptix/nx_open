@@ -40,7 +40,7 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         m_asyncChannel->readSomeAsync(buffer, std::move(handler));
     }
@@ -232,7 +232,7 @@ protected:
     }
 
 private:
-    nx::utils::bstream::ReflectingPipeline m_input;
+    nx::utils::bstream::Pipe m_input;
     aio::test::AsyncChannel m_asyncChannel;
     std::unique_ptr<TestHttpConnection> m_connection;
     nx::utils::SyncQueue<std::unique_ptr<nx_http::Message>> m_receivedMessageQueue;

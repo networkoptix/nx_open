@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
 
@@ -7,6 +9,7 @@ namespace nx {
 
 class CameraResourceStub: public QnVirtualCameraResource
 {
+    using base_type = QnVirtualCameraResource;
 public:
     CameraResourceStub(Qn::LicenseType licenseType = Qn::LC_Professional);
 
@@ -15,11 +18,15 @@ public:
 
     virtual Qn::LicenseType licenseType() const override;
 
+    virtual bool hasDualStreaming() const override;
+    void setHasDualStreaming(bool value);
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 
 private:
     Qn::LicenseType m_licenseType;
+    boost::optional<bool> m_hasDualStreaming;
 };
 
 } // namespace nx

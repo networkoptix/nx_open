@@ -2,22 +2,18 @@
 
 #include <nx/network/http/buffer_source.h>
 
-#include <utils/common/app_info.h>
-
 #include <nx/cloud/cdb/client/cdb_request_path.h>
-
-#include "../managers/cloud_module_url_provider.h"
 
 namespace nx {
 namespace cdb {
 namespace http_handler {
 
-const QString GetCloudModulesXml::kHandlerPath = QLatin1String(kCloudModuleXmlPath);
+const QString GetCloudModulesXml::kHandlerPath = QLatin1String(kDeprecatedCloudModuleXmlPath);
 
 GetCloudModulesXml::GetCloudModulesXml(
-    const CloudModuleUrlProvider& cloudModuleUrlProvider)
+    GenerateModulesXmlFunc generateModulesXmlFunc)
     :
-    m_cloudModuleUrlProvider(cloudModuleUrlProvider)
+    m_generateModulesXmlFunc(std::move(generateModulesXmlFunc))
 {
 }
 
@@ -34,8 +30,7 @@ void GetCloudModulesXml::processRequest(
     // Note: Host header has format host[:port].
     auto msgBody = std::make_unique<nx_http::BufferSource>(
         "text/xml",
-        m_cloudModuleUrlProvider.getCloudModulesXml(
-            SocketAddress(host).address.toString().toUtf8()));
+        m_generateModulesXmlFunc(SocketAddress(host).address.toString().toUtf8()));
 
     completionHandler(nx_http::RequestResult(nx_http::StatusCode::ok, std::move(msgBody)));
 }

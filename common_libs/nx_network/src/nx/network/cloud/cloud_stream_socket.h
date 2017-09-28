@@ -19,12 +19,13 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-//!Socket that is able to use hole punching (tcp or udp) and mediator to establish connection
-/*!
-    Method to use to connect to remote peer is selected depending on route to the peer
-    If connection to peer requires using udp hole punching than this socket uses UDT.
-    \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
-*/
+/**
+ * Socket that is able to use hole punching (tcp or udp) and mediator to establish connection.
+ * Method to use to connect to a remote peer is selected depending on the route to the peer.
+ * If connection to peer requires using udp hole punching, then this socket uses UDT.
+ * NOTE: Actual socket is instantiated only when address is known 
+ *   (AbstractCommunicatingSocket::connect or AbstractCommunicatingSocket::connectAsync)
+ */
 class NX_NETWORK_API CloudStreamSocket:
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
@@ -37,7 +38,6 @@ public:
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    //!Implementation of AbstractSocket::*
     virtual bool bind(const SocketAddress& localAddress) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual bool close() override;
@@ -45,10 +45,8 @@ public:
     virtual bool shutdown() override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 
-    //!Implementation of AbstractStreamSocket::*
     virtual bool reopen() override;
 
-    //!Implementation of AbstractCommunicatingSocket::*
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis) override;
@@ -63,20 +61,18 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync(aio::EventType eventType) override;
 
-    //!Implementation of AbstractSocket::*
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler ) override;
 
-    //!Implementation of AbstractCommunicatingSocket::*
     virtual void connectAsync(
         const SocketAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -85,8 +81,9 @@ public:
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
     virtual bool isInSelfAioThread() const override;
+    virtual QString idForToStringFromPtr() const override;
 
-    virtual QString getForeignHostFullCloudName() const;
+    virtual QString getForeignHostName() const override;
 
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*

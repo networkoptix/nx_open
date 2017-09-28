@@ -14,8 +14,10 @@ Pane
     property alias localId: informationBlock.localId
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
-    property alias online: informationBlock.online
+    property alias factorySystem: informationBlock.factorySystem
+    property alias running: informationBlock.online
     property alias ownerDescription: informationBlock.ownerDescription
+    property bool reachable: false
     property bool compatible: true
     property string invalidVersion
 
@@ -44,6 +46,8 @@ Pane
             if (startRow === 0)
                 updateDefaultAddress()
         }
+
+        onRowsMoved: updateDefaultAddress()
         onCountChanged: updateDefaultAddress()
 
         function updateDefaultAddress()
@@ -65,7 +69,14 @@ Pane
 
     background: Rectangle
     {
-        color: control.enabled ? ColorTheme.base7 : ColorTheme.base6
+        color:
+        {
+            if (control.factorySystem)
+                return ColorTheme.base10
+
+            return control.enabled ? ColorTheme.base7 : ColorTheme.base6
+        }
+
         radius: 2
 
         MaterialEffect
@@ -92,6 +103,7 @@ Pane
         enabled: compatible && online
         address: Nx.url(hostsModelAccessor.defaultAddress).address()
         user: authenticationDataModel.defaultCredentials.user
+        factoryDetailsText: d.kFactorySystemDetailsText
     }
 
     IconButton
@@ -119,6 +131,9 @@ Pane
     IssueLabel
     {
         id: issueLabel
+
+        visible: text !== ""
+
         anchors
         {
             bottom: parent.bottom
@@ -126,22 +141,40 @@ Pane
             right: parent.right
             rightMargin: 12
         }
-        color: cloudSystem ? ColorTheme.base14 : ColorTheme.red_main
-        visible: text !== ""
+
+        color:
+        {
+            if (!compatible)
+                return invalidVersion ? ColorTheme.yellow_main : ColorTheme.red_main
+
+            return ColorTheme.base14
+        }
+
+        textColor: compatible ? ColorTheme.contrast8 : ColorTheme.base4
+
         text:
         {
-            if (cloudSystem)
-            {
-                return !online && cloudStatusWatcher.status === QnCloudStatusWatcher.Online
-                    ? qsTr("OFFLINE") : ""
-            }
+            if (!compatible)
+                return invalidVersion ? invalidVersion : qsTr("INCOMPATIBLE");
 
-            return compatible ? "" : (invalidVersion || qsTr("INCOMPATIBLE"))
+            if (!running)
+                return qsTr("OFFLINE")
+
+            if (!reachable)
+                return qsTr("UNREACHABLE")
+
+            return ""
         }
     }
 
     function open()
     {
+        if (factorySystem)
+        {
+            Workflow.openStandardDialog("", d.kFactorySystemDetailsText)
+            return
+        }
+
         if (!compatible)
         {
             if (Nx.softwareVersion(invalidVersion).isLessThan(Nx.softwareVersion(kMinimimVersion))
@@ -194,6 +227,14 @@ Pane
                     systemId, localId, systemName, informationBlock.address)
             }
         }
+    }
+
+    QtObject
+    {
+        id: d
+
+        readonly property string kFactorySystemDetailsText:
+            qsTr("Connect to this server from web browser or through desktop client to set it up")
     }
 
     Keys.onEnterPressed: open()

@@ -1,8 +1,8 @@
-Welcome to {{PRODUCT_NAME}}
+Witamy w {{PRODUCT_NAME}}
 
-Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
+Dziękujemy za połączenie z {{PRODUCT_NAME}}. Kliknij przycisk poniżej, aby potwierdzić swój adres e-mail i aktywować konto.
 
-Activate account: {{config.portal_url}}/activate/{{message.code}}
+Aktywuj konto: {{config.portal_url}}/activate/{{message.code}}
 
-If you didn't register in {{PRODUCT_NAME}}, just ignore this email.
-Please do not share the message or the link with third parties.
+Jeśli nie chcesz rejestrować się w {{PRODUCT_NAME}}, po prostu zignoruj ​​ten e-mail.
+Nie udostępniaj nikomu wiadomości ani linku.

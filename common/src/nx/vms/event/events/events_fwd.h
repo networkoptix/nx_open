@@ -45,6 +45,9 @@ using SoftwareTriggerEventPtr = QSharedPointer<class SoftwareTriggerEvent>;
 class StorageFailureEvent;
 using StorageFailureEventPtr = QSharedPointer<class StorageFailureEvent>;
 
+class AnalyticsSdkEvent;
+using AnalyticsSdkEventPtr = QSharedPointer<class AnalyticsSdkEvent>;
+
 } // namespace event
 } // namespace vms
 } // namespace nx

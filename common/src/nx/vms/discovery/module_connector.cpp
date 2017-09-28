@@ -10,7 +10,7 @@ namespace vms {
 namespace discovery {
 
 static const auto kUrl =
-    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
+    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream");
 
 std::chrono::seconds kDefaultDisconnectTimeout(10);
 static const network::RetryPolicy kDefaultRetryPolicy(
@@ -111,22 +111,130 @@ void ModuleConnector::stopWhileInAioThread()
     m_modules.clear();
 }
 
+ModuleConnector::InformationReader::InformationReader(const ModuleConnector* parent):
+    m_parent(parent),
+    m_httpClient(nx_http::AsyncHttpClient::create())
+{
+    m_httpClient->bindToAioThread(parent->getAioThread());
+}
+
+ModuleConnector::InformationReader::~InformationReader()
+{
+    if (m_httpClient)
+        m_httpClient->pleaseStopSync();
+}
+
+void ModuleConnector::InformationReader::setHandler(
+    std::function<void(boost::optional<QnModuleInformation>, QString)> handler)
+{
+    m_handler = std::move(handler);
+}
+
+void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
+{
+    const auto handler =
+        [this](nx_http::AsyncHttpClientPtr client) mutable
+        {
+            NX_ASSERT(m_httpClient, client);
+            const auto clientGuard = makeScopeGuard([client](){ client->pleaseStopSync(); });
+            m_httpClient.reset();
+            if (!client->hasRequestSucceeded())
+                return nx::utils::swapAndCall(m_handler, boost::none, lit("HTTP request has failed"));
+
+            m_buffer = client->fetchMessageBodyBuffer();
+            m_socket = client->takeSocket();
+
+            if (!m_socket->setRecvTimeout(m_parent->m_disconnectTimeout))
+                return nx::utils::swapAndCall(m_handler, boost::none, SystemError::getLastOSErrorText());
+
+            readUntilError();
+        };
+
+    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, handler);
+    QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, handler);
+    m_httpClient->doGet(kUrl.arg(endpoint.toString()));
+}
+
+static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
+{
+    size_t bracerCount = 0;
+    for (int index = 0; index < buffer->size(); ++index)
+    {
+        switch (buffer->at(index))
+        {
+            case '{': ++bracerCount; break;
+            case '}': --bracerCount; break;
+        }
+
+        if (bracerCount == 0 && index != 0)
+        {
+            const auto object = buffer->left(index + 1);
+            *buffer = buffer->mid(index + 1);
+            return object;
+        }
+    }
+
+    return boost::none;
+}
+
+void ModuleConnector::InformationReader::readUntilError()
+{
+    while (const auto object = takeJsonObject(&m_buffer))
+    {
+        static const auto kEmptyObject = QJson::serialize(QJsonObject());
+        if (*object == kEmptyObject)
+            continue;
+
+        QnJsonRestResult restResult;
+        if (!QJson::deserialize(*object, &restResult)
+            || restResult.error != QnRestResult::Error::NoError)
+        {
+            return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
+        }
+
+        QnModuleInformation moduleInformation;
+        if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
+            || moduleInformation.id.isNull())
+        {
+            return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
+        }
+
+        nx::utils::ObjectDestructionFlag::Watcher destructionWatcher(&m_destructionFlag);
+        const auto localHandler = m_handler;
+        localHandler(std::move(moduleInformation), QString());
+        if (destructionWatcher.objectDestroyed())
+            return;
+    }
+
+    m_buffer.reserve(1500);
+    m_socket->readSomeAsync(&m_buffer,
+        [this](SystemError::ErrorCode code, size_t size)
+        {
+            if (code != SystemError::noError)
+                return nx::utils::swapAndCall(m_handler, boost::none, SystemError::toString(code));
+
+            if (size == 0)
+                return nx::utils::swapAndCall(m_handler, boost::none, lit("Disconnected"));
+
+            readUntilError();
+        });
+}
+
 ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_parent(parent),
     m_id(id),
     m_reconnectTimer(parent->m_retryPolicy, parent->getAioThread()),
     m_disconnectTimer(parent->getAioThread())
 {
-    NX_DEBUG(this, lm("New %1").args(m_id));
+    NX_DEBUG(this) << "New";
 }
 
 ModuleConnector::Module::~Module()
 {
-    NX_DEBUG(this, lm("Delete %1").args(m_id));
+    NX_DEBUG(this) << "Delete";
     NX_ASSERT(m_reconnectTimer.isInSelfAioThread());
-    m_socket.reset();
-    for (const auto& client: m_httpClients)
-        client->pleaseStopSync();
+    m_attemptingReaders.clear();
+    m_connectedReader.reset();
 }
 
 void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
@@ -158,7 +266,7 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 
 void ModuleConnector::Module::ensureConnection()
 {
-    if (m_id.isNull() || (m_httpClients.empty() && !m_socket))
+    if ((m_id.isNull()) || (m_attemptingReaders.empty() && !m_connectedReader))
         connectToGroup(m_endpoints.begin());
 }
 
@@ -181,13 +289,18 @@ ModuleConnector::Module::Priority
     if (host.isLocal())
         return kLocalNetwork;
 
-    if (host.isIpAddress())
+    if (host.ipV4() || host.ipV6())
         return kIp; //< TODO: Consider to check if we have such interface.
 
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
         return kCloud;
 
     return kOther;
+}
+
+QString ModuleConnector::Module::idForToStringFromPtr() const
+{
+    return m_id.toSimpleString();
 }
 
 boost::optional<ModuleConnector::Module::Endpoints::iterator>
@@ -223,6 +336,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         if (!m_id.isNull())
             m_parent->m_disconnectedHandler(m_id);
 
+        NX_VERBOSE(this, "Refuse to connect in passive mode");
         return;
     }
 
@@ -238,7 +352,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         return;
     }
 
-    if (m_socket)
+    if (m_connectedReader)
         return;
 
     NX_VERBOSE(this, lm("Connect to group %1: %2").args(
@@ -266,128 +380,87 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 void ModuleConnector::Module::connectToEndpoint(
     const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
-    NX_VERBOSE(this, lm("Attempt to connect to %1 by %2").args(m_id, endpoint));
-    const auto client = nx_http::AsyncHttpClient::create();
-    m_httpClients.insert(client);
-    client->bindToAioThread(m_reconnectTimer.getAioThread());
-    client->doGet(kUrl.arg(endpoint.toString()),
-        [this, endpoint, endpointsGroup](nx_http::AsyncHttpClientPtr client) mutable
-        {
-            m_httpClients.erase(client);
-            const auto moduleInformation = getInformation(client);
-            if (moduleInformation)
-            {
-                if (moduleInformation->id == m_id)
+    NX_VERBOSE(this, lm("Attempt to connect by %1").arg(endpoint));
+    m_attemptingReaders.push_front(std::make_unique<InformationReader>(m_parent));
+
+    const auto readerIt = m_attemptingReaders.begin();
+    (*readerIt)->start(endpoint);
+    (*readerIt)->setHandler(
+        [this, endpoint, endpointsGroup, readerIt](
+            boost::optional<QnModuleInformation> information, QString description) mutable
+       {
+           std::unique_ptr<InformationReader> reader(std::move(*readerIt));
+           m_attemptingReaders.erase(readerIt);
+
+           if (information)
+           {
+                if (information->id == m_id)
                 {
-                    if (saveConnection(endpoint, std::move(client), *moduleInformation))
+                    if (saveConnection(std::move(endpoint), std::move(reader), *information))
                         return;
                 }
                 else
                 {
-                    // Transfer this connection to a different module.
-                    endpointsGroup->second.erase(endpoint);
-                    m_parent->getModule(moduleInformation->id)
-                        ->saveConnection(endpoint, std::move(client), *moduleInformation);
+                    endpointsGroup->second.erase(endpoint); //< Wrong endpoint.
+                    m_parent->getModule(information->id)->saveConnection(
+                        std::move(endpoint), std::move(reader), *information);
                 }
-            }
+           }
 
-            if (m_id.isNull())
-            {
-                endpointsGroup->second.erase(endpoint);
-                return;
-            }
+           if (m_id.isNull())
+           {
+               endpointsGroup->second.erase(endpoint);
+               return;
+           }
 
-            // When the last endpoint in a group fails try the next group.
-            if (m_httpClients.empty())
-                connectToGroup(++endpointsGroup);
-        });
+           NX_VERBOSE(this, lm("Could not connect by %1: %2").args(endpoint, description));
+
+           // When the last endpoint in a group fails try the next group.
+           if (m_attemptingReaders.empty())
+               connectToGroup(std::next(endpointsGroup));
+       });
 }
 
-boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
-    nx_http::AsyncHttpClientPtr client)
-{
-    if (!client->hasRequestSuccesed())
-    {
-        NX_DEBUG(this, lm("Request to %1 has failed").args(client->url()));
-        return boost::none;
-    }
-
-    const auto contentType = nx_http::getHeaderValue(
-        client->response()->headers, "Content-Type");
-
-    if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
-    {
-        NX_DEBUG(this, lm("Unexpected Content-Type %2 from %3")
-            .args(contentType, client->url()));
-        return boost::none;
-    }
-
-    QnJsonRestResult restResult;
-    if (!QJson::deserialize(client->fetchMessageBodyBuffer(), &restResult)
-        || restResult.error != QnRestResult::Error::NoError)
-    {
-        NX_DEBUG(this, lm("Error response '%2' from %3")
-            .args(restResult.errorString, client->url()));
-        return boost::none;
-    }
-
-    QnModuleInformation moduleInformation;
-    if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
-        || moduleInformation.id.isNull())
-    {
-        NX_DEBUG(this, lm("Can not deserialize rsponse from %1")
-            .args(moduleInformation.id));
-        return boost::none;
-    }
-
-    return moduleInformation;
-}
-
-bool ModuleConnector::Module::saveConnection(
-   SocketAddress endpoint, nx_http::AsyncHttpClientPtr client, const QnModuleInformation& information)
+bool ModuleConnector::Module::saveConnection(SocketAddress endpoint,
+    std::unique_ptr<InformationReader> reader, const QnModuleInformation& information)
 {
     NX_ASSERT(!m_id.isNull());
     if (m_id.isNull())
         return false;
 
     saveEndpoint(endpoint);
-    if (m_socket)
+    if (m_connectedReader)
         return true;
 
-    for (const auto& client: m_httpClients)
-        client->pleaseStopSync();
-    m_httpClients.clear();
+    NX_VERBOSE(this, lm("Save connection to %1").args(endpoint));
+    m_attemptingReaders.clear();
+    m_disconnectTimer.cancelSync();
 
-    auto socket = client->takeSocket();
-    if (!socket->setRecvTimeout(m_parent->m_disconnectTimeout))
-    {
-        NX_WARNING(this, lm("Unable to save connection to %1: %2").args(
-            m_id, SystemError::getLastOSErrorText()));
-
-        return false;
-    }
-
-    const auto buffer = std::make_shared<Buffer>();
-    buffer->reserve(1);
-
-    m_socket = std::move(socket);
-    m_socket->readSomeAsync(buffer.get(),
-        [this, buffer](SystemError::ErrorCode code, size_t size)
+    m_connectedReader = std::move(reader);
+    m_connectedReader->setHandler(
+        [this, endpoint](boost::optional<QnModuleInformation> information, QString description) mutable
         {
-            NX_VERBOSE(this, lm("Unexpected connection to %1 read size=%2: %3").args(
-                m_id, size, SystemError::toString(code)));
+            if (information)
+            {
+                NX_VERBOSE(this, lm("Module information update from %1").arg(endpoint));
+                return m_parent->m_connectedHandler(*information, endpoint, m_connectedReader->ip());
+            }
 
-            m_socket.reset();
+            NX_VERBOSE(this, lm("Connection to %1 is closed: %2").args(endpoint, description));
+            m_connectedReader.reset();
             ensureConnection(); //< Reconnect attempt.
 
-            // Make sure we report disconnect in a limited time.
-            m_disconnectTimer.start(m_parent->m_disconnectTimeout * m_endpoints.size(),
-                [this](){ m_parent->m_disconnectedHandler(m_id); });
+            const auto reconnectTimeout = m_parent->m_disconnectTimeout
+                * std::chrono::milliseconds::rep(m_endpoints.size());
+            m_disconnectTimer.start(reconnectTimeout,
+                [this, reconnectTimeout]()
+                {
+                    NX_VERBOSE(this, lm("Reconnect did not happen in %1").arg(reconnectTimeout));
+                    m_parent->m_disconnectedHandler(m_id);
+                });
         });
 
-    auto ip = m_socket->getForeignAddress().address;
-    NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").args(m_id, endpoint, ip));
-    m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
+    m_parent->m_connectedHandler(information, std::move(endpoint), m_connectedReader->ip());
     m_reconnectTimer.reset();
     m_disconnectTimer.cancelSync();
     return true;

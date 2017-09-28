@@ -23,9 +23,9 @@ Item
         video.clear()
     }
 
-    VideoOutput 
-    { 
-        id: video 
+    VideoOutput
+    {
+        id: video
     }
 
     FisheyeShaderEffect
@@ -43,7 +43,7 @@ Item
 
         fieldRadius: resourceHelper ? resourceHelper.fisheyeParams.radius : 0.0
 
-        fieldRotation: resourceHelper 
+        fieldRotation: resourceHelper
             ? (resourceHelper.fisheyeParams.fovRot + resourceHelper.customRotation)
             : 0.0
 
@@ -170,7 +170,7 @@ Item
         {
             interactor.scalePower = startScalePower
             interactor.scaleBy(Math.log(scale) / Math.LN2, false)
-        }                
+        }
 
         MouseArea
         {
@@ -181,23 +181,47 @@ Item
             drag.threshold: 10
 
             property bool draggingStarted
-            property int startX
-            property int startY
+            property real pressX
+            property real pressY
 
             readonly property real pixelRadius: Math.min(width, height) / 2.0
             readonly property vector2d pixelCenter: Qt.vector2d(width, height).times(0.5)
 
+            KineticAnimation
+            {
+                id: kinetics
+
+                deceleration: 0.005
+
+                property point startPosition
+
+                onPositionChanged:
+                {
+                    const kSensitivity = 100.0
+                    var normalization = kSensitivity / mouseArea.pixelRadius
+                    var dx = position.x - startPosition.x
+                    var dy = position.y - startPosition.y
+                    interactor.updateRotation(dy * normalization, dx * normalization)
+                }
+
+                onMeasurementStarted:
+                {
+                    startPosition = position
+                    interactor.startRotation()
+                }
+            }
+
             onPressed:
             {
-                startX = mouse.x
-                startY = mouse.y
+                pressX = mouse.x
+                pressY = mouse.y
             }
 
             onReleased:
             {
                 if (draggingStarted)
                 {
-                    updateDrag(mouse.x - startX, mouse.y - startY)
+                    kinetics.finishMeasurement(Qt.point(mouse.x, mouse.y))
                     draggingStarted = false
                 }
                 else
@@ -210,45 +234,31 @@ Item
             {
                 if (mouse.buttons & Qt.LeftButton)
                 {
-                    if (!draggingStarted)
+                    if (draggingStarted)
                     {
-                        draggingStarted = Math.abs(mouse.x - startX) > drag.threshold
-                            || Math.abs(mouse.y - startY) > drag.threshold
+                        kinetics.continueMeasurement(Qt.point(mouse.x, mouse.y))
+                    }
+                    else
+                    {
+                        draggingStarted = Math.abs(mouse.x - pressX) > drag.threshold
+                            || Math.abs(mouse.y - pressY) > drag.threshold
 
                         if (draggingStarted)
-                        {
-                            startX = mouse.x
-                            startY = mouse.y
-                            interactor.startRotation()
-                        }
+                            kinetics.startMeasurement(Qt.point(mouse.x, mouse.y))
                     }
-
-                    if (draggingStarted)
-                        updateDrag(mouse.x - startX, mouse.y - startY)
                 }
             }
 
             onWheel:
             {
                 if (draggingStarted)
-                {
-                    updateDrag(mouseX - startX, mouseY - startY)
-                    startX = mouseX
-                    startY = mouseY
-                }
+                    kinetics.startMeasurement(Qt.point(mouse.x, mouse.y))
 
                 const kSensitivity = 100.0
                 interactor.scaleBy(wheel.angleDelta.y * kSensitivity / 1.0e5, true)
 
                 if (draggingStarted)
                     interactor.startRotation()
-            }
-
-            function updateDrag(dx, dy)
-            {
-                const kSensitivity = 100.0
-                var normalization = kSensitivity / pixelRadius
-                interactor.updateRotation(dy * normalization, dx * normalization)
             }
         }
     }

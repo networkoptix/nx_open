@@ -25,13 +25,15 @@ describe('On account page,', function () {
 
     it("dropdown in top right corner has links: Account settings, Change password, Logout", function () {
         p.helper.get(p.helper.urls.homepage);
-        expect(p.userAccountDropdownToggle.getText()).toContain(p.helper.userEmail);
+        var dropdownMenu = p.helper.forms.logout.dropdownMenu;
+        var dropdownToggle = p.helper.forms.logout.dropdownToggle;
 
-        p.userAccountDropdownToggle.click();
-        expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
-        expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
-        expect(p.userAccountDropdownMenu.getText()).toContain('Log Out');
-        p.userAccountDropdownToggle.click();
+        dropdownToggle.click();
+        expect(p.helper.forms.logout.dropdownParent.getText()).toContain(p.helper.userEmail);
+        expect(dropdownMenu.getText()).toContain('Account Settings');
+        expect(dropdownMenu.getText()).toContain('Change Password');
+        expect(dropdownMenu.getText()).toContain('Log Out');
+        dropdownToggle.click();
     });
 
     it("it is possible to log out", function () {

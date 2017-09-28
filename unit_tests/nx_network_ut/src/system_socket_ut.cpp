@@ -14,12 +14,103 @@ namespace nx {
 namespace network {
 namespace test {
 
-TEST( TcpSocket, KeepAliveOptions )
+class TcpSocket:
+    public ::testing::Test
+{
+public:
+    ~TcpSocket()
+    {
+        if (m_client)
+            m_client->pleaseStopSync();
+    }
+
+protected:
+    void whenAcceptedSocket()
+    {
+        m_client = std::make_unique<TCPSocket>(AF_INET);
+        ASSERT_TRUE(m_client->setNonBlockingMode(true));
+
+        nx::utils::promise<SystemError::ErrorCode> connected;
+        m_client->connectAsync(
+            m_tcpServerSocket.getLocalAddress(),
+            [&connected](SystemError::ErrorCode resultCode)
+            {
+                connected.set_value(resultCode);
+            });
+
+         m_acceptedSocket.reset(m_tcpServerSocket.accept());
+         ASSERT_EQ(SystemError::noError, connected.get_future().get());
+    }
+
+    void thenTimeoutsAreReportedCorrectly()
+    {
+        thenRecvTimeoutIsReportedCorrectly();
+        thenSendTimeoutIsReportedCorrectly();
+    }
+
+    void thenRecvTimeoutIsReportedCorrectly()
+    {
+        unsigned int reportedTimeout = 0;
+        ASSERT_TRUE(m_acceptedSocket->getRecvTimeout(&reportedTimeout));
+
+        unsigned int actualTimeout = 0;
+        ASSERT_TRUE(readSocketTimeout(m_acceptedSocket->handle(), SO_RCVTIMEO, &actualTimeout));
+
+        ASSERT_EQ(actualTimeout, reportedTimeout);
+    }
+
+    void thenSendTimeoutIsReportedCorrectly()
+    {
+        unsigned int reportedTimeout = 0;
+        ASSERT_TRUE(m_acceptedSocket->getSendTimeout(&reportedTimeout));
+
+        unsigned int actualTimeout = 0;
+        ASSERT_TRUE(readSocketTimeout(m_acceptedSocket->handle(), SO_SNDTIMEO, &actualTimeout));
+
+        ASSERT_EQ(actualTimeout, reportedTimeout);
+    }
+
+private:
+    std::unique_ptr<TCPSocket> m_client;
+    TCPServerSocket m_tcpServerSocket;
+    std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(m_tcpServerSocket.setRecvTimeout(
+            nx::utils::random::number<unsigned int>(10000, 90000)));
+        ASSERT_TRUE(m_tcpServerSocket.setSendTimeout(
+            nx::utils::random::number<unsigned int>(10000, 90000)));
+
+        ASSERT_TRUE(m_tcpServerSocket.bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_tcpServerSocket.listen());
+    }
+
+    static bool readSocketTimeout(int fd, int socketOption, unsigned int* millis)
+    {
+        #ifdef _WIN32
+            int valLen = sizeof(*millis);
+            if (getsockopt(fd, SOL_SOCKET, socketOption, (char*)millis, &valLen) != 0)
+                return false;
+        #else
+            timeval tv;
+            memset(&tv, 0, sizeof(tv));
+            socklen_t valLen = sizeof(tv);
+            if (::getsockopt(fd, SOL_SOCKET, socketOption, (void*)&tv, &valLen) < 0)
+                return false;
+            *millis = tv.tv_sec*1000 + tv.tv_usec/1000;
+        #endif
+        
+        return true;
+    }
+};
+
+TEST_F(TcpSocket, KeepAliveOptions )
 {
     if( SocketFactory::isStreamSocketTypeEnforced() )
         return;
 
-    const auto socket = std::make_unique< TCPSocket >( AF_INET );
+    const auto socket = std::make_unique< TCPSocket >(AF_INET);
     boost::optional< KeepAliveOptions > result;
 
     // Enable
@@ -48,7 +139,7 @@ TEST( TcpSocket, KeepAliveOptions )
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
-TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
+TEST_F(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
 {
     const auto socket = std::make_unique< TCPSocket >( AF_INET );
     boost::optional< KeepAliveOptions > result;
@@ -68,7 +159,7 @@ static void waitForKeepAliveDisconnect(AbstractStreamSocket* socket)
     NX_LOG(lm("waitForKeepAliveDisconnect end"), cl_logINFO);
 }
 
-TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
+TEST_F(TcpSocket, DISABLED_KeepAliveOptionsServer)
 {
     const auto server = std::make_unique<TCPServerSocket>(AF_INET);
     ASSERT_TRUE(server->setReuseAddrFlag(true));
@@ -81,21 +172,21 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
     waitForKeepAliveDisconnect(client.get());
 }
 
-TEST(TcpSocket, DISABLED_KeepAliveOptionsClient)
+TEST_F(TcpSocket, DISABLED_KeepAliveOptionsClient)
 {
     const auto client = std::make_unique<TCPSocket>(AF_INET);
     ASSERT_TRUE(client->connect(SocketAddress("52.55.219.5:3345")));
     waitForKeepAliveDisconnect(client.get());
 }
 
-TEST(TcpSocket, ErrorHandling)
+TEST_F(TcpSocket, ErrorHandling)
 {
     nx::network::test::socketErrorHandling(
         []() { return std::make_unique<TCPServerSocket>(AF_INET); },
         []() { return std::make_unique<TCPSocket>(AF_INET); });
 }
 
-TEST(TcpSocket, socket_timer_is_single_shot)
+TEST_F(TcpSocket, socket_timer_is_single_shot)
 {
     constexpr auto kTimeout = std::chrono::milliseconds(10);
 
@@ -110,14 +201,7 @@ TEST(TcpSocket, socket_timer_is_single_shot)
     ASSERT_EQ(1, triggerCount.load());
 }
 
-TEST(TcpServerSocketIpv6, BindsToLocalAddress)
-{
-    TCPServerSocket socket(AF_INET6);
-    ASSERT_TRUE(socket.bind(SocketAddress::anyPrivateAddress));
-    ASSERT_EQ(HostAddress::localhost, socket.getLocalAddress().address);
-}
-
-TEST(TcpSocket, ConnectErrorReporting)
+TEST_F(TcpSocket, ConnectErrorReporting)
 {
     // Connecting to port 1 which is reserved for now deprecated TCPMUX service.
     // So, in most cases can expect port 1 to be unused.
@@ -129,6 +213,19 @@ TEST(TcpSocket, ConnectErrorReporting)
     ASSERT_FALSE(connectResult);
     ASSERT_NE(SystemError::noError, connectErrorCode);
     ASSERT_FALSE(tcpSocket.isConnected());
+}
+
+TEST_F(TcpSocket, accepted_socket_timeouts_properly_reported)
+{
+    whenAcceptedSocket();
+    thenTimeoutsAreReportedCorrectly();
+}
+
+TEST(TcpServerSocketIpv6, BindsToLocalAddress)
+{
+    TCPServerSocket socket(AF_INET6);
+    ASSERT_TRUE(socket.bind(SocketAddress::anyPrivateAddress));
+    ASSERT_EQ(HostAddress::localhost, socket.getLocalAddress().address);
 }
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(

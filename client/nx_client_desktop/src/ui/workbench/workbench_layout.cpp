@@ -47,8 +47,9 @@ void pointize(const QRect& region, PointContainer* points)
     }
 }
 
-static const auto kItemMapTag(lit("__itemMap"));
-static const auto kFreeSlotTag(lit("__freeSlot"));
+// TODO: these tags are better to be bound to QnWorkbenchLayout.
+static const nx::utils::log::Tag kItemMapTag(lit("__itemMap"));
+static const nx::utils::log::Tag kFreeSlotTag(lit("__freeSlot"));
 
 } // namespace
 

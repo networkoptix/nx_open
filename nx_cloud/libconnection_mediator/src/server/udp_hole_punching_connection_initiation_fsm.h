@@ -14,6 +14,7 @@
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/stoppable.h>
 
 #include "listening_peer_pool.h"
@@ -22,11 +23,9 @@
 namespace nx {
 namespace hpm {
 
-namespace conf {
+namespace conf { class Settings; }
 
-class Settings;
-
-} // namespace conf
+class AbstractRelayClusterClient;
 
 /**
  * @note Object can be safely freed while in onFsmFinishedEventHandler handler.
@@ -46,7 +45,8 @@ public:
         nx::String connectionID,
         const ListeningPeerData& serverPeerData,
         std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
-        const conf::Settings& settings);
+        const conf::Settings& settings,
+        AbstractRelayClusterClient* const relayClusterClient);
     virtual ~UDPHolePunchingConnectionInitiationFsm() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -80,12 +80,14 @@ private:
     nx::String m_connectionID;
     std::function<void(api::NatTraversalResultCode)> m_onFsmFinishedEventHandler;
     const conf::Settings& m_settings;
+    AbstractRelayClusterClient* const m_relayClusterClient;
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
     ListeningPeerData m_serverPeerData;
     stats::ConnectSession m_sessionStatisticsInfo;
     boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
+    nx::utils::AsyncOperationGuard m_asyncOperationGuard;
 
     virtual void stopWhileInAioThread() override;
     
@@ -111,9 +113,14 @@ private:
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
+    void onRelayInstanceSearchCompletion(
+        api::ConnectResponse connectResponse,
+        boost::optional<QUrl> relayInstanceUrl,
+        std::function<void(api::ResultCode)> completionHandler);
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
-        std::list<SocketAddress> tcpEndpoints);
+        std::list<SocketAddress> tcpEndpoints,
+        boost::optional<QUrl> relayInstanceUrl);
     void sendConnectResponse(
         api::ResultCode resultCode,
         api::ConnectResponse connectResponse);

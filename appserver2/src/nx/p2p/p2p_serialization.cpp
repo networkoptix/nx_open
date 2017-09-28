@@ -9,6 +9,7 @@
 #include <utils/math/math.h>
 #include "routing_helpers.h"
 #include <utils/media/nalUnits.h>
+#include <nx_ec/data/api_tran_state_data.h>
 
 namespace {
     static const int kByteArrayAlignFactor = sizeof(unsigned);
@@ -211,6 +212,59 @@ QVector<SubscribeRecord> deserializeSubscribeRequest(const QByteArray& data, boo
     {
         *success = false;
     }
+    return result;
+}
+
+QByteArray serializeSubscribeAllRequest(const ec2::QnTranState& request, int reservedSpaceAtFront)
+{
+    QByteArray result;
+    {
+        QBuffer buffer(&result);
+        buffer.open(QIODevice::WriteOnly);
+        QDataStream out(&buffer);
+
+        for (int i = 0; i < reservedSpaceAtFront; ++i)
+            out << (quint8) 0;
+
+        for (auto itr = request.values.begin(); itr != request.values.end(); ++itr)
+        {
+            const ApiPersistentIdData& peer = itr.key();
+            qint32 sequence = itr.value();
+
+            out.writeRawData(peer.id.toRfc4122().data(), kGuidSize);
+            out.writeRawData(peer.persistentId.toRfc4122().data(), kGuidSize);
+            out << sequence;
+        }
+    }
+    return result;
+}
+
+ec2::QnTranState deserializeSubscribeAllRequest(const QByteArray& _response, bool* success)
+{
+    QByteArray response(_response);
+    ec2::QnTranState result;
+    *success = false;
+
+    QBuffer buffer(&response);
+    buffer.open(QIODevice::ReadOnly);
+    QDataStream in(&buffer);
+    QByteArray tmpBuffer;
+    tmpBuffer.resize(kGuidSize);
+    ApiPersistentIdData fullId;
+    qint32 sequence;
+    while (!in.atEnd())
+    {
+        if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
+            return result; //< Error.
+        fullId.id = QnUuid::fromRfc4122(tmpBuffer);
+        if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
+            return result; //< Error.
+        fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
+        in >> sequence;
+
+        result.values.insert(fullId, sequence);
+    }
+    *success = true;
     return result;
 }
 

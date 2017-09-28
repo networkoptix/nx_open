@@ -43,7 +43,7 @@ void TransactionLogReader::readTransactions(
         std::move(from),
         std::move(to),
         maxTransactionsToReturn,
-        [this, 
+        [this,
             sharedGuard = m_asyncOperationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
@@ -90,6 +90,11 @@ void TransactionLogReader::onTransactionsRead(
 ::ec2::QnTranState TransactionLogReader::getCurrentState() const
 {
     return m_transactionLog->getTransactionState(m_systemId);
+}
+
+nx::String TransactionLogReader::systemId() const
+{
+    return m_systemId;
 }
 
 } // namespace ec2

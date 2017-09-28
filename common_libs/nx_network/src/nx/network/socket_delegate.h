@@ -197,6 +197,11 @@ public:
         return this->m_target->getForeignAddress();
     }
 
+    virtual QString getForeignHostName() const override
+    {
+        return this->m_target->getForeignHostName();
+    }
+
     virtual bool isConnected() const override
     {
         return this->m_target->isConnected();
@@ -211,14 +216,14 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->sendAsync(buffer, std::move(handler));
     }

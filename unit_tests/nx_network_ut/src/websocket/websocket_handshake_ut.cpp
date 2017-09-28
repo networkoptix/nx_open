@@ -98,7 +98,7 @@ TEST(WebsocketHandshake, validateRequest_response)
 TEST(WebsocketHandshake, addClientHeaders)
 {
     nx_http::Request request;
-    addClientHeaders(&request, "test");
+    addClientHeaders(&request.headers, "test");
 
     ASSERT_EQ(request.headers.find("Connection")->second, "Upgrade");
     ASSERT_EQ(request.headers.find("Upgrade")->second, "websocket");

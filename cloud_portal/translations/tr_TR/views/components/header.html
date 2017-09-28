@@ -6,7 +6,7 @@
                 <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                 <ul uib-dropdown-menu>
                     <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Ayarlar</a></li>
-                    <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+                    <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">Görünüm</a></li>
                 </ul>
             </li>
         </ul>
@@ -18,13 +18,13 @@
         <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
             <li class="vertical-bar margin-right"></li>
             <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Ayarlar</a></li>
-            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">Görünüm</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
             <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
-                                             ng-click="login();$event.preventDefault();">Log In</a></span><span
-                    class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
+                                             ng-click="login();$event.preventDefault();"> Giriş Yap </a></span> <span
+                    class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" > Hesap Oluşturun </a></span></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-visible margin-right">
@@ -34,7 +34,7 @@
             <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
             <li uib-dropdown ng-if="systemCounter && !singleSystem" class="collapse-second">
                 <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">
-                    <span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}</span><span class="icon-caret"></span>
+                    <span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span><span class="ellipsis"> {{activeSystem? ActiveSystem.name: systemCounter + '' + L.header.systems}} </span><span class="icon-caret"></span>
                 </a>
                 <ul uib-dropdown-menu class="dropdown-menu-left">
                     <li ng-if="activeSystem" class="hidden-expanded active"><a href="">{{activeSystem.name}}</a></li>
@@ -42,7 +42,7 @@
 
                     <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"
                         ng-if="system!=activeSystem">
-                        <a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}<span class="system-owner"> &mdash; {{system.ownerFullName}}</span></a>
+                        <a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}<span class="system-owner">&mdash;{{system.ownerFullName}}</span></a>
                     </li>
                     <li role="separator" class="nav-divider"></li>
                     <li><a ng-href="/systems">{{$root.L.header.allSystems}}</a></li>
@@ -55,12 +55,12 @@
                     <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
                     <li class="hidden-expanded nav-divider" role="separator"></li>
 
-                    <li><a href="/account/">Hesap Ayarları</a></li>
-                    <li><a href="/account/password/">Parola Değiştir</a></li>
+                    <li><a href="/ Hesap /">Hesap Ayarları</a></li>
+                    <li><a href="/Hesap parolası/">Parola Değiştir</a></li>
                     <li><a href="" ng-click="logout()">Oturumu Kapat</a></li>
 
                     <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>
-                    <li><a href="/admin/" target="_blank" ng-if="account.is_staff">Portal management</a></li>
+                    <li><a href="/ Admin /" target="_blank" ng-if="account.is_staff">Portal yönetimi</a></li>
                 </ul>
             </li>
             <li class="vertical-bar"></li>

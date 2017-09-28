@@ -41,6 +41,7 @@ Controller::Controller(const conf::Settings& settings):
         &m_ec2SyncronizationEngine),
     m_authProvider(
         settings,
+        &m_dbInstanceController.queryExecutor(),
         &m_accountManager,
         &m_systemManager,
         m_tempPasswordManager,

@@ -3,6 +3,8 @@
 #include <core/resource/client_resource_fwd.h>
 #include <core/resource/client_core_camera.h>
 
+class QnArchiveStreamReader;
+
 class QnClientCameraResource: public QnClientCoreCamera {
     Q_OBJECT
 
@@ -15,7 +17,10 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider *dataProvider = 0) const override;
 
     virtual Qn::ResourceFlags flags() const override;
-    
+
+signals:
+    void dataDropped(QnArchiveStreamReader* reader);
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 };

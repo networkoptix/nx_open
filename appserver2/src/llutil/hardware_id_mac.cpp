@@ -12,6 +12,7 @@
 
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
+#include "hardware_id_p.h"
 
 namespace {
 
@@ -67,4 +68,17 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
 
 #endif
 }
+
+void fillHardwareIds(QList<QList<LLUtil::MacAndItsHardwareIds> >&, QnHardwareInfo&)
+{
+    // Unused on macosx, but has to be present to linkage to succeed.
+    NX_CRITICAL(false);
+}
+
+void calcHardwareIdMap(QMap<QString, QString>&, const QnHardwareInfo&, int, bool)
+{
+    // Unused on macosx, but has to be present to linkage to succeed.
+    NX_CRITICAL(false);
+}
+
 }

@@ -19,6 +19,7 @@ enum class ResultCode
     timedOut,
     networkError,
     preemptiveConnectionCountAtMaximum,
+    needRedirect,
     unknownError,
 };
 

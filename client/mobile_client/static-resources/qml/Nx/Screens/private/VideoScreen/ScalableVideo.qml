@@ -14,7 +14,7 @@ ZoomableFlickable
 
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
-
+    property size fitSize: content.boundedSize(width, height)
     function getMoveViewportData(position)
     {
         var mapped = mapToItem(video, position.x, position.y)
@@ -82,14 +82,7 @@ ZoomableFlickable
 
     function fitToBounds()
     {
-        if (content.sourceSize.width <= 0 || content.sourceSize.height <= 0)
-        {
-            resizeContent(width, height, false, true)
-            return
-        }
-
-        var size = content.boundedSize(width, height)
-        resizeContent(size.width, size.height, false, true)
+        resizeContent(width, height, false, true)
     }
 
     function clear()

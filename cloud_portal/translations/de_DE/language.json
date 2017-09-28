@@ -83,24 +83,24 @@
       "description":"Benutzerdefinierte Benutzerrolle im System festgelegt"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"Besitzer",
+      "description":"Uneingeschränkter Zugriff inklusive der Fähigkeit zu teilen und Systeme von der Cloud zu verbinden/trennen"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"Betrachter",
+      "description":"Kann Livevideos ansehen und das Archiv durchsuchen"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"Live-Betrachter",
+      "description":"Kann nur Livevideos ansehen"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"Erweiterter Betrachter",
+      "description":"Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"Benutzerdefiniert",
+      "description":"Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
     }
   },
   "errorCodes":{

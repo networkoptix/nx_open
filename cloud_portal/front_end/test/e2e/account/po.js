@@ -1,6 +1,7 @@
 'use strict';
 
 var AccountPage = function () {
+    var  p = this;
 
     var PasswordFieldSuite = require('../password_check.js');
     this.passwordField = new PasswordFieldSuite();
@@ -54,7 +55,7 @@ var AccountPage = function () {
     };
 
     this.prepareToPasswordCheck = function () {
-        this.currentPasswordInput.sendKeys(this.userPassword);
+        this.currentPasswordInput.sendKeys(p.helper.userPassword);
     };
 
     this.passCheck = {

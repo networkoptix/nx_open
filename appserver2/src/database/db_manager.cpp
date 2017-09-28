@@ -1989,7 +1989,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
-    }
+    }   
 
     return ErrorCode::ok;
 }
@@ -2015,10 +2015,10 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
     const auto query = m_insertCameraScheduleQuery.get(m_sdb, R"sql(
         INSERT INTO vms_scheduletask (
             camera_attrs_id, start_time, end_time, do_record_audio, record_type,
-            day_of_week, before_threshold, after_threshold, stream_quality, fps
+            day_of_week, before_threshold, after_threshold, stream_quality, fps, bitrate_kbps
         ) VALUES (
             :internalId, :startTime, :endTime, :recordAudio, :recordingType,
-            :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps
+            :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps, :bitrateKbps
         ))sql");
 
     query->bindValue(":internalId", internalId);
@@ -3401,7 +3401,8 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
             st.before_threshold as beforeThreshold,\
             st.after_threshold as afterThreshold,  \
             st.stream_quality as streamQuality,    \
-            st.fps                                 \
+            st.fps,                                \
+            st.bitrate_kbps as bitrateKbps         \
         FROM vms_scheduletask st \
         JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id \
         LEFT JOIN vms_resource r2 on r2.guid = r.camera_guid \

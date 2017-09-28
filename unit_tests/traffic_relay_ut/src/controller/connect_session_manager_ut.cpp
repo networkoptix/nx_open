@@ -12,11 +12,13 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <controller/connect_session_manager.h>
-#include <controller/traffic_relay.h>
-#include <model/client_session_pool.h>
-#include <model/listening_peer_pool.h>
-#include <settings.h>
+#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/controller/listening_peer_manager.h>
+#include <nx/cloud/relay/controller/traffic_relay.h>
+#include <nx/cloud/relay/model/client_session_pool.h>
+#include <nx/cloud/relay/model/listening_peer_pool.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relay/settings.h>
 
 #include "../settings_loader.h"
 
@@ -27,6 +29,28 @@ namespace controller {
 namespace test {
 
 namespace {
+
+class RemoteRelayPeerPoolStub: public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+{
+public:
+    virtual cf::future<std::string> findRelayByDomain(
+        const std::string& /*domainName*/) const override
+    {
+        return cf::make_ready_future(std::string());
+    }
+
+    virtual cf::future<bool> addPeer(
+        const std::string& /*domainName*/,
+        const std::string& /*relayHost*/) override
+    {
+        return cf::make_ready_future(true);
+    }
+
+    virtual cf::future<bool> removePeer(const std::string& /*domainName*/) override
+    {
+        return cf::make_ready_future(true);
+    }
+};
 
 class TrafficRelayStub:
     public controller::AbstractTrafficRelay
@@ -45,18 +69,18 @@ public:
         AbstractStreamSocket* serverConnection,
         const std::string& listeningPeerName) const
     {
-        using AdapterType = 
+        using AdapterType =
             nx::network::aio::AsyncChannelAdapter<
                 std::unique_ptr<AbstractStreamSocket>>;
 
         for (const auto& relaySession: m_relaySessions)
         {
-            // TODO: #ak Get rid of conversion to AdapterType 
+            // TODO: #ak Get rid of conversion to AdapterType
             //   when AbstractStreamSocket inherits AbstractAsyncChannel.
 
-            auto clientConnectionAdapter = 
+            auto clientConnectionAdapter =
                 dynamic_cast<AdapterType*>(relaySession.clientConnection.connection.get());
-            auto serverConnectionAdapter = 
+            auto serverConnectionAdapter =
                 dynamic_cast<AdapterType*>(relaySession.serverConnection.connection.get());
 
             if (clientConnectionAdapter->adaptee().get() == clientConnection &&
@@ -84,7 +108,7 @@ private:
 
 static constexpr int kMaxPreemptiveConnectionCount = 7;
 static constexpr int kRecommendedPreemptiveConnectionCount = 4;
-static constexpr std::chrono::seconds kConnectSessionIdleTimeout = 
+static constexpr std::chrono::seconds kConnectSessionIdleTimeout =
     std::chrono::seconds(11);
 
 class ConnectSessionManager:
@@ -103,6 +127,14 @@ public:
 
         m_clientEndpoint.address = HostAddress::localhost;
         m_clientEndpoint.port = nx::utils::random::number<int>(10000, 50000);
+    }
+
+    ~ConnectSessionManager()
+    {
+        if (m_lastClientConnection)
+            m_lastClientConnection->pleaseStopSync();
+
+        m_connectSessionManager.reset();
     }
 
 protected:
@@ -155,8 +187,9 @@ protected:
     {
         using namespace std::placeholders;
 
-        api::ConnectToPeerRequest request;
+        controller::ConnectToPeerRequestEx request;
         request.sessionId = m_expectedSessionId;
+        request.clientEndpoint = m_clientEndpoint;
         connectSessionManager().connectToPeer(
             request,
             std::bind(&ConnectSessionManager::onConnectCompletion, this, _1, _2));
@@ -217,7 +250,9 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, result.code);
         ASSERT_FALSE(result.response.sessionId.empty());
         if (!m_expectedSessionId.empty())
+        {
             ASSERT_EQ(m_expectedSessionId, result.response.sessionId);
+        }
         ASSERT_EQ(kConnectSessionIdleTimeout, result.response.sessionTimeout);
         ASSERT_TRUE(boost::ends_with(
             clientSessionPool().getPeerNameBySessionId(result.response.sessionId),
@@ -274,10 +309,26 @@ protected:
                     m_settingsLoader.settings(),
                     &clientSessionPool(),
                     &listeningPeerPool(),
+                    &m_remoteRelayPeerPoolStub,
                     &m_trafficRelayStub);
         }
 
         return *m_connectSessionManager;
+    }
+
+    controller::ListeningPeerManager& listeningPeerManager()
+    {
+        if (!m_listeningPeerManager)
+        {
+            m_settingsLoader.load();
+
+            m_listeningPeerManager =
+                std::make_unique<controller::ListeningPeerManager>(
+                    m_settingsLoader.settings().listeningPeer(),
+                    &listeningPeerPool());
+        }
+
+        return *m_listeningPeerManager;
     }
 
     model::ListeningPeerPool& listeningPeerPool()
@@ -286,9 +337,9 @@ protected:
         {
             m_settingsLoader.load();
 
-            m_listeningPeerPool = 
+            m_listeningPeerPool =
                 std::make_unique<model::ListeningPeerPool>(
-                    m_settingsLoader.settings());
+                    m_settingsLoader.settings().listeningPeer());
         }
 
         return *m_listeningPeerPool;
@@ -316,7 +367,7 @@ protected:
         api::BeginListeningRequest request;
         request.peerName = std::move(peerName);
 
-        connectSessionManager().beginListening(
+        listeningPeerManager().beginListening(
             request,
             std::bind(&ConnectSessionManager::onBeginListeningCompletion, this, _1, _2, _3));
     }
@@ -355,7 +406,9 @@ private:
     std::unique_ptr<model::ClientSessionPool> m_clientSessionPool;
     std::unique_ptr<model::ListeningPeerPool> m_listeningPeerPool;
     TrafficRelayStub m_trafficRelayStub;
+    RemoteRelayPeerPoolStub m_remoteRelayPeerPoolStub;
     std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
+    std::unique_ptr<controller::ListeningPeerManager> m_listeningPeerManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;
     nx::network::test::StreamSocketStub* m_lastListeningPeerConnection = nullptr;
@@ -474,7 +527,7 @@ protected:
     {
         issueCreateSession(std::string());
     }
-    
+
     void whenIssuedCreateSessionWithAlreadyUsedId()
     {
         whenIssuedCreateSessionWithPredefinedId();
@@ -508,7 +561,7 @@ protected:
         {
             for (;;)
             {
-                api::ConnectToPeerRequest request;
+                controller::ConnectToPeerRequestEx request;
                 request.sessionId = sessionId;
                 nx::utils::promise<api::ResultCode> completed;
                 connectSessionManager().connectToPeer(

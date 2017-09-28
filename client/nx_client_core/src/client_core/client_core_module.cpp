@@ -34,7 +34,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     NX_ASSERT(nx::utils::TimerManager::instance());
     m_connectionFactory.reset(getConnectionFactory(qnStaticCommon->localPeerType(),
-        nx::utils::TimerManager::instance(), m_commonModule));
+        nx::utils::TimerManager::instance(), m_commonModule, false));
 
     m_commonModule->instance<QnResourcesChangesManager>();
     m_commonModule->instance<QnClientPtzControllerPool>();

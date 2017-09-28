@@ -21,7 +21,7 @@
         <template>lib</template>
         <targetName>nx_client_core</targetName>
         <qt.libs>core gui quick quick-private network multimedia multimedia-private qtmultimediaquicktools_private concurrent sql</qt.libs>
-        <global.libs>-lcommon -lnx_media -lappserver2 -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <global.libs>-lcommon -lnx_media -lappserver2 -lcloud_db_client -lnx_vms_utils -lnx_network -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>

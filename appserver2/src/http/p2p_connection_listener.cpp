@@ -44,6 +44,7 @@ private:
 // -------------------------- ConnectionProcessor ---------------------
 
 const QString ConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
+const QString ConnectionProcessor::kCloudPathPrefix(lit("/cdb"));
 
 ConnectionProcessor::ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
@@ -61,7 +62,7 @@ ConnectionProcessor::~ConnectionProcessor()
     stop();
 }
 
-QByteArray ConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
+ec2::ApiPeerDataEx ConnectionProcessor::localPeer() const
 {
     ec2::ApiPeerDataEx localPeer;
     localPeer.id = commonModule()->moduleGUID();
@@ -75,13 +76,7 @@ QByteArray ConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         commonModule()->globalSettings()->aliveUpdateInterval()).count();
     localPeer.protoVersion = nx_ec::EC2_PROTO_VERSION;
-
-    if (dataFormat == Qn::JsonFormat)
-        return QJson::serialized(localPeer);
-    else if (dataFormat == Qn::UbjsonFormat)
-        return QnUbjson::serialized(localPeer);
-    else
-        return QByteArray();
+    return localPeer;
 }
 
 bool ConnectionProcessor::isDisabledPeer(const ec2::ApiPeerData& remotePeer) const
@@ -141,29 +136,6 @@ bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer)
     return true;
 }
 
-ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
-{
-    Q_D(const QnTCPConnectionProcessor);
-    ec2::ApiPeerDataEx remotePeer;
-    QUrlQuery query(d->request.requestLine.url.query());
-
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
-    if (query.hasQueryItem("format"))
-        QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
-
-    bool success = false;
-    QByteArray peerData = nx_http::getHeaderValue(d->request.headers, Qn::EC2_PEER_DATA);
-    peerData = QByteArray::fromBase64(peerData);
-    if (dataFormat == Qn::JsonFormat)
-        remotePeer = QJson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
-    else if (dataFormat == Qn::UbjsonFormat)
-        remotePeer = QnUbjson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
-
-    if (remotePeer.id.isNull())
-        remotePeer.id = QnUuid::createUuid();
-    return remotePeer;
-}
-
 Qn::UserAccessData ConnectionProcessor::userAccessData(const ec2::ApiPeerDataEx& remotePeer) const
 {
     Q_D(const QnTCPConnectionProcessor);
@@ -199,7 +171,7 @@ void ConnectionProcessor::run()
         return;
     parseRequest();
 
-    ec2::ApiPeerDataEx remotePeer = deserializeRemotePeerInfo();
+    ec2::ApiPeerDataEx remotePeer = deserializeFromRequest(d->request);
     if (!isPeerCompatible(remotePeer))
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
@@ -261,9 +233,7 @@ void ConnectionProcessor::run()
         return;
     }
 
-    d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_PEER_DATA,
-        responseBody(remotePeer.dataFormat).toBase64()));
+    serializeToResponse(&d->response, localPeer(), remotePeer.dataFormat);
 
     sendResponse(
         nx_http::StatusCode::switchingProtocols,

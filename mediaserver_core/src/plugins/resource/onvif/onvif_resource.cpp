@@ -845,9 +845,9 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
+int QnPlOnvifResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
-    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps), role);
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(resolution, streamParams, role), role);
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const

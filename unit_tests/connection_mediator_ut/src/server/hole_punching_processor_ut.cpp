@@ -9,12 +9,12 @@
 #include <gmock/gmock.h>
 
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/utils/sync_call.h>
-
+#include <relay/relay_cluster_client.h>
 #include <server/hole_punching_processor.h>
 #include <settings.h>
 #include <statistics/collector.h>
@@ -287,6 +287,20 @@ protected:
 
     void assertMediatorHasDroppedConnectSession()
     {
+        ASSERT_EQ(api::ResultCode::notFound, doConnectResultRequest());
+    }
+
+    void waitForMediatorToDropConnectSession()
+    {
+        while (doConnectResultRequest() != api::ResultCode::notFound)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+private:
+    nx::String m_lastConnectSessionId;
+
+    api::ResultCode doConnectResultRequest()
+    {
         api::ResultCode resultCode = api::ResultCode::ok;
         api::ConnectionResultRequest connectionResult;
         connectionResult.connectSessionId = m_lastConnectSessionId;
@@ -298,11 +312,8 @@ protected:
                     m_udpClient.get(),
                     std::move(connectionResult),
                     std::placeholders::_1));
-        ASSERT_EQ(api::ResultCode::notFound, resultCode);
+        return resultCode;
     }
-
-private:
-    nx::String m_lastConnectSessionId;
     std::unique_ptr<MediaServerEmulator> m_server;
 
     void initialiseServerEmulator(MediaServerEmulator::ActionToTake actionToTake)
@@ -329,7 +340,7 @@ TEST_F(
     whenIssueConnectRequest();
     
     thenConnectResultCodeIs(api::ResultCode::noReplyFromServer);
-    assertMediatorHasDroppedConnectSession();
+    waitForMediatorToDropConnectSession();
 }
 
 TEST_F(
@@ -382,11 +393,13 @@ class HolePunchingProcessor:
 
 public:
     HolePunchingProcessor():
+        m_relayClusterClient(m_settings),
         m_holePunchingProcessor(
             m_settings,
             &m_cloudData,
             &m_dispatcher,
             &m_listeningPeerPool,
+            &m_relayClusterClient,
             &m_statisticsCollector)
     {
         const char* args[] = {
@@ -461,6 +474,7 @@ private:
     nx::stun::MessageDispatcher m_dispatcher;
     ListeningPeerPool m_listeningPeerPool;
     DummyStatisticsCollector m_statisticsCollector;
+    RelayClusterClient m_relayClusterClient;
     hpm::HolePunchingProcessor m_holePunchingProcessor;
     nx::utils::SyncQueue<ConnectResponse> m_responses;
 

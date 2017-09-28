@@ -77,6 +77,9 @@ const auto kDefaultMediaServerConnectionIdlePeriod = std::chrono::minutes(1);
 const QLatin1String kCloudModuleXmlTemplatePath("moduleFinder/cloudModuleXmlTemplatePath");
 const QLatin1String kDefaultCloudModuleXmlTemplatePath(":/cloud_modules_template.xml");
 
+const QLatin1String kNewCloudModuleXmlTemplatePath("moduleFinder/newCloudModuleXmlTemplatePath");
+const QLatin1String kDefaultNewCloudModuleXmlTemplatePath(":/cloud_modules_new_template.xml");
+
 //-------------------------------------------------------------------------------------------------
 // Http
 const QLatin1String kTcpBacklogSize("http/tcpBacklogSize");
@@ -321,6 +324,8 @@ void Settings::loadSettings()
 
     m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
+    m_moduleFinder.newCloudModulesXmlTemplatePath = settings().value(
+        kNewCloudModuleXmlTemplatePath, kDefaultNewCloudModuleXmlTemplatePath).toString();
 
     //HTTP
     m_http.tcpBacklogSize = settings().value(

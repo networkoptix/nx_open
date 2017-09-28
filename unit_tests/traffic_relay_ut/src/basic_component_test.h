@@ -3,7 +3,7 @@
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
-#include <relay_service.h>
+#include <nx/cloud/relay/relay_service.h>
 
 namespace nx {
 namespace cloud {

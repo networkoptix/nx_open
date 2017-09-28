@@ -3,8 +3,8 @@
 #include <unordered_set>
 #include <QtSql>
 #include <nx/utils/test_support/test_options.h>
-#include <persistent_scheduler/persistent_scheduler.h>
-#include <persistent_scheduler/persistent_scheduler_db_helper.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler_db_helper.h>
 #include "scheduler_user.h"
 
 namespace nx {
@@ -73,11 +73,15 @@ protected:
                 scheduler.get(),
                 scheduleUser1FunctorId));
 
+        user1->registerAsAnEventReceiver();
+
         user2 = std::unique_ptr<SchedulerUser>(
             new SchedulerUser(
                 executor.get(),
                 scheduler.get(),
                 scheduleUser2FunctorId));
+
+        user2->registerAsAnEventReceiver();
     }
 
     void andWhenOnlyFirstUserRegistered()
@@ -87,6 +91,8 @@ protected:
                 executor.get(),
                 scheduler.get(),
                 scheduleUser1FunctorId));
+
+        user1->registerAsAnEventReceiver();
     }
 
     void andWhenFirstUsersUnsubscribesAllTasks()
@@ -142,7 +148,24 @@ protected:
                 executor.get(),
                 scheduler.get(),
                 scheduleUser1FunctorId));
+
+        user1->registerAsAnEventReceiver();
     }
+
+    void whenFirstUserInitialized()
+    {
+        user1 = std::unique_ptr<SchedulerUser>(
+            new SchedulerUser(
+                executor.get(),
+                scheduler.get(),
+                scheduleUser1FunctorId));
+    }
+
+    void whenUserRegisteredAsReceiver()
+    {
+        user1->registerAsAnEventReceiver();
+    }
+
 
     void whenFirstUserSchedulesALongTask()
     {
@@ -549,8 +572,9 @@ TEST_F(SchedulerIntegrationTest, UnsubscribeFromExpiredTask)
 
     andWhenTimeToFireComesButServerIsOffline();
     andWhenSystemRestarts();
-    whenFirstUserInitializedAndRegisteredToScheduler();
+    whenFirstUserInitialized();
     whenUserDecidesToUnSubscribeFromTimerFunction();
+    whenUserRegisteredAsReceiver();
     andWhenSchedulerWorksForSomeVeryShortTime();
     thenTaskShouldHaveAlreadyUnsubscribed();
 

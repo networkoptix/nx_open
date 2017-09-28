@@ -167,7 +167,7 @@ bool Socket<SocketInterfaceToImplement>::close()
 
     NX_ASSERT(
         !nx::network::SocketGlobals::isInitialized() ||
-        !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
+        !nx::network::SocketGlobals::aioService().isSocketBeingMonitored(static_cast<Pollable*>(this)));
 
     auto fd = m_fd;
     m_fd = -1;
@@ -593,6 +593,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
         if (wsaResult == SOCKET_ERROR && SystemError::getLastOSErrorCode() == WSA_IO_PENDING)
         {
             auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
+
             WaitForSingleObject(m_eventObject, timeout);
             if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
             {
@@ -762,7 +763,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::connectAsync(
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
@@ -770,7 +771,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::readSomeAsync(
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::sendAsync(
     const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     return m_aioHelper->sendAsync(buf, std::move(handler));
 }
@@ -1362,7 +1363,7 @@ TCPServerSocket::~TCPServerSocket()
     NX_CRITICAL(
         !nx::network::SocketGlobals::isInitialized() ||
         !nx::network::SocketGlobals::aioService()
-        .isSocketBeingWatched(static_cast<Pollable*>(this)),
+        .isSocketBeingMonitored(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
         "deleting socket if you delete socket from non-aio thread");
 }
@@ -1444,24 +1445,29 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     if (!getNonBlockingMode(&nonBlockingMode))
         return nullptr;
 
-    auto* acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
+    std::unique_ptr<AbstractStreamSocket> acceptedSocket(
+        d->accept(recvTimeoutMs, nonBlockingMode));
     if (!acceptedSocket)
         return nullptr;
 
 #if defined(_WIN32) || defined(Q_OS_MACX)
-    if (!nonBlockingMode)
-        return acceptedSocket;
-
-    // Make all platforms behave like Linux, so all new sockets are in blocking mode
-    // regardless of their origin.
-    if (!acceptedSocket->setNonBlockingMode(false))
+    if (nonBlockingMode)
     {
-        delete acceptedSocket;
-        return nullptr;
+        // Make all platforms behave like Linux, so all new sockets are in blocking mode
+        // regardless of their origin.
+        if (!acceptedSocket->setNonBlockingMode(false))
+            return nullptr;
     }
 #endif
 
-    return acceptedSocket;
+    // Needed since our socket API is somehow expected not to inherit timeouts.
+    if (!acceptedSocket->setRecvTimeout(0) ||
+        !acceptedSocket->setSendTimeout(0))
+    {
+        return nullptr;
+    }
+
+    return acceptedSocket.release();
 }
 
 bool TCPServerSocket::setListen(int queueLen)
@@ -1700,7 +1706,7 @@ bool UDPSocket::sendTo(
 void UDPSocket::sendToAsync(
     const nx::Buffer& buffer,
     const SocketAddress& endpoint,
-    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
     if (endpoint.address.isIpAddress())
     {
@@ -1752,7 +1758,7 @@ int UDPSocket::recvFrom(
 
 void UDPSocket::recvFromAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
     readSomeAsync(
         buf,

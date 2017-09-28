@@ -38,14 +38,26 @@ void SynchronousTcpServer::stop()
         m_thread.join();
 }
 
+void SynchronousTcpServer::waitForAtLeastOneConnection()
+{
+    while (!m_connection)
+        std::this_thread::yield();
+}
+
+AbstractStreamSocket* SynchronousTcpServer::anyConnection()
+{
+    return m_connection.get();
+}
+
 void SynchronousTcpServer::threadMain()
 {
     while (!m_stopped)
     {
-        std::unique_ptr<AbstractStreamSocket> connection(m_serverSocket.accept());
-        if (!connection)
+        m_connection.reset(m_serverSocket.accept());
+        if (!m_connection)
             continue;
-        processConnection(connection.get());
+        processConnection(m_connection.get());
+        m_connection.reset();
     }
 }
 

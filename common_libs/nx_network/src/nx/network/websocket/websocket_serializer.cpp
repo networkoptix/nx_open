@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <nx/utils/random.h>
+#include <nx/network/socket_common.h>
 #include "websocket_serializer.h"
 
 namespace nx {

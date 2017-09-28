@@ -27,8 +27,7 @@ public:
         const nx_http::StringType& stunOverHttpPath)
     {
         using namespace std::placeholders;
-        using CreateStunOverHttpConnectionHandler =
-            nx_http::server::handler::CreateTunnelHandler<nx::stun::ServerConnection>;
+        using CreateStunOverHttpConnectionHandler = nx_http::server::handler::CreateTunnelHandler;
 
         httpMessageDispatcher->template registerRequestProcessor<CreateStunOverHttpConnectionHandler>(
             stunOverHttpPath,

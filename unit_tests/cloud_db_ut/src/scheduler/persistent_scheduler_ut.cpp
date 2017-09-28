@@ -2,8 +2,8 @@
 #include <gmock/gmock.h>
 #include <nx/utils/std/future.h>
 #include <chrono>
-#include <persistent_scheduler/persistent_scheduler.h>
-#include <persistent_scheduler/persistent_scheduler_db_helper.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler.h>
+#include <nx/cloud/cdb/persistent_scheduler/persistent_scheduler_db_helper.h>
 #include "scheduler_user.h"
 
 namespace nx {
@@ -144,6 +144,7 @@ protected:
             new nx::cdb::PersistentScheduler(&executor, &dbHelper));
 
         user = std::unique_ptr<SchedulerUser>(new SchedulerUser(&executor, scheduler.get(), functorId));
+        user->registerAsAnEventReceiver();
         scheduler->start();
     }
 
@@ -198,10 +199,14 @@ protected:
     void thenTimersFiredSeveralTimes(int taskCount = -1)
     {
         if (taskCount >= 0)
+        {
             ASSERT_EQ(user->tasks().size(), static_cast<std::size_t>(taskCount));
+        }
 
         for (const auto& task : user->tasks())
+        {
             ASSERT_GT(task.second.fired, 0);
+        }
     }
 
     SqlExecutorStub executor;

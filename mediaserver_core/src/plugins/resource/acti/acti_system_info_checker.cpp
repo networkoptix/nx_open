@@ -161,7 +161,7 @@ QAuthenticator QnActiSystemInfoChecker::getNextAuthToCheckUnsafe()
 
 void QnActiSystemInfoChecker::handleSystemInfoResponse(nx_http::AsyncHttpClientPtr httpClient)
 {
-    if (httpClient->state() != nx_http::AsyncHttpClient::State::sDone)
+    if (httpClient->state() != nx_http::AsyncClient::State::sDone)
     {
         handleFail();
         return;

@@ -1,15 +1,15 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        Account is gemaakt. <br> Bevestigingsbericht wordt verzonden naar <br> {{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
-        Account is successfully created.
+        Account is succesvol aangemaakt.
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">Account aanmaken</h1>
+        <h1 ng-if="!session.fromClient">Accounts aanmaken</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
@@ -49,18 +49,14 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
-
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span>
-
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-mailadres is vereist.</span>                  <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">, Geef een geldig e-mailadres op.</span>                  <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Dit e-mailadres is al geregistreerd in {{PRODUCT_NAME}}.</span>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" >
             <div class="col-sm-offset-4 col-sm-8">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subscribe to email newsletters</label>
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Abonneer op de nieuwsbrief</label>
                 </div>
             </div>
         </div>
@@ -70,7 +66,7 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">By clicking "Create Account", you agree<br> to <a href="/content/eula" target="_blank">Terms and Conditions</a></small>
+                <small class="conditions-note"> Door te klikken op 'Account maken' gaat u akkoord met <br> met onze<a href="/content/eula" target="_blank"> algemene voorwaarden </a></small>
             </div>
         </div>
     </form>

@@ -216,7 +216,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<nx::vms::event::AbstractActionPtr>();
     qRegisterMetaType<nx::vms::event::AbstractActionList>();
-    qRegisterMetaType<nx::vms::event::ActionDataListPtr>();
     qRegisterMetaType<nx::vms::event::AbstractEventPtr>();
     qRegisterMetaType<nx::vms::event::RulePtr>();
     qRegisterMetaType<nx::vms::event::RuleList>();

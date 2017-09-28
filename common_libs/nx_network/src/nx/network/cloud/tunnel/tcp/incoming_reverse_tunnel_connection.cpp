@@ -47,7 +47,7 @@ void IncomingReverseTunnelConnection::start(
 }
 
 void IncomingReverseTunnelConnection::setHttpTimeouts(
-    nx_http::AsyncHttpClient::Timeouts timeouts)
+    nx_http::AsyncClient::Timeouts timeouts)
 {
     m_httpTimeouts = timeouts;
 }

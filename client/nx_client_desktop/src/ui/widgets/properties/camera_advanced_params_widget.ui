@@ -11,21 +11,45 @@
    </rect>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
    <property name="topMargin">
-    <number>16</number>
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="">
+     <widget class="QnPanel" name="leftPanel" native="true">
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
        <property name="topMargin">
-        <number>5</number>
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
        </property>
        <item>
         <widget class="QTreeWidget" name="groupsWidget">
+         <property name="allColumnsShowFocus">
+          <bool>true</bool>
+         </property>
          <column>
           <property name="text">
            <string>Category</string>
@@ -72,6 +96,12 @@
    <class>QnProgressWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/progress_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnPanel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

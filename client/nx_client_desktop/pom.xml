@@ -23,10 +23,10 @@
         <targetName>client</targetName>
 
         <qt.libs>core gui gui-private widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_audio -lappserver2 -lnx_client_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_audio -lappserver2 -lnx_client_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway -lnx_kit</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <buildLib>sharedlib</buildLib>

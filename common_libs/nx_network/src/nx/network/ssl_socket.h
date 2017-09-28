@@ -59,6 +59,7 @@ public:
     virtual int send(const void* buffer, unsigned int bufferLen) override;
 
     virtual SocketAddress getForeignAddress() const override;
+    virtual QString getForeignHostName() const override;
     virtual bool isConnected() const override;
 
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
@@ -77,17 +78,19 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual bool isEncryptionEnabled() const override;
+
+    virtual QString idForToStringFromPtr() const override;
 
 protected:
     Q_DECLARE_PRIVATE(SslSocket);
@@ -146,11 +149,11 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
 private:
     bool updateInternalBlockingMode();

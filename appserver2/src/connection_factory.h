@@ -39,7 +39,8 @@ namespace ec2 {
         Ec2DirectConnectionFactory(
             Qn::PeerType peerType,
             nx::utils::TimerManager* const timerManager,
-            QnCommonModule* commonModule);
+            QnCommonModule* commonModule,
+            bool isP2pMode);
         virtual ~Ec2DirectConnectionFactory();
 
         virtual void pleaseStop() override;
@@ -93,6 +94,7 @@ private:
     ClientQueryProcessor m_remoteQueryProcessor;
     QnMutex m_mutex;
     Ec2DirectConnectionPtr m_directConnection;
+    bool m_p2pMode = false;
 private:
     int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
     int establishConnectionToRemoteServer(

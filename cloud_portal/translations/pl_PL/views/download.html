@@ -13,11 +13,11 @@
                 <div class="panel-body flex-md">
                     <div class="col-md-4  col-md-push-8 border-left-md">
                         <p>
-                            <b>Latest version</b>
+                            <b>Najnowsza wersja</b>
                             <h2 class="version-number"><b>{{downloadsData.version}}</b></h2>
                         </p>
                         <p>
-                            <a ng-href="{{downloadsData.releaseNotes}}" target="_blank">What's new?</a>
+                            <a ng-href="{{downloadsData.releaseNotes}}" target="_blank">Co nowego?</a>
                             <br>&nbsp;
                         </p>
                     </div>
@@ -30,7 +30,7 @@
                                             <span class="download-link"></span>
                                       </div>
                                       <div class="media-body text-left">
-                                            <h2><b>Download {{VMS_NAME}}</b></h2>
+                                            <h2><b>Pobierz {{VMS_NAME}}</b></h2>
                                             <span class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
                                                 $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</span>
                                       </div>
@@ -41,7 +41,7 @@
                         </div>
 
                         <div ng-if="platform.installers.length>1">
-                            <h5><b>Other packages:</b></h5>
+                            <h5><b>Inne pakiety:</b></h5>
                             <div class="row">
                                 <div class="col-sm-4 col-md-6 col-lg-4" ng-repeat="link in platform.installers"
                                      ng-if="$index < (platform.installers.length / 2)">

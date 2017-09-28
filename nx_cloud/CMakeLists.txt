@@ -5,7 +5,7 @@ if(withClouds OR withDesktopClient)
 endif()
 
 if(withClouds)
-    if(NOT WINDOWS)
+    if(LINUX)
         add_compile_options("-Werror" "-Wall" "-Wextra")
     endif()
 

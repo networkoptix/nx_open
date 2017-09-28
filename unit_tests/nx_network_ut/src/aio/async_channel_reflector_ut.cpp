@@ -92,7 +92,7 @@ protected:
 
 private:
     std::unique_ptr<BasicPollable> m_reflector;
-    utils::bstream::ReflectingPipeline m_input;
+    utils::bstream::Pipe m_input;
     utils::bstream::test::NotifyingOutput m_output;
     nx::Buffer m_testData;
     utils::promise<SystemError::ErrorCode> m_reflectorDone;

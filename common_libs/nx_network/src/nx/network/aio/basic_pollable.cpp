@@ -1,8 +1,3 @@
-/**********************************************************
-* Jun 30, 2016
-* akolesnikov
-***********************************************************/
-
 #include "basic_pollable.h"
 
 #include <nx/utils/std/future.h>
@@ -41,7 +36,7 @@ BasicPollable::~BasicPollable()
     }
     else
     {
-        NX_CRITICAL(!m_aioService->isSocketBeingWatched(&m_pollable),
+        NX_CRITICAL(!m_aioService->isSocketBeingMonitored(&m_pollable),
             "You MUST cancel running async operation before deleting pollable "
             "if you delete it from non-aio thread");
     }

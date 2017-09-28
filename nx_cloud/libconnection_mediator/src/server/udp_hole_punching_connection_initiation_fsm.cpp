@@ -12,6 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 
+#include "relay/abstract_relay_cluster_client.h"
 #include "settings.h"
 
 namespace nx {
@@ -21,12 +22,14 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     nx::String connectionID,
     const ListeningPeerData& serverPeerData,
     std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
-    const conf::Settings& settings)
+    const conf::Settings& settings,
+    AbstractRelayClusterClient* const relayClusterClient)
 :
     m_state(State::init),
     m_connectionID(std::move(connectionID)),
     m_onFsmFinishedEventHandler(std::move(onFsmFinishedEventHandler)),
     m_settings(settings),
+    m_relayClusterClient(relayClusterClient),
     m_serverConnectionWeakRef(serverPeerData.peerConnection),
     m_serverPeerData(serverPeerData)
 {
@@ -112,6 +115,7 @@ stats::ConnectSession UDPHolePunchingConnectionInitiationFsm::statisticsInfo() c
 void UDPHolePunchingConnectionInitiationFsm::stopWhileInAioThread()
 {
     m_timer.pleaseStopSync();
+    m_asyncOperationGuard->terminate();
 }
 
 void UDPHolePunchingConnectionInitiationFsm::processConnectRequest(
@@ -225,7 +229,9 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
     m_state = State::waitingConnectionResult;
 
     api::ConnectResponse connectResponse = prepareConnectResponse(
-        api::ConnectionAckRequest(), std::list<SocketAddress>());
+        api::ConnectionAckRequest(),
+        std::list<SocketAddress>(),
+        boost::none);
     sendConnectResponse(api::ResultCode::noReplyFromServer, std::move(connectResponse));
 
     if (m_settings.connectionParameters().connectionResultWaitTimeout == 
@@ -280,7 +286,38 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
     m_state = State::waitingConnectionResult;
 
     api::ConnectResponse connectResponse = prepareConnectResponse(
-        request, std::move(tcpEndpoints));
+        request,
+        std::move(tcpEndpoints),
+        boost::none);
+
+    m_relayClusterClient->findRelayInstancePeerIsListeningOn(
+        m_serverPeerData.hostName.toStdString(),
+        [this, connectResponse = std::move(connectResponse),
+            completionHandler = std::move(completionHandler),
+            operationGuard = m_asyncOperationGuard.sharedGuard()](
+                nx::cloud::relay::api::ResultCode resultCode,
+                QUrl relayInstanceUrl)
+        {
+            if (auto lock = operationGuard->lock())
+            {
+                onRelayInstanceSearchCompletion(
+                    std::move(connectResponse),
+                    resultCode == nx::cloud::relay::api::ResultCode::ok
+                        ? boost::make_optional(relayInstanceUrl)
+                        : boost::none,
+                    std::move(completionHandler));
+            }
+        });
+}
+
+void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
+    api::ConnectResponse connectResponse,
+    boost::optional<QUrl> relayInstanceUrl,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (relayInstanceUrl)
+        connectResponse.trafficRelayUrl = relayInstanceUrl->toString().toUtf8();
+
     sendConnectResponse(api::ResultCode::ok, std::move(connectResponse));
 
     completionHandler(api::ResultCode::ok);
@@ -295,7 +332,8 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
 
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
-    std::list<SocketAddress> tcpEndpoints)
+    std::list<SocketAddress> tcpEndpoints,
+    boost::optional<QUrl> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;
     connectResponse.params = m_settings.connectionParameters();
@@ -303,8 +341,8 @@ api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectRespo
     connectResponse.forwardedTcpEndpointList = std::move(tcpEndpoints);
     connectResponse.cloudConnectVersion = connectionAckRequest.cloudConnectVersion;
     connectResponse.destinationHostFullName = m_serverPeerData.hostName;
-    if (!m_settings.trafficRelay().url.isEmpty())
-        connectResponse.trafficRelayUrl = m_settings.trafficRelay().url.toUtf8();
+    if (relayInstanceUrl)
+        connectResponse.trafficRelayUrl = relayInstanceUrl->toString().toUtf8();
 
     return connectResponse;
 }

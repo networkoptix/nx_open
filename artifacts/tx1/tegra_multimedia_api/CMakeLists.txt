@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNX_UTILS_API= -DTEGRA_VIDEO_API=")
 
 include_directories(
+    .
     include
     samples/common/algorithm/gie
     samples/common/algorithm/cuda

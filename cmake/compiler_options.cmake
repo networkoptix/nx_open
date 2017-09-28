@@ -62,6 +62,7 @@ if(enableAllVendors)
         -DENABLE_ISD
         -DENABLE_PULSE_CAMERA
         -DENABLE_FLIR
+        -DENABLE_HANWHA
     )
 endif()
 
@@ -141,7 +142,7 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    if(NOT "${arch}" STREQUAL "arm")
+    if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
     add_compile_options(
@@ -151,6 +152,7 @@ if(LINUX)
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
+    # TODO: #dmishin ask #dklychkov about this condition.
     if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
@@ -158,7 +160,7 @@ if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
+        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
 endif()
 
 if(MACOSX)
@@ -166,7 +168,6 @@ if(MACOSX)
         -msse4.1
         -Wno-unused-local-typedef
     )
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

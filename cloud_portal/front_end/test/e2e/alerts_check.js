@@ -10,15 +10,17 @@ var AlertSuite = function () {
         registerSuccess: 'Account is created.\nConfirmation message is sent to',
         registerConfirmSuccess: 'Your account is successfully activated',
         registerConfirmError: 'Account is already activated or confirmation code is incorrect',
-        accountSuccess: 'Your account was successfully saved.',
-        restorePassWrongEmail: 'Couldn\'t send confirmation email: This email has not been registered in portal.',
+        accountSuccess: 'Your account is successfully saved',
+        restorePassWrongEmail: 'Cannot send confirmation Email: Account does not exist',
         restorePassConfirmSent: 'Password reset instructions are sent to Email',
         restorePassWrongCode: 'Cannot save password: Confirmation code is already used or incorrect',
         restorePassSuccess: 'Password successfully saved',
-        changePassWrongCurrent: 'Cannot save password: Some parameters on the form are incorrect',
+        changePassWrongCurrent: 'Cannot save password: Current password is incorrect',
         changePassSuccess: 'Your account is successfully saved',
         systemAccessError: 'System info is unavailable: Some unexpected error has happened',
-        systemAccessRestricted: 'System info is unavailable: You don\'t have access to this system.',
+        systemAccessRestricted: 'Failed to access System\nThis link is broken,\n'+
+        'System may be disconnected from Nx Cloud,\nAccess to this System may be revoked,\n'+
+        'or you may be logged into a different account',
         permissionDeleteSuccess: 'Permissions were removed from ',
         permissionAddSuccess: 'New permissions saved'
     };

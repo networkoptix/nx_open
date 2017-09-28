@@ -104,7 +104,7 @@ UdtSocket<InterfaceToImplement>::~UdtSocket()
     NX_CRITICAL(
         !nx::network::SocketGlobals::isInitialized() ||
         !nx::network::SocketGlobals::aioService()
-            .isSocketBeingWatched(static_cast<Pollable*>(this)),
+            .isSocketBeingMonitored(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
         "deleting socket if you delete socket from non-aio thread");
 
@@ -738,14 +738,14 @@ void UdtStreamSocket::connectAsync(
 
 void UdtStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler )
 {
     return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
 
 void UdtStreamSocket::sendAsync(
     const nx::Buffer& buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode, size_t )> handler )
 {
     return m_aioHelper->sendAsync(buf, std::move(handler));
 }

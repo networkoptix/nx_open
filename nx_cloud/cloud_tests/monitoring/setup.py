@@ -3,11 +3,12 @@
 from setuptools import setup, find_packages
 
 from pip.req import parse_requirements
+from version import VERSION
 
 install_reqs = parse_requirements('requirements.txt', session=False)
 
 setup(name='monitoring_simple',
-      version='1.3',
+      version=VERSION,
       description='Simple cloud portal API tests for the purpose of monitoring',
       author='Ivan Vigasin',
       author_email='ivigasin@networkoptix.com',

@@ -19,8 +19,8 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/6edfa407-8e99-4f64-bde7-2986668bc87a';
-    this.systemName = 'ek-U16';
+    this.systemLink = '/f52c704d-0398-475e-bfc2-ccd88c44e20e';
+    this.systemName = 'autotest';
 
     this.get = function (opt_url) {
         var url = opt_url || '/';
@@ -52,6 +52,10 @@ var Helper = function () {
 
     this.getParentOf = function(field) {
         return field.element(by.xpath('..'));
+    };
+
+    this.getGrandParentOf = function (field) {
+      return h.getParentOf(h.getParentOf(field));
     };
 
     this.forms = {
@@ -93,8 +97,9 @@ var Helper = function () {
         logout: {
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: h.getParentOf(element(by.css('span.glyphicon-user'))),
-            // dropdownToggle: element(by.css('header')).element(by.css('.navbar')).all(by.css('.dropdown-toggle')).get(1),
-            dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
+            dropdownMenu: h.getGrandParentOf(element(by.css('span.glyphicon-user'))).element(by.css('[uib-dropdown-menu]')),
+	    dropdownParent: h.getGrandParentOf(element(by.css('span.glyphicon-user'))),
+            //dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
             logoutLink: element(by.css('header')).element(by.css('.navbar')).all(by.css('a[ng-click="logout()"]')).first(),
             alreadyLoggedIn: element(by.css('.authorized.modal-open')),
             logOut: element(by.css('button[ng-click="cancel()"]'))
@@ -150,7 +155,7 @@ var Helper = function () {
     this.userFirstName = 'TestFirstName';
     this.userLastName = 'TestLastName';
 
-    this.userPassword = this.basePassword;
+    this.userPassword = h.basePassword;
     this.userPasswordNew = 'qweasd123qwe';
     this.userPasswordWrong = 'qweqwe123';
 
@@ -291,7 +296,8 @@ var Helper = function () {
 
         // Log out if logged in
         h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
-            h.forms.logout.logOut.click()
+            h.forms.logout.logOut.click();
+            browser.sleep(3000);
         }, function () {});
 
         h.forms.register.firstNameInput.sendKeys(userFistName);
@@ -616,7 +622,8 @@ var Helper = function () {
         function onPrevMail(mail) {
             console.log("Open email to: " + mail.headers.to);
             deferred.fulfill(mail);
-            notifier.stop();
+            // Commented out because it was causing "ReferenceError: self is not defined"
+            //notifier.stop();
             notifier.removeListener("mail", onPrevMail);
         }
         notifier.on("mail", onPrevMail);
@@ -632,7 +639,7 @@ var Helper = function () {
             if((emailAddress === mail.headers.to) && (mail.subject.includes(emailSubject))) {
                 console.log("Catch email to: " + mail.headers.to);
                 deferred.fulfill(mail);
-                // notifier.stop();
+                //notifier.stop();
                 // commented out because causes  "ReferenceError: self is not defined" at Notifier.stop
                 // (/home/ekorneeva/develop/nx_vms/cloud_portal/front_end/node_modules/mail-notifier/index.js:106:5)
                 notifier.removeListener("mail", onMail);
@@ -711,7 +718,8 @@ var Helper = function () {
 
         // Log out if logged in
         h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
-            h.forms.logout.logOut.click()
+            h.forms.logout.logOut.click();
+            browser.sleep(3000);
         }, function () {});
 
         expect(here.passwordInput.isPresent()).toBe(true);

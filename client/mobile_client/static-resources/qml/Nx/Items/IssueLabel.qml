@@ -5,6 +5,7 @@ import Nx 1.0
 Rectangle
 {
     property alias text: label.text
+    property alias textColor: label.color
 
     color: ColorTheme.red_main
     radius: 2

@@ -26,16 +26,24 @@ SocketAddress getEndpoint(const QUrl& url)
         static_cast<quint16>(url.port(getDefaultPortForScheme(url.scheme()))));
 }
 
+std::string normalizePath(std::string path)
+{
+    // TODO: #ak Remove "..".
+
+    for (std::string::size_type pos = 0;;)
+    {
+        pos = path.find("//", pos);
+        if (pos == std::string::npos)
+            break;
+        path.replace(pos, 2U, "/");
+    }
+
+    return path;
+}
+
 QString normalizePath(const QString& path)
 {
-    // TODO: #ak Introduce proper implementation.
-
-    if (path.indexOf("//") == -1)
-        return path;
-
-    QString normalizedPath = path;
-    normalizedPath.replace("//", "/");
-    return normalizedPath;
+    return QString::fromStdString(normalizePath(path.toStdString()));
 }
 
 } // namespace url

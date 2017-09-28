@@ -35,7 +35,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    void setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts);
+    void setHttpTimeouts(nx_http::AsyncClient::Timeouts timeouts);
 
     void connect(const SocketAddress& endpoint, ConnectHandler handler);
 

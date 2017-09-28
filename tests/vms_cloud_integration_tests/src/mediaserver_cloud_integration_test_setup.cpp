@@ -34,6 +34,7 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
 {
     m_mediaServerLauncher.addSetting(nx_ms_conf::CDB_ENDPOINT, m_cdb.endpoint().toString());
     m_mediaServerLauncher.addSetting(nx_ms_conf::DELAY_BEFORE_SETTING_MASTER_FLAG, "100ms");
+    m_mediaServerLauncher.addSetting(nx_ms_conf::P2P_MODE_FLAG, GetParam().p2pMode);
 
     if (!m_mediaServerLauncher.start())
         return false;

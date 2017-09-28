@@ -85,30 +85,6 @@ public:
         const QnCameraAdvancedParamValueList& params, QObject* target, const char* slot);
 
     /**
-     * Get event log.
-     *
-     * Returns immediately. On request completion the specified slot of the specified target is
-     * called with signature <tt>(int handle, int httpStatusCode, const QList<nx::vms::event::AbstractAction>& events)</tt>.
-     * Status is 0 in case of success, in other cases it holds error code.
-     *
-     * @param dateFrom Start timestamp in msec.
-     * @param dateTo End timestamp in msec. Can be <tt>DATETIME_NOW</tt>.
-     * @param cameras Filter events by camera. Optional.
-     * @param businessRuleId Filter events by specified business rule. Optional.
-     *
-     * @return Request handle.
-     */
-    int getEventLogAsync(
-        qint64 dateFrom,
-        qint64 dateTo,
-        QnResourceList cameras,
-        nx::vms::event::EventType eventType,
-        nx::vms::event::ActionType actionType,
-        QnUuid businessRuleId,
-        QObject* target,
-        const char* slot);
-
-    /**
      * @return Request handle.
      */
     int getStatisticsAsync(QObject* target, const char* slot);

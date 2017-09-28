@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 12, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <chrono>
@@ -10,6 +5,7 @@
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "aio_event_handler.h"
 #include "basic_pollable.h"
@@ -59,6 +55,7 @@ private:
     AIOService& m_aioService;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     int m_internalTimerId;
+    QnMutex m_mutex;
 };
 
 } // namespace aio

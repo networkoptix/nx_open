@@ -4,6 +4,7 @@
 #include <nx/network/cloud/tunnel/tcp/reverse_connector.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -15,15 +16,13 @@ namespace test {
 
 static const String kAcceptorHostName("theAcceptor");
 
-class TcpReverseAcceptorTest:
+class TcpReverseAcceptor:
     public ::testing::Test
 {
 protected:
-    TcpReverseAcceptorTest():
+    TcpReverseAcceptor():
         m_acceptor(m_acceptResults.pusher())
     {
-        NX_CRITICAL(m_acceptor.start(kAcceptorHostName, SocketAddress::anyAddress));
-        m_acceptorAddress = SocketAddress(HostAddress::localhost, m_acceptor.address().port);
     }
 
     void testConnect(
@@ -86,12 +85,50 @@ protected:
         connectorDone.get_future().wait();
     }
 
+    void whenEstablishReverseConnection()
+    {
+        m_originatingHostName = nx::utils::generateRandomName(7);
+        auto connector = std::make_unique<ReverseConnector>(
+            m_originatingHostName,
+            kAcceptorHostName);
+        auto connectorGuard = makeScopeGuard([&connector]() { connector->pleaseStopSync(); });
+
+        utils::promise<SystemError::ErrorCode> connectorDone;
+        connector->connect(
+            m_acceptorAddress,
+            [&connectorDone](SystemError::ErrorCode resultCode)
+            {
+                connectorDone.set_value(resultCode);
+            });
+        connectorDone.get_future().wait();
+    }
+
+    void thenAcceptorProducesConnection()
+    {
+        m_prevAcceptedConnection = m_acceptResults.pop().second;
+        ASSERT_NE(nullptr, m_prevAcceptedConnection.get());
+    }
+
+    void andAcceptedConnectionReportsProperForeignHostName()
+    {
+        ASSERT_EQ(m_originatingHostName, m_prevAcceptedConnection->getForeignHostName().toUtf8());
+    }
+
+private:
     ReverseAcceptor m_acceptor;
     SocketAddress m_acceptorAddress;
     utils::SyncMultiQueue<String, std::unique_ptr<AbstractStreamSocket>> m_acceptResults;
+    nx::String m_originatingHostName;
+    std::unique_ptr<AbstractStreamSocket> m_prevAcceptedConnection;
+
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(m_acceptor.start(kAcceptorHostName, SocketAddress::anyAddress));
+        m_acceptorAddress = SocketAddress(HostAddress::localhost, m_acceptor.address().port);
+    }
 };
 
-TEST_F(TcpReverseAcceptorTest, Connect)
+TEST_F(TcpReverseAcceptor, Connect)
 {
     for (const String& hostName: {"client1", "client2"})
     {
@@ -113,6 +150,14 @@ TEST_F(TcpReverseAcceptorTest, Connect)
             }
         }
     }
+}
+
+TEST_F(TcpReverseAcceptor, resulting_socket_reports_proper_foreign_host_name)
+{
+    whenEstablishReverseConnection();
+
+    thenAcceptorProducesConnection();
+    andAcceptedConnectionReportsProperForeignHostName();
 }
 
 } // namespace test

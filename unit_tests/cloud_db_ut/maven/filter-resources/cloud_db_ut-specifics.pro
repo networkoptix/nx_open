@@ -9,5 +9,5 @@ INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/
 
 linux {
-    QMAKE_CXXFLAGS += -Werror
+    QMAKE_CXXFLAGS += -Werror -Wno-error=strict-aliasing
 }

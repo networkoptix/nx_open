@@ -47,10 +47,14 @@ public:
             m_deviceInfo.friendlyName = ch;
         else if (m_currentElementName == QLatin1String("manufacturer"))
             m_deviceInfo.manufacturer = ch;
+        else if (m_currentElementName == QLatin1String("manufacturerURL"))
+            m_deviceInfo.manufacturerUrl = ch;
         else if (m_currentElementName == QLatin1String("modelName"))
             m_deviceInfo.modelName = ch;
         else if (m_currentElementName == QLatin1String("serialNumber"))
             m_deviceInfo.serialNumber = ch;
+        else if (m_currentElementName == QLatin1String("UDN"))
+            m_deviceInfo.udn = ch;
         else if (m_currentElementName == QLatin1String("presentationURL"))
             m_deviceInfo.presentationUrl = ch;
 

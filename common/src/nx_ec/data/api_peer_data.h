@@ -5,6 +5,7 @@
 #include "nx/utils/latin1_array.h"
 #include <nx_ec/ec_proto_version.h>
 #include <nx/network/app_info.h>
+#include <nx/network/http/http_types.h>
 
 namespace ec2 {
 
@@ -119,6 +120,11 @@ struct ApiPeerData: ApiPersistentIdData
         return isServer(peerType);
     }
 
+    bool isCloudServer() const
+    {
+        return peerType == Qn::PT_CloudServer;
+    }
+
     bool isMobileClient() const
     {
         return isMobileClient(peerType);
@@ -146,6 +152,9 @@ typedef QSet<QnUuid> QnPeerSet;
 
 struct ApiPeerDataEx: public ApiPeerData
 {
+    ApiPeerDataEx(): ApiPeerData() {}
+    ApiPeerDataEx(const ApiPeerData& data) : ApiPeerData(data) {}
+
     QnUuid systemId;
     QString cloudHost = nx::network::AppInfo::defaultCloudHost();
     qint64 identityTime = 0;
@@ -154,6 +163,12 @@ struct ApiPeerDataEx: public ApiPeerData
 };
 
 #define ApiPeerDataEx_Fields ApiPeerData_Fields (systemId)(cloudHost)(identityTime)(aliveUpdateIntervalMs)(protoVersion)
+
+ec2::ApiPeerDataEx deserializeFromRequest(const nx_http::Request& request);
+void serializeToResponse(
+    nx_http::Response* response,
+    ec2::ApiPeerDataEx localPeer,
+    Qn::SerializationFormat dataFormat);
 
 } // namespace ec2
 

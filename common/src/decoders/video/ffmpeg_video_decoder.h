@@ -110,7 +110,8 @@ private:
     bool m_checkH264ResolutionChange;
 
     int m_forceSliceDecoding;
-    typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size
+    // I have used vector instead map because of 2-3 elements is typical size
+    typedef QVector<QPair<qint64, QnAbstractCompressedMetadataPtr> > MotionMap;
     MotionMap m_motionMap;
     QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;

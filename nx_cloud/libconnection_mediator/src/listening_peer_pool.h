@@ -23,7 +23,7 @@ struct ListeningPeerData
     nx::String hostName;
     /** Valid for locally-registered peer only. */
     ConnectionWeakRef peerConnection;
-    std::list< SocketAddress > endpoints;
+    std::list<SocketAddress> endpoints;
     api::ConnectionMethods connectionMethods;
 
     ListeningPeerData():

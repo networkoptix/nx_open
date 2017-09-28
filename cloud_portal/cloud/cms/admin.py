@@ -45,8 +45,8 @@ admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('name', 'description', 'url',
-                    'translatable', 'context_actions')
+    list_display = ('context_actions', 'name', 'description',
+                    'url', 'translatable')
     search_fields = ('name', 'description', 'url')
 
     def context_actions(self, obj):
@@ -88,10 +88,9 @@ admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('id', 'customization', 'name',
+    list_display = ('content_version_actions', 'id', 'customization', 'name',
                     'created_date', 'created_by',
-                    'accepted_date', 'accepted_by',
-                    'content_version_actions')
+                    'accepted_date', 'accepted_by')
 
     def content_version_actions(self, obj):
         return format_html('<a class="button" href="{}">review version</a>',

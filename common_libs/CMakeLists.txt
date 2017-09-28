@@ -3,6 +3,10 @@ add_subdirectory(nx_fusion)
 add_subdirectory(nx_network)
 add_subdirectory(udt)
 
+if(withClouds)
+    add_subdirectory(nx_cassandra)
+endif()
+
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_audio)
     add_subdirectory(nx_media)

@@ -46,6 +46,11 @@ int AbstractCommunicatingSocket::send(const QByteArray& data)
     return send(data.constData(), data.size());
 }
 
+QString AbstractCommunicatingSocket::getForeignHostName() const
+{
+    return getForeignAddress().address.toString();
+}
+
 void AbstractCommunicatingSocket::registerTimer(
     unsigned int timeout,
     nx::utils::MoveOnlyFunc<void()> handler)
@@ -57,7 +62,7 @@ void AbstractCommunicatingSocket::registerTimer(
 
 void AbstractCommunicatingSocket::readAsyncAtLeast(
     nx::Buffer* const buffer, size_t minimalSize,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     NX_CRITICAL(
         buffer->capacity() >= buffer->size() + static_cast<int>(minimalSize),
@@ -89,15 +94,20 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
     cancelIOSync(nx::network::aio::EventType::etNone);
 }
 
+QString AbstractCommunicatingSocket::idForToStringFromPtr() const
+{
+    return lm("%1->%2").args(getLocalAddress(), getForeignAddress());
+}
+
 void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
     nx::Buffer* const buffer, size_t minimalSize,
-    std::function<void(SystemError::ErrorCode, size_t)> handler,
+    IoCompletionHandler handler,
     size_t initBufSize)
 {
     readSomeAsync(
         buffer,
         [this, buffer, minimalSize, handler = std::move(handler), initBufSize](
-            SystemError::ErrorCode code, size_t size)
+            SystemError::ErrorCode code, size_t size) mutable
         {
             if (code != SystemError::noError || size == 0 ||
                 static_cast<size_t>(buffer->size()) >= initBufSize + minimalSize)
@@ -163,6 +173,11 @@ boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& st
 }
 
 //-------------------------------------------------------------------------------------------------
+
+QString AbstractStreamServerSocket::idForToStringFromPtr() const
+{
+    return lm("%1").args(getLocalAddress());
+}
 
 bool AbstractDatagramSocket::setDestAddr(
     const QString& foreignAddress,

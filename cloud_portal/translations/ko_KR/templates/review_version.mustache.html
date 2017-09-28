@@ -1,7 +1,7 @@
 <h1>There is a new revision for {{ message.product }}</h1>
-<p>Click on the link to review draft {{ message.id }} for {{ message.product }}</p>
-<a class="btn" href="{{ config.portal_url }}/admin/cms/review_version/{{ message.id }}/">Review Version</a>
-<h4>On this page you can</h4>
+<p>{{ message.id }}링크를 클릭하여 {{ message.product }}에 대한 초안 검토를 하십시요.  </p>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/review_version/{{ message.id }}/">버전 검토</a>
+<h4>이 페이지에서 아래 내용을 할 수 있습니다.</h4>
 <ul>
 	<li>Create a preview to see the most recent changes.</li>
 	<li>Publish this version which will update all content.</li>

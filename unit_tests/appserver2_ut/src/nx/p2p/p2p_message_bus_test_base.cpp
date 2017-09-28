@@ -155,6 +155,9 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
     result->addArg(dbFileArg.toStdString().c_str());
 
+    const QString p2pModeArg = lit("--p2pMode=1");
+    result->addArg(p2pModeArg.toStdString().c_str());
+
     const QString instanceArg = lit("--moduleInstance=%1").arg(m_instanceCounter);
     result->addArg(instanceArg.toStdString().c_str());
     const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());

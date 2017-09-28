@@ -1,5 +1,5 @@
 Config.helpLinks.push({
-    url: "WAVEsupport@hanwha.com",
+    url: "support@hanwhasecurity.com",
     title: "Support",
     target: "new" // new|frame
 });

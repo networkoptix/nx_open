@@ -820,7 +820,7 @@ bool QnGLRenderer::isLowQualityImage() const
     return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_LowQuality;
 }
 
-QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
+QnAbstractCompressedMetadataPtr QnGLRenderer::lastFrameMetadata() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_lastDisplayedMetadata;

@@ -1,4 +1,5 @@
 import QtQuick 2.6
+import QtQuick.Layouts 1.1
 import Nx 1.0
 
 import "private/SystemInformationBlock"
@@ -11,10 +12,13 @@ Item
     property string localId
     property string systemName
     property string ownerDescription
+    property bool factorySystem: false
     property bool cloud: false
     property bool online: true
+    property bool reachable: true
     property string address
     property string user
+    property string factoryDetailsText
 
     implicitHeight: column.height
 
@@ -34,23 +38,56 @@ Item
         bottomPadding: 12
         readonly property real availableWidth: width - leftPadding - rightPadding
 
-        Text
+        Row
         {
-            text: systemName ? systemName : "<%1>".arg(qsTr("Unknown"))
-            width: parent.width - 40
             height: 28
-            font.pixelSize: 18
-            font.weight: Font.DemiBold
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-            color: enabled ? ColorTheme.windowText : ColorTheme.base13
+            width: column.width
+
+            Text
+            {
+                id: captionText
+
+                text:
+                {
+                    if (factorySystem)
+                        return qsTr("New Server")
+
+                    return systemName ? systemName : "<%1>".arg(qsTr("Unknown"))
+                }
+
+                width: Math.min(column.availableWidth, implicitWidth)
+                font.pixelSize: 18
+                font.weight: Font.DemiBold
+                elide: Text.ElideRight
+                color: enabled ? ColorTheme.windowText : ColorTheme.base13
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text
+            {
+                visible: factorySystem
+                text: " – " + address
+                width: column.availableWidth - captionText.width
+                font.pixelSize: 16
+                elide: Text.ElideRight
+                color: ColorTheme.windowText
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: 1
+            }
         }
 
         Loader
         {
-            width: parent.availableWidth
-            sourceComponent: cloud ? cloudSystemInformationComponent
-                                   : localSystemInformationComponent
+            width: column.availableWidth
+            sourceComponent:
+            {
+                if (factorySystem)
+                    return factorySystemInformationComponent
+                else if (cloud)
+                    return cloudSystemInformationComponent
+                else
+                    return localSystemInformationComponent
+            }
         }
     }
 
@@ -72,6 +109,21 @@ Item
         CloudSystemInformation
         {
             description: systemInformationBlock.ownerDescription
+        }
+    }
+
+    Component
+    {
+        id: factorySystemInformationComponent
+
+        Text
+        {
+            topPadding: 8
+            text: systemInformationBlock.factoryDetailsText
+            wrapMode: Text.WordWrap
+            width: parent.width
+            font.pixelSize: 14
+            color: ColorTheme.contrast10
         }
     }
 }

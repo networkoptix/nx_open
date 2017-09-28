@@ -138,7 +138,7 @@ protected:
         auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
 
         fetcher.setModulesXmlUrl(QUrl(lm("http://%1:%2%3")
-            .arg(m_expectedHost).arg(endpoint().port).arg(kCloudModuleXmlPath)));
+            .arg(m_expectedHost).arg(endpoint().port).arg(kDeprecatedCloudModuleXmlPath)));
         for (const auto& header: m_additionalHttpHeaders)
             fetcher.addAdditionalHttpHeaderForGetRequest(header.first, header.second);
         nx::utils::promise<void> done;

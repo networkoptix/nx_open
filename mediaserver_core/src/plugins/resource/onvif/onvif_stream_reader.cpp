@@ -340,9 +340,9 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
     return true;
 }
 
-void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const
+void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& streamParams) const
 {
-
+    QnLiveStreamParams params = streamParams;
     auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     bool useEncodingInterval = resData.value<bool>
         (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
@@ -381,14 +381,14 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
         else
         {
             int fpsBase = resData.value<int>(Qn::FPS_BASE_PARAM_NAME);
-            int closestAvailableFps = m_onvifRes->getClosestAvailableFps(params.fps);
+            params.fps = m_onvifRes->getClosestAvailableFps(params.fps);
             encoder.RateControl->FrameRateLimit = fpsBase;
             encoder.RateControl->EncodingInterval = static_cast<int>(
-                fpsBase / closestAvailableFps + 0.5);
+                fpsBase / params.fps + 0.5);
         }
 
         encoder.RateControl->BitrateLimit = m_onvifRes
-            ->suggestBitrateKbps(quality, resolution, encoder.RateControl->FrameRateLimit, getRole());
+            ->suggestBitrateKbps(resolution, params, getRole());
     }
 
 

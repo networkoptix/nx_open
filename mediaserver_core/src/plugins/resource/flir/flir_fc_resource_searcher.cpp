@@ -309,7 +309,7 @@ void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
     if (m_terminated)
         return;
 
-    if (httpClient->state() != nx_http::AsyncHttpClient::State::sDone)
+    if (httpClient->state() != nx_http::AsyncClient::State::sDone)
     {
         cleanUpEndpointInfoUnsafe(senderAddress);
         return;

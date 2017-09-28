@@ -238,12 +238,9 @@ int runApplication(QtSingleGuiApplication* application)
 void initLog(const QString& logLevel)
 {
     nx::utils::log::Settings logSettings;
-    logSettings.level = nx::utils::log::levelFromString(logLevel);
+    logSettings.level.parse(logLevel);
     if (*ini().logLevel)
-    {
-        logSettings.level = nx::utils::log::levelFromString(
-            QString::fromUtf8(ini().logLevel));
-    }
+        logSettings.level.parse(QString::fromUtf8(ini().logLevel));
 
     logSettings.maxFileSize = 10 * 1024 * 1024;
     logSettings.maxBackupCount = 5;

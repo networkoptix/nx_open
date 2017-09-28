@@ -14,7 +14,7 @@ mark_as_advanced(Qt5MultimediaQuick_p_LIBRARY_OPTIMIZED Qt5MultimediaQuick_p_LIB
 nx_add_target(nx_client_core LIBRARY
     PUBLIC_LIBS
         Qt5::Quick
-        appserver2 nx_vms_utils cloud_db_client nx_media)
+        appserver2 nx_vms_utils cloud_db_client nx_media nx_network nx_utils)
 
 target_link_libraries(nx_client_core PUBLIC
     debug ${Qt5MultimediaQuick_p_LIBRARY_DEBUG}

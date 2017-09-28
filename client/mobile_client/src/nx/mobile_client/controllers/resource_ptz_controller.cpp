@@ -138,6 +138,11 @@ int ResourcePtzController::activePresetIndex() const
     return -1;
 }
 
+int ResourcePtzController::capabilities() const
+{
+    return (int) getCapabilities();
+}
+
 bool ResourcePtzController::setPresetByIndex(int index)
 {
     if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability)

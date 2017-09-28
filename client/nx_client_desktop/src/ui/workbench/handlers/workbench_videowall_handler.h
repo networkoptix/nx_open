@@ -119,6 +119,7 @@ private slots:
     void at_saveVideowallMatrixAction_triggered();
     void at_loadVideowallMatrixAction_triggered();
     void at_deleteVideowallMatrixAction_triggered();
+    void at_radassAction_triggered();
 
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
@@ -165,9 +166,6 @@ private slots:
     void at_controlModeCacheTimer_timeout();
 
     void submitDelayedItemOpen();
-
-    /** Handle RADASS resolution change if in control mode. */
-    void controlResolutionMode(Qn::ResolutionMode resolutionMode);
 
     void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout = false);

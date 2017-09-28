@@ -22,6 +22,10 @@ unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
 
+linux {
+    QMAKE_LFLAGS -= -Wl,--no-undefined
+}
+
 OTHER_FILES += ${root.dir}/client/nx_client_desktop/src/ui/help/help_topics.i
 
 SOURCES += ${project.build.directory}/client_app_info_impl.cpp

@@ -97,12 +97,17 @@ void QnCameraAdvancedParamsWidget::initSplitter() {
 }
 
 void QnCameraAdvancedParamsWidget::initialize() {
+
     initSplitter();
 
     updateCameraAvailability();
 
     /* Clean state. */
     setState(State::Init);
+
+    if (m_camera)
+        m_advancedParamsReader->clearResourceParams(m_camera);
+
     m_paramRequestHandle = 0;
     m_currentValues.clear();
     m_loadedValues.clear();

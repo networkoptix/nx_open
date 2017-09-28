@@ -17,10 +17,11 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
     QByteArray rendererString = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
     QByteArray vendorString = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
 
-    NX_INFO("OpenGL", lit("Extensions: %1.").arg(QLatin1String(extensionsString.constData())));
-    NX_INFO("OpenGL", lit("Version: %1.").arg(QLatin1String(versionString.constData())));
-    NX_INFO("OpenGL", lit("Renderer: %1.").arg(QLatin1String(rendererString.constData())));
-    NX_INFO("OpenGL", lit("Vendor: %1.").arg(QLatin1String(vendorString.constData())));
+    static const nx::utils::log::Tag kLogTag(typeid(QnGlHardwareChecker));
+    NX_INFO(kLogTag, lit("Extensions: %1.").arg(QLatin1String(extensionsString.constData())));
+    NX_INFO(kLogTag, lit("Version: %1.").arg(QLatin1String(versionString.constData())));
+    NX_INFO(kLogTag, lit("Renderer: %1.").arg(QLatin1String(rendererString.constData())));
+    NX_INFO(kLogTag, lit("Vendor: %1.").arg(QLatin1String(vendorString.constData())));
 
     bool contextIsValid = true;
 

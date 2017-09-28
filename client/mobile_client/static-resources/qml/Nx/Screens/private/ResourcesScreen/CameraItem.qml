@@ -118,11 +118,9 @@ Control
 
                 width: parent.width - x - parent.spacing
                 height: 24
-                maximumLineCount: 1
                 font.pixelSize: 16
                 font.weight: d.offline ? Font.DemiBold : Font.Normal
                 elide: Text.ElideRight
-                wrapMode: Text.Wrap
                 color: d.offline ? ColorTheme.base11 : ColorTheme.windowText
             }
         }

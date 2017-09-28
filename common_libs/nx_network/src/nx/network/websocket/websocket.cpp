@@ -186,7 +186,7 @@ void WebSocket::readWithoutAddingToQueueSync()
     }
 }
 
-void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
+void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler)
 {
     post(
         [this, buffer, handler = std::move(handler)]() mutable
@@ -207,7 +207,7 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, HandlerType handler)
         });
 }
 
-void WebSocket::sendAsync(const nx::Buffer& buffer, HandlerType handler)
+void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
 {
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
@@ -290,7 +290,7 @@ void WebSocket::handleSocketWrite(SystemError::ErrorCode ecode, size_t /*bytesSe
             });
 }
 
-void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, HandlerType handler)
+void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoCompletionHandler handler)
 {
     WriteData writeData(std::move(*buffer), writeSize);
     bool queueEmpty = m_writeQueue.empty();

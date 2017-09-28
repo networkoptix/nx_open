@@ -34,11 +34,7 @@ describe('Login dialog', function () {
 
     it("redirects to Systems after login", function () {
         p.helper.login();
-
-        // Check that user is on page Systems
-        expect(browser.getCurrentUrl()).toContain('systems');
-        expect(p.htmlBody.getText()).toContain('Systems');
-
+        // No need to check for login success since it's done at login() func
         p.helper.logout();
     });
 
@@ -48,14 +44,13 @@ describe('Login dialog', function () {
         p.emailInput.sendKeys(email);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.login();
+        p.helper.forms.logout.dropdownToggle.click();
 
-        expect(p.userAccountDropdownToggle.getText()).toContain(email);
-
-        p.userAccountDropdownToggle.click();
-        expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
-        expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
-        expect(p.userAccountDropdownMenu.getText()).toContain('Log Out');
-        p.userAccountDropdownToggle.click();
+        expect(p.helper.forms.logout.dropdownParent.getText()).toContain(email);
+        expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Account Settings');
+        expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Change Password');
+        expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Log Out');
+        p.helper.forms.logout.dropdownToggle.click();
 
         p.helper.logout();
     });
@@ -391,11 +386,13 @@ describe('Login dialog', function () {
                 // In real world it works correctly without refresh, but browser.switchTo() does not perform
                 // a real switch between tabs. For browser, tab stays not active,
                 // so login there does not affect other tabs
-                expect(p.helper.forms.logout.dropdownToggle.getText()).toContain('noptixqa'); // user is logged in
+                p.helper.forms.logout.dropdownToggle.click();
+                expect(p.helper.forms.logout.dropdownParent.getText()).toContain('noptixqa'); // user is logged in
+                p.helper.forms.logout.dropdownToggle.click();
                 p.helper.logout();
             });
             browser.switchTo().window(oldWindow).then(function () {
-                expect(p.userAccountDropdownToggle.isPresent()).toBe(true);
+                expect(p.helper.forms.logout.dropdownToggle.isPresent()).toBe(true);
                 browser.refresh();
                 // In real world it works correctly without refresh, but browser.switchTo() does not perform
                 // a real switch between tabs. For browser, tab stays not active,

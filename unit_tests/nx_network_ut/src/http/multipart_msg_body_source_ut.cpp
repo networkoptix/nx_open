@@ -110,7 +110,9 @@ TEST_F(HttpMultipartMessageBodySourceTest, general)
 
         ASSERT_EQ(testData, m_msgBody);
         if (closeMultipartBody)
+        {
             ASSERT_TRUE(m_eofReported);
+        }
     }
 }
 

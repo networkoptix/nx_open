@@ -74,6 +74,51 @@ static qint64 usecToMsec(qint64 posUsec)
     return posUsec == DATETIME_NOW ? kLivePosition : posUsec / 1000ll;
 }
 
+using QualityInfo = nx::media::media_player_quality_chooser::Result;
+using QualityInfoList = QList<QualityInfo>;
+QList<int> sortOutEqualQualities(QualityInfoList qualities)
+{
+    QList<int> result;
+    if (qualities.isEmpty())
+        return result;
+
+    // Removes standard qualities from list which will be sorted.
+    const auto newEnd = std::remove_if(qualities.begin(), qualities.end(),
+        [](const QualityInfo& value)
+        {
+            return value.quality < Player::CustomVideoQuality;
+        });
+
+    // Adds standard qualities to result.
+    for (auto it = newEnd; it != qualities.end(); ++it)
+        result.append(it->quality);
+
+    qualities.erase(newEnd, qualities.end());
+
+    std::sort(qualities.begin(), qualities.end(),
+        [](const QualityInfo& left, const QualityInfo& right) -> bool
+        {
+            return left.quality > right.quality;
+        });
+
+    for (int i = 0; i < qualities.size() - 1;)
+    {
+        // Removes neighbor equal values.
+        if (qualities[i].frameSize == qualities[i + 1].frameSize)
+        {
+            qualities.removeAt(i);
+            continue; //< Check next equal values.
+        }
+
+        ++i;
+    }
+
+    for (const auto qualityInfo: qualities)
+        result.append(qualityInfo.quality);
+
+    return result;
+}
+
 } // namespace
 
 class PlayerPrivate: public QObject
@@ -465,7 +510,6 @@ void PlayerPrivate::presentNextFrame()
     if (!videoFrameToRender)
         return;
 
-    setMediaStatus(Player::MediaStatus::Loaded);
     gotDataTimer.restart();
 
     updateCurrentResolution(videoFrameToRender->size());
@@ -501,6 +545,8 @@ void PlayerPrivate::presentNextFrame()
 
     if (videoSurface && videoSurface->isActive() && !skipFrame)
     {
+        setMediaStatus(Player::MediaStatus::Loaded);
+
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
         {
@@ -825,6 +871,7 @@ void Player::setPosition(qint64 value)
     }
 
     d->setLiveMode(value == kLivePosition);
+    d->setMediaStatus(MediaStatus::Loading);
     d->clearCurrentFrame();
     d->at_hurryUp(); //< renew receiving frames
 
@@ -843,6 +890,17 @@ void Player::setMaxTextureSize(int value)
     d->maxTextureSize = value;
 }
 
+bool Player::checkReadyToPlay()
+{
+    Q_D(Player);
+
+    if (d->archiveReader || d->initDataProvider())
+        return true;
+
+    d->log(lit("play() END: no data"));
+    return false;
+}
+
 void Player::play()
 {
     Q_D(Player);
@@ -854,11 +912,8 @@ void Player::play()
         return;
     }
 
-    if (!d->archiveReader && !d->initDataProvider())
-    {
-        d->log(lit("play() END: no data"));
+    if (!checkReadyToPlay())
         return;
-    }
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
@@ -876,13 +931,18 @@ void Player::pause()
     d->log(lit("pause()"));
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
-    d->dataConsumer->setAudioEnabled(false);
+    if (d->dataConsumer)
+        d->dataConsumer->setAudioEnabled(false);
 }
 
 void Player::preview()
 {
     Q_D(Player);
     d->log(lit("preview()"));
+
+    if (!checkReadyToPlay())
+        return;
+
     d->setState(State::Previewing);
     d->dataConsumer->setAudioEnabled(false);
 }
@@ -1102,7 +1162,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     const auto& maximumResolution = highQuality.frameSize;
 
     bool customResolutionAvailable = false;
-    QList<int> customQualities;
+    QualityInfoList customQualities;
 
     for (auto videoQuality: videoQualities)
     {
@@ -1121,14 +1181,15 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
 
             default:
             {
-                const auto& resultQuality = getQuality(videoQuality);
+                auto resultQuality = getQuality(videoQuality);
                 if (resultQuality.quality != UnknownVideoQuality
                     && resultQuality.frameSize.height() <= maximumResolution.height())
                 {
-                    customQualities.append(videoQuality);
-
                     if (resultQuality.quality == CustomVideoQuality)
                         customResolutionAvailable = true;
+
+                    resultQuality.quality = static_cast<Player::VideoQuality>(videoQuality);
+                    customQualities.append(resultQuality);
                 }
             }
         }
@@ -1137,7 +1198,10 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     d->log(lit("availableVideoQualities() END"));
 
     if (customResolutionAvailable)
-        return result + customQualities;
+    {
+        const auto uniqueCustomQualities = sortOutEqualQualities(customQualities);
+        return result + uniqueCustomQualities;
+    }
 
     return result;
 }
@@ -1166,6 +1230,18 @@ QSize Player::currentResolution() const
 {
     Q_D(const Player);
     return d->currentResolution;
+}
+
+Player::TranscodingSupportStatus Player::transcodingStatus() const
+{
+    Q_D(const Player);
+
+    const auto& camera = d->resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return TranscodingDisabled;
+
+    return media_player_quality_chooser::transcodingSupportStatus(
+        camera, d->positionMs, d->liveMode);
 }
 
 QRect Player::videoGeometry() const

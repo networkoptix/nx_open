@@ -2,6 +2,7 @@
 
 #include <QtCore/QUrl>
 
+#include "url_parse_helper.h"
 #include "../socket_common.h"
 
 namespace nx {
@@ -67,6 +68,11 @@ public:
     Builder& setPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
     {
         m_url.setPath(path, mode);
+        return *this;
+    }
+    Builder& appendPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    {
+        m_url.setPath(normalizePath(m_url.path() + path), mode);
         return *this;
     }
     Builder& setQuery(const QString& query, QUrl::ParsingMode mode = QUrl::DecodedMode)

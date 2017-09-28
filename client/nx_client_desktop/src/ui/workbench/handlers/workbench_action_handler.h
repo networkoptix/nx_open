@@ -98,15 +98,11 @@ protected:
     QnResourceList addToResourcePool(const QString &file) const;
     QnResourceList addToResourcePool(const QList<QString> &files) const;
 
-    void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
-
     void openResourcesInNewWindow(const QnResourceList &resources);
 
     void openNewWindow(const QStringList &args);
 
     void rotateItems(int degrees);
-
-    void setResolutionMode(Qn::ResolutionMode resolutionMode);
 
     void setCurrentLayoutCellSpacing(Qn::CellSpacing spacing);
 
@@ -127,7 +123,6 @@ protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
-    void at_workbench_currentLayoutChanged();
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();

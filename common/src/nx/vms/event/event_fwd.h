@@ -30,9 +30,8 @@ class PanicAction;
 typedef QSharedPointer<PanicAction> PanicActionPtr;
 typedef QList<PanicAction> PanicActionList;
 
-class ActionData;
+struct ActionData;
 typedef std::vector<ActionData> ActionDataList;
-typedef QSharedPointer<ActionDataList> ActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;
 
@@ -125,6 +124,9 @@ enum EventType
 
     /** Software triggers. */
     softwareTriggerEvent = 12,
+
+    /** Analytics SDK. */
+    analyticsSdkEvent = 13,
 
     /** System health message. */
     systemHealthEvent = 500,

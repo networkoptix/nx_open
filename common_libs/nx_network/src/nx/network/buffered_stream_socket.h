@@ -38,7 +38,9 @@ public:
 
     void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
+
+    virtual QString idForToStringFromPtr() const override;
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;

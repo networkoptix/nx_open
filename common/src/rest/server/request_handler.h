@@ -21,6 +21,34 @@ enum class RestPermissions
     adminOnly,
 };
 
+struct RestRequest
+{
+    QString path;
+    QnRequestParamList params; //< Should be QnRequestParams
+    const QnRestConnectionProcessor* owner = nullptr; //< Better to pass data instead of owner
+
+    RestRequest(QString path = {}, QnRequestParamList params = {},
+        const QnRestConnectionProcessor* owner = nullptr);
+};
+
+struct RestContent
+{
+    QByteArray type;
+    QByteArray body;
+
+    RestContent(QByteArray type = {}, QByteArray body = {});
+};
+
+struct RestResponse
+{
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    RestContent content;
+    bool isUndefinedContentLength = false;
+
+    RestResponse(nx_http::StatusCode::Value statusCode= nx_http::StatusCode::undefined,
+        RestContent content = {}, bool isUndefinedContentLength = false);
+};
+
 /**
  * QnRestRequestHandler must be thread-safe.
  *
@@ -33,11 +61,28 @@ class QnRestRequestHandler: public QObject
 public:
     QnRestRequestHandler();
 
-    // TODO: #rvasilenko #EC2 replace QnRequestParamList -> QnRequestParams
-    // TODO: #rvasilenko replace parameters set with a single struct, 8 arguments is far too many.
-    // TODO: #rvasilenko looks like QnRestConnectionProcessor* is used only to get and modify its
-    // headers.
+    // TODO: By default these methods use protected virtual functions, which should be removed.
+    // Only new functions are supposed to be used in future
+    virtual RestResponse executeGet(const RestRequest& request);
+    virtual RestResponse executeDelete(const RestRequest& request);
+    virtual RestResponse executePost(const RestRequest& request, const RestContent& content);
+    virtual RestResponse executePut(const RestRequest& request, const RestContent& content);
+    virtual void afterExecute(const RestRequest& request, const QByteArray& response);
 
+    friend class QnRestProcessorPool;
+
+    Qn::GlobalPermission permissions() const { return m_permissions; }
+
+    /** In derived classes, report all url params carrying camera id. */
+    virtual QStringList cameraIdUrlParams() const { return {}; }
+
+    virtual void afterExecute(
+        const QString& path,
+        const QnRequestParamList& params,
+        const QByteArray& body,
+        const QnRestConnectionProcessor* owner);
+
+protected:
     /**
      * @return Http status code.
      */
@@ -81,21 +126,6 @@ public:
             QByteArray& result,
             QByteArray& resultContentType,
             const QnRestConnectionProcessor* owner);
-
-    virtual void afterExecute(
-        const QString& /*path*/,
-        const QnRequestParamList& /*params*/,
-        const QByteArray& /*body*/,
-        const QnRestConnectionProcessor* /*owner*/)
-    {
-    }
-
-    friend class QnRestProcessorPool;
-
-    Qn::GlobalPermission permissions() const { return m_permissions; }
-
-    /** In derived classes, report all url params carrying camera id. */
-    virtual QStringList cameraIdUrlParams() const { return {}; }
 
 protected:
     void setPath(const QString& path) { m_path = path; }

@@ -1,11 +1,11 @@
 #include "log.h"
 
-const QString QnLog::MAIN_LOG_ID = QLatin1String();
-const QString QnLog::CUSTOM_LOG_BASE_ID = QLatin1String("CUSTOM");
-const QString QnLog::HTTP_LOG_INDEX = QLatin1String("HTTP");
-const QString QnLog::EC2_TRAN_LOG = QLatin1String("EC2_TRAN");
-const QString QnLog::HWID_LOG = QLatin1String("HWID");
-const QString QnLog::PERMISSIONS_LOG = QLatin1String("PERMISSIONS");
+const nx::utils::log::Tag QnLog::MAIN_LOG_ID(lit(""));
+const nx::utils::log::Tag QnLog::CUSTOM_LOG_BASE_ID(lit("CUSTOM"));
+const nx::utils::log::Tag QnLog::HTTP_LOG_INDEX(lit("HTTP"));
+const nx::utils::log::Tag QnLog::EC2_TRAN_LOG(lit("EC2_TRAN"));
+const nx::utils::log::Tag QnLog::HWID_LOG(lit("HWID"));
+const nx::utils::log::Tag QnLog::PERMISSIONS_LOG(lit("PERMISSIONS"));
 
 void QnLog::initLog(QnLog* /*log*/)
 {
@@ -23,7 +23,7 @@ std::shared_ptr<nx::utils::log::Logger> QnLogs::logger(int id)
     if (id == 0)
         return nx::utils::log::mainLogger();
 
-    static std::vector<QString> kAllLogs =
+    static std::vector<nx::utils::log::Tag> kAllLogs =
     {
         QnLog::MAIN_LOG_ID,
         QnLog::CUSTOM_LOG_BASE_ID,

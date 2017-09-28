@@ -37,7 +37,7 @@ public:
     void setCreateStreamSocketFunc(
         SocketFactory::CreateStreamSocketFuncType newFactoryFunc)
     {
-        auto oldFunc = 
+        auto oldFunc =
             SocketFactory::setCreateStreamSocketFunc(std::move(newFactoryFunc));
         if (!m_createStreamSocketFunc)
             m_createStreamSocketFunc = oldFunc;
@@ -62,7 +62,7 @@ public:
             });
 
         setCreateStreamServerSocketFunc(
-            [](bool /*sslRequired*/, NatTraversalSupport)
+            [](bool /*sslRequired*/, NatTraversalSupport, boost::optional<int> /*ipVersion*/)
                 -> std::unique_ptr<AbstractStreamServerSocket>
             {
                 return std::make_unique<UdtStreamServerSocket>(AF_INET);
@@ -142,9 +142,9 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     [](){ return std::make_unique<UdtStreamServerSocket>(AF_INET); },
     [](){ return std::make_unique<UdtStreamSocket>(AF_INET); })
 
-static std::unique_ptr<UdtStreamSocket> rendezvousUdtSocket(
+static std::unique_ptr<UdtStreamSocket> createRendezvousUdtSocket(
     std::chrono::milliseconds connectTimeout)
-{   
+{
     auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
     EXPECT_TRUE(socket->setRendezvous(true));
     EXPECT_TRUE(socket->setSendTimeout(connectTimeout.count()));
@@ -161,8 +161,8 @@ TEST_F(SocketUdt, rendezvousConnect)
     const std::chrono::seconds kTestDuration(3);
 
     //creating two sockets, performing randezvous connect
-    const auto connectorSocket = rendezvousUdtSocket(kConnectTimeout);
-    const auto acceptorSocket = rendezvousUdtSocket(kConnectTimeout);
+    const auto connectorSocket = createRendezvousUdtSocket(kConnectTimeout);
+    const auto acceptorSocket = createRendezvousUdtSocket(kConnectTimeout);
 
     auto socketStoppedGuard = makeScopeGuard(
         [&connectorSocket, &acceptorSocket]
@@ -227,87 +227,154 @@ TEST_F(SocketUdt, rendezvousConnect)
     ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0U);
 }
 
-TEST_F(SocketUdt, rendezvousConnectWithDelay)
+class SocketUdtRendezvous:
+    public SocketUdt
 {
-    const std::chrono::seconds kConnectTimeout(3);
-    const std::chrono::seconds kConnectDelay(1);
-    const size_t kBytesToEcho(128 * 1024);
-    const int kMaxSimultaneousConnections(25);
-    const std::chrono::seconds kTestDuration(3);
+public:
+    ~SocketUdtRendezvous()
+    {
+        if (m_serverSocket)
+            m_serverSocket->pleaseStopSync();
+        if (m_clientSocket)
+            m_clientSocket->pleaseStopSync();
+        if (m_generator)
+            m_generator->pleaseStopSync();
+        if (m_server)
+            m_server->pleaseStopSync();
+    }
 
-    //creating two sockets, performing randezvous connect
-    const auto serverSocket = rendezvousUdtSocket(kConnectTimeout);
-    const auto clientSocket = rendezvousUdtSocket(kConnectTimeout);
+protected:
+    static const std::chrono::seconds kConnectTimeout;
+    static const std::chrono::seconds kConnectDelay;
+    static const size_t kBytesToEcho;
+    static const int kMaxSimultaneousConnections;
+    static const std::chrono::seconds kTestDuration;
 
-    setUdtSocketFunctions();
+    virtual void SetUp() override
+    {
+        m_serverSocket = createRendezvousUdtSocket(kConnectTimeout);
+        m_clientSocket = createRendezvousUdtSocket(kConnectTimeout);
 
-    std::unique_ptr<RandomDataTcpServer> server;
-    serverSocket->connectAsync(
-        clientSocket->getLocalAddress(),
-        [&server, &serverSocket](
-            SystemError::ErrorCode code)
-        {
-            ASSERT_EQ(code, SystemError::noError)
-                << SystemError::toString(code).toStdString();
+        setUdtSocketFunctions();
+    }
 
-            auto buffer = std::make_shared<Buffer>();
-            buffer->reserve(100);
-            serverSocket->readSomeAsync(
-                buffer.get(),
-                [buffer](SystemError::ErrorCode code, size_t size)
-                {
-                    // no data is supposed to send using this socket
-                    EXPECT_TRUE(code != SystemError::noError || size == 0);
-                });
-        });
+    void startConnectingServerSocket()
+    {
+        m_serverSocket->connectAsync(
+            m_clientSocket->getLocalAddress(),
+            [this](
+                SystemError::ErrorCode code)
+            {
+                m_clientSocketConnected.set_value(code);
+            });
+    }
 
-    std::this_thread::sleep_for(kConnectDelay);
+    void assertServerSocketHasConnected()
+    {
+        const auto connectResultCode = m_clientSocketConnected.get_future().get();
+        ASSERT_EQ(SystemError::noError, connectResultCode)
+            << SystemError::toString(connectResultCode).toStdString();
+
+        auto serverSocketReadBuffer = std::make_shared<Buffer>();
+        serverSocketReadBuffer->reserve(100);
+        m_serverSocket->readSomeAsync(
+            serverSocketReadBuffer.get(),
+            [serverSocketReadBuffer](SystemError::ErrorCode code, size_t size)
+            {
+                // No data is supposed to be sent using through this connection.
+                EXPECT_TRUE(code != SystemError::noError || size == 0);
+            });
+    }
+
+    void startConnectingClientSocket()
+    {
+        m_clientSocket->connectAsync(
+            m_serverSocket->getLocalAddress(),
+            [this](SystemError::ErrorCode code)
+            {
+                m_serverSocketConnected.set_value(code);
+            });
+    }
     
-    std::unique_ptr<ConnectionsGenerator> generator;
-    clientSocket->connectAsync(
-        serverSocket->getLocalAddress(),
-        [&](SystemError::ErrorCode code)
+    void assertClientSocketHasConnected()
+    {
+        const auto connectResultCode = m_serverSocketConnected.get_future().get();
+        ASSERT_EQ(SystemError::noError, connectResultCode)
+            << SystemError::toString(connectResultCode).toStdString();
+
+        auto buffer = std::make_shared<Buffer>();
+        buffer->reserve(100);
+        m_clientSocket->readSomeAsync(
+            buffer.get(),
+            [buffer](SystemError::ErrorCode code, size_t size)
+            {
+                // no data is supposed to send using this socket
+                ASSERT_TRUE(code != SystemError::noError || size == 0);
+            });
+    }
+
+    void startConnectionGenerator()
+    {
+        m_server.reset(new RandomDataTcpServer(
+            TestTrafficLimitType::none, 0, TestTransmissionMode::pong));
+        m_server->setLocalAddress(m_serverSocket->getLocalAddress());
+        ASSERT_TRUE(m_server->start());
+
+        SocketAddress serverAddress(
+            HostAddress::localhost, m_server->addressBeingListened().port);
+        m_generator.reset(new ConnectionsGenerator(
+            serverAddress, kMaxSimultaneousConnections,
+            TestTrafficLimitType::incoming, kBytesToEcho,
+            ConnectionsGenerator::kInfiniteConnectionCount,
+            TestTransmissionMode::ping));
+
+        m_generator->setLocalAddress(m_clientSocket->getLocalAddress());
+        m_generator->start();
+    }
+
+    void waitUntilSomeActivityHasBeenPerformedByGenerator()
+    {
+        const int kTotalConnectionsEstablished = 7;
+
+        for (;;)
         {
-            ASSERT_EQ(code, SystemError::noError)
-                << SystemError::toString(code).toStdString();
+            if (m_generator->totalConnectionsEstablished() > kTotalConnectionsEstablished &&
+                m_generator->totalBytesSent() > 0U &&
+                m_generator->totalBytesReceived() > 0U)
+            {
+                break;
+            }
+            
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
 
-            server.reset(new RandomDataTcpServer(
-                TestTrafficLimitType::none, 0, TestTransmissionMode::pong));
-            server->setLocalAddress(serverSocket->getLocalAddress());
-            ASSERT_TRUE(server->start());
+private:
+    std::unique_ptr<UdtStreamSocket> m_serverSocket;
+    std::unique_ptr<UdtStreamSocket> m_clientSocket;
+    std::unique_ptr<RandomDataTcpServer> m_server;
+    std::unique_ptr<ConnectionsGenerator> m_generator;
+    nx::utils::promise<SystemError::ErrorCode> m_serverSocketConnected;
+    nx::utils::promise<SystemError::ErrorCode> m_clientSocketConnected;
+};
 
-            SocketAddress serverAddress(
-                HostAddress::localhost, server->addressBeingListened().port);
-            generator.reset(new ConnectionsGenerator(
-                serverAddress, kMaxSimultaneousConnections,
-                TestTrafficLimitType::incoming, kBytesToEcho,
-                ConnectionsGenerator::kInfiniteConnectionCount,
-                TestTransmissionMode::ping));
+const std::chrono::seconds SocketUdtRendezvous::kConnectTimeout = std::chrono::seconds::zero();
+const std::chrono::seconds SocketUdtRendezvous::kConnectDelay(1);
+const size_t SocketUdtRendezvous::kBytesToEcho(128 * 1024);
+const int SocketUdtRendezvous::kMaxSimultaneousConnections(25);
+const std::chrono::seconds SocketUdtRendezvous::kTestDuration(3);
 
-            generator->setLocalAddress(clientSocket->getLocalAddress());
-            generator->start();
+TEST_F(SocketUdtRendezvous, connectWithDelay)
+{
+    startConnectingServerSocket();
+    std::this_thread::sleep_for(kConnectDelay);
+    startConnectingClientSocket();
 
-            auto buffer = std::make_shared<Buffer>();
-            buffer->reserve(100);
-            clientSocket->readSomeAsync(
-                buffer.get(),
-                [buffer](SystemError::ErrorCode code, size_t size)
-                {
-                    // no data is supposed to send using this socket
-                    ASSERT_TRUE(code != SystemError::noError || size == 0);
-                });
-        });
+    assertClientSocketHasConnected();
+    assertServerSocketHasConnected();
 
-    std::this_thread::sleep_for(kTestDuration);
-
-    serverSocket->pleaseStopSync();
-    clientSocket->pleaseStopSync();
-    generator->pleaseStopSync();
-    server->pleaseStopSync();
-
-    ASSERT_GT(generator->totalConnectionsEstablished(), 0U);
-    ASSERT_GT(generator->totalBytesSent(), 0U);
-    ASSERT_GT(generator->totalBytesReceived(), 0U);
+    startConnectionGenerator();
+    waitUntilSomeActivityHasBeenPerformedByGenerator();
 }
 
 TEST_F(SocketUdt, acceptingFirstConnection)

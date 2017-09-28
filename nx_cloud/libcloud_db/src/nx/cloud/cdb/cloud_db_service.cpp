@@ -13,16 +13,12 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/db/db_structure_updater.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/platform/current_process.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
-
-#include <api/global_settings.h>
-#include <common/common_module.h>
-#include <nx/utils/platform/current_process.h>
-#include <utils/common/app_info.h>
-#include <nx/utils/db/db_structure_updater.h>
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
@@ -88,7 +84,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 
     //TODO #ak move following to stree xml
     nx_http::AuthMethodRestrictionList authRestrictionList;
-    authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, nx_http::AuthMethod::noAuth);
+    authRestrictionList.allow(kDeprecatedCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
+    authRestrictionList.allow(kDiscoveryCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
     authRestrictionList.allow(http_handler::Ping::kHandlerPath, nx_http::AuthMethod::noAuth);
     authRestrictionList.allow(kAccountRegisterPath, nx_http::AuthMethod::noAuth);
     authRestrictionList.allow(kAccountActivatePath, nx_http::AuthMethod::noAuth);
@@ -109,8 +106,10 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         controller.systemManager());
     m_authorizationManager = &authorizationManager;
 
-    CloudModuleUrlProvider cloudModuleUrlProvider(
+    CloudModuleUrlProvider cloudModuleUrlProviderDeprecated(
         settings.moduleFinder().cloudModulesXmlTemplatePath);
+    CloudModuleUrlProvider cloudModuleUrlProvider(
+        settings.moduleFinder().newCloudModulesXmlTemplatePath);
 
     //registering HTTP handlers
     registerApiHandlers(
@@ -123,6 +122,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         &controller.eventManager(),
         &controller.ec2SyncronizationEngine().connectionManager(),
         &controller.maintenanceManager(),
+        cloudModuleUrlProviderDeprecated,
         cloudModuleUrlProvider);
     //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
     controller.eventManager().registerHttpHandlers(
@@ -182,6 +182,7 @@ void CloudDbService::registerApiHandlers(
     EventManager* const /*eventManager*/,
     ec2::ConnectionManager* const ec2ConnectionManager,
     MaintenanceManager* const maintenanceManager,
+    const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
 {
     msgDispatcher->registerRequestProcessor<http_handler::Ping>(
@@ -307,6 +308,12 @@ void CloudDbService::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
+        nx_http::Method::get,
+        kEstablishEc2P2pTransactionConnectionPath,
+        &ec2::ConnectionManager::createWebsocketTransactionConnection,
+        ec2ConnectionManager);
+
+    registerHttpHandler(
         //api::kPushEc2TransactionPath,
         nx_http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
         &ec2::ConnectionManager::pushTransaction,
@@ -330,13 +337,24 @@ void CloudDbService::registerApiHandlers(
         EntityType::maintenance, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
+    using namespace std::placeholders;
+
     msgDispatcher->registerRequestProcessor<http_handler::GetCloudModulesXml>(
-        http_handler::GetCloudModulesXml::kHandlerPath,
+        kDeprecatedCloudModuleXmlPath,
+        [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
+            -> std::unique_ptr<http_handler::GetCloudModulesXml>
+        {
+            return std::make_unique<http_handler::GetCloudModulesXml>(
+                std::bind(&CloudModuleUrlProvider::getCloudModulesXml, cloudModuleUrlProviderDeprecated, _1));
+        });
+
+    msgDispatcher->registerRequestProcessor<http_handler::GetCloudModulesXml>(
+        kDiscoveryCloudModuleXmlPath,
         [&authorizationManager, &cloudModuleUrlProvider]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
         {
             return std::make_unique<http_handler::GetCloudModulesXml>(
-                cloudModuleUrlProvider);
+                std::bind(&CloudModuleUrlProvider::getCloudModulesXml, cloudModuleUrlProvider, _1));
         });
 }
 
@@ -418,6 +436,24 @@ void CloudDbService::registerHttpHandler(
         {
             return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
         });
+}
+
+template<typename ManagerType>
+void CloudDbService::registerHttpHandler(
+    nx_http::Method::ValueType method,
+    const char* handlerPath,
+    typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
+    ManagerType* manager)
+{
+    typedef CustomHttpHandler<ManagerType> RequestHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<RequestHandlerType>(
+        handlerPath,
+        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
+        {
+            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
+        },
+        method);
 }
 
 } // namespace cdb

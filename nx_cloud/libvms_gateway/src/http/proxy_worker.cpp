@@ -84,18 +84,13 @@ void ProxyWorker::stopWhileInAioThread()
 void ProxyWorker::replaceTargetHostWithFullCloudNameIfAppropriate(
     const AbstractStreamSocket* connectionToTheTargetPeer)
 {
-    auto cloudStreamSocket =
-        dynamic_cast<const nx::network::cloud::CloudStreamSocket*>(connectionToTheTargetPeer);
-    if (!cloudStreamSocket)
-        return;
-    
-    auto foreignHostFullCloudName = cloudStreamSocket->getForeignHostFullCloudName();
+    auto foreignHostFullCloudName = connectionToTheTargetPeer->getForeignHostName();
     if (foreignHostFullCloudName.isEmpty())
         return;
     if (!foreignHostFullCloudName.endsWith(m_targetHost))
         return; //< We only make address more precise here, not replacing it.
 
-    m_targetHost = cloudStreamSocket->getForeignHostFullCloudName().toUtf8();
+    m_targetHost = connectionToTheTargetPeer->getForeignHostName().toUtf8();
 }
 
 void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)

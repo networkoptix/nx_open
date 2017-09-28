@@ -12,6 +12,10 @@ struct TegraVideoFlagConfig: public nx::utils::FlagConfig
     NX_FLAG(0, enableTime, "");
     NX_FLAG(0, enableFps, "");
 
+    NX_INT_PARAM(1, decodersCount, "Number of simultaneous hardware video decoders.");
+
+    NX_INT_PARAM(1, tegraVideoCount, "Number of simultaneous TegraVideo instances.");
+
     NX_STRING_PARAM(
         //"../../data/model/GoogleNet-modified.prototxt",
         "/opt/networkoptix/mediaserver/bin/nvidia_models/GoogleNet-modified.prototxt",
@@ -28,6 +32,12 @@ struct TegraVideoFlagConfig: public nx::utils::FlagConfig
         cacheFile, "");
 
     NX_STRING_PARAM("", substituteFramesFilePrefix, "");
+
+    NX_INT_PARAM(-1, cropRectX, "-1 means 0.");
+    NX_INT_PARAM(-1, cropRectY, "-1 means 0.");
+    NX_INT_PARAM(-1, cropRectW, "-1 means taking frame width.");
+    NX_INT_PARAM(-1, cropRectH, "-1 means taking frame height.");
+    NX_INT_PARAM(-1, maxInferenceFps, "-1 means unlimited. This value should be divided by 10");
 };
 
 extern TegraVideoFlagConfig conf;

@@ -83,24 +83,24 @@
       "description":"תפקיד משתמש מותאם אישית שצוין במערכת"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"בעלים",
+      "description":"גישה בלתי מוגבלת כולל היכולת לשתף ולחבר / לנתק את המערכת מהענן"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"צופה",
+      "description":"ניתן להציג וידאו חי ולעיין בארכיון"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"צופה בוידאו חי",
+      "description":"יכול לצפות רק בוידאו חי"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"צופה מתקדם",
+      "description":"יכול לצפות בוידאו חי, לצפות בארכיון, להגדיר מצלמות, לשלוט PTZ וכו '"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"התאמה אישית",
+      "description":"השתמש ב {{PRODUCT_NAME}} כדי להגדיר הרשאות מותאמות אישית"
     }
   },
   "errorCodes":{

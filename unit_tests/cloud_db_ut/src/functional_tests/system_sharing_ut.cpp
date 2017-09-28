@@ -778,7 +778,9 @@ TEST_F(SystemSharing, remove_system)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
 
         //checking that sharing has also been removed (before and after restart)
         {
@@ -889,7 +891,9 @@ TEST_F(SystemSharing, get_access_role_list)
     for (int i = 0; i < 2; ++i)
     {
         if (i == 1)
+        {
             ASSERT_TRUE(restart());
+        }
 
         {
             std::set<api::SystemAccessRole> accessRoles;

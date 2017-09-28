@@ -219,12 +219,23 @@ void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst)
     dst.afterThreshold = src.getAfterThreshold();
     dst.streamQuality = src.getStreamQuality();
     dst.fps = src.getFps();
+    dst.bitrateKbps = src.getBitrateKbps();
 }
 
 void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst, const QnUuid& resourceId)
 {
-    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType,
-                         src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
+    dst = QnScheduleTask(
+        resourceId, 
+        src.dayOfWeek, 
+        src.startTime, 
+        src.endTime, 
+        src.recordingType,
+        src.beforeThreshold, 
+        src.afterThreshold, 
+        src.streamQuality, 
+        src.fps, 
+        src.recordAudio, 
+        src.bitrateKbps);
 }
 
 void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst)

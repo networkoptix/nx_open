@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QBitArray>
 
+#include <nx/utils/log/log_level.h>
 #include <nx/utils/uuid.h>
 #include <api/server_rest_connection_fwd.h>
 
@@ -132,7 +133,7 @@ private:
     AbstractPeerManager* m_peerManager = nullptr;
     const QString m_fileName;
 
-    QString m_logTag;
+    nx::utils::log::Tag m_logTag;
     bool m_printSelfPeerInLogs = false;
 
     State m_state = State::initial;

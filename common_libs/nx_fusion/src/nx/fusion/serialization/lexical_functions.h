@@ -105,6 +105,16 @@ QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(short)
 QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned short)
 #undef QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS
 
+inline void serialize(const std::string& value, QString* target)
+{
+    *target = QString::fromStdString(value);
+}
+
+inline bool deserialize(const QString &value, std::string* target)
+{
+    *target = value.toStdString(); //< We don't check for errors...
+    return true;
+}
 
 inline void serialize(const QnLatin1Array &value, QString *target) {
     *target = QString::fromLatin1(value);
@@ -137,6 +147,11 @@ bool deserialize(const QString &value, T *target, typename std::enable_if<QnLexi
 
 bool serialize(const QBitArray& value, QString* target);
 bool deserialize(const QString& value, QBitArray* target);
+
+bool serialize(const QRect& value, QString* target);
+bool deserialize(const QString& value, QRect* target);
+bool serialize(const QRectF& value, QString* target);
+bool deserialize(const QString& value, QRectF* target);
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((bool)(QnUuid)(QUrl)(QColor), (lexical))
 

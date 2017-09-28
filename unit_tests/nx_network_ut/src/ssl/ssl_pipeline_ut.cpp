@@ -16,8 +16,8 @@ class TestPipeline
 {
 public:
     TestPipeline(
-        std::unique_ptr<utils::bstream::TwoWayPipeline> clientPipeline,
-        std::unique_ptr<utils::bstream::TwoWayPipeline> serverPipeline)
+        std::unique_ptr<utils::bstream::AbstractTwoWayConverter> clientPipeline,
+        std::unique_ptr<utils::bstream::AbstractTwoWayConverter> serverPipeline)
         :
         m_clientPipeline(std::move(clientPipeline)),
         m_serverPipeline(std::move(serverPipeline)),
@@ -103,10 +103,10 @@ public:
     }
 
 private:
-    utils::bstream::ReflectingPipeline m_clientToServerPipeline;
-    utils::bstream::ReflectingPipeline m_serverToClientPipeline;
-    std::unique_ptr<utils::bstream::TwoWayPipeline> m_clientPipeline;
-    std::unique_ptr<utils::bstream::TwoWayPipeline> m_serverPipeline;
+    utils::bstream::Pipe m_clientToServerPipeline;
+    utils::bstream::Pipe m_serverToClientPipeline;
+    std::unique_ptr<utils::bstream::AbstractTwoWayConverter> m_clientPipeline;
+    std::unique_ptr<utils::bstream::AbstractTwoWayConverter> m_serverPipeline;
     std::unique_ptr<utils::bstream::AbstractOutputConverter> m_betweenClientAndServer;
     const int m_maxBytesToWrite;
     std::size_t m_clientToServerTotalBytesThrough;
@@ -117,19 +117,19 @@ private:
  * Invokes handler when pipelined wrapped writes any data to the output pipeline.
  */
 class NotifyingTwoWayPipelineWrapper:
-    public utils::bstream::TwoWayPipeline
+    public utils::bstream::AbstractTwoWayConverter
 {
 public:
     using DataWrittenEventHandler = nx::utils::MoveOnlyFunc<void(const void*, size_t)>;
 
     NotifyingTwoWayPipelineWrapper(
-        std::unique_ptr<utils::bstream::TwoWayPipeline> twoWayPipeline)
+        std::unique_ptr<utils::bstream::AbstractTwoWayConverter> twoWayPipeline)
         :
         m_twoWayPipeline(std::move(twoWayPipeline))
     {
         using namespace std::placeholders;
 
-        m_customOutput = makeCustomOutputPipeline(
+        m_customOutput = makeCustomOutput(
             std::bind(&NotifyingTwoWayPipelineWrapper::writeCustom, this, _1, _2));
         m_twoWayPipeline->setOutput(m_customOutput.get());
     }
@@ -157,7 +157,7 @@ public:
 private:
     //DataReadEventHandler m_onDataRead;
     DataWrittenEventHandler m_onDataWritten;
-    std::unique_ptr<utils::bstream::TwoWayPipeline> m_twoWayPipeline;
+    std::unique_ptr<utils::bstream::AbstractTwoWayConverter> m_twoWayPipeline;
     std::unique_ptr<AbstractOutput> m_customOutput;
 
     int writeCustom(const void* data, size_t count)

@@ -858,12 +858,12 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     clientPtr->setUserName( peerIter->second.authData.userName );
     if( peerIter->second.authData.password )
     {
-        clientPtr->setAuthType( nx_http::AsyncHttpClient::authBasicAndDigest );
+        clientPtr->setAuthType( nx_http::AuthType::authBasicAndDigest );
         clientPtr->setUserPassword( peerIter->second.authData.password.get() );
     }
     else if( peerIter->second.authData.ha1 )
     {
-        clientPtr->setAuthType( nx_http::AsyncHttpClient::authDigestWithPasswordHash );
+        clientPtr->setAuthType( nx_http::AuthType::authDigestWithPasswordHash );
         clientPtr->setUserPassword( peerIter->second.authData.ha1.get() );
     }
 
@@ -1361,6 +1361,7 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(
         });
 #else
     // TODO: this is an old version from 3.0 We can switch to the new as soon as saveMiscParam will work asynchronously
+    QN_UNUSED(lock);
     ++m_asyncOperationsInProgress;
     Ec2ThreadPool::instance()->start(make_custom_runnable(
         [this]

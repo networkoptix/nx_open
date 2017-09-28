@@ -9,16 +9,22 @@ namespace api {
 
 namespace {
 
-static constexpr const char* preemptiveConnectionCountHeaderName = 
+static constexpr const char* preemptiveConnectionCountHeaderName =
     "Nx-Relay-Preemptive-Connection-Count";
 
-} // namespace 
+} // namespace
 
 bool serializeToHeaders(nx_http::HttpHeaders* where, const BeginListeningResponse& what)
 {
     where->emplace(
         preemptiveConnectionCountHeaderName,
         nx_http::StringType::number(what.preemptiveConnectionCount));
+    return true;
+}
+
+bool serializeToHeaders(nx_http::HttpHeaders* where, const CreateClientSessionResponse& what)
+{
+    where->emplace("Location", what.actualRelayUrl.c_str());
     return true;
 }
 

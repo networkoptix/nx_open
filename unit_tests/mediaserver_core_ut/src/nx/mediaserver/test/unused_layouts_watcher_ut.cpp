@@ -44,6 +44,7 @@ TEST(UnusedLayoutsWatcherTest, main)
     ASSERT_EQ(2, readFiles(ec2Connection).size());
 
     fileDeleter.update();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ASSERT_EQ(1, readFiles(ec2Connection).size());
 
     fileDeleter.update();

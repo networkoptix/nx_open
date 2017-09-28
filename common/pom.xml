@@ -18,13 +18,13 @@
         <guid>${common.guid}</guid>
 
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <global.libs>-lnx_network -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>
-        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl ffmpeg any/detection_plugin_interface</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.mac.packages>quazip</rdep.mac.packages>
@@ -56,6 +56,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
 
         <dependency>

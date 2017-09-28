@@ -22,6 +22,24 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -30,7 +48,7 @@
         <template>lib</template>
 
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

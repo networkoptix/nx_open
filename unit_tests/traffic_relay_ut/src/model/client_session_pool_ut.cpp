@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <model/client_session_pool.h>
-#include <settings.h>
+#include <nx/cloud/relay/model/client_session_pool.h>
+#include <nx/cloud/relay/settings.h>
 
 namespace nx {
 namespace cloud {

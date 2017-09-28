@@ -110,23 +110,12 @@ void OutgoingTunnel::establishNewConnection(
 
         case State::init:
             startAsyncTunnelConnect(&lk);
+            postponeConnectTask(timeout, std::move(socketAttributes), std::move(handler));
+            break;
 
         case State::connecting:
-        {
-            // Saving handler for later use.
-            const auto timeoutTimePoint =
-                timeout > std::chrono::milliseconds::zero()
-                ? std::chrono::steady_clock::now() + timeout
-                : std::chrono::steady_clock::time_point::max();
-            ConnectionRequestData data;
-            data.socketAttributes = std::move(socketAttributes);
-            data.timeout = timeout;
-            data.handler = std::move(handler);
-            m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
-
-            post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
+            postponeConnectTask(timeout, std::move(socketAttributes), std::move(handler));
             break;
-        }
 
         default:
             NX_ASSERT(
@@ -153,6 +142,24 @@ QString OutgoingTunnel::stateToString(State state)
     }
 
     return lm("unknown(%1)").arg(static_cast<int>(state));
+}
+
+void OutgoingTunnel::postponeConnectTask(
+    std::chrono::milliseconds timeout,
+    SocketAttributes socketAttributes,
+    NewConnectionHandler handler)
+{
+    const auto timeoutTimePoint =
+        timeout > std::chrono::milliseconds::zero()
+            ? std::chrono::steady_clock::now() + timeout
+            : std::chrono::steady_clock::time_point::max();
+    ConnectionRequestData data;
+    data.socketAttributes = std::move(socketAttributes);
+    data.timeout = timeout;
+    data.handler = std::move(handler);
+    m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
+
+    post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
 }
 
 void OutgoingTunnel::updateTimerIfNeeded()

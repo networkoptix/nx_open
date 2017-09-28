@@ -23,7 +23,7 @@
         <targetName>vms_gateway</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -ltraffic_relay -lcloud_db_client -lnx_network -ludt -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
@@ -56,6 +56,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libtraffic_relay</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libtraffic_relay/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

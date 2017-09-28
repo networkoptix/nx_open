@@ -6,6 +6,8 @@
 #include <QtQuick/private/qquicktextinput_p_p.h>
 #include <QtQuick/private/qquickclipnode_p.h>
 
+#include <utils/common/app_info.h>
+
 class QnQuickTextInputPrivate: public QQuickTextInputPrivate
 {
     Q_DECLARE_PUBLIC(QnQuickTextInput)
@@ -218,6 +220,13 @@ QVariant QnQuickTextInput::inputMethodQuery(Qt::InputMethodQuery query) const
 
             return d->enterKeyType;
 
+        case Qt::ImCursorRectangle:
+        {
+            if (QnAppInfo::isIos())
+                return QRectF(0, 0, 0, 0); //< Avoids screen shift when focus received.
+            else
+                break;
+        }
         default:
             break;
     }
