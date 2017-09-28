@@ -342,6 +342,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
         });
 
+    connect(context, &QnWorkbenchContext::userChanged,
+        this, &QnMediaResourceWidget::resetTriggers);
+
     updateDisplay();
     updateDewarpingParams();
 
@@ -2587,6 +2590,8 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
         return true;
 
     const auto currentUser = accessController()->user();
+    if (!currentUser)
+        return false; //< All triggers will be added when user is set up.
 
     const auto subjects = rule->eventParams().metadata.instigators;
     if (::contains(subjects, currentUser->getId()))
