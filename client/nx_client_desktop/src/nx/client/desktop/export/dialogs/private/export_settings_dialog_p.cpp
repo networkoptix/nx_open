@@ -18,6 +18,7 @@
 #include <nx/utils/file_system.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+#include <nx/client/desktop/utils/proxy_image_provider.h>
 
 namespace {
 
@@ -205,10 +206,15 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         ? QSize(m_previewSize.width(), 0)
         : QSize(0, m_previewSize.height());
 
-    m_mediaImageProvider.reset(new QnSingleThumbnailLoader(
+    m_mediaImageProvider.reset(new ProxyImageProvider());
+
+    m_mediaImageProvider->setSourceProvider(new QnSingleThumbnailLoader(
         camera,
         m_exportMediaSettings.timePeriod.startTimeMs,
-        QnThumbnailRequestData::kDefaultRotation));
+        QnThumbnailRequestData::kDefaultRotation,
+        QSize(),
+        QnThumbnailRequestData::JpgFormat,
+        m_mediaImageProvider.data()));
 
     connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,
         this, &Private::setFrameSize);
@@ -673,7 +679,7 @@ const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayT
     return index < m_overlays.size() ? m_overlays[index] : nullptr;
 }
 
-QnSingleThumbnailLoader* ExportSettingsDialog::Private::mediaImageProvider() const
+QnImageProvider* ExportSettingsDialog::Private::mediaImageProvider() const
 {
     return m_mediaImageProvider.data();
 }

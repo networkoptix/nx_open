@@ -23,12 +23,14 @@
 
 class QWidget;
 class QnSingleThumbnailLoader;
+class QnImageProvider;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 class LayoutThumbnailLoader;
+class ProxyImageProvider;
 
 class ExportSettingsDialog::Private: public Connective<QObject>
 {
@@ -67,7 +69,7 @@ public:
 
     void createOverlays(QWidget* overlayContainer);
 
-    QnSingleThumbnailLoader* mediaImageProvider() const;
+    QnImageProvider* mediaImageProvider() const;
     LayoutThumbnailLoader* layoutImageProvider() const;
     QSize fullFrameSize() const;
 
@@ -131,7 +133,7 @@ private:
 
     QPointer<ExportOverlayWidget> m_selectedOverlay;
 
-    QScopedPointer<QnSingleThumbnailLoader> m_mediaImageProvider;
+    QScopedPointer<ProxyImageProvider> m_mediaImageProvider;
     QScopedPointer<LayoutThumbnailLoader> m_layoutImageProvider;
     QSize m_fullFrameSize;
     qreal m_overlayScale = 1.0;
