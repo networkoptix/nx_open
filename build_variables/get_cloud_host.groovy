@@ -23,11 +23,13 @@ if (!host)
     else if (properties.customization == "digitalwatchdog")
         compatibleCustomizations = ["digitalwatchdog_global"]
 
-    compatibleHosts = []
-    for (customization in compatibleCustomizations)
-        compatibleHosts.add(requestHost(customization, properties.cloudGroup))
-    if (compatibleHosts)
-        compatibleHosts = compatibleHosts.join(";")
+    if (properties.cloudGroup != "dev") {
+        compatibleHosts = []
+        for (customization in compatibleCustomizations)
+            compatibleHosts.add(requestHost(customization, properties.cloudGroup))
+        if (compatibleHosts)
+            compatibleHosts = compatibleHosts.join(";")
+    }
 }
 else
 {
