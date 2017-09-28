@@ -290,8 +290,8 @@ def product_settings(request, product_id):
 
 import base64, os
 @api_view(["GET"])
-def download_file(request, path):
-    data_records = DataRecord.objects.filter(data_structure__name=path)
+def download_file(request, context_id, path):
+    data_records = DataRecord.objects.filter(data_structure__context_id=context_id, data_structure__name=path)
 
     if data_records.exists():
         file = base64.b64decode(data_records.last().value)

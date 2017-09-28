@@ -7,7 +7,7 @@ urlpatterns = [
     url(r'context_editor/(?P<context>.+?)/',
         context_edit_view, name="context_editor"),
 
-    url(r'download/(?P<path>.*)$', download_file, name="download_file"),
+    url(r'download/(?P<context_id>.+?)/(?P<path>.*)$', download_file, name="download_file"),
 
     url(r'product_settings/(?P<product_id>.+?)/',
         product_settings, name="product_settings"),
