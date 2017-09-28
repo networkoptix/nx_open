@@ -265,6 +265,7 @@
 #include <rest/helper/p2p_statistics.h>
 #include <recorder/remote_archive_synchronizer.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/mediaserver/metadata/manager_pool.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2908,6 +2909,7 @@ void MediaServerProcess::run()
     commonModule()->resourceAccessManager()->beginUpdate();
     commonModule()->resourceAccessProvider()->beginUpdate();
     loadResourcesFromECS(ec2Connection, commonModule()->messageProcessor());
+    qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
 
     saveServerInfo(m_mediaServer);
