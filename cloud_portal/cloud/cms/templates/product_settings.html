@@ -12,7 +12,10 @@
 {% endblock %}
 
 {% block content%}
-
+<div>
+    <p><a href="{% url 'download_package' product.name %}" download>Download package (zip)</a></p>
+    <p><a href="{% url 'download_package' product.name %}?draft" download>Download package draft (zip)</a></p>
+</div>
 <form id="productForm" action="{% url 'product_settings' product.id %}"
       method="post" class="aligned" enctype="multipart/form-data">
     {% csrf_token %}
@@ -29,11 +32,9 @@
         </div>
     {% endfor %}
 
-    {% if perms.cms.edit_content %}
     <div class="submit-row">
         <button class="button" type="submit" name="Upload">Upload</button>
     </div>
-    {% endif %}
 
 </form>
 {% endblock%}

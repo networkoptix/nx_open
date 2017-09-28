@@ -124,7 +124,7 @@ def read_structure_json(filename):
         update_from_object(cms_structure)
 
 
-def process_zip(file_descriptor, user, update_structure, update_defaults, update_content):
+def process_zip(file_descriptor, user, update_structure, update_content):
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
     root = None
@@ -181,7 +181,7 @@ def process_zip(file_descriptor, user, update_structure, update_defaults, update
         data = zip_file.read(name)
         data64 = base64.b64encode(data)
 
-        if update_defaults:
+        if update_structure:
             # if set_defaults or data structure has no default value - save it
             structure.default = data64
             structure.save()

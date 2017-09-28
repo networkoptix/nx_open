@@ -78,30 +78,13 @@ class ProductSettingsForm(forms.Form):
         required=True
     )
 
-    generate_json = forms.BooleanField(
-        label="Generate structure.json",
-        help_text="Generate structure template based on archive",
-        initial=False,
-        required=False
-    )
-
-    update_structure = forms.BooleanField(
-        label="Update structure.json",
-        help_text="Update CMS structure based on json configuration",
-        initial=False,
-        required=False
-    )
-
-    update_defaults = forms.BooleanField(
-        label="Update defaults",
-        help_text="Update default values (files) based on archive",
-        initial=False,
-        required=False
-    )
-
-    update_content = forms.BooleanField(
-        label="Update files",
-        help_text="Update files in CMS based on archive",
-        initial=True,
-        required=False
+    action = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        required=True,
+        choices=(
+            ('generate_json', 'Generate structure template based on archive (Ignores other options)'),
+            ('update_structure',
+             'Update CMS structure and default values based on archive with structure.json and customization template'),
+            ('update_content', 'Upload customized content files for current customization')
+        )
     )

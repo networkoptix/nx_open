@@ -253,10 +253,10 @@ def product_settings(request, product_id):
             form = None
 
     if form:
-        generate_json = form.cleaned_data['generate_json']
-        update_structure = form.cleaned_data['update_structure']
-        update_defaults = form.cleaned_data['update_defaults']
-        update_content = form.cleaned_data['generate_json']
+        action = form.cleaned_data['action']
+        generate_json = action == 'generate_json'
+        update_structure = action == 'update_structure'
+        update_content = action == 'generate_json'
 
         file = request.FILES["file"]
 
@@ -273,7 +273,7 @@ def product_settings(request, product_id):
                 data = generate_structure.from_zip(file, product.name)
                 content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
                 return response_attachment(content, 'structure.json', 'application/json')
-            structure.process_zip(file, request.user, update_structure, update_defaults, update_content)
+            structure.process_zip(file, request.user, update_structure, update_content)
             messages.success(request._request, "File uploaded")
     else:
         form = ProductSettingsForm()
