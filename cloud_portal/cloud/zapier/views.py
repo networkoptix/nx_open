@@ -49,8 +49,8 @@ def get_systems(request):
     data = cloud_api.System.list(email, password)
     zap_list = {'systems': []}
 
-    for i in range(data['systems']):
-        zap_list['systems'].append({'id': i, 'system_id': data['systems'][i]})
+    for i in range(len(data['systems'])):
+        zap_list['systems'].append({'name': data['systems'][i]['name'], 'system_id': data['systems'][i]['id']})
 
     return api_success(zap_list)
     #format needs to be {'systems': [{'id': '1', 'system_id': 'a'}, {'id': '2', 'system_id': 'b'}]}
