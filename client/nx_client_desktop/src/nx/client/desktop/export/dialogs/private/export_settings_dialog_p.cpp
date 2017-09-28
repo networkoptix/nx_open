@@ -3,6 +3,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
+#include <QtGui/QTextDocument>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -13,6 +14,7 @@
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
+#include <utils/common/html.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
@@ -42,6 +44,13 @@ struct Position
         return qAbs(offset) < qAbs(other.offset);
     }
 };
+
+static QString ensureHtml(const QString& source)
+{
+    return mightBeHtml(source)
+        ? source
+        : Qt::convertFromPlainText(source);
+}
 
 } // namespace
 
@@ -657,11 +666,11 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
 void ExportSettingsDialog::Private::updateBookmarkText()
 {
     const auto description = m_exportMediaPersistentSettings.bookmarkOverlay.includeDescription
-        ? m_bookmarkDescription
+        ? ensureHtml(m_bookmarkDescription)
         : QString();
 
     static const auto kBookmarkTemplate = lit("<p><font size=5>%1</font></p>%2");
-    const auto text = kBookmarkTemplate.arg(m_bookmarkName).arg(description);
+    const auto text = kBookmarkTemplate.arg(m_bookmarkName.toHtmlEscaped()).arg(description);
     m_exportMediaPersistentSettings.bookmarkOverlay.text = text;
     overlay(ExportOverlayType::bookmark)->setText(text);
 }
