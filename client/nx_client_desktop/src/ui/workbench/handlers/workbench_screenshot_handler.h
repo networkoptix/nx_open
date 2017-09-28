@@ -42,6 +42,7 @@ struct QnScreenshotParameters
 };
 
 /* Proxy class, that starts loading instantly after base provider is set and notifies only once. */
+// TODO: #vkutin #gdm Use nx::client::desktop::ProxyImageProvider instead
 class QnScreenshotLoader: public QnImageProvider {
     Q_OBJECT
 public:
