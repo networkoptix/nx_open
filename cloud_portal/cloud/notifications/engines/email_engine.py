@@ -7,25 +7,21 @@ from django.conf import settings
 import json
 import os
 from util.helpers import get_language_for_email
-from cms.models import customization_cache
-from django.core.cache import cache, caches
+from cms.models import customization_cache, check_update_cache
+from django.core.cache import cache
 
 
-def get_global_cache(customization):
-    global_cache = caches['global']
-    return global_cache.get(customization)
-
-
-def email_cache(customization, cache_type, value=None, force=None):
+def email_cache(customization, cache_type, value=None, force=False):
     data = cache.get('email_cache')
-    global_id = get_global_cache(customization)
-
-    if data and customization in data and 'version_id' in data[customization]\
-            and data[customization]['version_id'] != global_id:
-        force = True
+    global_id = 0
 
     if not data:
-        data = {}
+        data = {customization: {'version_id': global_id}}
+
+    if customization in data and 'version_id' in data[customization]:
+        global_force, global_id = check_update_cache(customization, data[customization]['version_id'])
+        if not force:
+            force = global_force
 
     if customization not in data or force:
         data[customization] = {'version_id': global_id}
