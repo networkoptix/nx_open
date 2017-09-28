@@ -202,7 +202,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());
 
-    m_overlayScale = qMin(coefficients.first, coefficients.second);
+    m_overlayScale = std::min({coefficients.first, coefficients.second, 1.0});
 
     for (size_t i = 0; i != overlayCount; ++i)
         m_overlays[i]->setScale(m_overlayScale);
