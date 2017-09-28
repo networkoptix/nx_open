@@ -341,6 +341,7 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode
     return result;
 }
 
+// Computes offset-alignment pair from absolute pixel position
 void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType type)
 {
     auto overlayWidget = overlay(type);
@@ -448,14 +449,14 @@ void ExportSettingsDialog::Private::setTimestampOverlaySettings(
     const ExportTimestampOverlayPersistentSettings& settings)
 {
     m_exportMediaPersistentSettings.timestampOverlay = settings;
-    updateOverlay(ExportOverlayType::timestamp, true);
+    updateOverlayWidget(ExportOverlayType::timestamp);
 }
 
 void ExportSettingsDialog::Private::setImageOverlaySettings(
     const ExportImageOverlayPersistentSettings& settings)
 {
     m_exportMediaPersistentSettings.imageOverlay = settings;
-    updateOverlay(ExportOverlayType::image, true);
+    updateOverlayWidget(ExportOverlayType::image);
 
     if (settings.image.isNull() || settings.name.trimmed().isEmpty())
         return;
@@ -467,7 +468,7 @@ void ExportSettingsDialog::Private::setTextOverlaySettings(
     const ExportTextOverlayPersistentSettings& settings)
 {
     m_exportMediaPersistentSettings.textOverlay = settings;
-    updateOverlay(ExportOverlayType::text, true);
+    updateOverlayWidget(ExportOverlayType::text);
 }
 
 void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
@@ -475,7 +476,7 @@ void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
 {
     m_exportMediaPersistentSettings.bookmarkOverlay = settings;
     updateBookmarkText();
-    updateOverlay(ExportOverlayType::bookmark, true);
+    updateOverlayWidget(ExportOverlayType::bookmark);
 }
 
 void ExportSettingsDialog::Private::validateSettings(Mode mode)
@@ -515,39 +516,15 @@ void ExportSettingsDialog::Private::validateSettings(Mode mode)
 void ExportSettingsDialog::Private::updateOverlays()
 {
     for (size_t i = 0; i != overlayCount; ++i)
-        updateOverlay(static_cast<ExportOverlayType>(i));
+    {
+        const auto overlayType = static_cast<ExportOverlayType>(i);
+        updateOverlayWidget(overlayType);
+        updateOverlayPosition(overlayType);
+    }
 }
 
-void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type,
-    bool keepAbsolutePosition)
+void ExportSettingsDialog::Private::updateOverlayWidget(ExportOverlayType type)
 {
-    const auto positionOverlay =
-        [this](QWidget* overlay, const ExportOverlayPersistentSettings& data)
-        {
-            QPointF position;
-            const auto& space = m_fullFrameSize;
-            const auto size = QSizeF(overlay->size()) / m_overlayScale;
-
-            if (data.alignment.testFlag(Qt::AlignHCenter))
-                position.setX((space.width() - size.width()) * 0.5 + data.offset.x());
-            else if (data.alignment.testFlag(Qt::AlignRight))
-                position.setX(space.width() - size.width() - data.offset.x());
-            else
-                position.setX(data.offset.x());
-
-            if (data.alignment.testFlag(Qt::AlignVCenter))
-                position.setY((space.height() - size.height()) * 0.5 + data.offset.y());
-            else if (data.alignment.testFlag(Qt::AlignBottom))
-                position.setY(space.height() - size.height() - data.offset.y());
-            else
-                position.setY(data.offset.y());
-
-            QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
-            overlay->move(
-                qRound(position.x() * m_overlayScale),
-                qRound(position.y() * m_overlayScale));
-        };
-
     auto overlay = this->overlay(type);
     switch (type)
     {
@@ -564,8 +541,6 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type,
             overlay->setPalette(palette);
 
             updateTimestampText();
-            if (!keepAbsolutePosition)
-                positionOverlay(overlay, data);
             break;
         }
 
@@ -575,8 +550,6 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type,
             overlay->setImage(data.image);
             overlay->setOverlayWidth(data.overlayWidth);
             overlay->setOpacity(data.opacity);
-            if (!keepAbsolutePosition)
-                positionOverlay(overlay, data);
             break;
         }
 
@@ -600,8 +573,6 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type,
             palette.setColor(QPalette::Text, data.foreground);
             palette.setColor(QPalette::Window, data.background);
             overlay->setPalette(palette);
-            if (!keepAbsolutePosition)
-                positionOverlay(overlay, data);
             break;
         }
 
@@ -609,9 +580,40 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type,
             NX_ASSERT(false); //< Should not happen.
             break;
     }
+}
 
-    if (keepAbsolutePosition)
-        overlayPositionChanged(type);
+// Computes absolute pixel position by relative offset-alignment pair
+void ExportSettingsDialog::Private::updateOverlayPosition(ExportOverlayType type)
+{
+    auto overlay = this->overlay(type);
+    const auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
+
+    NX_EXPECT(overlay && settings);
+    if (!overlay || !settings)
+        return;
+
+    QPointF position;
+    const auto& space = m_fullFrameSize;
+    const auto size = QSizeF(overlay->size()) / m_overlayScale;
+
+    if (settings->alignment.testFlag(Qt::AlignHCenter))
+        position.setX((space.width() - size.width()) * 0.5 + settings->offset.x());
+    else if (settings->alignment.testFlag(Qt::AlignRight))
+        position.setX(space.width() - size.width() - settings->offset.x());
+    else
+        position.setX(settings->offset.x());
+
+    if (settings->alignment.testFlag(Qt::AlignVCenter))
+        position.setY((space.height() - size.height()) * 0.5 + settings->offset.y());
+    else if (settings->alignment.testFlag(Qt::AlignBottom))
+        position.setY(space.height() - size.height() - settings->offset.y());
+    else
+        position.setY(settings->offset.y());
+
+    QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
+    overlay->move(
+        qRound(position.x() * m_overlayScale),
+        qRound(position.y() * m_overlayScale));
 }
 
 void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
