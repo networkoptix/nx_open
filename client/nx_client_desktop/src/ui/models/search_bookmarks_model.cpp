@@ -17,6 +17,7 @@
 #include <utils/common/qtimespan.h>
 #include <nx/utils/collection.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/algorithm/index_of.h>
 
 namespace
 {
@@ -161,7 +162,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
 
 int QnSearchBookmarksModelPrivate::getBookmarkIndex(const QnUuid& bookmarkId) const
 {
-    return qnIndexOf(m_bookmarks,
+    return nx::utils::algorithm::index_of(m_bookmarks,
         [bookmarkId](const QnCameraBookmark& item) { return bookmarkId == item.guid; });
 }
 

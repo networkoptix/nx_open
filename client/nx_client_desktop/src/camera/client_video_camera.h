@@ -60,7 +60,7 @@ public:
         StreamRecorderRole role,
         qint64 serverTimeZoneMs,
         qint64 timelapseFrameStepMs, /* Default value is 0 (timelapse disabled) */
-        QnImageFilterHelper transcodeParams);
+        const QnLegacyTranscodingSettings& transcodeParams);
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;

@@ -18,6 +18,7 @@ extern "C"
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_bookmark.h>
@@ -158,7 +159,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(this, &QnWorkbenchNavigator::isRecordingChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
     connect(this, &QnWorkbenchNavigator::hasArchiveChanged, this, &QnWorkbenchNavigator::updateTimelineRelevancy);
 
-    m_cameraDataManager = context()->instance<QnCameraDataManager>();
+    m_cameraDataManager = qnClientModule->cameraDataManager();
     connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this, &QnWorkbenchNavigator::updateLoaderPeriods);
 
     connect(qnServerStorageManager, &QnServerStorageManager::serverRebuildArchiveFinished, m_cameraDataManager, &QnCameraDataManager::clearCache);

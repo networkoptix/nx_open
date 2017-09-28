@@ -24,6 +24,7 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <client_core/client_core_module.h>
 
@@ -2028,7 +2029,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->camDisplay()->isLongWaiting())
     {
-        auto loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
+        auto loader = qnClientModule->cameraDataManager()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
 

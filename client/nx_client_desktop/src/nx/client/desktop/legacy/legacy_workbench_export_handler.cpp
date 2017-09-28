@@ -1,4 +1,4 @@
-#include "workbench_export_handler.h"
+#include "legacy_workbench_export_handler.h"
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
@@ -7,13 +7,14 @@
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <common/common_globals.h>
 
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <camera/client_video_camera.h>
-#include <camera/client_video_camera_export_tool.h>
+
 #include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
@@ -33,18 +34,26 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+
+#include <nx/client/desktop/legacy/legacy_export_settings.h>
+#include <nx/client/desktop/legacy/legacy_export_media_tool.h>
+#include <nx/client/desktop/legacy/legacy_export_layout_tool.h>
+
+#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <nx/client/desktop/ui/dialogs/rapid_review_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/extensions/workbench_layout_export_tool.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <ui/help/help_topics.h>
@@ -52,11 +61,10 @@
 
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/app_info.h>
 #include <nx/utils/string.h>
 
 #include <utils/common/app_info.h>
-
-using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -77,6 +85,7 @@ static const qint64 kReservedClientSizeMb = 200;
 static const int kMsPerSecond = 1000;
 
 static const int kBitsPerByte = 8;
+
 
 /** Calculate estimated video size in megabytes. */
 qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint64 lengthMs)
@@ -124,23 +133,31 @@ private:
     QString m_target;
 };
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace legacy {
 
 // -------------------------------------------------------------------------- //
-// QnWorkbenchExportHandler
+// WorkbenchExportHandler
 // -------------------------------------------------------------------------- //
-QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
+WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::ExportTimeSelectionAction), &QAction::triggered, this,
-        &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
-    connect(action(action::ExportLayoutAction), &QAction::triggered, this,
-        &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
-    connect(action(action::ExportRapidReviewAction), &QAction::triggered, this,
-        &QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered);
+    connect(action(ui::action::ExportTimeSelectionAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
+    connect(action(ui::action::ExportLayoutAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_exportLayoutAction_triggered);
+    connect(action(ui::action::ExportRapidReviewAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_exportRapidReviewAction_triggered);
+    connect(action(ui::action::SaveLocalLayoutAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_saveLocalLayoutAction_triggered);
+    connect(action(ui::action::SaveLocalLayoutAsAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_saveLocalLayoutAsAction_triggered);
 }
 
-QString QnWorkbenchExportHandler::binaryFilterName() const
+QString WorkbenchExportHandler::binaryFilterName() const
 {
 #ifdef Q_OS_WIN
 #ifdef Q_OS_WIN64
@@ -152,7 +169,7 @@ QString QnWorkbenchExportHandler::binaryFilterName() const
     return QString();
 }
 
-bool QnWorkbenchExportHandler::lockFile(const QString &filename)
+bool WorkbenchExportHandler::lockFile(const QString &filename)
 {
     if (m_filesIsUse.contains(filename))
     {
@@ -175,29 +192,24 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename)
     return true;
 }
 
-void QnWorkbenchExportHandler::unlockFile(const QString &filename)
+void WorkbenchExportHandler::unlockFile(const QString &filename)
 {
     m_filesIsUse.remove(filename);
 }
 
-bool QnWorkbenchExportHandler::isBinaryExportSupported() const
+bool WorkbenchExportHandler::isBinaryExportSupported() const
 {
-#ifdef Q_OS_WIN
-    return !qnRuntime->isActiveXMode();
-#else
+    if (nx::utils::AppInfo::isWindows())
+        return !qnRuntime->isActiveXMode();
     return false;
-#endif
 }
 
-
-bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
+bool WorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
     const QnTimePeriod &exportPeriod,
     const QString &layoutFileName,
-    Qn::LayoutExportMode mode,
+    ExportLayoutSettings::Mode mode,
     bool readOnly,
-    bool cancellable,
-    QObject *target,
-    const char *slot)
+    bool cancellable)
 {
     if (!validateItemTypes(layout))
         return false;
@@ -219,24 +231,26 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     exportProgressDialog->setModal(false);
     exportProgressDialog->show();
 
-    QnLayoutExportTool* tool = new QnLayoutExportTool(layout, exportPeriod, layoutFileName, mode, readOnly, this);
-    connect(tool, SIGNAL(rangeChanged(int, int)), exportProgressDialog, SLOT(setRange(int, int)));
-    connect(tool, SIGNAL(valueChanged(int)), exportProgressDialog, SLOT(setValue(int)));
-    connect(tool, SIGNAL(stageChanged(QString)), exportProgressDialog, SLOT(setLabelText(QString)));
+    const auto filename = Filename::parse(layoutFileName);
+    auto tool = new ExportLayoutTool({layout, exportPeriod, filename, mode, readOnly}, this);
+    connect(tool, &ExportLayoutTool::rangeChanged, exportProgressDialog,
+        &QnProgressDialog::setRange);
+    connect(tool, &ExportLayoutTool::valueChanged, exportProgressDialog,
+        &QnProgressDialog::setValue);
+    connect(tool, &ExportLayoutTool::stageChanged, exportProgressDialog,
+        &QnProgressDialog::setLabelText);
 
-    connect(tool, &QnLayoutExportTool::finished, exportProgressDialog, &QWidget::hide);
-    connect(tool, &QnLayoutExportTool::finished, exportProgressDialog, &QObject::deleteLater);
-    connect(tool, &QnLayoutExportTool::finished, this, &QnWorkbenchExportHandler::at_layout_exportFinished);
-    connect(tool, &QnLayoutExportTool::finished, tool, &QObject::deleteLater);
-
-    connect(exportProgressDialog, SIGNAL(canceled()), tool, SLOT(stop()));
-    if (target && slot)
-        connect(tool, SIGNAL(finished(bool, QString)), target, slot);
+    connect(tool, &ExportLayoutTool::finished, exportProgressDialog, &QWidget::hide);
+    connect(tool, &ExportLayoutTool::finished, exportProgressDialog, &QObject::deleteLater);
+    connect(tool, &ExportLayoutTool::finished, this, &WorkbenchExportHandler::at_layout_exportFinished);
+    connect(tool, &ExportLayoutTool::finished, tool, &QObject::deleteLater);
+    connect(exportProgressDialog, &QnProgressDialog::canceled, tool, &ExportLayoutTool::stop);
 
     return tool->start();
 }
 
-QnMediaResourceWidget* QnWorkbenchExportHandler::extractMediaWidget(const action::Parameters& parameters)
+QnMediaResourceWidget* WorkbenchExportHandler::extractMediaWidget(
+    const ui::action::Parameters& parameters)
 {
     if (parameters.size() == 1)
         return dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
@@ -247,7 +261,7 @@ QnMediaResourceWidget* QnWorkbenchExportHandler::extractMediaWidget(const action
     return dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
 }
 
-void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
+void WorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
 {
     exportTimeSelection(menu()->currentParameters(sender()));
 }
@@ -255,7 +269,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
 
 // TODO: #GDM Monstrous function, refactor required
 // TODO: #ynikitenkov refactor to use QnResourcePtr
-void QnWorkbenchExportHandler::exportTimeSelectionInternal(
+void WorkbenchExportHandler::exportTimeSelectionInternal(
     const QnMediaResourcePtr &mediaResource,
     const QnAbstractStreamDataProvider *dataProvider,
     const QnLayoutItemData &itemData,
@@ -264,7 +278,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 )
 {
     qint64 durationMs = period.durationMs;
-    auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    auto loader = qnClientModule->cameraDataManager()->loader(mediaResource);
     if (loader)
     {
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
@@ -275,7 +289,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
 
     bool wasLoggedIn = !context()->user().isNull();
-    static const qint64 kTimelapseBaseFrameStepMs = 1000 /  dialogs::ExportRapidReview::kResultFps;
+    static const qint64 kTimelapseBaseFrameStepMs = 1000 / ui::dialogs::ExportRapidReview::kResultFps;
     qint64 exportSpeed = qMax(1ll, timelapseFrameStepMs / kTimelapseBaseFrameStepMs);
     // TODO: #Elric implement more precise estimation
     if (durationMs / exportSpeed > maxRecordingDurationMsec && timelapseFrameStepMs == 0)
@@ -330,7 +344,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
 
     bool transcodeWarnShown = false;
-    QnImageFilterHelper imageParameters;
+    QnLegacyTranscodingSettings imageParameters;
 
     while (true)
     {
@@ -424,9 +438,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         if (selectedExtension.contains(lit(".avi")))
         {
-            auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
-            const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
-            if (loader && archive)
+            if (auto loader = qnClientModule->cameraDataManager()->loader(mediaResource))
             {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
                 if (periods.size() > 1)
@@ -443,13 +455,13 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             }
         }
 
-        imageParameters.setSrcRect(zoomRect);
-        imageParameters.setContrastParams(contrastParams);
-        imageParameters.setDewarpingParams(mediaResource->getDewarpingParams(), dewarpingParams);
-        imageParameters.setRotation(rotation);
-        imageParameters.setCustomAR(customAr);
-        imageParameters.setTimeStampParams(timestampParams);
-        imageParameters.setVideoLayout(mediaResource->getVideoLayout());
+        imageParameters.zoomWindow = zoomRect;
+        imageParameters.contrastParams = contrastParams;
+        imageParameters.itemDewarpingParams = dewarpingParams;
+        imageParameters.resource = mediaResource;
+        imageParameters.rotation = rotation;
+        imageParameters.forcedAspectRatio = customAr;
+        imageParameters.timestampParams = timestampParams;
 
         auto videoLayout = mediaResource->getVideoLayout();
         bool doTranscode = transcodeCheckbox ||
@@ -469,10 +481,9 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                     const int bigValue = std::numeric_limits<int>::max();
                     NX_ASSERT(resolution.isValid());
 
-                    auto filters = imageParameters.createFilterChain(resolution, QSize(bigValue, bigValue));
-                    const QSize resultResolution = imageParameters.updatedResolution(filters, resolution);
-                    if (resultResolution.width() > imageParameters.defaultResolutionLimit.width() ||
-                        resultResolution.height() > imageParameters.defaultResolutionLimit.height())
+                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters,
+                        resolution, QSize(bigValue, bigValue));
+                    if (filterChain.isDownscaleRequired(resolution))
                     {
                         transcodeWarnShown = true;
                         const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,
@@ -550,7 +561,12 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         NX_ASSERT(!itemData.uuid.isNull(), Q_FUNC_INFO, "Make sure itemData is valid");
         newLayout->addItem(itemData);
-        saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
+        saveLayoutToLocalFile(newLayout,
+            period,
+            fileName,
+            ExportLayoutSettings::Mode::Export,
+            false,
+            true);
     }
     else
     {
@@ -561,29 +577,30 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaResource, Qn::InvalidUtcOffset);
 
-        QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
-            mediaResource,
-            period,
-            fileName,
-            imageParameters,
-            serverTimeZone,
-            timelapseFrameStepMs,
-            this);
+        LegacyExportMediaSettings settings;
+        settings.mediaResource = mediaResource;
+        settings.timePeriod = period;
+        settings.fileName = fileName;
+        settings.imageParameters = imageParameters;
+        settings.serverTimeZoneMs = serverTimeZone;
+        settings.timelapseFrameStepMs = timelapseFrameStepMs;
 
-        connect(exportProgressDialog, &QnProgressDialog::canceled, tool, &QnClientVideoCameraExportTool::stop);
+        auto tool = new LegacyExportMediaTool(settings, this);
 
-        connect(tool, &QnClientVideoCameraExportTool::finished, exportProgressDialog, &QWidget::hide);
-        connect(tool, &QnClientVideoCameraExportTool::finished, exportProgressDialog, &QnProgressDialog::deleteLater);
-        connect(tool, &QnClientVideoCameraExportTool::finished, this, &QnWorkbenchExportHandler::at_camera_exportFinished);
-        connect(tool, &QnClientVideoCameraExportTool::rangeChanged, exportProgressDialog, &QnProgressDialog::setRange);
-        connect(tool, &QnClientVideoCameraExportTool::valueChanged, exportProgressDialog, &QnProgressDialog::setValue);
+        connect(exportProgressDialog, &QnProgressDialog::canceled, tool, &LegacyExportMediaTool::stop);
+
+        connect(tool, &LegacyExportMediaTool::finished, exportProgressDialog, &QWidget::hide);
+        connect(tool, &LegacyExportMediaTool::finished, exportProgressDialog, &QnProgressDialog::deleteLater);
+        connect(tool, &LegacyExportMediaTool::finished, this, &WorkbenchExportHandler::at_camera_exportFinished);
+        connect(tool, &LegacyExportMediaTool::rangeChanged, exportProgressDialog, &QnProgressDialog::setRange);
+        connect(tool, &LegacyExportMediaTool::valueChanged, exportProgressDialog, &QnProgressDialog::setValue);
 
         tool->start();
         exportProgressDialog->show();
     }
 }
 
-bool QnWorkbenchExportHandler::exeFileIsTooBig(
+bool WorkbenchExportHandler::exeFileIsTooBig(
     const QnMediaResourcePtr& mediaResource,
     const QnTimePeriod& period) const
 {
@@ -591,7 +608,7 @@ bool QnWorkbenchExportHandler::exeFileIsTooBig(
     return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
 }
 
-bool QnWorkbenchExportHandler::exeFileIsTooBig(
+bool WorkbenchExportHandler::exeFileIsTooBig(
     const QnLayoutResourcePtr& layout,
     const QnTimePeriod& period) const
 {
@@ -604,7 +621,7 @@ bool QnWorkbenchExportHandler::exeFileIsTooBig(
     return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
 }
 
-bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
+bool WorkbenchExportHandler::confirmExportTooBigExeFile() const
 {
     return confirmExport(QnMessageBoxIcon::Warning,
         tr("EXE format not recommended"),
@@ -612,7 +629,7 @@ bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
             + L'\n' + tr("Export to EXE anyway?"));
 }
 
-void QnWorkbenchExportHandler::exportTimeSelection(const action::Parameters& parameters,
+void WorkbenchExportHandler::exportTimeSelection(const ui::action::Parameters& parameters,
     qint64 timelapseFrameStepMs)
 {
     const auto widget = extractMediaWidget(parameters);
@@ -668,17 +685,17 @@ void QnWorkbenchExportHandler::exportTimeSelection(const action::Parameters& par
     exportTimeSelectionInternal(mediaResource, dataProvider, itemData, period, timelapseFrameStepMs);
 }
 
-void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QString &filename)
+void WorkbenchExportHandler::at_layout_exportFinished(bool success, const QString &filename)
 {
     unlockFile(filename);
 
-    QnLayoutExportTool* tool = dynamic_cast<QnLayoutExportTool*>(sender());
+    auto tool = dynamic_cast<ExportLayoutTool*>(sender());
     if (!tool)
         return;
 
     if (success)
     {
-        if (tool->mode() == Qn::LayoutExport)
+        if (tool->mode() == ExportLayoutSettings::Mode::Export)
             showExportCompleteMessage();
     }
     else if (!tool->errorMessage().isEmpty())
@@ -689,7 +706,7 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
 }
 
 
-bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout)
+bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout)
 {
     bool hasImage = false;
     bool hasLocal = false;
@@ -733,12 +750,19 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
     return true;
 }
 
-bool QnWorkbenchExportHandler::saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable, QObject *target, const char *slot)
+bool WorkbenchExportHandler::saveLocalLayout(const QnLayoutResourcePtr &layout, bool readOnly, bool cancellable)
 {
-    return saveLayoutToLocalFile(layout, layout->getLocalRange(), layout->getUrl(), Qn::LayoutLocalSave, readOnly, cancellable, target, slot);
+    return saveLayoutToLocalFile(layout,
+        layout->getLocalRange(),
+        layout->getUrl(),
+        ExportLayoutSettings::Mode::LocalSave,
+        readOnly,
+        cancellable);
 }
 
-bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, const QnLayoutResourcePtr &layout, Qn::LayoutExportMode mode)
+bool WorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod,
+    const QnLayoutResourcePtr &layout,
+    ExportLayoutSettings::Mode mode)
 {
     // TODO: #Elric we have a lot of copypasta with at_exportTimeSelectionAction_triggered
 
@@ -748,9 +772,9 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         return false;
 
     QString dialogName;
-    if (mode == Qn::LayoutLocalSaveAs)
+    if (mode == ExportLayoutSettings::Mode::LocalSaveAs)
         dialogName = tr("Save local layout as...");
-    else if (mode == Qn::LayoutExport)
+    else if (mode == ExportLayoutSettings::Mode::Export)
         dialogName = tr("Export Layout As...");
     else
         return false; // not used
@@ -849,7 +873,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     return true;
 }
 
-bool QnWorkbenchExportHandler::confirmExport(
+bool WorkbenchExportHandler::confirmExport(
     QnMessageBoxIcon icon,
     const QString& text,
     const QString& extras) const
@@ -862,7 +886,7 @@ bool QnWorkbenchExportHandler::confirmExport(
     return (dialog.exec() != QDialogButtonBox::Cancel);
 }
 
-void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
+void WorkbenchExportHandler::at_exportLayoutAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
 
@@ -890,17 +914,17 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
     if (wasLoggedIn && !context()->user())
         return;
 
-    doAskNameAndExportLocalLayout(exportPeriod, layout, Qn::LayoutExport);
+    doAskNameAndExportLocalLayout(exportPeriod, layout, ExportLayoutSettings::Mode::Export);
 }
 
-void QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered()
+void WorkbenchExportHandler::at_exportRapidReviewAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     qint64 durationMs = period.durationMs;
     QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
-    auto loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+    auto loader = qnClientModule->cameraDataManager()->loader(mediaResource);
     if (loader)
     {
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
@@ -909,7 +933,7 @@ void QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered()
         Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
-    if (durationMs < dialogs::ExportRapidReview::kMinimalSourcePeriodLength)
+    if (durationMs < ui::dialogs::ExportRapidReview::kMinimalSourcePeriodLength)
     {
         QnMessageBox::warning(mainWindow(),
             tr("Too short period selected"),
@@ -917,7 +941,7 @@ void QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered()
         return;
     }
 
-    auto dialog = std::make_unique<dialogs::ExportRapidReview>(mainWindow());
+    auto dialog = std::make_unique<ui::dialogs::ExportRapidReview>(mainWindow());
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setSourcePeriodLengthMs(durationMs);
     int speed = qnSettings->timelapseSpeed();
@@ -931,16 +955,42 @@ void QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered()
     exportTimeSelection(parameters, dialog->frameStepMs());
 }
 
-void QnWorkbenchExportHandler::showExportCompleteMessage()
+void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
+    NX_ASSERT(layout && layout->isFile());
+    if (!layout || !layout->isFile())
+        return;
+
+    const bool readOnly = !accessController()->hasPermissions(layout,
+        Qn::WritePermission);
+    saveLocalLayout(layout, readOnly, true); //< Overwrite layout file.
+}
+
+void WorkbenchExportHandler::at_saveLocalLayoutAsAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
+    NX_ASSERT(layout && layout->isFile());
+    if (!layout || !layout->isFile())
+        return;
+
+    doAskNameAndExportLocalLayout(layout->getLocalRange(),
+        layout,
+        ExportLayoutSettings::Mode::LocalSaveAs);
+}
+
+void WorkbenchExportHandler::showExportCompleteMessage()
 {
     QnMessageBox::success(mainWindow(), tr("Export completed"));
 }
 
-void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QString &fileName)
+void WorkbenchExportHandler::at_camera_exportFinished(bool success, const QString &fileName)
 {
     unlockFile(fileName);
 
-    QnClientVideoCameraExportTool *tool = qobject_cast<QnClientVideoCameraExportTool*>(sender());
+    LegacyExportMediaTool *tool = qobject_cast<LegacyExportMediaTool*>(sender());
     if (!tool)
         return;
 
@@ -960,3 +1010,8 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
             QnStreamRecorder::errorString(tool->status()));
     }
 }
+
+} // namespace legacy
+} // namespace desktop
+} // namespace client
+} // namespace nx

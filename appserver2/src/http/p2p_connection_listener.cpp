@@ -282,8 +282,7 @@ void ConnectionProcessor::run()
     socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
     WebSocketPtr webSocket(new websocket::WebSocket(std::move(socket)));
-    webSocket->setAliveTimeout(keepAliveTimeout);
-    webSocket->start();
+    webSocket->setAliveTimeoutEx(keepAliveTimeout, 2);
 
     messageBus->gotConnectionFromRemotePeer(
         remotePeer,

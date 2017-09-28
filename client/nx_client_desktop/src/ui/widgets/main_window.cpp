@@ -39,6 +39,7 @@
 #include <ui/help/help_topics.h>
 
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
+#include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -46,7 +47,8 @@
 #include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>
+#include <nx/client/desktop/export/workbench/workbench_export_handler.h>
+#include <nx/client/desktop/legacy/legacy_workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
@@ -98,7 +100,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
 
-#include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
+
 #include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"
@@ -236,7 +238,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
-    context->instance<QnWorkbenchExportHandler>();
+    context->instance<WorkbenchExportHandler>();
+    context->instance<legacy::WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();

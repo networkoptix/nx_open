@@ -27,10 +27,11 @@ extern "C"
 
 #include <utils/color_space/image_correction.h>
 #include <core/resource/resource_consumer.h>
-#include <transcoding/filters/filter_helper.h>
+
+#include <nx/core/transcoding/filters/filter_chain.h>
 
 #include <recording/stream_recorder_data.h>
-#include <boost/optional.hpp>
+
 #include <common/common_module_aware.h>
 #include <plugins/resource/avi/avi_archive_metadata.h>
 
@@ -121,7 +122,7 @@ public:
     */
     void setServerTimeZoneMs(qint64 value);
 
-    void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
+    void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
 
 signals:
     void recordingStarted();
@@ -228,7 +229,7 @@ private:
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
     StreamRecorderRole m_role;
-    QnImageFilterHelper m_extraTranscodeParams;
+    nx::core::transcoding::FilterChain m_transcodeFilters;
 
     std::random_device m_rd;
     std::mt19937 m_gen;
