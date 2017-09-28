@@ -105,6 +105,10 @@ void ExportSettingsDialog::Private::saveSettings()
     {
         case Mode::Media:
         {
+            const auto imageSettings = m_exportMediaPersistentSettings.imageOverlay;
+            if (!imageSettings.image.isNull() && !imageSettings.name.trimmed().isEmpty())
+                imageSettings.image.save(cachedImageFileName(), "png");
+
             if (m_bookmarkName.isEmpty())
                 qnSettings->setExportMediaSettings(m_exportMediaPersistentSettings);
             else
@@ -458,11 +462,6 @@ void ExportSettingsDialog::Private::setImageOverlaySettings(
 {
     m_exportMediaPersistentSettings.imageOverlay = settings;
     updateOverlayWidget(ExportOverlayType::image);
-
-    if (settings.image.isNull() || settings.name.trimmed().isEmpty())
-        return;
-
-    settings.image.save(cachedImageFileName(), "png");
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
