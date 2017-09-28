@@ -49,9 +49,13 @@ class ManagerPool:
     Q_OBJECT
 public:
     ManagerPool(QnCommonModule* commonModule);
+    void init();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_rulesUpdated(const std::set<QnUuid>& affectedResources);
+
+public slots:
+    void initExistingResources();
 
 private:
     PluginList availablePlugins() const;
