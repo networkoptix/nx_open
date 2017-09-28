@@ -8,7 +8,38 @@ import json
 import os
 from util.helpers import get_language_for_email
 from cms.models import customization_cache
-from django.core.cache import cache
+from django.core.cache import cache, caches
+
+
+def get_global_cache(customization):
+    global_cache = caches['global']
+    return global_cache.get(customization)
+
+
+def email_cache(customization, cache_type, value=None, force=None):
+    data = cache.get('email_cache')
+    global_id = get_global_cache(customization)
+
+    if data and customization in data and 'version_id' in data[customization]\
+            and data[customization]['version_id'] != global_id:
+        force = True
+
+    if not data:
+        data = {}
+
+    if customization not in data or force:
+        data[customization] = {'version_id': global_id}
+
+    if cache_type not in data[customization]:
+        data[customization][cache_type] = {}
+
+    if value:
+        data[customization][cache_type] = value
+        cache.set('email_cache', data)
+    else:
+        cache.set('email_cache', data)
+        return data[customization][cache_type]
+
 
 def send(email, msg_type, message, customization):
     lang = get_language_for_email(email, customization)
@@ -24,8 +55,8 @@ def send(email, msg_type, message, customization):
     subject = get_email_title(customization, lang, msg_type, templates_location)
     subject = pystache.render(subject, {"message": message, "config": config})
 
-    message_html_template = read_template(msg_type, templates_location, True)
-    message_txt_template = read_template(msg_type, templates_location, False)
+    message_html_template = read_template(customization, msg_type, templates_location, True)
+    message_txt_template = read_template(customization, msg_type, templates_location, False)
 
     email_html_body = pystache.render(
         message_html_template, {"message": message, "config": config})
@@ -47,33 +78,27 @@ def send(email, msg_type, message, customization):
 
     msg.mixed_subtype = 'related'
     logo_filename = os.path.join(templates_root, 'email_logo.png')
-    msg_img = MIMEImage(read_logo(logo_filename))
+    msg_img = MIMEImage(read_logo(customization, logo_filename))
     msg_img.add_header('Content-ID', '<logo>')
     msg.attach(msg_img)
     return msg.send()
 
 
 def get_email_title(customization, lang, event, templates_location):
-    titles_cache = cache.get('email_titles')
+    titles_cache = email_cache(customization, 'email_titles')
 
-    if not titles_cache:
-        titles_cache = {}
-
-    if customization not in titles_cache:
-        titles_cache[customization] = {}
-
-    if lang not in titles_cache[customization]:
+    if lang not in titles_cache:
         filename = os.path.join(
             templates_location, "notifications-language.json")
         with open(filename) as data_file:
-            titles_cache[customization][lang] = json.load(data_file)
-        cache.set('email_titles', titles_cache)
+            titles_cache[lang] = json.load(data_file)
+        email_cache(customization, 'email_titles', titles_cache)
 
-    return titles_cache[customization][lang][event]["emailSubject"]
+    return titles_cache[lang][event]["emailSubject"]
 
 
-def read_template(name, location, html):
-    templates_cache = cache.get('email_templates')
+def read_template(customization, name, location, html):
+    templates_cache = email_cache(customization, 'email_templates')
 
     suffix = ''
     if not html:
@@ -84,15 +109,15 @@ def read_template(name, location, html):
             # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
             with codecs.open(filename, 'r', 'utf-8') as stream:
                 templates_cache[filename] = stream.read()
-            cache.set('email_templates', templates_cache)
+            email_cache(customization, 'email_templates', templates_cache)
         except Exception as e:
             raise type(e)(e.message + ' :' + filename)
     return templates_cache[filename]
 
 
-def read_logo(filename):
-    logos_cache = cache.get('logos')
-    modified_file_time_cache = cache.get('modified_file_times')
+def read_logo(customization, filename):
+    logos_cache = email_cache(customization, 'logos')
+    modified_file_time_cache = email_cache(customization, 'modified_file_times')
 
     # os.stat(filename)[8] gets the modified time for the file
     # If the file is not cached then it needs to be added
@@ -106,7 +131,7 @@ def read_logo(filename):
         # modified_file_time_cache
         modified_file_time_cache[filename] = os.stat(filename)[8]
 
-        cache.set('logos', logos_cache)
-        cache.set('modified_file_times', modified_file_time_cache)
+        email_cache(customization, 'logos', logos_cache)
+        email_cache(customization, 'modified_file_times', modified_file_time_cache)
         
     return logos_cache[filename]
