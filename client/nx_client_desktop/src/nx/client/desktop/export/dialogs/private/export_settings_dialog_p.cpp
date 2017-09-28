@@ -3,7 +3,6 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
-#include <QtGui/QTextDocument>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
@@ -44,13 +43,6 @@ struct Position
         return qAbs(offset) < qAbs(other.offset);
     }
 };
-
-static QString ensureHtml(const QString& source)
-{
-    return mightBeHtml(source)
-        ? source
-        : Qt::convertFromPlainText(source);
-}
 
 } // namespace
 
