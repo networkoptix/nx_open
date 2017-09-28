@@ -115,7 +115,7 @@ def create_zap_webhook(request):
     if user_hooks.exists():
         return Response({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
 
-    url_link = '/firehook/?system_id=%s&caption=%s' %(system_id, target)
+    url_link = '/firehook/?system_id=%s&caption=%s' %(system_id, caption)
     zap_hook = Hook(user=user, event=event, target=target)
     zap_hook.save()
     return Response({'message': 'Webhook created for ' + caption, 'link': url_link}, status=200)
@@ -134,3 +134,10 @@ def remove_zap_webhook(request):
     event = user_hooks[0].event
     user_hooks.delete()
     return Response({'message': 'Webhook deleted for ' + event}, status=200)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes((AllowAny, ))
+def test_subscribe(request):
+    authenticate(request)
+    return Response({'data': [{'caption': 'caption'}]})
