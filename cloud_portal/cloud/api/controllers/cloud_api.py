@@ -8,7 +8,9 @@ from api.helpers.exceptions import validate_response, ErrorCodes, APIRequestExce
 import logging
 logger = logging.getLogger(__name__)
 
-CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
+#For zapier demo purposes manual override CLOUD_DB_URL
+#CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
+CLOUD_DB_URL = 'http://cloud-dev.hdw.mx:80/cdb'
 
 
 def lower_case_email(func):

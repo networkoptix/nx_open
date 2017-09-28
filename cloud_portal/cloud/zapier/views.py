@@ -46,7 +46,7 @@ system
 @handle_exceptions
 def get_systems(request):
     user, email, password = authenticate(request)
-    data = cloud_api.System.list(email,password)
+    data = cloud_api.System.list(email, password)
     zap_list = {'systems': []}
 
     for i in range(data['systems']):
@@ -63,12 +63,12 @@ def nx_action(request):
 
     instance = "https://cloud-test.hdw.mx/gateway/"
     system_id = request.data['systemId']
+    source = request.data['source']
+    caption = request.data['caption']
+    description = "&description=" + request.data['description'] if 'description' in request.data else ""
 
-    source = 'source=' + request.data['source']
-    caption = '&caption=' + request.data['caption']
-    state = '&description=' + request.data['description']
-
-    url = "%s%s%s%s%s%s" % (instance, system_id, '/api/createEvent?', source, caption, state)
+    url = "{}{}/api/createEvent?source={}&caption={}{}"\
+        .format(instance, system_id, source, caption, description)
 
     headers = {'Content-Type': 'application/json'}
     r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
@@ -87,7 +87,11 @@ def fire_zap_webhook(request):
     if hooks_event.exists():
         for hook in hooks_event:
             raw_hook_event.send(sender=None, event_name=event, payload={'data': {'caption': caption}}, user=hook.user)
-    return Response({'message': "webhook fired for " + caption}, status=200)
+
+        return Response({'message': "webhook fired for " + caption}, status=200)
+
+    else:
+        return Response({'message': "webhook for " + caption + " does not exist"}, status=404)
 
 
 @api_view(['GET', 'POST'])
@@ -127,6 +131,6 @@ def remove_zap_webhook(request):
     user_hooks = Hook.objects.filter(user=user, target=target)
     if not user_hooks.exists():
         return Response({'message': "Webhook for " + target + " does not exist"}, status=500)
-    event = user_hooks.event
+    event = user_hooks[0].event
     user_hooks.delete()
     return Response({'message': 'Webhook deleted for ' + event}, status=200)
