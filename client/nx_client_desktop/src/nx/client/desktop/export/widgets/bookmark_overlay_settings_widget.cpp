@@ -43,7 +43,7 @@ BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
     connect(ui->descriptionCheckBox, &QCheckBox::stateChanged,
         [this]()
         {
-            //m_data.includeDescription = ui->descriptionComboBox->isChecked();
+            m_data.includeDescription = ui->descriptionCheckBox->isChecked();
             emit dataChanged(m_data);
         });
 
@@ -75,6 +75,7 @@ void BookmarkOverlaySettingsWidget::updateControls()
 {
     ui->fontSizeSpinBox->setValue(m_data.fontSize);
     ui->widthSlider->setValue(m_data.overlayWidth);
+    ui->descriptionCheckBox->setChecked(m_data.includeDescription);
 }
 
 const ExportBookmarkOverlayPersistentSettings& BookmarkOverlaySettingsWidget::data() const
