@@ -10,6 +10,7 @@ AnimatorGroup::~AnimatorGroup() {
     stop();
 }
 
+
 AbstractAnimator *AnimatorGroup::animatorAt(int index) const {
     if (index < 0 || index >= m_animators.size()) {
         qnWarning("Index is out of bounds.");
@@ -128,10 +129,20 @@ void AnimatorGroup::updateCurrentTime(int currentTime) {
         animator->setCurrentTime(currentTime);
 }
 
-int AnimatorGroup::estimatedDuration() const {
+int AnimatorGroup::estimatedDuration() const
+{
+    static const auto getDuration =
+        [](AbstractAnimator* animator)
+        {
+            const auto timeLimit = animator->timeLimit();
+            const auto estimated = animator->estimatedDuration();
+            return timeLimit >= 0 ? qMin(estimated, timeLimit) : estimated;
+        };
+
     int result = 0;
-    foreach(AbstractAnimator *animator, m_animators)
-        result = qMax(result, qMin(animator->estimatedDuration(), animator->timeLimit()));
+    for (const auto animator: m_animators)
+        result = qMax(result, getDuration(animator));
+
     return result;
 }
 

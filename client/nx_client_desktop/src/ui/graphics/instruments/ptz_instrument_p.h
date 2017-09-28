@@ -366,10 +366,8 @@ private:
         QPointF xStep(unit, 0), yStep(0, unit);
         QSizeF size = QnGeometry::toSize(xStep + yStep);
 
-        QN_UNUSED(left);
-
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
-        m_modeButton->setGeometry(QRectF(right - xStep * 4.0 - yStep * 1.5, 3.0 * size));
+        m_modeButton->setGeometry(QRectF(left + xStep - yStep * 1.5, 3.0 * size));
 
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));

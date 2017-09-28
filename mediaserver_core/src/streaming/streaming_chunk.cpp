@@ -72,8 +72,11 @@ bool StreamingChunk::tryRead(
         m_dataOffsetAtTheFrontOfTheBuffer + m_data.size();
 
     if (ctx->m_currentOffset >= dataOffsetAtTheEndOfTheBuffer) //< Whole data has been read.
-        return m_modificationState != State::opened; //< If chunk not opened, signalling end-of-data.
-                                                     //< Else, expecting more data to arrive to chunk.
+    {
+        // If chunk is not opened, signalling end-of-data. 
+        // Otherwise, expecting more data to arrive to chunk.
+        return m_modificationState != State::opened;
+    }
 
     Q_ASSERT(ctx->m_currentOffset >= m_dataOffsetAtTheFrontOfTheBuffer);
     const quint64 bytesToCopy = std::min<quint64>(

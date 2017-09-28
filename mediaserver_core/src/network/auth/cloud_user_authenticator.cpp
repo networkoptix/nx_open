@@ -29,11 +29,13 @@ static const std::chrono::minutes UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD
 CloudUserAuthenticator::CloudUserAuthenticator(
     CloudConnectionManager* const cloudConnectionManager,
     std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
-    const CdbNonceFetcher& cdbNonceFetcher)
+    const CdbNonceFetcher& cdbNonceFetcher,
+    const CloudUserInfoPool& cloudUserInfoPool)
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultAuthenticator(std::move(defaultAuthenticator)),
-    m_cdbNonceFetcher(cdbNonceFetcher)
+    m_cdbNonceFetcher(cdbNonceFetcher),
+    m_cloudUserInfoPool(cloudUserInfoPool)
 {
     using namespace std::placeholders;
 
@@ -125,7 +127,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     if (isCloudUser && isCloudNonce)
     {
         auto userInfoPoolAuthResult =
-            m_cdbNonceFetcher.cloudUserInfoPool().authenticate(method, authorizationHeader);
+            m_cloudUserInfoPool.authenticate(method, authorizationHeader);
 
         if (userInfoPoolAuthResult == Qn::Auth_OK)
             return std::tuple<Qn::AuthResult, QnResourcePtr>(Qn::Auth_OK, cloudUsers.first());

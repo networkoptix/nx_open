@@ -36,7 +36,15 @@ BasicPollable::BasicPollable(
 BasicPollable::~BasicPollable()
 {
     if (isInSelfAioThread())
+    {
         m_aioService->cancelPostedCalls(&m_pollable, true);
+    }
+    else
+    {
+        NX_CRITICAL(!m_aioService->isSocketBeingWatched(&m_pollable),
+            "You MUST cancel running async operation before deleting pollable "
+            "if you delete it from non-aio thread");
+    }
 }
 
 void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)

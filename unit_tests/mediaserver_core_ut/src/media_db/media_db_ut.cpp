@@ -129,8 +129,8 @@ TestFileOperation generateFileOperation(int code)
 
     result.chunksCatalog = nx::utils::random::number(0, 1);
     result.fileIndex = nx::utils::random::number(0, 1) == 0
-        ? DeviceFileCatalog::Chunk::FILE_INDEX_NONE
-        : DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION;
+        ? DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION
+        : DeviceFileCatalog::Chunk::FILE_INDEX_NONE;
 
     errorStream
         << "result.startTime: " << result.startTime << std::endl
@@ -626,6 +626,56 @@ TEST(MediaDbTest, BitsTwiddling)
     }
 }
 
+TEST(MediaDbTest, MediaFileOP_ResetValues)
+{
+    nx::media_db::MediaFileOperation mfop;
+    mfop.setCameraId(65535);
+    quint64 newCameraId = nx::utils::random::number(0, 65534);
+    mfop.setCameraId(newCameraId);
+    ASSERT_EQ(newCameraId, mfop.getCameraId());
+
+    mfop.setCatalog(1);
+    mfop.setCatalog(0);
+    ASSERT_EQ(0, mfop.getCatalog());
+
+    mfop.setDuration(std::pow(2, 20));
+    quint64 newDuration = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 20) - 1));
+    mfop.setDuration(newDuration);
+    ASSERT_EQ(newDuration, mfop.getDuration());
+
+    mfop.setFileSize(std::pow(2, 39));
+    quint64 newFileSize = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 39) - 1));
+    mfop.setFileSize(newFileSize);
+    ASSERT_EQ(newFileSize, mfop.getFileSize());
+
+    mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_NONE);
+    mfop.setFileTypeIndex(DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION);
+    ASSERT_EQ(DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, mfop.getFileTypeIndex());
+
+    mfop.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
+    mfop.setRecordType(nx::media_db::RecordType::FileOperationAdd);
+    ASSERT_EQ(nx::media_db::RecordType::FileOperationAdd, mfop.getRecordType());
+
+    mfop.setStartTime(std::pow(2, 42));
+    quint64 newStartTime = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 42) - 1));
+    mfop.setStartTime(newStartTime);
+    ASSERT_EQ(newStartTime, mfop.getStartTime());
+}
+
+TEST(MediaDbTest, CameraOP_ResetValues)
+{
+    nx::media_db::CameraOperation cop;
+    cop.setCameraId(std::pow(2, 16));
+    quint64 newCameraId = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 16) - 1));
+    cop.setCameraId(newCameraId);
+    ASSERT_EQ(newCameraId, cop.getCameraId());
+
+    cop.setCameraUniqueIdLen(std::pow(2, 14));
+    quint64 newCameraUniqueIdLen = nx::utils::random::number(0ULL, (quint64)(std::pow(2, 14) - 1));
+    cop.setCameraUniqueIdLen(newCameraUniqueIdLen);
+    ASSERT_EQ(newCameraUniqueIdLen, cop.getCameraUniqueIdLen());
+}
+
 TEST(MediaDbTest, ReadWrite_Simple)
 {
     nx::ut::utils::WorkDirResource workDirResource;
@@ -718,7 +768,7 @@ TEST(MediaDbTest, DbFileTruncate)
                                      << fileName.toLatin1().constData()
                                      << " remove failed";
         // truncating randomly last record
-        content.truncate(content.size() - nx::utils::random::number((size_t)1, sizeof(qint64) * 2 - 1));
+        content.truncate((int)content.size() - nx::utils::random::number((size_t)1, sizeof(qint64) * 2 - 1));
 
         initDbFile(&dbFile, fileName);
         dbFile.write(content);

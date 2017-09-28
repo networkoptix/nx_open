@@ -1,11 +1,7 @@
-/**********************************************************
-* Feb 12, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <chrono>
+#include <string>
 
 #include <nx/network/async_stoppable.h>
 
@@ -57,6 +53,8 @@ public:
 
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+
+    virtual std::string toString() const = 0;
 };
 
 } // namespace cloud

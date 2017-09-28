@@ -187,7 +187,7 @@ void StreamingChunkTranscoderThread::run()
         //TODO #ak support opened ending (when transcodeParams.endTimestamp() is known only after transcoding is done),
         //that required for minimizing hls live delay
         if ((quint64) srcMediaData->timestamp
-            >= transcodeIter->second->transcodeParams.endTimestamp().count())
+            >= transcodeIter->second->transcodeParams.endTimestamp())
             //|| transcodeIter->second->msTranscoded * USEC_IN_MSEC
                 //>= transcodeIter->second->transcodeParams.duration())
         {

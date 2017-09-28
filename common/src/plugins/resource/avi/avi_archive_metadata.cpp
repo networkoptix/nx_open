@@ -213,20 +213,21 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
 
 bool QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
 {
-    bool success = true;
+    bool isSuccessful = true;
 
-    auto setValueLogged = [this, &success, context, format](Tag tag, const QByteArray& value)
+    auto setValueLogged =
+        [this, &isSuccessful, context, format](Tag tag, const QByteArray& value)
         {
-            const int flags = 0;
+            static const int kFlags = 0; //< No additional flags are needed.
             const int errCode = av_dict_set(&context->metadata,
                 getTagName(tag, format),
                 value,
-                flags);
+                kFlags);
 
             if (errCode >= 0)
                 return;
 
-            success = false;
+            isSuccessful = false;
             NX_VERBOSE(this, lm("Error writing metadata %1: %2").args(getTagName(tag, format),
                 errCode));
         };
@@ -235,7 +236,7 @@ bool QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
 
     // Other tags are not supported in mp4 format.
     if (format == Format::mp4)
-        return success;
+        return isSuccessful;
 
     if (!videoLayoutSize.isEmpty())
     {
@@ -256,5 +257,5 @@ bool QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
     if (!signature.isEmpty())
         setValueLogged(SignatureTag, signature);
 
-    return success;
+    return isSuccessful;
 }

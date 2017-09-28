@@ -39,7 +39,7 @@ SERVER_VOX_PATH=$SERVER_BIN_PATH/vox
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
-BUILD_INFO_TXT=${basedir}/../../common/${arch}/build_info.txt
+BUILD_INFO_TXT=${libdir}/build_info.txt
 
 # Prepare stage dir
 rm -rf $STAGE

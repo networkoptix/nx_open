@@ -1483,10 +1483,21 @@ UDPSocket::UDPSocket(int ipVersion):
     m_destAddr()
 {
     setBroadcast();
+
     int buff_size = 1024 * 512;
     if (::setsockopt(handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof(buff_size)) < 0)
     {
         //error
+    }
+
+    // Made with an assumption that SO_LINGER may cause ::close system call to block 
+    // on win32 with some network drivers when network inteface fails.
+    struct linger lingerOptions = {0};
+    if (setsockopt(
+            handle(), SOL_SOCKET, SO_LINGER,
+            (const char*) &lingerOptions, sizeof(lingerOptions)) < 0)
+    {
+        // Ignoring for now.
     }
 }
 

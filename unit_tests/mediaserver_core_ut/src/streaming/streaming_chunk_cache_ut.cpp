@@ -107,7 +107,7 @@ private:
             0,
             "video/mp2t",
             "alias",
-            std::chrono::microseconds::zero(),
+            0,
             duration,
             MediaQuality::MEDIA_Quality_High,
             {});

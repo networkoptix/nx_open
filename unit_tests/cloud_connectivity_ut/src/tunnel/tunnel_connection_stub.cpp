@@ -28,6 +28,11 @@ void TunnelConnectionStub::setControlConnectionClosedHandler(
     m_onClosedHandler = std::move(handler);
 }
 
+std::string TunnelConnectionStub::toString() const
+{
+    return "TunnelConnectionStub";
+}
+
 bool TunnelConnectionStub::isStarted() const
 {
     return m_isStarted;

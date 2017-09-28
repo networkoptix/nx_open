@@ -5,11 +5,10 @@
 
 #include "streaming_chunk_cache_key.h"
 
-using nx::utils::TimerManager;
-
 const unsigned int DataSourceCache::DEFAULT_LIVE_TIME_MS;
 
-DataSourceCache::DataSourceCache():
+DataSourceCache::DataSourceCache(nx::utils::StandaloneTimerManager* timerManager):
+    m_timerManager(timerManager),
     m_terminated(false)
 {
 }
@@ -26,12 +25,12 @@ DataSourceCache::~DataSourceCache()
     }
 
     for (auto val: timers)
-        TimerManager::instance()->joinAndDeleteTimer(val.first);
+        m_timerManager->joinAndDeleteTimer(val.first);
 }
 
 DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
 {
-    TimerManager::TimerGuard timerGuard;
+    nx::utils::TimerManager::TimerGuard timerGuard;
     QnMutexLocker lock(&m_mutex);
 
     // Searching reader in cache.
@@ -40,10 +39,11 @@ DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
         const bool isTranscoderSuitable = 
             it->first.live() == key.live() &&
             it->first.mediaStreamParamsEqualTo(key) &&
-            it->first.streamingSessionId() == key.streamingSessionId();
+            it->first.streamingSessionId() == key.streamingSessionId() &&
+            !key.streamingSessionId().isEmpty();
         const bool mediaDataProviderSuitable = 
             it->first.live() == key.live() &&
-            it->second.first->mediaDataProvider->currentPosition() == key.startTimestamp();
+            it->second.first->mediaDataProvider->currentPos() == key.startTimestamp();
 
         if (!isTranscoderSuitable)
         {
@@ -57,8 +57,8 @@ DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
 
         // Taking existing reader which is already at required position (from previous chunk).
         DataSourceContextPtr item = it->second.first;
-        timerGuard = TimerManager::TimerGuard(
-            TimerManager::instance(),
+        timerGuard = nx::utils::TimerManager::TimerGuard(
+            m_timerManager,
             it->second.second);
         // timerGuard will remove timer after unlocking mutex.
         m_timers.erase(timerGuard.get());
@@ -66,7 +66,7 @@ DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
 
         if (!mediaDataProviderSuitable)
         {
-            NX_VERBOSE(this, lm("Returning chunk transccoder only. resourceId %1, requested pos %2")
+            NX_VERBOSE(this, lm("Returning chunk transcoder only. resourceId %1, requested pos %2")
                 .arg(key.srcResourceUniqueID()).arg(key.startTimestamp()));
             item->mediaDataProvider.reset();
         }
@@ -83,7 +83,7 @@ void DataSourceCache::put(
     const unsigned int livetimeMs)
 {
     QnMutexLocker lock(&m_mutex);
-    const quint64 timerId = TimerManager::instance()->addTimer(
+    const quint64 timerId = m_timerManager->addTimer(
         this,
         std::chrono::milliseconds(livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs));
     m_cachedDataProviders.emplace(key, std::make_pair(data, timerId));
@@ -94,7 +94,7 @@ void DataSourceCache::removeRange(
     const StreamingChunkCacheKey& beginKey,
     const StreamingChunkCacheKey& endKey)
 {
-    std::list<TimerManager::TimerGuard> timerGuards;
+    std::list<nx::utils::TimerManager::TimerGuard> timerGuards;
     QnMutexLocker lock(&m_mutex);
     for (auto
         it = m_cachedDataProviders.lower_bound(beginKey);
@@ -102,8 +102,8 @@ void DataSourceCache::removeRange(
         )
     {
         timerGuards.emplace_back(
-            TimerManager::TimerGuard(
-                TimerManager::instance(),
+            nx::utils::TimerManager::TimerGuard(
+                m_timerManager,
                 it->second.second));
         it = m_cachedDataProviders.erase(it);
     }

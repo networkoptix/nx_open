@@ -42,7 +42,7 @@ public:
         int channel,
         const QString& containerFormat,
         const QString& alias,
-        std::chrono::microseconds startTimestamp,
+        quint64 startTimestamp,
         std::chrono::microseconds duration,
         MediaQuality streamQuality,
         const std::multimap<QString, QString>& auxiliaryParams );
@@ -53,11 +53,11 @@ public:
     unsigned int channel() const;
     QString alias() const;
     //!Chunk start timestamp (micros). This is internal timestamp, not calendar time
-    std::chrono::microseconds startTimestamp() const;
+    quint64 startTimestamp() const;
     //!Duration in micros
     std::chrono::microseconds duration() const;
     //!startTimestamp() + duration
-    std::chrono::microseconds endTimestamp() const;
+    quint64 endTimestamp() const;
     MediaQuality streamQuality() const;
     //!Video resolution
     /*!
@@ -86,7 +86,7 @@ private:
     int m_channel;
     QString m_containerFormat;
     QString m_alias;
-    std::chrono::microseconds m_startTimestamp;
+    quint64 m_startTimestamp;
     std::chrono::microseconds m_duration;
     MediaQuality m_streamQuality;
     bool m_isLive;

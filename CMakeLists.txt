@@ -190,3 +190,7 @@ if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
 endif()
 
 include(fix_qt_vars)
+
+nx_configure_file(
+    build_variables/maven/filter-resources/build_info.txt
+    ${CMAKE_CURRENT_BINARY_DIR})

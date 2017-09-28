@@ -36,6 +36,10 @@
 QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
+const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_NONE = 0xffff;
+const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION = 0xfffe;
+const int DeviceFileCatalog::Chunk::UnknownDuration = -1;
+
 namespace {
     std::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
 

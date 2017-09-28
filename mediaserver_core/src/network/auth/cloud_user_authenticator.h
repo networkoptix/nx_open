@@ -21,9 +21,9 @@
 
 #include "abstract_user_data_provider.h"
 
-
-class CdbNonceFetcher;
 class CloudConnectionManager;
+class CdbNonceFetcher;
+class CloudUserInfoPool;
 
 /** Add support for authentication using cloud account credentials. */
 class CloudUserAuthenticator
@@ -38,7 +38,8 @@ public:
     CloudUserAuthenticator(
         CloudConnectionManager* const cloudConnectionManager,
         std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
-        const CdbNonceFetcher& cdbNonceFetcher);
+        const CdbNonceFetcher& cdbNonceFetcher,
+        const CloudUserInfoPool& cloudUserInfoPool);
     ~CloudUserAuthenticator();
 
     virtual QnResourcePtr findResByName(const QByteArray& nxUserName) const override;
@@ -73,6 +74,7 @@ private:
     CloudConnectionManager* const m_cloudConnectionManager;
     std::unique_ptr<AbstractUserDataProvider> m_defaultAuthenticator;
     const CdbNonceFetcher& m_cdbNonceFetcher;
+    const CloudUserInfoPool& m_cloudUserInfoPool;
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_cond;
     /** map<pair<username, nonce>, auth_data> */

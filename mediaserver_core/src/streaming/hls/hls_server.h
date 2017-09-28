@@ -28,7 +28,7 @@ namespace nx_hls
         MediaQuality streamQuality = MEDIA_Quality_High;
         int channel = 0;
         QString containerFormat = "mpeg2ts";
-        boost::optional<std::chrono::microseconds> startTimestamp;
+        boost::optional<quint64> startTimestamp;
         boost::optional<std::chrono::microseconds> duration;
         boost::optional<QString> alias;
     };

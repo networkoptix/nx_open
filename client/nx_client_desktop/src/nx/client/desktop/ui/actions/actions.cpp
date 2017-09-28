@@ -930,6 +930,16 @@ void initialize(Manager* manager, Action* root)
         );
 
     factory()
+        .flags(Tree)
+        .separator();
+
+    factory(MakeLayoutTourAction)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Make Showreel"))
+        .condition(condition::hasFlags(Qn::layout, All)
+            && !condition::isSafeMode());
+
+    factory()
         .flags(Scene | Tree)
         .separator();
 
@@ -1521,12 +1531,6 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false);
 
     factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
-
-    factory(MakeLayoutTourAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
-        .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, All)
-            && !condition::isSafeMode());
 
     factory(LayoutTourSettingsAction)
         .flags(Tree | NoTarget)

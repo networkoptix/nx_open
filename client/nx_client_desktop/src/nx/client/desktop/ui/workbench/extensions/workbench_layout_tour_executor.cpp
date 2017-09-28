@@ -321,7 +321,7 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     {
         const auto hint = m_mode == Mode::MultipleLayouts
             ? tr("Use keyboard arrows to switch layouts. To exit the showreel press Esc.")
-            : tr("Use keyboard arrows to switch cameras. Press any key to stop the tour.");
+            : tr("Press any key to stop the tour.");
 
         m_hintLabel = QnGraphicsMessageBox::information(hint, kHintTimeoutMs);
     }

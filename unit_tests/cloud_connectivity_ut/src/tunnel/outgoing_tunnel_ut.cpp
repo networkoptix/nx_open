@@ -107,6 +107,11 @@ public:
         m_onClosedHandler = std::move(handler);
     }
 
+    virtual std::string toString() const override
+    {
+        return "DummyConnection";
+    }
+
     void ignoreConnectRequests()
     {
         m_ignoreConnectRequest = true;

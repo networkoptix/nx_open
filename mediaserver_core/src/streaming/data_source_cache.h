@@ -37,7 +37,7 @@ class DataSourceCache:
 public:
     static const unsigned int DEFAULT_LIVE_TIME_MS = 3 * 1000;
 
-    DataSourceCache();
+    DataSourceCache(nx::utils::StandaloneTimerManager* timerManager);
     virtual ~DataSourceCache();
 
     DataSourceContextPtr take(const StreamingChunkCacheKey& key);
@@ -55,6 +55,7 @@ public:
     virtual void onTimer(const quint64& timerID) override;
 
 private:
+    nx::utils::StandaloneTimerManager* m_timerManager;
     mutable QnMutex m_mutex;
     std::map<StreamingChunkCacheKey, std::pair<DataSourceContextPtr, quint64>> m_cachedDataProviders;
     std::map<quint64, StreamingChunkCacheKey> m_timers;
