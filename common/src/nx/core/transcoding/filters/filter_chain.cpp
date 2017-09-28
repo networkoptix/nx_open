@@ -80,10 +80,6 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     if (m_settings.rotation != 0)
         push_back(QnAbstractImageFilterPtr(new QnRotateImageFilter(m_settings.rotation)));
 
-    //TODO: #GDM implement new timestamp filters here
-    //if (m_settings.timestampParams.enabled)
-    //    result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_settings.layout, m_settings.timestampParams));
-
     for (const auto overlaySettings: m_settings.overlays)
     {
         if (const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(
