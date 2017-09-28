@@ -70,10 +70,11 @@ class Context(models.Model):
 
     product = models.ForeignKey(Product, null=True)
     name = models.CharField(max_length=1024)
-    description = models.TextField()
+    description = models.TextField(blank=True, default="")
     translatable = models.BooleanField(default=True)
     is_global = models.BooleanField(default=False)
     hidden = models.BooleanField(default=False)
+    template = models.TextField(blank=True, default="")
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')

@@ -73,7 +73,7 @@ def update_from_object(cms_structure):
             if not isinstance(record, dict):
                 old_name = None
                 description = None
-                record_type = None
+                record_type = "text"
                 meta = None
                 advanced = False
                 if len(record) == 3:
@@ -90,8 +90,7 @@ def update_from_object(cms_structure):
                 meta = record['meta'] if 'meta' in record else None
                 advanced = record['advanced'] if 'advanced' in record else False
 
-            data_structure = find_or_add_data_structure(
-                name, old_name, context.id, has_language)
+            data_structure = find_or_add_data_structure(name, old_name, context.id, has_language)
 
             data_structure.order = order
             order += 1
@@ -155,7 +154,16 @@ def process_zip(file_descriptor, user, update_structure, update_defaults, update
             continue
 
         # now we have name
-        # find relevant data structure
+
+        # try to find relevant context and update its template
+        if update_structure:
+            context = Context.objects.filter(file_path=short_name)
+            if context.exists():
+                context.template = zip_file.read(name)
+                context.save()
+                continue
+
+        # try to find relevant data structure and update its default (maybe)
         structure = DataStructure.objects.filter(name=short_name)
         if not structure.exists():
             print("NOT EXISTS", short_name)

@@ -47,7 +47,7 @@ def read_cms_strings(filename):
     pattern = re.compile(r'%\S+?%')
     with open(filename, 'r') as file:
         data = file.read()
-        return set(re.findall(pattern, data))
+        return data, set(re.findall(pattern, data))
 
 
 def read_structure_file(filename, product_id, global_strings):
@@ -56,7 +56,7 @@ def read_structure_file(filename, product_id, global_strings):
     if language and language != "en_US":
         return
     # now read file and get records from there.
-    strings = read_cms_strings(filename)
+    data, strings = read_cms_strings(filename)
     if not strings:  # if there is no records at all - we ignore it
         return
 
@@ -64,9 +64,9 @@ def read_structure_file(filename, product_id, global_strings):
 
     # Here we check if there are any unique strings (which are not global)
     strings = [string for string in strings if string not in global_strings]
-    context = find_or_add_context_by_file(
-        context_name, product_id, bool(language))
-
+    context = find_or_add_context_by_file(context_name, product_id, bool(language))
+    context.template = data  # update template for this context
+    context.save()
     for string in strings:
         structure.find_or_add_data_structure(string, None, context.id, bool(language))
 

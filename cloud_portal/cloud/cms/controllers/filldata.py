@@ -30,14 +30,6 @@ def context_for_file(filename, customization_name):
     return context_name, language
 
 
-def file_for_context(context, customization_name, language_code):
-    file_name = context.file_path
-    if context.translatable:
-        file_name = file_name.replace('lang_{{language}}', 'lang_'+language_code)
-    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
-    return os.path.join(custom_dir, file_name)
-
-
 def target_file(file_name, customization, language_code, preview):
     if language_code:
         file_name = file_name.replace("{{language}}", language_code)
@@ -76,26 +68,24 @@ def save_content(filename, content):
         file.write(content)
 
 
-def process_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
+def process_context(context, language_code, customization, preview, version_id, global_contexts):
     if language_code:
         language = Language.objects.filter(code=language_code)
         if not language.exists():
             return
         language = customization.default_language
 
-    content = ''
-    if not context.is_global:
-        source_file = file_for_context(context, customization.name, language_code)
-        with open(source_file, 'r') as file:
-            content = file.read()
-
-    content = process_context_structure(customization, context, content, language, version_id, preview)
-
+    content = process_context_structure(customization, context, context.template, language, version_id, preview)
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
                 customization, global_context, content, None, version_id, preview)
 
+    return content
+
+
+def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
+    content = process_context(context, language_code, customization, preview, version_id, global_contexts)
     target_file_name = target_file(context_path, customization, language_code, preview)
     save_content(target_file_name, content)
 
@@ -209,7 +199,7 @@ def fill_content(customization_name='default', product='cloud_portal',
 
         # update affected languages
         for language_code in changed_languages:
-            process_context(context, context.file_path, language_code,
+            save_context(context, context.file_path, language_code,
                             customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
@@ -218,7 +208,6 @@ def fill_content(customization_name='default', product='cloud_portal',
 def save_b64_to_file(value, filename, storage_location):
     if not value:
         return
-
     file_name = os.path.join(storage_location, filename)
     make_dir(file_name)
     image_png = base64.b64decode(value)
