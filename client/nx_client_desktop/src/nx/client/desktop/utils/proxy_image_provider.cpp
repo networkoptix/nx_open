@@ -93,13 +93,15 @@ void ProxyImageProvider::setImageProcessor(AbstractImageProcessor* imageProcesso
     {
         *m_imageProcessorConnections << connect(m_imageProcessor, &QObject::destroyed,
             this, [this]() { setImageProcessor(nullptr); });
+
+        *m_imageProcessorConnections << connect(m_imageProcessor,
+            &AbstractImageProcessor::updateRequired, this, &ProxyImageProvider::updateFromSource);
     }
 
     if (!m_sourceProvider)
         return;
 
-    setSourceSizeHint(m_sourceProvider->sizeHint());
-    setSourceImage(m_sourceProvider->image());
+    updateFromSource();
 }
 
 void ProxyImageProvider::doLoadAsync()
@@ -143,6 +145,12 @@ void ProxyImageProvider::setSourceSizeHint(const QSize& sourceSizeHint)
 void ProxyImageProvider::setSourceImage(const QImage& sourceImage)
 {
     setImage(m_imageProcessor ? m_imageProcessor->process(sourceImage) : sourceImage);
+}
+
+void ProxyImageProvider::updateFromSource()
+{
+    setSourceSizeHint(m_sourceProvider->sizeHint());
+    setSourceImage(m_sourceProvider->image());
 }
 
 } // namespace desktop

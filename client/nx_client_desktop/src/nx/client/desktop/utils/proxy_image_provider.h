@@ -41,6 +41,7 @@ private:
     void setImage(const QImage& image);
     void setSourceSizeHint(const QSize& sourceSizeHint);
     void setSourceImage(const QImage& sourceImage);
+    void updateFromSource();
 
 private:
     QnImageProvider* m_sourceProvider = nullptr;

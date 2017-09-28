@@ -18,6 +18,9 @@ public:
 
    virtual QSize process(const QSize& sourceSize) const = 0;
    virtual QImage process(const QImage& sourceImage) const = 0;
+
+signals:
+   void updateRequired();
 };
 
 } // namespace desktop

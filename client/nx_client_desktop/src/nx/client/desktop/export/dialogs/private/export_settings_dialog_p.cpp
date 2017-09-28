@@ -20,6 +20,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 #include <nx/client/desktop/utils/proxy_image_provider.h>
+#include <nx/client/desktop/utils/transcoding_image_processor.h>
 
 namespace {
 
@@ -54,7 +55,8 @@ ExportSettingsDialog::Private::Private(const QnCameraBookmark& bookmark, const Q
     base_type(parent),
     m_previewSize(previewSize),
     m_bookmarkName(bookmark.name),
-    m_bookmarkDescription(bookmark.description)
+    m_bookmarkDescription(bookmark.description),
+    m_mediaImageProcessor(new TranscodingImageProcessor())
 {
     m_exportLayoutSettings.mode = ExportLayoutSettings::Mode::Export;
 }
@@ -167,6 +169,8 @@ void ExportSettingsDialog::Private::updateTranscodingSettings()
         m_exportMediaSettings.transcodingSettings.dewarping = QnItemDewarpingParams();
         m_exportMediaSettings.transcodingSettings.zoomWindow = QRectF();
     }
+
+    updateMediaImageProcessor();
 }
 
 void ExportSettingsDialog::Private::setApplyFilters(bool value)
@@ -220,6 +224,8 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         QSize(),
         QnThumbnailRequestData::JpgFormat,
         m_mediaImageProvider.data()));
+
+    m_mediaImageProvider->setImageProcessor(m_mediaImageProcessor.data());
 
     connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,
         this, &Private::setFrameSize);
@@ -674,6 +680,23 @@ void ExportSettingsDialog::Private::updateTimestampText()
 
     overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
         m_exportMediaPersistentSettings.timestampOverlay.format));
+}
+
+void ExportSettingsDialog::Private::updateMediaImageProcessor()
+{
+    QnLegacyTranscodingSettings processorSettings;
+    const auto& settings = m_exportMediaSettings.transcodingSettings;
+
+    processorSettings.itemDewarpingParams = settings.dewarping;
+    processorSettings.resource = m_exportMediaSettings.mediaResource;
+    processorSettings.contrastParams = settings.enhancement;
+    processorSettings.rotation = settings.rotation;
+    processorSettings.zoomWindow = settings.zoomWindow;
+    processorSettings.forcedAspectRatio = settings.aspectRatio.isValid()
+        ? settings.aspectRatio.toFloat()
+        : 0.0;
+
+    m_mediaImageProcessor->setTranscodingSettings(processorSettings);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)

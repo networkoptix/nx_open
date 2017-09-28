@@ -31,6 +31,7 @@ namespace desktop {
 
 class LayoutThumbnailLoader;
 class ProxyImageProvider;
+class TranscodingImageProcessor;
 
 class ExportSettingsDialog::Private: public Connective<QObject>
 {
@@ -103,6 +104,7 @@ private:
     void updateTimestampText();
     void overlayPositionChanged(ExportOverlayType type);
     void updateTranscodingSettings();
+    void updateMediaImageProcessor();
     QString cachedImageFileName() const;
 
     void setFrameSize(const QSize& size);
@@ -136,8 +138,10 @@ private:
 
     QScopedPointer<ProxyImageProvider> m_mediaImageProvider;
     QScopedPointer<LayoutThumbnailLoader> m_layoutImageProvider;
+    QScopedPointer<TranscodingImageProcessor> m_mediaImageProcessor;
     QSize m_fullFrameSize;
     qreal m_overlayScale = 1.0;
+
 
     bool m_positionUpdating = false;
 };
