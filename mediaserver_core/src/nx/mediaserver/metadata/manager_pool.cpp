@@ -6,7 +6,7 @@
 #include <plugins/plugin_tools.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/serialization/json.h>
@@ -44,8 +44,12 @@ ResourceMetadataContext::ResourceMetadataContext(
 ManagerPool::ManagerPool(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
-    auto resourcePool = commonModule->resourcePool();
-    
+}
+
+void ManagerPool::init()
+{
+    auto resourcePool = commonModule()->resourcePool();
+
     connect(
         resourcePool, &QnResourcePool::resourceAdded,
         this, &ManagerPool::at_resourceAdded);
@@ -57,6 +61,22 @@ ManagerPool::ManagerPool(QnCommonModule* commonModule):
     connect(
         qnServerModule->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
         this, &ManagerPool::at_rulesUpdated);
+
+    QMetaObject::invokeMethod(this, "initExistingResources");
+}
+
+void ManagerPool::initExistingResources()
+{
+    auto resourcePool = commonModule()->resourcePool();
+    const auto mediaServer = resourcePool
+        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+
+    const auto cameras = resourcePool->getAllCameras(
+        mediaServer,
+        /*ignoreDesktopCamera*/ true);
+
+    for (const auto& camera: cameras)
+        at_resourceAdded(camera);
 }
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
