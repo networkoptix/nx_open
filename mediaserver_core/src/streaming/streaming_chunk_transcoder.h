@@ -104,9 +104,12 @@ private:
         QnSecurityCamResourcePtr cameraResource,
         QnVideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
-    AbstractOnDemandDataProviderPtr createMediaDataProvider(
-        QnSecurityCamResourcePtr cameraResource,
+    AbstractOnDemandDataProviderPtr createLiveMediaDataProvider(
+        const VideoCameraLocker& /*locker*/,
         QnVideoCameraPtr camera,
+        const StreamingChunkCacheKey& transcodeParams);
+    AbstractOnDemandDataProviderPtr createArchiveReader(
+        QnSecurityCamResourcePtr cameraResource,
         const StreamingChunkCacheKey& transcodeParams);
 
     bool startTranscoding(
