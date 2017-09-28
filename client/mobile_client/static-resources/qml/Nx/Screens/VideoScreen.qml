@@ -496,6 +496,7 @@ PageBase
                     ptzAvailable: ptzPanel.controller.available
                         && videoScreenController.accessRightsHelper.canManagePtz
                         && !videoScreenController.offline
+                        && !videoScreenController.resourceHelper.fisheyeParams.enabled
                     onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }
@@ -510,6 +511,7 @@ PageBase
                     ptzAvailable: ptzPanel.controller.available
                         && videoScreenController.accessRightsHelper.canManagePtz
                         && !videoScreenController.offline
+                        && !videoScreenController.resourceHelper.fisheyeParams.enabled
                     onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }
