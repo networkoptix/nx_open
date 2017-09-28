@@ -299,3 +299,13 @@ def download_file(request, path):
     if file:
         return response_attachment(file, os.path.basename(path), "application")
     return Response("File does not exist", status=404)
+
+
+@api_view(["GET"])
+def download_package(request, product_name, customization_name=None):
+    if not customization_name:
+        customization_name = settings.CUSTOMIZATION
+    version_id = request.GET['version_id'] if 'version_id' in request.GET else None
+    preview = 'draft' in request.GET
+    zipped_data = filldata.get_zip_package(customization_name, product_name, preview, version_id)
+    return response_attachment(zipped_data, product_name+".zip", "application/zip")

@@ -4,6 +4,9 @@ import re
 import json
 import codecs
 import base64
+import zipfile
+from StringIO import StringIO
+
 
 SOURCE_DIR = 'static/{{customization}}/source/'
 
@@ -241,6 +244,57 @@ def fill_content(customization_name='default', product='cloud_portal',
             save_context(context, context.file_path, language_code, customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
+
+
+def zip_context(zip_file, context, customization, language_code, preview, version_id, global_contexts, add_root):
+    if context.template:
+        data = process_context(context, language_code, customization, preview, version_id, global_contexts)
+        name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
+        if add_root:
+            name = os.path.join(customization.name, name)
+        zip_file.writestr(name, data)
+    file_structures = context.datastructure_set.filter(type__in=(DataStructure.DATA_TYPES.image,
+                                                                 DataStructure.DATA_TYPES.file))
+    for file_structure in file_structures:
+        data = file_structure.find_actual_value(customization,
+                                                Language.objects.get(code=language_code) if language_code else None,
+                                                version_id)
+        data = base64.b64decode(data)
+        name = file_structure.name.replace("{{language}}", language_code) if language_code else file_structure.name
+        if add_root:
+            name = os.path.join(customization.name, name)
+        zip_file.writestr(name, data)
+
+
+def get_zip_package(customization_name, product_name,
+                    preview=True,
+                    version_id=None,
+                    add_root=True):
+    zip_data = StringIO()
+    zip_file = zipfile.ZipFile(zip_data, "a", zipfile.ZIP_DEFLATED, False)
+
+    product = Product.objects.get(name=product_name)
+    customization = Customization.objects.get(name=customization_name)
+    global_contexts = Context.objects.filter(is_global=True, product_id=product.id)
+    languages = customization.languages_list
+
+    for context in product.context_set.all():
+        if context.translatable:
+            for language_code in languages:
+                zip_context(zip_file, context, customization, language_code,
+                            preview, version_id, global_contexts, add_root)
+        else:
+            zip_context(zip_file, context, customization, None,
+                        preview, version_id, global_contexts, add_root)
+
+    # Mark the files as having been created on Windows so that
+    # Unix permissions are not inferred as 0000
+    for file in zip_file.filelist:
+        file.create_system = 0
+
+    zip_file.close()
+    zip_data.seek(0)
+    return zip_data.read()
 
 
 def save_b64_to_file(value, filename, storage_location):

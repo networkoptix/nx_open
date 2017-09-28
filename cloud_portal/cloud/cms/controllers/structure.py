@@ -159,14 +159,17 @@ def process_zip(file_descriptor, user, update_structure, update_defaults, update
         if update_structure:
             context = Context.objects.filter(file_path=short_name)
             if context.exists():
-                context.template = zip_file.read(name)
-                context.save()
+                context = context.first()
+                try:
+                    context.template = zip_file.read(name).decode("utf-8")
+                    context.save()
+                except UnicodeDecodeError:
+                    print("File is not UTF-encoded", name)
                 continue
 
         # try to find relevant data structure and update its default (maybe)
         structure = DataStructure.objects.filter(name=short_name)
         if not structure.exists():
-            print("NOT EXISTS", short_name)
             continue
         structure = structure.first()
 
