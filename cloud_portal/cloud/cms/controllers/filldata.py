@@ -91,7 +91,7 @@ def process_context(context, context_path, language_code, customization, preview
 
     content = process_context_structure(customization, context, content, language, version_id, preview)
 
-    if not context.is_global:  # if corrent context is global - do not apply other contexts
+    if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
                 customization, global_context, content, None, version_id, preview)
@@ -202,8 +202,8 @@ def fill_content(customization_name='default', product='cloud_portal',
         # if the default language is changed - we update all languages (lazy way)
         # otherwise - update only affected languages
         if incremental:
-            changed_languages = changed_records.filter(context_id=context.id).values_list('language').distinct()
-            if changed_languages.exists(language_id=customization.default_language_id):
+            changed_languages = changed_records.filter(data_structure__context_id=context.id).values_list('language').distinct()
+            if changed_languages.filter(id=customization.default_language_id).exists():
                 # if default language changes - it can affect all languages in the context
                 changed_languages = customization.languages_list
 
