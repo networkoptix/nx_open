@@ -14,7 +14,7 @@ namespace {
 
 static constexpr int kMinimumWidth = 60;
 
-static constexpr int kMinimumFontSize = 8;
+static constexpr int kMinimumFontSize = 10;
 static constexpr int kMaximumFontSize = 400;
 
 } // namespace
