@@ -220,7 +220,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_mediaImageProvider->setSourceProvider(new QnSingleThumbnailLoader(
         camera,
         m_exportMediaSettings.timePeriod.startTimeMs,
-        QnThumbnailRequestData::kDefaultRotation,
+        0,
         QSize(),
         QnThumbnailRequestData::JpgFormat,
         m_mediaImageProvider.data()));
