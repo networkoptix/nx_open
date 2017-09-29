@@ -7,7 +7,6 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <common/common_module.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
 

@@ -10,17 +10,21 @@
 
 #include <QtCore/QMap>
 
+#include <plugins/resource/onvif/onvif_audio_transmitter.h>
+#include <plugins/plugin_internal_tools.h>
 #include <utils/xml/camera_advanced_param_reader.h>
-#include <core/resource/camera_advanced_param.h>
 #include <camera/camera_pool.h>
 #include <common/common_module.h>
 
 #include <nx/utils/log/log.h>
-#include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <core/resource/media_stream_capability.h>
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/vms/event/events/events.h>
+#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+
 #include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource/media_stream_capability.h>
+#include <core/resource/camera_advanced_param.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -41,6 +45,10 @@ static const QString kFramePriorityProperty = lit("PriorityType");
 
 static const QString kNvrDeviceType = lit("NVR");
 static const QString kHanwhaVideoSourceStateOn = lit("On");
+
+//Taken from Hanwha metadata plugin manifest.json
+static const QnUuid kHanwhaInputPortEventId =
+    QnUuid(lit("{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}"));
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -76,6 +84,23 @@ static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamPro
         {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamEntropyCodingParamName},
         {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamEntropyCodingParamName}
     }}
+};
+
+static const std::set<QString> kHanwhaStreamLimitParameters = {
+    lit("Resolution"),
+    lit("FrameRate"),
+    lit("Bitrate"),
+    lit("EncodingType"),
+    lit("H264.BitrateControlType"),
+    lit("H264.GOVLength"),
+    lit("H264.PriorityType"),
+    lit("H264.Profile"),
+    lit("H264.EntropyCoding"),
+    lit("H265.BitrateControlType"),
+    lit("H265.GOVLength"),
+    lit("H265.PriorityType"),
+    lit("H265.Profile"),
+    lit("H265.EntropyCoding"),
 };
 
 struct UpdateInfo
@@ -353,6 +378,103 @@ bool HanwhaResource::setParamsPhysical(
     reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
 
     return success;
+}
+
+QnIOPortDataList HanwhaResource::getRelayOutputList() const
+{
+    QnIOPortDataList result;
+    for (const auto& entry: m_ioPortTypeById)
+    {
+        if (entry.portType == Qn::PT_Output)
+            result.push_back(entry);
+    }
+
+    return result;
+}
+
+QnIOPortDataList HanwhaResource::getInputPortList() const
+{
+    QnIOPortDataList result;
+    for (const auto& entry : m_ioPortTypeById)
+    {
+        if (entry.portType == Qn::PT_Input)
+            result.push_back(entry);
+    }
+
+    return result;
+}
+
+bool HanwhaResource::setRelayOutputState(
+    const QString& ouputId,
+    bool activate,
+    unsigned int autoResetTimeoutMs)
+{
+    const auto info = portInfoFromId(ouputId);
+    const auto state = activate ? lit("On") : lit("Off");
+
+    HanwhaRequestHelper::Parameters parameters = 
+        {{lit("%1.%2.State").arg(info.prefix).arg(info.number), state}};
+
+    if (info.submenu == lit("alarmoutput"))
+    {
+        parameters.emplace(
+            lit("%1.%2.ManualDuration")
+                .arg(info.prefix)
+                .arg(info.number),
+            lit("Always"));
+    }
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    const auto response = helper.control(
+        lit("io/%1").arg(info.submenu),
+        parameters);
+
+    return response.isSuccessful();
+}
+
+bool HanwhaResource::startInputPortMonitoringAsync(
+    std::function<void(bool)>&& completionHandler)
+{
+    m_areInputPortsMonitored = true;
+    return true;
+}
+
+void HanwhaResource::stopInputPortMonitoringAsync()
+{
+    m_areInputPortsMonitored = false;
+}
+
+bool HanwhaResource::isInputPortMonitored() const
+{
+    return m_areInputPortsMonitored;
+}
+
+bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
+{
+    if (!m_areInputPortsMonitored)
+        return false;
+    
+    const auto analyticsEvent = event.dynamicCast<nx::vms::event::AnalyticsSdkEvent>();
+    if (!analyticsEvent)
+        return false;
+
+    const auto parameters = analyticsEvent->getRuntimeParams();
+    if (parameters.analyticsEventId() != kHanwhaInputPortEventId)
+        return false;
+
+    emit cameraInput(
+        toSharedPointer(this),
+        analyticsEvent->auxiliaryData(),
+        analyticsEvent->getToggleState() == nx::vms::event::EventState::active,
+        parameters.eventTimestampUsec);
+
+    return true;
+}
+
+bool HanwhaResource::isEventComesFromAnalyticsDriver(nx::vms::event::EventType eventType) const
+{
+    return base_type::isEventComesFromAnalyticsDriver(eventType)
+        || eventType == nx::vms::event::EventType::cameraInputEvent;
 }
 
 QString HanwhaResource::sessionKey(
@@ -643,48 +765,61 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 {
     QnIOPortDataList ioPorts;
 
-    const auto alarmInputs = m_cgiParameters.parameter(
-        lit("eventstatus/eventstatus/check/AlarmInput"));
+    const auto maxAlarmInputs = m_attributes.attribute<int>(
+        lit("Eventsource/MaxAlarmInput"));
 
-    if (alarmInputs && alarmInputs->isValid())
+    const auto maxAlarmOutputs = m_attributes.attribute<int>(
+        lit("IO/MaxAlarmOutput"));
+
+    const auto maxAuxDevices = m_attributes.attribute<int>(
+        lit("IO/MaxAux"));
+    
+    if (maxAlarmInputs.is_initialized() && *maxAlarmInputs > 0)
     {
-        const auto inputs = alarmInputs->possibleValues();
-        if (!inputs.isEmpty())
-            setCameraCapability(Qn::RelayInputCapability, true);
-
-        for (const auto& input: inputs)
+        setCameraCapability(Qn::RelayInputCapability, true);
+        for (auto i = 1; i <= maxAlarmInputs.get(); ++i)
         {
             QnIOPortData inputPortData;
             inputPortData.portType = Qn::PT_Input;
-            inputPortData.id = lit("HanwhaAlarmInput.%1").arg(input);
-            inputPortData.inputName = tr("Alarm Input #%1").arg(input);
+            inputPortData.id = lit("AlarmInput.%1").arg(i);
+            inputPortData.inputName = tr("Alarm Input #%1").arg(i);
 
+            m_ioPortTypeById[inputPortData.id] = inputPortData;
             ioPorts.push_back(inputPortData);
         }
     }
 
-    const auto alarmOutputs = m_cgiParameters
-        .parameter(lit("eventstatus/eventstatus/check/AlarmOutput"));
-
-    if (alarmOutputs && alarmOutputs->isValid())
+    if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
     {
-        const auto outputs = alarmOutputs->possibleValues();
-        if (!outputs.isEmpty())
-            setCameraCapability(Qn::RelayOutputCapability, true);
-
-        for (const auto& output : outputs)
+        setCameraCapability(Qn::RelayOutputCapability, true);
+        for (auto i = 1; i <= maxAlarmOutputs.get(); ++i)
         {
             QnIOPortData outputPortData;
             outputPortData.portType = Qn::PT_Output;
-            outputPortData.id = lit("HanwhaAlarmOutput.%1").arg(output);
-            outputPortData.outputName = tr("Alarm Output #%1").arg(output);
+            outputPortData.id = lit("AlarmOutput.%1").arg(i);
+            outputPortData.outputName = tr("Alarm Output #%1").arg(i);
 
+            m_ioPortTypeById[outputPortData.id] = outputPortData;
+            ioPorts.push_back(outputPortData);
+        }
+    }
+
+    if (maxAuxDevices.is_initialized() && *maxAuxDevices > 0)
+    {
+        setCameraCapability(Qn::RelayOutputCapability, true);
+        for (auto i = 1; i <= maxAuxDevices.get(); ++i)
+        {
+            QnIOPortData outputPortData;
+            outputPortData.portType = Qn::PT_Output;
+            outputPortData.id = lit("Aux.%1").arg(i);
+            outputPortData.outputName = tr("Auxiliary Device #%1").arg(i);
+
+            m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
         }
     }
 
     setIOPorts(ioPorts);
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1549,7 +1684,7 @@ bool HanwhaResource::fillRanges(
     QnCameraAdvancedParams* inOutParameters,
     const HanwhaCgiParameters& cgiParameters) const
 {
-    for (const auto& id : inOutParameters->allParameterIds())
+    for (const auto& id: inOutParameters->allParameterIds())
     {
         auto parameter = inOutParameters->getParameterById(id);
         auto info = advancedParameterInfo(id);
@@ -2112,6 +2247,20 @@ QString HanwhaResource::propertyByPrameterAndRole(
         return QString();
 
     return entry->second;
+}
+
+HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id) const
+{
+    HanwhaPortInfo result;
+    auto split = id.split(L'.');
+    if (split.size() != 2)
+        return result;
+
+    result.prefix = split[0];
+    result.number = split[1];
+    result.submenu = result.prefix.toLower();
+
+    return result;
 }
 
 bool HanwhaResource::isNvr() const

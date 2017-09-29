@@ -83,6 +83,7 @@ struct HanwhaEvent
     boost::optional<int> region;
     bool isActive = false;
     Hanwha::EventItemType itemType; //< e.g Gunshot for sound classification
+    QString fullEventName;
 };
 
 using HanwhaEventList = std::vector<HanwhaEvent>;

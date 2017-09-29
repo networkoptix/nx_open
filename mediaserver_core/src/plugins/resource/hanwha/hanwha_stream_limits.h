@@ -22,8 +22,6 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-extern const std::set<QString> kHanwhaStreamLimitParameters;
-
 struct HanwhaStreamLimits
 {
     std::vector<QSize> resolutions;

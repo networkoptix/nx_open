@@ -45,6 +45,26 @@ public:
         const QnCameraAdvancedParamValueList &values,
         QnCameraAdvancedParamValueList &result) override;
 
+    virtual QnIOPortDataList getRelayOutputList() const override;
+
+    virtual QnIOPortDataList getInputPortList() const override;
+
+    virtual bool setRelayOutputState(
+        const QString& ouputId,
+        bool activate,
+        unsigned int autoResetTimeoutMs = 0) override;
+
+    virtual bool startInputPortMonitoringAsync(
+        std::function<void(bool)>&& completionHandler) override;
+
+    virtual void stopInputPortMonitoringAsync() override;
+
+    virtual bool isInputPortMonitored() const override;
+
+    virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
+
+    virtual bool isEventComesFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
+
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
     bool isVideoSourceActive();
@@ -197,8 +217,11 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
+
     void initMediaStreamCapabilities();
+
     nx::media::CameraStreamCapability mediaCapabilityForRole(Qn::ConnectionRole role) const;
+
     bool executeServiceCommand(
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& info);
@@ -206,6 +229,15 @@ private:
     bool resetProfileToDefault(Qn::ConnectionRole role);
 
     QString propertyByPrameterAndRole(const QString& parameter, Qn::ConnectionRole role) const;
+
+    struct HanwhaPortInfo
+    {
+        QString submenu;
+        QString number;
+        QString prefix;
+    };
+
+    HanwhaPortInfo portInfoFromId(const QString& id) const;
 
 private:
     using AdvancedParameterId = QString;
@@ -226,6 +258,8 @@ private:
     bool m_isNvr = false;
 
     nx::media::CameraMediaCapability m_capabilities;
+    QMap<QString, QnIOPortData> m_ioPortTypeById;
+    std::atomic<bool> m_areInputPortsMonitored = false;
 };
 
 } // namespace plugins

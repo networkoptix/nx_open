@@ -1,5 +1,6 @@
 #include "manager_pool.h"
 
+#include <common/common_module.h>
 #include <media_server/media_server_module.h>
 
 #include <plugins/plugin_manager.h>
@@ -190,7 +191,11 @@ AbstractMetadataHandler* ManagerPool::createMetadataHandler(
     const QnUuid& pluginId)
 {
     auto handler = new EventHandler();
-    handler->setResource(resource);
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return nullptr;
+
+    handler->setResource(camera);
     handler->setPluginId(pluginId);
 
     return handler;
