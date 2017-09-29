@@ -35,6 +35,17 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     Model model(settings);
+    for (;;)
+    {
+        if (model.doMandatoryInitialization())
+            break;
+        if (isTerminated())
+            return -1;
+
+        NX_INFO(this, lm("Retrying model initialization after delay"));
+        std::this_thread::sleep_for(
+            settings.cassandraConnection().delayBeforeRetryingInitialConnect);
+    }
     m_model = &model;
 
     Controller controller(settings, &model);

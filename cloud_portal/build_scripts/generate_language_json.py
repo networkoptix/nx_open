@@ -1,14 +1,8 @@
 import os
-import re
-import xml.etree.ElementTree as eTree
-import yaml
-from os.path import join
-
 import json
 import errno
-import yaml
-import shutil
 import codecs
+import sys
 
 
 def make_dir(filename):
@@ -61,7 +55,6 @@ def merge_json(target_filename, source_filename, key=None):
 
 
 def generate_languages_files(languages, template_filename):
-    languages_json = []
     # Localize this language
     with codecs.open(template_filename, 'r', 'utf-8') as file_descriptor:
         template = json.load(file_descriptor)
@@ -71,26 +64,18 @@ def generate_languages_files(languages, template_filename):
         merge(template, all_strings)
         language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
 
-        print ("Load: " + language_json_filename)
+        print("Load: " + language_json_filename)
         with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
             data = json.load(file_descriptor)
             data["language"] = lang
-            languages_json.append({
-                "language": lang,
-                "name": data["language_name"] if "language_name" in data else data["name"]
-            })
             merge(data, all_strings)
         save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
         merge_json("static/lang_" + lang + "/language.json",  "static/lang_" + lang + "/web_common/commonLanguage.json", 'common')
-    save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
 
-# Read config - get languages there
-config = yaml.safe_load(open('../cloud_portal.yaml'))
-
-# Iterate languages
-if 'languages' not in config:
-    raise 'No languages section in cloud_portal.yaml'
+languages = sys.argv[1:]
+if not languages:
+    languages = ["en_US"]
 
 merge_json('static/language.json', 'static/web_common/commonLanguage.json', 'common')
-generate_languages_files(config['languages'], 'static/language.json')
+generate_languages_files(languages, 'static/language.json')

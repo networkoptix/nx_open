@@ -66,36 +66,49 @@ def save_unrevisioned_records(customization, language, data_structures,
         new_record_value = ""
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
-        if data_structure.get_type('Image') == data_structure.type:
+        if data_structure.type == DataStructure.DATA_TYPES.image\
+                or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
             if data_structure_name in request_files:
-                new_record_value, dimensions, invalid_file_type = handle_image_upload(
-                    request_files[data_structure_name])
+                new_record_value, meta, invalid_file_type = handle_file_upload(
+                    request_files[data_structure_name], data_structure)
 
                 if invalid_file_type:
                     upload_errors.append(
                         (data_structure_name,
-                         'Invalid file type. Can only upload ".png"')
-                    )
+                         "Invalid file type. Uploaded file is {}. It should be {}."\
+                         .format(request_files[data_structure_name].content_type,
+                                 data_structure.meta_settings['format'])))
                     continue
 
                 # Gets the meta_settings form the DataStructure to check if the sizes are valid
                 # if the length is zero then there is no meta settings
                 if len(data_structure.meta_settings):
-                    size_errors = check_image_dimensions(
-                        data_structure_name,
-                        data_structure.meta_settings,
-                        dimensions)
+                    size_errors = None
+                    if data_structure.type == DataStructure.DATA_TYPES.image:
+                        size_errors = check_image_dimensions(
+                            data_structure_name,
+                            data_structure.meta_settings,
+                            meta)
 
+                    elif data_structure.type == DataStructure.DATA_TYPES.file:
+                        if 'file_size' in meta\
+                                and request_files[data_structure_name].size > meta['file_size']:
+                            size_errors = (data_structure_name, 'File size is {} it should be less than {}'\
+                                           .format(request_data[data_structure_name].size,
+                                                   meta['file_size']))
                     if size_errors:
                         upload_errors.extend(size_errors)
                         continue
             # If neither case do nothing for this record
             else:
                 continue
-        else:
+        elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
 
+
+        if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
+            continue
         if records.exists():
             if new_record_value == records.latest('created_date').value:
                 continue
@@ -154,16 +167,21 @@ def remove_unused_records(customization):
             record.delete()
 
 
-def generate_preview(context=None):
-    fill_content(customization_name=settings.CUSTOMIZATION)
+def generate_preview(context=None, send_to_review=False):
+    fill_content(customization_name=settings.CUSTOMIZATION,
+                 preview=True,
+                 incremental=True,
+                 changed_context=context,
+                 send_to_review=send_to_review)
     return context.url + "?preview" if context else "?preview"
 
 
 def publish_latest_version(customization, user):
     publish_errors = accept_latest_draft(customization, user)
     if not publish_errors:
-        fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
+        fill_content(customization_name=customization.name, preview=False, incremental=True)
     return publish_errors
+
 
 def send_version_for_review(customization, language, data_structures,
                             product, request_data, request_files, user):
@@ -203,16 +221,21 @@ def get_records_for_version(version):
     return contexts
 
 
-def handle_image_upload(image):
-    encoded_string = base64.b64encode(image.read())
-    file_type = image.content_type
+def handle_file_upload(file, data_structure):
+    encoded_string = base64.b64encode(file.read())
+    file_type = file.content_type
 
-    if file_type != 'image/png':
+    if 'format' in data_structure.meta_settings and data_structure.meta_settings['format'] not in file_type:
         return None, None, True
 
-    newImage = Image.open(image)
-    width, height = newImage.size
-    return encoded_string, {'width': width, 'height': height}, False
+    if data_structure.type == DataStructure.DATA_TYPES.image:
+        newImage = Image.open(file)
+        width, height = newImage.size
+        meta = {'width': width, 'height': height}
+    elif data_structure.type == DataStructure.DATA_TYPES.file:
+        meta = data_structure.meta_settings
+
+    return encoded_string, meta, False
 
 
 def check_image_dimensions(data_structure_name,

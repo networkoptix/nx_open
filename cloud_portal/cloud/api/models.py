@@ -5,12 +5,6 @@ from django.utils.deprecation import CallableFalse, CallableTrue
 from django.template.defaultfilters import truncatechars
 
 
-from cms.models import Customization
-from cloud import settings
-
-from django.utils import timezone
-
-
 class Account(PermissionsMixin):
 
     objects = AccountManager()
@@ -26,7 +20,6 @@ class Account(PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     language = models.CharField(max_length=7, blank=True)
     customization = models.CharField(max_length=255,null=True)
-
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['registeredDate', 'createdDate']

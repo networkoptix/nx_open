@@ -57,6 +57,8 @@ public:
         m_relayTest(relayTest)
     {}
 
+    virtual bool connectToDb() override;
+
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& /*domainName*/) const override;
 

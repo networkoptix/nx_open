@@ -53,7 +53,7 @@
 
                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in {{PRODUCT_NAME}}.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in %PRODUCT_NAME%.</span>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
