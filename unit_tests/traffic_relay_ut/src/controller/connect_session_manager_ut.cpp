@@ -30,9 +30,15 @@ namespace test {
 
 namespace {
 
-class RemoteRelayPeerPoolStub: public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
+class RemoteRelayPeerPoolStub:
+    public nx::cloud::relay::model::AbstractRemoteRelayPeerPool
 {
 public:
+    virtual bool connectToDb() override
+    {
+        return true;
+    }
+
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& /*domainName*/) const override
     {

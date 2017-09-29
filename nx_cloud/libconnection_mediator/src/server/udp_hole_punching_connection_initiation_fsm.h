@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 15, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -69,9 +64,10 @@ private:
     enum class State
     {
         init,
-        /** connectionReqiested indication has been sent to the server */
+        /** ConnectionReqiested indication has been sent to the server. */
         waitingServerPeerUDPAddress,
-        /** reported server's UDP address to the client, waiting for result */
+        resolvingServersRelayInstance,
+        /** Reported server's UDP address to the client, waiting for result. */
         waitingConnectionResult,
         fini,
     };
@@ -86,8 +82,10 @@ private:
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
     ListeningPeerData m_serverPeerData;
     stats::ConnectSession m_sessionStatisticsInfo;
+    api::ConnectResponse m_preparedConnectResponse;
     boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
+    std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
 
     virtual void stopWhileInAioThread() override;
     
@@ -95,32 +93,42 @@ private:
         const ConnectionStrongRef& originatingPeerConnection,
         api::ConnectRequest request,
         std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender);
+
     bool connectResponseHasAlreadyBeenSent() const;
+
     void repeatConnectResponse(
         std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender);
+
     void updateSessionStatistics(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
+
     bool notifyListeningPeerAboutConnectRequest(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
+
     nx::stun::Message prepareConnectionRequestedIndication(
         const ConnectionStrongRef& originatingPeerConnection,
         const api::ConnectRequest& connectRequest);
+
     void noConnectionAckOnTime();
 
     void processConnectionAckRequest(
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
-    void onRelayInstanceSearchCompletion(
-        api::ConnectResponse connectResponse,
-        boost::optional<QUrl> relayInstanceUrl,
-        std::function<void(api::ResultCode)> completionHandler);
+
+    void initiateRelayInstanceSearch();
+
+    void finishConnect();
+
+    void onRelayInstanceSearchCompletion(boost::optional<QUrl> relayInstanceUrl);
+
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
         std::list<SocketAddress> tcpEndpoints,
         boost::optional<QUrl> relayInstanceUrl);
+
     void sendConnectResponse(
         api::ResultCode resultCode,
         api::ConnectResponse connectResponse);

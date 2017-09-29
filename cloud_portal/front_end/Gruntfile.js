@@ -13,6 +13,9 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
 
+    //var cloudHost = 'localhost';  // for python manage.py runserver
+    //var cloudPort = 8000;
+
     var cloudHost = 'cloud-test.hdw.mx';  // 'cloud-local' // For local vagrant
     var cloudPort = 80;
 

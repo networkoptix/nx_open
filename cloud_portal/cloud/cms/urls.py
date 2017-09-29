@@ -7,6 +7,14 @@ urlpatterns = [
     url(r'context_editor/(?P<context>.+?)/',
         context_edit_view, name="context_editor"),
 
+    url(r'download/(?P<path>.*)$', download_file, name="download_file"),
+
+    url(r'package/(?P<product_name>.*$)', download_package, name="download_package"),
+    url(r'package/(?P<product_name>.*?)/(?P<customization_name>.*)$', download_package, name="download_package"),
+
+    url(r'product_settings/(?P<product_id>.+?)/',
+        product_settings, name="product_settings"),
+
     url(r'review_version_request/', review_version_request,
         name="review_page_actions"),
 

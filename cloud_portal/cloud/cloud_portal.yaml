@@ -18,10 +18,6 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
-mail_from: 'service@networkoptix.com'
-
-mail_prefix: ''
-
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
     user: 'AKIAJ6MLW7ZT7WXXXOIA'
@@ -34,10 +30,7 @@ admins:
         - 'Admins'
         - 'cloud-portal-admins@networkoptix.com'
 
-languages:
-    - zh_CN
 
 queue_name: '$INSTANCE_NAME'
 
 max_retries: 10
-

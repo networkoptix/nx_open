@@ -46,7 +46,8 @@ static std::chrono::milliseconds kDefaultTakeIdleConnectionTimeout = std::chrono
 static const QLatin1String kInternalTimerPeriod("listeningPeer/internalTimerPeriod");
 static std::chrono::milliseconds kDefaultInternalTimerPeriod = std::chrono::seconds(1);
 
-static const QLatin1String kInactivityPeriodBeforeFirstProbe("listeningPeer/tcpInactivityPeriodBeforeFirstProbe");
+static const QLatin1String kInactivityPeriodBeforeFirstProbe(
+    "listeningPeer/tcpInactivityPeriodBeforeFirstProbe");
 static const std::chrono::seconds kDefaultInactivityPeriodBeforeFirstProbe(30);
 
 static const QLatin1String kProbeSendPeriod("listeningPeer/tcpProbeSendPeriod");
@@ -63,15 +64,22 @@ static const QLatin1String kConnectSessionIdleTimeout(
 static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
     std::chrono::minutes(10);
 
+//-------------------------------------------------------------------------------------------------
+// ConnectingPeer
+
+static const QString kCassandraHost("cassandra/host");
+static const QString kDefaultCassandraHost;
+
+static const QString kDelayBeforeRetryingInitialConnect(
+    "cassandra/delayBeforeRetryingInitialConnect");
+static constexpr std::chrono::seconds kDefaultDelayBeforeRetryingInitialConnect =
+    std::chrono::seconds(10);
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 
 static const QString kModuleName = lit("traffic_relay");
-
-static const QString kCassandraHost("cassandra/host");
-static const QString kDefaultCassandraHost("127.0.0.1");
-
 
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize)
@@ -91,6 +99,11 @@ ListeningPeer::ListeningPeer():
 
 ConnectingPeer::ConnectingPeer():
     connectSessionIdleTimeout(kDefaultConnectSessionIdleTimeout)
+{
+}
+
+CassandraConnection::CassandraConnection():
+    delayBeforeRetryingInitialConnect(kDefaultDelayBeforeRetryingInitialConnect)
 {
 }
 
@@ -143,9 +156,9 @@ const Http& Settings::http() const
     return m_http;
 }
 
-const QString& Settings::cassandraHost() const
+const CassandraConnection& Settings::cassandraConnection() const
 {
-    return m_cassandraHost;
+    return m_cassandraConnection;
 }
 
 void Settings::loadSettings()
@@ -228,7 +241,14 @@ void Settings::loadConnectingPeer()
 
 void Settings::loadCassandraHost()
 {
-    m_cassandraHost = settings().value(kCassandraHost, kDefaultCassandraHost).toString();
+    using namespace std::chrono;
+
+    m_cassandraConnection.hostName =
+        settings().value(kCassandraHost, kDefaultCassandraHost).toString().toStdString();
+    m_cassandraConnection.delayBeforeRetryingInitialConnect = 
+        nx::utils::parseTimerDuration(
+            settings().value(kDelayBeforeRetryingInitialConnect).toString(),
+            kDefaultDelayBeforeRetryingInitialConnect);
 }
 
 } // namespace conf
