@@ -47,6 +47,11 @@ ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
 {
 }
 
+ManagerPool::~ManagerPool()
+{
+    disconnect(this, nullptr, nullptr, nullptr);
+}
+
 void ManagerPool::init()
 {
     auto resourcePool = m_serverModule->commonModule()->resourcePool();

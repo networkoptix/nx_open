@@ -40,7 +40,7 @@ public:
     std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
 };
 
-class ManagerPool: 
+class ManagerPool final: 
     public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
@@ -49,6 +49,7 @@ class ManagerPool:
     Q_OBJECT
 public:
     ManagerPool(QnMediaServerModule* commonModule);
+    ~ManagerPool();
     void init();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
