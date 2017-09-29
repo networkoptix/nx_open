@@ -94,7 +94,7 @@ namespace ec2
     void fromApiToResourceList(const ApiWebPageDataList& src, QnResourceList& dst);
     void fromApiToResourceList(const ApiWebPageDataList& src, QnWebPageResourceList& dst);
 
-    void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target);
+    void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target, int defaultPort);
 } // namespace ec2
 
 #endif // QN_API_CONVERSION_FUNCTIONS_H
