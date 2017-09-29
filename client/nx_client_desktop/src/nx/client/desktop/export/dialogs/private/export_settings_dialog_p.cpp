@@ -559,34 +559,17 @@ void ExportSettingsDialog::Private::updateOverlayWidget(ExportOverlayType type)
         }
 
         case ExportOverlayType::image:
-        {
-            const auto& data = m_exportMediaPersistentSettings.imageOverlay;
-            overlay->setImage(data.image);
-            overlay->setOverlayWidth(data.overlayWidth);
-            overlay->setOpacity(data.opacity);
-            break;
-        }
-
         case ExportOverlayType::bookmark:
         case ExportOverlayType::text:
         {
-            const auto& data = (type == ExportOverlayType::text)
-                ? static_cast<const ExportTextOverlayPersistentSettingsBase&>(m_exportMediaPersistentSettings.textOverlay)
-                : m_exportMediaPersistentSettings.bookmarkOverlay;
-
-            overlay->setText(data.text);
-            overlay->setTextIndent(data.indent);
-            overlay->setOverlayWidth(data.overlayWidth);
-            overlay->setRoundingRadius(data.roundingRadius);
-
-            auto font = overlay->font();
-            font.setPixelSize(data.fontSize);
-            overlay->setFont(font);
-
-            auto palette = overlay->palette();
-            palette.setColor(QPalette::Text, data.foreground);
-            palette.setColor(QPalette::Window, data.background);
-            overlay->setPalette(palette);
+            const auto runtime = m_exportMediaPersistentSettings.overlaySettings(type)
+                ->createRuntimeSettings();
+            NX_ASSERT(runtime->type() == nx::core::transcoding::OverlaySettings::Type::image);
+            if (runtime->type() != nx::core::transcoding::OverlaySettings::Type::image)
+                break;
+            const auto imageOverlay =
+                static_cast<nx::core::transcoding::ImageOverlaySettings*>(runtime.data());
+            overlay->setImage(imageOverlay->image);
             break;
         }
 
@@ -658,14 +641,6 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
                     overlayPositionChanged(type);
             });
     }
-
-    setPaletteColor(overlay(ExportOverlayType::image), QPalette::Window, Qt::transparent);
-
-    auto timestampOverlay = overlay(ExportOverlayType::timestamp);
-    timestampOverlay->setTextIndent(0);
-
-    static constexpr qreal kShadowBlurRadius = 3.0;
-    timestampOverlay->setShadow(Qt::black, QPointF(), kShadowBlurRadius);
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()
