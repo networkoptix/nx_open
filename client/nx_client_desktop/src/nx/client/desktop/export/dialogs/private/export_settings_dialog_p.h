@@ -59,7 +59,6 @@ public:
 
     Mode mode() const;
     void setMode(Mode mode);
-    bool isAcceptable() const;
 
     static FileExtensionList allowedFileExtensions(Mode mode);
 
@@ -142,6 +141,7 @@ private:
     QScopedPointer<TranscodingImageProcessor> m_mediaImageProcessor;
     QSize m_fullFrameSize;
     qreal m_overlayScale = 1.0;
+
 
     bool m_positionUpdating = false;
 };

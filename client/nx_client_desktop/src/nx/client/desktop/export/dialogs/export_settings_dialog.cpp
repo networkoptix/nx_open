@@ -127,7 +127,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     auto exportButton = ui->buttonBox->addButton(tr("Export"), QDialogButtonBox::AcceptRole);
     setAccentStyle(exportButton);
 
-    connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateValidity);
+    connect(d.data(), &Private::validated, this, &ExportSettingsDialog::updateAlerts);
 
     d->loadSettings();
     connect(this, &QDialog::accepted, d, &Private::saveSettings);
@@ -425,35 +425,27 @@ void ExportSettingsDialog::updateMode()
         : Mode::Layout;
 
     d->setMode(currentMode);
-    updateExportButtonState();
 }
 
-void ExportSettingsDialog::updateExportButtonState()
-{
-    ui->buttonBox->setEnabled(d->isAcceptable());
-}
-
-void ExportSettingsDialog::updateValidity(Mode mode, const QStringList& weakAlerts,
+void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts,
     const QStringList& severeAlerts)
 {
-    if (mode == d->mode())
-        updateExportButtonState();
-
     switch (mode)
     {
         case Mode::Media:
-            updateAlerts(ui->weakMediaAlertsLayout, weakAlerts, false);
-            updateAlerts(ui->severeMediaAlertsLayout, severeAlerts, true);
+            updateAlertsInternal(ui->weakMediaAlertsLayout, weakAlerts, false);
+            updateAlertsInternal(ui->severeMediaAlertsLayout, severeAlerts, true);
             break;
 
         case Mode::Layout:
-            updateAlerts(ui->weakLayoutAlertsLayout, weakAlerts, false);
-            updateAlerts(ui->severeLayoutAlertsLayout, severeAlerts, true);
+            updateAlertsInternal(ui->weakLayoutAlertsLayout, weakAlerts, false);
+            updateAlertsInternal(ui->severeLayoutAlertsLayout, severeAlerts, true);
             break;
     }
 }
 
-void ExportSettingsDialog::updateAlerts(QLayout* layout, const QStringList& texts, bool severe)
+void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
+    const QStringList& texts, bool severe)
 {
     // TODO: #vkutin #gdm Properly separate in the future.
     using QnMessageBar = QnPromoBar;
@@ -548,9 +540,6 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
 void ExportSettingsDialog::accept()
 {
-    if (!d->isAcceptable())
-        return;
-
     auto filenamePanel = d->mode() == Mode::Media
         ? ui->mediaFilenamePanel
         : ui->layoutFilenamePanel;
