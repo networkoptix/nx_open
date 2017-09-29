@@ -3,9 +3,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QLabel>
-
-#include <utils/common/html.h>
 
 namespace nx {
 namespace client {
