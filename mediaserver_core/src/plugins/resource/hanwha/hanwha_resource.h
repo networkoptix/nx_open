@@ -259,7 +259,7 @@ private:
 
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;
-    std::atomic<bool> m_areInputPortsMonitored = false;
+    std::atomic<bool> m_areInputPortsMonitored{false};
 };
 
 } // namespace plugins
