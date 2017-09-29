@@ -42,4 +42,9 @@ private:
     bool m_persistentConnectionEnabled;
 };
 
+class NX_NETWORK_API StreamConnectionHolder:
+    public nx::network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+{
+};
+
 } // namespace nx_http

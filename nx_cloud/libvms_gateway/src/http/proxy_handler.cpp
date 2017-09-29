@@ -18,10 +18,12 @@ constexpr const int kSocketTimeoutMs = 29*1000;
 
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
-    const conf::RunTimeOptions& runTimeOptions)
+    const conf::RunTimeOptions& runTimeOptions,
+    nx::cloud::relay::model::AbstractListeningPeerPool* listeningPeerPool)
 :
     m_settings(settings),
-    m_runTimeOptions(runTimeOptions)
+    m_runTimeOptions(runTimeOptions),
+    m_listeningPeerPool(listeningPeerPool)
 {
 }
 
@@ -55,7 +57,7 @@ void ProxyHandler::processRequest(
     m_request = std::move(request);
 
     m_targetPeerConnector = std::make_unique<TargetPeerConnector>(
-        nullptr,
+        m_listeningPeerPool,
         m_targetHost.target);
     m_targetPeerConnector->bindToAioThread(connection->getAioThread());
     m_targetPeerConnector->setTimeout(m_settings.tcp().sendTimeout);
@@ -228,13 +230,12 @@ void ProxyHandler::onConnected(
         !connection->setSendTimeout(m_settings.tcp().sendTimeout))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_INFO(this, lm("Failed to set socket options. %1").arg(SystemError::toString(osErrorCode)));
+        NX_INFO(this, lm("Failed to set socket options. %1")
+            .arg(SystemError::toString(osErrorCode)));
         return nx::utils::swapAndCall(
             m_requestCompletionHandler,
             nx_http::StatusCode::internalServerError);
     }
-
-    const auto originalType = typeid(*connection.get()).name();
 
     if (m_sslConnectionRequired)
     {
@@ -250,8 +251,8 @@ void ProxyHandler::onConnected(
     }
 
     NX_VERBOSE(this,
-        lm("Successfully established connection to %1(%2, full name %3, typeid %4) (path %5) from %6 with SSL=%7")
-        .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(), originalType,
+        lm("Successfully established connection to %1(%2, full name %3, path %4) from %5 with SSL=%6")
+        .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(),
             m_request.requestLine.url, connection->getLocalAddress(), m_sslConnectionRequired));
 
     m_requestProxyWorker = std::make_unique<ProxyWorker>(

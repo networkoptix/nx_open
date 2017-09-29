@@ -2,13 +2,15 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/string.h>
 
 namespace nx_http {
 namespace test {
 
-static const char* testPath = "/test/test";
-static const char* testMessageBody = "test message body";
+static const nx::String kTestPath = "/test/test";
+static const nx::String kContentServerPathPrefix = "/AsyncHttpClientRedirectTest/";
+static const nx::String kTestMessageBody = "test message body";
 
 class AsyncHttpClientRedirect:
     public ::testing::Test
@@ -25,7 +27,9 @@ protected:
     {
         givenResourceServer();
         ASSERT_TRUE(m_resourceServer->registerStaticProcessor(
-            testPath, testMessageBody, "text/plain"));
+            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            kTestMessageBody,
+            "text/plain"));
 
         givenRedirectServer();
     }
@@ -34,14 +38,18 @@ protected:
     {
         givenResourceServer();
         givenRedirectServer();
-        ASSERT_TRUE(m_resourceServer->registerRedirectHandler(testPath, m_redirectUrl));
+        ASSERT_TRUE(m_resourceServer->registerRedirectHandler(
+            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            m_redirectUrl));
     }
 
     void givenHttpResourceWithAuthentication()
     {
         givenResourceServer();
         ASSERT_TRUE(m_resourceServer->registerStaticProcessor(
-            testPath, testMessageBody, "text/plain"));
+            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            kTestMessageBody,
+            "text/plain"));
 
         // Enabling authentication.
         const QString userName = nx::utils::generateRandomName(7);
@@ -57,15 +65,16 @@ protected:
     {
         ASSERT_TRUE(m_resourceServer->bindAndListen());
         m_actualUrl = QUrl(lm("http://%1%2")
-            .arg(m_resourceServer->serverAddress().toString()).arg(testPath));
+            .arg(m_resourceServer->serverAddress().toString())
+            .arg(nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath)));
     }
 
     void givenRedirectServer()
     {
         ASSERT_TRUE(m_redirector->bindAndListen());
         m_redirectUrl = QUrl(lm("http://%1%2")
-            .arg(m_redirector->serverAddress().toString()).arg(testPath));
-        ASSERT_TRUE(m_redirector->registerRedirectHandler(testPath, m_actualUrl));
+            .arg(m_redirector->serverAddress().toString()).arg(kTestPath));
+        ASSERT_TRUE(m_redirector->registerRedirectHandler(kTestPath, m_actualUrl));
     }
 
     void whenRequestingRedirectedResource()
@@ -83,10 +92,12 @@ protected:
         QByteArray msgBody;
         while (!m_httpClient.eof())
             msgBody += m_httpClient.fetchMessageBodyBuffer();
-        ASSERT_EQ(QByteArray(testMessageBody), msgBody);
+        ASSERT_EQ(QByteArray(kTestMessageBody), msgBody);
 
         ASSERT_EQ(m_redirectUrl, m_httpClient.url());
-        ASSERT_EQ(m_actualUrl, m_httpClient.contentLocationUrl());
+        ASSERT_EQ(
+            m_actualUrl.toString(),
+            m_httpClient.contentLocationUrl().toString(QUrl::RemoveUserInfo));
     }
 
     void thenClientShouldPerformFiniteNumberOfRedirectionAttempts()

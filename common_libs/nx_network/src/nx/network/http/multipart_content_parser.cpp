@@ -220,7 +220,10 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
                 else
                 {
                     const nx_http::StringType& contentType = nx_http::getHeaderValue(m_currentFrameHeaders, "Content-Type");
-                    if (contentType == "application/text" || contentType == "text/plain")
+                    bool isTextData = !m_forceParseAsBinary
+                        && (contentType == "application/text" || contentType == "text/plain");
+
+                    if (isTextData)
                     {
                         m_state = readingTextData;
                     }
@@ -358,6 +361,11 @@ bool MultipartContentParser::readUnsizedBinaryData(
 bool MultipartContentParser::eof() const
 {
     return m_state == eofReached;
+}
+
+void MultipartContentParser::setForceParseAsBinary(bool force)
+{
+    m_forceParseAsBinary = force;
 }
 
 } // namespace nx_http

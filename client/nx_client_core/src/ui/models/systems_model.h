@@ -32,9 +32,9 @@ public:
         IsRunningRoleId,
         IsReachableRoleId,
         IsConnectableRoleId,
-        IsCompatibleRoleId,
+        IsCompatibleToMobileClient,
         IsCompatibleVersionRoleId,
-        IsCompatibleInternalRoleId,
+        IsCompatibleToDesktopClient,
 
         WrongVersionRoleId,
         CompatibleVersionRoleId,

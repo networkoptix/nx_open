@@ -884,11 +884,6 @@
       <source>Stay logged in</source>
       <translation>Maradjon bejelentkezve</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Hibás e-mail cím vagy jelszó</translation>
-    </message>
   </context>
   <context>
     <name>ConnectionNameDialog</name>
@@ -1882,11 +1877,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>Maradjon bejelentkezve</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Hibás e-mail cím vagy jelszó</translation>
     </message>
   </context>
   <context>

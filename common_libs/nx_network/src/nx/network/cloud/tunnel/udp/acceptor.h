@@ -31,6 +31,7 @@ public:
 
     virtual void accept(AcceptHandler handler) override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual std::string toString() const override;
 
 private:
     void connectionAckResult(nx::hpm::api::ResultCode code);

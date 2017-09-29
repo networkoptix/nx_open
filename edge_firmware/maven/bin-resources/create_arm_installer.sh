@@ -45,8 +45,8 @@ fi
 help()
 {
     echo "Options:"
-    echo "--no-client: Do not pack Lite Client."
-    echo "-v, --verbose: Do not redirect output to a log file."
+    echo " --no-client: Do not pack Lite Client."
+    echo " -v, --verbose: Do not redirect output to a log file."
 }
 
 # [out] LITE_CLIENT
@@ -534,6 +534,9 @@ main()
 
     echo "Creating version.txt: $VERSION"
     echo "$VERSION" >"$INSTALL_DIR/version.txt"
+
+    echo "Copying build_info.txt"
+    cp -r "$BUILD_DIR/build_info.txt" "$INSTALL_DIR/"
 
     copyBuildLibs
     copyQtLibs

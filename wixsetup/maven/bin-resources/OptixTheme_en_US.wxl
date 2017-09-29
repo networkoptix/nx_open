@@ -22,7 +22,7 @@
   <String Id="HelpCloseButton">Close</String>
   <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
   <String Id="InstallOptionsButton">Options</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">Accept and Install</String>
   <String Id="InstallCloseButton">Close</String>
   <String Id="OptionsHeader">Setup Options</String>
   <String Id="OptionsLocationLabel">Install location:</String>
@@ -39,7 +39,7 @@
   <String Id="ModifyCloseButton">Close</String>
   <String Id="SuccessHeader">Setup Successful</String>
   <String Id="SuccessUninstallHeader">Uninstall Successfully Completed</String>
-  <String Id="SuccessInstallHeader">Installation Successfully Completed</String> 
+  <String Id="SuccessInstallHeader">Installation Successfully Completed</String>
   <String Id="SuccessLaunchButton">Launch</String>
   <String Id="SuccessRestartText">You must restart your computer before you can use the software</String>
   <String Id="SuccessRestartButton">Restart</String>
@@ -61,7 +61,7 @@
   <String Id="InstallLicenseText">By clicking "Accept and Install" you agree to</String>
   <String Id="Options">Options</String>
   <String Id="SelectApps">Select applications to be installed:</String>
-  
+
   <!-- WixSchedFirewallExceptions -->
   <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
@@ -70,7 +70,7 @@
   <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
   <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
   <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  
+
   <!-- ArchCheck -->
   <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
   <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>

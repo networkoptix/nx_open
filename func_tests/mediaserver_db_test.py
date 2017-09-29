@@ -127,6 +127,7 @@ def wait_for_camera_disappearance_after_backup(server, camera_guid):
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_backup_restore
 def test_backup_restore(one, two, camera):
     two.merge_systems(one)
     full_info_initial = wait_until_servers_have_same_full_info(one, two)
@@ -142,6 +143,7 @@ def test_backup_restore(one, two, camera):
 
 
 # To detect VMS-5969
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_server_guids_changed
 @pytest.mark.skip(reason="VMS-5969")
 @pytest.mark.parametrize('db_version', ['current'])
 def test_server_guids_changed(one, two):

@@ -13,16 +13,12 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/db/db_structure_updater.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/platform/current_process.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
-
-#include <api/global_settings.h>
-#include <common/common_module.h>
-#include <nx/utils/platform/current_process.h>
-#include <utils/common/app_info.h>
-#include <nx/utils/db/db_structure_updater.h>
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <nx/cloud/cdb/api/ec2_request_paths.h>

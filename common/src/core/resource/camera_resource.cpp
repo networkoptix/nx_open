@@ -78,34 +78,6 @@ QnPhysicalCameraResource::QnPhysicalCameraResource(QnCommonModule* commonModule)
     m_lastInitTime.invalidate();
 }
 
-float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
-{
-    float lowEnd = 0.1f;
-    float hiEnd = 1.0f;
-
-    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
-
-    float resolutionFactor = 0.009f * pow(resolution.width() * resolution.height(), 0.7f);
-
-    float frameRateFactor = fps/1.0f;
-
-    float result = qualityFactor*frameRateFactor * resolutionFactor;
-
-    return qMax(192.0, result);
-}
-
-int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
-{
-    QN_UNUSED(role);
-
-    auto result = rawSuggestBitrateKbps(quality, resolution, fps);
-
-    if (bitratePerGopType() != Qn::BPG_None)
-        result = result * (30.0 / (qreal)fps);
-
-    return (int) result;
-}
-
 int QnPhysicalCameraResource::getChannel() const
 {
     QnMutexLocker lock( &m_mutex );

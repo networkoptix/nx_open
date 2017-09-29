@@ -135,6 +135,14 @@ public:
         m_clientEndpoint.port = nx::utils::random::number<int>(10000, 50000);
     }
 
+    ~ConnectSessionManager()
+    {
+        if (m_lastClientConnection)
+            m_lastClientConnection->pleaseStopSync();
+
+        m_connectSessionManager.reset();
+    }
+
 protected:
     std::string m_expectedSessionId;
 
@@ -185,8 +193,9 @@ protected:
     {
         using namespace std::placeholders;
 
-        api::ConnectToPeerRequest request;
+        controller::ConnectToPeerRequestEx request;
         request.sessionId = m_expectedSessionId;
+        request.clientEndpoint = m_clientEndpoint;
         connectSessionManager().connectToPeer(
             request,
             std::bind(&ConnectSessionManager::onConnectCompletion, this, _1, _2));
@@ -558,7 +567,7 @@ protected:
         {
             for (;;)
             {
-                api::ConnectToPeerRequest request;
+                controller::ConnectToPeerRequestEx request;
                 request.sessionId = sessionId;
                 nx::utils::promise<api::ResultCode> completed;
                 connectSessionManager().connectToPeer(

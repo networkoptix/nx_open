@@ -165,6 +165,7 @@ private:
         QnStorageResourcePtr storage;
         qint64 totalWriteTimeNs = 0;
         QnAviArchiveMetadata metadata;
+        QnAviArchiveMetadata::Format fileFormat = QnAviArchiveMetadata::Format::custom;
 
         StreamRecorderContext(const QString& fileName, const QnStorageResourcePtr& storage);
     };

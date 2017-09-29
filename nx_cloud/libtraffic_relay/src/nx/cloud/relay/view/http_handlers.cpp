@@ -18,7 +18,9 @@ BeginListeningHandler::BeginListeningHandler(
 {
 }
 
-api::BeginListeningRequest BeginListeningHandler::prepareRequestData()
+api::BeginListeningRequest BeginListeningHandler::prepareRequestData(
+    nx_http::HttpServerConnection* const /*connection*/,
+    const nx_http::Request& /*httpRequest*/)
 {
     api::BeginListeningRequest inputData;
     inputData.peerName = requestPathParams()[0].toStdString();
@@ -39,6 +41,8 @@ CreateClientSessionHandler::CreateClientSessionHandler(
 }
 
 void CreateClientSessionHandler::prepareRequestData(
+    nx_http::HttpServerConnection* const /*connection*/,
+    const nx_http::Request& /*httpRequest*/,
     api::CreateClientSessionRequest* request)
 {
     request->targetPeerName = requestPathParams()[0].toStdString();
@@ -57,9 +61,12 @@ ConnectToPeerHandler::ConnectToPeerHandler(
 {
 }
 
-api::ConnectToPeerRequest ConnectToPeerHandler::prepareRequestData()
+controller::ConnectToPeerRequestEx ConnectToPeerHandler::prepareRequestData(
+    nx_http::HttpServerConnection* const connection,
+    const nx_http::Request& /*httpRequest*/)
 {
-    api::ConnectToPeerRequest inputData;
+    controller::ConnectToPeerRequestEx inputData;
+    inputData.clientEndpoint = connection->socket()->getForeignAddress();
     inputData.sessionId = requestPathParams()[0].toStdString();
     return inputData;
 }

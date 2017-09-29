@@ -201,9 +201,9 @@ static const size_t BufferNpos = size_t(-1);
  * Searches first occurence of any element of \0-terminated string toSearch in count elements of str,
  *   starting with element offset.
  * @param toSearch \0-terminated string.
- * @param count number of characters of str to check, 
+ * @param count number of characters of str to check,
  *   NOT a length of searchable characters string (toSearch).
- * NOTE: following algorithms differ from stl analogue in following: 
+ * NOTE: following algorithms differ from stl analogue in following:
  *   they limit number of characters checked during search.
  */
 template<class Str>
@@ -288,6 +288,11 @@ size_t find_last_of(
 
     return BufferNpos;
 }
+
+/**
+ * Format Json string with indentation to make it human-readable.
+ */
+NX_UTILS_API QByteArray formatJsonString(const QByteArray& data);
 
 } // namespace utils
 } // namespace nx

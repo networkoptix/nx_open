@@ -1139,6 +1139,27 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     if (!layout)
         return InvisibleAction;
 
+    const auto resources = parameters.resources();
+    if (resources.isEmpty())
+    {
+        if (layout->flags().testFlag(Qn::exported_layout))
+            return InvisibleAction;
+    }
+    else
+    {
+        const bool onlyInacceptableItems = std::all_of(resources.begin(), resources.end(),
+            [](const QnResourcePtr& resource)
+            {
+                const auto flags = resource->flags();
+                return flags.testFlag(Qn::local)
+                    || flags.testFlag(Qn::server)
+                    || flags.testFlag(Qn::web_page)
+                    || flags.testFlag(Qn::io_module);
+            });
+
+        if (onlyInacceptableItems)
+            return InvisibleAction;
+    }
     auto layoutItems = parameters.layoutItems();
     const bool supported = layoutItems.empty()
         ? isRadassSupported(layout, MatchMode::Any)

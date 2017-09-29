@@ -35,6 +35,8 @@ public:
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    virtual std::string toString() const override;
+
 private:
     void updateCloseTimer();
 

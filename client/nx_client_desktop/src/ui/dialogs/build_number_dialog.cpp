@@ -8,14 +8,15 @@
 
 namespace {
 
-bool checkPassword(int buildNumber, const QString& password)
+bool checkPassword(const QString& build, const QString& password)
 {
 #ifdef _DEBUG
-    Q_UNUSED(buildNumber);
+    Q_UNUSED(build);
     Q_UNUSED(password);
+    qDebug() << passwordForBuild(build);
     return true;
 #else
-    return passwordForBuild((unsigned)buildNumber) == password;
+    return passwordForBuild(build) == password;
 #endif
 }
 
@@ -30,18 +31,16 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
     okButton->setText(tr("Select Build"));
 
     ui->buildNumberInputField->setTitle(tr("Build Number"));
-    ui->buildNumberInputField->setValidator(
-        Qn::defaultIntValidator(0, std::numeric_limits<int>::max(), tr("Invalid build number")));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setValidator(
         [this](const QString& password)
         {
-            int build = buildNumber();
-            if (!build)
+            const auto buildOrChangeset = changeset();
+            if (buildOrChangeset.isEmpty())
                 return Qn::kValidResult;
 
-            return checkPassword(build, password)
+            return checkPassword(buildOrChangeset, password)
                 ? Qn::kValidResult
                 : Qn::ValidationResult(tr("The password is incorrect."));
         });
@@ -52,7 +51,7 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
             if (!ui->passwordInputField->text().isEmpty())
                 ui->passwordInputField->validate();
 
-            okButton->setEnabled(text.toInt() > 0);
+            okButton->setEnabled(!text.isEmpty());
         });
 
     okButton->setEnabled(false);
@@ -73,6 +72,11 @@ QnBuildNumberDialog::~QnBuildNumberDialog()
 int QnBuildNumberDialog::buildNumber() const
 {
     return ui->buildNumberInputField->text().toInt();
+}
+
+QString QnBuildNumberDialog::changeset() const
+{
+    return ui->buildNumberInputField->text().trimmed();
 }
 
 QString QnBuildNumberDialog::password() const

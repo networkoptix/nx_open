@@ -42,7 +42,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
     if (isCameraControlRequired)
     {
         QString request(lit("admin.cgi?image&h264_bitrate=%1&h264_framerate=%2"));
-        int bitrate = m_stardotRes->suggestBitrateKbps(params.quality, m_stardotRes->getResolution(), params.fps);
+        int bitrate = m_stardotRes->suggestBitrateKbps(m_stardotRes->getResolution(), params, getRole());
         request = request.arg(bitrate).arg(params.fps);
 
         CLHttpStatus status;

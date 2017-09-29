@@ -9,16 +9,6 @@ extern Logger logger;
 
 namespace ite
 {
-    inline bool operator == ( const nxpl::NX_GUID& id1, const nxpl::NX_GUID& id2 )
-    {
-        for( unsigned i=0; i < sizeof(nxpl::NX_GUID); ++i )
-        {
-            if (id1.bytes[i] != id2.bytes[i])
-                return false;
-        }
-        return true;
-    }
-
     template <typename T>
     class DefaultRefCounter : public T
     {

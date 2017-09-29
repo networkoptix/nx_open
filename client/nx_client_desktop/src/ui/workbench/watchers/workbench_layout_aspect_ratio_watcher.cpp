@@ -34,10 +34,10 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
     if (m_watchedLayout->items().size() > 1)
         return;
 
-    bool hasAspectRatio = widget->hasAspectRatio();
+    const auto hasAspectRatio = widget->hasAspectRatio();
     if (hasAspectRatio)
     {
-        const auto ar = widget->visualChannelAspectRatio();
+        const auto ar = widget->visualAspectRatio();
         if (m_watchedLayout->flags().testFlag(QnLayoutFlag::FillViewport))
             m_watchedLayout->setCellAspectRatio(ar);
         else

@@ -47,10 +47,6 @@ public:
      */
     virtual void setBitrateKbps(int /*value*/) {}
 
-    /**
-     * Returns true if transmitter is ready to use
-     */
-    virtual bool isInitialized() const = 0;
 
     virtual void prepare() {}
 

@@ -82,6 +82,15 @@
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Hệ thống điện toán đám mây chỉ có thể được hợp nhất với hệ thống không sử dụng điện toán đám mây. Tên và mật khẩu hệ thống được lấy từ hệ thống điện toán đám mây.</translation>
     </message>
+    <message>
+      <source>New System</source>
+      <translation type="unfinished">New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>

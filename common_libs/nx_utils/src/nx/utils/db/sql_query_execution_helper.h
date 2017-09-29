@@ -4,6 +4,8 @@
 #include <QtCore/QString>
 #include <QtSql/QSqlDatabase>
 
+#include <nx/utils/uuid.h>
+
 namespace nx {
 namespace utils {
 namespace db {
@@ -21,6 +23,12 @@ public:
     static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
     /** Reads file fileName and calls QnDbHelper::execSQLScript. */
     static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
+
+    /** Bind uuid to a query parameter. By default, null id is bound as NULL (param: optional). */
+    static void bindId(QSqlQuery* query,
+        const QString& parameter,
+        const QnUuid& id,
+        bool optional = true);
 };
 
 } // namespace db

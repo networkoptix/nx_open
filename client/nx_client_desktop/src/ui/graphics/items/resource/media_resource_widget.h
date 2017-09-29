@@ -277,11 +277,6 @@ private:
 
     void setupHud();
 
-    void initSoftwareTriggers();
-
-    void updateTriggersAvailability();
-    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
-
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
 
@@ -313,11 +308,21 @@ private:
         QnUuid overlayItemId;
     };
 
+    void initSoftwareTriggers();
+
     SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
     void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
         std::function<void()> clientSideHandler = std::function<void()>());
     void resetTriggers();
+
+    void updateTriggersAvailability();
+    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
+    void updateTriggerButtonTooltip(
+        QnSoftwareTriggerButton* button,
+        const SoftwareTriggerInfo& info,
+        bool enabledBySchedule);
+
 
 private:
     struct ResourceStates

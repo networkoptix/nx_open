@@ -8,6 +8,7 @@ describe('Restore all passwords', function () { // to enable suit, replace xdesc
         self.helper.restorePassword(self.helper.userEmailOwner);
     });
     it("restore system admin password", function () {
+        browser.sleep(5000);
         self.helper.restorePassword(self.helper.userEmailAdmin);
     });
     it("restore system viewer password", function () {

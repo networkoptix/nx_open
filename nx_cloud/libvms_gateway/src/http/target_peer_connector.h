@@ -28,7 +28,7 @@ class TargetPeerConnector:
 public:
     using ConnectHandler = nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode /*systemErrorCode*/,
-        std::unique_ptr<AbstractStreamSocket> /*connection to the target peer*/)>;
+        std::unique_ptr<AbstractStreamSocket> /*connectionToTheTargetPeer*/)>;
 
     TargetPeerConnector(
         nx::cloud::relay::model::AbstractListeningPeerPool* listeningPeerPool,

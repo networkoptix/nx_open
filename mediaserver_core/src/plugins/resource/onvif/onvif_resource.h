@@ -267,7 +267,7 @@ public:
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const override;
+    virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
     QnMutex* getStreamConfMutex();
     virtual void beforeConfigureStream(Qn::ConnectionRole role);
@@ -367,6 +367,7 @@ protected:
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
+    void scheduleRetrySubscriptionTimer();
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();

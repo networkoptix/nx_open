@@ -683,7 +683,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', [
         'clean:server',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',

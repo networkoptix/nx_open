@@ -16,12 +16,58 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/events/events.h>
 
-//#include <core/resource/camera_history.h>
-//#include <utils/common/id.h>
+#include <nx/utils/log/assert.h>
+
+namespace {
+
+nx::api::AnalyticsEventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
+    const QnUuid& driverId, const QnUuid& eventTypeId)
+{
+    NX_EXPECT(camera);
+    if (!camera)
+        return {};
+
+    if (driverId.isNull())
+        return {};
+
+    auto server = camera->getParentServer();
+    NX_EXPECT(server);
+    if (!server)
+        return {};
+
+    const auto drivers = server->analyticsDrivers();
+    const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
+        [driverId](const nx::api::AnalyticsDriverManifest& manifest)
+        {
+            return manifest.driverId == driverId;
+        });
+
+    NX_EXPECT(driver != drivers.cend());
+    if (driver == drivers.cend())
+        return {};
+
+    const auto types = driver->outputEventTypes;
+    const auto eventType = std::find_if(types.cbegin(), types.cend(),
+        [eventTypeId](const nx::api::AnalyticsEventType eventType)
+        {
+            return eventType.eventTypeId == eventTypeId;
+        });
+
+    return eventType == types.cend()
+        ? nx::api::AnalyticsEventType()
+        : *eventType;
+}
+
+} // namespace
+
+
+
 namespace nx {
 namespace vms {
 namespace event {
@@ -91,6 +137,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case serverStartEvent:     return tr("Server Started");
         case licenseIssueEvent:    return tr("License Issue");
         case backupFinishedEvent:  return tr("Archive backup finished");
+        case analyticsSdkEvent:    return tr("Analytics Event");
 
         case anyServerEvent:       return tr("Any Server Issue");
         case anyEvent:             return tr("Any Event");
@@ -193,6 +240,11 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 .arg(getSoftwareTriggerName(params))
                 .arg(resourceName);
 
+        case analyticsSdkEvent:
+            return tr("%1 at %2", "Analytics Event at some camera")
+                .arg(getAnalyticsSdkEventName(params))
+                .arg(resourceName);
+
         default:
             return tr("An unknown event has occurred");
     }
@@ -238,7 +290,7 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
     if (!sourceText.isEmpty())
         result << tr("Source: %1").arg(sourceText);
 
-    if (eventType >= userDefinedEvent)
+    if (eventType >= userDefinedEvent || eventType == analyticsSdkEvent)
     {
         if (!params.caption.isEmpty())
             result << tr("Caption: %1").arg(params.caption);
@@ -318,6 +370,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
         case serverStartEvent:
             break;
 
+        case analyticsSdkEvent:
         case userDefinedEvent:
             if (!params.description.isEmpty())
                 result << params.description;
@@ -653,6 +706,28 @@ QString StringsHelper::getSoftwareTriggerName(const EventParameters& params)
 {
     NX_ASSERT(params.eventType == softwareTriggerEvent);
     return getSoftwareTriggerName(params.caption);
+}
+
+QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
+    const QString& locale) const
+{
+    NX_ASSERT(params.eventType == analyticsSdkEvent);
+
+    QnUuid driverId = params.analyticsDriverId();
+    NX_EXPECT(!driverId.isNull());
+
+    QnUuid eventTypeId = params.analyticsEventId();
+    NX_EXPECT(!eventTypeId.isNull());
+
+    const auto source = eventSource(params);
+    const auto camera = source.dynamicCast<QnVirtualCameraResource>();
+
+    const auto eventType = analyticsEventType(camera, driverId, eventTypeId);
+    const auto text = eventType.eventName.text(locale);
+
+    return !text.isEmpty()
+        ? text
+        : tr("Analytics Event");
 }
 
 QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const

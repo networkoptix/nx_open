@@ -367,7 +367,8 @@ upgrade() {
     chmod 600 /etc/crontab
 }
 
-# Install debs, unless the dir is missing from /opt/deb, or the proper version is installed.
+# Install all deb packages from /opt/deb/<package>/, but do nothing if the directory is missing, or
+# the specified version of a deb package with the same name as the directory is already installed.
 installDebs() # package [version]
 {
     local -r PACKAGE="$1"; shift

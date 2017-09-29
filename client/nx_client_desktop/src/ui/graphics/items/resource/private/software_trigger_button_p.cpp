@@ -104,13 +104,6 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
             q->update();
         });
 
-    connect(main, &SoftwareTriggerButton::enabledChanged, this,
-        [this]()
-        {
-            Q_Q(const SoftwareTriggerButton);
-            m_toolTip->setVisible(q->isEnabled());
-        });
-
     m_toolTipHoverProcessor->addTargetItem(main);
     m_toolTipHoverProcessor->setHoverEnterDelay(kHoverEnterDelayMs);
     m_toolTipHoverProcessor->setHoverLeaveDelay(kHoverLeaveDelayMs);
@@ -290,16 +283,18 @@ bool SoftwareTriggerButtonPrivate::isLive() const
     return m_live;
 }
 
-void SoftwareTriggerButtonPrivate::setLive(bool value)
+bool SoftwareTriggerButtonPrivate::setLive(bool value)
 {
     if (m_live == value)
-        return;
+        return false;
 
     m_live = value;
     updateToolTipText();
 
     Q_Q(SoftwareTriggerButton);
     q->update();
+
+    return true;
 }
 
 SoftwareTriggerButton::State SoftwareTriggerButtonPrivate::state() const

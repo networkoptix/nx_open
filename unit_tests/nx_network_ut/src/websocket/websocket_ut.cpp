@@ -18,7 +18,7 @@ public:
     using nx::network::StreamSocketDelegate::StreamSocketDelegate;
     virtual ~TestStreamSocketDelegate() override { delete m_target; }
 
-    virtual void readSomeAsync(nx::Buffer* const buf, HandlerType handler) override
+    virtual void readSomeAsync(nx::Buffer* const buf, IoCompletionHandler handler) override
     {
         if (m_terminated)
         {
@@ -32,10 +32,10 @@ public:
             return;
         }
 
-        m_target->readSomeAsync(buf, handler);
+        m_target->readSomeAsync(buf, std::move(handler));
     }
 
-    virtual void sendAsync(const nx::Buffer& buf, HandlerType handler) override
+    virtual void sendAsync(const nx::Buffer& buf, IoCompletionHandler handler) override
     {
         if (m_terminated)
         {
@@ -43,7 +43,7 @@ public:
             return;
         }
 
-        m_target->sendAsync(buf, handler);
+        m_target->sendAsync(buf, std::move(handler));
     }
 
     void terminate() { m_terminated = true; }

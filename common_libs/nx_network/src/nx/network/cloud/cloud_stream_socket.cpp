@@ -302,22 +302,38 @@ void CloudStreamSocket::connectAsync(
 
 void CloudStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_socketDelegate)
+    {
         m_socketDelegate->readSomeAsync(buf, std::move(handler));
+    }
     else
-        m_readIoBinder.post(std::bind(handler, SystemError::notConnected, 0));
+    {
+        m_readIoBinder.post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::notConnected, 0);
+            });
+    }
 }
 
 void CloudStreamSocket::sendAsync(
     const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_socketDelegate)
+    {
         m_socketDelegate->sendAsync(buf, std::move(handler));
+    }
     else
-        m_writeIoBinder.post(std::bind(handler, SystemError::notConnected, 0));
+    {
+        m_writeIoBinder.post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::notConnected, 0);
+            });
+    }
 }
 
 void CloudStreamSocket::registerTimer(

@@ -29,7 +29,7 @@ namespace QnXmlDetail {
     template<class Element, class Tag>
     void serialize_collection_element(const Element &element, QXmlStreamWriter *stream, const Tag &) {
         stream->writeStartElement(QLatin1String("element"));
-        QnXml::serialize(element, stream);
+        QnXmlDetail::serialize(element, stream);
         stream->writeEndElement();
     }
 
@@ -38,11 +38,11 @@ namespace QnXmlDetail {
         stream->writeStartElement(QLatin1String("element"));
 
         stream->writeStartElement(QLatin1String("key"));
-        QnXml::serialize(element.first, stream);
+        QnXmlDetail::serialize(element.first, stream);
         stream->writeEndElement();
 
         stream->writeStartElement(QLatin1String("value"));
-        QnXml::serialize(element.second, stream);
+        QnXmlDetail::serialize(element.second, stream);
         stream->writeEndElement();
 
         stream->writeEndElement();
@@ -88,8 +88,10 @@ QN_DEFINE_COLLECTION_XML_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, 
 
 template<class T>
 void serialize(const T &value, QXmlStreamWriter *stream, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
-    /* All enums are by default lexically serialized. */
-    stream->writeCharacters(QnLexical::serialized(value));
+    // All enums are by default lexically serialized.
+
+    // NOTE: writeCharacters() adds chars prohibited in XML, including '\0', as is.
+    stream->writeCharacters(QnXml::replaceProhibitedChars(QnLexical::serialized(value)));
 }
 
 

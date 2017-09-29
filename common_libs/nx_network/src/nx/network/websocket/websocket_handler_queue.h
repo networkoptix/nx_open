@@ -14,10 +14,10 @@ class HandlerQueue
 public:
     struct Held
     {
-        HandlerType handler;
+        IoCompletionHandler handler;
         BufferType buffer;
 
-        Held(HandlerType&& handler, BufferType&& buffer) :
+        Held(IoCompletionHandler&& handler, BufferType&& buffer) :
             handler(std::move(handler)),
             buffer(std::move(buffer))
         {}

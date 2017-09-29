@@ -19,3 +19,10 @@ NXCLOUD_VERSION=${NXCLOUD_VERSION:-1.0.110}
 
 export VERSION QT_VERSION NXCLOUD_VERSION
 
+# Build variables. No need to export.
+
+REVISION="$(hg id -i)"
+BUILD_DATE="$(TZ=GMT date)"
+BUILD_HOST="$(hostname)"
+BUILD_USER="$(id -un)"
+

@@ -35,6 +35,8 @@
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
 
+#include <camera/video_decoder_factory.h>
+
 #include <cloud/cloud_connection.h>
 
 #include <core/resource/client_camera_factory.h>
@@ -66,6 +68,7 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <nx/client/desktop/radass/radass_controller.h>
+#include <analytics/metadata_analytics_controller.h>
 
 #include <server/server_storage_manager.h>
 
@@ -77,7 +80,7 @@
 
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
-#include <utils/server_interface_watcher.h>
+#include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 
@@ -326,6 +329,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
+    commonModule->store(new QnMetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -404,7 +408,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 
     // TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
-#ifndef __arm__
+#if !defined(__arm__) && !defined(__aarch64__)
     QnPerformanceTest::detectLightMode();
 #else
     // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
@@ -563,13 +567,15 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
-    commonModule->store(new PluginManager());
     // client uses ordinary QT file to access file system
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
+    auto pluginManager = commonModule->store(new PluginManager(nullptr));
+
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
+    QnVideoDecoderFactory::setPluginManager(pluginManager);
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 

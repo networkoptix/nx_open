@@ -85,4 +85,11 @@ set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_GB)
-set(additionalTranslations fr_FR ru_RU es_ES de_DE hu_HU)
+set(additionalTranslations
+    fr_FR
+    de_DE
+    es_ES
+    ru_RU
+    hu_HU
+    nl_NL
+)

@@ -39,15 +39,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Воспроизвести закладку с начала</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Изменить закладку</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Удалить закладку</translation>
     </message>
   </context>
   <context>
@@ -411,7 +411,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Открыть видеостену</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -431,7 +431,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Сохранить видеостену</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -563,7 +563,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Изменить...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -855,7 +855,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Журнал закладок...</translation>
     </message>
     <message>
       <source>Showreel...</source>
@@ -937,27 +937,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>Лицензия отключена.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>Лицензия неактивна.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Лицензия недействительна.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>Лицензия пробная.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>Лицензия находится в ожидании деактивации, но еще не деактивирована.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>Количество деактиваций для этой лицензии превысило лимит.</translation>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
@@ -1037,8 +1037,28 @@ to view more bookmarks</source>
       <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Файл %1 используется другим процессом. Пожалуйста, используйте другое имя.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Filename should not contain the following reserved characters:
+%1</source>
+      <translation type="unfinished">
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+        <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -1673,10 +1693,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>Номер сборки</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>Недопустимый номер сборки</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2679,6 +2695,17 @@ to %1</source>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Подробнее о %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Incorrect email or password</source>
+      <translation type="unfinished">Incorrect email or password</translation>
+    </message>
+    <message>
+      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
+      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4649,6 +4676,10 @@ to %1</source>
     <message>
       <source>Manage Bookmarks</source>
       <translation type="unfinished">Manage Bookmarks</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
@@ -7872,20 +7903,20 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
-      <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
-    </message>
-    <message>
       <source>Stop Showreel</source>
       <translation>Остановить прокрутку</translation>
     </message>
     <message>
-      <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
-    </message>
-    <message>
       <source>Start Showreel</source>
       <translation>Запустить прокрутки</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation type="unfinished">Stop Tour</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation type="unfinished">Start Tour</translation>
     </message>
   </context>
   <context>
@@ -8157,8 +8188,8 @@ to %1</source>
       <translation>Используйте клавиши со стрелками для переключения раскладок. Для выхода из проктутки нажмите Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>

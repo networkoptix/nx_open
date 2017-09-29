@@ -6,6 +6,8 @@
 #include <QtCore/QSequentialAnimationGroup>
 #include <QtGui/QInputEvent>
 #include <QtWidgets/QGraphicsOpacityEffect>
+#include <QtWidgets/QStyleOptionButton>
+#include <QtWidgets/QStylePainter>
 
 using namespace std::chrono;
 
@@ -53,6 +55,7 @@ ButtonWithConfirmation::ButtonWithConfirmation(QWidget* parent):
 
     d->opacityEffect = new QGraphicsOpacityEffect(this);
     setGraphicsEffect(d->opacityEffect);
+    d->opacityEffect->setEnabled(false);
 
     static const auto kOpacityPropertyName = "opacity";
 
@@ -215,6 +218,16 @@ bool ButtonWithConfirmation::event(QEvent* event)
 
     event->accept();
     return true;
+}
+
+void ButtonWithConfirmation::paintEvent(QPaintEvent* /*event*/)
+{
+    QStylePainter painter(this);
+    QStyleOptionButton option;
+    initStyleOption(&option);
+    if (d->state == Private::State::confirmation)
+        option.state |= QStyle::State_MouseOver;
+    painter.drawControl(QStyle::CE_PushButton, option);
 }
 
 } // namespace ui

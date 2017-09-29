@@ -26,11 +26,11 @@
                     </span>
                 </div>
                 <div class="hide-excess-text">
-                    <span ng-if="server.id == activeCamera.parentId"
+                    <span ng-if="server.active"
                           class="glyphicon glyphicon-server-active"></span>
-                    <span ng-if="server.status == 'Online' && server.id != activeCamera.parentId"
+                    <span ng-if="server.status == 'Online' && !server.active"
                           class="glyphicon glyphicon-server-online"></span>
-                    <span ng-if="server.status != 'Online' && server.id != activeCamera.parentId"
+                    <span ng-if="server.status != 'Online' && !server.active"
                           class="glyphicon glyphicon-server-offline"></span>
                     <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
                 </div>

@@ -1,7 +1,10 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/relay_connection_acceptor.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -28,8 +31,6 @@ public:
 
     ~ProxyUsingRelaying()
     {
-        if (m_relayClient)
-            m_relayClient->pleaseStopSync();
         if (m_httpClient)
             m_httpClient->pleaseStopSync();
         if (m_serverConnection)
@@ -37,46 +38,36 @@ public:
     }
 
 protected:
-    void givenEstablishedServerConnection()
-    {
-        using namespace std::placeholders;
-
-        whenEstablishServerConnection();
-        thenConnectionIsEstaliblished();
-
-        m_serverConnection = std::make_unique<nx_http::AsyncMessagePipeline>(
-            this,
-            std::move(m_prevBeginListenResult.connection));
-        m_serverConnection->setMessageHandler(
-            std::bind(&ProxyUsingRelaying::saveMessageReceived, this, _1));
-        m_serverConnection->startReadingConnection();
-    }
-
     void whenIssueProxyRequest()
     {
         m_httpClient = std::make_unique<nx_http::AsyncClient>();
         m_httpClient->doGet(nx::network::url::Builder(m_baseUrl)
-            .addPath(lm("/%1/%2").arg(m_peerName).arg(kTestRequestPath)));
+            .appendPath(lm("/%1/%2").arg(m_peerName).arg(kTestRequestPath)));
     }
 
-    void thenRequestProxiedToTheServerConnection()
+    void thenConnectionIsAccepted()
     {
-        m_receivedMessageQueue.pop();
+        m_prevAcceptedConnection = m_acceptedConnections.pop();
+        ASSERT_NE(nullptr, m_prevAcceptedConnection.get());
     }
 
-    void whenEstablishServerConnection()
+    void andRequestProxiedToTheServerConnection()
     {
         using namespace std::placeholders;
 
-        m_relayClient->beginListening(
-            m_peerName,
-            std::bind(&ProxyUsingRelaying::saveBeginListenResult, this, _1, _2, _3));
-    }
+        ASSERT_TRUE(m_prevAcceptedConnection->setRecvTimeout(
+            std::chrono::milliseconds::zero()));
 
-    void thenConnectionIsEstaliblished()
-    {
-        m_prevBeginListenResult = m_beginListenResults.pop();
-        ASSERT_EQ(relay::api::ResultCode::ok, m_prevBeginListenResult.resultCode);
+        m_serverConnection = std::make_unique<nx_http::AsyncMessagePipeline>(
+            this,
+            std::make_unique<nx::network::deprecated::SslSocket>(
+                std::move(m_prevAcceptedConnection),
+                true));
+        m_serverConnection->setMessageHandler(
+            std::bind(&ProxyUsingRelaying::saveMessageReceived, this, _1));
+        m_serverConnection->startReadingConnection();
+
+        m_receivedMessageQueue.pop();
     }
 
 private:
@@ -87,59 +78,58 @@ private:
         std::unique_ptr<AbstractStreamSocket> connection;
     };
 
-    std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
+    std::unique_ptr<nx::network::cloud::relay::ConnectionAcceptor> m_relayConnectionAcceptor;
     QUrl m_baseUrl;
     nx::String m_peerName;
-    BeginListenResult m_prevBeginListenResult;
-    nx::utils::SyncQueue<BeginListenResult> m_beginListenResults;
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_serverConnection;
     nx::utils::SyncQueue<nx_http::Message> m_receivedMessageQueue;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosureReasons;
+    nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
+    std::unique_ptr<AbstractStreamSocket> m_prevAcceptedConnection;
 
     virtual void SetUp() override
     {
+        using namespace std::placeholders;
+
         ASSERT_TRUE(startAndWaitUntilStarted());
 
         m_baseUrl = nx::network::url::Builder()
             .setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint())
             .setPath(nx::cloud::gateway::kApiPathPrefix).toUrl();
 
-        m_relayClient = relay::api::ClientFactory::create(m_baseUrl);
+        m_relayConnectionAcceptor = 
+            std::make_unique<nx::network::cloud::relay::ConnectionAcceptor>(m_baseUrl);
+        m_relayConnectionAcceptor->acceptAsync(
+            std::bind(&ProxyUsingRelaying::saveAcceptedConnection, this, _1, _2));
     }
 
     virtual void closeConnection(
-        SystemError::ErrorCode /*closeReason*/,
+        SystemError::ErrorCode closeReason,
         nx_http::AsyncMessagePipeline* /*connection*/) override
     {
-        // TODO
-    }
-
-    void saveBeginListenResult(
-        relay::api::ResultCode resultCode,
-        relay::api::BeginListeningResponse response,
-        std::unique_ptr<AbstractStreamSocket> connection)
-    {
-        m_beginListenResults.push(
-            BeginListenResult{resultCode, std::move(response), std::move(connection)});
+        m_connectionClosureReasons.push(closeReason);
     }
 
     void saveMessageReceived(nx_http::Message message)
     {
         m_receivedMessageQueue.push(std::move(message));
     }
-};
 
-TEST_F(ProxyUsingRelaying, server_connection_can_be_established)
-{
-    whenEstablishServerConnection();
-    thenConnectionIsEstaliblished();
-}
+    void saveAcceptedConnection(
+        SystemError::ErrorCode /*systemErrorCode*/,
+        std::unique_ptr<AbstractStreamSocket> connection)
+    {
+        m_acceptedConnections.push(std::move(connection));
+    }
+};
 
 TEST_F(ProxyUsingRelaying, DISABLED_relay_connection_is_used_for_proxying)
 {
-    givenEstablishedServerConnection();
     whenIssueProxyRequest();
-    thenRequestProxiedToTheServerConnection();
+
+    thenConnectionIsAccepted();
+    andRequestProxiedToTheServerConnection();
 }
 
 } // namespace test

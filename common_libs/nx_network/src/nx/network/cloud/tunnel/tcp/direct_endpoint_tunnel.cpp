@@ -99,6 +99,11 @@ void DirectTcpEndpointTunnel::setControlConnectionClosedHandler(
     m_connectionClosedHandler = std::move(handler);
 }
 
+std::string DirectTcpEndpointTunnel::toString() const
+{
+    return lm("Direct tcp connect to %1").args(m_targetEndpoint).toStdString();
+}
+
 void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)

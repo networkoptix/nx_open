@@ -2,6 +2,7 @@
 
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/log/log_level.h>
 #include <mobile_client/mobile_client_meta_types.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
 #include <client_core/local_connection_data.h>
@@ -33,6 +34,8 @@ public:
         WebSocketPort,
 
         StartupParameters,
+
+        LogLevel,
 
         // Depracated properties
         SavedSessions,
@@ -92,6 +95,10 @@ private:
             QnMobileClientStartupParameters,
             startupParameters, setStartupParameters,
             StartupParameters, QnMobileClientStartupParameters())
+
+        QN_DECLARE_RW_PROPERTY(QString,
+            logLevel, setLogLevel,
+            LogLevel, lit("none"))
 
         // Deprecated properties
         QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSessionId,          setLastUsedSessionId,       LastUsedSessionId,          QString())

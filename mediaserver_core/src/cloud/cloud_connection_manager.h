@@ -44,6 +44,7 @@ public:
 
     bool detachSystemFromCloud();
 
+    bool removeCloudUsers();
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
     void connectedToCloud();
@@ -58,7 +59,6 @@ private:
 
     void setCloudCredentials(const QString& cloudSystemId, const QString& cloudAuthKey);
     bool makeSystemLocal();
-    bool removeCloudUsers();
 
 private slots:
     void cloudSettingsChanged();

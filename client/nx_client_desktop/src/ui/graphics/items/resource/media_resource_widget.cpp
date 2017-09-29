@@ -534,22 +534,24 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (!button)
         return;
 
-    const bool ruleEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime());
-    if (button->isEnabled() == ruleEnabled)
+    const bool buttonEnabled = rule && rule->isScheduleMatchTime(qnSyncTime->currentDateTime())
+        || !button->isLive();
+
+    if (button->isEnabled() == buttonEnabled)
         return;
 
-    if (ruleEnabled)
+    const auto info = triggerIt.value().info;
+
+    if (!buttonEnabled)
     {
-        button->setEnabled(true);
-        return;
+        const bool longPressed = info.prolonged &&
+            button->state() == QnSoftwareTriggerButton::State::Waiting;
+        if (longPressed)
+            button->setState(QnSoftwareTriggerButton::State::Failure);
     }
 
-    const bool longPressed = triggerIt.value().info.prolonged &&
-        button->state() == QnSoftwareTriggerButton::State::Waiting;
-    if (longPressed)
-        button->setState(QnSoftwareTriggerButton::State::Failure);
-
-    button->setEnabled(false);
+    button->setEnabled(buttonEnabled);
+    updateTriggerButtonTooltip(button, info, buttonEnabled);
 }
 
 void QnMediaResourceWidget::updateTriggersAvailability()
@@ -1436,7 +1438,16 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     {
         ensureMotionSelectionCache();
 
-        paintMotionGrid(painter, channel, rect, m_renderer->lastFrameMetadata(channel));
+        auto metadata = m_renderer->lastFrameMetadata(channel);
+        if (!metadata || metadata->dataType != QnAbstractMediaData::DataType::META_V1)
+            return;
+
+        paintMotionGrid(
+            painter,
+            channel,
+            rect,
+            std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+
         paintMotionSensitivity(painter, channel, rect);
 
         /* Motion selection. */
@@ -2557,6 +2568,12 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
     const auto button = new QnSoftwareTriggerButton(this);
     configureTriggerButton(button, info, clientSideHandler);
 
+    connect(button, &QnSoftwareTriggerButton::isLiveChanged, this,
+        [this, button, rule]()
+        {
+            updateTriggerAvailability(rule);
+        });
+
     // TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
     const auto overlayItemId = m_triggersContainer->insertItem(0, button);
 
@@ -2586,17 +2603,40 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
     return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
 }
 
+void QnMediaResourceWidget::updateTriggerButtonTooltip(
+    QnSoftwareTriggerButton* button,
+    const SoftwareTriggerInfo& info,
+    bool enabledBySchedule)
+{
+    if (!button)
+    {
+        NX_EXPECT(false, "Trigger button is null");
+        return;
+    }
+
+    if (enabledBySchedule)
+    {
+        const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
+        button->setToolTip(info.prolonged
+            ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
+            : name);
+        return;
+    }
+    else
+    {
+        button->setToolTip(tr("Disabled by schedule"));
+    }
+
+}
+
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
     NX_EXPECT(button);
 
-    const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
-    button->setToolTip(info.prolonged
-        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Soft Trigger"))
-        : name);
+    updateTriggerButtonTooltip(button, info, true);
 
     const auto resultHandler =
         [button = QPointer<QnSoftwareTriggerButton>(button)](bool success, qint64 requestId)

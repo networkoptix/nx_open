@@ -59,6 +59,7 @@
 #include <ui/workbench/handlers/workbench_screen_recording_handler.h>
 #include <ui/workbench/handlers/workbench_text_overlays_handler.h>
 #include <nx/client/desktop/radass/radass_action_handler.h>
+#include <ui/workbench/handlers/workbench_analytics_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -249,6 +250,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchCloudHandler>();
     context->instance<workbench::LayoutToursHandler>();
     context->instance<nx::client::desktop::RadassActionHandler>();
+    context->instance<QnWorkbenchAnalyticsHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();

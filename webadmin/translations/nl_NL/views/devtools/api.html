@@ -48,14 +48,9 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
-                                            <a ng-click="setActiveFunction(group,function,$event)"
-                                               ng-href="#/developers/api{{function.url}}">
-                                                <b ng-if="function.caption"
-                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b>
-                                                <span ng-if="function.method">{{function.method}}:</span>
-                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b>
-                                            </a>
+                                            <span class="label label-danger" ng-if="function.proprietary">merkgebonden</span>                                             <a ng-click="setActiveFunction(group,function,$event)"
+                                               ng-href="#/developers/api{{function.url}}"><b ng-if="function.caption"
+                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b> <span ng-if="function.method">{{function.method}}:</span> <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b></a>
                                             <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
                                         </li>
                                     </ul>

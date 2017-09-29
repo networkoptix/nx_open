@@ -59,6 +59,7 @@ def wait_for_servers_return_same_results_to_api_call(env, method, api_object, ap
         time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.0)
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_merged_servers_should_return_same_results_to_certain_api_calls
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
         ('GET', 'ec2', 'getStorages'),
@@ -80,6 +81,7 @@ def assert_both_servers_are_online(env):
             server, len(online_servers))
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_proxy_requests
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_proxy_requests(env):
@@ -106,6 +108,7 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
         assert metadata.height == sample_media_file.height
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920653/Connection+behind+NAT#ConnectionbehindNAT-test_get_streams
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
 def test_get_streams(artifact_factory, env, camera, sample_media_file, stream_type):

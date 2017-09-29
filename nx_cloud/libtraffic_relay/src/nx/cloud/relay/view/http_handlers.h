@@ -31,7 +31,9 @@ public:
         controller::AbstractListeningPeerManager* listeningPeerManager);
 
 protected:
-    virtual api::BeginListeningRequest prepareRequestData() override;
+    virtual api::BeginListeningRequest prepareRequestData(
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& httpRequest) override;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -58,7 +60,10 @@ public:
         controller::AbstractConnectSessionManager* connectSessionManager);
 
 protected:
-    virtual void prepareRequestData(api::CreateClientSessionRequest* request) override;
+    virtual void prepareRequestData(
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& httpRequest,
+        api::CreateClientSessionRequest* request) override;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -66,14 +71,14 @@ protected:
 class ConnectToPeerHandler:
     public BasicHandlerWithoutRequestBody<
         controller::AbstractConnectSessionManager,
-        api::ConnectToPeerRequest,
+        controller::ConnectToPeerRequestEx,
         controller::AbstractConnectSessionManager::ConnectToPeerHandler>
 {
     using self_type = ConnectToPeerHandler;
     using base_type =
         BasicHandlerWithoutRequestBody<
             controller::AbstractConnectSessionManager,
-            api::ConnectToPeerRequest,
+            controller::ConnectToPeerRequestEx,
             controller::AbstractConnectSessionManager::ConnectToPeerHandler>;
 
 public:
@@ -83,7 +88,9 @@ public:
         controller::AbstractConnectSessionManager* connectSessionManager);
 
 protected:
-    virtual api::ConnectToPeerRequest prepareRequestData() override;
+    virtual controller::ConnectToPeerRequestEx prepareRequestData(
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& httpRequest) override;
 };
 
 } // namespace view

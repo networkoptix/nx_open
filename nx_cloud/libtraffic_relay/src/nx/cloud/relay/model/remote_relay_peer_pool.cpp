@@ -204,10 +204,12 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                     return cf::make_ready_future(std::make_pair(errorCode, cassandra::Query()));
 
                 auto whereString = whereStringForFind(domainName);
+                std::string queryString = "SELECT relay_id, relay_host \
+                     FROM cdb.relay_peers " + whereString;
 
-                return m_cassConnection->prepareQuery(
-                    ("SELECT relay_id, relay_host \
-                     FROM cdb.relay_peers " + whereString).c_str());
+                NX_VERBOSE(this, lm("find relay: query string: %1").arg(queryString));
+
+                return m_cassConnection->prepareQuery(queryString.c_str());
             })
         .then(
             [this](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
@@ -247,13 +249,22 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                         return std::string();
 
                     if (hostUuid->uuidString == thisHostId)
+                    {
+                        NX_VERBOSE(this, 
+                            lm("find relay: selected host string is equal to this host string (%1)")
+                                .arg(thisHostId));
                         continue;
+                    }
 
                     if (!getQueryResultValue(result.second, "relay_host", &relayHost))
                         return std::string();
 
+                    NX_VERBOSE(this, lm("find relay: Getting next cursor value (%1, %2)")
+                        .arg(hostUuid->uuidString).arg(*relayHost));
+
+
                     NX_VERBOSE(this, lm("Found relay host %1 for domain %2")
-                        .arg(relayHost)
+                        .arg(*relayHost)
                         .arg(domainName));
 
                     return *relayHost;

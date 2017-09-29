@@ -26,7 +26,7 @@ Drawer
             id: layoutsList
 
             anchors.fill: parent
-            anchors.topMargin: getStatusBarHeight()
+            anchors.topMargin: deviceStatusBarHeight
             anchors.bottomMargin: bottomContent.height
             bottomMargin: 8
             flickableDirection: Flickable.VerticalFlick
@@ -178,6 +178,10 @@ Drawer
                 forceActiveFocus()
             }
         }
+        else
+        {
+            Workflow.focusCurrentScreen()
+        }
     }
 
     // TODO: #dklychkov Use closePolicy after switching to Qt 5.7 or higher.
@@ -188,7 +192,6 @@ Drawer
         if (Utils.keyIsBack(event.key))
         {
             close()
-            Workflow.focusCurrentScreen()
             event.accepted = true
         }
     }

@@ -172,20 +172,31 @@ QSet<QnUuid> QnMediaServerUpdateTool::actualTargetIds() const {
     return targets;
 }
 
-QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion) const {
+QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion,
+    const QString& targetChangeset) const
+{
     QUrlQuery query;
 
-    QString versionSuffix;
-    if (targetVersion.isNull()) {
+    QString versionSuffix; //< TODO: #dklychkov what's that?
+
+    if (targetVersion.isNull())
+    {
         query.addQueryItem(lit("version"), lit("latest"));
         query.addQueryItem(lit("current"), getCurrentVersion(resourcePool()).toString());
-    } else {
+    }
+    else
+    {
+        const auto key = targetChangeset.isEmpty()
+            ? QString::number(targetVersion.build())
+            : targetChangeset;
+
         query.addQueryItem(lit("version"), targetVersion.toString());
-        query.addQueryItem(lit("password"), passwordForBuild(static_cast<unsigned>(targetVersion.build())));
+        query.addQueryItem(lit("password"), passwordForBuild(key));
     }
 
     QSet<QnSystemInformation> systemInformationList;
-    foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
+    for (const auto& server: actualTargets())
+    {
         bool incompatible = (server->getStatus() == Qn::Incompatible);
 
         if (server->getStatus() != Qn::Online && !incompatible)

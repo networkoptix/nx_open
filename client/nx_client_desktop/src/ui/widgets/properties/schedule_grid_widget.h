@@ -36,6 +36,7 @@ public:
         int fps;
         Qn::StreamQuality quality;
         Qn::RecordingType recordingType;
+        qreal bitrateMbps; //< 0 means auto.
 
         CellParams();
         bool operator==(const CellParams& other) const;

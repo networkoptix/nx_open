@@ -144,10 +144,10 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -295,7 +295,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer& buf,
         const SocketAddress& foreignAddress,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
     /**
      * Actually calls UDPSocket::recvFrom and makes datagram source address/port
      *   available through UDPSocket::lastDatagramSourceAddress.
@@ -307,7 +307,7 @@ public:
         SocketAddress* const sourceAddress ) override;
     virtual void recvFromAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
     virtual SocketAddress lastDatagramSourceAddress() const override;
     virtual bool hasData() const override;
     /**

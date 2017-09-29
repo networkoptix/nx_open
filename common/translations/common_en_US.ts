@@ -82,6 +82,15 @@
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>New System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered System %1 is incompatible with the current System.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

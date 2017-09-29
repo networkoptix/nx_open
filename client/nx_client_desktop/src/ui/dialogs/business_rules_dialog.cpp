@@ -641,6 +641,7 @@ void QnBusinessRulesDialog::testRule(const QnBusinessRuleViewModelPtr& ruleModel
         connection->testEventRule(ruleModel->id(), nx::vms::event::EventState::undefined,
             makeCallback(lit("Event Occurred")), QThread::currentThread());
     }
+
 }
 
 void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr& ruleModel)

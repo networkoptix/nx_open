@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Network Optix metadata plugin manifest",
+    "type": "object",
+    "properties": {
+        "acceptedDataTypes": {
+            "type": "array",
+            "description": "Types of data that can be accepted by plugin",
+            "items": {
+                "type": "string",
+                "enum":[
+                    "compressedVideo",
+                    "compressedAudio",
+                    "decompressedVideo",
+                    "decompressedAudio",
+                    "metadata"]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "supportedCodecs": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["video/avc", "video/hevc", "image/jpeg", "some", "audio", "codecs"]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "supportedHandleTypes": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["none, glTexture", "xvShmImage", "coreImage", "qPixmap", "eglImage"]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "supportedPixelFormats": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["YUV_420", "YUV_442", "YUV_444", "NV_12", "RGB", "RGBA", "ABGR", "BGR"]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "outputEventTypes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "kindName": {
+                        "type": "string"
+                    },
+                    "localization":{
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "locale": {
+                                    "type": "string"
+                                },
+                                "kindName": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["locale", "kindName"]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                    }
+                },
+                "required": ["kindName", "localization"]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        }
+    }
+}

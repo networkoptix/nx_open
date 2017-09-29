@@ -128,14 +128,14 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     int reqID = commonModule()->ec2Connection()->getLayoutManager(Qn::kSystemAccess)->save(
         apiLayout, this, [this, layout, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-        markBeingSaved(layout->getId(), false);
+            markBeingSaved(layout->getId(), false);
 
             /* Check if all OK */
             bool success = errorCode == ec2::ErrorCode::ok;
             if (success)
-            {
-                m_storage->store(layout);
-                clean(layout->getId()); //< Not changed, not being saved.
+            {              
+                store(layout); //< Cleanup 'changed' flag here, sending corresponding signal.
+                clean(layout->getId()); //< Silently remove from flags storage.
             }
 
             if (callback)

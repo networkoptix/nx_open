@@ -12,7 +12,7 @@ class QnBusyIndicatorWidget;
 class QnAutoscaledPlainText;
 class QnImageProvider;
 
-class QnResourcePreviewWidget : public Connective<QWidget>
+class QnResourcePreviewWidget: public Connective<QWidget>
 {
     Q_OBJECT
     typedef Connective<QWidget> base_type;
@@ -26,12 +26,17 @@ public:
 
     QnBusyIndicatorWidget* busyIndicator() const;
 
+    virtual QSize sizeHint() const override;
+
+    virtual bool hasHeightForWidth() const override;
+    virtual int heightForWidth(int width) const override;
+
+    QPalette::ColorRole borderRole() const;
+    void setBorderRole(QPalette::ColorRole role);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
-    virtual void resizeEvent(QResizeEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
-    virtual QSize sizeHint() const override;
-    virtual QSize minimumSizeHint() const override;
 
 private:
     void retranslateUi();
@@ -40,12 +45,11 @@ private:
     void updateThumbnailStatus(Qn::ThumbnailStatus status);
     void updateThumbnailImage(const QImage& image);
 
-
 private:
     mutable QSize m_cachedSizeHint;
-    QLabel* m_preview = nullptr;
-    QnAutoscaledPlainText* m_placeholder = nullptr;
-    QnBusyIndicatorWidget* m_indicator = nullptr;
-    QStackedWidget* m_pages = nullptr;
+    QnAutoscaledPlainText* const m_placeholder = nullptr;
+    QnBusyIndicatorWidget* const m_indicator = nullptr;
+    QPixmap m_preview;
     QPointer<QnImageProvider> m_imageProvider;
+    QPalette::ColorRole m_borderRole = QPalette::Shadow;
 };

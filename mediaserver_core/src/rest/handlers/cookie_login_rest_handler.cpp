@@ -12,6 +12,8 @@
 #include <network/client_authenticate_helper.h>
 #include "current_user_rest_handler.h"
 #include <api/model/cookie_login_data.h>
+#include "cookie_logout_rest_handler.h"
+#include <nx/utils/scope_guard.h>
 
 int QnCookieLoginRestHandler::executePost(
     const QString &/*path*/,
@@ -22,6 +24,15 @@ int QnCookieLoginRestHandler::executePost(
 {
     bool success = false;
     QnCookieData cookieData = QJson::deserialized<QnCookieData>(body, QnCookieData(), &success);
+
+    auto logoutGuard = makeScopeGuard(
+        [owner]
+        {
+            auto headers = &owner->response()->headers;
+            if (headers->find("Set-Cookie") == headers->end())
+                QnCookieHelper::addLogoutHeaders(headers);
+        });
+
     if (!success)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid json object. All fields are mandatory");

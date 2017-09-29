@@ -3,58 +3,80 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 
+#include <utils/common/event_loop.h>
+
 #include <nx/utils/log/assert.h>
 
 namespace
 {
-    QTimer *executeDelayedImpl(const Callback &callback
-        , int delayMs
-        , QThread *targetThread
-        , QObject *parent)
-    {
-        NX_ASSERT(!(targetThread && parent), Q_FUNC_INFO, "Invalid thread and parent parameters");
 
-        if (parent)
-        {
-            /* NX_ASSERT does not stop debugging here. */
-            NX_ASSERT(parent->thread() == QThread::currentThread(), Q_FUNC_INFO,
-                "Timer cannot be child of QObject, located in another thread. Use targetThread "
-                "parameter instead and guarded callback.");
-        }
-
-        QTimer *timer = new QTimer(parent);
-        timer->setInterval(delayMs);
-        timer->setSingleShot(true);
-
-        if (targetThread)
-            timer->moveToThread(targetThread);
-
-        /* Set timer as context so if timer is destroyed, callback is also destroyed. */
-        QObject::connect(timer, &QTimer::timeout, timer, callback);
-        QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
-
-        /* Workaround for windows. QTimer cannot be started from a different thread in windows. */
-        QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection);
-
-        return timer;
-    }
-}
-
-void executeDelayed(const Callback &callback
-    , int delayMs
-    , QThread *targetThread)
+class DelayedFunctor: public QObject
 {
-    executeDelayedImpl(callback, delayMs, targetThread, nullptr);
+public:
+    DelayedFunctor(Callback callback, QObject* parent):
+        QObject(parent),
+        m_callback(std::move(callback))
+    {
+    }
+
+    void execute()
+    {
+        m_callback();
+    }
+
+private:
+    Callback m_callback;
+};
+
+QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread, QObject* parent)
+{
+    NX_ASSERT(!(targetThread && parent), Q_FUNC_INFO, "Invalid thread and parent parameters");
+
+    if (parent)
+    {
+        /* NX_ASSERT does not stop debugging here. */
+        NX_ASSERT(parent->thread() == QThread::currentThread(), Q_FUNC_INFO,
+            "Timer cannot be child of QObject, located in another thread. Use targetThread "
+            "parameter instead and guarded callback.");
+    }
+
+    auto timer = new QTimer(parent);
+    timer->setInterval(delayMs);
+    timer->setSingleShot(true);
+
+    auto functor = new DelayedFunctor(std::move(callback), timer);
+
+    if (targetThread)
+    {
+        NX_EXPECT(qnHasEventLoop(targetThread));
+        timer->moveToThread(targetThread);
+        functor->moveToThread(targetThread);
+    }
+
+    QObject::connect(timer, &QTimer::timeout, functor, &DelayedFunctor::execute);
+    QObject::connect(timer, &QTimer::timeout, timer, &QObject::deleteLater);
+
+    // Workaround for windows. QTimer cannot be started from a different thread in windows.
+    QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection);
+
+    return timer;
 }
 
-QTimer *executeDelayedParented(const Callback &callback
+} // namespace
+
+void executeDelayed(Callback callback, int delayMs, QThread* targetThread)
+{
+    executeDelayedImpl(std::move(callback), delayMs, targetThread, nullptr);
+}
+
+QTimer *executeDelayedParented(Callback callback
     , int delayMs
     , QObject *parent)
 {
     return executeDelayedImpl(callback, delayMs, nullptr, parent);
 }
 
-void executeInThread(QThread* thread, const Callback& callback)
+void executeInThread(QThread* thread, Callback callback)
 {
     NX_EXPECT(thread);
     NX_EXPECT(callback);

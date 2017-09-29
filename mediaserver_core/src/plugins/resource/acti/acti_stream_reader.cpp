@@ -33,10 +33,10 @@ QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
     return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
 }
 
-CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& streamParams)
 {
     // configure stream params
-
+    QnLiveStreamParams params = streamParams;
     QString SET_RESOLUTION(QLatin1String("CHANNEL=%1&VIDEO_RESOLUTION=%2"));
     QString SET_FPS(QLatin1String("CHANNEL=%1&VIDEO_FPS_NUM=%2"));
     QString SET_BITRATE(QLatin1String("CHANNEL=%1&VIDEO_BITRATE=%2&VIDEO_MAX_BITRATE=%2"));
@@ -50,13 +50,13 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
     const int kStreamingMethodRtpUdpMulticast = 5;
 
     m_multiCodec.setRole(m_role);
-    int fps = m_actiRes->roundFps(params.fps, m_role);
+    params.fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
 
     QSize resolution = m_actiRes->getResolution(m_role);
     QString resolutionStr = formatResolutionStr(resolution);
 
-    int bitrate = m_actiRes->suggestBitrateKbps(params.quality, resolution, fps);
+    int bitrate = m_actiRes->suggestBitrateKbps(resolution, params, getRole());
     bitrate = m_actiRes->roundBitrate(bitrate);
     QString bitrateStr = m_actiRes->formatBitrateString(bitrate);
 
@@ -88,7 +88,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(bool isCameraCo
                 return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("streaming method"));
         }
 
-        QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
+        QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(params.fps), status);
         if (status != CL_HTTP_SUCCESS)
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 

@@ -107,7 +107,6 @@ public:
     int chunkBarHeight = 48;
     int textY = -1;
 
-    bool showLive = true;
     QSGTexture* stripesDarkTexture = nullptr;
     QSGTexture* stripesLightTexture = nullptr;
     qreal activeLiveOpacity = 0.0;

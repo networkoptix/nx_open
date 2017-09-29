@@ -66,6 +66,7 @@ void TargetPeerConnector::takeConnectionFromListeningPeerPool()
     using namespace std::placeholders;
 
     m_listeningPeerPool->takeIdleConnection(
+        nx::cloud::relay::model::ClientInfo(), //< TODO: #ak
         m_targetEndpoint.address.toString().toStdString(),
         std::bind(&TargetPeerConnector::processTakeConnectionResult, this, _1, _2));
 }

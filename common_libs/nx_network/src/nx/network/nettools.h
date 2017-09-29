@@ -85,9 +85,6 @@ QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
  */
 void NX_NETWORK_API setInterfaceListFilter(const QList<QHostAddress>& ifList);
 
-// return true if succeded
-bool NX_NETWORK_API getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
-
 void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 
 QString NX_NETWORK_API getMacByIP(const QString& host, bool net = true);

@@ -38,17 +38,6 @@
 
 #include "cloud/cloud_manager_group.h"
 
-namespace {
-
-struct Ini: nx::kit::IniConfig
-{
-    Ini(): IniConfig("QnAuthHelper.ini") { reload(); }
-
-    NX_INI_INT(static_cast<int>(nx::utils::log::Level::none), logLevel, "");
-};
-
-} // namespace
-
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
 ////////////////////////////////////////////////////////////
@@ -84,11 +73,6 @@ QnAuthHelper::QnAuthHelper(
     m_userDataProvider(&cloudManagerGroup->userAuthenticator),
     m_ldap(new QnLdapManager(commonModule))
 {
-    Ini ini;
-
-    const auto logger = nx::utils::log::addLogger({nx::utils::log::Tag(typeid(QnAuthHelper))});
-    logger->setDefaultLevel(static_cast<nx::utils::log::Level>(ini.logLevel));
-    logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
 }
 
 QnAuthHelper::~QnAuthHelper()

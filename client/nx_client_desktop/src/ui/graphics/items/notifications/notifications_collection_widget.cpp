@@ -392,6 +392,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
         {
             case vms::event::cameraMotionEvent:
             case vms::event::softwareTriggerEvent:
+            case vms::event::analyticsSdkEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 item->addActionButton(
@@ -591,6 +592,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const vms::event::AbstractA
         case vms::event::cameraDisconnectEvent:
         case vms::event::cameraIpConflictEvent:
         case vms::event::networkIssueEvent:
+        case vms::event::analyticsSdkEvent:
         {
             auto resource = resourcePool()->getResourceById(params.eventResourceId);
             return resource
