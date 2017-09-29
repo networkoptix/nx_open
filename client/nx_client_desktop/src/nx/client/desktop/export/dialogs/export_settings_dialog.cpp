@@ -211,7 +211,10 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
     updateMode();
 
-    ui->cameraExportSettingsButton->click(); //< Set current page to settings.
+    if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
+        ui->bookmarkButton->click(); //< Set current page to bookmark info.
+    else
+        ui->cameraExportSettingsButton->click(); //< Set current page to settings.
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
