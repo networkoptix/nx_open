@@ -87,7 +87,7 @@ private:
         auto connection = std::make_unique<CassandraConnectionStub>();
         connection->setDbHostAvailable(m_isCassandraOnline);
         connection->setInitializationDoneEventQueue(&m_cassandraConnectionInitializationEvents);
-        return connection;
+        return std::move(connection);
     }
 };
 
