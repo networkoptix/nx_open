@@ -35,11 +35,17 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
+HanwhaResourceSearcher::~HanwhaResourceSearcher()
+{
+    nx_upnp::DeviceSearcher::instance()->unregisterHandler(this, kUpnpBasicDeviceType);
+}
+
 QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnUuid &resourceTypeId,
     const QnResourceParams& /*params*/)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    NX_EXPECT(!resourceType.isNull());
     if (resourceType.isNull())
     {
         NX_WARNING(this, lm("No resource type for Hanwha camera. Id = %1").arg(resourceTypeId));
@@ -50,7 +56,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
-    result = QnVirtualCameraResourcePtr( new HanwhaResource() );
+    result = QnVirtualCameraResourcePtr(new HanwhaResource());
     result->setTypeId(resourceTypeId);
     return result;
 }
@@ -181,7 +187,6 @@ void HanwhaResourceSearcher::createResource(
     const QAuthenticator& auth,
     QnResourceList& result)
 {
-
     auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
     if (rt.isNull())
         return;

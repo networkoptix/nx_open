@@ -18,16 +18,16 @@ class HanwhaResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
 	public nx_upnp::SearchHandler
 {
-
 public:
     HanwhaResourceSearcher(QnCommonModule* commonModule);
+    virtual ~HanwhaResourceSearcher();
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
 
     // return the manufacture of the server
-    virtual QString manufacture() const;
+    virtual QString manufacture() const override;
 
     virtual QnResourceList findResources(void) override;
 
@@ -49,7 +49,6 @@ public:
         bool generateNewOne = false) const;
 
 private:
-
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,
         const QnMacAddress& mac,
@@ -70,9 +69,9 @@ private:
     };
     using SessionKeyPtr = std::shared_ptr<SessionKeyData>;
 
+    mutable QnMutex m_mutex;
     QnResourceList m_foundUpnpResources;
     std::set<QString> m_alreadFoundMacAddresses;
-    mutable QnMutex m_mutex;
     QMap<QString, int> m_channelsByCamera;
 
     // TODO: #dmishin make different session keys for different session types
