@@ -126,7 +126,7 @@ def create_zap_webhook(request):
         return Response({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
 
     url_link = 'http://cloud-dev.hdw.mx/firehook/?system_id=%s&caption=%s' % (system_id, caption)
-    rules_query = GeneratedRules.objects.filter(email=email, caption=caption, active=True,
+    rules_query = GeneratedRules.objects.filter(email=email, caption=caption,
                                                 system_id=system_id, direction="Nx to Zapier")
     if not rules_query.exists():
         make_rule("Generic Event", email, password, caption=caption, zapier_trigger=url_link)
