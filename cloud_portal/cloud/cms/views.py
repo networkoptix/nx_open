@@ -1,15 +1,13 @@
 from __future__ import absolute_import
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-from rest_framework.response import Response
-
+from django.views.decorators.http import require_http_methods
+from django.views import defaults
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import admin
-from django.http.response import HttpResponse, HttpResponseBadRequest
+from django.http.response import HttpResponse, HttpResponseBadRequest, Http404
 
 import os
 from cloud import settings
@@ -159,7 +157,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
 
 # Create your views here.
-@api_view(["GET", "POST"])
+@require_http_methods(["GET", "POST"])
 @permission_required('cms.edit_content')
 def context_edit_view(request, context=None, language=None):
     if request.method == "GET":
@@ -198,7 +196,7 @@ def context_edit_view(request, context=None, language=None):
                        'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
 
-@api_view(["POST"])
+@require_http_methods(["POST"])
 @permission_required('cms.change_contentversion')
 def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
@@ -217,10 +215,10 @@ def review_version_request(request, context=None, language=None):
             messages.success(request._request, "Version " +
                              str(version.id) + " has been published")
         return redirect(reverse('review_version', args=[version.id]))
-    return Response("Invalid")
+    return defaults.bad_request("File does not exist")
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 @permission_required('cms.change_contentversion')
 def review_version_view(request, version_id=None):
     version = ContentVersion.objects.get(id=version_id)
@@ -242,7 +240,7 @@ def response_attachment(data, filename, content_type):
     return response
 
 
-@api_view(["GET", "POST"])
+@require_http_methods(["GET", "POST"])
 @permission_required('cms.change_product')
 def product_settings(request, product_id):
     product = Product.objects.get(pk=product_id)
@@ -298,7 +296,7 @@ def product_settings(request, product_id):
                    'title': 'Settings for %s' % product.name})
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 def download_file(request, path):
     language_code = request.GET['lang'] if 'lang' in request.GET else None
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
@@ -306,10 +304,10 @@ def download_file(request, path):
     file = filldata.read_customized_file(path, settings.CUSTOMIZATION, language_code, version_id, preview)
     if file:
         return response_attachment(file, os.path.basename(path), "application")
-    return Response("File does not exist", status=404)
+    raise defaults.page_not_found("File does not exist")
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 def download_package(request, product_name, customization_name=None):
     if not customization_name:
         customization_name = settings.CUSTOMIZATION
