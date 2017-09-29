@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+LOCAL_ENIRONMENT = False
 conf = get_config()
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
@@ -142,6 +142,13 @@ CACHES = {
         }
     }
 }
+
+if LOCAL_ENIRONMENT:
+    conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
+    CACHES["global"] = {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'portal_cache',
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
