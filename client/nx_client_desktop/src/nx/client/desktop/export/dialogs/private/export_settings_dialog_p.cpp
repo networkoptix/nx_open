@@ -652,7 +652,6 @@ void ExportSettingsDialog::Private::updateBookmarkText()
     static const auto kBookmarkTemplate = lit("<p><font size=5>%1</font></p>%2");
     const auto text = kBookmarkTemplate.arg(m_bookmarkName.toHtmlEscaped()).arg(description);
     m_exportMediaPersistentSettings.bookmarkOverlay.text = text;
-    overlay(ExportOverlayType::bookmark)->setText(text);
 }
 
 void ExportSettingsDialog::Private::updateTimestampText()
