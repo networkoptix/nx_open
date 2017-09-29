@@ -1238,6 +1238,16 @@ float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QS
     return qMax(192.0, result);
 }
 
+bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
+{
+    return false;
+}
+
+bool QnSecurityCamResource::isEventComesFromAnalyticsDriver(nx::vms::event::EventType eventType) const
+{
+    return eventType == nx::vms::event::EventType::analyticsSdkEvent;
+}
+
 int QnSecurityCamResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)

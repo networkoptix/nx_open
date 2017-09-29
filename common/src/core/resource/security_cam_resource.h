@@ -5,23 +5,23 @@
 #include <map>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/api/analytics/supported_events.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 #include <utils/common/value_cache.h>
+#include <common/common_globals.h>
+#include <api/model/api_ioport_data.h>
 
-#include "media_resource.h"
-#include "motion_window.h"
-#include "core/misc/schedule_task.h"
-#include "network_resource.h"
-#include "common/common_globals.h"
-#include <nx/vms/event/event_fwd.h>
+#include <core/dataconsumer/audio_data_transmitter.h>
+#include <core/misc/schedule_task.h>
 
-#include "api/model/api_ioport_data.h"
-#include <nx/api/analytics/supported_events.h>
-
-#include "core/dataconsumer/audio_data_transmitter.h"
+#include <core/resource/media_resource.h>
+#include <core/resource/motion_window.h>
+#include <core/resource/network_resource.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/combined_sensors_description.h>
-#include "media_stream_capability.h"
+#include <core/resource/media_stream_capability.h>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -304,6 +304,9 @@ public:
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
     virtual int suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
     float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const;
+
+    virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
+    virtual bool isEventComesFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
 
 public slots:
     virtual void inputPortListenerAttached();

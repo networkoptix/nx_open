@@ -13,12 +13,14 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     EventState toggleState,
     const QString& caption,
     const QString& description,
+    const QString& auxiliaryData,
     qint64 timeStampUsec)
     :
     base_type(analyticsSdkEvent, resource, toggleState, timeStampUsec),
     m_driverId(driverId),
     m_eventId(eventId),
     m_caption(caption),
+    m_auxiliaryData(auxiliaryData),
     m_description(description)
 {
 }
@@ -54,6 +56,11 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
     return m_driverId == params.analyticsDriverId()
         && m_eventId == params.analyticsEventId();
+}
+
+QString AnalyticsSdkEvent::auxiliaryData() const
+{
+    return m_auxiliaryData;
 }
 
 } // namespace event
