@@ -167,7 +167,7 @@ def test_subscribe(request):
 def make_rule(rule_type, email, password, caption="", description="", source="", zapier_trigger=""):
 
     if rule_type == "Generic Event":
-        action_params = "{\"additionalResources\":[\"{00000000-0000-0000-0000-100000000000}\",\"{\00000000-0000-0000-"
+        action_params = "{\"additionalResources\":[\"{00000000-0000-0000-0000-100000000000}\",\"{00000000-0000-0000-"
         action_params += "0000-100000000001}\"],\"allUsers\":false,\"durationMs\":5000,\"forced\":true,\"fps\":10,\""
         action_params += "needConfirmation\":false,\"playToClient\":true,\"recordAfter\":0,\"recordBeforeMs\":1000,\""
         action_params += "streamQuality\":\"highest\",\"useSource\":false}"
