@@ -261,7 +261,8 @@ TEST_F(PersistentScheduler, unsubscribe)
     waitForPredicateBecomeTrue(
         [&firedAlready, this, taskId]()
         {
-            return firedAlready == user->tasks()[taskId].fired;
+            return firedAlready == user->tasks()[taskId].fired
+                && !user->tasks()[taskId].subscribed;
         },
         "PersistentScheduler.unsubscribe");
 
