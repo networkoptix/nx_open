@@ -111,7 +111,7 @@ def update_from_object(cms_structure):
                     with open(file_path, 'r') as file:
                         value = base64.b64encode(file.read())
                 except IOError:
-                    print("No file to read", file_path)
+                    pass
 
             data_structure.meta_settings = meta if meta else {}
             data_structure.default = value
@@ -125,6 +125,7 @@ def read_structure_json(filename):
 
 
 def process_zip(file_descriptor, user, update_structure, update_content):
+    log_messages = ()
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
     root = None
@@ -135,12 +136,13 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             data = zip_file.read(name)
             cms_structure = json.loads(data)
             update_from_object(cms_structure)
+            log_messages.append(('success', 'Updated from json using %s' % name))
+        else:
+            log_messages.append(('warning', 'Not found structure.json file'))
 
     for name in zip_file.namelist():
-        if name.startswith('__'):  # Ignore trash in archive from MACs
-            continue
-
-        if name.endswith('structure.json'):  # Ignore **structure.json files
+        if name.startswith('__') or name.endswith('structure.json'):  # Ignore trash in archive from MACs or **structure.json files
+            log_messages.append(('info', 'Ignored: %s' % name))
             continue
 
         if name.endswith('/'):
@@ -151,6 +153,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
         short_name = name.replace(root, '')
 
         if short_name.startswith('help/'):  # Ignore help
+            log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
             continue
 
         # now we have name
@@ -163,8 +166,9 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                 try:
                     context.template = zip_file.read(name).decode("utf-8")
                     context.save()
+                    log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
                 except UnicodeDecodeError:
-                    print("File is not UTF-encoded", name)
+                    log_messages.append(('error', 'Ignored: %s (file is not UTF-encoded)' % name))
                 continue
 
         # try to find relevant data structure and update its default (maybe)
@@ -175,7 +179,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
         # if data structure is not FILE or IMAGE - print to log and ignore
         if structure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            print("NOT FILE", short_name)
+            log_messages.append(('warning', 'Ignored: %s (data structure is not a file)' % name))
             continue
 
         data = zip_file.read(name)
@@ -184,6 +188,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
         if update_structure:
             # if set_defaults or data structure has no default value - save it
             structure.default = data64
+            log_messages.append(('success', 'Updated default for data structure %s using %s' % (structure.label, name)))
             structure.save()
 
         if update_content:
@@ -192,9 +197,9 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             latest_value = structure.find_actual_value(customization)
             # check if file was changed
             if latest_value == data64:
-                print("not changed", short_name)
+                log_messages.append(('info', 'Ignored %s (content not changed)' % name))
                 continue
-            print("add new record", short_name)
+
             # add new dataRecrod
             record = DataRecord(
                 data_structure=structure,
@@ -203,3 +208,5 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                 created_by=user
             )
             record.save()
+            log_messages.append(('success', 'Updated value for data structure %s using %s' % (structure.label, name)))
+    return log_messages

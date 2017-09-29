@@ -273,8 +273,16 @@ def product_settings(request, product_id):
                 data = generate_structure.from_zip(file, product.name)
                 content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
                 return response_attachment(content, 'structure.json', 'application/json')
-            structure.process_zip(file, request.user, update_structure, update_content)
-            messages.success(request._request, "File uploaded")
+            log_messages = structure.process_zip(file, request.user, update_structure, update_content)
+            for item in log_messages:
+                log_type = {
+                    'info': messages.INFO,
+                    'error': messages.ERROR,
+                    'debug': messages.DEBUG,
+                    'success': messages.SUCCESS,
+                    'warning': messages.WARNING,
+                }[item[0]]
+            messages.add_message(request._request, log_type, item[1])
     else:
         form = ProductSettingsForm()
 
