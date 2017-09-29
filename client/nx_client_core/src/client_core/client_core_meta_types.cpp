@@ -15,6 +15,7 @@
 #include <utils/common/app_info.h>
 #include <helpers/nx_globals_object.h>
 #include <helpers/url_helper.h>
+#include <nx/client/core/animation/kinetic_animation.h>
 
 void QnClientCoreMetaTypes::initialize()
 {
@@ -32,6 +33,9 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
 
     qmlRegisterType<nx::client::core::ui::positioners::Grid>("Nx.Positioners", 1, 0, "Grid");
+
+    qmlRegisterType<nx::client::core::animation::KineticAnimation>(
+        "Nx.Animations", 1, 0, "KineticAnimation");
 
     qmlRegisterUncreatableType<NxGlobalsObject>(
         "Nx", 1, 0, "NxGlobals", QLatin1String("Cannot create an instance of NxGlobals."));
