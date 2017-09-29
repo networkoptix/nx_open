@@ -81,6 +81,9 @@ private:
             m_relayClient->pleaseStopSync();
         stop();
 
+        controller::ListeningPeerManagerFactory::instance().setCustomFunc(
+            std::move(m_listeningPeerManagerFactoryFuncBak));
+
         controller::ConnectSessionManagerFactory::setFactoryFunc(
             std::move(m_connectionSessionManagerFactoryFuncBak));
     }
