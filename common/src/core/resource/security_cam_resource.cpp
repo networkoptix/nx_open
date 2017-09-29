@@ -1243,7 +1243,7 @@ bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr&
     return false;
 }
 
-bool QnSecurityCamResource::isEventComesFromAnalyticsDriver(nx::vms::event::EventType eventType) const
+bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const
 {
     return eventType == nx::vms::event::EventType::analyticsSdkEvent;
 }

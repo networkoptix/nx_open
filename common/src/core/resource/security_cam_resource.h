@@ -306,7 +306,7 @@ public:
     float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const;
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
-    virtual bool isEventComesFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
 
 public slots:
     virtual void inputPortListenerAttached();

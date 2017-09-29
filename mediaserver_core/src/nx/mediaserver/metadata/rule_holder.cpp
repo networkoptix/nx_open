@@ -252,7 +252,7 @@ bool RuleHolder::isAnalyticsSdkEventRule(const event::RulePtr& rule) const
             if (!camera)
                 return false;
 
-            return camera->isEventComesFromAnalyticsDriver(ruleEventType);
+            return camera->doesEventComeFromAnalyticsDriver(ruleEventType);
         });
 }
 

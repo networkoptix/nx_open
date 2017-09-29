@@ -63,7 +63,7 @@ public:
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
 
-    virtual bool isEventComesFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
 
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
