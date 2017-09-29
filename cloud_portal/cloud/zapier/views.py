@@ -13,6 +13,8 @@ from django.http import JsonResponse
 from rest_hooks.models import Hook
 from rest_hooks.signals import raw_hook_event
 
+from models import *
+
 
 def authenticate(request):
     user, email, password = None, None, None
@@ -61,11 +63,19 @@ def get_systems(request):
 def nx_action(request):
     user, email, password = authenticate(request)
 
-    instance = "https://cloud-test.hdw.mx/gateway/"
+    instance = "http://cloud-test.hdw.mx/gateway/"
     system_id = request.data['systemId']
     source = request.data['source']
     caption = request.data['caption']
     description = "&description=" + request.data['description'] if 'description' in request.data else ""
+
+    rules_query = GeneratedRules.objects.filter(email=email, source=source, caption=caption,
+                                                system_id=system_id, direction="Zapier to Nx")
+    if not rules_query.exists():
+        make_rule("Generic Event", email, password, caption=caption, source=source, description=description)
+        rule = GeneratedRules(email=email, system_id=system_id, caption=caption,
+                              source=source, direction="Zapier to Nx")
+        rule.save()
 
     url = "{}{}/api/createEvent?source={}&caption={}{}"\
         .format(instance, system_id, source, caption, description)
@@ -115,7 +125,14 @@ def create_zap_webhook(request):
     if user_hooks.exists():
         return Response({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
 
-    url_link = '/firehook/?system_id=%s&caption=%s' %(system_id, caption)
+    url_link = 'http://cloud-dev.hdw.mx/firehook/?system_id=%s&caption=%s' % (system_id, caption)
+    rules_query = GeneratedRules.objects.filter(email=email, caption=caption, active=True,
+                                                system_id=system_id, direction="Nx to Zapier")
+    if not rules_query.exists():
+        make_rule("Generic Event", email, password, caption=caption, zapier_trigger=url_link)
+        rule = GeneratedRules(email=email, system_id=system_id, caption=caption, direction="Nx to Zapier")
+        rule.save()
+
     zap_hook = Hook(user=user, event=event, target=target)
     zap_hook.save()
     return Response({'message': 'Webhook created for ' + caption, 'link': url_link}, status=200)
@@ -131,6 +148,7 @@ def remove_zap_webhook(request):
     user_hooks = Hook.objects.filter(user=user, target=target)
     if not user_hooks.exists():
         return Response({'message': "Webhook for " + target + " does not exist"}, status=500)
+
     event = user_hooks[0].event
     user_hooks.delete()
     return Response({'message': 'Webhook deleted for ' + event}, status=200)
@@ -141,3 +159,66 @@ def remove_zap_webhook(request):
 def test_subscribe(request):
     authenticate(request)
     return Response({'data': [{'caption': 'caption'}]})
+
+
+def make_rule(rule_type, email, password, caption="", description="", source="", zapier_trigger=""):
+
+    if rule_type == "Generic Event":
+        action_params = "{\"additionalResources\":[\"{00000000-0000-0000-0000-100000000001}\",\"{\00000000-0000-0000-"
+        action_params += "0000-100000000000}\"],\"allUsers\":false,\"durationMs\":5000,\"forced\":true,\"fps\":10,\""
+        action_params += "needConfirmation\":false,\"playToClient\":true,\"recordAfter\":0,\"recordBeforeMs\":1000,\""
+        action_params += "streamQuality\":\"highest\",\"useSource\":false}"
+
+        event_condition = "{\"caption\":\"%s\",\"description\":\"%s\",\"eventTimestampUsec\":\"0\",\"event"
+        event_condition += "Type\":\"undefinedEvent\",\"metadata\":{\"allUsers\":false},\"reasonCode\":\"none\",\""
+        event_condition += "resourceName\":\"%s\"}"
+
+        data = {
+            "actionParams": action_params,
+            "actionResourceIds": [],
+            "actionType": "showPopupAction",
+            "aggregationPeriod": 0,
+            "comment": "Zapier generated rule for Generic Event made by {}".format(email),
+            "disabled": False,
+            "eventCondition": event_condition % (caption, description, source),
+            "eventResourceIds": [],
+            "eventState": "Undefined",
+            "eventType": "userDefinedEvent",
+            "schedule": "",
+            "system": False
+        }
+
+    elif rule_type == "Http Action":
+        action_params = "{\"allUsers\":false,\"durationMs\":5000,\"forced\":true,\"fps\":10,\"needConfirmation\""
+        action_params += ":false,\"playToClient\":true,\"recordAfter\":0,\"recordBeforeMs\":1000,\"streamQuality\":\""
+        action_params += "highest\",\"url\":\"%s\",\"useSource\":false}"
+
+        event_condition = "{\"caption\":\"%s\",\"description\":\"_bell_on\",\"eventTimestampUsec\":\"0\",\""
+        event_condition += "eventType\":\"undefinedEvent\",\"inputPortId\":\"921d6e67-a9c3-4b2e-b1c8-1162b4a7cd01\",\""
+        event_condition += "metadata\":{\"allUsers\":false,\"instigators\":[\"{00000000-0000-0000-0000-100000000000}\""
+        event_condition += "]},\"reasonCode\":\"none\"}"
+
+        data = {
+            "actionParams": action_params % zapier_trigger,
+            "actionResourceIds": [],
+            "actionType": "execHttpRequestAction",
+            "aggregationPeriod": 0,
+            "comment": "Zapier Generated Rule for HTTP action made by {}".format(email),
+            "disabled": False,
+            "eventCondition": event_condition % caption,
+            "eventResourceIds": [],
+            "eventState": "Undefined",
+            "eventType": "softwareTriggerEvent",
+            "id": "{88618778-52af-4553-9bb8-c3831dcaf6bd}",
+            "schedule": "",
+            "system": False
+        }
+
+    else:
+        return False
+
+    url = "http://cloud-test.hdw.mx/gateway/9aeb4e34-d495-4e93-8ae5-3af9630ffc0e/ec2/saveEventRule"
+    headers = {'Content-Type': 'application/json'}
+
+    requests.post(url, json=data, headers=headers, auth=HTTPDigestAuth(email, password))
+    return True

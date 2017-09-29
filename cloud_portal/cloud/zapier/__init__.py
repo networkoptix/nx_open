@@ -1,1 +1,1 @@
-default_app_config = 'cms.apps.ZapierConfig'
+default_app_config = 'zapier.apps.ZapierConfig'
