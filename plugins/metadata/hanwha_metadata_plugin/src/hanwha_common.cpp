@@ -18,16 +18,17 @@ QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEv
 
     for (const auto& eventDescriptor: outputEventTypes)
     {
-        const bool gotEventDescriptor = internalEventName.contains(eventDescriptor.internalName)
-            || (!eventDescriptor.internalMonitoringName.isEmpty()
-                && internalEventName.contains(eventDescriptor.internalMonitoringName));
-
-        if (gotEventDescriptor)
+        const auto possibleInternalNames = eventDescriptor.internalName.split(L',');
+        for (const auto& name: possibleInternalNames)
         {
-            m_idByInternalName.insert(internalEventName, eventDescriptor.eventTypeId);
-            return eventDescriptor.eventTypeId;
+            if (internalEventName.contains(name))
+            {
+                m_idByInternalName.insert(internalEventName, eventDescriptor.eventTypeId);
+                return eventDescriptor.eventTypeId;
+            }
         }
     }
+
     return QUuid();
 }
 
