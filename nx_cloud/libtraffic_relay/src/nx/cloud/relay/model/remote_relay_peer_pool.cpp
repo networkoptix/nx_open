@@ -1,11 +1,14 @@
-#include <sstream>
-#include <boost/algorithm/string.hpp>
 #include "remote_relay_peer_pool.h"
+
+#include <sstream>
+
+#include <boost/algorithm/string.hpp>
+
+#include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/casssandra/async_cassandra_connection.h>
-#include "../settings.h"
 
+#include "../settings.h"
 
 namespace nx {
 namespace cloud {
@@ -40,20 +43,40 @@ bool getQueryResultValue(const cassandra::QueryResult& queryResult, const char* 
 
 
 RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
-    m_cassConnection(
-        new nx::cassandra::AsyncConnection(settings.cassandraHost().toLatin1().constData()))
+    m_settings(settings)
 {
+}
+
+bool RemoteRelayPeerPool::connectToDb()
+{
+    m_cassConnection = 
+        nx::cassandra::AsyncConnectionFactory::instance().create(
+            m_settings.cassandraConnection().hostName);
+
     prepareDbStructure();
+
+    if (!m_dbReady)
+        m_cassConnection.reset();
+
+    return m_dbReady;
 }
 
 void RemoteRelayPeerPool::prepareDbStructure()
 {
+    // TODO: Imply DbStructureUpdater here (it will require some refactoring).
+    NX_INFO(this, lm("Initiating connection to cassandra DB"));
+
     m_cassConnection->init()
         .then(
             [this](cf::future<CassError> result)
             {
-                if (result.get() != CASS_OK)
+                const auto resultCode = result.get();
+                if (resultCode != CASS_OK)
+                {
+                    NX_INFO(this, lm("Error connecting to cassandra DB. "
+                        "Connection initialization failed. %1").arg(resultCode));
                     return result;
+                }
 
                 return m_cassConnection->executeUpdate(
                     "CREATE KEYSPACE cdb WITH replication = { \
@@ -62,8 +85,13 @@ void RemoteRelayPeerPool::prepareDbStructure()
         .then(
             [this](cf::future<CassError> result)
             {
-                if (result.get() != CASS_OK)
+                const auto resultCode = result.get();
+                if (resultCode != CASS_OK)
+                {
+                    NX_INFO(this, lm("Error connecting to cassandra DB. "
+                        "Error creating keyspace. %1").arg(resultCode));
                     return result;
+                }
 
                 return m_cassConnection->executeUpdate(
                     "CREATE TABLE cdb.relay_peers ( \
@@ -80,14 +108,17 @@ void RemoteRelayPeerPool::prepareDbStructure()
         .then(
             [this](cf::future<CassError> result)
             {
-                if (result.get() == CASS_OK || result.get() == CASS_ERROR_SERVER_ALREADY_EXISTS)
+                const auto resultCode = result.get();
+                if (resultCode == CASS_OK || resultCode == CASS_ERROR_SERVER_ALREADY_EXISTS)
                 {
-                    NX_VERBOSE(this, "Prepare db successful");
+                    NX_INFO(this, "Connection to cassandra DB established. "
+                        "DB structure prepared successfully");
                     m_dbReady = true;
                     return cf::unit();
                 }
 
-                NX_VERBOSE(this, "Prepare db failed");
+                NX_INFO(this, lm("Error connecting to cassandra DB. "
+                    "Error creating tables. %1").arg(resultCode));
                 return cf::unit();
             }).wait();
 }
@@ -107,7 +138,8 @@ cf::future<int> RemoteRelayPeerPool::getLocalHostId() const
                 auto prepareResult = prepareFuture.get();
                 if (prepareResult.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Prepare select local host id failed");
+                    NX_DEBUG(this, lm("Error preparing \"select local host id\" query. %1")
+                        .arg(prepareResult.first));
                     return cf::make_ready_future(
                         std::make_pair(prepareResult.first, cassandra::QueryResult()));
                 }
@@ -121,13 +153,13 @@ cf::future<int> RemoteRelayPeerPool::getLocalHostId() const
                 auto result = selectFuture.get();
                 if (result.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Select local host id failed");
+                    NX_DEBUG(this, lm("Error selecting local host id. %1").arg(result.first));
                     return (int)result.first;
                 }
 
                 if (!result.second.next())
                 {
-                    NX_VERBOSE(this, "Select local host id failed. Empty cursor.");
+                    NX_DEBUG(this, "Select local host id failed. Empty cursor.");
                     return (int)CASS_ERROR_SERVER_INVALID_QUERY;
                 }
 
@@ -135,13 +167,13 @@ cf::future<int> RemoteRelayPeerPool::getLocalHostId() const
                 auto getValueResult = result.second.get(0, &localHostId);
                 if (!getValueResult)
                 {
-                    NX_VERBOSE(this, "Get local host id from QueryResult failed");
+                    NX_DEBUG(this, "Get local host id from QueryResult failed");
                     return (int)CASS_ERROR_SERVER_INVALID_QUERY;
                 }
 
                 if (!(bool)localHostId)
                 {
-                    NX_VERBOSE(this, "Local host id is NULL");
+                    NX_DEBUG(this, "Local host id is NULL");
                     return (int)CASS_ERROR_SERVER_INVALID_QUERY;
                 }
 
@@ -150,6 +182,8 @@ cf::future<int> RemoteRelayPeerPool::getLocalHostId() const
                     m_hostId = localHostId->uuidString;
                     NX_ASSERT(!m_hostId.empty());
                 }
+
+                NX_VERBOSE(this, lm("Read local host id %1").arg(localHostId->uuidString));
 
                 return (int)CASS_OK;
             });
@@ -181,7 +215,8 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                 auto result = prepareFuture.get();
                 if (result.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Prepare select from cdb.relay_peers failed");
+                    NX_DEBUG(this,
+                        lm("Error prepare select from cdb.relay_peers. %1").arg(result.first));
                     return cf::make_ready_future(
                         std::make_pair(result.first, cassandra::QueryResult()));
                 }
@@ -194,7 +229,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                 auto result = selectFuture.get();
                 if (result.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Select from cdb.relay_peers failed");
+                    NX_DEBUG(this, lm("Error selecting from cdb.relay_peers. %1").arg(result.first));
                     return std::string();
                 }
 
@@ -243,7 +278,10 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
             {
                 auto errorCode = (CassError)getLocalHostIdFuture.get();
                 if (errorCode != CASS_OK)
+                {
+                    NX_DEBUG(this, lm("Error getting local host id. %1").arg(errorCode));
                     return cf::make_ready_future(std::make_pair(errorCode, cassandra::Query()));
+                }
 
                 return m_cassConnection->prepareQuery(
                     "INSERT INTO cdb.relay_peers ( \
@@ -261,13 +299,14 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
                 auto prepareResult = prepareFuture.get();
                 if (prepareResult.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Prepare insert into cdb.relay_peers failed");
+                    NX_DEBUG(this, lm("Error preparing insert into cdb.relay_peers. %1")
+                        .arg(prepareResult.first));
                     return cf::make_ready_future(std::move((CassError)prepareResult.first));
                 }
 
                 if (!bindUpdateParameters(&prepareResult.second, domainName, relayHost))
                 {
-                    NX_VERBOSE(this, "Bind parameters for insert into cdb.relay_peers failed");
+                    NX_DEBUG(this, lm("Error binding parameters for insert into cdb.relay_peers"));
                     return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
                 }
 
@@ -276,9 +315,11 @@ cf::future<bool> RemoteRelayPeerPool::addPeer(
         .then(
             [this](cf::future<CassError> executeFuture)
             {
-                if (executeFuture.get() != CASS_OK)
+                const auto resultCode = executeFuture.get();
+                if (resultCode != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Execute insert into cdb.relay_peers failed");
+                    NX_VERBOSE(this, 
+                        lm("Error executing insert into cdb.relay_peers. %1").arg(resultCode));
                     return false;
                 }
 
@@ -298,7 +339,10 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
             {
                 auto errorCode = (CassError)getLocalHostIdFuture.get();
                 if (errorCode != CASS_OK)
+                {
+                    NX_DEBUG(this, lm("Error getting local host id. %1").arg(errorCode));
                     return cf::make_ready_future(std::make_pair(errorCode, cassandra::Query()));
+                }
 
                 return m_cassConnection->prepareQuery(
                     "DELETE FROM cdb.relay_peers WHERE \
@@ -314,13 +358,14 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
                 auto prepareResult = prepareFuture.get();
                 if (prepareResult.first != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Prepare delete from cdb.relay_peers failed");
+                    NX_DEBUG(this, lm("Error preparing delete from cdb.relay_peers")
+                        .arg(prepareResult.first));
                     return cf::make_ready_future(std::move((CassError)prepareResult.first));
                 }
 
                 if (!bindUpdateParameters(&prepareResult.second, domainName))
                 {
-                    NX_VERBOSE(this, "Bind parameters for delete from cdb.relay_peers failed");
+                    NX_DEBUG(this, "Error binding parameters for delete from cdb.relay_peers");
                     return cf::make_ready_future((CassError)CASS_ERROR_SERVER_INVALID_QUERY);
                 }
 
@@ -329,15 +374,22 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
         .then(
             [this](cf::future<CassError> executeFuture)
             {
+                const auto executeResult = executeFuture.get();
                 if (executeFuture.get() != CASS_OK)
                 {
-                    NX_VERBOSE(this, "Execute delete from cdb.relay_peers failed");
+                    NX_DEBUG(this, lm("Error executing delete from cdb.relay_peers. %1")
+                        .arg(executeResult));
                     return false;
                 }
 
                 NX_VERBOSE(this, "Execute delete from cdb.relay_peers succeded");
                 return true;
             });
+}
+
+bool RemoteRelayPeerPool::isConnectedToDb() const
+{
+    return m_dbReady;
 }
 
 bool RemoteRelayPeerPool::bindUpdateParameters(
@@ -430,14 +482,15 @@ std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainNam
     return ss.str();
 }
 
-cassandra::AsyncConnection* RemoteRelayPeerPool::getConnection()
+cassandra::AbstractAsyncConnection* RemoteRelayPeerPool::getConnection()
 {
     return m_cassConnection.get();
 }
 
 RemoteRelayPeerPool::~RemoteRelayPeerPool()
 {
-    m_cassConnection->wait();
+    if (m_dbReady)
+        m_cassConnection->wait();
 }
 
 } // namespace model
