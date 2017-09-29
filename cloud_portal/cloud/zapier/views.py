@@ -67,7 +67,7 @@ def nx_action(request):
     system_id = request.data['systemId']
     source = request.data['source']
     caption = request.data['caption']
-    description = "&description=" + request.data['description'] if 'description' in request.data else ""
+    description = request.data['description'] if 'description' in request.data else ""
 
     rules_query = GeneratedRules.objects.filter(email=email, source=source, caption=caption,
                                                 system_id=system_id, direction="Zapier to Nx")
@@ -76,6 +76,9 @@ def nx_action(request):
         rule = GeneratedRules(email=email, system_id=system_id, caption=caption,
                               source=source, direction="Zapier to Nx")
         rule.save()
+
+    if description:
+        description = "&description=" + description
 
     url = "{}{}/api/createEvent?source={}&caption={}{}"\
         .format(instance, system_id, source, caption, description)
@@ -125,11 +128,11 @@ def create_zap_webhook(request):
     if user_hooks.exists():
         return Response({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
 
-    url_link = 'http://cloud-dev.hdw.mx/firehook/?system_id=%s&caption=%s' % (system_id, caption)
+    url_link = 'http://cloud-dev.hdw.mx/fire_hook/?system_id=%s&caption=%s' % (system_id, caption)
     rules_query = GeneratedRules.objects.filter(email=email, caption=caption,
                                                 system_id=system_id, direction="Nx to Zapier")
     if not rules_query.exists():
-        make_rule("Generic Event", email, password, caption=caption, zapier_trigger=url_link)
+        make_rule("Http Action", email, password, caption=caption, zapier_trigger=url_link)
         rule = GeneratedRules(email=email, system_id=system_id, caption=caption, direction="Nx to Zapier")
         rule.save()
 
@@ -164,8 +167,8 @@ def test_subscribe(request):
 def make_rule(rule_type, email, password, caption="", description="", source="", zapier_trigger=""):
 
     if rule_type == "Generic Event":
-        action_params = "{\"additionalResources\":[\"{00000000-0000-0000-0000-100000000001}\",\"{\00000000-0000-0000-"
-        action_params += "0000-100000000000}\"],\"allUsers\":false,\"durationMs\":5000,\"forced\":true,\"fps\":10,\""
+        action_params = "{\"additionalResources\":[\"{00000000-0000-0000-0000-100000000000}\",\"{\00000000-0000-0000-"
+        action_params += "0000-100000000001}\"],\"allUsers\":false,\"durationMs\":5000,\"forced\":true,\"fps\":10,\""
         action_params += "needConfirmation\":false,\"playToClient\":true,\"recordAfter\":0,\"recordBeforeMs\":1000,\""
         action_params += "streamQuality\":\"highest\",\"useSource\":false}"
 
@@ -196,7 +199,7 @@ def make_rule(rule_type, email, password, caption="", description="", source="",
         event_condition = "{\"caption\":\"%s\",\"description\":\"_bell_on\",\"eventTimestampUsec\":\"0\",\""
         event_condition += "eventType\":\"undefinedEvent\",\"inputPortId\":\"921d6e67-a9c3-4b2e-b1c8-1162b4a7cd01\",\""
         event_condition += "metadata\":{\"allUsers\":false,\"instigators\":[\"{00000000-0000-0000-0000-100000000000}\""
-        event_condition += "]},\"reasonCode\":\"none\"}"
+        event_condition += ",\"{00000000-0000-0000-0000-100000000001}\"]},\"reasonCode\":\"none\"}"
 
         data = {
             "actionParams": action_params % zapier_trigger,
