@@ -197,9 +197,8 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
         }
         else
         {
-            const auto rich = mightBeHtml(text) ? text : Qt::convertFromPlainText(text);
             textHtml = elideHtml(
-                htmlFormattedParagraph(rich, kDescriptionPixelFontSize),
+                htmlFormattedParagraph(ensureHtml(text), kDescriptionPixelFontSize),
                 kDescriptionMaxLength);
         }
 

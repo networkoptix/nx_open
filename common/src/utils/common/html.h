@@ -43,3 +43,5 @@ QString elideHtml(const QString &html, int maxLength, const QString &tail = lit(
 
 bool mightBeHtml(const QString& text);
 bool mightBeHtml(const QStringList& lines);
+
+QString ensureHtml(const QString& source); //< Converts source to HTML if it is plain.

@@ -111,12 +111,12 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPt
 
     QPainter painter(&m_finalImage);
     painter.drawImage(m_imageOffsetInBuffer, m_croppedImage);
+    painter.end();
 
-    static const auto kNoFlip = false;
     bgra_to_yv12_simd_intr(m_finalImageBytes.get(), targetStride,
         yPlane, uPlane, vPlane,
         yPlaneStride, uvPlaneStride,
-        targetWidth, targetHeight, kNoFlip);
+        targetWidth, targetHeight, false /*don't flip*/);
 
     return frame;
 }
@@ -159,10 +159,10 @@ void ImageToFramePainter::updateTargetImage()
 
         m_croppedImage = m_image.copy(sourceImageRect);
 
-        const auto drawHeight = targetImageRect.height();
+        const auto drawHeight = qPower2Ceil(
+            static_cast<unsigned int>(targetImageRect.height()), 2);
         const auto drawWidth = qPower2Ceil(
-            static_cast<unsigned int>(targetImageRect.width()),
-            CL_MEDIA_ALIGNMENT);
+            static_cast<unsigned int>(targetImageRect.width()), CL_MEDIA_ALIGNMENT);
 
         m_finalImageBytes = createAlignedBuffer(
             drawWidth * drawHeight * kARGBBytesCount);

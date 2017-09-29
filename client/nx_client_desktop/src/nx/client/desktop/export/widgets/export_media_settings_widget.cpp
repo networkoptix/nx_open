@@ -10,8 +10,12 @@ ExportMediaSettingsWidget::ExportMediaSettingsWidget(QWidget* parent):
     ui(new Ui::ExportMediaSettingsWidget())
 {
     ui->setupUi(this);
-    connect(ui->filtersCheckBox, &QCheckBox::toggled,
-        this, &ExportMediaSettingsWidget::dataChanged);
+    connect(ui->filtersCheckBox, &QCheckBox::toggled, this,
+        [this](bool checked)
+        {
+            ui->filtersCheckBox->repaint();
+            emit dataChanged(checked);
+        });
 }
 
 ExportMediaSettingsWidget::~ExportMediaSettingsWidget()

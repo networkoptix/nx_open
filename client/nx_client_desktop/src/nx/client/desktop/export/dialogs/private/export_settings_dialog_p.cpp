@@ -13,11 +13,14 @@
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
+#include <utils/common/html.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+#include <nx/client/desktop/utils/proxy_image_provider.h>
+#include <nx/client/desktop/utils/transcoding_image_processor.h>
 
 namespace {
 
@@ -42,6 +45,14 @@ struct Position
     }
 };
 
+template<class Settings>
+void copyOverlaySettingsWithoutPosition(Settings& dest, Settings src)
+{
+    // Position is stored in ExportOverlayPersistentSettings base.
+    src.nx::client::desktop::ExportOverlayPersistentSettings::operator=(dest); //< Preserve position.
+    dest.operator=(src);
+}
+
 } // namespace
 
 namespace nx {
@@ -52,7 +63,8 @@ ExportSettingsDialog::Private::Private(const QnCameraBookmark& bookmark, const Q
     base_type(parent),
     m_previewSize(previewSize),
     m_bookmarkName(bookmark.name),
-    m_bookmarkDescription(bookmark.description)
+    m_bookmarkDescription(bookmark.description),
+    m_mediaImageProcessor(new TranscodingImageProcessor())
 {
     m_exportLayoutSettings.mode = ExportLayoutSettings::Mode::Export;
 }
@@ -103,6 +115,10 @@ void ExportSettingsDialog::Private::saveSettings()
     {
         case Mode::Media:
         {
+            const auto imageSettings = m_exportMediaPersistentSettings.imageOverlay;
+            if (!imageSettings.image.isNull() && !imageSettings.name.trimmed().isEmpty())
+                imageSettings.image.save(cachedImageFileName(), "png");
+
             if (m_bookmarkName.isEmpty())
                 qnSettings->setExportMediaSettings(m_exportMediaPersistentSettings);
             else
@@ -161,6 +177,8 @@ void ExportSettingsDialog::Private::updateTranscodingSettings()
         m_exportMediaSettings.transcodingSettings.dewarping = QnItemDewarpingParams();
         m_exportMediaSettings.transcodingSettings.zoomWindow = QRectF();
     }
+
+    updateMediaImageProcessor();
 }
 
 void ExportSettingsDialog::Private::setApplyFilters(bool value)
@@ -196,7 +214,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());
 
-    m_overlayScale = qMin(coefficients.first, coefficients.second);
+    m_overlayScale = std::min({coefficients.first, coefficients.second, 1.0});
 
     for (size_t i = 0; i != overlayCount; ++i)
         m_overlays[i]->setScale(m_overlayScale);
@@ -205,10 +223,17 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         ? QSize(m_previewSize.width(), 0)
         : QSize(0, m_previewSize.height());
 
-    m_mediaImageProvider.reset(new QnSingleThumbnailLoader(
+    m_mediaImageProvider.reset(new ProxyImageProvider());
+
+    m_mediaImageProvider->setSourceProvider(new QnSingleThumbnailLoader(
         camera,
         m_exportMediaSettings.timePeriod.startTimeMs,
-        QnThumbnailRequestData::kDefaultRotation));
+        0,
+        QSize(),
+        QnThumbnailRequestData::JpgFormat,
+        m_mediaImageProvider.data()));
+
+    m_mediaImageProvider->setImageProcessor(m_mediaImageProcessor.data());
 
     connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,
         this, &Private::setFrameSize);
@@ -335,6 +360,7 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode
     return result;
 }
 
+// Computes offset-alignment pair from absolute pixel position
 void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType type)
 {
     auto overlayWidget = overlay(type);
@@ -441,35 +467,30 @@ void ExportSettingsDialog::Private::hideOverlay(ExportOverlayType type)
 void ExportSettingsDialog::Private::setTimestampOverlaySettings(
     const ExportTimestampOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.timestampOverlay = settings;
-    updateOverlay(ExportOverlayType::timestamp);
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.timestampOverlay, settings);
+    updateOverlayWidget(ExportOverlayType::timestamp);
 }
 
 void ExportSettingsDialog::Private::setImageOverlaySettings(
     const ExportImageOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.imageOverlay = settings;
-    updateOverlay(ExportOverlayType::image);
-
-    if (settings.image.isNull() || settings.name.trimmed().isEmpty())
-        return;
-
-    settings.image.save(cachedImageFileName(), "png");
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.imageOverlay, settings);
+    updateOverlayWidget(ExportOverlayType::image);
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
     const ExportTextOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.textOverlay = settings;
-    updateOverlay(ExportOverlayType::text);
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.textOverlay, settings);
+    updateOverlayWidget(ExportOverlayType::text);
 }
 
 void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
     const ExportBookmarkOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.bookmarkOverlay = settings;
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.bookmarkOverlay, settings);
     updateBookmarkText();
-    updateOverlay(ExportOverlayType::bookmark);
+    updateOverlayWidget(ExportOverlayType::bookmark);
 }
 
 void ExportSettingsDialog::Private::validateSettings(Mode mode)
@@ -509,38 +530,15 @@ void ExportSettingsDialog::Private::validateSettings(Mode mode)
 void ExportSettingsDialog::Private::updateOverlays()
 {
     for (size_t i = 0; i != overlayCount; ++i)
-        updateOverlay(static_cast<ExportOverlayType>(i));
+    {
+        const auto overlayType = static_cast<ExportOverlayType>(i);
+        updateOverlayWidget(overlayType);
+        updateOverlayPosition(overlayType);
+    }
 }
 
-void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
+void ExportSettingsDialog::Private::updateOverlayWidget(ExportOverlayType type)
 {
-    const auto positionOverlay =
-        [this](QWidget* overlay, const ExportOverlayPersistentSettings& data)
-        {
-            QPointF position;
-            const auto& space = m_fullFrameSize;
-            const auto size = QSizeF(overlay->size()) / m_overlayScale;
-
-            if (data.alignment.testFlag(Qt::AlignHCenter))
-                position.setX((space.width() - size.width()) * 0.5 + data.offset.x());
-            else if (data.alignment.testFlag(Qt::AlignRight))
-                position.setX(space.width() - size.width() - data.offset.x());
-            else
-                position.setX(data.offset.x());
-
-            if (data.alignment.testFlag(Qt::AlignVCenter))
-                position.setY((space.height() - size.height()) * 0.5 + data.offset.y());
-            else if (data.alignment.testFlag(Qt::AlignBottom))
-                position.setY(space.height() - size.height() - data.offset.y());
-            else
-                position.setY(data.offset.y());
-
-            QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
-            overlay->move(
-                qRound(position.x() * m_overlayScale),
-                qRound(position.y() * m_overlayScale));
-        };
-
     auto overlay = this->overlay(type);
     switch (type)
     {
@@ -557,41 +555,21 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
             overlay->setPalette(palette);
 
             updateTimestampText();
-            positionOverlay(overlay, data);
             break;
         }
 
         case ExportOverlayType::image:
-        {
-            const auto& data = m_exportMediaPersistentSettings.imageOverlay;
-            overlay->setImage(data.image);
-            overlay->setOverlayWidth(data.overlayWidth);
-            overlay->setOpacity(data.opacity);
-            positionOverlay(overlay, data);
-            break;
-        }
-
         case ExportOverlayType::bookmark:
         case ExportOverlayType::text:
         {
-            const auto& data = (type == ExportOverlayType::text)
-                ? static_cast<const ExportTextOverlayPersistentSettingsBase&>(m_exportMediaPersistentSettings.textOverlay)
-                : m_exportMediaPersistentSettings.bookmarkOverlay;
-
-            overlay->setText(data.text);
-            overlay->setTextIndent(data.indent);
-            overlay->setOverlayWidth(data.overlayWidth);
-            overlay->setRoundingRadius(data.roundingRadius);
-
-            auto font = overlay->font();
-            font.setPixelSize(data.fontSize);
-            overlay->setFont(font);
-
-            auto palette = overlay->palette();
-            palette.setColor(QPalette::Text, data.foreground);
-            palette.setColor(QPalette::Window, data.background);
-            overlay->setPalette(palette);
-            positionOverlay(overlay, data);
+            const auto runtime = m_exportMediaPersistentSettings.overlaySettings(type)
+                ->createRuntimeSettings();
+            NX_ASSERT(runtime->type() == nx::core::transcoding::OverlaySettings::Type::image);
+            if (runtime->type() != nx::core::transcoding::OverlaySettings::Type::image)
+                break;
+            const auto imageOverlay =
+                static_cast<nx::core::transcoding::ImageOverlaySettings*>(runtime.data());
+            overlay->setImage(imageOverlay->image);
             break;
         }
 
@@ -599,6 +577,40 @@ void ExportSettingsDialog::Private::updateOverlay(ExportOverlayType type)
             NX_ASSERT(false); //< Should not happen.
             break;
     }
+}
+
+// Computes absolute pixel position by relative offset-alignment pair
+void ExportSettingsDialog::Private::updateOverlayPosition(ExportOverlayType type)
+{
+    auto overlay = this->overlay(type);
+    const auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
+
+    NX_EXPECT(overlay && settings);
+    if (!overlay || !settings)
+        return;
+
+    QPointF position;
+    const auto& space = m_fullFrameSize;
+    const auto size = QSizeF(overlay->size()) / m_overlayScale;
+
+    if (settings->alignment.testFlag(Qt::AlignHCenter))
+        position.setX((space.width() - size.width()) * 0.5 + settings->offset.x());
+    else if (settings->alignment.testFlag(Qt::AlignRight))
+        position.setX(space.width() - size.width() - settings->offset.x());
+    else
+        position.setX(settings->offset.x());
+
+    if (settings->alignment.testFlag(Qt::AlignVCenter))
+        position.setY((space.height() - size.height()) * 0.5 + settings->offset.y());
+    else if (settings->alignment.testFlag(Qt::AlignBottom))
+        position.setY(space.height() - size.height() - settings->offset.y());
+    else
+        position.setY(settings->offset.y());
+
+    QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
+    overlay->move(
+        qRound(position.x() * m_overlayScale),
+        qRound(position.y() * m_overlayScale));
 }
 
 void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
@@ -629,26 +641,17 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
                     overlayPositionChanged(type);
             });
     }
-
-    setPaletteColor(overlay(ExportOverlayType::image), QPalette::Window, Qt::transparent);
-
-    auto timestampOverlay = overlay(ExportOverlayType::timestamp);
-    timestampOverlay->setTextIndent(0);
-
-    static constexpr qreal kShadowBlurRadius = 3.0;
-    timestampOverlay->setShadow(Qt::black, QPointF(), kShadowBlurRadius);
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()
 {
     const auto description = m_exportMediaPersistentSettings.bookmarkOverlay.includeDescription
-        ? m_bookmarkDescription
+        ? ensureHtml(m_bookmarkDescription)
         : QString();
 
     static const auto kBookmarkTemplate = lit("<p><font size=5>%1</font></p>%2");
-    const auto text = kBookmarkTemplate.arg(m_bookmarkName).arg(description);
+    const auto text = kBookmarkTemplate.arg(m_bookmarkName.toHtmlEscaped()).arg(description);
     m_exportMediaPersistentSettings.bookmarkOverlay.text = text;
-    overlay(ExportOverlayType::bookmark)->setText(text);
 }
 
 void ExportSettingsDialog::Private::updateTimestampText()
@@ -659,6 +662,23 @@ void ExportSettingsDialog::Private::updateTimestampText()
 
     overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
         m_exportMediaPersistentSettings.timestampOverlay.format));
+}
+
+void ExportSettingsDialog::Private::updateMediaImageProcessor()
+{
+    QnLegacyTranscodingSettings processorSettings;
+    const auto& settings = m_exportMediaSettings.transcodingSettings;
+
+    processorSettings.itemDewarpingParams = settings.dewarping;
+    processorSettings.resource = m_exportMediaSettings.mediaResource;
+    processorSettings.contrastParams = settings.enhancement;
+    processorSettings.rotation = settings.rotation;
+    processorSettings.zoomWindow = settings.zoomWindow;
+    processorSettings.forcedAspectRatio = settings.aspectRatio.isValid()
+        ? settings.aspectRatio.toFloat()
+        : 0.0;
+
+    m_mediaImageProcessor->setTranscodingSettings(processorSettings);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)
@@ -673,7 +693,7 @@ const ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayT
     return index < m_overlays.size() ? m_overlays[index] : nullptr;
 }
 
-QnSingleThumbnailLoader* ExportSettingsDialog::Private::mediaImageProvider() const
+QnImageProvider* ExportSettingsDialog::Private::mediaImageProvider() const
 {
     return m_mediaImageProvider.data();
 }

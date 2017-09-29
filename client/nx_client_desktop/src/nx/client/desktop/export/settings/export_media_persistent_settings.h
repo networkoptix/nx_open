@@ -23,6 +23,7 @@ struct ExportOverlayPersistentSettings
     QPoint offset;
     Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignTop;
 
+    virtual ~ExportOverlayPersistentSettings() = default;
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const = 0;
 };
 #define ExportOverlayPersistentSettings_Fields (offset)(alignment)

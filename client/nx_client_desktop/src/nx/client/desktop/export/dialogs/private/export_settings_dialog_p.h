@@ -23,12 +23,15 @@
 
 class QWidget;
 class QnSingleThumbnailLoader;
+class QnImageProvider;
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 class LayoutThumbnailLoader;
+class ProxyImageProvider;
+class TranscodingImageProcessor;
 
 class ExportSettingsDialog::Private: public Connective<QObject>
 {
@@ -67,7 +70,7 @@ public:
 
     void createOverlays(QWidget* overlayContainer);
 
-    QnSingleThumbnailLoader* mediaImageProvider() const;
+    QnImageProvider* mediaImageProvider() const;
     LayoutThumbnailLoader* layoutImageProvider() const;
     QSize fullFrameSize() const;
 
@@ -94,12 +97,14 @@ private:
     ExportOverlayWidget* overlay(ExportOverlayType type);
     const ExportOverlayWidget* overlay(ExportOverlayType type) const;
 
-    void updateOverlay(ExportOverlayType type);
+    void updateOverlayWidget(ExportOverlayType type);
+    void updateOverlayPosition(ExportOverlayType type);
     void updateOverlays();
     void updateBookmarkText();
     void updateTimestampText();
     void overlayPositionChanged(ExportOverlayType type);
     void updateTranscodingSettings();
+    void updateMediaImageProcessor();
     QString cachedImageFileName() const;
 
     void setFrameSize(const QSize& size);
@@ -131,10 +136,12 @@ private:
 
     QPointer<ExportOverlayWidget> m_selectedOverlay;
 
-    QScopedPointer<QnSingleThumbnailLoader> m_mediaImageProvider;
+    QScopedPointer<ProxyImageProvider> m_mediaImageProvider;
     QScopedPointer<LayoutThumbnailLoader> m_layoutImageProvider;
+    QScopedPointer<TranscodingImageProcessor> m_mediaImageProcessor;
     QSize m_fullFrameSize;
     qreal m_overlayScale = 1.0;
+
 
     bool m_positionUpdating = false;
 };

@@ -2,14 +2,7 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QAbstractTextDocumentLayout>
-#include <QtGui/QTextDocument>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QLabel>
-
-#include <QtWidgets/private/qpixmapfilter_p.h>
-
-#include <utils/common/html.h>
 
 namespace nx {
 namespace client {
@@ -19,42 +12,29 @@ namespace {
 
 static constexpr qreal kBorderThickness = 2.0;
 
+QSize textMargins(const QFontMetrics& fontMetrics)
+{
+    return QSize(fontMetrics.averageCharWidth() / 2, 1);
+}
+
 } // namespace
 
 struct ExportOverlayWidget::Private
 {
-    Private(ExportOverlayWidget* parent):
-        document(new QTextDocument())
-    {
-        connect(document.data(), &QTextDocument::contentsChanged,
-            parent, &ExportOverlayWidget::updateLayout);
-
-        connect(document->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged,
-            parent, &ExportOverlayWidget::updateLayout);
-    }
-
-    QScopedPointer<QTextDocument> document;
-    QScopedPointer<QPixmapDropShadowFilter> shadow;
-    int overlayWidth = -1; //< -1 means content-defined
     bool borderVisible = true;
-    qreal roundingRadius = 0.0;
-    qreal opacity = 1.0;
     qreal scale = 1.0;
     QString text;
     QImage image;
     QRectF unscaledRect;
 
     QPoint initialPos;
+    QFont font;
     bool dragging = false;
-
-    QPixmap shadowSource;
-    QPointF filterOffset;
-    int shadowIterations; //< TODO: #vkutin Temporary way to increase shadow density.
 };
 
 ExportOverlayWidget::ExportOverlayWidget(QWidget* parent):
     base_type(parent),
-    d(new Private(this))
+    d(new Private())
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -83,20 +63,6 @@ void ExportOverlayWidget::setScale(qreal value)
     updateLayout();
 }
 
-qreal ExportOverlayWidget::opacity() const
-{
-    return d->opacity;
-}
-
-void ExportOverlayWidget::setOpacity(qreal value)
-{
-    if (qFuzzyIsNull(d->opacity - value))
-        return;
-
-    d->opacity = value;
-    update();
-}
-
 QString ExportOverlayWidget::text() const
 {
     return d->text;
@@ -108,40 +74,7 @@ void ExportOverlayWidget::setText(const QString& value)
         return;
 
     d->text = value;
-
-    if (mightBeHtml(value))
-        d->document->setHtml(value);
-    else
-        d->document->setPlainText(value);
-}
-
-int ExportOverlayWidget::overlayWidth() const
-{
-    return d->overlayWidth;
-}
-
-void ExportOverlayWidget::setOverlayWidth(int value)
-{
-    if (d->overlayWidth == value)
-        return;
-
-    d->overlayWidth = value;
-    d->document->setTextWidth(value);
-    updateLayout();
-}
-
-int ExportOverlayWidget::textIndent() const
-{
-    return d->document->documentMargin();
-}
-
-void ExportOverlayWidget::setTextIndent(int value)
-{
-    if (qFuzzyIsNull(d->document->documentMargin() - value))
-        return;
-
-    d->document->setDocumentMargin(value);
-    updateLayout();
+    update();
 }
 
 QImage ExportOverlayWidget::image() const
@@ -153,11 +86,6 @@ void ExportOverlayWidget::setImage(const QImage& value)
 {
     d->image = value;
     updateLayout();
-}
-
-void ExportOverlayWidget::setImage(const QPixmap& value)
-{
-    setImage(value.toImage());
 }
 
 bool ExportOverlayWidget::borderVisible() const
@@ -174,73 +102,18 @@ void ExportOverlayWidget::setBorderVisible(bool value)
     update();
 }
 
-qreal ExportOverlayWidget::roundingRadius() const
-{
-    return d->roundingRadius;
-}
-
-void ExportOverlayWidget::setRoundingRadius(qreal value)
-{
-    if (qFuzzyIsNull(d->roundingRadius - value))
-        return;
-
-    d->roundingRadius = value;
-    update();
-}
-
-bool ExportOverlayWidget::hasShadow() const
-{
-    return !d->shadow.isNull();
-}
-
-void ExportOverlayWidget::setShadow(const QColor& color, const QPointF& offset, qreal blurRadius,
-    int iterations)
-{
-    if (d->shadow.isNull())
-        d->shadow.reset(new QPixmapDropShadowFilter);
-
-    d->shadow->setColor(color);
-    d->shadow->setOffset(offset);
-    d->shadow->setBlurRadius(blurRadius);
-    d->shadowIterations = iterations;
-
-    updateLayout();
-}
-
-void ExportOverlayWidget::removeShadow()
-{
-    if (d->shadow.isNull())
-        return;
-
-    d->shadow.reset();
-    updateLayout();
-}
-
 void ExportOverlayWidget::updateLayout()
 {
-    QSizeF textSize = (d->text.isEmpty() && !d->image.isNull()) ? QSizeF() : d->document->size();
+    QFontMetrics fontMetrics(d->font);
+    QSizeF textSize = fontMetrics.size(0, d->text) + textMargins(fontMetrics) * 2;
     QSizeF imageSize = d->image.size();
-
-    if (d->overlayWidth >= 0)
-    {
-        textSize.setWidth(d->overlayWidth);
-        imageSize *= d->overlayWidth / imageSize.width();
-    }
 
     d->unscaledRect.setSize(QSizeF(minimumSize()).expandedTo(textSize).expandedTo(imageSize)
         .expandedTo(QApplication::globalStrut()));
 
-    if (d->shadow)
-    {
-        const auto effectRect = d->shadow->boundingRectFor(d->unscaledRect);
-        d->filterOffset = -effectRect.topLeft();
-        d->shadowSource = QPixmap(); //< Invalidate cache.
-        d->unscaledRect.setSize(effectRect.size());
-    }
-
     const QRectF geometry(pos(), d->unscaledRect.size() * d->scale);
     setGeometry(geometry.toAlignedRect());
-    update();
+    updatePosition(pos());
 }
 
 void ExportOverlayWidget::updateCursor()
@@ -270,38 +143,9 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
     painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    // Paint background.
-    painter.setBrush(palette().window());
-    painter.setPen(Qt::NoPen);
-    const auto radius = d->roundingRadius * d->scale;
-    painter.drawRoundedRect(rect(), radius, radius);
-
     // Paint scaled contents.
     painter.scale(d->scale, d->scale);
-    painter.setOpacity(d->opacity);
-
-    if (d->shadow)
-    {
-        if (d->shadowSource.isNull())
-        {
-            const int devicePixelRatio = qApp->devicePixelRatio();
-            const QSize size = d->unscaledRect.toAlignedRect().size();
-            d->shadowSource = QPixmap(size * devicePixelRatio);
-            d->shadowSource.setDevicePixelRatio(devicePixelRatio);
-            d->shadowSource.fill(Qt::transparent);
-
-            QPainter pixmapPainter(&d->shadowSource);
-            pixmapPainter.translate(d->filterOffset);
-            renderContent(pixmapPainter);
-        }
-
-        for (int i = 0; i < d->shadowIterations; ++i)
-            d->shadow->draw(&painter, QPointF(), d->shadowSource);
-    }
-    else
-    {
-        renderContent(painter);
-    }
+    renderContent(painter);
 
     // Paint border.
     if (d->borderVisible)
@@ -309,7 +153,6 @@ void ExportOverlayWidget::paintEvent(QPaintEvent* /*event*/)
         painter.setBrush(Qt::NoBrush);
         painter.setPen(QPen(palette().link(), kBorderThickness, Qt::DashLine));
         painter.resetTransform();
-        painter.setOpacity(1.0);
         painter.drawRect(rect());
     }
 }
@@ -321,10 +164,12 @@ void ExportOverlayWidget::renderContent(QPainter& painter)
 
     if (!d->text.isEmpty())
     {
-        QAbstractTextDocumentLayout::PaintContext context;
-        context.palette = palette();
-        context.clip = d->unscaledRect;
-        d->document->documentLayout()->draw(&painter, context);
+        QPainterPath path;
+        QFontMetrics fontMetrics(d->font);
+        path.addText(textMargins(fontMetrics).width(), fontMetrics.ascent(), d->font, d->text);
+        painter.setRenderHints(QPainter::Antialiasing);
+        painter.strokePath(path, QPen(Qt::black, 2.0));
+        painter.fillPath(path, Qt::white);
     }
 }
 
@@ -399,7 +244,8 @@ bool ExportOverlayWidget::event(QEvent* event)
 
         case QEvent::FontChange:
         {
-            d->document->setDefaultFont(font());
+            d->font = font();
+            d->font.setBold(true);
             updateLayout();
             break;
         }

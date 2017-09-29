@@ -190,10 +190,7 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     for (const auto& item : m_layout->getItems())
     {
         const auto resource = resourcePool->getResourceByDescriptor(item.resource);
-        if (!resource)
-            continue;
-
-        if (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page))
+        if (!resource.dynamicCast<QnVirtualCameraResource>())
             continue;
 
         QnLayoutItemData localItem = item;

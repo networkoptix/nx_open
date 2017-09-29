@@ -62,19 +62,19 @@ void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& f
     const auto timeString =
         QDateTime::fromMSecsSinceEpoch(m_currentTimeMs).toString(m_params.format);
 
-    const auto textSize = QSize(m_fontMetrics.width(timeString) + 30, m_fontMetrics.height() + 30);
+    const QSize textMargins(m_fontMetrics.averageCharWidth() / 2, 1);
+    const QSize textSize = m_fontMetrics.size(0, timeString) + textMargins * 2;
+
     QImage image(textSize, QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::transparent);
 
     QPainter painter(&image);
-    painter.setRenderHints(QPainter::Antialiasing
-        | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
+    painter.setRenderHints(QPainter::Antialiasing);
 
     QPainterPath path;
-    path.addText(0, m_fontMetrics.ascent(), m_font, timeString);
-    painter.setBrush(m_params.foreground);
-    painter.drawPath(path);
-    painter.strokePath(path, m_params.outline);
+    path.addText(textMargins.width(), m_fontMetrics.ascent(), m_font, timeString);
+    painter.strokePath(path, QPen(m_params.outline, 2.0));
+    painter.fillPath(path, m_params.foreground);
 
     m_painter.setImage(image, m_params.offset, m_params.alignment);
 }
