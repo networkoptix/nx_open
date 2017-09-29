@@ -18,6 +18,8 @@
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
 
+class QnMediaServerModule;
+
 namespace nx {
 namespace mediaserver {
 namespace metadata {
@@ -39,15 +41,14 @@ public:
 };
 
 class ManagerPool: 
-    public Connective<QObject>,
-    public QnCommonModuleAware
+    public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
     using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
 
     Q_OBJECT
 public:
-    ManagerPool(QnCommonModule* commonModule);
+    ManagerPool(QnMediaServerModule* commonModule);
     void init();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
@@ -105,6 +106,7 @@ private:
 
 private:
     ResourceMetadataContextMap m_contexts;
+    QnMediaServerModule* m_serverModule;
 };
 
 } // namespace metadata

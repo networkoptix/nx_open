@@ -42,14 +42,14 @@ ResourceMetadataContext::ResourceMetadataContext(
 {
 }
 
-ManagerPool::ManagerPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
+    m_serverModule(serverModule)
 {
 }
 
 void ManagerPool::init()
 {
-    auto resourcePool = commonModule()->resourcePool();
+    auto resourcePool = m_serverModule->commonModule()->resourcePool();
 
     connect(
         resourcePool, &QnResourcePool::resourceAdded,
@@ -68,9 +68,10 @@ void ManagerPool::init()
 
 void ManagerPool::initExistingResources()
 {
-    auto resourcePool = commonModule()->resourcePool();
+    auto resourcePool = m_serverModule->commonModule()->resourcePool();
     const auto mediaServer = resourcePool
-        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+        ->getResourceById<QnMediaServerResource>(
+            m_serverModule->commonModule()->moduleGUID());
 
     const auto cameras = resourcePool->getAllCameras(
         mediaServer,
@@ -106,7 +107,8 @@ void ManagerPool::at_rulesUpdated(const std::set<QnUuid>& affectedResources)
 {
     for (const auto& resourceId: affectedResources)
     {
-        auto resource = commonModule()
+        auto resource = m_serverModule
+            ->commonModule()
             ->resourcePool()
             ->getResourceById(resourceId);
 
@@ -253,9 +255,11 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, std::set<Qn
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServer(
     AbstractMetadataPlugin* plugin)
 {
-    auto server = commonModule()
+    auto server = m_serverModule
+        ->commonModule()
         ->resourcePool()
-        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+        ->getResourceById<QnMediaServerResource>(
+            m_serverModule->commonModule()->moduleGUID());
 
     if (!server)
         return boost::none;
