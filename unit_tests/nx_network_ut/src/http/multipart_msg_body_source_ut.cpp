@@ -40,7 +40,7 @@ protected:
         m_msgBodySource->serializer()->writeEpilogue();
     }
 
-    void thenSerializedDataMatchaesExpectations()
+    void thenSerializedDataMatchesExpectations()
     {
         thenSerializedMessageBodyIsEqualTo(m_expectedData);
     }
@@ -143,7 +143,7 @@ TEST_F(HttpMultipartMessageBodySource, general)
 TEST_F(HttpMultipartMessageBodySource, onlyEpilogue)
 {
     whenWriteEpilogue();
-    thenSerializedDataMatchaesExpectations();
+    thenSerializedDataMatchesExpectations();
     thenEndOfStreamIsReported();
 }
 
