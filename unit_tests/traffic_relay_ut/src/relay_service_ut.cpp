@@ -75,6 +75,11 @@ protected:
         ASSERT_TRUE(waitUntilStarted());
     }
 
+    void thenRelayCanStillBeStopped()
+    {
+        stop();
+    }
+
 private:
     boost::optional<nx::cassandra::AsyncConnectionFactory::Function>
         m_cassandraConnectionFactoryBak;
@@ -101,7 +106,11 @@ TEST_F(RelayService, waits_for_db_availability_if_db_host_is_specified)
     andRelayHasStarted();
 }
 
-//TEST_F(RelayService, can_be_stopped_regardless_of_db_host_availability)
+TEST_F(RelayService, can_be_stopped_regardless_of_db_host_availability)
+{
+    givenRelayThatFailedToConnectToDb();
+    thenRelayCanStillBeStopped();
+}
 
 } // namespace test
 } // namespace relay
