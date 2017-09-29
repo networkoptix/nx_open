@@ -142,22 +142,23 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     const ExportLayoutSettings& settings)
 {
     Results results;
-    if (FileExtensionUtils::isExecutable(settings.filename.extension))
-    {
-        // TODO: #GDM estimated binary size for layout.
-        //if (exeFileIsTooBig(settings.layout, durationMs))
-        //    results.set(int(Result::tooBigExeFile));
-    }
 
     const auto resPool = qnClientCoreModule->commonModule()->resourcePool();
-    for (const auto& item: settings.layout->getItems())
+    for (const auto& item : settings.layout->getItems())
     {
         const auto resource = resPool->getResourceByDescriptor(item.resource);
         if (resource && !resource.dynamicCast<QnVirtualCameraResource>())
         {
             results.set(int(Result::nonCameraResources));
-            break;
+            return results; //< This is a blocking alert. No other validation is required.
         }
+    }
+
+    if (FileExtensionUtils::isExecutable(settings.filename.extension))
+    {
+        // TODO: #GDM estimated binary size for layout.
+        //if (exeFileIsTooBig(settings.layout, durationMs))
+        //    results.set(int(Result::tooBigExeFile));
     }
 
     // Rough estimation.

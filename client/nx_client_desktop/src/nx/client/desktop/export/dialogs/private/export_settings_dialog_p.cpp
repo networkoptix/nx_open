@@ -708,6 +708,13 @@ QSize ExportSettingsDialog::Private::fullFrameSize() const
     return m_fullFrameSize;
 }
 
+bool ExportSettingsDialog::Private::isAcceptable() const
+{
+    return m_mode == Mode::Layout
+        ? !m_layoutValidationResults.test(int(ExportMediaValidator::Result::nonCameraResources))
+        : true;
+}
+
 void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results results,
     QStringList& weakAlerts, QStringList& severeAlerts)
 {
@@ -742,8 +749,8 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                     return ExportSettingsDialog::tr("Settings are not available for .EXE files.");
 
                 case ExportMediaValidator::Result::nonCameraResources:
-                    return ExportSettingsDialog::tr("Layout contains non-camera resources. "
-                        "They will be exported as \"NO DATA\" placeholders.");
+                    return ExportSettingsDialog::tr("Non-camera resources are not allowed for "
+                        "multi video export. Please remove them from the layout and try again.");
 
                 default:
                     NX_EXPECT(false);

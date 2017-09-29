@@ -73,8 +73,9 @@ private:
     void updateSettingsWidgets();
     void updateMode();
     void updateTabWidgetSize();
-    void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
-    void updateAlertsInternal(QLayout* layout, const QStringList& texts, bool severe);
+    void updateExportButtonState();
+    void updateValidity(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
+    void updateAlerts(QLayout* layout, const QStringList& texts, bool severe);
 
     Filename suggestedFileName(const Filename& baseName) const;
 
