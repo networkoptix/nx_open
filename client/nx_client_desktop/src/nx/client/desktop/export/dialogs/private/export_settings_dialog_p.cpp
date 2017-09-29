@@ -49,7 +49,7 @@ template<class Settings>
 void copyOverlaySettingsWithoutPosition(Settings& dest, Settings src)
 {
     // Position is stored in ExportOverlayPersistentSettings base.
-    src.ExportOverlayPersistentSettings::operator=(dest); //< Preserve position.
+    src.nx::client::desktop::ExportOverlayPersistentSettings::operator=(dest); //< Preserve position.
     dest.operator=(src);
 }
 
