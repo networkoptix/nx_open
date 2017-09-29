@@ -40,14 +40,28 @@ bool getQueryResultValue(const cassandra::QueryResult& queryResult, const char* 
 
 
 RemoteRelayPeerPool::RemoteRelayPeerPool(const conf::Settings& settings):
-    m_cassConnection(
-        new nx::cassandra::AsyncConnection(settings.cassandraHost().toLatin1().constData()))
+    m_settings(settings)
 {
+}
+
+bool RemoteRelayPeerPool::connectToDb()
+{
+    m_cassConnection = 
+        nx::cassandra::AsyncConnectionFactory::instance().create(
+            m_settings.cassandraConnection().hostName);
+
     prepareDbStructure();
+
+    if (!m_dbReady)
+        m_cassConnection.reset();
+
+    return m_dbReady;
 }
 
 void RemoteRelayPeerPool::prepareDbStructure()
 {
+    // TODO: Imply DbStructureUpdater here (it will require some refactoring).
+
     m_cassConnection->init()
         .then(
             [this](cf::future<CassError> result)
@@ -340,6 +354,11 @@ cf::future<bool> RemoteRelayPeerPool::removePeer(const std::string& domainName)
             });
 }
 
+bool RemoteRelayPeerPool::isConnectedToDb() const
+{
+    return m_dbReady;
+}
+
 bool RemoteRelayPeerPool::bindUpdateParameters(
     cassandra::Query* query,
     const std::string& domainName,
@@ -430,14 +449,15 @@ std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainNam
     return ss.str();
 }
 
-cassandra::AsyncConnection* RemoteRelayPeerPool::getConnection()
+cassandra::AbstractAsyncConnection* RemoteRelayPeerPool::getConnection()
 {
     return m_cassConnection.get();
 }
 
 RemoteRelayPeerPool::~RemoteRelayPeerPool()
 {
-    m_cassConnection->wait();
+    if (m_dbReady)
+        m_cassConnection->wait();
 }
 
 } // namespace model

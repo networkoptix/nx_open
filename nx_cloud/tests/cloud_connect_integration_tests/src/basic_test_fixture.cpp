@@ -44,6 +44,11 @@ cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
     return cf::make_ready_future(true);
 }
 
+bool MemoryRemoteRelayPeerPool::connectToDb()
+{
+    return false;
+}
+
 cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
 {
     m_relayTest->peerRemoved(domainName);

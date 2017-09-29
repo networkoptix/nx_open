@@ -467,28 +467,10 @@ bool QueryResult::get(int index, boost::optional<Uuid>* value) const
 #undef NX_CASS_GET_BASIC_VALUE_BY_INDEX
 #undef NX_CASS_GET_BASIC_VALUE
 
+//-------------------------------------------------------------------------------------------------
+// AbstractAsyncConnection
 
-/** ------------------------------- AsyncConnection ---------------------------------------------*/
-
-AsyncConnection::AsyncConnection(const char* host):
-    m_cluster(cass_cluster_new()),
-    m_session(cass_session_new())
-{
-    cass_cluster_set_contact_points(m_cluster, host);
-}
-
-void AsyncConnection::init(nx::utils::MoveOnlyFunc<void(CassError)> initCb)
-{
-    incPending();
-    CassFuture* future = cass_session_connect(m_session, m_cluster);
-    cass_future_set_callback(
-        future,
-        &onDone,
-        makeErrorCbContext(this, std::move(initCb)));
-    cass_future_free(future);
-}
-
-cf::future<CassError> AsyncConnection::init()
+cf::future<CassError> AbstractAsyncConnection::init()
 {
     cf::promise<CassError> p;
     cf::future<CassError> f = p.get_future();
@@ -502,20 +484,7 @@ cf::future<CassError> AsyncConnection::init()
     return f;
 }
 
-void AsyncConnection::prepareQuery(
-    const char* queryString,
-    nx::utils::MoveOnlyFunc<void(CassError, Query query)> prepareCb)
-{
-    incPending();
-    CassFuture* future = cass_session_prepare(m_session, queryString);
-    cass_future_set_callback(
-        future,
-        &onPrepare,
-        makeQueryCbContext(this, std::move(prepareCb)));
-    cass_future_free(future);
-}
-
-cf::future<std::pair<CassError, Query>> AsyncConnection::prepareQuery(const char* queryString)
+cf::future<std::pair<CassError, Query>> AbstractAsyncConnection::prepareQuery(const char* queryString)
 {
     cf::promise<std::pair<CassError, Query>> p;
     auto f = p.get_future();
@@ -528,6 +497,101 @@ cf::future<std::pair<CassError, Query>> AsyncConnection::prepareQuery(const char
         });
 
     return f;
+}
+
+cf::future<std::pair<CassError, QueryResult>> AbstractAsyncConnection::executeSelect(Query query)
+{
+    cf::promise<std::pair<CassError, QueryResult>> p;
+    auto f = p.get_future();
+
+    executeSelect(
+        std::move(query),
+        [p = std::move(p)](CassError result, QueryResult queryResult) mutable
+        {
+            p.set_value(std::make_pair(result, std::move(queryResult)));
+        });
+
+    return f;
+}
+
+cf::future<std::pair<CassError, QueryResult>> AbstractAsyncConnection::executeSelect(
+        const char* queryString)
+{
+    cf::promise<std::pair<CassError, QueryResult>> p;
+    auto f = p.get_future();
+
+    executeSelect(
+        queryString,
+        [p = std::move(p)](CassError result, QueryResult queryResult) mutable
+        {
+            p.set_value(std::make_pair(result, std::move(queryResult)));
+        });
+
+    return f;
+}
+
+cf::future<CassError> AbstractAsyncConnection::executeUpdate(Query query)
+{
+    cf::promise<CassError> p;
+    cf::future<CassError> f = p.get_future();
+
+    executeUpdate(
+        std::move(query),
+        [p = std::move(p)](CassError result) mutable
+        {
+            p.set_value(result);
+        });
+
+    return f;
+}
+
+cf::future<CassError> AbstractAsyncConnection::executeUpdate(const char* queryString)
+{
+    cf::promise<CassError> p;
+    cf::future<CassError> f = p.get_future();
+
+    executeUpdate(
+        queryString,
+        [p = std::move(p)](CassError result) mutable
+        {
+            p.set_value(result);
+        });
+
+    return f;
+}
+
+//-------------------------------------------------------------------------------------------------
+// AsyncConnection
+
+AsyncConnection::AsyncConnection(const std::string& hostName):
+    m_cluster(cass_cluster_new()),
+    m_session(cass_session_new())
+{
+    cass_cluster_set_contact_points(m_cluster, hostName.c_str());
+}
+
+void AsyncConnection::init(nx::utils::MoveOnlyFunc<void(CassError)> initCb)
+{
+    incPending();
+    CassFuture* future = cass_session_connect(m_session, m_cluster);
+    cass_future_set_callback(
+        future,
+        &onDone,
+        makeErrorCbContext(this, std::move(initCb)));
+    cass_future_free(future);
+}
+
+void AsyncConnection::prepareQuery(
+    const char* queryString,
+    nx::utils::MoveOnlyFunc<void(CassError, Query query)> prepareCb)
+{
+    incPending();
+    CassFuture* future = cass_session_prepare(m_session, queryString);
+    cass_future_set_callback(
+        future,
+        &onPrepare,
+        makeQueryCbContext(this, std::move(prepareCb)));
+    cass_future_free(future);
 }
 
 void AsyncConnection::executeSelect(
@@ -557,37 +621,6 @@ void AsyncConnection::executeSelect(
     cass_future_free(future);
 }
 
-cf::future<std::pair<CassError, QueryResult>> AsyncConnection::executeSelect(Query query)
-{
-    cf::promise<std::pair<CassError, QueryResult>> p;
-    auto f = p.get_future();
-
-    executeSelect(
-        std::move(query),
-        [p = std::move(p)](CassError result, QueryResult queryResult) mutable
-        {
-            p.set_value(std::make_pair(result, std::move(queryResult)));
-        });
-
-    return f;
-}
-
-cf::future<std::pair<CassError, QueryResult>> AsyncConnection::executeSelect(
-        const char* queryString)
-{
-    cf::promise<std::pair<CassError, QueryResult>> p;
-    auto f = p.get_future();
-
-    executeSelect(
-        queryString,
-        [p = std::move(p)](CassError result, QueryResult queryResult) mutable
-        {
-            p.set_value(std::make_pair(result, std::move(queryResult)));
-        });
-
-    return f;
-}
-
 void AsyncConnection::executeUpdate(
     Query query,
     nx::utils::MoveOnlyFunc<void(CassError)> updateCb)
@@ -613,37 +646,6 @@ void AsyncConnection::executeUpdate(
         &onUpdate,
         makeUpdateCbContext(this, Query(statement), std::move(updateCb)));
     cass_future_free(future);
-}
-
-
-cf::future<CassError> AsyncConnection::executeUpdate(Query query)
-{
-    cf::promise<CassError> p;
-    cf::future<CassError> f = p.get_future();
-
-    executeUpdate(
-        std::move(query),
-        [p = std::move(p)](CassError result) mutable
-        {
-            p.set_value(result);
-        });
-
-    return f;
-}
-
-cf::future<CassError> AsyncConnection::executeUpdate(const char* queryString)
-{
-    cf::promise<CassError> p;
-    cf::future<CassError> f = p.get_future();
-
-    executeUpdate(
-        queryString,
-        [p = std::move(p)](CassError result) mutable
-        {
-            p.set_value(result);
-        });
-
-    return f;
 }
 
 AsyncConnection::~AsyncConnection()
@@ -708,6 +710,25 @@ void AsyncConnection::onUpdate(CassFuture* future, void* data)
     ctx->free();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+AsyncConnectionFactory::AsyncConnectionFactory():
+    base_type(std::bind(&AsyncConnectionFactory::defaultFactoryFunction, this,
+        std::placeholders::_1))
+{
+}
+
+AsyncConnectionFactory& AsyncConnectionFactory::instance()
+{
+    static AsyncConnectionFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<AbstractAsyncConnection>
+    AsyncConnectionFactory::defaultFactoryFunction(const std::string& dbHostName)
+{
+    return std::make_unique<AsyncConnection>(dbHostName);
+}
 
 } // namespace cassandra
 } // namespace nx
