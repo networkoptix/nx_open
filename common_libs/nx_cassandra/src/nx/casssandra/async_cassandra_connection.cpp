@@ -1,5 +1,8 @@
-#include <string.h>
 #include "async_cassandra_connection.h"
+
+#include <string.h>
+
+#include <nx/utils/std/cpp14.h>
 
 using namespace nx::utils;
 
