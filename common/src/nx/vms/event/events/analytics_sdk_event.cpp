@@ -20,8 +20,8 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     m_driverId(driverId),
     m_eventId(eventId),
     m_caption(caption),
-    m_auxiliaryData(auxiliaryData),
-    m_description(description)
+    m_description(description),
+    m_auxiliaryData(auxiliaryData)
 {
 }
 
