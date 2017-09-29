@@ -1,3 +1,5 @@
 module Nx
 
 singleton ColorTheme 1.0 ColorTheme.qml
+
+MathUtils 1.0 math_utils.js

@@ -8,48 +8,82 @@ import Nx.Positioners 1.0 as Positioners
 
 Control
 {
+    id: layoutViewer
+
     property alias layoutId: layoutModel.layoutId
 
     background: Rectangle { color: ColorTheme.windowBackground }
 
-    Positioners.Grid
+    contentItem: FlickableView
     {
-        id: gridLayout
-        anchors.fill: parent
+        id: flickableView
 
-        cellSize: Qt.size(
-            availableWidth / gridSize.width,
-            availableWidth / gridSize.width / 16 * 9)
+        contentWidthPartToBeAlwaysVisible: 0.3
+        contentHeightPartToBeAlwaysVisible: 0.3
 
-        Repeater
+        contentWidth: gridLayout.implicitWidth
+        contentHeight: gridLayout.implicitHeight
+        implicitContentWidth: gridLayout.implicitWidth
+        implicitContentHeight: gridLayout.implicitHeight
+
+        Positioners.Grid
         {
-            id: repeater
+            id: gridLayout
 
-            model: LayoutModel
+            readonly property real cellAspectRatio: 16 / 9
+
+            readonly property size implicitSize:
             {
-                id: layoutModel
+                var gridAspectRatio = cellAspectRatio
+                    * Math.max(1, gridSize.width) / Math.max(1, gridSize.height)
+
+                return flickableView.width / flickableView.height < gridAspectRatio
+                    ? Qt.size(flickableView.width, flickableView.width / gridAspectRatio)
+                    : Qt.size(flickableView.height * gridAspectRatio, flickableView.height)
             }
 
-            delegate: Item
+            implicitWidth: implicitSize.width
+            implicitHeight: implicitSize.height
+
+            width: flickableView.contentWidth
+            height: flickableView.contentHeight
+
+            cellSize: Qt.size(
+                width / gridSize.width,
+                width / gridSize.width / 16 * 9)
+
+            Repeater
             {
-                width: 50
-                height: 50
+                id: repeater
 
-                Rectangle
+                model: LayoutModel
                 {
-                    anchors.fill: parent
-                    anchors.margins: 2
-                    color: "#70ff0000"
+                    id: layoutModel
                 }
 
-                Text
+                delegate: Item
                 {
-                    anchors.centerIn: parent
-                    text: model.name
-                }
+                    width: 50
+                    height: 50
 
-                Positioners.Grid.geometry: model.geometry
+                    Positioners.Grid.geometry: model.geometry
+
+                    Rectangle
+                    {
+                        anchors.fill: parent
+                        anchors.margins: 2
+                        color: "#70ff0000"
+                    }
+
+                    Text
+                    {
+                        anchors.centerIn: parent
+                        text: model.name
+                    }
+                }
             }
         }
+
+        onDoubleClicked: fitInView()
     }
 }
