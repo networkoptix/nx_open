@@ -62,8 +62,7 @@
                 "localization": {
                 }
             },
-            "internalName": "VideoAnalytics.AppearDisappear",
-            "internalMonitoringName": "VideoAnalytics.Appearing",
+            "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
             "description": "Object %1 ",
             "positiveState": "appeared",
             "negativeState": "disappeared",
