@@ -49,7 +49,7 @@ ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
 
 ManagerPool::~ManagerPool()
 {
-    disconnect(this, nullptr, nullptr, nullptr);
+    disconnect(this);
 }
 
 void ManagerPool::init()
