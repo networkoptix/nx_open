@@ -45,6 +45,14 @@ struct Position
     }
 };
 
+template<class Settings>
+void copyOverlaySettingsWithoutPosition(Settings& dest, Settings src)
+{
+    // Position is stored in ExportOverlayPersistentSettings base.
+    src.ExportOverlayPersistentSettings::operator=(dest); //< Preserve position.
+    dest.operator=(src);
+}
+
 } // namespace
 
 namespace nx {
@@ -459,28 +467,28 @@ void ExportSettingsDialog::Private::hideOverlay(ExportOverlayType type)
 void ExportSettingsDialog::Private::setTimestampOverlaySettings(
     const ExportTimestampOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.timestampOverlay = settings;
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.timestampOverlay, settings);
     updateOverlayWidget(ExportOverlayType::timestamp);
 }
 
 void ExportSettingsDialog::Private::setImageOverlaySettings(
     const ExportImageOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.imageOverlay = settings;
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.imageOverlay, settings);
     updateOverlayWidget(ExportOverlayType::image);
 }
 
 void ExportSettingsDialog::Private::setTextOverlaySettings(
     const ExportTextOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.textOverlay = settings;
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.textOverlay, settings);
     updateOverlayWidget(ExportOverlayType::text);
 }
 
 void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
     const ExportBookmarkOverlayPersistentSettings& settings)
 {
-    m_exportMediaPersistentSettings.bookmarkOverlay = settings;
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.bookmarkOverlay, settings);
     updateBookmarkText();
     updateOverlayWidget(ExportOverlayType::bookmark);
 }
