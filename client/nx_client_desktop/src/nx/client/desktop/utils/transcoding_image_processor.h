@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include <nx/client/desktop/utils/abstract_image_processor.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
@@ -22,7 +24,8 @@ public:
    virtual QImage process(const QImage& sourceImage) const override;
 
 private:
-    nx::core::transcoding::LegacyTranscodingSettings m_settings;
+    class Private;
+    QScopedPointer<Private> d;
 };
 
 } // namespace desktop
