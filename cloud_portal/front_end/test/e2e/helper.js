@@ -19,7 +19,7 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/5bd416e3-797e-4547-a7bd-65d80f66f539';
+    this.systemLink = '/f52c704d-0398-475e-bfc2-ccd88c44e20e';
     this.systemName = 'autotest';
 
     this.get = function (opt_url) {
