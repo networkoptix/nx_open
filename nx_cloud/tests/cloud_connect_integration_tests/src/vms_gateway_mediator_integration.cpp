@@ -34,6 +34,10 @@ protected:
     {
         mediator().stop();
 
+        // TODO: #ak We cannot rely on that mediator will be able to start on the same port.
+        // Must hold port busy somehow. 
+        // E.g., could introduce simple tcp forwarder based on AsyncChannelBridge class.
+
         whenStartGateway();
 
         // Waiting for gateway to fail request.
