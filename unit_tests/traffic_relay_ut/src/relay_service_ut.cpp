@@ -82,7 +82,7 @@ private:
     nx::utils::SyncQueue<bool> m_cassandraConnectionInitializationEvents;
 
     std::unique_ptr<nx::cassandra::AbstractAsyncConnection>
-        createCassandraConnectionStub(const std::string& dbHostName)
+        createCassandraConnectionStub(const std::string& /*dbHostName*/)
     {
         auto connection = std::make_unique<CassandraConnectionStub>();
         connection->setDbHostAvailable(m_isCassandraOnline);
