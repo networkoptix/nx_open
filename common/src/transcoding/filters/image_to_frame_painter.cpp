@@ -116,7 +116,7 @@ CLVideoDecoderOutputPtr ImageToFramePainter::drawTo(const CLVideoDecoderOutputPt
     bgra_to_yv12_simd_intr(m_finalImageBytes.get(), targetStride,
         yPlane, uPlane, vPlane,
         yPlaneStride, uvPlaneStride,
-        targetWidth, targetHeight, false/*don't flip*/);
+        targetWidth, targetHeight, false /*don't flip*/);
 
     return frame;
 }
