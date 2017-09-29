@@ -29,7 +29,7 @@ mysite = MyAdminSite()
 def get_post_parameters(request, context_id, language_id):
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     context, language = get_context_and_language(
-        request.data, context_id, language_id)
+        request.POST, context_id, language_id)
     user = Account.objects.get(email=request.user)
 
     if not language and 'language' in request.session:
@@ -94,7 +94,7 @@ def advanced_touched_without_permission(request_data, customization, data_struct
 def handle_post_context_edit_view(request, context_id, language_id):
     context, language, form, customization, user = get_post_parameters(
         request, context_id, language_id)
-    request_data = request.data
+    request_data = request.POST
     request_files = request.FILES
     preview_link = ""
     upload_errors = []
@@ -111,9 +111,9 @@ def handle_post_context_edit_view(request, context_id, language_id):
                 request_data, request_files, user)
 
         if upload_errors:
-            add_upload_error_messages(request._request, upload_errors)
+            add_upload_error_messages(request, upload_errors)
 
-        messages.success(request._request, "Changes have been saved.")
+        messages.success(request, "Changes have been saved.")
 
     elif 'Preview' in request_data:
         upload_errors = save_unrevisioned_records(
@@ -122,9 +122,9 @@ def handle_post_context_edit_view(request, context_id, language_id):
         preview_link = request.get_host() + generate_preview(context)
 
         if upload_errors:
-            add_upload_error_messages(request._request, upload_errors)
+            add_upload_error_messages(request, upload_errors)
 
-        messages.success(request._request,
+        messages.success(request,
                          "Changes have been saved. Preview has been created.")
 
     elif 'SaveDraft' in request_data:
@@ -133,9 +133,9 @@ def handle_post_context_edit_view(request, context_id, language_id):
             request_data, request_files, user)
 
         if upload_errors:
-            add_upload_error_messages(request._request, upload_errors)
+            add_upload_error_messages(request, upload_errors)
 
-        messages.success(request._request, "Changes have been saved.")
+        messages.success(request, "Changes have been saved.")
 
     elif 'SendReview' in request_data:
         upload_errors = send_version_for_review(
@@ -143,10 +143,10 @@ def handle_post_context_edit_view(request, context_id, language_id):
             context.product, request_data, request_files, user)
 
         if upload_errors:
-            add_upload_error_messages(request._request, upload_errors)
+            add_upload_error_messages(request, upload_errors)
 
         messages.success(
-            request._request,
+            request,
             "Changes have been saved. A new version has been created.")
 
         return None, None, None, None
@@ -180,7 +180,7 @@ def context_edit_view(request, context=None, language=None):
         context, form, language, preview_link = handle_post_context_edit_view(
             request, context, language)
 
-        if 'SendReview' in request.data:
+        if 'SendReview' in request.POST:
             return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
 
         return render(request, 'context_editor.html',
@@ -199,20 +199,20 @@ def context_edit_view(request, context=None, language=None):
 @require_http_methods(["POST"])
 @permission_required('cms.change_contentversion')
 def review_version_request(request, context=None, language=None):
-    if "Preview" in request.data:
+    if "Preview" in request.POST:
         preview_link = "//" + request.get_host() + generate_preview(send_to_review=True)
         return redirect(preview_link)
-    elif "Publish" in request.data:
+    elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
         publishing_errors = publish_latest_version(customization, request.user)
         version = ContentVersion.objects.latest('created_date')
         if publishing_errors:
-            messages.error(request._request, "Version " +
+            messages.error(request, "Version " +
                              str(version.id) + publishing_errors)
         else:
-            messages.success(request._request, "Version " +
+            messages.success(request, "Version " +
                              str(version.id) + " has been published")
         return redirect(reverse('review_version', args=[version.id]))
     return defaults.bad_request("File does not exist")
@@ -263,7 +263,7 @@ def product_settings(request, product_id):
                 return HttpResponseBadRequest('json is acceptable only for Updating structure')
             cms_structure = json.load(file)
             structure.update_from_object(cms_structure)
-            messages.success(request._request, "Structure updated")
+            messages.success(request, "Structure updated")
         else:
             if not file.name.endswith('zip'):
                 return HttpResponseBadRequest('zip archive is expected')
@@ -280,7 +280,7 @@ def product_settings(request, product_id):
                     'success': messages.SUCCESS,
                     'warning': messages.WARNING,
                 }[item[0]]
-            messages.add_message(request._request, log_type, item[1])
+            messages.add_message(request, log_type, item[1])
     else:
         form = ProductSettingsForm()
 

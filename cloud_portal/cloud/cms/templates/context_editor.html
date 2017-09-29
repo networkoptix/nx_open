@@ -36,7 +36,7 @@
 
                 {% if field|is_FileField and field.value %}
                 <div>
-                    <a href="{% url 'download_file' field.name %}" download>Download</a>
+                    <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download</a>
                 </div>
                 {% endif %}
 
@@ -51,6 +51,13 @@
 
     {% if perms.cms.edit_content %}
     <div class="submit-row">
+        {% if user.is_superuser and context.file_path%}
+        <button class="button">
+            <a style="color:white; text-decoration:none !important;"
+               href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
+               download>Download Draft</a>
+        </button>
+        {% endif %}
         <button class="button" type="submit" name="SaveDraft">Save Draft</button>
         <button class="button" type="submit" name="Preview">Save and Preview</button>
         <button class="button" type="submit" name="SendReview">Send for Review</button>

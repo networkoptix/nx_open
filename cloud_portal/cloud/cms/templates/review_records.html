@@ -51,6 +51,8 @@
 						<img style="max-height: 200px; max-width: 200px;" src="data:image/png;base64,{{record}}">
 					{% elif record.data_structure.type == 0 %}
 						{{record}}
+					{% elif record.data_structure.type == 4 %}
+						<a href="{% url 'download_file' record.data_structure.name %}?version_id={{version.id}}&lang={{record.language.code}}&draft" download>Download</a>
 					{% else %}
 						<div style="overflow-y: scroll; max-height: 350px; padding: 5px; border: 1px solid silver">{{record|safe}}</div>
 					{% endif %}
