@@ -21,7 +21,8 @@ class LayoutThumbnailLoader:
 public:
     explicit LayoutThumbnailLoader(
         const QnLayoutResourcePtr& layout,
-        const QSize maximumSize,
+        bool allowNonCameraResources,
+        const QSize& maximumSize,
         qint64 msecSinceEpoch = QnThumbnailRequestData::kLatestThumbnail,
         QnThumbnailRequestData::ThumbnailFormat format = QnThumbnailRequestData::JpgFormat,
         QObject* parent = nullptr);
