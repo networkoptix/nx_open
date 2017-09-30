@@ -566,11 +566,10 @@ struct ModifyResourceAccess
             result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
-            NX_LOG(lit("%1 resource access returned false for transaction %2. User resource isNull: %3. Target resource isNull %4")
+            NX_LOG(lit("%1 resource access returned false. User resource: %3. Target resource: %4")
                 .arg(isRemove ? "Remove" : "Modify")
-                .arg(getTransactionDescriptorByParam<Param>()->getName())
-                .arg(!(bool)userResource)
-                .arg(!(bool)target),
+                .arg(userResource ? userResource->getId().toString() : QString())
+                .arg(target ? target->getId().toString() : QString()),
                 cl_logWARNING);
 
         return result;
