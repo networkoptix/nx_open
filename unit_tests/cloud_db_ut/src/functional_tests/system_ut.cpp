@@ -534,9 +534,9 @@ protected:
             getSystems(owner().email, owner().password, &systems));
         ASSERT_EQ(1U, systems.size());
 
-        m_system.status = api::SystemStatus::ssActivated;
+        m_system.status = api::SystemStatus::activated;
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), m_system) != systems.end());
-        ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+        ASSERT_EQ(api::SystemStatus::activated, systems[0].status);
 
         ASSERT_EQ(owner().email, systems[0].ownerAccountEmail);
     }

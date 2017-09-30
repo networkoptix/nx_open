@@ -88,7 +88,7 @@ nx::utils::db::DBResult SystemDataObject::markSystemAsDeleted(
         )sql");
     markSystemAsRemoved.bindValue(
         ":statusCode",
-        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssDeleted)));
+        QnSql::serialized_field(static_cast<int>(api::SystemStatus::deleted_)));
     markSystemAsRemoved.bindValue(
         ":expiration_utc_timestamp",
         (int)(nx::utils::timeSinceEpoch().count() +
@@ -183,7 +183,7 @@ nx::utils::db::DBResult SystemDataObject::activateSystem(
         "WHERE id=:id");
     updateSystemStatusQuery.bindValue(
         ":statusCode",
-        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssActivated)));
+        QnSql::serialized_field(static_cast<int>(api::SystemStatus::activated)));
     updateSystemStatusQuery.bindValue(
         ":id",
         QnSql::serialized_field(systemId));
@@ -250,10 +250,10 @@ nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(nx::utils::db::Qu
         "AND expiration_utc_timestamp < :currentTime");
     dropExpiredSystems.bindValue(
         ":notActivatedStatusCode",
-        static_cast<int>(api::SystemStatus::ssNotActivated));
+        static_cast<int>(api::SystemStatus::notActivated));
     dropExpiredSystems.bindValue(
         ":deletedStatusCode",
-        static_cast<int>(api::SystemStatus::ssDeleted));
+        static_cast<int>(api::SystemStatus::deleted_));
     dropExpiredSystems.bindValue(
         ":currentTime",
         (int)nx::utils::timeSinceEpoch().count());

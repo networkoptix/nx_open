@@ -34,15 +34,14 @@ public:
 
 enum class SystemStatus
 {
-    // TODO: #ak remove "ss" prefix.
-    ssInvalid = 0,
+    invalid = 0,
     /**
      * System has been bound but not a single request from
      * that system has been received by cloud.
      */
-    ssNotActivated,
-    ssActivated,
-    ssDeleted
+    notActivated,
+    activated,
+    deleted_,
 };
 
 class SystemData
@@ -66,7 +65,7 @@ public:
     std::chrono::system_clock::time_point registrationTime;
 
     SystemData():
-        status(SystemStatus::ssInvalid),
+        status(SystemStatus::invalid),
         cloudConnectionSubscriptionStatus(true),
         systemSequence(0)
     {

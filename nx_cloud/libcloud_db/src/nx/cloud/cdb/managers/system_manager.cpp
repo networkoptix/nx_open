@@ -132,7 +132,7 @@ void SystemManager::authenticateByName(
     if (systemIter == systemByIdIndex.end())
         return;
 
-    if (systemIter->status == api::SystemStatus::ssDeleted)
+    if (systemIter->status == api::SystemStatus::deleted_)
     {
         if (systemIter->expirationTimeUtc > nx::utils::timeSinceEpoch().count() ||
             m_settings.systemManager().controlSystemStatusByDb) //system not expired yet
@@ -260,7 +260,7 @@ void SystemManager::getSystems(
     //always providing only activated systems
     filter.resources().put(
         attr::systemStatus,
-        static_cast<int>(api::SystemStatus::ssActivated));
+        static_cast<int>(api::SystemStatus::activated));
 
     nx::utils::stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
@@ -760,7 +760,7 @@ nx::utils::db::DBResult SystemManager::insertNewSystemDataToDb(
     result->systemData.opaque = newSystem.opaque;
     result->systemData.authKey = QnUuid::createUuid().toSimpleString().toStdString();
     result->systemData.ownerAccountEmail = account.email;
-    result->systemData.status = api::SystemStatus::ssNotActivated;
+    result->systemData.status = api::SystemStatus::notActivated;
     result->systemData.expirationTimeUtc =
         nx::utils::timeSinceEpoch().count() +
         std::chrono::duration_cast<std::chrono::seconds>(
@@ -873,7 +873,7 @@ void SystemManager::markSystemAsDeletedInCache(const std::string& systemId)
             systemIter,
             [this](data::SystemData& system)
             {
-                system.status = api::SystemStatus::ssDeleted;
+                system.status = api::SystemStatus::deleted_;
                 system.expirationTimeUtc =
                     nx::utils::timeSinceEpoch().count() +
                     duration_cast<seconds>(
@@ -1536,7 +1536,7 @@ void SystemManager::activateSystemIfNeeded(
     SystemDictionary& systemByIdIndex,
     typename SystemDictionary::iterator systemIter)
 {
-    if (systemIter->status == api::SystemStatus::ssActivated &&
+    if (systemIter->status == api::SystemStatus::activated &&
         !systemIter->activationInDbNeeded)
     {
         return;
@@ -1546,7 +1546,7 @@ void SystemManager::activateSystemIfNeeded(
         systemIter,
         [](data::SystemData& system)
         {
-            system.status = api::SystemStatus::ssActivated;
+            system.status = api::SystemStatus::activated;
             system.activationInDbNeeded = false;
         });
 
@@ -1578,7 +1578,7 @@ void SystemManager::systemActivated(
                 {
                     if (dbResult == nx::utils::db::DBResult::ok)
                     {
-                        system.status = api::SystemStatus::ssActivated;
+                        system.status = api::SystemStatus::activated;
                         system.expirationTimeUtc = std::numeric_limits<int>::max();
                         system.activationInDbNeeded = false;
                     }
@@ -1832,7 +1832,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
              systemIter != systemsByExpirationTime.end();
              )
         {
-            NX_ASSERT(systemIter->status != api::SystemStatus::ssActivated);
+            NX_ASSERT(systemIter->status != api::SystemStatus::activated);
 
             auto& sharingBySystemId = m_accountAccessRoleForSystem.get<kSharingBySystemId>();
             sharingBySystemId.erase(systemIter->id);

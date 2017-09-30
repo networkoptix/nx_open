@@ -306,10 +306,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 }   //nx
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemStatus,
-    (nx::cdb::api::SystemStatus::ssInvalid, "invalid")
-    (nx::cdb::api::SystemStatus::ssNotActivated, "notActivated")
-    (nx::cdb::api::SystemStatus::ssActivated, "activated")
-    (nx::cdb::api::SystemStatus::ssDeleted, "deleted")
+    (nx::cdb::api::SystemStatus::invalid, "invalid")
+    (nx::cdb::api::SystemStatus::notActivated, "notActivated")
+    (nx::cdb::api::SystemStatus::activated, "activated")
+    (nx::cdb::api::SystemStatus::deleted_, "deleted")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemHealth,
