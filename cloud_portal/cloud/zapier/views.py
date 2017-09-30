@@ -6,7 +6,6 @@ from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, api_success, APINotAuthorisedException
 
 from requests.auth import HTTPDigestAuth
-from django.http import JsonResponse
 from django.utils.http import urlencode
 
 from rest_hooks.signals import raw_hook_event
@@ -112,7 +111,7 @@ def fire_zap_webhook(request):
 @handle_exceptions
 def ping(request):
     authenticate(request)
-    return JsonResponse({'status': 'ok'})
+    return Response({'status': 'ok'})
 
 
 @api_view(['POST'])
