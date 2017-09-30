@@ -8,6 +8,7 @@
 
 #include <QtCore/QThread>
 
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/std/future.h>
@@ -80,9 +81,6 @@ public:
         m_sendBuffer(nullptr),
         m_sendBufPos(0),
         m_registerTimerCallCounter(0),
-        m_connectSendHandlerTerminatedFlag(nullptr),
-        m_recvHandlerTerminatedFlag(nullptr),
-        m_timerHandlerTerminatedFlag(nullptr),
         m_threadHandlerIsRunningIn(NULL),
         m_asyncSendIssued(false),
         m_addressResolverIsInUse(false),
@@ -97,13 +95,6 @@ public:
         //but even in described case no synchronization required, since before removing socket handler implementation MUST cancel ongoing
         //async I/O and wait for completion. That is, wait for eventTriggered to return.
         //So, socket can only be removed from handler called in aio thread. So, eventTriggered is down the stack if m_*TerminatedFlag is not nullptr
-
-        if (m_connectSendHandlerTerminatedFlag)
-            *m_connectSendHandlerTerminatedFlag = true;
-        if (m_recvHandlerTerminatedFlag)
-            *m_recvHandlerTerminatedFlag = true;
-        if (m_timerHandlerTerminatedFlag)
-            *m_timerHandlerTerminatedFlag = true;
     }
 
     void terminate()
@@ -376,15 +367,13 @@ private:
     nx::utils::MoveOnlyFunc<void()> m_timerHandler;
     size_t m_registerTimerCallCounter;
 
-    bool* m_connectSendHandlerTerminatedFlag;
-    bool* m_recvHandlerTerminatedFlag;
-    bool* m_timerHandlerTerminatedFlag;
-
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     std::atomic<bool> m_asyncSendIssued;
     std::atomic<bool> m_addressResolverIsInUse;
     const int m_ipVersion;
     QnMutex m_mutex;
+
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
 
     bool isNonBlockingMode() const
     {
@@ -426,99 +415,102 @@ private:
             std::unique_ptr<AsyncSocketImplHelper, decltype(threadHandlerIsRunningInResetFunc)>
                 threadHandlerIsRunningInResetGuard(this, threadHandlerIsRunningInResetFunc);
 
-            const size_t connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter;
             auto connectHandlerLocal =
-                [this, connectSendAsyncCallCounterBak, &terminated](SystemError::ErrorCode errorCode)
+                [this, &terminated](SystemError::ErrorCode errorCode) -> bool
                 {
-                    auto connectHandlerBak = std::move(m_connectHandler);
+                    const auto connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter;
+                
+                    decltype(m_connectHandler) connectHandlerBak;
+                    m_connectHandler.swap(connectHandlerBak);
                     m_asyncSendIssued = false;
-                    connectHandlerBak(errorCode);
 
-                    if (terminated)
-                        return;     //most likely, socket has been removed in handler
+                    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                    connectHandlerBak(errorCode);
+                    if (watcher.objectDestroyed())
+                    {
+                        terminated = true;
+                        return false;
+                    }
+
                     QnMutexLocker lock(&m_mutex);
                     if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
                     {
                         nx::network::SocketGlobals::aioService().stopMonitoring(
                             this->m_socket, aio::etWrite);
                     }
+
+                    return true;
                 };
 
-            auto connectFinallyFunc =
-                [this, &terminated](AsyncSocketImplHelper* /*pThis*/)
-                {
-                    if (terminated)
-                        return;     //most likely, socket has been removed in handler
-                    m_connectSendHandlerTerminatedFlag = nullptr;
-                };
-
-            const size_t recvAsyncCallCounterBak = m_recvAsyncCallCounter;
             auto recvHandlerLocal =
-                [this, recvAsyncCallCounterBak, &terminated](
-                    SystemError::ErrorCode errorCode, size_t bytesRead)
+                [this, &terminated](
+                    SystemError::ErrorCode errorCode, size_t bytesRead) -> bool
                 {
+                    const size_t recvAsyncCallCounterBak = m_recvAsyncCallCounter;
+        
                     m_recvBuffer = nullptr;
-                    auto recvHandlerBak = std::move(m_recvHandler);
-                    recvHandlerBak(errorCode, bytesRead);
 
-                    if (terminated)
-                        return;     //most likely, socket has been removed in handler
+                    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                    nx::utils::swapAndCall(m_recvHandler, errorCode, bytesRead);
+                    if (watcher.objectDestroyed())
+                    {
+                        terminated = true;
+                        return false;
+                    }
+
                     QnMutexLocker lock(&m_mutex);
                     if (recvAsyncCallCounterBak == m_recvAsyncCallCounter)
                     {
                         nx::network::SocketGlobals::aioService().stopMonitoring(
                             this->m_socket, aio::etRead);
                     }
-                };
 
-            auto readFinallyFunc =
-                [this, &terminated](AsyncSocketImplHelper* /*pThis*/)
-                {
-                    if (terminated)
-                        return;     //most likely, socket has been removed in handler
-                    m_recvHandlerTerminatedFlag = nullptr;
+                    return true;
                 };
 
             auto sendHandlerLocal =
-                [this, connectSendAsyncCallCounterBak, &terminated](
-                    SystemError::ErrorCode errorCode, size_t bytesSent)
+                [this, &terminated](
+                    SystemError::ErrorCode errorCode, size_t bytesSent) -> bool
                 {
+                    const auto connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter;
+
                     m_sendBuffer = nullptr;
                     m_sendBufPos = 0;
-                    auto sendHandlerBak = std::move(m_sendHandler);
-                    m_asyncSendIssued = false;
-                    sendHandlerBak(errorCode, bytesSent);
 
-                    if (terminated)
-                        return;     //most likely, socket has been removed in handler
+                    decltype(m_sendHandler) sendHandlerBak;
+                    m_sendHandler.swap(sendHandlerBak);
+                    m_asyncSendIssued = false;
+
+                    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                    sendHandlerBak(errorCode, bytesSent);
+                    if (watcher.objectDestroyed())
+                    {
+                        terminated = true;
+                        return false;
+                    }
+
                     QnMutexLocker lock(&m_mutex);
                     if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
                     {
                         nx::network::SocketGlobals::aioService().stopMonitoring(
                             this->m_socket, aio::etWrite);
                     }
-                };
 
-            auto writeFinallyFunc =
-                [this, &terminated](AsyncSocketImplHelper* /*pThis*/)
-                {
-                    if (terminated)
-                        return;     //most likely, socket has been removed in handler
-                    m_connectSendHandlerTerminatedFlag = nullptr;
+                    return true;
                 };
 
             //processing event
 
             if (eventType & aio::etRead)
             {
-                processRecvEvent(eventType, terminated, recvHandlerLocal, readFinallyFunc);
+                processRecvEvent(eventType, terminated, recvHandlerLocal);
             }
             else if (eventType & aio::etWrite)
             {
                 processWriteEvent(
                     eventType, terminated,
-                    connectHandlerLocal, connectFinallyFunc,
-                    sendHandlerLocal, writeFinallyFunc);
+                    connectHandlerLocal,
+                    sendHandlerLocal);
             }
             else if (eventType == aio::etTimedOut)
             {
@@ -528,9 +520,9 @@ private:
             {
                 processErrorEvent(
                     terminated,
-                    connectHandlerLocal, connectFinallyFunc,
-                    recvHandlerLocal, readFinallyFunc,
-                    sendHandlerLocal, writeFinallyFunc);
+                    connectHandlerLocal,
+                    recvHandlerLocal,
+                    sendHandlerLocal);
             }
             else
             {
@@ -580,60 +572,51 @@ private:
 
     void processTimedOutEvent(SocketType* sock, bool& terminated)
     {
-        const size_t registerTimerCallCounterBak = m_registerTimerCallCounter;
         auto timerHandlerLocal = 
-            [this, registerTimerCallCounterBak, sock, &terminated]()
+            [this, sock, &terminated]()
             {
-                auto timerHandlerBak = std::move(m_timerHandler);
-                timerHandlerBak();
+                const size_t registerTimerCallCounterBak = m_registerTimerCallCounter;
+            
+                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+                nx::utils::swapAndCall(m_timerHandler);
+                if (watcher.objectDestroyed())
+                {
+                    terminated = true;
+                    return false;
+                }
 
-                if (terminated)
-                    return;     //most likely, socket has been removed in handler
                 QnMutexLocker lock(&m_mutex);
                 if (registerTimerCallCounterBak == m_registerTimerCallCounter)
                 {
                     nx::network::SocketGlobals::aioService().stopMonitoring(
                         sock, aio::etTimedOut);
                 }
-            };
-
-        auto timerFinallyFunc =
-            [this, &terminated](AsyncSocketImplHelper* /*pThis*/)
-            {
-                if (terminated)
-                    return;     //most likely, socket has been removed in handler
-                m_timerHandlerTerminatedFlag = nullptr;
+                return true;
             };
 
         //timer on socket (not read/write timeout, but some timer)
-        m_timerHandlerTerminatedFlag = &terminated;
 
         if (m_timerHandler)
         {
             //async connect. If we are here than connect succeeded
-            std::unique_ptr<AsyncSocketImplHelper, decltype(timerFinallyFunc)>
-                cleanupGuard(this, timerFinallyFunc);
             timerHandlerLocal();
         }
     }
 
-    template<typename Handler, typename FinallyHandler>
+    template<typename Handler>
     void processRecvEvent(
         aio::EventType eventType,
         bool& terminated,
-        const Handler& recvHandlerLocal,
-        const FinallyHandler& readFinallyFunc)
+        const Handler& recvHandlerLocal)
     {
         if (eventType == aio::etRead)
         {
-            m_recvHandlerTerminatedFlag = &terminated;
-
-            std::unique_ptr<AsyncSocketImplHelper, decltype(readFinallyFunc)>
-                cleanupGuard(this, readFinallyFunc);
-
             NX_ASSERT(m_recvHandler);
             if (!isNonBlockingMode())
-                return recvHandlerLocal(SystemError::invalidData, (size_t) -1);
+            {
+                recvHandlerLocal(SystemError::invalidData, (size_t) -1);
+                return;
+            }
 
             //reading to buffer
             const auto bufSizeBak = m_recvBuffer->size();
@@ -665,32 +648,22 @@ private:
         {
             NX_ASSERT(m_recvHandler);
 
-            m_recvHandlerTerminatedFlag = &terminated;
-            std::unique_ptr<AsyncSocketImplHelper, decltype(readFinallyFunc)> cleanupGuard(this, readFinallyFunc);
             recvHandlerLocal(SystemError::timedOut, (size_t)-1);
         }
     }
 
-    template<
-        typename ConnectHandler, typename ConnectFinallyHandler,
-        typename SendHandler, typename SendFinallyHandler>
+    template<typename ConnectHandler, typename SendHandler>
     void processWriteEvent(
         aio::EventType eventType,
         bool& terminated,
         const ConnectHandler& connectHandlerLocal,
-        const ConnectFinallyHandler& connectFinallyFunc,
-        const SendHandler& sendHandlerLocal,
-        const SendFinallyHandler& writeFinallyFunc)
+        const SendHandler& sendHandlerLocal)
     {
         if (eventType == aio::etWrite)
         {
-            m_connectSendHandlerTerminatedFlag = &terminated;
-
             if (m_connectHandler)
             {
                 //async connect. If we are here than connect succeeded
-                std::unique_ptr<AsyncSocketImplHelper, decltype(connectFinallyFunc)>
-                    cleanupGuard(this, connectFinallyFunc);
                 connectHandlerLocal(SystemError::noError);
             }
             else
@@ -698,10 +671,10 @@ private:
                 //can send some bytes
                 NX_ASSERT(m_sendHandler);
                 if (!isNonBlockingMode())
-                    return sendHandlerLocal(SystemError::invalidData, (size_t) -1);
-
-                std::unique_ptr<AsyncSocketImplHelper, decltype(writeFinallyFunc)>
-                    cleanupGuard(this, writeFinallyFunc);
+                {
+                    sendHandlerLocal(SystemError::invalidData, (size_t) -1);
+                    return;
+                }
 
                 const int bytesWritten = this->m_socket->send(
                     m_sendBuffer->constData() + m_sendBufPos,
@@ -731,36 +704,29 @@ private:
         }
         else if (eventType == aio::etWriteTimedOut)
         {
-            m_connectSendHandlerTerminatedFlag = &terminated;
-
             if (m_connectHandler)
             {
-                std::unique_ptr<AsyncSocketImplHelper, decltype(connectFinallyFunc)> cleanupGuard(this, connectFinallyFunc);
                 connectHandlerLocal(SystemError::timedOut);
             }
             else
             {
                 NX_ASSERT(m_sendHandler);
-                std::unique_ptr<AsyncSocketImplHelper, decltype(writeFinallyFunc)> cleanupGuard(this, writeFinallyFunc);
                 sendHandlerLocal(SystemError::timedOut, (size_t)-1);
             }
         }
     }
 
     template<
-        typename ConnectHandler, typename ConnectFinallyHandler,
-        typename RecvHandler, typename RecvFinallyHandler,
-        typename SendHandler, typename SendFinallyHandler>
+        typename ConnectHandler,
+        typename RecvHandler,
+        typename SendHandler>
     void processErrorEvent(
         bool& terminated,
         const ConnectHandler& connectHandlerLocal,
-        const ConnectFinallyHandler& connectFinallyFunc,
         const RecvHandler& recvHandlerLocal,
-        const RecvFinallyHandler& readFinallyFunc,
-        const SendHandler& sendHandlerLocal,
-        const SendFinallyHandler& writeFinallyFunc)
+        const SendHandler& sendHandlerLocal)
     {
-        //TODO #ak distinguish read and write
+        // TODO: #ak Distinguish read and write.
         SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
         if (!this->m_socket->getLastError(&sockErrorCode))
             sockErrorCode = SystemError::notConnected;
@@ -769,32 +735,20 @@ private:
 
         if (m_connectHandler)
         {
-            m_connectSendHandlerTerminatedFlag = &terminated;
-            std::unique_ptr<AsyncSocketImplHelper, decltype(connectFinallyFunc)>
-                cleanupGuard(this, connectFinallyFunc);
-            connectHandlerLocal(sockErrorCode);
+            if (!connectHandlerLocal(sockErrorCode))
+                return;
         }
-
-        if (terminated)
-            return;
 
         if (m_recvHandler)
         {
-            m_recvHandlerTerminatedFlag = &terminated;
-            std::unique_ptr<AsyncSocketImplHelper, decltype(readFinallyFunc)>
-                cleanupGuard(this, readFinallyFunc);
-            recvHandlerLocal(sockErrorCode, (size_t)-1);
+            if (!recvHandlerLocal(sockErrorCode, (size_t)-1))
+                return;
         }
-
-        if (terminated)
-            return;
 
         if (m_sendHandler)
         {
-            m_connectSendHandlerTerminatedFlag = &terminated;
-            std::unique_ptr<AsyncSocketImplHelper, decltype(writeFinallyFunc)>
-                cleanupGuard(this, writeFinallyFunc);
-            sendHandlerLocal(sockErrorCode, (size_t)-1);
+            if (!sendHandlerLocal(sockErrorCode, (size_t)-1))
+                return;
         }
     }
 
