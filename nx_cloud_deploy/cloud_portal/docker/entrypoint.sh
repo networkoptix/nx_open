@@ -68,7 +68,7 @@ do
             #/app/env/bin/python manage.py filldata
 
             find /app/app/static | xargs touch
-            exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
+            exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :8000 --log-level=debug --timeout 300
             ;;
         celery)
             write_my_cnf
