@@ -138,9 +138,15 @@ void ExportSettingsDialog::Private::saveSettings()
     }
 }
 
-void ExportSettingsDialog::Private::setServerTimeOffsetMs(qint64 offsetMs)
+void ExportSettingsDialog::Private::setServerTimeZoneOffsetMs(qint64 offsetMs)
+{
+    m_exportMediaSettings.serverTimeZoneMs = offsetMs;
+}
+
+void ExportSettingsDialog::Private::setTimestampOffsetMs(qint64 offsetMs)
 {
     m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs = offsetMs;
+    updateTimestampText();
 }
 
 void ExportSettingsDialog::Private::setAvailableTranscodingSettings(

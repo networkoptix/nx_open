@@ -502,8 +502,9 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
     updateSettingsWidgets();
 
-    d->setServerTimeOffsetMs(
-        widget->context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(mediaResource));
+    const auto timeWatcher = widget->context()->instance<QnWorkbenchServerTimeWatcher>();
+    d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
+    d->setTimestampOffsetMs(timeWatcher->displayOffset(mediaResource));
 
     const auto resource = mediaResource->toResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
