@@ -74,7 +74,7 @@ void ExportOverlayWidget::setText(const QString& value)
         return;
 
     d->text = value;
-    update();
+    updateLayout();
 }
 
 QImage ExportOverlayWidget::image() const
