@@ -426,11 +426,47 @@ private:
         PostProcessList* const transactionsPostProcessList,
         TransactionType::Value transactionType = TransactionType::Regular);
 
+    class AccessRightGrant
+    {
+    public:
+        AccessRightGrant(
+            ServerQueryProcessor* owner,
+            Qn::UserAccessData accessRight)
+            :
+            m_owner(owner),
+            m_previousAccessRight(owner->m_userAccessData)
+        {
+            m_owner->m_userAccessData = accessRight;
+        }
+
+        ~AccessRightGrant()
+        {
+            m_owner->m_userAccessData = m_previousAccessRight;
+        }
+    private:
+        ServerQueryProcessor* m_owner;
+        Qn::UserAccessData m_previousAccessRight;
+    };
+
     ErrorCode removeResourceSync(
         QnTransaction<ApiIdData>& tran,
         ApiObjectType resourceType,
         PostProcessList* const transactionsPostProcessList)
     {
+        ErrorCode errorCode = removeResourceNestedObjectsSync(tran, resourceType, transactionsPostProcessList);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+        return processUpdateSync(tran, transactionsPostProcessList, 0);
+    }
+
+    ErrorCode removeResourceNestedObjectsSync(
+        QnTransaction<ApiIdData>& tran,
+        ApiObjectType resourceType,
+        PostProcessList* const transactionsPostProcessList)
+    {
+        // Remove nested objects without checking actual access rights. Only main remove transaction will be validated.
+        AccessRightGrant grant(this, Qn::kSystemAccess);
+
         ErrorCode errorCode = ErrorCode::ok;
         auto connection = QnAppServerConnectionFactory::getConnection2();
 
@@ -573,12 +609,10 @@ private:
                 NX_ASSERT(0);
         }
 
-        if(errorCode != ErrorCode::ok)
-            return errorCode;
+        return errorCode;
 
         #undef RUN_AND_CHECK_ERROR
 
-        return processUpdateSync(tran, transactionsPostProcessList, 0);
     }
 
     ErrorCode processUpdateSync(
