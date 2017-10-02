@@ -12,6 +12,7 @@
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
+#include <nx/utils/timer_holder.h>
 
 extern "C" {
 
@@ -50,7 +51,7 @@ public:
     virtual QnIOPortDataList getInputPortList() const override;
 
     virtual bool setRelayOutputState(
-        const QString& ouputId,
+        const QString& outputId,
         bool activate,
         unsigned int autoResetTimeoutMs = 0) override;
 
@@ -239,6 +240,8 @@ private:
 
     HanwhaPortInfo portInfoFromId(const QString& id) const;
 
+    bool setRelayOutputStateInternal(const QString& outputId, bool activate);
+
 private:
     using AdvancedParameterId = QString;
 
@@ -260,6 +263,8 @@ private:
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;
     std::atomic<bool> m_areInputPortsMonitored{false};
+
+    nx::utils::TimerHolder m_timerHolder;
 };
 
 } // namespace plugins

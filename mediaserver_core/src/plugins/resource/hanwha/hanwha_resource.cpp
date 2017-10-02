@@ -160,7 +160,7 @@ struct GroupParameterInfo
 
 HanwhaResource::~HanwhaResource()
 {
-    // TODO: #dmishin don't forget about it.
+    m_timerHolder.terminate();
 }
 
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
@@ -405,31 +405,22 @@ QnIOPortDataList HanwhaResource::getInputPortList() const
 }
 
 bool HanwhaResource::setRelayOutputState(
-    const QString& ouputId,
+    const QString& outputId,
     bool activate,
     unsigned int autoResetTimeoutMs)
 {
-    const auto info = portInfoFromId(ouputId);
-    const auto state = activate ? lit("On") : lit("Off");
+    auto resetHandler =
+        [state = !activate, outputId, this]()
+        {
+            setRelayOutputStateInternal(outputId, state);
+        };
 
-    HanwhaRequestHelper::Parameters parameters = 
-        {{lit("%1.%2.State").arg(info.prefix).arg(info.number), state}};
-
-    if (info.submenu == lit("alarmoutput"))
-    {
-        parameters.emplace(
-            lit("%1.%2.ManualDuration")
-                .arg(info.prefix)
-                .arg(info.number),
-            lit("Always"));
-    }
-
-    HanwhaRequestHelper helper(toSharedPointer(this));
-    const auto response = helper.control(
-        lit("io/%1").arg(info.submenu),
-        parameters);
-
-    return response.isSuccessful();
+    m_timerHolder.addTimer(
+        outputId,
+        resetHandler,
+        std::chrono::milliseconds(autoResetTimeoutMs));
+                
+    return setRelayOutputStateInternal(outputId, activate);
 }
 
 bool HanwhaResource::startInputPortMonitoringAsync(
@@ -2261,6 +2252,32 @@ HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id)
     result.submenu = result.prefix.toLower();
 
     return result;
+}
+
+bool HanwhaResource::setRelayOutputStateInternal(const QString& outputId, bool activate)
+{
+    const auto info = portInfoFromId(outputId);
+    const auto state = activate ? lit("On") : lit("Off");
+
+    HanwhaRequestHelper::Parameters parameters =
+        {{lit("%1.%2.State").arg(info.prefix).arg(info.number), state}};
+
+    if (info.submenu == lit("alarmoutput"))
+    {
+        parameters.emplace(
+            lit("%1.%2.ManualDuration")
+                .arg(info.prefix)
+                .arg(info.number),
+            lit("Always"));
+    }
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    helper.setIgnoreMutexAnalyzer(true);
+    const auto response = helper.control(
+        lit("io/%1").arg(info.submenu),
+        parameters);
+
+    return response.isSuccessful();
 }
 
 bool HanwhaResource::isNvr() const
