@@ -130,9 +130,14 @@ void KineticAnimation::finishMeasurement(const QPointF& position)
 
 void KineticAnimation::stop()
 {
-    if (m_animation->state() != QAbstractAnimation::Stopped)
+    if (m_animation->state() != QAbstractAnimation::Stopped
+        || !m_xHelper.isStopped() || !m_yHelper.isStopped())
+    {
         m_animation->stop();
-    emit stopped();
+        m_xHelper.stop();
+        m_yHelper.stop();
+        emit stopped();
+    }
 }
 
 } // namespace animation
