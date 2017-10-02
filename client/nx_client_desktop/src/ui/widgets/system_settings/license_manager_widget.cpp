@@ -53,13 +53,12 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/log/log.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
 #include <nx/client/desktop/ui/common/clipboard_button.h>
-
-#include <nx/utils/log/log.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -67,41 +66,6 @@ namespace {
 
 static const auto kHtmlDelimiter = lit("<br>");
 static const auto kEmptyLine = lit("%1%1").arg(kHtmlDelimiter);
-
-using DeactivationErrors =
-    nx::client::desktop::license::Deactivator::Deactivator::LicenseErrorHash;
-DeactivationErrors filterDeactivationErrors(const DeactivationErrors& errors)
-{
-    DeactivationErrors result;
-    for (auto it = errors.begin(); it != errors.end(); ++it)
-    {
-        using ErrorCode = nx::client::desktop::license::Deactivator::ErrorCode;
-
-        const auto code = it.value();
-        if (code == ErrorCode::noError || code == ErrorCode::keyIsNotActivated)
-            continue; //< Filter out non-actual-error codes
-
-        result.insert(it.key(), it.value());
-    }
-    return result;
-}
-
-QString toPlainText(const QString& htmlText)
-{
-    QTextDocument doc;
-    doc.setHtml(htmlText);
-    return doc.toPlainText();
-}
-
-QnLicensePtr findLicense(const QByteArray& key, const QnLicenseList& licenses)
-{
-    for (const auto& license: licenses)
-    {
-        if (license->key() == key)
-            return license;
-    }
-    return QnLicensePtr();
-}
 
 QString licenseReplyLogString(
     QNetworkReply* reply,
@@ -138,6 +102,41 @@ QString licenseRequestLogString(const QByteArray& body, const QByteArray& licens
         lit("\nSending request to license server (license key is %1).\nBody:\n%2\n");
     return kRequestLogTemplate.arg(
         QString::fromLatin1(licenseKey), QString::fromUtf8(body));
+}
+
+using DeactivationErrors =
+    nx::client::desktop::license::Deactivator::Deactivator::LicenseErrorHash;
+DeactivationErrors filterDeactivationErrors(const DeactivationErrors& errors)
+{
+    DeactivationErrors result;
+    for (auto it = errors.begin(); it != errors.end(); ++it)
+    {
+        using ErrorCode = nx::client::desktop::license::Deactivator::ErrorCode;
+
+        const auto code = it.value();
+        if (code == ErrorCode::noError || code == ErrorCode::keyIsNotActivated)
+            continue; //< Filter out non-actual-error codes
+
+        result.insert(it.key(), it.value());
+    }
+    return result;
+}
+
+QString toPlainText(const QString& htmlText)
+{
+    QTextDocument doc;
+    doc.setHtml(htmlText);
+    return doc.toPlainText();
+}
+
+QnLicensePtr findLicense(const QByteArray& key, const QnLicenseList& licenses)
+{
+    for (const auto& license: licenses)
+    {
+        if (license->key() == key)
+            return license;
+    }
+    return QnLicensePtr();
 }
 
 class QnLicenseListSortProxyModel : public QSortFilterProxyModel
@@ -496,7 +495,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     }
 
     const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
-    NX_INFO(this, licenseRequestLogString(messageBody, licenseKey));
+    NX_LOGX(licenseRequestLogString(messageBody, licenseKey), cl_logINFO);
     QNetworkReply *reply = m_httpClient->post(request, messageBody);
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
@@ -924,7 +923,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
     QByteArray replyData = reply->readAll();
 
-    NX_INFO(this, licenseReplyLogString(reply, replyData, licenseKey));
+    NX_LOGX(licenseReplyLogString(reply, replyData, licenseKey), cl_logINFO);
 
     // TODO: #Elric use JSON mapping here.
     // If we can deserialize JSON it means there is an error.
