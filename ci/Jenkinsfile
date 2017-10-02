@@ -1,37 +1,110 @@
 // -* mode: groovy -*-
 // Continuous integration main jenkinsfile
 
+import org.codehaus.groovy.runtime.StackTraceUtils
+
+@Library('jenkins')
+import org.nx.jenkins.SlaveRunner
+
+
 NX_REPOSITORY_CREDENTIALS_ID = 'nx-repository-readonly'
+JUNK_SHOP_PROJECT = 'ci'
+config = null
 
 
 def main() {
+	try {
+		unsafe_main()
+	} catch (Exception|AssertionError x) {
+		echo "Error running test: $x"
+		echo "---- sanitized stack: ----"
+		org.codehaus.groovy.runtime.StackTraceUtils.sanitize(x).printStackTrace()
+		echo "---- full stack: ----"
+		x.printStackTrace()
+		echo "---------------------"
+		if (config) {
+			echo "Emailing $config.jenkins_developers"
+			def email_body = [
+				"Jenkins CI project for branch $env.BRANCH_NAME is failed:",
+				"$x",
+				"${env.BUILD_URL}console",
+			]
+			emailext(
+				body: email_body.join('\n'),
+				subject: "Jenkins CI $env.BRANCH_NAME project is failed",
+				to: config.jenkins_developers.join(' '),
+			)
+			currentBuild.result = 'ABORTED'  // FAILED is used to indicate build failure
+		}
+		throw x
+	}
+
+}
+
+def unsafe_main() {
+	def action = params?.action ?: 'update_parameters'
 	def must_clean_workspace = params?.clean ?: false
-	def devtools_script = null
+	def slave_runner
+	def requested_platform_names
+
+	echo "Action: $action"
 
 	stage('Checkout master') {
 		node ('master') {
-			dir('nx_vms') {
-				checkout scm
-			}
-			/*
 			checkout([
-					$class: 'MercurialSCM',
-					credentialsId: NX_REPOSITORY_CREDENTIALS_ID,
-					installation: '(Default)',
-					revision: 'default',
-					source: 'ssh://hg@la.hdw.mx/devtools',
-					subdir: 'devtools',
-				])
-			 */
-			git '/home/vfedorov/git/ci'
-			devtools_script = load 'ci/ci.groovy'
-			devtools_script.run_master_node_preparations()
+                    $class: 'MercurialSCM',
+                    // credentialsId: NX_REPOSITORY_CREDENTIALS_ID,
+                    installation: '(Default)',
+                    revision: 'default',
+                    // source: 'ssh://hg@la.hdw.mx/devtools',
+                    source: '/home/vfedorov/repo/jenkins',
+                    subdir: 'jenkins',
+                ])
+
+			config = readYaml file: 'jenkins/config.yaml'
+			echo "config = $config"
+
+			update_job_parameters(config)
+			if (action == 'update_parameters') return
+
+			requested_platform_names = config.platforms.keySet().findAll{ params.get(it) }
+			echo "Will run $requested_platform_names"
+			
+			slave_runner = new SlaveRunner(this, config)
+			slave_runner.run_master_node_preparations()
 		}
 	}
 
-	devtools_script.main()
+	if (action != 'update_parameters') {
+		def branch = env.BRANCH_NAME
+		def run_params = [
+			junk_shop_project: JUNK_SHOP_PROJECT,
+			requested_platform_names: requested_platform_names,
+			branch: branch,
+			build_number: env.BUILD_NUMBER.toInteger(),
+			configuration: 'release',
+			customization: 'default',
+			cloud_group: 'dev',
+			must_clean_workspace: must_clean_workspace,
+			]
+		slave_runner.run_slaves_stage(run_params)
+	}
 }
 
+// Change parameters for currently running jenkins task; next run will require and use these parameters.
+def update_job_parameters(config) {
+	def job_params = [
+		choice(name: 'action', choices: ['build', 'update_parameters'].join('\n'), description: 'Action to run'),
+		booleanParam(name: 'clean', defaultValue: false, description: 'Do clean build')
+	]
+	def platform_params = config.platforms.collect {
+		booleanParam(name: it.key, defaultValue: it.key in config.ci.default_platforms, description: "Build $it.key platform")
+	}
+	properties([
+		parameters(job_params + platform_params),
+		buildDiscarder(logRotator(daysToKeepStr: config.ci.days_to_keep_old_build.toString())),
+	])
+}
 
 // ==============================================================================
 main()
