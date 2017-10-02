@@ -35,6 +35,7 @@ struct LayoutThumbnailLoader::Private
     // Input data.
     LayoutThumbnailLoader* const q;
     QnLayoutResourcePtr layout;
+    bool allowNonCameraResources = true;
     QSize maximumSize;
     qint64 msecSinceEpoch;
     QnThumbnailRequestData::ThumbnailFormat format;
@@ -42,21 +43,30 @@ struct LayoutThumbnailLoader::Private
     // Methods.
     Private(LayoutThumbnailLoader* q,
         const QnLayoutResourcePtr& layout,
+        bool allowNonCameraResources,
         const QSize& maximumSize,
         qint64 msecSinceEpoch,
         QnThumbnailRequestData::ThumbnailFormat format)
         :
         q(q),
         layout(layout),
+        allowNonCameraResources(allowNonCameraResources),
         maximumSize(maximumSize),
         msecSinceEpoch(msecSinceEpoch),
         format(format),
-        noDataWidget(new QnAutoscaledPlainText())
+        noDataWidget(new QnAutoscaledPlainText()),
+        nonCameraWidget(new QnAutoscaledPlainText())
     {
         noDataWidget->setText(tr("NO DATA"));
         noDataWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
         noDataWidget->setAlignment(Qt::AlignCenter);
         noDataWidget->setContentsMargins(kMinIndicationMargins);
+
+        nonCameraWidget->setText(tr("NOT A CAMERA"));
+        nonCameraWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
+        nonCameraWidget->setAlignment(Qt::AlignCenter);
+        nonCameraWidget->setContentsMargins(kMinIndicationMargins);
+        setPaletteColor(nonCameraWidget.data(), QPalette::WindowText, qnGlobals->errorTextColor());
     }
 
     void updateTileStatus(Qn::ThumbnailStatus status, qreal aspectRatio,
@@ -83,7 +93,7 @@ struct LayoutThumbnailLoader::Private
                         cellRect, Qt::KeepAspectRatio);
 
                     QPainter painter(&data.image);
-                    paintPixmapSharp(&painter, noDataPixmap(targetRect.size().toSize()),
+                    paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
                         targetRect.topLeft());
                 }
                 else
@@ -107,7 +117,7 @@ struct LayoutThumbnailLoader::Private
                     painter.translate(cellRect.center());
                     painter.rotate(rotation);
                     painter.translate(-cellRect.center());
-                    paintPixmapSharp(&painter, noDataPixmap(targetRect.size().toSize()),
+                    paintPixmapSharp(&painter, specialPixmap(status, targetRect.size().toSize()),
                         targetRect.topLeft());
                 }
 
@@ -161,13 +171,28 @@ struct LayoutThumbnailLoader::Private
         emit q->imageChanged(data.image);
     }
 
-    QPixmap noDataPixmap(const QSize& size) const
+    QPixmap specialPixmap(Qn::ThumbnailStatus status, const QSize& size) const
     {
         QPixmap pixmap(size * data.image.devicePixelRatio());
         pixmap.setDevicePixelRatio(data.image.devicePixelRatio());
         pixmap.fill(Qt::transparent);
-        noDataWidget->resize(size);
-        noDataWidget->render(&pixmap);
+
+        switch (status)
+        {
+            case Qn::ThumbnailStatus::NoData:
+                noDataWidget->resize(size);
+                noDataWidget->render(&pixmap);
+                break;
+
+            case Qn::ThumbnailStatus::Invalid:
+                nonCameraWidget->resize(size);
+                nonCameraWidget->render(&pixmap);
+                break;
+
+            default:
+                NX_ASSERT(false);
+        }
+
         return pixmap;
     }
 
@@ -182,17 +207,19 @@ struct LayoutThumbnailLoader::Private
 
     Data data;
     QScopedPointer<QnAutoscaledPlainText> noDataWidget;
+    QScopedPointer<QnAutoscaledPlainText> nonCameraWidget;
 };
 
 LayoutThumbnailLoader::LayoutThumbnailLoader(
     const QnLayoutResourcePtr& layout,
-    const QSize maximumSize,
+    bool allowNonCameraResources,
+    const QSize& maximumSize,
     qint64 msecSinceEpoch,
     QnThumbnailRequestData::ThumbnailFormat format,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, layout, maximumSize, msecSinceEpoch, format))
+    d(new Private(this, layout, allowNonCameraResources, maximumSize, msecSinceEpoch, format))
 {
 }
 
@@ -252,11 +279,26 @@ void LayoutThumbnailLoader::doLoadAsync()
     d->data = Private::Data();
 
     QRectF bounding;
-    for (const auto& data: d->layout->getItems())
+    const auto layoutItems = d->layout->getItems();
+
+    QVector<QPair<QnUuid, QnResourcePtr>> validItems;
+    validItems.reserve(layoutItems.size());
+
+    for (auto iter = layoutItems.constBegin(); iter != layoutItems.constEnd(); ++iter)
     {
-        const QRectF itemRect = data.combinedGeometry;
-        if (itemRect.isValid()) // TODO: #GDM #VW some items can be not placed yet, wtf
-            bounding = bounding.united(itemRect);
+        const auto& itemRect = iter->combinedGeometry;
+        if (!itemRect.isValid()) // TODO: #GDM #VW some items can be not placed yet, wtf
+            continue;
+
+        const auto resource = resourcePool->getResourceByDescriptor(iter->resource);
+        if (!resource)
+            continue;
+
+        if (!d->allowNonCameraResources && !resource.dynamicCast<QnVirtualCameraResource>())
+            continue;
+
+        bounding = bounding.united(itemRect);
+        validItems << qMakePair(iter.key(),  resource);
     }
 
     if (bounding.isEmpty())
@@ -299,15 +341,12 @@ void LayoutThumbnailLoader::doLoadAsync()
     emit sizeHintChanged(d->data.image.size());
     emit statusChanged(d->data.status);
 
-    for (const auto& data : d->layout->getItems())
+    for (const auto& item: validItems)
     {
-        const QRectF cellRect = data.combinedGeometry;
-        if (!cellRect.isValid())
-            continue;
-
-        const auto resource = resourcePool->getResourceByDescriptor(data.resource);
-        if (!resource)
-            continue;
+        const auto data = d->layout->getItem(item.first);
+        const auto& resource = item.second;
+        const auto& cellRect = data.combinedGeometry;
+        const auto rotation = data.rotation;
 
         // Cell bounds.
         const QRectF scaledCellRect(
@@ -319,13 +358,13 @@ void LayoutThumbnailLoader::doLoadAsync()
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
         {
-            // Non-camera resources are drawn as "NO DATA".
+            // Non-camera resources are drawn as "NOT A CAMERA".
             const auto scaledCellAr = QnGeometry::aspectRatio(scaledCellRect);
-            d->updateTileStatus(Qn::ThumbnailStatus::NoData, scaledCellAr, scaledCellRect, 0);
+            d->updateTileStatus(Qn::ThumbnailStatus::Invalid, scaledCellAr,
+                scaledCellRect, rotation);
             continue;
         }
 
-        const auto rotation = data.rotation;
         const auto zoomRect = data.zoomRect;
 
         QSize thumbnailSize(0, scaledCellRect.height());

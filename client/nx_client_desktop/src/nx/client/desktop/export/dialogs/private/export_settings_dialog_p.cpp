@@ -271,7 +271,8 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
         return;
 
     m_layoutImageProvider.reset(new LayoutThumbnailLoader(
-        layout, m_previewSize, m_exportLayoutSettings.period.startTimeMs));
+        layout, false /*don't allow non-camera resources*/,
+        m_previewSize, m_exportLayoutSettings.period.startTimeMs));
 
     m_layoutImageProvider->loadAsync();
 }
@@ -742,8 +743,8 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                     return ExportSettingsDialog::tr("Settings are not available for .EXE files.");
 
                 case ExportMediaValidator::Result::nonCameraResources:
-                    return ExportSettingsDialog::tr("Layout contains non-camera resources. "
-                        "They will be exported as \"NO DATA\" placeholders.");
+                    return ExportSettingsDialog::tr("Local files, server monitor widgets "
+                        "and webpages will not be exported.");
 
                 default:
                     NX_EXPECT(false);

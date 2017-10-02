@@ -432,7 +432,7 @@ bool QnSecurityCamResource::hasCombinedSensors() const
 
 bool QnSecurityCamResource::isEdge() const
 {
-    return QnMediaServerResource::isEdgeServer(resourcePool()->getResourceById(getParentId()));
+    return QnMediaServerResource::isEdgeServer(getParentResource());
 }
 
 bool QnSecurityCamResource::isSharingLicenseInGroup() const

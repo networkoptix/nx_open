@@ -72,6 +72,13 @@ public:
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 
     static RuleList getDefaultRules();
+
+    /**
+     * Some guids in getSystemRules() didn't match to original SQL script.
+     * It is fixed now, but old database could has these invalid guids.
+     * return map of invalid and valid guids. map key contains old guid.
+     */
+    static QMap<QnUuid, QnUuid> remappedGuidsToFix();
     static RuleList getSystemRules();
     static RuleList getRulesUpd43();
     static RuleList getRulesUpd48();

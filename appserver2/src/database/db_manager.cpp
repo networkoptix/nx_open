@@ -1568,13 +1568,63 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
         return ec2::db::cleanupClientInfoList(m_sdb);
 
-    if (updateName.endsWith(lit("/103_update_business_rules_guids.sql")))
-        return updateBusinessRulesGuids();
+    if (updateName.endsWith(lit("/99_20170928_update_business_rules_guids.sql")))
+    {
+        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
+    }
 
     if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
         return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
+    return true;
+}
+
+bool QnDbManager::fixDefaultBusinessRuleGuids()
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr(lit("SELECT 1 FROM vms_businessrule WHERE guid = :guid"));
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    QSqlQuery updQuery(m_sdb);
+    QString udpQueryStr(lit("\
+        UPDATE vms_businessrule \
+        SET guid = :newValue  \
+        WHERE guid = :oldValue"));
+    if (!prepareSQLQuery(&updQuery, udpQueryStr, Q_FUNC_INFO))
+        return false;
+
+    QSqlQuery delQuery(m_sdb);
+    QString delQueryStr(lit("DELETE FROM vms_businessrule where guid = :guid"));
+    if (!prepareSQLQuery(&delQuery, delQueryStr, Q_FUNC_INFO))
+        return false;
+
+    auto remapTable = nx::vms::event::Rule::remappedGuidsToFix();
+    for (auto itr = remapTable.begin(); itr != remapTable.end(); ++itr)
+    {
+        auto oldValue = itr.key();
+        auto newValue = itr.value();
+        
+        query.addBindValue(QnSql::serialized_field(newValue));
+        if (!execSQLQuery(&query, Q_FUNC_INFO))
+            return false;
+        const bool isNewValueExists = query.next();
+        if (isNewValueExists)
+        {
+            delQuery.addBindValue(QnSql::serialized_field(oldValue));
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+        else
+        {
+            updQuery.addBindValue(QnSql::serialized_field(newValue));
+            updQuery.addBindValue(QnSql::serialized_field(oldValue));
+            if (!execSQLQuery(&updQuery, Q_FUNC_INFO))
+                return false;
+        }
+    }
+
     return true;
 }
 
