@@ -83,11 +83,8 @@ QSizeF Grid::cellSize() const
 
 void Grid::setCellSize(const QSizeF& size)
 {
-    if (qFuzzyCompare(d->cellSize.width(), size.width())
-        && qFuzzyCompare(d->cellSize.height(), size.height()))
-    {
+    if (d->cellSize == size)
         return;
-    }
 
     d->cellSize = size;
     emit cellSizeChanged();
