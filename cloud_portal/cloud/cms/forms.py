@@ -2,6 +2,24 @@ from django import forms
 from .models import *
 
 
+def convert_meta_to_description(meta):
+    meta_to_plain = {"format": "File type must be %s",
+                     "height": "Height equal to %spx",
+                     "height_le": "Height less than or equal to %spx",
+                     "height_ge": "Height greater than or equal to %spx",
+                     "width": "Width equal to %spx",
+                     "width_le": "Width less than or equal to %spx",
+                     "width_ge": "Width greater than or equal to %spx",
+                     "size": "File size less than or queat to %s bytes",
+                     }
+    converted_msg = ""
+    for k in meta:
+        if k in meta_to_plain:
+            converted_msg += "<br>" + meta_to_plain[k] % meta[k]
+
+    return converted_msg
+
+
 class CustomContextForm(forms.Form):
     language = forms.ModelChoiceField(
         widget=forms.Select, label="Language", queryset=Language.objects.all())
@@ -23,6 +41,9 @@ class CustomContextForm(forms.Form):
             ds_name = data_structure.label
 
             ds_description = data_structure.description
+
+            if data_structure.meta_settings:
+                ds_description += convert_meta_to_description(data_structure.meta_settings)
 
             ds_language = language
             if not data_structure.translatable:
