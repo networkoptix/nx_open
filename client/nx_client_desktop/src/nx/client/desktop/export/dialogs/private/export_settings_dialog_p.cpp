@@ -212,7 +212,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     if (const auto camera = media->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
         setCamera(camera);
     else
-        setOtherMedia(media);
+        setLocalFile(media);
 
     validateSettings(Mode::Media);
 
@@ -254,7 +254,7 @@ void ExportSettingsDialog::Private::setCamera(const QnVirtualCameraResourcePtr& 
         this, &Private::setFrameSize);
 }
 
-void ExportSettingsDialog::Private::setOtherMedia(const QnMediaResourcePtr& other)
+void ExportSettingsDialog::Private::setLocalFile(const QnMediaResourcePtr& other)
 {
     // TODO: #vkutin #gdm Do not use QnThumbnailsLoader here,
     // implement QnSingleLocalThumbnailLoader as image provider
