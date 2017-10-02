@@ -483,7 +483,7 @@ private:
                 if (registerTimerCallCounterBak == m_registerTimerCallCounter)
                 {
                     nx::network::SocketGlobals::aioService().stopMonitoring(
-                        m_socket, aio::etTimedOut);
+                        this->m_socket, aio::etTimedOut);
                 }
             });
 
