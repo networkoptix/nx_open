@@ -539,7 +539,7 @@ void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
 
 void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target, int defaultPort)
 {
-    for (const auto& addr: source.split(L';', QString::SkipEmptyParts))
+    for (const auto& part: source.split(L';', QString::SkipEmptyParts))
     {
         SocketAddress endpoint(part);
         if (endpoint.port == 0)
