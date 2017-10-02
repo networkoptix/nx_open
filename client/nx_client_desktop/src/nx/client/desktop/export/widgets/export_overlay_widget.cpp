@@ -114,6 +114,7 @@ void ExportOverlayWidget::updateLayout()
     const QRectF geometry(pos(), d->unscaledRect.size() * d->scale);
     setGeometry(geometry.toAlignedRect());
     updatePosition(pos());
+    update();
 }
 
 void ExportOverlayWidget::updateCursor()
