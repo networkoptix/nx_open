@@ -173,12 +173,13 @@ ExportSettingsDialog::ExportSettingsDialog(
     const auto updateRapidReviewData =
         [this](int absoluteSpeed, qint64 frameStepMs)
         {
+            ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Speed")).arg(absoluteSpeed).
+                arg(QChar(L'\x2013'))); //< N-dash
+
             if (ui->speedButton->state() == ui::SelectableTextButton::State::deactivated)
                 return;
 
             d->setRapidReviewFrameStep(frameStepMs);
-            ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Speed")).arg(absoluteSpeed).
-                arg(QChar(L'\x2013'))); //< N-dash
 
             if (frameStepMs) //< 0 would mean rapid review is off due to impossibility.
             {
