@@ -487,10 +487,6 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
 
 void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 {
-    const auto mediaResource = widget->resource();
-    d->setMediaResource(mediaResource);
-    ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
-
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
         {
@@ -498,6 +494,10 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
             ui->imageSettingsPage->setMaxOverlayWidth(size.width());
             ui->textSettingsPage->setMaxOverlayWidth(size.width());
         });
+
+    const auto mediaResource = widget->resource();
+    d->setMediaResource(mediaResource);
+    ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
     updateSettingsWidgets();
 
