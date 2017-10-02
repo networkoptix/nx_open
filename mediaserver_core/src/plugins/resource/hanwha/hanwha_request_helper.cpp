@@ -75,9 +75,9 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
     
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
-        return HanwhaResponse(statusCode);
+        return HanwhaResponse(statusCode, url.toString());
 
-    return HanwhaResponse(buffer, statusCode, groupBy);
+    return HanwhaResponse(buffer, statusCode, url.toString(), groupBy);
 }
 
 HanwhaResponse HanwhaRequestHelper::view(
@@ -187,7 +187,18 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
 {
     auto split = path.split(L'/');
     if (split.size() != 2)
-        return HanwhaResponse(nx_http::StatusCode::undefined);
+    {
+        QString parameterString;
+        for (const auto& parameter: parameters)
+            parameterString += parameter.first + lit("=") + parameter.second + lit("&");
+
+        QString urlString = lit("Path: %1, Action: %2, Parameters: %3")
+            .arg(path)
+            .arg(action)
+            .arg(parameterString);
+
+        return HanwhaResponse(nx_http::StatusCode::undefined, urlString);
+    }
 
     return doRequest(split[0], split[1], action, parameters, groupBy);
 }

@@ -161,7 +161,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
         return error(
             response,
             CameraDiagnostics::RequestFailedResult(
-                lit("media/videoprofile/update"),
+                response.requestUrl(),
                 response.errorString()));
     }
 
@@ -252,7 +252,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         return error(
             response,
             CameraDiagnostics::RequestFailedResult(
-                lit("media/streamuri/view"),
+                response.requestUrl(),
                 response.errorString()));
     }
 

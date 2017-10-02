@@ -678,7 +678,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         return error(
             profiles,
             CameraDiagnostics::RequestFailedResult(
-                lit("media/videoprofile/view"),
+                profiles.requestUrl(),
                 profiles.errorString()));
     }
 
@@ -1097,7 +1097,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
         return error(
             response,
             CameraDiagnostics::RequestFailedResult(
-                lit("media/videoprofile/view"),
+                response.requestUrl(),
                 response.errorString()));
     }
 
@@ -1137,7 +1137,7 @@ CameraDiagnostics::Result HanwhaResource::removeProfile(int profileNumber)
         return error(
             response,
             CameraDiagnostics::RequestFailedResult(
-                lit("media/videoprofile/remove"),
+                response.requestUrl(),
                 response.errorString()));
     }
 
@@ -1169,7 +1169,7 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
         return error(
             response,
             CameraDiagnostics::RequestFailedResult(
-                lit("media/videoprofile/add"),
+                response.requestUrl(),
                 response.errorString()));
     }
 
@@ -1226,7 +1226,7 @@ CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCod
         return error(
             response,
             CameraDiagnostics::RequestFailedResult(
-                lit("media/videocodecinfo"),
+                response.requestUrl(),
                 lit("Request failed")));
     }
 

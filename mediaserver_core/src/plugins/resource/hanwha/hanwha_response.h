@@ -30,10 +30,14 @@ static const int kUnknownError = 1;
 class HanwhaResponse
 {
 public:
-    explicit HanwhaResponse(nx_http::StatusCode::Value statusCode);
+    explicit HanwhaResponse(
+        nx_http::StatusCode::Value statusCode,
+        const QString& requestUrl);
+
     explicit HanwhaResponse(
         const nx::Buffer& rawBuffer,
         nx_http::StatusCode::Value statusCode,
+        const QString& requestUrl,
         const QString& groupBy = QString());
 
     bool isSuccessful() const;
@@ -41,6 +45,7 @@ public:
     QString errorString() const;
     std::map<QString, QString> response() const;
     nx_http::StatusCode::Value statusCode() const;
+    QString requestUrl() const;
     
     template<typename T>
     boost::optional<T> parameter(const QString& parameterName) const
@@ -64,6 +69,7 @@ private:
     std::map<QString, QString> m_response;
     nx_http::StatusCode::Value m_statusCode = nx_http::StatusCode::undefined;
     QString m_groupBy;
+    QString m_requestUrl;
 };
 
 template<>
