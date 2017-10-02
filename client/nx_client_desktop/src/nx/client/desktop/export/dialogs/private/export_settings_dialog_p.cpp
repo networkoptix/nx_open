@@ -248,6 +248,8 @@ void ExportSettingsDialog::Private::setCamera(const QnVirtualCameraResourcePtr& 
         0,
         QSize(),
         QnThumbnailRequestData::JpgFormat,
+        QnThumbnailRequestData::AspectRatio::SourceAspectRatio,
+        QnThumbnailRequestData::RoundMethod::PreciseMethod,
         m_mediaImageProvider.data()));
 
     connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,

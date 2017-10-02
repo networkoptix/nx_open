@@ -210,6 +210,8 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         QnThumbnailRequestData::kDefaultRotation,
         kDefaultThumbnailSize,
         QnThumbnailRequestData::JpgFormat,
+        QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
+        QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
         item);
 
     item->setImageProvider(loader);
