@@ -10,7 +10,7 @@
 namespace nx {
 
 namespace cassandra {
-class AsyncConnection;
+class AbstractAsyncConnection;
 class Query;
 }
 
@@ -27,6 +27,8 @@ public:
     RemoteRelayPeerPool(const conf::Settings& settings);
     ~RemoteRelayPeerPool();
 
+    virtual bool connectToDb() override;
+
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& domainName) const override;
 
@@ -36,11 +38,14 @@ public:
 
     virtual cf::future<bool> removePeer(const std::string& domainName) override;
 
+    bool isConnectedToDb() const;
+
 protected:
-    cassandra::AsyncConnection* getConnection();
+    cassandra::AbstractAsyncConnection* getConnection();
 
 private:
-    std::unique_ptr<cassandra::AsyncConnection> m_cassConnection;
+    const conf::Settings& m_settings;
+    std::unique_ptr<cassandra::AbstractAsyncConnection> m_cassConnection;
     bool m_dbReady = false;
     mutable std::string m_hostId;
     mutable QnMutex m_mutex;

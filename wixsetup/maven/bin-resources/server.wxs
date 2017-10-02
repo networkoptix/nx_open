@@ -222,11 +222,16 @@
         </ComponentGroup>
         <?endif?>
 
+        <Component Id="ServerBuildInfoTxt" Directory="$(var.customization)MediaServerDir">
+            <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\..\build_info.txt" DiskId="6"/>
+        </Component>
+        
         <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
             <ComponentRef Id='ServerVersion'/>
+            <ComponentRef Id='ServerBuildInfoTxt'/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>

@@ -19,7 +19,7 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "------------------------------"
     echo "Copy config"
-    cp $dir/cloud_portal.yaml $TARGET_DIR/$CUSTOMIZATION/
+    cp ../cloud/cloud_portal.yaml $TARGET_DIR/$CUSTOMIZATION/
 
 
     echo "------------------------------"
@@ -37,10 +37,13 @@ dir=../customizations/$CUSTOMIZATION/
 
     cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
 
-    echo "Move fonts"
-    rm -rf $TARGET_DIR/common || true
-    mkdir -p $TARGET_DIR/common/static
-    mv ../front_end/dist/fonts $TARGET_DIR/common/static/fonts
+    if [ "$CUSTOMIZATION" = "default" ]
+    then
+        echo "Move fonts  - only for default"
+        rm -rf $TARGET_DIR/common || true
+        mkdir -p $TARGET_DIR/common/static
+        mv ../front_end/dist/fonts $TARGET_DIR/common/static/fonts
+    fi
 
     echo "Move front_end to destination"
     mv ../front_end/dist $TARGET_DIR/$CUSTOMIZATION/source/static
@@ -114,26 +117,22 @@ dir=../customizations/$CUSTOMIZATION/
         echo "Overwrite them with localized sources"
         cp -rf $lang_dir/web_common/views/* $TARGET_DIR/$CUSTOMIZATION/source/static/lang_$LANG/web_common/views/ || true
 
+        echo "Generate language.json"
+        pushd $TARGET_DIR/$CUSTOMIZATION/source
+        python ../../../../build_scripts/generate_language_json.py $LANG
+        popd
+
     done
-    rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
 
-    echo "Localization success"
-
-
-    echo "------------------------------"
-    echo "Branding"
-    cp $dir/branding.ts $TARGET_DIR/$CUSTOMIZATION
     pushd $TARGET_DIR/$CUSTOMIZATION/source
-    python ../../../../build_scripts/generate_languages_json.py
-    # python ../../../../build_scripts/branding.py # do not do branding here, leave it to cms
-    rm -rf *.ts
+    python ../../../../build_scripts/generate_all_languages_json.py
     popd
-    echo "Branding success"
 
+    rm -rf $TARGET_DIR/$CUSTOMIZATION/source/static/views
+    echo "Localization success"
 
     echo "copy sources to root"
     cp -rf $TARGET_DIR/$CUSTOMIZATION/source/* $TARGET_DIR/$CUSTOMIZATION/
-
 
 echo "$CUSTOMIZATION Done"
 

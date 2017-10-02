@@ -32,6 +32,7 @@ protected:
     virtual int serviceMain(const AbstractServiceSettings& settings) = 0;
 
     int runMainLoop();
+    bool isTerminated() const;
 
 private:
     int m_argc;
@@ -39,6 +40,7 @@ private:
     nx::utils::promise<int> m_processTerminationEvent;
     nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> m_startedEventHandler;
     const QString m_applicationDisplayName;
+    std::atomic<bool> m_isTerminated;
 
     void initializeLog(const AbstractServiceSettings& settings);
     void reportStartupResult(bool result);

@@ -34,11 +34,7 @@ describe('Login dialog', function () {
 
     it("redirects to Systems after login", function () {
         p.helper.login();
-
-        // Check that user is on page Systems
-        expect(browser.getCurrentUrl()).toContain('systems');
-        expect(p.htmlBody.getText()).toContain('Systems');
-
+        // No need to check for login success since it's done at login() func
         p.helper.logout();
     });
 
@@ -50,7 +46,7 @@ describe('Login dialog', function () {
         p.login();
         p.helper.forms.logout.dropdownToggle.click();
 
-        expect(p.helper.forms.logout.dropdownMenu.getText()).toContain(email);
+        expect(p.helper.forms.logout.dropdownParent.getText()).toContain(email);
         expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Account Settings');
         expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Change Password');
         expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('Log Out');
@@ -391,7 +387,7 @@ describe('Login dialog', function () {
                 // a real switch between tabs. For browser, tab stays not active,
                 // so login there does not affect other tabs
                 p.helper.forms.logout.dropdownToggle.click();
-                expect(p.helper.forms.logout.dropdownMenu.getText()).toContain('noptixqa'); // user is logged in
+                expect(p.helper.forms.logout.dropdownParent.getText()).toContain('noptixqa'); // user is logged in
                 p.helper.forms.logout.dropdownToggle.click();
                 p.helper.logout();
             });

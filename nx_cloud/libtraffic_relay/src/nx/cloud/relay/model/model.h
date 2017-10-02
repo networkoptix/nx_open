@@ -17,6 +17,8 @@ class Model
 public:
     Model(const conf::Settings& settings);
 
+    bool doMandatoryInitialization();
+
     model::ClientSessionPool& clientSessionPool();
     const model::ClientSessionPool& clientSessionPool() const;
 
@@ -27,6 +29,7 @@ public:
     const model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool() const;
 
 private:
+    const conf::Settings& m_settings;
     model::ClientSessionPool m_clientSessionPool;
     model::ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPeerPool;

@@ -148,6 +148,17 @@ bool SocketGlobals::isInitialized()
     return s_instance != nullptr;
 }
 
+void SocketGlobals::printArgumentsHelp(std::ostream* outputStream)
+{
+    (*outputStream) <<
+        "  --ip-version=, -ip               Ip version to use. 4 or 6" << std::endl <<
+        "  --enforce-socket={socket type}   tcp, udt, cloud" << std::endl <<
+        "  --enforce-ssl                    Use ssl for every connection" << std::endl <<
+        "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
+        "  --cloud-connect-disable-udp      Disable UDP hole punching" << std::endl <<
+        "  --cloud-connect-enable-proxy-only" << std::endl;
+}
+
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
 {
     if (const auto value = arguments.get("ip-version", "ip"))
@@ -161,6 +172,19 @@ void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
 
     if (const auto value = arguments.get("enforce-mediator", "mediator"))
         mediatorConnector().mockupMediatorUrl(*value);
+
+    if (arguments.get("cloud-connect-disable-udp"))
+    {
+        cloud::ConnectorFactory::setEnabledCloudConnectMask(
+            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
+            ~((int)cloud::CloudConnectType::udpHp));
+    }
+
+    if (arguments.get("cloud-connect-enable-proxy-only"))
+    {
+        cloud::ConnectorFactory::setEnabledCloudConnectMask(
+            (int)cloud::CloudConnectType::proxy);
+    }
 }
 
 void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)

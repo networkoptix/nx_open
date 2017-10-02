@@ -10,12 +10,14 @@ namespace utils {
 Service::Service(int argc, char **argv, const QString& applicationDisplayName):
     m_argc(argc),
     m_argv(argv),
-    m_applicationDisplayName(applicationDisplayName)
+    m_applicationDisplayName(applicationDisplayName),
+    m_isTerminated(false)
 {
 }
 
 void Service::pleaseStop()
 {
+    m_isTerminated = true;
     m_processTerminationEvent.set_value(0);
 }
 
@@ -60,6 +62,11 @@ int Service::runMainLoop()
     reportStartupResult(true);
 
     return m_processTerminationEvent.get_future().get();
+}
+
+bool Service::isTerminated() const
+{
+    return m_isTerminated.load();
 }
 
 void Service::initializeLog(const AbstractServiceSettings& settings)
