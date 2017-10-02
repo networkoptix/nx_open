@@ -4,8 +4,6 @@
 
 #include <core/ptz/ptz_preset.h>
 
-#include <nx/utils/collection.h>
-
 namespace {
     const qreal minimalSpeed = 0.01;
     const qreal maximalSpeed = 1.0;
@@ -21,8 +19,9 @@ bool QnPtzTour::isValid(const QnPtzPresetList &existingPresets) const {
         QnPtzTourSpot spot = spots[i];
         uniqueSpots << spot.presetId;
 
-        int index = qnIndexOf(existingPresets, [&](const QnPtzPreset &preset) { return spot.presetId == preset.id; });
-        if(index < 0)
+        const auto preset = std::find_if(existingPresets.cbegin(), existingPresets.cend(),
+            [&](const QnPtzPreset &preset) { return spot.presetId == preset.id; });
+        if (preset == existingPresets.cend())
             return false;           // one of the spots does not exist
     }
 

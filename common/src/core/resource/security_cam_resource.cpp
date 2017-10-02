@@ -432,7 +432,19 @@ bool QnSecurityCamResource::hasCombinedSensors() const
 
 bool QnSecurityCamResource::isEdge() const
 {
-    return QnMediaServerResource::isEdgeServer(resourcePool()->getResourceById(getParentId()));
+    return QnMediaServerResource::isEdgeServer(getParentResource());
+}
+
+bool QnSecurityCamResource::isSharingLicenseInGroup() const
+{
+    if (getGroupId().isEmpty())
+        return false; //< Not a multichannel device. Nothing to share
+    if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
+        return false; //< Don't allow sharing for encoders e.t.c
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
+    if (!resType)
+        return false;
+    return resType->hasParam(lit("canShareLicenseGroup"));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -1067,7 +1079,7 @@ void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag flag) {
 
 
 bool QnSecurityCamResource::needCheckIpConflicts() const {
-    return getChannel() == 0 && !hasCameraCapabilities(Qn::ShareIpCapability);
+    return !hasCameraCapabilities(Qn::ShareIpCapability);
 }
 
 QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
@@ -1224,6 +1236,16 @@ float QnSecurityCamResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QS
     float result = qualityFactor*frameRateFactor * resolutionFactor;
 
     return qMax(192.0, result);
+}
+
+bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
+{
+    return false;
+}
+
+bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const
+{
+    return eventType == nx::vms::event::EventType::analyticsSdkEvent;
 }
 
 int QnSecurityCamResource::suggestBitrateKbps(const QSize& resolution, const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const

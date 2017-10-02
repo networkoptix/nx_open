@@ -302,25 +302,38 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
     QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
     m_resource = resource;
-    if (m_formatContext == 0)
+    if (m_formatContext == nullptr)
     {
         m_eofReached = false;
         QString url = m_resource->getUrl();
-        if (m_storage == 0) {
-            m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(resource->commonModule(), url));
+        if (m_storage == nullptr)
+        {
+            m_storage = QnStorageResourcePtr(
+                QnStoragePluginFactory::instance()->createStorage(
+                    resource->commonModule(),
+                    url));
             if(!m_storage)
                 return false;
         }
 
         m_formatContext = avformat_alloc_context();
-        m_formatContext->pb = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
-        if (!m_formatContext->pb) {
+        NX_ASSERT(m_formatContext != nullptr);
+        if (m_formatContext == nullptr)
+            return false;
+
+        m_IOContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
+        if (!m_IOContext)
+        {
             close();
             m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
+        m_formatContext->pb = m_IOContext;
+        /**
+         * If avformat_open_input() fails, FormatCtx will be freed before avformat_open_input()
+         * returns.
+         */
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
-
         if (!m_initialized)
         {
             close();
@@ -350,15 +363,19 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
+    if (m_IOContext)
+    {
+        QnFfmpegHelper::closeFfmpegIOContext(m_IOContext);
+        if (m_formatContext)
+            m_formatContext->pb = nullptr;
+        m_IOContext = nullptr;
+    }
+
 	if (m_formatContext)
-	{
-		QnFfmpegHelper::closeFfmpegIOContext(m_formatContext->pb);
-		m_formatContext->pb = 0;
 		avformat_close_input(&m_formatContext);
-	}
 
     m_contexts.clear();
-    m_formatContext = 0;
+    m_formatContext = nullptr;
     m_initialized = false;
     m_streamsFound = false;
     m_playlistOffsetUs = 0;

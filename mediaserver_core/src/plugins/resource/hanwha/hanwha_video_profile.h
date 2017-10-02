@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <QtCore/QSize>
 
 #include <boost/optional/optional.hpp>
@@ -8,6 +10,8 @@
 
 #include <utils/media/h264_common.h>
 #include <utils/media/hevc_common.h>
+
+#include <plugins/resource/hanwha/hanwha_common.h>
 
 extern "C" {
 
@@ -23,10 +27,10 @@ namespace plugins {
 struct HanwhaVideoProfile
 {
     QString name;
-    int number = -1;
+    int number = kHanwhaInvalidProfile;
     AVCodecID codec = AVCodecID::AV_CODEC_ID_NONE;
     QSize resolution;
-    int frameRate = -1;
+    int frameRate = kHanwhaInvalidFps;
     int compressionLevel = -1;
     int bitrateKbps = -1;
 
@@ -56,3 +60,5 @@ struct HanwhaVideoProfile
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

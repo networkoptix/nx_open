@@ -172,7 +172,7 @@ QnMediaServerModule::QnMediaServerModule(
             commonModule()->eventRuleManager()));
 
     m_metadataManagerPoolThread = new QThread(this);
-    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(commonModule()));
+    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
 

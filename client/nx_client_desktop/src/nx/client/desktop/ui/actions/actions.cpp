@@ -749,23 +749,35 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider)
         .separator();
 
+    factory(ExportVideoAction)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget)
+        .text(ContextMenu::tr("Export Video..."))
+        .conditionalText(ContextMenu::tr("Export Bookmark..."),
+            condition::hasArgument(Qn::CameraBookmarkRole))
+        .requiredTargetPermissions(Qn::ExportPermission)
+        .condition((condition::hasTimePeriod() || condition::hasArgument(Qn::CameraBookmarkRole))
+            && condition::isTrue(nx::client::desktop::ini().universalExportDialog));
+
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(new ExportCondition(true));
+        .condition(ConditionWrapper(new ExportCondition(true))
+            && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportLayoutAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Multi-Video..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(false));
+        .condition(ConditionWrapper(new ExportCondition(false))
+            && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportRapidReviewAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(true));
+        .condition(ConditionWrapper(new ExportCondition(true))
+            && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ThumbnailsSearchAction)
         .flags(Slider | Scene | SingleTarget)
@@ -924,6 +936,16 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Layout"))
         .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
+    factory(SaveLocalLayoutAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
+
+    factory(SaveLocalLayoutAsAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
+
     factory(SaveLayoutAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)
@@ -939,16 +961,6 @@ void initialize(Manager* manager, Action* root)
             ConditionWrapper(new SaveLayoutAsCondition(false))
             && !condition::isLayoutTourReviewMode()
         );
-
-    factory()
-        .flags(Tree)
-        .separator();
-
-    factory(MakeLayoutTourAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
-        .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
-            && !condition::isSafeMode());
 
     factory()
         .flags(Scene | Tree)
@@ -1522,6 +1534,12 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false);
 
     factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+
+    factory(MakeLayoutTourAction)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Make Showreel"))
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
+            && !condition::isSafeMode());
 
     factory(LayoutTourSettingsAction)
         .flags(Tree | NoTarget)

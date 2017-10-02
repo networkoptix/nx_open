@@ -88,9 +88,11 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
 
             const bool readonly = commonModule()->isReadOnly()
                 || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
-
             bookmarksViewer->setReadOnly(readonly);
+
         };
+
+    setupBookmarksExport();
 
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         updateBookmarkActionsAvailability);
@@ -113,6 +115,14 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
                 getActionParamsFunc(bookmark));
         });
 
+    connect(bookmarksViewer, &QnBookmarksViewer::exportBookmarkClicked, this,
+        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+        {
+            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_export"));
+            menu()->triggerIfPossible(action::ExportVideoAction,
+                getActionParamsFunc(bookmark));
+        });
+
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
@@ -130,6 +140,38 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
             menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
                 {Qn::BookmarkTagRole, tag});
         });
+}
+
+void QnWorkbenchBookmarksHandler::setupBookmarksExport()
+{
+    const auto updateExportAbility =
+        [this]()
+        {
+            const auto currentWidget = navigator()->currentWidget();
+            if (!currentWidget)
+                return;
+
+            const auto resource = currentWidget->resource();
+            if (!resource)
+                return;
+
+            const bool allowExport = accessController()->hasPermissions(
+                currentWidget->resource(), Qn::ExportPermission);
+
+            navigator()->timeSlider()->bookmarksViewer()->setAllowExport(allowExport);
+        };
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        [this, updateExportAbility](const QnResourcePtr& resource)
+        {
+            const auto currentWidget = navigator()->currentWidget();
+            const auto currentResource = currentWidget ? currentWidget->resource() : QnResourcePtr();
+            if (resource == currentResource)
+                updateExportAbility();
+        });
+
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
+        this, updateExportAbility);
 }
 
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()

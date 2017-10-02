@@ -1,12 +1,13 @@
 #include "manager_pool.h"
 
+#include <common/common_module.h>
 #include <media_server/media_server_module.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/serialization/json.h>
@@ -41,11 +42,20 @@ ResourceMetadataContext::ResourceMetadataContext(
 {
 }
 
-ManagerPool::ManagerPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
+    m_serverModule(serverModule)
 {
-    auto resourcePool = commonModule->resourcePool();
-    
+}
+
+ManagerPool::~ManagerPool()
+{
+    disconnect(this);
+}
+
+void ManagerPool::init()
+{
+    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+
     connect(
         resourcePool, &QnResourcePool::resourceAdded,
         this, &ManagerPool::at_resourceAdded);
@@ -57,6 +67,23 @@ ManagerPool::ManagerPool(QnCommonModule* commonModule):
     connect(
         qnServerModule->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
         this, &ManagerPool::at_rulesUpdated);
+
+    QMetaObject::invokeMethod(this, "initExistingResources");
+}
+
+void ManagerPool::initExistingResources()
+{
+    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+    const auto mediaServer = resourcePool
+        ->getResourceById<QnMediaServerResource>(
+            m_serverModule->commonModule()->moduleGUID());
+
+    const auto cameras = resourcePool->getAllCameras(
+        mediaServer,
+        /*ignoreDesktopCamera*/ true);
+
+    for (const auto& camera: cameras)
+        at_resourceAdded(camera);
 }
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
@@ -85,7 +112,8 @@ void ManagerPool::at_rulesUpdated(const std::set<QnUuid>& affectedResources)
 {
     for (const auto& resourceId: affectedResources)
     {
-        auto resource = commonModule()
+        auto resource = m_serverModule
+            ->commonModule()
             ->resourcePool()
             ->getResourceById(resourceId);
 
@@ -170,7 +198,11 @@ AbstractMetadataHandler* ManagerPool::createMetadataHandler(
     const QnUuid& pluginId)
 {
     auto handler = new EventHandler();
-    handler->setResource(resource);
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return nullptr;
+
+    handler->setResource(camera);
     handler->setPluginId(pluginId);
 
     return handler;
@@ -228,9 +260,11 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, std::set<Qn
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServer(
     AbstractMetadataPlugin* plugin)
 {
-    auto server = commonModule()
+    auto server = m_serverModule
+        ->commonModule()
         ->resourcePool()
-        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+        ->getResourceById<QnMediaServerResource>(
+            m_serverModule->commonModule()->moduleGUID());
 
     if (!server)
         return boost::none;

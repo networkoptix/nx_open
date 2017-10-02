@@ -5,6 +5,8 @@
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <common/common_module_aware.h>
 
 namespace nx {
 namespace mediaserver {
@@ -22,13 +24,15 @@ struct ResourceEvents
     std::set<QnUuid> resourceEvents;
 };
 
-class RuleHolder
+class RuleHolder: public QnCommonModuleAware
 {
     using RuleId = QnUuid;
     using ResourceId = QnUuid;
     using EventTypeId = QnUuid;
     using AffectedResources = std::set<QnUuid>;
 public:
+
+    RuleHolder(QnCommonModule* commonModule);
     AffectedResources addRule(const nx::vms::event::RulePtr& rule);
     AffectedResources updateRule(const nx::vms::event::RulePtr& rule);
     AffectedResources removeRule(const QnUuid& ruleId);
@@ -43,11 +47,11 @@ private:
     std::set<QnUuid> eventResources(const QVector<QnUuid>& resources) const;
     bool isRuleBeingWatched(const QnUuid& ruleId) const;
     bool isAnalyticsSdkEventRule(const nx::vms::event::RulePtr& ruleId) const;
+    QnUuid analyticsEventIdFromRule(const nx::vms::event::RulePtr& rule) const;
     std::set<QnUuid> calculateResourceEvents(const QnUuid& resourceId) const;
 
 private:
     mutable QnMutex m_mutex;
-
     std::map<RuleId, std::set<ResourceId>> m_ruleResourceMap;
     std::map<ResourceId, std::set<RuleId>> m_resourceRuleMap;
     std::map<ResourceId, std::set<EventTypeId>> m_resourceEventMap;

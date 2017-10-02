@@ -100,7 +100,7 @@ public:
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
-    void setAllowLocks(bool allowLocks);
+    void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
 
@@ -131,7 +131,7 @@ private:
     boost::optional<AuthType> m_authType;
 
     bool m_expectOnlyBody = false;
-    bool m_allowLocks = false;
+    bool m_ignoreMutexAnalyzer = false;
 
     void instantiateHttpClient();
     template<typename AsyncClientFunc>

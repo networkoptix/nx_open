@@ -577,49 +577,7 @@ static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
     return result;
 }
 
-namespace {
-class PartitionInfoAsyncFetcher : public QRunnable
-{
-public:
-    PartitionInfoAsyncFetcher() {}
-
-    virtual void run() override
-    {
-        m_info = readPartitionsAndSizes();
-    }
-
-    QList<QnPlatformMonitor::PartitionSpace> getInfo()
-    {
-        return m_info;
-    }
-private:
-    QList<QnPlatformMonitor::PartitionSpace> m_info;
-};
-}
-
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
-    const int kExpiryTimeout = 500;
-    QThreadPool pool;
-    PartitionInfoAsyncFetcher infoFetcher;
-
-    NX_VERBOSE(this, lm("Preparing to get partitions info. Timeout is %1 ms.").arg(kExpiryTimeout));
-    pool.setMaxThreadCount(1);
-    infoFetcher.setAutoDelete(false);
-
-    pool.start(&infoFetcher);
-    pool.waitForDone(kExpiryTimeout);
-    auto result = infoFetcher.getInfo();
-
-    if (result.isEmpty())
-    {
-        NX_WARNING(this, lm("Get partitions info result is empty. "
-            "This might result in serious storage related problems."));
-    }
-    else
-    {
-        NX_DEBUG(this, lm("Get partitions info: %1").container(result));
-    }
-
-    return result;
+    return readPartitionsAndSizes();
 }

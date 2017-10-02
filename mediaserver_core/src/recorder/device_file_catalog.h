@@ -31,9 +31,9 @@ public:
 
     struct Chunk
     {
-        static const quint16 FILE_INDEX_NONE           = 0xffff;
-        static const quint16 FILE_INDEX_WITH_DURATION  = 0xfffe;
-        static const int UnknownDuration               = -1;
+        static const quint16 FILE_INDEX_NONE;
+        static const quint16 FILE_INDEX_WITH_DURATION;
+        static const int UnknownDuration;
 
         Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1), fileSizeHi(0), fileSizeLo(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) :

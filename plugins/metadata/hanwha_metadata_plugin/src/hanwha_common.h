@@ -41,13 +41,20 @@ public:
     struct EventDescriptor: public nx::api::AnalyticsEventType
     {
         QString internalName;
+        QString internalMonitoringName;
         QString description;
         QString positiveState;
         QString negativeState;
         EventTypeFlags flags;
         QString regionDescription;
     };
-    #define EventDescriptor_Fields AnalyticsEventType_Fields (internalName)(description)(positiveState)(negativeState)(flags)(regionDescription)
+    #define EventDescriptor_Fields AnalyticsEventType_Fields (internalName)\
+        (internalMonitoringName)\
+        (description)\
+        (positiveState)\
+        (negativeState)\
+        (flags)\
+        (regionDescription)
 
     struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
     {
@@ -76,6 +83,7 @@ struct HanwhaEvent
     boost::optional<int> region;
     bool isActive = false;
     Hanwha::EventItemType itemType; //< e.g Gunshot for sound classification
+    QString fullEventName;
 };
 
 using HanwhaEventList = std::vector<HanwhaEvent>;

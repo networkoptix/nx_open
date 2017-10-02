@@ -45,7 +45,30 @@ public:
         const QnCameraAdvancedParamValueList &values,
         QnCameraAdvancedParamValueList &result) override;
 
-public:
+    virtual QnIOPortDataList getRelayOutputList() const override;
+
+    virtual QnIOPortDataList getInputPortList() const override;
+
+    virtual bool setRelayOutputState(
+        const QString& ouputId,
+        bool activate,
+        unsigned int autoResetTimeoutMs = 0) override;
+
+    virtual bool startInputPortMonitoringAsync(
+        std::function<void(bool)>&& completionHandler) override;
+
+    virtual void stopInputPortMonitoringAsync() override;
+
+    virtual bool isInputPortMonitored() const override;
+
+    virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
+
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
+
+    QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
+
+    bool isVideoSourceActive();
+
     int maxProfileCount() const;
 
     AVCodecID streamCodec(Qn::ConnectionRole role) const;
@@ -73,6 +96,9 @@ public:
     void updateToChannel(int value);
 
     bool isNvr() const;
+
+    QString nxProfileName(Qn::ConnectionRole role) const;
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -119,7 +145,10 @@ private:
 
     QString defaultValue(const QString& parameter, Qn::ConnectionRole role) const;
 
-    QString suggestCodecProfile(AVCodecID codec, QString desiredProfile) const;
+    QString suggestCodecProfile(
+        AVCodecID codec, 
+        Qn::ConnectionRole role, 
+        const QString& desiredProfile) const;
 
     QSize bestSecondaryResolution(
         const QSize& primaryResolution,
@@ -156,20 +185,6 @@ private:
 
     boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
 
-    boost::optional<QString> tryToGetSpecificParameterDefault(
-        const QString& parameterString,
-        const HanwhaResponse& response) const;
-
-    boost::optional<int> calculateDefaultBitrate(
-        const QString& parmeterString,
-        const HanwhaResponse& response) const;
-
-    boost::optional<int> calculateDefaultGovLength(
-        const QString& parameterString,
-        const HanwhaResponse& response) const;
-
-    std::tuple<int, int, AVCodecID> channelProfileCodec(const QString& parameterString) const;
-    
     QString toHanwhaAdvancedParameterValue(
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& parameterInfo,
@@ -202,8 +217,11 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
+
     void initMediaStreamCapabilities();
-    nx::media::CameraStreamCapability mediaCapabilityForRole(Qn::ConnectionRole role);
+
+    nx::media::CameraStreamCapability mediaCapabilityForRole(Qn::ConnectionRole role) const;
+
     bool executeServiceCommand(
         const QnCameraAdvancedParameter& parameter,
         const HanwhaAdavancedParameterInfo& info);
@@ -211,6 +229,15 @@ private:
     bool resetProfileToDefault(Qn::ConnectionRole role);
 
     QString propertyByPrameterAndRole(const QString& parameter, Qn::ConnectionRole role) const;
+
+    struct HanwhaPortInfo
+    {
+        QString submenu;
+        QString number;
+        QString prefix;
+    };
+
+    HanwhaPortInfo portInfoFromId(const QString& id) const;
 
 private:
     using AdvancedParameterId = QString;
@@ -231,6 +258,8 @@ private:
     bool m_isNvr = false;
 
     nx::media::CameraMediaCapability m_capabilities;
+    QMap<QString, QnIOPortData> m_ioPortTypeById;
+    std::atomic<bool> m_areInputPortsMonitored{false};
 };
 
 } // namespace plugins

@@ -24,6 +24,7 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <client_core/client_core_module.h>
 
@@ -340,6 +341,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             if (m_ptzController)
                 m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
         });
+
+    connect(context, &QnWorkbenchContext::userChanged,
+        this, &QnMediaResourceWidget::resetTriggers);
 
     updateDisplay();
     updateDewarpingParams();
@@ -2025,7 +2029,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->camDisplay()->isLongWaiting())
     {
-        auto loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
+        auto loader = qnClientModule->cameraDataManager()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
 
@@ -2595,6 +2599,8 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
         return true;
 
     const auto currentUser = accessController()->user();
+    if (!currentUser)
+        return false; //< All triggers will be added when user is set up.
 
     const auto subjects = rule->eventParams().metadata.instigators;
     if (::contains(subjects, currentUser->getId()))

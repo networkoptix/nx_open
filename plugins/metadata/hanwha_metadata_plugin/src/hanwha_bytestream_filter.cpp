@@ -81,6 +81,7 @@ boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
     event.region = eventRegion(eventSource);
     event.isActive = isEventActive(eventState);
     event.itemType = eventItemType(eventSource, eventState);
+    event.fullEventName = eventSource;
     
     event.caption = HanwhaStringHelper::buildCaption(
         m_manifest,

@@ -51,7 +51,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
         transactionsToSend);
 }
 
-ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
+ErrorCode detail::ServerQueryProcessor::removeUserAccessRightsHelper(
     const QnUuid& id,
     PostProcessList* const transactionsToSend)
 {

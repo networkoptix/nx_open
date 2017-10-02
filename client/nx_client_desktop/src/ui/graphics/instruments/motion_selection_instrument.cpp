@@ -14,6 +14,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include "selection_item.h"
@@ -165,10 +166,14 @@ void MotionSelectionInstrument::updateCursor()
     if (!m_itemUnderMouse)
         return;
 
-    if (m_widget && motionSelectionEnabled(m_widget))
+    if (m_widget && motionSelectionEnabled(m_widget) &&
+        (dragProcessor()->isRunning() || !m_buttonUnderMouse))
+    {
         m_itemUnderMouse->setCursor(Qt::CrossCursor);
-    else
-        m_itemUnderMouse->unsetCursor();
+        return;
+    }
+
+    m_itemUnderMouse->unsetCursor();
 }
 
 void MotionSelectionInstrument::setWidget(QnMediaResourceWidget* widget)
@@ -232,6 +237,24 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     return false;
 }
 
+void MotionSelectionInstrument::updateButtonUnderCursor(QWidget* viewport, QMouseEvent* event)
+{
+    const auto graphicsView = view(viewport);
+    const auto buttonItem = item(graphicsView, event->pos(),
+        [](QGraphicsItem* item)
+        {
+            return dynamic_cast<QnImageButtonWidget*>(item);
+        });
+
+    const auto button = dynamic_cast<QnImageButtonWidget*>(buttonItem);
+    if (button == m_buttonUnderMouse)
+        return;
+
+    m_buttonUnderMouse = button;
+
+    updateCursor();
+}
+
 bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
 {
     auto view = this->view(viewport);
@@ -240,6 +263,8 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
     auto item = dynamic_cast<QGraphicsWidget*>(
         this->item(view, event->pos(), [](QGraphicsItem* item){ return item->isWidget(); }));
     setItemUnderMouse(item);
+
+    updateButtonUnderCursor(viewport, event);
 
     // Make sure selection will not stop while we are dragging over widget.
     const bool isDrag = dragProcessor()->isRunning() && event->buttons().testFlag(Qt::LeftButton);
@@ -254,6 +279,7 @@ bool MotionSelectionInstrument::mouseReleaseEvent(QWidget* viewport, QMouseEvent
 {
     const auto result = base_type::mouseReleaseEvent(viewport, event);
     updateWidgetUnderCursor(viewport, event);
+    updateCursor();
     return result;
 }
 

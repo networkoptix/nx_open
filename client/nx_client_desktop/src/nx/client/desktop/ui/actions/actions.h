@@ -473,6 +473,12 @@ enum IDType
     SaveLayoutAction,
 
     /**
+     * Saves selected local layout.
+     */
+    SaveLocalLayoutAction,
+    SaveLocalLayoutAsAction,
+
+    /**
      * Saves selected layout under another name.
      *
      * Parameters:
@@ -933,6 +939,11 @@ enum IDType
      * Scale timeline to match the selection.
      */
     ZoomToTimeSelectionAction,
+
+    /**
+     * Exports selected range.
+     */
+    ExportVideoAction,
 
     /**
      * Exports selected range.

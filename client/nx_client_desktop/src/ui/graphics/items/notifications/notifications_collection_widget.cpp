@@ -267,7 +267,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
 
     widget->setCloseButtonAvailable(false);
     widget->setNotificationLevel(QnNotificationLevel::Value::CriticalNotification);
-    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Acknowledge"),
+    widget->addTextButton(qnSkin->icon("buttons/acknowledge.png"), tr("Acknowledge"),
         [this, camera, action]()
         {
             auto& actionParams = action->getParams();

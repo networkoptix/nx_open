@@ -63,6 +63,7 @@ if(enableAllVendors)
         -DENABLE_PULSE_CAMERA
         -DENABLE_FLIR
         -DENABLE_HANWHA
+        -DENABLE_ADVANTECH
     )
 endif()
 
