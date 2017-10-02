@@ -745,7 +745,8 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition((condition::hasTimePeriod() || condition::hasArgument(Qn::CameraBookmarkRole))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && condition::isTrue(ini().universalExportDialog));
 
     factory(ExportTimeSelectionAction)

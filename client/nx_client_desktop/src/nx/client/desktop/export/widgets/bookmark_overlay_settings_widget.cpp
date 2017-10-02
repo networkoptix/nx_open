@@ -1,6 +1,7 @@
 #include "bookmark_overlay_settings_widget.h"
 #include "ui_bookmark_overlay_settings_widget.h"
 
+#include <limits>
 #include <ui/common/aligner.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -27,6 +28,8 @@ BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
 
     ui->widthSlider->setProperty(style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
+
+    ui->widthSlider->setMaximum(std::numeric_limits<int>::max());
 
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ui->widthLabel, ui->fontSizeLabel});

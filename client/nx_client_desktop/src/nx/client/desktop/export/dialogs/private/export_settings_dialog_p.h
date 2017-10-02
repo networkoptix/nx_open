@@ -92,6 +92,7 @@ public:
 signals:
     void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void overlaySelected(ExportOverlayType type);
+    void frameSizeChanged(const QSize& size);
 
 private:
     ExportOverlayWidget* overlay(ExportOverlayType type);
@@ -108,6 +109,9 @@ private:
     QString cachedImageFileName() const;
 
     void setFrameSize(const QSize& size);
+
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
+    void setOtherMedia(const QnMediaResourcePtr& other);
 
     static void generateAlerts(ExportMediaValidator::Results results,
         QStringList& weakAlerts, QStringList& severeAlerts);

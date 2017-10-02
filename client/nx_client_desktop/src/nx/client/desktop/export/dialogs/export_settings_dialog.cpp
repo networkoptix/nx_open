@@ -491,9 +491,13 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
     d->setMediaResource(mediaResource);
     ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
-    ui->bookmarkSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
-    ui->imageSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
-    ui->textSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
+    connect(d, &Private::frameSizeChanged, this,
+        [this](const QSize& size)
+        {
+            ui->bookmarkSettingsPage->setMaxOverlayWidth(size.width());
+            ui->imageSettingsPage->setMaxOverlayWidth(size.width());
+            ui->textSettingsPage->setMaxOverlayWidth(size.width());
+        });
 
     updateSettingsWidgets();
 
