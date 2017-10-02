@@ -42,8 +42,8 @@ static api::SystemSharingEx createDerivedFromBase(api::SystemSharing right)
 SystemManager::SystemManager(
     const conf::Settings& settings,
     nx::utils::StandaloneTimerManager* const timerManager,
-    AccountManager* const accountManager,
-    const SystemHealthInfoProvider& systemHealthInfoProvider,
+    AbstractAccountManager* const accountManager,
+    const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
     ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
@@ -100,8 +100,7 @@ SystemManager::SystemManager(
             std::bind(&SystemManager::processRemoveResourceParam, this, _1, _2, _3),
             std::bind(&SystemManager::onEc2RemoveResourceParamDone, this, _1, _2));
 
-    m_accountManager->setUpdateAccountSubroutine(
-        std::bind(&SystemManager::placeUpdateUserTransactionToEachSystem, this, _1, _2));
+    m_accountManager->addExtension(this);
 }
 
 SystemManager::~SystemManager()
@@ -110,7 +109,7 @@ SystemManager::~SystemManager()
 
     m_startedAsyncCallsCounter.wait();
 
-    m_accountManager->setUpdateAccountSubroutine(nullptr);
+    m_accountManager->removeExtension(this);
 }
 
 void SystemManager::authenticateByName(
@@ -708,6 +707,13 @@ std::pair<std::string, std::string> SystemManager::extractSystemIdAndAccountEmai
     const api::SystemSharing& data)
 {
     return std::make_pair(data.systemId, data.accountEmail);
+}
+
+void SystemManager::afterUpdatingAccount(
+    nx::utils::db::QueryContext* queryContext,
+    const data::AccountUpdateDataWithEmail& accountUpdate)
+{
+    placeUpdateUserTransactionToEachSystem(queryContext, accountUpdate);
 }
 
 nx::utils::db::DBResult SystemManager::insertSystemToDB(

@@ -25,6 +25,7 @@
 #include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/db/filter.h>
 
+#include "account_manager.h"
 #include "cache.h"
 #include "data_view.h"
 #include "managers_types.h"
@@ -41,15 +42,11 @@
 namespace nx {
 namespace cdb {
 
-namespace conf {
-
-class Settings;
-
-} // namespace conf
+namespace conf { class Settings; } // namespace conf
 
 class AbstractEmailManager;
-class AccountManager;
-class SystemHealthInfoProvider;
+class AbstractAccountManager;
+class AbstractSystemHealthInfoProvider;
 
 namespace ec2 {
 
@@ -66,7 +63,8 @@ class InviteUserNotification;
  */
 class SystemManager:
     public AbstractSystemSharingManager,
-    public AbstractAuthenticationDataProvider
+    public AbstractAuthenticationDataProvider,
+    public AbstractAccountManagerExtension
 {
 public:
     enum class NotificationCommand
@@ -82,8 +80,8 @@ public:
     SystemManager(
         const conf::Settings& settings,
         nx::utils::StandaloneTimerManager* const timerManager,
-        AccountManager* const accountManager,
-        const SystemHealthInfoProvider& systemHealthInfoProvider,
+        AbstractAccountManager* const accountManager,
+        const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
         ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
@@ -230,8 +228,8 @@ private:
 
     const conf::Settings& m_settings;
     nx::utils::StandaloneTimerManager* const m_timerManager;
-    AccountManager* const m_accountManager;
-    const SystemHealthInfoProvider& m_systemHealthInfoProvider;
+    AbstractAccountManager* const m_accountManager;
+    const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
@@ -245,6 +243,10 @@ private:
     std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
     std::set<AbstractSystemSharingExtension*> m_systemSharingExtensions;
+
+    virtual void afterUpdatingAccount(
+        nx::utils::db::QueryContext*,
+        const data::AccountUpdateDataWithEmail&) override;
 
     nx::utils::db::DBResult insertSystemToDB(
         nx::utils::db::QueryContext* const queryContext,

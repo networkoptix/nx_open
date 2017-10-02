@@ -300,6 +300,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemStatus,
     (nx::cdb::api::SystemStatus::notActivated, "notActivated")
     (nx::cdb::api::SystemStatus::activated, "activated")
     (nx::cdb::api::SystemStatus::deleted_, "deleted")
+    (nx::cdb::api::SystemStatus::beingMerged, "beingMerged")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemHealth,

@@ -17,23 +17,37 @@ namespace cdb {
 
 namespace ec2 { class ConnectionManager; }
 
+class AbstractSystemHealthInfoProvider
+{
+public:
+    virtual ~AbstractSystemHealthInfoProvider() = default;
+
+    virtual bool isSystemOnline(const std::string& systemId) const = 0;
+
+    virtual void getSystemHealthHistory(
+        const AuthorizationInfo& authzInfo,
+        data::SystemId systemId,
+        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) = 0;
+};
+
 /**
  * Aggregates system health information from different sources.
  */
-class SystemHealthInfoProvider
+class SystemHealthInfoProvider:
+    public AbstractSystemHealthInfoProvider
 {
 public:
     SystemHealthInfoProvider(
         ec2::ConnectionManager* ec2ConnectionManager,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
-    ~SystemHealthInfoProvider();
+    virtual ~SystemHealthInfoProvider() override;
 
-    bool isSystemOnline(const std::string& systemId) const;
+    virtual bool isSystemOnline(const std::string& systemId) const override;
 
-    void getSystemHealthHistory(
+    virtual void getSystemHealthHistory(
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
-        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler);
+        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) override;
 
 private:
     ec2::ConnectionManager* m_ec2ConnectionManager;

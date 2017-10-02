@@ -42,6 +42,7 @@ enum class SystemStatus
     notActivated,
     activated,
     deleted_,
+    beingMerged,
 };
 
 class SystemData
