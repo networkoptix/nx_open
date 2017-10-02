@@ -6,7 +6,7 @@
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::anyHost, 0),
+    m_serverEndpoint(HostAddress::localhost, 0),
     m_firstStartup(true)
 {
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))

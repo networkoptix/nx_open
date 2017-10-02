@@ -669,8 +669,7 @@ void AsyncClient::initiateTcpConnection()
     m_state = State::sInit;
 
     int ipVersion = AF_INET;
-    if (!(bool) HostAddress(m_contentLocationUrl.host()).ipV4()
-        && (bool) HostAddress(m_contentLocationUrl.host()).ipV6())
+    if ((bool) HostAddress(m_contentLocationUrl.host()).isPureIpV6())
     {
         ipVersion = AF_INET6;
     }

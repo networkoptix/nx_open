@@ -44,7 +44,8 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
     }
     else if (ipVersion == AF_INET6)
     {
-        if (const auto ip = endpoint.address.ipV6())
+        const auto ipV6 = endpoint.address.ipV6();
+        if (ipV6.first)
         {
             const auto a = new sockaddr_in6;
             memset(a, 0, sizeof(*a));
@@ -52,8 +53,12 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
             size = sizeof(sockaddr_in6);
 
             a->sin6_family = AF_INET6;
-            a->sin6_addr = *ip;
+            a->sin6_addr = ipV6.first.get();
             a->sin6_port = htons(endpoint.port);
+            if (endpoint.address.scopeId())
+                a->sin6_scope_id = endpoint.address.scopeId().get();
+            else
+                a->sin6_scope_id = 0;
             return;
         }
     }
@@ -74,10 +79,16 @@ SocketAddress SystemSocketAddress::toSocketAddress() const
     else if (ptr->sa_family == AF_INET6)
     {
         const auto a = reinterpret_cast<const sockaddr_in6*>(ptr.get());
-        return SocketAddress(a->sin6_addr, ntohs(a->sin6_port));
+        HostAddress resultHostAddr;
+        if (a->sin6_scope_id  == 0)
+            resultHostAddr = HostAddress(a->sin6_addr);
+        else
+            resultHostAddr = HostAddress(a->sin6_addr, a->sin6_scope_id);
+
+        return SocketAddress(resultHostAddr, ntohs(a->sin6_port));
     }
 
-    NX_ASSERT(false, lm("Corupt family: %1").arg(ptr->sa_family));
+    NX_ASSERT(false, lm("Corrupt family: %1").arg(ptr->sa_family));
     return SocketAddress();
 }
 
