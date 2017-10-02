@@ -243,7 +243,7 @@ void Settings::loadCassandraHost()
 {
     using namespace std::chrono;
 
-    m_cassandraConnection.hostName =
+    m_cassandraConnection.host =
         settings().value(kCassandraHost, kDefaultCassandraHost).toString().toStdString();
     m_cassandraConnection.delayBeforeRetryingInitialConnect = 
         nx::utils::parseTimerDuration(
