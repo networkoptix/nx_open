@@ -9,6 +9,8 @@
 #include <QtCore/QThread>
 
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_message.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/std/future.h>
@@ -371,6 +373,7 @@ private:
     const int m_ipVersion;
     QnMutex m_mutex;
 
+    nx::utils::ObjectDestructionFlag m_socketDestroyedDuringEventHandlingFlag;
     nx::utils::ObjectDestructionFlag m_socketDestroyedInUserHandlerFlag;
 
     bool isNonBlockingMode() const
@@ -408,7 +411,7 @@ private:
             }
             else if (eventType == aio::etTimedOut)
             {
-                processTimedOutEvent(this->m_socket);
+                processTimedOutEvent();
             }
             else if (eventType == aio::etError)
             {
@@ -421,11 +424,13 @@ private:
         }
         catch (const std::exception& e)
         {
-            NX_CRITICAL(false, e.what());
+            NX_WARNING(this, lm("User exception caught while processing socket I/O event %1. %2")
+                .args(eventType, e.what()));
         }
         catch (...)
         {
-            NX_CRITICAL(false, "Unknown exception");
+            NX_WARNING(this, lm("Unknown user exception caught while processing socket I/O event %1")
+                .args(eventType));
         }
     }
 
@@ -455,35 +460,34 @@ private:
             {
                 NX_CRITICAL(resolvedAddress.address.isIpAddress());
                 this->m_socket->connect(resolvedAddress, sendTimeout);
-            });    //to be called between pollset.add and pollset.polladdress
+            });    //< Functor will be called between pollset.add and pollset.poll.
         return true;
     }
 
-    void processTimedOutEvent(SocketType* sock)
+    void processTimedOutEvent()
     {
-        auto timerHandlerLocal = 
-            [this, sock]()
+        if (!m_timerHandler)
+            return;
+
+        // Timer on socket (not read/write timeout, but some timer).
+
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
+
+        auto execFinally = makeScopeGuard(
+            [this, &watcher, registerTimerCallCounterBak = m_registerTimerCallCounter]()
             {
-                const size_t registerTimerCallCounterBak = m_registerTimerCallCounter;
-            
-                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
-                nx::utils::swapAndCall(m_timerHandler);
                 if (watcher.objectDestroyed())
-                    return false;
+                    return;
 
                 QnMutexLocker lock(&m_mutex);
                 if (registerTimerCallCounterBak == m_registerTimerCallCounter)
                 {
                     nx::network::SocketGlobals::aioService().stopMonitoring(
-                        sock, aio::etTimedOut);
+                        m_socket, aio::etTimedOut);
                 }
-                return true;
-            };
+            });
 
-        // Timer on socket (not read/write timeout, but some timer).
-
-        if (m_timerHandler)
-            timerHandlerLocal();
+        nx::utils::swapAndCall(m_timerHandler);
     }
 
     void processRecvEvent(aio::EventType eventType)
@@ -531,26 +535,28 @@ private:
         }
     }
 
-    bool reportReadCompletion(
+    void reportReadCompletion(
         SystemError::ErrorCode errorCode, size_t bytesRead)
     {
-        const size_t recvAsyncCallCounterBak = m_recvAsyncCallCounter;
-
         m_recvBuffer = nullptr;
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
+
+        auto execFinally = makeScopeGuard(
+            [this, &watcher, recvAsyncCallCounterBak = m_recvAsyncCallCounter]()
+            {
+                if (watcher.objectDestroyed())
+                    return;
+
+                QnMutexLocker lock(&m_mutex);
+                if (recvAsyncCallCounterBak == m_recvAsyncCallCounter)
+                {
+                    nx::network::SocketGlobals::aioService().stopMonitoring(
+                        this->m_socket, aio::etRead);
+                }
+            });
+
         nx::utils::swapAndCall(m_recvHandler, errorCode, bytesRead);
-        if (watcher.objectDestroyed())
-            return false;
-
-        QnMutexLocker lock(&m_mutex);
-        if (recvAsyncCallCounterBak == m_recvAsyncCallCounter)
-        {
-            nx::network::SocketGlobals::aioService().stopMonitoring(
-                this->m_socket, aio::etRead);
-        }
-
-        return true;
     }
 
     void processWriteEvent(aio::EventType eventType)
@@ -612,40 +618,42 @@ private:
         }
     }
 
-    bool reportConnectCompletion(SystemError::ErrorCode errorCode)
+    void reportConnectCompletion(SystemError::ErrorCode errorCode)
     {
-        return reportConnectOrSendCompletion(m_connectHandler, errorCode);
+        reportConnectOrSendCompletion(m_connectHandler, errorCode);
     }
 
-    bool reportSendCompletion(
+    void reportSendCompletion(
         SystemError::ErrorCode errorCode, size_t bytesSent)
     {
         m_sendBuffer = nullptr;
         m_sendBufPos = 0;
 
-        return reportConnectOrSendCompletion(m_sendHandler, errorCode, bytesSent);
+        reportConnectOrSendCompletion(m_sendHandler, errorCode, bytesSent);
     }
 
     template<typename Handler, typename ... Args>
-    bool reportConnectOrSendCompletion(Handler& handler, Args... args)
+    void reportConnectOrSendCompletion(Handler& handler, Args... args)
     {
-        const auto connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter;
-
         m_asyncSendIssued = false;
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
+
+        auto execFinally = makeScopeGuard(
+            [this, &watcher, connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter]()
+            {
+                if (watcher.objectDestroyed())
+                    return;
+
+                QnMutexLocker lock(&m_mutex);
+                if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
+                {
+                    nx::network::SocketGlobals::aioService().stopMonitoring(
+                        this->m_socket, aio::etWrite);
+                }
+            });
+
         nx::utils::swapAndCall(handler, args...);
-        if (watcher.objectDestroyed())
-            return false;
-
-        QnMutexLocker lock(&m_mutex);
-        if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
-        {
-            nx::network::SocketGlobals::aioService().stopMonitoring(
-                this->m_socket, aio::etWrite);
-        }
-
-        return true;
     }
 
     void processErrorEvent()
@@ -657,21 +665,27 @@ private:
         else if (sockErrorCode == SystemError::noError)
             sockErrorCode = SystemError::notConnected;  //< MUST report some error.
 
+        nx::utils::ObjectDestructionFlag::Watcher watcher(
+            &m_socketDestroyedDuringEventHandlingFlag);
+
         if (m_connectHandler)
         {
-            if (!reportConnectCompletion(sockErrorCode))
+            reportConnectCompletion(sockErrorCode);
+            if (watcher.objectDestroyed())
                 return;
         }
 
         if (m_recvHandler)
         {
-            if (!reportReadCompletion(sockErrorCode, (size_t)-1))
+            reportReadCompletion(sockErrorCode, (size_t)-1);
+            if (watcher.objectDestroyed())
                 return;
         }
 
         if (m_sendHandler)
         {
-            if (!reportSendCompletion(sockErrorCode, (size_t)-1))
+            reportSendCompletion(sockErrorCode, (size_t)-1);
+            if (watcher.objectDestroyed())
                 return;
         }
     }
