@@ -26,6 +26,8 @@ Control
         implicitContentWidth: gridLayout.implicitWidth
         implicitContentHeight: gridLayout.implicitHeight
 
+        unzoomToCenter: zoomedItem
+
         Positioners.Grid
         {
             id: gridLayout
@@ -63,10 +65,33 @@ Control
 
                 delegate: Item
                 {
-                    width: 50
-                    height: 50
+                    id: item
 
                     Positioners.Grid.geometry: model.geometry
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+
+                        onDoubleClicked:
+                        {
+                            if (flickableView.zoomedItem !== item)
+                            {
+                                flickableView.zoomedItem = item
+                                return
+                            }
+
+                            if (item.width !== flickableView.width
+                                && item.height !== flickableView.height)
+                            {
+                                flickableView.fitInView()
+                            }
+                            else
+                            {
+                                flickableView.zoomedItem = null
+                            }
+                        }
+                    }
 
                     Rectangle
                     {

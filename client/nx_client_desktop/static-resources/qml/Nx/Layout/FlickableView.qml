@@ -20,6 +20,10 @@ Item
     property real contentWidthPartToBeAlwaysVisible: 0
     property real contentHeightPartToBeAlwaysVisible: 0
 
+    property bool unzoomToCenter: false
+
+    property Item zoomedItem: null
+
     signal clicked(int x, int y, int button)
     signal doubleClicked(int x, int y, int button)
 
@@ -35,7 +39,7 @@ Item
         readonly property int zoomOvershootAnimationDuration: 200
         readonly property int stickyScaleAnimationDuration: 3000
 
-        readonly property real minScale: 1
+        property real minScale: 1
         readonly property real maxScale: 1000
         readonly property real scaleOvershoot: 1.2
         readonly property real scalePerDegree: 1.01
@@ -115,6 +119,22 @@ Item
 
             scaleOffsetX -= (scaleOriginX - 0.5) * newWidth * (ds - 1)
             scaleOffsetY -= (scaleOriginY - 0.5) * newHeight * (ds - 1)
+
+            if (unzoomToCenter && !panOffsetXAnimation.running && !panOffsetYAnimation.running
+                && !(mouseArea.buttons & Qt.RightButton))
+            {
+                clearScaleOffset()
+
+                var baseOffset = defaultPanOffset()
+
+                var maxShiftX = Math.max(0, zoomedItem.width - width) / 2
+                var maxShiftY = Math.max(0, zoomedItem.height - height) / 2
+
+                panOffsetX = MathUtils.bound(
+                    baseOffset.x - maxShiftX, panOffsetX, baseOffset.x + maxShiftX)
+                panOffsetY = MathUtils.bound(
+                    baseOffset.y - maxShiftY, panOffsetY, baseOffset.y + maxShiftY)
+            }
         }
 
         function setAnimationEasingType(easingType)
@@ -132,6 +152,30 @@ Item
             mouseArea.pressPanOffsetY += scaleOffsetY
             scaleOffsetX = 0
             scaleOffsetY = 0
+        }
+
+        function defaultPanOffset()
+        {
+            if (!zoomedItem)
+                return Qt.point(0, 0)
+
+            var originX = (zoomedItem.x + zoomedItem.width / 2) / contentWidth
+            var originY = (zoomedItem.y + zoomedItem.height / 2) / contentHeight
+
+            return Qt.point(contentWidth * (0.5 - originX), contentHeight * (0.5 - originY))
+        }
+
+        function at_zoomedItemChangedGeometry()
+        {
+            if (mouseArea.buttons & Qt.RightButton
+                || panOffsetXAnimation.running
+                || panOffsetYAnimation.running
+                || scaleAnimation.running)
+            {
+                return
+            }
+
+            fitInView(true)
         }
     }
 
@@ -285,15 +329,18 @@ Item
         interval: 200
         onTriggered:
         {
-            if (d.scale < d.stickyScaleThreshold)
-                animateScaleTo(1, d.stickyScaleAnimationDuration)
+            if (d.scale < d.minScale * d.stickyScaleThreshold)
+                animateScaleTo(d.minScale, d.stickyScaleAnimationDuration)
         }
     }
 
     onWidthChanged: fitInView(true)
 
+    onZoomedItemChanged: fitInView()
+
     function stopPanOffsetAnimations()
     {
+        kineticAnimation.stop()
         panOffsetXAnimation.stop()
         panOffsetYAnimation.stop()
     }
@@ -340,13 +387,33 @@ Item
     {
         d.clearScaleOffset()
 
-        var maxShiftX = (width + contentWidth) / 2
-            - contentWidthPartToBeAlwaysVisible * width
-        var newX = MathUtils.bound(-maxShiftX, d.panOffsetX, maxShiftX)
+        var maxShiftX
+        var maxShiftY
+        var newX
+        var newY
 
-        var maxShiftY = (height + contentHeight) / 2
-            - contentHeightPartToBeAlwaysVisible * height
-        var newY = MathUtils.bound(-maxShiftY, d.panOffsetY, maxShiftY)
+        if (zoomedItem && Utils.isChild(zoomedItem, contentItem))
+        {
+            var baseOffset = d.defaultPanOffset()
+
+            maxShiftX = Math.max(0, zoomedItem.width - width) / 2
+            maxShiftY = Math.max(0, zoomedItem.height - height) / 2
+
+            newX = MathUtils.bound(
+                baseOffset.x - maxShiftX, d.panOffsetX, baseOffset.x + maxShiftX)
+            newY = MathUtils.bound(
+                baseOffset.y - maxShiftY, d.panOffsetY, baseOffset.y + maxShiftY)
+        }
+        else
+        {
+            maxShiftX = (width + contentWidth) / 2
+                - contentWidthPartToBeAlwaysVisible * width
+            newX = MathUtils.bound(-maxShiftX, d.panOffsetX, maxShiftX)
+
+            maxShiftY = (height + contentHeight) / 2
+                - contentHeightPartToBeAlwaysVisible * height
+            newY = MathUtils.bound(-maxShiftY, d.panOffsetY, maxShiftY)
+        }
 
         if (instant)
         {
@@ -366,27 +433,46 @@ Item
 
         stickyScaleActivationTimer.stop()
 
+        d.blockScaleBoundsAnimation = true
+        stopScaleAnimation()
+        stopPanOffsetAnimations()
+        d.blockScaleBoundsAnimation = false
+        d.clearScaleOffset()
+
+        var newScale = 1
+        var newOffsetX = 0
+        var newOffsetY = 0
+        d.scaleOriginX = 0.5
+        d.scaleOriginY = 0.5
+        d.minScale = 1
+
+        if (zoomedItem && Utils.isChild(zoomedItem, contentItem))
+        {
+            var originX = (zoomedItem.x + zoomedItem.width / 2) / contentWidth
+            var originY = (zoomedItem.y + zoomedItem.height / 2) / contentHeight
+
+            var newSize = MathUtils.scaledSize(
+                Qt.size(zoomedItem.width, zoomedItem.height), Qt.size(width, height))
+            newScale = d.scale * newSize.width / zoomedItem.width
+            d.minScale = newScale
+
+            var newContentWidth = implicitContentWidth * newScale
+            var newContentHeight = implicitContentHeight * newScale
+            newOffsetX = newContentWidth * (0.5 - originX)
+            newOffsetY = newContentHeight * (0.5 - originY)
+        }
+
         if (instant)
         {
-            d.scale = 0
-            d.panOffsetX = 0
-            d.panOffsetY = 0
-            d.scaleOffsetX = 0
-            d.scaleOffsetY = 0
+            d.scale = newScale
+            d.panOffsetX = newOffsetX
+            d.panOffsetY = newOffsetY
         }
         else
         {
-            d.blockScaleBoundsAnimation = true
-            kineticAnimation.stop()
-            stopScaleAnimation()
-            stopPanOffsetAnimations()
-            d.blockScaleBoundsAnimation = false
-            d.clearScaleOffset()
-            d.scaleOriginX = 0.5
-            d.scaleOriginY = 0.5
             d.setAnimationEasingType(Easing.InOutCubic)
-            animateScaleTo(1, d.fitInViewDuration)
-            animatePanOffsetTo(0, 0, d.fitInViewDuration)
+            animateScaleTo(newScale, d.fitInViewDuration)
+            animatePanOffsetTo(newOffsetX, newOffsetY, d.fitInViewDuration)
         }
     }
 }
