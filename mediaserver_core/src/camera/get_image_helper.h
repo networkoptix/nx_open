@@ -24,7 +24,8 @@ public:
         , qint64 timeUsec
         , const QSize& size
         , QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod
-        , int rotation = QnThumbnailRequestData::kDefaultRotation);
+        , int rotation = QnThumbnailRequestData::kDefaultRotation
+        , QnThumbnailRequestData::AspectRatio aspectRatio = QnThumbnailRequestData::AutoAspectRatio );
 
     static QByteArray encodeImage(const QSharedPointer<CLVideoDecoderOutput>& outFrame, const QByteArray& format);
 
@@ -37,7 +38,11 @@ private:
         , QnServerArchiveDelegate &serverDelegate
         , int prefferedChannel);
 
-    static QSize updateDstSize(const QSharedPointer<QnSecurityCamResource>& res, const QSize& dstSize, QSharedPointer<CLVideoDecoderOutput> outFrame);
+    static QSize updateDstSize(
+        const QSharedPointer<QnSecurityCamResource>& res,
+        const QSize& dstSize,
+        QSharedPointer<CLVideoDecoderOutput> outFrame,
+        QnThumbnailRequestData::AspectRatio aspectRatio);
 
     static QSharedPointer<CLVideoDecoderOutput> getImageWithCertainQuality(
           bool useHQ
@@ -45,7 +50,8 @@ private:
         , qint64 timeUsec
         , const QSize& size
         , QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod
-        , int rotation = -1 );
+        , int rotation = -1
+        , QnThumbnailRequestData::AspectRatio aspectRatio = QnThumbnailRequestData::AutoAspectRatio );
 
     static QSharedPointer<CLVideoDecoderOutput> getMostPreciseImageFromLive(
         QnVideoCameraPtr& camera,
