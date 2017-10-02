@@ -66,7 +66,7 @@ QHostAddress QnInterfaceAndAddr::broadcastAddress() const
     return QHostAddress(broadcastIpv4);
 }
 
-QHostAddress QnInterfaceAndAddr::networkAddress() const
+QHostAddress QnInterfaceAndAddr::subNetworkAddress() const
 {
     quint32 broadcastIpv4 = address.toIPv4Address() & netMask.toIPv4Address();
     return QHostAddress(broadcastIpv4);
