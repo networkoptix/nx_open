@@ -249,27 +249,27 @@ public:
     AsyncConnection(AsyncConnection&&) = default;
     AsyncConnection& operator=(AsyncConnection&&) = default;
 
-    virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> initCb);
+    virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler);
 
     virtual void prepareQuery(
         const char* queryString,
-        nx::utils::MoveOnlyFunc<void(CassError, Query query)> prepareCb) override;
+        nx::utils::MoveOnlyFunc<void(CassError, Query query)> completionHandler) override;
 
     virtual void executeSelect(
         Query query,
-        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb) override;
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> completionHandler) override;
 
     virtual void executeSelect(
         const char* queryString,
-        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb) override;
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> completionHandler) override;
 
     virtual void executeUpdate(
         Query query,
-        nx::utils::MoveOnlyFunc<void(CassError)> updateCb) override;
+        nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) override;
 
     virtual void executeUpdate(
         const char* queryString,
-        nx::utils::MoveOnlyFunc<void(CassError)> updateCb) override;
+        nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) override;
 
     virtual void wait() override;
 
