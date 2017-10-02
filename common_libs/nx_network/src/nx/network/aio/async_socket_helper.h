@@ -732,8 +732,7 @@ class AsyncServerSocketHelper:
 public:
     AsyncServerSocketHelper(SocketType* _sock):
         m_sock(_sock),
-        m_acceptAsyncCallCount(0),
-        m_terminatedFlagPtr(nullptr)
+        m_acceptAsyncCallCount(0)
     {
     }
 
@@ -741,65 +740,55 @@ public:
     {
         // NOTE: Removing socket not from completion handler while completion handler is running 
         // in another thread is undefined behavour anyway, so no synchronization here.
-        if (m_terminatedFlagPtr)
-            *m_terminatedFlagPtr = true;
     }
 
     virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override
     {
         NX_ASSERT(m_acceptHandler);
 
-        bool terminated = false;    //set to true just before object destruction
-        m_terminatedFlagPtr = &terminated;
-        const int acceptAsyncCallCountBak = m_acceptAsyncCallCount;
-        
-        decltype(m_acceptHandler) acceptHandlerBak;
-        acceptHandlerBak.swap(m_acceptHandler);
-
-        auto acceptHandlerBakLocal = 
-            [this, sock, acceptHandlerBak = std::move(acceptHandlerBak),
-                    &terminated, acceptAsyncCallCountBak](
-                SystemError::ErrorCode errorCode,
-                std::unique_ptr<AbstractStreamSocket> newConnection)
-            {
-                acceptHandlerBak(errorCode, std::move(newConnection));
-                if (terminated)
-                    return;
-                //if asyncAccept has been called from onNewConnection, no need to call stopMonitoring
-                QnMutexLocker lock(&m_mutex);
-                if (m_acceptAsyncCallCount == acceptAsyncCallCountBak)
-                    nx::network::SocketGlobals::aioService().stopMonitoring(sock, aio::etRead);
-                m_terminatedFlagPtr = nullptr;
-            };
-
-        switch (eventType)
+        try
         {
-            case aio::etRead:
+            switch (eventType)
             {
-                // Accepting socket.
-                std::unique_ptr<AbstractStreamSocket> newSocket(m_sock->systemAccept());
-                const auto resultCode = newSocket != nullptr
-                    ? SystemError::noError
-                    : SystemError::getLastOSErrorCode();
-                acceptHandlerBakLocal(resultCode, std::move(newSocket));
-                break;
+                case aio::etRead:
+                {
+                    // Accepting socket.
+                    std::unique_ptr<AbstractStreamSocket> newSocket(m_sock->systemAccept());
+                    const auto resultCode = newSocket != nullptr
+                        ? SystemError::noError
+                        : SystemError::getLastOSErrorCode();
+                    reportAcceptResult(resultCode, std::move(newSocket));
+                    break;
+                }
+
+                case aio::etReadTimedOut:
+                    reportAcceptResult(SystemError::timedOut, nullptr);
+                    break;
+
+                case aio::etError:
+                {
+                    SystemError::ErrorCode errorCode = SystemError::noError;
+                    sock->getLastError(&errorCode);
+                    reportAcceptResult(errorCode, nullptr);
+                    break;
+                }
+
+                default:
+                    NX_ASSERT(false);
+                    break;
             }
-
-            case aio::etReadTimedOut:
-                acceptHandlerBakLocal(SystemError::timedOut, nullptr);
-                break;
-
-            case aio::etError:
-            {
-                SystemError::ErrorCode errorCode = SystemError::noError;
-                sock->getLastError(&errorCode);
-                acceptHandlerBakLocal(errorCode, nullptr);
-                break;
-            }
-
-            default:
-                NX_ASSERT(false);
-                break;
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this,
+                lm("User exception caught while processing server socket I/O event %1. %2")
+                    .args(eventType, e.what()));
+        }
+        catch (...)
+        {
+            NX_WARNING(this,
+                lm("Unknown user exception caught while processing server socket I/O event %1")
+                    .args(eventType));
         }
     }
 
@@ -851,8 +840,29 @@ private:
     SocketType* m_sock;
     AcceptCompletionHandler m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
-    bool* m_terminatedFlagPtr;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
     QnMutex m_mutex;
+
+    void reportAcceptResult(
+        SystemError::ErrorCode errorCode,
+        std::unique_ptr<AbstractStreamSocket> newConnection)
+    {
+        nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
+
+        auto execFinally = makeScopeGuard(
+            [this, &thisWatcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()
+            {
+                if (thisWatcher.objectDestroyed())
+                    return;
+
+                // If asyncAccept has been called from onNewConnection, no need to call stopMonitoring.
+                QnMutexLocker lock(&m_mutex);
+                if (m_acceptAsyncCallCount == acceptAsyncCallCountBak)
+                    nx::network::SocketGlobals::aioService().stopMonitoring(this->m_sock, aio::etRead);
+            });
+
+        nx::utils::swapAndCall(m_acceptHandler, errorCode, std::move(newConnection));
+    }
 };
 
 } // namespace aio
