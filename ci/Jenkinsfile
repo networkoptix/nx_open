@@ -8,7 +8,7 @@ import org.nx.jenkins.SlaveRunner
 
 
 NX_REPOSITORY_CREDENTIALS_ID = 'nx-repository-readonly'
-JUNK_SHOP_PROJECT = 'ci'
+PROJECT_NAME = 'ci'
 config = null
 
 
@@ -36,9 +36,16 @@ def main() {
 			)
 			currentBuild.result = 'ABORTED'  // FAILED is used to indicate build failure
 		}
+		increment_build_number()
 		throw x
 	}
 
+	increment_build_number()
+	pragprog displayLanguageCode: 'en', indicateBuildResult: true
+}
+
+def increment_build_number() {
+	build job: 'buildnumber', propagate: false
 }
 
 def unsafe_main() {
@@ -78,7 +85,7 @@ def unsafe_main() {
 	if (action != 'update_parameters') {
 		def branch = env.BRANCH_NAME
 		def run_params = [
-			junk_shop_project: JUNK_SHOP_PROJECT,
+			project_name: PROJECT_NAME,
 			requested_platform_names: requested_platform_names,
 			branch: branch,
 			build_number: env.BUILD_NUMBER.toInteger(),
