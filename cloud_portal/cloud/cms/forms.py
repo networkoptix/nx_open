@@ -5,12 +5,12 @@ from .models import *
 def convert_meta_to_description(meta):
     meta_to_plain = {"format": "Format:  %s",
                      "height": "Height: %spx",
-                     "height_le": "Height not greater than %spx",
-                     "height_ge": "Height not less than %spx",
+                     "height_le": "Height: not greater than %spx",
+                     "height_ge": "Height: not less than %spx",
                      "width": "Width: %spx",
-                     "width_le": "Width not greater than %spx",
-                     "width_ge": "Width not less than %spx",
-                     "size": "Size limit: %s Mb",
+                     "width_le": "Width: not greater than %spx",
+                     "width_ge": "Width: not less than %spx",
+                     "size": "Size limit: %s MB",
                      }
     converted_msg = ""
     for k in meta:

@@ -93,7 +93,7 @@ def save_unrevisioned_records(customization, language, data_structures,
 
                     elif data_structure.type == DataStructure.DATA_TYPES.file:
                         if 'file_size' in meta\
-                                and request_files[data_structure_name].size > meta['file_size']:
+                                and request_files[data_structure_name].size/1000000 > meta['file_size']:
                             size_errors = (data_structure_name, 'File size is {} it should be less than {}'\
                                            .format(request_data[data_structure_name].size,
                                                    meta['file_size']))
