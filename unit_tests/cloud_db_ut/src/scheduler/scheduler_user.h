@@ -6,6 +6,16 @@ namespace nx {
 namespace cdb {
 namespace test {
 
+template<typename Predicate>
+void waitForPredicateBecomeTrue(Predicate p, const char* description)
+{
+    while (!p())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::cout <<"Waiting for " << description << std::endl;
+    }
+}
+
 class SchedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
 {
 public:
