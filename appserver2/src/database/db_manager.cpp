@@ -612,6 +612,14 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
                     return false;
             }
+            
+            if (m_resyncFlags.testFlag(ResyncUserAccessRights))
+            {
+                if (!rebuildUserAccessRightsTransactions())
+                    return false;
+                if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+                    return false;
+            }
 
         }
 
@@ -2352,9 +2360,6 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
         return err;
 
     err = deleteRecordFromResourceTable(internalId);
-    if (err != ErrorCode::ok)
-        return err;
-
     return ErrorCode::ok;
 }
 

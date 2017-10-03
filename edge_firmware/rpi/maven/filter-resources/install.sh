@@ -17,6 +17,7 @@ configure()
 	INSTALLER_DIR="$(dirname "$0")"
     TAR_FILE="$INSTALLER_DIR/$DISTRIB.tar.gz"
 	ZIP_FILE="$INSTALLER_DIR/../$DISTRIB.zip"
+    TOOLS_DIR="/root/tools/$CUSTOMIZATION"
 }
 
 checkRunningUnderRoot()
@@ -87,8 +88,9 @@ copyToDataPartition()
     # Unpack the distro to sdcard.
     tar xfv "$TAR_FILE" -C "$MNT/" || return $?
 
+    # Copy backed-up license db from HDD to SD card.
     mkdir -p "$MNT/$MEDIASERVER_PATH/var" || return $?
-    cp -f "/root/tools/nx/ecs_static.sqlite" "$MNT/$MEDIASERVER_PATH/var/" || return $?
+    cp -f "$TOOLS_DIR/ecs_static.sqlite" "$MNT/$MEDIASERVER_PATH/var/" || true
 
     local CONF_FILE="$MNT/$MEDIASERVER_PATH/etc/mediaserver.conf"
     local CONF_CONTENT="statisticsReportAllowed=true"
@@ -135,7 +137,8 @@ upgradeVms()
         # Avoid grabbing libstdc++ from mediaserver lib folder.
         export LD_LIBRARY_PATH=""
 
-        cp -f "/$MEDIASERVER_PATH/var/ecs_static.sqlite" "/root/tools/nx/"
+        # Backup current license db if exists.
+        cp -f "/$MEDIASERVER_PATH/var/ecs_static.sqlite" "$TOOLS_DIR" || true
 
         callMounted vfat "/dev/mmcblk0p1" "/mnt/boot" copyToBootPartition
 
