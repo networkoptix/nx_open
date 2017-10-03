@@ -34,3 +34,4 @@ django-tinymce==2.6.0
 django-csv-exports==1.0.3
 django-redis==4.8.0
 redis==2.10.6
+django-admin-tools==0.8.1

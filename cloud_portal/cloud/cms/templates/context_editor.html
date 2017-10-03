@@ -4,6 +4,8 @@
 {% load cms_filters %}
 
 {% block extrahead %}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
 {% endblock %}
 
@@ -52,16 +54,15 @@
     {% if perms.cms.edit_content %}
     <div class="submit-row">
         {% if user.is_superuser and context.file_path%}
-        <button class="button">
-            <a style="color:white; text-decoration:none !important;"
-               href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
+        <button class="btn">
+            <a href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
                download>Download Draft</a>
         </button>
         {% endif %}
-        <button class="button" type="submit" name="SaveDraft">Save Draft</button>
-        <button class="button" type="submit" name="Preview">Save and Preview</button>
-        <button class="button" type="submit" name="SendReview">Send for Review</button>
-        <button class="button" type="reset"  name="Reset">Reset</button>
+        <button class="btn" type="submit" name="SaveDraft">Save Draft</button>
+        <button class="btn" type="submit" name="Preview">Save and Preview</button>
+        <button class="btn" type="submit" name="SendReview">Send for Review</button>
+        <button class="btn" type="reset"  name="Reset">Reset</button>
     </div>
     {% endif %}
 
@@ -69,7 +70,7 @@
 
 {% if preview_link %}
 <div class="submit-row">
-    <button onClick="openPreview()">Open Preview</button>
+    <button class='btn' onClick="openPreview()">Open Preview</button>
 </div>
 {% endif %}
 

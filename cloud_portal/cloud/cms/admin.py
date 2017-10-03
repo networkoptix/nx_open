@@ -43,7 +43,7 @@ class ProductAdmin(CMSAdmin):
     list_display_links = ('name',)
 
     def context_actions(self, obj):
-        return format_html('<a class="button" href="{}">settings</a>',
+        return format_html('<button class="btn"><a href="{}">settings</a></button>',
                            reverse('product_settings', args=[obj.id]))
 
     context_actions.short_description = 'Admin Options'
@@ -61,7 +61,7 @@ class ContextAdmin(CMSAdmin):
     search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
-        return format_html('<a class="button" href="{}">edit content</a>',
+        return format_html('<button class="btn"><a href="{}">edit content</a></button>',
                            reverse('context_editor', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
@@ -113,7 +113,7 @@ class ContentVersionAdmin(CMSAdmin):
     list_display_links = ('id', )
 
     def content_version_actions(self, obj):
-        return format_html('<a class="button" href="{}">review version</a>',
+        return format_html('<button class="btn"> <a href="{}">review version</a></button>',
                            reverse('review_version', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
