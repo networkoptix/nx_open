@@ -35,10 +35,8 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     Model model(settings);
-    for (;;)
+    while (!model.doMandatoryInitialization())
     {
-        if (model.doMandatoryInitialization())
-            break;
         if (isTerminated())
             return -1;
 

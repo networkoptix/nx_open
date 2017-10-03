@@ -13,7 +13,7 @@ class CassandraConnectionStub:
     public nx::cassandra::AbstractAsyncConnection
 {
 public:
-    virtual ~CassandraConnectionStub();
+    virtual ~CassandraConnectionStub() override;
 
     virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) override;
 
