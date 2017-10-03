@@ -330,6 +330,16 @@ private:
         const api::SystemSharing& sharing);
 
     /**
+     * TODO: #ak Having both requestResources and filter looks overabundant.
+     * @return boost::none is returned in case if distinct filter has been specified 
+     *   and system was not found with this filter.
+     */
+    boost::optional<std::vector<api::SystemDataEx>> selectSystemsFromCacheByFilter(
+        const nx::utils::stree::AbstractResourceReader& requestResources,
+        const data::DataFilter& filter);
+    void addUserAccessInfo(const std::string& accountEmail, api::SystemDataEx& systemDataEx);
+
+    /**
      * Fetch existing account or create a new one sending corresponding notification.
      */
     nx::utils::db::DBResult fetchAccountToShareWith(

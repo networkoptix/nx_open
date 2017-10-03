@@ -224,121 +224,45 @@ void SystemManager::unbindSystem(
     m_dbManager->executeUpdate<std::string>(
         std::bind(&SystemManager::markSystemAsDeleted, this, _1, _2),
         std::move(systemId.systemId),
-        std::bind(&SystemManager::systemMarkedAsDeleted,
-                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, _3, std::move(completionHandler)));
+        std::bind(&SystemManager::systemMarkedAsDeleted, this,
+            m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, _3, std::move(completionHandler)));
 }
-
-namespace {
-
-/**
- * Returns true, if record contains every single resource present in filter.
- */
-static bool applyFilter(
-    const nx::utils::stree::AbstractResourceReader& record,
-    const nx::utils::stree::AbstractIteratableContainer& filter)
-{
-    // TODO: #ak this method should be moved to stree and have linear complexity, not n*log(n)!
-    for (auto it = filter.begin(); !it->atEnd(); it->next())
-    {
-        auto val = record.get(it->resID());
-        if (!val || val.get() != it->value())
-            return false;
-    }
-
-    return true;
-}
-
-} // namespace
 
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     data::DataFilter filter,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
-    //always providing only activated systems
-    filter.resources().put(
+    // Always providing only activated systems.
+    filter.addFilterValue(
         attr::systemStatus,
         static_cast<int>(api::SystemStatus::activated));
+    filter.addFilterValue(
+        attr::systemStatus,
+        static_cast<int>(api::SystemStatus::beingMerged));
 
     nx::utils::stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
-    const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
+    const auto foundSystems = selectSystemsFromCacheByFilter(wholeFilterMap, filter);
+    if (!foundSystems)
+        return completionHandler(api::ResultCode::notFound, api::SystemDataExList());
 
     api::SystemDataExList resultData;
-    auto systemId = wholeFilterMap.get<std::string>(cdb::attr::authSystemId);
-    if (!systemId)
-        systemId = wholeFilterMap.get<std::string>(cdb::attr::systemId);
+    resultData.systems = std::move(*foundSystems);
 
-    QnMutexLocker lk(&m_mutex);
-    const auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-    if (systemId)
-    {
-        //selecting system by id
-        auto systemIter = systemByIdIndex.find(systemId.get());
-        if ((systemIter == systemByIdIndex.end()) ||
-            !applyFilter(*systemIter, filter))
-        {
-            lk.unlock();
-            return completionHandler(api::ResultCode::notFound, resultData);
-        }
-        resultData.systems.emplace_back(*systemIter);
-    }
-    else if (accountEmail)
-    {
-        const auto& accountIndex = m_accountAccessRoleForSystem.get<kSharingByAccountEmail>();
-        const auto accountSystemsRange = accountIndex.equal_range(accountEmail.get());
-        for (auto it = accountSystemsRange.first; it != accountSystemsRange.second; ++it)
-        {
-            auto systemIter = systemByIdIndex.find(it->systemId);
-            if ((systemIter != systemByIdIndex.end()) &&
-                applyFilter(*systemIter, filter))
-            {
-                resultData.systems.push_back(*systemIter);
-            }
-        }
-    }
-    else
-    {
-        //filtering full system list
-        for (const auto& system: systemByIdIndex)
-        {
-            if (applyFilter(system, filter))
-                resultData.systems.push_back(system);
-        }
-    }
-    lk.unlock();
-
+    const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
     if (accountEmail)
     {
-        //returning rights account has for each system
-        for (auto& systemDataEx: resultData.systems)
-        {
-            const auto accountData =
-                m_accountManager->findAccountByUserName(systemDataEx.ownerAccountEmail);
-            if (accountData)
-                systemDataEx.ownerFullName = accountData->fullName;
-            const auto sharingData = getSystemSharingData(
-                *accountEmail,
-                systemDataEx.id);
-            if (sharingData && sharingData->isEnabled)
-            {
-                systemDataEx.accessRole = sharingData->accessRole;
-                // Calculating system weight.
-                systemDataEx.usageFrequency = nx::utils::calculateSystemUsageFrequency(
-                    sharingData->lastLoginTime,
-                    sharingData->usageFrequency + 1);
-                systemDataEx.lastLoginTime = sharingData->lastLoginTime;
-                systemDataEx.sharingPermissions =
-                    std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
-            }
-            else
-            {
-                systemDataEx.accessRole = api::SystemAccessRole::none;
-            }
-        }
+        std::for_each(
+            resultData.systems.begin(),
+            resultData.systems.end(),
+            std::bind(&SystemManager::addUserAccessInfo, this,
+                *accountEmail, std::placeholders::_1));
 
-        // Omitting systems in which current user is disabled
+        const auto systemsBeforeFilteringByAccessRights = resultData.systems.size();
+
+        // Omitting systems in which current user is disabled.
         const auto unallowedSystemsRangeStartIter = std::remove_if(
             resultData.systems.begin(),
             resultData.systems.end(),
@@ -348,13 +272,13 @@ void SystemManager::getSystems(
             });
         resultData.systems.erase(unallowedSystemsRangeStartIter, resultData.systems.end());
 
-        // If the only system found by filter has user disabled, then returning "forbidden".
-        if (resultData.systems.empty() && static_cast<bool>(systemId))
+        // If every system has been filtered out by access rights, then reporting forbidden.
+        if (resultData.systems.empty() && systemsBeforeFilteringByAccessRights > 0)
             return completionHandler(api::ResultCode::forbidden, resultData);
     }
 
-    //adding system health
-    for (auto& systemDataEx : resultData.systems)
+    // Adding system health.
+    for (auto& systemDataEx: resultData.systems)
     {
         systemDataEx.stateOfHealth =
             m_systemHealthInfoProvider.isSystemOnline(systemDataEx.id)
@@ -362,9 +286,7 @@ void SystemManager::getSystems(
             : api::SystemHealth::offline;
     }
 
-    completionHandler(
-        api::ResultCode::ok,
-        resultData);
+    completionHandler(api::ResultCode::ok, resultData);
 }
 
 void SystemManager::shareSystem(
@@ -1153,6 +1075,81 @@ nx::utils::db::DBResult SystemManager::notifyUserAboutNewSystem(
                 std::function<void(bool)>());
         });
     return nx::utils::db::DBResult::ok;
+}
+
+boost::optional<std::vector<api::SystemDataEx>> SystemManager::selectSystemsFromCacheByFilter(
+    const nx::utils::stree::AbstractResourceReader& requestResources,
+    const data::DataFilter& filter)
+{
+    const auto accountEmail = requestResources.get<std::string>(cdb::attr::authAccountEmail);
+
+    auto systemId = requestResources.get<std::string>(cdb::attr::authSystemId);
+    if (!systemId)
+        systemId = requestResources.get<std::string>(cdb::attr::systemId);
+
+    std::vector<api::SystemDataEx> resultData;
+
+    QnMutexLocker lock(&m_mutex);
+
+    const auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
+    if (systemId)
+    {
+        // Selecting system by id.
+        auto systemIter = systemByIdIndex.find(systemId.get());
+        if (systemIter == systemByIdIndex.end() || !filter.matches(*systemIter))
+            return boost::none;
+        resultData.emplace_back(*systemIter);
+    }
+    else if (accountEmail)
+    {
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<kSharingByAccountEmail>();
+        const auto accountSystemsRange = accountIndex.equal_range(accountEmail.get());
+        for (auto it = accountSystemsRange.first; it != accountSystemsRange.second; ++it)
+        {
+            auto systemIter = systemByIdIndex.find(it->systemId);
+            if (systemIter != systemByIdIndex.end() && filter.matches(*systemIter))
+                resultData.push_back(*systemIter);
+        }
+    }
+    else
+    {
+        // Filtering full system list.
+        for (const auto& system: systemByIdIndex)
+        {
+            if (filter.matches(system))
+                resultData.push_back(system);
+        }
+    }
+
+    return resultData;
+}
+
+void SystemManager::addUserAccessInfo(
+    const std::string& accountEmail,
+    api::SystemDataEx& systemDataEx)
+{
+    const auto accountData =
+        m_accountManager->findAccountByUserName(systemDataEx.ownerAccountEmail);
+    if (accountData)
+        systemDataEx.ownerFullName = accountData->fullName;
+    const auto sharingData = getSystemSharingData(
+        accountEmail,
+        systemDataEx.id);
+    if (sharingData && sharingData->isEnabled)
+    {
+        systemDataEx.accessRole = sharingData->accessRole;
+        // Calculating system weight.
+        systemDataEx.usageFrequency = nx::utils::calculateSystemUsageFrequency(
+            sharingData->lastLoginTime,
+            sharingData->usageFrequency + 1);
+        systemDataEx.lastLoginTime = sharingData->lastLoginTime;
+        systemDataEx.sharingPermissions =
+            std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
+    }
+    else
+    {
+        systemDataEx.accessRole = api::SystemAccessRole::none;
+    }
 }
 
 nx::utils::db::DBResult SystemManager::fetchAccountToShareWith(

@@ -14,9 +14,11 @@
 #include <nx/cloud/cdb/dao/rdb/system_data_object.h>
 
 #include "test_setup.h"
+#include "../base_persistent_data_test.h"
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 namespace {
 
@@ -1193,6 +1195,8 @@ TEST_F(FtSystem, reenabled_user_can_see_system)
     assertUserCanSeeSystem(user, system);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class FtSystemTimestamp:
     public FtSystem
 {
@@ -1235,5 +1239,52 @@ TEST_F(FtSystemTimestamp, registration_timestamp)
     assertRegistrationTimestampIsValid();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class SystemBeingMergedState:
+    public FtSystem
+{
+    using base_type = FtSystem;
+
+protected:
+    void givenSystem()
+    {
+        m_system = base_type::givenSystem();
+    }
+
+    void whenMoveSystemToBeingMergedState()
+    {
+        stop();
+
+        DaoHelper daoHelper(dbConnectionOptions());
+        daoHelper.initializeDatabase();
+        ASSERT_NO_THROW(
+            daoHelper.queryExecutor().executeSqlSync(
+                lm("UPDATE system SET status_code=4 WHERE id='%1'").arg(m_system.id).toUtf8()));
+
+        ASSERT_TRUE(restart());
+    }
+
+    void thenSystemStateIs(api::SystemStatus systemStatus)
+    {
+        api::SystemDataEx system;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystem(owner().email, owner().password, m_system.id, &system));
+        ASSERT_EQ(systemStatus, system.status);
+    }
+
+private:
+    api::SystemData m_system;
+};
+
+TEST_F(SystemBeingMergedState, moving_system_to_beingMerged_state)
+{
+    givenSystem();
+    whenMoveSystemToBeingMergedState();
+    thenSystemStateIs(api::SystemStatus::beingMerged);
+}
+
+} // namespace test
 } // namespace cdb
 } // namespace nx
