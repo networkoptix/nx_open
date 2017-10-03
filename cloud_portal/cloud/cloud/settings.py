@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENIRONMENT = False
+LOCAL_ENVIRONMENT = False
 conf = get_config()
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
@@ -143,7 +143,7 @@ CACHES = {
     }
 }
 
-if LOCAL_ENIRONMENT:
+if LOCAL_ENVIRONMENT:
     conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
     CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
