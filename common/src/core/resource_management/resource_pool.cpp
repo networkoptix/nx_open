@@ -307,6 +307,24 @@ QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
     return QnResourcePtr(NULL);
 }
 
+QnSecurityCamResourceList QnResourcePool::getResourcesBySharedId(const QString& sharedId) const
+{
+    QnSecurityCamResourceList result;
+    QnMutexLocker locker(&m_resourcesMtx);
+    for (const QnResourcePtr &resource : m_resources)
+    {
+        const auto camera = resource.dynamicCast<QnSecurityCamResource>();
+        if (camera)
+        {
+            const auto resourceSharedId = camera->getSharedId();
+            if (resourceSharedId == sharedId)
+                result.push_back(camera);
+        }
+    }
+
+    return result;
+}
+
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
 {
     QnMutexLocker locker( &m_resourcesMtx );
