@@ -25,6 +25,9 @@ public:
     RadassMode mode(QnCamDisplay* display) const;
     void setMode(QnCamDisplay* display, RadassMode mode);
 
+signals:
+    void performanceCanBeImproved();
+
 public slots:
     /** Inform controller that not enough data or CPU for stream */
     void onSlowStream(QnArchiveStreamReader* reader);
