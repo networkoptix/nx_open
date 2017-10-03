@@ -20,7 +20,7 @@ class HanwhaResourceSearcher:
 {
 public:
     HanwhaResourceSearcher(QnCommonModule* commonModule);
-    virtual ~HanwhaResourceSearcher();
+    virtual ~HanwhaResourceSearcher() = default;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,
