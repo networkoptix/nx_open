@@ -26,7 +26,7 @@ Control
         implicitContentWidth: gridLayout.implicitSize.width
         implicitContentHeight: gridLayout.implicitSize.height
 
-        unzoomToCenter: zoomedItem
+        alignToCenterWhenUnzoomed: zoomedItem
 
         Positioners.Grid
         {
