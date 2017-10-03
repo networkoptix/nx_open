@@ -13,7 +13,7 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
     switch (resultCode)
     {
         case ResultCode::ok:
-        case ResultCode::partialContent:    //< Mapping to "200 OK" because request is not Partial Content from Http point of view.
+        case ResultCode::partialContent: //< Mapping to "200 OK" because request is not Partial Content from Http point of view.
             return nx_http::StatusCode::ok;
         case ResultCode::notAuthorized:
         case ResultCode::credentialsRemovedPermanently:

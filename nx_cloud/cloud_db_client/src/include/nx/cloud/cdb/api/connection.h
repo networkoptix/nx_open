@@ -21,7 +21,7 @@ namespace cdb {
  * This is functor that is called on operation completion/failure
  * and reports ResultCode and output data (if applicable).
  * WARNING: Implementation is allowed to invoke completionHandler directly within calling function.
- *      This allows all this methods to return void
+ *   It allows all these methods to return void.
  *
  * Generally, some methods can be forbidden for credentials.
  * E.g., if credentials are system credentials, api::AccountManager::getAccount is forbidden
@@ -115,7 +115,7 @@ public:
 
     /**
      * Connects to cloud_db to check user credentials.
-     * NOTE: Instanciates connection only if connection to cloud is available and provided credentials are valid.
+     * NOTE: Instantiates connection only if connection to cloud is available and provided credentials are valid.
      */
     virtual void connect(
         std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler) = 0;
