@@ -3,14 +3,14 @@ from .models import *
 
 
 def convert_meta_to_description(meta):
-    meta_to_plain = {"format": "File type must be %s",
-                     "height": "Height equal to %spx",
-                     "height_le": "Height cannot be greater than %spx",
-                     "height_ge": "Height cannot be less than %spx",
-                     "width": "Width equal to %spx",
-                     "width_le": "Width cannot be greater than %spx",
-                     "width_ge": "Width cannot be less than %spx",
-                     "size": "File size cannot be more than %s bytes",
+    meta_to_plain = {"format": "Format:  %s",
+                     "height": "Height: %spx",
+                     "height_le": "Height not greater than %spx",
+                     "height_ge": "Height not less than %spx",
+                     "width": "Width: %spx",
+                     "width_le": "Width not greater than %spx",
+                     "width_ge": "Width not less than %spx",
+                     "size": "Size limit: %s Mb",
                      }
     converted_msg = ""
     for k in meta:
