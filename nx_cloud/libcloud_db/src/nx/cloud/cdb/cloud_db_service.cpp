@@ -103,6 +103,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     AuthorizationManager authorizationManager(
         controller.streeManager(),
         controller.accountManager(),
+        controller.systemManager(),
         controller.systemManager());
     m_authorizationManager = &authorizationManager;
 
@@ -244,7 +245,7 @@ void CloudDbService::registerApiHandlers(
     registerHttpHandler(
         kSystemUnbindPath,
         &SystemManager::unbindSystem, systemManager,
-        EntityType::system, DataActionType::_delete);
+        EntityType::system, DataActionType::delete_);
 
     registerHttpHandler(
         kSystemSharePath,

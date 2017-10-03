@@ -540,6 +540,17 @@ void SystemManager::recordUserSessionStart(
         });
 }
 
+boost::optional<api::SystemData> SystemManager::findSystemById(const std::string& id) const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    const auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
+    const auto systemIter = systemByIdIndex.find(id);
+    if (systemIter == systemByIdIndex.end())
+        return boost::none;
+    return *systemIter;
+}
+
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& accountEmail,
     const std::string& systemId) const

@@ -1252,6 +1252,12 @@ protected:
         m_system = base_type::givenSystem();
     }
 
+    void givenSystemInBeingMergedState()
+    {
+        givenSystem();
+        whenMoveSystemToBeingMergedState();
+    }
+
     void whenMoveSystemToBeingMergedState()
     {
         stop();
@@ -1274,8 +1280,66 @@ protected:
         ASSERT_EQ(systemStatus, system.status);
     }
 
+    void assertEachReadRequestReturns(api::ResultCode resultCode)
+    {
+        {
+            std::vector<api::SystemSharingEx> systemSharings;
+            ASSERT_EQ(
+                resultCode,
+                getSystemSharings(owner().email, owner().password, m_system.id, &systemSharings));
+        }
+
+        {
+            api::SystemDataEx system;
+            ASSERT_EQ(
+                resultCode,
+                getSystem(owner().email, owner().password, m_system.id, &system));
+        }
+
+        {
+            api::SystemHealthHistory systemHealthHistory;
+            ASSERT_EQ(
+                resultCode,
+                getSystemHealthHistory(
+                    owner().email, owner().password, m_system.id, &systemHealthHistory));
+        }
+    }
+
+    void assertEachUpdateRequestReturns(api::ResultCode resultCode)
+    {
+        {
+            ASSERT_EQ(
+                resultCode,
+                unbindSystem(owner().email, owner().password, m_system.id));
+        }
+
+        {
+            api::SystemSharing systemSharing;
+            systemSharing.accountEmail = m_anotherAccount.email;
+            systemSharing.accessRole = api::SystemAccessRole::viewer;
+            systemSharing.systemId = m_system.id;
+            ASSERT_EQ(
+                resultCode,
+                shareSystem(owner().email, owner().password, systemSharing));
+        }
+
+        {
+            ASSERT_EQ(
+                resultCode,
+                renameSystem(owner().email, owner().password, m_system.id, "zzzz"));
+        }
+    }
+
 private:
     api::SystemData m_system;
+    AccountWithPassword m_anotherAccount;
+
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_anotherAccount = addActivatedAccount2();
+    }
 };
 
 TEST_F(SystemBeingMergedState, moving_system_to_beingMerged_state)
@@ -1283,6 +1347,18 @@ TEST_F(SystemBeingMergedState, moving_system_to_beingMerged_state)
     givenSystem();
     whenMoveSystemToBeingMergedState();
     thenSystemStateIs(api::SystemStatus::beingMerged);
+}
+
+TEST_F(SystemBeingMergedState, read_requests_are_allowed)
+{
+    givenSystemInBeingMergedState();
+    assertEachReadRequestReturns(api::ResultCode::ok);
+}
+
+TEST_F(SystemBeingMergedState, update_requests_are_forbidden)
+{
+    givenSystemInBeingMergedState();
+    assertEachUpdateRequestReturns(api::ResultCode::notAllowedInCurrentState);
 }
 
 } // namespace test

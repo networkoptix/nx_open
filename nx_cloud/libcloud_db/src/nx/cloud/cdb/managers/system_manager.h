@@ -56,12 +56,21 @@ class SyncronizationEngine;
 
 class InviteUserNotification;
 
+class AbstractSystemManager
+{
+public:
+    virtual ~AbstractSystemManager() = default;
+
+    virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const = 0;
+};
+
 /**
  * Provides methods for manipulating system data on persisent storage.
  * Calls DBManager instance to perform DB manipulation.
  * @note All data can be cached.
  */
 class SystemManager:
+    public AbstractSystemManager,
     public AbstractSystemSharingManager,
     public AbstractAuthenticationDataProvider,
     public AbstractAccountManagerExtension
@@ -139,11 +148,8 @@ public:
         data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
 
-    /**
-     * @return api::SystemAccessRole::none is returned if
-     * - accountEmail has no rights for systemId
-     * - accountEmail or systemId is unknown
-     */
+    virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
+
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const override;
