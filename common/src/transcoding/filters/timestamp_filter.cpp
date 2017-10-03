@@ -19,6 +19,11 @@ QFont fontFromParams(const nx::core::transcoding::TimestampOverlaySettings& para
     return result;
 }
 
+QDateTime makeDateTime(qint64 msecsSinceEpocs, int offsetFromUtc)
+{
+    return QDateTime::fromMSecsSinceEpoch(msecsSinceEpocs, Qt::OffsetFromUTC, offsetFromUtc);
+};
+
 } // namespace
 
 namespace nx {
@@ -53,15 +58,15 @@ TimestampFilter::Internal::Internal(const core::transcoding::TimestampOverlaySet
 
 void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& frame)
 {
-    const qint64 displayTime = frame->pts / 1000 + m_params.serverTimeDisplayOffsetMs;
+    const qint64 displayTime = frame->pts / 1000;
     if (m_currentTimeMs == displayTime)
         return;
 
     m_currentTimeMs = displayTime;
 
     const auto timeString = displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD
-        ? QDateTime::fromMSecsSinceEpoch(m_currentTimeMs).toString(m_params.format)
-        : QTime(0, 0).addMSecs(m_currentTimeMs).toString(lit("hh:mm:ss"));
+        ? timestampTextUtc(m_currentTimeMs, m_params.serverTimeDisplayOffsetMs, m_params.format)
+        : timestampTextSimple(m_currentTimeMs);
 
     const QSize textMargins(m_fontMetrics.averageCharWidth() / 2, 1);
     const QSize textSize = m_fontMetrics.size(0, timeString) + textMargins * 2;
@@ -107,6 +112,26 @@ QSize TimestampFilter::updatedResolution(const QSize& sourceSize)
 {
     d->painter().updateSourceSize(sourceSize);
     return sourceSize;
+}
+
+QString TimestampFilter::timestampTextUtc(
+    qint64 sinceEpochMs,
+    int displayOffsetMs,
+    Qt::DateFormat format)
+{
+    const auto secondsFromUtc = QDateTime::currentDateTime().offsetFromUtc()
+        + (displayOffsetMs / 1000);
+
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(
+        sinceEpochMs + (displayOffsetMs % 1000), Qt::OffsetFromUTC, secondsFromUtc);
+
+    return dateTime.toString(format);
+}
+
+QString TimestampFilter::timestampTextSimple(qint64 timeOffsetMs)
+{
+    const auto time = QTime(0, 0).addMSecs(timeOffsetMs);
+    return time.toString(lit("hh:mm:ss"));
 }
 
 } // namespace filters

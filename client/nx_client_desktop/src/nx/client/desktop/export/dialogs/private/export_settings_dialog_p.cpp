@@ -11,6 +11,7 @@
 #include <camera/single_thumbnail_loader.h>
 #include <camera/thumbnails_loader.h>
 #include <client/client_settings.h>
+#include <transcoding/filters/timestamp_filter.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
@@ -724,24 +725,23 @@ void ExportSettingsDialog::Private::updateBookmarkText()
     m_exportMediaPersistentSettings.bookmarkOverlay.text = text;
 }
 
-void ExportSettingsDialog::Private::updateTimestampText()
+QString ExportSettingsDialog::Private::timestampText(qint64 timeMs) const
 {
     if (mediaSupportsUtc())
     {
-        const auto dateTime = QDateTime::fromMSecsSinceEpoch(m_exportMediaSettings.timePeriod.startTimeMs
-            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs)
-            .toOffsetFromUtc(qnSyncTime->currentDateTime().offsetFromUtc());
-
-        overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
-            m_exportMediaPersistentSettings.timestampOverlay.format));
+        return transcoding::filters::TimestampFilter::timestampTextUtc(
+            timeMs,
+            m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs,
+            m_exportMediaPersistentSettings.timestampOverlay.format);
     }
-    else
-    {
-        const auto time = QTime(0, 0).addMSecs(m_exportMediaSettings.timePeriod.startTimeMs
-            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs);
 
-        overlay(ExportOverlayType::timestamp)->setText(time.toString(lit("hh:mm:ss")));
-    }
+    return transcoding::filters::TimestampFilter::timestampTextSimple(timeMs);
+}
+
+void ExportSettingsDialog::Private::updateTimestampText()
+{
+    overlay(ExportOverlayType::timestamp)->setText(timestampText(
+        m_exportMediaSettings.timePeriod.startTimeMs));
 }
 
 void ExportSettingsDialog::Private::updateMediaImageProcessor()

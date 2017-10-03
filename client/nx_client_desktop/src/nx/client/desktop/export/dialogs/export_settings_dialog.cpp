@@ -502,11 +502,11 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
     d->setMediaResource(mediaResource);
     ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
-    updateSettingsWidgets();
-
     const auto timeWatcher = widget->context()->instance<QnWorkbenchServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
     d->setTimestampOffsetMs(timeWatcher->displayOffset(mediaResource));
+
+    updateSettingsWidgets();
 
     const auto resource = mediaResource->toResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -527,18 +527,7 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
     const auto currentSettings = d->exportMediaSettings();
     const auto namePart = resource->getName();
-    QString timePart;
-    if (resource->flags().testFlag(Qn::utc))
-    {
-        const auto& ts = d->exportMediaPersistentSettings().timestampOverlay;
-        timePart = QDateTime::fromMSecsSinceEpoch(currentSettings.timePeriod.startTimeMs
-            + ts.serverTimeDisplayOffsetMs).toString(ts.format);
-    }
-    else
-    {
-        timePart = QTime(0, 0, 0, 0).addMSecs(currentSettings.timePeriod.startTimeMs)
-            .toString(Qt::SystemLocaleShortDate);
-    }
+    auto timePart = d->timestampText(currentSettings.timePeriod.startTimeMs);
 
     if (utils::AppInfo::isWindows())
         timePart.replace(L':', L'-');
