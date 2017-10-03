@@ -59,8 +59,9 @@ void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& f
 
     m_currentTimeMs = displayTime;
 
-    const auto timeString =
-        QDateTime::fromMSecsSinceEpoch(m_currentTimeMs).toString(m_params.format);
+    const auto timeString = displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD
+        ? QDateTime::fromMSecsSinceEpoch(m_currentTimeMs).toString(m_params.format)
+        : QTime(0, 0).addMSecs(m_currentTimeMs).toString(lit("hh:mm:ss"));
 
     const QSize textMargins(m_fontMetrics.averageCharWidth() / 2, 1);
     const QSize textSize = m_fontMetrics.size(0, timeString) + textMargins * 2;

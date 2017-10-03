@@ -9,6 +9,7 @@
 #include <core/resource/camera_bookmark.h>
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/single_thumbnail_loader.h>
+#include <camera/thumbnails_loader.h>
 #include <client/client_settings.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
@@ -137,9 +138,15 @@ void ExportSettingsDialog::Private::saveSettings()
     }
 }
 
-void ExportSettingsDialog::Private::setServerTimeOffsetMs(qint64 offsetMs)
+void ExportSettingsDialog::Private::setServerTimeZoneOffsetMs(qint64 offsetMs)
+{
+    m_exportMediaSettings.serverTimeZoneMs = offsetMs;
+}
+
+void ExportSettingsDialog::Private::setTimestampOffsetMs(qint64 offsetMs)
 {
     m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs = offsetMs;
+    updateTimestampText();
 }
 
 void ExportSettingsDialog::Private::setAvailableTranscodingSettings(
@@ -202,19 +209,29 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     m_mediaImageProvider.reset();
     m_fullFrameSize = QSize();
 
-    const auto camera = media->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
+    if (const auto camera = media->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
+        setCamera(camera);
+    else
+        setLocalFile(media);
+
+    validateSettings(Mode::Media);
+
+    if (!m_mediaImageProvider) //< Just in case.
         return;
 
-    // TODO: FIXME: #vkutin #gdm Handle non-camera resources.
+    m_mediaImageProvider->setImageProcessor(m_mediaImageProcessor.data());
+    m_mediaImageProvider->loadAsync();
+}
 
+void ExportSettingsDialog::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
+{
     setFrameSize(QnCameraThumbnailManager::sizeHintForCamera(camera, QSize()));
 
     const QPair<qreal, qreal> coefficients(
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());
 
-    m_overlayScale = std::min({coefficients.first, coefficients.second, 1.0});
+    m_overlayScale = std::min({ coefficients.first, coefficients.second, 1.0 });
 
     for (size_t i = 0; i != overlayCount; ++i)
         m_overlays[i]->setScale(m_overlayScale);
@@ -231,15 +248,58 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         0,
         QSize(),
         QnThumbnailRequestData::JpgFormat,
+        QnThumbnailRequestData::AspectRatio::SourceAspectRatio,
+        QnThumbnailRequestData::RoundMethod::PreciseMethod,
         m_mediaImageProvider.data()));
-
-    m_mediaImageProvider->setImageProcessor(m_mediaImageProcessor.data());
 
     connect(m_mediaImageProvider.data(), &QnImageProvider::sizeHintChanged,
         this, &Private::setFrameSize);
+}
 
-    m_mediaImageProvider->loadAsync();
-    validateSettings(Mode::Media);
+void ExportSettingsDialog::Private::setLocalFile(const QnMediaResourcePtr& other)
+{
+    // TODO: #vkutin #gdm Do not use QnThumbnailsLoader here,
+    // implement QnSingleLocalThumbnailLoader as image provider
+    // or better support local files in QnSingleThumbnailLoader.
+
+    if (!QnThumbnailsLoader::supportedResource(other))
+    {
+        NX_ASSERT(false, Q_FUNC_INFO, "Incompatible media resource.");
+        return;
+    }
+
+    m_mediaImageProvider.reset(new ProxyImageProvider());
+
+    const auto startTimeMs = m_exportMediaSettings.timePeriod.startTimeMs;
+    static constexpr auto kSensibleDurationMs = 1000;
+
+    const auto loader = new QnThumbnailsLoader(other);
+    loader->setTimePeriod(QnTimePeriod(startTimeMs, kSensibleDurationMs));
+    loader->setTimeStep(kSensibleDurationMs);
+    loader->setBoundingSize(m_previewSize);
+
+    connect(loader, &QnThumbnailsLoader::thumbnailLoaded, this,
+        [this, loader = QPointer<QnThumbnailsLoader>(loader)](const QnThumbnail& thumbnail)
+        {
+            if (!loader)
+                return;
+
+            // At this point we can update frame size.
+            setFrameSize(loader->sourceSize());
+
+            // Delete old source provider after setting a new one.
+            QScopedPointer<QnImageProvider> oldSource(m_mediaImageProvider->sourceProvider());
+
+            // Set new source provider.
+            m_mediaImageProvider->setSourceProvider(new QnBasicImageProvider(
+                thumbnail.image(), m_mediaImageProvider.data()));
+
+            // We don't need more than one thumbnail.
+            loader->stop();
+            loader->disconnect(this);
+        });
+
+    loader->start();
 }
 
 void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
@@ -261,6 +321,7 @@ void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
         m_overlays[i]->setScale(m_overlayScale);
 
     updateOverlays();
+    emit frameSizeChanged(size);
 }
 
 void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
@@ -271,8 +332,10 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout)
         return;
 
     m_layoutImageProvider.reset(new LayoutThumbnailLoader(
-        layout, false /*don't allow non-camera resources*/,
-        m_previewSize, m_exportLayoutSettings.period.startTimeMs));
+        layout,
+        /*allowNonCameraResources*/ false,
+        m_previewSize,
+        m_exportLayoutSettings.period.startTimeMs));
 
     m_layoutImageProvider->loadAsync();
 }
@@ -364,6 +427,9 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode
 // Computes offset-alignment pair from absolute pixel position
 void ExportSettingsDialog::Private::overlayPositionChanged(ExportOverlayType type)
 {
+    if (!m_fullFrameSize.isValid())
+        return;
+
     auto overlayWidget = overlay(type);
     NX_EXPECT(overlayWidget);
     if (!overlayWidget || overlayWidget->isHidden())
@@ -583,6 +649,9 @@ void ExportSettingsDialog::Private::updateOverlayWidget(ExportOverlayType type)
 // Computes absolute pixel position by relative offset-alignment pair
 void ExportSettingsDialog::Private::updateOverlayPosition(ExportOverlayType type)
 {
+    if (!m_fullFrameSize.isValid())
+        return;
+
     auto overlay = this->overlay(type);
     const auto settings = m_exportMediaPersistentSettings.overlaySettings(type);
 
@@ -657,12 +726,22 @@ void ExportSettingsDialog::Private::updateBookmarkText()
 
 void ExportSettingsDialog::Private::updateTimestampText()
 {
-    const auto dateTime = QDateTime::fromMSecsSinceEpoch(m_exportMediaSettings.timePeriod.startTimeMs
-        + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs)
-        .toOffsetFromUtc(qnSyncTime->currentDateTime().offsetFromUtc());
+    if (mediaSupportsUtc())
+    {
+        const auto dateTime = QDateTime::fromMSecsSinceEpoch(m_exportMediaSettings.timePeriod.startTimeMs
+            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs)
+            .toOffsetFromUtc(qnSyncTime->currentDateTime().offsetFromUtc());
 
-    overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
-        m_exportMediaPersistentSettings.timestampOverlay.format));
+        overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
+            m_exportMediaPersistentSettings.timestampOverlay.format));
+    }
+    else
+    {
+        const auto time = QTime(0, 0).addMSecs(m_exportMediaSettings.timePeriod.startTimeMs
+            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs);
+
+        overlay(ExportOverlayType::timestamp)->setText(time.toString(lit("hh:mm:ss")));
+    }
 }
 
 void ExportSettingsDialog::Private::updateMediaImageProcessor()
@@ -707,6 +786,19 @@ LayoutThumbnailLoader* ExportSettingsDialog::Private::layoutImageProvider() cons
 QSize ExportSettingsDialog::Private::fullFrameSize() const
 {
     return m_fullFrameSize;
+}
+
+Filename ExportSettingsDialog::Private::selectedFileName(Mode mode) const
+{
+    return mode == Mode::Media
+        ? m_exportMediaSettings.fileName
+        : m_exportLayoutSettings.filename;
+}
+
+bool ExportSettingsDialog::Private::mediaSupportsUtc() const
+{
+    return m_exportMediaSettings.mediaResource
+        && m_exportMediaSettings.mediaResource->toResource()->hasFlags(Qn::utc);
 }
 
 void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results results,

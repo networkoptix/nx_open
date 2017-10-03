@@ -52,10 +52,14 @@ public:
     void setMediaFilename(const Filename& filename);
     void setLayoutFilename(const Filename& filename);
     void setRapidReviewFrameStep(qint64 frameStepMs);
-    void setServerTimeOffsetMs(qint64 offsetMs);
+    void setServerTimeZoneOffsetMs(qint64 offsetMs);
+    void setTimestampOffsetMs(qint64 offsetMs);
     void setAvailableTranscodingSettings(const nx::core::transcoding::Settings& settings);
     void setApplyFilters(bool value);
     void setLayoutReadOnly(bool value);
+
+    bool mediaSupportsUtc() const;
+    Filename selectedFileName(Mode mode) const;
 
     Mode mode() const;
     void setMode(Mode mode);
@@ -92,6 +96,7 @@ public:
 signals:
     void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void overlaySelected(ExportOverlayType type);
+    void frameSizeChanged(const QSize& size);
 
 private:
     ExportOverlayWidget* overlay(ExportOverlayType type);
@@ -108,6 +113,9 @@ private:
     QString cachedImageFileName() const;
 
     void setFrameSize(const QSize& size);
+
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
+    void setLocalFile(const QnMediaResourcePtr& other);
 
     static void generateAlerts(ExportMediaValidator::Results results,
         QStringList& weakAlerts, QStringList& severeAlerts);

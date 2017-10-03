@@ -173,12 +173,13 @@ ExportSettingsDialog::ExportSettingsDialog(
     const auto updateRapidReviewData =
         [this](int absoluteSpeed, qint64 frameStepMs)
         {
+            ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Speed")).arg(absoluteSpeed).
+                arg(QChar(L'\x2013'))); //< N-dash
+
             if (ui->speedButton->state() == ui::SelectableTextButton::State::deactivated)
                 return;
 
             d->setRapidReviewFrameStep(frameStepMs);
-            ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Speed")).arg(absoluteSpeed).
-                arg(QChar(L'\x2013'))); //< N-dash
 
             if (frameStepMs) //< 0 would mean rapid review is off due to impossibility.
             {
@@ -405,12 +406,13 @@ void ExportSettingsDialog::updateSettingsWidgets()
     ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
     ui->exportMediaSettingsPage->setApplyFilters(d->exportMediaPersistentSettings().applyFilters);
     ui->timestampSettingsPage->setData(d->exportMediaPersistentSettings().timestampOverlay);
+    ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
     ui->bookmarkSettingsPage->setData(d->exportMediaPersistentSettings().bookmarkOverlay);
     ui->imageSettingsPage->setData(d->exportMediaPersistentSettings().imageOverlay);
     ui->textSettingsPage->setData(d->exportMediaPersistentSettings().textOverlay);
     ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
-    ui->mediaFilenamePanel->setFilename(d->exportMediaSettings().fileName);
-    ui->layoutFilenamePanel->setFilename(d->exportLayoutSettings().filename);
+    ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
+    ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
 }
 
 void ExportSettingsDialog::updateTabWidgetSize()
@@ -487,18 +489,23 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
 
 void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 {
+    connect(d, &Private::frameSizeChanged, this,
+        [this](const QSize& size)
+        {
+            ui->bookmarkSettingsPage->setMaxOverlayWidth(size.width());
+            ui->imageSettingsPage->setMaxOverlayWidth(size.width());
+            ui->textSettingsPage->setMaxOverlayWidth(size.width());
+        });
+
     const auto mediaResource = widget->resource();
     d->setMediaResource(mediaResource);
     ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
-    ui->bookmarkSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
-    ui->imageSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
-    ui->textSettingsPage->setMaxOverlayWidth(d->fullFrameSize().width());
-
     updateSettingsWidgets();
 
-    d->setServerTimeOffsetMs(
-        widget->context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(mediaResource));
+    const auto timeWatcher = widget->context()->instance<QnWorkbenchServerTimeWatcher>();
+    d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
+    d->setTimestampOffsetMs(timeWatcher->displayOffset(mediaResource));
 
     const auto resource = mediaResource->toResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();

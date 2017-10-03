@@ -98,9 +98,6 @@ void ProxyImageProvider::setImageProcessor(AbstractImageProcessor* imageProcesso
             &AbstractImageProcessor::updateRequired, this, &ProxyImageProvider::updateFromSource);
     }
 
-    if (!m_sourceProvider)
-        return;
-
     updateFromSource();
 }
 
@@ -149,6 +146,9 @@ void ProxyImageProvider::setSourceImage(const QImage& sourceImage)
 
 void ProxyImageProvider::updateFromSource()
 {
+    if (!m_sourceProvider)
+        return;
+
     setSourceSizeHint(m_sourceProvider->sizeHint());
     setSourceImage(m_sourceProvider->image());
 }

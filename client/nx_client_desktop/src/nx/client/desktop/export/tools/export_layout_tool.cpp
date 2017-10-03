@@ -187,10 +187,14 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     if (!resourcePool)
         return result;
 
-    for (const auto& item : m_layout->getItems())
+    for (const auto& item: m_layout->getItems())
     {
         const auto resource = resourcePool->getResourceByDescriptor(item.resource);
-        if (!resource.dynamicCast<QnVirtualCameraResource>())
+        const bool skip = mode() == ExportLayoutSettings::Mode::Export
+            ? !resource.dynamicCast<QnVirtualCameraResource>()
+            : (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page));
+
+        if (skip)
             continue;
 
         QnLayoutItemData localItem = item;
