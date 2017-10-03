@@ -240,7 +240,28 @@ nx::utils::db::DBResult SystemDataObject::fetchSystems(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(nx::utils::db::QueryContext* queryContext)
+boost::optional<data::SystemData> SystemDataObject::fetchSystemById(
+    nx::utils::db::QueryContext* queryContext,
+    const std::string& systemId)
+{
+    const nx::utils::db::InnerJoinFilterFields sqlFilter =
+        {{"system.id", ":systemId", QnSql::serialized_field(systemId)}};
+
+    std::vector<data::SystemData> systems;
+    const auto result = fetchSystems(queryContext, sqlFilter, &systems);
+    if (result != nx::utils::db::DBResult::ok)
+        throw nx::utils::db::Exception(result);
+
+    if (systems.empty())
+        return boost::none;
+
+    NX_ASSERT(systems.size() == 1);
+
+    return std::move(systems[0]);
+}
+
+nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(
+    nx::utils::db::QueryContext* queryContext)
 {
     //dropping expired not-activated systems and expired marked-for-removal systems
     QSqlQuery dropExpiredSystems(*queryContext->connection());

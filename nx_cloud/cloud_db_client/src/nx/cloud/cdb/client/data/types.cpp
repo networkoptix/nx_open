@@ -21,6 +21,7 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
         case ResultCode::forbidden:
         case ResultCode::accountNotActivated:
         case ResultCode::accountBlocked:
+        case ResultCode::notAllowedInCurrentState:
             return nx_http::StatusCode::forbidden;
         case ResultCode::notFound:
             return nx_http::StatusCode::notFound;
@@ -74,7 +75,6 @@ ResultCode httpStatusCodeToResultCode(nx_http::StatusCode::Value statusCode)
     }
 }
 
-
 nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCode)
 {
     if (resultCode == ResultCode::ok)
@@ -92,6 +92,7 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
         case ResultCode::invalidNonce:
         case ResultCode::unknownRealm:
         case ResultCode::credentialsRemovedPermanently:
+        case ResultCode::notAllowedInCurrentState:
             requestResultCode = nx_http::FusionRequestErrorClass::unauthorized;
             break;
 
@@ -147,6 +148,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, ResultCode,
     (nx::cdb::api::ResultCode::badRequest, "badRequest")
     (nx::cdb::api::ResultCode::invalidNonce, "invalidNonce")
     (nx::cdb::api::ResultCode::serviceUnavailable, "serviceUnavailable")
+    (nx::cdb::api::ResultCode::notAllowedInCurrentState, "notAllowedInCurrentState")
     (nx::cdb::api::ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
     (nx::cdb::api::ResultCode::invalidFormat, "invalidFormat")
     (nx::cdb::api::ResultCode::retryLater, "retryLater")

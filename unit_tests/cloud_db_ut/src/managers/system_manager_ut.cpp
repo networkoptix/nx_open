@@ -26,15 +26,7 @@ public:
         m_ec2SyncronizationEngine(
             QnUuid::createUuid(),
             m_settings.p2pDb(),
-            &persistentDbManager()->queryExecutor()),
-        m_systemManager(
-            m_settings,
-            &m_timerManager,
-            &m_accountManagerStub,
-            m_systemHealthInfoProvider,
-            &persistentDbManager()->queryExecutor(),
-            &m_emailManager,
-            &m_ec2SyncronizationEngine)
+            &persistentDbManager()->queryExecutor())
     {
         m_timerManager.start();
     }
@@ -47,12 +39,91 @@ public:
 protected:
     void givenSystemInState(api::SystemStatus systemStatus)
     {
+        m_system = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
+        m_system.status = api::SystemStatus::beingMerged;
+        insertSystem(m_ownerAccount, m_system);
+    }
+
+    void whenUnbindSystem()
+    {
+        data::SystemId systemIdHolder;
+        systemIdHolder.systemId = m_system.id;
+
+        AuthorizationInfo authorizationInfo;
+        nx::utils::promise<api::ResultCode> done;
+        m_systemManager->unbindSystem(
+            authorizationInfo,
+            systemIdHolder,
+            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+        m_prevResultCode = done.get_future().get();
+    }
+
+    void whenShareSystem()
+    {
+        data::SystemSharing systemSharing;
+        systemSharing.accessRole = api::SystemAccessRole::cloudAdmin;
+        systemSharing.systemId = m_system.id;
+        systemSharing.accountEmail = m_otherAccount.email;
+
+        AuthorizationInfo authorizationInfo;
+        nx::utils::promise<api::ResultCode> done;
+        m_systemManager->shareSystem(
+            authorizationInfo,
+            systemSharing,
+            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+        m_prevResultCode = done.get_future().get();
+    }
+
+    void whenRenameSystem()
+    {
+        data::SystemAttributesUpdate systemUpdate;
+        systemUpdate.systemId = m_system.id;
+        systemUpdate.name = QnUuid::createUuid().toStdString();
+
+        AuthorizationInfo authorizationInfo;
+        nx::utils::promise<api::ResultCode> done;
+        m_systemManager->updateSystem(
+            authorizationInfo,
+            systemUpdate,
+            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+        m_prevResultCode = done.get_future().get();
+    }
+
+    void thenResultIs(api::ResultCode resultCode)
+    {
+        ASSERT_EQ(resultCode, m_prevResultCode);
+    }
+
+    void thenEveryReadRequestReturns(api::ResultCode /*resultCode*/)
+    {
         // TODO
     }
 
     void thenEveryModificationRequestReturns(api::ResultCode resultCode)
     {
-        // TODO
+        initializeSystemManagerIfNeeded();
+
+        thenUnbindSystemReturns(resultCode);
+        thenShareSystemReturns(resultCode);
+        thenUpdateSystemReturns(resultCode);
+    }
+
+    void thenUnbindSystemReturns(api::ResultCode resultCode)
+    {
+        whenUnbindSystem();
+        thenResultIs(resultCode);
+    }
+
+    void thenShareSystemReturns(api::ResultCode resultCode)
+    {
+        whenShareSystem();
+        thenResultIs(resultCode);
+    }
+
+    void thenUpdateSystemReturns(api::ResultCode resultCode)
+    {
+        whenRenameSystem();
+        thenResultIs(resultCode);
     }
 
 private:
@@ -63,14 +134,36 @@ private:
     SystemHealthInfoProviderStub m_systemHealthInfoProvider;
     TestEmailManager m_emailManager;
     ec2::SyncronizationEngine m_ec2SyncronizationEngine;
-    cdb::SystemManager m_systemManager;
-};
+    std::unique_ptr<cdb::SystemManager> m_systemManager;
+    std::string m_systemId;
+    api::AccountData m_ownerAccount;
+    api::AccountData m_otherAccount;
+    data::SystemData m_system;
+    api::ResultCode m_prevResultCode = api::ResultCode::ok;
 
-TEST_F(SystemManager, system_in_beingMerged_state_cannot_be_modified)
-{
-    givenSystemInState(api::SystemStatus::beingMerged);
-    thenEveryModificationRequestReturns(api::ResultCode::forbidden);
-}
+    virtual void SetUp() override
+    {
+        initializeDatabase();
+
+        m_ownerAccount = insertRandomAccount();
+        m_otherAccount = insertRandomAccount();
+    }
+
+    void initializeSystemManagerIfNeeded()
+    {
+        if (m_systemManager)
+            return;
+
+        m_systemManager = std::make_unique<cdb::SystemManager>(
+            m_settings,
+            &m_timerManager,
+            &m_accountManagerStub,
+            m_systemHealthInfoProvider,
+            &persistentDbManager()->queryExecutor(),
+            &m_emailManager,
+            &m_ec2SyncronizationEngine);
+    }
+};
 
 } // namespace test
 } // namespace cdb

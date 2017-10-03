@@ -53,7 +53,12 @@ public:
         const nx::utils::db::InnerJoinFilterFields& filterFields,
         std::vector<data::SystemData>* const systems) = 0;
 
-    virtual nx::utils::db::DBResult deleteExpiredSystems(nx::utils::db::QueryContext* queryContext) = 0;
+    virtual boost::optional<data::SystemData> fetchSystemById(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId) = 0;
+
+    virtual nx::utils::db::DBResult deleteExpiredSystems(
+        nx::utils::db::QueryContext* queryContext) = 0;
 };
 
 class SystemDataObjectFactory
