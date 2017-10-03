@@ -1011,8 +1011,7 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Resolution..."))
         .childFactory(new RadassActionFactory(manager))
         .condition(ConditionWrapper(new ChangeResolutionCondition())
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
+            && !condition::isLayoutTourReviewMode());
 
     factory()
         .flags(Scene | SingleTarget)

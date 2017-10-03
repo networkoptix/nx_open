@@ -72,10 +72,9 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &RadassActionHandler::handleCurrentLayoutChanged);
 
-    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this,
+    // We must load settings as early as possible to handle auto-run showreels and layouts.
+    connect(globalSettings(), &QnGlobalSettings::localSystemIdChangedDirect, this,
         &RadassActionHandler::handleLocalSystemIdChanged);
-
-    handleLocalSystemIdChanged();
 }
 
 RadassActionHandler::~RadassActionHandler()
@@ -138,7 +137,7 @@ void RadassActionHandler::handleCurrentLayoutChanged()
         if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
         {
             auto camDisplay = mediaWidget->display()->camDisplay();
-            d->controller->setMode(camDisplay, d->manager->mode(QnLayoutItemIndexList() << index));
+            d->controller->setMode(camDisplay, d->manager->mode(index));
         }
     }
 }
