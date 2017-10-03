@@ -176,7 +176,7 @@ public:
 
         /* Maximal texture size. */
         int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-        NX_INFO(this, lm("OpenGL max texture size: %1.").arg(maxTextureSize));
+        NX_VERBOSE(this, lm("OpenGL max texture size: %1.").arg(maxTextureSize));
 
         /* Clamp constant. */
 //        clampConstant = GL_CLAMP;
