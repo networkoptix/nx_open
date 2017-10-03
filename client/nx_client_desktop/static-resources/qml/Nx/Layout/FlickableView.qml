@@ -19,7 +19,7 @@ Item
     property real contentWidthPartToBeAlwaysVisible: 0
     property real contentHeightPartToBeAlwaysVisible: 0
 
-    property bool unzoomToCenter: false
+    property bool alignToCenterWhenUnzoomed: false
 
     property Item zoomedItem: null
 
@@ -171,7 +171,7 @@ Item
             d.scaleOffsetX -= (d.scaleOriginX - 0.5) * newWidth * (ds - 1)
             d.scaleOffsetY -= (d.scaleOriginY - 0.5) * newHeight * (ds - 1)
 
-            if (unzoomToCenter && !panOffsetXAnimation.running && !panOffsetYAnimation.running
+            if (alignToCenterWhenUnzoomed && !panOffsetXAnimation.running && !panOffsetYAnimation.running
                 && !(mouseArea.buttons & Qt.RightButton))
             {
                 d.clearScaleOffset()
