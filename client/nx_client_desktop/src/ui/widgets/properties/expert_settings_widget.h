@@ -35,6 +35,8 @@ private slots:
 
     void at_restoreDefaultsButton_clicked();
 
+    void at_secondStreamQualityChanged();
+
     void updateControlBlock();
 
 private:

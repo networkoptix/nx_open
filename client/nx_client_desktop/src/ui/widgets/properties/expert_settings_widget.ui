@@ -59,8 +59,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1077</width>
-        <height>574</height>
+        <width>1060</width>
+        <height>577</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -120,7 +120,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="qualityGroupBox">
+           <widget class="QGroupBox" name="secondStreamGroupBox">
             <property name="title">
              <string>Secondary Stream</string>
             </property>
@@ -136,43 +136,71 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <item>
-                <widget class="QComboBox" name="secondStreamQualityComboBox"/>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QLabel" name="lowQualityWarningLabel">
-               <property name="text">
-                <string>Warning! Low quality may result in low resolution image.</string>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="highQualityWarningLabel">
-               <property name="text">
-                <string>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</string>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
-               </property>
+              <widget class="QWidget" name="secondStreamQualityWidget" native="true">
+               <layout class="QVBoxLayout" name="verticalLayout_8">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout">
+                  <item>
+                   <widget class="QLabel" name="secondStreamQualityLabel">
+                    <property name="text">
+                     <string>Quality</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="secondStreamQualityComboBox"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lowQualityWarningLabel">
+                  <property name="text">
+                   <string>Warning! Low quality may result in low resolution image.</string>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="highQualityWarningLabel">
+                  <property name="text">
+                   <string>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</string>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -416,6 +444,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>settingsDisableControlCheckBox</tabstop>
+  <tabstop>bitratePerGopCheckBox</tabstop>
+  <tabstop>secondStreamDisableCheckBox</tabstop>
+  <tabstop>secondStreamQualityComboBox</tabstop>
+  <tabstop>checkBoxForceMotionDetection</tabstop>
+  <tabstop>comboBoxForcedMotionStream</tabstop>
+  <tabstop>checkBoxPrimaryRecorder</tabstop>
+  <tabstop>checkBoxSecondaryRecorder</tabstop>
+  <tabstop>comboBoxTransport</tabstop>
+  <tabstop>checkBoxDisableNativePtzPresets</tabstop>
+  <tabstop>restoreDefaultsButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
