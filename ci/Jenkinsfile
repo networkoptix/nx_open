@@ -36,16 +36,10 @@ def main() {
 			)
 			currentBuild.result = 'ABORTED'  // FAILED is used to indicate build failure
 		}
-		increment_build_number()
 		throw x
 	}
 
-	increment_build_number()
 	pragprog displayLanguageCode: 'en', indicateBuildResult: true
-}
-
-def increment_build_number() {
-	build job: 'buildnumber', propagate: false
 }
 
 def unsafe_main() {
@@ -83,6 +77,8 @@ def unsafe_main() {
 	}
 
 	if (action != 'update_parameters') {
+		increment_build_number()
+
 		def branch = env.BRANCH_NAME
 		def run_params = [
 			project_name: PROJECT_NAME,
@@ -94,7 +90,6 @@ def unsafe_main() {
 			cloud_group: 'dev',
 			must_clean_workspace: must_clean_workspace,
 		]
-		echo "Running with run_params: $run_params"
 		slave_runner.run_slaves_stage(run_params)
 	}
 }
@@ -112,6 +107,10 @@ def update_job_parameters(config) {
 		parameters(job_params + platform_params),
 		buildDiscarder(logRotator(daysToKeepStr: config.ci.days_to_keep_old_build.toString())),
 	])
+}
+
+def increment_build_number() {
+	build job: 'buildnumber', propagate: false
 }
 
 // ==============================================================================
