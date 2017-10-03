@@ -1006,13 +1006,6 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
 
-    factory(RadassAction)
-        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Resolution..."))
-        .childFactory(new RadassActionFactory(manager))
-        .condition(ConditionWrapper(new ChangeResolutionCondition())
-            && !condition::isLayoutTourReviewMode());
-
     factory()
         .flags(Scene | SingleTarget)
         .childFactory(new PtzPresetsToursFactory(manager))
@@ -1124,6 +1117,13 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("270 degrees"))
             .condition(new RotateItemCondition());
     } factory.endSubMenu();
+
+    factory(RadassAction)
+        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Resolution..."))
+        .childFactory(new RadassActionFactory(manager))
+        .condition(ConditionWrapper(new ChangeResolutionCondition())
+            && !condition::isLayoutTourReviewMode());
 
     factory()
         .flags(Scene | Tree)
