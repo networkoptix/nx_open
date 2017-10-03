@@ -83,11 +83,10 @@ ROOT_URLCONF = 'cloud.urls'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /app/app
 STATIC_LOCATION = os.path.join(BASE_DIR, "static")  # this is used for email_engine to find templates
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static/common/static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static/common")
 STATICFILES_DIRS = (
     os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static"),
     os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static/lang_en_US"),
-    os.path.join(BASE_DIR, "css"),
 )
 
 
@@ -98,7 +97,7 @@ TEMPLATES = [
             STATIC_ROOT,
             os.path.join(STATIC_LOCATION, CUSTOMIZATION),  # get rid of app/app hardcode
             os.path.join(STATIC_LOCATION, CUSTOMIZATION, 'templates'),
-            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'django_templates'),
         ),
         'OPTIONS': {
             'context_processors': [
