@@ -19,11 +19,6 @@ QFont fontFromParams(const nx::core::transcoding::TimestampOverlaySettings& para
     return result;
 }
 
-QDateTime makeDateTime(qint64 msecsSinceEpocs, int offsetFromUtc)
-{
-    return QDateTime::fromMSecsSinceEpoch(msecsSinceEpocs, Qt::OffsetFromUTC, offsetFromUtc);
-};
-
 } // namespace
 
 namespace nx {
