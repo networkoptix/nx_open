@@ -73,6 +73,7 @@ RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleL
 
 RuleHolder::EventIds RuleHolder::watchedEvents(const QnUuid& resourceId) const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_watchedEvents.value(resourceId);
 }
 
