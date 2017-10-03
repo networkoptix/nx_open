@@ -93,7 +93,8 @@ def unsafe_main() {
 			customization: 'default',
 			cloud_group: 'dev',
 			must_clean_workspace: must_clean_workspace,
-			]
+		]
+		echo "Running with run_params: $run_params"
 		slave_runner.run_slaves_stage(run_params)
 	}
 }
