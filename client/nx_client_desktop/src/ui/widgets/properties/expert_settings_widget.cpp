@@ -25,9 +25,7 @@ using namespace nx::client::desktop::ui;
 
 QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     QWidget(parent),
-    ui(new Ui::CameraExpertSettingsWidget),
-    m_updating(false),
-    m_qualityEditable(false)
+    ui(new Ui::CameraExpertSettingsWidget)
 {
     ui->setupUi(this);
 
@@ -38,48 +36,44 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
 
     CheckboxUtils::autoClearTristate(ui->checkBoxForceMotionDetection);
 
-    setWarningStyle(ui->settingsWarningLabel, style::Hints::kDisabledItemOpacity);
-    setWarningStyle(ui->settingsDisabledWarningLabel, style::Hints::kDisabledItemOpacity);
-    setWarningStyle(ui->highQualityWarningLabel, style::Hints::kDisabledItemOpacity);
-    setWarningStyle(ui->lowQualityWarningLabel, style::Hints::kDisabledItemOpacity);
-    setWarningStyle(ui->generalWarningLabel, style::Hints::kDisabledItemOpacity);
+    setWarningStyle(ui->settingsWarningLabel);
+    setWarningStyle(ui->bitrateIncreaseWarningLabel);
+    setWarningStyle(ui->highQualityWarningLabel);
+    setWarningStyle(ui->lowQualityWarningLabel);
+    setWarningStyle(ui->generalWarningLabel);
+
+    ui->settingsWarningLabel->setVisible(false);
+    ui->bitrateIncreaseWarningLabel->setVisible(false);
+    ui->highQualityWarningLabel->setVisible(false);
+    ui->lowQualityWarningLabel->setVisible(false);
 
     ui->iconLabel->setPixmap(qnSkin->pixmap("legacy/warning.png"));
     ui->iconLabel->setScaledContents(true);
 
-    // If "I have read manual" is set, all controls should be enabled.
-    connect(ui->assureCheckBox, &QCheckBox::toggled, ui->assureCheckBox, &QWidget::setDisabled);
-    connect(ui->assureCheckBox, &QCheckBox::toggled, ui->restoreDefaultsButton, &QWidget::setEnabled);
-    connect(ui->assureCheckBox, &QCheckBox::toggled, ui->scrollArea, &QWidget::setEnabled);
-    ui->restoreDefaultsButton->setEnabled(false);
-
-    connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, ui->qualityGroupBox, &QGroupBox::setDisabled);
-    connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled, this, &QnCameraExpertSettingsWidget::updateControlBlock);
-    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this, &QnCameraExpertSettingsWidget::updateControlBlock);
+    connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled,
+        ui->qualityGroupBox, &QGroupBox::setDisabled);
+    connect(ui->settingsDisableControlCheckBox, &QCheckBox::toggled,
+        this, &QnCameraExpertSettingsWidget::updateControlBlock);
+    connect(ui->bitratePerGopCheckBox, &QCheckBox::toggled,
+        this, &QnCameraExpertSettingsWidget::updateControlBlock);
+    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged,
+        this, &QnCameraExpertSettingsWidget::updateControlBlock);
     updateControlBlock();
-
-    connect(ui->qualityOverrideCheckBox, &QCheckBox::toggled, ui->qualitySlider, &QWidget::setVisible);
-    connect(ui->qualityOverrideCheckBox, &QCheckBox::toggled, ui->qualityLabelsWidget, &QWidget::setVisible);
-    ui->qualitySlider->setVisible(false);
-    ui->qualityLabelsWidget->setVisible(false);
-
-    connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_qualitySlider_valueChanged(int)));
-    ui->highQualityWarningLabel->setVisible(false);
-    ui->lowQualityWarningLabel->setVisible(false);
-
-    ui->verticalSpacerLabel->setMinimumHeight(ui->verticalSpacerLabel->fontMetrics().height());
-    ui->verticalSpacerLabel_2->setMinimumHeight(ui->verticalSpacerLabel_2->fontMetrics().height());
 
     connect(ui->restoreDefaultsButton, SIGNAL(clicked()), this, SLOT(at_restoreDefaultsButton_clicked()));
 
     connect(ui->settingsDisableControlCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dataChanged()));
-    connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
-    connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxPrimaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
-    connect(ui->checkBoxBitratePerGOP, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+    connect(ui->bitratePerGopCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxDisableNativePtzPresets, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+
+    /* FIXME!!!
+    connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_qualitySlider_valueChanged(int)));
+    connect(ui->qualityOverrideCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+    connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
+    */
 
     connect(
         ui->checkBoxForceMotionDetection, &QCheckBox::stateChanged,
@@ -122,7 +116,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool controlDisabled = false;
 
     int arecontCamerasCount = 0;
-    bool anyHasDualStreaming = false;
+    m_hasDualStreaming = false;
 
     bool isFirstQuality = true;
     bool isFirstControl = true;
@@ -157,7 +151,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         if (!camera->supportedMotionType().testFlag(Qn::MT_SoftwareGrid))
             allCamerasSupportForceMotion = false;
 
-        anyHasDualStreaming |= camera->hasDualStreaming();
+        m_hasDualStreaming |= camera->hasDualStreaming();
 
         if (camera->hasDualStreaming()) {
             if (isFirstQuality) {
@@ -230,32 +224,38 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         camCnt++;
     }
 
-    m_qualityEditable = anyHasDualStreaming;
-    ui->qualityGroupBox->setVisible(anyHasDualStreaming);
-    if (sameQuality && quality != Qn::SSQualityNotDefined) {
+    m_qualityEditable = m_hasDualStreaming; // FIXME!!!
+    ui->qualityGroupBox->setVisible(m_hasDualStreaming);
+
+    // FIXME!!!
+    /*
+    if (sameQuality && quality != Qn::SSQualityNotDefined)
+    {
         ui->qualityOverrideCheckBox->setChecked(true);
         ui->qualityOverrideCheckBox->setVisible(false);
         ui->qualitySlider->setValue(qualityToSliderPos(quality));
     }
-    else {
+    else
+    {
         ui->qualityOverrideCheckBox->setChecked(false);
         ui->qualityOverrideCheckBox->setVisible(true);
         ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
     }
-
+    */
     if (samePrimaryRec)
         ui->checkBoxPrimaryRecorder->setChecked(primaryRecorderDisabled);
     else
         ui->checkBoxPrimaryRecorder->setCheckState(Qt::PartiallyChecked);
 
     if (sameBitratePerGOP)
-        ui->checkBoxBitratePerGOP->setChecked(bitratePerGopPresent);
+        ui->bitratePerGopCheckBox->setChecked(bitratePerGopPresent);
     else
-        ui->checkBoxBitratePerGOP->setCheckState(Qt::PartiallyChecked);
-    ui->checkBoxBitratePerGOP->setEnabled(enableBitratePerGop);
+        ui->bitratePerGopCheckBox->setCheckState(Qt::PartiallyChecked);
 
-    ui->checkBoxSecondaryRecorder->setEnabled(anyHasDualStreaming);
-    if (anyHasDualStreaming) {
+    ui->bitratePerGopCheckBox->setEnabled(enableBitratePerGop);
+
+    ui->checkBoxSecondaryRecorder->setEnabled(m_hasDualStreaming);
+    if (m_hasDualStreaming) {
         if (sameSecRec)
             ui->checkBoxSecondaryRecorder->setChecked(secondaryRecorderDisabled);
         else
@@ -275,7 +275,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     ui->comboBoxForcedMotionStream->clear();
     ui->comboBoxForcedMotionStream->addItem(tr("Primary"), QnMediaResource::primaryStreamValue());
 
-    if (anyHasDualStreaming)
+    if (m_hasDualStreaming)
         ui->comboBoxForcedMotionStream->addItem(tr("Secondary"), QnMediaResource::secondaryStreamValue());
 
     bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
@@ -309,32 +309,39 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::PartiallyChecked);
     else
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
-
-    bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
-            && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
-            && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
-            && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !enableBitratePerGop)
-            && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
-            && ui->comboBoxTransport->currentIndex() == 0
-            && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked
-            && ui->checkBoxDisableNativePtzPresets->checkState() == Qt::Unchecked;
-
-    ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
-    ui->assureCheckBox->setChecked(!defaultValues);
-    ui->scrollArea->setEnabled(ui->assureCheckBox->isChecked());
-
 }
 
-void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResourceList &cameras) {
-    if (!ui->assureCheckBox->isChecked())
-        return;
+Qn::SecondStreamQuality QnCameraExpertSettingsWidget::selectedSecondStreamQuality() const
+{
+    if (m_qualityEditable)
+        return Qn::SecondStreamQuality(ui->secondStreamQualityComboBox->currentData().toInt());
 
+    return ui->secondStreamDisableCheckBox->isChecked()
+        ? Qn::SSQualityDontUse
+        : Qn::SSQualityNotDefined;
+}
+
+void QnCameraExpertSettingsWidget::setSelectedSecondStreamQuality(Qn::SecondStreamQuality value) const
+{
+    if (m_qualityEditable)
+    {
+        ui->secondStreamQualityComboBox->setCurrentIndex(
+            ui->secondStreamQualityComboBox->findData(value));
+    }
+    else
+    {
+        ui->secondStreamDisableCheckBox->setChecked(value == Qn::SSQualityDontUse);
+    }
+}
+
+void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResourceList& cameras)
+{
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
     bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
     auto disableNativePtz = ui->checkBoxDisableNativePtzPresets->checkState();
 
-    Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
+    Qn::SecondStreamQuality quality = selectedSecondStreamQuality();
 
     for (const QnVirtualCameraResourcePtr &camera: cameras)
     {
@@ -346,13 +353,14 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
                 camera->setCameraControlDisabled(false);
         }
 
-        if (globalControlEnabled && enableControls && ui->qualityOverrideCheckBox->isChecked() && camera->hasDualStreaming())
-            camera->setSecondaryStreamQuality(quality);
+//      FIXME!!!
+//        if (globalControlEnabled && enableControls && ui->qualityOverrideCheckBox->isChecked() && camera->hasDualStreaming())
+//            camera->setSecondaryStreamQuality(quality);
 
         if (ui->checkBoxPrimaryRecorder->checkState() != Qt::PartiallyChecked)
             camera->setProperty(QnMediaResource::dontRecordPrimaryStreamKey(), ui->checkBoxPrimaryRecorder->isChecked() ? lit("1") : lit("0"));
-        if (ui->checkBoxBitratePerGOP->checkState() != Qt::PartiallyChecked)
-            camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, ui->checkBoxBitratePerGOP->isChecked() ? lit("1") : lit("0"));
+        if (ui->bitratePerGopCheckBox->checkState() != Qt::PartiallyChecked)
+            camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, ui->bitratePerGopCheckBox->isChecked() ? lit("1") : lit("0"));
         if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
@@ -411,49 +419,64 @@ void QnCameraExpertSettingsWidget::at_dataChanged()
         emit dataChanged();
 }
 
+bool QnCameraExpertSettingsWidget::areDefaultValues() const
+{
+    if (m_hasDualStreaming && selectedSecondStreamQuality() != Qn::SSQualityMedium)
+        return false;
+
+    if (ui->bitratePerGopCheckBox->isEnabled() && ui->bitratePerGopCheckBox->isChecked())
+        return false;
+
+    return ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
+        && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
+        && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
+        && ui->comboBoxTransport->currentIndex() == 0
+        && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked
+        && ui->checkBoxDisableNativePtzPresets->checkState() == Qt::Unchecked;
+}
+
 void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
 {
+    // FIXME!!!
+    /*
     ui->settingsDisableControlCheckBox->setCheckState(Qt::Unchecked);
     ui->qualityOverrideCheckBox->setChecked(true);
     ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityMedium));
     ui->checkBoxPrimaryRecorder->setChecked(false);
-    ui->checkBoxBitratePerGOP->setChecked(false);
+    ui->bitratePerGopCheckBox->setChecked(false);
     ui->checkBoxSecondaryRecorder->setChecked(false);
     ui->comboBoxTransport->setCurrentIndex(0);
     ui->checkBoxForceMotionDetection->setCheckState(Qt::Unchecked);
     ui->comboBoxForcedMotionStream->setCurrentIndex(0);
     ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
+    */
 }
 
+/* FIXME!!!
 void QnCameraExpertSettingsWidget::at_qualitySlider_valueChanged(int value) {
     Qn::SecondStreamQuality quality = sliderPosToQuality(value);
     ui->lowQualityWarningLabel->setVisible(quality == Qn::SSQualityLow);
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
 }
+*/
 
-void QnCameraExpertSettingsWidget::updateControlBlock() {
-    bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
-    ui->settingsDisableControlCheckBox->setEnabled(globalControlEnabled);
-    ui->settingsDisabledWarningLabel->setVisible(!globalControlEnabled);
-    ui->settingsWarningLabel->setVisible(globalControlEnabled && !ui->settingsDisableControlCheckBox->isChecked());
-}
-
-Qn::SecondStreamQuality QnCameraExpertSettingsWidget::sliderPosToQuality(int pos) const {
-    if (pos == 0)
-        return Qn::SSQualityDontUse;
-    else
-        return Qn::SecondStreamQuality(pos-1);
-}
-
-int QnCameraExpertSettingsWidget::qualityToSliderPos(Qn::SecondStreamQuality quality)
+void QnCameraExpertSettingsWidget::updateControlBlock()
 {
-    if (quality == Qn::SSQualityDontUse)
-        return 0;
-    else
-        return int(quality) + 1;
+    const auto globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
+    ui->settingsDisableControlCheckBox->setEnabled(globalControlEnabled);
+
+    ui->settingsWarningLabel->setVisible(globalControlEnabled &&
+        ui->settingsDisableControlCheckBox->isChecked());
+
+    ui->bitrateIncreaseWarningLabel->setVisible(globalControlEnabled &&
+        ui->bitratePerGopCheckBox->isChecked());
+
+    ui->settingsGroupBox->layout()->activate();
+    ui->leftWidget->layout()->activate();
 }
 
-bool QnCameraExpertSettingsWidget::isSecondStreamEnabled() const {
+bool QnCameraExpertSettingsWidget::isSecondStreamEnabled() const
+{
     if (!m_qualityEditable)
         return true;
 
@@ -463,14 +486,16 @@ bool QnCameraExpertSettingsWidget::isSecondStreamEnabled() const {
     if (!ui->qualityGroupBox->isEnabled())
         return true;
 
-    if (!ui->qualityOverrideCheckBox->isChecked())
-        return true;
+//    if (!ui->qualityOverrideCheckBox->isChecked()) // FIXME!!!
+  //      return true;
 
-    Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
+    Qn::SecondStreamQuality quality = selectedSecondStreamQuality();
     return quality != Qn::SSQualityDontUse;
 }
 
-void QnCameraExpertSettingsWidget::setSecondStreamEnabled(bool value /* = true*/) {
+void QnCameraExpertSettingsWidget::setSecondStreamEnabled(bool value /* = true*/)
+{
+    /* FIXME!!!
     if (!m_qualityEditable)
         return;
 
@@ -485,4 +510,5 @@ void QnCameraExpertSettingsWidget::setSecondStreamEnabled(bool value /* = true*/
     } else {
         ui->qualitySlider->setValue(qualityToSliderPos(Qn::SSQualityDontUse));
     }
+    */
 }
