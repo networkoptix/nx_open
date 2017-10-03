@@ -9,6 +9,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 namespace {
 
@@ -1233,5 +1234,6 @@ TEST_F(SystemSharingDisabledUser, user_get_empty_list_if_he_is_disabled_in_the_o
     thenResponseShouldBeEmpty();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

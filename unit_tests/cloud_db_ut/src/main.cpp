@@ -37,7 +37,7 @@ int main(int argc, char** argv)
                     driverName.toStdString().c_str());
             }
 
-            nx::cdb::CdbFunctionalTest::setDbConnectionOptions(
+            nx::cdb::test::CdbFunctionalTest::setDbConnectionOptions(
                 std::move(connectionOptions));
 
             return nx::utils::test::DeinitFunctions();

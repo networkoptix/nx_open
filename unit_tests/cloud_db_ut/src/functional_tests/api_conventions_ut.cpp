@@ -1,23 +1,19 @@
-/**********************************************************
-* Nov 23, 2015
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/utils/app_info.h>
+
 #include <nx/cloud/cdb/client/data/account_data.h>
 #include <nx/cloud/cdb/client/data/types.h>
 
 #include "test_setup.h"
-#include <utils/common/app_info.h>
-
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class ApiConventions:
     public CdbFunctionalTest
@@ -62,7 +58,7 @@ TEST_F(ApiConventions, general)
         //operation forbidden for account in this state
         nx_http::HttpClient httpClient;
         QUrl url(lit("http://%1:%2/cdb/system/bind?name=esadfwer&customization=%3").
-            arg(endpoint().address.toString()).arg(endpoint().port).arg(QnAppInfo::customizationName()));
+            arg(endpoint().address.toString()).arg(endpoint().port).arg(nx::utils::AppInfo::customizationName()));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(httpClient.doGet(url));
@@ -255,5 +251,6 @@ TEST_F(ApiConventions, json_in_ok_response)
     ASSERT_EQ(result, api::ResultCode::ok);
 }
 
-}   //cdb
-}   //nx
+} // namespace test
+} // namespace cdb
+} // namespace nx
