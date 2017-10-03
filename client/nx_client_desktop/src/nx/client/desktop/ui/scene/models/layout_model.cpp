@@ -24,15 +24,20 @@ public:
 
     int itemIndex(const QnUuid& itemId) const;
 
+    void updateGridBoundingRect();
+
 private:
     void at_itemAdded(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
     void at_itemRemoved(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
     void at_itemChanged(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
 
+    void setGridBoundingRect(const QRect& rect);
+
 public:
     QnUuid layoutId;
     QnLayoutResourcePtr layout;
     QList<QnUuid> itemIds;
+    QRect gridBoundingRect;
 };
 
 LayoutModel::Private::Private(LayoutModel* parent):
@@ -51,7 +56,10 @@ void LayoutModel::Private::setLayout(const QnLayoutResourcePtr& newLayout)
     layout = newLayout;
 
     if (!layout)
+    {
+        updateGridBoundingRect();
         return;
+    }
 
     connect(layout, &QnLayoutResource::itemAdded, this, &Private::at_itemAdded);
     connect(layout, &QnLayoutResource::itemRemoved, this, &Private::at_itemRemoved);
@@ -59,6 +67,8 @@ void LayoutModel::Private::setLayout(const QnLayoutResourcePtr& newLayout)
 
     for (const auto& item: layout->getItems())
         itemIds.insert(std::lower_bound(itemIds.begin(), itemIds.end(), item.uuid), item.uuid);
+
+    updateGridBoundingRect();
 }
 
 int LayoutModel::Private::itemIndex(const QnUuid& itemId) const
@@ -67,6 +77,29 @@ int LayoutModel::Private::itemIndex(const QnUuid& itemId) const
     if (it != itemIds.end() && *it == itemId)
         return static_cast<int>(std::distance(itemIds.begin(), it));
     return -1;
+}
+
+void LayoutModel::Private::updateGridBoundingRect()
+{
+    if (!layout)
+    {
+        setGridBoundingRect(QRect());
+        return;
+    }
+
+    const auto& items = layout->getItems();
+
+    if (items.isEmpty())
+    {
+        setGridBoundingRect(QRect());
+        return;
+    }
+
+    auto rect = items.begin()->combinedGeometry.toRect();
+    for (auto it = ++items.begin(); it != items.end(); ++it)
+        rect = rect.united(it->combinedGeometry.toRect());
+
+    setGridBoundingRect(rect);
 }
 
 void LayoutModel::Private::at_itemAdded(
@@ -80,6 +113,8 @@ void LayoutModel::Private::at_itemAdded(
     q->beginInsertRows(QModelIndex(), row, row);
     itemIds.insert(it, item.uuid);
     q->endInsertRows();
+
+    updateGridBoundingRect();
 }
 
 void LayoutModel::Private::at_itemRemoved(
@@ -92,6 +127,8 @@ void LayoutModel::Private::at_itemRemoved(
     q->beginRemoveRows(QModelIndex(), row, row);
     itemIds.removeAt(row);
     q->endRemoveRows();
+
+    updateGridBoundingRect();
 }
 
 void LayoutModel::Private::at_itemChanged(
@@ -103,6 +140,17 @@ void LayoutModel::Private::at_itemChanged(
 
     const auto& modelIndex = q->index(row);
     emit q->dataChanged(modelIndex, modelIndex);
+
+    updateGridBoundingRect();
+}
+
+void LayoutModel::Private::setGridBoundingRect(const QRect& rect)
+{
+    if (gridBoundingRect == rect)
+        return;
+
+    gridBoundingRect = rect;
+    emit q->gridBoundingRectChanged();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -136,6 +184,11 @@ void LayoutModel::setLayoutId(const QnUuid& id)
     d->setLayout(layout);
 
     endResetModel();
+}
+
+QRect LayoutModel::gridBoundingRect() const
+{
+    return d->gridBoundingRect;
 }
 
 QHash<int, QByteArray> LayoutModel::roleNames() const

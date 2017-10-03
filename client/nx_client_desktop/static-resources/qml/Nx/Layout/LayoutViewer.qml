@@ -21,10 +21,10 @@ Control
         contentWidthPartToBeAlwaysVisible: 0.3
         contentHeightPartToBeAlwaysVisible: 0.3
 
-        contentWidth: gridLayout.implicitWidth
-        contentHeight: gridLayout.implicitHeight
-        implicitContentWidth: gridLayout.implicitWidth
-        implicitContentHeight: gridLayout.implicitHeight
+        contentWidth: gridLayout.implicitSize.width
+        contentHeight: gridLayout.implicitSize.height
+        implicitContentWidth: gridLayout.implicitSize.width
+        implicitContentHeight: gridLayout.implicitSize.height
 
         unzoomToCenter: zoomedItem
 
@@ -34,25 +34,14 @@ Control
 
             readonly property real cellAspectRatio: 16 / 9
 
-            readonly property size implicitSize:
-            {
-                var gridAspectRatio = cellAspectRatio
-                    * Math.max(1, gridSize.width) / Math.max(1, gridSize.height)
-
-                return flickableView.width / flickableView.height < gridAspectRatio
-                    ? Qt.size(flickableView.width, flickableView.width / gridAspectRatio)
-                    : Qt.size(flickableView.height * gridAspectRatio, flickableView.height)
-            }
-
-            implicitWidth: implicitSize.width
-            implicitHeight: implicitSize.height
+            property size implicitSize: contentImplicitSize()
 
             width: flickableView.contentWidth
             height: flickableView.contentHeight
 
             cellSize: Qt.size(
-                width / gridSize.width,
-                width / gridSize.width / 16 * 9)
+                width / layoutModel.gridBoundingRect.width,
+                width / layoutModel.gridBoundingRect.width / cellAspectRatio)
 
             Repeater
             {
@@ -61,6 +50,39 @@ Control
                 model: LayoutModel
                 {
                     id: layoutModel
+
+                    property rect previousRect: Qt.rect(0, 0, 0, 0)
+
+                    onGridBoundingRectChanged:
+                    {
+                        flickableView.zoomedItem = null
+
+                        if (previousRect.width === 0 && previousRect.height === 0)
+                        {
+                            previousRect = gridBoundingRect
+                            flickableView.fitInView(true)
+                            return
+                        }
+
+                        var rect = gridBoundingRect
+                        var cellSize = gridLayout.cellSize
+
+                        var dx = rect.x - previousRect.x
+                        var dy = rect.y - previousRect.y
+                        var dw = rect.width - previousRect.width
+                        var dh = rect.height - previousRect.height
+
+                        var cx = flickableView.contentX + dx * cellSize.width
+                        var cy = flickableView.contentY + dy * cellSize.height
+                        var cw = flickableView.contentWidth + dw * cellSize.width
+                        var ch = flickableView.contentHeight + dh * cellSize.height
+
+                        previousRect = rect
+
+                        flickableView.setContentGeometry(cx, cy, cw, ch)
+                        gridLayout.implicitSize = gridLayout.contentImplicitSize()
+                        flickableView.fitInView()
+                    }
                 }
 
                 delegate: Item
@@ -106,6 +128,17 @@ Control
                         text: model.name
                     }
                 }
+            }
+
+            function contentImplicitSize()
+            {
+                var gridAspectRatio = cellAspectRatio
+                    * Math.max(1, layoutModel.gridBoundingRect.width)
+                    / Math.max(1, layoutModel.gridBoundingRect.height)
+
+                return flickableView.width / flickableView.height < gridAspectRatio
+                    ? Qt.size(flickableView.width, flickableView.width / gridAspectRatio)
+                    : Qt.size(flickableView.height * gridAspectRatio, flickableView.height)
             }
         }
 

@@ -7,7 +7,6 @@ Item
     id: flickableView
 
     default property alias data: contentItem.data
-    readonly property alias contentItem: contentItem
 
     property real implicitContentWidth
     property real implicitContentHeight
@@ -44,7 +43,6 @@ Item
         readonly property real scaleOvershoot: 1.2
         readonly property real scalePerDegree: 1.01
         readonly property real stickyScaleThreshold: 1.8
-        property real scale: 1
         property real targetScale: 1
         property bool blockScaleBoundsAnimation: false
         property bool scalingAfterInteraction: false
@@ -76,65 +74,12 @@ Item
             onStopped: easing.type = d.defaultAnimationEasingType
         }
 
-        NumberAnimation on scale
+        function currentScale()
         {
-            id: scaleAnimation
-            easing.type: d.defaultAnimationEasingType
+            if (!haveImplicitSize)
+                return 1
 
-            onStarted: stickyScaleActivationTimer.stop()
-
-            onStopped:
-            {
-                easing.type = d.defaultAnimationEasingType
-                d.scalingAfterInteraction = false
-
-                if (!mouseArea.pressed && !d.blockScaleBoundsAnimation)
-                {
-                    if (d.scale < d.minScale)
-                    {
-                        animateScaleTo(d.minScale, d.returnToBoundsDuration)
-                    }
-                    else if (d.scale > d.maxScale)
-                    {
-                        animateScaleTo(d.maxScale, d.returnToBoundsDuration)
-                    }
-                    else
-                    {
-                        returnToBounds()
-                        stickyScaleActivationTimer.restart()
-                    }
-                }
-            }
-        }
-
-        onScaleChanged:
-        {
-            var newWidth = implicitContentWidth * scale
-            var newHeight = implicitContentHeight * scale
-
-            var ds = newWidth / contentWidth
-
-            contentWidth = newWidth
-            contentHeight = newHeight
-
-            scaleOffsetX -= (scaleOriginX - 0.5) * newWidth * (ds - 1)
-            scaleOffsetY -= (scaleOriginY - 0.5) * newHeight * (ds - 1)
-
-            if (unzoomToCenter && !panOffsetXAnimation.running && !panOffsetYAnimation.running
-                && !(mouseArea.buttons & Qt.RightButton))
-            {
-                clearScaleOffset()
-
-                var baseOffset = defaultPanOffset()
-
-                var maxShiftX = Math.max(0, zoomedItem.width - width) / 2
-                var maxShiftY = Math.max(0, zoomedItem.height - height) / 2
-
-                panOffsetX = MathUtils.bound(
-                    baseOffset.x - maxShiftX, panOffsetX, baseOffset.x + maxShiftX)
-                panOffsetY = MathUtils.bound(
-                    baseOffset.y - maxShiftY, panOffsetY, baseOffset.y + maxShiftY)
-            }
+            return contentWidth / implicitContentWidth
         }
 
         function setAnimationEasingType(easingType)
@@ -179,11 +124,76 @@ Item
         }
     }
 
+    NumberAnimation
+    {
+        id: scaleAnimation
+        easing.type: d.defaultAnimationEasingType
+        target: scaleAnimation
+        property: "scale"
+
+        property real scale: 1
+
+        onStarted: stickyScaleActivationTimer.stop()
+
+        onStopped:
+        {
+            easing.type = d.defaultAnimationEasingType
+            d.scalingAfterInteraction = false
+
+            if (!mouseArea.pressed && !d.blockScaleBoundsAnimation)
+            {
+                if (scale < d.minScale)
+                {
+                    animateScaleTo(d.minScale, d.returnToBoundsDuration)
+                }
+                else if (scale > d.maxScale)
+                {
+                    animateScaleTo(d.maxScale, d.returnToBoundsDuration)
+                }
+                else
+                {
+                    returnToBounds()
+                    stickyScaleActivationTimer.restart()
+                }
+            }
+        }
+
+        onScaleChanged:
+        {
+            var newWidth = implicitContentWidth * scale
+            var newHeight = implicitContentHeight * scale
+
+            var ds = newWidth / contentWidth
+
+            contentWidth = newWidth
+            contentHeight = newHeight
+
+            d.scaleOffsetX -= (d.scaleOriginX - 0.5) * newWidth * (ds - 1)
+            d.scaleOffsetY -= (d.scaleOriginY - 0.5) * newHeight * (ds - 1)
+
+            if (unzoomToCenter && !panOffsetXAnimation.running && !panOffsetYAnimation.running
+                && !(mouseArea.buttons & Qt.RightButton))
+            {
+                d.clearScaleOffset()
+
+                var baseOffset = d.defaultPanOffset()
+
+                var maxShiftX = Math.max(0, zoomedItem.width - width) / 2
+                var maxShiftY = Math.max(0, zoomedItem.height - height) / 2
+
+                d.panOffsetX = MathUtils.bound(
+                    baseOffset.x - maxShiftX, d.panOffsetX, baseOffset.x + maxShiftX)
+                d.panOffsetY = MathUtils.bound(
+                    baseOffset.y - maxShiftY, d.panOffsetY, baseOffset.y + maxShiftY)
+            }
+        }
+    }
+
     Binding
     {
         target: d
         property: "targetScale"
-        value: d.scale
+        value: d.currentScale()
         when: !d.scalingAfterInteraction
     }
 
@@ -329,9 +339,17 @@ Item
         interval: 200
         onTriggered:
         {
-            if (d.scale < d.minScale * d.stickyScaleThreshold)
+            if (d.currentScale() < d.minScale * d.stickyScaleThreshold)
                 animateScaleTo(d.minScale, d.stickyScaleAnimationDuration)
         }
+    }
+
+    Connections
+    {
+        target: zoomedItem
+
+        onXChanged: d.at_zoomedItemChangedGeometry()
+        onYChanged: d.at_zoomedItemChangedGeometry()
     }
 
     onWidthChanged: fitInView(true)
@@ -372,15 +390,24 @@ Item
     {
         stopScaleAnimation()
 
-        if (d.scale === scale)
+        var currentScale = d.currentScale()
+
+        if (currentScale === scale)
             return
 
         if (duration === undefined)
             duration = d.defaultAnimationDuration
 
+        scaleAnimation.from = currentScale
         scaleAnimation.to = scale
         scaleAnimation.duration = duration
         scaleAnimation.start()
+    }
+
+    function stopAnimations()
+    {
+        stopScaleAnimation()
+        stopPanOffsetAnimations()
     }
 
     function returnToBounds(instant)
@@ -453,7 +480,7 @@ Item
 
             var newSize = MathUtils.scaledSize(
                 Qt.size(zoomedItem.width, zoomedItem.height), Qt.size(width, height))
-            newScale = d.scale * newSize.width / zoomedItem.width
+            newScale = d.currentScale() * newSize.width / zoomedItem.width
             d.minScale = newScale
 
             var newContentWidth = implicitContentWidth * newScale
@@ -464,7 +491,7 @@ Item
 
         if (instant)
         {
-            d.scale = newScale
+            scaleAnimation.scale = newScale
             d.panOffsetX = newOffsetX
             d.panOffsetY = newOffsetY
         }
@@ -474,5 +501,20 @@ Item
             animateScaleTo(newScale, d.fitInViewDuration)
             animatePanOffsetTo(newOffsetX, newOffsetY, d.fitInViewDuration)
         }
+    }
+
+    function setContentGeometry(x, y, width, height)
+    {
+        d.blockScaleBoundsAnimation = true
+        stopScaleAnimation()
+        stopPanOffsetAnimations()
+        d.clearScaleOffset()
+        d.blockScaleBoundsAnimation = false
+
+        contentWidth = width
+        contentHeight = height
+
+        d.panOffsetX = x - contentX
+        d.panOffsetY = y - contentY
     }
 }
