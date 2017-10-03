@@ -20,6 +20,8 @@ ProxyImageProvider::ProxyImageProvider(QnImageProvider* sourceProvider, QObject*
 
 ProxyImageProvider::~ProxyImageProvider()
 {
+    m_imageProcessorConnections.reset();
+    m_sourceProviderConnections.reset();
 }
 
 QImage ProxyImageProvider::image() const
