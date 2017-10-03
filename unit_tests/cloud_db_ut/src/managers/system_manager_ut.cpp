@@ -40,7 +40,7 @@ protected:
     void givenSystemInState(api::SystemStatus systemStatus)
     {
         m_system = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
-        m_system.status = api::SystemStatus::beingMerged;
+        m_system.status = systemStatus;
         insertSystem(m_ownerAccount, m_system);
     }
 
