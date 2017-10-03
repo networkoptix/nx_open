@@ -1,7 +1,6 @@
 #pragma once
 
-#include <map>
-#include <set>
+#include <QtCore/QSet>
 
 #include <utils/common/connective.h>
 
@@ -23,10 +22,10 @@ public:
     void at_ruleAddedOrUpdated(const nx::vms::event::RulePtr& rule, bool added);
     void at_ruleRemoved(const QnUuid& ruleId);
 
-    std::set<QnUuid> watchedEventsForResource(const QnUuid& resourceId);
+    QSet<QnUuid> watchedEventsForResource(const QnUuid& resourceId);
 
 signals:
-    void rulesUpdated(const std::set<QnUuid>& affectedResources);
+    void rulesUpdated(const QSet<QnUuid>& affectedResources);
 
 private:
     RuleHolder m_ruleHolder;
@@ -35,5 +34,3 @@ private:
 } // namespace metadata
 } // namespace mediaserver
 } // namespace nx
-
-Q_DECLARE_METATYPE(std::set<QnUuid>);
