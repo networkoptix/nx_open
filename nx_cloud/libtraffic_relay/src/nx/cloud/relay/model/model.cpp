@@ -20,7 +20,7 @@ bool Model::doMandatoryInitialization()
     // TODO: #ak Refactor here. E.g., if DB connection parameters are specified, 
     // we can create some dummy RemoteRelayPeerPool so that we keep real RemoteRelayPeerPool 
     // implementation clear (free of DB needed/not needed checks).
-    if (m_settings.cassandraConnection().hostName.empty())
+    if (m_settings.cassandraConnection().host.empty())
         return true;
     return m_remoteRelayPeerPool->connectToDb();
 }
