@@ -75,6 +75,17 @@ void TimestampOverlaySettingsWidget::setData(const ExportTimestampOverlayPersist
     emit dataChanged(m_data);
 }
 
+bool TimestampOverlaySettingsWidget::formatEnabled() const
+{
+    return !ui->formatComboBox->isHidden();
+}
+
+void TimestampOverlaySettingsWidget::setFormatEnabled(bool value)
+{
+    ui->formatLabel->setVisible(value);
+    ui->formatComboBox->setVisible(value);
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -23,6 +23,9 @@ public:
     const ExportTimestampOverlayPersistentSettings& data() const;
     void setData(const ExportTimestampOverlayPersistentSettings& data);
 
+    bool formatEnabled() const;
+    void setFormatEnabled(bool value);
+
 signals:
     void dataChanged(const ExportTimestampOverlayPersistentSettings& data);
     void deleteClicked();

@@ -726,12 +726,22 @@ void ExportSettingsDialog::Private::updateBookmarkText()
 
 void ExportSettingsDialog::Private::updateTimestampText()
 {
-    const auto dateTime = QDateTime::fromMSecsSinceEpoch(m_exportMediaSettings.timePeriod.startTimeMs
-        + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs)
-        .toOffsetFromUtc(qnSyncTime->currentDateTime().offsetFromUtc());
+    if (mediaSupportsUtc())
+    {
+        const auto dateTime = QDateTime::fromMSecsSinceEpoch(m_exportMediaSettings.timePeriod.startTimeMs
+            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs)
+            .toOffsetFromUtc(qnSyncTime->currentDateTime().offsetFromUtc());
 
-    overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
-        m_exportMediaPersistentSettings.timestampOverlay.format));
+        overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
+            m_exportMediaPersistentSettings.timestampOverlay.format));
+    }
+    else
+    {
+        const auto time = QTime(0, 0).addMSecs(m_exportMediaSettings.timePeriod.startTimeMs
+            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs);
+
+        overlay(ExportOverlayType::timestamp)->setText(time.toString(lit("hh:mm:ss")));
+    }
 }
 
 void ExportSettingsDialog::Private::updateMediaImageProcessor()
@@ -776,6 +786,19 @@ LayoutThumbnailLoader* ExportSettingsDialog::Private::layoutImageProvider() cons
 QSize ExportSettingsDialog::Private::fullFrameSize() const
 {
     return m_fullFrameSize;
+}
+
+Filename ExportSettingsDialog::Private::selectedFileName(Mode mode) const
+{
+    return mode == Mode::Media
+        ? m_exportMediaSettings.fileName
+        : m_exportLayoutSettings.filename;
+}
+
+bool ExportSettingsDialog::Private::mediaSupportsUtc() const
+{
+    return m_exportMediaSettings.mediaResource
+        && m_exportMediaSettings.mediaResource->toResource()->hasFlags(Qn::utc);
 }
 
 void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results results,

@@ -406,12 +406,13 @@ void ExportSettingsDialog::updateSettingsWidgets()
     ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
     ui->exportMediaSettingsPage->setApplyFilters(d->exportMediaPersistentSettings().applyFilters);
     ui->timestampSettingsPage->setData(d->exportMediaPersistentSettings().timestampOverlay);
+    ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
     ui->bookmarkSettingsPage->setData(d->exportMediaPersistentSettings().bookmarkOverlay);
     ui->imageSettingsPage->setData(d->exportMediaPersistentSettings().imageOverlay);
     ui->textSettingsPage->setData(d->exportMediaPersistentSettings().textOverlay);
     ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
-    ui->mediaFilenamePanel->setFilename(d->exportMediaSettings().fileName);
-    ui->layoutFilenamePanel->setFilename(d->exportLayoutSettings().filename);
+    ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
+    ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
 }
 
 void ExportSettingsDialog::updateTabWidgetSize()

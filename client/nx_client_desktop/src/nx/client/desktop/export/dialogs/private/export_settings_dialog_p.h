@@ -58,6 +58,9 @@ public:
     void setApplyFilters(bool value);
     void setLayoutReadOnly(bool value);
 
+    bool mediaSupportsUtc() const;
+    Filename selectedFileName(Mode mode) const;
+
     Mode mode() const;
     void setMode(Mode mode);
 
