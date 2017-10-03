@@ -384,6 +384,7 @@ void ExportSettingsDialog::setupSettingsButtons()
 
 ExportSettingsDialog::~ExportSettingsDialog()
 {
+    d->disconnect(this);
 }
 
 ExportSettingsDialog::Mode ExportSettingsDialog::mode() const
