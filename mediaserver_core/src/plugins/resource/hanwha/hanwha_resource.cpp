@@ -8,6 +8,7 @@
 #include "hanwha_ptz_controller.h"
 #include "hanwha_resource_searcher.h"
 #include "hanwha_shared_resource_context.h"
+#include "hanwha_archive_delegate.h"
 
 #include <QtCore/QMap>
 
@@ -642,10 +643,13 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     const auto firmware = response.parameter<QString>(lit("FirmwareVersion"));
     const auto deviceType = response.parameter<QString>(lit("DeviceType"));
 
-    if (!deviceType || deviceType->isEmpty())
-        m_isNvr = false;
-    else
-        m_isNvr = (*deviceType).trimmed() == kNvrDeviceType;
+    m_isNvr = false;
+    if (deviceType && deviceType->trimmed() == kNvrDeviceType)
+    {
+        m_isNvr = true;
+        setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
+        setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
+    }
     
     if (!firmware.is_initialized())
         return CameraDiagnostics::NoErrorResult();
@@ -2316,6 +2320,13 @@ QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
         .remove(QRegExp("[^a-zA-Z]"));
 
     return appName + suffix;
+}
+
+QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
+{
+    if (isNvr())
+        return new HanwhaNvrArchiveDelegate(toSharedPointer());
+    return nullptr;
 }
 
 } // namespace plugins

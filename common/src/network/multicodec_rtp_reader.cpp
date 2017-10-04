@@ -133,6 +133,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 {
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
+    
+    const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
+    if (position != AV_NOPTS_VALUE)
+        m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */ , 1 /* scale */);
 
     QnAbstractMediaDataPtr result;
     do {
@@ -223,6 +227,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
             QnAbstractMediaDataPtr result = m_tracks[i].parser->nextData();
             if (result) {
                 result->channelNumber = m_tracks[i].parser->logicalChannelNum();
+                if (result->dataType == QnAbstractMediaData::VIDEO)
+                {
+                    result->channelNumber = 
+                        std::min(result->channelNumber, (quint32) m_numberOfVideoChannels - 1);
+                }
                 return result;
             }
         }
@@ -501,7 +510,8 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotKeyDataInfo.clear();
     m_gotData = false;
 
-    const CameraDiagnostics::Result result = m_RtpSession.open(m_currentStreamUrl);
+    const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
+    const CameraDiagnostics::Result result = m_RtpSession.open(m_currentStreamUrl, position);
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
@@ -512,7 +522,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if (camera)
         m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
 
-    m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
+    m_RtpSession.play(position, AV_NOPTS_VALUE, 1.0);
 
     m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(QnRtspClient::TT_VIDEO) : 1;
     {
@@ -700,6 +710,21 @@ void QnMulticodecRtpReader::calcStreamUrl()
     {
         QTextStream(&m_currentStreamUrl) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
     }
+}
+
+void QnMulticodecRtpReader::setPositionUsec(qint64 value)
+{
+    m_positionUsec = value;
+}
+
+void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat& format)
+{
+    m_RtpSession.setDateTimeFormat(format);
+}
+
+void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
+{
+    m_timeHelper.setTrustToCameraTime(value);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

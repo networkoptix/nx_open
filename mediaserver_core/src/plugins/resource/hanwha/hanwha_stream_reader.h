@@ -19,13 +19,16 @@ class HanwhaStreamReader: public QnRtpStreamReader
 public:
     HanwhaStreamReader(const HanwhaResourcePtr& res);
 
+    void setPositionUsec(qint64 value);
+
     virtual ~HanwhaStreamReader() override;
 
 protected: 
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
         const QnLiveStreamParams& params) override;
-
+    
+    friend class HanwhaNvrArchiveDelegate;
 private:
     HanwhaProfileParameters makeProfileParameters(
         int profileNumber,

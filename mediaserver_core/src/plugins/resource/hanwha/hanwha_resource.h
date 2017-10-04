@@ -106,7 +106,8 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
-
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+    virtual bool allowRtspVideoLayout() const override { return false; }
 private:
     CameraDiagnostics::Result init();
     CameraDiagnostics::Result initSystem();

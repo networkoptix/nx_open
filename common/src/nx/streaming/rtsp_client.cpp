@@ -252,6 +252,16 @@ QnRtspTimeHelper::~QnRtspTimeHelper()
     }
 }
 
+void QnRtspTimeHelper::setTrustToCameraTime(bool value)
+{
+    m_trustToCameraTime = value;
+}
+
+bool QnRtspTimeHelper::isTrustToCameraTime() const
+{
+    return m_trustToCameraTime;
+}
+
 double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
     double localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
@@ -261,26 +271,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
         m_cameraClockToLocalDiff->timeDiff = localtime - cameraTime;
     double result = cameraTime + m_cameraClockToLocalDiff->timeDiff;
 
-
-    qint64 currentDrift = (localtime - result)*1000;
-    m_cameraClockToLocalDiff->driftSum += currentDrift;
-    m_cameraClockToLocalDiff->driftStats.push(currentDrift);
-    if (m_cameraClockToLocalDiff->driftStats.size() > DRIFT_STATS_WINDOW_SIZE) {
-        qint64 frontVal;
-        m_cameraClockToLocalDiff->driftStats.pop(frontVal);
-        m_cameraClockToLocalDiff->driftSum -= frontVal;
-    }
-
-    //qDebug() << "drift = " << (int) currentDrift;
-    if (m_cameraClockToLocalDiff->driftStats.size() >= DRIFT_STATS_WINDOW_SIZE/4)
-    {
-        double avgDrift = m_cameraClockToLocalDiff->driftSum / (double) m_cameraClockToLocalDiff->driftStats.size();
-        //qDebug() << "avgDrift = " << (int) (avgDrift*1000) << "sz=" << m_cameraClockToLocalDiff->driftStats.size();
-        return result + avgDrift/1000.0;
-    }
-    else {
-        return result;
-    }
+    return result;
 }
 
 void QnRtspTimeHelper::reset()
@@ -288,8 +279,6 @@ void QnRtspTimeHelper::reset()
     QnMutexLocker lock( &m_cameraClockToLocalDiff->mutex );
 
     m_cameraClockToLocalDiff->timeDiff = INT_MAX;
-    m_cameraClockToLocalDiff->driftStats.clear();
-    m_cameraClockToLocalDiff->driftSum = 0;
 }
 
 bool QnRtspTimeHelper::isLocalTimeChanged()
@@ -355,9 +344,15 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const QnRtspStatistic& sta
 {
     if (statistics.isEmpty())
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
-    else {
+    
+    {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
-        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
+
+        double cameraTimeSecs = statistics.nptTime + rtpTimeDiff / double(frequency);
+        if (isTrustToCameraTime())
+            return cameraTimeSecs * 1000000ll; //< Trust to camera time
+
+        double resultInSecs = cameraTimeToLocalTime(cameraTimeSecs);
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
         // Such data can not be recorded to archive. I ofter got that situation if server under debug
@@ -1217,6 +1212,20 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
     return sendRequestInternal(std::move(request));
 }
 
+QByteArray QnRtspClient::nptPosToString(qint64 posUsec) const
+{
+    switch (m_dateTimeFormat)
+    {
+        case DateTimeFormat::ISO:
+        {
+            auto datetime = QDateTime::fromMSecsSinceEpoch(posUsec / 1000, Qt::UTC);
+            return datetime.toString(lit("yyyyMMddThhmmssZ")).toLocal8Bit();
+        }
+        default:
+            return nx_http::StringType::number(posUsec);
+    }
+}
+
 void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
 {
     nx_http::StringType rangeVal;
@@ -1225,7 +1234,7 @@ void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 start
         //There is no guarantee that every RTSP server understands utc ranges.
         //RFC requires only npt ranges support.
         if (startPos != DATETIME_NOW)
-            rangeVal += "clock=" + nx_http::StringType::number(startPos);
+            rangeVal += "clock=" + nptPosToString(startPos);
         else
             rangeVal += "clock=now";
         rangeVal += '-';
@@ -2014,4 +2023,9 @@ void QnRtspClient::setTrackInfo(const TrackMap& tracks)
 AbstractStreamSocket* QnRtspClient::tcpSock()
 {
     return m_tcpSock.get();
+}
+
+void QnRtspClient::setDateTimeFormat(const DateTimeFormat& format)
+{
+    m_dateTimeFormat = format;
 }
