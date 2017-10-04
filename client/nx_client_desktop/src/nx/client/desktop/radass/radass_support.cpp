@@ -20,7 +20,13 @@ bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemD
 
     // Some layouts do not belong to the same resource pool as cameras (e.g. showreels).
     if (!resourcePool)
+    {
+        // Unit tests do not have core module.
+        if (!qnClientCoreModule)
+            return false;
+
         resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    }
 
     const auto camera = resourcePool->getResourceByDescriptor(item.resource)
         .dynamicCast<QnVirtualCameraResource>();
