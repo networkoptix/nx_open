@@ -160,6 +160,10 @@ Control
             }
         }
 
-        onDoubleClicked: fitInView()
+        onDoubleClicked:
+        {
+            flickableView.zoomedItem = null
+            fitInView()
+        }
     }
 }
