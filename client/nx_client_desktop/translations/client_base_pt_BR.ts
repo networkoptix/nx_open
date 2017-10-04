@@ -4327,6 +4327,10 @@ to %1</translation>
       <comment>Soft Trigger</comment>
       <translation type="unfinished">press and hold</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -7217,14 +7221,6 @@ to %1</translation>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Introduza Password...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Password do Administrador</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
@@ -7245,10 +7241,6 @@ to %1</translation>
       <translation type="unfinished">Total amount of licenses will decrease</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>A password não pode estar vazia.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation type="unfinished">Cloud Systems cannot be merged</translation>
     </message>
@@ -7263,6 +7255,14 @@ to %1</translation>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation type="unfinished">Server will be connected to System shortly</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7815,11 +7815,11 @@ to %1</translation>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Parar Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Iniciar Tour</translation>
     </message>
   </context>
   <context>
@@ -8084,8 +8084,8 @@ to %1</translation>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Pressione uma tecla para interromper o Tour.</translation>
     </message>
   </context>
   <context>

@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>새로운 시스템</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>발견 된 시스템 %1이 (가) 현재 시스템과 호환되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -97,7 +97,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>시스템 이벤트</translation>
     </message>
   </context>
   <context>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>서버 %1 : &quot;%2&quot;에서 잘못된 응답을 받았습니다.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>입, 출력 오류가 발생하였습니다. OS 메세지: "%1".</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -180,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>기기 요청 &quot;%1&quot;이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>카메라 요청 &quot;%1&quot;이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I / O 모듈 요청 &quot;%1&quot;이 &quot;%2&quot;  오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>카메라 아카이브에서 복원 되었습니다. 라이브 비디오를 보려면 카메라를 삭제 한후 다시 추가하십시요.</translation>
     </message>
   </context>
   <context>
@@ -408,11 +408,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Time Licenses</translation>
     </message>
   </context>
   <context>
@@ -546,7 +546,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>HWID와 일치하는 서버를  찾지 못했습니다</translation>
     </message>
   </context>
   <context>
@@ -663,11 +663,11 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>하드웨어 ID: %1</translation>
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Time Licenses</translation>
     </message>
   </context>
   <context>
@@ -1203,7 +1203,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>서버 &quot;%1&quot; 오류</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1217,19 +1217,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>서버 &quot;%1&quot; 충돌</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>서버 &quot;%1&quot; 시작됨</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>서버 &quot;%1&quot;에 라이센스 문제가 있습니다.</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>서버 &quot;%1&quot;가 아카이브 백업을 완료했습니다.</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1241,7 +1241,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1283,7 +1283,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Trigger: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1293,8 +1293,8 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n 번, 첫 번째 : %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1357,11 +1357,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD 디스크 "%1" 꽉 찼습니다. 디스크에 VM에 의해 관리 되지 않는 너무 많은 데이터를 포함 합니다.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>시스템 디스크 &quot;%1&quot;가 거의 찼습니다.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1425,7 +1425,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Trigger 이름</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1445,7 +1445,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>모든 관리자</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1457,23 +1457,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Soft Trigger</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Soft Trigger %1 at %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Soft trigger %1이 (가) 여러 번 활성화되었습니다.</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>이메일 보내기</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>확인</translation>
     </message>
   </context>
   <context>

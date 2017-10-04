@@ -2152,7 +2152,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation>thứ hai</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>

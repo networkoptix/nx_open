@@ -22,10 +22,10 @@
                 <tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>พอร์ท</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="พอร์ท" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -50,7 +50,7 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
+                        <h3>รีสตาร์ท</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
                     </div>

@@ -20,7 +20,7 @@
   "settings":{
     "tabs":{
       "server":"เซิร์ฟเวอร์",
-      "system":"System",
+      "system":"ระบบ",
       "device":"อุุปกรณ์"
     },
     "confirmRestart":"Restart server?",
@@ -79,7 +79,7 @@
     "mergeSucceed":"Merge succeed.",
     "newSystemDisplayName":"New system",
     "incompatibleProtocol":"incompatible version",
-    "incompatibleCloudHost":"cloud conflict",
+    "incompatibleCloudHost":"ความขัดแย้งของระบบคลาวด์",
     "incompatibleCloudState":"cloud connected"
   },
   "login":{
@@ -106,7 +106,7 @@
     "selectFiles":"Select files"
   },
   "advanced":{
-    "free":"Free",
+    "free":"ฟรี",
     "total":"Total",
     "occupied":"Occupied",
     "reserved":"Reserved"

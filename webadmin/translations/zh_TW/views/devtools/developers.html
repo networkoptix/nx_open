@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>開發者工具</h2>
         <p>
-            您是否樂於開發與整合呢? 請讓我們知道.
+            Have an idea on how to improve our developer tools or just want to start a conversation?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">給予回饋意見</a></p>
     </div>
@@ -11,9 +11,9 @@
     <div>
         <h3>通用事件生成器</h3>
         <p>
-            通用事件是一種讓第三方系統觸發 VMS 動作的特殊事件。
-            要建立 Generic Event 來整合系統需要向伺服器發出HTTP請求（使用Server API）。
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            A Generic Event is a method of sending events from 3rd party systems to a System,
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">通用事件生成器</a></p>
     </div>
@@ -23,18 +23,18 @@
             伺服器 API 提供一套標準的 API 供第三方廠商呼叫. 讓開發者可取用所有在 Client 上能操作的系統功能: 調閱/管理系統資源 (伺服器, 攝影機, 使用者, 權限), 從系統中索取即時影像或錄影資料, 生成事件, 建立規則, 操控 PTZ 攝影機以及更多功能.
         </p>
         <p>
-            <a href="#/developers/api"><b>API 測試工具（新）</b></a>
-            - 帶有工具的互動式文件以測試 API 呼叫 <br>
-            <a href="#/developers/changelog">API 更新日誌</a>
-            - API 重大變更的清單<br>
-            <a id="api-doc" href="api.xml" target="_blank">API 文件</a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
         </p>
 
     </div>
     <div>
         <h3>攝影機詳細資訊面板</h3>
         <p>
-            用於顯示攝影機附加資訊的web client特殊面板:
+            Displays additional developer-friendly information for cameras in the Web Admin interface:
         </p>
         <ul>
             <li>攝影機 ID</li>
@@ -42,7 +42,8 @@
             <li>從瀏覽器直接匯出影像</li>
         </ul>
         <p>
-            若要開啟攝影機詳細資訊面板 - 開啟 <a href="#/view">web client</a>，選擇攝影機，設置圖示（齒輪），然後選擇 "攝影機細節"
+            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
+            select the target camera, click on the settings icon (gear), then choose "Camera Details"
         </p>
         <p><a href="#/view/?cameraLinks">開啟攝影機詳細資訊面板</a></p>
     </div>

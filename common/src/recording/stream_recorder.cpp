@@ -716,6 +716,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         if (isTranscode)
             context.metadata.dewarpingParams.enabled = false;
 
+        context.metadata.timeZoneOffset = m_serverTimeZoneMs;
+
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature)
         {

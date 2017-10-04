@@ -170,7 +170,7 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="סיסמא" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="סיסמה" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
@@ -191,7 +191,7 @@
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
                     forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
             <div class="help-block">
-                נדרשים אימייל וסיסמא
+                נדרשים אימייל וסיסמה
             </div>
         </div>
 
@@ -223,7 +223,7 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="הקלד סיסמא בשנית" required>
+                   type="password" autocomplete="new-password" placeholder="הקלד סיסמה בשנית" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
@@ -296,13 +296,13 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="כניסה" required>
+                   placeholder="שם משתמש" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="סיסמא" required>
+                   placeholder="סיסמה" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
