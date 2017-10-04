@@ -104,7 +104,8 @@ class DataStructure(models.Model):
                          (1, 'image', 'Image'),
                          (2, 'html', 'HTML'),
                          (3, 'long_text', 'Long Text'),
-                         (4, 'file', 'File'))
+                         (4, 'file', 'File'),
+                         (5, 'guid', 'GUID'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='')

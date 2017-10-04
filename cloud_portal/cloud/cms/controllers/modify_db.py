@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from PIL import Image
-import base64
+import base64, re, uuid
 
 from .filldata import fill_content
 from api.models import Account
@@ -106,6 +106,26 @@ def save_unrevisioned_records(context, customization, language, data_structures,
 
             elif 'delete_' + data_structure_name not in request_data:
                 continue
+
+        elif data_structure.type == DataStructure.DATA_TYPES.guid:
+
+            # if the guid is valid it will go to the next set of checks
+            new_record_value = request_data[data_structure_name] if data_structure_name in request_data else ""
+            is_guid = re.match('\{[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}\}',new_record_value)
+
+            # if its option and not a valid guid set error message and go to next DataStructure
+            if new_record_value and not is_guid:
+                upload_errors.append((data_structure_name, 'Invalid GUID {} it should formatted like {}'\
+                                           .format(new_record_value,
+                                                   "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}")))
+                continue
+
+            # no guid submitted or default value and is not optional generate a guid
+            elif not data_structure.optional and not new_record_value: # and not data_structure.default:
+                new_record_value = '{' + str(uuid.uuid4()) + '}'
+                upload_errors.append((data_structure_name,
+                                      'No submitted GUID or default value. GUID has been generated.' \
+                                      .format(new_record_value)))
 
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
