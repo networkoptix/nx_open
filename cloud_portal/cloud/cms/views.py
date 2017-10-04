@@ -202,33 +202,40 @@ def context_edit_view(request, context=None, language=None):
 
 @require_http_methods(["POST"])
 @permission_required('cms.change_contentversion')
-def review_version_request(request, context=None, language=None):
+def review_version_request(request, version_id=None):
+
+    if not ContentVersion.objects.filter(id=version_id).exists():
+        defaults.bad_request("Version does not exist")
+
     if "Preview" in request.POST:
-        preview_link = "//" + request.get_host() + generate_preview(send_to_review=True)
-        return redirect(preview_link)
+        generate_preview(send_to_review=True)
+        return redirect(reverse('review_version', args=[version_id]) + "?preview")
     elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
         publishing_errors = publish_latest_version(customization, request.user)
-        version = ContentVersion.objects.latest('created_date')
         if publishing_errors:
             messages.error(request, "Version " +
-                             str(version.id) + publishing_errors)
+                             str(version_id) + publishing_errors)
         else:
             messages.success(request, "Version " +
-                             str(version.id) + " has been published")
-        return redirect(reverse('review_version', args=[version.id]))
+                             str(version_id) + " has been published")
+        return redirect(reverse('review_version', args=[version_id]))
     return defaults.bad_request("File does not exist")
 
 
 @require_http_methods(["GET"])
 @permission_required('cms.change_contentversion')
 def review_version_view(request, version_id=None):
+    preview_link = ""
+    if 'preview' in request.GET:
+        preview_link = "//" + request.get_host() + generate_preview_link()
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
     return render(request, 'review_records.html', {'version': version,
                                                    'contexts': contexts,
+                                                   'preview_link': preview_link,
                                                    'user': request.user,
                                                    'has_permission': mysite.has_permission(request),
                                                    'site_url': mysite.site_url,

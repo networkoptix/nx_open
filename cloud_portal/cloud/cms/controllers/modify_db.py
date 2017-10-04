@@ -197,7 +197,7 @@ def remove_unused_records(customization):
 
 
 def generate_preview_link(context=None):
-    return context.url + "?preview" if context else "?preview"
+    return context.url + "?preview" if context else "/content/about?preview"
 
 
 def generate_preview(context=None, send_to_review=False):

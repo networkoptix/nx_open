@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'product_settings/(?P<product_id>.+?)/',
         product_settings, name="product_settings"),
 
-    url(r'review_version_request/', review_version_request,
+    url(r'review_version_request/(?P<version_id>.+?)/', review_version_request,
         name="review_page_actions"),
 
     url(r'review_version/(?P<version_id>.+?)/',

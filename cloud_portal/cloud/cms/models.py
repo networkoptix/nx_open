@@ -124,7 +124,7 @@ class DataStructure(models.Model):
                     DataStructure.DATA_TYPES.text)
 
     def find_actual_value(self, customization, language=None, version_id=None):
-        content_value = None
+        content_value = ""
         content_record = None
         # try to get translated content
         if language and self.translatable:

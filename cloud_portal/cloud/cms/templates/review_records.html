@@ -72,14 +72,24 @@
 	</div>
 </div>
 {% if not version.accepted_date %}
-<form action="{% url 'review_page_actions' %}" method="post">
+<form action="{% url 'review_page_actions' version.id %}" method="post">
 	{% csrf_token %}
 	<div class="submit-row">
-        <button class="btn" type="submit" name="Preview">Preview</button>
+        <button class="btn" type="submit" name="Preview">Generate Preview</button>
 		{% if perms.cms.publish_version %}
         <button class="btn" type="submit" name="Publish">Publish</button>
 		{% endif %}
 	</div>
 </form>
+{% if preview_link %}
+<div class="submit-row">
+    <button class='btn' onClick="openPreview()">Open Preview</button>
+</div>
+{% endif %}
+<script>
+    function openPreview(){
+        window.open("//{{ preview_link }}");
+    }
+</script>
 {% endif %}
 {% endblock %}
