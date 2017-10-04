@@ -68,9 +68,9 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
     return m_rtpReader.openStream();
 }
 
-QUrl HikvisionHevcStreamReader::buildHikvisionStreamUrl(int rtspPortNumber) const
+utils::Url HikvisionHevcStreamReader::buildHikvisionStreamUrl(int rtspPortNumber) const
 {
-    auto url = QUrl(m_hikvisionResource->getUrl());
+    auto url = nx::utils::Url(m_hikvisionResource->getUrl());
     url.setScheme(lit("rtsp"));
     url.setPort(rtspPortNumber);
     url.setPath(kChannelStreamingPathTemplate.arg(
@@ -81,9 +81,9 @@ QUrl HikvisionHevcStreamReader::buildHikvisionStreamUrl(int rtspPortNumber) cons
     return url;
 }
 
-QUrl HikvisionHevcStreamReader::hikvisionRequestUrlFromPath(const QString& path) const
+nx::utils::Url HikvisionHevcStreamReader::hikvisionRequestUrlFromPath(const QString& path) const
 {
-    auto url = QUrl(m_hikvisionResource->getUrl());
+    auto url = nx::utils::Url(m_hikvisionResource->getUrl());
     url.setPath(path);
 
     return url;

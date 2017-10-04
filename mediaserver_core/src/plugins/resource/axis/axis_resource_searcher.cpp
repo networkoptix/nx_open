@@ -62,7 +62,7 @@ QString QnPlAxisResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
 

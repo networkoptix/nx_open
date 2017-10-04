@@ -154,7 +154,7 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
 {
     auto httpClient = getHttpClient();
 
-    QUrl requestUrl(getUrl());
+    nx::utils::Url requestUrl(getUrl());
     requestUrl.setPath(lit("/ISAPI/System/TwoWayAudio/channels"));
     requestUrl.setHost(getHostAddress());
     requestUrl.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));

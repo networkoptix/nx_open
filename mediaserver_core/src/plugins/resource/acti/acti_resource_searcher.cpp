@@ -218,7 +218,7 @@ QString QnActiResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     if (!url.scheme().isEmpty() && doMultichannelCheck)
         return QList<QnResourcePtr>();
@@ -226,7 +226,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     QnResourceList result;
     auto actiRes = QnActiResourcePtr(new QnActiResource());
 
-    QUrl urlCopy(
+    nx::utils::Url urlCopy(
         lit("http://%1:%2")
             .arg(url.host())
             .arg(url.port(nx_http::DEFAULT_HTTP_PORT)));

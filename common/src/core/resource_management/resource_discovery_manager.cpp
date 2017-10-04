@@ -37,7 +37,7 @@
 
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
-QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
+QnManualCameraInfo::QnManualCameraInfo(const nx::utils::Url &url, const QAuthenticator& auth, const QString& resType)
 {
     QString urlStr = url.toString();
     this->url = url;
@@ -286,7 +286,7 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input)
         qWarning()
             << "CheckHostAddrAsync exception ("<<e.what()<<") caught\n"
             << "\t\tresource type:" << input.resType->getName() << "\n"
-            << "\t\tresource url:" << input.url << "\n";
+            << "\t\tresource url:" << input.url.toString() << "\n";
 
         return QnResourceList();
     }
@@ -295,7 +295,7 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input)
         qWarning()
             << "CheckHostAddrAsync exception caught\n"
             << "\t\tresource type:" << input.resType->getName() << "\n"
-            << "\t\tresource url:" << input.url << "\n";
+            << "\t\tresource url:" << input.url.toString() << "\n";
 
         return QnResourceList();
     }
@@ -580,7 +580,7 @@ void QnResourceDiscoveryManager::fillManualCamInfo(QnManualCameraInfoMap& camera
 {
     QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
     QAuthenticator auth = camera->getAuth();
-    auto inserted = cameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), auth, resType->getName()));
+    auto inserted = cameras.insert(camera->getUniqueId(), QnManualCameraInfo(nx::utils::Url(camera->getUrl()), auth, resType->getName()));
     for (int i = 0; i < m_searchersList.size(); ++i) {
         if (m_searchersList[i]->isResourceTypeSupported(resType->getId()))
             inserted.value().searcher = m_searchersList[i];
@@ -599,7 +599,7 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
             if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
                 continue;
 
-                auto url = QUrl(itr.key());
+                auto url = nx::utils::Url(itr.key());
                 if (url.path() == lit("/"))
                     url.setPath(lit(""));
 
@@ -651,7 +651,7 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
         if (!m_manualCameraMap.contains(camera->getUrl())) {
             QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
             QAuthenticator auth = camera->getAuth();
-            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), auth, resType->getName()));
+            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(nx::utils::Url(camera->getUrl()), auth, resType->getName()));
         }
     }
     if (!newManualCameras.isEmpty())
@@ -661,7 +661,7 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
 {
     QnMutexLocker lock( &m_searchersListMutex );
-    return m_manualCameraMap.contains(QUrl(url).toString(QUrl::StripTrailingSlash));
+    return m_manualCameraMap.contains(nx::utils::Url(url).toString(QUrl::StripTrailingSlash));
 }
 
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {

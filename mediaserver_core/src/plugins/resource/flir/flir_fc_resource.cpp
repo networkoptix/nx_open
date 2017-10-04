@@ -215,7 +215,7 @@ bool FcResource::hasDualStreaming() const
     return false;
 }
 
-bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const QUrl& url)
+bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const nx::utils::Url& url)
 {
     auto success = httpClient.doGet(url);
     if (!success)

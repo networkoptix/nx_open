@@ -56,7 +56,7 @@ FcResourceSearcher::~FcResourceSearcher()
 }
 
 QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     bool doMultichannelCheck)
 {

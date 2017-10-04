@@ -142,13 +142,13 @@ bool doGetRequest(
     nx_http::StatusCode::Value* outStatusCode = nullptr);
 
 bool doPutRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     const nx::Buffer& buffer,
     nx_http::StatusCode::Value* outStatusCode = nullptr);
 
 bool doRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     const nx_http::Method::ValueType& method,
     const nx::Buffer* bufferToSend = nullptr,
