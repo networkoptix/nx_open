@@ -8,8 +8,8 @@
     static bool changeUser( struct passwd* pwd )
     {
         if( !pwd ||
-            setreuid( pwd->pw_uid, pwd->pw_uid ) < 0 ||
-            setregid( pwd->pw_gid, pwd->pw_gid ) < 0 )
+            setregid( pwd->pw_gid, pwd->pw_gid ) < 0 ||
+            setreuid( pwd->pw_uid, pwd->pw_uid ) < 0)
         {
             // TODO: qWarning or NX_LOG the real error?
             return false;
