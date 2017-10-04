@@ -204,12 +204,12 @@ def fill_content(customization_name='default', product='cloud_portal',
 
         changed_records = DataRecord.objects.filter(version_id=version_id)
         if not version_id:  # if version_id is None - check if records are actually latest
-            changed_records = [record for record in changed_records if
-                               record.id == DataRecord.objects.
-                               filter(language_id=record.language_id,
-                                      data_structure_id=record.data_structure_id,
-                                      customization_id=customization.id).
-                               latest('created_date').id]
+            changed_records_ids = [DataRecord.objects.
+                                   filter(language_id=record.language_id,
+                                          data_structure_id=record.data_structure_id,
+                                          customization_id=customization.id).
+                                   latest('created_date').id for record in changed_records]
+            changed_records = changed_records.filter(id__in=changed_records_ids)
 
         changed_context_ids = list(changed_records.values_list('data_structure__context_id', flat=True).distinct())
         changed_contexts = Context.objects.filter(id__in=changed_context_ids)
@@ -234,8 +234,10 @@ def fill_content(customization_name='default', product='cloud_portal',
         # if the default language is changed - we update all languages (lazy way)
         # otherwise - update only affected languages
         if incremental:
-            changed_languages = changed_records.filter(data_structure__context_id=context.id).values_list('language').distinct()
-            if changed_languages.filter(id=customization.default_language_id).exists():
+            changed_languages = list(changed_records.filter(data_structure__context_id=context.id).\
+                values_list('language__code', flat=True).distinct())
+
+            if customization.default_language.code in changed_languages:
                 # if default language changes - it can affect all languages in the context
                 changed_languages = customization.languages_list
 
