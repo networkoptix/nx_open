@@ -153,7 +153,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
         return None, None, None, None
 
-    preview_link = request.get_host() + generate_preview_link(context) if saved else ""
+    preview_link = generate_preview_link(context) if saved else ""
 
     form.add_fields(context, customization, language, user)
 
@@ -230,7 +230,7 @@ def review_version_request(request, version_id=None):
 def review_version_view(request, version_id=None):
     preview_link = ""
     if 'preview' in request.GET:
-        preview_link = "//" + request.get_host() + generate_preview_link()
+        preview_link = generate_preview_link()
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
     return render(request, 'review_records.html', {'version': version,
