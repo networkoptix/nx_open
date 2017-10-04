@@ -17,6 +17,11 @@
 #include <helpers/url_helper.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 
+static QObject* createNxGlobals(QQmlEngine*, QJSEngine*)
+{
+    return new NxGlobalsObject();
+}
+
 void QnClientCoreMetaTypes::initialize()
 {
     qRegisterMetaType<QnStringSet>();
@@ -37,9 +42,8 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterType<nx::client::core::animation::KineticAnimation>(
         "Nx.Animations", 1, 0, "KineticAnimation");
 
-    qmlRegisterUncreatableType<NxGlobalsObject>(
-        "Nx", 1, 0, "NxGlobals", QLatin1String("Cannot create an instance of NxGlobals."));
-    qmlRegisterUncreatableType<QnUrlHelper>(
+    qmlRegisterSingletonType<NxGlobalsObject>("Nx", 1, 0, "Nx", &createNxGlobals);
+    qmlRegisterUncreatableType<QnUuid>(
         "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
     qRegisterMetaType<QnUrlHelper>();
     qmlRegisterUncreatableType<QnUrlHelper>(
