@@ -1,5 +1,6 @@
 #if defined(ENABLE_HANWHA)
 
+#include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_utils.h"
 
@@ -26,9 +27,10 @@ const QString kAction = lit("action");
 
 } // namespace
 
-HanwhaRequestHelper::HanwhaRequestHelper(const QnSecurityCamResourcePtr& resource):
+HanwhaRequestHelper::HanwhaRequestHelper(const HanwhaResourcePtr& resource):
     m_auth(resource->getAuth()),
-    m_url(resource->getUrl())
+    m_url(resource->getUrl()),
+    m_requestSemaphore(resource->requestSemaphore())
 {
 }
 
@@ -168,6 +170,7 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
     httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
 
+    QnSemaphoreLocker lock(m_requestSemaphore);
     if (!httpClient.doGet(url))
         return false;
 

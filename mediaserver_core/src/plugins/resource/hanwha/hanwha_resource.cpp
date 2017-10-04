@@ -7,6 +7,7 @@
 #include "hanwha_stream_reader.h"
 #include "hanwha_ptz_controller.h"
 #include "hanwha_resource_searcher.h"
+#include "hanwha_shared_resource_context.h"
 
 #include <QtCore/QMap>
 
@@ -21,10 +22,13 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/camera_advanced_param.h>
+
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -472,17 +476,26 @@ QString HanwhaResource::sessionKey(
     HanwhaSessionType sessionType,
     bool generateNewOne)
 {
-    auto discoveryManager = commonModule()->resourceDiscoveryManager();
-    if (!discoveryManager)
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    
+    if (!sharedContext)
         return QString();
 
-    auto searcher = dynamic_cast<HanwhaResourceSearcher*>(
-        discoveryManager->searcherByManufacture(kHanwhaManufacturerName));
+    return sharedContext->sessionKey(sessionType, generateNewOne);
+}
 
-    if (!searcher)
-        return QString();
+QnSemaphore* HanwhaResource::requestSemaphore()
+{
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
 
-    return searcher->sessionKey(toSharedPointer(this), sessionType, generateNewOne);
+    if (!sharedContext)
+        return nullptr;
+
+    return sharedContext->requestSemaphore();
 }
 
 bool HanwhaResource::isVideoSourceActive()

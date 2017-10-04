@@ -43,11 +43,6 @@ public:
         const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
-    QString sessionKey(
-        const HanwhaResourcePtr resource,
-        HanwhaSessionType sessionType,
-        bool generateNewOne = false) const;
-
 private:
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,
