@@ -5,13 +5,13 @@
                 <img src="customization/webadmin_logo.png" height="40" style="margin-top:5px"/>
             </a>
 
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">                 <span class="sr-only">Toggle navigation</span>                 <span class="icon-bar"></span>                 <span class="icon-bar"></span>                 <span class="icon-bar"></span>             </button>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">                 <span class="sr-only">Alternar navegación</span>                 <span class="icon-bar"></span>                 <span class="icon-bar"></span>                 <span class="icon-bar"></span>             </button>
         </div>
         <nav ng-if="!noPanel" class="collapse navbar-collapse" id="navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
+                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Settings</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}"><a ng-href="#/view/">View</a></li>
-                <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}"><a ng-href="#/client/">Cliente Lite</a></li>
-                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Configuración</a></li>
+                <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}"><a ng-href="#/client/">Lite Client</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Información</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">Para los desarrolladores</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Ayuda</a></li>

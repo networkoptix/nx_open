@@ -280,7 +280,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation>研判...</translation>
+      <translation>使用者行为记录...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
@@ -1038,23 +1038,22 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>另一个进程正使用文件&quot;%1&quot;.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>文件 &quot;%1&quot; 无法覆写，请尝试另一个名称。</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>文件名不应包含下列字符：%1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>文件名&quot;%1&quot; 由作业系统保留。请尝试另一个名字。</translation>
     </message>
   </context>
   <context>
@@ -1407,7 +1406,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>研判日志回放</translation>
+      <translation>使用者行为记录回放</translation>
     </message>
   </context>
   <context>
@@ -2639,11 +2638,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>不正确的邮箱或密码</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>帐户无法激活。请检查您的电子邮件并遵循提供的说明操作</translation>
     </message>
   </context>
   <context>
@@ -3380,7 +3379,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation>打开审查跟踪日志</translation>
+      <translation>打开使用者行为记录日志</translation>
     </message>
     <message>
       <source>Monitor All Servers on a Single Layout</source>
@@ -4250,7 +4249,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1（轮播&quot;%2&quot; 已启用）</translation>
+      <translation>%1 (轮播&quot;%2&quot; 已启用)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4266,12 +4265,16 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>无法调用触发器 %1（%2）</translation>
+      <translation>无法调用触发器 %1 (%2)</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>按住</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
   </context>
   <context>
@@ -4573,7 +4576,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>当任何一个用户看到事件书签, 通知将被显示</translation>
     </message>
   </context>
   <context>
@@ -4799,7 +4802,7 @@ to %1</source>
     </message>
     <message>
       <source>Space</source>
-      <translation>空格</translation>
+      <translation>空间</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -6377,7 +6380,7 @@ to %1</source>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
+      <translation>h时 ap</translation>
     </message>
     <message>
       <source>dd</source>
@@ -6407,7 +6410,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy h ap</translation>
+      <translation>dd日 MMMM yyyy h时 ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
@@ -7139,14 +7142,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>输入密码...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>管理员密码</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>系统将于短期内合并</translation>
     </message>
@@ -7167,10 +7162,6 @@ to %1</source>
       <translation>授权的总量将减少</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>密码不能为空。</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>云系统不能合并</translation>
     </message>
@@ -7185,6 +7176,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>服务器将很快连接到系统</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7714,11 +7713,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>停止轮巡</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>开始轮巡</translation>
     </message>
   </context>
   <context>
@@ -7976,8 +7975,8 @@ to %1</source>
       <translation>使用键盘方向键切换布局。退出幻灯片按Esc键。</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>按任意键停止轮巡.</translation>
     </message>
   </context>
   <context>

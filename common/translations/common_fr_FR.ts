@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nouveau Système</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Le système découvert %1 est incompatible avec le système actuel.</translation>
     </message>
   </context>
   <context>

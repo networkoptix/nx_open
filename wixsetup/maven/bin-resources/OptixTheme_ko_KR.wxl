@@ -4,14 +4,10 @@
   <String Id="Caption">[WixBundleName] 설정 - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
-   creates a complete local copy of the bundle in directory. Install is the default.
-
-/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
-   no prompts. By default UI and all prompts are displayed.
-
-/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
-/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
+  <String Id="HelpText">/ 설치 | / 수리 | / uninstall | / layout [directory] - 디렉토리에 번들의 전체 로컬 복사본을 설치, 복구, 제거 또는 작성합니다. 설치가 기본값입니다.
+ / 패시브 | / quiet - 프롬프트가없는 최소 UI를 표시하거나 UI가없고 프롬프트가 표시되지 않습니다. 기본적으로 UI 및 모든 프롬프트가 표시됩니다. 
+/ norestart - 다시 시작하려는 시도를 모두 표시하지 않습니다. 기본적으로 UI는 다시 시작하기 전에 확인 메시지를 표시합니다.
+ / log log.txt - 특정 파일에 기록합니다. 기본적으로 로그 파일은 %TEMP%에 생성됩니다.</String>
   <String Id="ConfirmCancelMessage">취소하시겠습니까?</String>
   <String Id="ClientAndServer">클라이언트와 서버</String>
   <String Id="ClientOnly">클라이언트만</String>
@@ -61,13 +57,13 @@
   <String Id="InstallLicenseText">\"동의 및 설치\"를 클릭 하 여 동의 하세요</String>
   <String Id="Options">옵션:</String>
   <String Id="SelectApps">설치할 응용 프로그램을 선택 합니다.</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="msierrFirewallCannotConnect">Windows 방화벽에 연결할 수 없습니다. ([2] [3] [4] [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Windows 방화벽 구성</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Windows 방화벽 구성</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Windows 방화벽 구성 롤백 중</String>
+  <String Id="WixExecFirewallExceptionsInstall">Windows 방화벽 구성 설치 중</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Windows 방화벽 구성 롤백 중</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Windows 방화벽 구성 제거 중</String>
+  <String Id="Product_ArchMismatch_x86">이 패키지는 32 비트 OS용으로 설계 되었습니다. 설치를 지금 종료 합니다.</String>
+  <String Id="Product_ArchMismatch_x64">이 패키지는 64 비트 OS용으로 설계 되었습니다. 설치를 지금 종료 합니다.</String>
 </WixLocalization>

@@ -4,8 +4,8 @@
     "lowStream":"Düşük akış",
     "transcoding":"Dönüştürme",
     "unknown":"Belirtilmemiş",
-    "copyToClipboard":"copy to clipboard",
-    "copyDefaultText":"copy",
+    "copyToClipboard":"panoya yapıştır",
+    "copyDefaultText":"kopyala",
     "copyActiveText":"copied to clipboard"
   },
   "systemOffline":"System Offline",
@@ -23,5 +23,5 @@
     "ieWin10":"Please, use Microsoft Edge or Google Chrome browsers.",
     "ubuntuNX":"This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
   },
-  "searchCamPlaceholder":"search"
+  "searchCamPlaceholder":"arama"
 }

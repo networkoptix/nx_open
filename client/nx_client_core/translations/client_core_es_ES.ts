@@ -75,7 +75,7 @@
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Lo sentimos, el servicio %1 no se encuentra disponible temporalmente. Estamos haciendo nuestro mejor esfuerzo para restaurarlo. Por favor, inténtelo de nuevo más tarde.</translation>
+      <translation>Lo sentimos, el servicio %1 no se encuentra temporalmente disponible. Estamos haciendo nuestro mejor esfuerzo para restaurarlo. Por favor, inténtelo de nuevo más tarde.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
