@@ -148,7 +148,7 @@ private:
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
-    std::atomic<qint64> m_positionUsec = AV_NOPTS_VALUE;
+    std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
 };
 
 #endif // ENABLE_DATA_PROVIDERS
