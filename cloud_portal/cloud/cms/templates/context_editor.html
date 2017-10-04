@@ -31,30 +31,29 @@
             {{ field.label_tag }}
             <div id="{{field.label}}" style="display:inline-block;">
                 {% if field|is_ImageField and field.value %}
-                    {% if field|is_optional:context %}
                     <div>
-                        <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
-                        <img class="preview-image context-preview" style="opacity: 0.5;"
+                        {% if field|is_optional:context %}
+                        <label><input id="delete_{{field.name}}" type="checkbox"
+                                      name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
+                        <img class="preview-image context-preview optional-image"
                              src="data:image/png;base64,{{field.value}}">
-                    </div>
-                    {% else %}
-                    <div>
+
+                        {% else %}
                         <img class="preview-image context-preview"
                              src="data:image/png;base64,{{field.value}}">
+                        {% endif %}
                     </div>
-                    {% endif %}
 
                 {% elif field|is_FileField and field.value %}
-                    {% if field|is_optional:context %}
                     <div>
+                        {% if field|is_optional:context %}
                         <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
                         <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download Example</a>
-                    </div>
-                    {% else %}
-                    <div>
+
+                        {% else %}
                         <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download</a>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 {% endif %}
                 {{ field }}
                 
