@@ -112,6 +112,7 @@ class DataStructure(models.Model):
     meta_settings = JSONField(default=dict())
     advanced = models.BooleanField(default=False)
     order = models.IntegerField(default=100000)
+    optional = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -156,7 +157,7 @@ class DataStructure(models.Model):
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 
-        if not content_value:  # if no value - use default value from structure
+        if not content_value and not self.optional:  # if no value - use default value from structure
             content_value = self.default
 
         return content_value

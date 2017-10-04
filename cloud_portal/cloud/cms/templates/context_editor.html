@@ -31,17 +31,29 @@
             {{ field.label_tag }}
             <div id="{{field.label}}" style="display:inline-block;">
                 {% if field|is_ImageField and field.value %}
-                <div>
-                    <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
-                </div>
-                {% endif %}
+                    {% if field|is_optional:context %}
+                    <div>
+                        <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
+                        <img style="max-height: 400px; max-width: 400px; opacity: 0.5;" src="data:image/png;base64,{{field.value}}">
+                    </div>
+                    {% else %}
+                    <div>
+                        <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
+                    </div>
+                    {% endif %}
 
-                {% if field|is_FileField and field.value %}
-                <div>
-                    <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download</a>
-                </div>
+                {% elif field|is_FileField and field.value %}
+                    {% if field|is_optional:context %}
+                    <div>
+                        <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
+                        <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download Example</a>
+                    </div>
+                    {% else %}
+                    <div>
+                        <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download</a>
+                    </div>
+                    {% endif %}
                 {% endif %}
-
                 {{ field }}
                 
                 {% if field.help_text %}

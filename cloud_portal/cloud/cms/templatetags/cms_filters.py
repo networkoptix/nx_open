@@ -12,3 +12,10 @@ def is_ImageField(field):
 @register.filter
 def is_FileField(field):
     return type(field.field).__name__ == "FileField"
+
+
+@register.filter
+def is_optional(field, context):
+    name = field.name
+    data_structure = DataStructure.objects.get(context=context, name=name)
+    return data_structure.optional

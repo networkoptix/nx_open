@@ -76,6 +76,7 @@ def update_from_object(cms_structure):
                 record_type = "text"
                 meta = None
                 advanced = False
+                optional = False
                 if len(record) == 3:
                     label, name, value = record
                 if len(record) == 4:
@@ -89,6 +90,7 @@ def update_from_object(cms_structure):
                 record_type = record['type'] if 'type' in record else None
                 meta = record['meta'] if 'meta' in record else None
                 advanced = record['advanced'] if 'advanced' in record else False
+                optional = record['optional'] if 'optional' in record else False
 
             data_structure = find_or_add_data_structure(name, old_name, context.id, has_language)
 
@@ -96,6 +98,7 @@ def update_from_object(cms_structure):
             order += 1
             data_structure.label = label if label else name
             data_structure.advanced = advanced
+            data_structure.optional = optional
             if description:
                 data_structure.description = description
             if record_type:

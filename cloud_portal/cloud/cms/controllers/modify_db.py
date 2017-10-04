@@ -69,7 +69,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
         if data_structure.type == DataStructure.DATA_TYPES.image\
                 or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
-            if data_structure_name in request_files:
+            if data_structure_name in request_files and request_files[data_structure_name]:
                 new_record_value, meta, invalid_file_type = handle_file_upload(
                     request_files[data_structure_name], data_structure)
 
@@ -101,8 +101,12 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         upload_errors.extend(size_errors)
                         continue
             # If neither case do nothing for this record
-            else:
+            elif not data_structure.optional:
                 continue
+
+            elif 'delete_' + data_structure_name not in request_data:
+                continue
+
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
 
