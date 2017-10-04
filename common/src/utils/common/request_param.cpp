@@ -73,10 +73,10 @@ QNetworkReply::NetworkError QnHTTPRawResponse::httpStatusCodeToNetworkError(
     }
 }
 
-QnRequestParams requestParamsFromUrl(const QUrl& url)
+QnRequestParams requestParamsFromUrl(const nx::utils::Url& url)
 {
     QnRequestParams params;
-    const QUrlQuery query(url);
+    const QUrlQuery query(url.toQUrl());
     for (const auto& item: query.queryItems())
     {
         if (!params.contains(item.first))

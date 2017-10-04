@@ -949,7 +949,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-QUrl appServerConnectionUrl(QSettings &settings)
+nx::utils::Url appServerConnectionUrl(QSettings &settings)
 {
     // migrate appserverPort settings from version 2.2 if exist
     if (!qnServerModule->roSettings()->value("appserverPort").isNull())
@@ -958,18 +958,18 @@ QUrl appServerConnectionUrl(QSettings &settings)
         qnServerModule->roSettings()->remove("appserverPort");
     }
 
-    QUrl appServerUrl;
+    nx::utils::Url appServerUrl;
     QUrlQuery params;
 
     // ### remove
     QString host = settings.value("appserverHost").toString();
     if( QUrl( host ).scheme() == "file" )
     {
-        appServerUrl = QUrl( host ); // it is a completed URL
+        appServerUrl = nx::utils::Url( host ); // it is a completed URL
     }
     else if (host.isEmpty() || host == "localhost")
     {
-        appServerUrl = QUrl::fromLocalFile( closeDirPath( getDataDirectory() ) );
+        appServerUrl = nx::utils::Url::fromLocalFile( closeDirPath( getDataDirectory() ) );
     }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
@@ -1270,7 +1270,7 @@ void MediaServerProcess::updateAddressesList()
     NX_LOGX(lit("Update mediaserver addresses: %1")
             .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
 
-    const QUrl defaultUrl(m_mediaServer->getApiUrl());
+    const nx::utils::Url defaultUrl(m_mediaServer->getApiUrl());
     const SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
     if (std::find(serverAddresses.begin(), serverAddresses.end(),
                   defaultAddress) == serverAddresses.end())
@@ -2497,7 +2497,7 @@ void MediaServerProcess::run()
     QSettings* settings = qnServerModule->roSettings();
 
     commonModule()->setResourceDiscoveryManager(new QnMServerResourceDiscoveryManager(commonModule()));
-    QUrl appServerUrl = appServerConnectionUrl(*settings);
+    nx::utils::Url appServerUrl = appServerConnectionUrl(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( qnServerModule->roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 

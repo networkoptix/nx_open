@@ -303,7 +303,7 @@ void QnMediaServerResource::setUrl(const QString& url)
     emit apiUrlChanged(toSharedPointer(this));
 }
 
-QUrl QnMediaServerResource::getApiUrl() const
+nx::utils::Url QnMediaServerResource::getApiUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(apiUrlScheme(isSslAllowed()))
@@ -363,7 +363,7 @@ SocketAddress QnMediaServerResource::getPrimaryAddress() const
     QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
         return m_primaryAddress;
-    return nx::network::url::getEndpoint(QUrl(m_url));
+    return nx::network::url::getEndpoint(nx::utils::Url(m_url));
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const
@@ -666,9 +666,9 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
     }
 }
 
-QUrl QnMediaServerResource::buildApiUrl() const
+nx::utils::Url QnMediaServerResource::buildApiUrl() const
 {
-    QUrl url;
+    nx::utils::Url url;
     if (m_primaryAddress.isNull())
     {
         url = m_apiConnection->url();

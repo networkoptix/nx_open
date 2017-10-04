@@ -35,33 +35,33 @@ void HttpClient::pleaseStop()
     m_cond.wakeAll();
 }
 
-bool HttpClient::doGet(const QUrl& url)
+bool HttpClient::doGet(const nx::utils::Url& url)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncHttpClient::*)(const QUrl&)>(
+        static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&)>(
             &nx_http::AsyncHttpClient::doGet), _1, url));
 }
 
 bool HttpClient::doUpgrade(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const StringType& protocolToUpgradeTo)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncHttpClient::*)(const QUrl&, const StringType&)>(
+        static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&, const StringType&)>(
             &nx_http::AsyncHttpClient::doUpgrade), _1, url, protocolToUpgradeTo));
 }
 
 bool HttpClient::doPost(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBody)
 {
     using namespace std::placeholders;
 
     typedef void(AsyncHttpClient::*FuncType)(
-        const QUrl& /*url*/,
+        const nx::utils::Url& /*url*/,
         const nx_http::StringType& /*contentType*/,
         nx_http::StringType /*messageBody*/,
         bool /*includeContentLength*/);
@@ -76,12 +76,12 @@ bool HttpClient::doPost(
 }
 
 bool HttpClient::doPut(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBody)
 {
     typedef void(AsyncHttpClient::*FuncType)(
-        const QUrl& /*url*/,
+        const nx::utils::Url& /*url*/,
         const nx_http::StringType& /*contentType*/,
         nx_http::StringType /*messageBody*/);
 
@@ -93,11 +93,11 @@ bool HttpClient::doPut(
         std::move(messageBody)));
 }
 
-bool HttpClient::doDelete(const QUrl& url)
+bool HttpClient::doDelete(const nx::utils::Url& url)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncHttpClient::*)(const QUrl&)>(
+        static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&)>(
             &nx_http::AsyncHttpClient::doDelete), _1, url));
 }
 
@@ -143,12 +143,12 @@ void HttpClient::addAdditionalHeader(const StringType& key, const StringType& va
     m_additionalHeaders.emplace_back(key, value);
 }
 
-const QUrl& HttpClient::url() const
+const nx::utils::Url& HttpClient::url() const
 {
     return m_asyncHttpClient->url();
 }
 
-const QUrl& HttpClient::contentLocationUrl() const
+const nx::utils::Url& HttpClient::contentLocationUrl() const
 {
     return m_asyncHttpClient->contentLocationUrl();
 }
@@ -249,7 +249,7 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
 }
 
 bool HttpClient::fetchResource(
-    const QUrl& url,
+    const nx::utils::Url& url,
     BufferType* msgBody,
     StringType* contentType)
 {

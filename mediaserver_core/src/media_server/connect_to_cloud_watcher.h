@@ -24,9 +24,9 @@ public:
 private slots:
     void at_updateConnection();
     void restartTimer();
-    void addCloudPeer(QUrl url);
+    void addCloudPeer(nx::utils::Url url);
 private:
-    QUrl m_cloudUrl;
+    nx::utils::Url m_cloudUrl;
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudModuleUrlFetcher> m_cdbEndPointFetcher;
     ec2::AbstractTransactionMessageBus* m_messageBus;

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <QtCore/QUrl>
+#include <QtCore/QJsonValue>
+#include <QtXml/QtXml>
+#include <boost/optional.hpp>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace utils {
@@ -20,14 +24,22 @@ public:
     Url& operator=(Url&& /*other*/) = default;
 
 
-    inline void swap(Url& cother) Q_DECL_NOTHROW { m_url.swap(other); }
+    inline void swap(Url& other) Q_DECL_NOTHROW { m_url.swap(other.m_url); }
 
     void setUrl(const QString& url, QUrl::ParsingMode mode = QUrl::TolerantMode);
-    QString url(QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
-    QString toString(QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
-    QString toDisplayString(QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
+    QString url(
+        QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
+
+    QString toString(
+        QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
+
+    QString toDisplayString(
+        QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
     QByteArray toEncoded(QUrl::FormattingOptions options = QUrl::FullyEncoded) const;
+    QUrl toQUrl() const;
+
+    static Url fromQUrl(const QUrl& url);
     static Url fromEncoded(const QByteArray &url, QUrl::ParsingMode mode = QUrl::TolerantMode);
     static Url fromUserInput(const QString &userInput);
     static Url fromUserInput(
@@ -44,36 +56,36 @@ public:
     void setScheme(const QString &scheme);
     QString scheme() const;
 
-    void setAuthority(const QString &authority, ParsingMode mode = TolerantMode);
-    QString authority(ComponentFormattingOptions options = PrettyDecoded) const;
+    void setAuthority(const QString &authority, QUrl::ParsingMode mode = QUrl::TolerantMode);
+    QString authority(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
 
-    void setUserInfo(const QString &userInfo, ParsingMode mode = TolerantMode);
-    QString userInfo(ComponentFormattingOptions options = PrettyDecoded) const;
+    void setUserInfo(const QString &userInfo, QUrl::ParsingMode mode = QUrl::TolerantMode);
+    QString userInfo(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
 
-    void setUserName(const QString &userName, ParsingMode mode = DecodedMode);
-    QString userName(ComponentFormattingOptions options = FullyDecoded) const;
+    void setUserName(const QString &userName, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    QString userName(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
 
-    void setPassword(const QString &password, ParsingMode mode = DecodedMode);
-    QString password(ComponentFormattingOptions = FullyDecoded) const;
+    void setPassword(const QString &password, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    QString password(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
 
-    void setHost(const QString &host, ParsingMode mode = DecodedMode);
-    QString host(ComponentFormattingOptions = FullyDecoded) const;
+    void setHost(const QString &host, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    QString host(QUrl::ComponentFormattingOptions = QUrl::FullyDecoded) const;
 
     void setPort(int port);
     int port(int defaultPort = -1) const;
 
-    void setPath(const QString &path, ParsingMode mode = DecodedMode);
-    QString path(ComponentFormattingOptions options = FullyDecoded) const;
-    QString fileName(ComponentFormattingOptions options = FullyDecoded) const;
+    void setPath(const QString &path, QUrl::ParsingMode mode = QUrl::DecodedMode);
+    QString path(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
+    QString fileName(QUrl::ComponentFormattingOptions options = QUrl::FullyDecoded) const;
 
     bool hasQuery() const;
-    void setQuery(const QString &query, ParsingMode mode = TolerantMode);
+    void setQuery(const QString &query, QUrl::ParsingMode mode = QUrl::TolerantMode);
     void setQuery(const QUrlQuery &query);
-    QString query(ComponentFormattingOptions = PrettyDecoded) const;
+    QString query(QUrl::ComponentFormattingOptions = QUrl::PrettyDecoded) const;
 
     bool hasFragment() const;
-    QString fragment(ComponentFormattingOptions options = PrettyDecoded) const;
-    void setFragment(const QString &fragment, ParsingMode mode = TolerantMode);
+    QString fragment(QUrl::ComponentFormattingOptions options = QUrl::PrettyDecoded) const;
+    void setFragment(const QString &fragment, QUrl::ParsingMode mode = QUrl::TolerantMode);
 
     Q_REQUIRED_RESULT QUrl resolved(const QUrl &relative) const;
 
@@ -81,34 +93,32 @@ public:
     bool isParentOf(const QUrl &url) const;
 
     bool isLocalFile() const;
-    static QUrl fromLocalFile(const QString &localfile);
+    static Url fromLocalFile(const QString &localfile);
     QString toLocalFile() const;
 
     void detach();
     bool isDetached() const;
 
-    bool operator <(const QUrl &url) const;
-    bool operator ==(const QUrl &url) const;
-    bool operator !=(const QUrl &url) const;
+    bool operator <(const Url &url) const;
+    bool operator ==(const Url &url) const;
+    bool operator !=(const Url &url) const;
 
-    bool matches(const QUrl &url, FormattingOptions options) const;
+    bool matches(const Url &url, QUrl::FormattingOptions options) const;
 
-    static QString fromPercentEncoding(const QByteArray &);
-    static QByteArray toPercentEncoding(const QString &,
-                                        const QByteArray &exclude = QByteArray(),
-                                        const QByteArray &include = QByteArray());
-#if defined(Q_OS_DARWIN) || defined(Q_QDOC)
-    static QUrl fromCFURL(CFURLRef url);
-    CFURLRef toCFURL() const Q_DECL_CF_RETURNS_RETAINED;
-    static QUrl fromNSURL(const NSURL *url);
-    NSURL *toNSURL() const Q_DECL_NS_RETURNS_AUTORELEASED;
-#endif
+    static QString fromPercentEncoding(const QByteArray& url);
+    static QByteArray toPercentEncoding(
+        const QString &,
+        const QByteArray &exclude = QByteArray(),
+        const QByteArray &include = QByteArray());
 
 private:
     QUrl m_url;
-    boost::optional<int> m_IpV6ScopeId;
+    boost::optional<int> m_ipV6ScopeId;
 
-    static QUrl urlFromString(const QString& url);
+    Url(const QUrl& other);
+
+    template<typename SetUrlFunc>
+    void parse(const QString& url, SetUrlFunc setUrlFunc);
 };
 
 
@@ -142,3 +152,27 @@ inline bool addressesEqual(const QUrl& lhs, const QUrl& rhs)
 } // namespace url
 } // namespace utils
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::utils::Url)
+
+inline void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target)
+{
+    *target = QJsonValue(url.toString());
+}
+
+inline bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::utils::Url* target)
+{
+    *target = nx::utils::Url(value.toString());
+    return true;
+}
+
+inline bool deserialize(const QString& s, nx::utils::Url* url)
+{
+    *url = nx::utils::Url(s);
+    return true;
+}
+
+inline void serialize(const nx::utils::Url& url, QString* target)
+{
+    *target = url.toString();
+}

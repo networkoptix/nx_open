@@ -134,7 +134,7 @@ QnPlAxisResource::~QnPlAxisResource()
 
 void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
@@ -220,7 +220,7 @@ bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
     //based on VAPIX Version 3 I/O Port API
 
     QAuthenticator auth = getAuth();
-    QUrl requestUrl;
+    nx::utils::Url requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
     //preparing request
@@ -1368,7 +1368,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     //based on VAPIX Version 3 I/O Port API
 
     QAuthenticator auth = getAuth();
-    QUrl requestUrl;
+    nx::utils::Url requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
     //preparing request

@@ -10,6 +10,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/url.h>
 
 #include "http_types.h"
 
@@ -31,7 +32,7 @@ public:
     class AuthorizationCacheItem
     {
     public:
-        QUrl url;
+        nx::utils::Url url;
         StringType method;
         StringType userName;
         boost::optional<StringType> password;
@@ -45,7 +46,7 @@ public:
             typename AuthorizationRef
         >
         AuthorizationCacheItem(
-            const QUrl& url,
+            const nx::utils::Url& url,
             const StringType& method,
             const StringType& userName,
             boost::optional<StringType> password,
@@ -146,7 +147,7 @@ public:
         \return \a true if necessary information has been found in cache and added to \a request. \a false otherwise
     */
     bool addAuthorizationHeader(
-        const QUrl& url,
+        const nx::utils::Url& url,
         Request* const request,
         AuthInfoCache::AuthorizationCacheItem* const authzData );
 
@@ -154,7 +155,7 @@ public:
         \param url This argument is required since \a request->requestLine.url can contain only path
     */
     static bool addAuthorizationHeader(
-        const QUrl& url,
+        const nx::utils::Url& url,
         Request* const request,
         AuthInfoCache::AuthorizationCacheItem authzData );
     static AuthInfoCache* instance();
@@ -168,7 +169,7 @@ private:
     mutable std::mutex m_mutex;
 
     AuthorizationCacheItem getCachedAuthentication(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const StringType& method ) const;
 
     AuthInfoCache( const AuthInfoCache& );

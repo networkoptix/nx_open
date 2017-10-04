@@ -312,7 +312,7 @@ Handle ServerConnection::downloadFileChunk(
 
 Handle ServerConnection::downloadFileChunkFromInternet(
     const QString& fileName,
-    const QUrl& url,
+    const nx::utils::Url& url,
     int chunkIndex,
     int chunkSize,
     Result<QByteArray>::type callback,
@@ -725,7 +725,7 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
         auto nearestServer = commonModule()->currentServer();
         if (!nearestServer)
             return nx_http::ClientPool::Request();
-        QUrl nearestUrl(server->getApiUrl());
+        nx::utils::Url nearestUrl(server->getApiUrl());
         if (nearestServer->getId() == commonModule()->moduleGUID())
             request.url.setHost(lit("127.0.0.1"));
         else

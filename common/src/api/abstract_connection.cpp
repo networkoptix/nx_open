@@ -58,11 +58,11 @@ void QnAbstractConnection::setExtraQueryParameters(const QnRequestParamList &ext
     m_extraQueryParameters = extraQueryParameters;
 }
 
-QUrl QnAbstractConnection::url() const {
+nx::utils::Url QnAbstractConnection::url() const {
     return m_url;
 }
 
-void QnAbstractConnection::setUrl(const QUrl &url) {
+void QnAbstractConnection::setUrl(const nx::utils::Url &url) {
     m_url = url;
 }
 
@@ -121,10 +121,10 @@ int QnAbstractConnection::sendAsyncRequest(
             m_extraHeaders.end(),
             std::inserter(actualHeaders, actualHeaders.end()));
 
-    QUrlQuery urlQuery(m_url);
+    QUrlQuery urlQuery(m_url.toQUrl());
     for (auto it = m_extraQueryParameters.begin(); it != m_extraQueryParameters.end(); ++it)
         urlQuery.addQueryItem(it->first, it->second);
-    QUrl url = m_url;
+    nx::utils::Url url = m_url;
     url.setQuery(urlQuery);
 
     return commonModule()->sessionManager()->sendAsyncRequest(

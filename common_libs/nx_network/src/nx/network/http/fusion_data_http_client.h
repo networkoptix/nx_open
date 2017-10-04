@@ -13,6 +13,7 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/url.h>
 
 namespace nx_http {
 namespace detail {
@@ -63,7 +64,7 @@ class BaseFusionDataHttpClient:
     using self_type = BaseFusionDataHttpClient<HandlerFunc>;
 
 public:
-    BaseFusionDataHttpClient(QUrl url, AuthInfo auth):
+    BaseFusionDataHttpClient(nx::utils::Url url, AuthInfo auth):
         m_url(std::move(url))
     {
         m_httpClient.setAuth(auth);
@@ -128,7 +129,7 @@ public:
     }
 
 protected:
-    QUrl m_url;
+    nx::utils::Url m_url;
     nx_http::StringType m_requestContentType;
     nx_http::BufferType m_requestBody;
     nx::utils::MoveOnlyFunc<HandlerFunc> m_handler;
@@ -177,7 +178,7 @@ public:
      * TODO: #ak If response Content-Type is multipart, then handler is invoked for every body part.
      */
     FusionDataHttpClient(
-        QUrl url,
+        nx::utils::Url url,
         AuthInfo auth,
         const InputData& input)
         :
@@ -213,7 +214,7 @@ class FusionDataHttpClient<void, OutputData>:
         void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url, AuthInfo auth):
+    FusionDataHttpClient(nx::utils::Url url, AuthInfo auth):
         ParentType(std::move(url), std::move(auth))
     {
     }
@@ -244,7 +245,7 @@ class FusionDataHttpClient<InputData, void>:
 
 public:
     FusionDataHttpClient(
-        QUrl url,
+        nx::utils::Url url,
         AuthInfo auth,
         const InputData& input)
         :
@@ -278,7 +279,7 @@ class FusionDataHttpClient<void, void>:
         void(SystemError::ErrorCode, const nx_http::Response*)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url, AuthInfo auth):
+    FusionDataHttpClient(nx::utils::Url url, AuthInfo auth):
         ParentType(std::move(url), std::move(auth))
     {
     }

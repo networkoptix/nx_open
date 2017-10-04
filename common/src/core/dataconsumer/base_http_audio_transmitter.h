@@ -37,7 +37,7 @@ protected:
         nx_http::AsyncHttpClientPtr httpClient,
         bool isRetryAfterUnauthorizedResponse) const = 0;
 
-    virtual QUrl transmissionUrl() const = 0;
+    virtual nx::utils::Url transmissionUrl() const = 0;
     virtual std::chrono::milliseconds transmissionTimeout() const = 0;
     virtual nx_http::StringType contentType() const = 0;
 

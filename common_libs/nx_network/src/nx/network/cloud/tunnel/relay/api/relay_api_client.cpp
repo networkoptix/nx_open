@@ -19,8 +19,7 @@ namespace api {
 
 static ClientFactory::CustomFactoryFunc factoryFunc;
 
-std::unique_ptr<Client> ClientFactory::create(
-    const QUrl& baseUrl)
+std::unique_ptr<Client> ClientFactory::create(const utils::Url &baseUrl)
 {
     if (factoryFunc)
         return factoryFunc(baseUrl);
@@ -39,7 +38,7 @@ ClientFactory::CustomFactoryFunc
 //-------------------------------------------------------------------------------------------------
 // ClientImpl
 
-ClientImpl::ClientImpl(const QUrl& baseUrl):
+ClientImpl::ClientImpl(const nx::utils::Url& baseUrl):
     m_baseUrl(baseUrl),
     m_prevSysErrorCode(SystemError::noError)
 {
@@ -186,7 +185,7 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
         const char* requestPathTemplate,
         std::initializer_list<RequestPathArgument> requestPathArguments)
 {
-    QUrl requestUrl = m_baseUrl;
+    nx::utils::Url requestUrl = m_baseUrl;
     requestUrl.setPath(network::url::normalizePath(
         requestUrl.path() +
         nx_http::rest::substituteParameters(

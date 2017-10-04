@@ -42,7 +42,7 @@ namespace ec2
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
         virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 
-        virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+        virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
         virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
         virtual void dropConnections() override;

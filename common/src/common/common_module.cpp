@@ -240,11 +240,11 @@ QnUuid QnCommonModule::remoteGUID() const {
     return m_remoteUuid;
 }
 
-QUrl QnCommonModule::currentUrl() const
+nx::utils::Url QnCommonModule::currentUrl() const
 {
     if (auto connection = ec2Connection())
         return connection->connectionInfo().ecUrl;
-    return QUrl();
+    return nx::utils::Url();
 }
 
 QnMediaServerResourcePtr QnCommonModule::currentServer() const

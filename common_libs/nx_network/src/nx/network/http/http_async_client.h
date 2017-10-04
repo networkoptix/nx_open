@@ -12,6 +12,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/url.h>
 
 #include "abstract_msg_body_source.h"
 #include "auth_cache.h"
@@ -135,7 +136,7 @@ public:
      * @return true, if socket is created and async connect is started. false otherwise.
      *   To get error description use SystemError::getLastOSErrorCode().
      */
-    void doGet(const QUrl& url);
+    void doGet(const nx::utils::Url& url);
     /**
      * This overload is same as:
      * @code{.cpp}
@@ -144,34 +145,34 @@ public:
      * @endcode
      */
     void doGet(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     /**
      * Start POST request to url.
      * @return true, if socket is created and async connect is started. false otherwise
      */
-    void doPost(const QUrl& url);
+    void doPost(const nx::utils::Url &url);
     void doPost(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doPut(const QUrl& url);
+    void doPut(const nx::utils::Url& url);
     void doPut(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doDelete(const QUrl& url);
+    void doDelete(const nx::utils::Url& url);
     void doDelete(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doUpgrade(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doUpgrade(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx_http::Method::ValueType method,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
@@ -195,8 +196,8 @@ public:
      * @note This method is thread-safe and can be called in any thread.
      */
     BufferType fetchMessageBodyBuffer();
-    const QUrl& url() const;
-    const QUrl& contentLocationUrl() const;
+    const nx::utils::Url& url() const;
+    const nx::utils::Url& contentLocationUrl() const;
     /**
      * Number of bytes read (including http request line and headers)
      *  via single HTTP request.
@@ -255,7 +256,7 @@ public:
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
 
-    static QString endpointWithProtocol(const QUrl& url);
+    static QString endpointWithProtocol(const nx::utils::Url& url);
 
 private:
     enum class Result
@@ -275,8 +276,8 @@ private:
     bool m_connectionClosed;
     BufferType m_requestBuffer;
     size_t m_requestBytesSent;
-    QUrl m_requestUrl;
-    QUrl m_contentLocationUrl;
+    nx::utils::Url m_requestUrl;
+    nx::utils::Url m_contentLocationUrl;
     HttpStreamReader m_httpStreamReader;
     BufferType m_responseBuffer;
     BufferType m_receivedBytesLeft;

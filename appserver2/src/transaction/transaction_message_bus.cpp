@@ -1086,9 +1086,9 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         emit peerLost(aliveData.peer.id, aliveData.peer.peerType);
 }
 
-static SocketAddress getUrlAddr(const QUrl& url) { return SocketAddress(url.host(), url.port()); }
+static SocketAddress getUrlAddr(const nx::utils::Url& url) { return SocketAddress(url.host(), url.port()); }
 
-bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
+bool QnTransactionMessageBus::isPeerUsing(const nx::utils::Url& url)
 {
     const SocketAddress& addr1 = getUrlAddr(url);
     for (int i = 0; i < m_connectingConnections.size(); ++i)
@@ -1198,7 +1198,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
     }
 }
 
-void QnTransactionMessageBus::at_peerIdDiscovered(const QUrl& url, const QnUuid& id)
+void QnTransactionMessageBus::at_peerIdDiscovered(const nx::utils::Url& url, const QnUuid& id)
 {
     QnMutexLocker lock(&m_mutex);
     auto itr = m_remoteUrls.find(url);
@@ -1245,9 +1245,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 
     // add new outgoing connections
-    for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
+    for (QMap<nx::utils::Url, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
-        const QUrl& url = itr.key();
+        const nx::utils::Url& url = itr.key();
         RemoteUrlConnectInfo& connectInfo = itr.value();
         bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
 
@@ -1506,9 +1506,9 @@ bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
     return false;
 }
 
-QUrl QnTransactionMessageBus::updateOutgoingUrl(const QUrl& srcUrl) const
+nx::utils::Url QnTransactionMessageBus::updateOutgoingUrl(const nx::utils::Url& srcUrl) const
 {
-    QUrl url(srcUrl);
+    nx::utils::Url url(srcUrl);
     url.setPath("/ec2/events");
     QUrlQuery q(url.query());
 
@@ -1519,10 +1519,10 @@ QUrl QnTransactionMessageBus::updateOutgoingUrl(const QUrl& srcUrl) const
     return url;
 }
 
-void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& _url)
+void QnTransactionMessageBus::addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url &_url)
 {
     removeOutgoingConnectionFromPeer(id);
-    QUrl url = updateOutgoingUrl(_url);
+    nx::utils::Url url = updateOutgoingUrl(_url);
     QnMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url))
     {
@@ -1540,7 +1540,7 @@ void QnTransactionMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
         RemoteUrlConnectInfo& info = itr.value();
         if (info.id == id)
         {
-            QUrl url = itr.key();
+            nx::utils::Url url = itr.key();
             const SocketAddress& urlStr = getUrlAddr(url);
             for (QnTransactionTransport* transport : m_connections.values())
             {

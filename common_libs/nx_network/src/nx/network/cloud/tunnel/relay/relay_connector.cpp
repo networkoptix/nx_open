@@ -12,7 +12,7 @@ namespace cloud {
 namespace relay {
 
 Connector::Connector(
-    QUrl relayUrl,
+    nx::utils::Url relayUrl,
     AddressEntry targetHostAddress,
     nx::String connectSessionId)
     :

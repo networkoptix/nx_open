@@ -54,7 +54,7 @@ public:
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
-    virtual QUrl getApiUrl() const;
+    virtual nx::utils::Url getApiUrl() const;
 
     SocketAddress getPrimaryAddress() const;
     void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
@@ -166,7 +166,7 @@ private:
     mutable QnResourcePtr m_firstCamera;
 
     Qn::PanicMode calculatePanicMode() const;
-    QUrl buildApiUrl() const;
+    nx::utils::Url buildApiUrl() const;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr)

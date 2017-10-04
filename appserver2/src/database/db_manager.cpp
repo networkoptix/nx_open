@@ -325,7 +325,7 @@ QString QnDbManager::getDatabaseName(const QString& baseName)
     return baseName + commonModule()->moduleGUID().toString();
 }
 
-bool QnDbManager::init(const QUrl& dbUrl)
+bool QnDbManager::init(const nx::utils::Url& dbUrl)
 {
     NX_ASSERT(m_tranLog != nullptr);
     m_tran.reset(new QnDbTransactionExt(m_sdb, m_tranLog, m_mutex));

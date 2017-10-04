@@ -12,7 +12,7 @@ public:
     OldEcConnection(const QnConnectionInfo& connectionInfo);
 
     virtual QnConnectionInfo connectionInfo() const override;
-    virtual void updateConnectionUrl(const QUrl& url) override;
+    virtual void updateConnectionUrl(const nx::utils::Url& url) override;
 
     virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &) override;
     virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;
@@ -46,7 +46,7 @@ public:
     virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
 
-    virtual void addRemotePeer(const QnUuid& id, const QUrl& _url) override;
+    virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) override;
     virtual void deleteRemotePeer(const QnUuid& id) override;
 
     virtual Timestamp getTransactionLogTime() const override;

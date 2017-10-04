@@ -96,7 +96,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     }
     else
     {
-        QUrl url;
+        nx::utils::Url url;
         if (const auto& connection = m_bus->commonModule()->ec2Connection())
             url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());

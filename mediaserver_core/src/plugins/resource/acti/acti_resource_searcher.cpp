@@ -109,7 +109,7 @@ nx_upnp::DeviceInfo QnActiResourceSearcher::parseDeviceXml(
     return xmlHandler.deviceInfo();
 }
 
-QByteArray QnActiResourceSearcher::getDeviceXmlAsync(const QUrl& url)
+QByteArray QnActiResourceSearcher::getDeviceXmlAsync(const nx::utils::Url& url)
 {
     QnMutexLocker lock( &m_mutex );
 
@@ -135,7 +135,7 @@ QByteArray QnActiResourceSearcher::getDeviceXmlAsync(const QUrl& url)
     return m_cachedXml.value(host).xml;
 }
 
-nx_upnp::DeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const QUrl& url, bool* outStatus) const
+nx_upnp::DeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const nx::utils::Url &url, bool* outStatus) const
 {
     nx_upnp::DeviceInfo deviceInfo;
     QByteArray response;
@@ -297,7 +297,7 @@ boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiS
     if (status != CL_HTTP_SUCCESS)
     {
         bool upnpDevInfoStatus = false;
-        QUrl deviceXmlUrl(actiResource->getUrl());
+        nx::utils::Url deviceXmlUrl(actiResource->getUrl());
         deviceXmlUrl.setPort(kActiDeviceXmlPort);
         deviceXmlUrl.setPath(kActiDeviceXmlPath);
 
@@ -384,7 +384,7 @@ void QnActiResourceSearcher::processPacket(
 
         if (!m_systemInfoCheckers.contains(host))
         {
-            auto checker = std::make_shared<QnActiSystemInfoChecker>(QUrl(devInfo.presentationUrl));
+            auto checker = std::make_shared<QnActiSystemInfoChecker>(nx::utils::Url(devInfo.presentationUrl));
             m_systemInfoCheckers[host] = checker;
         }
 

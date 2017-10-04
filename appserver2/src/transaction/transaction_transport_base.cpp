@@ -446,11 +446,11 @@ const ec2::ApiPeerData& QnTransactionTransportBase::remotePeer() const
     return m_remotePeer;
 }
 
-QUrl QnTransactionTransportBase::remoteAddr() const
+nx::utils::Url QnTransactionTransportBase::remoteAddr() const
 {
     QnMutexLocker lock(&m_mutex);
     // Emulating deep copy here
-    QUrl tmpUrl(m_remoteAddr);
+    nx::utils::Url tmpUrl(m_remoteAddr);
     tmpUrl.setUserName(tmpUrl.userName());
     return tmpUrl;
 }
@@ -509,7 +509,7 @@ void QnTransactionTransportBase::removeEventHandler( int eventHandlerID )
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
-void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
+void QnTransactionTransportBase::doOutgoingConnect(const nx::utils::Url& remotePeerUrl)
 {
     NX_LOG( QnLog::EC2_TRAN_LOG,
         lm("QnTransactionTransportBase::doOutgoingConnect. remotePeerUrl = %1").arg(remotePeerUrl),
@@ -609,7 +609,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         Qn::EC2_CONNECTION_STATE_HEADER_NAME,
         toString(getState()).toLatin1() );
 
-    QUrl url = remoteAddr();
+    nx::utils::Url url = remoteAddr();
     url.setPath(url.path() + lit("/") + toString(getState()));
     m_httpClient->doGet(url);
 }
@@ -626,7 +626,7 @@ void QnTransactionTransportBase::repeatDoGet()
     m_httpClient->removeAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME );
     m_httpClient->addAdditionalHeader( Qn::EC2_CONNECTION_STATE_HEADER_NAME, toString(getState()).toLatin1() );
 
-    QUrl url = remoteAddr();
+    nx::utils::Url url = remoteAddr();
     url.setPath(url.path() + lit("/") + toString(getState()));
     m_httpClient->doGet(url);
 }
@@ -957,10 +957,10 @@ void QnTransactionTransportBase::onMonitorConnectionForClosure(
         std::bind(&QnTransactionTransportBase::onMonitorConnectionForClosure, this, _1, _2) );
 }
 
-QUrl QnTransactionTransportBase::generatePostTranUrl()
+nx::utils::Url QnTransactionTransportBase::generatePostTranUrl()
 {
     //return m_postTranBaseUrl;
-    QUrl postTranUrl = m_postTranBaseUrl;
+    nx::utils::Url postTranUrl = m_postTranBaseUrl;
     postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
     return postTranUrl;
 }
@@ -1349,7 +1349,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         else
         {
             QnMutexLocker lk( &m_mutex );
-            QUrlQuery query = QUrlQuery(m_remoteAddr);
+            QUrlQuery query = QUrlQuery(m_remoteAddr.toQUrl());
             query.addQueryItem("canceled", QString());
             m_remoteAddr.setQuery(query);
         }

@@ -134,7 +134,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
 
     const QString configApi = globalSettings->statisticsReportServerApi();
     const QString serverApi = configApi.isEmpty() ? Ec2StaticticsReporter::DEFAULT_SERVER_API : configApi;
-    const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
+    const nx::utils::Url url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
 
     auto crashes = readCrashes();
     while (!crashes.isEmpty())
@@ -194,7 +194,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
             std::chrono::milliseconds(SCAN_TIMER_CYCLE));
 }
 
-bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSettings* settings)
+bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash, QSettings* settings)
 {
     auto filePath = crash.absoluteFilePath();
     QFile file(filePath);

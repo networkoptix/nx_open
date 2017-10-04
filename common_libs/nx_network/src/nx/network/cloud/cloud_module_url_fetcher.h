@@ -23,13 +23,13 @@ namespace cloud {
  */
 class NX_NETWORK_API CloudModuleUrlFetcher:
     public BasicCloudModuleUrlFetcher<
-        nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, QUrl)>>
+        nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, nx::utils::Url)>>
 {
     using base_type = BasicCloudModuleUrlFetcher<
-        nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, QUrl)>>;
+        nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, nx::utils::Url)>>;
 
 public:
-    using Handler = nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, QUrl)>;
+    using Handler = nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, nx::utils::Url)>;
 
     /**
      * Helper class to be used if BasicCloudModuleUrlFetcher user can die before
@@ -60,7 +60,7 @@ public:
     /**
      * Specify url explicitly.
      */
-    void setUrl(QUrl endpoint);
+    void setUrl(nx::utils::Url endpoint);
 
 protected:
     virtual bool analyzeXmlSearchResult(
@@ -71,7 +71,7 @@ protected:
 
 private:
     const int m_moduleAttrName;
-    boost::optional<QUrl> m_url;
+    boost::optional<nx::utils::Url> m_url;
 };
 
 //-------------------------------------------------------------------------------------------------

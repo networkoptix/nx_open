@@ -149,11 +149,11 @@ protected:
 
         m_requestIsRunning = true;
         m_httpClient->doGet(
-            m_modulesXmlUrl,
+            nx::utils::Url::fromQUrl(m_modulesXmlUrl),
             std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
     }
 
-    QUrl buildUrl(const QString& str, int moduleAttrName)
+    nx::utils::Url buildUrl(const QString& str, int moduleAttrName)
     {
         QUrl url(str);
         if (url.host().isEmpty())
@@ -183,7 +183,7 @@ protected:
             }
         }
 
-        return url;
+        return nx::utils::Url::fromQUrl(url);
     }
 
 private:

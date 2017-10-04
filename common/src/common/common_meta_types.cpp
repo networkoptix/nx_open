@@ -7,6 +7,7 @@
 #include <utils/common/request_param.h>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
+#include <nx/utils/url.h>
 #include <utils/common/optional.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/math/space_mapper.h>
@@ -208,6 +209,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
+    qRegisterMetaType<nx::utils::Url>();
 
 #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();

@@ -289,7 +289,7 @@ void DeviceSearcher::onSomeBytesRead(
         return;
     uuidStr = uuidStr.split( ':' )[1];
 
-    const QUrl descriptionUrl( QLatin1String( locationHeader->second ) );
+    const nx::utils::Url descriptionUrl( QLatin1String( locationHeader->second ) );
     uuidStr += descriptionUrl.toString();
     if (descriptionUrl.isValid())
         startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
@@ -425,7 +425,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
 
 void DeviceSearcher::startFetchDeviceXml(
     const QByteArray& uuidStr,
-    const QUrl& descriptionUrl,
+    const nx::utils::Url& descriptionUrl,
     const HostAddress& remoteHost )
 {
     DiscoveredDeviceInfo info;

@@ -9,7 +9,7 @@ namespace cloud {
 namespace relay {
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
-    QUrl relayUrl,
+    nx::utils::Url relayUrl,
     nx::String relaySessionId,
     std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient)
     :

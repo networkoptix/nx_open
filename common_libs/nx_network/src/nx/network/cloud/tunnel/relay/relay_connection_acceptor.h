@@ -29,7 +29,7 @@ class NX_NETWORK_API ReverseConnection:
     using base_type = aio::BasicPollable;
 
 public:
-    ReverseConnection(const QUrl& relayUrl);
+    ReverseConnection(const utils::Url &relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -75,7 +75,7 @@ class NX_NETWORK_API ConnectionAcceptor:
     using base_type = AbstractConnectionAcceptor;
 
 public:
-    ConnectionAcceptor(const QUrl& relayUrl);
+    ConnectionAcceptor(const utils::Url &relayUrl);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -88,7 +88,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const QUrl m_relayUrl;
+    const nx::utils::Url m_relayUrl;
     ReverseConnectionAcceptor<detail::ReverseConnection> m_acceptor;
     bool m_started = false;
 
@@ -102,10 +102,10 @@ private:
 
 class NX_NETWORK_API ConnectionAcceptorFactory:
     public nx::utils::BasicFactory<
-        std::unique_ptr<AbstractConnectionAcceptor>(const QUrl& /*relayUrl*/)>
+        std::unique_ptr<AbstractConnectionAcceptor>(const nx::utils::Url& /*relayUrl*/)>
 {
     using base_type = nx::utils::BasicFactory<
-        std::unique_ptr<AbstractConnectionAcceptor>(const QUrl& /*relayUrl*/)>;
+        std::unique_ptr<AbstractConnectionAcceptor>(const nx::utils::Url& /*relayUrl*/)>;
 
 public:
     ConnectionAcceptorFactory();
@@ -113,8 +113,7 @@ public:
     static ConnectionAcceptorFactory& instance();
 
 private:
-    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(
-        const QUrl& relayUrl);
+    std::unique_ptr<AbstractConnectionAcceptor> defaultFactoryFunc(const utils::Url &relayUrl);
 };
 
 } // namespace relay

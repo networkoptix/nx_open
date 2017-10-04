@@ -316,7 +316,7 @@ int Appserver2Process::exec()
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));
 
-    const QUrl dbUrl = QUrl::fromLocalFile(settings.dbFilePath());
+    const nx::utils::Url dbUrl = nx::utils::Url::fromLocalFile(settings.dbFilePath());
 
     ec2::AbstractECConnectionPtr ec2Connection;
     //QnConnectionInfo connectInfo;

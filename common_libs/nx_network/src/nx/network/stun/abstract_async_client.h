@@ -4,6 +4,7 @@
 #include <nx/network/retry_timer.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace stun {
@@ -46,7 +47,7 @@ public:
      * @param handler Called when 1st connection attempt has passed regardless of its success.
      * NOTE: Shall be called only once (to provide address). Reconnect will happen automatically.
      */
-    virtual void connect(const QUrl& url, ConnectHandler handler = nullptr) = 0;
+    virtual void connect(const nx::utils::Url& url, ConnectHandler handler = nullptr) = 0;
 
     /**
      * Subscribes for certain indications.

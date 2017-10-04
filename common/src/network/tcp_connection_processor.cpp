@@ -500,7 +500,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->authenticatedOnce = d->authenticatedOnce;
 }
 
-QUrl QnTCPConnectionProcessor::getDecodedUrl() const
+nx::utils::Url QnTCPConnectionProcessor::getDecodedUrl() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->request.requestLine.url;

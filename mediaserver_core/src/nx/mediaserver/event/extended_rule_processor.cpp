@@ -401,7 +401,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    QUrl url(action->getParams().url);
+    nx::utils::Url url(action->getParams().url);
 
     if (action->getParams().text.isEmpty())
     {

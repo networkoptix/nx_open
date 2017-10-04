@@ -12,10 +12,10 @@ namespace url {
 class Builder
 {
 public:
-    Builder(const QUrl& url = QUrl()): m_url(url) {}
+    Builder(const nx::utils::Url& url = nx::utils::Url()): m_url(url) {}
 
-    QUrl toUrl() const { return m_url; }
-    operator QUrl() const { return toUrl(); }
+    nx::utils::Url toUrl() const { return m_url; }
+    operator nx::utils::Url() const { return toUrl(); }
 
     QString toString(QUrl::FormattingOptions options =
         QUrl::FormattingOptions(QUrl::PrettyDecoded)) const
@@ -92,7 +92,7 @@ public:
     }
 
 private:
-    QUrl m_url;
+    nx::utils::Url m_url;
 };
 
 } // namespace url

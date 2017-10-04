@@ -60,7 +60,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
     initSocket();
 }
 
-CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, const QAuthenticator& auth):
+CLSimpleHTTPClient::CLSimpleHTTPClient(const nx::utils::Url& url, unsigned int timeout, const QAuthenticator& auth):
     m_host(url.host()),
     m_port(url.port()),
     m_connected(false),

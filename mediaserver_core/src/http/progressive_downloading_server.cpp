@@ -509,7 +509,7 @@ void QnProgressiveDownloadingConsumer::run()
         }
         updateCodecByFormat(d->streamingFormat);
 
-        const QUrlQuery decodedUrlQuery( getDecodedUrl() );
+        const QUrlQuery decodedUrlQuery( getDecodedUrl().toQUrl() );
 
         QSize videoSize(640,480);
         QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();

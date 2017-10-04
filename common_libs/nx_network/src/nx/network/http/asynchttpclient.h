@@ -70,7 +70,7 @@ public:
      * @return true, if socket is created and async connect is started. false otherwise.
      *   To get error description use SystemError::getLastOSErrorCode().
      */
-    void doGet(const QUrl& url);
+    void doGet(const nx::utils::Url& url);
     /**
      * This overload is same as:
      * @code{.cpp}
@@ -84,7 +84,7 @@ public:
      * @endcode
      */
     void doGet(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     /**
@@ -94,37 +94,37 @@ public:
      * @todo Infinite POST message body support
      */
     void doPost(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody,
         bool includeContentLength = true);
     void doPost(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody,
         bool includeContentLength,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doPut(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
     void doPut(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
-    void doDelete(const QUrl& url);
+    void doDelete(const nx::utils::Url& url);
     void doDelete(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doUpgrade(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const StringType& protocolToUpgradeTo);
     void doUpgrade(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
@@ -147,8 +147,8 @@ public:
      * @note This method is thread-safe and can be called in any thread.
      */
     BufferType fetchMessageBodyBuffer();
-    const QUrl& url() const;
-    const QUrl& contentLocationUrl() const;
+    const nx::utils::Url& url() const;
+    const nx::utils::Url& contentLocationUrl() const;
     /**
      * Number of bytes read (including http request line and headers)
      *  via single HTTP request.
@@ -214,7 +214,7 @@ public:
      */
     static AsyncHttpClientPtr create();
 
-    static QString endpointWithProtocol(const QUrl& url);
+    static QString endpointWithProtocol(const nx::utils::Url &url);
 
 signals:
     /**
@@ -376,7 +376,7 @@ private:
  * For real files better to use nx_http::AsyncHttpClient directly.
  */
 void NX_NETWORK_API downloadFileAsync(
-    const QUrl& url,
+    const nx::utils::Url& url,
     std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
     AuthType authType = AuthType::authBasicAndDigest,
@@ -386,7 +386,7 @@ void NX_NETWORK_API downloadFileAsync(
  * Calls previous function and waits for completion.
  */
 SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
-    const QUrl& url,
+    const nx::utils::Url& url,
     int* const statusCode,
     nx_http::BufferType* const msgBody);
 
@@ -394,14 +394,14 @@ SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
  * Same as downloadFileAsync but provide contentType at callback.
  */
 void NX_NETWORK_API downloadFileAsyncEx(
-    const QUrl& url,
+    const nx::utils::Url& url,
     std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
     AuthType authType = AuthType::authBasicAndDigest,
     AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 void downloadFileAsyncEx(
-    const QUrl& url,
+    const nx::utils::Url& url,
     std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
     nx_http::AsyncHttpClientPtr httpClientCaptured);
 
@@ -411,7 +411,7 @@ typedef std::function<void(SystemError::ErrorCode, int httpStatus)> UploadComple
  * Uploads specified data using POST.
  */
 void NX_NETWORK_API uploadDataAsync(
-    const QUrl &url,
+    const nx::utils::Url &url,
     const QByteArray& data,
     const QByteArray& contentType,
     const nx_http::HttpHeaders& extraHeaders,
@@ -421,7 +421,7 @@ void NX_NETWORK_API uploadDataAsync(
     const QString& password = QString());
 
 SystemError::ErrorCode NX_NETWORK_API uploadDataSync(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QByteArray& data,
     const QByteArray& contentType,
     const QString& user,

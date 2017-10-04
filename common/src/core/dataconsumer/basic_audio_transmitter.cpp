@@ -41,12 +41,12 @@ bool QnBasicAudioTransmitter::isReadyForTransmission(
     return isRetryAfterUnauthorizedResponse || noAuth;
 }
 
-QUrl QnBasicAudioTransmitter::transmissionUrl() const
+nx::utils::Url QnBasicAudioTransmitter::transmissionUrl() const
 {
     return m_url;
 }
 
-void QnBasicAudioTransmitter::setTransmissionUrl(const QUrl& url)
+void QnBasicAudioTransmitter::setTransmissionUrl(const nx::utils::Url& url)
 {
     m_url = url;
 }

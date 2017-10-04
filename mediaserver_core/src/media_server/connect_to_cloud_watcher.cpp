@@ -69,7 +69,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     {
         m_cdbEndPointFetcher->get(
             nx_http::AuthInfo(),
-            [this](int statusCode, QUrl url)
+            [this](int statusCode, nx::utils::Url url)
             {
                 if (statusCode != nx_http::StatusCode::ok)
                 {
@@ -85,7 +85,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     }
 }
 
-void QnConnectToCloudWatcher::addCloudPeer(QUrl url)
+void QnConnectToCloudWatcher::addCloudPeer(nx::utils::Url url)
 {
     const auto& commonModule = m_messageBus->commonModule();
     NX_LOGX(lm("Creating transaction connection to cloud_db at %1")

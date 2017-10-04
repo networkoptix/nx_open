@@ -170,7 +170,7 @@ void AsyncClient::setRequestBody(std::unique_ptr<AbstractMsgBodySource> body)
     m_requestBody->bindToAioThread(getAioThread());
 }
 
-void AsyncClient::doGet(const QUrl& url)
+void AsyncClient::doGet(const nx::utils::Url& url)
 {
     NX_ASSERT(!url.host().isEmpty());
     NX_ASSERT(url.isValid());
@@ -183,14 +183,14 @@ void AsyncClient::doGet(const QUrl& url)
 }
 
 void AsyncClient::doGet(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doGet(url);
 }
 
-void AsyncClient::doPost(const QUrl& url)
+void AsyncClient::doPost(const nx::utils::Url& url)
 {
     NX_ASSERT(url.isValid());
 
@@ -204,14 +204,14 @@ void AsyncClient::doPost(const QUrl& url)
 }
 
 void AsyncClient::doPost(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPost(url);
 }
 
-void AsyncClient::doPut(const QUrl& url)
+void AsyncClient::doPut(const nx::utils::Url& url)
 {
     NX_ASSERT(url.isValid());
 
@@ -225,14 +225,14 @@ void AsyncClient::doPut(const QUrl& url)
 }
 
 void AsyncClient::doPut(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPut(url);
 }
 
-void AsyncClient::doDelete(const QUrl& url)
+void AsyncClient::doDelete(const nx::utils::Url& url)
 {
     NX_ASSERT(!url.host().isEmpty());
     NX_ASSERT(url.isValid());
@@ -245,7 +245,7 @@ void AsyncClient::doDelete(const QUrl& url)
 }
 
 void AsyncClient::doDelete(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -253,7 +253,7 @@ void AsyncClient::doDelete(
 }
 
 void AsyncClient::doUpgrade(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -265,7 +265,7 @@ void AsyncClient::doUpgrade(
 }
 
 void AsyncClient::doUpgrade(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx_http::Method::ValueType method,
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -328,12 +328,12 @@ BufferType AsyncClient::fetchMessageBodyBuffer()
     return buffer;
 }
 
-const QUrl& AsyncClient::url() const
+const nx::utils::Url& AsyncClient::url() const
 {
     return m_requestUrl;
 }
 
-const QUrl& AsyncClient::contentLocationUrl() const
+const nx::utils::Url& AsyncClient::contentLocationUrl() const
 {
     return m_contentLocationUrl;
 }
@@ -1030,7 +1030,7 @@ bool AsyncClient::sendRequestToNewLocation(const Response& response)
     m_authorizationTried = false;
     m_ha1RecalcTried = false;
 
-    m_contentLocationUrl = QUrl(QLatin1String(locationIter->second));
+    m_contentLocationUrl = nx::utils::Url(QLatin1String(locationIter->second));
 
     initiateHttpMessageDelivery();
     return true;
@@ -1240,7 +1240,7 @@ bool AsyncClient::reconnectIfAppropriate()
     return false;
 }
 
-QString AsyncClient::endpointWithProtocol(const QUrl& url)
+QString AsyncClient::endpointWithProtocol(const nx::utils::Url& url)
 {
     return lm("%1://%2:%3")
         .arg(url.scheme())

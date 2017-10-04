@@ -83,7 +83,7 @@ int TransactionMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
     return m_bus->distanceToPeer(dstPeer);
 }
 
-void TransactionMessageBusAdapter::addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url)
+void TransactionMessageBusAdapter::addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url &url)
 {
     m_bus->addOutgoingConnectionToPeer(id, url);
 }
