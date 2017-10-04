@@ -13,8 +13,8 @@ namespace {
 class ExportMediaProcess: public ExportProcess
 {
 public:
-    ExportMediaProcess(const ExportMediaSettings& settings, QObject* parent):
-        ExportProcess(new ExportMediaTool(settings), parent)
+    ExportMediaProcess(const QnUuid& id, const ExportMediaSettings& settings, QObject* parent):
+        ExportProcess(id, new ExportMediaTool(settings), parent)
     {
     }
 };
@@ -22,16 +22,17 @@ public:
 class ExportLayoutProcess: public ExportProcess
 {
 public:
-    ExportLayoutProcess(const ExportLayoutSettings& settings, QObject* parent):
-        ExportProcess(new ExportLayoutTool(settings), parent)
+    ExportLayoutProcess(const QnUuid& id, const ExportLayoutSettings& settings, QObject* parent):
+        ExportProcess(id, new ExportLayoutTool(settings), parent)
     { }
 
 };
 
 } // namespace
 
-ExportProcess::ExportProcess(AbstractExportTool* tool, QObject* parent):
+ExportProcess::ExportProcess(const QnUuid& id, AbstractExportTool* tool, QObject* parent):
     base_type(parent),
+    m_info(id),
     m_tool(tool)
 {
     connect(m_tool, &ExportMediaTool::rangeChanged, this,
@@ -123,14 +124,14 @@ ExportManager::~ExportManager()
 {
 }
 
-QnUuid ExportManager::exportMedia(const ExportMediaSettings& settings)
+QnUuid ExportManager::exportMedia(const QnUuid& id, const ExportMediaSettings& settings)
 {
-    return d->startExport(new ExportMediaProcess(settings, this));
+    return d->startExport(new ExportMediaProcess(id, settings, this));
 }
 
-QnUuid ExportManager::exportLayout(const ExportLayoutSettings& settings)
+QnUuid ExportManager::exportLayout(const QnUuid& id, const ExportLayoutSettings& settings)
 {
-    return d->startExport(new ExportLayoutProcess(settings, this));
+    return d->startExport(new ExportLayoutProcess(id, settings, this));
 }
 
 void ExportManager::stopExport(const QnUuid& exportProcessId)
@@ -143,7 +144,7 @@ ExportProcessInfo ExportManager::info(const QnUuid& exportProcessId) const
 {
     if (const auto process = d->exportProcesses.value(exportProcessId))
         return process->info();
-    return ExportProcessInfo();
+    return ExportProcessInfo(QnUuid());
 }
 
 QString ExportProcess::errorString(ExportProcessError error)
@@ -168,10 +169,14 @@ QString ExportProcess::errorString(ExportProcessError error)
 
         case ExportProcessError::fileAccess:
             return tr("File write error.");
-    }
 
-    NX_ASSERT(false, Q_FUNC_INFO, "All ExportProcessError codes must be handled.");
-    return QString();
+        case ExportProcessError::dataNotFound:
+            return tr("No data was exported.");
+
+        default:
+            NX_ASSERT(false, "Should never get here");
+            return tr("Internal error");
+    }
 }
 
 } // namespace desktop

@@ -252,6 +252,10 @@ void QnStreamRecorder::close()
                     m_mediaProvider,
                     fileSize);
         }
+        else
+        {
+            m_lastError.lastError = StreamRecorderError::dataNotFound;
+        }
     }
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
