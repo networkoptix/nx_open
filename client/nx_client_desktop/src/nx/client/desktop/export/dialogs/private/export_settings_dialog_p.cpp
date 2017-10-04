@@ -412,15 +412,11 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode
             break;
     }
 
-    // TODO: #vkutin Enable binary for media export when it's ready.
-    if (mode == Mode::Layout)
-    {
-        // Both media and layout can be exported to binary.
-        if (utils::AppInfo::isWin64())
-            result << FileExtension::exe64;
-        else if (utils::AppInfo::isWin32())
-            result << FileExtension::exe86;
-    }
+    // Both media and layout can be exported to binary.
+    if (utils::AppInfo::isWin64())
+        result << FileExtension::exe64;
+    else if (utils::AppInfo::isWin32())
+        result << FileExtension::exe86;
 
     return result;
 }

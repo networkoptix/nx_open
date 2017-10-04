@@ -35,8 +35,10 @@
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 namespace nx {
 namespace client {
@@ -55,6 +57,13 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
         return dynamic_cast<QnMediaResourceWidget *>(display->widgets().front());
 
     return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
+}
+
+QnLayoutResourcePtr constructLayoutForWidget(QnMediaResourceWidget* widget)
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->addItem(widget->item()->data());
+    return layout;
 }
 
 } // namespace
@@ -230,21 +239,36 @@ void WorkbenchExportHandler::handleExportVideoAction()
         return;
 
     QnUuid exportProcessId;
-    Filename filename;
+    Filename fileName;
     switch (dialog->mode())
     {
         case ExportSettingsDialog::Mode::Media:
         {
             const auto settings = dialog->exportMediaSettings();
-            exportProcessId = d->exportManager->exportMedia(settings);
-            filename = settings.fileName;
+            fileName = settings.fileName;
+            if (FileExtensionUtils::isExecutable(fileName.extension))
+            {
+                ExportLayoutSettings layoutSettings;
+                layoutSettings.filename = fileName;
+                layoutSettings.layout = constructLayoutForWidget(widget);
+                layoutSettings.mode = ExportLayoutSettings::Mode::Export;
+                layoutSettings.period = period;
+                layoutSettings.readOnly = false;
+
+                exportProcessId = d->exportManager->exportLayout(layoutSettings);
+            }
+            else
+            {
+                exportProcessId = d->exportManager->exportMedia(settings);
+            }
+
             break;
         }
         case ExportSettingsDialog::Mode::Layout:
         {
             const auto settings = dialog->exportLayoutSettings();
             exportProcessId = d->exportManager->exportLayout(settings);
-            filename = settings.filename;
+            fileName = settings.filename;
             break;
         }
         default:
@@ -257,7 +281,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
         return;
 
     auto progressDialog = new QnProgressDialog(
-        filename.completeFileName(),
+        fileName.completeFileName(),
         tr("Stop Export"),
         0,
         100,
@@ -268,7 +292,7 @@ void WorkbenchExportHandler::handleExportVideoAction()
             d->exportManager->stopExport(exportProcessId);
         });
 
-    d->runningExports.insert(exportProcessId, { filename, progressDialog });
+    d->runningExports.insert(exportProcessId, { fileName, progressDialog });
     progressDialog->show();
     // Fill dialog with initial values (export is already running).
     exportProcessUpdated(d->exportManager->info(exportProcessId));
