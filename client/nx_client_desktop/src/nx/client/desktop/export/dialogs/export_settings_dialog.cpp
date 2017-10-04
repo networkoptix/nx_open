@@ -504,7 +504,9 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
     const auto timeWatcher = widget->context()->instance<QnWorkbenchServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
-    d->setTimestampOffsetMs(timeWatcher->displayOffset(mediaResource));
+
+    const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
+    d->setTimestampOffsetMs(timestampOffsetMs);
 
     updateSettingsWidgets();
 
@@ -527,14 +529,15 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
     const auto currentSettings = d->exportMediaSettings();
     const auto namePart = resource->getName();
-    auto timePart = d->timestampText(currentSettings.timePeriod.startTimeMs);
-
-    if (utils::AppInfo::isWindows())
-        timePart.replace(L':', L'-');
+    const auto timePart = resource->hasFlags(Qn::utc)
+        ? QDateTime::fromMSecsSinceEpoch(currentSettings.timePeriod.startTimeMs
+            + timestampOffsetMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
+        : QTime(0, 0, 0, 0).addMSecs(currentSettings.timePeriod.startTimeMs)
+            .toString(lit("hh_mm_ss"));
 
     Filename baseFileName = currentSettings.fileName;
     baseFileName.name = nx::utils::replaceNonFileNameCharacters(
-        namePart + lit(" - ") + timePart, L' ');
+        namePart + L'_' + timePart, L'_');
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }
