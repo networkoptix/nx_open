@@ -27,6 +27,7 @@
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/vms/discovery/manager.h>
 
 class QnAppserverResourceProcessor;
@@ -168,6 +169,7 @@ private:
         CloudManagerGroup* const cloudManagerGroup,
         ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
+    void changeSystemUser(const QString& userName);
 
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
@@ -184,7 +186,11 @@ private:
     void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    void serviceModeInit();
+    nx::utils::log::Settings logSettings(
+        const QString& argValue, const QString& settingsKey, const QString& defaultValue);
+
+    void initializeLogging();
+    void initializeHardwareId();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
 
@@ -194,6 +200,7 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
+    std::unique_ptr<AbstractStreamServerSocket> m_preparedTcpServerSocket;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;

@@ -111,6 +111,8 @@ namespace nx_ms_conf
 
     static const QLatin1String DELAY_BEFORE_SETTING_MASTER_FLAG("delayBeforeSettingMasterFlag");
     static const QLatin1String DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG("30s");
+
+    static const QLatin1String SYSTEM_USER("systemUser");
 }
 
 /**
