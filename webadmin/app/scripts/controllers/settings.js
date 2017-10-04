@@ -331,7 +331,7 @@ angular.module('webadminApp')
 
         $scope.disconnectFromSystem = function(){ // Detach server from the system
             dialogs.confirmWithPassword(
-                L.settings.confirmDisconnectFromSystemTitle,
+                "", // L.settings.confirmDisconnectFromSystemTitle,
                 L.settings.confirmDisconnectFromSystem,
                 L.settings.confirmDisconnectFromSystemAction,
                 'danger').then(function (oldPassword) {
