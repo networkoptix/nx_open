@@ -4,9 +4,11 @@
 
 #include <memory>
 
-#include <core/resource/resource.h>
+#include <core/resource/security_cam_resource.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/cpp14.h>
+
 #include <nx/mediaserver/resource/abstract_shared_resource_context.h>
 #include <nx/mediaserver/server_module_aware.h>
 
