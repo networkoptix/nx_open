@@ -15,7 +15,11 @@ def convert_meta_to_description(meta):
     converted_msg = ""
     for k in meta:
         if k in meta_to_plain:
-            converted_msg += "<br>" + meta_to_plain[k] % meta[k]
+            value = meta[k]
+
+            if isinstance(value, list):
+                value = ", ".join(value)
+            converted_msg += "<br>" + meta_to_plain[k] % value
 
     return converted_msg
 
