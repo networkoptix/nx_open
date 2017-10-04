@@ -260,8 +260,6 @@ void SystemManager::getSystems(
             std::bind(&SystemManager::addUserAccessInfo, this,
                 *accountEmail, std::placeholders::_1));
 
-        const auto systemsBeforeFilteringByAccessRights = resultData.systems.size();
-
         // Omitting systems in which current user is disabled.
         const auto unallowedSystemsRangeStartIter = std::remove_if(
             resultData.systems.begin(),
@@ -273,8 +271,11 @@ void SystemManager::getSystems(
         resultData.systems.erase(unallowedSystemsRangeStartIter, resultData.systems.end());
 
         // If every system has been filtered out by access rights, then reporting forbidden.
-        if (resultData.systems.empty() && systemsBeforeFilteringByAccessRights > 0)
+        if (resultData.systems.empty() &&
+            static_cast<bool>(filter.get<std::string>(attr::systemId)))
+        {
             return completionHandler(api::ResultCode::forbidden, resultData);
+        }
     }
 
     // Adding system health.
@@ -555,24 +556,10 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& accountEmail,
     const std::string& systemId) const
 {
-#if 0
-    QnMutexLocker lk(&m_mutex);
-    const auto& accountSystemPairIndex =
-        m_accountAccessRoleForSystem.get<kSharingUniqueIndex>();
-    api::SystemSharing toFind;
-    toFind.accountEmail = accountEmail;
-    toFind.systemId = systemId;
-    const auto it = accountSystemPairIndex.find(toFind);
-    return it != accountSystemPairIndex.end()
-        ? it->accessRole
-        : api::SystemAccessRole::none;
-#else
-    //TODO #ak getSystemSharingData does returns a lot of data which is redundant for this method.
     const auto sharingData = getSystemSharingData(accountEmail, systemId);
     if (!sharingData)
         return api::SystemAccessRole::none;
     return sharingData->accessRole;
-#endif
 }
 
 boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(

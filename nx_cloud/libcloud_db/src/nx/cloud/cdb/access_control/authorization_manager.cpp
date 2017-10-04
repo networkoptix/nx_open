@@ -65,7 +65,7 @@ nx::utils::stree::ResourceContainer AuthorizationManager::addHelperAttributes(
     const auto authenticatedSystemId =
         authenticationProperties.get<std::string>(attr::authSystemId);
     if (authenticatedSystemId)
-        auxSearchAttrs.put(attr::systemId, true);
+        auxSearchAttrs.put(attr::systemId, authenticatedSystemId->c_str());
 
     const auto requestedSystemId = dataToAuthorize.get<std::string>(attr::systemId);
     if (authenticatedAccountEmail)
