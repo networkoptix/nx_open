@@ -1,7 +1,12 @@
 #pragma once
 
+#include <memory>
+
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/utils/timer_manager.h>
 
+#include "access_control/authentication_manager.h"
+#include "access_control/authorization_manager.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/synchronization_engine.h"
 #include "ec2/vms_p2p_command_bus.h"
@@ -45,6 +50,14 @@ public:
 
     MaintenanceManager& maintenanceManager();
 
+    CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated();
+    
+    CloudModuleUrlProvider& cloudModuleUrlProvider();
+
+    AuthenticationManager& authenticationManager();
+    
+    AuthorizationManager& authorizationManager();
+
 private:
     dao::rdb::DbInstanceController m_dbInstanceController;
     std::unique_ptr<AbstractEmailManager> m_emailManager;
@@ -59,6 +72,12 @@ private:
     SystemManager m_systemManager;
     AuthenticationProvider m_authProvider;
     MaintenanceManager m_maintenanceManager;
+    CloudModuleUrlProvider m_cloudModuleUrlProviderDeprecated;
+    CloudModuleUrlProvider m_cloudModuleUrlProvider;
+
+    std::unique_ptr<nx_http::AuthMethodRestrictionList> m_authRestrictionList;
+    std::unique_ptr<AuthenticationManager> m_authenticationManager;
+    std::unique_ptr<AuthorizationManager> m_authorizationManager;
 
     void performDataMigrations();
     void generateUserAuthRecords(nx::utils::db::QueryContext* queryContext);
