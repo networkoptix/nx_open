@@ -324,40 +324,71 @@ protected:
         ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
-            ASSERT_EQ(task.second.fired, 0);
+            ASSERT_EQ(0, task.second.fired);
     }
 
     void thenLongTaskShouldAtLastFire()
     {
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                if (user1->tasks().empty() || user1->tasks().cbegin()->second.fired < 1)
+                    return false;
+                return true;
+            },
+            "thenLongTaskShouldAtLastFire");
+
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
-            ASSERT_EQ(task.second.fired, 1);
+            ASSERT_GE(task.second.fired, 1);
     }
 
     void thenTaskShouldFireAsIfServerWasNotOffline()
     {
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                if (user1->tasks().empty() || user1->tasks().cbegin()->second.fired < 2)
+                    return false;
+                return true;
+            },
+            "thenTaskShouldFireAsIfServerWasNotOffline");
+
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(1U, user1Tasks.size());
 
-        for (const auto& task: user1Tasks)
+        for (const auto& task : user1Tasks)
             ASSERT_EQ(task.second.fired, 2);
     }
 
     void thenFistTaskShouldFire()
     {
+        auto dataIsReady = [this]()
+        {
+            auto tasks = user1->tasks();
+            return
+                user1->tasks().size () == 2
+                && std::any_of(
+                        tasks.cbegin(),
+                        tasks.cend(),
+                        [](const std::pair<QnUuid, SchedulerUser::Task> p)
+                        {
+                            return p.second.fired == 2;
+                        });
+        };
+
+        waitForPredicateBecomeTrue(
+            [this, dataIsReady]()
+            {
+                return dataIsReady();
+            },
+            "thenFistTaskShouldFire");
+
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(2U, user1Tasks.size());
-
-        bool someTaskFiredExactlyTwice = std::any_of(
-            user1Tasks.cbegin(),
-            user1Tasks.cend(),
-            [](const std::pair<QnUuid, SchedulerUser::Task> p)
-            {
-                return p.second.fired == 2;
-            });
-        ASSERT_TRUE(someTaskFiredExactlyTwice);
+        ASSERT_TRUE(dataIsReady());
     }
 
     void thenSecondTaskShouldFireMultipleTimes()

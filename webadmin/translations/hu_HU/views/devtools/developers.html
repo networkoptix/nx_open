@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>Fejlesztői eszközök</h2>
         <p>
-            Elégedett az integráció fejlesztéssel? Szívesen fogadjuk visszajelzését.
+            Have an idea on how to improve our developer tools or just want to start a conversation?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Várjuk visszajezését</a></p>
     </div>
@@ -11,9 +11,9 @@
     <div>
         <h3>Általános esemény generátor</h3>
         <p>
-            Az általános esemény egy speciális esemény 3. rendszerek részére VMS műveletek indításához.
-            Általános esemény létrehozásához az integrált rendszerben HTTP kérés szükséges a szerver felé (szerver API használatával).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            A Generic Event is a method of sending events from 3rd party systems to a System,
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">Általános esemény generátor</a></p>
     </div>
@@ -24,18 +24,18 @@
 minden a hagyományos kliensben elérhető jellemző hozzáféréséhez: rendszer források (szerverek, kamerák, felhasználók, engedélyek), élő és rögzített videók lekérésére, események létrehozására, szabályok írására, PTZ kamerák vezérlésére, stb.
         </p>
         <p>
-            <a href="#/developers/api"><b>API teszt eszköz (új)</b></a>
-            - interaktív dokumentáció Teszt API hívás eszközökkel<br>
-            <a href="#/developers/changelog">API változáslog</a>
-            - API törés változások listája<br>
-            <a id="api-doc" href="api.xml" target="_blank">API dokumentáció</a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
         </p>
 
     </div>
     <div>
         <h3>Kamera részletek panel</h3>
         <p>
-            Speciális panel a webkliens számára, amely további kamera információk megjelnítésére szolgál:
+            Displays additional developer-friendly information for cameras in the Web Admin interface:
         </p>
         <ul>
             <li>Kamera ID</li>
@@ -43,8 +43,8 @@ minden a hagyományos kliensben elérhető jellemző hozzáféréséhez: rendsze
             <li>Közvetlen videó exportálás a böngészőből</li>
         </ul>
         <p>
-            A kamera részletek panel megnyitásához - nyissa meg a <a href="#/view">web klienst</a>, váassza ki a kamerát,
-            beállítások ikon (fogaskerék), majd válassza a "Kamera részletek" pontot
+            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
+            select the target camera, click on the settings icon (gear), then choose "Camera Details"
         </p>
         <p><a href="#/view/?cameraLinks">kamera részletek panel megnyitása</a></p>
     </div>

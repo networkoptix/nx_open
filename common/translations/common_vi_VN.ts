@@ -84,7 +84,7 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Hệ thống mới</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
@@ -810,7 +810,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>thứ hai</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>

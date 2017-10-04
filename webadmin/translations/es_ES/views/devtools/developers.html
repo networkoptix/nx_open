@@ -1,51 +1,51 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Herramientas de Desarrollador</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            Have an idea on how to improve our developer tools or just want to start a conversation?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Dejar comentarios</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Generador de eventos genéricos</h3>
         <p>
-            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
-            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            A Generic Event is a method of sending events from 3rd party systems to a System,
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Generador de eventos genéricos</a></p>
     </div>
     <div>
         <h3>Servidor API</h3>
         <p>
-            Servidor API proporciona un conjunto estándar de API llamadas para 3 sistemas de partido. Da a los desarrolladores la capacidad para acceder a casi cualquier función de sistema disponible en el cliente regular: consulta y administrar los recursos del sistema (servidores, cámaras, usuarios, permisos), tirar de vivo o video grabado fuera del sistema, generar eventos, crear normas, controlar cámaras PTZ y mucho más.
+            Servidor API proporciona un conjunto estándar de llamadas API para sistemas de terceros. Da a los desarrolladores la capacidad para acceder a casi cualquier función de sistema disponible en el cliente regular: consulta y administrar los recursos del sistema (servidores, cámaras, usuarios, permisos), tirar de vivo o video grabado fuera del sistema, generar eventos, crear normas, controlar cámaras PTZ y mucho más.
         </p>
         <p>
             <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
             - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
+            <a href="#/developers/changelog">API Changelog</a>
             - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Panel de detalles de la cámara</h3>
         <p>
-            Special panel for a webclient which displays additional information for cameras:
+            Displays additional developer-friendly information for cameras in the Web Admin interface:
         </p>
         <ul>
             <li>ID de cámara</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>Enlaces para todos flujos de vídeo disponibles</li>
+            <li>Exportar vídeo directamente desde el navegador</li>
         </ul>
         <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
+            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
+            select the target camera, click on the settings icon (gear), then choose "Camera Details"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">abrir el Panel de Detalles de Cámara</a></p>
     </div>
     <div>
         <h3>Fuente de vídeo integración SDK</h3>

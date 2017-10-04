@@ -1038,23 +1038,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>檔案 &quot;%1&quot; 目前正被使用中。</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>檔案 &quot;%1&quot; 無法儲存. 請嘗試另一個名稱.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
+      <translation>
+        <numerusform>檔名不可包含以下字元:
 %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>檔名 &quot;%1&quot; 被作業系統保留. 請嘗試另一個檔名.</translation>
     </message>
   </context>
   <context>
@@ -2643,11 +2643,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>不正確的電子郵件或密碼</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>帳戶未啟動. 請檢查您的電子郵件並按照提供的說明操作</translation>
     </message>
   </context>
   <context>
@@ -3744,7 +3744,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;找不到伺服器></translation>
+      <translation>找不到伺服器></translation>
     </message>
     <message>
       <source>Expires</source>
@@ -4254,7 +4254,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1（輪巡&quot;%2&quot; 已啟用）</translation>
+      <translation>%1 (輪巡&quot;%2&quot; 已啟用)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4270,12 +4270,16 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>無法呼叫觸發器 %1（%2）</translation>
+      <translation>無法呼叫觸發器 %1 (%2)</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>按著不放</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
   </context>
   <context>
@@ -4577,7 +4581,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>當任何一個使用者看到事件書籤時, 通知將會顯示.</translation>
     </message>
   </context>
   <context>
@@ -4851,7 +4855,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;在其它伺服器的攝影機或已被移除的攝影機></translation>
+      <translation>在其它伺服器的攝影機或已被移除的攝影機></translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -6381,7 +6385,7 @@ to %1</source>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
+      <translation>h點 ap</translation>
     </message>
     <message>
       <source>dd</source>
@@ -6411,7 +6415,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy h ap</translation>
+      <translation>dd日 MMMM yyyy h點 ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
@@ -7143,14 +7147,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>輸入密碼...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>管理者密碼</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>很快地系統會被合併起來</translation>
     </message>
@@ -7171,10 +7167,6 @@ to %1</source>
       <translation>授權的總數量將減少</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>密碼不可為空.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>雲端系統不能合併</translation>
     </message>
@@ -7189,6 +7181,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>伺服器馬上就會連接到系統</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7718,11 +7718,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>停止輪跳</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>開始巡航</translation>
     </message>
   </context>
   <context>
@@ -7980,8 +7980,8 @@ to %1</source>
       <translation>使用鍵盤的方向鍵切換佈局. 退出幻燈片請按 Esc 鍵.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>請按任何鍵停止輪跳.</translation>
     </message>
   </context>
   <context>

@@ -1038,16 +1038,16 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>File &quot;%1&quot; is used by another process.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>File &quot;%1&quot; cannot be written. Please try another name.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Filename should not contain the following reserved characters:
 %1</numerusform>
         <numerusform>Filename should not contain the following reserved characters:
@@ -1056,7 +1056,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
     </message>
   </context>
   <context>
@@ -2672,11 +2672,11 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Incorrect email or password</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
     </message>
   </context>
   <context>
@@ -4327,6 +4327,10 @@ to %1</translation>
       <comment>Soft Trigger</comment>
       <translation>press and hold</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4628,7 +4632,7 @@ to %1</translation>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>Notification will be shown until one of the users who see it creates bookmark with event description</translation>
     </message>
   </context>
   <context>
@@ -7217,14 +7221,6 @@ to %1</translation>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Enter Password...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Administrator Password</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Systems will be merged shortly</translation>
     </message>
@@ -7245,10 +7241,6 @@ to %1</translation>
       <translation>Total amount of licenses will decrease</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Password cannot be empty.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Cloud Systems cannot be merged</translation>
     </message>
@@ -7263,6 +7255,14 @@ to %1</translation>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Server will be connected to System shortly</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7815,11 +7815,11 @@ to %1</translation>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Stop Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Start Tour</translation>
     </message>
   </context>
   <context>
@@ -8084,8 +8084,8 @@ to %1</translation>
       <translation>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>

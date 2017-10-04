@@ -36,33 +36,33 @@
 
                     <div>
                         <h3>Сброс сервера</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            The server will be detached from the current system. Video archive will remain intact.</p>
+                        <p>Это действие вернет этот сервер к настройкам по умолчанию (очистит базу данных и сбросит конфигурацию).
+                            Сервер будет отсоединен от текущей системы. Видео архив останется без изменений.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Восстановить значения по умолчанию</button></p>
                     </div>
                     <div>
-                        <h3>Detach server from the system</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                        <h3>Отсоединить сервер от системы</h3>
+                        <p>Это действие отделит сервер от системы, но база данных, локальных пользователей и конфигурация будет сохранена. 
+Видеоархив затронут не будет. <b>Облачные пользователи будут удалены.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Отсоединить от системы</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>Перезапуск</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">Перезапустить сервер</button>
+                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Перезагрузить</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>Изменить пароль администратора</h3>
+                            <p>Если система локальная  (не подключена к облаку), это изменит пароль для пользователя "admin" и пароль восстановления (пользователь "root") на некоторых серверах.
+                                <br>В другом случае это изменит только пароль восстановления.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Изменить пароль</button>
                             </div>
                         </form>
                     </div>

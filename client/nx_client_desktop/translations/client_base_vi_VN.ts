@@ -2638,7 +2638,7 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Email hoặc mật khẩu không chính xác</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
@@ -4271,6 +4271,10 @@ to %1</source>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>nhấn và giữ</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
   </context>
   <context>
@@ -6370,7 +6374,7 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>giờ:phút</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>h ap</source>
@@ -6395,12 +6399,12 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh: mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
@@ -6425,12 +6429,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h: mm ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h: mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -7137,14 +7141,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Nhập mật khẩu ...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Mật khẩu quản trị viên</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Hệ thống sẽ được sáp nhập ngay</translation>
     </message>
@@ -7165,10 +7161,6 @@ to %1</source>
       <translation>Tổng số bản quyền sẽ giảm</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Password không có sản phẩm nào.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Không thể hợp nhất Cloud Systems</translation>
     </message>
@@ -7183,6 +7175,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Máy chủ sẽ được kết nối với Hệ thống ngay</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7712,11 +7712,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Ngừng nhảy vòng</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Bắt đầu bay</translation>
     </message>
   </context>
   <context>
@@ -7974,8 +7974,8 @@ to %1</source>
       <translation>Sử dụng mũi tên trên bàn phím để chuyển giữu các layout. Để thoát khỏi showreel ấn Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Nhấn phím bất kỳ để ngăn chặn bánh xe hop.</translation>
     </message>
   </context>
   <context>

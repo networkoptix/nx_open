@@ -31,6 +31,11 @@ namespace ec2
 
 class TimeSynchronizationManager;
 
+namespace db
+{
+    bool migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManager* db);
+}
+
 namespace aux {
 bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin);
 }
@@ -48,6 +53,7 @@ enum ApiObjectType
     ApiObject_BusinessRule,
     ApiObject_Storage,
     ApiObject_WebPage,
+    ApiObjectUserRole,
 };
 
 struct ApiObjectInfo
@@ -88,7 +94,7 @@ namespace detail
         friend class ::ec2::QnDbManagerAccess;
         friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
         friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
-
+        friend bool ::ec2::db::migrateAccessRightsToUbjsonFormat(QSqlDatabase& database, detail::QnDbManager* db);
     public:
         QnDbManager(QnCommonModule* commonModule);
         virtual ~QnDbManager();
@@ -522,7 +528,6 @@ namespace detail
         ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
         ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
         ErrorCode removeCameraAttributes(const QnUuid& id);
-        ErrorCode removeResourceAccessRights(const QnUuid& id);
         ErrorCode removeResourceStatus(const QnUuid& id);
         ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
@@ -649,6 +654,7 @@ namespace detail
             ResyncClientInfo        =  0x800, //< removed since 3.1
             ResyncVideoWalls        = 0x1000,
             ResyncWebPages          = 0x2000,
+            ResyncUserAccessRights  = 0x4000,
         };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 
@@ -686,6 +692,7 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         bool encryptKvPairs();
+        bool fixDefaultBusinessRuleGuids();
 
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
 
@@ -693,7 +700,7 @@ namespace detail
         bool resyncIfNeeded(ResyncFlags flags);
 
         QString getDatabaseName(const QString& baseName);
-
+        bool rebuildUserAccessRightsTransactions();
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -736,6 +743,7 @@ public:
     QnDbManagerAccess(detail::QnDbManager* dbManager, const Qn::UserAccessData &userAccessData);
 
     Qn::UserAccessData userAccessData() const { return m_userAccessData; }
+    void setUserAccessData(Qn::UserAccessData value) { m_userAccessData = value; }
     detail::QnDbManager* db() const { return m_dbManager; }
 
     ApiObjectType getObjectType(const QnUuid& objectId);
@@ -820,7 +828,13 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
+        {
+            NX_LOG(lit("User %1 has not permission to execute transaction %2")
+                .arg(m_userAccessData.userId.toString())
+                .arg(toString(tran.command)),
+                cl_logWARNING);
             return ErrorCode::forbidden;
+        }
         return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 

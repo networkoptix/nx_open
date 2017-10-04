@@ -172,8 +172,22 @@ qint64 MediaFileOperation::getFileSize() const
 
 void MediaFileOperation::setFileSize(qint64 fileSize)
 {
-    part2 &= ~(getBitMask(0x27ULL) << 0x17);
-    part2 |= ((quint64)fileSize & getBitMask(0x27LL)) << 0x17;
+    const quint64 kFileSizeMaskLength = 0x27ULL;
+    const quint64 kMaxFileSizeValue = getBitMask(kFileSizeMaskLength);
+
+    part2 &= ~(getBitMask(kFileSizeMaskLength) << 0x17);
+    if (fileSize > kMaxFileSizeValue)
+    {
+        NX_WARNING(
+            this,
+            lm("File size value %1 would overflow. Setting to max available value %2 instead.")
+                .arg(fileSize)
+                .arg(kMaxFileSizeValue));
+        part2 |= (getBitMask(kFileSizeMaskLength)) << 0x17;
+        return;
+    }
+
+    part2 |= ((quint64)fileSize & getBitMask(kFileSizeMaskLength)) << 0x17;
 }
 
 int MediaFileOperation::getFileTypeIndex() const

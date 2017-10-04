@@ -404,7 +404,7 @@ bool QnSecurityCamResource::hasCombinedSensors() const
 
 bool QnSecurityCamResource::isEdge() const
 {
-    return QnMediaServerResource::isEdgeServer(resourcePool()->getResourceById(getParentId()));
+    return QnMediaServerResource::isEdgeServer(getParentResource());
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -1019,7 +1019,7 @@ void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag flag) {
 
 
 bool QnSecurityCamResource::needCheckIpConflicts() const {
-    return getChannel() == 0 && !hasCameraCapabilities(Qn::ShareIpCapability);
+    return !hasCameraCapabilities(Qn::ShareIpCapability);
 }
 
 QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(

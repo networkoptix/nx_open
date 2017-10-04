@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>如果启用了模糊功能，Intel HD Graphics显示屏可能会面临问题。我们强烈建议您不开启。</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>禁用模糊功能</translation>
     </message>
   </context>
   <context>
@@ -211,7 +211,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>研判</translation>
+      <translation>使用者行为记录</translation>
     </message>
     <message>
       <location/>
@@ -2764,7 +2764,7 @@
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation>允许研判启用</translation>
+      <translation>启用使用者行为记录</translation>
     </message>
     <message>
       <location/>

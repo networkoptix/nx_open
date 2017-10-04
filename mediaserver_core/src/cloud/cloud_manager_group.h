@@ -7,8 +7,11 @@
 struct CloudManagerGroup
 {
     CloudConnectionManager connectionManager;
+    CloudUserInfoPool cloudUserInfoPool;
     CdbNonceFetcher authenticationNonceFetcher;
     CloudUserAuthenticator userAuthenticator;
 
-    CloudManagerGroup(QnCommonModule* commonModule, AbstractNonceProvider* defaultNonceFetcher);
+    CloudManagerGroup(
+        QnCommonModule* commonModule,
+        AbstractNonceProvider* defaultNonceFetcher);
 };
