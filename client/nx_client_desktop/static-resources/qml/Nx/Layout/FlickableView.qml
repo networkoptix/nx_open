@@ -11,10 +11,10 @@ Item
     property real implicitContentWidth
     property real implicitContentHeight
 
-    property alias contentWidth: contentItem.width
-    property alias contentHeight: contentItem.height
-    property alias contentX: contentItem.x
-    property alias contentY: contentItem.y
+    readonly property alias contentWidth: contentItem.width
+    readonly property alias contentHeight: contentItem.height
+    readonly property alias contentX: contentItem.x
+    readonly property alias contentY: contentItem.y
 
     property real contentWidthPartToBeAlwaysVisible: 0
     property real contentHeightPartToBeAlwaysVisible: 0
@@ -52,11 +52,11 @@ Item
         property real scaleOffsetX: 0
         property real scaleOffsetY: 0
 
+        property real contentAspectRatio: 0
+        readonly property bool haveContentSize: contentAspectRatio > 0
+
         property real panOffsetX: 0
         property real panOffsetY: 0
-
-        readonly property bool haveImplicitSize:
-            implicitContentWidth > 0 && implicitContentHeight > 0
 
         NumberAnimation on panOffsetX
         {
@@ -76,10 +76,10 @@ Item
 
         function currentScale()
         {
-            if (!haveImplicitSize)
+            if (!haveContentSize)
                 return 1
 
-            return contentWidth / implicitContentWidth
+            return contentWidth / d.implicitContentSize().width
         }
 
         function setAnimationEasingType(easingType)
@@ -122,6 +122,13 @@ Item
 
             fitInView(true)
         }
+
+        function implicitContentSize()
+        {
+            return haveContentSize
+                ? MathUtils.scaledSize(Qt.size(contentAspectRatio, 1), Qt.size(width, height))
+                : Qt.size(0, 0)
+        }
     }
 
     NumberAnimation
@@ -160,18 +167,20 @@ Item
 
         onScaleChanged:
         {
-            var newWidth = implicitContentWidth * scale
-            var newHeight = implicitContentHeight * scale
+            var implicitContentSize = d.implicitContentSize()
+            var newWidth = implicitContentSize.width * scaleAnimation.scale
+            var newHeight = implicitContentSize.height * scaleAnimation.scale
 
             var ds = newWidth / contentWidth
 
-            contentWidth = newWidth
-            contentHeight = newHeight
+            contentItem.width = newWidth
+            contentItem.height = newHeight
 
             d.scaleOffsetX -= (d.scaleOriginX - 0.5) * newWidth * (ds - 1)
             d.scaleOffsetY -= (d.scaleOriginY - 0.5) * newHeight * (ds - 1)
 
-            if (alignToCenterWhenUnzoomed && !panOffsetXAnimation.running && !panOffsetYAnimation.running
+            if (alignToCenterWhenUnzoomed
+                && !panOffsetXAnimation.running && !panOffsetYAnimation.running
                 && !(mouseArea.buttons & Qt.RightButton))
             {
                 d.clearScaleOffset()
@@ -264,7 +273,7 @@ Item
 
         onWheel:
         {
-            if (!d.haveImplicitSize)
+            if (!d.haveContentSize)
                 return
 
             var angle = wheel.angleDelta.y / 8
@@ -353,6 +362,7 @@ Item
     }
 
     onWidthChanged: fitInView(true)
+    onHeightChanged: fitInView(true)
 
     onZoomedItemChanged: fitInView()
 
@@ -455,7 +465,7 @@ Item
 
     function fitInView(instant)
     {
-        if (!d.haveImplicitSize)
+        if (!d.haveContentSize)
             return
 
         stickyScaleActivationTimer.stop()
@@ -473,6 +483,8 @@ Item
         d.scaleOriginY = 0.5
         d.minScale = 1
 
+        var implicitContentSize = d.implicitContentSize()
+
         if (zoomedItem && Utils.isChild(zoomedItem, contentItem))
         {
             var originX = (zoomedItem.x + zoomedItem.width / 2) / contentWidth
@@ -483,8 +495,8 @@ Item
             newScale = d.currentScale() * newSize.width / zoomedItem.width
             d.minScale = newScale
 
-            var newContentWidth = implicitContentWidth * newScale
-            var newContentHeight = implicitContentHeight * newScale
+            var newContentWidth = implicitContentSize.width * newScale
+            var newContentHeight = implicitContentSize.height * newScale
             newOffsetX = newContentWidth * (0.5 - originX)
             newOffsetY = newContentHeight * (0.5 - originY)
         }
@@ -494,6 +506,10 @@ Item
             scaleAnimation.scale = newScale
             d.panOffsetX = newOffsetX
             d.panOffsetY = newOffsetY
+            contentItem.width = implicitContentSize.width
+            contentItem.height = implicitContentSize.height
+            contentItem.x = (width - contentItem.width) / 2
+            contentItem.y = (height - contentItem.height) / 2
         }
         else
         {
@@ -511,10 +527,28 @@ Item
         d.clearScaleOffset()
         d.blockScaleBoundsAnimation = false
 
-        contentWidth = width
-        contentHeight = height
+        contentItem.width = width
+        contentItem.height = height
 
-        d.panOffsetX = x - contentX
-        d.panOffsetY = y - contentY
+        d.contentAspectRatio = (width === 0 || height === 0) ? 0 : width / height
+
+        d.panOffsetX = x - flickableView.width / 2 + width / 2
+        d.panOffsetY = y - flickableView.height / 2 + height / 2
+    }
+
+    function implicitContentGeometry(aspectRatio)
+    {
+        if (aspectRatio === 0)
+            return Qt.rect(0, 0, 0, 0)
+
+        if (width === 0 || height === 0)
+            return Qt.rect(0, 0, aspectRatio, 1)
+
+        var size = MathUtils.scaledSize(Qt.size(aspectRatio, 1), Qt.size(width, height))
+        return Qt.rect(
+            (width - size.width) / 2,
+            (height - size.height) / 2,
+            size.width,
+            size.height)
     }
 }

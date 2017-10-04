@@ -44,6 +44,8 @@ class QnWorkbenchLayout: public QObject, public QnConnectionContextAware
     Q_OBJECT
     Q_PROPERTY(QnUuid resourceId READ resourceId CONSTANT)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(float cellAspectRatio
+        READ cellAspectRatio WRITE setCellAspectRatio NOTIFY cellAspectRatioChanged)
 
 public:
     /**

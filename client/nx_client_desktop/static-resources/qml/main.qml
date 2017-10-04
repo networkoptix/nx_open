@@ -14,6 +14,6 @@ Control
     contentItem: LayoutViewer
     {
         anchors.fill: parent
-        layoutId: workbench.currentLayout.resourceId
+        layout: workbench.currentLayout
     }
 }

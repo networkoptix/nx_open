@@ -10,7 +10,7 @@ Control
 {
     id: layoutViewer
 
-    property alias layoutId: layoutModel.layoutId
+    property var layout: null
 
     background: Rectangle { color: ColorTheme.windowBackground }
 
@@ -21,20 +21,39 @@ Control
         contentWidthPartToBeAlwaysVisible: 0.3
         contentHeightPartToBeAlwaysVisible: 0.3
 
-        contentWidth: gridLayout.implicitSize.width
-        contentHeight: gridLayout.implicitSize.height
-        implicitContentWidth: gridLayout.implicitSize.width
-        implicitContentHeight: gridLayout.implicitSize.height
-
         alignToCenterWhenUnzoomed: zoomedItem
 
         Positioners.Grid
         {
             id: gridLayout
 
-            readonly property real cellAspectRatio: 16 / 9
+            property real cellAspectRatio: layout ? layout.cellAspectRatio : 1
 
-            property size implicitSize: contentImplicitSize()
+            Behavior on cellAspectRatio
+            {
+                NumberAnimation
+                {
+                    duration: 150
+
+                    // NumberAnimation inside Behavior does not emit stopped() signal.
+                    onRunningChanged:
+                    {
+                        if (running)
+                            return
+
+                        var contentAspectRatio = gridLayout.cellAspectRatio
+                            * layoutModel.gridBoundingRect.width
+                            / layoutModel.gridBoundingRect.height
+
+                        flickableView.setContentGeometry(
+                            flickableView.contentX,
+                            flickableView.contentY,
+                            flickableView.contentWidth,
+                            flickableView.contentWidth / contentAspectRatio)
+                        flickableView.fitInView()
+                    }
+                }
+            }
 
             width: flickableView.contentWidth
             height: flickableView.contentHeight
@@ -51,6 +70,8 @@ Control
                 {
                     id: layoutModel
 
+                    layoutId: layout ? layout.resourceId : Nx.uuid("")
+
                     property rect previousRect: Qt.rect(0, 0, 0, 0)
 
                     onGridBoundingRectChanged:
@@ -59,7 +80,16 @@ Control
 
                         if (previousRect.width === 0 && previousRect.height === 0)
                         {
+                            var contentAspectRatio = gridLayout.cellAspectRatio
+                                * layoutModel.gridBoundingRect.width
+                                / layoutModel.gridBoundingRect.height
+
                             previousRect = gridBoundingRect
+
+                            var crect = flickableView.implicitContentGeometry(contentAspectRatio)
+                            flickableView.setContentGeometry(
+                                crect.x, crect.y, crect.width, crect.height)
+
                             flickableView.fitInView(true)
                             return
                         }
@@ -80,7 +110,6 @@ Control
                         previousRect = rect
 
                         flickableView.setContentGeometry(cx, cy, cw, ch)
-                        gridLayout.implicitSize = gridLayout.contentImplicitSize()
                         flickableView.fitInView()
                     }
                 }
@@ -128,17 +157,6 @@ Control
                         text: model.name
                     }
                 }
-            }
-
-            function contentImplicitSize()
-            {
-                var gridAspectRatio = cellAspectRatio
-                    * Math.max(1, layoutModel.gridBoundingRect.width)
-                    / Math.max(1, layoutModel.gridBoundingRect.height)
-
-                return flickableView.width / flickableView.height < gridAspectRatio
-                    ? Qt.size(flickableView.width, flickableView.width / gridAspectRatio)
-                    : Qt.size(flickableView.height * gridAspectRatio, flickableView.height)
             }
         }
 
