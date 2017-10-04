@@ -40,7 +40,7 @@ button.btn-danger > a{
 }
 
 img.preview-image{
-    background-image: url('/static/images/transparent_bg.png');
+    background-image: url('/static/cms_images/transparent_bg.png');
 }
 
 context-preview{

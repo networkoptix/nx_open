@@ -124,7 +124,7 @@ http {
             error_page 404 /static/index.html;   
         }
 
-        location /static/images/ {
+        location /static/cms_images/ {
             root /app/app/static/common;
             error_page 404 /static/index.html;   
         }
