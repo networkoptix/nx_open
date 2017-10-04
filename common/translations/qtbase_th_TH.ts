@@ -212,7 +212,7 @@
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>ตัด</translation>
     </message>
     <message>
       <source>Copy</source>

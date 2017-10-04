@@ -31,7 +31,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Save password</source>

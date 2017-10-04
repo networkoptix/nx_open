@@ -49,22 +49,22 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>Yeniden Başlat</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">Sunucuyu Yeniden Başlatın</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Yeniden Başlat</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>Yönetici parolasını değiştir</h3>
+                            <p>Eğer sistem yerel ise ( buluta bağlı değil ise) parola "admin" olarak değişecektir.<br>
+                                Aksi halde sadece kurtarma (root) parolası değişecektir.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Şifre değiştir</button>
                             </div>
                         </form>
                     </div>

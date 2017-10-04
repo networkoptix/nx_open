@@ -31,7 +31,7 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>ระบบเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -249,7 +249,7 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <location/>
@@ -264,7 +264,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>เริ่มต้น</translation>
     </message>
   </context>
   <context>
@@ -302,7 +302,7 @@
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>คุณภาพการสำรองข้อมูล</translation>
     </message>
   </context>
   <context>
@@ -437,7 +437,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>กฎเหตุการณ์</translation>
     </message>
     <message>
       <location/>
@@ -679,7 +679,7 @@
     <message>
       <location/>
       <source>Motion detection control</source>
-      <translation type="unfinished">Motion detection control</translation>
+      <translation>ควบคุมการตรวจจับการเคลื่อนไหว</translation>
     </message>
     <message>
       <location/>
@@ -735,7 +735,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>เพิ่มอุปกรณ์ ...</translation>
     </message>
   </context>
   <context>
@@ -882,7 +882,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>คงอยู่ในระบบ</translation>
     </message>
   </context>
   <context>
@@ -977,7 +977,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>กฎเหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -1089,12 +1089,12 @@
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>ออฟเซ็ต Y</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>ออฟเซ็ต x</translation>
     </message>
     <message>
       <location/>
@@ -1147,7 +1147,7 @@
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>อินพุตเสียง</translation>
     </message>
     <message>
       <location/>
@@ -1193,7 +1193,7 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation type="unfinished">Aspect Ratio</translation>
+      <translation>อัตราส่วนภาพ</translation>
     </message>
     <message>
       <location/>
@@ -1312,12 +1312,12 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>URL ของเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation type="unfinished">Admin DN</translation>
+      <translation>Admin DN</translation>
     </message>
     <message>
       <location/>
@@ -1472,7 +1472,7 @@
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>เปิดใช้งานอินเทอร์เน็ต</translation>
     </message>
     <message>
       <location/>
@@ -1536,12 +1536,12 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>โฮสต์</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>พอร์ท</translation>
     </message>
     <message>
       <location/>
@@ -1876,7 +1876,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>คงอยู่ในระบบ</translation>
     </message>
   </context>
   <context>
@@ -2152,7 +2152,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2317,7 +2317,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>พอร์ท</translation>
     </message>
   </context>
   <context>
@@ -2782,7 +2782,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation type="unfinished">System Time</translation>
+      <translation>เวลาของระบบ</translation>
     </message>
     <message>
       <location/>
@@ -2841,7 +2841,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>ชนิดของผู้ใช้</translation>
     </message>
     <message>
       <location/>

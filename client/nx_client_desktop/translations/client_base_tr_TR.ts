@@ -1037,11 +1037,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>&quot;%1&quot; dosyası başka bir işlem tarafından kullanılıyor.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>"%1" dosyası zaten var. Lütfen başka bir ad deneyin.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
@@ -2667,7 +2667,7 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hatalı e-posta yada şifre</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
@@ -4321,6 +4321,10 @@ to %1</source>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>bas ve basılı tut</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
   </context>
   <context>
@@ -6436,7 +6440,7 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>ss:aa</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>h ap</source>
@@ -6446,12 +6450,12 @@ to %1</source>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation>gg</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>AAAA</translation>
+      <translation>MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6461,27 +6465,27 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>gg AAAA yyyy ss:dd</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>gg AAAA yyyy ss:dd</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>gg AAAA yyyy h ap</translation>
+      <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>gg AAAA yyyy</translation>
+      <translation>dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>AAAA yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6491,12 +6495,12 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>saat: dakika ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>gg AAAA yyyy s: DD ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -7211,14 +7215,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Şifre Giriniz...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Yönetici Şifresi</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Sistem kısa süre içinde birleştirilecek</translation>
     </message>
@@ -7239,10 +7235,6 @@ to %1</source>
       <translation>Toplam lisans miktarını azalacaktır</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Parola boş olamaz.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Bulut sistemler birleştirilemez</translation>
     </message>
@@ -7257,6 +7249,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Sunucu kısa sürede Sistem'e bağlanacak</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7809,11 +7809,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Turu Durdur</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Tura Başla</translation>
     </message>
   </context>
   <context>
@@ -8078,8 +8078,8 @@ to %1</source>
       <translation>Düzeni değiştirmek için klavye oklarını kullanın. Showreel'den çıkmak için Esc tuşuna basın.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Turu Bitirmek İçin Herhangi Bir Düğmeye Basın.</translation>
     </message>
   </context>
   <context>

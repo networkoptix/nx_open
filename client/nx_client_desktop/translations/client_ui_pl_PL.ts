@@ -409,7 +409,7 @@
     <message>
       <location/>
       <source>When</source>
-      <translation>Kiedy</translation>
+      <translation>Jeśli</translation>
     </message>
     <message>
       <location/>
@@ -419,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>W</translation>
+      <translation>Na</translation>
     </message>
   </context>
   <context>
@@ -1031,7 +1031,7 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
       <source>Export Rapid Review</source>
-      <translation>Eksportuj szybkie streszczenie</translation>
+      <translation>Eksportuj szybki przegląd</translation>
     </message>
     <message>
       <location/>
@@ -1051,7 +1051,7 @@
     <message>
       <location/>
       <source>Rapid Review speed</source>
-      <translation>Prędkość szybkiego streszczenia</translation>
+      <translation>Prędkość szybkiego przeglądu</translation>
     </message>
   </context>
   <context>
@@ -2764,7 +2764,7 @@
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation>Włącz dziennik dostępu</translation>
+      <translation>Zapisuj dziennik dostępu</translation>
     </message>
     <message>
       <location/>

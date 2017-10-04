@@ -2,7 +2,7 @@
     <div ng-click="cameraLinks.enabled = false" class="pull-right">
         <span class="glyphicon glyphicon-remove"></span>
     </div>
-    <div class='camera-links-title'>Camera Details</div>
+    <div class='camera-links-title'>รายละเอียดกล้อง</div>
     <table>
         <tr ng-if="debugMode"><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
         <tr><td>ชื่อ</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
@@ -48,7 +48,7 @@
         </tr>
         <tr>
             <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useCredentials"
-                       ng-disabled="linkSettings.useAuth">&nbsp;Use credentials</label></td>
+                       ng-disabled="linkSettings.useAuth">&nbsp;ข้อมูลรับรองที่เชื่อถือได้</label></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
             <td><label class="camera-links-label" for="useLogin">เข้าสู่ระบบ</label></td>
