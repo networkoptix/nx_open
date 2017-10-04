@@ -51,7 +51,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
              customization.name)
 
 
-def save_unrevisioned_records(customization, language, data_structures,
+def save_unrevisioned_records(context, customization, language, data_structures,
                               request_data, request_files, user):
     upload_errors = []
     for data_structure in data_structures:
@@ -123,6 +123,11 @@ def save_unrevisioned_records(customization, language, data_structures,
                             created_by=user)
         record.save()
 
+    fill_content(customization_name=customization.name,
+                 preview=True,
+                 incremental=True,
+                 changed_context=context)
+
     return upload_errors
 
 
@@ -167,13 +172,17 @@ def remove_unused_records(customization):
             record.delete()
 
 
+def generate_preview_link(context=None):
+    return context.url + "?preview" if context else "?preview"
+
+
 def generate_preview(context=None, send_to_review=False):
     fill_content(customization_name=settings.CUSTOMIZATION,
                  preview=True,
                  incremental=True,
                  changed_context=context,
                  send_to_review=send_to_review)
-    return context.url + "?preview" if context else "?preview"
+    return generate_preview_link(context)
 
 
 def publish_latest_version(customization, user):
@@ -183,7 +192,7 @@ def publish_latest_version(customization, user):
     return publish_errors
 
 
-def send_version_for_review(customization, language, data_structures,
+def send_version_for_review(context, customization, language, data_structures,
                             product, request_data, request_files, user):
     old_versions = ContentVersion.objects.filter(accepted_date=None)
 
@@ -192,7 +201,7 @@ def send_version_for_review(customization, language, data_structures,
         strip_version_from_records(old_version)
         old_version.delete()
 
-    upload_errors = save_unrevisioned_records(
+    upload_errors = save_unrevisioned_records(context,
         customization, language, data_structures,
         request_data, request_files, user)
 

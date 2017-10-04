@@ -96,7 +96,8 @@ def handle_post_context_edit_view(request, context_id, language_id):
         request, context_id, language_id)
     request_data = request.POST
     request_files = request.FILES
-    preview_link = ""
+
+    saved = True
     upload_errors = []
     if not (user.is_superuser or user.has_perm('cms.edit_advanced'))\
             and advanced_touched_without_permission(request_data, customization, context.datastructure_set.all()):
@@ -106,9 +107,11 @@ def handle_post_context_edit_view(request, context_id, language_id):
            and request_data['currentLanguage']:
             last_language = Language.objects.get(
                 id=request_data['currentLanguage'])
-            upload_errors = save_unrevisioned_records(
+            upload_errors = save_unrevisioned_records(context,
                 customization, last_language, context.datastructure_set.all(),
                 request_data, request_files, user)
+        else:
+            saved = False
 
         if upload_errors:
             add_upload_error_messages(request, upload_errors)
@@ -116,10 +119,9 @@ def handle_post_context_edit_view(request, context_id, language_id):
         messages.success(request, "Changes have been saved.")
 
     elif 'Preview' in request_data:
-        upload_errors = save_unrevisioned_records(
+        upload_errors = save_unrevisioned_records(context,
             customization, language, context.datastructure_set.all(),
             request_data, request_files, user)
-        preview_link = request.get_host() + generate_preview(context)
 
         if upload_errors:
             add_upload_error_messages(request, upload_errors)
@@ -128,7 +130,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
                          "Changes have been saved. Preview has been created.")
 
     elif 'SaveDraft' in request_data:
-        upload_errors = save_unrevisioned_records(
+        upload_errors = save_unrevisioned_records(context,
             customization, language, context.datastructure_set.all(),
             request_data, request_files, user)
 
@@ -138,7 +140,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
         messages.success(request, "Changes have been saved.")
 
     elif 'SendReview' in request_data:
-        upload_errors = send_version_for_review(
+        upload_errors = send_version_for_review(context,
             customization, language, context.datastructure_set.all(),
             context.product, request_data, request_files, user)
 
@@ -150,6 +152,8 @@ def handle_post_context_edit_view(request, context_id, language_id):
             "Changes have been saved. A new version has been created.")
 
         return None, None, None, None
+
+    preview_link = request.get_host() + generate_preview_link(context) if saved else ""
 
     form.add_fields(context, customization, language, user)
 
