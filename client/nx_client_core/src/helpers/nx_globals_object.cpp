@@ -96,3 +96,8 @@ void NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
         flickable->topMargin(), flickable->bottomMargin(),
         rect.y(), rect.height()));
 }
+
+QnUuid NxGlobalsObject::uuid(const QString& uuid) const
+{
+    return QnUuid::fromStringSafe(uuid);
+}
