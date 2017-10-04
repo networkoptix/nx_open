@@ -106,6 +106,7 @@ if [ '${arch}' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,cer
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+install -m 750 $SERVER_BIN_PATH/root_tool $BINSTAGE
 install -m 755 $SERVER_BIN_PATH/testcamera $BINSTAGE
 install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
 install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
