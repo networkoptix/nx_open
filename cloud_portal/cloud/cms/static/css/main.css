@@ -38,3 +38,17 @@ button > a {
 button.btn-danger > a{
     color: #FAFBFC !important;
 }
+
+img.preview-image{
+    background-image: url('/static/images/transparent_bg.png');
+}
+
+context-preview{
+    max-height: 400px;
+    max-width: 400px;
+}
+
+review-preview{
+    max-height: 200px;
+    max-width: 200px;
+}

@@ -53,7 +53,7 @@
 					<td>{{ record.data_structure.name }}</td>
 					<td>
 					{% if record.data_structure.type == 1 %}
-						<img style="max-height: 200px; max-width: 200px;" src="data:image/png;base64,{{record}}">
+						<img class="preview-image review-preview" src="data:image/png;base64,{{record}}">
 					{% elif record.data_structure.type == 0 %}
 						{{record}}
 					{% elif record.data_structure.type == 4 %}

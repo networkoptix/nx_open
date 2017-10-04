@@ -34,11 +34,13 @@
                     {% if field|is_optional:context %}
                     <div>
                         <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
-                        <img style="max-height: 400px; max-width: 400px; opacity: 0.5;" src="data:image/png;base64,{{field.value}}">
+                        <img class="preview-image context-preview" style="opacity: 0.5;"
+                             src="data:image/png;base64,{{field.value}}">
                     </div>
                     {% else %}
                     <div>
-                        <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
+                        <img class="preview-image context-preview"
+                             src="data:image/png;base64,{{field.value}}">
                     </div>
                     {% endif %}
 

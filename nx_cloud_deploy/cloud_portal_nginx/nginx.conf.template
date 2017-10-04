@@ -124,6 +124,11 @@ http {
             error_page 404 /static/index.html;   
         }
 
+        location /static/images/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;   
+        }
+
         location /static/bootstrap {
             root /app/app/static/common;
             error_page 404 /static/index.html;
