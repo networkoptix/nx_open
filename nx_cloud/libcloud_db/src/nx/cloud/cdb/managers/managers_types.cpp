@@ -56,5 +56,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, DataActionType,
     (nx::cdb::DataActionType::fetch, "fetch")
     (nx::cdb::DataActionType::insert, "insert")
     (nx::cdb::DataActionType::update, "update")
-    (nx::cdb::DataActionType::_delete, "delete")
+    (nx::cdb::DataActionType::delete_, "delete")
 )

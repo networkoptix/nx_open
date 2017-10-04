@@ -76,20 +76,20 @@
                             <set value="none" resName="authorized" resValue="false"/>
                         </condition>
                     </condition>
-                    <condition value="/cdb/system/getCloudUsers" resName="systemId" matchType="presence">
-                        <sequence value="true">
-                            <!-- user list is allowed for account -->
-                            <set resName="authorized" resValue="false"/>
-                            <condition resName="auth.accountRightsOnSystem">
-                                <set value="owner" resName="authorized" resValue="true"/>
-                                <set value="cloudAdmin" resName="authorized" resValue="true"/>
-                                <set value="localAdmin" resName="authorized" resValue="true"/>
-                                <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
-                                <set value="maintenance" resName="authorized" resValue="true"/>
-                            </condition>
-                        </sequence>
-                        <condition value="false" resName="auth.systemId" matchType="presence">
-                            <set value="true" resName="authorized" resValue="true"/>
+                    <condition value="/cdb/system/getCloudUsers" resName="auth.systemId" matchType="presence">
+                        <set value="true" resName="authorized" resValue="true"/>
+                        <condition value="false" resName="systemId" matchType="presence">
+                            <sequence value="true">
+                                <!-- user list is allowed for account -->
+                                <set resName="authorized" resValue="false"/>
+                                <condition resName="auth.accountRightsOnSystem">
+                                    <set value="owner" resName="authorized" resValue="true"/>
+                                    <set value="cloudAdmin" resName="authorized" resValue="true"/>
+                                    <set value="localAdmin" resName="authorized" resValue="true"/>
+                                    <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
+                                    <set value="maintenance" resName="authorized" resValue="true"/>
+                                </condition>
+                            </sequence>
                         </condition>
                     </condition>
                     <condition value="/cdb/system/getAccessRoleList" resName="systemId" matchType="presence">

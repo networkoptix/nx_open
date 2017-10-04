@@ -9,6 +9,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class SystemSharingInvitingUser:
     public CdbFunctionalTest
@@ -178,5 +179,6 @@ TEST_F(SystemSharingInvitingUser, basic_scenario)
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

@@ -34,6 +34,7 @@ enum class ResultCode
     badRequest,
     invalidNonce,
     serviceUnavailable,
+    notAllowedInCurrentState,
 
     /** Credentials used for authentication are no longer valid. */
     credentialsRemovedPermanently,

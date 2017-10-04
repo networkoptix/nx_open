@@ -420,7 +420,7 @@ api::ResultCode CdbLauncher::bindRandomSystem(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
-    systemData->status = api::SystemStatus::ssActivated;
+    systemData->status = api::SystemStatus::activated;
     return api::ResultCode::ok;
 }
 

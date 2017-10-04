@@ -1,8 +1,3 @@
-/**********************************************************
-* Oct 12, 2015
-* akolesnikov
-***********************************************************/
-
 #include "system_ut.h"
 
 #include <gtest/gtest.h>
@@ -19,9 +14,11 @@
 #include <nx/cloud/cdb/dao/rdb/system_data_object.h>
 
 #include "test_setup.h"
+#include "../base_persistent_data_test.h"
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 namespace {
 
@@ -174,7 +171,7 @@ TEST_F(FtSystem, unbind)
         api::ResultCode::ok,
         addActivatedAccount(&account2, &account2Password));
 
-    //adding system2 to account1
+    // Adding system2 to account1.
     api::SystemData system0;
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -182,13 +179,13 @@ TEST_F(FtSystem, unbind)
 
     for (int i = 0; i < 4; ++i)
     {
-        //adding system1 to account1
+        // Adding system1 to account1.
         api::SystemData system1;
         ASSERT_EQ(
             api::ResultCode::ok,
             bindRandomSystem(account1.email, account1Password, &system1));
 
-        //checking account1 system list
+        // Checking account1 system list.
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
@@ -201,7 +198,7 @@ TEST_F(FtSystem, unbind)
             ASSERT_EQ(account1.fullName, systems[1].ownerFullName);
         }
 
-        //sharing system1 with account2 as viewer
+        // Sharing system1 with account2 as viewer.
         ASSERT_EQ(
             api::ResultCode::ok,
             shareSystem(
@@ -214,40 +211,40 @@ TEST_F(FtSystem, unbind)
         switch (i)
         {
             case 0:
-                //unbinding with owner credentials
+                // Unbinding with owner credentials.
                 ASSERT_EQ(
                     api::ResultCode::ok,
                     unbindSystem(account1.email, account1Password, system1.id));
                 break;
             case 1:
-                //unbinding with system credentials
+                // Unbinding with system credentials.
                 ASSERT_EQ(
                     api::ResultCode::ok,
                     unbindSystem(system1.id, system1.authKey, system1.id));
                 break;
             case 2:
-                //unbinding with owner credentials
+                // Unbinding with owner credentials.
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
                     unbindSystem(account2.email, account2Password, system1.id));
-                //unbinding with system credentials
+                // Unbinding with system credentials.
                 ASSERT_EQ(
                     api::ResultCode::ok,
                     unbindSystem(system1.id, system1.authKey, system1.id));
                 continue;
             case 3:
-                //unbinding with other system credentials
+                // Unbinding with other system credentials.
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
                     unbindSystem(system0.id, system0.authKey, system1.id));
-                //unbinding with system credentials
+                // Unbinding with system credentials.
                 ASSERT_EQ(
                     api::ResultCode::ok,
                     unbindSystem(system1.id, system1.authKey, system1.id));
                 continue;
         }
 
-        //checking account1 system list
+        // Checking account1 system list.
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
@@ -274,7 +271,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
         api::ResultCode::ok,
         testSetup->addActivatedAccount(&account2, &account2Password));
 
-    //adding system2 to account1
+    // Adding system2 to account1.
     api::SystemData system1;
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -290,7 +287,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
         ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
     }
 
-    //requesting system1 using account2 credentials
+    // Requesting system1 using account2 credentials.
     {
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
@@ -299,7 +296,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 
     {
-        //requesting unknown system
+        // Requesting unknown system.
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::forbidden,
@@ -534,9 +531,9 @@ protected:
             getSystems(owner().email, owner().password, &systems));
         ASSERT_EQ(1U, systems.size());
 
-        m_system.status = api::SystemStatus::ssActivated;
+        m_system.status = api::SystemStatus::activated;
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), m_system) != systems.end());
-        ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+        ASSERT_EQ(api::SystemStatus::activated, systems[0].status);
 
         ASSERT_EQ(owner().email, systems[0].ownerAccountEmail);
     }
@@ -657,7 +654,7 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
             api::ResultCode::ok,
             addActivatedAccount(&account1, &account1Password));
 
-        //adding system1 to account1
+        // Adding system1 to account1.
         api::SystemData system1;
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -684,7 +681,7 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
                     : api::ResultCode::notAuthorized,
                 getCdbNonce(system1.id, system1.authKey, &nonceData));
 
-            //checking HTTP status code
+            // Checking HTTP status code.
             nx_http::HttpClient httpClient;
             QUrl requestUrl(lit("http://127.0.0.1:%1/cdb/auth/get_nonce").arg(endpoint().port));
             requestUrl.setUserName(QString::fromStdString(system1.id));
@@ -705,7 +702,7 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
             }
             else if (i == 1)
             {
-                //waiting for result code to switch to notAuthorized
+                // Waiting for result code to switch to notAuthorized.
                 std::this_thread::sleep_for(
                     kSystemGoneForeverPeriod + kDropExpiredSystemsPeriodSec*2);
                 continue;
@@ -834,8 +831,8 @@ TEST_F(FtSystem, persistent_sequence)
 }
 
 /**
- * Validates order of elements in \a systems against \a systemIdsInSortOrder.
- * @param systemIdsInSortOrder Sorted by descending priority
+ * Validates order of elements in systems against systemIdsInSortOrder.
+ * systemIdsInSortOrder Sorted by descending priority
  */
 static void validateSystemsOrder(
     const std::list<std::string>& systemIdsInSortOrder,
@@ -872,8 +869,6 @@ protected:
         container.push_front(std::move(value));
     }
 };
-
-//constexpr float nx::utils::kSystemAccessBurnPeriodFullDays = 5.0;
 
 TEST_F(FtSystemSortingOrder, weight_expiration)
 {
@@ -1200,6 +1195,8 @@ TEST_F(FtSystem, reenabled_user_can_see_system)
     assertUserCanSeeSystem(user, system);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class FtSystemTimestamp:
     public FtSystem
 {
@@ -1242,5 +1239,128 @@ TEST_F(FtSystemTimestamp, registration_timestamp)
     assertRegistrationTimestampIsValid();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class SystemBeingMergedState:
+    public FtSystem
+{
+    using base_type = FtSystem;
+
+protected:
+    void givenSystem()
+    {
+        m_system = base_type::givenSystem();
+    }
+
+    void givenSystemInBeingMergedState()
+    {
+        givenSystem();
+        whenMoveSystemToBeingMergedState();
+    }
+
+    void whenMoveSystemToBeingMergedState()
+    {
+        stop();
+
+        DaoHelper daoHelper(dbConnectionOptions());
+        daoHelper.initializeDatabase();
+        ASSERT_NO_THROW(
+            daoHelper.queryExecutor().executeSqlSync(
+                lm("UPDATE system SET status_code=4 WHERE id='%1'").arg(m_system.id).toUtf8()));
+
+        ASSERT_TRUE(restart());
+    }
+
+    void thenSystemStateIs(api::SystemStatus systemStatus)
+    {
+        api::SystemDataEx system;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystem(owner().email, owner().password, m_system.id, &system));
+        ASSERT_EQ(systemStatus, system.status);
+    }
+
+    void assertEachReadRequestReturns(api::ResultCode resultCode)
+    {
+        {
+            std::vector<api::SystemSharingEx> systemSharings;
+            ASSERT_EQ(
+                resultCode,
+                getSystemSharings(owner().email, owner().password, m_system.id, &systemSharings));
+        }
+
+        {
+            api::SystemDataEx system;
+            ASSERT_EQ(
+                resultCode,
+                getSystem(owner().email, owner().password, m_system.id, &system));
+        }
+
+        {
+            api::SystemHealthHistory systemHealthHistory;
+            ASSERT_EQ(
+                resultCode,
+                getSystemHealthHistory(
+                    owner().email, owner().password, m_system.id, &systemHealthHistory));
+        }
+    }
+
+    void assertEachUpdateRequestReturns(api::ResultCode resultCode)
+    {
+        {
+            ASSERT_EQ(
+                resultCode,
+                unbindSystem(owner().email, owner().password, m_system.id));
+        }
+
+        {
+            api::SystemSharing systemSharing;
+            systemSharing.accountEmail = m_anotherAccount.email;
+            systemSharing.accessRole = api::SystemAccessRole::viewer;
+            systemSharing.systemId = m_system.id;
+            ASSERT_EQ(
+                resultCode,
+                shareSystem(owner().email, owner().password, systemSharing));
+        }
+
+        {
+            ASSERT_EQ(
+                resultCode,
+                renameSystem(owner().email, owner().password, m_system.id, "zzzz"));
+        }
+    }
+
+private:
+    api::SystemData m_system;
+    AccountWithPassword m_anotherAccount;
+
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_anotherAccount = addActivatedAccount2();
+    }
+};
+
+TEST_F(SystemBeingMergedState, moving_system_to_beingMerged_state)
+{
+    givenSystem();
+    whenMoveSystemToBeingMergedState();
+    thenSystemStateIs(api::SystemStatus::beingMerged);
+}
+
+TEST_F(SystemBeingMergedState, read_requests_are_allowed)
+{
+    givenSystemInBeingMergedState();
+    assertEachReadRequestReturns(api::ResultCode::ok);
+}
+
+TEST_F(SystemBeingMergedState, update_requests_are_forbidden)
+{
+    givenSystemInBeingMergedState();
+    assertEachUpdateRequestReturns(api::ResultCode::notAllowedInCurrentState);
+}
+
+} // namespace test
 } // namespace cdb
 } // namespace nx

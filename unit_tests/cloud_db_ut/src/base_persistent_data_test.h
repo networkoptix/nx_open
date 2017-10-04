@@ -25,6 +25,7 @@ public:
 
     api::AccountData insertRandomAccount();
     api::SystemData insertRandomSystem(const api::AccountData& account);
+    void insertSystem(const api::AccountData& account, const data::SystemData& system);
 
     void insertSystemSharing(const api::SystemSharingEx& sharing);
     void deleteSystemSharing(const api::SystemSharingEx& sharing);
