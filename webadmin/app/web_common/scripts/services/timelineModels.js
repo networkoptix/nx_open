@@ -1050,7 +1050,10 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     }
 
     if(this.visibleStart > this.visibleEnd){
-        console.error ("wtf! visibleStart > visibleEnd ?",new Date(this.visibleStart),new Date(this.visibleEnd));
+        console.error ("wtf! visibleStart > visibleEnd - do full zoom out",new Date(this.visibleStart),new Date(this.visibleEnd));
+        this.visibleStart = this.start;
+        this.visibleEnd = this.end;
+        this.msPerPixel = this.maxMsPerPixel;
     }
 
     // Adjust here with msPerPixel again!
