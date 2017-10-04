@@ -8,9 +8,6 @@ Item
 
     default property alias data: contentItem.data
 
-    property real implicitContentWidth
-    property real implicitContentHeight
-
     readonly property alias contentWidth: contentItem.width
     readonly property alias contentHeight: contentItem.height
     readonly property alias contentX: contentItem.x
