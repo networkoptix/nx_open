@@ -242,7 +242,7 @@ def handle_file_upload(file, data_structure):
     file_type = file.content_type
 
     if 'format' in data_structure.meta_settings and\
-            is_valid_file_type(file_type, data_structure.meta_settings['format']):
+            is_valid_file_type(file_type.lower(), data_structure.meta_settings['format']):
         return None, None, True
 
     if data_structure.type == DataStructure.DATA_TYPES.image:
