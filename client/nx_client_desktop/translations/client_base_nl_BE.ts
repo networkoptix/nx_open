@@ -1037,25 +1037,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Bestand &quot;%1&quot; kan niet worden weggeschreven. Probeer een andere naam.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>De bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer een andere naam.</translation>
     </message>
   </context>
   <context>
@@ -2667,11 +2665,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Incorrecte email of wachtwoord</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>Account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
     </message>
   </context>
   <context>
@@ -4322,6 +4320,10 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>houd ingedrukt</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4623,7 +4625,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>De notificatie wordt weergegeven totdat een van de gebruikers, een bladwijzer aanmaken met gebeurtenisbeschrijving</translation>
     </message>
   </context>
   <context>
@@ -7212,14 +7214,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Voer wachtwoord in...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Administrator wachtwoord</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Systemen zullen spoedig zijn samengevoegd</translation>
     </message>
@@ -7240,10 +7234,6 @@ to %1</source>
       <translation>Totaal aantal licenties zal afnemen</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Wachtwoord mag niet leeg zijn.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Cloud systemen kunnen niet worden samengevoegd</translation>
     </message>
@@ -7258,6 +7248,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Server wordt spoedig op het systeem aangesloten</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7810,11 +7808,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Stop tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Start tour</translation>
     </message>
   </context>
   <context>
@@ -8079,8 +8077,8 @@ to %1</source>
       <translation>Gebruik de toetsenbordpijlen om layouts te veranderen. Druk op Esc om de showreel te verlaten.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation type="unfinished">Press any key to stop the tour.</translation>
     </message>
   </context>
   <context>

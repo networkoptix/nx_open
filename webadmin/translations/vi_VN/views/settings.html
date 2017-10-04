@@ -47,22 +47,20 @@
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>Khởi động lại</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()"> Khởi động lại máy chủ </button> <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> Khởi động lại </button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>Thay đổi mật khẩu</h3>
+                            <p>Nếu hệ thống là cục bộ (không kết nối với dữ liệu đám mây), điều này sẽ thay đổi mật khẩu cho người dùng "admin" và mật khẩu khôi phục (gốc) trên một số máy chủ. <br> Nếu không, điều này sẽ chỉ thay đổi mật khẩu khôi phục.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Đổi mật khẩu</button>
                             </div>
                         </form>
                     </div>

@@ -252,6 +252,10 @@ void QnStreamRecorder::close()
                     m_mediaProvider,
                     fileSize);
         }
+        else
+        {
+            m_lastError.lastError = StreamRecorderError::dataNotFound;
+        }
     }
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -715,6 +719,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         context.metadata.dewarpingParams = mediaDev->getDewarpingParams();
         if (isTranscode)
             context.metadata.dewarpingParams.enabled = false;
+
+        context.metadata.timeZoneOffset = m_serverTimeZoneMs;
 
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature)

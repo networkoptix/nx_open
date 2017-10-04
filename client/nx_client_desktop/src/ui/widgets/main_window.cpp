@@ -252,7 +252,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
     context->instance<workbench::LayoutToursHandler>();
-    context->instance<nx::client::desktop::RadassActionHandler>();
+    context->instance<RadassActionHandler>();
     context->instance<QnWorkbenchAnalyticsHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();

@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>Outils développeur</h2>
         <p>
-            Êtes-vous heureux de développer de l'intergrations? Laissez nous savoir.
+            Have an idea on how to improve our developer tools or just want to start a conversation?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Laisser commentaires</a></p>
     </div>
@@ -11,9 +11,9 @@
     <div>
         <h3>Générateur d’événements génériques</h3>
         <p>
-            Événements génériques est un type spécial d'événements pour les systèmes tiers afin de déclencher des actions dans le VMS.
-            Pour créer un système intégré d'événement générique, il est nécessaire de faire une demande HTTP au serveur (en utilisant l'API du serveur).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            A Generic Event is a method of sending events from 3rd party systems to a System,
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">Générateur d’événements génériques</a></p>
     </div>
@@ -23,18 +23,18 @@
             Serveur API fournis un standrad réglé pour appel API de systèmes de 3e partie. Il donne aux développeurs la possibilité d’accéder à presque chaque fonctionnalité système disponible dans le client régulier : requête/gérer les ressources système (serveurs, caméras, utilisateurs, permissions), accès au direct ou vidéo enregistrée hors système, génèrer des événements, créer des règles, contrôler les caméras PTZ et bien plus encore.
         </p>
         <p>
-            <a href="#/developers/api"><b> Outil Test API (nouveau)</b></a>
-            - documentation interactif avec outils pour tester les appels API <br>
-            <a href="#/developers/changelog"> API changelog </a>
-            - liste des modifications de rupture dans API <br>
-            <a id="api-doc" href="api.xml" target="_blank"> Documentation API </a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
         </p>
 
     </div>
     <div>
         <h3>Panneau de détails caméra</h3>
         <p>
-            Panneau spécial pour un webclient qui affiche de l'informations supplémentaires pour les caméras:
+            Displays additional developer-friendly information for cameras in the Web Admin interface:
         </p>
         <ul>
             <li>ID Caméra</li>
@@ -42,8 +42,8 @@
             <li>Exportation directe de vidéos depuis le navigateur</li>
         </ul>
         <p>
-            Pour ouvrir le panneau Détails de caméra - ouvrir <a href="#/view"> client Web </a> , Sélectionnez caméra, 
-            icône de réglage (vitesse), puis choisissez "Détails de la caméra"
+            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
+            select the target camera, click on the settings icon (gear), then choose "Camera Details"
         </p>
         <p><a href="#/view/?cameraLinks">ouvrir panneau de détails caméra</a></p>
     </div>

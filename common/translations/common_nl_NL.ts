@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Nieuw systeem</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Het gevonden systeem %1 is niet samen te voegen met het huidige systeem.</translation>
     </message>
   </context>
   <context>
@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Tijdlicenties</translation>
+      <translation>Testlicenties</translation>
     </message>
   </context>
   <context>
@@ -677,7 +677,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation>Tijdlicentie</translation>
+      <translation>Testicentie</translation>
     </message>
   </context>
   <context>
@@ -1000,7 +1000,7 @@
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>Aangepaste rollen</translation>
+      <translation>Aangepaste profielen</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1020,7 +1020,7 @@
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>Aangepaste gebruikersrol.</translation>
+      <translation>Aangepast profiel.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
@@ -1047,7 +1047,7 @@
     </message>
     <message>
       <source>Write to log</source>
-      <translation>Schrijf weg naar het log</translation>
+      <translation>Schrijf weg naar het logboek</translation>
     </message>
     <message>
       <source>Show notification</source>
@@ -1075,7 +1075,7 @@
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Toon op alarm layout</translation>
+      <translation>Toon op alarm scherm</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
@@ -1457,7 +1457,7 @@
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -1469,8 +1469,8 @@
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
-        <numerusform>%n Rollen</numerusform>
-        <numerusform>%n Rollen</numerusform>
+        <numerusform>%n Profielen</numerusform>
+        <numerusform>%n Profielen</numerusform>
       </translation>
     </message>
     <message>

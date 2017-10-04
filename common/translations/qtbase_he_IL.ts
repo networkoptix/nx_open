@@ -944,7 +944,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Discard</source>
-      <translation>שכח</translation>
+      <translation>בטל</translation>
     </message>
     <message>
       <source>Help</source>

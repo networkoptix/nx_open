@@ -14,16 +14,16 @@
         </div>
         <nav ng-if="!noPanel" class="collapse navbar-collapse" id="navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
-                <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}"><a ng-href="#/view/">Weergave</a></li>
+                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Settings</a></li>
+                <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}"><a ng-href="#/view/">View</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}"><a ng-href="#/client/">Lite Client</a></li>
-                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Instellingen</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Informatie</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">Voor ontwikkelaars</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Help</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li ng-hide="settings.liteClient"><a ng-click="logout()" title="Log uit">Log uit</a></li>
+                <li ng-hide="settings.liteClient"><a ng-click="logout()" title="Uitloggen">Uitloggen</a></li>
                 <li language-select dropdown></li>
             </ul>
         </nav>

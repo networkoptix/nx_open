@@ -115,6 +115,7 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
     result.insert(kWidthParam, QnLexical::serialized(size.width()));
     result.insert(kImageFormatParam, QnLexical::serialized(imageFormat));
     result.insert(kRoundMethodParam, QnLexical::serialized(roundMethod));
+    result.insert(kAspectRatioParam, QnLexical::serialized(aspectRatio));
     return result;
 }
 

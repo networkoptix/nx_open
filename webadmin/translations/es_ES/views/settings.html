@@ -36,33 +36,31 @@
 
                     <div>
                         <h3>Reinicio de servidor</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            The server will be detached from the current system. Video archive will remain intact.</p>
+                        <p>Esta acción revertirá este servidor a los valores predeterminados (borrar la base de datos y restablecer la configuración).
+                            El servidor se separará del sistema actual. El archivo de vídeo permanecerá intacto.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurar valores predeterminados de fábrica</button></p>
                     </div>
                     <div>
-                        <h3>Detach server from the system</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                        <h3>Separar el servidor del sistema</h3>
+                        <p>Esta acción separará el servidor de la base de datos de mantenimiento del sistema, los usuarios locales y la configuración. El archivo de vídeo permanecerá intacto. <b>Los usuarios de la nube se eliminarán.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Separar del sistema</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>Reiniciar</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">Reiniciar servidor</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reiniciar</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>Cambiar contraseña de admin</h3>
+                            <p>Si el sistema es local (no conectado a la nube) esto cambiará la contraseña para el usuario "admin" y la contraseña de recuperación (root) en algunos servidores.<br>
+De lo contrario, solo cambiará la contraseña de recuperación.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">Cambiar contraseña</button>
                             </div>
                         </form>
                     </div>
@@ -84,8 +82,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Combinar sistemas</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Combinar sistemas</button></p>
+                            <h3>Unir sistemas</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Unir Sistemas</button></p>
                         </form>
                     </div>
 
@@ -93,7 +91,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>Este sistema está relacionado con {{Config.cloud.productName}}, propietario del sistema: <b>{{cloudAccountName}}</b></p>
+                            <p>Este sistema está enlazado a {{Config.cloud.productName}}, propietario del sistema: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Desconectarse de {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -165,7 +163,7 @@
                     </div>
                     <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
                         <h3>Restaurar la configuración del servidor</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Full Restore</button>                             <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restaurar todo pero la red</button></p>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Restauración Completa</button>                             <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restaurar todo pero la red</button></p>
                     </div>
                     <div ng-if="canRunClient || canStopClient">
                         <h3>Ejecute la aplicación cliente servidor</h3>

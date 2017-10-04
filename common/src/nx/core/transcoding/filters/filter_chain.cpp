@@ -16,11 +16,10 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace
-{
+namespace {
 
-static const float kMinStepChangeCoeff = 0.95f;
-static const float kAspectRatioComparisionPrecision = 0.01f;
+static constexpr float kMinStepChangeCoeff = 0.95f;
+static constexpr float kAspectRatioComparisionPrecision = 0.01f;
 
 } // namespace
 

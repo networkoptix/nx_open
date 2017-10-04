@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>開発ツール</h2>
         <p>
-            インテグレーション開発にご興味がある場合は連絡下さい
+            Have an idea on how to improve our developer tools or just want to start a conversation?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">レビューを書く</a></p>
     </div>
@@ -11,9 +11,9 @@
     <div>
         <h3>一般的なイベント ジェネレーター</h3>
         <p>
-            一般的なイベントは、VMS のアクションがトリガーするサードパーティ製システムのイベントの種類です。
-            一般的なイベントを作成するにはサーバー (Server API を使用) にHTTPリクエストを行います。
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            A Generic Event is a method of sending events from 3rd party systems to a System,
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
         </p>
         <p><a href="#/developers/events">一般的なイベント ジェネレーター</a></p>
     </div>
@@ -23,18 +23,18 @@
             サーバー APIは、サードパーティシステムの標準API呼び出しセットを提供します 正規クライアントで利用可能なほとんどすべてのシステムの機能にアクセスすることができます クエリ/管理システム リソース (サーバー、カメラ、ユーザー、権限)、ライブまたは録画したビデオのシステムからイベントを生成するルールを作成、PTZ カメラを制御します
         </p>
         <p>
-            <a href="#/developers/api"><b>API テストツール(new)</b></a>
-            - API呼出しをテストするインタエアクティブドキュメント<br>
-            <a href="#/developers/changelog">API 変更履歴</a>
-            - 変更点の一覧<br>
-            <a id="api-doc" href="api.xml" target="_blank">API ドキュメント</a>
+            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
+            - interactive documentation with tools for testing API calls<br>
+            <a href="#/developers/changelog">API Changelog</a>
+            - list of breaking changes in API<br>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
         </p>
 
     </div>
     <div>
         <h3>カメラの詳細</h3>
         <p>
-            カメラの追加情報を表示するWebクライアント用の特別なパネル：
+            Displays additional developer-friendly information for cameras in the Web Admin interface:
         </p>
         <ul>
             <li>カメラ ID</li>
@@ -42,7 +42,8 @@
             <li>ブラウザからビデオのエクスポート</li>
         </ul>
         <p>
-            カメラ詳細パネルを開くには -  <a href="#/view"> Webクライアント</a> を開き、カメラを選択し、設定アイコン（歯車）を選択し、次に「カメラの詳細」を選択します。
+            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
+            select the target camera, click on the settings icon (gear), then choose "Camera Details"
         </p>
         <p><a href="#/view/?cameraLinks">カメラ詳細パネルを開く</a></p>
     </div>

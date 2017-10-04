@@ -35,8 +35,10 @@
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 
 namespace nx {
 namespace client {
@@ -57,10 +59,18 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
 }
 
+QnLayoutResourcePtr constructLayoutForWidget(QnMediaResourceWidget* widget)
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->addItem(widget->item()->data());
+    return layout;
+}
+
 } // namespace
 
 struct WorkbenchExportHandler::Private
 {
+    WorkbenchExportHandler* const q;
     QScopedPointer<ExportManager> exportManager;
 
     struct ExportInfo
@@ -70,7 +80,9 @@ struct WorkbenchExportHandler::Private
     };
     QHash<QnUuid, ExportInfo> runningExports;
 
-    Private(): exportManager(new ExportManager())
+    explicit Private(WorkbenchExportHandler* owner):
+        q(owner),
+        exportManager(new ExportManager())
     {
     }
 
@@ -82,6 +94,28 @@ struct WorkbenchExportHandler::Private
                 return true;
         }
         return false;
+    }
+
+    QnUuid initExport(const Filename& fileName)
+    {
+        const auto exportProcessId = QnUuid::createUuid();
+
+        const auto progressDialog = new QnProgressDialog(
+            fileName.completeFileName(),
+            tr("Stop Export"),
+            0,
+            100,
+            q->mainWindow());
+
+        connect(progressDialog, &QnProgressDialog::canceled, exportManager.data(),
+            [this, exportProcessId]
+            {
+                exportManager->stopExport(exportProcessId);
+            });
+
+        runningExports.insert(exportProcessId, { fileName, progressDialog });
+
+        return exportProcessId;
     }
 
     static void addResourceToPool(const Filename& filename, QnResourcePool* resourcePool)
@@ -128,7 +162,7 @@ struct WorkbenchExportHandler::Private
 WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d(new Private())
+    d(new Private(this))
 {
     connect(d->exportManager, &ExportManager::processUpdated, this,
         &WorkbenchExportHandler::exportProcessUpdated);
@@ -155,6 +189,9 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
 
 void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info)
 {
+    if (!d->runningExports.contains(info.id))
+        return;
+
     const auto exportProcess = d->runningExports.take(info.id);
 
     if (auto dialog = exportProcess.progressDialog)
@@ -230,21 +267,37 @@ void WorkbenchExportHandler::handleExportVideoAction()
         return;
 
     QnUuid exportProcessId;
-    Filename filename;
+
     switch (dialog->mode())
     {
         case ExportSettingsDialog::Mode::Media:
         {
             const auto settings = dialog->exportMediaSettings();
-            exportProcessId = d->exportManager->exportMedia(settings);
-            filename = settings.fileName;
+            exportProcessId = d->initExport(settings.fileName);
+
+            if (FileExtensionUtils::isExecutable(settings.fileName.extension))
+            {
+                ExportLayoutSettings layoutSettings;
+                layoutSettings.filename = settings.fileName;
+                layoutSettings.layout = constructLayoutForWidget(widget);
+                layoutSettings.mode = ExportLayoutSettings::Mode::Export;
+                layoutSettings.period = period;
+                layoutSettings.readOnly = false;
+
+                d->exportManager->exportLayout(exportProcessId, layoutSettings);
+            }
+            else
+            {
+                d->exportManager->exportMedia(exportProcessId, settings);
+            }
+
             break;
         }
         case ExportSettingsDialog::Mode::Layout:
         {
             const auto settings = dialog->exportLayoutSettings();
-            exportProcessId = d->exportManager->exportLayout(settings);
-            filename = settings.filename;
+            exportProcessId = d->initExport(settings.filename);
+            d->exportManager->exportLayout(exportProcessId, settings);
             break;
         }
         default:
@@ -252,26 +305,32 @@ void WorkbenchExportHandler::handleExportVideoAction()
             return;
     }
 
-    NX_ASSERT(!exportProcessId.isNull());
+    NX_ASSERT(!exportProcessId.isNull(), "Workflow is broken");
     if (exportProcessId.isNull())
         return;
 
-    auto progressDialog = new QnProgressDialog(
-        filename.completeFileName(),
-        tr("Stop Export"),
-        0,
-        100,
-        mainWindow());
-    connect(progressDialog, &QnProgressDialog::canceled, this,
-        [this, exportProcessId]
-        {
-            d->exportManager->stopExport(exportProcessId);
-        });
+    const auto info = d->exportManager->info(exportProcessId);
 
-    d->runningExports.insert(exportProcessId, { filename, progressDialog });
-    progressDialog->show();
-    // Fill dialog with initial values (export is already running).
-    exportProcessUpdated(d->exportManager->info(exportProcessId));
+    switch(info.status)
+    {
+
+        case ExportProcessStatus::initial:
+        case ExportProcessStatus::exporting:
+        case ExportProcessStatus::cancelling:
+            if (const auto dialog = d->runningExports.value(exportProcessId).progressDialog)
+                dialog->show();
+            // Fill dialog with initial values (export is already running).
+            exportProcessUpdated(info);
+            break;
+        case ExportProcessStatus::success:
+        case ExportProcessStatus::failure:
+            // Possibly export is finished already.
+            exportProcessFinished(info);
+            break;
+        default:
+            NX_ASSERT(false, "Should never get here in 'cancelled' state");
+            break;
+    }
 }
 
 } // namespace desktop
