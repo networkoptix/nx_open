@@ -1,8 +1,13 @@
 #if defined(ENABLE_HANWHA)
 
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
+
 #include "hanwha_archive_delegate.h"
 #include "hanwha_stream_reader.h"
 #include "hanwha_resource.h"
+#include "hanwha_shared_resource_context.h"
+#include "hanwha_chunk_reader.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -41,14 +46,18 @@ void HanwhaNvrArchiveDelegate::close()
 
 qint64 HanwhaNvrArchiveDelegate::startTime() const
 {
-    // TODO: implement me
-    return QDateTime::currentDateTime().toMSecsSinceEpoch() * 1000 - 3600*1000000ll * 24;
+    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
+    return qnServerModule->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
+        ->chunkLoader()->startTimeUsec();
 }
 
 qint64 HanwhaNvrArchiveDelegate::endTime() const
 {
-    // TODO: implement me
-    return DATETIME_NOW;
+    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
+    return qnServerModule->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
+        ->chunkLoader()->endTimeUsec();
 }
 
 QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
@@ -87,11 +96,6 @@ void HanwhaNvrArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 }
 
 void HanwhaNvrArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
-{
-    // TODO: implement me
-}
-
-void HanwhaNvrArchiveDelegate::setGroupId(const QByteArray& data)
 {
     // TODO: implement me
 }

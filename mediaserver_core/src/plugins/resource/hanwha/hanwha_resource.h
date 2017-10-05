@@ -66,6 +66,8 @@ public:
 
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
 
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
     QnSemaphore* requestSemaphore();

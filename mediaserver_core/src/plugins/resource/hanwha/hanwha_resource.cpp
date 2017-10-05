@@ -30,6 +30,7 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <media_server/media_server_module.h>
+#include "hanwha_chunk_reader.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -563,6 +564,14 @@ CameraDiagnostics::Result HanwhaResource::init()
     initMediaStreamCapabilities();
 
     saveParams();
+
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    auto loader = sharedContext->chunkLoader();
+    int channelCount = sharedContext->channelCount(getAuth(), getUrl());
+    loader->start(getAuth(), getUrl(), channelCount);
+
     return result;
 }
 
@@ -2327,6 +2336,17 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     if (isNvr())
         return new HanwhaNvrArchiveDelegate(toSharedPointer());
     return nullptr;
+}
+
+QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
+{
+    if (!isNvr())
+        return QnTimePeriodList();
+
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    return sharedContext->chunkLoader()->chunks(getChannel());
 }
 
 } // namespace plugins

@@ -31,7 +31,6 @@ public:
     virtual void onReverseMode(qint64 displayTime, bool value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
-    virtual void setGroupId(const QByteArray& data) override;
     virtual void beforeSeek(qint64 time) override;
 private:
     std::shared_ptr<HanwhaStreamReader> m_streamReader;

@@ -3,6 +3,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_resource.h"
+#include "hanwha_chunk_reader.h"
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -25,7 +26,8 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     :
     AbstractSharedResourceContext(serverModule, sharedId),
     m_sharedId(sharedId),
-    m_requestSemaphore(kMaxConcurrentRequestNumber)
+    m_requestSemaphore(kMaxConcurrentRequestNumber),
+    m_chunkLoader(new HanwhaChunkLoader())
 {
 }
 
@@ -69,6 +71,28 @@ QString HanwhaSharedResourceContext::sessionKey(
 QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
 {
     return &m_requestSemaphore;
+}
+
+std::shared_ptr<HanwhaChunkLoader> HanwhaSharedResourceContext::chunkLoader() const
+{
+    return m_chunkLoader;
+}
+
+int HanwhaSharedResourceContext::channelCount(const QAuthenticator& auth, const QUrl& url)
+{
+    QnMutexLocker lock(&m_channelCountMutex);
+
+    if (m_cachedChannelCount)
+        return m_cachedChannelCount;
+
+    HanwhaRequestHelper helper(auth, url.toString());
+    helper.setIgnoreMutexAnalyzer(true);
+    auto attributes = helper.fetchAttributes(lit("attributes/System"));
+    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
+    int result = maxChannels ? *maxChannels : 1;
+    if (attributes.isValid())
+        m_cachedChannelCount = result;
+    return result;
 }
 
 } // namespace plugins

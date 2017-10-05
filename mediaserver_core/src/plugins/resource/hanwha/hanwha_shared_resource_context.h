@@ -15,6 +15,8 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+class HanwhaChunkLoader;
+
 class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext
 {
@@ -30,12 +32,18 @@ public:
 
     QnSemaphore* requestSemaphore();
 
+    std::shared_ptr<HanwhaChunkLoader> chunkLoader() const;
+    int channelCount(const QAuthenticator& auth, const QUrl& url);
 private:
     mutable QnMutex m_sessionMutex;
+    mutable QnMutex m_channelCountMutex;
     
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
     QMap<HanwhaSessionType, QString> m_sessionKeys;
     QnSemaphore m_requestSemaphore;
+
+    std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
+    int m_cachedChannelCount = 0;
 };
 
 } // namespace plugins

@@ -66,8 +66,11 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
     if (m_hanwhaResource->isNvr())
     {
+        auto sessionKeyType = getRole() == Qn::CR_Archive
+            ? HanwhaSessionType::live
+            : HanwhaSessionType::archive;
         streamUrlString.append(lit("&session=%1")
-            .arg(m_hanwhaResource->sessionKey(HanwhaSessionType::live)));
+            .arg(m_hanwhaResource->sessionKey(sessionKeyType)));
     }
 
     m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
