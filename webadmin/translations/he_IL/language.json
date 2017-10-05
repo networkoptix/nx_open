@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"התנתק",
     "disconnectedFromCloudSuccess":"המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
     "confirmDisconnectFromSystem":"נתק שרת מהמערכת הנוכחית",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"ניתוק",
     "disconnectedFromSystemSuccess":"השרת נותק מהמערכת בהצלחה",
     "connectedSuccess":"מערכת חובר בהצלחה",

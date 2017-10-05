@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"연결 끊기",
     "disconnectedFromCloudSuccess":"시스템은 성공적으로 {{CLOUD_NAME}}에서 분리되었습니다.",
     "confirmDisconnectFromSystem":"현재 시스템에서 서버 분리",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"분리",
     "disconnectedFromSystemSuccess":"서버가 시스템에서 성공적으로 분리되었습니다.",
     "connectedSuccess":"시스템은 성공적으로 연결 됨",

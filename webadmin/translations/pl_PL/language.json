@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Rozłącz",
     "disconnectedFromCloudSuccess":"System został odłączony od {{CLOUD_NAME}}",
     "confirmDisconnectFromSystem":"Odłącz serwer z bieżącego systemu",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Odłącz",
     "disconnectedFromSystemSuccess":"Serwer został odłączony od systemu",
     "connectedSuccess":"System został podłączony pomyślnie",

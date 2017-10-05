@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"斷線",
     "disconnectedFromCloudSuccess":"系統已成功從 {{CLOUD_NAME}} 斷開連接",
     "confirmDisconnectFromSystem":"將伺服器從系統中脫離",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"脫離",
     "disconnectedFromSystemSuccess":"伺服器已成功地從系統脫離",
     "connectedSuccess":"系統已成功連接",

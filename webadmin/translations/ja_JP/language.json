@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"切断",
     "disconnectedFromCloudSuccess":"システムが{{CLOUD_NAME}} から正常に切断されました",
     "confirmDisconnectFromSystem":"システムからサーバーを切離す",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"切離す",
     "disconnectedFromSystemSuccess":"サーバーがシステムから正常に切離されました",
     "connectedSuccess":"システムが正常に接続されています",

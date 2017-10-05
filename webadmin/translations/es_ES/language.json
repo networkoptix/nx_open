@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Desconectar",
     "disconnectedFromCloudSuccess":"Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
     "confirmDisconnectFromSystem":"Separar el servidor del sistema actual",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Separar",
     "disconnectedFromSystemSuccess":"Servidor fue separado del sistema con éxito",
     "connectedSuccess":"Sistema fue conectado con éxito",
