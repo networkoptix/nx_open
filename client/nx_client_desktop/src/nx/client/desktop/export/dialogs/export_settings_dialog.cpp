@@ -229,6 +229,10 @@ ExportSettingsDialog::ExportSettingsDialog(
                 ui->exportMediaSettingsPage->setApplyFilters(
                     d->exportMediaPersistentSettings().applyFilters);
             }
+            else
+            {
+                ui->cameraExportSettingsButton->click();
+            }
         });
 
     if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
