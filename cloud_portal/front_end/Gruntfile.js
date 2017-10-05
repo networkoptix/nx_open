@@ -73,7 +73,7 @@ module.exports = function (grunt) {
             },
             compass: {
                 files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}',
-                        'customizations/<%= yeoman.config.customization %>/front_end/{,*/}*.{scss,sass}',
+                        'skins/<%= yeoman.config.skin %>/front_end/{,*/}*.{scss,sass}',
                         '<%= yeoman.web_common %>/styles/{,*/}*.{scss,sass}'],
                 tasks: ['compass:server', 'autoprefixer']
             },
@@ -449,13 +449,13 @@ module.exports = function (grunt) {
         copy: {
             custom: {
                 expand: true,
-                cwd: '../customizations/<%= yeoman.config.customization %>/front_end',
+                cwd: '../skins/<%= yeoman.config.skin %>/front_end',
                 dest: '.tmp/',
                 src: '**'
             },
             custom_css: {
                 expand: true,
-                cwd: '../customizations/<%= yeoman.config.customization %>/front_end/styles/',
+                cwd: '../skins/<%= yeoman.config.skin %>/front_end/styles/',
                 dest: '<%= yeoman.app %>/styles/custom/',
                 src: '**'
             },
@@ -491,7 +491,7 @@ module.exports = function (grunt) {
                     },
                     {
                         expand: true,
-                        cwd: '../customizations/<%= yeoman.config.customization %>/front_end',
+                        cwd: '../skins/<%= yeoman.config.skin %>/front_end',
                         dest: '<%= yeoman.dist %>/',
                         src: '**'
                     },
@@ -692,8 +692,8 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('setbranding', function (branding) {
-        var config = {customization: branding};
+    grunt.registerTask('setskin', function (skin) {
+        var config = {skin: skin};
         grunt.file.write('config.json', JSON.stringify(config, null, 2) + '\n');
     });
 

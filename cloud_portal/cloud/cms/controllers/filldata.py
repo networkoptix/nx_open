@@ -1,14 +1,15 @@
 from ..models import *
 import os
-import re
 import json
+import shutil
 import codecs
 import base64
 import zipfile
+import errno
 from StringIO import StringIO
 
-
-SOURCE_DIR = 'static/{{customization}}/source/'
+SOURCE_DIR = 'static/_source/{{skin}}'
+TARGET_DIR = 'static/{{customization}}'
 
 
 def make_dir(filename):
@@ -19,18 +20,6 @@ def make_dir(filename):
         except OSError as exc:  # Guard against race condition
             if exc.errno != errno.EEXIST:
                 raise
-
-
-def context_for_file(filename, customization_name):
-    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
-    context_name = filename.replace(custom_dir, '')
-    match = re.search(r'lang_(.+?)/', context_name)
-    language = None
-    if match:
-        language = match.group(1)
-        context_name = context_name.replace(
-            match.group(0), 'lang_{{language}}/')
-    return context_name, language
 
 
 def target_file(file_name, customization, language_code, preview):
@@ -128,8 +117,9 @@ def read_customized_file(filename, customization_name, language_code=None, versi
 
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts)
-    target_file_name = target_file(context_path, customization, language_code, preview)
-    save_content(target_file_name, content)
+    if context.template:
+        target_file_name = target_file(context_path, customization, language_code, preview)
+        save_content(target_file_name, content)
 
 
 def generate_languages_json(customization, preview):
@@ -137,6 +127,26 @@ def generate_languages_json(customization, preview):
                       for lang in customization.languages.all()]
     target_file_name = target_file('static/languages.json', customization, None, preview)
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
+
+
+def copy_and_overwrite(from_path, to_path):
+    if os.path.exists(to_path):
+        shutil.rmtree(to_path)
+    shutil.copytree(from_path, to_path)
+
+
+def init_skin(customization_name, product='cloud_portal'):
+    # 1. read skin for this customization
+    customization = Customization.objects.get(name=customization_name)
+    skin = customization.read_global_value('%SKIN%')
+    # 2. copy directory
+    from_dir = SOURCE_DIR.replace("{{skin}}", skin)
+    target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
+    copy_and_overwrite(from_dir, target_dir)
+    copy_and_overwrite(from_dir, os.path.join(target_dir, 'preview'))
+    # 3. run fill_content
+    fill_content(customization_name, product, preview=False, incremental=False)
+    fill_content(customization_name, product, preview=True, incremental=False)
 
 
 def fill_content(customization_name='default', product='cloud_portal',

@@ -15,7 +15,7 @@ function instantiate_config()
     export CLOUD_PORTAL_HOST=${!CLOUD_PORTAL_HOST_var:-$CLOUD_PORTAL_HOST}
 
     tmp=$(tempfile)
-    envsubst < $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml > $tmp
+    envsubst < $CLOUD_PORTAL_BASE_CONF_DIR/../cloud_portal.yaml > $tmp
     mv $tmp $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
 }
 

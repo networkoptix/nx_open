@@ -15,6 +15,12 @@
           "description": "Name for cloud"
         },
         {
+          "label": "Skin",
+          "name": "%SKIN%",
+          "value": "blue",
+          "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update."
+        },
+        {
           "label": "VMS Name",
           "name": "%VMS_NAME%",
           "old_name": "{{VMS_NAME}}",
@@ -94,13 +100,22 @@
           "description": "Sender email for emails from cloud portal. Case sensitive. (Needs to be verified by Amazon, contact Nx support team for assistance)",
           "advanced": true
         },
-
-
+        {
+          "label": "Favicon",
+          "name": "static/images/favicon.ico",
+          "value": "",
+          "optional": true,
+          "description": "Favicon for browser tabs",
+          "type": "Image",
+          "meta": {
+            "format": "ico"
+          }
+        },
         {
           "label": "Portal header logo",
           "name": "static/images/logo.png",
           "value": "",
-          "description": "Logo for branding. Height must be equal 64px",
+          "description": "Logo for branding. ",
           "type": "Image",
           "meta": {
             "format": "png",
@@ -111,7 +126,7 @@
           "label": "Email Logo",
           "name": "templates/email_logo.png",
           "value": "",
-          "description": "Logo for email. Height must be not more than 40px, width - not more than 100px",
+          "description": "Logo for email. ",
           "type": "Image",
           "meta": {
             "format": "png",
@@ -130,8 +145,9 @@
         {
           "label":"Landing page large image",
           "name": "static/images/promo/cloud.png",
+          "optional": true,
           "value": "",
-          "description": "Image for the front page. Image must have transparent background, recommended height is 200px (that is minimal height).",
+          "description": "Image for the front page. Image must have transparent background.",
           "type": "Image",
           "meta": {
             "format": "png",

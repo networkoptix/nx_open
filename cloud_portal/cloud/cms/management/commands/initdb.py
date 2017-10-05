@@ -43,7 +43,7 @@ def init_cms_db():
 
     # read customizations
     for custom in os.listdir(STATIC_DIR):
-        if custom == 'common':
+        if custom in ('common', '_source'):
             continue
         if os.path.isdir(os.path.join(STATIC_DIR, custom)):
             # read languages and languages in customizations

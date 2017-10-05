@@ -10,13 +10,13 @@ rm -rf $TARGET_DIR
 echo "Create $TARGET_DIR"
 mkdir $TARGET_DIR
 
-echo "Iterate all customizations"
-for dir in ../customizations/*/
+echo "Iterate all skins"
+for dir in ../skins/*/
 do
     dir=${dir%*/}
-    CUSTOMIZATION=${dir/..\/customizations\//}
+    SKIN=${dir/..\/skins\//}
 
-    ./build_customization.sh $CUSTOMIZATION
+    ./build_skin.sh $SKIN
 done
 
 echo "Done!"
