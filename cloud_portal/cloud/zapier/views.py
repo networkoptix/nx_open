@@ -41,7 +41,8 @@ def get_systems(request):
     data = requests.get(request, auth=HTTPDigestAuth(email, password))
     zap_list = {'systems': []}
 
-    print data
+    if data:
+        data = json.loads(data.text)
 
     for i in range(len(data['systems'])):
         zap_list['systems'].append({'name': data['systems'][i]['name'], 'system_id': data['systems'][i]['id']})
@@ -51,7 +52,7 @@ def get_systems(request):
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def nx_action(request):
+def zapier_send_generic_event(request):
     user, email, password = authenticate(request)
     system_id = request.data['systemId']
     source = request.data['source']
@@ -86,7 +87,7 @@ def nx_action(request):
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def fire_zap_webhook(request):
+def nx_http_action(request):
     caption = request.query_params['caption']
     system_id = request.query_params['system_id']
     event = system_id + ' ' + caption
