@@ -44,8 +44,8 @@ Item
         property bool blockScaleBoundsAnimation: false
         property bool scalingAfterInteraction: false
         // Scale origin is in item coordinates scaled to 1x1.
-        property real scaleOriginX: 0.5
-        property real scaleOriginY: 0.5
+        property real scaleOriginX: 0
+        property real scaleOriginY: 0
         property real scaleOffsetX: 0
         property real scaleOffsetY: 0
 
