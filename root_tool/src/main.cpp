@@ -6,9 +6,11 @@ static int showHelp()
         << "Usage: root_tool <command> <args...>" << std::endl
         << "Supported commands:" << std::endl
         << "    mount <url> <directory> [<user> [<password>]]" << std::endl
-        << "    umount <source|directory>" << std::endl
-        << "    chown <path>" << std::endl
-        << "    install <deb>" << std::endl;
+        << "    unmount <source|directory>" << std::endl
+        << "    chown <file_or_directory_path>" << std::endl
+        << "    touch <file_path>" << std::endl
+        << "    mkdir <directory_path>" << std::endl
+        << "    install <deb_package>" << std::endl;
 
     return 0;
 }
@@ -55,10 +57,16 @@ int main(int /*argc*/, const char** argv)
             return nx::root_tool::unmount(getArg(argv, "<source> or <directory> is required"));
 
         if (command == std::string("chown"))
-            return nx::root_tool::chengeOwner(getArg(argv, "<path> is required"));
+            return nx::root_tool::chengeOwner(getArg(argv, "<file_or_directory_path> is required"));
+
+        if (command == std::string("touch"))
+            return nx::root_tool::chengeOwner(getArg(argv, "<file_path> is required"));
+
+        if (command == std::string("mkdir"))
+            return nx::root_tool::chengeOwner(getArg(argv, "<directory_path> is required"));
 
         if (command == std::string("install"))
-            return nx::root_tool::install(getArg(argv, "<deb> is required"));
+            return nx::root_tool::install(getArg(argv, "<deb_package> is required"));
 
         if (command == std::string("ids"))
             return nx::root_tool::showIds();

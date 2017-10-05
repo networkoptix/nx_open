@@ -10,15 +10,39 @@ namespace root_tool {
 static const uid_t kRealUid = getuid();
 static const uid_t kRealGid = getgid();
 
-static const std::string kAllowedMountPointPreffix("/tmp/");
-static const std::string kAllowedMountPointSuffix("_temp_folder_");
+static void checkMountPermissions(const std::string& directory)
+{
+    static const std::string kAllowedMountPointPreffix("/tmp/");
+    static const std::string kAllowedMountPointSuffix("_temp_folder_");
 
-static const std::set<std::string> kForbiddenOwnershipPaths = { "/" };
-static const std::set<std::string> kForbiddenOwnershipPrefixes = {
-    "/bin", "/boot", "/cdrom", "/dev", "/etc", "/lib", "/lib64", "/proc", "/root", "/run", "/sbin",
-    "/snap", "/srv", "/sys", "/usr", "/var"};
+    if (directory.find(kAllowedMountPointPreffix) != 0
+        || directory.find(kAllowedMountPointSuffix) == std::string::npos)
+    {
+        throw std::invalid_argument(directory + " is forbidden for mount");
+    }
+}
 
-void execute(const std::string& command)
+static void checkOwnerPermissions(const std::string& path)
+{
+    static const std::set<std::string> kForbiddenOwnershipPaths = { "/" };
+    static const std::set<std::string> kForbiddenOwnershipPrefixes = {
+        "/bin", "/boot", "/cdrom", "/dev", "/etc", "/lib", "/lib64", "/proc", "/root", "/run",
+        "/sbin", "/snap", "/srv", "/sys", "/usr", "/var"};
+
+    for (const auto& forbiddenPath: kForbiddenOwnershipPaths)
+    {
+        if (path == forbiddenPath)
+            throw std::invalid_argument(path + " is forbidden for chown");
+    }
+
+    for (const auto& forbiddenPrefix: kForbiddenOwnershipPrefixes)
+    {
+        if (path.find(forbiddenPrefix) == 0)
+            throw std::invalid_argument(path + " is forbidden for chown");
+    }
+}
+
+static int execute(const std::string& command)
 {
     const auto pipe = popen((command + " 2>&1").c_str(), "r");
     if (pipe == nullptr)
@@ -31,18 +55,15 @@ void execute(const std::string& command)
 
     if (pclose(pipe) != 0)
         throw std::runtime_error(command + " -- " + output.str());
+
+    return 0;
 }
 
 int mount(Argument url, Argument directory, OptionalArgument username, OptionalArgument password)
 {
+    checkMountPermissions(directory);
     if (url.find("//") != 0)
         throw std::invalid_argument(url + " is not an SMB url");
-
-    if (directory.find(kAllowedMountPointPreffix) != 0
-        || directory.find(kAllowedMountPointSuffix) == std::string::npos)
-    {
-        throw std::invalid_argument(directory + " is forbidden for mount");
-    }
 
     std::ostringstream command;
     command << "mount -t cifs '" << url << "' '" << directory << "'"
@@ -54,50 +75,45 @@ int mount(Argument url, Argument directory, OptionalArgument username, OptionalA
     if (password)
         command << ",password=" << *password;
 
-    execute(command.str());
-    return 0;
+    return execute(command.str());
 }
 
 int unmount(Argument directory)
 {
-    if (directory.find(kAllowedMountPointPreffix) != 0
-        || directory.find(kAllowedMountPointSuffix) == std::string::npos)
-    {
-        throw std::invalid_argument(directory + " is forbidden for umount");
-    }
+    checkMountPermissions(directory);
 
     // TODO: Check if it is mounted by cifs.
-
-    execute("umount '" + directory + "'");
-    return 0;
+    return execute("umount '" + directory + "'");
 }
 
 int chengeOwner(Argument path)
 {
-    for (const auto& forbiddenPath: kForbiddenOwnershipPaths)
-    {
-        if (path == forbiddenPath)
-            throw std::invalid_argument(path + " is forbidden for chown");
-    }
-
-    for (const auto& forbiddenPrefix: kForbiddenOwnershipPrefixes)
-    {
-        if (path.find(forbiddenPrefix) == 0)
-            throw std::invalid_argument(path + " is forbidden for chown");
-    }
+    checkOwnerPermissions(path);
 
     std::ostringstream command;
     command << "chown -R " << kRealUid << ":" << kRealGid << " '" << path << "'";
-    execute(command.str());
-    return 0;
+    return execute(command.str());
+}
+
+int touchFile(Argument filePath)
+{
+    checkOwnerPermissions(filePath);
+    execute("touch '" + filePath + "'"); //< TODO: use file open+close;
+    return chengeOwner(filePath);
+}
+
+int makeDirectory(Argument directoryPath)
+{
+    checkOwnerPermissions(directoryPath);
+    execute("mkdir -p '" + directoryPath + "'"); //< TODO: use syscall
+    return chengeOwner(directoryPath);
 }
 
 int install(Argument debPackage)
 {
     // TODO: Check for deb package signature as soon as it is avaliable.
 
-    execute("dpkg -i '" + debPackage + "'");
-    return 0;
+    return execute("dpkg -i '" + debPackage + "'");
 }
 
 int showIds()
