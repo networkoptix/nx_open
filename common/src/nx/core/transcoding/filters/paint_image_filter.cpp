@@ -1,5 +1,7 @@
 #include "paint_image_filter.h"
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <nx/core/transcoding/filters/image_to_frame_painter.h>
 
 namespace nx {
@@ -37,3 +39,5 @@ void PaintImageFilter::setImage(
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -1,5 +1,7 @@
 #include "timestamp_filter.h"
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <QtCore/QDateTime>
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
@@ -130,3 +132,5 @@ QString TimestampFilter::timestampTextSimple(qint64 timeOffsetMs)
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // ENABLE_DATA_PROVIDERS

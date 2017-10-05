@@ -1,5 +1,7 @@
 #include "filter_chain.h"
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <core/resource/media_resource.h>
 
 #include <transcoding/filters/scale_image_filter.h>
@@ -250,3 +252,5 @@ void FilterChain::addLegacyFilter(QnAbstractImageFilterPtr filter)
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // ENABLE_DATA_PROVIDERS

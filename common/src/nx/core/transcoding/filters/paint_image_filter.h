@@ -1,5 +1,6 @@
-
 #pragma once
+
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <transcoding/filters/abstract_image_filter.h>
 
@@ -34,3 +35,5 @@ private:
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // ENABLE_DATA_PROVIDERS
