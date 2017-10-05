@@ -277,7 +277,7 @@ void ExportSettingsDialog::setupSettingsButtons()
         qVariantFromValue(ExportOverlayType::text));
 
     ui->speedButton->setDeactivatable(true);
-    ui->speedButton->setDeactivatedText(tr("Speed Up"));
+    ui->speedButton->setDeactivatedText(tr("Rapid Review"));
     ui->speedButton->setDeactivationToolTip(tr("Reset Speed"));
     ui->speedButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/rapid_review.png")));
     ui->speedButton->setIcon(qnSkin->icon(
