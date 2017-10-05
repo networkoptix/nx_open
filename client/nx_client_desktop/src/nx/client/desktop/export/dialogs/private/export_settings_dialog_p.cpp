@@ -743,11 +743,7 @@ void ExportSettingsDialog::Private::updateTimestampText()
 void ExportSettingsDialog::Private::updateMediaImageProcessor()
 {
     const auto& settings = m_exportMediaSettings.transcodingSettings;
-    const auto dewarpingParams = m_exportMediaSettings.mediaResource
-        ? m_exportMediaSettings.mediaResource->getDewarpingParams()
-        : QnMediaDewarpingParams();
-
-    m_mediaImageProcessor->setTranscodingSettings(settings, dewarpingParams);
+    m_mediaImageProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)

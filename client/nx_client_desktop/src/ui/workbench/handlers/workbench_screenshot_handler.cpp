@@ -520,8 +520,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
             transcodeParams);
 
         // Thumbnail from loader is already merged for panoramic cameras.
-        filters.prepare(QnConstResourceVideoLayoutPtr(),
-            parameters.resource->getDewarpingParams(), result.size());
+        filters.prepareForImage(parameters.resource, result.size());
 
         if (!filters.isEmpty())
         {
