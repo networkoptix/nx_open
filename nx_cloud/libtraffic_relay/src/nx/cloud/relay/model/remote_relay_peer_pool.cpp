@@ -7,6 +7,7 @@
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "../settings.h"
 
