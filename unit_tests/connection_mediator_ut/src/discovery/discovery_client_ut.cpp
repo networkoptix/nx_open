@@ -43,7 +43,7 @@ protected:
         
         registerWebSocketAcceptHandlerAt(
             nx_http::rest::substituteParameters(
-                http::kModuleKeepAliveConnectionPath, { m_moduleId.c_str() }));
+                http::kModuleKeepAliveConnectionPath, { m_moduleId.c_str() }).c_str());
     }
 
     virtual void onWebSocketAccepted(
