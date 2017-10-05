@@ -70,6 +70,9 @@ do
             ;;
         celery)
             write_my_cnf
+
+            /app/env/bin/python manage.py filldata
+
             rm -f /tmp/*.pid
             exec /app/env/bin/celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
