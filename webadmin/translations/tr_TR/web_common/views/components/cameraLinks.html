@@ -4,7 +4,7 @@
     </div>
     <div class='camera-links-title'>Kamera Ayarları</div>
     <table>
-        <tr ng-if="debugMode"><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
+        <tr ng-if="debugMode"><td>Oynatılıyor</td><td class="camera-links-info">{{transport}}-{{currentResolution}} ile {{player}}</td></tr>
         <tr><td>Ad</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
@@ -16,7 +16,7 @@
         <tr>
             <td>Görünüm</td>
             <td>
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}">Web</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}"> Web </a>
                 <copy-button copy-data="formatLink(activeCamera, 0, 'web')"></copy-button>
             </td>
         </tr>
@@ -44,11 +44,11 @@
     <div class='camera-links-title'>Bağlantı ayarları</div>
     <table>
         <tr>
-            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;Use temporary key</label></td>
+            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;Geçici anahtarı kullan</label></td>
         </tr>
         <tr>
             <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useCredentials"
-                       ng-disabled="linkSettings.useAuth">&nbsp;Use credentials</label></td>
+                       ng-disabled="linkSettings.useAuth">&nbsp;Kimlik bilgilerini kullan</label></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
             <td><label class="camera-links-label" for="useLogin">Giriş</label></td>
@@ -71,7 +71,7 @@
                        ng-model="linkSettings.resolution"></td>
         </tr>
         <tr>
-            <td>Playing position</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
+            <td>Oynatma pozisyonu</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
         </tr>
     </table>
 </div>

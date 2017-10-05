@@ -1046,16 +1046,14 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>Dosya adı ayrılmış şu karakterler içermemelidir: %1</numerusform>
+        <numerusform>Dosya adı ayrılmış şu karakterleri içermemelidir: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>&quot;%1&quot; dosyası başka bir işlem tarafından kullanılıyor. Lütfen başka bir isim deneyin.</translation>
     </message>
   </context>
   <context>
@@ -2671,7 +2669,7 @@ to %1</source>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>&apos;ı aktif değil.Lütfen e-postanızı denetleyin ve sağlanan yönergeleri izleyin</translation>
     </message>
   </context>
   <context>
@@ -4324,7 +4322,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Takvim dışı</translation>
     </message>
   </context>
   <context>
@@ -4627,7 +4625,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>Bildirimi gören kullanıcılardan biri etkinlik açıklamasıyla yer imi oluşturana kadar gösterilir.</translation>
     </message>
   </context>
   <context>
@@ -7252,11 +7250,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Şifre Giriniz...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Yönetici parolası</translation>
     </message>
   </context>
   <context>

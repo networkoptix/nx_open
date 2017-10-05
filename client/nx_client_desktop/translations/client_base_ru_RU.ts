@@ -4376,7 +4376,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Отключено по расписанию</translation>
     </message>
   </context>
   <context>
@@ -7329,11 +7329,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Введите пароль...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Пароль администратора</translation>
     </message>
   </context>
   <context>

@@ -4279,7 +4279,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>已依據排程停用</translation>
     </message>
   </context>
   <context>
@@ -7184,11 +7184,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>輸入密碼...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>管理者密碼</translation>
     </message>
   </context>
   <context>

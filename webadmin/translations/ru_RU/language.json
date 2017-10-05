@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Отключить",
     "disconnectedFromCloudSuccess":"Система успешно отключена от {{CLOUD_NAME}}",
     "confirmDisconnectFromSystem":"Отсоединить сервер от текущей системы",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Отсоединить",
     "disconnectedFromSystemSuccess":"Сервер был успешно отсоединет от системы",
     "connectedSuccess":"Система успешно подключена",

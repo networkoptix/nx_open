@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Trennen",
     "disconnectedFromCloudSuccess":"System wurde von {{CLOUD_NAME}} erfolgreich getrennt",
     "confirmDisconnectFromSystem":"Server aus dem aktuellen System trennen",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Trennen",
     "disconnectedFromSystemSuccess":"Server wurde erfolgreich vom System getrennt",
     "connectedSuccess":"Das System wurde erfolgreich verbunden",
