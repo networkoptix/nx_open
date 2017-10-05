@@ -40,6 +40,7 @@
 #include <nx/mediaserver/license_watcher.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
+#include <nx/mediaserver/root_tool.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
@@ -236,4 +237,14 @@ nx::mediaserver::metadata::ManagerPool* QnMediaServerModule::metadataManagerPool
 nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWatcher() const
 {
     return m_metadataRuleWatcher;
+}
+
+void QnMediaServerModule::initializeRootTool()
+{
+    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+}
+
+nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
+{
+    return m_rootTool.get();
 }

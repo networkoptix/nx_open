@@ -2451,7 +2451,10 @@ void MediaServerProcess::run()
         changeSystemUser(systemUser);
 
     if (m_serviceMode)
+    {
         initializeLogging();
+        qnServerModule->initializeRootTool();
+    }
 
     updateAllowedInterfaces();
 

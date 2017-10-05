@@ -21,6 +21,7 @@ namespace mediaserver {
 
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
+class RootTool;
 
 namespace metadata {
 
@@ -61,6 +62,9 @@ public:
     nx::mediaserver::metadata::ManagerPool* metadataManagerPool() const;
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
 
+    void initializeRootTool();
+    nx::mediaserver::RootTool* rootTool() const;
+
 private:
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
@@ -80,6 +84,7 @@ private:
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
     QThread* m_metadataManagerPoolThread = nullptr;
+    std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
 };
 
 #define qnServerModule QnMediaServerModule::instance()
