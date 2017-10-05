@@ -4322,7 +4322,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Uitgeschakeld volgens schema</translation>
     </message>
   </context>
   <context>
@@ -7251,11 +7251,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Voer wachtwoord in...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Admin wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -8078,7 +8078,7 @@ to %1</source>
     </message>
     <message>
       <source>Press any key to stop the tour.</source>
-      <translation type="unfinished">Press any key to stop the tour.</translation>
+      <translation>Druk op een willekeurige toets om de tour te stoppen.</translation>
     </message>
   </context>
   <context>

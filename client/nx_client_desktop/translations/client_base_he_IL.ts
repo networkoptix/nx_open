@@ -3208,7 +3208,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
@@ -3217,7 +3217,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>רשימת תיעוד אירועים ל %1 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
         <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
@@ -3844,7 +3844,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;השרת לא נמצא></translation>
+      <translation>השרת לא נמצא</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -4526,7 +4526,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>לא ניתן להגדיר אפשרות הקלטה של &quot;תנועה + תזרים משני&quot;.</translation>
+      <translation>לא ניתן להגדיר אפשרות הקלטה של "תנועה + תזרים משני".</translation>
     </message>
   </context>
   <context>
@@ -4797,7 +4797,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>בערך דקה %n</numerusform>
         <numerusform>בערך %n דקות</numerusform>
         <numerusform>בערך %n דקות</numerusform>
@@ -5009,7 +5009,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;מצלמות משרתים אחרים ומצלמות שהוסרו></translation>
+      <translation>מצלמות משרתים אחרים ומצלמות שהוסרו</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -5858,7 +5858,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>לא ניתן להגדיר אפשרות הקלטה של &quot;תנועה + תזרים משני&quot;.</translation>
+      <translation>לא ניתן להגדיר אפשרות הקלטה של "תנועה + תזרים משני".</translation>
     </message>
   </context>
   <context>
@@ -5928,7 +5928,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>לא נמצא פריסט. השתמש באפשרות &quot;מתקדם&quot;.</translation>
+      <translation>לא נמצא פריסט. השתמש באפשרות "מתקדם".</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>

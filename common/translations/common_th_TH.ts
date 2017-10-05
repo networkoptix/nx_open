@@ -264,55 +264,55 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</translation>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>ไม่สามารถเปิด URL สื่อ %1 ไม่สามารถเชื่อมต่อกับพอร์ตสื่อ %2</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>ไม่สามารถเปิด URL สื่อ %1 การเชื่อมต่อกับพอร์ต %2 ปิดโดยไม่คาดคิด</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>ไม่สามารถแยกวิเคราะห์การตอบสนองของอุปกรณ์ URL %1 ชื่อคำขอ %2</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>ไม่สามารถแยกวิเคราะห์การตอบสนองของอุปกรณ์ URL %1 ชื่อคำขอ %2</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>ไม่สามารถแยกวิเคราะห์การตอบสนองของอุปกรณ์ URL %1 ชื่อคำขอ %2</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>ไม่มีสื่อบันทึกที่สนับสนุนที่ URL %1</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>ไม่ได้รับอนุญาต URL %1</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
+      <translation>ไม่สามารถเปิด URL สื่อ %1 โปรโตคอลสื่อที่ไม่รองรับ %2</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>กล้องถูกเรียกคืนจากที่จัดเก็บ ลบกล้องและเพิ่มอีกครั้งเพื่อดูวิดีโอสด</translation>
     </message>
   </context>
   <context>
@@ -339,23 +339,23 @@
     </message>
     <message>
       <source>Could not initialize resampling context, error code: %1</source>
-      <translation type="unfinished">Could not initialize resampling context, error code: %1</translation>
+      <translation>ไม่สามารถเริ่มต้นการบริบทใหม่รหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers, error code: %1</source>
-      <translation type="unfinished">Could not allocate sample buffers, error code: %1</translation>
+      <translation>ไม่สามารถจัดสรรบัฟเฟอร์ตัวอย่างรหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not send audio frame to encoder, Error code: %1.</translation>
+      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio packet from encoder, Error code: %1.</translation>
+      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio frame from decoder, Error code: %1.</translation>
+      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
     </message>
   </context>
   <context>
@@ -998,23 +998,23 @@
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation type="unfinished">Can view live video from all cameras.</translation>
+      <translation>สามารถดูวิดีโอสดจากกล้องทั้งหมด</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation type="unfinished">Custom user role.</translation>
+      <translation>บทบาทผู้ใช้ที่กำหนดเอง</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation type="unfinished">Custom permissions.</translation>
+      <translation>สิทธิ์ที่กำหนดเอง</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation type="unfinished">Has access to whole System and can do everything.</translation>
+      <translation>มีสิทธิ์เข้าถึงระบบทั้งหมดและสามารถทำทุกอย่างได้</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+      <translation>มีสิทธิ์เข้าถึงระบบทั้งหมดและสามารถจัดการได้ สามารถสร้างผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -1085,8 +1085,8 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
+      <translation>
+        <numerusform>การเคลื่อนไหวบนกล้อง</numerusform>
       </translation>
     </message>
     <message>
@@ -1127,38 +1127,38 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Devices</numerusform>
+      <translation>
+        <numerusform>สัญญาณอินพุตบนอุปกรณ์</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Cameras</numerusform>
+      <translation>
+        <numerusform>สัญญาณอินพุตบนกล้อง</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Devices Disconnected</numerusform>
+      <translation>
+        <numerusform>ขาดการเชื่อมต่อกับอุปกรณ์</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Cameras Disconnected</numerusform>
+      <translation>
+        <numerusform>หยุด​เชื่อม​ต่อ​กล้อง​แล้ว</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Devices IP Conflict</numerusform>
+      <translation>
+        <numerusform>ความขัดแย้งทางอุปกรณ์ IP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Cameras IP Conflict</numerusform>
+      <translation>
+        <numerusform>ข้อขัดแย้ง IP ของกล้อง</numerusform>
       </translation>
     </message>
     <message>
@@ -1203,7 +1203,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>เซิร์ฟเวอร์ &quot;%1&quot; ล้มเหลว</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1217,19 +1217,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>เซิร์ฟเวอร์ &quot;%1&quot; ขัดแย้ง</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>เริ่มต้นเซิร์ฟเวอร์ &quot;%1&quot; แล้ว</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>เซิร์ฟเวอร์ &quot;%1&quot; มีปัญหาเกี่ยวกับใบอนุญาต</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>เซิร์ฟเวอร์ "%1" ได้เสร็จสิ้นการสำรองข้อมูลเก็บถาวร</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1241,7 +1241,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>มีเหตุการณ์ %1 หลายครั้ง</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1283,7 +1283,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>ทริกเกอร์: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1293,8 +1293,8 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n ครั้ง, ครั้งแรก: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1337,7 +1337,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>อุปกรณ์ไม่ตอบสนองต่อคำขอเครือข่าย</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -1345,7 +1345,7 @@
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>วิดีโอหยุดลงอย่างกะทันหัน</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
@@ -1357,11 +1357,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD disk %1 เต็ม ดิสก์มีข้อมูลมากเกินไปที่ไม่ได้รับการจัดการโดย VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>ดิสก์ระบบ &quot;%1&quot; ใกล้เต็มแล้ว</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1385,7 +1385,7 @@
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
+      <translation>การสำรองข้อมูลที่เก็บถาวรเสร็จสิ้น แต่ไม่ครบถ้วนเนื่องจากเวลาการสำรองข้อมูลเสร็จสิ้น ข้อมูลสำรองไว้ที่ %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
@@ -1397,15 +1397,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+      <translation>ใบอนุญาตไม่เพียงพอ การบันทึกถูกปิดใช้งานบนอุปกรณ์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+      <translation>ใบอนุญาตไม่เพียงพอ การบันทึกถูกปิดใช้งานบนอุปกรณ์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+      <translation>ใบอนุญาตไม่เพียงพอ การบันทึกถูกปิดใช้งานบนอุปกรณ์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>start</source>
@@ -1429,18 +1429,18 @@
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>สิทธิพิเศษ</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>ผู้ใช้ %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
+      <translation>
+        <numerusform>%n บทบาท</numerusform>
       </translation>
     </message>
     <message>

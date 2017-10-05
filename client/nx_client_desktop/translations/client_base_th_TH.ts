@@ -854,23 +854,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>การบันทึก บุ๊คมาร์ค</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>showreel</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Showreel ใหม่...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>นำออกจาก Showreel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>ทำ Showreel</translation>
     </message>
   </context>
   <context>
@@ -897,31 +897,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>For the last 5 min</source>
-      <translation type="unfinished">For the last 5 min</translation>
+      <translation>สำหรับ 5 นาทีสุดท้าย</translation>
     </message>
     <message>
       <source>For the last hour</source>
-      <translation type="unfinished">For the last hour</translation>
+      <translation>สำหรับชั่วโมงสุดท้าย</translation>
     </message>
     <message>
       <source>For the last day</source>
-      <translation type="unfinished">For the last day</translation>
+      <translation>สำหรับวันสุดท้าย</translation>
     </message>
     <message>
       <source>For the last week</source>
-      <translation type="unfinished">For the last week</translation>
+      <translation>สำหรับสัปดาห์ที่ผ่านมา</translation>
     </message>
     <message>
       <source>For the last month</source>
-      <translation type="unfinished">For the last month</translation>
+      <translation>สำหรับเดือนที่แล้ว</translation>
     </message>
     <message>
       <source>All data</source>
-      <translation type="unfinished">All data</translation>
+      <translation>ข้อมูลทั้งหมด</translation>
     </message>
     <message>
       <source>For all data</source>
-      <translation type="unfinished">For all data</translation>
+      <translation>สำหรับข้อมูลทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -932,23 +932,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>ไม่มีใบอนุญาต</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>ใบอนุญาตถูกปิดการใช้งาน</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>สัญญาอนุญาตไม่ได้ใช้งาน</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>ใบอนุญาตทดลองใช้</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
