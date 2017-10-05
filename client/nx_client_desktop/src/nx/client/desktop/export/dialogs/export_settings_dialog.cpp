@@ -446,7 +446,7 @@ void ExportSettingsDialog::updateTabWidgetSize()
     auto size = ui->tabWidget->minimumSizeHint();
     if (ui->tabWidget->tabBar()->isHidden())
         size.setHeight(size.height() - ui->tabWidget->tabBar()->sizeHint().height());
-    ui->tabWidget->setMaximumSize(size);
+    ui->tabWidget->setFixedSize(size);
 }
 
 void ExportSettingsDialog::updateMode()
@@ -473,6 +473,8 @@ void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts
             updateAlertsInternal(ui->severeLayoutAlertsLayout, severeAlerts, true);
             break;
     }
+
+    updateTabWidgetSize();
 }
 
 void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
