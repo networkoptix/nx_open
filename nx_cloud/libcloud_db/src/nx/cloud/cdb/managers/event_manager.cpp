@@ -21,7 +21,7 @@ namespace nx {
 namespace cdb {
 
 class SubscribeToSystemEventsHandler:
-    public AbstractFreeMsgBodyHttpHandler<void>
+    public AbstractFreeMsgBodyHttpHandler<>
 {
 public:
     static const QString kHandlerPath;
@@ -30,7 +30,7 @@ public:
         EventManager* const eventManager,
         const AuthorizationManager& authorizationManager)
     :
-        AbstractFreeMsgBodyHttpHandler<void>(
+        AbstractFreeMsgBodyHttpHandler<>(
             EntityType::system,
             DataActionType::fetch,
             authorizationManager,
