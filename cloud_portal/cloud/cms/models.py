@@ -98,7 +98,7 @@ class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
-    label = models.CharField(max_length=1024)
+    label = models.CharField(max_length=1024, blank=True)
 
     DATA_TYPES = Choices((0, 'text', 'Text'),
                          (1, 'image', 'Image'),
@@ -110,7 +110,7 @@ class DataStructure(models.Model):
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='')
     translatable = models.BooleanField(default=True)
-    meta_settings = JSONField(default=dict())
+    meta_settings = JSONField(default=dict(), blank=True)
     advanced = models.BooleanField(default=False)
     order = models.IntegerField(default=100000)
     optional = models.BooleanField(default=False)

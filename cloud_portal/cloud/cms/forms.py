@@ -42,7 +42,7 @@ class CustomContextForm(forms.Form):
             self.remove_langauge()
 
         for data_structure in data_structures:
-            ds_name = data_structure.label
+            ds_name = data_structure.label if data_structure.label else data_structure.name
 
             ds_description = data_structure.description
 
