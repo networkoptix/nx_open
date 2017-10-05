@@ -31,13 +31,16 @@
             {{ field.label_tag }}
             <div id="{{field.label}}" style="display:inline-block;">
                 {% if field|is_ImageField and field.value %}
+                    {% has_value field.name context customization language as record_exists %}
+                    {% is_optional field.name context as optional %}
                     <div>
-                        {% if field|is_optional:context %}
+                        {% if optional and record_exists %}
                         <label><input id="delete_{{field.name}}" type="checkbox"
                                       name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
+                        <br><br>
                         {% endif %}
 
-                        {%if field|is_optional:context and not field|has_value:context %}
+                        {%if optional and not record_exists %}
                         <img class="preview-image context-preview optional-image"
                              src="data:image/png;base64,{{field.value}}">
                         {% else %}
@@ -47,13 +50,15 @@
                     </div>
 
                 {% elif field|is_FileField and field.value %}
+                    {% has_value field.name context customization language as record_exists %}
+                    {% is_optional field.name context as optional %}
                     <div>
-                        {% if field|is_optional:context %}
+                        {% if optional and record_exists %}
                         <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
                         {% endif %}
 
                         <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>
-                        {% if field|is_optional:context and not field|has_value:context %}
+                        {% if optional and not record_exists %}
                         Download Example
                         {% else %}
                         Download

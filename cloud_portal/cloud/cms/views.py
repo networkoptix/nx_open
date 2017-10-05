@@ -65,7 +65,7 @@ def handle_get_view(request, context_id, language_code):
     if context:
         form.add_fields(context, customization, language, request.user)
 
-    return context, form, language
+    return context, form, customization, language
 
 
 def add_upload_error_messages(request, errors):
@@ -157,7 +157,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
     form.add_fields(context, customization, language, user)
 
-    return context, form, language, preview_link
+    return context, form, customization, language, preview_link
 
 
 # Create your views here.
@@ -165,10 +165,11 @@ def handle_post_context_edit_view(request, context_id, language_id):
 @permission_required('cms.edit_content')
 def context_edit_view(request, context=None, language=None):
     if request.method == "GET":
-        context, form, language = handle_get_view(request, context, language)
+        context, form, customization, language = handle_get_view(request, context, language)
         return render(request, 'context_editor.html',
                       {'context': context,
                        'form': form,
+                       'customization': customization,
                        'language': language,
                        'user': request.user,
                        'has_permission': mysite.has_permission(request),
@@ -181,8 +182,7 @@ def context_edit_view(request, context=None, language=None):
         if not request.user.has_perm('cms.edit_content'):
             raise PermissionDenied
 
-        context, form, language, preview_link = handle_post_context_edit_view(
-            request, context, language)
+        context, form, customization, language, preview_link = handle_post_context_edit_view(request, context, language)
 
         if 'SendReview' in request.POST:
             return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
@@ -190,6 +190,7 @@ def context_edit_view(request, context=None, language=None):
         return render(request, 'context_editor.html',
                       {'context': context,
                        'form': form,
+                       'customization': customization,
                        'language': language,
                        'preview_link': preview_link,
                        'user': request.user,
