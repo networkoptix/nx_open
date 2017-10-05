@@ -490,8 +490,8 @@ Item
         else
         {
             d.setAnimationEasingType(Easing.InOutCubic)
-            animateScaleTo(newScale, d.fitInViewDuration)
             animatePanOffsetTo(newOffsetX, newOffsetY, d.fitInViewDuration)
+            animateScaleTo(newScale, d.fitInViewDuration)
         }
     }
 
