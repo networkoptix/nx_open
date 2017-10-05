@@ -108,7 +108,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
 
             # if the guid is valid it will go to the next set of checks
             new_record_value = request_data[data_structure_name] if data_structure_name in request_data else ""
-            is_guid = re.match('\{[\dabcdef]{8}-[\dabcdef]{4}-[\dabcdef]{4}-[\dabcdef]{4}-[\dabcdef]{12}\}',
+            is_guid = re.match('\{[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}\}',
                                new_record_value)
 
             # if its option and not a valid guid set error message and go to next DataStructure

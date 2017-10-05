@@ -50,7 +50,7 @@ class CustomContextForm(forms.Form):
                 ds_description += convert_meta_to_description(data_structure.meta_settings)
 
             if data_structure.type == DataStructure.DATA_TYPES.guid:
-                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexdecimal characters (0-9, a-f)"
+                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexdecimal characters (0-9, a-f, A-F)"
 
             ds_language = language
             if not data_structure.translatable:
