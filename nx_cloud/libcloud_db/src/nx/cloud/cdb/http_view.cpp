@@ -287,12 +287,9 @@ void HttpView::registerHttpHandler(
     EntityType entityType,
     DataActionType dataActionType)
 {
-    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
-        ActualOutputDataType;
-
     typedef AbstractFiniteMsgBodyHttpHandler<
         typename std::remove_const<typename std::remove_reference<InputData>::type>::type,
-        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
+        OutputData...
     > HttpHandlerType;
 
     m_httpMessageDispatcher.registerRequestProcessor<HttpHandlerType>(
