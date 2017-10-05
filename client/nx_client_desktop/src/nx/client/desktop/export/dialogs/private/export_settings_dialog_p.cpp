@@ -235,19 +235,6 @@ void ExportSettingsDialog::Private::setCamera(const QnVirtualCameraResourcePtr& 
 {
     setFrameSize(QnCameraThumbnailManager::sizeHintForCamera(camera, QSize()));
 
-    const QPair<qreal, qreal> coefficients(
-        qreal(m_previewSize.width()) / m_fullFrameSize.width(),
-        qreal(m_previewSize.height()) / m_fullFrameSize.height());
-
-    m_overlayScale = std::min({ coefficients.first, coefficients.second, 1.0 });
-
-    for (size_t i = 0; i != overlayCount; ++i)
-        m_overlays[i]->setScale(m_overlayScale);
-
-    const auto thumbnailSizeLimit = coefficients.first >= coefficients.second
-        ? QSize(m_previewSize.width(), 0)
-        : QSize(0, m_previewSize.height());
-
     m_mediaImageProvider.reset(new ProxyImageProvider());
 
     m_mediaImageProvider->setSourceProvider(new QnSingleThumbnailLoader(
@@ -321,7 +308,7 @@ void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());
 
-    m_overlayScale = qMin(coefficients.first, coefficients.second);
+    m_overlayScale = std::min({coefficients.first, coefficients.second, 1.0});
 
     QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
 
