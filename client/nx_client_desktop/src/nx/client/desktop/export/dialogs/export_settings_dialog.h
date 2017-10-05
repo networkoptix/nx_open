@@ -39,18 +39,18 @@ public:
         Layout,
     };
 
-    using IsFileNameValid = std::function<bool (const Filename& fileName, bool quiet)>;
+    using FileNameValidator = std::function<bool (const Filename& fileName, bool quiet)>;
 
     /** Default mode. Will have both "Single camera" and "Layout" tabs. */
     ExportSettingsDialog(QnMediaResourceWidget* widget,
         const QnTimePeriod& timePeriod,
-        IsFileNameValid isFileNameValid,
+        FileNameValidator isFileNameValid,
         QWidget* parent = nullptr);
 
     /** Bookmark mode. Will have only "Single camera" tab. */
     ExportSettingsDialog(QnMediaResourceWidget* widget,
         const QnCameraBookmark& bookmark,
-        IsFileNameValid isFileNameValid,
+        FileNameValidator isFileNameValid,
         QWidget* parent = nullptr);
 
     virtual ~ExportSettingsDialog() override;
@@ -65,7 +65,7 @@ public:
 private:
     ExportSettingsDialog(const QnTimePeriod& timePeriod,
         const QnCameraBookmark& bookmark,
-        IsFileNameValid isFileNameValid,
+        FileNameValidator isFileNameValid,
         QWidget* parent = nullptr);
 
     void setMediaResourceWidget(QnMediaResourceWidget* widget);
@@ -82,7 +82,7 @@ private:
     class Private;
     QScopedPointer<Private> d;
     QScopedPointer<Ui::ExportSettingsDialog> ui;
-    IsFileNameValid isFileNameValid;
+    FileNameValidator isFileNameValid;
 };
 
 } // namespace desktop

@@ -42,7 +42,7 @@ static constexpr int kNoDataDefaultFontSize = 18;
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnTimePeriod& timePeriod,
-    IsFileNameValid isFileNameValid,
+    FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
@@ -68,7 +68,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnCameraBookmark& bookmark,
-    IsFileNameValid isFileNameValid,
+    FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFileNameValid, parent)
@@ -81,7 +81,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     const QnCameraBookmark& bookmark,
-    IsFileNameValid isFileNameValid,
+    FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     base_type(parent),
