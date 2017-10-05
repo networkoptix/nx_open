@@ -21,7 +21,7 @@ namespace nx {
 namespace cdb {
 namespace detail {
 
-template<typename Input, typename Output>
+template<typename Input = void, typename Output = void>
 class BaseFiniteMsgBodyHttpHandler:
     public nx_http::AbstractFusionRequestHandler<Input, Output>
 {
@@ -90,19 +90,20 @@ protected:
 
 } // namespace detail
 
-
 /**
  * Contains logic common for all cloud_db HTTP request handlers.
  */
-template<typename Input = void, typename Output = void>
+template<typename Input, typename ... Output>
 class AbstractFiniteMsgBodyHttpHandler:
-    public detail::BaseFiniteMsgBodyHttpHandler<Input, Output>
+    public detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>
 {
+    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
+
 public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
         Input inputData,
-        std::function<void(api::ResultCode resultCode, Output outData)>&& completionHandler)> ExecuteRequestFunc;
+        std::function<void(api::ResultCode resultCode, Output... outData)>&& completionHandler)> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
@@ -110,7 +111,7 @@ public:
         const AuthorizationManager& authorizationManager,
         ExecuteRequestFunc requestFunc)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<Input, Output>(
+        detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>(
             entityType,
             actionType,
             authorizationManager),
@@ -135,94 +136,34 @@ public:
         m_requestFunc(
             AuthorizationInfo(std::move(authInfo)),
             std::move(inputData),
-            [this](api::ResultCode resultCode, Output outData)
+            [this](api::ResultCode resultCode, Output... outData)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
                     QnLexical::serialized(resultCode).toLatin1());
                 this->requestCompleted(
                     resultCodeToFusionRequestResult(resultCode),
-                    std::move(outData));
+                    std::move(outData)...);
             });
     }
 
 private:
     ExecuteRequestFunc m_requestFunc;
 };
-
-
-/**
- * No output/
- */
-template<typename Input>
-class AbstractFiniteMsgBodyHttpHandler<Input, void>:
-    public detail::BaseFiniteMsgBodyHttpHandler<Input, void>
-{
-public:
-    typedef std::function<void(
-        const AuthorizationInfo& authzInfo,
-        Input inputData,
-        std::function<void(api::ResultCode resultCode)> completionHandler)> ExecuteRequestFunc;
-
-    AbstractFiniteMsgBodyHttpHandler(
-        EntityType entityType,
-        DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc requestFunc)
-        :
-        detail::BaseFiniteMsgBodyHttpHandler<Input, void>(
-            entityType,
-            actionType,
-            authorizationManager),
-        m_requestFunc(std::move(requestFunc))
-    {
-    }
-
-    virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo,
-        Input inputData) override
-    {
-        //performing authorization
-        //  authorization is performed here since it can depend on input data which 
-        //  needs to be deserialized depending on request type
-        if (!this->authorize(
-                connection,
-                request,
-                authInfo,
-                inputData,
-                &authInfo))
-            return;
-
-        m_requestFunc(
-            AuthorizationInfo(std::move(authInfo)),
-            std::move(inputData),
-            [this](api::ResultCode resultCode)
-            {
-                this->response()->headers.emplace(
-                    Qn::API_RESULT_CODE_HEADER_NAME,
-                    QnLexical::serialized(resultCode).toLatin1());
-                this->requestCompleted(resultCodeToFusionRequestResult(resultCode));
-            });
-    }
-
-private:
-    ExecuteRequestFunc m_requestFunc;
-};
-
 
 /**
  * No input.
  */
-template<typename Output>
-class AbstractFiniteMsgBodyHttpHandler<void, Output>:
-    public detail::BaseFiniteMsgBodyHttpHandler<void, Output>
+template<typename... Output>
+class AbstractFiniteMsgBodyHttpHandler<void, Output...>:
+    public detail::BaseFiniteMsgBodyHttpHandler<void, Output...>
 {
+    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
+
 public:
     typedef std::function<void(
         const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode resultCode, Output outData)> completionHandler)> ExecuteRequestFunc;
+        std::function<void(api::ResultCode resultCode, Output... outData)> completionHandler)> ExecuteRequestFunc;
 
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
@@ -230,7 +171,7 @@ public:
         const AuthorizationManager& authorizationManager,
         ExecuteRequestFunc requestFunc)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<void, Output>(
+        detail::BaseFiniteMsgBodyHttpHandler<void, Output...>(
             entityType,
             actionType,
             authorizationManager),
@@ -253,14 +194,14 @@ public:
 
         m_requestFunc(
             AuthorizationInfo(std::move(authInfo)),
-            [this](api::ResultCode resultCode, Output outData)
+            [this](api::ResultCode resultCode, Output... outData)
             {
                 this->response()->headers.emplace(
                     Qn::API_RESULT_CODE_HEADER_NAME,
                     QnLexical::serialized(resultCode).toLatin1());
                 this->requestCompleted(
                     resultCodeToFusionRequestResult(resultCode),
-                    std::move(outData));
+                    std::move(outData)...);
             });
     }
 
@@ -268,71 +209,17 @@ private:
     ExecuteRequestFunc m_requestFunc;
 };
 
-/**
- * No input, no output.
- */
-template<>
-class AbstractFiniteMsgBodyHttpHandler<void, void>:
-    public detail::BaseFiniteMsgBodyHttpHandler<void, void>
-{
-public:
-    typedef std::function<void(
-        const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode resultCode)> completionHandler)> ExecuteRequestFunc;
-
-    AbstractFiniteMsgBodyHttpHandler(
-        EntityType entityType,
-        DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc requestFunc)
-        :
-        detail::BaseFiniteMsgBodyHttpHandler<void, void>(
-            entityType,
-            actionType,
-            authorizationManager),
-        m_requestFunc(std::move(requestFunc))
-    {
-    }
-
-    virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo) override
-    {
-        if (!this->authorize(
-            connection,
-            request,
-            authInfo,
-            nx::utils::stree::ResourceContainer(),
-            &authInfo))
-            return;
-
-        m_requestFunc(
-            AuthorizationInfo(std::move(authInfo)),
-            [this](api::ResultCode resultCode)
-            {
-                this->response()->headers.emplace(
-                    Qn::API_RESULT_CODE_HEADER_NAME,
-                    QnLexical::serialized(resultCode).toLatin1());
-                this->requestCompleted(resultCodeToFusionRequestResult(resultCode));
-            });
-    }
-
-private:
-    ExecuteRequestFunc m_requestFunc;
-};
-
-// TODO: #ak use variadic templates here to decrease number of specializations.
-
-template<typename InputData>
+template<typename... InputData>
 class AbstractFreeMsgBodyHttpHandler:
-    public detail::BaseFiniteMsgBodyHttpHandler<InputData, void>
+    public detail::BaseFiniteMsgBodyHttpHandler<InputData...>
 {
+    static_assert(sizeof...(InputData) <= 1, "Specify input data type or leave blank");
+
 public:
     typedef nx::utils::MoveOnlyFunc<void(
         nx_http::HttpServerConnection* const connection,
         const AuthorizationInfo& authzInfo,
-        InputData inputData,
+        InputData... inputData,
         nx::utils::MoveOnlyFunc<
         void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)>
             completionHandler)> ExecuteRequestFunc;
@@ -343,7 +230,7 @@ public:
         const AuthorizationManager& authorizationManager,
         ExecuteRequestFunc requestFunc)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<InputData, void>(
+        detail::BaseFiniteMsgBodyHttpHandler<InputData..., void>(
             entityType,
             actionType,
             authorizationManager),
@@ -355,7 +242,7 @@ public:
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         nx::utils::stree::ResourceContainer authInfo,
-        InputData inputData) override
+        InputData... inputData) override
     {
         if (!this->authorize(
                 connection,
@@ -368,75 +255,7 @@ public:
         m_requestFunc(
             connection,
             AuthorizationInfo(std::move(authInfo)),
-            std::move(inputData),
-            [this](
-                api::ResultCode resultCode,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody)
-        {
-            this->response()->headers.emplace(
-                Qn::API_RESULT_CODE_HEADER_NAME,
-                QnLexical::serialized(resultCode).toLatin1());
-
-            if (resultCode == api::ResultCode::ok)
-            {
-                this->requestCompleted(
-                    nx_http::StatusCode::ok,
-                    std::move(responseMsgBody));
-            }
-            else
-            {
-                this->requestCompleted(
-                    resultCodeToFusionRequestResult(resultCode));
-            }
-        });
-    }
-
-private:
-    ExecuteRequestFunc m_requestFunc;
-};
-
-template<>
-class AbstractFreeMsgBodyHttpHandler<void>:
-    public detail::BaseFiniteMsgBodyHttpHandler<void, void>
-{
-public:
-    typedef nx::utils::MoveOnlyFunc<void(
-        nx_http::HttpServerConnection* connection,
-        const AuthorizationInfo& authzInfo,
-        nx::utils::MoveOnlyFunc<
-        void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
-            > completionHandler)> ExecuteRequestFunc;
-
-    AbstractFreeMsgBodyHttpHandler(
-        EntityType entityType,
-        DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc requestFunc)
-        :
-        detail::BaseFiniteMsgBodyHttpHandler<void, void>(
-            entityType,
-            actionType,
-            authorizationManager),
-        m_requestFunc(std::move(requestFunc))
-    {
-    }
-
-    virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        const nx_http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo) override
-    {
-        if (!this->authorize(
-                connection,
-                request,
-                authInfo,
-                nx::utils::stree::ResourceContainer(),
-                &authInfo))
-            return;
-
-        m_requestFunc(
-            connection,
-            AuthorizationInfo(std::move(authInfo)),
+            std::move(inputData)...,
             [this](
                 api::ResultCode resultCode,
                 std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody)
@@ -446,12 +265,16 @@ public:
                     QnLexical::serialized(resultCode).toLatin1());
 
                 if (resultCode == api::ResultCode::ok)
+                {
                     this->requestCompleted(
                         nx_http::StatusCode::ok,
                         std::move(responseMsgBody));
+                }
                 else
+                {
                     this->requestCompleted(
                         resultCodeToFusionRequestResult(resultCode));
+                }
             });
     }
 
