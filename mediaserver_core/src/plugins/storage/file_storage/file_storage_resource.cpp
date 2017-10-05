@@ -14,6 +14,7 @@
 #include <utils/common/writer_pool.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <media_server/media_server_module.h>
+#include <nx/mediaserver/root_tool.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -559,6 +560,14 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& urlStr
 
     QString localPath = aux::genLocalPath(getUrl());
     setLocalPathSafe(localPath);
+    if (const auto rootTool = qnServerModule->rootTool())
+    {
+        if (rootTool->remount(url, localPath))
+            return Qn::StorageInit_Ok;
+
+        NX_WARNING(this, lm("Failed to mount '%1' to '%2' by root tool").args(url, localPath));
+    }
+
     umount(localPath.toLatin1().constData());
     rmdir(localPath.toLatin1().constData());
 
