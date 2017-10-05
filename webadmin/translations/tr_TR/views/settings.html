@@ -38,15 +38,14 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
 
                     <div>
                         <h3>Sunucuyu sıfırla</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            The server will be detached from the current system. Video archive will remain intact.</p>
+                        <p>Bu eylem, bu sunucuyu varsayılanlara geri döndürür (veritabanını temizler ve yapılandırmayı sıfırlar).
+                            Sunucu geçerli sistemden ayrılacaktır. Video arşivi bozulmadan kalacaktır.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrika ayarlarına geri yükle</button></p>
                     </div>
                     <div>
-                        <h3>Detach server from the system</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                        <h3>Sunucuyu mevcut sistemden ayır</h3>
+                        <p>Bu eylem, sunucuyu veritabanını, yerel kullanıcıları ve yapılandırmayı koruyan sistemden ayırır. Video arşivi bozulmadan kalacaktır. <b> Bulut kullanıcıları silinir. </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Sunucuyu mevcut sistemden ayır</button></p>
                     </div>
                     <div>
                         <h3>Yeniden Başlat</h3>

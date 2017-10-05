@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Szétkapcsolás",
     "disconnectedFromCloudSuccess":"A {{CLOUD_NAME}} rendszer sikeresen lekapcsolódott",
     "confirmDisconnectFromSystem":"Szerver leválasztása a jelenlegi rendszerről",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Leválasztás",
     "disconnectedFromSystemSuccess":"A szerver leválasztása a rendszerről sikeresen megtörtént",
     "connectedSuccess":"Rendszer sikeresen csatlakoztatva",

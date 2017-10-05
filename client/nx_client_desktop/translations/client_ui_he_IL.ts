@@ -699,7 +699,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>"אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה  &quot;מבוטל ב"ניהול המערכת &quot;.</translation>
+      <translation>"אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה "מבוטל ב"ניהול המערכת".</translation>
     </message>
     <message>
       <location/>
@@ -2205,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>מחשב חזק מומלץ עבור רזולוציה ואיכות &quot;הטובים ביותר &quot;.</translation>
+      <translation>מחשב חזק מומלץ עבור רזולוציה ואיכות "הטובים ביותר".</translation>
     </message>
     <message>
       <location/>
@@ -2827,7 +2827,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על  &quot;תפקיד חדש &quot; כדי ליצור אחד.</translation>
+      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על &quot;תפקיד חדש&quot; כדי ליצור אחד.</translation>
     </message>
     <message>
       <location/>

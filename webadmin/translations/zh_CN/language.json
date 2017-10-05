@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"断开连接",
     "disconnectedFromCloudSuccess":"系统已成功从{{CLOUD_NAME}} 断开连接",
     "confirmDisconnectFromSystem":"从当前系统分离服务器",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"分离",
     "disconnectedFromSystemSuccess":"服务器已成功地从系统分离",
     "connectedSuccess":"系统已成功连接",

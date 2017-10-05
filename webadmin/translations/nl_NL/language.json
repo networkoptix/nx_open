@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Verbinding verbreken",
     "disconnectedFromCloudSuccess":"Systeem is succesvol afgesloten van {{CLOUD_NAME}}",
     "confirmDisconnectFromSystem":"Maak de server los van het huidige systeem",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Losmaken",
     "disconnectedFromSystemSuccess":"Server is succesvol losgemaakt van het systeem",
     "connectedSuccess":"Verbinding maken met het systeem is mislukt",
