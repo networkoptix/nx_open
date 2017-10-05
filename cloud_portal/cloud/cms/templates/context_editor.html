@@ -35,9 +35,11 @@
                         {% if field|is_optional:context %}
                         <label><input id="delete_{{field.name}}" type="checkbox"
                                       name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
+                        {% endif %}
+
+                        {%if field|is_optional:context and not field|has_value:context %}
                         <img class="preview-image context-preview optional-image"
                              src="data:image/png;base64,{{field.value}}">
-
                         {% else %}
                         <img class="preview-image context-preview"
                              src="data:image/png;base64,{{field.value}}">
@@ -48,11 +50,15 @@
                     <div>
                         {% if field|is_optional:context %}
                         <label><input id="delete_{{field.name}}" type="checkbox" name="delete_{{field.name}}" value="false"/>&nbsp;Clear Value</label>
-                        <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download Example</a>
-
-                        {% else %}
-                        <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>Download</a>
                         {% endif %}
+
+                        <a href="{% url 'download_file' field.name %}?lang={{language.code}}&draft" download>
+                        {% if field|is_optional:context and not field|has_value:context %}
+                        Download Example
+                        {% else %}
+                        Download
+                        {% endif %}
+                        </a>
                     </div>
                 {% endif %}
                 {{ field }}

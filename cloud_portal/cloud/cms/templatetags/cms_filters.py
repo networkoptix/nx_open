@@ -19,3 +19,13 @@ def is_optional(field, context):
     name = field.name
     data_structure = DataStructure.objects.get(context=context, name=name)
     return data_structure.optional
+
+
+@register.filter
+def has_value(field, context):
+    name = field.name
+    data_structure = DataStructure.objects.get(context=context, name=name)
+
+    data_records = DataRecord.objects.filter(data_structure=data_structure)
+
+    return data_records.exists()
