@@ -302,8 +302,10 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setQuality(quality);
             ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
            // m_transcodingSettings.codec = codec;
-            ffmpegTranscoder->setFilterList(QnImageFilterHelper::createFilterChain(
-                m_transcodingSettings, resolution));
+            auto filterChain = QnImageFilterHelper::createFilterChain(
+                m_transcodingSettings);
+            filterChain.prepare(m_transcodingSettings.resource, resolution);
+            ffmpegTranscoder->setFilterList(filterChain); //TODO: #GDM #3.2 Update to FilterChain
 
             if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version

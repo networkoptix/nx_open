@@ -47,9 +47,12 @@ public:
     QSize apply(const QSize& resolution) const;
     CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;
 
+    void addLegacyFilter(QnAbstractImageFilterPtr filter);
+
 private:
     bool m_ready = false;
     Settings m_settings;
+    QnAbstractImageFilterList m_legacyFilters;
 };
 
 } // namespace transcoding

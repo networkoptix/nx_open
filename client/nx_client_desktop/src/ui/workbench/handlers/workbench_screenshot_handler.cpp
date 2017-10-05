@@ -503,7 +503,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QImage result = image;
 
     if (!result.isNull()) {
-        // TODO: #GDM looks like total mess
+        // TODO: #GDM #3.2 looks like total mess
         parameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
             ? QDateTime::currentMSecsSinceEpoch()
             : parameters.displayTimeMsec;
@@ -516,21 +516,17 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.timestampParams = parameters.timestampParams;
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
-        QList<QnAbstractImageFilterPtr> filters = QnImageFilterHelper::createFilterChain(
-            transcodeParams,
-            result.size());
+        auto filters = QnImageFilterHelper::createFilterChain(
+            transcodeParams);
+        filters.prepare(parameters.resource, result.size());
 
-        if (!filters.isEmpty()) {
+        if (!filters.isEmpty())
+        {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
             // TODO: #GDM how is this supposed to work with latestScreenshotTime?
             frame->pts = parameters.utcTimestampMsec * 1000;
-            for(auto filter: filters)
-            {
-                frame = filter->updateImage(frame);
-                if (!frame)
-                    break;
-            }
-            result = (bool)frame ? frame->toImage() : QImage();
+            frame = filters.apply(frame);
+            result = frame ? frame->toImage() : QImage();
         }
     }
 

@@ -167,11 +167,18 @@ void FilterChain::prepare(const QnConstResourceVideoLayoutPtr& videoLayout,
         }
     }
 
+    for (auto legacyFilter: m_legacyFilters)
+        push_back(legacyFilter);
+
     m_ready = true;
 }
 
 bool FilterChain::isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const
 {
+    //TODO: #GDM #3.2 Remove when legacy will gone.
+    if (!m_legacyFilters.empty())
+        return true;
+
     if (m_settings.aspectRatio.isValid())
         return true;
 
@@ -235,6 +242,11 @@ CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source
     for (auto filter: *this)
         result = filter->updateImage(result);
     return result;
+}
+
+void FilterChain::addLegacyFilter(QnAbstractImageFilterPtr filter)
+{
+    m_legacyFilters.append(filter);
 }
 
 } // namespace transcoding
