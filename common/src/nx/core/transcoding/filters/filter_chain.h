@@ -3,11 +3,13 @@
 #if defined(ENABLE_DATA_PROVIDERS)
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout.h>
 
 #include <nx/core/transcoding/filters/transcoding_settings.h>
 
 #include <transcoding/filters/abstract_image_filter.h>
 
+struct QnMediaDewarpingParams;
 class CLVideoDecoderOutput;
 using CLVideoDecoderOutputPtr = QSharedPointer<CLVideoDecoderOutput>;
 
@@ -26,14 +28,21 @@ public:
     FilterChain& operator=(const FilterChain&) = default;
 
     void prepare(const QnMediaResourcePtr& resource,
-        const QSize& srcResolution,
+        const QSize& srcFrameResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit);
 
+    void prepare(const QnConstResourceVideoLayoutPtr& videoLayout,
+        const QnMediaDewarpingParams& mediaDewarpingParams,
+        const QSize& srcFrameResolution,
+        const QSize& resolutionLimit = kDefaultResolutionLimit);
+
+    bool isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const;
     bool isTranscodingRequired(const QnMediaResourcePtr& resource) const;
 
     bool isDownscaleRequired(const QSize& srcResolution) const;
 
     bool isReady() const;
+    void reset();
 
     QSize apply(const QSize& resolution) const;
     CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;

@@ -108,9 +108,10 @@ struct WorkbenchExportHandler::Private
             q->mainWindow());
 
         connect(progressDialog, &QnProgressDialog::canceled, exportManager.data(),
-            [this, exportProcessId]
+            [this, exportProcessId, progressDialog]
             {
                 exportManager->stopExport(exportProcessId);
+                progressDialog->hide();
             });
 
         runningExports.insert(exportProcessId, { fileName, progressDialog });

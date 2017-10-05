@@ -3,7 +3,10 @@
 #include <QtCore/QScopedPointer>
 
 #include <nx/client/desktop/utils/abstract_image_processor.h>
-#include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+
+namespace nx { namespace core { namespace transcoding {struct Settings; } } }
+
+struct QnMediaDewarpingParams;
 
 namespace nx {
 namespace client {
@@ -18,7 +21,9 @@ public:
    explicit TranscodingImageProcessor(QObject* parent = nullptr);
    virtual ~TranscodingImageProcessor() override;
 
-   void setTranscodingSettings(const nx::core::transcoding::LegacyTranscodingSettings& settings);
+   void setTranscodingSettings(
+       const nx::core::transcoding::Settings& settings,
+       const QnMediaDewarpingParams& mediaDewarpingParams);
 
    virtual QSize process(const QSize& sourceSize) const override;
    virtual QImage process(const QImage& sourceImage) const override;

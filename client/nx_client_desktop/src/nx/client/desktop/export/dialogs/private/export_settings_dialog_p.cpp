@@ -742,19 +742,12 @@ void ExportSettingsDialog::Private::updateTimestampText()
 
 void ExportSettingsDialog::Private::updateMediaImageProcessor()
 {
-    QnLegacyTranscodingSettings processorSettings;
     const auto& settings = m_exportMediaSettings.transcodingSettings;
+    const auto dewarpingParams = m_exportMediaSettings.mediaResource
+        ? m_exportMediaSettings.mediaResource->getDewarpingParams()
+        : QnMediaDewarpingParams();
 
-    processorSettings.itemDewarpingParams = settings.dewarping;
-    processorSettings.resource = m_exportMediaSettings.mediaResource;
-    processorSettings.contrastParams = settings.enhancement;
-    processorSettings.rotation = settings.rotation;
-    processorSettings.zoomWindow = settings.zoomWindow;
-    processorSettings.forcedAspectRatio = settings.aspectRatio.isValid()
-        ? settings.aspectRatio.toFloat()
-        : 0.0;
-
-    m_mediaImageProcessor->setTranscodingSettings(processorSettings);
+    m_mediaImageProcessor->setTranscodingSettings(settings, dewarpingParams);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)

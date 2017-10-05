@@ -18,7 +18,7 @@ public:
      */
     static nx::core::transcoding::FilterChain createFilterChain(
         const nx::core::transcoding::LegacyTranscodingSettings& settings,
-        const QSize& srcResolution,
+        const QSize& srcFrameResolution,
         const QSize& resolutionLimit = nx::core::transcoding::FilterChain::kDefaultResolutionLimit);
 };
 

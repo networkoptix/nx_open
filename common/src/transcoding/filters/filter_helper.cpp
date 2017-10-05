@@ -10,7 +10,7 @@
 
 nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     const nx::core::transcoding::LegacyTranscodingSettings& legacy,
-    const QSize& srcResolution,
+    const QSize& srcFrameResolution,
     const QSize& resolutionLimit)
 {
     nx::core::transcoding::Settings settings;
@@ -22,7 +22,7 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     settings.zoomWindow = legacy.zoomWindow;
 
     nx::core::transcoding::FilterChain result(settings);
-    result.prepare(legacy.resource, srcResolution, resolutionLimit);
+    result.prepare(legacy.resource, srcFrameResolution, resolutionLimit);
 
     if (legacy.timestampParams.enabled)
     {
