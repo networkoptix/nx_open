@@ -20,11 +20,8 @@
         <targetName>relaying</targetName>
 
         <qt.libs>core</qt.libs>
-        <global.libs>-lnx_network -lnx_utils</global.libs>
-        <!-- <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs> -->
+        <global.libs>-lnx_network -lnx_fusion -lnx_utils</global.libs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
-
-        <!-- <rdep.packages>openssl</rdep.packages> -->
         <buildLib>sharedlib</buildLib>
     </properties>
 
@@ -36,6 +33,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
         </dependency>
 
         <dependency>

@@ -21,7 +21,7 @@
         <template>app</template>
 
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lnx_network -ludt -ltraffic_relay -lnx_cassandra -lcloud_db_client -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lnx_network -ludt -ltraffic_relay -lnx_cassandra -lrelaying -lcloud_db_client -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
@@ -37,6 +37,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/libtraffic_relay/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>librelaying</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/librelaying/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

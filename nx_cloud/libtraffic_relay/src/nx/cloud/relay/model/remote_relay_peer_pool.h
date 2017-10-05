@@ -3,8 +3,11 @@
 #include <memory>
 #include <string>
 #include <utility>
+
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
+
 #include "abstract_remote_relay_peer_pool.h"
 
 namespace nx {
@@ -57,6 +60,16 @@ private:
         const std::string& domainName,
         const boost::optional<std::string>& relayHost = boost::none) const;
     cf::future<int> getLocalHostId() const;
+};
+
+class RemoteRelayPeerPoolFactory
+{
+public:
+    using FactoryFunc = nx::utils::MoveOnlyFunc<
+        std::unique_ptr<model::AbstractRemoteRelayPeerPool>(const conf::Settings&)>;
+    static std::unique_ptr<model::AbstractRemoteRelayPeerPool> create(
+        const conf::Settings& settings);
+    static void setFactoryFunc(FactoryFunc func);
 };
 
 } // namespace model

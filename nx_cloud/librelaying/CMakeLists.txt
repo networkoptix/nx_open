@@ -13,7 +13,7 @@ nx_add_target(librelaying LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/librelaying_app_info_impl.cpp"
     PUBLIC_LIBS
-        nx_network nx_utils)
+        nx_network nx_fusion nx_utils)
 
 target_compile_definitions(librelaying
     PRIVATE NX_RELAYING_API=${API_EXPORT_MACRO}

@@ -55,26 +55,6 @@ const model::AbstractRemoteRelayPeerPool& Model::remoteRelayPeerPool() const
     return *m_remoteRelayPeerPool;
 }
 
-namespace model {
-
-static RemoteRelayPeerPoolFactory::FactoryFunc remoteRelayPeerPoolFactoryFunc;
-
-std::unique_ptr<model::AbstractRemoteRelayPeerPool> RemoteRelayPeerPoolFactory::create(
-    const conf::Settings& settings)
-{
-    if (remoteRelayPeerPoolFactoryFunc)
-        return remoteRelayPeerPoolFactoryFunc(settings);
-
-    return std::make_unique<model::RemoteRelayPeerPool>(settings);
-}
-
-void RemoteRelayPeerPoolFactory::setFactoryFunc(FactoryFunc func)
-{
-    remoteRelayPeerPoolFactoryFunc.swap(func);
-}
-
-} // namespace model
-
 } // namespace relay
 } // namespace cloud
 } // namespace nx

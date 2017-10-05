@@ -37,20 +37,6 @@ private:
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPeerPool;
 };
 
-namespace model {
-
-class RemoteRelayPeerPoolFactory
-{
-public:
-    using FactoryFunc = nx::utils::MoveOnlyFunc<
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool>(const conf::Settings&)>;
-    static std::unique_ptr<model::AbstractRemoteRelayPeerPool> create(
-        const conf::Settings& settings);
-    static void setFactoryFunc(FactoryFunc func);
-};
-
-} // namespace model
-
 } // namespace relay
 } // namespace cloud
 } // namespace nx
