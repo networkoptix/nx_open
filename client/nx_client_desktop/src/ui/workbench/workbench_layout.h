@@ -42,10 +42,7 @@ Q_DECLARE_METATYPE(QnLayoutFlags)
 class QnWorkbenchLayout: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
-    Q_PROPERTY(QnUuid resourceId READ resourceId CONSTANT)
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(float cellAspectRatio
-        READ cellAspectRatio WRITE setCellAspectRatio NOTIFY cellAspectRatioChanged)
+    Q_PROPERTY(QnLayoutResource* resource READ resourcePtr CONSTANT)
 
 public:
     /**
@@ -71,6 +68,11 @@ public:
      * @return Resource associated with this layout, if any.
      */
     QnLayoutResourcePtr resource() const;
+
+    /**
+     * @return Plain pointer to the associated resource. Needed by QML.
+     */
+    QnLayoutResource* resourcePtr() const;
 
     /**
      * @return Layout associated with the given resource, if any.

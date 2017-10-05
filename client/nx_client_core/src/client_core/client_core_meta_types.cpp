@@ -3,6 +3,9 @@
 #include <QtQml/QtQml>
 
 #include <core/ptz/media_dewarping_params.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/layout_resource.h>
 #include <test/qml_test_helper.h>
 #include <ui/helpers/scene_position_listener.h>
 #include <ui/video/video_output.h>
@@ -53,4 +56,13 @@ void QnClientCoreMetaTypes::initialize()
 
     qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",
         QLatin1String("Cannot create an instance of QnMediaDewarpingParams."));
+
+    qmlRegisterUncreatableType<QnResource>("Nx.Common", 1, 0, "Resource",
+        QLatin1String("Cannot create an instance of Resource."));
+    qmlRegisterUncreatableType<QnVirtualCameraResource>("Nx.Common", 1, 0, "VirtualCameraResource",
+        QLatin1String("Cannot create an instance of VirtualCameraResource."));
+    qmlRegisterUncreatableType<QnMediaServerResource>("Nx.Common", 1, 0, "MediaServerResource",
+        QLatin1String("Cannot create an instance of MediaServerResource."));
+    qmlRegisterUncreatableType<QnLayoutResource>("Nx.Common", 1, 0, "LayoutResource",
+        QLatin1String("Cannot create an instance of LayoutResource."));
 }

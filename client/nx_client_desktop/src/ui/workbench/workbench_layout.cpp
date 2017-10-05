@@ -123,6 +123,11 @@ QnLayoutResourcePtr QnWorkbenchLayout::resource() const
     return QnLayoutResourcePtr();
 }
 
+QnLayoutResource*QnWorkbenchLayout::resourcePtr() const
+{
+    return resource().data();
+}
+
 QnWorkbenchLayout* QnWorkbenchLayout::instance(const QnLayoutResourcePtr& layout)
 {
     if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))

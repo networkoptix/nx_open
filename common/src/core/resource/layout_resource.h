@@ -23,6 +23,10 @@ class QnLayoutResource: public QnResource,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT
+    Q_PROPERTY(float cellAspectRatio
+        READ cellAspectRatio WRITE setCellAspectRatio NOTIFY cellAspectRatioChanged)
+    Q_PROPERTY(qreal cellSpacing
+        READ cellSpacing WRITE setCellSpacing NOTIFY cellSpacingChanged)
 
     using base_type = QnResource;
 

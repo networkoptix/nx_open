@@ -169,7 +169,7 @@ void QnClientMetaTypes::registerQmlTypes()
 
     qmlRegisterUncreatableType<QnWorkbench>("Nx.Workbench", 1, 0, "Workbench",
         lit("Cannot create instance of Workbench."));
-    qmlRegisterUncreatableType<QnWorkbench>("Nx.Workbench", 1, 0, "WorkbenchLayout",
+    qmlRegisterUncreatableType<QnWorkbenchLayout>("Nx.Workbench", 1, 0, "WorkbenchLayout",
         lit("Cannot create instance of WorkbenchLayout."));
 }
 
