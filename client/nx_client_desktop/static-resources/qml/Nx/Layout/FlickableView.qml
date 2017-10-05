@@ -162,8 +162,8 @@ Item
 
         onScaleChanged:
         {
-            var x = contentItem.x
-            var y = contentItem.y
+            var x = contentX
+            var y = contentY
             var w = contentItem.width
             var h = contentItem.height
 
@@ -313,19 +313,8 @@ Item
     Item
     {
         id: contentItem
-
-        Binding
-        {
-            target: contentItem
-            property: "x"
-            value: d.panOffsetX + d.scaleOffsetX
-        }
-        Binding
-        {
-            target: contentItem
-            property: "y"
-            value: d.panOffsetY + d.scaleOffsetY
-        }
+        x: d.panOffsetX + d.scaleOffsetX
+        y: d.panOffsetY + d.scaleOffsetY
     }
 
     Timer
@@ -497,8 +486,6 @@ Item
             d.panOffsetY = newOffsetY
             contentItem.width = implicitContentSize.width
             contentItem.height = implicitContentSize.height
-            contentItem.x = (width - contentWidth) / 2
-            contentItem.y = (height - contentHeight) / 2
         }
         else
         {
