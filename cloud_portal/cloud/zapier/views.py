@@ -1,17 +1,17 @@
 import django, requests, json, base64
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-
-from api.helpers.exceptions import handle_exceptions, api_success, APINotAuthorisedException
-
-from requests.auth import HTTPDigestAuth
-from django.utils.http import urlencode
-
-from rest_hooks.signals import raw_hook_event
-
 from models import *
 from cloud import settings
+
+from django.utils.http import urlencode
+from requests.auth import HTTPDigestAuth
+
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.http.response import HttpResponse, JsonResponse
+
+from api.helpers.exceptions import APINotAuthorisedException
+
+from rest_hooks.signals import raw_hook_event
 
 CLOUD_DB_URL = 'http://cloud-test.hdw.mx:80/cdb'
 CLOUD_INSTANCE_URL = 'http://cloud-test.hdw.mx'
@@ -32,32 +32,34 @@ def authenticate(request):
     return user, email, password
 
 
-@api_view(['GET'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
+@require_http_methods(["GET"])
 def get_systems(request):
     user, email, password = authenticate(request)
     request = CLOUD_DB_URL + "/system/get?customization=" + settings.CUSTOMIZATION
     data = requests.get(request, auth=HTTPDigestAuth(email, password))
+
+    if data:
+        data = json.loads(data.text)
     zap_list = {'systems': []}
 
     for i in range(len(data['systems'])):
         zap_list['systems'].append({'name': data['systems'][i]['name'], 'system_id': data['systems'][i]['id']})
 
-    return api_success(zap_list)
+    return JsonResponse(zap_list, status=200)
 
-@api_view(['POST'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
-def nx_action(request):
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def zapier_send_generic_event(request):
     user, email, password = authenticate(request)
-    system_id = request.data['systemId']
-    source = request.data['source']
-    caption = request.data['caption']
+    data = json.loads(request.body)
+    system_id = data['systemId']
+    source = data['source']
+    caption = data['caption']
 
     query_params = {"source": source, "caption": caption}
 
-    description = request.data['description'] if 'description' in request.data else ""
+    description = data['description'] if 'description' in request.POST else ""
 
     if description:
         query_params['description'] = description
@@ -78,15 +80,13 @@ def nx_action(request):
     headers = {'Content-Type': 'application/json'}
     r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
 
-    return json.loads(r.text)
+    return JsonResponse(json.loads(r.text), status=200)
 
 
-@api_view(['GET'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
-def fire_zap_webhook(request):
-    caption = request.query_params['caption']
-    system_id = request.query_params['system_id']
+@require_http_methods(["GET"])
+def nx_http_action(request):
+    caption = request.GET['caption']
+    system_id = request.GET['system_id']
     event = system_id + ' ' + caption
     hooks_event = ZapHook.objects.filter(event=event)
 
@@ -100,69 +100,70 @@ def fire_zap_webhook(request):
                 rule.times_used += 1
                 rule.save()
 
-        return Response({'message': "webhook fired for " + caption}, status=200)
+        return HttpResponse("Webhook fired for " + caption, status=200)
 
     else:
-        return Response({'message': "webhook for " + caption + " does not exist"}, status=404)
+        return HttpResponse("Webhook for " + caption + " does not exist", status=500)
 
 
-@api_view(['GET', 'POST'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
+@require_http_methods(["GET"])
 def ping(request):
     authenticate(request)
-    return Response({'status': 'ok'})
+    return HttpResponse("Ok")
 
 
-@api_view(['POST'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
+@csrf_exempt
+@require_http_methods(["POST"])
 def create_zap_webhook(request):
     user, email, password = authenticate(request)
-    system_id = request.query_params['system_id']
-    caption = request.query_params['caption']
-    target = request.data['target_url']
+
+    system_id = request.GET['system_id']
+    caption = request.GET['caption']
+
+    data = json.loads(request.body)
+    target = data['target_url']
+
     event = system_id + " " + caption
+
+    query_params = {'system_id': system_id, 'caption': caption}
 
     user_hooks = ZapHook.objects.filter(user=user, target=target)
     if user_hooks.exists():
-        return Response({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
+        return JsonResponse({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
 
-    url_link = '{}/zapier/fire_hook/?system_id={}&caption={}'.format(CLOUD_INSTANCE_URL,
-                                                                     system_id, urlencode({"caption": caption}))
+    url_link = '{}/zapier/trigger_zapier/?{}'.format(CLOUD_INSTANCE_URL, urlencode(query_params))
     rules_query = GeneratedRule.objects.filter(email=email, caption=caption,
-                                                system_id=system_id, direction="Nx to Zapier")
+                                               system_id=system_id, direction="Nx to Zapier")
     if not rules_query.exists():
-        #make_rule("Http Action", email, password, system_id, caption=caption, zapier_trigger=url_link)
+        make_rule("Http Action", email, password, system_id, caption=caption, zapier_trigger=url_link)
         GeneratedRule(email=email, system_id=system_id, caption=caption, direction="Nx to Zapier", times_used=0).save()
 
     zap_hook = ZapHook(user=user, event=event, target=target)
     zap_hook.save()
-    return Response({'message': 'Webhook created for ' + caption, 'link': url_link}, status=200)
+    return JsonResponse({'message': 'Webhook created for ' + caption, 'link': url_link})
 
 
-@api_view(['POST'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
+@csrf_exempt
+@require_http_methods(["POST"])
 def remove_zap_webhook(request):
     user, email, password = authenticate(request)
-    target = request.data['target_url']
+    data = json.loads(request.body)
+    target = data['target_url']
 
     user_hooks = ZapHook.objects.filter(user=user, target=target)
     if not user_hooks.exists():
-        return Response({'message': "Webhook for " + target + " does not exist"}, status=500)
+        return HttpResponse("Webhook for " + target + " does not exist", status=500)
 
     event = user_hooks[0].event
     user_hooks.delete()
-    return Response({'message': 'Webhook deleted for ' + event}, status=200)
+    return HttpResponse('Webhook deleted for ' + event, status=200)
 
 
-@api_view(['GET', 'POST'])
-@permission_classes((AllowAny, ))
-@handle_exceptions
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
 def test_subscribe(request):
     authenticate(request)
-    return Response({'data': [{'caption': 'caption'}]})
+    return HttpResponse({'data': [{'caption': 'caption'}]})
 
 
 def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
