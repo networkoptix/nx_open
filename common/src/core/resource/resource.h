@@ -65,7 +65,7 @@ public:
     virtual void setParentId(const QnUuid& parent);
 
     // device unique identifier
-    virtual QString getUniqueId() const { return getId().toString(); };
+    virtual QString getUniqueId() const { return getId().toString(); }
     virtual void setUniqId(const QString& value);
 
 

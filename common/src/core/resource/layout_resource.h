@@ -24,7 +24,7 @@ class QnLayoutResource: public QnResource,
 {
     Q_OBJECT
 
-    typedef QnResource base_type;
+    using base_type = QnResource;
 
 public:
     QnLayoutResource(QnCommonModule* commonModule = nullptr);
