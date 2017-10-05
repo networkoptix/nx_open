@@ -38,6 +38,16 @@ bool RootTool::changeOwner(const QString& path)
     return execute({"chown", path});
 }
 
+bool RootTool::touchFile(const QString& path)
+{
+    return execute({"touch", path});
+}
+
+bool RootTool::makeDirectory(const QString& path)
+{
+    return execute({"mkdir", path});
+}
+
 static std::string makeArgsLine(const std::vector<QString>& args)
 {
     std::ostringstream argsStream;

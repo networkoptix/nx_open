@@ -23,6 +23,8 @@ public:
     bool unmount(const QString& path);
 
     bool changeOwner(const QString& path);
+    bool touchFile(const QString& path);
+    bool makeDirectory(const QString& path);
 
 private:
     bool execute(const std::vector<QString>& args);
