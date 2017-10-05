@@ -35,12 +35,12 @@ const model::ClientSessionPool& Model::clientSessionPool() const
     return m_clientSessionPool;
 }
 
-model::ListeningPeerPool& Model::listeningPeerPool()
+relaying::ListeningPeerPool& Model::listeningPeerPool()
 {
     return m_listeningPeerPool;
 }
 
-const model::ListeningPeerPool& Model::listeningPeerPool() const
+const relaying::ListeningPeerPool& Model::listeningPeerPool() const
 {
     return m_listeningPeerPool;
 }

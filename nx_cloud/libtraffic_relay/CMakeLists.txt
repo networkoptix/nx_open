@@ -9,7 +9,7 @@ nx_add_target(libtraffic_relay LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libtraffic_relay_app_info_impl.cpp"
     PUBLIC_LIBS
-        cloud_db_client nx_network nx_utils nx_cassandra)
+        cloud_db_client nx_network nx_utils nx_cassandra librelaying)
 
 set_target_properties(libtraffic_relay PROPERTIES PREFIX "")
 

@@ -145,7 +145,7 @@ const CloudConnect& Settings::cloudConnect() const
     return m_cloudConnect;
 }
 
-const relay::conf::ListeningPeer Settings::listeningPeer() const
+const relaying::Settings& Settings::listeningPeer() const
 {
     return m_listeningPeer;
 }
@@ -261,7 +261,7 @@ void Settings::loadSettings()
     else
         m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
 
-    // TODO Loading listeningPeer.
+    m_listeningPeer.load(settings());
 }
 
 } // namespace conf

@@ -24,7 +24,7 @@ public:
     ProxyHandler(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
-        nx::cloud::relay::model::AbstractListeningPeerPool* listeningPeerPool);
+        relaying::AbstractListeningPeerPool* listeningPeerPool);
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
@@ -40,7 +40,7 @@ public:
 private:
     const conf::Settings& m_settings;
     const conf::RunTimeOptions& m_runTimeOptions;
-    nx::cloud::relay::model::AbstractListeningPeerPool* m_listeningPeerPool;
+    relaying::AbstractListeningPeerPool* m_listeningPeerPool;
 
     nx_http::Request m_request;
     nx_http::RequestProcessedHandler m_requestCompletionHandler;

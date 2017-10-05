@@ -12,11 +12,11 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
+#include <nx/cloud/relaying/listening_peer_manager.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
 #include <nx/cloud/relay/controller/connect_session_manager.h>
-#include <nx/cloud/relay/controller/listening_peer_manager.h>
 #include <nx/cloud/relay/controller/traffic_relay.h>
 #include <nx/cloud/relay/model/client_session_pool.h>
-#include <nx/cloud/relay/model/listening_peer_pool.h>
 #include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/settings.h>
 
@@ -322,14 +322,14 @@ protected:
         return *m_connectSessionManager;
     }
 
-    controller::ListeningPeerManager& listeningPeerManager()
+    relaying::ListeningPeerManager& listeningPeerManager()
     {
         if (!m_listeningPeerManager)
         {
             m_settingsLoader.load();
 
             m_listeningPeerManager =
-                std::make_unique<controller::ListeningPeerManager>(
+                std::make_unique<relaying::ListeningPeerManager>(
                     m_settingsLoader.settings().listeningPeer(),
                     &listeningPeerPool());
         }
@@ -337,14 +337,14 @@ protected:
         return *m_listeningPeerManager;
     }
 
-    model::ListeningPeerPool& listeningPeerPool()
+    relaying::ListeningPeerPool& listeningPeerPool()
     {
         if (!m_listeningPeerPool)
         {
             m_settingsLoader.load();
 
             m_listeningPeerPool =
-                std::make_unique<model::ListeningPeerPool>(
+                std::make_unique<relaying::ListeningPeerPool>(
                     m_settingsLoader.settings().listeningPeer());
         }
 
@@ -410,11 +410,11 @@ private:
     };
 
     std::unique_ptr<model::ClientSessionPool> m_clientSessionPool;
-    std::unique_ptr<model::ListeningPeerPool> m_listeningPeerPool;
+    std::unique_ptr<relaying::ListeningPeerPool> m_listeningPeerPool;
     TrafficRelayStub m_trafficRelayStub;
     RemoteRelayPeerPoolStub m_remoteRelayPeerPoolStub;
     std::unique_ptr<controller::ConnectSessionManager> m_connectSessionManager;
-    std::unique_ptr<controller::ListeningPeerManager> m_listeningPeerManager;
+    std::unique_ptr<relaying::ListeningPeerManager> m_listeningPeerManager;
     std::string m_peerName;
     nx::utils::SyncQueue<api::ResultCode> m_beginListeningResults;
     nx::network::test::StreamSocketStub* m_lastListeningPeerConnection = nullptr;

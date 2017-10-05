@@ -8,44 +8,42 @@
 
 namespace nx {
 namespace cloud {
-namespace relay {
+namespace relaying {
 
-namespace conf { struct ListeningPeer; };
-namespace model { class ListeningPeerPool; }
+class ListeningPeerPool;
+struct Settings;
 
-namespace controller {
-
-class AbstractListeningPeerManager
+class NX_RELAYING_API AbstractListeningPeerManager
 {
 public:
     using BeginListeningHandler =
         nx::utils::MoveOnlyFunc<void(
-            api::ResultCode, api::BeginListeningResponse, nx_http::ConnectionEvents)>;
+            relay::api::ResultCode, relay::api::BeginListeningResponse, nx_http::ConnectionEvents)>;
 
     virtual ~AbstractListeningPeerManager() = default;
 
     virtual void beginListening(
-        const api::BeginListeningRequest& request,
+        const relay::api::BeginListeningRequest& request,
         BeginListeningHandler completionHandler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
 
-class ListeningPeerManager:
+class NX_RELAYING_API ListeningPeerManager:
     public AbstractListeningPeerManager
 {
 public:
     ListeningPeerManager(
-        const conf::ListeningPeer& settings,
-        model::ListeningPeerPool* listeningPeerPool);
+        const Settings& settings,
+        ListeningPeerPool* listeningPeerPool);
 
     virtual void beginListening(
-        const api::BeginListeningRequest& request,
+        const relay::api::BeginListeningRequest& request,
         BeginListeningHandler completionHandler) override;
 
 private:
-    const conf::ListeningPeer& m_settings;
-    model::ListeningPeerPool* m_listeningPeerPool;
+    const Settings& m_settings;
+    ListeningPeerPool* m_listeningPeerPool;
 
     void saveServerConnection(
         const std::string& peerName,
@@ -56,10 +54,10 @@ private:
 
 using ListeningPeerManagerFactoryFunction =
     std::unique_ptr<AbstractListeningPeerManager>(
-        const conf::ListeningPeer&,
-        model::ListeningPeerPool*);
+        const Settings&,
+        ListeningPeerPool*);
 
-class ListeningPeerManagerFactory:
+class NX_RELAYING_API ListeningPeerManagerFactory:
     public nx::utils::BasicFactory<ListeningPeerManagerFactoryFunction>
 {
     using base_type = nx::utils::BasicFactory<ListeningPeerManagerFactoryFunction>;
@@ -71,11 +69,10 @@ public:
 
 private:
     std::unique_ptr<AbstractListeningPeerManager> defaultFactoryFunction(
-        const conf::ListeningPeer&,
-        model::ListeningPeerPool*);
+        const Settings&,
+        ListeningPeerPool*);
 };
 
-} // namespace controller
-} // namespace relay
+} // namespace relaying
 } // namespace cloud
 } // namespace nx

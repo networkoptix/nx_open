@@ -10,7 +10,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/relay/settings.h>
+#include <nx/cloud/relaying/settings.h>
 
 #include <http/target_peer_connector.h>
 
@@ -147,8 +147,8 @@ private:
     SocketAddress m_targetEndpoint;
     boost::optional<SocketFactory::CreateStreamSocketFuncType> m_streamSocketFactoryBak;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
-    cloud::relay::conf::ListeningPeer m_listeningPeerPoolSettings;
-    cloud::relay::model::ListeningPeerPool m_listeningPeerPool;
+    relaying::Settings m_listeningPeerPoolSettings;
+    relaying::ListeningPeerPool m_listeningPeerPool;
     ConnectResult m_prevResult;
     AbstractStreamSocket* m_serverConnection = nullptr;
 

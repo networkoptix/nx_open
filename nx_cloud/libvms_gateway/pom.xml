@@ -23,7 +23,7 @@
         <targetName>vms_gateway</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -ltraffic_relay -lcloud_db_client -lnx_network -ludt -lnx_utils</global.libs>
+        <global.libs>-lcommon -lrelaying -lcloud_db_client -lnx_network -ludt -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
@@ -60,11 +60,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libtraffic_relay</artifactId>
+            <artifactId>relaying</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/libtraffic_relay/pom.xml</systemPath>
+            <systemPath>${root.dir}/nx_cloud/librelaying/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

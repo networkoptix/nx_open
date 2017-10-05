@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>nx_cloud</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>librelaying</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Relaying Library</name>
+
+    <properties>
+        <guid>${librelaying.guid}</guid>
+        <product.title>${company.name} relaying library</product.title>
+        <template>lib</template>
+        <targetName>relaying</targetName>
+
+        <qt.libs>core</qt.libs>
+        <global.libs>-lnx_network -lnx_utils</global.libs>
+        <!-- <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs> -->
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+
+        <!-- <rdep.packages>openssl</rdep.packages> -->
+        <buildLib>sharedlib</buildLib>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+</project>

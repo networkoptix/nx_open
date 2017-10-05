@@ -20,7 +20,7 @@ std::vector<SocketAddress> RelayService::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
-const model::ListeningPeerPool& RelayService::listeningPeerPool() const
+const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() const
 {
     return m_model->listeningPeerPool();
 }
