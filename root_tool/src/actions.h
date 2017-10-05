@@ -20,6 +20,12 @@ int unmount(Argument directory);
 /** Changes path ownership to real UID and GID. */
 int chengeOwner(Argument path);
 
+/** Touches a file and gives ownership to real UID and GID. */
+int touchFile(Argument filePath);
+
+/** Creates directory and gives ownership to real UID and GID. */
+int makeDirectory(Argument directoryPath);
+
 /** Installs deb package to system. */
 int install(Argument debPackage);
 
