@@ -98,9 +98,9 @@ void ClientImpl::startSession(
             // Removing request path from the end of response.actualRelayUrl 
             // so that we have basic relay url.
             NX_ASSERT(
-                response.actualRelayUrl.find(requestPath.toStdString()) != std::string::npos);
+                response.actualRelayUrl.find(requestPath) != std::string::npos);
             NX_ASSERT(
-                response.actualRelayUrl.find(requestPath.toStdString()) + requestPath.size() ==
+                response.actualRelayUrl.find(requestPath) + requestPath.size() ==
                 response.actualRelayUrl.size());
 
             response.actualRelayUrl.erase(
@@ -215,7 +215,7 @@ std::unique_ptr<nx_http::FusionDataHttpClient<Request, Response>>
     requestUrl.setPath(network::url::normalizePath(
         requestUrl.path() +
         nx_http::rest::substituteParameters(
-            requestPathTemplate, std::move(requestPathArguments))));
+            requestPathTemplate, std::move(requestPathArguments)).c_str()));
 
     auto httpClient = std::make_unique<
         nx_http::FusionDataHttpClient<Request, Response>>(

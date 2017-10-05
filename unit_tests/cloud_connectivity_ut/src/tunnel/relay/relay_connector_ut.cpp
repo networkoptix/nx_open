@@ -237,7 +237,7 @@ TEST_F(RelayConnector, stops_internal_timer_when_reporting_result)
 
 static const char* const kRelaySessionId = "session1";
 static const char* const kServerId = "server1.system1";
-static const char* const kRelayRelayApiPrefix = "/RelayConnectorRedirectTest";
+static const char* const kRelayApiPrefix = "/RelayConnectorRedirectTest";
 
 class RelayConnectorRedirect:
     public RelayConnector
@@ -297,7 +297,7 @@ private:
 
         m_realRelay.registerStaticProcessor(
             nx::network::url::normalizePath(
-                kRelayRelayApiPrefix + nx::String("/") +
+                kRelayApiPrefix + nx::String("/") +
                 createClientSessionPath),
             QByteArray("{ \"sessionId\": \"") + kRelaySessionId + 
                 QByteArray("\", \"sessionTimeout\": \"100\" }"),
@@ -305,7 +305,7 @@ private:
 
         m_realRelay.registerRequestProcessorFunc(
             nx::network::url::normalizePath(
-                kRelayRelayApiPrefix + nx::String("/") + 
+                kRelayApiPrefix + nx::String("/") + 
                 nx_http::rest::substituteParameters(
                     nx::cloud::relay::api::kClientSessionConnectionsPath, {kRelaySessionId})),
             std::bind(&RelayConnectorRedirect::upgradeConnection, this, _1, _2, _3, _4, _5));
@@ -313,9 +313,10 @@ private:
         ASSERT_TRUE(m_realRelay.bindAndListen());
 
         m_redirectingRelay.registerRedirectHandler(
-            createClientSessionPath,
+            createClientSessionPath.c_str(),
             nx::network::url::Builder().setScheme("http")
-                .setEndpoint(m_realRelay.serverAddress()).setPath(kRelayRelayApiPrefix + createClientSessionPath));
+                .setEndpoint(m_realRelay.serverAddress())
+                .setPath(QString::fromStdString(kRelayApiPrefix + createClientSessionPath)));
 
         ASSERT_TRUE(m_redirectingRelay.bindAndListen());
     }

@@ -124,6 +124,12 @@ EventManager::EventManager():
 {
 }
 
+ModuleFinder::ModuleFinder():
+    cloudModulesXmlTemplatePath(kDefaultCloudModuleXmlTemplatePath),
+    newCloudModulesXmlTemplatePath(kDefaultNewCloudModuleXmlTemplatePath)
+{
+}
+
 Http::Http():
     tcpBacklogSize(kDefaultTcpBacklogSize),
     connectionInactivityPeriod(kDefaultConnectionInactivityPeriod)

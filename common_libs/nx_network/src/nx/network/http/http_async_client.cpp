@@ -172,14 +172,7 @@ void AsyncClient::setRequestBody(std::unique_ptr<AbstractMsgBodySource> body)
 
 void AsyncClient::doGet(const QUrl& url)
 {
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
-
-    resetDataBeforeNewRequest();
-    m_requestUrl = url;
-    m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::get);
-    initiateHttpMessageDelivery();
+    doRequest(nx_http::Method::get, url);
 }
 
 void AsyncClient::doGet(
@@ -192,15 +185,7 @@ void AsyncClient::doGet(
 
 void AsyncClient::doPost(const QUrl& url)
 {
-    NX_ASSERT(url.isValid());
-
-    resetDataBeforeNewRequest();
-    m_requestUrl = url;
-    m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::post);
-    addBodyToRequest();
-
-    initiateHttpMessageDelivery();
+    doRequest(nx_http::Method::post, url);
 }
 
 void AsyncClient::doPost(
@@ -213,15 +198,7 @@ void AsyncClient::doPost(
 
 void AsyncClient::doPut(const QUrl& url)
 {
-    NX_ASSERT(url.isValid());
-
-    resetDataBeforeNewRequest();
-    m_requestUrl = url;
-    m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::put);
-    addBodyToRequest();
-
-    initiateHttpMessageDelivery();
+    doRequest(nx_http::Method::put, url);
 }
 
 void AsyncClient::doPut(
@@ -234,14 +211,7 @@ void AsyncClient::doPut(
 
 void AsyncClient::doDelete(const QUrl& url)
 {
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
-
-    resetDataBeforeNewRequest();
-    m_requestUrl = url;
-    m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::delete_);
-    initiateHttpMessageDelivery();
+    doRequest(nx_http::Method::delete_, url);
 }
 
 void AsyncClient::doDelete(
@@ -284,6 +254,32 @@ void AsyncClient::doUpgrade(
     m_additionalHeaders.emplace("Content-Length", "0");
     composeRequest(method);
     initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doRequest(
+    nx_http::Method::ValueType method,
+    const QUrl& url)
+{
+    NX_ASSERT(!url.host().isEmpty());
+    NX_ASSERT(url.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = url;
+    m_contentLocationUrl = url;
+    composeRequest(method);
+    if (m_requestBody)
+        addBodyToRequest();
+
+    initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doRequest(
+    nx_http::Method::ValueType method,
+    const QUrl& url,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doRequest(method, url);
 }
 
 const nx_http::Request& AsyncClient::request() const

@@ -51,6 +51,7 @@ public:
      */
     template<typename InputData, typename HandlerFunc, typename ErrHandlerFunc>
     void executeRequest(
+        nx_http::Method::ValueType httpMethod,
         const QString& path,
         InputData input,
         HandlerFunc handler,
@@ -67,7 +68,7 @@ public:
 
         m_cdbEndPointFetcher->get(
             auth,
-            [this, auth, path, input, handler, errHandler](
+            [this, auth, httpMethod, path, input, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 QUrl cdbUrl) mutable
             {
@@ -76,6 +77,7 @@ public:
 
                 cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
                 execute(
+                    httpMethod,
                     std::move(cdbUrl),
                     std::move(auth),
                     input,
@@ -83,8 +85,24 @@ public:
             });
     }
 
+    template<typename InputData, typename HandlerFunc, typename ErrHandlerFunc>
+    void executeRequest(
+        const QString& path,
+        InputData input,
+        HandlerFunc handler,
+        ErrHandlerFunc errHandler)
+    {
+        executeRequest<InputData, HandlerFunc, ErrHandlerFunc>(
+            nx_http::Method::post,
+            path,
+            std::move(input),
+            std::move(handler),
+            std::move(errHandler));
+    }
+
     template<typename HandlerFunc, typename ErrHandlerFunc>
     void executeRequest(
+        nx_http::Method::ValueType httpMethod,
         const QString& path,
         HandlerFunc handler,
         ErrHandlerFunc errHandler)
@@ -97,7 +115,7 @@ public:
 
         m_cdbEndPointFetcher->get(
             auth,
-            [this, auth, path, handler, errHandler](
+            [this, auth, httpMethod, path, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 QUrl cdbUrl) mutable
             {
@@ -106,10 +124,24 @@ public:
 
                 cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
                 execute(
+                    httpMethod,
                     std::move(cdbUrl),
                     std::move(auth),
                     std::move(handler));
             });
+    }
+
+    template<typename HandlerFunc, typename ErrHandlerFunc>
+    void executeRequest(
+        const QString& path,
+        HandlerFunc handler,
+        ErrHandlerFunc errHandler)
+    {
+        executeRequest<HandlerFunc, ErrHandlerFunc>(
+            nx_http::Method::get,
+            path,
+            std::move(handler),
+            std::move(errHandler));
     }
 
 private:
@@ -126,51 +158,64 @@ private:
      */
     template<typename InputData, typename OutputData>
     void execute(
+        nx_http::Method::ValueType httpMethod,
         QUrl url,
         nx_http::AuthInfo auth,
         const InputData& input,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
     {
-        execute(std::make_unique<
-            nx_http::FusionDataHttpClient<InputData, OutputData>>(std::move(url), std::move(auth), input),
+        execute(
+            httpMethod,
+            std::make_unique<
+                nx_http::FusionDataHttpClient<InputData, OutputData>>(std::move(url), std::move(auth), input),
             std::move(completionHandler));
     }
 
     template<typename InputData>
     void execute(
+        nx_http::Method::ValueType httpMethod,
         QUrl url,
         nx_http::AuthInfo auth,
         const InputData& input,
         std::function<void(api::ResultCode)> completionHandler)
     {
-        execute(std::make_unique<
-            nx_http::FusionDataHttpClient<InputData, void>>(std::move(url), std::move(auth), input),
+        execute(
+            httpMethod,
+            std::make_unique<
+                nx_http::FusionDataHttpClient<InputData, void>>(std::move(url), std::move(auth), input),
             std::move(completionHandler));
     }
 
     template<typename OutputData>
     void execute(
+        nx_http::Method::ValueType httpMethod,
         QUrl url,
         nx_http::AuthInfo auth,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
     {
-        execute(std::make_unique<
-            nx_http::FusionDataHttpClient<void, OutputData>>(std::move(url), std::move(auth)),
+        execute(
+            httpMethod,
+            std::make_unique<
+                nx_http::FusionDataHttpClient<void, OutputData>>(std::move(url), std::move(auth)),
             std::move(completionHandler));
     }
 
     void execute(
+        nx_http::Method::ValueType httpMethod,
         QUrl url,
         nx_http::AuthInfo auth,
         std::function<void(api::ResultCode)> completionHandler)
     {
-        execute(std::make_unique<
-            nx_http::FusionDataHttpClient<void, void>>(std::move(url), std::move(auth)),
+        execute(
+            httpMethod,
+            std::make_unique<
+                nx_http::FusionDataHttpClient<void, void>>(std::move(url), std::move(auth)),
             std::move(completionHandler));
     }
 
     template<typename HttpClientType, typename ... OutputData>
     void execute(
+        nx_http::Method::ValueType httpMethod,
         std::unique_ptr<HttpClientType> client,
         std::function<void(api::ResultCode, OutputData...)> completionHandler)
     {
@@ -181,6 +226,7 @@ private:
         m_runningRequests.push_back(std::unique_ptr<network::aio::BasicPollable>());
         auto thisClient = client.get();
         client->execute(
+            httpMethod,
             [completionHandler, this, thisClient](
                 SystemError::ErrorCode errCode,
                 const nx_http::Response* response,

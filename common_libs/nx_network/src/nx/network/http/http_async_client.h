@@ -176,6 +176,14 @@ public:
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doRequest(
+        nx_http::Method::ValueType method,
+        const QUrl& url);
+    void doRequest(
+        nx_http::Method::ValueType method,
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
     const nx_http::Request& request() const;
 
     /**
