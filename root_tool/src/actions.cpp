@@ -10,7 +10,8 @@ namespace root_tool {
 static const uid_t kRealUid = getuid();
 static const uid_t kRealGid = getgid();
 
-static const std::string kAllowedMountPointPreffix("/tmp/hdd");
+static const std::string kAllowedMountPointPreffix("/tmp/");
+static const std::string kAllowedMountPointSuffix("_temp_folder_");
 
 static const std::set<std::string> kForbiddenOwnershipPaths = { "/" };
 static const std::set<std::string> kForbiddenOwnershipPrefixes = {
@@ -37,8 +38,11 @@ int mount(Argument url, Argument directory, OptionalArgument username, OptionalA
     if (url.find("//") != 0)
         throw std::invalid_argument(url + " is not an SMB url");
 
-    if (directory.find(kAllowedMountPointPreffix) != 0)
-        throw std::invalid_argument(url + " is forbidden for mount");
+    if (directory.find(kAllowedMountPointPreffix) != 0
+        || directory.find(kAllowedMountPointSuffix) == std::string::npos)
+    {
+        throw std::invalid_argument(directory + " is forbidden for mount");
+    }
 
     std::ostringstream command;
     command << "mount -t cifs '" << url << "' '" << directory << "'"
@@ -56,8 +60,11 @@ int mount(Argument url, Argument directory, OptionalArgument username, OptionalA
 
 int unmount(Argument directory)
 {
-    if (directory.find(kAllowedMountPointPreffix) != 0)
-        throw std::invalid_argument(directory + " is forbidden for unmount");
+    if (directory.find(kAllowedMountPointPreffix) != 0
+        || directory.find(kAllowedMountPointSuffix) == std::string::npos)
+    {
+        throw std::invalid_argument(directory + " is forbidden for umount");
+    }
 
     // TODO: Check if it is mounted by cifs.
 
@@ -79,9 +86,9 @@ int chengeOwner(Argument path)
             throw std::invalid_argument(path + " is forbidden for chown");
     }
 
-    if (chown(path.c_str(), kRealUid, kRealGid != 0))
-        throw std::runtime_error("chown has filed");
-
+    std::ostringstream command;
+    command << "chown -R " << kRealUid << ":" << kRealGid << " '" << path << "'";
+    execute(command.str());
     return 0;
 }
 
