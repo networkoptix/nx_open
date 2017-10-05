@@ -4,8 +4,8 @@
 #include <transcoding/filters/abstract_image_filter.h>
 
 namespace nx {
+namespace core {
 namespace transcoding {
-namespace filters {
 
 namespace detail {
 
@@ -31,6 +31,6 @@ private:
     const QScopedPointer<detail::ImageToFramePainter> m_painter;
 };
 
-} // namespace filters
 } // namespace transcoding
+} // namespace core
 } // namespace nx

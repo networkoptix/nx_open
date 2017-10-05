@@ -48,8 +48,8 @@ QPoint calculateFinalPosition(
 } // namespace
 
 namespace nx {
+namespace core {
 namespace transcoding {
-namespace filters {
 namespace detail {
 
 ImageToFramePainter::ImageToFramePainter()
@@ -178,6 +178,6 @@ void ImageToFramePainter::updateTargetImage()
 }
 
 } // namespace detail
-} // namespace filters
 } // namespace transcoding
+} // namespace core
 } // namespace nx

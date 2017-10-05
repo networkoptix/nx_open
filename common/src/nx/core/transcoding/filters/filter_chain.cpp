@@ -9,8 +9,8 @@
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/rotate_image_filter.h>
 #include <transcoding/filters/time_image_filter.h>
-#include <transcoding/filters/paint_image_filter.h>
-#include <transcoding/filters/timestamp_filter.h>
+#include <nx/core/transcoding/filters/paint_image_filter.h>
+#include <nx/core/transcoding/filters/timestamp_filter.h>
 
 #include <transcoding/transcoder.h>
 
@@ -94,19 +94,17 @@ void FilterChain::prepare(const QnConstResourceVideoLayoutPtr& videoLayout,
         if (const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(
             overlaySettings.data()))
         {
-            const auto paintFilter = new nx::transcoding::filters::PaintImageFilter();
-            const auto filter = QnAbstractImageFilterPtr(paintFilter);
+            const auto paintFilter = new PaintImageFilter();
             paintFilter->setImage(imageFilterSetting->image,
                 imageFilterSetting->offset,
                 imageFilterSetting->alignment);
 
-            push_back(filter);
+            push_back(QnAbstractImageFilterPtr(paintFilter));
         }
         else if (const auto timestampFilterSettings = dynamic_cast<TimestampOverlaySettings*>(
             overlaySettings.data()))
         {
-            push_back(QnAbstractImageFilterPtr(new nx::transcoding::filters::TimestampFilter(
-                *timestampFilterSettings)));
+            push_back(QnAbstractImageFilterPtr(new TimestampFilter(*timestampFilterSettings)));
         }
 
     }

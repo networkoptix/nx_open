@@ -11,7 +11,7 @@
 #include <camera/single_thumbnail_loader.h>
 #include <camera/thumbnails_loader.h>
 #include <client/client_settings.h>
-#include <transcoding/filters/timestamp_filter.h>
+#include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
@@ -725,13 +725,13 @@ QString ExportSettingsDialog::Private::timestampText(qint64 timeMs) const
 {
     if (mediaSupportsUtc())
     {
-        return transcoding::filters::TimestampFilter::timestampTextUtc(
+        return nx::core::transcoding::TimestampFilter::timestampTextUtc(
             timeMs,
             m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs,
             m_exportMediaPersistentSettings.timestampOverlay.format);
     }
 
-    return transcoding::filters::TimestampFilter::timestampTextSimple(timeMs);
+    return nx::core::transcoding::TimestampFilter::timestampTextSimple(timeMs);
 }
 
 void ExportSettingsDialog::Private::updateTimestampText()
