@@ -253,7 +253,7 @@ void FcResourceSearcher::receiveFromCallback(
         return;
     }
 
-    auto url = QUrl(lit("http://%1").arg(senderAddress.toString()));
+    auto url = nx::utils::Url(lit("http://%1").arg(senderAddress.toString()));
     url.setPort(nx_http::DEFAULT_HTTP_PORT);
     url.setPath(kDeviceInfoUrlPath);
 

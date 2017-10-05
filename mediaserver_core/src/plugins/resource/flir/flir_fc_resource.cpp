@@ -231,7 +231,7 @@ bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, c
 
 boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx_http::HttpClient& httpClient)
 {
-    QUrl url = getUrl();
+    nx::utils::Url url = getUrl();
     url.setPath(fc_private::kConfigurationFile);
 
     if (!doGetRequestAndCheckResponse(httpClient, url))
@@ -246,7 +246,7 @@ boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx_ht
 
 bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
 {
-    QUrl url = getUrl();
+    nx::utils::Url url = getUrl();
     url.setPath(fc_private::kStartNexusServerCommand);
 
     if (!doGetRequestAndCheckResponse(httpClient, url))

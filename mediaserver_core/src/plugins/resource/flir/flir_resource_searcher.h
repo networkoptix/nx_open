@@ -11,7 +11,7 @@ struct FlirDeviceInfo
     QString mac;
     QString model;
     QString firmware;
-    QUrl url;
+    nx::utils::Url url;
 };
 
 class QnFlirResourceSearcher: public QnMdnsResourceSearcher
@@ -23,7 +23,7 @@ public:
 
     static const quint16 kFlirVendorId = 1161;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
     virtual QString manufacture() const override;
 

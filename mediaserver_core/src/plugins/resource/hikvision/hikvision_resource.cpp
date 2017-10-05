@@ -124,7 +124,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
     Qn::ConnectionRole role,
     ChannelCapabilities* outCapabilities)
 {
-    auto url = QUrl(getUrl());
+    auto url = nx::utils::Url(getUrl());
     url.setPath(kCapabilitiesRequestPathTemplate.arg(
         buildChannelNumber(role, getChannel())));
 

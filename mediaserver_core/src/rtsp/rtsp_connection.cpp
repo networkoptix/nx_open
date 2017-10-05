@@ -293,7 +293,7 @@ void QnRtspConnectionProcessor::parseRequest()
     if( scaleIter != d->request.headers.end() )
         d->rtspScale = scaleIter->second.toDouble();
 
-    QUrl url(d->request.requestLine.url);
+    nx::utils::Url url(d->request.requestLine.url);
     if (d->mediaRes == 0 && d->request.requestLine.url.path() != lit("*"))
     {
         QString resId = url.path();
@@ -629,7 +629,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
 
     QnResourcePtr res = getResource()->toResourcePtr();
 
-    QUrl url(d->request.requestLine.url);
+    nx::utils::Url url(d->request.requestLine.url);
     const QUrlQuery urlQuery( url.query() );
     int rotation;
     if (urlQuery.hasQueryItem("rotation"))

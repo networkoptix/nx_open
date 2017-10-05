@@ -1425,7 +1425,7 @@ void MediaServerProcess::loadResourcesFromECS(
                 {
                     const auto auth = QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId);
                     manualCameras.insert(camera.url,
-                        QnManualCameraInfo(QUrl(camera.url), auth, resType->getName()));
+                        QnManualCameraInfo(nx::utils::Url(camera.url), auth, resType->getName()));
                 }
                 else
                 {

@@ -136,17 +136,14 @@ boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(const 
 
     httpClient->setExpectOnlyMessageBodyWithoutHeaders(expectOnlyBody);
 
-    auto deviceUrl = QUrl(m_resource->getUrl());
-    auto requestUrl = QUrl(
+    auto deviceUrl = nx::utils::Url(m_resource->getUrl());
+    auto requestUrl = nx::utils::Url(
         lit("http://%1:%2%3")
             .arg(deviceUrl.host())
             .arg(deviceUrl.port(nx_http::DEFAULT_HTTP_PORT))
             .arg(requestPath));
 
     bool success = httpClient->doGet(requestUrl);
-
-    auto httpResponse = httpClient->response();
-
     if (!success)
         return boost::none;
 

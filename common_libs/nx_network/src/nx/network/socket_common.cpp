@@ -73,9 +73,13 @@ bool HostAddress::operator<(const HostAddress& rhs) const
     else if (rhs.toString() < toString())
         return false;
 
+    if (!(bool) m_scopeId && !(bool) rhs.m_scopeId)
+        return false;
+
     if ((bool) m_scopeId && !(bool) rhs.m_scopeId)
         return false;
-    else if ((bool) rhs.m_scopeId && !(bool) m_scopeId)
+
+    if ((bool) rhs.m_scopeId && !(bool) m_scopeId)
         return true;
 
     return m_scopeId.get() < rhs.m_scopeId.get();

@@ -85,7 +85,7 @@ QString OnvifResourceSearcher::manufacture() const
     return QnPlOnvifResource::MANUFACTURE;
 }
 
-int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
+int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
 {
     typedef GSoapAsyncCallWrapper <
         DeviceSoapWrapper,

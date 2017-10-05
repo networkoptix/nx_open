@@ -159,7 +159,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     QnThumbnailRequestContext context(request, ownerPort);
     NX_ASSERT(!request.isLocal, Q_FUNC_INFO, "Local request must be processed before");
 
-    QUrl apiUrl(server->getApiUrl());
+    nx::utils::Url apiUrl(server->getApiUrl());
     apiUrl.setPath(L'/' + urlPath);
 
     QnThumbnailRequestData modifiedRequest(request);

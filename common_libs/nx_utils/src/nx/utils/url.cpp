@@ -17,7 +17,10 @@ public:
     UrlWithIpV6AndScopeId(const QString& url): m_url(url.toLower())
     {
         if (!parseWith(kUrlWithIpInBracketsWithScopeIdRx))
+        {
+            m_parsePos = 0;
             parseWith(kUrlIpWithoutBracketsWithScopeIdRx);
+        }
     }
 
     QString urlWithoutScopeId() const
@@ -49,6 +52,7 @@ private:
     const QString m_url;
     mutable QString m_newUrl;
     mutable int m_scopeId = -1;
+    mutable int m_parsePos = 0;
 
     bool parseWith(const QRegExp& rx) const
     {
@@ -71,12 +75,13 @@ private:
 
     bool extract(const QRegExp& rx, Extracted* target) const
     {
-        target->pos = rx.indexIn(m_url);
+        target->pos = rx.indexIn(m_url, m_parsePos);
         if (target->pos == -1)
             return false;
 
         target->len = rx.matchedLength();
         target->data = rx.cap(1);
+        m_parsePos += target->len;
 
         return true;
     }
@@ -107,7 +112,10 @@ public:
     IpWithScopeId(const QString& ip): m_ip(ip)
     {
         if(!parseWith(kIpInBracketsWithScopeIdRx))
+        {
+            m_parsePos = 0;
             parseWith(kIpWithoutBracketsWithScopeIdRx);
+        }
     }
 
     QString ip() const { return m_newIp; }
@@ -121,6 +129,7 @@ private:
     const QString m_ip;
     mutable QString m_newIp;
     mutable int m_scopeId = -1;
+    mutable int m_parsePos = 0;
 
     bool parseWith(const QRegExp& rx) const
     {
@@ -134,10 +143,12 @@ private:
 
     bool extract(const QRegExp& rx, QString* target) const
     {
-        if (rx.indexIn(m_ip) == -1)
+        if ((m_parsePos = rx.indexIn(m_ip, m_parsePos)) == -1)
             return false;
 
         *target = rx.cap(1);
+        m_parsePos += rx.matchedLength();
+
         return true;
     }
 };
@@ -202,7 +213,7 @@ void Url::setUrl(const QString& url, QUrl::ParsingMode /*mode*/)
 
 QString Url::url(QUrl::FormattingOptions options) const
 {
-    if (!m_url.isValid() || !m_url.isEmpty())
+    if (!m_url.isValid() || m_url.isEmpty())
         return QString();
 
     QString result = m_url.url(options);
@@ -224,7 +235,7 @@ QString Url::toDisplayString(QUrl::FormattingOptions options) const
 
 QByteArray Url::toEncoded(QUrl::FormattingOptions options) const
 {
-    if (!m_url.isValid() || !m_url.isEmpty())
+    if (!m_url.isValid() || m_url.isEmpty())
         return QByteArray();
 
     QByteArray result = m_url.toEncoded(options);

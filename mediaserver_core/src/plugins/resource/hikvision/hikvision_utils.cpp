@@ -360,7 +360,7 @@ bool parseTransportElement(
 }
 
 bool doGetRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
     nx_http::StatusCode::Value* outStatusCode)

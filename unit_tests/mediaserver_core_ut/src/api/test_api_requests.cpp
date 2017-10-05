@@ -55,10 +55,10 @@ std::unique_ptr<nx_http::HttpClient> createHttpClient()
     return httpClient;
 }
 
-QUrl createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
+nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
 {
     // NOTE: urlStr contains a URL part starting after the origin: slash, path, query, etc.
-    return QUrl(launcher->apiUrl().toString(
+    return nx::utils::Url(launcher->apiUrl().toString(
         QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment) + urlStr);
 }
 
@@ -70,7 +70,7 @@ void doExecutePost(
     int httpStatus)
 {
     auto httpClient = createHttpClient();
-    QUrl url = createUrl(launcher, urlStr);
+    nx::utils::Url url = createUrl(launcher, urlStr);
 
     const auto& actualRequest = preprocessRequestFunc ? preprocessRequestFunc(request) : request;
 
@@ -94,7 +94,7 @@ void doExecuteGet(
     int httpStatus)
 {
     auto httpClient = createHttpClient();
-    QUrl url = createUrl(launcher, urlStr);
+    nx::utils::Url url = createUrl(launcher, urlStr);
 
     NX_LOG(lm("[TEST] GET %1").arg(urlStr), cl_logINFO);
 

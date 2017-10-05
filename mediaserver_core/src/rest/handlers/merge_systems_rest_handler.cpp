@@ -69,7 +69,7 @@ namespace {
             return nx_http::StatusCode::undefined;
     }
 
-    void addAuthToRequest(QUrl& request, const QString& remoteAuthKey)
+    void addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey)
     {
         QUrlQuery query(request.query());
         query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
@@ -160,7 +160,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    QUrl url(data.url);
+    nx::utils::Url url(data.url);
     if (!url.isValid())
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Received invalid parameter url %1")
@@ -197,7 +197,7 @@ int QnMergeSystemsRestHandler::execute(
         query.addQueryItem("checkOwnerPermissions", lit("true"));
         query.addQueryItem("showAddresses", lit("true"));
 
-        QUrl requestUrl(url);
+        nx::utils::Url requestUrl(url);
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
         requestUrl.setQuery(query);
         addAuthToRequest(requestUrl, data.getKey);
@@ -338,7 +338,7 @@ int QnMergeSystemsRestHandler::execute(
     /* Save additional address if needed */
     if (!remoteModuleInformation.remoteAddresses.contains(url.host()))
     {
-        QUrl simpleUrl;
+        nx::utils::Url simpleUrl;
         simpleUrl.setScheme(lit("http"));
         simpleUrl.setHost(url.host());
         if (url.port() != remoteModuleInformation.port)
@@ -366,7 +366,7 @@ int QnMergeSystemsRestHandler::execute(
 }
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
-    const QUrl &remoteUrl,
+    const nx::utils::Url &remoteUrl,
     const QString& /*getKey*/,
     const QString& postKey,
     bool oneServer,
@@ -424,7 +424,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
 
 bool QnMergeSystemsRestHandler::executeRemoteConfigure(
     const ConfigureSystemData& data,
-    const QUrl &remoteUrl,
+    const nx::utils::Url &remoteUrl,
     const QString& postKey,
     const QnRestConnectionProcessor* owner)
 {
@@ -436,7 +436,7 @@ bool QnMergeSystemsRestHandler::executeRemoteConfigure(
     client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
-    QUrl requestUrl(remoteUrl);
+    nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(lit("/api/configure"));
     addAuthToRequest(requestUrl, postKey);
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
@@ -470,7 +470,7 @@ bool QnMergeSystemsRestHandler::executeRemoteConfigure(
 
 template <class ResultDataType>
 bool executeRequest(
-    const QUrl &remoteUrl,
+    const nx::utils::Url &remoteUrl,
     const QString& getKey,
     ResultDataType& result,
     const QString& path)
@@ -480,7 +480,7 @@ bool executeRequest(
     client.setSendTimeoutMs(kRequestTimeout.count());
     client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
 
-    QUrl requestUrl(remoteUrl);
+    nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(path);
     addAuthToRequest(requestUrl, getKey);
     if (!client.doGet(requestUrl) || !isResponseOK(client))
@@ -500,7 +500,7 @@ bool executeRequest(
 }
 
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
-    const QUrl& remoteUrl,
+    const nx::utils::Url& remoteUrl,
     const QnUuid& systemId,
     const QString& systemName,
     const QString& getKey,
@@ -582,7 +582,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
 
         QByteArray serializedData = QJson::serialized(currentServer);
-        QUrl requestUrl(remoteUrl);
+        nx::utils::Url requestUrl(remoteUrl);
         addAuthToRequest(requestUrl, postKey);
         requestUrl.setPath(lit("/ec2/saveMediaServer"));
         if (!client.doPost(requestUrl, "application/json", serializedData) ||

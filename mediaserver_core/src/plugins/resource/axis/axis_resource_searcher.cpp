@@ -130,7 +130,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
-    QUrl finalUrl(url);
+    nx::utils::Url finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
     resource->setUrl(finalUrl.toString());

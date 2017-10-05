@@ -45,7 +45,7 @@ TEST(ServerListensBothIpv6AndIpv4, main)
     // std::this_thread::sleep_for(std::chrono::minutes(5));
 
     nx_http::HttpClient httpClient;
-    QUrl testUrl("http://host:111/static/index.html");
+    nx::utils::Url testUrl("http://host:111/static/index.html");
     testUrl.setPort(mediaServerLauncher->port());
 
     for (const auto& addr: addressesToTest)

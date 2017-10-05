@@ -124,7 +124,7 @@ bool MediaServerLauncher::stopAsync()
     return true;
 }
 
-QUrl MediaServerLauncher::apiUrl() const
+nx::utils::Url MediaServerLauncher::apiUrl() const
 {
-    return QUrl(lit("http://") + endpoint().toString());
+    return nx::utils::Url(lit("http://") + endpoint().toString());
 }

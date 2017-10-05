@@ -104,7 +104,7 @@ QString ThirdPartyResourceSearcher::manufacture() const
     return THIRD_PARTY_MANUFACTURER_NAME;
 }
 
-QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
+QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils::Url& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
     QVector<nxcip::CameraInfo> cameraInfoTempArray;
 

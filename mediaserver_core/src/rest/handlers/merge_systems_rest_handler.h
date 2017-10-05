@@ -36,14 +36,14 @@ private:
         QnJsonRestResult &result);
 
     bool applyCurrentSettings(
-        const QUrl &remoteUrl,
+        const nx::utils::Url &remoteUrl,
         const QString& getKey,
         const QString& postKey,
         bool oneServer,
         const QnRestConnectionProcessor* owner);
 
     bool applyRemoteSettings(
-        const QUrl &remoteUrl,
+        const nx::utils::Url &remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,
@@ -56,7 +56,7 @@ private:
 
     bool executeRemoteConfigure(
         const ConfigureSystemData& data,
-        const QUrl &remoteUrl,
+        const nx::utils::Url &remoteUrl,
         const QString& postKey,
         const QnRestConnectionProcessor* owner);
 private:

@@ -170,7 +170,7 @@ int Helper::handleAddDownload(const QString& fileName)
     const auto urlString = params.value("url");
     if (!urlString.isEmpty())
     {
-        fileInfo.url = QUrl(urlString);
+        fileInfo.url = nx::utils::Url(urlString);
         if (!fileInfo.url.isValid())
             return makeInvalidParameterError("url");
     }
@@ -223,7 +223,7 @@ int Helper::handleDownloadChunk(const QString& fileName, int chunkIndex)
 
 int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIndex)
 {
-    const QUrl url = params.value("url");
+    const nx::utils::Url url = params.value("url");
     if (url.isEmpty())
         return makeInvalidParameterError("url", QnRestResult::MissingParameter);
     else if (!url.isValid())
