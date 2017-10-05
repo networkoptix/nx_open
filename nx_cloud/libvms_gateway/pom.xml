@@ -60,7 +60,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>relaying</artifactId>
+            <artifactId>librelaying</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
