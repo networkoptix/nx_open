@@ -40,9 +40,8 @@ Item
         readonly property real scaleOvershoot: 1.2
         readonly property real scalePerDegree: 1.01
         readonly property real stickyScaleThreshold: 1.8
-        property real targetScale: 1
+        property real targetScale: 0
         property bool blockScaleBoundsAnimation: false
-        property bool scalingAfterInteraction: false
         // Scale origin is in item coordinates scaled to 1x1.
         property real scaleOriginX: 0
         property real scaleOriginY: 0
@@ -141,7 +140,7 @@ Item
         onStopped:
         {
             easing.type = d.defaultAnimationEasingType
-            d.scalingAfterInteraction = false
+            d.targetScale = 0
 
             if (!mouseArea.pressed && !d.blockScaleBoundsAnimation)
             {
@@ -192,14 +191,6 @@ Item
                     baseOffset.y - maxShiftY, d.panOffsetY, baseOffset.y + maxShiftY)
             }
         }
-    }
-
-    Binding
-    {
-        target: d
-        property: "targetScale"
-        value: d.currentScale()
-        when: !d.scalingAfterInteraction
     }
 
     MouseArea
@@ -272,9 +263,11 @@ Item
 
             var angle = wheel.angleDelta.y / 8
 
+            var scale = d.targetScale !== 0 ? d.targetScale : d.currentScale()
+
             var newScale = MathUtils.bound(
                 d.minScale / d.scaleOvershoot,
-                d.targetScale * Math.pow(d.scalePerDegree, angle),
+                scale * Math.pow(d.scalePerDegree, angle),
                 d.maxScale * d.scaleOvershoot)
 
             d.blockScaleBoundsAnimation = true
@@ -284,7 +277,6 @@ Item
 
             d.blockScaleBoundsAnimation = false
 
-            d.scalingAfterInteraction = true
             d.scaleOriginX = (-contentX + wheel.x) / contentWidth
             d.scaleOriginY = (-contentY + wheel.y) / contentHeight
             d.targetScale = newScale
