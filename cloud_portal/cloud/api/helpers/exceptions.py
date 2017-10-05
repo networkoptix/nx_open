@@ -306,7 +306,7 @@ def handle_exceptions(func):
             error_text = "{}({})".format(error.error_text, error.error_code)
             if error.error_data:
                 clean_passwords(error.error_data)
-            error_formatted = 'Status: {}\nMessage: {}\nError code: {}\nError data: {}'.\
+            error_formatted = 'Status: {}, Message: {}, Result code: {}, Data: {}'.\
                               format(error.status_code,
                                      error.error_text,
                                      error.error_code,
@@ -317,16 +317,26 @@ def handle_exceptions(func):
             error_formatted = 'Unexpected error'
 
         clean_passwords(request_data)
-        error_formatted = '\n{}:{}\nPortal URL: {}\nUser: {}\nUser IP:{}\nRequest: {}\n{}\nCall Stack: \n{}'.\
-            format(error.__class__.__name__,
-                   error_text,
-                   page_url,
-                   user_name,
-                   ip,
-                   request_data,
-                   error_formatted,
-                   traceback.format_exc()
-                   ).replace("Traceback", "")  # remove Traceback word from handled exceptions
+
+        if log_level == logging.INFO:
+            error_formatted = ' {}:{} ({} at {}) Request: {}'. \
+                format(error.__class__.__name__,
+                       error_text,
+                       user_name,
+                       page_url,
+                       request_data
+                       )
+        else:
+            error_formatted = ' {}:{}\n{}({}) at {} Request: {}\n{}\nCall Stack: \n{}'. \
+                format(error.__class__.__name__,
+                       error_text,
+                       user_name,
+                       ip,
+                       page_url,
+                       request_data,
+                       error_formatted,
+                       traceback.format_exc()
+                       ).replace("Traceback", "")  # remove Traceback word from handled exceptions
 
         logger.log(log_level, error_formatted)
         return error_formatted
