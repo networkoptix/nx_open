@@ -351,8 +351,13 @@ void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
 
 void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
+    const auto transcodingWasAllowed = isTranscodingAllowed();
     m_exportMediaSettings.fileName = filename;
     validateSettings(Mode::Media);
+
+    const bool transcodingIsAllowed = isTranscodingAllowed();
+    if (transcodingIsAllowed != transcodingWasAllowed)
+        emit transcodingAllowedChanged(transcodingIsAllowed);
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
@@ -391,6 +396,11 @@ void ExportSettingsDialog::Private::setMode(Mode mode)
 
     m_mode = mode;
     validateSettings(m_mode);
+}
+
+bool ExportSettingsDialog::Private::isTranscodingAllowed() const
+{
+    return !FileExtensionUtils::isExecutable(m_exportMediaSettings.fileName.extension);
 }
 
 FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode)
@@ -708,6 +718,23 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
                     overlayPositionChanged(type);
             });
     }
+
+    connect(this, &Private::transcodingAllowedChanged, this,
+        [this](bool transcodingIsAllowed)
+        {
+            if (transcodingIsAllowed)
+            {
+                for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
+                    overlay(overlayType)->setHidden(false);
+            }
+            else
+            {
+                for (const auto overlayWidget: m_overlays)
+                    overlayWidget->setHidden(true);
+            }
+
+            updateMediaImageProcessor();
+        });
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()
@@ -742,7 +769,10 @@ void ExportSettingsDialog::Private::updateTimestampText()
 
 void ExportSettingsDialog::Private::updateMediaImageProcessor()
 {
-    const auto& settings = m_exportMediaSettings.transcodingSettings;
+    const auto& settings = isTranscodingAllowed()
+        ? m_exportMediaSettings.transcodingSettings
+        : nx::core::transcoding::Settings();
+
     m_mediaImageProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);
 }
 

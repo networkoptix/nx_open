@@ -155,8 +155,14 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
         d, &Private::setLayoutReadOnly);
 
-    connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setMediaFilename);
     connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);
+    connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, this,
+        [this](const Filename& fileName)
+        {
+            d->setMediaFilename(fileName);
+            ui->transcodingButtonsWidget->setHidden(
+                FileExtensionUtils::isExecutable(fileName.extension));
+        });
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
         d, &Private::setTimestampOverlaySettings);
@@ -211,6 +217,17 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
     updateMode();
+
+    connect(d, &Private::transcodingAllowedChanged, this,
+        [this](bool transcodingIsAllowed)
+        {
+            ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
+            if (transcodingIsAllowed)
+            {
+                ui->exportMediaSettingsPage->setApplyFilters(
+                    d->exportMediaPersistentSettings().applyFilters);
+            }
+        });
 
     if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
         ui->bookmarkButton->click(); //< Set current page to bookmark info.

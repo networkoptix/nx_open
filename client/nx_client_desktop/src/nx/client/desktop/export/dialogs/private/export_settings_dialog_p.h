@@ -95,10 +95,13 @@ public:
 
     QString timestampText(qint64 timeMs) const;
 
+    bool isTranscodingAllowed() const;
+
 signals:
     void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void overlaySelected(ExportOverlayType type);
     void frameSizeChanged(const QSize& size);
+    void transcodingAllowedChanged(bool allowed);
 
 private:
     ExportOverlayWidget* overlay(ExportOverlayType type);
