@@ -288,6 +288,11 @@ void HanwhaStreamReader::setPositionUsec(qint64 value)
     m_rtpReader.setPositionUsec(value);
 }
 
+QnRtspClient& HanwhaStreamReader::rtspClient()
+{
+    return m_rtpReader.rtspClient();
+}
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx

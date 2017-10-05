@@ -89,6 +89,8 @@ public:
 
     void setDateTimeFormat(const QnRtspClient::DateTimeFormat& format);
 
+    QnRtspClient& rtspClient();
+
     /**
      * Trust to camera NPT clock if value is true. Remember difference between camera and local clock otherwise.
      * Default value is false.
@@ -102,9 +104,9 @@ private:
     struct TrackInfo
     {
         TrackInfo(): ioDevice(0), parser(0) {}
-        ~TrackInfo() { delete parser; }
+        ~TrackInfo() { }
         QnRtspIoDevice* ioDevice; // external reference. do not delete
-        QnRtpStreamParser* parser;
+        std::shared_ptr<QnRtpStreamParser> parser;
     };
 
     QnRtpStreamParser* createParser(const QString& codecName);

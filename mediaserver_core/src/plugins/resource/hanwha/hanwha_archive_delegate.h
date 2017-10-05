@@ -2,6 +2,7 @@
 
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <recording/time_period_list.h>
+#include <plugins/resource/avi/thumbnails_archive_delegate.h>
 
 #if defined(ENABLE_HANWHA)
 
@@ -33,8 +34,12 @@ public:
 
     virtual void beforeSeek(qint64 time) override;
 private:
+    std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
     int m_scale = 1;
+    qint64 m_endTimeUsec = AV_NOPTS_VALUE;
+    qint64 m_lastSeekTime = AV_NOPTS_VALUE;
+    bool m_previewMode = false;
 };
 
 } // namespace plugins

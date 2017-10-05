@@ -136,7 +136,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     
     const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
     if (position != AV_NOPTS_VALUE)
-        m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */ , 1 /* scale */);
+    {
+        m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */, 1 /* scale */);
+        // Recreate parsers
+        for (auto& track: m_tracks)
+        {
+            if (track.parser)
+                track.parser.reset(createParser(track.parser->codecName()));
+        }
+    }
 
     QnAbstractMediaDataPtr result;
     do {
@@ -265,7 +273,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
         int channelNum = m_RtpSession.getChannelNum(rtpChannelNum);
-        QnRtpStreamParser* parser = m_tracks[channelNum].parser;
+        auto parser = m_tracks[channelNum].parser;
         QnRtspIoDevice* ioDevice = m_tracks[channelNum].ioDevice;
         if (m_tracks.size() < channelNum || !parser)
             continue;
@@ -431,7 +439,10 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     }
 
     if (result)
+    {
         Qn::directConnect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
+        result->setCodecName(codecName);
+    }
     return result;
 }
 
@@ -554,7 +565,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         audioExist |= trackType == QnRtspClient::TT_AUDIO;
         if (trackType == QnRtspClient::TT_VIDEO || trackType == QnRtspClient::TT_AUDIO)
         {
-            m_tracks[i].parser = createParser(trackInfo[i]->codecName.toUpper());
+            m_tracks[i].parser.reset(createParser(trackInfo[i]->codecName.toUpper()));
             if (m_tracks[i].parser) {
                 m_tracks[i].parser->setTimeHelper(&m_timeHelper);
                 m_tracks[i].parser->setSDPInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
@@ -570,7 +581,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
                         m_tracks[i].ioDevice->setForceRtcpReports(forceRtcpReports);
                 }
 
-                QnRtpAudioStreamParser* audioParser = dynamic_cast<QnRtpAudioStreamParser*> (m_tracks[i].parser);
+                QnRtpAudioStreamParser* audioParser = dynamic_cast<QnRtpAudioStreamParser*> (m_tracks[i].parser.get());
                 if (audioParser)
                     m_audioLayout = audioParser->getAudioLayout();
 
@@ -725,6 +736,11 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
 void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
 {
     m_timeHelper.setTrustToCameraTime(value);
+}
+
+QnRtspClient& QnMulticodecRtpReader::rtspClient()
+{
+    return m_RtpSession;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

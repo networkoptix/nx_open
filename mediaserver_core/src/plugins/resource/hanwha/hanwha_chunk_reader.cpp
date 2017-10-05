@@ -252,8 +252,16 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     {
         const auto endTimeMs = QDateTime::fromString(fieldValue, kHanwhaDateFormat).toMSecsSinceEpoch();
         QnTimePeriod timePeriod(m_lastParsedStartTime, endTimeMs - m_lastParsedStartTime);
-        if (!chunks.containPeriod(timePeriod))
+        if (m_startTimeUsec == AV_NOPTS_VALUE || chunks.isEmpty())
+        {
             chunks.push_back(timePeriod);
+        }
+        else
+        {
+            QnTimePeriodList periods;
+            periods << timePeriod;
+            QnTimePeriodList::overwriteTail(chunks, periods, timePeriod.startTimeMs);
+        }
     }
     
     return true;

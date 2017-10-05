@@ -22,7 +22,6 @@ public:
     void setPositionUsec(qint64 value);
 
     virtual ~HanwhaStreamReader() override;
-
 protected: 
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
@@ -44,7 +43,7 @@ private:
     CameraDiagnostics::Result streamUri(int profileNumber, QString* outUrl);
 
     QString rtpTransport() const;
-
+    QnRtspClient& rtspClient();
 private:
     HanwhaResourcePtr m_hanwhaResource;
     

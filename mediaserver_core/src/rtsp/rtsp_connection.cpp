@@ -58,6 +58,7 @@ extern "C"
 #include <nx/utils/random.h>
 #include <nx/fusion/serialization/lexical_enum.h>
 #include <media_server/media_server_module.h>
+#include <plugins/resource/avi/thumbnails_archive_delegate.h>
 
 class QnTcpListener;
 
@@ -1142,7 +1143,14 @@ void QnRtspConnectionProcessor::createDataProvider()
         QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(d->mediaRes->toResource());
         QnAbstractArchiveDelegate* archiveDelegate = nullptr;
         if (camRes)
+        {
             archiveDelegate = camRes->createArchiveDelegate();
+            if (archiveDelegate &&
+                !archiveDelegate->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanProcessMediaStep))
+            {
+                archiveDelegate = new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(archiveDelegate));
+            }
+        }
         if (!archiveDelegate)
             archiveDelegate = new QnServerArchiveDelegate(); // default value
 

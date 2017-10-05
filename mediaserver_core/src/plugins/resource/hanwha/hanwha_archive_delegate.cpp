@@ -2,6 +2,7 @@
 
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <utils/common/util.h>
 
 #include "hanwha_archive_delegate.h"
 #include "hanwha_stream_reader.h"
@@ -22,7 +23,6 @@ HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource
 
     m_flags |= Flag_CanOfflineRange;
     //m_flags |= Flag_CanProcessNegativeSpeed; //< TODO: implement me
-    m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanOfflineLayout;
     m_flags |= Flag_CanOfflineHasVideo;
     m_flags |= Flag_UnsyncTime;
@@ -64,7 +64,16 @@ QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
 {
     if (!m_streamReader)
         return QnAbstractMediaDataPtr();
-    return m_streamReader->getNextData();
+    auto result = m_streamReader->getNextData();
+
+    if (result && m_endTimeUsec != AV_NOPTS_VALUE && result->timestamp > m_endTimeUsec)
+    {
+        const bool isForwardDirection = m_scale >= 0;
+        QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
+        rez->timestamp = isForwardDirection ? DATETIME_NOW : 0;
+        return rez;
+    }
+    return result;
 }
 
 qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
@@ -74,13 +83,17 @@ qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
         ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
         ->chunkLoader()->chunks(hanwhaRes->getChannel());
     const bool isForwardDirection = m_scale >= 0;
-    auto itr = chunks.findNearestPeriod(timeUsec / 1000, isForwardDirection);
+    const qint64 timeMs = timeUsec / 1000;
+    auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection);
     if (itr == chunks.cend())
         timeUsec = isForwardDirection ? DATETIME_NOW : 0;
-    else
-        timeUsec = itr->startTimeMs * 1000;
+    else if (!itr->contains(timeMs))
+        timeUsec = isForwardDirection ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
 
+    if (m_previewMode && m_lastSeekTime == timeUsec)
+        return timeUsec;
 
+    m_lastSeekTime = timeUsec;
     m_streamReader->setPositionUsec(timeUsec);
     return timeUsec;
 }
@@ -107,9 +120,13 @@ void HanwhaNvrArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     // TODO: implement me
 }
 
-void HanwhaNvrArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qint64 frameStep)
+void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
 {
-    // TODO: implement me
+    auto& rtspClient = m_streamReader->rtspClient();
+    rtspClient.setAdditionAttribute("Frames", "Intra");
+    m_endTimeUsec = endTimeUsec;
+    m_previewMode = frameStepUsec > 1;
+    seek(startTimeUsec, true /*findIFrame*/);
 }
 
 void HanwhaNvrArchiveDelegate::beforeSeek(qint64 time)

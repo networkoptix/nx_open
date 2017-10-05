@@ -322,7 +322,7 @@ public:
     QByteArray serverInfo() const;
 
     void setDateTimeFormat(const DateTimeFormat& format);
-
+    void setScaleHeaderEnabled(bool value);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -420,6 +420,7 @@ private:
     mutable QnMutex m_socketMutex;
     QByteArray m_serverInfo;
     DateTimeFormat m_dateTimeFormat = DateTimeFormat::Numeric;
+    bool m_scaleHeaderEnabled = true;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

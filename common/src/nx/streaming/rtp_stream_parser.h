@@ -66,11 +66,15 @@ public:
 
     int logicalChannelNum() const { return m_logicalChannelNum; }
     void setLogicalChannelNum(int value) { m_logicalChannelNum = value; }
+    
+    void setCodecName(const QString& value) { m_codecName = value; }
+    QString codecName() const { return m_codecName;  }
 signals:
     void packetLostDetected(quint32 prev, quint32 next);
 protected:
     QnRtspTimeHelper* m_timeHelper;
     int m_logicalChannelNum;
+    QString m_codecName;
 };
 
 class QnRtspAudioLayout: public QnResourceAudioLayout
