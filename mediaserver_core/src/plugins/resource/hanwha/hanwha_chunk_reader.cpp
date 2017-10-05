@@ -259,24 +259,35 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     return true;
 }
 
-qint64 HanwhaChunkLoader::startTimeUsec() const
+qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_startTimeUsec;
+    const qint64 startTimeMs = m_startTimeUsec / 1000;
+    const qint64 endTimeMs = m_endTimeUsec / 1000;
+    if (m_chunks.size() <= channelNumber || m_chunks[channelNumber].isEmpty())
+        return AV_NOPTS_VALUE;
+    return m_chunks[channelNumber].front().startTimeMs * 1000;
 }
 
-qint64 HanwhaChunkLoader::endTimeUsec() const
+qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_endTimeUsec;
+    const qint64 startTimeMs = m_startTimeUsec / 1000;
+    const qint64 endTimeMs = m_endTimeUsec / 1000;
+    if (m_chunks.size() <= channelNumber || m_chunks[channelNumber].isEmpty())
+        return AV_NOPTS_VALUE;
+    return m_chunks[channelNumber].last().endTimeMs() * 1000;
 }
 
 QnTimePeriodList HanwhaChunkLoader::chunks(int channelNumber) const
 {
     QnMutexLocker lock(&m_mutex);
+    const qint64 startTimeMs = m_startTimeUsec / 1000;
+    const qint64 endTimeMs = m_endTimeUsec / 1000;
     if (m_chunks.size() <= channelNumber)
         return QnTimePeriodList();
-    return m_chunks[channelNumber];
+    QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
+    return m_chunks[channelNumber].intersected(boundingPeriod);
 }
 
 } // namespace plugins

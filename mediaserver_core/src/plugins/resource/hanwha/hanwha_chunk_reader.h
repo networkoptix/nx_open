@@ -30,8 +30,8 @@ public:
     void start(const QAuthenticator& auth, const QUrl& url, int channelCount);
     bool isStarted() const;
 
-    qint64 startTimeUsec() const;
-    qint64 endTimeUsec() const;
+    qint64 startTimeUsec(int channelNumber) const;
+    qint64 endTimeUsec(int channelNumber) const;
     QnTimePeriodList chunks(int channelNumber) const;
 private:
     void onHttpClientDone();

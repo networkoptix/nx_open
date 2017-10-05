@@ -34,6 +34,7 @@ public:
     virtual void beforeSeek(qint64 time) override;
 private:
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
+    int m_scale = 1;
 };
 
 } // namespace plugins
