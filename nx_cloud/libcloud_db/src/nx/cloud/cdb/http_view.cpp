@@ -422,7 +422,7 @@ protected:
     {
         m_func(
             authzInfo,
-            requestPathParams(),
+            this->requestPathParams(),
             std::move(inputData),
             std::move(completionHandler));
     }
