@@ -75,6 +75,7 @@ ExportSettingsDialog::ExportSettingsDialog(
 {
     ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->layoutTab));
     setMediaResourceWidget(widget);
+    updateMode();
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -131,6 +132,8 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     d->loadSettings();
     connect(this, &QDialog::accepted, d, &Private::saveSettings);
+
+    ui->tabWidget->setCurrentWidget(d->mode() == Mode::Media ? ui->cameraTab : ui->layoutTab);
 
     d->setTimePeriod(timePeriod);
 
@@ -216,7 +219,6 @@ ExportSettingsDialog::ExportSettingsDialog(
         ui->speedButton, &ui::SelectableTextButton::deactivate);
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
-    updateMode();
 
     connect(d, &Private::transcodingAllowedChanged, this,
         [this](bool transcodingIsAllowed)

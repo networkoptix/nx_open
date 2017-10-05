@@ -4,9 +4,15 @@
 #include <QtCore/QString>
 #include <QtCore/QAbstractListModel>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 namespace nx {
 namespace client {
-namespace desktop {
+
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
+#endif
+QN_DECLARE_METAOBJECT_HEADER(desktop, FileExtension, )
 
 /** List of supported file extensions, used in the client. */
 enum class FileExtension
@@ -66,4 +72,4 @@ struct Filename
 } // namespace client
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::client::desktop::FileExtension)
+QN_FUSION_DECLARE_FUNCTIONS(nx::client::desktop::FileExtension, (metatype)(lexical))

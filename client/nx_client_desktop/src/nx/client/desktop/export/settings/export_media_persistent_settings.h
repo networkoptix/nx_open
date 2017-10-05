@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/data/export_media_settings.h>
 
 namespace nx {
@@ -100,6 +101,7 @@ struct ExportRapidReviewPersistentSettings
 struct ExportMediaPersistentSettings
 {
     bool applyFilters = false;
+    FileExtension fileFormat = FileExtension::mkv;
 
     ExportRapidReviewPersistentSettings rapidReview;
 
@@ -118,7 +120,7 @@ struct ExportMediaPersistentSettings
 
     void updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const;
 };
-#define ExportMediaPersistentSettings_Fields (applyFilters)(rapidReview)\
+#define ExportMediaPersistentSettings_Fields (applyFilters)(fileFormat)(rapidReview)\
     (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)
 
 #define EXPORT_MEDIA_PERSISTENT_TYPES \

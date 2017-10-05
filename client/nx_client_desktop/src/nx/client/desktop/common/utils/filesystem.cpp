@@ -5,8 +5,9 @@
 
 #include <utils/common/app_info.h>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
-#include "nx/utils/app_info.h"
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace client {
@@ -14,9 +15,10 @@ namespace desktop {
 
 namespace {
 
-class FilesystemStrings
+class FileSystemStrings
 {
-    Q_DECLARE_TR_FUNCTIONS(FilesystemStrings)
+    Q_DECLARE_TR_FUNCTIONS(FileSystemStrings)
+
 public:
     static QString suffix(FileExtension ext)
     {
@@ -61,14 +63,7 @@ public:
         return FileExtension::mkv;
     }
 
-    static QString description(FileExtension ext)
-    {
-        const QString formatTemplate(lit("%1 (*.%2)"));
-        return formatTemplate.arg(descriptionInternal(ext)).arg(suffix(ext));
-    }
-
-private:
-    static QString descriptionInternal(FileExtension extension)
+    static QString description(FileExtension extension)
     {
         switch (extension)
         {
@@ -89,6 +84,12 @@ private:
                 NX_ASSERT(false, "Should never get here");
                 return QString();
         }
+    }
+
+    static QString filterDescription(FileExtension ext)
+    {
+        const QString formatTemplate(lit("%1 (*.%2)"));
+        return formatTemplate.arg(description(ext)).arg(suffix(ext));
     }
 };
 
@@ -120,7 +121,7 @@ void FileExtensionModel::setExtensions(const FileExtensionList& extensions)
     endResetModel();
 }
 
-int FileExtensionModel::rowCount(const QModelIndex& parent) const
+int FileExtensionModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return m_data.size();
 }
@@ -143,9 +144,9 @@ QVariant FileExtensionModel::data(const QModelIndex& index, int role) const
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleDescriptionRole:
-            return FilesystemStrings::description(extension);
+            return FileSystemStrings::filterDescription(extension);
         case Qn::ShortTextRole:
-            return lit(".%1").arg(FilesystemStrings::suffix(extension));
+            return lit(".%1").arg(FileSystemStrings::suffix(extension));
         case ExtensionRole:
             return qVariantFromValue(extension);
         default:
@@ -161,13 +162,13 @@ Filename Filename::parse(const QString& filename)
     Filename result;
     result.path = info.absolutePath();
     result.name = info.completeBaseName();
-    result.extension = FilesystemStrings::extension(info.suffix());
+    result.extension = FileSystemStrings::extension(info.suffix());
     return result;
 }
 
 QString Filename::completeFileName() const
 {
-    const auto ext = L'.' + FilesystemStrings::suffix(extension);
+    const auto ext = L'.' + FileSystemStrings::suffix(extension);
     const auto fullName = name.endsWith(ext)
         ? name
         : name + ext;
@@ -185,3 +186,5 @@ bool Filename::operator==(const Filename& other) const
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop, FileExtension)

@@ -89,8 +89,13 @@ void ExportSettingsDialog::Private::loadSettings()
     if (lastExportDir.isEmpty())
         lastExportDir = QDir::homePath();
 
+    setMode(qnSettings->lastExportMode() == lit("layout") ? Mode::Layout : Mode::Media);
+
     m_exportMediaSettings.fileName.path = lastExportDir;
+    m_exportMediaSettings.fileName.extension = m_exportMediaPersistentSettings.fileFormat;
+
     m_exportLayoutSettings.filename.path = lastExportDir;
+    m_exportLayoutSettings.filename.extension = m_exportLayoutPersistentSettings.fileFormat;
 
     auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
     if (!imageOverlay.name.trimmed().isEmpty())
@@ -127,6 +132,7 @@ void ExportSettingsDialog::Private::saveSettings()
                 qnSettings->setExportBookmarkSettings(m_exportMediaPersistentSettings);
 
             qnSettings->setLastExportDir(m_exportMediaSettings.fileName.path);
+            qnSettings->setLastExportMode(lit("media"));
             break;
         }
 
@@ -134,6 +140,7 @@ void ExportSettingsDialog::Private::saveSettings()
         {
             qnSettings->setExportLayoutSettings(m_exportLayoutPersistentSettings);
             qnSettings->setLastExportDir(m_exportLayoutSettings.filename.path);
+            qnSettings->setLastExportMode(lit("layout"));
             break;
         }
     }
@@ -353,6 +360,7 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     const auto transcodingWasAllowed = isTranscodingAllowed();
     m_exportMediaSettings.fileName = filename;
+    m_exportMediaPersistentSettings.fileFormat = filename.extension;
     validateSettings(Mode::Media);
 
     const bool transcodingIsAllowed = isTranscodingAllowed();
@@ -363,6 +371,7 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
     m_exportLayoutSettings.filename = filename;
+    m_exportLayoutPersistentSettings.fileFormat = filename.extension;
     validateSettings(Mode::Layout);
 }
 
