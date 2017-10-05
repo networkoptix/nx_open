@@ -106,6 +106,11 @@ void ClientImpl::openConnectionToTheTargetHost(
         });
 }
 
+QUrl ClientImpl::url() const
+{
+    return QUrl();
+}
+
 SystemError::ErrorCode ClientImpl::prevRequestSysErrorCode() const
 {
     return SystemError::noError;

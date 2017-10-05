@@ -61,7 +61,7 @@ LoginPage = function () {
 
     this.login = function () {
         this.dialogLoginButton.click();
-        browser.sleep(2000); // such a shame, but I can't solve it right now
+        browser.sleep(5000);
 
         // Check that element that is visible only for authorized user is displayed on page
         expect(this.loginSuccessElement.isDisplayed()).toBe(true);

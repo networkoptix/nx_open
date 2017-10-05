@@ -18,10 +18,23 @@
                title="{{server.url}}"
                ng-click="toggleServerCollapsed(server)"
                class="server-link collapse-group"
-               ng-class="{offline:server.status!='Online'}"> <div class="pull-right"> <span> <icon for="!server.collapsed && cameras[server.id].length> 0 "on-true =" chevron-up "title-true =" collapse "> </icon> <icon for="server.collapsed && cameras[server.id].length> 0 "on-true =" chevron-down "title-true =" expand "> </icon></span></div> <div class="hide-excess-text"> <span ng-if="server.id == activeCamera.parentId"
-                          class="glyphicon glyphicon-server-active"> </span> <span ng-if="server.status == 'Online' && server.id != activeCamera.parentId"
-                          class="glyphicon glyphicon-server-online"> </span> <span ng-if="server.status != 'Online' && server.id != activeCamera.parentId"
-                          class="glyphicon glyphicon-server-offline"> </span> <span class="server-name"> &nbsp; {{server.name}} </span> <small ng-if="toggleInfo"> &nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}} </small></div></a>
+               ng-class="{offline:server.status!='Online'}">
+                <div class="pull-right">
+                    <span>
+                        <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-up" title-true="collapse" ></icon>
+                        <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="expand" ></icon>
+                    </span>
+                </div>
+                <div class="hide-excess-text">
+                    <span ng-if="server.active"
+                          class="glyphicon glyphicon-server-active"></span>
+                    <span ng-if="server.status == 'Online' && !server.active"
+                          class="glyphicon glyphicon-server-online"></span>
+                    <span ng-if="server.status != 'Online' && !server.active"
+                          class="glyphicon glyphicon-server-offline"></span>
+                    <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
+                </div>
+            </a>
             <ul class="nav "
                 collapse="server.collapsed" uib-collapse="server.collapsed"
                 ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy}" >

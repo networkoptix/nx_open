@@ -9,6 +9,18 @@ namespace rest {
 
 namespace detail {
 
+template<typename Arg>
+void replace(QByteArray* where, int pos, int count, const Arg& withWhat)
+{
+    where->replace(pos, count, withWhat);
+}
+
+template<>
+inline void replace(QByteArray* where, int pos, int count, const std::string& withWhat)
+{
+    where->replace(pos, count, withWhat.c_str());
+}
+
 template<typename ArgumentType>
 bool substituteNextParameter(
     nx::String* path,
@@ -24,7 +36,8 @@ bool substituteNextParameter(
         return false;
     }
 
-    path->replace(
+    replace(
+        path,
         openingBracketPos,
         closingBracketPos - openingBracketPos + 1,
         argument);
@@ -59,6 +72,26 @@ nx::String substituteParameters(
         NX_ASSERT(false);
     }
     return resultPath;
+}
+
+template<typename ArgumentType>
+std::string substituteParameters(
+    const std::string& pathTemplate,
+    std::initializer_list<ArgumentType> arguments)
+{
+    return substituteParameters(
+        nx::String::fromStdString(pathTemplate),
+        std::move(arguments)).toStdString();
+}
+
+template<typename ArgumentType>
+std::string substituteParameters(
+    const char* pathTemplate,
+    std::initializer_list<ArgumentType> arguments)
+{
+    return substituteParameters(
+        nx::String(pathTemplate),
+        std::move(arguments)).toStdString();
 }
 
 } // namespace rest

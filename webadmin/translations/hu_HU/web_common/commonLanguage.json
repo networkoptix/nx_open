@@ -4,9 +4,9 @@
     "lowStream":"Másodlagos stream",
     "transcoding":"Transzkódolás",
     "unknown":"Ismeretlen",
-    "copyToClipboard":"copy to clipboard",
-    "copyDefaultText":"copy",
-    "copyActiveText":"copied to clipboard"
+    "copyToClipboard":"másolás vágólapra",
+    "copyDefaultText":"másolás",
+    "copyActiveText":"vágólapra másolva"
   },
   "systemOffline":"A rendszer offline",
   "cameraStates":{

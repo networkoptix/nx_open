@@ -101,6 +101,7 @@ public:
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
+    void setAllowLocks(bool allowLocks);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
 
@@ -130,7 +131,8 @@ private:
     boost::optional<SocketAddress> m_proxyEndpoint;
     boost::optional<AuthType> m_authType;
 
-    bool m_expectOnlyBody;
+    bool m_expectOnlyBody = false;
+    bool m_allowLocks = false;
 
     void instantiateHttpClient();
     template<typename AsyncClientFunc>

@@ -75,7 +75,10 @@ public:
         FullScreenMode              = 0x10000,
         ActivityPresence            = 0x20000,
 
-        AlwaysShowName              = 0x40000
+        AlwaysShowName              = 0x40000,
+
+        AnalyticsModeMaster         = 0x80000,   /**< item is an analytics mode master. */
+        AnalyticsModeSlave          = 0x100000,  /**< item is an analytics mode slave. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 

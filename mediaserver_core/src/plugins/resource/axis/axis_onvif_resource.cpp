@@ -7,7 +7,7 @@ QnAxisOnvifResource::QnAxisOnvifResource()
 {
 }
 
-int QnAxisOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role) const
+int QnAxisOnvifResource::suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
     Q_UNUSED(q)
     Q_UNUSED(resolution)

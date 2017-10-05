@@ -82,6 +82,13 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
 }
 
+std::string OutgoingTunnelConnectionWatcher::toString() const
+{
+    return m_tunnelConnection
+        ? m_tunnelConnection->toString()
+        : std::string();
+}
+
 void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
 {
     NX_ASSERT(isInSelfAioThread());

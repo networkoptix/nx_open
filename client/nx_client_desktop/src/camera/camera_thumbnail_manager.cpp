@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/model_functions.h>
+#include <ui/common/geometry.h>
 #include <ui/style/skin.h>
 
 #include <utils/common/delayed.h>
@@ -170,11 +171,13 @@ QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourceP
 {
     // TODO: #GDM process camera rotation?
     qreal aspectRatio = kDefaultAspectRatio;
+    QSize tiling(1, 1);
     if (camera)
     {
         const auto cameraAr = camera->aspectRatio();
+        tiling = camera->getVideoLayout()->size();
         if (cameraAr.isValid())
-            aspectRatio = cameraAr.toFloat();
+            aspectRatio = cameraAr.toFloat() * tiling.width() / tiling.height();
     }
     NX_ASSERT(!qFuzzyIsNull(aspectRatio));
 
@@ -187,7 +190,7 @@ QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourceP
             return result;
 
         const auto stream = camera->defaultStream();
-        result = stream.getResolution();
+        result = QnGeometry::cwiseMul(stream.getResolution(), tiling);
     }
     // Only height is given, calculating width by aspect ratio
     else if (result.width() <= 0)

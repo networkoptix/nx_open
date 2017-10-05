@@ -17,6 +17,7 @@ public:
     virtual ~QnBuildNumberDialog();
 
     int buildNumber() const;
+    QString changeset() const;
     QString password() const;
 
     virtual void accept() override;

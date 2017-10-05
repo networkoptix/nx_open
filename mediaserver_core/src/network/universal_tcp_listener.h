@@ -1,12 +1,12 @@
-#ifndef __UNIVERSAL_TCP_LISTENER_H__
-#define __UNIVERSAL_TCP_LISTENER_H__
+#pragma once 
+
+#include <set>
 
 #include <network/http_connection_listener.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/http_mod_manager.h>
-
 
 class CloudConnectionManager;
 
@@ -27,6 +27,10 @@ public:
     void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
     nx_http::HttpModManager* httpModManager() const;
     virtual void applyModToRequest(nx_http::Request* request) override;
+
+    bool isAuthentificationRequired(nx_http::Request& request);
+    void enableUnauthorizedForwarding(const QString& path);
+
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         QSharedPointer<AbstractStreamSocket> clientSocket) override;
@@ -34,6 +38,7 @@ protected:
         bool sslNeeded,
         const SocketAddress& localAddress) override;
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket) override;
+
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
@@ -51,6 +56,7 @@ private:
     std::atomic<int> m_totalListeningSockets{1};
 #endif
 
+    std::set<QString> m_unauthorizedForwardingPaths;
 
     void onCloudBindingStatusChanged(
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
@@ -61,5 +67,3 @@ private:
         nx::network::MultipleServerSocket* multipleServerSocket,
         int ipVersion);
 };
-
-#endif  //__UNIVERSAL_TCP_LISTENER_H__

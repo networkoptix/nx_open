@@ -258,6 +258,7 @@ void QnServerUpdatesWidget::initDropdownActions()
         {
             setMode(Mode::LatestVersion);
             m_targetVersion = QnSoftwareVersion();
+            m_targetChangeset = QString();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_latestVersion);
 
@@ -279,6 +280,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             setMode(Mode::SpecificBuild);
             QnSoftwareVersion version = qnStaticCommon->engineVersion();
             m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
+            m_targetChangeset = dialog.changeset();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_targetVersion);
 
@@ -322,14 +324,14 @@ void QnServerUpdatesWidget::initDownloadActions()
         [this]()
         {
             QDesktopServices::openUrl(
-                m_updateTool->generateUpdatePackageUrl(m_targetVersion));
+                m_updateTool->generateUpdatePackageUrl(m_targetVersion, m_targetChangeset));
         });
 
     downloadLinkMenu->addAction(tr("Copy Link to Clipboard"),
         [this]()
         {
             qApp->clipboard()->setText(
-                m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+                m_updateTool->generateUpdatePackageUrl(m_targetVersion, m_targetChangeset).toString());
 
             ui->linkCopiedWidget->show();
             fadeWidget(ui->linkCopiedWidget, 1.0, 0.0, kLinkCopiedMessageTimeoutMs, 1.0,

@@ -1,19 +1,22 @@
 from __future__ import absolute_import
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
-from rest_framework.response import Response
-
+from django.views.decorators.http import require_http_methods
+from django.views import defaults
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import admin
+from django.http.response import HttpResponse, HttpResponseBadRequest, Http404
 
+import os
 from cloud import settings
+import json
+from .controllers import structure, generate_structure
 
 from .controllers.modify_db import *
 from .forms import *
+from .controllers import filldata
 
 from django.contrib.admin import AdminSite
 
@@ -60,7 +63,7 @@ def handle_get_view(request, context_id, language_code):
 
     form = CustomContextForm(initial={'language': language_id})
     if context:
-        form.add_fields(context, customization, language)
+        form.add_fields(context, customization, language, request.user)
 
     return context, form, language
 
@@ -71,6 +74,23 @@ def add_upload_error_messages(request, errors):
             request, "Upload error for {}. {}".format(error[0], error[1]))
 
 
+def advanced_touched_without_permission(request_data, customization, data_structures):
+    for ds_name in request_data:
+        data_structure = data_structures.filter(name=ds_name)
+        if data_structure.exists() and data_structure[0].advanced:
+            data_record = data_structure[0].datarecord_set.filter(customization=customization)
+
+            if data_record.exists():
+                db_record_value = data_record.latest('created_date').value
+            else:
+                db_record_value = data_structure.default
+
+            if request_data[ds_name] != db_record_value:
+                    return True
+
+    return False
+
+
 def handle_post_context_edit_view(request, context_id, language_id):
     context, language, form, customization, user = get_post_parameters(
         request, context_id, language_id)
@@ -78,7 +98,9 @@ def handle_post_context_edit_view(request, context_id, language_id):
     request_files = request.FILES
     preview_link = ""
     upload_errors = []
-
+    if not (user.is_superuser or user.has_perm('cms.edit_advanced'))\
+            and advanced_touched_without_permission(request_data, customization, context.datastructure_set.all()):
+        raise PermissionDenied
     if 'languageChanged' in request_data:
         if 'currentLanguage' in request_data \
            and request_data['currentLanguage']:
@@ -129,13 +151,13 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
         return None, None, None, None
 
-    form.add_fields(context, customization, language)
+    form.add_fields(context, customization, language, user)
 
     return context, form, language, preview_link
 
 
 # Create your views here.
-@api_view(["GET", "POST"])
+@require_http_methods(["GET", "POST"])
 @permission_required('cms.edit_content')
 def context_edit_view(request, context=None, language=None):
     if request.method == "GET":
@@ -174,11 +196,11 @@ def context_edit_view(request, context=None, language=None):
                        'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
 
-@api_view(["POST"])
+@require_http_methods(["POST"])
 @permission_required('cms.change_contentversion')
 def review_version_request(request, context=None, language=None):
     if "Preview" in request.data:
-        preview_link = "//" + request.get_host() + generate_preview()
+        preview_link = "//" + request.get_host() + generate_preview(send_to_review=True)
         return redirect(preview_link)
     elif "Publish" in request.data:
         if not request.user.has_perm('cms.publish_version'):
@@ -193,10 +215,10 @@ def review_version_request(request, context=None, language=None):
             messages.success(request._request, "Version " +
                              str(version.id) + " has been published")
         return redirect(reverse('review_version', args=[version.id]))
-    return Response("Invalid")
+    return defaults.bad_request("File does not exist")
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 @permission_required('cms.change_contentversion')
 def review_version_view(request, version_id=None):
     version = ContentVersion.objects.get(id=version_id)
@@ -210,3 +232,86 @@ def review_version_view(request, version_id=None):
                                                    'site_title': admin.site.site_title,
                                                    'title': 'Review a Version'
                                                    })
+
+
+def response_attachment(data, filename, content_type):
+    response = HttpResponse(data, content_type=content_type)
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+
+
+@require_http_methods(["GET", "POST"])
+@permission_required('cms.change_product')
+def product_settings(request, product_id):
+    product = Product.objects.get(pk=product_id)
+    form = None
+    if request.method == "POST":
+        form = ProductSettingsForm(request.POST, request.FILES)
+        if not form.is_valid():
+            form = None
+
+    if form:
+        action = form.cleaned_data['action']
+        generate_json = action == 'generate_json'
+        update_structure = action == 'update_structure'
+        update_content = action == 'generate_json'
+
+        file = request.FILES["file"]
+
+        if file.name.endswith('json'):
+            if not update_structure:
+                return HttpResponseBadRequest('json is acceptable only for Updating structure')
+            cms_structure = json.load(file)
+            structure.update_from_object(cms_structure)
+            messages.success(request._request, "Structure updated")
+        else:
+            if not file.name.endswith('zip'):
+                return HttpResponseBadRequest('zip archive is expected')
+            if generate_json:
+                data = generate_structure.from_zip(file, product.name)
+                content = json.dumps(data, ensure_ascii=False, indent=4, separators=(',', ': '))
+                return response_attachment(content, 'structure.json', 'application/json')
+            log_messages = structure.process_zip(file, request.user, update_structure, update_content)
+            for item in log_messages:
+                log_type = {
+                    'info': messages.INFO,
+                    'error': messages.ERROR,
+                    'debug': messages.DEBUG,
+                    'success': messages.SUCCESS,
+                    'warning': messages.WARNING,
+                }[item[0]]
+            messages.add_message(request._request, log_type, item[1])
+    else:
+        form = ProductSettingsForm()
+
+    return render(request, 'product_settings.html',
+                  {'product': product,
+                   'form': form,
+
+                   'user': request.user,
+                   'has_permission': mysite.has_permission(request),
+                   'site_url': mysite.site_url,
+                   'site_header': admin.site.site_header,
+                   'site_title': admin.site.site_title,
+                   'title': 'Settings for %s' % product.name})
+
+
+@require_http_methods(["GET"])
+def download_file(request, path):
+    language_code = request.GET['lang'] if 'lang' in request.GET else None
+    version_id = request.GET['version_id'] if 'version_id' in request.GET else None
+    preview = 'draft' in request.GET
+    file = filldata.read_customized_file(path, settings.CUSTOMIZATION, language_code, version_id, preview)
+    if file:
+        return response_attachment(file, os.path.basename(path), "application")
+    raise defaults.page_not_found("File does not exist")
+
+
+@require_http_methods(["GET"])
+def download_package(request, product_name, customization_name=None):
+    if not customization_name:
+        customization_name = settings.CUSTOMIZATION
+    version_id = request.GET['version_id'] if 'version_id' in request.GET else None
+    preview = 'draft' in request.GET
+    zipped_data = filldata.get_zip_package(customization_name, product_name, preview, version_id)
+    return response_attachment(zipped_data, product_name+".zip", "application/zip")

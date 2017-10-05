@@ -85,6 +85,11 @@ struct EventParameters
      */
     EventMetaData metadata;
 
+    // TODO: #GDM #vkutin #rvasilenko think about implementing something like std::variant here.
+    QnUuid analyticsEventId() const;
+    void setAnalyticsEventId(const QnUuid& id);
+    QnUuid analyticsDriverId() const;
+    void setAnalyticsDriverId(const QnUuid& id);
 
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;

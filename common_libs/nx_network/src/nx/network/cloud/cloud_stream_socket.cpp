@@ -304,22 +304,38 @@ void CloudStreamSocket::connectAsync(
 
 void CloudStreamSocket::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_socketDelegate)
+    {
         m_socketDelegate->readSomeAsync(buf, std::move(handler));
+    }
     else
-        m_readIoBinder.post(std::bind(handler, SystemError::notConnected, 0));
+    {
+        m_readIoBinder.post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::notConnected, 0);
+            });
+    }
 }
 
 void CloudStreamSocket::sendAsync(
     const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     if (m_socketDelegate)
+    {
         m_socketDelegate->sendAsync(buf, std::move(handler));
+    }
     else
-        m_writeIoBinder.post(std::bind(handler, SystemError::notConnected, 0));
+    {
+        m_writeIoBinder.post(
+            [handler = std::move(handler)]()
+            {
+                handler(SystemError::notConnected, 0);
+            });
+    }
 }
 
 void CloudStreamSocket::registerTimer(
@@ -367,7 +383,11 @@ QString CloudStreamSocket::idForToStringFromPtr() const
 
 QString CloudStreamSocket::getForeignHostName() const
 {
-    return m_cloudTunnelAttributes.remotePeerName;
+    if (!m_cloudTunnelAttributes.remotePeerName.isEmpty())
+        return m_cloudTunnelAttributes.remotePeerName;
+    if (m_socketDelegate)
+        return m_socketDelegate->getForeignHostName();
+    return QString();
 }
 
 void CloudStreamSocket::connectToEntriesAsync(
@@ -440,7 +460,14 @@ void CloudStreamSocket::onConnectDone(
         if (errorCode != SystemError::noError)
             connection.reset();
         if (cloudTunnelAttributes)
+        {
+            NX_VERBOSE(this, lm("Got connection to %1").arg(cloudTunnelAttributes->remotePeerName));
             m_cloudTunnelAttributes = std::move(*cloudTunnelAttributes);
+        }
+        else
+        {
+            NX_VERBOSE(this, lm("Got connection without tunnel attributes"));
+        }
     }
 
     if (errorCode == SystemError::noError)

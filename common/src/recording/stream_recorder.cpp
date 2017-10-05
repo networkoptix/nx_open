@@ -43,15 +43,40 @@ static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 static const int STORE_QUEUE_SIZE = 50;
 
-bool updateInFile(QIODevice* file, const QByteArray& source, const QByteArray& target)
+// 16Kb ought to be enough for anybody.
+static const int kMetadataSeekSizeBytes = 16 * 1024;
+
+bool updateInFile(QIODevice* file,
+    QnAviArchiveMetadata::Format fileFormat,
+    const QByteArray& source,
+    const QByteArray& target)
 {
     NX_ASSERT(file);
     NX_ASSERT(source.size() == target.size());
 
-    // 16Kb ought to be enough for anybody.
-    file->seek(0);
-    QByteArray data = file->read(1024 * 16);
-    int pos = data.indexOf(source);
+    auto pos = -1;
+    switch (fileFormat)
+    {
+        // Mp4 stores metadata at the end of file.
+        case QnAviArchiveMetadata::Format::mp4:
+        {
+            const auto offset = file->size() - kMetadataSeekSizeBytes;
+            file->seek(offset);
+            const auto data = file->read(kMetadataSeekSizeBytes);
+            pos = data.indexOf(source);
+            if (pos >= 0)
+                pos += offset;
+            break;
+        }
+        default:
+        {
+            file->seek(0);
+            const auto data = file->read(kMetadataSeekSizeBytes);
+            pos = data.indexOf(source);
+            break;
+        }
+    }
+
     if (pos < 0)
         return false;
 
@@ -162,10 +187,15 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     // Placeholder start for actual signature. Really QnSignHelper::signSize() bytes written.
     const auto placeholder = QnSignHelper::getSignMagic();
 
-    // Update old metadata.
-    const bool tagUpdated = updateInFile(file.data(), placeholder, QnSignHelper::getSignFromDigest(
-        getSignature()));
-    NX_ASSERT(tagUpdated, "SignVideo: signature tag was not updated");
+    // Update old metadata (except mp4).
+    if (context->fileFormat != QnAviArchiveMetadata::Format::mp4)
+    {
+        const bool tagUpdated = updateInFile(file.data(),
+            context->fileFormat,
+            placeholder,
+            QnSignHelper::getSignFromDigest(getSignature()));
+        NX_ASSERT(tagUpdated, "SignVideo: signature tag was not updated");
+    }
 
     // Update new metadata.
     auto& metadata = context->metadata;
@@ -179,7 +209,9 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     metadata.signature = QnSignHelper::makeSignature(signPattern);
 
     //New metadata is stored as json, so signature is written base64 - encoded.
-    const bool metadataUpdated = updateInFile(file.data(), signPlaceholder.toBase64(),
+    const bool metadataUpdated = updateInFile(file.data(),
+        context->fileFormat,
+        signPlaceholder.toBase64(),
         metadata.signature.toBase64());
     NX_ASSERT(metadataUpdated, "SignVideo: metadata tag was not updated");
 }
@@ -203,7 +235,7 @@ void QnStreamRecorder::close()
             if (m_needCalcSignature)
                 updateSignatureAttr(&m_recordingContextVector[i]);
 #endif
-            m_recordingContextVector[i].formatCtx->pb = 0;
+            m_recordingContextVector[i].formatCtx->pb = nullptr;
             avformat_close_input(&m_recordingContextVector[i].formatCtx);
         }
         m_recordingContextVector[i].formatCtx = 0;
@@ -695,12 +727,11 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         }
 #endif
 
-        auto fileFormat = QnAviArchiveMetadata::Format::custom;
         if (fileExt == lit("avi"))
-            fileFormat = QnAviArchiveMetadata::Format::avi;
+            context.fileFormat = QnAviArchiveMetadata::Format::avi;
         else if (fileExt == lit("mp4"))
-            fileFormat = QnAviArchiveMetadata::Format::mp4;
-        context.metadata.saveToFile(context.formatCtx, fileFormat);
+            context.fileFormat = QnAviArchiveMetadata::Format::mp4;
+        context.metadata.saveToFile(context.formatCtx, context.fileFormat);
 
         context.formatCtx->start_time = mediaData->timestamp;
 

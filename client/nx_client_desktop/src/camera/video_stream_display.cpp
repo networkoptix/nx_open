@@ -18,6 +18,7 @@
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
+#include <camera/video_decoder_factory.h>
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes

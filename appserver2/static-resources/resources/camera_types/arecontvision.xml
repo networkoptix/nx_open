@@ -162,11 +162,6 @@
             </params>
         </resource>     
         <resource name = "4656" public = "4655"/>
-        <resource name = "20365" public = "20185"> 
-            <params>
-                <param name = "VideoLayout" default_value = "width=2;height=2;sensors=0,1,2,3"/>                    
-            </params>
-        </resource>  		
         <resource name = "3325" public = "3556"/>
         <resource name = "3326" public = "3556"/>
         <resource name = "2325" public = "2195"/>
@@ -184,5 +179,25 @@
             </params>
         </resource>
         <resource name = "12376" public = "12375"/>
+        <resource name = "10355" public = "ArecontVision_Abstract,ArecontVision_H264">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "3658"/>
+                <param name = "MaxSensorHeight" default_value = "2746"/>
+                <param name = "MaxFPS" default_value = "7"/>
+            </params>
+        </resource>      
+        <resource name = "2355" public = "2555"/>
+        <resource name = "2356" public = "2555"/>     
+        <resource name = "5355" public = "ArecontVision_Abstract,ArecontVision_H264">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "2592"/>
+                <param name = "MaxSensorHeight" default_value = "1944"/>
+                <param name = "MaxFPS" default_value = "14"/>
+            </params>
+        </resource>   
+        <resource name = "3355" public = "3556"/>        
+        <resource name = "3356" public = "3556"/>     
+        <resource name = "1355" public = "1225"/>  
+        <resource name = "20375" public = "20365"/>        
     </oem>
 </resources>

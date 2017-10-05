@@ -66,6 +66,7 @@ void TargetPeerConnector::takeConnectionFromListeningPeerPool()
     using namespace std::placeholders;
 
     m_listeningPeerPool->takeIdleConnection(
+        nx::cloud::relay::model::ClientInfo(), //< TODO: #ak
         m_targetEndpoint.address.toString().toStdString(),
         std::bind(&TargetPeerConnector::processTakeConnectionResult, this, _1, _2));
 }
@@ -97,7 +98,10 @@ void TargetPeerConnector::initiateDirectConnection()
     m_targetPeerSocket = SocketFactory::createStreamSocket(false);
     m_targetPeerSocket->bindToAioThread(getAioThread());
 
-    if (!m_targetPeerSocket->setNonBlockingMode(true))
+    bool setSocketOptionsResult = m_targetPeerSocket->setNonBlockingMode(true);
+    if (setSocketOptionsResult && m_timeout)
+        setSocketOptionsResult = m_targetPeerSocket->setSendTimeout(*m_timeout);
+    if (!setSocketOptionsResult)
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_INFO(this, lm("Failed to set socket options. %1")

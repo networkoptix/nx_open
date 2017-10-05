@@ -36,6 +36,12 @@ void EventConnector::onNewResource(const QnResourcePtr& resource)
 
         connect(camera.data(), &QnSecurityCamResource::cameraInput,
             this, &EventConnector::at_cameraInput);
+
+        connect(camera.data(), &QnSecurityCamResource::analyticsEventStart,
+            this, &EventConnector::at_analyticsEventStart);
+
+        connect(camera.data(), &QnSecurityCamResource::analyticsEventEnd,
+            this, &EventConnector::at_analyticsEventEnd);
     }
 }
 
@@ -150,6 +156,48 @@ void EventConnector::at_cameraInput(const QnResourcePtr& resource,
     qnEventRuleProcessor->processEvent(event);
 }
 
+void EventConnector::at_analyticsEventStart(
+    const QnResourcePtr& resource,
+    const QString& caption,
+    const QString& description,
+    qint64 timestamp)
+{
+    auto secCam = resource.dynamicCast<QnSecurityCamResource>();
+    if (!secCam)
+        return;
+
+    nx::vms::event::EventMetaData metadata;
+    metadata.cameraRefs.push_back(secCam->getId());
+    at_customEvent(
+        secCam->getUserDefinedName(),
+        caption,
+        description,
+        metadata,
+        nx::vms::event::EventState::active,
+        timestamp);
+}
+
+void EventConnector::at_analyticsEventEnd(
+    const QnResourcePtr& resource,
+    const QString& caption,
+    const QString& description,
+    qint64 timestamp)
+{
+    auto secCam = resource.dynamicCast<QnSecurityCamResource>();
+    if (!secCam)
+        return;
+
+    nx::vms::event::EventMetaData metadata;
+    metadata.cameraRefs.push_back(secCam->getId());
+    at_customEvent(
+        secCam->getUserDefinedName(),
+        caption,
+        description,
+        metadata,
+        nx::vms::event::EventState::inactive,
+        timestamp);
+}
+
 void EventConnector::at_softwareTrigger(const QnResourcePtr& resource,
     const QString& triggerId, const QnUuid& userId, qint64 timeStamp,
     vms::event::EventState toggleState)
@@ -159,6 +207,23 @@ void EventConnector::at_softwareTrigger(const QnResourcePtr& resource,
 
     vms::event::SoftwareTriggerEventPtr event(new vms::event::SoftwareTriggerEvent(
         resource->toSharedPointer(), triggerId, userId, timeStamp, toggleState));
+
+    qnEventRuleProcessor->processEvent(event);
+}
+
+void EventConnector::at_analyticsSdkEvent(const QnResourcePtr& resource,
+    const QnUuid& driverId,
+    const QnUuid& eventId,
+    vms::event::EventState toggleState,
+    const QString& caption,
+    const QString& description,
+    qint64 timeStampUsec)
+{
+    if (!resource)
+        return;
+
+    vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
+        resource->toSharedPointer(), driverId, eventId, toggleState, caption, description, timeStampUsec));
 
     qnEventRuleProcessor->processEvent(event);
 }
@@ -424,6 +489,16 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
             at_archiveBackupFinished(resource, params.eventTimestampUsec,
                 params.reasonCode, params.description);
+            return true;
+        }
+
+        case vms::event::analyticsSdkEvent:
+        {
+            if (!check(resource, lit("'AnalyticsSdkEvent' requires 'resource' parameter")))
+                return false;
+
+            at_analyticsSdkEvent(resource, params.analyticsDriverId(), params.analyticsEventId(),
+                eventState, params.caption, params.description, params.eventTimestampUsec);
             return true;
         }
 

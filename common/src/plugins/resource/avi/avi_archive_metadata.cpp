@@ -211,63 +211,51 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
     return result;
 }
 
-void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
+bool QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
 {
-    int flags = 0;
+    bool isSuccessful = true;
 
-    av_dict_set(
-        &context->metadata,
-        getTagName(CustomTag, format),
-        QJson::serialized<QnAviArchiveMetadata>(*this),
-        flags);
+    auto setValueLogged =
+        [this, &isSuccessful, context, format](Tag tag, const QByteArray& value)
+        {
+            static const int kFlags = 0; //< No additional flags are needed.
+            const int errCode = av_dict_set(&context->metadata,
+                getTagName(tag, format),
+                value,
+                kFlags);
+
+            if (errCode >= 0)
+                return;
+
+            isSuccessful = false;
+            NX_VERBOSE(this, lm("Error writing metadata %1: %2").args(getTagName(tag, format),
+                errCode));
+        };
+
+    setValueLogged(CustomTag, QJson::serialized<QnAviArchiveMetadata>(*this));
 
     // Other tags are not supported in mp4 format.
-    if (format == QnAviArchiveMetadata::Format::mp4)
-        return;
-
-    // Keep old format for compatibility with old clients.
+    if (format == Format::mp4)
+        return isSuccessful;
 
     if (!videoLayoutSize.isEmpty())
     {
-        const QString layoutStr = serializeLayout(*this);
-        av_dict_set(
-            &context->metadata,
-            getTagName(LayoutInfoTag, format),
-            layoutStr.toLatin1().data(),
-            flags);
+        // Keep old format for compatibility with old clients.
+        const auto layoutStr = serializeLayout(*this);
+        setValueLogged(LayoutInfoTag, layoutStr.toLatin1());
     }
 
     if (startTimeMs > 0)
-    {
-        av_dict_set(
-            &context->metadata,
-            getTagName(StartTimeTag, format),
-            QString::number(startTimeMs).toLatin1().data(),
-            flags);
-    }
+        setValueLogged(StartTimeTag, QString::number(startTimeMs).toLatin1());
 
-    av_dict_set(
-        &context->metadata,
-        getTagName(SoftwareTag, format),
-        "Network Optix",
-        flags);
+    setValueLogged(SoftwareTag, "Network Optix");
 
+    // Dewarping exists in resource and is not activated now. Allow dewarping for saved file.
     if (dewarpingParams.enabled)
-    {
-        // Dewarping exists in resource and is not activated now. Allow dewarping for saved file.
-        av_dict_set(
-            &context->metadata,
-            getTagName(DewarpingTag, format),
-            QJson::serialized<QnMediaDewarpingParams>(dewarpingParams),
-            flags);
-    }
+        setValueLogged(DewarpingTag, QJson::serialized<QnMediaDewarpingParams>(dewarpingParams));
 
     if (!signature.isEmpty())
-    {
-        av_dict_set(
-            &context->metadata,
-            getTagName(SignatureTag, format),
-            signature.data(),
-            flags);
-    }
+        setValueLogged(SignatureTag, signature);
+
+    return isSuccessful;
 }

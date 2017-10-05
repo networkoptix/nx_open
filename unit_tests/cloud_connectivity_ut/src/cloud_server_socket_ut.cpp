@@ -168,6 +168,11 @@ struct FakeTcpTunnelAcceptor:
         m_ioThreadSocket->pleaseStop(std::move(handler));
     }
 
+    virtual std::string toString() const override
+    {
+        return "FakeTcpTunnelAcceptor";
+    }
+
     aio::AbstractAioThread* m_designatedAioThread;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     network::test::AddressBinder::Manager m_addressManager;

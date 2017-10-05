@@ -147,6 +147,12 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     m_controlConnectionClosedHandler = std::move(handler);
 }
 
+std::string OutgoingTunnelConnection::toString() const
+{
+    return lm("UDP hole punching from %1 to %2")
+        .args(m_localPunchedAddress, m_remoteHostAddress).toStdString();
+}
+
 void OutgoingTunnelConnection::proceedWithConnection(
     UdtStreamSocket* connectionPtr,
     std::chrono::milliseconds timeout)

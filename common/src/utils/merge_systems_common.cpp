@@ -3,6 +3,8 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/network/app_info.h>
+#include <network/connection_validator.h>
+#include <network/system_helpers.h>
 
 #include <utils/common/app_info.h>
 
@@ -34,6 +36,10 @@ class ErrorStrings
 public:
     static QString getErrorMessage(Value value, const QnModuleInformation& moduleInformation)
     {
+        const auto systemName = helpers::isNewSystem(moduleInformation)
+            ? L'"' + tr("New System") + L'"'
+            : moduleInformation.systemName;
+
         switch (value)
         {
             case ok:
@@ -41,9 +47,18 @@ public:
             case notFound:
                 return tr("System was not found.");
             case incompatibleVersion:
+            {
+                //TODO: #GDM Why do we have two separate mechanisms of connection validation?
+                const auto status = QnConnectionValidator::validateConnection(moduleInformation);
+                if (status == Qn::IncompatibleInternalConnectionResult)
+                    return tr("The discovered System %1 is incompatible with the current System.",
+                        "%1 is name of System")
+                        .arg(systemName);
+
                 return tr("The discovered System %1 has an incompatible version %2.",
                     "%1 is name of System, %2 is version information")
-                    .arg(moduleInformation.systemName).arg(moduleInformation.version.toString());
+                    .arg(systemName).arg(moduleInformation.version.toString());
+            }
             case unauthorized:
                 return tr("The password or user name is invalid.");
             case forbidden:
@@ -63,11 +78,11 @@ public:
             case safeMode:
                 return tr("The discovered System %1 is in safe mode.",
                     "%1 is name of System")
-                    .arg(moduleInformation.systemName);
+                    .arg(systemName);
             case configurationFailed:
                 return tr("Could not configure the remote System %1.",
                     "%1 is name of System")
-                    .arg(moduleInformation.systemName);
+                    .arg(systemName);
             case dependentSystemBoundToCloud:
                 return tr("Cloud System can only be merged with non-Cloud. "
                     "System name and password are taken from Cloud System.",

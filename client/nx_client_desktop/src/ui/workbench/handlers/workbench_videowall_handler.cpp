@@ -1,14 +1,11 @@
 #include "workbench_videowall_handler.h"
 
-#include <QtCore/QProcess>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 
 #include <boost/preprocessor/stringize.hpp>
@@ -22,12 +19,10 @@
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-#include <client/client_app_info.h>
 #include <client/client_installations_manager.h>
 #include <client/client_startup_parameters.h>
 
 #include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -35,14 +30,9 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_type.h>
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -83,9 +73,6 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
-#include <ui/help/help_topics.h>
-#include <ui/help/help_topic_accessor.h>
-
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 
@@ -102,6 +89,7 @@
 #include <utils/common/uuid_pool.h>
 #include <nx/utils/counter.h>
 #include <utils/unity_launcher_workaround.h>
+#include <utils/common/delayed.h>
 
 #include <nx/vms/utils/platform/autorun.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
@@ -1864,8 +1852,14 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     menu()->trigger(action::OpenInNewTabAction, layout);
 
-    // new layout should not be marked as changed
-    saveVideowallAndReviewLayout(videoWall, layout);
+    // New layout should not be marked as changed, make sure it will be done after layout opening.
+    executeDelayedParented(
+        [this, videoWall, layout]
+        {
+            saveVideowallAndReviewLayout(videoWall, layout);
+        },
+        kDefaultDelay,
+        this);
 }
 
 void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered()

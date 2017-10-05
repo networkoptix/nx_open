@@ -25,6 +25,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class AccountTemporaryCredentials:
     public CdbFunctionalTest
@@ -279,5 +280,6 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
     assertTemporaryCredentialsAreLowCase();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

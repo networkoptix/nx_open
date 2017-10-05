@@ -82,7 +82,7 @@ public:
         const std::string& systemId,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
     /**
-     * NOTE: If authRequest.realm value is unknown to CDB, request will fail
+     * NOTE: If authRequest.realm value is unknown to CDB, request will fail.
      */
     virtual void getAuthenticationResponse(
         const api::AuthRequest& authRequest,

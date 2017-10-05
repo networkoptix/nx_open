@@ -36,8 +36,9 @@ class Metadata(object):
 
     @classmethod
     def from_file(cls, file_path):
+        assert os.stat(file_path).st_size != 0, 'Server returned empty media stream'
         cap = cv2.VideoCapture(file_path)
-        assert cap.isOpened(), 'Media stream saved to %r is invalid' % file_path
+        assert cap.isOpened(), 'Media stream returned from server is invalid (saved to %r)' % file_path
         try:
             metadata = cls(cap)
             metadata.log_properties(file_path)

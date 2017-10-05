@@ -316,17 +316,24 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (m_catalog == QnServer::HiQualityCatalog) {
-            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled()) {
-                liveProvider->setFps(m_currentScheduleTask.getFps());
-                liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
+        if (m_catalog == QnServer::HiQualityCatalog) 
+        {
+            QnLiveStreamParams params;
+            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled())
+            {
+                params.fps = m_currentScheduleTask.getFps();
+                params.quality = m_currentScheduleTask.getStreamQuality();
+                params.bitrateKbps = m_currentScheduleTask.getBitrateKbps();
             }
             else {
                 NX_ASSERT(camera);
-                liveProvider->setFps(camera->getMaxFps());
-                liveProvider->setQuality(Qn::QualityHighest);
+
+                params.fps = camera->getMaxFps();
+                params.quality = Qn::QualityHighest;
+                params.bitrateKbps = 0;
             }
-            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
+            params.secondaryQuality = (camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
+            liveProvider->setParams(params);
         }
         liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
     }
@@ -589,7 +596,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(QnUuid(), 1, 0, 0, Qn::RT_Never, 0, 0);
+    QnScheduleTask noRecordTask;
 
     if (!m_schedule.isEmpty())
     {

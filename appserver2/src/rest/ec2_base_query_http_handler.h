@@ -2,7 +2,6 @@
 
 #include <QtCore/QByteArray>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
 #include <rest/server/request_handler.h>
@@ -61,28 +60,8 @@ public:
             {
                 if (_errorCode == ErrorCode::ok)
                 {
-                    if(format == Qn::UbjsonFormat)
-                    {
-                        result = QnUbjson::serialized(outputData);
-                    }
-                    else if (format == Qn::JsonFormat)
-                    {
-                        result = QJson::serialized(outputData);
-                        if (params.contains("extraFormatting"))
-                            result  = formatJSonString(result);
-                    }
-                    else if (format == Qn::CsvFormat)
-                    {
-                        result = QnCsv::serialized(outputData);
-                    }
-                    else if (format == Qn::XmlFormat)
-                    {
-                        result = QnXml::serialized(outputData, lit("reply"));
-                    }
-                    else
-                    {
-                        NX_ASSERT(false);
-                    }
+                    result = Qn::serialized(
+                        outputData, format, params.contains("extraFormatting"));
                 }
                 errorCode = _errorCode;
                 contentType = Qn::serializationFormatToHttpContentType(format);

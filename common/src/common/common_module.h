@@ -13,9 +13,10 @@
 #include <utils/common/instance_storage.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include "network/module_information.h"
-#include "nx_ec/data/api_runtime_data.h"
+#include <network/module_information.h>
+#include <nx_ec/data/api_runtime_data.h>
 #include <utils/common/value_cache.h>
+#include <plugins/native_sdk/common_plugin_container.h>
 
 class QSettings;
 class QnSessionManager;
@@ -37,6 +38,15 @@ namespace nx { namespace vms { namespace event { class RuleManager; }}}
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
+
+namespace nx {
+namespace analytics {
+
+class DetectionPluginFactory;
+class MetadataPluginFactory;
+
+} // namespace analytics
+} // namespace nx
 
 struct BeforeRestoreDbData
 {
@@ -167,6 +177,16 @@ public:
     nx::vms::event::RuleManager* eventRuleManager() const
     {
         return m_eventRuleManager;
+    }
+
+    nx::analytics::DetectionPluginFactory* detectionPluginFactory() const
+    {
+        return m_detectionPluginFactory;
+    }
+
+    nx::analytics::MetadataPluginFactory* metadataPluginFactory() const
+    {
+        return m_metadataPluginFactory;
     }
 
     QnLicensePool* licensePool() const;
@@ -305,6 +325,10 @@ private:
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
     QnLayoutTourManager* m_layoutTourManager = nullptr;
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
+
+    // TODO: #dmishin move these factories to server module
+    nx::analytics::DetectionPluginFactory* m_detectionPluginFactory = nullptr;
+    nx::analytics::MetadataPluginFactory* m_metadataPluginFactory = nullptr;
 
     QnUuid m_videowallGuid;
 };

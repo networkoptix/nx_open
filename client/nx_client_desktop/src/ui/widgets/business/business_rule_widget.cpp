@@ -454,6 +454,8 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(this));
     else if (eventType == vms::event::cameraInputEvent)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(this));
+    else if (eventType == vms::event::analyticsSdkEvent)
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAnalyticsPolicy>(this));
     dialog.setSelectedResources(m_model->eventResources());
 
     if (dialog.exec() != QDialog::Accepted)

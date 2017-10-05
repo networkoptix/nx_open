@@ -39,6 +39,7 @@ SERVER_VOX_PATH=$SERVER_BIN_PATH/vox
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
+BUILD_INFO_TXT=${libdir}/build_info.txt
 
 # Prepare stage dir
 rm -rf $STAGE
@@ -50,6 +51,9 @@ mkdir -p $SHARESTAGE
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 mkdir -p $SYSTEMDSTAGE
+
+# Copy build_info.txt
+cp -r $BUILD_INFO_TXT $BINSTAGE/../
 
 # Copy dbsync 2.2
 if [ '${arch}' != 'arm' ]

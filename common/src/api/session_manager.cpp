@@ -200,7 +200,9 @@ nx::utils::Url QnSessionManager::createApiUrl(const nx::utils::Url& baseUrl, con
     for (int i = 0; i < params.count(); i++)
     {
         QPair<QString, QString> param = params[i];
-        urlQuery.addQueryItem(param.first, param.second);
+        urlQuery.addQueryItem(
+            QString::fromUtf8(QUrl::toPercentEncoding(param.first)),
+            QString::fromUtf8(QUrl::toPercentEncoding(param.second)));
     }
     url.setQuery(urlQuery);
     return url;

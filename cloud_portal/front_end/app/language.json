@@ -1,19 +1,19 @@
 {
   "language_name": "LANGUAGE_NAME",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Cancel",
-    "loginTitle": "Log in to {{PRODUCT_NAME}}",
+    "loginTitle": "Log in to %PRODUCT_NAME%",
     "loginButton":"Log in",
     "logoutAuthorisedTitle": "You are already logged in",
     "logoutAuthorisedContinueButton": "Continue",
     "logoutAuthorisedLogoutButton": "Log Out"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Welcome to",
     "register": "Create account in",
     "changePassword": "Change password -",
@@ -31,8 +31,8 @@
     "view": "View cameras - ",
     "debug": "Debug",
     "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} for ",
+    "download": "Download %VMS_NAME%",
+    "downloadPlatform": "Download %VMS_NAME% for ",
     "pageNotFound": "Page not found"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "description": "Use the %PRODUCT_NAME% Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Custom",
-      "description": "Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "description": "Use the %PRODUCT_NAME% Client application to set up custom permissions"
     }
   },
   "errorCodes": {
@@ -132,7 +132,7 @@
     "passwordMismatch": "Wrong password",
     "cantEditYourself": "Changing own permissions is not allowed",
     "cantEditAdmin": "This user has administrator permissions",
-    "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
+    "cantOpenClient": "%VMS_NAME% application is not detected. <a href=\"/download\">Download</a>",
     "lostConnection": "Connection to {{systemName}} lost",
     "thisSystem": "the system"
   },
@@ -156,11 +156,11 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "System is unreachable",
     "offline": "System is offline",
-    "openClient": "Open in {{VMS_NAME}}",
+    "openClient": "Open in %VMS_NAME%",
     "confirmRenameTitle": "System name",
     "confirmRenameAction": "Save",
     "successRename": "System name saved",
-    "confirmDisconnectTitle": "Disconnect System from {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Disconnect System from %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Disconnect",
     "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
     "confirmUnshareFromMeTitle": "Disconnect System?",
@@ -168,26 +168,27 @@
     "confirmUnshare": "This user will not be able to access System. Are you sure?",
     "confirmUnshareTitle": "Delete user?",
     "confirmUnshareAction": "Delete",
-    "successDisconnected": "System is successfully disconnected from {{PRODUCT_NAME}}",
+    "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
     "permissionsRemoved": "Permissions were removed from {{email}}"
   },
   "account": {
       "accountSavedSuccess": "Your account is successfully saved",
+      "activationLinkSent": "Activation Link Sent",
       "passwordChangedSuccess": "Your account is successfully saved",
       "changePassword": "Change Password",
       "newPasswordLabel":"New password",
       "saveChanges":"Save"
   },
   "downloads": {
-    "noClientDetectedTitle": "Install {{VMS_NAME}} to view your System",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Install %VMS_NAME% to view your System",
+    "action": "Download %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link":"{{ANDROID_APP_LINK}}"
+        "link":"%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -220,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm": "Send",
+    "sendConfirm": "Resend activation link",
     "resetPassword": "Reset Password",
     "setNewPassword": "Save password",
     "setNewPasswordLabel": "New password"

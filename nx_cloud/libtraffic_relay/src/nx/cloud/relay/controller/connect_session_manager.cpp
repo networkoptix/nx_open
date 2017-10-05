@@ -69,22 +69,20 @@ void ConnectSessionManager::createClientSession(
     {
         response.sessionId = m_clientSessionPool->addSession(request.desiredSessionId, peerName);
         completionHandler(api::ResultCode::ok, std::move(response));
-
         return;
     }
 
     m_remoteRelayPeerPool->findRelayByDomain(request.targetPeerName)
         .then(
             [completionHandler = std::move(completionHandler), response = std::move(response),
-            request, this](
-                cf::future<std::string> findRelayFuture) mutable
+                request, this](
+                    cf::future<std::string> findRelayFuture) mutable
             {
                 auto redirectEndpointString = findRelayFuture.get();
                 if (redirectEndpointString.empty())
                 {
                     NX_VERBOSE(this, lm("Session %1. Listening peer %2 was not found")
-                        .arg(request.desiredSessionId)
-                        .arg(request.targetPeerName));
+                        .arg(request.desiredSessionId).arg(request.targetPeerName));
                     completionHandler(api::ResultCode::notFound, std::move(response));
 
                     return cf::unit();
@@ -94,21 +92,20 @@ void ConnectSessionManager::createClientSession(
                 ss << "http://" << redirectEndpointString << "/relay/server/"
                     << request.targetPeerName << "/client_sessions/";
 
-                response.redirectUrl = ss.str();
+                response.actualRelayUrl = ss.str();
                 NX_VERBOSE(this, lm("Session %1. Redirect relay %2 found for peer %3")
                     .arg(request.desiredSessionId)
-                    .arg(response.redirectUrl)
+                    .arg(response.actualRelayUrl)
                     .arg(request.targetPeerName));
 
                 completionHandler(api::ResultCode::needRedirect, std::move(response));
 
                 return cf::unit();
-
             });
 }
 
 void ConnectSessionManager::connectToPeer(
-    const api::ConnectToPeerRequest& request,
+    const ConnectToPeerRequestEx& request,
     ConnectToPeerHandler completionHandler)
 {
     using namespace std::placeholders;
@@ -124,7 +121,13 @@ void ConnectSessionManager::connectToPeer(
             nx_http::ConnectionEvents());
     }
 
+    model::ClientInfo clientInfo;
+    clientInfo.relaySessionId = request.sessionId;
+    clientInfo.endpoint = request.clientEndpoint;
+    // clientInfo.peerName = ...; TODO: #ak
+
     m_listeningPeerPool->takeIdleConnection(
+        clientInfo,
         peerName,
         [this, clientSessionId = request.sessionId, peerName,
             scopedCallGuard = m_apiCallCounter.getScopedIncrement(),
@@ -193,52 +196,8 @@ void ConnectSessionManager::startRelaying(
     relaySessionIter->listeningPeerConnection = std::move(listeningPeerConnection);
     relaySessionIter->listeningPeerName = listeningPeerName;
 
-    sendOpenTunnelNotification(relaySessionIter);
-}
-
-void ConnectSessionManager::sendOpenTunnelNotification(
-    std::list<RelaySession>::iterator relaySessionIter)
-{
-    using namespace std::placeholders;
-
-    api::OpenTunnelNotification notification;
-    notification.setClientEndpoint(relaySessionIter->clientConnection->getForeignAddress());
-    notification.setClientPeerName(relaySessionIter->clientPeerName.c_str());
-    relaySessionIter->openTunnelNotificationBuffer = notification.toHttpMessage().toString();
-
-    relaySessionIter->listeningPeerConnection->sendAsync(
-        relaySessionIter->openTunnelNotificationBuffer,
-        std::bind(&ConnectSessionManager::onOpenTunnelNotificationSent, this,
-            _1, _2, relaySessionIter));
-}
-
-void ConnectSessionManager::onOpenTunnelNotificationSent(
-    SystemError::ErrorCode sysErrorCode,
-    std::size_t /*bytesSent*/,
-    std::list<RelaySession>::iterator relaySessionIter)
-{
-    RelaySession relaySession;
-
-    // TODO: #ak Make lock shorter. Handle cancellation problem:
-    // element from m_relaySessions is removed and destructor does not wait for this session completion.
-    QnMutexLocker lock(&m_mutex);
-
-    if (m_terminated)
-        return;
-
-    relaySession = std::move(*relaySessionIter);
+    auto relaySession = std::move(*relaySessionIter);
     m_relaySessions.erase(relaySessionIter);
-
-    if (sysErrorCode != SystemError::noError)
-    {
-        NX_LOGX(lm("Session %1. Failed to send open tunnel notification to %2 (%3). %4")
-            .arg(relaySession.id).arg(relaySession.listeningPeerName)
-            .arg(relaySession.listeningPeerConnection->getForeignAddress())
-            .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
-        return;
-    }
-
-    relaySession.listeningPeerConnection->cancelIOSync(network::aio::etNone);
     startRelaying(std::move(relaySession));
 }
 

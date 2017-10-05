@@ -3,7 +3,13 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/relay_connector.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
+#include <nx/network/http/test_http_server.h>
+#include <nx/network/http/rest/http_rest_client.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include "api/relay_api_client_stub.h"
 #include "cloud_relay_basic_fixture.h"
@@ -34,6 +40,24 @@ public:
     }
 
 protected:
+    struct Result
+    {
+        nx::hpm::api::NatTraversalResultCode resultCode;
+        SystemError::ErrorCode sysErrorCode;
+        std::unique_ptr<AbstractOutgoingTunnelConnection> connection;
+
+        Result(
+            nx::hpm::api::NatTraversalResultCode resultCode,
+            SystemError::ErrorCode sysErrorCode,
+            std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+            :
+            resultCode(resultCode),
+            sysErrorCode(sysErrorCode),
+            connection(std::move(connection))
+        {
+        }
+    };
+
     void givenHappyRelay()
     {
         m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
@@ -92,27 +116,27 @@ protected:
 
     void assertConnectorProvidedAConnection()
     {
-        auto connectResult = m_connectFinished.get_future().get();
-        ASSERT_EQ(hpm::api::NatTraversalResultCode::ok, connectResult.resultCode);
-        ASSERT_EQ(SystemError::noError, connectResult.sysErrorCode);
-        ASSERT_NE(nullptr, connectResult.connection);
+        m_prevConnectorResult = m_connectFinished.get_future().get();
+        ASSERT_EQ(hpm::api::NatTraversalResultCode::ok, m_prevConnectorResult->resultCode);
+        ASSERT_EQ(SystemError::noError, m_prevConnectorResult->sysErrorCode);
+        ASSERT_NE(nullptr, m_prevConnectorResult->connection);
     }
 
     void assertConnectorReportedError()
     {
-        auto connectResult = m_connectFinished.get_future().get();
-        ASSERT_NE(hpm::api::NatTraversalResultCode::ok, connectResult.resultCode);
-        ASSERT_EQ(nullptr, connectResult.connection);
+        m_prevConnectorResult = m_connectFinished.get_future().get();
+        ASSERT_NE(hpm::api::NatTraversalResultCode::ok, m_prevConnectorResult->resultCode);
+        ASSERT_EQ(nullptr, m_prevConnectorResult->connection);
     }
 
     void assertTimedOutHasBeenReported()
     {
-        auto connectResult = m_connectFinished.get_future().get();
+        m_prevConnectorResult = m_connectFinished.get_future().get();
         ASSERT_EQ(
             hpm::api::NatTraversalResultCode::errorConnectingToRelay,
-            connectResult.resultCode);
-        ASSERT_EQ(SystemError::timedOut, connectResult.sysErrorCode);
-        ASSERT_EQ(nullptr, connectResult.connection);
+            m_prevConnectorResult->resultCode);
+        ASSERT_EQ(SystemError::timedOut, m_prevConnectorResult->sysErrorCode);
+        ASSERT_EQ(nullptr, m_prevConnectorResult->connection);
     }
 
     void assertRequestToRelayServerHasBeenCancelled()
@@ -128,30 +152,30 @@ protected:
         std::this_thread::sleep_for(kTimeout * 7);
     }
 
-private:
-    struct Result
+    void createRelayConnector(
+        QUrl relayUrl,
+        nx::String targetHostAddress,
+        nx::String connectSessionId)
     {
-        nx::hpm::api::NatTraversalResultCode resultCode;
-        SystemError::ErrorCode sysErrorCode;
-        std::unique_ptr<AbstractOutgoingTunnelConnection> connection;
+        m_connector = std::make_unique<relay::Connector>(
+            relayUrl,
+            nx::network::cloud::AddressEntry(
+                AddressType::cloud, targetHostAddress.constData()),
+            connectSessionId);
+    }
 
-        Result(
-            nx::hpm::api::NatTraversalResultCode resultCode,
-            SystemError::ErrorCode sysErrorCode,
-            std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
-            :
-            resultCode(resultCode),
-            sysErrorCode(sysErrorCode),
-            connection(std::move(connection))
-        {
-        }
-    };
+    const Result& prevConnectorResult()
+    {
+        return *m_prevConnectorResult;
+    }
 
+private:
     std::unique_ptr<relay::Connector> m_connector;
     nx::utils::promise<Result> m_connectFinished;
     QUrl m_relayUrl;
     std::atomic<nx::cloud::relay::api::test::ClientImpl*>
         m_prevClientToRelayConnectionInstanciated;
+    boost::optional<Result> m_prevConnectorResult;
 
     virtual void onClientToRelayConnectionInstanciated(
         nx::cloud::relay::api::test::ClientImpl* connection) override
@@ -206,6 +230,121 @@ TEST_F(RelayConnector, stops_internal_timer_when_reporting_result)
     whenConnectorIsInvokedWithTimeout();
     waitForAnyResponseReported();
     assertConnectorTimeoutIsNotReported();
+}
+
+//-------------------------------------------------------------------------------------------------
+// Test cases.
+
+static const char* const kRelaySessionId = "session1";
+static const char* const kServerId = "server1.system1";
+static const char* const kRelayApiPrefix = "/RelayConnectorRedirectTest";
+
+class RelayConnectorRedirect:
+    public RelayConnector
+{
+public:
+    RelayConnectorRedirect()
+    {
+        resetClientFactoryToDefault();
+    }
+
+protected:
+    void whenCreateConnectSessionThatIsRedirectedToAnotherRelayInstance()
+    {
+        createRelayConnector(
+            nx::network::url::Builder().setScheme("http")
+                .setEndpoint(m_redirectingRelay.serverAddress()).toUrl(),
+            kServerId,
+            kRelaySessionId);
+
+        whenConnectorIsInvoked();
+        assertConnectorProvidedAConnection();
+    }
+
+    void thenProperUrlIsSpecifiedToTunnelConnection()
+    {
+        using namespace std::placeholders;
+
+        prevConnectorResult().connection->establishNewConnection(
+            std::chrono::seconds::zero(),
+            SocketAttributes(),
+            std::bind(&RelayConnectorRedirect::saveConnectionResult, this, _1, _2, _3));
+
+        ASSERT_EQ(SystemError::noError, m_connectResults.pop().systemErrorCode);
+        m_connectionsUpgradedByRealRelay.pop();
+    }
+
+private:
+    struct ConnectResult
+    {
+        SystemError::ErrorCode systemErrorCode;
+        std::unique_ptr<AbstractStreamSocket> connection;
+        bool stillValid;
+    };
+
+    TestHttpServer m_redirectingRelay;
+    TestHttpServer m_realRelay;
+    nx::utils::SyncQueue<ConnectResult> m_connectResults;
+    nx::utils::SyncQueue<int /*dummy*/> m_connectionsUpgradedByRealRelay;
+
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        const auto createClientSessionPath = 
+            nx_http::rest::substituteParameters(
+                nx::cloud::relay::api::kServerClientSessionsPath, {kServerId});
+
+        m_realRelay.registerStaticProcessor(
+            nx::network::url::normalizePath(
+                kRelayApiPrefix + nx::String("/") +
+                createClientSessionPath),
+            QByteArray("{ \"sessionId\": \"") + kRelaySessionId + 
+                QByteArray("\", \"sessionTimeout\": \"100\" }"),
+            "application/json");
+
+        m_realRelay.registerRequestProcessorFunc(
+            nx::network::url::normalizePath(
+                kRelayApiPrefix + nx::String("/") + 
+                nx_http::rest::substituteParameters(
+                    nx::cloud::relay::api::kClientSessionConnectionsPath, {kRelaySessionId})),
+            std::bind(&RelayConnectorRedirect::upgradeConnection, this, _1, _2, _3, _4, _5));
+
+        ASSERT_TRUE(m_realRelay.bindAndListen());
+
+        m_redirectingRelay.registerRedirectHandler(
+            createClientSessionPath.c_str(),
+            nx::network::url::Builder().setScheme("http")
+                .setEndpoint(m_realRelay.serverAddress())
+                .setPath(QString::fromStdString(kRelayApiPrefix + createClientSessionPath)));
+
+        ASSERT_TRUE(m_redirectingRelay.bindAndListen());
+    }
+
+    void saveConnectionResult(
+        SystemError::ErrorCode systemErrorCode,
+        std::unique_ptr<AbstractStreamSocket> connection,
+        bool stillValid)
+    {
+        m_connectResults.push({systemErrorCode, std::move(connection), stillValid});
+    }
+
+    void upgradeConnection(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        completionHandler(nx_http::StatusCode::switchingProtocols);
+        m_connectionsUpgradedByRealRelay.push(0);
+    }
+};
+
+TEST_F(RelayConnectorRedirect, handles_redirect_properly)
+{
+    whenCreateConnectSessionThatIsRedirectedToAnotherRelayInstance();
+    thenProperUrlIsSpecifiedToTunnelConnection();
 }
 
 } // namespace test

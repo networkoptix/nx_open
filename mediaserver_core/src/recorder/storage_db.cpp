@@ -224,6 +224,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
     mediaFileOp.setCameraId(cameraId);
     mediaFileOp.setCatalog(catalog);
     mediaFileOp.setDuration(chunk.durationMs);
+    mediaFileOp.setFileTypeIndex(chunk.fileIndex);
     mediaFileOp.setFileSize(chunk.getFileSize());
     mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
     mediaFileOp.setStartTime(chunk.startTimeMs);
@@ -482,6 +483,7 @@ bool QnStorageDb::vacuumInternal()
                                        QnServer::ChunksCatalog::HiQualityCatalog);
                 mediaFileOp.setDuration(chunkIt->durationMs);
                 mediaFileOp.setFileSize(chunkIt->getFileSize());
+                mediaFileOp.setFileTypeIndex(chunkIt->fileIndex);
                 mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
                 mediaFileOp.setStartTime(chunkIt->startTimeMs);
                 mediaFileOp.setTimeZone(chunkIt->timeZone);
@@ -629,7 +631,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
 
     DeviceFileCatalog::Chunk newChunk(
         DeviceFileCatalog::Chunk(mediaFileOp.getStartTime(), m_storageIndex,
-                                 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
+                                 mediaFileOp.getFileTypeIndex(),
                                  mediaFileOp.getDuration(), mediaFileOp.getTimeZone(),
                                  (quint16)(mediaFileOp.getFileSize() >> 32),
                                  (quint32)mediaFileOp.getFileSize()));

@@ -1,7 +1,7 @@
 {
   "language_name":"ภาษาไทย",
   "dialogs":{
-    "okButton":"Ok",
+    "okButton":"ตกลง",
     "openLink":"Visit this link",
     "openLinkWithTitle":"To {{title}} visit this link"
   },
@@ -41,7 +41,11 @@
     "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
     "confirmDisconnectFromCloudAction":"Disconnect",
-    "disconnectedSuccess":"System was disconnected successfully",
+    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
+    "confirmDisconnectFromSystem":"Detach server from current system",
+    "confirmDisconnectFromSystemTitle":"",
+    "confirmDisconnectFromSystemAction":"Detach",
+    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
     "connectedSuccess":"System was connected successfully",
     "createLocalOwnerTitle":"Create local administrator",
     "confirmChangePassword":"Change admin password",

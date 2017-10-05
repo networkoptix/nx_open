@@ -24,10 +24,7 @@ bool serializeToHeaders(nx_http::HttpHeaders* where, const BeginListeningRespons
 
 bool serializeToHeaders(nx_http::HttpHeaders* where, const CreateClientSessionResponse& what)
 {
-    where->emplace(
-        "Location",
-        nx_http::StringType(what.redirectUrl.data(), (int) what.redirectUrl.size()));
-
+    where->emplace("Location", what.actualRelayUrl.c_str());
     return true;
 }
 

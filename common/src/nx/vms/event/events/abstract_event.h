@@ -28,14 +28,16 @@ bool hasToggleState(EventType eventType);
 
 QList<EventState> allowedEventStates(EventType eventType);
 
+/** Check if camera required for this event to setup a rule. */
 bool requiresCameraResource(EventType eventType);
 
+/** Check if server required for this event to setup a rule. */
 bool requiresServerResource(EventType eventType);
 
-/** Check if camera required for this event to OCCUR. */
+/** Check if camera required for this event to OCCUR. Always includes requiresCameraResource(). */
 bool isSourceCameraRequired(EventType eventType);
 
-/** Check if server required for this event to OCCUR. */
+/** Check if server required for this event to OCCUR. Always includes requiresServerResource(). */
 bool isSourceServerRequired(EventType eventType);
 
 /**

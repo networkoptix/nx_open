@@ -18,6 +18,7 @@ namespace cloud {
 namespace gateway {
 
 class AuthorizationManager;
+class RelayEngine;
 
 class VmsGatewayProcess:
     public nx::utils::Service
@@ -56,6 +57,7 @@ private:
     void registerApiHandlers(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
+        RelayEngine* relayEngine,
         nx_http::server::rest::MessageDispatcher* const msgDispatcher);
 };
 

@@ -1,7 +1,6 @@
 #include "resource_preview_widget.h"
 
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStyle>
 
 #include <client/client_globals.h>
@@ -13,6 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/common/geometry.h>
+#include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/widgets/common/busy_indicator.h>
@@ -23,7 +23,6 @@
 namespace {
 
 static const QMargins kMinIndicationMargins(4, 2, 4, 2);
-static const QSize kFrameSize(2, 2);
 
 /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
  * This descendant when it is downscaled draws dots generally not snapped. */
@@ -59,30 +58,25 @@ public:
 
 } // namespace
 
-QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) :
+QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent):
     base_type(parent),
-    m_preview(new QLabel(this)),
     m_placeholder(new QnAutoscaledPlainText(this)),
-    m_indicator(new QnAutoscaledBusyIndicatorWidget(this)),
-    m_pages(new QStackedWidget(this))
+    m_indicator(new QnAutoscaledBusyIndicatorWidget(this))
 {
-    m_pages->addWidget(m_preview);
-    m_pages->addWidget(m_placeholder);
-    m_pages->addWidget(m_indicator);
-    m_pages->setCurrentWidget(m_indicator);
-    m_pages->setFrameStyle(QFrame::NoFrame | QFrame::Plain);
-
     retranslateUi();
+    setBackgroundRole(QPalette::Window);
 
     m_placeholder->setProperty(style::Properties::kDontPolishFontProperty, true);
     setProperty(style::Properties::kDontPolishFontProperty, true);
 
     m_placeholder->setAlignment(Qt::AlignCenter);
     m_placeholder->setContentsMargins(kMinIndicationMargins);
+    m_placeholder->setHidden(true);
+    new QnWidgetAnchor(m_placeholder);
 
     m_indicator->setContentsMargins(kMinIndicationMargins);
-
-    m_preview->setAlignment(Qt::AlignCenter);
+    m_indicator->setBorderRole(QPalette::Window);
+    new QnWidgetAnchor(m_indicator);
 }
 
 QnResourcePreviewWidget::~QnResourcePreviewWidget()
@@ -132,20 +126,49 @@ QnBusyIndicatorWidget* QnResourcePreviewWidget::busyIndicator() const
     return m_indicator;
 }
 
+QPalette::ColorRole QnResourcePreviewWidget::borderRole() const
+{
+    return m_borderRole;
+}
+
+void QnResourcePreviewWidget::setBorderRole(QPalette::ColorRole role)
+{
+    if (m_borderRole == role)
+        return;
+
+    m_borderRole = role;
+    update();
+}
+
 void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
-    painter.setPen(palette().window().color());
-    painter.setBrush(palette().dark());
+    if (m_preview.isNull() || m_placeholder->isVisible())
+    {
+        QRectF paintRect = rect();
+        painter.setBrush(palette().brush(backgroundRole()));
 
-    QRect content = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, sizeHint(), rect());
-    painter.drawRect(content.intersected(rect()).adjusted(0, 0, -1, -1));
-}
+        if (m_borderRole == QPalette::NoRole)
+        {
+            painter.setPen(Qt::NoPen);
+        }
+        else
+        {
+            painter.setPen(palette().color(m_borderRole));
+            paintRect.adjust(0.5, 0.5, -0.5, -0.5);
+        }
 
-void QnResourcePreviewWidget::resizeEvent(QResizeEvent* event)
-{
-    m_pages->resize(size());
-    base_type::resizeEvent(event);
+        painter.drawRect(paintRect);
+    }
+    else
+    {
+        const auto sourceSize = m_preview.size() / m_preview.devicePixelRatio();
+        const auto paintSize = QnGeometry::bounded(sourceSize, size(), Qt::KeepAspectRatio);
+        const auto paintRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
+            size(), QRect(QPoint(), paintSize.toSize()));
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+        painter.drawPixmap(paintRect, m_preview);
+    }
 }
 
 void QnResourcePreviewWidget::changeEvent(QEvent* event)
@@ -171,8 +194,8 @@ QSize QnResourcePreviewWidget::sizeHint() const
 {
     if (!m_cachedSizeHint.isValid())
     {
-        if (m_preview->pixmap())
-            m_cachedSizeHint = m_preview->pixmap()->size();
+        if (!m_preview.isNull())
+            m_cachedSizeHint = m_preview.size();
 
         if (m_cachedSizeHint.isEmpty())
         {
@@ -183,7 +206,7 @@ QSize QnResourcePreviewWidget::sizeHint() const
                 m_cachedSizeHint = minimumSize();
         }
 
-        const QSize maxSize = maximumSize() - kFrameSize;
+        const QSize maxSize = maximumSize();
 
         qreal oversizeCoefficient = qMax(
             static_cast<qreal>(m_cachedSizeHint.width()) / maxSize.width(),
@@ -191,16 +214,20 @@ QSize QnResourcePreviewWidget::sizeHint() const
 
         if (oversizeCoefficient > 1.0)
             m_cachedSizeHint /= oversizeCoefficient;
-
-        m_cachedSizeHint += kFrameSize;
     }
 
     return m_cachedSizeHint;
 }
 
-QSize QnResourcePreviewWidget::minimumSizeHint() const
+bool QnResourcePreviewWidget::hasHeightForWidth() const
 {
-    return sizeHint();
+    return true;
+}
+
+int QnResourcePreviewWidget::heightForWidth(int width) const
+{
+    const QSizeF hint = sizeHint();
+    return qRound(hint.height() / hint.width() * width);
 }
 
 void QnResourcePreviewWidget::retranslateUi()
@@ -219,21 +246,29 @@ void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
     switch (status)
     {
         case Qn::ThumbnailStatus::Loaded:
-            m_pages->setCurrentWidget(m_preview);
+            m_placeholder->setHidden(true);
+            m_indicator->setHidden(true);
             break;
 
-        case Qn::ThumbnailStatus::NoData:
-            m_pages->setCurrentWidget(m_placeholder);
+        case Qn::ThumbnailStatus::Loading:
+            m_placeholder->setHidden(true);
+            m_indicator->setHidden(false);
             break;
 
         default:
-            m_pages->setCurrentWidget(m_indicator);
+            m_placeholder->setHidden(false);
+            m_indicator->setHidden(true);
             break;
     }
 }
 
 void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
 {
-    m_preview->setPixmap(QPixmap::fromImage(image));
+    const auto maxHeight = qMin(maximumHeight(), heightForWidth(maximumWidth()));
+    m_preview = QPixmap::fromImage(image.size().height() > maxHeight
+        ? image.scaled(maximumSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
+        : image);
+
     invalidateGeometry();
+    update();
 }

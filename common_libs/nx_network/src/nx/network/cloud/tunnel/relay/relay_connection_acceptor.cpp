@@ -183,7 +183,22 @@ void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
             SystemError::ErrorCode sysErrorCode,
             std::unique_ptr<detail::ReverseConnection> connection) mutable
         {
-            handler(sysErrorCode, toStreamSocket(std::move(connection)));
+            std::unique_ptr<AbstractStreamSocket> acceptedSocket;
+            if (connection)
+                acceptedSocket = toStreamSocket(std::move(connection));
+
+            if (acceptedSocket)
+            {
+                NX_INFO(this, lm("Cloud connection from %1 has been accepted. Info: relay %2")
+                    .args(acceptedSocket->getForeignAddress(), m_relayUrl));
+            }
+            else
+            {
+                NX_INFO(this, lm("Cloud connection accept error (%1). Info: relay %2")
+                    .args(SystemError::toString(sysErrorCode), m_relayUrl));
+            }
+
+            handler(sysErrorCode, std::move(acceptedSocket));
         });
 }
 

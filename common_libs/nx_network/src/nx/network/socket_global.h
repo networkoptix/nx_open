@@ -69,6 +69,7 @@ public:
     static void verifyInitialization();
     static bool isInitialized();
 
+    static void printArgumentsHelp(std::ostream* outputStream);
     static void applyArguments(const utils::ArgumentParser& arguments);
 
     typedef void (*CustomInit)();

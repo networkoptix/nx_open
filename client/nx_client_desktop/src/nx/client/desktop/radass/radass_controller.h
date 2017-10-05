@@ -12,9 +12,11 @@ namespace desktop {
 class RadassController: public QObject
 {
     Q_OBJECT
+    using base_type = QObject;
+
 public:
-    RadassController();
-    ~RadassController();
+    explicit RadassController(QObject* parent = nullptr);
+    virtual ~RadassController() override;
 
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);
@@ -35,7 +37,7 @@ private:
 
 private:
     struct Private;
-    Private* d;
+    QScopedPointer<Private> d;
 };
 
 } // namespace desktop

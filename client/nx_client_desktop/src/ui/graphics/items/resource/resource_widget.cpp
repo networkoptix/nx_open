@@ -556,7 +556,32 @@ QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
 
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
-    QSizeF result = base_type::sizeHint(which, constraint);
+    QSizeF result;
+    switch (which)
+    {
+        case Qt::MinimumSize:
+        {
+            static const qreal kMinPartOfCell = 0.25;
+            static const qreal kMinimalWidth = qnGlobals->workbenchUnitSize() * kMinPartOfCell;
+            static const qreal kMinimalHeight = kMinimalWidth
+                / qnGlobals->defaultLayoutCellAspectRatio();
+            result = QSizeF(kMinimalWidth, kMinimalHeight);
+            break;
+        }
+        case Qt::MaximumSize:
+        {
+            static const int kMaxCells = 64;
+            static const qreal kMaximalWidth = qnGlobals->workbenchUnitSize() * kMaxCells;
+            static const qreal kMaximalHeight = kMaximalWidth
+                / qnGlobals->defaultLayoutCellAspectRatio();
+            result = QSizeF(kMaximalWidth, kMaximalHeight);
+            break;
+        }
+
+        default:
+            result = base_type::sizeHint(which, constraint);
+            break;
+    }
 
     if (!hasAspectRatio())
         return result;

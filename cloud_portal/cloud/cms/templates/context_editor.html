@@ -28,11 +28,18 @@
         <div class="form-row">
             {{ field.label_tag }}
             <div id="{{field.label}}" style="display:inline-block;">
-                {% if field|is_ImageField and field.value%}
+                {% if field|is_ImageField and field.value %}
                 <div>
                     <img style="max-height: 400px; max-width: 400px;" src="data:image/png;base64,{{field.value}}">
                 </div>
                 {% endif %}
+
+                {% if field|is_FileField and field.value %}
+                <div>
+                    <a href="{% url 'download_file' field.name %}" download>Download</a>
+                </div>
+                {% endif %}
+
                 {{ field }}
                 
                 {% if field.help_text %}
@@ -55,7 +62,8 @@
 
 {% if preview_link %}
 <div class="submit-row">
-<button onClick="openPreview()">Open Preview</button>
+    <button onClick="openPreview()">Open Preview</button>
+</div>
 {% endif %}
 
 <!--{% if image %}
@@ -108,12 +116,11 @@
         menubar: false,
         resize: 'both',
         theme:'advanced',
-        theme_advanced_buttons1: 'undo,redo,separator,insert,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent',
+        plugins: 'preview,-visualblocks,-advcode,paste',
+        theme_advanced_buttons1: 'undo,redo,separator,formatselect,insert,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,code,removeformat,pasteword',
         theme_advanced_toolbar_location: 'top',
         theme_advanced_toolbar_align: 'left',
-        theme_advanced_resizing: true,
-        paste_text_sticky: true,
-        paste_text_sticky_default : true
+        theme_advanced_resizing: true
     });
 </script>
 {% endblock%}

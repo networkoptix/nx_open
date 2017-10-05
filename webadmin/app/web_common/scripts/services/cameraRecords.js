@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('cameraRecords', ['$q', function ($q) {
+    .factory('cameraRecords', [function () {
         var lastRecordProvider = null;
         var lastPositionProvider = null;
         return {
@@ -9,14 +9,14 @@ angular.module('nxCommon')
                 if(lastRecordProvider){
                     lastRecordProvider.abort("getRecordsProvider");
                 }
-                lastRecordProvider = new CameraRecordsProvider(cameras, mediaserver, $q, width);
+                lastRecordProvider = new CameraRecordsProvider(cameras, mediaserver, width);
                 return lastRecordProvider;
             },
             getPositionProvider:function(cameras, mediaserver){
                 if(lastPositionProvider){
                     lastPositionProvider.abort("getPositionProvider");
                 }
-                lastPositionProvider = new ShortCache(cameras, mediaserver, $q);
+                lastPositionProvider = new ShortCache(cameras, mediaserver);
                 return lastPositionProvider;
             }
         };

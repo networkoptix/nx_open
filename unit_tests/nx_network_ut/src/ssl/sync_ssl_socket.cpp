@@ -205,14 +205,14 @@ int SyncSslSocket::send(const void* buffer, unsigned int bufferLen)
 
 void SyncSslSocket::readSomeAsync(
     nx::Buffer* const /*buffer*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
     NX_CRITICAL(false, "Not implemented and will never be. Use ssl::StreamSocket");
 }
 
 void SyncSslSocket::sendAsync(
     const nx::Buffer& /*buffer*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
     NX_CRITICAL(false, "Not implemented and will never be. Use ssl::StreamSocket");
 }

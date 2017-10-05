@@ -12,6 +12,7 @@
 
 #include <ui/common/aligner.h>
 #include <ui/common/palette.h>
+#include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -29,7 +30,7 @@ namespace
     const int kWelcomeFontWeight = QFont::Light;
 }
 
-class QnLoginToCloudDialogPrivate : public QObject
+class QnLoginToCloudDialogPrivate: public QObject
 {
     QnLoginToCloudDialog* q_ptr;
     Q_DECLARE_PUBLIC(QnLoginToCloudDialog)
@@ -45,7 +46,7 @@ public:
     void at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status);
     void at_cloudStatusWatcher_error();
 
-    void showCredentialsError(bool show);
+    void showCredentialsError(const QString& text);
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
@@ -132,10 +133,11 @@ void QnLoginToCloudDialog::showEvent(QShowEvent* event)
         ui->passwordInputField->setFocus();
 }
 
-void QnLoginToCloudDialogPrivate::showCredentialsError(bool show)
+void QnLoginToCloudDialogPrivate::showCredentialsError(const QString& text)
 {
     Q_Q(QnLoginToCloudDialog);
-    q->ui->invalidCredentialsLabel->setVisible(show);
+    q->ui->invalidCredentialsLabel->setHidden(text.isEmpty());
+    q->ui->invalidCredentialsLabel->setText(text);
     q->ui->containerWidget->layout()->activate();
 }
 
@@ -152,7 +154,7 @@ void QnLoginToCloudDialogPrivate::updateUi()
         q->ui->loginInputField->isValid() &&
         q->ui->passwordInputField->isValid());
 
-    showCredentialsError(false);
+    showCredentialsError(QString());
 }
 
 void QnLoginToCloudDialogPrivate::lockUi(bool locked)
@@ -182,7 +184,7 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     Q_Q(QnLoginToCloudDialog);
 
-    showCredentialsError(false);
+    showCredentialsError(QString());
 
     qnCloudStatusWatcher->resetCredentials();
 
@@ -228,11 +230,15 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     {
         case QnCloudStatusWatcher::NoError:
             break;
+
         case QnCloudStatusWatcher::InvalidCredentials:
-        {
-            showCredentialsError(true);
+            showCredentialsError(QnCloudResultMessages::invalidCredentials());
             break;
-        }
+
+        case QnCloudStatusWatcher::AccountNotActivated:
+            showCredentialsError(QnCloudResultMessages::accountNotActivated());
+            break;
+
         case QnCloudStatusWatcher::UnknownError:
         default:
         {

@@ -57,8 +57,8 @@ class ServerRestApiProxy(object):
         return ServerRestApiProxy(self._server_name, self._url + '/' + name, self._user, self._password, self._timeout)
 
     def GET(self, raise_exception=True, timeout=None, headers=None, **kw):
-        self._log_request('GET', kw)
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
+        self._log_request('GET', params)
         return self._make_request(raise_exception, timeout, requests.get, self._url, headers=headers, params=params)
 
     def POST(self, raise_exception=True, timeout=None, headers=None, json=None, **kw):
@@ -72,7 +72,7 @@ class ServerRestApiProxy(object):
         password = self._password
         if password not in STANDARD_PASSWORDS:
             password = '***'  # mask nondefault passwords
-        log.debug('%s: %s:%s %s %s %s', self._server_name, self._user, password, method, self._url, data)
+        log.debug('%s: %s:%s %s %s %s', self._server_name, self._user, password, method, self._url, json.dumps(data))
 
     def _get_param_to_str(self, value):
         if type(value) is bool:

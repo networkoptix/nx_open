@@ -1,6 +1,7 @@
 #include "media_server_module.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 
 #include <common/common_globals.h>
 #include <common/common_module.h>
@@ -37,11 +38,14 @@
 #include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <nx/mediaserver/license_watcher.h>
+#include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/mediaserver/metadata/event_rule_watcher.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
+#include <plugins/plugin_manager.h>
 
 namespace {
 
@@ -157,7 +161,19 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFileDeletor(commonModule()));
 
     store(new nx::vms::common::p2p::downloader::Downloader(
-        downloadsDirectory(), commonModule()));
+        downloadsDirectory(), commonModule(), nullptr, this));
+
+    m_pluginManager = store(new PluginManager(this, QString(), &m_pluginContainer));
+    m_pluginManager->loadPlugins(roSettings());
+
+    m_metadataRuleWatcher = store(
+        new nx::mediaserver::metadata::EventRuleWatcher(
+            commonModule()->eventRuleManager()));
+
+    m_metadataManagerPoolThread = new QThread(this);
+    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(commonModule()));
+    m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
+    m_metadataManagerPoolThread->start();
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -167,6 +183,8 @@ QnMediaServerModule::~QnMediaServerModule()
 {
     m_commonModule->resourcePool()->clear();
     m_context.reset();
+    m_metadataManagerPoolThread->exit();
+    m_metadataManagerPoolThread->wait();
     clear();
 }
 
@@ -203,4 +221,19 @@ nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersW
 nx::mediaserver::LicenseWatcher* QnMediaServerModule::licenseWatcher() const
 {
     return m_licenseWatcher;
+}
+
+PluginManager* QnMediaServerModule::pluginManager() const
+{
+    return m_pluginManager;
+}
+
+nx::mediaserver::metadata::ManagerPool* QnMediaServerModule::metadataManagerPool() const
+{
+    return m_metadataManagerPool;
+}
+
+nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWatcher() const
+{
+    return m_metadataRuleWatcher;
 }

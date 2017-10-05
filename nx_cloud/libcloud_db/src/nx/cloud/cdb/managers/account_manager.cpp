@@ -522,11 +522,6 @@ void AccountManager::removeExtension(AbstractAccountManagerExtension* extension)
     m_extensions.remove(extension);
 }
 
-void AccountManager::setUpdateAccountSubroutine(UpdateAccountSubroutine func)
-{
-    m_updateAccountSubroutine = std::move(func);
-}
-
 nx::utils::db::DBResult AccountManager::fillCache()
 {
     nx::utils::promise<nx::utils::db::DBResult> cacheFilledPromise;
@@ -795,8 +790,10 @@ nx::utils::db::DBResult AccountManager::updateAccountInDb(
             account);
     }
 
-    if (m_updateAccountSubroutine)
-        return m_updateAccountSubroutine(queryContext, accountUpdateData);
+    m_extensions.invoke(
+        &AbstractAccountManagerExtension::afterUpdatingAccount,
+        queryContext,
+        accountUpdateData);
 
     return nx::utils::db::DBResult::ok;
 }

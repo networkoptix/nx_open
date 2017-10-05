@@ -20,7 +20,7 @@ bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemD
     return camera && camera->hasDualStreaming2();
 }
 
-}
+} // namespace
 
 namespace nx {
 namespace client {

@@ -181,13 +181,13 @@ void DummySocket::connectAsync(
 
 void DummySocket::readSomeAsync(
     nx::Buffer* const /*buf*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
 }
 
 void DummySocket::sendAsync(
     const nx::Buffer& /*buf*/,
-    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+    IoCompletionHandler /*handler*/)
 {
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QThread>
+
 #include "server_rest_connection_fwd.h"
 
 #include <nx/network/http/http_types.h>
@@ -26,26 +28,32 @@
 
 namespace rest {
 
-struct RestResultWithDataBase: public QnRestResult
+struct RestResultWithDataBase
 {
-    RestResultWithDataBase() {}
-    RestResultWithDataBase(const QnRestResult& other): QnRestResult(other) {}
 };
 
 template <typename T>
 struct RestResultWithData: public RestResultWithDataBase
 {
     RestResultWithData() {}
-
-    RestResultWithData(const QnRestResult& restResult, const T& data):
-        RestResultWithDataBase(restResult),
-        data(data)
+    RestResultWithData(const QnRestResult& restResult, T data):
+        error(restResult.error),
+        errorString(restResult.errorString),
+        data(std::move(data))
     {
     }
 
+    RestResultWithData(const RestResultWithData&) = delete;
+    RestResultWithData(RestResultWithData&&) = default;
+    RestResultWithData& operator=(const RestResultWithData&) = delete;
+    RestResultWithData& operator=(RestResultWithData&&) = default;
+
+    QnRestResult::Error error;
+    QString errorString;
     T data;
 };
 
+using EventLogData = RestResultWithData<nx::vms::event::ActionDataList>;
 using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
 
 class ServerConnection:
@@ -185,6 +193,10 @@ public:
     Handle testEventRule(const QnUuid& ruleId, nx::vms::event::EventState toggleState,
         GetCallback callback, QThread* targetThread = nullptr);
 
+    Handle getEvents(QnEventLogRequestData request,
+        Result<EventLogData>::type callback,
+        QThread *targetThread = nullptr);
+
     /**
     * Cancel running request by known requestID. If request is canceled, callback isn't called.
     * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -198,7 +210,7 @@ private:
     template <typename ResultType> Handle executeGet(
         const QString& path,
         const QnRequestParamList& params,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePost(
@@ -206,7 +218,7 @@ private:
         const QnRequestParamList& params,
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executePut(
@@ -214,19 +226,27 @@ private:
         const QnRequestParamList& params,
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType> Handle executeDelete(
         const QString& path,
         const QnRequestParamList& params,
-        REST_CALLBACK(ResultType) callback,
+        Callback<ResultType> callback,
         QThread* targetThread);
 
     template <typename ResultType>
-    Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread);
-    Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread);
-    Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread);
+    Handle executeRequest(const nx_http::ClientPool::Request& request,
+        Callback<ResultType> callback,
+        QThread* targetThread);
+
+    Handle executeRequest(const nx_http::ClientPool::Request& request,
+        Callback<QByteArray> callback,
+        QThread* targetThread);
+
+    Handle executeRequest(const nx_http::ClientPool::Request& request,
+        Callback<EmptyResponseType> callback,
+        QThread* targetThread);
 
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
 

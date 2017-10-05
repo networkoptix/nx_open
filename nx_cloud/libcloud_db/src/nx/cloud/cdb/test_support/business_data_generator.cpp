@@ -56,7 +56,7 @@ data::SystemData BusinessDataGenerator::generateRandomSystem(const api::AccountD
     //system.opaque = newSystem.opaque;
     system.authKey = QnUuid::createUuid().toSimpleString().toStdString();
     system.ownerAccountEmail = account.email;
-    system.status = api::SystemStatus::ssActivated;
+    system.status = api::SystemStatus::activated;
     system.expirationTimeUtc =
         duration_cast<seconds>(nx::utils::timeSinceEpoch() + hours(1)).count();
 

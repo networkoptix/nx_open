@@ -78,8 +78,11 @@ void EMailManager::sendAsync(
         m_ongoingRequests.insert(httpClient);
     }
 
+    auto notificationUrl = m_notificationModuleUrl;
+    notificationUrl.setQuery(lm("id=%1").arg(currentNotificationIndex));
+
     httpClient->doPost(
-        m_notificationModuleUrl,
+        notificationUrl,
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
         notification.serializeToJson());
 }

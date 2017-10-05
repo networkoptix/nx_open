@@ -2,6 +2,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>
+#include <QtGui/QScreen>
 
 #include <camera/camera_thumbnail_cache.h>
 #include <utils/mobile_app_info.h>
@@ -45,6 +46,11 @@ QnContext::QnContext(QObject* parent) :
         this)),
     m_localPrefix(lit("qrc:///"))
 {
+    const auto screen = qApp->primaryScreen();
+    screen->setOrientationUpdateMask(Qt::PortraitOrientation | Qt::InvertedPortraitOrientation
+        | Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation);
+    connect(screen, &QScreen::orientationChanged, this, &QnContext::deviceStatusBarHeightChanged);
+
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this,
         [this]()
         {
@@ -121,8 +127,14 @@ void QnContext::enterFullscreen() {
     hideSystemUi();
 }
 
-int QnContext::getStatusBarHeight() const {
-    return statusBarHeight();
+int QnContext::deviceStatusBarHeight() const
+{
+    return ::statusBarHeight();
+}
+
+bool QnContext::getNavigationBarIsLeftSide() const
+{
+    return ::isLeftSideNavigationBar();
 }
 
 int QnContext::getNavigationBarHeight() const {

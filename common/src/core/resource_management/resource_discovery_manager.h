@@ -11,7 +11,6 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/url.h>
-#include <nx/network/netstate.h>
 #include <nx/network/nettools.h>
 
 #include <api/model/manual_camera_seach_reply.h>

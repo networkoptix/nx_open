@@ -49,6 +49,8 @@ QnStorageUrlDialog::QnStorageUrlDialog(
 
     /* Override cursor to stay arrow when entire dialog has wait cursor: */
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setCursor(Qt::ArrowCursor);
+
+    setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 }
 
 QnStorageUrlDialog::~QnStorageUrlDialog()

@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QLabel>
 
 #include <core/resource/camera_advanced_param.h>
 
@@ -27,6 +28,10 @@ private:
 
 	void createGroupWidgets(const QnCameraAdvancedParamGroup &group, QTreeWidgetItem* parentItem = NULL);
 	QWidget* createContentsPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
+    void setLabelText(
+        QLabel* label,
+        const QnCameraAdvancedParameter& parameter,
+        const QString& range) const;
 
 private:
 	QTreeWidget* m_groupWidget;

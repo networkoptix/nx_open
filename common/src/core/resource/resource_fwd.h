@@ -220,6 +220,7 @@ namespace plugins {
 
 class HikvisionResource;
 class LilinResource;
+class HanwhaResource;
 
 } // namespace plugins
 } // namespace mediaserver_core
@@ -229,3 +230,6 @@ typedef QnSharedResourcePointer<nx::mediaserver_core::plugins::LilinResource> Li
 
 typedef
 QnSharedResourcePointer<nx::mediaserver_core::plugins::HikvisionResource> QnHikvisionResourcePtr;
+
+typedef
+QnSharedResourcePointer<nx::mediaserver_core::plugins::HanwhaResource> HanwhaResourcePtr;

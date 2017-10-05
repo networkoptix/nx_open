@@ -18,7 +18,7 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
-mail_from: 'WAVEsync@hanwhasecurity.com'
+mail_from: 'wavesync@hanwha.com'
 
 mail_prefix: ''
 
@@ -36,6 +36,7 @@ admins:
 
 languages:
     - en_US
+    - en_GB
     - ru_RU
     - fr_FR
     - de_DE
@@ -43,7 +44,13 @@ languages:
     - ja_JP
     - ko_KR
     - tr_TR
+    - zh_CN
+    - zh_TW
+    - he_IL
     - hu_HU
+    - nl_NL
+    - pl_PL
+    - vi_VN
 
 queue_name: '$INSTANCE_NAME'
 

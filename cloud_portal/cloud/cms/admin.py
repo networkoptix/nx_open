@@ -39,19 +39,37 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(CMSAdmin):
-    list_display = ('name',)
+    list_display = ('context_actions', 'name',)
+    list_display_links = ('name',)
+
+    def context_actions(self, obj):
+        return format_html('<a class="button" href="{}">settings</a>',
+                           reverse('product_settings', args=[obj.id]))
+
+    context_actions.short_description = 'Admin Options'
+    context_actions.allow_tags = True
+
 
 admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('name', 'description', 'url',
-                    'translatable', 'context_actions')
-    search_fields = ('name', 'description', 'url')
+    list_display = ('context_actions', 'product', 'name', 'description',
+                    'url', 'translatable', 'is_global')
+
+    list_display_links = ('name', )
+    search_fields = ('name', 'description', 'url', 'product__name')
 
     def context_actions(self, obj):
         return format_html('<a class="button" href="{}">edit content</a>',
                            reverse('context_editor', args=[obj.id]))
+
+    def get_queryset(self, request):  # show only users for current customization
+        qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        if not request.user.is_superuser:
+            qs = qs.filter(hidden=False)  ## only superuser sees hidden contexts
+        # additional filter - display only revisions from current customization
+        return qs
 
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
@@ -82,20 +100,27 @@ class DataRecordAdmin(CMSAdmin):
                     'data_structure', 'short_description', 'version')
     list_filter = ('data_structure', 'customization', 'language')
     search_fields = ('data_structure__name', 'customization__name',
-                     'data_structure__short_description', 'value', 'language__code')
+                     'data_structure__description', 'value', 'language__code')
 
 admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('id', 'customization', 'name',
+    list_display = ('content_version_actions', 'id', 'customization', 'name',
                     'created_date', 'created_by',
-                    'accepted_date', 'accepted_by',
-                    'content_version_actions')
+                    'accepted_date', 'accepted_by', 'state')
+
+    list_display_links = ('id', )
 
     def content_version_actions(self, obj):
         return format_html('<a class="button" href="{}">review version</a>',
                            reverse('review_version', args=[obj.id]))
+
+    def get_queryset(self, request):  # show only users for current customization
+        qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        qs = qs.filter(customization__name=settings.CUSTOMIZATION)
+        # additional filter - display only revisions from current customization
+        return qs
 
     content_version_actions.short_description = "Admin Options"
     content_version_actions.allow_tags = True

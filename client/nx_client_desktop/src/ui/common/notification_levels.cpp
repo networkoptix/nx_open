@@ -29,6 +29,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::Abstra
         case vms::event::cameraInputEvent:
         case vms::event::serverStartEvent:
         case vms::event::softwareTriggerEvent:
+        case vms::event::analyticsSdkEvent:
             return Value::CommonNotification;
 
         /* Yellow notifications */

@@ -93,7 +93,8 @@ struct QnCameraAdvancedParameter
         Number,
         Enumeration,
         Button,
-        String
+        String,
+        Separator
     };
 
     QString id;
@@ -103,10 +104,15 @@ struct QnCameraAdvancedParameter
     QString description;
     QString tag;  
     bool readOnly = false;
-    QString readCmd; // read parameter command line. Isn't used in UI
-    QString writeCmd; // write parameter command line. Isn't used in UI
-    QString internalRange; // internal device values for range parameters
+    QString readCmd; //< Read parameter command line. Isn't used in UI.
+    QString writeCmd; //< Write parameter command line. Isn't used in UI.
+    QString internalRange; //< Internal device values for range parameters.
+    QString aux; //< Auxiliary driver dependent data.
     std::vector<QnCameraAdvancedParameterDependency> dependencies;
+    bool showRange = false; //< Show range near parameter's label
+    QString unit;
+    QString notes;
+    bool resync = false;
 
     bool isValid() const;
     QStringList getRange() const;
@@ -135,12 +141,17 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (readCmd)\
     (writeCmd)\
     (internalRange)\
-    (dependencies)
+    (aux)\
+    (dependencies)\
+    (showRange)\
+    (unit)\
+    (notes)
 
 struct QnCameraAdvancedParamGroup
 {
     QString name;
     QString description;
+    QString aux;
     std::vector<QnCameraAdvancedParamGroup> groups;
     std::vector<QnCameraAdvancedParameter> params;
 
@@ -150,7 +161,7 @@ struct QnCameraAdvancedParamGroup
     bool updateParameter(const QnCameraAdvancedParameter &parameter);
     QnCameraAdvancedParamGroup filtered(const QSet<QString> &allowedIds) const;
 };
-#define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
+#define QnCameraAdvancedParamGroup_Fields (name)(description)(aux)(groups)(params)
 
 struct QnCameraAdvancedParameterOverload
 {
@@ -166,7 +177,7 @@ struct QnCameraAdvancedParams
     QString name;
     QString version;
     QString unique_id;
-    bool packet_mode =false;
+    bool packet_mode = false;
     std::vector<QnCameraAdvancedParamGroup> groups;
 
     QSet<QString> allParameterIds() const;

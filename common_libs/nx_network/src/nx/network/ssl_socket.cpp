@@ -128,7 +128,7 @@ public:
 
     void reset(
         nx::Buffer* buffer,
-        std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)>&& handler)
     {
         m_readBuffer = buffer;
         m_handler = std::move(handler);
@@ -162,7 +162,7 @@ protected:
 
 private:
     nx::Buffer* m_readBuffer;
-    std::function<void(SystemError::ErrorCode,std::size_t)> m_handler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)> m_handler;
     std::size_t m_readBytes;
 };
 
@@ -181,7 +181,7 @@ public:
 
     void reset(
         const nx::Buffer* buffer,
-        std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)>&& handler)
     {
         m_writeBuffer = buffer;
         m_handler = std::move(handler);
@@ -212,7 +212,7 @@ protected:
 
 private:
     const nx::Buffer* m_writeBuffer;
-    std::function<void(SystemError::ErrorCode,std::size_t)> m_handler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)> m_handler;
 };
 
 class SslAsyncHandshake : public SslAsyncOperation
@@ -226,7 +226,7 @@ public:
         NX_VERBOSE(this, lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
-    void reset(std::function<void(SystemError::ErrorCode)>&& handler)
+    void reset(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>&& handler)
     {
         m_handler = std::move(handler);
         SslAsyncOperation::reset();
@@ -255,7 +255,7 @@ protected:
     }
 
 private:
-    std::function<void(SystemError::ErrorCode)> m_handler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_handler;
 };
 
 class SslAsyncBioHelper
@@ -283,11 +283,11 @@ public:
 
     void asyncSend(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, std::size_t)> handler);
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler);
 
     void asyncRecv(
         nx::Buffer* buffer,
-        std::function<void(SystemError::ErrorCode, std::size_t)> handler);
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler);
 
     void clear()
     {
@@ -792,7 +792,7 @@ void SslAsyncBioHelper::asyncPerform(SslAsyncOperation* operation)
 
 void SslAsyncBioHelper::asyncSend(
     const nx::Buffer& buffer,
-    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     m_write->reset(&buffer, std::move(handler));
     asyncPerform(m_write.get());
@@ -800,7 +800,7 @@ void SslAsyncBioHelper::asyncSend(
 
 void SslAsyncBioHelper::asyncRecv(
     nx::Buffer* buffer,
-    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     m_read->reset(buffer, std::move(handler));
     asyncPerform(m_read.get());
@@ -813,14 +813,14 @@ public:
 
     struct SnifferData
     {
-        std::function<void(SystemError::ErrorCode,std::size_t)> completionHandler;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)> completionHandler;
         nx::Buffer* buffer;
 
         SnifferData(
-            std::function<void(SystemError::ErrorCode,std::size_t)>&& completionHandler,
+            nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)>&& completionHandler,
             nx::Buffer* buf)
         :
-            completionHandler(completionHandler),
+            completionHandler(std::move(completionHandler)),
             buffer(buf)
         {}
     };
@@ -837,7 +837,7 @@ public:
 
     void asyncSend(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode,std::size_t)>&& op)
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)>&& op)
     {
         // We have to receive some data at first to be able to understand if this connection
         // is secure or not by analyzing client's request.
@@ -848,18 +848,17 @@ public:
 
     void asyncRecv(
         nx::Buffer* buffer,
-        std::function<void(SystemError::ErrorCode,std::size_t)>&& completionHandler)
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,std::size_t)>&& completionHandler)
     {
         if (!m_isInitialized) {
             m_snifferBuffer.reserve(kSnifferBufferLength);
             socket()->readSomeAsync(
                 &m_snifferBuffer,
-                std::bind(
-                    &MixedSslAsyncBioHelper::Sniffer,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    SnifferData(std::move(completionHandler),buffer)));
+                [this, data = SnifferData(std::move(completionHandler), buffer)](
+                    SystemError::ErrorCode systemErrorCode, std::size_t bytesRead) mutable
+                {
+                    Sniffer(systemErrorCode, bytesRead, std::move(data));
+                });
         } else {
             NX_ASSERT(m_isSsl);
             SslAsyncBioHelper::asyncRecv(buffer,std::move(completionHandler));
@@ -902,12 +901,11 @@ private:
             } else if (m_snifferBuffer.size() < kSnifferDataHeaderLength) {
                 socket()->readSomeAsync(
                     &m_snifferBuffer,
-                    std::bind(
-                    &MixedSslAsyncBioHelper::Sniffer,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    data));
+                    [this, data = std::move(data)](
+                        SystemError::ErrorCode systemErrorCode, std::size_t bytesRead) mutable
+                    {
+                        Sniffer(systemErrorCode, bytesRead, std::move(data));
+                    });
                 return;
             }
             // Fix for the bug that always false in terms of comparison of 0x80
@@ -1590,7 +1588,7 @@ void SslSocket::connectAsync(
 
 static bool checkAsyncOperation(
     std::atomic<bool>* isInProgress,
-    std::function<void(SystemError::ErrorCode, std::size_t)>* handler,
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)>* handler,
     AbstractStreamSocket* socket, const char* place)
 {
     if (isInProgress->exchange(true))
@@ -1613,7 +1611,7 @@ static bool checkAsyncOperation(
 
 void SslSocket::readSomeAsync(
     nx::Buffer* const buffer,
-    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     if (!initializeUnderlyingSocketIfNeeded())
     {
@@ -1643,7 +1641,7 @@ void SslSocket::readSomeAsync(
 
 void SslSocket::sendAsync(
     const nx::Buffer& buffer,
-    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     if (!initializeUnderlyingSocketIfNeeded())
     {
@@ -1661,7 +1659,7 @@ void SslSocket::sendAsync(
         return;
 
     d->wrappedSocket->post(
-        [this, &buffer, handler]() mutable
+        [this, &buffer, handler = std::move(handler)]() mutable
         {
             Q_D(SslSocket);
             if (!d->nonBlockingMode.load() && !d->syncSendPromise.load())
@@ -1813,7 +1811,7 @@ void MixedSslSocket::connectAsync(
 
 void MixedSslSocket::readSomeAsync(
     nx::Buffer* const buffer,
-    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
     NX_ASSERT(d->nonBlockingMode.load() || d->syncRecvPromise.load());
@@ -1852,7 +1850,7 @@ void MixedSslSocket::readSomeAsync(
 
 void MixedSslSocket::sendAsync(
     const nx::Buffer& buffer,
-    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
     NX_ASSERT(d->nonBlockingMode.load() || d->syncSendPromise.load());

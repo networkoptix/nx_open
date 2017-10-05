@@ -47,6 +47,16 @@ ListeningPeerPool* MediatorProcess::listeningPeerPool() const
     return &m_controller->listeningPeerPool();
 }
 
+Controller& MediatorProcess::controller()
+{
+    return *m_controller;
+}
+
+const Controller& MediatorProcess::controller() const
+{
+    return *m_controller;
+}
+
 std::unique_ptr<nx::utils::AbstractServiceSettings> MediatorProcess::createSettings()
 {
     return std::make_unique<conf::Settings>();

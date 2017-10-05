@@ -182,7 +182,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoW
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
+TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_0)
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
@@ -203,6 +203,34 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
 
     awaitAccessValue(user, target, Source::videowall);
     layout->setParentId(videoWall->getId());
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_1)
+{
+    auto target = addCamera();
+    auto videoWall = addVideoWall();
+    QnVideoWallItem vwitem;
+    vwitem.uuid = QnUuid::createUuid();
+    videoWall->items()->addItem(vwitem);
+
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    /* What's going on on drop. */
+    auto layout = createLayout();
+
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    item.resource.uniqueId = target->getUniqueId();
+    layout->addItem(item);
+    layout->setParentId(videoWall->getId());
+    resourcePool()->addResource(layout);
+
+    awaitAccessValue(user, target, Source::videowall);
+
+    vwitem.layout = layout->getId();
+    videoWall->items()->updateItem(vwitem);
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }

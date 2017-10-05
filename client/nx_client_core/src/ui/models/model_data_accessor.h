@@ -27,6 +27,7 @@ public:
     Q_INVOKABLE QVariant getData(int row, const QString& roleName) const;
 
 signals:
+    void rowsMoved();
     void modelChanged();
     void countChanged();
     void dataChanged(int startRow, int endRow);

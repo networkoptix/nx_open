@@ -44,6 +44,11 @@ cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
     return cf::make_ready_future(true);
 }
 
+bool MemoryRemoteRelayPeerPool::connectToDb()
+{
+    return false;
+}
+
 cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
 {
     m_relayTest->peerRemoved(domainName);
@@ -102,6 +107,11 @@ BasicTestFixture::~BasicTestFixture()
     m_httpServer.reset();
 }
 
+void BasicTestFixture::setInitFlags(int flags)
+{
+    m_initFlags = flags;
+}
+
 SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
 {
     return m_relays[index]->moduleInstance()->httpEndpoints()[0];
@@ -144,6 +154,8 @@ void BasicTestFixture::SetUp()
 
     m_mediator.addArg("-trafficRelay/url");
     m_mediator.addArg(relayUrl().toString().toStdString().c_str());
+    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
+    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
     ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());
@@ -159,11 +171,14 @@ void BasicTestFixture::SetUp()
             break;
     }
 
-    SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
-        nx::network::url::Builder().setScheme("http")
-            .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
-            .setPath(kCloudModulesXmlPath));
-    SocketGlobals::mediatorConnector().enable(true);
+    if ((m_initFlags & doNotInitializeMediatorConnection) == 0)
+    {
+        SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
+            nx::network::url::Builder().setScheme("http")
+                .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
+                .setPath(kCloudModulesXmlPath));
+        SocketGlobals::mediatorConnector().enable(true);
+    }
 }
 
 void BasicTestFixture::startServer()

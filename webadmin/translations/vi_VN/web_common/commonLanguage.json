@@ -4,9 +4,9 @@
     "lowStream":"Luồng tốc độ thấp",
     "transcoding":"Đang chuyển mã",
     "unknown":"Không xác định",
-    "copyToClipboard":"copy to clipboard",
-    "copyDefaultText":"copy",
-    "copyActiveText":"copied to clipboard"
+    "copyToClipboard":"chép vào bảng nháp",
+    "copyDefaultText":"sao chép",
+    "copyActiveText":"sao chép vào clipboard"
   },
   "systemOffline":"Hệ thống offline",
   "cameraStates":{

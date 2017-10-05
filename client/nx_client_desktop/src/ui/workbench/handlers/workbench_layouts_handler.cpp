@@ -6,6 +6,7 @@
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -24,6 +25,7 @@
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
+#include <nx/client/desktop/radass/radass_resource_manager.h>
 
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -402,6 +404,18 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     }
 
     snapshotManager()->save(newLayout);
+
+    const auto radassManager = context()->instance<RadassResourceManager>();
+    for (auto it = newUuidByOldUuid.begin(); it != newUuidByOldUuid.end(); ++it)
+    {
+        const auto mode = radassManager->mode(QnLayoutItemIndex(layout, it.key()));
+        const auto newItemIndex = QnLayoutItemIndex(newLayout, it.value());
+        radassManager->setMode(newItemIndex, mode);
+    }
+
+    if (!globalSettings()->localSystemId().isNull())
+        radassManager->saveData(globalSettings()->localSystemId(), resourcePool());
+
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
 }

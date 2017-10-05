@@ -3,18 +3,18 @@
 
 #include <common/common_module.h>
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/stun/async_client.h>
-#include <nx/network/udt/udt_socket.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/network/stun/async_client.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
 
 #include "cloud/cloud_connection_manager.h"
 #include "proxy_sender_connection_processor.h"
 #include "universal_request_processor.h"
-
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
@@ -267,6 +267,28 @@ void QnUniversalTcpListener::updateCloudConnectState(
 void QnUniversalTcpListener::applyModToRequest(nx_http::Request* request)
 {
     m_httpModManager->apply(request);
+}
+
+bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& request)
+{
+    const auto targetHeader = request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
+    if (targetHeader != request.headers.end()
+        && QnUuid(targetHeader->second) != commonModule()->moduleGUID())
+    {
+        const auto requestPath = request.requestLine.url.path();
+        for (const auto& path: m_unauthorizedForwardingPaths)
+        {
+            if (requestPath.startsWith(path))
+                return false;
+        }
+    }
+
+    return true;
+}
+
+void QnUniversalTcpListener::enableUnauthorizedForwarding(const QString& path)
+{
+    m_unauthorizedForwardingPaths.insert(lit("/") + path + lit("/"));
 }
 
 nx_http::HttpModManager* QnUniversalTcpListener::httpModManager() const

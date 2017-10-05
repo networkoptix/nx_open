@@ -111,14 +111,6 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
             }
         })
-        .when('/activate/sent', {
-            title: L.pageTitles.activateSent,
-            templateUrl: Config.viewsDir + 'activeActions.html',
-            controller: 'ActivateRestoreCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.reactivatingSuccess = true; }]
-            }
-        })
         .when('/activate/success',{
             title: L.pageTitles.activateSuccess,
             templateUrl: Config.viewsDir + 'activeActions.html',

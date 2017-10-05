@@ -38,7 +38,7 @@ struct QnAviArchiveMetadata
     qreal overridenAr = 0.0;
 
     static QnAviArchiveMetadata loadFromFile(const AVFormatContext* context);
-    void saveToFile(AVFormatContext* context, Format format);
+    bool saveToFile(AVFormatContext* context, Format format);
 };
 #define QnAviArchiveMetadata_Fields (version)(signature)(timeZoneOffset)(startTimeMs) \
     (videoLayoutChannels)(videoLayoutSize)(dewarpingParams)(overridenAr)

@@ -12,8 +12,11 @@ if(withDesktopClient)
         find_package(Qt5 COMPONENTS X11Extras)
     endif()
 
-    add_subdirectory(nx_client_desktop)
-    add_subdirectory(minilauncher)
+    if(WINDOWS)
+        add_subdirectory(minilauncher)
+    endif()
+    
+    add_subdirectory(nx_client_desktop)   
     add_subdirectory(desktop_client)
     add_subdirectory(applauncher)
 endif()

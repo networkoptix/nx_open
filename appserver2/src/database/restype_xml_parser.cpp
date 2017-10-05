@@ -5,7 +5,7 @@ namespace ec2
 {
 const QString kRootCameraId("1b7181ce-0227-d3f7-9443-c86aab922d96");
 
-ResTypeXmlParser::ResTypeXmlParser(ApiResourceTypeDataList& data): 
+ResTypeXmlParser::ResTypeXmlParser(ApiResourceTypeDataList& data):
     m_data(data),
     m_rootResType(nullptr),
     m_resTypeFound(false)
@@ -16,7 +16,7 @@ ResTypeXmlParser::ResTypeXmlParser(ApiResourceTypeDataList& data):
 
 const ApiResourceTypeData* ResTypeXmlParser::findResTypeByName(const QString& name)
 {
-    for (int i = m_data.size()-1; i >= 0; --i) {
+    for (int i = (int) m_data.size() - 1; i >= 0; --i) {
         if (m_data[i].name == name && m_data[i].vendor == m_vendor)
             return &m_data[i];
     }
@@ -70,7 +70,7 @@ bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttri
             return false;
     }
     else {
-        for(const QString& parentName: attrs.value("public").split(L',')) 
+        for(const QString& parentName: attrs.value("public").split(L','))
         {
             if (!addParentType(newData, parentName.trimmed()))
                 return false;
@@ -122,7 +122,7 @@ bool ResTypeXmlParser::startElement( const QString& namespaceURI, const QString&
         return processResource(localName, attrs);
     else if (localName == lit("param"))
         return processParam(localName, attrs);
-    
+
     return true;
 }
 
@@ -130,7 +130,7 @@ bool ResTypeXmlParser::endElement( const QString& namespaceURI, const QString& l
 {
     Q_UNUSED(namespaceURI)
     Q_UNUSED(qName)
-    
+
     if (localName == lit("resource"))
         m_resTypeFound = false;
 

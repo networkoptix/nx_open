@@ -24,7 +24,7 @@
         <android.oslibs>-lz</android.oslibs>
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>
-        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl ffmpeg any/detection_plugin_interface</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.mac.packages>quazip</rdep.mac.packages>

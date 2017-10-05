@@ -928,6 +928,10 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     return isResourcesListValid<QnCameraInputPolicy>(
                         resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
 
+                case vms::event::analyticsSdkEvent:
+                    return isResourcesListValid<QnCameraAnalyticsPolicy>(
+                        resourcePool()->getResources<QnCameraAnalyticsPolicy::resource_type>(filtered));
+
                 case vms::event::softwareTriggerEvent:
                 {
                     if (m_eventParams.metadata.allUsers)
@@ -1102,6 +1106,9 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 
     if (m_eventType == vms::event::cameraInputEvent)
         return QnCameraInputPolicy::getText(resources, detailed);
+
+    if (m_eventType == vms::event::analyticsSdkEvent)
+        return QnCameraAnalyticsPolicy::getText(resources, detailed);
 
     if (!vms::event::isResourceRequired(m_eventType))
         return braced(tr("System"));

@@ -196,9 +196,6 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
 
     base_type::handleResourceAdded(resource);
 
-    if (isUpdating())
-        return;
-
     if (auto videoWall = resource.dynamicCast<QnVideoWallResource>())
     {
         handleVideoWallAdded(videoWall);
@@ -211,7 +208,8 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
                 updateAccessToLayout(layout);
             });
 
-        updateAccessToLayout(layout);
+        if (!isUpdating())
+            updateAccessToLayout(layout);
     }
 }
 
@@ -304,10 +302,13 @@ void QnVideoWallItemAccessProvider::handleVideoWallAdded(const QnVideoWallResour
     NX_EXPECT(mode() == Mode::cached);
 
     /* Layouts and videowalls can be added independently. */
-    for (auto layout: getLayoutsForVideoWall(videoWall))
+    if (!isUpdating())
     {
-        if (layoutBelongsToVideoWall(layout) && m_itemAggregator->addWatchedLayout(layout))
-            updateAccessToResource(layout);
+        for (auto layout: getLayoutsForVideoWall(videoWall))
+        {
+            if (layoutBelongsToVideoWall(layout) && m_itemAggregator->addWatchedLayout(layout))
+                updateAccessToResource(layout);
+        }
     }
 
     connect(videoWall, &QnVideoWallResource::itemAdded, this,

@@ -87,11 +87,6 @@ static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
  */
 uint qt4Hash(const QString& key);
 
-/**
- * Format JSon string to human readable format
- */
-QByteArray formatJSonString(const QByteArray& data);
-
 #ifdef _DEBUG
 QString debugTime(qint64 timeMSec, const QString &fmt = QString());
 #endif

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <functional>
+
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
 
 namespace nx {
@@ -60,8 +62,6 @@ enum class ReceiveMode
     message,    /**< Read handler will be called only when complete message has been read from socket*/
     stream      /**< Read handler will be called only when any data has been read from socket */
 };
-
-using HandlerType = std::function<void(SystemError::ErrorCode, size_t)>;
 
 } // namespace websocket
 } // namespace network

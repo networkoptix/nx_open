@@ -98,16 +98,18 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
-        const nx_http::Request& /*request*/,
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& request,
         nx::utils::stree::ResourceContainer /*authInfo*/) override
     {
-        Request inputData = prepareRequestData();
+        Request inputData = prepareRequestData(connection, request);
         this->invokeManagerFunc(inputData, this->m_managerFunc);
     }
 
 protected:
-    virtual Request prepareRequestData() = 0;
+    virtual Request prepareRequestData(
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& httpRequest) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -126,17 +128,20 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
-        const nx_http::Request& /*request*/,
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& request,
         nx::utils::stree::ResourceContainer /*authInfo*/,
         Request inputData) override
     {
-        prepareRequestData(&inputData);
+        prepareRequestData(connection, request, &inputData);
         this->invokeManagerFunc(inputData, this->m_managerFunc);
     }
 
 protected:
-    virtual void prepareRequestData(Request* request) = 0;
+    virtual void prepareRequestData(
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& httpRequest,
+        Request* request) = 0;
 };
 
 } // namespace view

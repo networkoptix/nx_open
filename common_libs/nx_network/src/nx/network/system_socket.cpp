@@ -767,7 +767,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::connectAsync(
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
@@ -775,7 +775,7 @@ void CommunicatingSocket<SocketInterfaceToImplement>::readSomeAsync(
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::sendAsync(
     const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+    IoCompletionHandler handler)
 {
     return m_aioHelper->sendAsync(buf, std::move(handler));
 }
@@ -1498,6 +1498,15 @@ UDPSocket::UDPSocket(int ipVersion):
     {
         //error
     }
+
+    struct linger lingerOptions;
+    memset(&lingerOptions, 0, sizeof(lingerOptions));
+    if (setsockopt(
+            handle(), SOL_SOCKET, SO_LINGER,
+            (const char*)&lingerOptions, sizeof(lingerOptions)) < 0) 
+    {
+        // Ignoring for now.
+    }
 }
 
 UDPSocket::~UDPSocket()
@@ -1699,7 +1708,7 @@ bool UDPSocket::sendTo(
 void UDPSocket::sendToAsync(
     const nx::Buffer& buffer,
     const SocketAddress& endpoint,
-    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
     if (endpoint.address.isIpAddress())
     {
@@ -1751,7 +1760,7 @@ int UDPSocket::recvFrom(
 
 void UDPSocket::recvFromAsync(
     nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
     readSomeAsync(
         buf,

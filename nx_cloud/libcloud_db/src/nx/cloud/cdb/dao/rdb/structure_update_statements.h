@@ -824,6 +824,15 @@ CREATE TABLE system_auth_info(
 
 )sql";
 
+/**
+ * CLOUD-1424. Adding beingMerged system state.
+ */
+static const char kAddBeingMergedState[] = R"sql(
+
+INSERT INTO system_status VALUES(4, 'beingMerged');
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

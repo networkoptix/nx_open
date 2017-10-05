@@ -35,6 +35,8 @@
 #include <common/common_module.h>
 #include <api/global_settings.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+
 namespace {
     const QString kUrlScheme = lit("rtsp");
     const QString protoVersionPropertyName = lit("protoVersion");
@@ -51,7 +53,15 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     m_serverFlags(Qn::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
-        &m_mutex )
+        &m_mutex ),
+    m_analyticsDriversCache(
+        [this]()
+        {
+            return QJson::deserialized<QList<nx::api::AnalyticsDriverManifest>>(
+                getProperty(Qn::kAnalyticsDriversParamName).toUtf8());
+        },
+        &m_mutex
+    )
 {
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
     addFlags(Qn::server | Qn::remote);
@@ -60,7 +70,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     m_statusTimer.restart();
 
     connect(this, &QnResource::resourceChanged,
-        this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
+        this, &QnMediaServerResource::resetCachedValues, Qt::DirectConnection);
 
     connect(this, &QnResource::propertyChanged,
         this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
@@ -73,10 +83,12 @@ QnMediaServerResource::~QnMediaServerResource()
     m_runningIfRequests.clear();
 }
 
-void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+void QnMediaServerResource::at_propertyChanged(const QnResourcePtr& /*res*/, const QString& key)
 {
     if (key == QnMediaResource::panicRecordingKey())
-        m_panicModeCache.update();
+        m_panicModeCache.reset();
+    else if (key == Qn::kAnalyticsDriversParamName)
+        m_analyticsDriversCache.reset();
 }
 
 void QnMediaServerResource::at_cloudSettingsChanged()
@@ -85,6 +97,12 @@ void QnMediaServerResource::at_cloudSettingsChanged()
         return;
 
     emit auxUrlsChanged(toSharedPointer(this));
+}
+
+void QnMediaServerResource::resetCachedValues()
+{
+    m_panicModeCache.reset();
+    m_analyticsDriversCache.reset();
 }
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
@@ -105,11 +123,6 @@ void QnMediaServerResource::beforeDestroy()
 {
     QnMutexLocker lock(&m_mutex);
     m_firstCamera.clear();
-}
-
-void QnMediaServerResource::atResourceChanged()
-{
-    m_panicModeCache.update();
 }
 
 QString QnMediaServerResource::getUniqueId() const
@@ -574,6 +587,18 @@ QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWith
     return information;
 }
 
+QList<nx::api::AnalyticsDriverManifest> QnMediaServerResource::analyticsDrivers() const
+{
+    return m_analyticsDriversCache.get();
+}
+
+void QnMediaServerResource::setAnalyticsDrivers(
+    const QList<nx::api::AnalyticsDriverManifest>& drivers)
+{
+    QString value = QString::fromUtf8(QJson::serialized(drivers));
+    setProperty(Qn::kAnalyticsDriversParamName, value);
+}
+
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge);
@@ -683,3 +708,4 @@ nx::utils::Url QnMediaServerResource::buildApiUrl() const
 
     return url;
 }
+
