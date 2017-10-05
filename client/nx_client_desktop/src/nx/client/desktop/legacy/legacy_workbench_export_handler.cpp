@@ -481,8 +481,9 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
                     const int bigValue = std::numeric_limits<int>::max();
                     NX_ASSERT(resolution.isValid());
 
-                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters,
-                        resolution, QSize(bigValue, bigValue));
+                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters);
+                    filterChain.prepare(imageParameters.resource, resolution,
+                        QSize(bigValue, bigValue));
                     if (filterChain.isDownscaleRequired(resolution))
                     {
                         transcodeWarnShown = true;

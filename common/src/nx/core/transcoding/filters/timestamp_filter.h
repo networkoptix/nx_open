@@ -1,21 +1,15 @@
 #pragma once
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <QtCore/qnamespace.h>
 #include <transcoding/filters/abstract_image_filter.h>
 
-
 namespace nx {
-
 namespace core {
 namespace transcoding {
 
 struct TimestampOverlaySettings;
-
-} // namespace transcoding
-} // namespace core
-
-namespace transcoding {
-namespace filters {
 
 class TimestampFilter: public QnAbstractImageFilter
 {
@@ -38,6 +32,8 @@ private:
     const QScopedPointer<Internal> d;
 };
 
-} // namespace filters
 } // namespace transcoding
+} // namespace core
 } // namespace nx
+
+#endif // ENABLE_DATA_PROVIDERS

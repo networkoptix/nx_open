@@ -1,12 +1,14 @@
 #include "timestamp_filter.h"
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <QtCore/QDateTime>
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 
 #include <utils/common/util.h>
 #include <utils/media/frame_info.h>
-#include <transcoding/filters/image_to_frame_painter.h>
+#include <nx/core/transcoding/filters/image_to_frame_painter.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
 
 namespace {
@@ -22,18 +24,16 @@ QFont fontFromParams(const nx::core::transcoding::TimestampOverlaySettings& para
 } // namespace
 
 namespace nx {
+namespace core {
 namespace transcoding {
-namespace filters {
 
 class TimestampFilter::Internal
 {
 public:
-    Internal(const core::transcoding::TimestampOverlaySettings& params);
+    explicit Internal(const core::transcoding::TimestampOverlaySettings& params);
 
     void updateTimestamp(const CLVideoDecoderOutputPtr& frame);
     detail::ImageToFramePainter& painter();
-
-private:
 
 private:
     const QFont m_font;
@@ -129,7 +129,8 @@ QString TimestampFilter::timestampTextSimple(qint64 timeOffsetMs)
     return time.toString(lit("hh:mm:ss"));
 }
 
-} // namespace filters
 } // namespace transcoding
+} // namespace core
 } // namespace nx
 
+#endif // ENABLE_DATA_PROVIDERS

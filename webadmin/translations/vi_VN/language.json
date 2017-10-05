@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Ngắt kết nối",
     "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
     "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Detach",
     "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
     "connectedSuccess":"Hệ thống ngắt nối thành công",

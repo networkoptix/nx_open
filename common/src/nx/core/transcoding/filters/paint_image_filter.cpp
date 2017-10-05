@@ -1,10 +1,12 @@
 #include "paint_image_filter.h"
 
-#include <transcoding/filters/image_to_frame_painter.h>
+#if defined(ENABLE_DATA_PROVIDERS)
+
+#include <nx/core/transcoding/filters/image_to_frame_painter.h>
 
 namespace nx {
+namespace core {
 namespace transcoding {
-namespace filters {
 
 PaintImageFilter::PaintImageFilter():
     m_painter(new detail::ImageToFramePainter())
@@ -34,6 +36,8 @@ void PaintImageFilter::setImage(
     m_painter->setImage(image, offset, alignment);
 }
 
-} // namespace filters
 } // namespace transcoding
+} // namespace core
 } // namespace nx
+
+#endif // ENABLE_DATA_PROVIDERS
