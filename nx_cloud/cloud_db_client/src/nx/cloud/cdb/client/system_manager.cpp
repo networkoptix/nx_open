@@ -3,6 +3,7 @@
 #include "cdb_request_path.h"
 #include "data/system_data.h"
 
+#include <nx/network/http/rest/http_rest_client.h>
 #include <nx/utils/app_info.h>
 
 namespace nx {
@@ -164,6 +165,20 @@ void SystemManager::getSystemHealthHistory(
         api::SystemId(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemHealthHistory()));
+}
+
+void SystemManager::startMerge(
+    const std::string& idOfSystemToMergeTo,
+    const std::string& idOfSystemBeingMerged,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    executeRequest(
+        nx_http::Method::post,
+        nx_http::rest::substituteParameters(
+            kSystemsMergedToASpecificSystem, {idOfSystemToMergeTo}).c_str(),
+        api::SystemId(idOfSystemBeingMerged),
+        completionHandler,
+        completionHandler);
 }
 
 } // namespace client

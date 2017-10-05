@@ -931,6 +931,26 @@ api::ResultCode CdbLauncher::getStatistics(api::Statistics* const statistics)
     return resCode;
 }
 
+api::ResultCode CdbLauncher::mergeSystems(
+    const AccountWithPassword& account,
+    const std::string& systemToMergeTo,
+    const std::string& systemBeingMerged)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(account.email, account.password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode) =
+        makeSyncCall<nx::cdb::api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::startMerge,
+                connection->systemManager(),
+                systemToMergeTo,
+                systemBeingMerged,
+                std::placeholders::_1));
+    return resCode;
+}
+
 bool CdbLauncher::isStartedWithExternalDb() const
 {
     const nx::utils::db::ConnectionOptions connectionOptions = dbConnectionOptions();

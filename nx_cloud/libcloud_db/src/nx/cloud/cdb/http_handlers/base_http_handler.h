@@ -90,9 +90,8 @@ protected:
 
 } // namespace detail
 
-/**
- * Contains logic common for all cloud_db HTTP request handlers.
- */
+//-------------------------------------------------------------------------------------------------
+
 template<typename Input, typename ... Output>
 class AbstractFiniteMsgBodyHttpHandler:
     public detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>
@@ -100,22 +99,15 @@ class AbstractFiniteMsgBodyHttpHandler:
     static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
 
 public:
-    typedef std::function<void(
-        const AuthorizationInfo& authzInfo,
-        Input inputData,
-        std::function<void(api::ResultCode resultCode, Output... outData)>&& completionHandler)> ExecuteRequestFunc;
-
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc requestFunc)
+        const AuthorizationManager& authorizationManager)
         :
         detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>(
             entityType,
             actionType,
-            authorizationManager),
-        m_requestFunc(std::move(requestFunc))
+            authorizationManager)
     {
     }
 
@@ -133,7 +125,7 @@ public:
                 &authInfo))
             return;
 
-        m_requestFunc(
+        processRequest(
             AuthorizationInfo(std::move(authInfo)),
             std::move(inputData),
             [this](api::ResultCode resultCode, Output... outData)
@@ -147,9 +139,57 @@ public:
             });
     }
 
+protected:
+    virtual void processRequest(
+        const AuthorizationInfo& authzInfo,
+        Input inputData,
+        std::function<void(api::ResultCode, Output...)> completionHandler) = 0;
+};
+
+/**
+ * Contains logic common for all cloud_db HTTP request handlers.
+ */
+template<typename Input, typename ... Output>
+class FiniteMsgBodyHttpHandler:
+    public AbstractFiniteMsgBodyHttpHandler<Input, Output...>
+{
+    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
+
+public:
+    typedef std::function<void(
+        const AuthorizationInfo& authzInfo,
+        Input inputData,
+        std::function<void(api::ResultCode resultCode, Output... outData)>&& completionHandler)
+    > ExecuteRequestFunc;
+
+    FiniteMsgBodyHttpHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc requestFunc)
+        :
+        AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
+            entityType,
+            actionType,
+            authorizationManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+    }
+
+protected:
+    virtual void processRequest(
+        const AuthorizationInfo& authzInfo,
+        Input inputData,
+        std::function<void(api::ResultCode, Output...)> completionHandler) override
+    {
+        m_requestFunc(authzInfo, std::move(inputData), std::move(completionHandler));
+    }
+
 private:
     ExecuteRequestFunc m_requestFunc;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * No input.
@@ -161,21 +201,15 @@ class AbstractFiniteMsgBodyHttpHandler<void, Output...>:
     static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
 
 public:
-    typedef std::function<void(
-        const AuthorizationInfo& authzInfo,
-        std::function<void(api::ResultCode resultCode, Output... outData)> completionHandler)> ExecuteRequestFunc;
-
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
-        ExecuteRequestFunc requestFunc)
+        const AuthorizationManager& authorizationManager)
         :
         detail::BaseFiniteMsgBodyHttpHandler<void, Output...>(
             entityType,
             actionType,
-            authorizationManager),
-        m_requestFunc(std::move(requestFunc))
+            authorizationManager)
     {
     }
 
@@ -192,7 +226,7 @@ public:
                 &authInfo))
             return;
 
-        m_requestFunc(
+        processRequest(
             AuthorizationInfo(std::move(authInfo)),
             [this](api::ResultCode resultCode, Output... outData)
             {
@@ -205,9 +239,49 @@ public:
             });
     }
 
+protected:
+    virtual void processRequest(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode, Output...)> completionHandler) = 0;
+};
+
+template<typename... Output>
+class FiniteMsgBodyHttpHandler<void, Output...>:
+    public AbstractFiniteMsgBodyHttpHandler<void, Output...>
+{
+public:
+    typedef std::function<void(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode resultCode, Output... outData)> completionHandler)
+    > ExecuteRequestFunc;
+
+    FiniteMsgBodyHttpHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc requestFunc)
+        :
+        AbstractFiniteMsgBodyHttpHandler<void, Output...>(
+            entityType,
+            actionType,
+            authorizationManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+    }
+
+protected:
+    virtual void processRequest(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode, Output...)> completionHandler) override
+    {
+        m_requestFunc(authzInfo, std::move(completionHandler));
+    }
+
 private:
     ExecuteRequestFunc m_requestFunc;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 template<typename... InputData>
 class AbstractFreeMsgBodyHttpHandler:

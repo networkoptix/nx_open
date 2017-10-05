@@ -29,7 +29,6 @@ HttpView::HttpView(
         nx::network::NatTraversalSupport::disabled)
 {
     registerApiHandlers(
-        &m_httpMessageDispatcher,
         controller->authorizationManager(),
         &controller->accountManager(),
         &controller->systemManager(),
@@ -91,7 +90,6 @@ std::vector<SocketAddress> HttpView::endpoints() const
 }
 
 void HttpView::registerApiHandlers(
-    nx_http::MessageDispatcher* const msgDispatcher,
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
@@ -103,7 +101,7 @@ void HttpView::registerApiHandlers(
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
 {
-    msgDispatcher->registerRequestProcessor<http_handler::Ping>(
+    m_httpMessageDispatcher.registerRequestProcessor<http_handler::Ping>(
         http_handler::Ping::kHandlerPath,
         [&authorizationManager]() -> std::unique_ptr<http_handler::Ping>
         {
@@ -201,6 +199,25 @@ void HttpView::registerApiHandlers(
         EntityType::system, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
+    // SystemMergeManager
+    registerWriteOnlyRestHandler<data::SystemId>(
+        nx_http::Method::post,
+        kSystemsMergedToASpecificSystem,
+        EntityType::system, DataActionType::update,
+        [this](
+            const AuthorizationInfo& authzInfo,
+            const std::vector<nx_http::StringType>& restPathParams,
+            data::SystemId inputData,
+            std::function<void(api::ResultCode)> completionHandler)
+        {
+            m_controller->systemMergeManager().startMergingSystems(
+                authzInfo,
+                restPathParams[0].toStdString(),
+                std::move(inputData),
+                std::move(completionHandler));
+        });
+
+    //---------------------------------------------------------------------------------------------
     // AuthenticationProvider
     registerHttpHandler(
         kAuthGetNoncePath,
@@ -257,7 +274,7 @@ void HttpView::registerApiHandlers(
     //---------------------------------------------------------------------------------------------
     using namespace std::placeholders;
 
-    msgDispatcher->registerRequestProcessor<http_handler::GetCloudModulesXml>(
+    m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kDeprecatedCloudModuleXmlPath,
         [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
@@ -266,7 +283,7 @@ void HttpView::registerApiHandlers(
                 std::bind(&CloudModuleUrlProvider::getCloudModulesXml, cloudModuleUrlProviderDeprecated, _1));
         });
 
-    msgDispatcher->registerRequestProcessor<http_handler::GetCloudModulesXml>(
+    m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kDiscoveryCloudModuleXmlPath,
         [&authorizationManager, &cloudModuleUrlProvider]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
@@ -287,7 +304,7 @@ void HttpView::registerHttpHandler(
     EntityType entityType,
     DataActionType dataActionType)
 {
-    typedef AbstractFiniteMsgBodyHttpHandler<
+    typedef FiniteMsgBodyHttpHandler<
         typename std::remove_const<typename std::remove_reference<InputData>::type>::type,
         OutputData...
     > HttpHandlerType;
@@ -318,7 +335,7 @@ void HttpView::registerHttpHandler(
 {
     typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
         ActualOutputDataType;
-    typedef AbstractFiniteMsgBodyHttpHandler<
+    typedef FiniteMsgBodyHttpHandler<
         void,
         typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
     > HttpHandlerType;
@@ -367,6 +384,74 @@ void HttpView::registerHttpHandler(
         [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
         {
             return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
+        },
+        method);
+}
+
+namespace {
+
+template<typename Input, typename HandlerFunc>
+class WriteOnlyRestHandler:
+    public AbstractFiniteMsgBodyHttpHandler<Input>
+{
+    using base_type = AbstractFiniteMsgBodyHttpHandler<Input>;
+
+public:
+    //using HandlerFunc = 
+    //    void(const AuthorizationInfo& authzInfo,
+    //        const std::vector<nx_http::StringType>& restPathParams,
+    //        Input inputData,
+    //        std::function<void(api::ResultCode)> completionHandler);
+
+    WriteOnlyRestHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager,
+        HandlerFunc func)
+        :
+        base_type(entityType, actionType, authorizationManager),
+        m_func(std::move(func))
+    {
+    }
+
+protected:
+    virtual void processRequest(
+        const AuthorizationInfo& authzInfo,
+        Input inputData,
+        std::function<void(api::ResultCode)> completionHandler) override
+    {
+        m_func(
+            authzInfo,
+            requestPathParams(),
+            std::move(inputData),
+            std::move(completionHandler));
+    }
+
+private:
+    HandlerFunc m_func;
+};
+
+} // namespace
+
+template<typename InputData, typename HandlerType>
+void HttpView::registerWriteOnlyRestHandler(
+    nx_http::Method::ValueType method,
+    const char* handlerPath,
+    EntityType entityType,
+    DataActionType dataActionType,
+    HandlerType handler)
+{
+    using HttpHandlerType = WriteOnlyRestHandler<InputData, HandlerType>;
+
+    m_httpMessageDispatcher.registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, entityType, dataActionType, handler]() -> std::unique_ptr<HttpHandlerType>
+        {
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                m_controller->authorizationManager(),
+                handler);
         },
         method);
 }

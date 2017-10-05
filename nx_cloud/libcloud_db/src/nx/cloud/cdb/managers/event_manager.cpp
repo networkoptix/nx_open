@@ -68,7 +68,7 @@ EventManager::~EventManager()
 
 void EventManager::registerHttpHandlers(
     const AuthorizationManager& authorizationManager,
-    nx_http::MessageDispatcher* const httpMessageDispatcher)
+    nx_http::server::rest::MessageDispatcher* const httpMessageDispatcher)
 {
     httpMessageDispatcher->registerRequestProcessor<SubscribeToSystemEventsHandler>(
         SubscribeToSystemEventsHandler::kHandlerPath,

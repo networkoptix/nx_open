@@ -18,6 +18,7 @@
 #include "managers/maintenance_manager.h"
 #include "managers/system_health_info_provider.h"
 #include "managers/system_manager.h"
+#include "managers/system_merge_manager.h"
 #include "managers/temporary_account_password_manager.h"
 #include "stree/stree_manager.h"
 
@@ -46,6 +47,8 @@ public:
 
     SystemManager& systemManager();
 
+    AbstractSystemMergeManager& systemMergeManager();
+
     AuthenticationProvider& authProvider();
 
     MaintenanceManager& maintenanceManager();
@@ -70,6 +73,7 @@ private:
     SystemHealthInfoProvider m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;
     SystemManager m_systemManager;
+    SystemMergeManager m_systemMergeManager;
     AuthenticationProvider m_authProvider;
     MaintenanceManager m_maintenanceManager;
     CloudModuleUrlProvider m_cloudModuleUrlProviderDeprecated;

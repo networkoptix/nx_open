@@ -43,6 +43,9 @@ Controller::Controller(const conf::Settings& settings):
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SyncronizationEngine),
+    m_systemMergeManager(
+        &m_systemManager,
+        &m_dbInstanceController.queryExecutor()),
     m_authProvider(
         settings,
         &m_dbInstanceController.queryExecutor(),
@@ -128,6 +131,11 @@ SystemHealthInfoProvider& Controller::systemHealthInfoProvider()
 SystemManager& Controller::systemManager()
 {
     return m_systemManager;
+}
+
+AbstractSystemMergeManager& Controller::systemMergeManager()
+{
+    return m_systemMergeManager;
 }
 
 AuthenticationProvider& Controller::authProvider()

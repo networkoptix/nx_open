@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/socket_common.h>
 
@@ -86,11 +86,10 @@ private:
 
     const conf::Settings& m_settings;
     Controller* m_controller;
-    nx_http::MessageDispatcher m_httpMessageDispatcher;
+    nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer> m_multiAddressHttpServer;
 
     void registerApiHandlers(
-        nx_http::MessageDispatcher* const msgDispatcher,
         const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager,
@@ -137,6 +136,21 @@ private:
         const char* handlerPath,
         typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
         ManagerType* manager);
+
+    /**
+     * @param handler is 
+     * void(const AuthorizationInfo& authzInfo,
+     *     const std::vector<nx_http::StringType>& restPathParams,
+     *     InputData inputData,
+     *     std::function<void(api::ResultCode)> completionHandler);
+     */
+    template<typename InputData, typename HandlerType>
+    void registerWriteOnlyRestHandler(
+        nx_http::Method::ValueType method,
+        const char* handlerPath,
+        EntityType entityType,
+        DataActionType dataActionType,
+        HandlerType handler);
 };
 
 } // namespace cdb
