@@ -518,7 +518,10 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.zoomWindow = parameters.zoomRect;
         auto filters = QnImageFilterHelper::createFilterChain(
             transcodeParams);
-        filters.prepare(parameters.resource, result.size());
+
+        // Thumbnail from loader is already merged for panoramic cameras.
+        filters.prepare(QnConstResourceVideoLayoutPtr(),
+            parameters.resource->getDewarpingParams(), result.size());
 
         if (!filters.isEmpty())
         {

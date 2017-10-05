@@ -1144,7 +1144,7 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
         ? isRadassSupported(layout, MatchMode::Any)
         : isRadassSupported(layoutItems, MatchMode::Any);
 
-    return supported ? EnabledAction : DisabledAction;
+    return supported ? EnabledAction : InvisibleAction;
 }
 
 PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):

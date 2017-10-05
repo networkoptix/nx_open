@@ -264,21 +264,18 @@ QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProce
         if (m_display[i])
         {
             frame = m_display[i]->getScreenshot(anyQuality);
-            if (frame)
+            if (!frame)
+                continue;
+
+            if (!filters.isTranscodingRequired(imageProcessingParams.resource))
+                return frame->toImage();
+
+            if (!filters.isReady())
             {
-                if (!filters.isReady())
-                {
-                    filters.prepare(imageProcessingParams.resource,
-                        QSize(frame->width, frame->height));
-                }
-                frame = filters.apply(frame);
-                for(auto filter: filters)
-                {
-                    frame = filter->updateImage(frame);
-                    if (!frame)
-                        break;
-                }
+                filters.prepare(imageProcessingParams.resource,
+                    QSize(frame->width, frame->height));
             }
+            frame = filters.apply(frame);
         }
     }
     return frame ? frame->toImage() : QImage();
