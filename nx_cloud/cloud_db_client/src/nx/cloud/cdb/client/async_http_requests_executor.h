@@ -158,8 +158,8 @@ private:
      */
     template<typename InputData, typename OutputData>
     void execute(
-        nx::utils::Url url,
         nx_http::Method::ValueType httpMethod,
+        nx::utils::Url url,
         nx_http::AuthInfo auth,
         const InputData& input,
         std::function<void(api::ResultCode, OutputData)> completionHandler)

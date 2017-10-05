@@ -59,16 +59,16 @@ public:
     void setAllowLocks(bool allowLocks);
 
 private:
-    QUrl buildRequestUrl(
+    utils::Url buildRequestUrl(
         const QString& cgi,
         const QString& submenu,
         const QString& action,
         std::map<QString, QString> parameters) const;
 
-    QUrl buildAttributesUrl(const QString& attributesPath) const;
+    utils::Url buildAttributesUrl(const QString& attributesPath) const;
 
     bool doRequestInternal(
-        const QUrl& url,
+        const utils::Url& url,
         const QAuthenticator& auth,
         nx::Buffer* outBuffer,
         nx_http::StatusCode::Value* outStatusCode);

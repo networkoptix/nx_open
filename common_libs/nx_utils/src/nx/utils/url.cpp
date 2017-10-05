@@ -17,10 +17,7 @@ public:
     UrlWithIpV6AndScopeId(const QString& url): m_url(url.toLower())
     {
         if (!parseWith(kUrlWithIpInBracketsWithScopeIdRx))
-        {
-            m_parsePos = 0;
             parseWith(kUrlIpWithoutBracketsWithScopeIdRx);
-        }
     }
 
     QString urlWithoutScopeId() const
@@ -39,60 +36,39 @@ public:
     }
 
 private:
-    struct Extracted
-    {
-        QString data;
-        int pos;
-        int len;
-    };
-
     const static QRegExp kUrlWithIpInBracketsWithScopeIdRx;
     const static QRegExp kUrlIpWithoutBracketsWithScopeIdRx;
 
     const QString m_url;
     mutable QString m_newUrl;
     mutable int m_scopeId = -1;
-    mutable int m_parsePos = 0;
 
     bool parseWith(const QRegExp& rx) const
     {
-        Extracted scopeId;
-        Extracted ip;
-        Extracted ipWithScopeId;
-
-        if (!extract(rx, &ipWithScopeId) || !extract(rx, &ip) || !extract(rx, &scopeId))
+        int pos;
+        if ((pos = rx.indexIn(m_url)) == -1)
             return false;
 
-        if (!validateCharAfterIp(ipWithScopeId))
+        QString ipWithScopeId = rx.cap(1);
+        QString ip = rx.cap(2);
+
+        if (!validateCharAfterIp(rx.matchedLength()))
             return false;
 
         m_newUrl = m_url;
-        m_newUrl.replace(ipWithScopeId.data, ip.data);
-        m_scopeId = scopeId.data.toInt();
+        m_newUrl.replace(ipWithScopeId, ip);
+        m_scopeId = rx.cap(3).toInt();
 
         return true;
     }
 
-    bool extract(const QRegExp& rx, Extracted* target) const
+    bool validateCharAfterIp(int pos) const
     {
-        target->pos = rx.indexIn(m_url, m_parsePos);
-        if (target->pos == -1)
-            return false;
-
-        target->len = rx.matchedLength();
-        target->data = rx.cap(1);
-        m_parsePos += target->len;
-
-        return true;
-    }
-
-    bool validateCharAfterIp(const Extracted& extracted) const
-    {
-        NX_ASSERT(extracted.pos + extracted.len <= m_url.size());
-        if (extracted.pos + extracted.len == m_url.size())
+        NX_ASSERT(pos <= m_url.size());
+        if (pos == m_url.size())
             return true;
 
-        const auto nextChar = m_url[extracted.pos + extracted.len];
+        const auto nextChar = m_url[pos];
         if (nextChar != '/' && nextChar != '#' && nextChar != '?')
             return false;
 
@@ -112,10 +88,7 @@ public:
     IpWithScopeId(const QString& ip): m_ip(ip)
     {
         if(!parseWith(kIpInBracketsWithScopeIdRx))
-        {
-            m_parsePos = 0;
             parseWith(kIpWithoutBracketsWithScopeIdRx);
-        }
     }
 
     QString ip() const { return m_newIp; }
@@ -129,25 +102,14 @@ private:
     const QString m_ip;
     mutable QString m_newIp;
     mutable int m_scopeId = -1;
-    mutable int m_parsePos = 0;
 
     bool parseWith(const QRegExp& rx) const
     {
-        QString scopeId;
-        if (!extract(rx, &m_newIp) || !extract(rx, &scopeId))
+        if (rx.indexIn(m_ip) == -1)
             return false;
 
-        m_scopeId = scopeId.toInt();
-        return true;
-    }
-
-    bool extract(const QRegExp& rx, QString* target) const
-    {
-        if ((m_parsePos = rx.indexIn(m_ip, m_parsePos)) == -1)
-            return false;
-
-        *target = rx.cap(1);
-        m_parsePos += rx.matchedLength();
+        m_newIp = rx.cap(1);
+        m_scopeId = rx.cap(2).toInt();
 
         return true;
     }

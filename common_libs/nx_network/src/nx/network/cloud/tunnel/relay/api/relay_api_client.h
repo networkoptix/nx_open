@@ -52,7 +52,7 @@ public:
         const nx::String& sessionId,
         OpenRelayConnectionHandler handler) = 0;
 
-    virtual QUrl url() const = 0;
+    virtual nx::utils::Url url() const = 0;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const = 0;
 };
@@ -97,7 +97,7 @@ public:
         const nx::String& sessionId,
         OpenRelayConnectionHandler handler) override;
 
-    virtual QUrl url() const override;
+    virtual nx::utils::Url url() const override;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 

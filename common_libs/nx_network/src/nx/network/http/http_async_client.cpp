@@ -258,7 +258,7 @@ void AsyncClient::doUpgrade(
 
 void AsyncClient::doRequest(
     nx_http::Method::ValueType method,
-    const QUrl& url)
+    const nx::utils::Url& url)
 {
     NX_ASSERT(!url.host().isEmpty());
     NX_ASSERT(url.isValid());
@@ -275,7 +275,7 @@ void AsyncClient::doRequest(
 
 void AsyncClient::doRequest(
     nx_http::Method::ValueType method,
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);

@@ -127,7 +127,7 @@ void ClientImpl::openConnectionToTheTargetHost(
             std::move(completionHandler));
 }
 
-QUrl ClientImpl::url() const
+nx::utils::Url ClientImpl::url() const
 {
     return m_baseUrl;
 }

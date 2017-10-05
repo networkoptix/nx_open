@@ -35,7 +35,7 @@ HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesP
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(attributesPath);
 
-    qDebug() << "URL" << url;
+    qDebug() << "URL" << url.toString();
     if (!doRequestInternal(url, m_resource->getAuth(), &buffer, &statusCode))
         return HanwhaAttributes(statusCode);
 
@@ -109,13 +109,13 @@ void HanwhaRequestHelper::setAllowLocks(bool allowLocks)
     m_allowLocks = allowLocks;
 }
 
-QUrl HanwhaRequestHelper::buildRequestUrl(
+utils::Url HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
     std::map<QString, QString> parameters) const
 {
-    QUrl url(m_resource->getUrl());
+    utils::Url url(m_resource->getUrl());
     QUrlQuery query;
 
     url.setPath(kPathTemplate.arg(cgi));
@@ -130,9 +130,9 @@ QUrl HanwhaRequestHelper::buildRequestUrl(
     return url;
 }
 
-QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const
+utils::Url HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const
 {
-    QUrl url(m_resource->getUrl());
+    utils::Url url(m_resource->getUrl());
     url.setQuery(QUrlQuery());
 
     url.setPath(kAttributesPathTemplate.arg(attributesPath));
@@ -141,7 +141,7 @@ QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) cons
 }
 
 bool HanwhaRequestHelper::doRequestInternal(
-    const QUrl& url,
+    const utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
     nx_http::StatusCode::Value* outStatusCode)

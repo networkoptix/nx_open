@@ -53,8 +53,7 @@ QString HanwhaResourceSearcher::manufacture() const
     return kHanwhaManufacturerName;
 }
 
-QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
-    const QUrl& url,
+QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url,
     const QAuthenticator& auth,
     bool isSearchAction)
 {
@@ -67,7 +66,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
 
     QnResourceList result;
     HanwhaResourcePtr resource(new HanwhaResource());
-    QUrl urlCopy(url);
+    utils::Url urlCopy(url);
     urlCopy.setScheme("http");
     QString urlStr = urlCopy.toString();
 
