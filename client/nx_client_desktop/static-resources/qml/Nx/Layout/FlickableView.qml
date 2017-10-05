@@ -99,12 +99,11 @@ Item
         function defaultPanOffset()
         {
             if (!zoomedItem)
-                return Qt.point(0, 0)
+                return Qt.point((width - contentWidth) / 2, (height - contentHeight) / 2)
 
-            var originX = (zoomedItem.x + zoomedItem.width / 2) / contentWidth
-            var originY = (zoomedItem.y + zoomedItem.height / 2) / contentHeight
-
-            return Qt.point(contentWidth * (0.5 - originX), contentHeight * (0.5 - originY))
+            return Qt.point(
+                -zoomedItem.x + (width - zoomedItem.width) / 2,
+                -zoomedItem.y + (height - zoomedItem.height) / 2)
         }
 
         function at_zoomedItemChangedGeometry()
@@ -164,17 +163,17 @@ Item
 
         onScaleChanged:
         {
+            var x = contentItem.x
+            var y = contentItem.y
+            var w = contentItem.width
+            var h = contentItem.height
+
             var implicitContentSize = d.implicitContentSize()
-            var newWidth = implicitContentSize.width * scaleAnimation.scale
-            var newHeight = implicitContentSize.height * scaleAnimation.scale
+            contentItem.width = implicitContentSize.width * scaleAnimation.scale
+            contentItem.height = implicitContentSize.height * scaleAnimation.scale
 
-            var ds = newWidth / contentWidth
-
-            contentItem.width = newWidth
-            contentItem.height = newHeight
-
-            d.scaleOffsetX -= (d.scaleOriginX - 0.5) * newWidth * (ds - 1)
-            d.scaleOffsetY -= (d.scaleOriginY - 0.5) * newHeight * (ds - 1)
+            d.scaleOffsetX += d.scaleOriginX * (w - contentItem.width)
+            d.scaleOffsetY += d.scaleOriginY * (h - contentItem.height)
 
             if (alignToCenterWhenUnzoomed
                 && !panOffsetXAnimation.running && !panOffsetYAnimation.running
@@ -250,17 +249,15 @@ Item
 
             d.clearScaleOffset()
 
-            var maxShiftX = (width + contentWidth) / 2
             d.panOffsetX = MathUtils.bound(
-                -maxShiftX,
+                -contentWidth,
                 pressPanOffsetX + mouse.x - pressX,
-                maxShiftX)
+                width)
 
-            var maxShiftY = (height + contentHeight) / 2
             d.panOffsetY = MathUtils.bound(
-                -maxShiftY,
+                -contentHeight,
                 pressPanOffsetY + mouse.y - pressY,
-                maxShiftY)
+                height)
 
             kineticAnimation.continueMeasurement(Qt.point(d.panOffsetX, d.panOffsetY))
         }
@@ -311,10 +308,11 @@ Item
             if (mouseArea.pressedButtons & Qt.RightButton || d.blockScaleBoundsAnimation)
                 return
 
-            var maxShiftX = (width + contentWidth) / 2
-            var maxShiftY = (height + contentHeight) / 2
-            if (Math.abs(d.panOffsetX) >= maxShiftX || Math.abs(d.panOffsetY) >= maxShiftY)
+            if (d.panOffsetX < -contentWidth || d.panOffsetX > width
+                || d.panOffsetY < -contentHeight || d.panOffsetY > height)
+            {
                 stop()
+            }
         }
 
         onStopped: returnToBounds()
@@ -328,13 +326,13 @@ Item
         {
             target: contentItem
             property: "x"
-            value: width / 2 - contentWidth / 2 + d.panOffsetX + d.scaleOffsetX
+            value: d.panOffsetX + d.scaleOffsetX
         }
         Binding
         {
             target: contentItem
             property: "y"
-            value: height / 2 - contentHeight / 2 + d.panOffsetY + d.scaleOffsetY
+            value: d.panOffsetY + d.scaleOffsetY
         }
     }
 
@@ -440,13 +438,13 @@ Item
         }
         else
         {
-            maxShiftX = (width + contentWidth) / 2
-                - contentWidthPartToBeAlwaysVisible * width
-            newX = MathUtils.bound(-maxShiftX, d.panOffsetX, maxShiftX)
+            var minVisibleWidth = contentWidthPartToBeAlwaysVisible * width
+            newX = MathUtils.bound(
+                -contentWidth + minVisibleWidth, d.panOffsetX, width - minVisibleWidth)
 
-            maxShiftY = (height + contentHeight) / 2
-                - contentHeightPartToBeAlwaysVisible * height
-            newY = MathUtils.bound(-maxShiftY, d.panOffsetY, maxShiftY)
+            var minVisibleHeight = contentHeightPartToBeAlwaysVisible * height
+            newY = MathUtils.bound(
+                -contentHeight + minVisibleHeight, d.panOffsetY, height - minVisibleHeight)
         }
 
         if (instant)
@@ -473,14 +471,14 @@ Item
         d.blockScaleBoundsAnimation = false
         d.clearScaleOffset()
 
-        var newScale = 1
-        var newOffsetX = 0
-        var newOffsetY = 0
-        d.scaleOriginX = 0.5
-        d.scaleOriginY = 0.5
-        d.minScale = 1
-
         var implicitContentSize = d.implicitContentSize()
+
+        var newScale = 1
+        var newOffsetX = (width - implicitContentSize.width) / 2
+        var newOffsetY = (height - implicitContentSize.height) / 2
+        d.scaleOriginX = 0
+        d.scaleOriginY = 0
+        d.minScale = 1
 
         if (zoomedItem && Utils.isChild(zoomedItem, contentItem))
         {
@@ -494,8 +492,10 @@ Item
 
             var newContentWidth = implicitContentSize.width * newScale
             var newContentHeight = implicitContentSize.height * newScale
-            newOffsetX = newContentWidth * (0.5 - originX)
-            newOffsetY = newContentHeight * (0.5 - originY)
+            newOffsetX = -zoomedItem.x / contentWidth * newContentWidth
+                + (width - newSize.width) / 2
+            newOffsetY = -zoomedItem.y / contentHeight * newContentHeight
+                + (height - newSize.height) / 2
         }
 
         if (instant)
@@ -505,8 +505,8 @@ Item
             d.panOffsetY = newOffsetY
             contentItem.width = implicitContentSize.width
             contentItem.height = implicitContentSize.height
-            contentItem.x = (width - contentItem.width) / 2
-            contentItem.y = (height - contentItem.height) / 2
+            contentItem.x = (width - contentWidth) / 2
+            contentItem.y = (height - contentHeight) / 2
         }
         else
         {
@@ -529,8 +529,8 @@ Item
 
         d.contentAspectRatio = (width === 0 || height === 0) ? 0 : width / height
 
-        d.panOffsetX = x - flickableView.width / 2 + width / 2
-        d.panOffsetY = y - flickableView.height / 2 + height / 2
+        d.panOffsetX = x
+        d.panOffsetY = y
     }
 
     function implicitContentGeometry(aspectRatio)
