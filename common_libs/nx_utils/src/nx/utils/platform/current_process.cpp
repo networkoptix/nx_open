@@ -1,9 +1,10 @@
 #include "current_process.h"
 
 #if defined( Q_OS_LINUX ) || defined( Q_OS_MAC )
-    #include <unistd.h>
-    #include <sys/types.h>
     #include <pwd.h>
+    #include <sys/prctl.h>
+    #include <sys/types.h>
+    #include <unistd.h>
 
     static bool changeUser( struct passwd* pwd )
     {
@@ -15,6 +16,8 @@
             return false;
         }
 
+        // Allow core dump creation.
+        prctl(PR_SET_DUMPABLE, 1);
         return true;
     }
 #endif

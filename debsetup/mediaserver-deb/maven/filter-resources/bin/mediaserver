@@ -15,10 +15,17 @@ for interface in /proc/sys/net/ipv4/conf/*/rp_filter; do
 done
 
 # Process core dumps async
-$VMS_DIR/bin/shell_utils.sh crash_gdb_bt $VMS_DIR/bin/mediaserver-bin
+if grep systemUser $VMS_DIR/etc/mediaserver.conf; then
+    CRASH_DIR=$VMS_DIR/var/crash
+    ARGS+=" --crash-directory=$CRASH_DIR"
+else
+    CRASH_DIR=$HOME
+fi
+$VMS_DIR/bin/shell_utils.sh crash_gdb_bt $VMS_DIR/bin/mediaserver-bin $CRASH_DIR
 
 lsblk -o MODEL -n | grep -v '^$' > /tmp/hddlist
 
+echo
 echo --- Set ulimits:
 FD_MAX=32000
 SYS_FD_MAX=$(cat /proc/sys/fs/file-max 2>/dev/null || echo $FD_MAX)
@@ -26,5 +33,6 @@ ulimit -n $((SYS_FD_MAX<FD_MAX?SYS_FD_MAX:FD_MAX))
 ulimit -c unlimited
 ulimit -a
 
+echo
 echo --- Starting: $EXE $ARGS
 exec start-stop-daemon --start -d $VMS_DIR/bin --exec $EXE -- $ARGS
