@@ -753,7 +753,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(ConditionWrapper(new ExportCondition(true))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(ini().universalExportDialog));
 
     factory(ExportLayoutAction)
@@ -767,7 +768,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(ConditionWrapper(new ExportCondition(true))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(ini().universalExportDialog));
 
     factory(ThumbnailsSearchAction)
