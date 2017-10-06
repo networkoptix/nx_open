@@ -28,7 +28,9 @@ class NX_NETWORK_API ReverseConnectionHolder:
     public aio::BasicPollable
 {
 public:
-    explicit ReverseConnectionHolder(aio::AbstractAioThread* aioThread);
+    ReverseConnectionHolder(
+        aio::AbstractAioThread* aioThread,
+        const String& hostName);
     virtual ~ReverseConnectionHolder() override;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -49,6 +51,7 @@ private:
     void startCleanupTimer(std::chrono::milliseconds timeLeft);
     void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
 
+    const String m_hostName;
     std::atomic<size_t> m_socketCount;
     std::list<std::unique_ptr<AbstractStreamSocket>> m_sockets;
     std::multimap<std::chrono::steady_clock::time_point, Handler> m_handlers;
