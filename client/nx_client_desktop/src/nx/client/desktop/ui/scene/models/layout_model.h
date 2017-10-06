@@ -24,6 +24,7 @@ public:
     enum class Roles
     {
         itemId = Qt::UserRole + 1,
+        resource,
         name,
         geometry,
     };

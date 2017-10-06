@@ -195,6 +195,7 @@ QHash<int, QByteArray> LayoutModel::roleNames() const
 {
     static QHash<int, QByteArray> kRoleNames{
         { static_cast<int>(Roles::itemId), "itemId" },
+        { static_cast<int>(Roles::resource), "resource" },
         { static_cast<int>(Roles::name), "name" },
         { static_cast<int>(Roles::geometry), "geometry" },
     };
@@ -214,6 +215,10 @@ QVariant LayoutModel::data(const QModelIndex& index, int role) const
     {
         case Roles::itemId:
             return QVariant::fromValue(itemId);
+
+        case Roles::resource:
+            return QVariant::fromValue(
+                d->layout->resourcePool()->getResourceById(item.resource.id).data());
 
         case Roles::name:
         {

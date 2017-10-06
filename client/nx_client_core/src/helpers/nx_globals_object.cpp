@@ -3,6 +3,10 @@
 #include <QtCore/QtMath>
 #include <QtQuick/private/qquickflickable_p.h>
 
+namespace nx {
+namespace client {
+namespace core {
+
 namespace detail {
 
 QQuickFlickable* findFlickable(const QQuickItem* item)
@@ -101,3 +105,7 @@ QnUuid NxGlobalsObject::uuid(const QString& uuid) const
 {
     return QnUuid::fromStringSafe(uuid);
 }
+
+} // namespace core
+} // namespace client
+} // namespace nx

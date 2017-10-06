@@ -6,6 +6,8 @@ import Nx.Utils 1.0
 import Nx.Models 1.0
 import Nx.Positioners 1.0 as Positioners
 
+import "Items"
+
 Control
 {
     id: layoutViewer
@@ -157,47 +159,14 @@ Control
 
                 delegate: Item
                 {
-                    id: item
-
                     Positioners.Grid.geometry: model.geometry
 
-                    Rectangle
+                    ResourceItem
                     {
-                        id: content
-
                         anchors.centerIn: parent
                         width: parent.width * (1 - gridLayout.cellSpacingFactor)
                         height: parent.height * (1 - gridLayout.cellSpacingFactor)
-                        color: "#70ff0000"
-
-                        MouseArea
-                        {
-                            anchors.fill: parent
-
-                            onDoubleClicked:
-                            {
-                                if (flickableView.zoomedItem !== content)
-                                {
-                                    flickableView.zoomedItem = content
-                                }
-                                else if (
-                                    Math.abs(content.width - flickableView.width)
-                                        < gridLayout.unzoomThreshold
-                                    || Math.abs(content.height - flickableView.height)
-                                        < gridLayout.unzoomThreshold)
-                                {
-                                    flickableView.zoomedItem = null
-                                }
-
-                                flickableView.fitInView()
-                            }
-                        }
-
-                        Text
-                        {
-                            anchors.centerIn: parent
-                            text: model.name
-                        }
+                        modelData: model
                     }
                 }
             }
