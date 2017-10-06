@@ -1,20 +1,20 @@
 add_subdirectory(cloud_db_client)
 
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
+endif()
+
 if(withClouds OR withDesktopClient)
+    add_subdirectory(librelaying)
     add_subdirectory(libvms_gateway)
 endif()
 
 if(withClouds)
-    if(LINUX)
-        add_compile_options("-Werror" "-Wall" "-Wextra")
-    endif()
-
     add_subdirectory(vms_gateway)
     add_subdirectory(libconnection_mediator)
     add_subdirectory(connection_mediator)
     add_subdirectory(libcloud_db)
     add_subdirectory(cloud_db)
-    add_subdirectory(librelaying)
     add_subdirectory(libtraffic_relay)
     add_subdirectory(traffic_relay)
     add_subdirectory(time_server)

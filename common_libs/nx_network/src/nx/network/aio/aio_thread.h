@@ -40,7 +40,7 @@ public:
     AIOThread(std::unique_ptr<AbstractPollSet> pollSet = nullptr);
     virtual ~AIOThread();
 
-    virtual void pleaseStop();
+    virtual void pleaseStop() override;
 
     /**
      * Start monitoring socket sock for event eventToWatch and trigger eventHandler when event happens.
