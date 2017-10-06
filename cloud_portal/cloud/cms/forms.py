@@ -105,7 +105,8 @@ class CustomContextForm(forms.Form):
 class ProductSettingsForm(forms.Form):
     file = forms.FileField(
         label="File",
-        help_text="Archive with static files and images for content or stucture.json file",
+        help_text="Archive with static files and images for content or stucture.json file. "
+                  "Archive must have top-level directories named as customizations",
         required=True
     )
 

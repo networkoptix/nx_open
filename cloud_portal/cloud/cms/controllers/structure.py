@@ -148,8 +148,9 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             continue
 
         if name.endswith('/'):
-            if not root:  # find root directory to ignore
+            if name.count('/') == 1:  # top level directories are customizations
                 root = name
+                customization_name = root.replace('/', '')
             continue  # not a file - ignore it
 
         short_name = name.replace(root, '')
@@ -194,7 +195,11 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             structure.save()
 
         if update_content:
-            customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+            customization = Customization.objects.filter(name=customization_name)
+            if not customization.exists():
+                log_messages.append(('warning', 'Ignored %s (customization %s not found)' % (name,customization_name)))
+                continue
+            customization = customization.first()
             # get latest value
             latest_value = structure.find_actual_value(customization)
             # check if file was changed
