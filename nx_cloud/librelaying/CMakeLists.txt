@@ -10,13 +10,7 @@ if(LINUX)
     add_compile_options("-Werror" "-Wall" "-Wextra")
 endif()
 
-nx_configure_file(
-    maven/filter-resources/librelaying_app_info_impl.cpp
-    ${CMAKE_CURRENT_BINARY_DIR})
-
 nx_add_target(librelaying LIBRARY ${library_type}
-    ADDITIONAL_SOURCES
-        "${CMAKE_CURRENT_BINARY_DIR}/librelaying_app_info_impl.cpp"
     PUBLIC_LIBS
         nx_network nx_fusion nx_utils)
 
