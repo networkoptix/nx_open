@@ -196,8 +196,13 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
 
     // Second stream must be upscaled to the first stream resolution before the filters apply.
-    if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != AV_PIX_FMT_YUV420P)
-        decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, AV_PIX_FMT_YUV420P));
+    if (decodedFrame->width != m_sourceResolution.width()
+        || decodedFrame->height != m_sourceResolution.height()
+        || decodedFrame->format != AV_PIX_FMT_YUV420P)
+    {
+        decodedFrame = CLVideoDecoderOutputPtr(
+            decodedFrame->scaled(m_sourceResolution, AV_PIX_FMT_YUV420P));
+    }
 
     decodedFrame = processFilterChain(decodedFrame);
 
