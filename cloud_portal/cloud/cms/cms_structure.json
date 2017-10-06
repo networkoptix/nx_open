@@ -28,6 +28,13 @@
           "description": "Name of the VMS customization. Must be short!"
         },
         {
+          "label": "Cloud tab name",
+          "name": "%CLOUD_TAB_NAME%",
+          "old_name": "{{CLOUD_TAB_NAME}}",
+          "value": "Cloud",
+          "description": "Cloud tab name in thick client"
+        },
+        {
           "label": "Support Link",
           "name": "%SUPPORT_LINK%",
           "old_name": "{{supportLink}}",
