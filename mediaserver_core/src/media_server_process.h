@@ -70,6 +70,7 @@ public:
     QString enforcedMediatorEndpoint;
     QString ipVersion;
     QString createFakeData;
+    QString crashDirectory;
 
     CmdLineArguments():
         logLevel(

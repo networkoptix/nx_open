@@ -1024,6 +1024,12 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     parseCommandLineParameters(argc, argv);
 
+    // TODO: Other platforms?
+    #ifdef __linux__
+        if (!m_cmdLineArguments.crashDirectory.isEmpty())
+            linux_exception::setCrashDirectory(m_cmdLineArguments.crashDirectory.toStdString());
+    #endif
+
     m_settings.reset(new MSSettings(
         m_cmdLineArguments.configFilePath,
         m_cmdLineArguments.rwConfigFilePath));
@@ -1075,6 +1081,8 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         lit("Force ip version"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.createFakeData, "--create-fake-data", NULL,
         lit("Create fake data: users,cameras,propertiesPerCamera,camerasPerLayout,storageCount"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.crashDirectory, "--crash-directory", NULL,
+        lit("Directory to save and send crash reports."), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
         lit("Deletes resources with NULL ids, "
             "cleans dangling cameras' and servers' user attributes, "
