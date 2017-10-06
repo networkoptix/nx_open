@@ -15,9 +15,18 @@ namespace plugins {
 
 static const int kMaxAllowedChannelNumber = 64;
 static const QString kHanwhaDateFormat("yyyy-MM-dd hh:mm:ss");
+static const  char kStartTimeParamName[] = "StartTime";
+static const  char kEndTimeParamName[] = "EndTime";
 
 static std::chrono::seconds kUpdateChunksDelay(60);
 static std::chrono::seconds kResendRequestIfFail(10);
+
+QDateTime parseHanwhaDateTime(const QByteArray& value)
+{
+    auto dateTime = QDateTime::fromString(value, kHanwhaDateFormat);
+    dateTime.setOffsetFromUtc(0);
+    return dateTime;
+}
 
 HanwhaChunkLoader::HanwhaChunkLoader():
     m_httpClient(new nx_http::AsyncClient())
@@ -119,7 +128,7 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
         channelsParam << QString::number(i);
     query.addQueryItem("ChannelIdList", channelsParam.join(','));
     loadChunksUrl.setQuery(query);
-    m_lastParsedStartTime = AV_NOPTS_VALUE;
+    m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
     m_httpClient->setOnSomeMessageBodyAvailable(
         std::bind(&HanwhaChunkLoader::onGotChunkData, this));
     m_httpClient->setOnDone(
@@ -182,10 +191,10 @@ void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
             QByteArray fieldName = params[0];
             QByteArray fieldValue = params[1];
 
-            if (fieldName == "StartTime")
-                startTimeUsec = QDateTime::fromString(fieldValue, kHanwhaDateFormat).toMSecsSinceEpoch() * 1000;
-            else if (fieldName == "EndTime")
-                endTimeUsec = QDateTime::fromString(fieldValue, kHanwhaDateFormat).toMSecsSinceEpoch() * 1000;
+            if (fieldName == kStartTimeParamName)
+                startTimeUsec = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch() * 1000;
+            else if (fieldName == kEndTimeParamName)
+                endTimeUsec = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch() * 1000;
         }
     }
     if (startTimeUsec != AV_NOPTS_VALUE && endTimeUsec != AV_NOPTS_VALUE)
@@ -244,14 +253,15 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     const QByteArray fieldValue = line.mid(delimiterPos + 1).trimmed();
 
     QnTimePeriodList& chunks = m_chunks[channelNumber];
-    if (fieldName == "StartTime")
+    if (fieldName == kStartTimeParamName)
     {
-        m_lastParsedStartTime = QDateTime::fromString(fieldValue, kHanwhaDateFormat).toMSecsSinceEpoch();
+        m_lastParsedStartTimeMs = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch();
     }
-    else if (fieldName == "EndTime")
+    else if (fieldName == kEndTimeParamName)
     {
-        const auto endTimeMs = QDateTime::fromString(fieldValue, kHanwhaDateFormat).toMSecsSinceEpoch();
-        QnTimePeriod timePeriod(m_lastParsedStartTime, endTimeMs - m_lastParsedStartTime);
+        auto endTimeMs = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch();
+
+        QnTimePeriod timePeriod(m_lastParsedStartTimeMs, endTimeMs - m_lastParsedStartTimeMs);
         if (m_startTimeUsec == AV_NOPTS_VALUE || chunks.isEmpty())
         {
             chunks.push_back(timePeriod);

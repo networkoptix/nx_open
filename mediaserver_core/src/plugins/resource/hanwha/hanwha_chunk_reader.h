@@ -53,7 +53,7 @@ private:
 
     qint64 m_startTimeUsec = AV_NOPTS_VALUE;
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
-    qint64 m_lastParsedStartTime = AV_NOPTS_VALUE;
+    qint64 m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
 
     int m_maxChannels = 0;
     QAuthenticator m_auth;
