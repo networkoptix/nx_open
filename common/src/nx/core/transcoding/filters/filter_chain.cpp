@@ -59,36 +59,41 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     prepareDewarpingFilter(resource);
     prepareImageEnhancementFilter();
     prepareRotationFilter();
-    prepareOverlaysFilters();
     prepareDownscaleFilter(srcFrameResolution, resolutionLimit);
+    prepareOverlaysFilters();
 
     m_ready = true;
 }
 
 
 void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
-    const QSize& fullImageResolution)
+    const QSize& fullImageResolution,
+    const QSize& resolutionLimit)
 {
     NX_ASSERT(resource);
     if (!resource)
         return;
 
     NX_ASSERT(!isReady(), "Double initialization");
-    NX_EXPECT(isImageTranscodingRequired());
+    NX_EXPECT(isImageTranscodingRequired(fullImageResolution));
 
     prepareImageArFilter(resource, fullImageResolution);
     prepareZoomWindowFilter();
     prepareDewarpingFilter(resource);
     prepareImageEnhancementFilter();
     prepareRotationFilter();
+    prepareDownscaleFilter(fullImageResolution, resolutionLimit);
     prepareOverlaysFilters();
 
     m_ready = true;
 }
 
-bool FilterChain::isImageTranscodingRequired() const
+bool FilterChain::isImageTranscodingRequired(const QSize& fullImageResolution,
+    const QSize& resolutionLimit) const
 {
-    return isTranscodingRequired(QnConstResourceVideoLayoutPtr());
+    return isTranscodingRequired(QnConstResourceVideoLayoutPtr())
+        || fullImageResolution.width() > resolutionLimit.width()
+        || fullImageResolution.height() > resolutionLimit.height();
 }
 
 bool FilterChain::isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const
@@ -300,7 +305,10 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
             QSize(srcFrameResolution.width() * resizeRatio,
                 srcFrameResolution.height() * resizeRatio));
 
-        auto scaleFilter = front().dynamicCast<QnScaleImageFilter>();
+        auto scaleFilter = !empty()
+            ? front().dynamicCast<QnScaleImageFilter>()
+            : QSharedPointer<QnScaleImageFilter>();
+
         if (!scaleFilter)
         {
             // Adding scale filter.

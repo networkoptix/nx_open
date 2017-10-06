@@ -63,7 +63,7 @@ void TranscodingImageProcessor::setTranscodingSettings(
 
 QSize TranscodingImageProcessor::process(const QSize& sourceSize) const
 {
-    if (!d->filters().isImageTranscodingRequired())
+    if (!d->filters().isImageTranscodingRequired(sourceSize))
         return sourceSize;
 
     const auto filters = d->ensureFilters(sourceSize);
@@ -75,10 +75,11 @@ QImage TranscodingImageProcessor::process(const QImage& sourceImage) const
     if (sourceImage.isNull())
         return QImage();
 
-    if (!d->filters().isImageTranscodingRequired())
+    const auto imageSize = sourceImage.size();
+    if (!d->filters().isImageTranscodingRequired(imageSize))
         return sourceImage;
 
-    const auto filters = d->ensureFilters(sourceImage.size());
+    const auto filters = d->ensureFilters(imageSize);
     if (!filters.isReady())
         return sourceImage;
 

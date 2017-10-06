@@ -223,6 +223,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         setLocalFile(media);
 
     validateSettings(Mode::Media);
+    updateMediaImageProcessor();
 
     if (!m_mediaImageProvider) //< Just in case.
         return;

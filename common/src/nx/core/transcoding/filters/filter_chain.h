@@ -40,9 +40,11 @@ public:
      * concerning video layout size.
      */
     void prepareForImage(const QnMediaResourcePtr& resource,
-        const QSize& fullImageResolution);
+        const QSize& fullImageResolution,
+        const QSize& resolutionLimit = kDefaultResolutionLimit);
 
-    bool isImageTranscodingRequired() const;
+    bool isImageTranscodingRequired(const QSize& fullImageResolution,
+        const QSize& resolutionLimit = kDefaultResolutionLimit) const;
     bool isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const;
     bool isTranscodingRequired(const QnMediaResourcePtr& resource) const;
 
