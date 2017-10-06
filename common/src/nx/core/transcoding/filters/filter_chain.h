@@ -62,7 +62,7 @@ private:
         const QSize& fullImageResolution);
     void prepareDewarpingFilter(const QnMediaResourcePtr& resource);
     void prepareZoomWindowFilter();
-    void prepareImageEnhancementFilter(bool isPanoramicCamera);
+    void prepareImageEnhancementFilter();
     void prepareRotationFilter();
     void prepareOverlaysFilters();
     void prepareDownscaleFilter(const QSize& srcFrameResolution, const QSize& resolutionLimit);

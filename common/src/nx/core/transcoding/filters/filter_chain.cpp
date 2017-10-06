@@ -57,7 +57,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
 
     prepareZoomWindowFilter();
     prepareDewarpingFilter(resource);
-    prepareImageEnhancementFilter(isPanoramicCamera);
+    prepareImageEnhancementFilter();
     prepareRotationFilter();
     prepareOverlaysFilters();
     prepareDownscaleFilter(srcFrameResolution, resolutionLimit);
@@ -79,7 +79,7 @@ void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
     prepareImageArFilter(resource, fullImageResolution);
     prepareZoomWindowFilter();
     prepareDewarpingFilter(resource);
-    prepareImageEnhancementFilter(false);
+    prepareImageEnhancementFilter();
     prepareRotationFilter();
     prepareOverlaysFilters();
 
@@ -219,13 +219,10 @@ void FilterChain::prepareZoomWindowFilter()
         push_back(QnAbstractImageFilterPtr(new QnCropImageFilter(m_settings.zoomWindow)));
 }
 
-void FilterChain::prepareImageEnhancementFilter(bool isPanoramicCamera)
+void FilterChain::prepareImageEnhancementFilter()
 {
     if (m_settings.enhancement.enabled)
-    {
-        push_back(QnAbstractImageFilterPtr(new QnContrastImageFilter(
-            m_settings.enhancement, isPanoramicCamera)));
-    }
+        push_back(QnAbstractImageFilterPtr(new QnContrastImageFilter(m_settings.enhancement)));
 }
 
 void FilterChain::prepareRotationFilter()
