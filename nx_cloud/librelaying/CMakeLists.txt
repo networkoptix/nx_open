@@ -1,8 +1,13 @@
 set(product.title "${company.name} librelaying")
 set(product.display.title "${company.name} Relaying library")
+
 set(library_type)
 if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
+endif()
+
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
 endif()
 
 nx_configure_file(

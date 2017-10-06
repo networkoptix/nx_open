@@ -1,6 +1,10 @@
 set(product.title "${company.name} libtraffic_relay")
 set(product.display.title "${company.name} Traffic Relay")
 
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
+endif()
+
 nx_configure_file(
     maven/filter-resources/libtraffic_relay_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})

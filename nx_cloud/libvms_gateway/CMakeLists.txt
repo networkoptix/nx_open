@@ -1,6 +1,10 @@
 set(product.title "${company.name} libvms_gateway")
 set(product.display.title "${company.name} VMS Gateway")
 
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
+endif()
+
 nx_configure_file(
     maven/filter-resources/libvms_gateway_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
