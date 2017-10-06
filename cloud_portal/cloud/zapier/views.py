@@ -13,8 +13,16 @@ from rest_hooks.signals import raw_hook_event
 from models import *
 from cloud import settings
 
+from html_sanitizer import Sanitizer
+sanitizer = Sanitizer()
+
+#Hacked URLs
 CLOUD_DB_URL = 'http://cloud-test.hdw.mx:80/cdb'
 CLOUD_INSTANCE_URL = 'http://cloud-test.hdw.mx'
+
+#Correct urls
+#CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
+#CLOUD_INSTANCE_URL = settings.CLOUD_CONNECT['gateway']
 
 
 def authenticate(request):
@@ -26,10 +34,152 @@ def authenticate(request):
             email, password = base64.b64decode(credentials[1]).split(':', 1)
             user = django.contrib.auth.authenticate(username=email, password=password)
 
+            #start auth hacks
+            request = CLOUD_INSTANCE_URL + "/api/account/login/"
+            data = json.loads(requests.post(request, json={'email': email, 'password': password}).text)
+            if data['email'] != email:
+                raise APINotAuthorisedException('Username or password are invalid')
+            #end auth hacks
+
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
     return user, email, password
+
+
+def increment_rule(rule):
+    rule.times_used += 1
+    rule.save()
+
+
+def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
+
+    if rule_type == "Generic Event":
+        action_params = json.dumps({"additionalResources": ["{00000000-0000-0000-0000-100000000000}",
+                                                "{00000000-0000-0000-0000-100000000001}"],
+                                    "allUsers": False,
+                                    "durationMs": 5000,
+                                    "forced": True,
+                                    "fps": 10,
+                                    "needConfirmation": False,
+                                    "playToClient": True,
+                                    "recordAfter": 0,
+                                    "recordBeforeMs": 1000,
+                                    "streamQuality": "highest",
+                                    "useSource": False
+                                    })
+
+        event_condition = json.dumps({"caption": caption,
+                                      "description": description,
+                                      "eventTimestampUsec": "0",
+                                      "eventType": "undefinedEvent",
+                                      "metadata": {
+                                          "allUsers": False
+                                      },
+                                      "reasonCode": "none",
+                                      "resourceName": source
+                                      })
+
+        data = {
+            "actionParams": action_params,
+            "actionResourceIds": [],
+            "actionType": "showPopupAction",
+            "aggregationPeriod": 0,
+            "comment": "Auto generated rule for Generic Event from Zapier made by {}".format(email),
+            "disabled": False,
+            "eventCondition": event_condition,
+            "eventResourceIds": [],
+            "eventState": "Undefined",
+            "eventType": "userDefinedEvent",
+            "schedule": "",
+            "system": False
+        }
+
+    elif rule_type == "Http Action":
+        action_params = json.dumps({"allUsers": False,
+                                    "durationMs": 5000,
+                                    "forced": True,
+                                    "fps": 10,
+                                    "needConfirmation": False,
+                                    "playToClient": True,
+                                    "recordAfter": 0,
+                                    "recordBeforeMs": 1000,
+                                    "streamQuality": "highest",
+                                    "url": zapier_trigger,
+                                    "useSource": False
+                                    })
+
+        event_condition = json.dumps({"caption": "Soft Trigger Send " + caption + " to Zapier",
+                                      "description": "_bell_on",
+                                      "eventTimestampUsec": "0",
+                                      "eventType": "undefinedEvent",
+                                      "inputPortId": "921d6e67-a9c3-4b2e-b1c8-1162b4a7cd01",
+                                      "metadata": {
+                                          "allUsers": False,
+                                          "instigators": ["{00000000-0000-0000-0000-100000000000}",
+                                                          "{00000000-0000-0000-0000-100000000001}"]
+                                      },
+                                      "reasonCode": "none"
+                                      })
+
+        data = {
+            "actionParams": action_params,
+            "actionResourceIds": [],
+            "actionType": "execHttpRequestAction",
+            "aggregationPeriod": 0,
+            "comment": "Auto generated rule for HTTP action to Zapier made by {}".format(email),
+            "disabled": False,
+            "eventCondition": event_condition,
+            "eventResourceIds": [],
+            "eventState": "Undefined",
+            "eventType": "softwareTriggerEvent",
+            "schedule": "",
+            "system": False
+        }
+
+    else:
+        return
+
+    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL, system_id)
+    headers = {'Content-Type': 'application/json'}
+
+    requests.post(url, json=data, headers=headers, auth=HTTPDigestAuth(email, password))
+
+
+def make_or_increment_rule(action, email, system_id, caption, password=None,
+                           description=None, source=None, target_url=None):
+    caption = sanitizer.sanitize(caption)
+
+    rules_query = GeneratedRule.objects.filter(email=email, system_id=system_id, caption=caption)
+
+    if action == 'Generic Event':
+        source = sanitizer.sanitize(source)
+        description = sanitizer.sanitize(description)
+        rules_query = rules_query.filter(source=source, direction="Zapier to Nx")
+
+        if not rules_query.exists():
+            make_rule(action, email, password, system_id,
+                      caption=caption, source=source, description=description)
+            GeneratedRule(email=email, system_id=system_id, caption=caption,
+                          source=source, direction="Zapier to Nx").save()
+
+        else:
+            increment_rule(rules_query[0])
+
+    elif action == 'Http Action':
+        target_url = sanitizer.sanitize(target_url)
+        rules_query = rules_query.filter(direction="Nx to Zapier")
+        if not rules_query.exists():
+            make_rule(action, email, password, system_id, caption=caption, zapier_trigger=target_url)
+            GeneratedRule(email=email, system_id=system_id, caption=caption, direction="Nx to Zapier",
+                          times_used=0).save()
+
+    elif action == 'Hook Fired':
+        rules_query = rules_query.filter(direction="Nx to Zapier")
+
+        if rules_query.exists():
+            increment_rule(rules_query[0])
+
 
 
 @api_view(['GET'])
@@ -44,8 +194,8 @@ def get_systems(request):
     if data:
         data = json.loads(data.text)
 
-    for i in range(len(data['systems'])):
-        zap_list['systems'].append({'name': data['systems'][i]['name'], 'system_id': data['systems'][i]['id']})
+    for system in data['systems']:
+        zap_list['systems'].append({'name': system['name'], 'system_id': system['id']})
 
     return api_success(zap_list)
 
@@ -65,21 +215,13 @@ def zapier_send_generic_event(request):
     if description:
         query_params['description'] = description
 
-    rules_query = GeneratedRule.objects.filter(email=email, source=source, caption=caption,
-                                               system_id=system_id, direction="Zapier to Nx")
-    if not rules_query.exists():
-        make_rule("Generic Event", email, password, system_id, caption=caption, source=source, description=description)
-        GeneratedRule(email=email, system_id=system_id, caption=caption, source=source, direction="Zapier to Nx").save()
-    else:
-        rule = rules_query[0]
-        rule.times_used += 1
-        rule.save()
+    make_or_increment_rule('Generic Event', email, system_id, caption,
+                           password=password, description=description, source=source)
 
     url = "{}/gateway/{}/api/createEvent?{}"\
         .format(CLOUD_INSTANCE_URL, system_id, urlencode(query_params))
 
-    headers = {'Content-Type': 'application/json'}
-    r = requests.get(url, data=None, headers=headers, auth=HTTPDigestAuth(email, password))
+    r = requests.get(url, data=None, auth=HTTPDigestAuth(email, password))
 
     return json.loads(r.text)
 
@@ -96,12 +238,7 @@ def nx_http_action(request):
     if hooks_event.exists():
         for hook in hooks_event:
             raw_hook_event.send(sender=None, event_name=event, payload={'data': {'caption': caption}}, user=hook.user)
-            query = GeneratedRule.objects.filter(email=hook.user.email, caption=caption,
-                                                 system_id= system_id, direction="Nx to Zapier")
-            if query.exists():
-                rule = query[0]
-                rule.times_used += 1
-                rule.save()
+            make_or_increment_rule('Hook Fired', hook.user.email, system_id, caption)
 
         return Response({'message': "Webhook fired for " + caption}, status=200)
 
@@ -120,7 +257,7 @@ def ping(request):
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def create_zap_webhook(request):
+def subscribe_webhook(request):
     user, email, password = authenticate(request)
 
     system_id = request.query_params['system_id']
@@ -135,12 +272,9 @@ def create_zap_webhook(request):
     if user_hooks.exists():
         return Response({'message': 'There is already a webhook for ' + caption, 'link': None}, status=500)
 
-    url_link = '{}/zapier/trigger_zapier/?{}'.format(CLOUD_INSTANCE_URL, urlencode(query_params))
-    rules_query = GeneratedRule.objects.filter(email=email, caption=caption,
-                                                system_id=system_id, direction="Nx to Zapier")
-    if not rules_query.exists():
-        make_rule("Http Action", email, password, system_id, caption=caption, zapier_trigger=url_link)
-        GeneratedRule(email=email, system_id=system_id, caption=caption, direction="Nx to Zapier", times_used=0).save()
+    url_link = '{}/zapier/?{}'.format(CLOUD_INSTANCE_URL, urlencode(query_params))
+
+    make_or_increment_rule('Http Action', email, system_id, caption, password=password, target_url=target)
 
     zap_hook = ZapHook(user=user, event=event, target=target)
     zap_hook.save()
@@ -150,7 +284,7 @@ def create_zap_webhook(request):
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def remove_zap_webhook(request):
+def unsubscribe_webhook(request):
     user, email, password = authenticate(request)
     target = request.data['target_url']
 
@@ -169,65 +303,3 @@ def remove_zap_webhook(request):
 def test_subscribe(request):
     authenticate(request)
     return Response({'data': [{'caption': 'caption'}]})
-
-
-def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
-
-    if rule_type == "Generic Event":
-        action_params = "{\"additionalResources\":[\"{00000000-0000-0000-0000-100000000000}\",\"{00000000-0000-0000-" \
-                        "0000-100000000001}\"],\"allUsers\":false,\"durationMs\":5000,\"forced\":true,\"fps\":10,\"" \
-                        "needConfirmation\":false,\"playToClient\":true,\"recordAfter\":0,\"recordBeforeMs\":1000,\"" \
-                        "streamQuality\":\"highest\",\"useSource\":false}"
-
-        event_condition = "{\"caption\":\"%s\",\"description\":\"%s\",\"eventTimestampUsec\":\"0\",\"event" \
-                          "Type\":\"undefinedEvent\",\"metadata\":{\"allUsers\":false},\"reasonCode\":\"none\",\"" \
-                          "resourceName\":\"%s\"}"
-
-        data = {
-            "actionParams": action_params,
-            "actionResourceIds": [],
-            "actionType": "showPopupAction",
-            "aggregationPeriod": 0,
-            "comment": "Auto generated rule for Generic Event from Zapier made by {}".format(email),
-            "disabled": False,
-            "eventCondition": event_condition % (caption, description, source),
-            "eventResourceIds": [],
-            "eventState": "Undefined",
-            "eventType": "userDefinedEvent",
-            "schedule": "",
-            "system": False
-        }
-
-    elif rule_type == "Http Action":
-        action_params = "{\"allUsers\":false,\"durationMs\":5000,\"forced\":true,\"fps\":10,\"needConfirmation\"" \
-                        ":false,\"playToClient\":true,\"recordAfter\":0,\"recordBeforeMs\":1000,\"streamQuality\":\"" \
-                        "highest\",\"url\":\"%s\",\"useSource\":false}"
-
-        event_condition = "{\"caption\":\"Soft Trigger Send %s to Zapier\",\"description\":\"_bell_on\",\"" \
-                          "eventTimestampUsec\":\"0\",\"eventType\":\"undefinedEvent\",\"inputPortId\":\"" \
-                          "921d6e67-a9c3-4b2e-b1c8-1162b4a7cd01\",\"metadata\":{\"allUsers\":false,\"instigators\"" \
-                          ":[\"{00000000-0000-0000-0000-100000000000}\",\"{00000000-0000-0000-0000-100000000001}\"" \
-                          "]},\"reasonCode\":\"none\"}"
-
-        data = {
-            "actionParams": action_params % zapier_trigger,
-            "actionResourceIds": [],
-            "actionType": "execHttpRequestAction",
-            "aggregationPeriod": 0,
-            "comment": "Auto generated rule for HTTP action to Zapier made by {}".format(email),
-            "disabled": False,
-            "eventCondition": event_condition % caption,
-            "eventResourceIds": [],
-            "eventState": "Undefined",
-            "eventType": "softwareTriggerEvent",
-            "schedule": "",
-            "system": False
-        }
-
-    else:
-        return
-
-    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL, system_id)
-    headers = {'Content-Type': 'application/json'}
-
-    requests.post(url, json=data, headers=headers, auth=HTTPDigestAuth(email, password))
