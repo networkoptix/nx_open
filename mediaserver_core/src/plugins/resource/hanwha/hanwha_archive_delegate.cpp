@@ -20,6 +20,7 @@ HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource
     NX_ASSERT(hanwhaRes);
     m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
     m_streamReader->setRole(Qn::CR_Archive);
+    m_streamReader->setSessionType(HanwhaSessionType::archive);
 
     m_flags |= Flag_CanOfflineRange;
     //m_flags |= Flag_CanProcessNegativeSpeed; //< TODO: implement me
@@ -126,6 +127,8 @@ void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec
     rtspClient.setAdditionAttribute("Frames", "Intra");
     m_endTimeUsec = endTimeUsec;
     m_previewMode = frameStepUsec > 1;
+    m_streamReader->setSessionType(
+        m_previewMode ? HanwhaSessionType::preview : HanwhaSessionType::archive);
     seek(startTimeUsec, true /*findIFrame*/);
 }
 

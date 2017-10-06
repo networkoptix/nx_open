@@ -91,6 +91,7 @@ void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
 
     m_httpClient->setOnDone(
         std::bind(&HanwhaChunkLoader::onHttpClientDone, this));
+    m_httpClient->setOnSomeMessageBodyAvailable(nullptr);
 
     m_httpClient->doGet(loadChunksUrl);
 }

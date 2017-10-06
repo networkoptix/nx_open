@@ -8,6 +8,12 @@
 #include <nx/network/http/http_async_client.h>
 #include <recording/time_period_list.h>
 
+extern "C"
+{
+    // For const AV_NOPTS_VALUE.
+#include <libavutil/avutil.h>
+}
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {

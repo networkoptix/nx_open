@@ -50,7 +50,7 @@ QString HanwhaSharedResourceContext::sessionKey(
             return QString();
 
         auto hanwhaResource = resources.front().dynamicCast<HanwhaResource>();
-        if (hanwhaResource)
+        if (!hanwhaResource)
             return QString();
 
         HanwhaRequestHelper helper(hanwhaResource);

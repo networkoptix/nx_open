@@ -20,7 +20,7 @@ public:
     HanwhaStreamReader(const HanwhaResourcePtr& res);
 
     void setPositionUsec(qint64 value);
-
+    void setSessionType(HanwhaSessionType value);
     virtual ~HanwhaStreamReader() override;
 protected: 
     virtual CameraDiagnostics::Result openStreamInternal(
@@ -46,7 +46,7 @@ private:
     QnRtspClient& rtspClient();
 private:
     HanwhaResourcePtr m_hanwhaResource;
-    
+    HanwhaSessionType m_sessionType = HanwhaSessionType::live;
 };
 
 } // namespace plugins
