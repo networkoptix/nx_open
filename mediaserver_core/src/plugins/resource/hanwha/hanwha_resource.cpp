@@ -656,7 +656,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (deviceType && deviceType->trimmed() == kNvrDeviceType)
     {
         m_isNvr = true;
-        setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
+        //setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
         setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
     }
     

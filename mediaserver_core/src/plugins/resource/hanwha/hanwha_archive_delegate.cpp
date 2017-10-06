@@ -22,7 +22,7 @@ HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
     auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.setAdditionAttribute("Rate-Control", "no");
+    //rtspClient.setAdditionAttribute("Rate-Control", "no");
 
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
