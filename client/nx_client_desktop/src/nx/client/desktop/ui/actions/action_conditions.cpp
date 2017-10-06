@@ -1135,16 +1135,31 @@ ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters
 ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
     QnWorkbenchContext* context)
 {
-    QnLayoutResourcePtr layout = context->workbench()->currentLayout()->resource();
+    const auto layout = context->workbench()->currentLayout()->resource();
     if (!layout)
         return InvisibleAction;
 
-    auto layoutItems = parameters.layoutItems();
-    const bool supported = layoutItems.empty()
-        ? isRadassSupported(layout, MatchMode::Any)
-        : isRadassSupported(layoutItems, MatchMode::Any);
+    const auto layoutItems = parameters.layoutItems();
 
-    return supported ? EnabledAction : InvisibleAction;
+    const auto itemIds =
+        [layout, layoutItems]
+        {
+            if (layoutItems.empty())
+                return layout->layoutResourceIds();
+
+            QSet<QnUuid> result;
+            for (const auto idx: layoutItems)
+                result.insert(idx.layout()->getItem(idx.uuid()).resource.id);
+            return result;
+        }();
+
+    const auto cameras = context->resourcePool()->getResources<QnVirtualCameraResource>(itemIds);
+
+    if (cameras.empty())
+        return InvisibleAction;
+
+    const bool supported = isRadassSupported(cameras, MatchMode::Any);
+    return supported ? EnabledAction : DisabledAction;
 }
 
 PtzCondition::PtzCondition(Ptz::Capabilities capabilities, bool disableIfPtzDialogVisible):
