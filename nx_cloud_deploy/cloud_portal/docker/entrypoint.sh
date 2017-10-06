@@ -52,7 +52,6 @@ do
 
             yes "yes" | /app/env/bin/python manage.py migrate
 
-            /app/env/bin/python manage.py initdb
             /app/env/bin/python manage.py readstructure
             ;;
         config)
