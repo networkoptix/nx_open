@@ -226,8 +226,9 @@ void WorkbenchExportHandler::handleExportVideoAction()
     const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
     const auto widget = extractMediaWidget(display(), parameters);
-    NX_ASSERT(widget);
-    if (!widget) //< Media resource widget is mandatory.
+    const auto mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
+    NX_ASSERT(widget || mediaResource);
+    if (!widget && !mediaResource) //< Media resource or widget is mandatory.
         return;
 
     NX_ASSERT(period.isValid() || bookmark.isValid());
@@ -260,9 +261,18 @@ void WorkbenchExportHandler::handleExportVideoAction()
         };
 
     QScopedPointer<ExportSettingsDialog> dialog;
-    dialog.reset(isBookmark
-        ? new ExportSettingsDialog(widget, bookmark, isFileNameValid, mainWindow())
-        : new ExportSettingsDialog(widget, period, isFileNameValid, mainWindow()));
+    if (widget)
+    {
+        dialog.reset(isBookmark
+            ? new ExportSettingsDialog(widget, bookmark, isFileNameValid, mainWindow())
+            : new ExportSettingsDialog(widget, period, isFileNameValid, mainWindow()));
+    }
+    else
+    {
+        dialog.reset(isBookmark
+            ? new ExportSettingsDialog(mediaResource, context(), bookmark, isFileNameValid, mainWindow())
+            : new ExportSettingsDialog(mediaResource, context(), period, isFileNameValid, mainWindow()));
+    }
 
     if (dialog->exec() != QDialog::Accepted)
         return;
