@@ -233,6 +233,11 @@
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
                                         </replacement>
+					<!-- Following dirty, dirty hack added with hope of maven build retiring soon -->
+                                        <replacement>
+                                            <token>relaying${parsedVersion.majorVersion}</token>
+                                            <value>relaying</value>
+                                        </replacement>
 
                                         <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
                                         <replacement>
