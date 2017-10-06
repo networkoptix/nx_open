@@ -165,7 +165,9 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 
-    for(auto filter: m_filters)
+    m_sourceResolution = m_resolution;
+
+    for (auto filter: m_filters)
         setResolution(filter->updatedResolution(getResolution()));
 
     return true;
