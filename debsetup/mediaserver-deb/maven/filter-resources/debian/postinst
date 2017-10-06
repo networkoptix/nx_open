@@ -253,10 +253,17 @@ case "$1" in
             [ -n "$UPGRADING" ] && $DBSYNC
         fi
 
-        useradd "$SYSTEM_USER" || true
-        $CFG_HELPER systemUser "$SYSTEM_USER"
-        chown "root:$SYSTEM_USER" "$BIN_DIR/root_tool"
-        chmod 4750 "$BIN_DIR/root_tool"
+        if [ ! -z "$SYSTEM_USER" ]; then
+            $CFG_HELPER systemUser "$SYSTEM_USER"
+            useradd "$SYSTEM_USER" || true
+
+            # Allow core dumps creation.
+            chown "$SYSTEM_USER:$SYSTEM_USER" "$BIN_DIR"
+
+            # Helper tool to get root permissions.
+            chown "root:$SYSTEM_USER" "$BIN_DIR/root_tool"
+            chmod 4750 "$BIN_DIR/root_tool"
+        fi
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
