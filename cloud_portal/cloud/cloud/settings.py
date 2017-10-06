@@ -333,7 +333,7 @@ LINKS_LIVE_TIMEOUT = 300  # Five minutes
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
     'requiredRegex': re.compile("^[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$"),
-    'commonList': 'static/{}/static/scripts/commonPasswordsList.json'.format(CUSTOMIZATION)
+    'commonList': 'static/_source/blue/static/scripts/commonPasswordsList.json'
 }
 
 common_list_file = PASSWORD_REQUIREMENTS['commonList']

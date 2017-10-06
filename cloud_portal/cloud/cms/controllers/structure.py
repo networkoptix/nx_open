@@ -49,7 +49,8 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 
 def update_from_object(cms_structure):
     product_name = cms_structure['product']
-    default_language = customization_cache('default', 'default_language')
+
+    default_language = Customization.objects.get(name='default').default_language.code
     product_id = find_or_add_product(product_name).id
     order = 0
 
