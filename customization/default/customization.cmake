@@ -1,18 +1,18 @@
-set(parent.customization "%CUSTOMIZATION%")
-set(defaultSkin "%SKIN%")
+set(parent.customization "default")
+set(defaultSkin "dark_blue")
 set(compatibleCustomizations "default_cn" "default_zh_CN")
 
 # Components Namings
-set(display.product.name "%VMS_NAME%")
-set(display.mobile.name "%MOBILE_NAME%")
+set(display.product.name "Nx Witness")
+set(display.mobile.name "Nx Mobile")
 set(product.name "HD Witness")
 set(product.name.short "hdwitness")
 set(product.appName "hdwitness")
-set(company.name "%COMPANY_NAME%")
-set(short.company.name "%COMPANY_SHORT_NAME%")
-set(liteDeviceName "%LITE_DEVICE_NAME%")
-set(cloudName "%CLOUD_NAME%")
-set(uri.protocol "%CLIENT_PROTOCOL%")
+set(company.name "Network Optix")
+set(short.company.name "Nx")
+set(liteDeviceName "nx1")
+set(cloudName "Nx Cloud")
+set(uri.protocol "nx-vms")
 
 # Default settings
 set(backgroundImage
@@ -21,65 +21,78 @@ set(defaultWebPages
     "{\"Home Page\": \"http://networkoptix.com\", \"Support\": \"http://support.networkoptix.com\"}")
 
 # Support section
-set(companyUrl "%COMPANY_LINK%")
-set(productUrl "%PRODUCT_LINK%")
-set(supportUrl "%SUPPORT_LINK%")
-set(supportEmail "%SUPPORT_EMAIL%")
-set(supportPhone "%SUPPORT_PHONE%")
-set(licenseEmail "%LICENCE_EMAIL%")
+set(companyUrl "http://networkoptix.com")
+set(productUrl "http://networkoptix.com/nxwitness-overview")
+set(supportUrl "http://support.networkoptix.com")
+set(supportEmail "support@networkoptix.com")
+set(supportPhone "")
+set(licenseEmail "support@networkoptix.com")
 
-set(installer.name "%INSTALLER_NAME%")
-set(android.packageName "%ANDROID_PACKAGE_NAME%")
-set(android.oldPackageName "%ANDROID_OLD_PACKAGE_NAME%")
-set(android.alias "%ANDROID_ALIAS%")
-set(android.storepass "%ANDROID_STORE_PASS%")
-set(android.keypass "%ANDROID_KEY_PASS%")
+set(installer.name "nxwitness")
+set(android.packageName "com.networkoptix.nxwitness")
+set(android.oldPackageName "com.networkoptix.hdwitness")
+set(android.alias "hdwitness")
+set(android.storepass "hYCmvTDu")
+set(android.keypass "31O2zNNy")
 
 # Custom Installer (if needed). If not leave "default"
-set(customization.upgradeCode "%UPGRADE_CODE%")
-set(customization.clientUpgradeCode "%CLIENT_UPGRADE_CODE%")
-set(customization.serverUpgradeCode "%SERVER_UPGRADE_CODE%")
+set(customization.upgradeCode "{ce572797-45bf-4f1c-a783-369ea79c597e}")
+set(customization.clientUpgradeCode "{6ae0699e-af9d-4cc1-85a3-9bf8819563af}")
+set(customization.serverUpgradeCode "{b4582e3d-c6e1-4f51-806b-ad69417a2584}")
 
-set(customization.clientBundleUpgradeCode "%CLIENT_BUNDLE_UPGRADE_CODE%")
-set(customization.serverBundleUpgradeCode "%SERVER_BUNDLE_UPGRADE_CODE%")
-set(customization.fullBundleUpgradeCode "%FULL_BUNDLE_UPGRADE_CODE%")
-set(customization.nxtoolBundleUpgradeCode "%NXTOOL_BUNDLE_UPGRADE_CODE%")
-set(customization.axBundleUpgradeCode "%AX_BUNDLE_UPGRADE_CODE%")
+set(customization.clientBundleUpgradeCode "{4505af3c-b20c-4ae9-b5c4-c1fddbc5db34}")
+set(customization.serverBundleUpgradeCode "{4904f26d-6146-45f4-be37-80a31c15872d}")
+set(customization.fullBundleUpgradeCode "{2c83e785-23e4-4b70-be6c-ed49fa329bb5}")
+set(customization.nxtoolBundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
+set(customization.axBundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
 
-set(deb.customization.company.name "%CUSTOMIZATION_COMPANY_NAME%")
+set(deb.customization.company.name "networkoptix")
 
-set(ax.className "%AX_CLASS_NAME%")
-set(ax.classId "%AX_CLASS_ID%")
-set(ax.interfaceId "%AX_INTERFACE_ID%")
-set(ax.eventsId "%AX_EVENTS_ID%")
-set(ax.typeLibId "%AX_TYPE_LIB_ID%")
-set(ax.appId "%AX_APP_ID%")
-set(ax.upgradeCode "%AX_UPGRADE_CODE%")
+set(ax.className "NxWitnes")
+set(ax.classId "{930BF2FA-8BEB-4975-A04E-7FD63A4825AB}")
+set(ax.interfaceId "{5C0BD575-9376-4CF0-B34F-044AC58BD8AB}")
+set(ax.eventsId "{F220AAEC-AE9E-4771-9397-09F6F00C3B89}")
+set(ax.typeLibId "{534EA078-DCAF-4EF0-B982-95B5656D87B3}")
+set(ax.appId "{B21774A2-4417-4F07-84DC-37439C9B1063}")
+set(ax.upgradeCode "{44777DB8-96B1-4B09-9746-6D0390288C84}")
 
 set(ios.skip.sign false)
-set(ios.bundle_identifier "%IOS_BUNDLE_IDENTIFIER%")
-set(ios.new_bundle_identifier "%IOS_NEW_BUNDLE_IDENTIFIER%")
-set(ios.group_identifier "%IOS_GROUP_IDENTIFIER%")
-set(ios.sign.identity "%IOS_SIGN_IDENTIFY%")
-set(ios.old_app_appstore_id "%IOS_OLD_APPSTORE_ID%")
+set(ios.bundle_identifier "com.networkoptix.HDWitness")
+set(ios.new_bundle_identifier "com.networkoptix.NxMobile")
+set(ios.group_identifier "group.com.networkoptix.NxMobile")
+set(ios.sign.identity "iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)")
+set(ios.old_app_appstore_id "id648369716")
 
-set(mac.skip.sign %MAC_SKIP_SIGN%)
-set(mac.sign.identity "%MAC_SIGN_IDENTITY%")
-set(mac.app.sign.identity "%MAC_APP_SIGN_IDENTITY%")
-set(mac.pkg.sign.identity "%MAC_PKG_SIGN_IDENTITY%")
-set(mac.bundle.identifier "%MAC_BUNDLE_IDENTIFIER%")
-set(mac.protocol_handler_bundle.identifier "%MAC_PROTOCOL_HANDLER_BUNDLE%")
+set(mac.skip.sign false)
+set(mac.sign.identity "Developer ID Application: Network Optix, Inc. (L6FE34GJWM)")
+set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, Inc. (L6FE34GJWM)")
+set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
+set(mac.bundle.identifier "com.networkoptix.HDWitness2")
+set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 
 # Other customizations.
-set(freeLicenseIsTrial %FREE_LICENSE_IS_TRIAL%)
-set(freeLicenseCount %FREE_LICENSE_COUNT%)
-set(freeLicenseKey %FREE_LICENSE_KEY%)
+set(freeLicenseIsTrial true)
+set(freeLicenseCount 4)
+set(freeLicenseKey "0000-0000-0000-0005")
 
 # Installer Customizations
-set(sign.password "%SIGN_PASSWORD%")
-set(sign.cer "%SIGN_CERTIFICATE%")
-set(sign.intermediate.cer "%SIGN_INTERMEDIATE_CERTIFICATE%")
+set(sign.password "qweasd123")
+set(sign.cer "app.p12")
+set(sign.intermediate.cer "")
 
 # Localization
-set(defaultTranslation %DEFAULT_LANGUAGE%)
-set(additionalTranslations %ADDITIONAL_LANGUAGES%)
+set(defaultTranslation en_US)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+)
