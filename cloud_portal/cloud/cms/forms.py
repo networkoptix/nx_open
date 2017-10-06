@@ -42,7 +42,7 @@ class CustomContextForm(forms.Form):
             self.remove_langauge()
 
         for data_structure in data_structures:
-            ds_name = data_structure.label if data_structure.label else data_structure.name
+            ds_label = data_structure.label if data_structure.label else data_structure.name
 
             ds_description = data_structure.description
 
@@ -79,7 +79,7 @@ class CustomContextForm(forms.Form):
                 ds_description += "<br><p class='text-danger'>Required</p>"
 
             if data_structure.type == DataStructure.DATA_TYPES.image:
-                self.fields[data_structure.name] = forms.ImageField(label=ds_name,
+                self.fields[data_structure.name] = forms.ImageField(label=ds_label,
                                                                     help_text=ds_description,
                                                                     initial=record_value,
                                                                     required=False,
@@ -87,7 +87,7 @@ class CustomContextForm(forms.Form):
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.file:
-                self.fields[data_structure.name] = forms.FileField(label=ds_name,
+                self.fields[data_structure.name] = forms.FileField(label=ds_label,
                                                                    help_text=ds_description,
                                                                    initial=record_value,
                                                                    required=False,
@@ -95,7 +95,7 @@ class CustomContextForm(forms.Form):
                 continue
 
             self.fields[data_structure.name] = forms.CharField(required=False,
-                                                               label=ds_name,
+                                                               label=ds_label,
                                                                help_text=ds_description,
                                                                initial=record_value,
                                                                widget=widget_type,
