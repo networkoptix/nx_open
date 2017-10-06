@@ -4320,6 +4320,10 @@ to %1</source>
         <comment>Soft Trigger</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Disabled by schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
@@ -7209,14 +7213,6 @@ to %1</source>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-        <source>Enter Password...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Administrator Password</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Systems will be merged shortly</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7237,10 +7233,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password cannot be empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cloud Systems cannot be merged</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7254,6 +7246,14 @@ to %1</source>
     </message>
     <message>
         <source>Server will be connected to System shortly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter password...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administrator password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8076,7 +8076,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+        <source>Press any key to stop the tour.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

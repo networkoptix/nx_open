@@ -2,9 +2,9 @@
 
 #if defined(ENABLE_HANWHA)
 
-#include <map>
-
 #include <QtCore/QUrl>
+
+#include <nx/utils/thread/semaphore.h>
 
 #include <core/resource/resource_fwd.h>
 #include <plugins/resource/hanwha/hanwha_attributes.h>
@@ -20,7 +20,7 @@ class HanwhaRequestHelper
 public:
     using Parameters = std::map<QString, QString>;
 
-    HanwhaRequestHelper(const QnSecurityCamResourcePtr& resource);
+    HanwhaRequestHelper(const HanwhaResourcePtr& resource);
     HanwhaRequestHelper(const QAuthenticator& auth, const QString& url);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
@@ -86,6 +86,7 @@ private:
     const QAuthenticator m_auth;
     const QString m_url;
     bool m_ignoreMutexAnalyzer = false;
+    QnSemaphore* m_requestSemaphore = nullptr;
 };
 
 } // namespace plugins

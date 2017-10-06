@@ -67,10 +67,13 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     if (m_hanwhaResource->isNvr())
     {
         streamUrlString.append(lit("&session=%1")
-            .arg(m_hanwhaResource->sessionKey(HanwhaSessionType::live)));
+            .arg(m_hanwhaResource->sessionKey(m_sessionType)));
     }
 
+    m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
     m_rtpReader.setRole(role);
+    m_rtpReader.setTrustToCameraTime(m_hanwhaResource->isNvr());
+
     m_rtpReader.setRequest(streamUrlString);
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
@@ -230,12 +233,16 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
     ParameterMap params =
     {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
-        {kHanwhaMediaTypeProperty, kHanwhaLiveMediaType},
         {kHanwhaStreamingModeProperty, kHanwhaFullMode},
         {kHanwhaStreamingTypeProperty, kHanwhaRtpUnicast},
         {kHanwhaTransportProtocolProperty, rtpTransport()},
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
+    
+    if (getRole() == Qn::CR_Archive)
+        params.emplace(kHanwhaMediaTypeProperty, kHanwhaSearchMediaType);
+    else
+        params.emplace(kHanwhaMediaTypeProperty, kHanwhaLiveMediaType);
 
     if (m_hanwhaResource->isNvr())
         params.emplace(kHanwhaClientTypeProperty, "PC");
@@ -271,6 +278,21 @@ QString HanwhaStreamReader::rtpTransport() const
         return kHanwhaUdp;
 
     return kHanwhaTcp;
+}
+
+void HanwhaStreamReader::setPositionUsec(qint64 value)
+{
+    m_rtpReader.setPositionUsec(value);
+}
+
+QnRtspClient& HanwhaStreamReader::rtspClient()
+{
+    return m_rtpReader.rtspClient();
+}
+
+void HanwhaStreamReader::setSessionType(HanwhaSessionType value)
+{
+    m_sessionType = value;
 }
 
 } // namespace plugins

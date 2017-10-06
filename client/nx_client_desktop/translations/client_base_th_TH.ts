@@ -34,20 +34,19 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation type="unfinished">Zoom timeline
-to view more bookmarks</translation>
+      <translation>ขยายไทม์ไลน์เพื่อดูบุ๊กมาร์กเพิ่มเติม</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>เล่นคั่นหน้าจากจุดเริ่มต้น</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>แก้​ไข​บุ๊ค​มา​ร์ค</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>ลบ​บุ๊ค​มา​ร์ค</translation>
     </message>
   </context>
   <context>
@@ -88,7 +87,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>เชื่อมต่อกับระบบ</translation>
     </message>
     <message>
       <source>Help</source>
@@ -128,15 +127,15 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>ถูกตัดออกจากเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation type="unfinished">Browse Local Files</translation>
+      <translation>เรียกดูไฟล์ในเครื่อง</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation type="unfinished">Show Welcome Screen</translation>
+      <translation>แสดงหน้าจอต้อนรับ</translation>
     </message>
     <message>
       <source>New...</source>
@@ -168,7 +167,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation type="unfinished">Video Wall...</translation>
+      <translation>สร้างจอแสดงผลใหม่...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
@@ -176,11 +175,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Web Page...</source>
-      <translation type="unfinished">Web Page...</translation>
+      <translation>เว็บเพจ:</translation>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
+      <translation>หน้าเว็บใหม่ ...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -285,29 +284,29 @@ to view more bookmarks</translation>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
+      <translation>เข้าสู่ระบบ %1</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation type="unfinished">Log out from %1</translation>
+      <translation>ออกจากระบบจาก %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation type="unfinished">Open %1 Portal...</translation>
+      <translation>เปิด %1 พอร์ทัล ...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation type="unfinished">Account Settings...</translation>
+      <translation>ตั้งค่าบัญชี</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation type="unfinished">Create Account...</translation>
+      <translation>สร้างบัญชี</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>กฎเหตุการณ์</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -411,7 +410,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>เปิดภาพบนผนัง</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
@@ -431,7 +430,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>บันทึกภาพบนผนัง</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -451,7 +450,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
+      <translation>ล้างหน้าจอ</translation>
     </message>
     <message>
       <source>Save Layout</source>
@@ -495,7 +494,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>PTZ...</source>
-      <translation type="unfinished">PTZ...</translation>
+      <translation>PTZ ...</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
@@ -559,11 +558,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation type="unfinished">Stop Sharing Layout</translation>
+      <translation>หยุดแชร์เค้าโครง</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>แก้ไข ...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -583,11 +582,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation type="unfinished">User Roles...</translation>
+      <translation>บทบาทผู้ใช้ ...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation type="unfinished">Role Settings...</translation>
+      <translation>ตั้งค่าแฟ้มข้อมูล...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -675,7 +674,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>เพิ่มอุปกรณ์ ...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -695,7 +694,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>เซิร์ฟเวอร์เว็บเพจ</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -815,11 +814,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Pin Tree</source>
-      <translation type="unfinished">Pin Tree</translation>
+      <translation>Pin Tree</translation>
     </message>
     <message>
       <source>Unpin Tree</source>
-      <translation type="unfinished">Unpin Tree</translation>
+      <translation>Unpin Tree</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -839,11 +838,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation type="unfinished">Show Notifications</translation>
+      <translation>แสดงการแจ้งเตือน</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation type="unfinished">Hide Notifications</translation>
+      <translation>ซ่อนการแจ้งเตือน</translation>
     </message>
     <message>
       <source>Pin Notifications</source>
@@ -855,23 +854,23 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>การบันทึก บุ๊คมาร์ค</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>showreel</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Showreel ใหม่...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>นำออกจาก Showreel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>ทำ Showreel</translation>
     </message>
   </context>
   <context>
@@ -898,58 +897,58 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>For the last 5 min</source>
-      <translation type="unfinished">For the last 5 min</translation>
+      <translation>สำหรับ 5 นาทีสุดท้าย</translation>
     </message>
     <message>
       <source>For the last hour</source>
-      <translation type="unfinished">For the last hour</translation>
+      <translation>สำหรับชั่วโมงสุดท้าย</translation>
     </message>
     <message>
       <source>For the last day</source>
-      <translation type="unfinished">For the last day</translation>
+      <translation>สำหรับวันสุดท้าย</translation>
     </message>
     <message>
       <source>For the last week</source>
-      <translation type="unfinished">For the last week</translation>
+      <translation>สำหรับสัปดาห์ที่ผ่านมา</translation>
     </message>
     <message>
       <source>For the last month</source>
-      <translation type="unfinished">For the last month</translation>
+      <translation>สำหรับเดือนที่แล้ว</translation>
     </message>
     <message>
       <source>All data</source>
-      <translation type="unfinished">All data</translation>
+      <translation>ข้อมูลทั้งหมด</translation>
     </message>
     <message>
       <source>For all data</source>
-      <translation type="unfinished">For all data</translation>
+      <translation>สำหรับข้อมูลทั้งหมด</translation>
     </message>
   </context>
   <context>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation type="unfinished">License does not exist.</translation>
+      <translation>ไม่มีใบอนุญาต</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation type="unfinished">License is disabled.</translation>
+      <translation>ใบอนุญาตถูกปิดการใช้งาน</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>สัญญาอนุญาตไม่ได้ใช้งาน</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>ใบอนุญาตทดลองใช้</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
@@ -1207,11 +1206,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation type="unfinished">OpenGL renderer</translation>
+      <translation>OpenGL renderer</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation type="unfinished">OpenGL vendor</translation>
+      <translation>OpenGL renderer</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
@@ -1227,7 +1226,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Customer Support</source>
-      <translation type="unfinished">Customer Support</translation>
+      <translation>ฝ่ายสนับสนุนลูกค้า</translation>
     </message>
     <message>
       <source>Client is not connected to any System</source>
@@ -1672,7 +1671,7 @@ to view more bookmarks</translation>
     <name>QnBuildNumberDialog</name>
     <message>
       <source>Build Number</source>
-      <translation type="unfinished">Build Number</translation>
+      <translation>หมายเลข</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1787,7 +1786,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>ระบบ</translation>
     </message>
     <message>
       <source>Any Server</source>
@@ -1918,7 +1917,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>ช่วงเวลาของการดำเนินการ</translation>
     </message>
   </context>
   <context>
@@ -2058,11 +2057,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>สตรีมหลัก</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>สตรีมรอง</translation>
     </message>
     <message>
       <source>Camera has no secondary stream</source>
@@ -2307,7 +2306,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation type="unfinished">MAC address</translation>
+      <translation>ที่อยู่ Mac</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2391,7 +2390,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
-      <translation type="unfinished">Recording Schedule</translation>
+      <translation>ตารางเวลาการบันทึก</translation>
     </message>
     <message>
       <source>based on server time</source>
@@ -2643,7 +2642,7 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
@@ -2816,7 +2815,7 @@ to %1</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>รีสตาร์ท</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3352,7 +3351,7 @@ to %1</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>กฎเหตุการณ์</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3364,7 +3363,7 @@ to %1</translation>
     </message>
     <message>
       <source>Health Monitoring</source>
-      <translation type="unfinished">Health Monitoring</translation>
+      <translation>การตรวจสอบสุขภาพ</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3756,7 +3755,7 @@ to %1</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>ใบอนุญาตหมดอายุ</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -4277,6 +4276,10 @@ to %1</translation>
       <comment>Soft Trigger</comment>
       <translation type="unfinished">press and hold</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation type="unfinished">Disabled by schedule</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4310,7 +4313,7 @@ to %1</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>เซิร์ฟเวอร์ใหม่</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
@@ -4508,7 +4511,7 @@ to %1</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>รับทราบ</translation>
     </message>
   </context>
   <context>
@@ -5055,14 +5058,14 @@ to %1</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>showreel</translation>
     </message>
   </context>
   <context>
     <name>QnResourceTreeModelOtherSystemsNode</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>ระบบใหม่</translation>
     </message>
   </context>
   <context>
@@ -5088,7 +5091,7 @@ to %1</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -5219,7 +5222,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>ผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5319,7 +5322,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>เซิร์ฟเวอร์เว็บเพจ</translation>
     </message>
   </context>
   <context>
@@ -5927,11 +5930,11 @@ to %1</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>ส่วนหลัก</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>การสำรองข้อมูล</translation>
     </message>
     <message>
       <source>Add more drives to use them as backup storage.</source>
@@ -5991,7 +5994,7 @@ to %1</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation type="unfinished">Continue anyway?</translation>
+      <translation>ดำเนินการต่อ?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
@@ -6050,11 +6053,11 @@ to %1</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>การสำรองข้อมูล</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>ส่วนหลัก</translation>
     </message>
     <message>
       <source>%1 GB</source>
@@ -6761,11 +6764,11 @@ to %1</translation>
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>ท้องถิ่น</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>คลาวด์</translation>
     </message>
     <message>
       <source>Login</source>
@@ -6883,7 +6886,7 @@ to %1</translation>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
-      <translation type="unfinished">Fullscreen mode</translation>
+      <translation>โหมดเต็มหน้าจอ</translation>
     </message>
   </context>
   <context>
@@ -6894,7 +6897,7 @@ to %1</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -7143,14 +7146,6 @@ to %1</translation>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>ป้อนรหัสผ่าน ...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>รหัสผ่านผู้ดูแลระบบ</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation type="unfinished">Systems will be merged shortly</translation>
     </message>
@@ -7171,10 +7166,6 @@ to %1</translation>
       <translation type="unfinished">Total amount of licenses will decrease</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>รหัสผ่านต้องไม่ปล่อยว่าง.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation type="unfinished">Cloud Systems cannot be merged</translation>
     </message>
@@ -7189,6 +7180,14 @@ to %1</translation>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation type="unfinished">Server will be connected to System shortly</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation type="unfinished">Enter password...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation type="unfinished">Administrator password</translation>
     </message>
   </context>
   <context>
@@ -7692,7 +7691,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>ผู้ใช้ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -7718,11 +7717,11 @@ to %1</translation>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>หยุดทัวร์</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>เริ่มต้น ทัวร์</translation>
     </message>
   </context>
   <context>
@@ -7980,8 +7979,8 @@ to %1</translation>
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>กดปุ่มใด ๆ เพื่อที่จะหยุด.</translation>
     </message>
   </context>
   <context>
@@ -8007,7 +8006,7 @@ to %1</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>

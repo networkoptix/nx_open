@@ -62,6 +62,7 @@ namespace Qn
     static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
     static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
+    static const QString kGroupPlayParamName = lit("groupplay");
 
     static const QString kPrimaryStreamResolutionParamName = lit("primaryStreamResolution");
     static const QString kSecondaryStreamResolutionParamName = lit("secondaryStreamResolution");

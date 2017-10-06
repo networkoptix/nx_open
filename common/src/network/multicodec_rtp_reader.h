@@ -1,11 +1,11 @@
-#ifndef __MULTI_CODEC_RTP_READER__
-#define __MULTI_CODEC_RTP_READER__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QElapsedTimer>
 
 #include <vector>
+#include <atomic>
 
 #include <core/dataprovider/abstract_media_stream_provider.h>
 #include <core/resource/resource_consumer.h>
@@ -85,6 +85,17 @@ public:
 
     QString getCurrentStreamUrl() const;
 
+    void setPositionUsec(qint64 value);
+
+    void setDateTimeFormat(const QnRtspClient::DateTimeFormat& format);
+
+    QnRtspClient& rtspClient();
+
+    /**
+     * Trust to camera NPT clock if value is true. Remember difference between camera and local clock otherwise.
+     * Default value is false.
+     */
+    void setTrustToCameraTime(bool value);
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -93,9 +104,9 @@ private:
     struct TrackInfo
     {
         TrackInfo(): ioDevice(0), parser(0) {}
-        ~TrackInfo() { delete parser; }
+        ~TrackInfo() { }
         QnRtspIoDevice* ioDevice; // external reference. do not delete
-        QnRtpStreamParser* parser;
+        std::shared_ptr<QnRtpStreamParser> parser;
     };
 
     QnRtpStreamParser* createParser(const QString& codecName);
@@ -109,10 +120,10 @@ private:
     QnRtspClient::TransportType getRtpTransport() const;
 
     void calcStreamUrl();
-
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
+    void createTrackParsers();
 private:
     QnRtspClient m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
@@ -140,8 +151,7 @@ private:
 
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
+    std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif //__MULTI_CODEC_RTP_READER__

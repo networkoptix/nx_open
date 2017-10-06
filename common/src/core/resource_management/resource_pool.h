@@ -150,6 +150,9 @@ public:
 
     QnResourcePtr getResourceById(const QnUuid &id) const;
 
+    // Shared id is groupId for multichannel resources and uniqueId for single channel resources.
+    QnSecurityCamResourceList getResourcesBySharedId(const QString& sharedId) const;
+
     QnResourcePtr getResourceByUniqueId(const QString &id) const;
     void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
 

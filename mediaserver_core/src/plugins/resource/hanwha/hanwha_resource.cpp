@@ -7,6 +7,8 @@
 #include "hanwha_stream_reader.h"
 #include "hanwha_ptz_controller.h"
 #include "hanwha_resource_searcher.h"
+#include "hanwha_shared_resource_context.h"
+#include "hanwha_archive_delegate.h"
 
 #include <QtCore/QMap>
 
@@ -21,10 +23,14 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/camera_advanced_param.h>
+
+#include <media_server/media_server_module.h>
+#include "hanwha_chunk_reader.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -472,17 +478,26 @@ QString HanwhaResource::sessionKey(
     HanwhaSessionType sessionType,
     bool generateNewOne)
 {
-    auto discoveryManager = commonModule()->resourceDiscoveryManager();
-    if (!discoveryManager)
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    
+    if (!sharedContext)
         return QString();
 
-    auto searcher = dynamic_cast<HanwhaResourceSearcher*>(
-        discoveryManager->searcherByManufacture(kHanwhaManufacturerName));
+    return sharedContext->sessionKey(sessionType, generateNewOne);
+}
 
-    if (!searcher)
-        return QString();
+QnSemaphore* HanwhaResource::requestSemaphore()
+{
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
 
-    return searcher->sessionKey(toSharedPointer(this), sessionType, generateNewOne);
+    if (!sharedContext)
+        return nullptr;
+
+    return sharedContext->requestSemaphore();
 }
 
 bool HanwhaResource::isVideoSourceActive()
@@ -549,6 +564,14 @@ CameraDiagnostics::Result HanwhaResource::init()
     initMediaStreamCapabilities();
 
     saveParams();
+
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    auto loader = sharedContext->chunkLoader();
+    int channelCount = sharedContext->channelCount(getAuth(), getUrl());
+    loader->start(getAuth(), getUrl(), channelCount);
+
     return result;
 }
 
@@ -629,10 +652,13 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     const auto firmware = response.parameter<QString>(lit("FirmwareVersion"));
     const auto deviceType = response.parameter<QString>(lit("DeviceType"));
 
-    if (!deviceType || deviceType->isEmpty())
-        m_isNvr = false;
-    else
-        m_isNvr = (*deviceType).trimmed() == kNvrDeviceType;
+    m_isNvr = false;
+    if (deviceType && deviceType->trimmed() == kNvrDeviceType)
+    {
+        m_isNvr = true;
+        setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
+        setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
+    }
     
     if (!firmware.is_initialized())
         return CameraDiagnostics::NoErrorResult();
@@ -2303,6 +2329,24 @@ QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
         .remove(QRegExp("[^a-zA-Z]"));
 
     return appName + suffix;
+}
+
+QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
+{
+    if (isNvr())
+        return new HanwhaNvrArchiveDelegate(toSharedPointer());
+    return nullptr;
+}
+
+QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
+{
+    if (!isNvr())
+        return QnTimePeriodList();
+
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    return sharedContext->chunkLoader()->chunks(getChannel());
 }
 
 } // namespace plugins

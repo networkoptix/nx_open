@@ -173,7 +173,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     const auto updateRapidReviewData =
         [this](int absoluteSpeed, qint64 frameStepMs)
         {
-            ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Speed")).arg(absoluteSpeed).
+            ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Rapid Review")).arg(absoluteSpeed).
                 arg(QChar(L'\x2013'))); //< N-dash
 
             if (ui->speedButton->state() == ui::SelectableTextButton::State::deactivated)
@@ -277,7 +277,7 @@ void ExportSettingsDialog::setupSettingsButtons()
         qVariantFromValue(ExportOverlayType::text));
 
     ui->speedButton->setDeactivatable(true);
-    ui->speedButton->setDeactivatedText(tr("Speed Up"));
+    ui->speedButton->setDeactivatedText(tr("Rapid Review"));
     ui->speedButton->setDeactivationToolTip(tr("Reset Speed"));
     ui->speedButton->setDeactivatedIcon(qnSkin->icon(lit("buttons/rapid_review.png")));
     ui->speedButton->setIcon(qnSkin->icon(
@@ -384,6 +384,7 @@ void ExportSettingsDialog::setupSettingsButtons()
 
 ExportSettingsDialog::~ExportSettingsDialog()
 {
+    d->disconnect(this);
 }
 
 ExportSettingsDialog::Mode ExportSettingsDialog::mode() const
@@ -501,11 +502,13 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
     d->setMediaResource(mediaResource);
     ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
-    updateSettingsWidgets();
-
     const auto timeWatcher = widget->context()->instance<QnWorkbenchServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
-    d->setTimestampOffsetMs(timeWatcher->displayOffset(mediaResource));
+
+    const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
+    d->setTimestampOffsetMs(timestampOffsetMs);
+
+    updateSettingsWidgets();
 
     const auto resource = mediaResource->toResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -526,25 +529,15 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
     const auto currentSettings = d->exportMediaSettings();
     const auto namePart = resource->getName();
-    QString timePart;
-    if (resource->flags().testFlag(Qn::utc))
-    {
-        const auto& ts = d->exportMediaPersistentSettings().timestampOverlay;
-        timePart = QDateTime::fromMSecsSinceEpoch(currentSettings.timePeriod.startTimeMs
-            + ts.serverTimeDisplayOffsetMs).toString(ts.format);
-    }
-    else
-    {
-        timePart = QTime(0, 0, 0, 0).addMSecs(currentSettings.timePeriod.startTimeMs)
-            .toString(Qt::SystemLocaleShortDate);
-    }
-
-    if (utils::AppInfo::isWindows())
-        timePart.replace(L':', L'-');
+    const auto timePart = resource->hasFlags(Qn::utc)
+        ? QDateTime::fromMSecsSinceEpoch(currentSettings.timePeriod.startTimeMs
+            + timestampOffsetMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
+        : QTime(0, 0, 0, 0).addMSecs(currentSettings.timePeriod.startTimeMs)
+            .toString(lit("hh_mm_ss"));
 
     Filename baseFileName = currentSettings.fileName;
     baseFileName.name = nx::utils::replaceNonFileNameCharacters(
-        namePart + lit(" - ") + timePart, L' ');
+        namePart + L'_' + timePart, L'_');
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }

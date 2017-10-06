@@ -1,21 +1,21 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>개발자 도구</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            개발자 도구 개선 방법이나 대화를 시작하고 싶으십니까?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">피드백을 남겨 주세요</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>일반 이벤트 생성기</h3>
         <p>
-            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
-            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            A Generic Event is a method of sending events from 3rd party systems to a System,
+            which can be used to trigger System actions in the Events & Rules engine.
+            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">일반 이벤트 생성기</a></p>
     </div>
     <div>
         <h3>서버 API</h3>
@@ -28,27 +28,27 @@
         <p>
             <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
             - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
+            <a href="#/developers/changelog">API Changelog</a>
             - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>카메라 세부 정보 패널</h3>
         <p>
-            Special panel for a webclient which displays additional information for cameras:
+            Displays additional developer-friendly information for cameras in the Web Admin interface:
         </p>
         <ul>
             <li>카메라 ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>모든 사용 가능한 비디오 스트림에 대 한 링크</li>
+            <li>브라우저에서 직접 동영상 내보내기</li>
         </ul>
         <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
+            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
+            select the target camera, click on the settings icon (gear), then choose "Camera Details"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">카메라 세부 정보 패널 열기</a></p>
     </div>
     <div>
         <h3>비디오 소스 통합 SDK</h3>

@@ -1,5 +1,8 @@
 #include "radass_support.h"
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -15,6 +18,16 @@ bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemD
     if (!item.zoomRect.isNull())
         return false;
 
+    // Some layouts do not belong to the same resource pool as cameras (e.g. showreels).
+    if (!resourcePool)
+    {
+        // Unit tests do not have core module.
+        if (!qnClientCoreModule)
+            return false;
+
+        resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    }
+
     const auto camera = resourcePool->getResourceByDescriptor(item.resource)
         .dynamicCast<QnVirtualCameraResource>();
     return camera && camera->hasDualStreaming2();
@@ -28,7 +41,7 @@ namespace desktop {
 
 bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
 {
-    if (!layout || !layout->resourcePool())
+    if (!layout)
         return false;
 
     return GenericCondition::check<QnLayoutItemData>(layout->getItems(), match,
@@ -40,7 +53,7 @@ bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
 
 ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout)
 {
-    if (!layout || !layout->resourcePool())
+    if (!layout)
         return ConditionResult::None;
 
     return GenericCondition::check<QnLayoutItemData>(layout->getItems(),
@@ -52,7 +65,7 @@ ConditionResult isRadassSupported(const QnLayoutResourcePtr& layout)
 
 bool isRadassSupported(const QnLayoutItemIndex& item)
 {
-    if (!item.layout() || !item.layout()->resourcePool())
+    if (!item.layout())
         return false;
 
     const auto layoutItem = item.layout()->getItem(item.uuid());

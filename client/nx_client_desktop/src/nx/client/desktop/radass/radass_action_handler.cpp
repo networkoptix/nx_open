@@ -28,10 +28,12 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 
 namespace {
 
 static const QString kCacheDirectoryName = lit("radass");
+static constexpr int kHintTimeoutMs = 5000;
 
 QString getCacheDirectory()
 {
@@ -50,6 +52,9 @@ struct RadassActionHandler::Private
     QScopedPointer<RadassCamerasWatcher> camerasWatcher;
     RadassController* controller = nullptr;
     RadassResourceManager* manager = nullptr;
+
+    bool notifiedAboutPerformanceLoss = false;
+    QPointer<QnGraphicsMessageBox> performanceHintLabel;
 };
 
 RadassActionHandler::RadassActionHandler(QObject* parent):
@@ -69,13 +74,15 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     connect(d->manager, &RadassResourceManager::modeChanged, this,
         &RadassActionHandler::handleItemModeChanged);
 
+    connect(d->controller, &RadassController::performanceCanBeImproved, this,
+        &RadassActionHandler::notifyAboutPerformanceLoss);
+
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &RadassActionHandler::handleCurrentLayoutChanged);
 
-    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this,
+    // We must load settings as early as possible to handle auto-run showreels and layouts.
+    connect(globalSettings(), &QnGlobalSettings::localSystemIdChangedDirect, this,
         &RadassActionHandler::handleLocalSystemIdChanged);
-
-    handleLocalSystemIdChanged();
 }
 
 RadassActionHandler::~RadassActionHandler()
@@ -138,15 +145,31 @@ void RadassActionHandler::handleCurrentLayoutChanged()
         if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
         {
             auto camDisplay = mediaWidget->display()->camDisplay();
-            d->controller->setMode(camDisplay, d->manager->mode(QnLayoutItemIndexList() << index));
+            d->controller->setMode(camDisplay, d->manager->mode(index));
         }
     }
+
+    // Notify once for each layout.
+    d->notifiedAboutPerformanceLoss = false;
+    if (d->performanceHintLabel)
+        d->performanceHintLabel->hideImmideately();
+    d->performanceHintLabel.clear();
 }
 
 void RadassActionHandler::handleLocalSystemIdChanged()
 {
     d->manager->switchLocalSystemId(globalSettings()->localSystemId());
     handleCurrentLayoutChanged();
+}
+
+void RadassActionHandler::notifyAboutPerformanceLoss()
+{
+    if (d->notifiedAboutPerformanceLoss)
+        return;
+
+    const auto hint = tr("Set layout resolution to \"Auto\" to increase performance.");
+    d->performanceHintLabel = QnGraphicsMessageBox::information(hint, kHintTimeoutMs);
+    d->notifiedAboutPerformanceLoss = true;
 }
 
 } // namespace desktop

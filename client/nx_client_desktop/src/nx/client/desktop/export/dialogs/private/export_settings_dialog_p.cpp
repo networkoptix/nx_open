@@ -11,6 +11,7 @@
 #include <camera/single_thumbnail_loader.h>
 #include <camera/thumbnails_loader.h>
 #include <client/client_settings.h>
+#include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <ui/common/palette.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
@@ -411,15 +412,11 @@ FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode
             break;
     }
 
-    // TODO: #vkutin Enable binary for media export when it's ready.
-    if (mode == Mode::Layout)
-    {
-        // Both media and layout can be exported to binary.
-        if (utils::AppInfo::isWin64())
-            result << FileExtension::exe64;
-        else if (utils::AppInfo::isWin32())
-            result << FileExtension::exe86;
-    }
+    // Both media and layout can be exported to binary.
+    if (utils::AppInfo::isWin64())
+        result << FileExtension::exe64;
+    else if (utils::AppInfo::isWin32())
+        result << FileExtension::exe86;
 
     return result;
 }
@@ -724,41 +721,33 @@ void ExportSettingsDialog::Private::updateBookmarkText()
     m_exportMediaPersistentSettings.bookmarkOverlay.text = text;
 }
 
-void ExportSettingsDialog::Private::updateTimestampText()
+QString ExportSettingsDialog::Private::timestampText(qint64 timeMs) const
 {
     if (mediaSupportsUtc())
     {
-        const auto dateTime = QDateTime::fromMSecsSinceEpoch(m_exportMediaSettings.timePeriod.startTimeMs
-            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs)
-            .toOffsetFromUtc(qnSyncTime->currentDateTime().offsetFromUtc());
-
-        overlay(ExportOverlayType::timestamp)->setText(dateTime.toString(
-            m_exportMediaPersistentSettings.timestampOverlay.format));
+        return nx::core::transcoding::TimestampFilter::timestampTextUtc(
+            timeMs,
+            m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs,
+            m_exportMediaPersistentSettings.timestampOverlay.format);
     }
-    else
-    {
-        const auto time = QTime(0, 0).addMSecs(m_exportMediaSettings.timePeriod.startTimeMs
-            + m_exportMediaPersistentSettings.timestampOverlay.serverTimeDisplayOffsetMs);
 
-        overlay(ExportOverlayType::timestamp)->setText(time.toString(lit("hh:mm:ss")));
-    }
+    return nx::core::transcoding::TimestampFilter::timestampTextSimple(timeMs);
+}
+
+void ExportSettingsDialog::Private::updateTimestampText()
+{
+    overlay(ExportOverlayType::timestamp)->setText(timestampText(
+        m_exportMediaSettings.timePeriod.startTimeMs));
 }
 
 void ExportSettingsDialog::Private::updateMediaImageProcessor()
 {
-    QnLegacyTranscodingSettings processorSettings;
     const auto& settings = m_exportMediaSettings.transcodingSettings;
+    const auto dewarpingParams = m_exportMediaSettings.mediaResource
+        ? m_exportMediaSettings.mediaResource->getDewarpingParams()
+        : QnMediaDewarpingParams();
 
-    processorSettings.itemDewarpingParams = settings.dewarping;
-    processorSettings.resource = m_exportMediaSettings.mediaResource;
-    processorSettings.contrastParams = settings.enhancement;
-    processorSettings.rotation = settings.rotation;
-    processorSettings.zoomWindow = settings.zoomWindow;
-    processorSettings.forcedAspectRatio = settings.aspectRatio.isValid()
-        ? settings.aspectRatio.toFloat()
-        : 0.0;
-
-    m_mediaImageProcessor->setTranscodingSettings(processorSettings);
+    m_mediaImageProcessor->setTranscodingSettings(settings, dewarpingParams);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)

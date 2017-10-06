@@ -30,6 +30,12 @@ class EventRuleWatcher;
 
 } // namespace metadata
 
+namespace resource {
+
+class SharedContextPool;
+
+} // namespace resource
+
 } // namespace mediaserver
 } // namespace nx
 
@@ -61,6 +67,7 @@ public:
     PluginManager* pluginManager() const;
     nx::mediaserver::metadata::ManagerPool* metadataManagerPool() const;
     nx::mediaserver::metadata::EventRuleWatcher* metadataRuleWatcher() const;
+    nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
 
     void initializeRootTool();
     nx::mediaserver::RootTool* rootTool() const;
@@ -84,6 +91,7 @@ private:
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
     QThread* m_metadataManagerPoolThread = nullptr;
+    nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
 };
 

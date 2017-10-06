@@ -437,7 +437,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>חוקי אירוע</translation>
+      <translation>חוקים</translation>
     </message>
     <message>
       <location/>
@@ -535,12 +535,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
@@ -699,7 +699,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>"אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה  &quot;מבוטל ב"ניהול המערכת &quot;.</translation>
+      <translation>"אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה "מבוטל ב"ניהול המערכת".</translation>
     </message>
     <message>
       <location/>
@@ -874,7 +874,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>שינוי סיסמא</translation>
+      <translation>שינוי סיסמה</translation>
     </message>
   </context>
   <context>
@@ -977,7 +977,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>חוקי אירוע...</translation>
+      <translation>חוקים...</translation>
     </message>
   </context>
   <context>
@@ -995,17 +995,17 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation>סיסמא לאימות (אופציונאלי)</translation>
+      <translation>סיסמה לאימות (אופציונאלי)</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -1546,12 +1546,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -1619,7 +1619,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation>מחזור סרטון</translation>
+      <translation>מחזור סיור פריסות</translation>
     </message>
   </context>
   <context>
@@ -1660,7 +1660,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>מקליט</translation>
+      <translation>הקלטה</translation>
     </message>
     <message>
       <location/>
@@ -2063,7 +2063,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation>הגדרות LDAP...</translation>
+      <translation>LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2073,7 +2073,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>קבל משתמשים מLDAP...</translation>
+      <translation>רענן נתוני LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2205,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>מחשב חזק מומלץ עבור רזולוציה ואיכות &quot;הטובים ביותר &quot;.</translation>
+      <translation>מחשב חזק מומלץ עבור רזולוציה ואיכות "הטובים ביותר".</translation>
     </message>
     <message>
       <location/>
@@ -2479,12 +2479,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -2795,7 +2795,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation>שינוי סיסמא...</translation>
+      <translation>שינוי סיסמה...</translation>
     </message>
   </context>
   <context>
@@ -2827,7 +2827,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על  &quot;תפקיד חדש &quot; כדי ליצור אחד.</translation>
+      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על &quot;תפקיד חדש&quot; כדי ליצור אחד.</translation>
     </message>
     <message>
       <location/>

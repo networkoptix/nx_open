@@ -142,7 +142,7 @@ bool QnSecurityCamResource::removeProperty(const QString& key)
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
-    return hasParam(lit("groupplay"));
+    return hasParam(Qn::kGroupPlayParamName);
 }
 
 const QnResource* QnSecurityCamResource::toResource() const {
@@ -775,7 +775,19 @@ void QnSecurityCamResource::setGroupId(const QString& value) {
 
 }
 
-QString QnSecurityCamResource::getModel() const {
+QString QnSecurityCamResource::getSharedId() const
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_groupId.isEmpty())
+            return m_groupId;
+    }
+    
+    return getUniqueId();
+}
+
+QString QnSecurityCamResource::getModel() const
+{
     SAFE(return m_model)
 }
 

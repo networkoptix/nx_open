@@ -8,7 +8,5 @@
         <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
                 ng-src="{{camera.preview}}" preview-image>
     </div>
-    <div class="camera-name">{{camera.name}}<br/>
-        <small ng-if="toggleInfo">{{camera.url}}</small>
-    </div>
+    {{camera.name}} <div class="camera-name"><br/>         <small ng-if="toggleInfo">{{camera.url}}</small></div>
 </a>

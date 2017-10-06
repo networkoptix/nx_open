@@ -14,9 +14,9 @@
         </div>
         <nav ng-if="!noPanel" class="collapse navbar-collapse" id="navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
+                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Ayarlar</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}"><a ng-href="#/view/">Görünüm</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}"><a ng-href="#/client/">Mini İstemci</a></li>
-                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Ayarlar</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Bilgi</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">Geliştiriciler için</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Yardım</a></li>

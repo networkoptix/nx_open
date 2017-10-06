@@ -14,9 +14,9 @@
         </div>
         <nav ng-if="!noPanel" class="collapse navbar-collapse" id="navbar-collapse" role="navigation">
             <ul class="nav navbar-nav">
+                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Beállítások</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}"><a ng-href="#/view/">Nézet</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}"><a ng-href="#/client/">Lite Kliens</a></li>
-                <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}"><a ng-href="#/settings/">Beállítások</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Információ</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">Fejlesztőknek</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Súgó</a></li>

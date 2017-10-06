@@ -7,15 +7,14 @@
 class QImage;
 
 namespace nx {
+namespace core {
 namespace transcoding {
-namespace filters {
 namespace detail {
 
 class ImageToFramePainter
 {
 public:
     ImageToFramePainter();
-
     ~ImageToFramePainter();
 
     void setImage(
@@ -50,6 +49,6 @@ private:
 };
 
 } // namespace detail
-} // namespace filters
 } // namespace transcoding
+} // namespace core
 } // namespace nx

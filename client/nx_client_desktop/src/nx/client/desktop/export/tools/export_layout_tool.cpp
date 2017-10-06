@@ -3,6 +3,10 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QEventLoop>
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
@@ -182,10 +186,9 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     QnLayoutItemDataMap items;
 
     // Take resource pool from the original layout.
-    const auto resourcePool = d->settings.layout->resourcePool();
-    NX_ASSERT(resourcePool, "Export of temporary layout is forbidden");
+    auto resourcePool = d->settings.layout->resourcePool();
     if (!resourcePool)
-        return result;
+        resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
     for (const auto& item: m_layout->getItems())
     {
@@ -492,9 +495,6 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     qint64 serverTimeZone = QnWorkbenchServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
-    QnLegacyTranscodingSettings settings;
-    settings.resource = m_currentCamera->resource();
-
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
         lit("mkv"),
@@ -502,7 +502,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         role,
         serverTimeZone,
         0,
-        settings);
+        nx::core::transcoding::FilterChain());
 
     return true;
 }

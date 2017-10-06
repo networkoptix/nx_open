@@ -1038,25 +1038,23 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>A &quot;%1&quot; fájlt egy másik folyamat használja.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>&quot;%1&quot; nem írható. Próbáljon más nevet.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>A fájlnév nem tartalmazhatja a következő fenntartott karaktereket: %1</numerusform>
+        <numerusform>A fájlnév nem tartalmazhatja a következő fenntartott karaktereket: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>&quot;%1&quot; fájlnevet más alkalmazás használja. Próbáljon más nevet.</translation>
     </message>
   </context>
   <context>
@@ -2670,11 +2668,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Hibás e-mail cím vagy jelszó</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>A fiók nincs aktiválva. Kérjük, ellenőrizze e-mailjét és kövesse az utasításokat</translation>
     </message>
   </context>
   <context>
@@ -4325,6 +4323,10 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>tartsa lenyomva</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Ütemezés alapján letiltva</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4626,7 +4628,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>Az értesítés addig látható lesz amíg valamelyik felhasználó, aki látja, létre nem hoz egy könyvjelzőt az eseményleírásával</translation>
     </message>
   </context>
   <context>
@@ -6440,7 +6442,7 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>óó:pp</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>h ap</source>
@@ -6495,7 +6497,7 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>ó:pp ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -7215,14 +7217,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Jelszó megadása...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Adminisztrátor jelszó</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>A rendszer hamarosan összevonásra kerül</translation>
     </message>
@@ -7243,10 +7237,6 @@ to %1</source>
       <translation>A licencek száma csökkenni fog</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>A jelszó mező nem lehet üres.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Felhő rendszerek nem vonhatók össze</translation>
     </message>
@@ -7261,6 +7251,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>A szerver rövidesen csatlakozik a rendszerhez</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Jelszó megadása...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Adminisztrátor jelszó</translation>
     </message>
   </context>
   <context>
@@ -7813,11 +7811,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Túra leállítása</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Túra indítása</translation>
     </message>
   </context>
   <context>
@@ -8082,8 +8080,8 @@ to %1</source>
       <translation>Elrendezések váltásához használja a nyilakat. Kilépés a showreelből az Esc billentyűvel.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Nyomjon meg egy gombot a túra megállításához.</translation>
     </message>
   </context>
   <context>

@@ -1,7 +1,6 @@
 #include "transcoding_image_processor.h"
 
 #include <transcoding/filters/abstract_image_filter.h>
-#include <transcoding/filters/filter_helper.h>
 #include <utils/media/frame_info.h>
 
 namespace nx {
@@ -11,22 +10,26 @@ namespace desktop {
 class TranscodingImageProcessor::Private
 {
 public:
-    const nx::core::transcoding::LegacyTranscodingSettings& settings() const
+    const core::transcoding::FilterChain& filters() const
     {
-        return m_settings;
+        return m_filters;
     }
 
-    void setSettings(const nx::core::transcoding::LegacyTranscodingSettings& settings)
+    void setSettings(const nx::core::transcoding::Settings& settings)
     {
-        m_settings = settings;
+        m_filters = core::transcoding::FilterChain(settings);
         m_sourceSize = QSize();
     }
 
-    QnAbstractImageFilterList ensureFilters(const QSize& sourceSize)
+    core::transcoding::FilterChain ensureFilters(const QSize& sourceSize)
     {
         if (m_sourceSize != sourceSize)
         {
-            m_filters = QnImageFilterHelper::createFilterChain(m_settings, sourceSize);
+            m_filters.reset();
+            // Image is already combined, so video layout must be ignored.
+            m_filters.prepare(QnConstResourceVideoLayoutPtr(),
+                m_mediaDewarpingParams,
+                sourceSize);
             m_sourceSize = sourceSize;
         }
 
@@ -34,8 +37,9 @@ public:
     }
 
 private:
-    nx::core::transcoding::LegacyTranscodingSettings m_settings;
-    QnAbstractImageFilterList m_filters;
+    QnMediaDewarpingParams m_mediaDewarpingParams;
+    core::transcoding::FilterChain m_filters;
+
     QSize m_sourceSize;
 };
 
@@ -50,7 +54,8 @@ TranscodingImageProcessor::~TranscodingImageProcessor()
 }
 
 void TranscodingImageProcessor::setTranscodingSettings(
-    const nx::core::transcoding::LegacyTranscodingSettings& settings)
+    const core::transcoding::Settings& settings,
+    const QnMediaDewarpingParams& mediaDewarpingParams)
 {
     d->setSettings(settings);
     emit updateRequired();
@@ -58,15 +63,11 @@ void TranscodingImageProcessor::setTranscodingSettings(
 
 QSize TranscodingImageProcessor::process(const QSize& sourceSize) const
 {
-    if (d->settings().resource.isNull() || d->settings().isEmpty())
+    if (!d->filters().isTranscodingRequired(QnConstResourceVideoLayoutPtr()))
         return sourceSize;
 
-    QSize size(sourceSize);
-
-    for (const auto& filter: d->ensureFilters(sourceSize))
-        size = filter->updatedResolution(size);
-
-    return size;
+    const auto filters = d->ensureFilters(sourceSize);
+    return filters.apply(sourceSize);
 }
 
 QImage TranscodingImageProcessor::process(const QImage& sourceImage) const
@@ -74,21 +75,12 @@ QImage TranscodingImageProcessor::process(const QImage& sourceImage) const
     if (sourceImage.isNull())
         return QImage();
 
-    if (d->settings().resource.isNull() || d->settings().isEmpty())
+    if (!d->filters().isTranscodingRequired(QnConstResourceVideoLayoutPtr()))
         return sourceImage;
 
     const auto filters = d->ensureFilters(sourceImage.size());
-    if (filters.empty())
-        return sourceImage;
-
     QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(sourceImage));
-    for (const auto& filter: filters)
-    {
-        frame = filter->updateImage(frame);
-        if (!frame)
-            break;
-    }
-
+    frame = filters.apply(frame);
     return frame ? frame->toImage() : QImage();
 }
 

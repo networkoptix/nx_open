@@ -93,6 +93,8 @@ public:
 
     void validateSettings(Mode mode);
 
+    QString timestampText(qint64 timeMs) const;
+
 signals:
     void validated(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
     void overlaySelected(ExportOverlayType type);

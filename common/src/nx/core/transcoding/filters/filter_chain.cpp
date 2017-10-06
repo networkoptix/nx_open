@@ -1,5 +1,7 @@
 #include "filter_chain.h"
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <core/resource/media_resource.h>
 
 #include <transcoding/filters/scale_image_filter.h>
@@ -9,18 +11,17 @@
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/rotate_image_filter.h>
 #include <transcoding/filters/time_image_filter.h>
-#include <transcoding/filters/paint_image_filter.h>
-#include <transcoding/filters/timestamp_filter.h>
+#include <nx/core/transcoding/filters/paint_image_filter.h>
+#include <nx/core/transcoding/filters/timestamp_filter.h>
 
 #include <transcoding/transcoder.h>
 
 #include <nx/utils/log/assert.h>
 
-namespace
-{
+namespace {
 
-static const float kMinStepChangeCoeff = 0.95f;
-static const float kAspectRatioComparisionPrecision = 0.01f;
+static constexpr float kMinStepChangeCoeff = 0.95f;
+static constexpr float kAspectRatioComparisionPrecision = 0.01f;
 
 } // namespace
 
@@ -36,18 +37,29 @@ FilterChain::FilterChain(const Settings& settings):
 }
 
 void FilterChain::prepare(const QnMediaResourcePtr& resource,
-    const QSize& srcResolution,
+    const QSize& srcFrameResolution,
+    const QSize& resolutionLimit)
+{
+    prepare(resource->getVideoLayout(),
+        resource->getDewarpingParams(),
+        srcFrameResolution,
+        resolutionLimit);
+}
+
+void FilterChain::prepare(const QnConstResourceVideoLayoutPtr& videoLayout,
+    const QnMediaDewarpingParams& mediaDewarpingParams,
+    const QSize& srcFrameResolution,
     const QSize& resolutionLimit)
 {
     NX_ASSERT(!isReady(), "Double initialization");
-    NX_EXPECT(isTranscodingRequired(resource));
+    NX_EXPECT(isTranscodingRequired(videoLayout));
 
     if (m_settings.aspectRatio.isValid())
     {
         QSize newSize;
-        newSize.setHeight(srcResolution.height());
-        newSize.setWidth(srcResolution.height() * m_settings.aspectRatio.toFloat() + 0.5);
-        if (newSize != srcResolution)
+        newSize.setHeight(srcFrameResolution.height());
+        newSize.setWidth(srcFrameResolution.height() * m_settings.aspectRatio.toFloat() + 0.5);
+        if (newSize != srcFrameResolution)
         {
             push_back(QnAbstractImageFilterPtr(new QnScaleImageFilter(
                 QnCodecTranscoder::roundSize(newSize))));
@@ -55,10 +67,9 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     }
 
     bool tiledFilterExist = false;
-    const auto layout = resource->getVideoLayout();
-    if (layout && layout->channelCount() > 1)
+    if (videoLayout && videoLayout->channelCount() > 1)
     {
-        push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(layout)));
+        push_back(QnAbstractImageFilterPtr(new QnTiledImageFilter(videoLayout)));
         tiledFilterExist = true;
     }
 
@@ -68,7 +79,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     if (m_settings.dewarping.enabled)
     {
         push_back(QnAbstractImageFilterPtr(new QnFisheyeImageFilter(
-            resource->getDewarpingParams(), m_settings.dewarping)));
+            mediaDewarpingParams, m_settings.dewarping)));
     }
 
     if (m_settings.enhancement.enabled)
@@ -85,19 +96,17 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
         if (const auto imageFilterSetting = dynamic_cast<ImageOverlaySettings*>(
             overlaySettings.data()))
         {
-            const auto paintFilter = new nx::transcoding::filters::PaintImageFilter();
-            const auto filter = QnAbstractImageFilterPtr(paintFilter);
+            const auto paintFilter = new PaintImageFilter();
             paintFilter->setImage(imageFilterSetting->image,
                 imageFilterSetting->offset,
                 imageFilterSetting->alignment);
 
-            push_back(filter);
+            push_back(QnAbstractImageFilterPtr(paintFilter));
         }
         else if (const auto timestampFilterSettings = dynamic_cast<TimestampOverlaySettings*>(
             overlaySettings.data()))
         {
-            push_back(QnAbstractImageFilterPtr(new nx::transcoding::filters::TimestampFilter(
-                *timestampFilterSettings)));
+            push_back(QnAbstractImageFilterPtr(new TimestampFilter(*timestampFilterSettings)));
         }
 
     }
@@ -109,7 +118,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     {
         //we can't be sure the way input image scale affects output, so adding a loop...
 
-        const QSize resultResolution = apply(srcResolution);
+        const QSize resultResolution = apply(srcFrameResolution);
         if (resultResolution.width() <= resolutionLimit.width() &&
             resultResolution.height() <= resolutionLimit.height())
         {
@@ -136,14 +145,14 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
         if (resizeRatio >= 1.0)
             break;  //done. resolution is OK
 
-        // This is needed for the loop to be finite.
+                    // This is needed for the loop to be finite.
         if (resizeRatio >= prevResizeRatio - kAspectRatioComparisionPrecision)
             resizeRatio = prevResizeRatio * kMinStepChangeCoeff;
         prevResizeRatio = resizeRatio;
 
         // Adjusting scale filter.
         const auto resizeToSize = QnCodecTranscoder::roundSize(
-            QSize(srcResolution.width() * resizeRatio, srcResolution.height() * resizeRatio));
+            QSize(srcFrameResolution.width() * resizeRatio, srcFrameResolution.height() * resizeRatio));
 
         auto scaleFilter = front().dynamicCast<QnScaleImageFilter>();
         if (!scaleFilter)
@@ -158,16 +167,22 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
         }
     }
 
+    for (auto legacyFilter: m_legacyFilters)
+        push_back(legacyFilter);
+
     m_ready = true;
 }
 
-bool FilterChain::isTranscodingRequired(const QnMediaResourcePtr& resource) const
+bool FilterChain::isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const
 {
+    //TODO: #GDM #3.2 Remove when legacy will gone.
+    if (!m_legacyFilters.empty())
+        return true;
+
     if (m_settings.aspectRatio.isValid())
         return true;
 
-    const auto layout = resource->getVideoLayout();
-    if (layout && layout->channelCount() > 1)
+    if (videoLayout && videoLayout->channelCount() > 1)
         return true;
 
     if (!m_settings.zoomWindow.isEmpty())
@@ -185,6 +200,14 @@ bool FilterChain::isTranscodingRequired(const QnMediaResourcePtr& resource) cons
     return !m_settings.overlays.isEmpty();
 }
 
+bool FilterChain::isTranscodingRequired(const QnMediaResourcePtr& resource) const
+{
+    NX_ASSERT(resource);
+    return isTranscodingRequired(resource
+        ? resource->getVideoLayout()
+        : QnConstResourceVideoLayoutPtr());
+}
+
 bool FilterChain::isDownscaleRequired(const QSize& srcResolution) const
 {
     NX_ASSERT(isReady());
@@ -197,6 +220,12 @@ bool FilterChain::isDownscaleRequired(const QSize& srcResolution) const
 bool FilterChain::isReady() const
 {
     return m_ready;
+}
+
+void FilterChain::reset()
+{
+    clear();
+    m_ready = false;
 }
 
 QSize FilterChain::apply(const QSize& resolution) const
@@ -215,6 +244,13 @@ CLVideoDecoderOutputPtr FilterChain::apply(const CLVideoDecoderOutputPtr& source
     return result;
 }
 
+void FilterChain::addLegacyFilter(QnAbstractImageFilterPtr filter)
+{
+    m_legacyFilters.append(filter);
+}
+
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -61,6 +61,9 @@ public:
     */
     qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
+
+    void setTrustToCameraTime(bool value);
+    bool isTrustToCameraTime() const;
 private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
     bool isLocalTimeChanged();
@@ -73,11 +76,9 @@ private:
     double m_rtcpReportTimeDiff;
 
     struct CamSyncInfo {
-        CamSyncInfo(): timeDiff(INT_MAX), driftSum(0) {}
+        CamSyncInfo(): timeDiff(INT_MAX) {}
         QnMutex mutex;
         double timeDiff;
-        QnUnsafeQueue<qint64> driftStats;
-        qint64 driftSum;
     };
 
     QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
@@ -86,6 +87,7 @@ private:
     static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
+    bool m_trustToCameraTime = false;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);
@@ -144,6 +146,12 @@ public:
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
+
+    enum class DateTimeFormat
+    {
+        Numeric,
+        ISO
+    };
 
     struct SDPTrackInfo
     {
@@ -313,6 +321,8 @@ public:
     /** @return "Server" http header value */
     QByteArray serverInfo() const;
 
+    void setDateTimeFormat(const DateTimeFormat& format);
+    void setScaleHeaderEnabled(bool value);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -347,6 +357,7 @@ private:
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx_http::Request&& request);
     void addCommonHeaders(nx_http::HttpHeaders& headers);
+    QByteArray nptPosToString(qint64 posUsec) const;
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
@@ -408,6 +419,8 @@ private:
     nx_http::header::AuthScheme::Value m_defaultAuthScheme;
     mutable QnMutex m_socketMutex;
     QByteArray m_serverInfo;
+    DateTimeFormat m_dateTimeFormat = DateTimeFormat::Numeric;
+    bool m_scaleHeaderEnabled = true;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

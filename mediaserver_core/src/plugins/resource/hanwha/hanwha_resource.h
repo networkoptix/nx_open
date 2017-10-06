@@ -66,7 +66,11 @@ public:
 
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
 
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
+
+    QnSemaphore* requestSemaphore();
 
     bool isVideoSourceActive();
 
@@ -104,7 +108,8 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
-
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+    virtual bool allowRtspVideoLayout() const override { return false; }
 private:
     CameraDiagnostics::Result init();
     CameraDiagnostics::Result initSystem();

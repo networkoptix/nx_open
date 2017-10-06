@@ -90,7 +90,6 @@ private:
                 return QString();
         }
     }
-
 };
 
 } // namespace

@@ -1,12 +1,14 @@
 #include "timestamp_filter.h"
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <QtCore/QDateTime>
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 
 #include <utils/common/util.h>
 #include <utils/media/frame_info.h>
-#include <transcoding/filters/image_to_frame_painter.h>
+#include <nx/core/transcoding/filters/image_to_frame_painter.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
 
 namespace {
@@ -22,18 +24,16 @@ QFont fontFromParams(const nx::core::transcoding::TimestampOverlaySettings& para
 } // namespace
 
 namespace nx {
+namespace core {
 namespace transcoding {
-namespace filters {
 
 class TimestampFilter::Internal
 {
 public:
-    Internal(const core::transcoding::TimestampOverlaySettings& params);
+    explicit Internal(const core::transcoding::TimestampOverlaySettings& params);
 
     void updateTimestamp(const CLVideoDecoderOutputPtr& frame);
     detail::ImageToFramePainter& painter();
-
-private:
 
 private:
     const QFont m_font;
@@ -53,15 +53,15 @@ TimestampFilter::Internal::Internal(const core::transcoding::TimestampOverlaySet
 
 void TimestampFilter::Internal::updateTimestamp(const CLVideoDecoderOutputPtr& frame)
 {
-    const qint64 displayTime = frame->pts / 1000 + m_params.serverTimeDisplayOffsetMs;
+    const qint64 displayTime = frame->pts / 1000;
     if (m_currentTimeMs == displayTime)
         return;
 
     m_currentTimeMs = displayTime;
 
     const auto timeString = displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD
-        ? QDateTime::fromMSecsSinceEpoch(m_currentTimeMs).toString(m_params.format)
-        : QTime(0, 0).addMSecs(m_currentTimeMs).toString(lit("hh:mm:ss"));
+        ? timestampTextUtc(m_currentTimeMs, m_params.serverTimeDisplayOffsetMs, m_params.format)
+        : timestampTextSimple(m_currentTimeMs);
 
     const QSize textMargins(m_fontMetrics.averageCharWidth() / 2, 1);
     const QSize textSize = m_fontMetrics.size(0, timeString) + textMargins * 2;
@@ -109,7 +109,28 @@ QSize TimestampFilter::updatedResolution(const QSize& sourceSize)
     return sourceSize;
 }
 
-} // namespace filters
+QString TimestampFilter::timestampTextUtc(
+    qint64 sinceEpochMs,
+    int displayOffsetMs,
+    Qt::DateFormat format)
+{
+    const auto secondsFromUtc = QDateTime::currentDateTime().offsetFromUtc()
+        + (displayOffsetMs / 1000);
+
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(
+        sinceEpochMs + (displayOffsetMs % 1000), Qt::OffsetFromUTC, secondsFromUtc);
+
+    return dateTime.toString(format);
+}
+
+QString TimestampFilter::timestampTextSimple(qint64 timeOffsetMs)
+{
+    const auto time = QTime(0, 0).addMSecs(timeOffsetMs);
+    return time.toString(lit("hh:mm:ss"));
+}
+
 } // namespace transcoding
+} // namespace core
 } // namespace nx
 
+#endif // ENABLE_DATA_PROVIDERS

@@ -20,7 +20,7 @@ class HanwhaResourceSearcher:
 {
 public:
     HanwhaResourceSearcher(QnCommonModule* commonModule);
-    virtual ~HanwhaResourceSearcher();
+    virtual ~HanwhaResourceSearcher() = default;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,
@@ -42,11 +42,6 @@ public:
         const SocketAddress& deviceEndpoint,
         const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
-
-    QString sessionKey(
-        const HanwhaResourcePtr resource,
-        HanwhaSessionType sessionType,
-        bool generateNewOne = false) const;
 
 private:
     void createResource(
