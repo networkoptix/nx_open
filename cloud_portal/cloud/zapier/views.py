@@ -17,12 +17,12 @@ from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
 #Hacked URLs
-CLOUD_DB_URL = 'http://cloud-test.hdw.mx:80/cdb'
-CLOUD_INSTANCE_URL = 'http://cloud-test.hdw.mx'
+CLOUD_DB_URL_HACK = 'http://cloud-demo.hdw.mx:80/cdb'
+CLOUD_INSTANCE_URL_HACK = 'http://cloud-demo.hdw.mx'
 
 #Correct urls
 #CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
-#CLOUD_INSTANCE_URL = settings.CLOUD_CONNECT['gateway']
+CLOUD_INSTANCE_URL = settings.CLOUD_CONNECT['gateway']
 
 
 def authenticate(request):
@@ -35,8 +35,10 @@ def authenticate(request):
             user = django.contrib.auth.authenticate(username=email, password=password)
 
             #start auth hacks
-            request = CLOUD_INSTANCE_URL + "/api/account/login/"
-            data = json.loads(requests.post(request, json={'email': email, 'password': password}).text)
+            request = CLOUD_INSTANCE_URL_HACK + "/api/account/login/"
+            r = requests.post(request, json={'email': email, 'password': password})
+            if r.status_code == 200:
+                data = r.json()
             if data['email'] != email:
                 raise APINotAuthorisedException('Username or password are invalid')
             #end auth hacks
@@ -140,10 +142,11 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
     else:
         return
 
-    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL, system_id)
-    headers = {'Content-Type': 'application/json'}
+    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL_HACK, system_id)
 
-    requests.post(url, json=data, headers=headers, auth=HTTPDigestAuth(email, password))
+    r = requests.post(url, json=data, auth=HTTPDigestAuth(email, password))
+    if r.status_code != 200:
+        return Response({'message': "There was an error making the rule"}, status=r.status_code)
 
 
 def make_or_increment_rule(action, email, system_id, caption, password=None,
@@ -181,18 +184,20 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
             increment_rule(rules_query[0])
 
 
-
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def get_systems(request):
     user, email, password = authenticate(request)
-    request = CLOUD_DB_URL + "/system/get?customization=" + settings.CUSTOMIZATION
-    data = requests.get(request, auth=HTTPDigestAuth(email, password))
-    zap_list = {'systems': []}
+    request = CLOUD_DB_URL_HACK + "/system/get"
+    r = requests.get(request, params={"customization": settings.CUSTOMIZATION}, auth=HTTPDigestAuth(email, password))
 
-    if data:
-        data = json.loads(data.text)
+    if r.status_code != 200:
+        Response({'message': "Error getting systems for user"}, status=r.status_code)
+
+    data = r.json()
+
+    zap_list = {'systems': []}
 
     for system in data['systems']:
         zap_list['systems'].append({'name': system['name'], 'system_id': system['id']})
@@ -218,12 +223,15 @@ def zapier_send_generic_event(request):
     make_or_increment_rule('Generic Event', email, system_id, caption,
                            password=password, description=description, source=source)
 
-    url = "{}/gateway/{}/api/createEvent?{}"\
-        .format(CLOUD_INSTANCE_URL, system_id, urlencode(query_params))
+    url = "{}/gateway/{}/api/createEvent"\
+        .format(CLOUD_INSTANCE_URL_HACK, system_id)
 
-    r = requests.get(url, data=None, auth=HTTPDigestAuth(email, password))
+    r = requests.get(url, data=None, params=query_params, auth=HTTPDigestAuth(email, password))
 
-    return json.loads(r.text)
+    if r.status_code != 200:
+        Response({'message': "Error sending generic event to system"}, status=r.status_code)
+
+    return r.json()
 
 
 @api_view(['GET'])
@@ -274,7 +282,7 @@ def subscribe_webhook(request):
 
     url_link = '{}/zapier/?{}'.format(CLOUD_INSTANCE_URL, urlencode(query_params))
 
-    make_or_increment_rule('Http Action', email, system_id, caption, password=password, target_url=target)
+    make_or_increment_rule('Http Action', email, system_id, caption, password=password, target_url=url_link)
 
     zap_hook = ZapHook(user=user, event=event, target=target)
     zap_hook.save()
