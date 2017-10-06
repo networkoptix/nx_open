@@ -22,6 +22,8 @@
         <template>lib</template>
         <targetName>vms_gateway</targetName>
 
+        <buildLib>sharedlib</buildLib>
+
         <qt.libs>core network concurrent sql xml</qt.libs>
         <global.libs>-lcommon -lrelaying -lcloud_db_client -lnx_network -ludt -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
@@ -67,32 +69,5 @@
             <systemPath>${root.dir}/nx_cloud/librelaying/pom.xml</systemPath>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>sharedlib</buildLib>
-            </properties>
-        </profile>
-
-    </profiles>
 
 </project>

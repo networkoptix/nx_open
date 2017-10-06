@@ -16,7 +16,7 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-class VmsGatewayFunctionalTest:
+class NX_VMS_GATEWAY_API VmsGatewayFunctionalTest:
     public utils::test::ModuleLauncher<VmsGatewayProcessPublic>
 {
 public:

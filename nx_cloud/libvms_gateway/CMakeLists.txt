@@ -5,15 +5,24 @@ if(LINUX)
     add_compile_options("-Werror" "-Wall" "-Wextra")
 endif()
 
+set(library_type)
+if(WINDOWS)
+    set(library_type LIBRARY_TYPE SHARED)
+endif()
+
 nx_configure_file(
     maven/filter-resources/libvms_gateway_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-nx_add_target(libvms_gateway LIBRARY
+nx_add_target(libvms_gateway LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libvms_gateway_app_info_impl.cpp"
     PUBLIC_LIBS
         common cloud_db_client nx_network nx_fusion nx_utils librelaying
 )
+
+target_compile_definitions(libvms_gateway
+    PRIVATE NX_VMS_GATEWAY_API=${API_EXPORT_MACRO}
+    INTERFACE NX_VMS_GATEWAY_API=${API_IMPORT_MACRO})
 
 set_target_properties(libvms_gateway PROPERTIES PREFIX "")

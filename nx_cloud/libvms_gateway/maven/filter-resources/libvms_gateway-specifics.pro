@@ -11,3 +11,8 @@ linux {
     QMAKE_CXXFLAGS += -Werror
     QMAKE_LFLAGS += -Wl,--no-undefined
 }
+
+win* {
+    DEFINES -= NX_VMS_GATEWAY_API=__declspec(dllimport)
+    DEFINES += NX_VMS_GATEWAY_API=__declspec(dllexport)
+}

@@ -22,7 +22,7 @@ namespace gateway {
 class AuthorizationManager;
 class RelayEngine;
 
-class VmsGatewayProcess:
+class NX_VMS_GATEWAY_API VmsGatewayProcess:
     public nx::utils::Service
 {
     using base_type = nx::utils::Service;

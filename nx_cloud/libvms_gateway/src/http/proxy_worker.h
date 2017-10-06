@@ -31,7 +31,7 @@ public:
 /**
  * Proxies HTTP request and corresponding response.
  */
-class ProxyWorker:
+class NX_VMS_GATEWAY_API ProxyWorker:
     public nx::network::aio::BasicPollable,
     public nx_http::StreamConnectionHolder
 {
