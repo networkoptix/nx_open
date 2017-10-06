@@ -23,12 +23,19 @@ Control
 
         alignToCenterWhenUnzoomed: zoomedItem
 
+        property real fitInViewSpacing: 0
+        property real gridSpacing: zoomedItem ? 0 : fitInViewSpacing
+
+        leftMargin: -gridSpacing
+        rightMargin: -gridSpacing
+        topMargin: -gridSpacing
+        bottomMargin: -gridSpacing
+
         Positioners.Grid
         {
             id: gridLayout
 
             property real cellAspectRatio: layout ? layout.cellAspectRatio : 1
-
             Behavior on cellAspectRatio
             {
                 NumberAnimation
@@ -55,6 +62,37 @@ Control
                 }
             }
 
+            readonly property real cellSpacingFactor: layout ? layout.cellSpacing : 0
+            readonly property real cellSpacing:
+            {
+                if (layoutModel.gridBoundingRect.width === 0
+                    || layoutModel.gridBoundingRect.height === 0)
+                {
+                    return 0
+                }
+
+                var contentAspectRatio = gridLayout.cellAspectRatio
+                    * layoutModel.gridBoundingRect.width
+                    / layoutModel.gridBoundingRect.height
+
+                var implicitContentWidth =
+                    flickableView.implicitContentGeometry(contentAspectRatio).width
+
+                var cellWidth = implicitContentWidth / layoutModel.gridBoundingRect.width
+
+                return layout.cellSpacing * cellWidth
+            }
+
+            onCellSpacingChanged:
+            {
+                // Don't use binding for fitInViewSpacing!
+                // We must guarantee it is assigned before fitInView call.
+                flickableView.fitInViewSpacing = cellSpacing / 2
+                flickableView.fitInView(true)
+            }
+
+            readonly property real unzoomThreshold: 10
+
             width: flickableView.contentWidth
             height: flickableView.contentHeight
 
@@ -78,13 +116,16 @@ Control
                     {
                         flickableView.zoomedItem = null
 
-                        if (previousRect.width === 0 && previousRect.height === 0)
+                        if (previousRect.width === 0 || previousRect.height === 0)
                         {
                             var contentAspectRatio = gridLayout.cellAspectRatio
                                 * layoutModel.gridBoundingRect.width
                                 / layoutModel.gridBoundingRect.height
 
                             previousRect = gridBoundingRect
+
+                            if (gridBoundingRect.width === 0 || gridBoundingRect.height === 0)
+                                return
 
                             var crect = flickableView.implicitContentGeometry(contentAspectRatio)
                             flickableView.setContentGeometry(
@@ -120,41 +161,43 @@ Control
 
                     Positioners.Grid.geometry: model.geometry
 
-                    MouseArea
-                    {
-                        anchors.fill: parent
-
-                        onDoubleClicked:
-                        {
-                            if (flickableView.zoomedItem !== item)
-                            {
-                                flickableView.zoomedItem = item
-                                return
-                            }
-
-                            if (item.width !== flickableView.width
-                                && item.height !== flickableView.height)
-                            {
-                                flickableView.fitInView()
-                            }
-                            else
-                            {
-                                flickableView.zoomedItem = null
-                            }
-                        }
-                    }
-
                     Rectangle
                     {
-                        anchors.fill: parent
-                        anchors.margins: 2
-                        color: "#70ff0000"
-                    }
+                        id: content
 
-                    Text
-                    {
                         anchors.centerIn: parent
-                        text: model.name
+                        width: parent.width * (1 - gridLayout.cellSpacingFactor)
+                        height: parent.height * (1 - gridLayout.cellSpacingFactor)
+                        color: "#70ff0000"
+
+                        MouseArea
+                        {
+                            anchors.fill: parent
+
+                            onDoubleClicked:
+                            {
+                                if (flickableView.zoomedItem !== content)
+                                {
+                                    flickableView.zoomedItem = content
+                                }
+                                else if (
+                                    Math.abs(content.width - flickableView.width)
+                                        < gridLayout.unzoomThreshold
+                                    || Math.abs(content.height - flickableView.height)
+                                        < gridLayout.unzoomThreshold)
+                                {
+                                    flickableView.zoomedItem = null
+                                }
+
+                                flickableView.fitInView()
+                            }
+                        }
+
+                        Text
+                        {
+                            anchors.centerIn: parent
+                            text: model.name
+                        }
                     }
                 }
             }

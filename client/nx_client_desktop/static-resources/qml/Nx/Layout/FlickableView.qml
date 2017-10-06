@@ -13,6 +13,11 @@ Item
     readonly property alias contentX: contentItem.x
     readonly property alias contentY: contentItem.y
 
+    property real leftMargin: 0
+    property real rightMargin: 0
+    property real topMargin: 0
+    property real bottomMargin: 0
+
     property real contentWidthPartToBeAlwaysVisible: 0
     property real contentHeightPartToBeAlwaysVisible: 0
 
@@ -100,9 +105,10 @@ Item
             if (!zoomedItem)
                 return Qt.point((width - contentWidth) / 2, (height - contentHeight) / 2)
 
+            var pos = zoomedItem.mapToItem(contentItem, 0, 0)
             return Qt.point(
-                -zoomedItem.x + (width - zoomedItem.width) / 2,
-                -zoomedItem.y + (height - zoomedItem.height) / 2)
+                -pos.x + (width - zoomedItem.width) / 2,
+                -pos.y + (height - zoomedItem.height) / 2)
         }
 
         function at_zoomedItemChangedGeometry()
@@ -340,8 +346,6 @@ Item
     onWidthChanged: fitInView(true)
     onHeightChanged: fitInView(true)
 
-    onZoomedItemChanged: fitInView()
-
     function stopPanOffsetAnimations()
     {
         kineticAnimation.stop()
@@ -452,40 +456,56 @@ Item
         d.blockScaleBoundsAnimation = false
         d.clearScaleOffset()
 
+        var availableWidth = width - leftMargin - rightMargin
+        var availableHeight = height - topMargin - bottomMargin
+
         var implicitContentSize = d.implicitContentSize()
 
-        var newScale = 1
-        var newOffsetX = (width - implicitContentSize.width) / 2
-        var newOffsetY = (height - implicitContentSize.height) / 2
-        d.scaleOriginX = 0
-        d.scaleOriginY = 0
-        d.minScale = 1
+        var contentSourceX = 0
+        var contentSourceY = 0
+        var contentSourceW = 1
+        var contentSourceH = 1
 
         if (zoomedItem && Utils.isChild(zoomedItem, contentItem))
         {
-            var originX = (zoomedItem.x + zoomedItem.width / 2) / contentWidth
-            var originY = (zoomedItem.y + zoomedItem.height / 2) / contentHeight
+            var pos = zoomedItem.mapToItem(contentItem, 0, 0)
 
-            var newSize = MathUtils.scaledSize(
-                Qt.size(zoomedItem.width, zoomedItem.height), Qt.size(width, height))
-            newScale = d.currentScale() * newSize.width / zoomedItem.width
-            d.minScale = newScale
-
-            var newContentWidth = implicitContentSize.width * newScale
-            var newContentHeight = implicitContentSize.height * newScale
-            newOffsetX = -zoomedItem.x / contentWidth * newContentWidth
-                + (width - newSize.width) / 2
-            newOffsetY = -zoomedItem.y / contentHeight * newContentHeight
-                + (height - newSize.height) / 2
+            contentSourceX = pos.x / contentWidth
+            contentSourceY = pos.y / contentHeight
+            contentSourceW = zoomedItem.width / contentWidth
+            contentSourceH = zoomedItem.height / contentHeight
         }
+
+        var implicitContentGeometry = Qt.rect(
+            contentSourceX * implicitContentSize.width,
+            contentSourceY * implicitContentSize.height,
+            contentSourceW * implicitContentSize.width,
+            contentSourceH * implicitContentSize.height)
+
+        var newSize = MathUtils.scaledSize(
+            Qt.size(implicitContentGeometry.width, implicitContentGeometry.height),
+            Qt.size(availableWidth, availableHeight))
+        var newScale = newSize.width / implicitContentGeometry.width
+
+        var newContentWidth = implicitContentSize.width * newScale
+        var newContentHeight = implicitContentSize.height * newScale
+
+        var newOffsetX = leftMargin + (availableWidth - newSize.width) / 2
+            - contentSourceX * newContentWidth
+        var newOffsetY = topMargin + (availableHeight - newSize.height) / 2
+            - contentSourceY * newContentHeight
+
+        d.scaleOriginX = 0
+        d.scaleOriginY = 0
+
+        d.minScale = newScale
 
         if (instant)
         {
-            scaleAnimation.scale = newScale
             d.panOffsetX = newOffsetX
             d.panOffsetY = newOffsetY
-            contentItem.width = implicitContentSize.width
-            contentItem.height = implicitContentSize.height
+            contentItem.width = newContentWidth
+            contentItem.height = newContentHeight
         }
         else
         {
