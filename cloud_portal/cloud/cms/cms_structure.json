@@ -7,6 +7,7 @@
       "translatable": false,
       "values":[
         ["{{PRODUCT_NAME}}","VMS Demo Cloud","Name for cloud"],
+        ["{{CLOUD_TAB_NAME}}","Cloud","Cloud tab name in thick client"],
         ["{{CLIENT_PROTOCOL}}","demo-vms","URL protocol for calling native clients from browser"],
         ["{{VMS_NAME}}","VMS Demonstration","Name of the VMS customization. Must be short!"],
         ["{{downloadLink}}","http://www.networkoptix.com/live-demo#fulltrial","Emergency link for downloading applications (in case if cloud is down)"],
