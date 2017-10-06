@@ -12,5 +12,5 @@ linux {
 }
 
 win* {
-    DEFINES += __declspec(dllexport)
+    DEFINES += NX_RELAYING_API=__declspec(dllexport)
 }
