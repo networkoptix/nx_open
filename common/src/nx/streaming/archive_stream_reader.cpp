@@ -227,6 +227,7 @@ bool QnArchiveStreamReader::init()
     QSize resolution = m_customResolution;
     qint64 jumpTime = qint64(AV_NOPTS_VALUE);
     bool imSeek = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
+    bool reverseMode = m_reverseMode;
     if (imSeek)
     {
         if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
@@ -245,7 +246,12 @@ bool QnArchiveStreamReader::init()
     m_delegate->setQuality(quality, true, resolution);
     // It is optimization: open and jump at same time
     if (jumpTime != qint64(AV_NOPTS_VALUE))
-        m_delegate->seek(jumpTime, true);
+    {
+        if (reverseMode)
+            m_delegate->onReverseMode(jumpTime, m_reverseMode);
+        else
+            m_delegate->seek(jumpTime, true);
+    }
 
     bool opened = m_delegate->open(m_resource);
 
@@ -260,6 +266,9 @@ bool QnArchiveStreamReader::init()
     m_oldQuality = quality;
     m_oldQualityFastSwitch = true;
     m_oldResolution = resolution;
+    m_prevReverseMode = reverseMode;
+    if (jumpTime != qint64(AV_NOPTS_VALUE))
+        m_prevReverseMode = reverseMode;
     m_jumpMtx.unlock();
 
     // Alloc common resources

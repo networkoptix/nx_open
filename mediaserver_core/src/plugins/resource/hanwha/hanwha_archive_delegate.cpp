@@ -21,9 +21,11 @@ HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource
     m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
+    auto& rtspClient = m_streamReader->rtspClient();
+    rtspClient.setAdditionAttribute("Rate-Control", "no");
 
     m_flags |= Flag_CanOfflineRange;
-    //m_flags |= Flag_CanProcessNegativeSpeed; //< TODO: implement me
+    m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanOfflineLayout;
     m_flags |= Flag_CanOfflineHasVideo;
     m_flags |= Flag_UnsyncTime;
@@ -65,16 +67,29 @@ QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
 {
     if (!m_streamReader)
         return QnAbstractMediaDataPtr();
+    if (!m_streamReader->isStreamOpened() && !open(m_streamReader->m_resource))
+        return QnAbstractMediaDataPtr();
+
     auto result = m_streamReader->getNextData();
+    if (result && !isForwardDirection())
+    {
+        result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+        result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+    }
 
     if (result && m_endTimeUsec != AV_NOPTS_VALUE && result->timestamp > m_endTimeUsec)
     {
-        const bool isForwardDirection = m_scale >= 0;
         QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
-        rez->timestamp = isForwardDirection ? DATETIME_NOW : 0;
+        rez->timestamp = isForwardDirection() ? DATETIME_NOW : 0;
         return rez;
     }
     return result;
+}
+
+bool HanwhaNvrArchiveDelegate::isForwardDirection() const
+{
+    auto& rtspClient = m_streamReader->rtspClient();
+    return rtspClient.getScale() >= 0;
 }
 
 qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
@@ -83,13 +98,12 @@ qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
     const auto chunks = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
         ->chunkLoader()->chunks(hanwhaRes->getChannel());
-    const bool isForwardDirection = m_scale >= 0;
     const qint64 timeMs = timeUsec / 1000;
-    auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection);
+    auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection());
     if (itr == chunks.cend())
-        timeUsec = isForwardDirection ? DATETIME_NOW : 0;
+        timeUsec = isForwardDirection() ? DATETIME_NOW : 0;
     else if (!itr->contains(timeMs))
-        timeUsec = isForwardDirection ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
+        timeUsec = isForwardDirection() ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
 
     if (m_previewMode && m_lastSeekTime == timeUsec)
         return timeUsec;
@@ -118,15 +132,22 @@ void HanwhaNvrArchiveDelegate::beforeClose()
 
 void HanwhaNvrArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
-    // TODO: implement me
+    auto& rtspClient = m_streamReader->rtspClient();
+    rtspClient.setScale(value ? -1 : 1);
+    seek(displayTime, true /*findIFrame*/);
+    close();
+    open(m_streamReader->m_resource);
 }
 
 void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
 {
-    auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.setAdditionAttribute("Frames", "Intra");
     m_endTimeUsec = endTimeUsec;
     m_previewMode = frameStepUsec > 1;
+    if (m_previewMode)
+    {
+        auto& rtspClient = m_streamReader->rtspClient();
+        rtspClient.setAdditionAttribute("Frames", "Intra");
+    }
     m_streamReader->setSessionType(
         m_previewMode ? HanwhaSessionType::preview : HanwhaSessionType::archive);
     seek(startTimeUsec, true /*findIFrame*/);

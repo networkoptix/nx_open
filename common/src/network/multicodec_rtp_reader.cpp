@@ -527,7 +527,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     if (camera)
         m_RtpSession.setAudioEnabled(camera->isAudioEnabled());
 
-    m_RtpSession.play(position, AV_NOPTS_VALUE, 1.0);
+    m_RtpSession.play(position, AV_NOPTS_VALUE, m_RtpSession.getScale());
 
     m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(QnRtspClient::TT_VIDEO) : 1;
     {

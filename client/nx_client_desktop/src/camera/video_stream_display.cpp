@@ -497,7 +497,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     dec->setOutPictureSize(getMaxScreenSize());
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
-    if (dec->getWidth() > 0) {
+    if (dec->getWidth() > 0) 
+    {
         scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
@@ -536,6 +537,16 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
         while (dec->decode(emptyData, &m_tmpFrame))
         {
+            if (scaleFactor == QnFrameScaler::factor_unknown && dec->getWidth() > 0)
+            {
+                scaleFactor = determineScaleFactor(
+                    m_renderList, 
+                    data->channelNumber, 
+                    dec->getWidth(), 
+                    dec->getHeight(), 
+                    force_factor);
+            }
+
             QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
             if (!downscaleFrame(m_tmpFrame, tmpOutFrame, scaleFactor, pixFmt))
                 continue;
