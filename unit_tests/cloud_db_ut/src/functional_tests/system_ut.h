@@ -1,12 +1,13 @@
 #pragma once
 
-
 namespace nx {
 namespace cdb {
+namespace test {
 
 class CdbFunctionalTest;
 
 void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup);
 
-}   //cdb
-}   //nx
+} // namespace test
+} // namespace cdb
+} // namespace nx

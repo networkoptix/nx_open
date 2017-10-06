@@ -16,13 +16,13 @@ namespace cdb {
 namespace http_handler {
 
 class Ping:
-    public AbstractFiniteMsgBodyHttpHandler<void, api::ModuleInfo>
+    public FiniteMsgBodyHttpHandler<void, api::ModuleInfo>
 {
 public:
     static const QString kHandlerPath;
 
     Ping(const AuthorizationManager& authorizationManager):
-        AbstractFiniteMsgBodyHttpHandler<void, api::ModuleInfo>(
+        FiniteMsgBodyHttpHandler<void, api::ModuleInfo>(
             EntityType::module,
             DataActionType::fetch,
             authorizationManager,

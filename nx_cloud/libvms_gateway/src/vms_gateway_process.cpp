@@ -12,6 +12,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/platform/current_process.h>
 
+#include <nx/cloud/relaying/relay_engine.h>
+
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
 
 #include "access_control/authentication_manager.h"
@@ -19,7 +21,6 @@
 #include "http/http_api_path.h"
 #include "http/proxy_handler.h"
 #include "libvms_gateway_app_info.h"
-#include "relay_engine.h"
 #include "stree/cdb_ns.h"
 
 static int registerQtResources()
@@ -101,7 +102,9 @@ int VmsGatewayProcess::serviceMain(
             authRestrictionList,
             streeManager);
 
-        RelayEngine relayEngine(settings.listeningPeer(), &httpMessageDispatcher);
+        relaying::RelayEngine relayEngine(
+            settings.listeningPeer(),
+            &httpMessageDispatcher);
 
         registerApiHandlers(
             settings,
@@ -230,7 +233,7 @@ void VmsGatewayProcess::publicAddressFetched(
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
-    RelayEngine* relayEngine,
+    relaying::RelayEngine* relayEngine,
     nx_http::server::rest::MessageDispatcher* const msgDispatcher)
 {
     msgDispatcher->registerRequestProcessor<ProxyHandler>(

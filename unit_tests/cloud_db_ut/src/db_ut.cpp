@@ -66,7 +66,7 @@ TEST_F(DbRegress, general)
             return systemData.name == "la_office_test";
         });
     ASSERT_NE(systems.end(), laOfficeTestSystemIter);
-    ASSERT_EQ(api::SystemStatus::ssActivated, laOfficeTestSystemIter->status);
+    ASSERT_EQ(api::SystemStatus::activated, laOfficeTestSystemIter->status);
 }
 
 class DbFailure: 

@@ -1,7 +1,11 @@
 #include "controller.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
+#include <nx/cloud/cdb/client/cdb_request_path.h>
+
+#include "http_handlers/ping.h"
 #include "settings.h"
 
 namespace nx {
@@ -39,6 +43,9 @@ Controller::Controller(const conf::Settings& settings):
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SyncronizationEngine),
+    m_systemMergeManager(
+        &m_systemManager,
+        &m_dbInstanceController.queryExecutor()),
     m_authProvider(
         settings,
         &m_dbInstanceController.queryExecutor(),
@@ -49,13 +56,40 @@ Controller::Controller(const conf::Settings& settings):
     m_maintenanceManager(
         kCdbGuid,
         &m_ec2SyncronizationEngine,
-        m_dbInstanceController)
+        m_dbInstanceController),
+    m_cloudModuleUrlProviderDeprecated(
+        settings.moduleFinder().cloudModulesXmlTemplatePath),
+    m_cloudModuleUrlProvider(
+        settings.moduleFinder().newCloudModulesXmlTemplatePath)
 {
     performDataMigrations();
 
     m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
     m_timerManager.start();
+
+    // TODO: #ak Move following to stree xml.
+    m_authRestrictionList = std::make_unique<nx_http::AuthMethodRestrictionList>();
+    m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountRegisterPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountActivatePath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountReactivatePath, nx_http::AuthMethod::noAuth);
+
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
+    authDataProviders.push_back(&m_accountManager);
+    authDataProviders.push_back(&m_systemManager);
+    m_authenticationManager = std::make_unique<AuthenticationManager>(
+        std::move(authDataProviders),
+        *m_authRestrictionList,
+        m_streeManager);
+
+    m_authorizationManager = std::make_unique<AuthorizationManager>(
+        m_streeManager,
+        m_accountManager,
+        m_systemManager,
+        m_systemManager);
 }
 
 Controller::~Controller()
@@ -99,6 +133,11 @@ SystemManager& Controller::systemManager()
     return m_systemManager;
 }
 
+AbstractSystemMergeManager& Controller::systemMergeManager()
+{
+    return m_systemMergeManager;
+}
+
 AuthenticationProvider& Controller::authProvider()
 {
     return m_authProvider;
@@ -107,6 +146,26 @@ AuthenticationProvider& Controller::authProvider()
 MaintenanceManager& Controller::maintenanceManager()
 {
     return m_maintenanceManager;
+}
+
+CloudModuleUrlProvider& Controller::cloudModuleUrlProviderDeprecated()
+{
+    return m_cloudModuleUrlProviderDeprecated;
+}
+
+CloudModuleUrlProvider& Controller::cloudModuleUrlProvider()
+{
+    return m_cloudModuleUrlProvider;
+}
+
+AuthenticationManager& Controller::authenticationManager()
+{
+    return *m_authenticationManager;
+}
+
+AuthorizationManager& Controller::authorizationManager()
+{
+    return *m_authorizationManager;
 }
 
 void Controller::performDataMigrations()

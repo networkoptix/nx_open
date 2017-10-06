@@ -92,6 +92,9 @@ void DbInstanceController::initializeStructureMigration()
             m_userAuthRecordsMigrationNeeded = true;
             return nx::utils::db::DBResult::ok;
         });
+
+    // Version 17.2.
+    dbStructureUpdater().addUpdateScript(db::kAddBeingMergedState);
 }
 
 } // namespace rdb

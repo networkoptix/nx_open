@@ -72,7 +72,7 @@ public:
 
     virtual ~BaseFusionDataHttpClient() = default;
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
         m_httpClient.bindToAioThread(aioThread);
@@ -81,13 +81,26 @@ public:
     void execute(nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
-        addRequestBody();
+        if (!m_requestBody.isEmpty())
+            addRequestBody();
         auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
 
         if (m_requestContentType.isEmpty())
             m_httpClient.doGet(m_url, std::move(completionHandler));
         else
             m_httpClient.doPost(m_url, std::move(completionHandler));
+    }
+
+    void execute(
+        nx_http::Method::ValueType httpMethod,
+        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+    {
+        m_handler = std::move(handler);
+        if (!m_requestBody.isEmpty())
+            addRequestBody();
+        auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
+
+        m_httpClient.doRequest(httpMethod, m_url, std::move(completionHandler));
     }
 
     void executeUpgrade(
@@ -106,7 +119,8 @@ public:
         nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
-        addRequestBody();
+        if (!m_requestBody.isEmpty())
+            addRequestBody();
 
         m_httpClient.doUpgrade(
             m_url,

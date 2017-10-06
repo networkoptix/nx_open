@@ -19,7 +19,7 @@ constexpr const int kSocketTimeoutMs = 29*1000;
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
-    nx::cloud::relay::model::AbstractListeningPeerPool* listeningPeerPool)
+    relaying::AbstractListeningPeerPool* listeningPeerPool)
 :
     m_settings(settings),
     m_runTimeOptions(runTimeOptions),

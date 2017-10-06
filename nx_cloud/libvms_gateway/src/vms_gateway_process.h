@@ -10,6 +10,8 @@
 #include <nx/network/public_ip_discovery.h>
 #include <nx/utils/service.h>
 
+#include <nx/cloud/relaying/relay_engine.h>
+
 #include "settings.h"
 #include "run_time_options.h"
 
@@ -57,10 +59,10 @@ private:
     void registerApiHandlers(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
-        RelayEngine* relayEngine,
+        relaying::RelayEngine* relayEngine,
         nx_http::server::rest::MessageDispatcher* const msgDispatcher);
 };
 
-} // namespace cloud
 } // namespace gateway
+} // namespace cloud
 } // namespace nx

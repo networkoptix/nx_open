@@ -43,7 +43,7 @@ enum class DataActionType
     fetch,
     insert,
     update,
-    _delete
+    delete_
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(DataActionType)

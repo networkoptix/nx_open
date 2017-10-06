@@ -8,7 +8,7 @@ namespace cloud {
 namespace gateway {
 
 TargetPeerConnector::TargetPeerConnector(
-    nx::cloud::relay::model::AbstractListeningPeerPool* listeningPeerPool,
+    relaying::AbstractListeningPeerPool* listeningPeerPool,
     const SocketAddress& targetEndpoint)
     :
     m_listeningPeerPool(listeningPeerPool),
@@ -66,7 +66,7 @@ void TargetPeerConnector::takeConnectionFromListeningPeerPool()
     using namespace std::placeholders;
 
     m_listeningPeerPool->takeIdleConnection(
-        nx::cloud::relay::model::ClientInfo(), //< TODO: #ak
+        relaying::ClientInfo(), //< TODO: #ak
         m_targetEndpoint.address.toString().toStdString(),
         std::bind(&TargetPeerConnector::processTakeConnectionResult, this, _1, _2));
 }

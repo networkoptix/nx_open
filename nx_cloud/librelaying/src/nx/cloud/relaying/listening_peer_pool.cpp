@@ -5,14 +5,13 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "../settings.h"
+#include "settings.h"
 
 namespace nx {
 namespace cloud {
-namespace relay {
-namespace model {
+namespace relaying {
 
-ListeningPeerPool::ListeningPeerPool(const conf::ListeningPeer& settings):
+ListeningPeerPool::ListeningPeerPool(const Settings& settings):
     m_settings(settings),
     m_terminated(false)
 {
@@ -158,7 +157,7 @@ void ListeningPeerPool::takeIdleConnection(
         m_unsuccessfulResultReporter.post(
             [completionHandler = std::move(completionHandler)]()
             {
-                completionHandler(api::ResultCode::notFound, nullptr);
+                completionHandler(relay::api::ResultCode::notFound, nullptr);
             });
         return;
     }
@@ -261,7 +260,7 @@ void ListeningPeerPool::giveAwayConnection(
         TakeIdleConnectionHandler completionHandler;
     };
 
-    api::OpenTunnelNotification notification;
+    relay::api::OpenTunnelNotification notification;
     notification.setClientEndpoint(clientInfo.endpoint);
     notification.setClientPeerName(clientInfo.peerName.c_str());
     auto openTunnelNotificationBuffer = 
@@ -288,12 +287,12 @@ void ListeningPeerPool::giveAwayConnection(
                     .arg(clientInfo.relaySessionId)
                     .arg(context->connectionContext->connection->getForeignAddress())
                     .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG1);
-                return context->completionHandler(api::ResultCode::networkError, nullptr);
+                return context->completionHandler(relay::api::ResultCode::networkError, nullptr);
             }
 
             context->connectionContext->connection->cancelIOSync(network::aio::etNone);
             context->completionHandler(
-                api::ResultCode::ok,
+                relay::api::ResultCode::ok,
                 std::move(context->connectionContext->connection));
         });
 }
@@ -440,7 +439,7 @@ void ListeningPeerPool::handleTimedoutTakeConnectionRequests(
         scheduleEvent(
             [handler = std::move(handler)]()
             {
-                handler(api::ResultCode::timedOut, nullptr);
+                handler(relay::api::ResultCode::timedOut, nullptr);
             });
     }
 }
@@ -519,12 +518,11 @@ ListeningPeerPoolFactory& ListeningPeerPoolFactory::instance()
 }
 
 std::unique_ptr<AbstractListeningPeerPool>
-    ListeningPeerPoolFactory::defaultFactoryFunction(const conf::ListeningPeer& settings)
+    ListeningPeerPoolFactory::defaultFactoryFunction(const Settings& settings)
 {
     return std::make_unique<ListeningPeerPool>(settings);
 }
 
-} // namespace model
-} // namespace relay
+} // namespace relaying
 } // namespace cloud
 } // namespace nx

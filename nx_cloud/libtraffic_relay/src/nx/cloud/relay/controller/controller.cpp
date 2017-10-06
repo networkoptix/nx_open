@@ -21,7 +21,7 @@ Controller::Controller(
             &model->remoteRelayPeerPool(),
             &m_trafficRelay)),
     m_listeningPeerManager(
-        controller::ListeningPeerManagerFactory::instance().create(
+        relaying::ListeningPeerManagerFactory::instance().create(
             settings.listeningPeer(), &model->listeningPeerPool())),
     m_model(model),
     m_settings(&settings)
@@ -39,7 +39,7 @@ controller::AbstractConnectSessionManager& Controller::connectSessionManager()
     return *m_connectSessionManager;
 }
 
-controller::AbstractListeningPeerManager& Controller::listeningPeerManager()
+relaying::AbstractListeningPeerManager& Controller::listeningPeerManager()
 {
     return *m_listeningPeerManager;
 }

@@ -12,15 +12,14 @@
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/relay/model/listening_peer_pool.h>
-#include <nx/cloud/relay/settings.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
+#include <nx/cloud/relaying/settings.h>
 
 #include "../settings_loader.h"
 
 namespace nx {
 namespace cloud {
-namespace relay {
-namespace model {
+namespace relaying {
 namespace test {
 
 //-------------------------------------------------------------------------------------------------
@@ -170,7 +169,7 @@ protected:
     {
         thenConnectRequestHasCompleted();
 
-        ASSERT_EQ(api::ResultCode::ok, m_prevTakeIdleConnectionResult->code);
+        ASSERT_EQ(relay::api::ResultCode::ok, m_prevTakeIdleConnectionResult->code);
         ASSERT_NE(nullptr, m_prevTakeIdleConnectionResult->connection);
     }
 
@@ -184,7 +183,7 @@ protected:
         nx_http::Message message(nx_http::MessageType::request);
         ASSERT_TRUE(message.request->parse(buffer));
 
-        api::OpenTunnelNotification openTunnelNotification;
+        relay::api::OpenTunnelNotification openTunnelNotification;
         ASSERT_TRUE(openTunnelNotification.parse(message));
         ASSERT_EQ(
             m_clientInfo.endpoint.toString(),
@@ -196,16 +195,16 @@ protected:
     {
         thenConnectRequestHasCompleted();
 
-        ASSERT_NE(api::ResultCode::ok, m_prevTakeIdleConnectionResult->code);
+        ASSERT_NE(relay::api::ResultCode::ok, m_prevTakeIdleConnectionResult->code);
         ASSERT_EQ(nullptr, m_prevTakeIdleConnectionResult->connection);
     }
 
-    void thenGetConnectionRequestIs(api::ResultCode expectedResultCode)
+    void thenGetConnectionRequestIs(relay::api::ResultCode expectedResultCode)
     {
         thenConnectRequestHasCompleted();
 
         ASSERT_EQ(expectedResultCode, m_prevTakeIdleConnectionResult->code);
-        if (expectedResultCode == api::ResultCode::ok)
+        if (expectedResultCode == relay::api::ResultCode::ok)
             ASSERT_NE(nullptr, m_prevTakeIdleConnectionResult->connection);
         else
             ASSERT_EQ(nullptr, m_prevTakeIdleConnectionResult->connection);
@@ -246,14 +245,14 @@ protected:
         ASSERT_TRUE(m_peerDisconnectedEvents.isEmpty());
     }
 
-    const model::ListeningPeerPool& pool() const
+    const relaying::ListeningPeerPool& pool() const
     {
         if (!m_pool)
             const_cast<ListeningPeerPool*>(this)->initializePool();
         return *m_pool;
     }
 
-    model::ListeningPeerPool& pool()
+    relaying::ListeningPeerPool& pool()
     {
         if (!m_pool)
             initializePool();
@@ -273,25 +272,25 @@ protected:
 private:
     struct TakeIdleConnectionResult
     {
-        api::ResultCode code;
+        relay::api::ResultCode code;
         std::unique_ptr<AbstractStreamSocket> connection;
     };
 
-    std::unique_ptr<model::ListeningPeerPool> m_pool;
+    std::unique_ptr<relaying::ListeningPeerPool> m_pool;
     std::atomic<bool> m_poolHasBeenDestroyed;
     std::string m_peerName;
     network::test::StreamSocketStub* m_peerConnection;
     std::vector<network::test::StreamSocketStub*> m_peerConnections;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
     boost::optional<TakeIdleConnectionResult> m_prevTakeIdleConnectionResult;
-    SettingsLoader m_settingsLoader;
+    relay::SettingsLoader m_settingsLoader;
     boost::optional<std::chrono::milliseconds> m_connectionPostDelay;
     nx::utils::SyncQueue<std::string> m_peerConnectedEvents;
     nx::utils::SyncQueue<std::string> m_peerDisconnectedEvents;
-    model::ClientInfo m_clientInfo;
+    relaying::ClientInfo m_clientInfo;
 
     void onTakeIdleConnectionCompletion(
-        api::ResultCode resultCode,
+        relay::api::ResultCode resultCode,
         std::unique_ptr<AbstractStreamSocket> connection)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -304,7 +303,7 @@ private:
         using namespace std::placeholders;
 
         m_settingsLoader.load();
-        m_pool = std::make_unique<model::ListeningPeerPool>(
+        m_pool = std::make_unique<relaying::ListeningPeerPool>(
             m_settingsLoader.settings().listeningPeer());
 
         nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
@@ -398,7 +397,7 @@ TEST_F(
 
     givenListeningPeerWhoseConnectionsHaveBeenTaken();
     whenRequestedConnection();
-    thenGetConnectionRequestIs(api::ResultCode::timedOut);
+    thenGetConnectionRequestIs(relay::api::ResultCode::timedOut);
 }
 
 TEST_F(ListeningPeerPool, waits_get_idle_connection_completion_before_destruction)
@@ -549,7 +548,6 @@ TEST_F(ListeningPeerPoolFindPeerByParentDomainName, find_peer_by_prefix)
 }
 
 } // namespace test
-} // namespace model
-} // namespace relay
+} // namespace relaying
 } // namespace cloud
 } // namespace nx

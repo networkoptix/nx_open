@@ -10,6 +10,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class Settings:
     public CdbFunctionalTest
@@ -104,5 +105,6 @@ TEST_F(SettingsHttp, tcpBacklogSize_applied)
     assertTcpBacklogSizeHasBeenAppliedToServerSocket();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

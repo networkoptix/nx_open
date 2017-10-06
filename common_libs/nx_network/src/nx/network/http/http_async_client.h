@@ -176,6 +176,14 @@ public:
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doRequest(
+        nx_http::Method::ValueType method,
+        const QUrl& url);
+    void doRequest(
+        nx_http::Method::ValueType method,
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
     const nx_http::Request& request() const;
 
     /**
@@ -318,6 +326,7 @@ private:
 
     void resetDataBeforeNewRequest();
     void initiateHttpMessageDelivery();
+    bool canExistingConnectionBeUsed() const;
     void initiateTcpConnection();
     /**
      * @return Bytes parsed or -1 in case of error.
@@ -327,9 +336,13 @@ private:
     Result processResponseHeadersBytes(bool* const continueReceiving);
     bool isMalformed(const nx_http::Response& response) const;
     bool repeatRequestIfNeeded(const Response& response);
+    Result startReadingMessageBody(bool* const continueReceiving);
     bool sendRequestToNewLocation(const Response& response);
     Result processResponseMessageBodyBytes(std::size_t bytesRead, bool* const continueReceiving);
     void composeRequest(const nx_http::StringType& httpMethod);
+    void prepareRequestLine(bool useHttp11, const nx_http::StringType& httpMethod);
+    void prepareRequestHeaders(bool useHttp11, const nx_http::StringType& httpMethod);
+    void addAppropriateAuthenticationInformation();
     void addBodyToRequest();
     void serializeRequest();
     /**

@@ -2,17 +2,16 @@
 
 #include "connect_session_manager.h"
 
+#include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/aio/async_channel_adapter.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_open_tunnel_notification.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
-#include <nx/casssandra/async_cassandra_connection.h>
 
 #include "traffic_relay.h"
 #include "../model/client_session_pool.h"
-#include "../model/listening_peer_pool.h"
 #include "../model/remote_relay_peer_pool.h"
 #include "../settings.h"
 
@@ -24,7 +23,7 @@ namespace controller {
 ConnectSessionManager::ConnectSessionManager(
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
-    model::ListeningPeerPool* listeningPeerPool,
+    relaying::ListeningPeerPool* listeningPeerPool,
     model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
     controller::AbstractTrafficRelay* trafficRelay)
     :
@@ -121,7 +120,7 @@ void ConnectSessionManager::connectToPeer(
             nx_http::ConnectionEvents());
     }
 
-    model::ClientInfo clientInfo;
+    relaying::ClientInfo clientInfo;
     clientInfo.relaySessionId = request.sessionId;
     clientInfo.endpoint = request.clientEndpoint;
     // clientInfo.peerName = ...; TODO: #ak
@@ -224,7 +223,7 @@ static ConnectSessionManagerFactory::FactoryFunc customFactoryFunc;
 std::unique_ptr<AbstractConnectSessionManager> ConnectSessionManagerFactory::create(
     const conf::Settings& settings,
     model::ClientSessionPool* clientSessionPool,
-    model::ListeningPeerPool* listeningPeerPool,
+    relaying::ListeningPeerPool* listeningPeerPool,
     model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
     controller::AbstractTrafficRelay* trafficRelay)
 {

@@ -215,6 +215,11 @@ public:
     api::ResultCode getVmsConnections(api::VmsConnectionDataList* const vmsConnections);
     api::ResultCode getStatistics(api::Statistics* const statistics);
 
+    api::ResultCode mergeSystems(
+        const AccountWithPassword& account,
+        const std::string& systemToMergeTo,
+        const std::string& systemBeingMerged);
+
     bool isStartedWithExternalDb() const;
     bool placePreparedDB(const QString& dbDumpPath);
 

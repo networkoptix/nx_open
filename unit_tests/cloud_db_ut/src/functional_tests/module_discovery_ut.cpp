@@ -11,6 +11,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 class ModuleDiscovery:
     public CdbFunctionalTest
@@ -79,5 +80,6 @@ TEST_F(ModuleDiscovery, cloud_modules_xml_with_multiple_mediator_ports)
     andXmlContainsMultipleMediatorPorts();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

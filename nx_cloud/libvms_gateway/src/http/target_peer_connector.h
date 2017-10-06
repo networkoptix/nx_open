@@ -10,7 +10,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
 
-#include <nx/cloud/relay/model/listening_peer_pool.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
 
 namespace nx {
 namespace cloud {
@@ -31,7 +31,7 @@ public:
         std::unique_ptr<AbstractStreamSocket> /*connectionToTheTargetPeer*/)>;
 
     TargetPeerConnector(
-        nx::cloud::relay::model::AbstractListeningPeerPool* listeningPeerPool,
+        relaying::AbstractListeningPeerPool* listeningPeerPool,
         const SocketAddress& targetEndpoint);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -40,7 +40,7 @@ public:
     void connectAsync(ConnectHandler handler);
 
 private:
-    nx::cloud::relay::model::AbstractListeningPeerPool* m_listeningPeerPool;
+    relaying::AbstractListeningPeerPool* m_listeningPeerPool;
     const SocketAddress m_targetEndpoint;
     boost::optional<std::chrono::milliseconds> m_timeout;
     ConnectHandler m_completionHandler;

@@ -158,7 +158,7 @@ private:
         m_tcpServer.start();
     }
 
-    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw()
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override
     {
         MonitoringEvent event;
         event.sock = sock;

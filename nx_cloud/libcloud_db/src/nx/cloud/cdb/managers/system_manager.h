@@ -25,6 +25,7 @@
 #include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/db/filter.h>
 
+#include "account_manager.h"
 #include "cache.h"
 #include "data_view.h"
 #include "managers_types.h"
@@ -41,15 +42,11 @@
 namespace nx {
 namespace cdb {
 
-namespace conf {
-
-class Settings;
-
-} // namespace conf
+namespace conf { class Settings; } // namespace conf
 
 class AbstractEmailManager;
-class AccountManager;
-class SystemHealthInfoProvider;
+class AbstractAccountManager;
+class AbstractSystemHealthInfoProvider;
 
 namespace ec2 {
 
@@ -59,14 +56,24 @@ class SyncronizationEngine;
 
 class InviteUserNotification;
 
+class AbstractSystemManager
+{
+public:
+    virtual ~AbstractSystemManager() = default;
+
+    virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const = 0;
+};
+
 /**
  * Provides methods for manipulating system data on persisent storage.
  * Calls DBManager instance to perform DB manipulation.
  * @note All data can be cached.
  */
 class SystemManager:
+    public AbstractSystemManager,
     public AbstractSystemSharingManager,
-    public AbstractAuthenticationDataProvider
+    public AbstractAuthenticationDataProvider,
+    public AbstractAccountManagerExtension
 {
 public:
     enum class NotificationCommand
@@ -82,8 +89,8 @@ public:
     SystemManager(
         const conf::Settings& settings,
         nx::utils::StandaloneTimerManager* const timerManager,
-        AccountManager* const accountManager,
-        const SystemHealthInfoProvider& systemHealthInfoProvider,
+        AbstractAccountManager* const accountManager,
+        const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
         ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
@@ -141,11 +148,8 @@ public:
         data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
 
-    /**
-     * @return api::SystemAccessRole::none is returned if
-     * - accountEmail has no rights for systemId
-     * - accountEmail or systemId is unknown
-     */
+    virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
+
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const override;
@@ -230,8 +234,8 @@ private:
 
     const conf::Settings& m_settings;
     nx::utils::StandaloneTimerManager* const m_timerManager;
-    AccountManager* const m_accountManager;
-    const SystemHealthInfoProvider& m_systemHealthInfoProvider;
+    AbstractAccountManager* const m_accountManager;
+    const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
@@ -245,6 +249,10 @@ private:
     std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
     std::set<AbstractSystemSharingExtension*> m_systemSharingExtensions;
+
+    virtual void afterUpdatingAccount(
+        nx::utils::db::QueryContext*,
+        const data::AccountUpdateDataWithEmail&) override;
 
     nx::utils::db::DBResult insertSystemToDB(
         nx::utils::db::QueryContext* const queryContext,
@@ -326,6 +334,16 @@ private:
         const std::string& grantorEmail,
         const data::AccountData& inviteeAccount,
         const api::SystemSharing& sharing);
+
+    /**
+     * TODO: #ak Having both requestResources and filter looks overabundant.
+     * @return boost::none is returned in case if distinct filter has been specified 
+     *   and system was not found with this filter.
+     */
+    boost::optional<std::vector<api::SystemDataEx>> selectSystemsFromCacheByFilter(
+        const nx::utils::stree::AbstractResourceReader& requestResources,
+        const data::DataFilter& filter);
+    void addUserAccessInfo(const std::string& accountEmail, api::SystemDataEx& systemDataEx);
 
     /**
      * Fetch existing account or create a new one sending corresponding notification.

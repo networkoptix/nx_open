@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 4, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "system_data.h"
 
 #include <nx/fusion/model_functions.h>
@@ -16,9 +11,8 @@ namespace api {
 
 using namespace nx::network;
 
-////////////////////////////////////////////////////////////
-//// class SystemRegistrationData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemRegistrationData
 
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, name)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, customization)
@@ -50,9 +44,8 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
     url::serializeField(urlQuery, SystemRegistrationData_opaque_field, data.opaque);
 }
 
-////////////////////////////////////////////////////////////
-//// class SystemSharing
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemSharing
 
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, systemId)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, accountEmail)
@@ -118,9 +111,8 @@ bool loadFromUrlQuery(const QUrlQuery& /*urlQuery*/, SystemSharingList* const /*
 }
 
 
-////////////////////////////////////////////////////////////
-//// class SystemId
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemId
 
 SystemId::SystemId()
 {
@@ -150,9 +142,8 @@ void serializeToUrlQuery(const SystemId& data, QUrlQuery* const urlQuery)
 }
 
 
-////////////////////////////////////////////////////////////
-//// class Filter
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class Filter
 
 void serializeToUrlQuery(const Filter& data, QUrlQuery* const urlQuery)
 {
@@ -177,9 +168,8 @@ void serialize(QnJsonContext* /*ctx*/, const Filter& filter, QJsonValue* target)
 }
 
 
-////////////////////////////////////////////////////////////
-//// class SystemAttributesUpdate
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemAttributesUpdate
 
 MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, systemId)
 MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, name)
@@ -301,15 +291,16 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields/*,
     (optional, false)*/)
 
-}   //api
-}   //cdb
-}   //nx
+} // namespace api
+} // namespace cdb
+} // namespace nx
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemStatus,
-    (nx::cdb::api::SystemStatus::ssInvalid, "invalid")
-    (nx::cdb::api::SystemStatus::ssNotActivated, "notActivated")
-    (nx::cdb::api::SystemStatus::ssActivated, "activated")
-    (nx::cdb::api::SystemStatus::ssDeleted, "deleted")
+    (nx::cdb::api::SystemStatus::invalid, "invalid")
+    (nx::cdb::api::SystemStatus::notActivated, "notActivated")
+    (nx::cdb::api::SystemStatus::activated, "activated")
+    (nx::cdb::api::SystemStatus::deleted_, "deleted")
+    (nx::cdb::api::SystemStatus::beingMerged, "beingMerged")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemHealth,
