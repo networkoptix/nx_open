@@ -909,7 +909,8 @@ void TimeSynchronizationManager::timeSyncRequestDone(
     //scheduling next synchronization
     if( m_terminated )
         return;
-        peerIter->second.syncTimerID =
+
+    peerIter->second.syncTimerID =
         nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(

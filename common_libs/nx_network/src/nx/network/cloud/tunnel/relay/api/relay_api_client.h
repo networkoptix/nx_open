@@ -82,7 +82,7 @@ class NX_NETWORK_API ClientImpl:
 public:
     ClientImpl(const QUrl& baseUrl);
 
-    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread);
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void beginListening(
         const nx::String& peerName,

@@ -2,17 +2,16 @@
 
 #include <nx/utils/log/log.h>
 
-#include "../model/listening_peer_pool.h"
-#include "../settings.h"
+#include "listening_peer_pool.h"
+#include "settings.h"
 
 namespace nx {
 namespace cloud {
-namespace relay {
-namespace controller {
+namespace relaying {
 
 ListeningPeerManager::ListeningPeerManager(
-    const conf::ListeningPeer& settings,
-    model::ListeningPeerPool* listeningPeerPool)
+    const Settings& settings,
+    ListeningPeerPool* listeningPeerPool)
     :
     m_settings(settings),
     m_listeningPeerPool(listeningPeerPool)
@@ -20,7 +19,7 @@ ListeningPeerManager::ListeningPeerManager(
 }
 
 void ListeningPeerManager::beginListening(
-    const api::BeginListeningRequest& request,
+    const relay::api::BeginListeningRequest& request,
     BeginListeningHandler completionHandler)
 {
     using namespace std::placeholders;
@@ -41,13 +40,13 @@ void ListeningPeerManager::beginListening(
             .arg(m_settings.maxPreemptiveConnectionCount),
             cl_logDEBUG2);
         completionHandler(
-            api::ResultCode::preemptiveConnectionCountAtMaximum,
-            api::BeginListeningResponse(),
+            relay::api::ResultCode::preemptiveConnectionCountAtMaximum,
+            relay::api::BeginListeningResponse(),
             nx_http::ConnectionEvents());
         return;
     }
 
-    api::BeginListeningResponse response;
+    relay::api::BeginListeningResponse response;
     response.preemptiveConnectionCount =
         m_settings.recommendedPreemptiveConnectionCount;
 
@@ -57,7 +56,7 @@ void ListeningPeerManager::beginListening(
             request.peerName, _1);
 
     completionHandler(
-        api::ResultCode::ok,
+        relay::api::ResultCode::ok,
         std::move(response),
         std::move(connectionEvents));
 }
@@ -87,15 +86,14 @@ ListeningPeerManagerFactory& ListeningPeerManagerFactory::instance()
 }
 
 std::unique_ptr<AbstractListeningPeerManager> ListeningPeerManagerFactory::defaultFactoryFunction(
-    const conf::ListeningPeer& settings,
-    model::ListeningPeerPool* listeningPeerPool)
+    const Settings& settings,
+    ListeningPeerPool* listeningPeerPool)
 {
     return std::make_unique<ListeningPeerManager>(
         settings,
         listeningPeerPool);
 }
 
-} // namespace controller
-} // namespace relay
+} // namespace relaying
 } // namespace cloud
 } // namespace nx

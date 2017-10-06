@@ -19,16 +19,14 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
 
+#include "settings.h"
+
 namespace nx {
 namespace cloud {
-namespace relay {
-
-namespace conf { struct ListeningPeer; }
-
-namespace model {
+namespace relaying {
 
 using TakeIdleConnectionHandler = nx::utils::MoveOnlyFunc<
-    void(api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
+    void(relay::api::ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
 
 struct ClientInfo
 {
@@ -37,7 +35,7 @@ struct ClientInfo
     std::string peerName;
 };
 
-class AbstractListeningPeerPool
+class NX_RELAYING_API AbstractListeningPeerPool
 {
 public:
     virtual ~AbstractListeningPeerPool() = default;
@@ -76,11 +74,11 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-class ListeningPeerPool:
+class NX_RELAYING_API ListeningPeerPool:
     public AbstractListeningPeerPool
 {
 public:
-    ListeningPeerPool(const conf::ListeningPeer& settings);
+    ListeningPeerPool(const Settings& settings);
     ~ListeningPeerPool();
 
     virtual void addConnection(
@@ -137,7 +135,7 @@ private:
     /** multimap<full peer name, connection context> */
     using PeerConnections = std::map<std::string, PeerContext>;
 
-    const conf::ListeningPeer& m_settings;
+    const Settings& m_settings;
     PeerConnections m_peers;
     mutable QnMutex m_mutex;
     bool m_terminated;
@@ -209,9 +207,9 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using ListeningPeerPoolFactoryFunction =
-    std::unique_ptr<AbstractListeningPeerPool>(const conf::ListeningPeer& /*settings*/);
+    std::unique_ptr<AbstractListeningPeerPool>(const Settings& /*settings*/);
 
-class ListeningPeerPoolFactory:
+class NX_RELAYING_API ListeningPeerPoolFactory:
     public nx::utils::BasicFactory<ListeningPeerPoolFactoryFunction>
 {
     using base_type = nx::utils::BasicFactory<ListeningPeerPoolFactoryFunction>;
@@ -223,10 +221,9 @@ public:
 
 private:
     std::unique_ptr<AbstractListeningPeerPool> defaultFactoryFunction(
-        const conf::ListeningPeer& settings);
+        const Settings& settings);
 };
 
-} // namespace model
 } // namespace relay
 } // namespace cloud
 } // namespace nx

@@ -3,6 +3,10 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
+endif()
+
 nx_configure_file(
     maven/filter-resources/app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})

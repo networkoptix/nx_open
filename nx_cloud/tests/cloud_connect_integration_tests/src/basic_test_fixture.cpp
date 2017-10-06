@@ -8,10 +8,11 @@
 #include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
-#include <nx/cloud/relay/controller/connect_session_manager.h>
+//#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
-#include <nx/cloud/relay/model/listening_peer_pool.h>
-#include <nx/cloud/relay/model/model.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
+//#include <nx/cloud/relay/model/model.h>
 
 namespace nx {
 namespace network {

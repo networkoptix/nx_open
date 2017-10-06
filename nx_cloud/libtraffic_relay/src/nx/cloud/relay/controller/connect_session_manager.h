@@ -11,6 +11,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <nx/cloud/relaying/listening_peer_pool.h>
+
 namespace nx {
 namespace cloud {
 namespace relay {
@@ -65,7 +67,7 @@ public:
     ConnectSessionManager(
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
-        model::ListeningPeerPool* listeningPeerPool,
+        relaying::ListeningPeerPool* listeningPeerPool,
         model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
         controller::AbstractTrafficRelay* trafficRelay);
     ~ConnectSessionManager();
@@ -91,7 +93,7 @@ private:
 
     const conf::Settings& m_settings;
     model::ClientSessionPool* m_clientSessionPool;
-    model::ListeningPeerPool* m_listeningPeerPool;
+    relaying::ListeningPeerPool* m_listeningPeerPool;
     model::AbstractRemoteRelayPeerPool* m_remoteRelayPeerPool;
     controller::AbstractTrafficRelay* m_trafficRelay;
     utils::Counter m_apiCallCounter;
@@ -120,13 +122,13 @@ public:
         std::unique_ptr<AbstractConnectSessionManager>(
             const conf::Settings& settings,
             model::ClientSessionPool* clientSessionPool,
-            model::ListeningPeerPool* listeningPeerPool,
+            relaying::ListeningPeerPool* listeningPeerPool,
             controller::AbstractTrafficRelay* trafficRelay)>;
 
     static std::unique_ptr<AbstractConnectSessionManager> create(
         const conf::Settings& settings,
         model::ClientSessionPool* clientSessionPool,
-        model::ListeningPeerPool* listeningPeerPool,
+        relaying::ListeningPeerPool* listeningPeerPool,
         model::AbstractRemoteRelayPeerPool* remoteRelayPeerPool,
         controller::AbstractTrafficRelay* trafficRelay);
     /**

@@ -8,8 +8,7 @@
 
 namespace nx {
 namespace cloud {
-namespace relay {
-namespace view {
+namespace relaying {
 
 template<
     typename Manager,
@@ -55,25 +54,25 @@ protected:
 
 private:
     void onRequestProcessed(
-        api::ResultCode resultCode,
+        relay::api::ResultCode resultCode,
         Response ... response)
     {
-        auto requestResult = api::resultCodeToFusionRequestResult(resultCode);
-        if (resultCode == api::ResultCode::needRedirect)
+        auto requestResult = relay::api::resultCodeToFusionRequestResult(resultCode);
+        if (resultCode == relay::api::ResultCode::needRedirect)
             requestResult.setHttpStatusCode(nx_http::StatusCode::found);
 
         this->requestCompleted(requestResult, std::move(response)...);
     }
 
     void onRequestProcessed(
-        api::ResultCode resultCode,
+        relay::api::ResultCode resultCode,
         Response ... response,
         nx_http::ConnectionEvents connectionEvents)
     {
         this->setConnectionEvents(std::move(connectionEvents));
 
-        auto requestResult = api::resultCodeToFusionRequestResult(resultCode);
-        if (resultCode == api::ResultCode::ok)
+        auto requestResult = relay::api::resultCodeToFusionRequestResult(resultCode);
+        if (resultCode == relay::api::ResultCode::ok)
             requestResult.setHttpStatusCode(nx_http::StatusCode::switchingProtocols);
 
         this->requestCompleted(
@@ -144,7 +143,6 @@ protected:
         Request* request) = 0;
 };
 
-} // namespace view
-} // namespace relay
+} // namespace relaying
 } // namespace cloud
 } // namespace nx
