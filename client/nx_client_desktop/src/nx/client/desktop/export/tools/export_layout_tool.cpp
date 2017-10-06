@@ -432,31 +432,6 @@ void ExportLayoutTool::finishExport(bool success)
 {
     d->finishExport();
 
-    //TODO: #GDM restore functionality and move it to handler
-    /*
-    switch (d->settings.mode)
-    {
-        case ExportLayoutSettings::Mode::LocalSave:
-        {
-            // Take resource pool from the original layout.
-            const auto resourcePool = d->settings.layout->resourcePool();
-            NX_ASSERT(resourcePool);
-            if (!resourcePool)
-                return;
-            auto existing = resourcePool->getResourceByUrl(d->settings.filename.completeFileName())
-                .dynamicCast<QnLayoutResource>();
-            // Update existing layout.
-            NX_ASSERT(existing);
-            if (existing)
-            {
-                existing->update(m_layout);
-                snapshotManager()->store(existing);
-            }
-            break;
-        }
-    }
-    */
-
     // TODO: #GDM This is more correct "Save as" handling, but it does not work yet.
     /*
     else if (m_mode == Qn::LayoutLocalSaveAs)
