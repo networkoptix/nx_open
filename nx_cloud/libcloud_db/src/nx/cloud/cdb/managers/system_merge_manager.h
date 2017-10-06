@@ -44,6 +44,11 @@ public:
 private:
     AbstractSystemManager* m_systemManager = nullptr;
     nx::utils::db::AsyncSqlQueryExecutor* m_dbManager = nullptr;
+
+    nx::utils::db::DBResult updateSystemStateInDb(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& idOfSystemToMergeTo,
+        const std::string& idOfSystemToMergeBeMerged);
 };
 
 } // namespace cdb
