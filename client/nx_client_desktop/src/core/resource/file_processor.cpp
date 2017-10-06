@@ -28,33 +28,52 @@ bool isFileSupported(const QString& filePath)
         || FileTypeSupport::isFileSupported(filePath);
 }
 
+QString fixSeparators(const QString& filePath)
+{
+    return QDir::fromNativeSeparators(filePath);
+}
+
 } // namespace
 
 QStringList QnFileProcessor::findAcceptedFiles(const QStringList &files)
 {
     QStringList acceptedFiles;
-    foreach (const QString &path, files) {
-        if (QnAviDvdResource::isAcceptedUrl(path)) {
-            if (path.indexOf(QLatin1Char('?')) == -1) {
+    for (QString path: files)
+    {
+        path = fixSeparators(path);
+        if (QnAviDvdResource::isAcceptedUrl(path))
+        {
+            if (path.indexOf(QLatin1Char('?')) == -1)
+            {
                 /* Open all titles on a DVD. */
                 QStringList titles = QnAVIDvdArchiveDelegate::getTitleList(path);
-                foreach (const QString &title, titles)
+                for (const QString &title: titles)
                     acceptedFiles.append(path + QLatin1String("?title=") + title);
-            } else {
+            }
+            else
+            {
                 acceptedFiles.append(path);
             }
-        } else if (QnAviBlurayResource::isAcceptedUrl(path)) {
+        }
+        else if (QnAviBlurayResource::isAcceptedUrl(path))
+        {
             acceptedFiles.append(path);
-        } else {
+        }
+        else
+        {
             QFileInfo fileInfo(path);
-            if (fileInfo.isDir()) {
+            if (fileInfo.isDir())
+            {
                 QDirIterator it(path, QDirIterator::Subdirectories);
-                while (it.hasNext()) {
+                while (it.hasNext())
+                {
                     QString nextFilename = it.next();
                     if (it.fileInfo().isFile() && FileTypeSupport::isFileSupported(nextFilename))
                         acceptedFiles.append(nextFilename);
                 }
-            } else if (fileInfo.isFile() && FileTypeSupport::isFileSupported(path)) {
+            }
+            else if (fileInfo.isFile() && FileTypeSupport::isFileSupported(path))
+            {
                 acceptedFiles.append(path);
             }
         }
@@ -71,15 +90,16 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl>& urls)
         if (!url.isLocalFile())
             continue;
 
-        files.append(url.toLocalFile());
+        files.append(fixSeparators(url.toLocalFile()));
     }
     return QnFileProcessor::findAcceptedFiles(files);
 }
 
 QnResourcePtr QnFileProcessor::createResourcesForFile(const QString& fileName)
 {
+    const auto path = fixSeparators(fileName);
     auto pool = qnClientCoreModule->commonModule()->resourcePool();
-    QnResourcePtr result = QnResourceDirectoryBrowser::resourceFromFile(fileName, pool);
+    const auto result = QnResourceDirectoryBrowser::resourceFromFile(path, pool);
     if (result)
         pool->addResource(result);
     return result;
@@ -89,9 +109,10 @@ QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files
 {
     auto pool = qnClientCoreModule->commonModule()->resourcePool();
     QnResourceList result;
-    for (const QString& fileName: files)
+    for (const auto& fileName: files)
     {
-        QnResourcePtr resource = QnResourceDirectoryBrowser::resourceFromFile(fileName, pool);
+        const auto path = fixSeparators(fileName);
+        QnResourcePtr resource = QnResourceDirectoryBrowser::resourceFromFile(path, pool);
         if (resource)
             result << resource;
     }
@@ -110,7 +131,7 @@ QnResourceList QnFileProcessor::findOrCreateResourcesForFiles(const QList<QUrl>&
         if (!url.isLocalFile())
             continue;
 
-        const QString filePath = url.toLocalFile();
+        const auto filePath = fixSeparators(url.toLocalFile());
         if (!QFile::exists(filePath))
             continue;
 
