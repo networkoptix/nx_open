@@ -77,7 +77,7 @@ public:
      */
     virtual void stopWhileInAioThread() override;
 
-    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

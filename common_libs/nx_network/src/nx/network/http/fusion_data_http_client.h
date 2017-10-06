@@ -72,7 +72,7 @@ public:
 
     virtual ~BaseFusionDataHttpClient() = default;
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
         m_httpClient.bindToAioThread(aioThread);
