@@ -138,12 +138,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (position != AV_NOPTS_VALUE)
     {
         m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */, 1 /* scale */);
-        // Recreate parsers
-        for (auto& track: m_tracks)
-        {
-            if (track.parser)
-                track.parser.reset(createParser(track.parser->codecName()));
-        }
+        createTrackParsers();
     }
 
     QnAbstractMediaDataPtr result;
@@ -441,7 +436,6 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     if (result)
     {
         Qn::directConnect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
-        result->setCodecName(codecName);
     }
     return result;
 }
@@ -553,20 +547,51 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         }
     }
 
-    QnRtspClient::TrackMap trackInfo =  m_RtpSession.getTrackInfo();
-    m_tracks.resize(trackInfo.size());
+    createTrackParsers();
+
     bool videoExist = false;
     bool audioExist = false;
+    int logicalVideoNum = 0;
+    for (const auto& track: m_RtpSession.getTrackInfo())
+    {
+        QnRtspClient::TrackType trackType = track->trackType;
+        videoExist |= trackType == QnRtspClient::TT_VIDEO;
+        audioExist |= trackType == QnRtspClient::TT_AUDIO;
+    }
+
+    if (m_role == Qn::CR_LiveVideo)
+    {
+        if (audioExist) {
+            if (!camera->isAudioSupported())
+                camera->forceEnableAudio();
+        }
+        else {
+            camera->forceDisableAudio();
+        }
+    }
+
+    m_rtcpReportTimer.restart();
+    if (!audioExist && !videoExist) {
+        m_RtpSession.stop();
+        return CameraDiagnostics::NoMediaTrackResult( m_currentStreamUrl );
+    }
+    m_rtpStarted = true;
+    return CameraDiagnostics::NoErrorResult();
+}
+
+void QnMulticodecRtpReader::createTrackParsers()
+{
+    QnRtspClient::TrackMap trackInfo = m_RtpSession.getTrackInfo();
+    m_tracks.resize(trackInfo.size());
     int logicalVideoNum = 0;
     for (int i = 0; i < trackInfo.size(); ++i)
     {
         QnRtspClient::TrackType trackType = trackInfo[i]->trackType;
-        videoExist |= trackType == QnRtspClient::TT_VIDEO;
-        audioExist |= trackType == QnRtspClient::TT_AUDIO;
         if (trackType == QnRtspClient::TT_VIDEO || trackType == QnRtspClient::TT_AUDIO)
         {
             m_tracks[i].parser.reset(createParser(trackInfo[i]->codecName.toUpper()));
-            if (m_tracks[i].parser) {
+            if (m_tracks[i].parser) 
+            {
                 m_tracks[i].parser->setTimeHelper(&m_timeHelper);
                 m_tracks[i].parser->setSDPInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
                 m_tracks[i].ioDevice = trackInfo[i]->ioDevice;
@@ -598,25 +623,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
             }
         }
     }
-
-    if (m_role == Qn::CR_LiveVideo)
-    {
-        if (audioExist) {
-            if (!camera->isAudioSupported())
-                camera->forceEnableAudio();
-        }
-        else {
-            camera->forceDisableAudio();
-        }
-    }
-
-    m_rtcpReportTimer.restart();
-    if (!audioExist && !videoExist) {
-        m_RtpSession.stop();
-        return CameraDiagnostics::NoMediaTrackResult( m_currentStreamUrl );
-    }
-    m_rtpStarted = true;
-    return CameraDiagnostics::NoErrorResult();
 }
 
 int QnMulticodecRtpReader::getLastResponseCode() const
