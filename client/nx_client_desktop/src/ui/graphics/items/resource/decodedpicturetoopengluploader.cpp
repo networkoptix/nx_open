@@ -44,7 +44,6 @@ extern "C"
 #endif
 //#define USE_SINGLE_PBO_PER_FRAME
 #endif
-#include "transcoding/filters/contrast_image_filter.h"
 
 #include <nx/streaming/config.h>
 

@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "utils/color_space/image_correction.h"
+#include <utils/color_space/image_correction.h>
 
 #include "abstract_image_filter.h"
 

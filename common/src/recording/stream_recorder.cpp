@@ -21,13 +21,6 @@
 
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
-#include "transcoding/filters/contrast_image_filter.h"
-#include "transcoding/filters/time_image_filter.h"
-#include "transcoding/filters/fisheye_image_filter.h"
-#include "transcoding/filters/rotate_image_filter.h"
-#include "transcoding/filters/crop_image_filter.h"
-#include "transcoding/filters/tiled_image_filter.h"
-#include "transcoding/filters/scale_image_filter.h"
 
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "export/sign_helper.h"

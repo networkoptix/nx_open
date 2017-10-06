@@ -11,9 +11,6 @@
 #include <transcoding/ffmpeg_audio_transcoder.h>
 
 #include <transcoding/filters/abstract_image_filter.h>
-#include <transcoding/filters/tiled_image_filter.h>
-#include <transcoding/filters/scale_image_filter.h>
-#include <transcoding/filters/rotate_image_filter.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>

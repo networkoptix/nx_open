@@ -23,9 +23,6 @@
 
 #include <platform/environment.h>
 
-#include <transcoding/filters/contrast_image_filter.h>
-#include <transcoding/filters/fisheye_image_filter.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -35,7 +32,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
-#include <ui/workbench/workbench_context.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -43,9 +39,7 @@
 #include <nx/utils/string.h>
 #include <utils/common/warnings.h>
 
-#include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
-#include "transcoding/filters/abstract_image_filter.h"
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 using namespace nx::client::desktop::ui;
