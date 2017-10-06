@@ -464,7 +464,9 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 
 void QnRecordingManager::at_serverPropertyChanged(const QnResourcePtr &, const QString &key)
 {
-    if (key == QnMediaResource::panicRecordingKey()) {
+    if (key == QnMediaResource::panicRecordingKey())
+    {
+        NX_DEBUG(this, "Panic mode has changed, update camera");
         for (const auto& camera: m_recordMap.keys())
             updateCamera(camera.dynamicCast<QnSecurityCamResource>());
     }
