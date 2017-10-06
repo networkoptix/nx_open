@@ -83,8 +83,9 @@ ROOT_URLCONF = 'cloud.urls'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /app/app
 STATIC_LOCATION = os.path.join(BASE_DIR, "static")  # this is used for email_engine to find templates
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static/common")
+STATIC_ROOT = os.path.join(BASE_DIR, "static/common/static")
 if LOCAL_ENVIRONMENT:
+    STATIC_ROOT = os.path.join(BASE_DIR, "static/common")
     STATICFILES_DIRS = (
         os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static"),
         os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static/lang_en_US"),

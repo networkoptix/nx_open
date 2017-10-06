@@ -10,6 +10,7 @@ function instantiate_config()
 {
     export CUSTOMIZATION=$1
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
+    mkdir --parents $CLOUD_PORTAL_CONF_DIR
 
     local CLOUD_PORTAL_HOST_var=CLOUD_PORTAL_HOST_$customization
     export CLOUD_PORTAL_HOST=${!CLOUD_PORTAL_HOST_var:-$CLOUD_PORTAL_HOST}
