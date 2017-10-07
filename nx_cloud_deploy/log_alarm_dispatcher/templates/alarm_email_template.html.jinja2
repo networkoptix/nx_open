@@ -1,0 +1,82 @@
+<html>
+<body>
+Dear Network Optix admins,
+
+    <p>Alarm happened at <b>{{ message['StateChangeTime'] | reformat_timestamp }}</b></p>
+
+    {% set log_group = alarm_info['log_group_name'] | escape %}
+    {% set filter_pattern = alarm_info['filter_pattern'] | escape %}
+
+    <p>
+    <table border="0" cellspacing="10">
+    <tr>
+        <td>Instance:</td>
+        <td>{{ alarm_info['instance_name'] }}</td>
+    </tr>
+    <tr>
+        <td>Region:</td>
+        <td>{{ message['Region'] }}</td>
+    </tr>
+    <tr>
+        <td>Module:</td>
+        <td>{{ alarm_info['module_name'] }}</td>
+    </tr>
+    <tr>
+        <td>Alarm:</td>
+        <td>{{ alarm_info['alarm_name'] }}</td>
+    </tr>
+    <tr>
+        <td>Old State:</td>
+        <td>{{ message['OldStateValue'] }}</td>
+    </tr>
+    <tr>
+        <td>New State:</td>
+        <td>{{ message['NewStateValue'] }}</td>
+    </tr>
+    <tr>
+        <td>Change Reason:</td>
+        <td>{{ message['NewStateReason'] }}</td>
+    </tr>
+    {% if log_group %}
+    <tr>
+        <td>Log Group:</td>
+        <td>{{ log_group }}</td>
+    </tr>
+    <tr>
+        <td>Filter Pattern:</td>
+        <td>{{ filter_pattern }}</td>
+    </tr>
+    {% endif %}
+    </table>
+    </p>
+
+    <p>Don't know what to do? Look <a
+        href="https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85485875/Cloud+HM">here</a></p>
+
+    <p>
+    {% if events %}
+        Here are relevant lines from {{ alarm_info['module_name'] }} log:<br/>
+
+        {% for event in events %}
+            {% set log_stream = event['logStreamName'] | escape %}
+
+            <h2>Log Stream: <a
+                    href="https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group={{ log_group }};stream={{ log_stream }}">{{ log_stream }}</a>
+            </h2>
+            {% for message in event['messages'] %}
+                <pre style="display: inline; color: {{ "red" if message["matched"] else "black" }}">{{ message['timestamp'] }}: {{ message['text'] | escape }}
+</pre>
+                {% if message["matched"] %}
+                    <p> ----------------------------------- </p>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+</p>
+
+<p>May the force be with you.</p>
+
+    Yours, <br/>
+    Smart Cloud Watchdog
+</body>
+</html>
