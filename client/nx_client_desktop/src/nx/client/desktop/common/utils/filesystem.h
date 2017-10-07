@@ -3,16 +3,11 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QAbstractListModel>
-
-#include <nx/fusion/model_functions_fwd.h>
+#include <QtCore/QCoreApplication>
 
 namespace nx {
 namespace client {
-
-#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
-Q_OBJECT
-#endif
-QN_DECLARE_METAOBJECT_HEADER(desktop, FileExtension, )
+namespace desktop {
 
 /** List of supported file extensions, used in the client. */
 enum class FileExtension
@@ -30,6 +25,18 @@ class FileExtensionUtils
 {
 public:
     static bool isExecutable(FileExtension extension);
+};
+
+class FileSystemStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(FileSystemStrings)
+
+public:
+    static QString suffix(FileExtension ext);
+    static FileExtension extension(const QString& suffix,
+        FileExtension defaultValue = FileExtension::mkv);
+    static QString description(FileExtension extension);
+    static QString filterDescription(FileExtension ext);
 };
 
 class FileExtensionModel: public QAbstractListModel
@@ -72,4 +79,4 @@ struct Filename
 } // namespace client
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::client::desktop::FileExtension, (metatype)(lexical))
+Q_DECLARE_METATYPE(nx::client::desktop::FileExtension)

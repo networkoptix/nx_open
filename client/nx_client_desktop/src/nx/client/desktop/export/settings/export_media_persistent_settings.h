@@ -101,7 +101,7 @@ struct ExportRapidReviewPersistentSettings
 struct ExportMediaPersistentSettings
 {
     bool applyFilters = false;
-    FileExtension fileFormat = FileExtension::mkv;
+    QString fileFormat;
 
     ExportRapidReviewPersistentSettings rapidReview;
 

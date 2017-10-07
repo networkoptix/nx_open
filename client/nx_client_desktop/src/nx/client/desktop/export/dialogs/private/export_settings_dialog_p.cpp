@@ -108,10 +108,12 @@ void ExportSettingsDialog::Private::loadSettings()
     setMode(QnLexical::deserialized<Mode>(qnSettings->lastExportMode(), Mode::Media));
 
     m_exportMediaSettings.fileName.path = lastExportDir;
-    m_exportMediaSettings.fileName.extension = m_exportMediaPersistentSettings.fileFormat;
+    m_exportMediaSettings.fileName.extension = FileSystemStrings::extension(
+        m_exportMediaPersistentSettings.fileFormat, FileExtension::mkv);
 
     m_exportLayoutSettings.filename.path = lastExportDir;
-    m_exportLayoutSettings.filename.extension = m_exportLayoutPersistentSettings.fileFormat;
+    m_exportLayoutSettings.filename.extension = FileSystemStrings::extension(
+        m_exportLayoutPersistentSettings.fileFormat, FileExtension::nov);
 
     auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
     if (!imageOverlay.name.trimmed().isEmpty())
@@ -365,7 +367,7 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     const auto transcodingWasAllowed = isTranscodingAllowed();
     m_exportMediaSettings.fileName = filename;
-    m_exportMediaPersistentSettings.fileFormat = filename.extension;
+    m_exportMediaPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Media);
 
     const bool transcodingIsAllowed = isTranscodingAllowed();
@@ -376,7 +378,7 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
     m_exportLayoutSettings.filename = filename;
-    m_exportLayoutPersistentSettings.fileFormat = filename.extension;
+    m_exportLayoutPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Layout);
 }
 
