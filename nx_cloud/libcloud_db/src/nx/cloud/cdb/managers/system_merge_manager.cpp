@@ -20,7 +20,7 @@ SystemMergeManager::SystemMergeManager(
 }
 
 void SystemMergeManager::startMergingSystems(
-    const AuthorizationInfo& authzInfo,
+    const AuthorizationInfo& /*authzInfo*/,
     const std::string& idOfSystemToMergeTo,
     data::SystemId idOfSystemToBeMerged,
     std::function<void(api::ResultCode)> completionHandler)
