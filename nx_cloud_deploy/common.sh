@@ -52,9 +52,16 @@ function push()
 {
     $(aws ecr get-login --no-include-email)
 
-    echo "Pushing $MODULE:$VERSION to the ECR registry"
-    docker tag $MODULE:$VERSION 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/$MODULE:$VERSION
-    docker push 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/$MODULE:$VERSION
+    echo "Pushing $MODULE:$VERSION to the registry"
+    [ -z "$REPOSITORY_HOST" ] && REPOSITORY_HOST=009544449203.dkr.ecr.us-east-1.amazonaws.com
+    [ -z "$REPOSITORY_PATH" ] && REPOSITORY_PATH=/cloud
+
+    REPOSITORY=$REPOSITORY_HOST$REPOSITORY_PATH
+    docker tag $MODULE:$VERSION $REPOSITORY/$MODULE:$VERSION
+    docker push $REPOSITORY/$MODULE:$VERSION
+
+    docker tag $MODULE:$VERSION $REPOSITORY/$MODULE:latest
+    docker push $REPOSITORY/$MODULE:latest
 }
 
 function clean()
