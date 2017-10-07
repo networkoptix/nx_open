@@ -17,8 +17,8 @@ from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
 #Hacked URLs
-CLOUD_DB_URL_HACK = 'http://cloud-demo.hdw.mx:80/cdb'
-CLOUD_INSTANCE_URL_HACK = 'http://cloud-demo.hdw.mx'
+CLOUD_DB_URL_HACK = 'http://cloud-test.hdw.mx:80/cdb'
+CLOUD_INSTANCE_URL_HACK = 'http://cloud-test.hdw.mx'
 
 #Correct urls
 #CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
@@ -37,12 +37,9 @@ def authenticate(request):
             #start auth hacks
             request = CLOUD_INSTANCE_URL_HACK + "/api/account/login/"
             r = requests.post(request, json={'email': email, 'password': password})
-            if r.status_code == 200:
-                data = r.json()
-            if data['email'] != email:
+            if r.status_code != 200:
                 raise APINotAuthorisedException('Username or password are invalid')
             #end auth hacks
-
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
