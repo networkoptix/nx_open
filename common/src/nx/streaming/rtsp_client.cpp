@@ -1241,7 +1241,7 @@ void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 start
         if (endPos != qint64(AV_NOPTS_VALUE))
         {
             if (endPos != DATETIME_NOW)
-                rangeVal += nx_http::StringType::number(endPos);
+                rangeVal += nptPosToString(endPos);
             else
                 rangeVal += "clock";
         }
