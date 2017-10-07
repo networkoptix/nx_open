@@ -1,10 +1,10 @@
 from ..models import *
 import os
 import json
-import shutil
 import codecs
 import base64
 import zipfile
+import distutils
 import errno
 from StringIO import StringIO
 
@@ -129,12 +129,6 @@ def generate_languages_json(customization, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def copy_and_overwrite(from_path, to_path):
-    if os.path.exists(to_path):
-        shutil.rmtree(to_path)
-    shutil.copytree(from_path, to_path)
-
-
 def init_skin(customization_name, product='cloud_portal'):
     # 1. read skin for this customization
     customization = Customization.objects.get(name=customization_name)
@@ -142,8 +136,8 @@ def init_skin(customization_name, product='cloud_portal'):
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
-    copy_and_overwrite(from_dir, target_dir)
-    copy_and_overwrite(from_dir, os.path.join(target_dir, 'preview'))
+    distutils.dir_util.copy_tree(from_dir, target_dir)
+    distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
     # 3. run fill_content
     fill_content(customization_name, product, preview=False, incremental=False)
     fill_content(customization_name, product, preview=True, incremental=False)
