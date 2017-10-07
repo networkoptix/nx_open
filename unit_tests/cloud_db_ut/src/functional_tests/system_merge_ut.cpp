@@ -148,7 +148,7 @@ private:
     {
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();
         m_systemHealthInfoProviderStub = systemHealthInfoProvider.get();
-        return systemHealthInfoProvider;
+        return std::move(systemHealthInfoProvider);
     }
 };
 
