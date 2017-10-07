@@ -23,25 +23,14 @@
 		</fieldset>
 		<table style="width: 100%">
 			<thead>
+				<th style="width: 70px;"></th>
 				<th>Language</th>
 				<th>Field</th>
 				<th>Value</th>
-				<th style="width: 70px;"></th>
 			</thead>
 			<tbody>
 				{% for record in records%}
 				<tr>
-					<td>{{ record.language.code }}</td>
-					<td>{{ record.data_structure.name }}</td>
-					<td>
-					{% if record.data_structure.type == 1 %}
-						<img style="max-height: 200px; max-width: 200px;" src="data:image/png;base64,{{record}}">
-					{% elif record.data_structure.type == 0 %}
-						{{record}}
-					{% else %}
-						<div style="overflow-y: scroll; max-height: 350px; padding: 5px; border: 1px solid silver">{{record|safe}}</div>
-					{% endif %}
-					</td>
 					<td>
 						{% if record.language %}
 						<a class="button"
@@ -54,6 +43,17 @@
 						   Edit Record
 						</a>
 						{% endif %}
+					</td>
+					<td>{{ record.language.code }}</td>
+					<td>{{ record.data_structure.name }}</td>
+					<td>
+					{% if record.data_structure.type == 1 %}
+						<img style="max-height: 200px; max-width: 200px;" src="data:image/png;base64,{{record}}">
+					{% elif record.data_structure.type == 0 %}
+						{{record}}
+					{% else %}
+						<div style="overflow-y: scroll; max-height: 350px; padding: 5px; border: 1px solid silver">{{record|safe}}</div>
+					{% endif %}
 					</td>
 				</tr>
 				{% endfor %}

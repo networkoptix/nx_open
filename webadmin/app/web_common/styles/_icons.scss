@@ -141,6 +141,7 @@
   background-position: -148px -52px;
 }
 
+.camera-preview-failed,
 .camera-preview-offline,
 .camera-preview-unauthorized{
   @include icon;
@@ -150,6 +151,10 @@
   display: block;
   margin:0 auto;
   top: 5px;
+}
+
+.camera-preview-failed{
+  background-position: -48px -191px; 
 }
 
 .camera-preview-offline{

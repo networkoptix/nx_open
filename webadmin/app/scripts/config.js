@@ -127,6 +127,7 @@ var Config = {
             // * 30 seconds for server to init camera
             // * 20 seconds for chunks
             // * 10 seconds extra
+        updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
         flashChromelessPath: "components/flashlsChromeless.swf",
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
         staticResources: "web_common/"

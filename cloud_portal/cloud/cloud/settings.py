@@ -48,10 +48,12 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_celery_results',
     'rest_framework',
+    'rest_hooks',
     'corsheaders',
     'notifications',
     'api',
     'cms',
+    'zapier',
     'tinymce'
 )
 
@@ -75,6 +77,7 @@ TEMPLATES = [
         'DIRS': (
             '/app/app/static/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
             '/app/app/static/{}/templates'.format(CUSTOMIZATION),
+            '/app/app/templates'
         ),
         'APP_DIRS': True,
         'OPTIONS': {
@@ -216,6 +219,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
        'rest_framework.permissions.AllowAny',
     )
+}
+HOOK_EVENTS = {
+    'user.send_zap_request': None
 }
 
 # Celery settings section

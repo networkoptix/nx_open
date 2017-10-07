@@ -21,6 +21,7 @@ from django.views.generic.base import TemplateView
 
 
 admin.site.disable_action('delete_selected')  # Remove delete action from all models in admin
+admin.site.index_template = 'admin/index.html'
 
 
 def redirect_login(request):
@@ -35,6 +36,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
+    url(r'^zapier/', include('zapier.urls')),
 
     url(r'^apple-app-site-association',
         TemplateView.as_view(template_name="static/apple-app-site-association",

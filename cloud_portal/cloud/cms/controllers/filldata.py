@@ -111,6 +111,7 @@ def process_file(source_file, customization, product_id, preview, version_id):
         source_file, customization.name)
 
     branding_context = Context.objects.filter(name='branding')
+    language = None
     context = Context.objects.filter(
         file_path=context_name, product_id=product_id)
     language = None
