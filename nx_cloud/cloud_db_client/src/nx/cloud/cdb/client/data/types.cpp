@@ -15,38 +15,40 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
         case ResultCode::ok:
         case ResultCode::partialContent: //< Mapping to "200 OK" because request is not Partial Content from Http point of view.
             return nx_http::StatusCode::ok;
+
+        case ResultCode::badUsername:
+        case ResultCode::badRequest:
+        case ResultCode::mergedSystemIsOffline:
+        case ResultCode::invalidFormat:
+            return nx_http::StatusCode::badRequest;
+
         case ResultCode::notAuthorized:
         case ResultCode::credentialsRemovedPermanently:
             return nx_http::StatusCode::unauthorized;
+
         case ResultCode::forbidden:
         case ResultCode::accountNotActivated:
         case ResultCode::accountBlocked:
         case ResultCode::notAllowedInCurrentState:
-            return nx_http::StatusCode::forbidden;
-        case ResultCode::notFound:
-            return nx_http::StatusCode::notFound;
         case ResultCode::alreadyExists:
-            return nx_http::StatusCode::forbidden;
-        case ResultCode::dbError:
-            return nx_http::StatusCode::internalServerError;
-        case ResultCode::networkError:
-            return nx_http::StatusCode::internalServerError;
-        case ResultCode::notImplemented:
-            return nx_http::StatusCode::notImplemented;
         case ResultCode::unknownRealm:
         case ResultCode::invalidNonce:
             return nx_http::StatusCode::forbidden;
-        case ResultCode::badUsername:
-        case ResultCode::badRequest:
-            return nx_http::StatusCode::badRequest;
-        case ResultCode::serviceUnavailable:
-            return nx_http::StatusCode::serviceUnavailable;
-        case ResultCode::invalidFormat:
-            return nx_http::StatusCode::badRequest;
-        case ResultCode::retryLater:
-            return nx_http::StatusCode::serviceUnavailable;
+
+        case ResultCode::notFound:
+            return nx_http::StatusCode::notFound;
+
+        case ResultCode::dbError:
+        case ResultCode::networkError:
         case ResultCode::unknownError:
             return nx_http::StatusCode::internalServerError;
+
+        case ResultCode::notImplemented:
+            return nx_http::StatusCode::notImplemented;
+
+        case ResultCode::serviceUnavailable:
+        case ResultCode::retryLater:
+            return nx_http::StatusCode::serviceUnavailable;
     }
 
     return nx_http::StatusCode::internalServerError;
@@ -149,6 +151,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, ResultCode,
     (nx::cdb::api::ResultCode::invalidNonce, "invalidNonce")
     (nx::cdb::api::ResultCode::serviceUnavailable, "serviceUnavailable")
     (nx::cdb::api::ResultCode::notAllowedInCurrentState, "notAllowedInCurrentState")
+    (nx::cdb::api::ResultCode::mergedSystemIsOffline, "mergedSystemIsOffline")
     (nx::cdb::api::ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
     (nx::cdb::api::ResultCode::invalidFormat, "invalidFormat")
     (nx::cdb::api::ResultCode::retryLater, "retryLater")

@@ -35,6 +35,7 @@ enum class ResultCode
     invalidNonce,
     serviceUnavailable,
     notAllowedInCurrentState,
+    mergedSystemIsOffline,
 
     /** Credentials used for authentication are no longer valid. */
     credentialsRemovedPermanently,
