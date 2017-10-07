@@ -19,7 +19,7 @@
         <template>lib</template>
         <targetName>relaying</targetName>
 
-        <qt.libs>core</qt.libs>
+        <qt.libs>core gui</qt.libs>
         <global.libs>-lnx_network -lnx_fusion -lnx_utils</global.libs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <buildLib>sharedlib</buildLib>

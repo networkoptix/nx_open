@@ -43,7 +43,7 @@ public:
 
     ec2::SyncronizationEngine& ec2SyncronizationEngine();
 
-    SystemHealthInfoProvider& systemHealthInfoProvider();
+    AbstractSystemHealthInfoProvider& systemHealthInfoProvider();
 
     SystemManager& systemManager();
 
@@ -70,7 +70,7 @@ private:
     EventManager m_eventManager;
     ec2::SyncronizationEngine m_ec2SyncronizationEngine;
     ec2::VmsP2pCommandBus m_vmsP2pCommandBus;
-    SystemHealthInfoProvider m_systemHealthInfoProvider;
+    std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;
     SystemManager m_systemManager;
     SystemMergeManager m_systemMergeManager;

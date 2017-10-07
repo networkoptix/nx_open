@@ -552,6 +552,18 @@ boost::optional<api::SystemData> SystemManager::findSystemById(const std::string
     return *systemIter;
 }
 
+nx::utils::db::DBResult SystemManager::updateSystemStatus(
+    nx::utils::db::QueryContext* queryContext,
+    const std::string& systemId,
+    api::SystemStatus systemStatus)
+{
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&SystemManager::updateSystemStatusInCache, this,
+            systemId, systemStatus));
+
+    return m_systemDao->updateSystemStatus(queryContext, systemId, systemStatus);
+}
+
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& accountEmail,
     const std::string& systemId) const
@@ -1553,28 +1565,16 @@ void SystemManager::activateSystemIfNeeded(
 
     using namespace std::placeholders;
 
-    m_dbManager->executeUpdate<std::string>(
-        std::bind(&dao::AbstractSystemDataObject::activateSystem, m_systemDao.get(), _1, _2),
+    m_dbManager->executeUpdate<std::string /*systemId*/>(
+        std::bind(&SystemManager::updateSystemStatus, this, _1, _2, api::SystemStatus::activated),
         systemIter->id,
-        std::bind(&SystemManager::systemActivated, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(), _1, _2, _3));
-}
-
-void SystemManager::systemActivated(
-    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-    nx::utils::db::QueryContext* /*queryContext*/,
-    nx::utils::db::DBResult dbResult,
-    std::string systemId)
-{
-    {
-        QnMutexLocker lk(&m_mutex);
-
-        auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
-        auto systemIter = systemByIdIndex.find(systemId);
-        if (systemIter != systemByIdIndex.end())
+        [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+            nx::utils::db::QueryContext* /*queryContext*/,
+            nx::utils::db::DBResult dbResult,
+            std::string systemId)
         {
-            systemByIdIndex.modify(
-                systemIter,
+            updateSystemInCache(
+                systemId,
                 [dbResult](data::SystemData& system)
                 {
                     if (dbResult == nx::utils::db::DBResult::ok)
@@ -1588,8 +1588,34 @@ void SystemManager::systemActivated(
                         system.activationInDbNeeded = true;
                     }
                 });
-        }
+        });
+}
+
+template<typename Handler>
+void SystemManager::updateSystemInCache(std::string systemId, Handler handler)
+{
+    QnMutexLocker lk(&m_mutex);
+
+    auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
+    auto systemIter = systemByIdIndex.find(systemId);
+    if (systemIter != systemByIdIndex.end())
+    {
+        systemByIdIndex.modify(
+            systemIter,
+            handler);
     }
+}
+
+void SystemManager::updateSystemStatusInCache(
+    std::string systemId,
+    api::SystemStatus systemStatus)
+{
+    updateSystemInCache(
+        systemId,
+        [systemStatus](data::SystemData& system)
+        {
+            system.status = systemStatus;
+        });
 }
 
 nx::utils::db::DBResult SystemManager::saveUserSessionStart(

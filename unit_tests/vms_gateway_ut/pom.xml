@@ -19,7 +19,7 @@
     <properties>
         <guid>${vms_gateway_ut.guid}</guid>
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lvms_gateway -lcommon -lconnection_mediator -lrelaying -lcloud_db_client -lnx_fusion -lnx_utils -lnx_network -ludt</global.libs>
+        <global.libs>-lvms_gateway_core -lcommon -lconnection_mediator -lrelaying -lcloud_db_client -lnx_fusion -lnx_utils -lnx_network -ludt</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
@@ -29,11 +29,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libvms_gateway</artifactId>
+            <artifactId>libvms_gateway_core</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
+            <systemPath>${root.dir}/nx_cloud/libvms_gateway_core/pom.xml</systemPath>
         </dependency>
 
         <dependency>

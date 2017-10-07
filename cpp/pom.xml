@@ -233,6 +233,14 @@
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
                                         </replacement>
+                                        <replacement>
+                                            <token>${targetName}${release.version}</token>
+                                            <value>${targetName}</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>${targetName}${parsedVersion.majorVersion}</token>
+                                            <value>${targetName}</value>
+                                        </replacement>
 
                                         <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
                                         <replacement>

@@ -438,15 +438,16 @@ public:
     {
     }
 
-    virtual nx::utils::db::DBResult activateSystem(
+    virtual nx::utils::db::DBResult updateSystemStatus(
         nx::utils::db::QueryContext* const queryContext,
-        const std::string& systemId) override
+        const std::string& systemId,
+        api::SystemStatus systemStatus) override
     {
         nx::utils::db::DBResult result = nx::utils::db::DBResult::ok;
         if (m_failEveryActivateSystemRequest)
             result = nx::utils::db::DBResult::ioError;
         else
-            result = base_type::activateSystem(queryContext, systemId);
+            result = base_type::updateSystemStatus(queryContext, systemId, systemStatus);
         if (m_onActivateSystemDone)
             m_onActivateSystemDone(result);
         return result;
