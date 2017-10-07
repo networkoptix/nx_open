@@ -25,7 +25,6 @@ CLH264RtpParser::CLH264RtpParser():
         m_firstSeqNum(0),
         m_packetPerNal(0),
         m_videoFrameSize(0),
-        m_previousPacketHasMarkerBit(false),
         m_lastRtpTime(0)
 {
 }
@@ -358,9 +357,6 @@ bool CLH264RtpParser::isPacketStartsNewFrame(
     if (!m_frameExists)
         return false; //< no slice found so far. no need to create frame
 
-    if (m_previousPacketHasMarkerBit)
-        return true;
-
     int nalLen = bufferEnd - curPtr;
 
     if (packetType == STAP_A_PACKET)
@@ -586,7 +582,16 @@ bool CLH264RtpParser::processData(
 
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
-    m_previousPacketHasMarkerBit = rtpHeader->marker;
+
+    if (rtpHeader->marker)
+    {
+        m_mediaData = createVideoData(
+            rtpBufferBase,
+            m_lastRtpTime,
+            statistics
+        ); // last packet
+        gotData = true;
+    }
 
     if (gotData)
         backupCurrentData(rtpBufferBase);
