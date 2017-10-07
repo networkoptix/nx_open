@@ -7,6 +7,7 @@
       "translatable": false,
       "values":[
         ["{{PRODUCT_NAME}}","VMS Demo Cloud","Name for cloud"],
+        ["{{CLOUD_TAB_NAME}}","Cloud","Cloud tab name in thick client"],
         ["{{CLIENT_PROTOCOL}}","demo-vms","URL protocol for calling native clients from browser"],
         ["{{VMS_NAME}}","VMS Demonstration","Name of the VMS customization. Must be short!"],
         ["{{downloadLink}}","http://www.networkoptix.com/live-demo#fulltrial","Emergency link for downloading applications (in case if cloud is down)"],
@@ -25,7 +26,9 @@
         ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}],
         ["templates/email_logo.png", "",
           "Logo for email. Height must be not more than 40px, width - not more than 100px",
-          "Image", {"height_le": 40, "width_le": 100}]
+          "Image", {"height_le": 40, "width_le": 100}],
+        ["%MAIL_FROM_NAME%", "", "Reserved for future use"],
+        ["%MAIL_FROM_EMAIL%", "", "Reserved for future use"]
       ]
     },
     {

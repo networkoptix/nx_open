@@ -47,6 +47,11 @@ PeerRegistrator& Controller::listeningPeerRegistrator()
     return m_listeningPeerRegistrator;
 }
 
+const PeerRegistrator& Controller::listeningPeerRegistrator() const
+{
+    return m_listeningPeerRegistrator;
+}
+
 ListeningPeerPool& Controller::listeningPeerPool()
 {
     return m_listeningPeerPool;

@@ -48,6 +48,9 @@ public:
 
     ~TargetPeerConnector()
     {
+        if (m_targetPeerConnector)
+            m_targetPeerConnector->pleaseStopSync();
+
         if (m_streamSocketFactoryBak)
             SocketFactory::setCreateStreamSocketFunc(std::move(*m_streamSocketFactoryBak));
     }
@@ -110,6 +113,13 @@ protected:
         ASSERT_EQ(m_serverConnection, m_prevResult.connection.get());
     }
 
+    void andTimeoutHasBeenSetOnUnderlyingSocket()
+    {
+        unsigned int sendTimeoutMillis = 0;
+        ASSERT_TRUE(m_prevResult.connection->getSendTimeout(&sendTimeoutMillis));
+        ASSERT_EQ(m_connectTimeout->count(), sendTimeoutMillis);
+    }
+
     void switchToStreamSocketThatCannotConnect()
     {
         using namespace std::placeholders;
@@ -118,9 +128,9 @@ protected:
             std::bind(&TargetPeerConnector::createStreamSocket, this, _1, _2));
     }
 
-    void enableConnectTimeout()
+    void enableConnectTimeout(std::chrono::milliseconds timeout)
     {
-        m_connectTimeout = std::chrono::milliseconds(1);
+        m_connectTimeout = timeout;
     }
 
 private:
@@ -172,11 +182,22 @@ TEST_F(TargetPeerConnector, regular_connection_is_established)
 TEST_F(TargetPeerConnector, timeout)
 {
     switchToStreamSocketThatCannotConnect();
-    enableConnectTimeout();
+    enableConnectTimeout(std::chrono::milliseconds(1));
     
     givenDirectlyAccessibleServer();
     whenConnect();
     thenTimeoutIsReported();
+}
+
+// That's a requirement of cloud connect "reverse" method.
+TEST_F(TargetPeerConnector, passes_timeout_to_underlying_socket)
+{
+    enableConnectTimeout(std::chrono::hours(1));
+
+    givenDirectlyAccessibleServer();
+    whenConnect();
+    thenDirectConnectionIsEstablished();
+    andTimeoutHasBeenSetOnUnderlyingSocket();
 }
 
 //TEST_F(TargetPeerConnector, reports_regular_connection_error)

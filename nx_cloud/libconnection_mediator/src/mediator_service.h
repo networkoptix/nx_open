@@ -41,6 +41,9 @@ public:
     std::vector<SocketAddress> stunEndpoints() const;
     ListeningPeerPool* listeningPeerPool() const;
 
+    Controller& controller();
+    const Controller& controller() const;
+
 protected:
     virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;

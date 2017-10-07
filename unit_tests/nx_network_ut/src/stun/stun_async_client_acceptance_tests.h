@@ -68,18 +68,13 @@ protected:
 
     void givenConnectedClient()
     {
-        using namespace std::placeholders;
-
-        ASSERT_TRUE(m_client.setIndicationHandler(
-            m_indictionMethodToSubscribeTo,
-            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
-            this));
-
-        nx::utils::promise<SystemError::ErrorCode> connected;
-        m_client.connect(
-            m_serverUrl,
-            [&connected](SystemError::ErrorCode resultCode) { connected.set_value(resultCode); });
-        ASSERT_EQ(SystemError::noError, connected.get_future().get());
+        nx::utils::promise<SystemError::ErrorCode> connectCompleted;
+        initializeClient(
+            [&connectCompleted](SystemError::ErrorCode systemErrorCode)
+            {
+                connectCompleted.set_value(systemErrorCode);
+            });
+        ASSERT_EQ(SystemError::noError, connectCompleted.get_future().get());
 
         waitForServerToHaveAtLeastOneConnection();
     }
@@ -98,16 +93,18 @@ protected:
 
     void givenDisconnectedClient()
     {
-        using namespace std::placeholders;
+        initializeClient([](SystemError::ErrorCode /*resultCode*/) {});
+    }
 
-        ASSERT_TRUE(m_client.setIndicationHandler(
-            m_indictionMethodToSubscribeTo,
-            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
-            this));
-
-        m_client.connect(
-            m_serverUrl,
-            [](SystemError::ErrorCode /*resultCode*/) {});
+    void givenClientFailedToConnect()
+    {
+        nx::utils::promise<SystemError::ErrorCode> connectCompleted;
+        initializeClient(
+            [&connectCompleted](SystemError::ErrorCode systemErrorCode)
+            {
+                connectCompleted.set_value(systemErrorCode);
+            });
+        ASSERT_NE(SystemError::noError, connectCompleted.get_future().get());
     }
 
     void whenRemoveHandler()
@@ -252,6 +249,21 @@ private:
         ASSERT_TRUE(m_server->listen());
     }
 
+    void initializeClient(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
+    {
+        using namespace std::placeholders;
+
+        ASSERT_TRUE(m_client.setIndicationHandler(
+            m_indictionMethodToSubscribeTo,
+            std::bind(&StunAsyncClientAcceptanceTest::saveIndication, this, _1),
+            this));
+
+        m_client.connect(
+            m_serverUrl,
+            std::move(completionHandler));
+    }
+
     void sendResponse(
         std::shared_ptr<stun::AbstractServerConnection> connection,
         nx::stun::Message request)
@@ -323,6 +335,16 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, reconnect_works)
     this->thenClientIsAbleToPerformRequests();
 }
 
+TYPED_TEST_P(StunAsyncClientAcceptanceTest, reconnect_occurs_after_initial_connect_failure)
+{
+    this->givenBrokenServer();
+    this->givenClientFailedToConnect();
+
+    this->whenRestartServer();
+
+    this->thenClientReconnects();
+}
+
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, client_receives_indication)
 {
     this->givenConnectedClient();
@@ -390,6 +412,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     same_handler_cannot_be_added_twice,
     add_remove_indication_handler,
     reconnect_works,
+    reconnect_occurs_after_initial_connect_failure,
     client_receives_indication,
     subscription_to_every_indication,
     client_receives_indication_after_reconnect,

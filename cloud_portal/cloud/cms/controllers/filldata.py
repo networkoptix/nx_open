@@ -114,6 +114,7 @@ def process_file(source_file, customization, product_id, preview, version_id):
     language = None
     context = Context.objects.filter(
         file_path=context_name, product_id=product_id)
+    language = None
     if language_code:
         language = Language.objects.filter(code=language_code)
         if not language.exists():

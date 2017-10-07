@@ -365,7 +365,11 @@ QString CloudStreamSocket::idForToStringFromPtr() const
 
 QString CloudStreamSocket::getForeignHostName() const
 {
-    return m_cloudTunnelAttributes.remotePeerName;
+    if (!m_cloudTunnelAttributes.remotePeerName.isEmpty())
+        return m_cloudTunnelAttributes.remotePeerName;
+    if (m_socketDelegate)
+        return m_socketDelegate->getForeignHostName();
+    return QString();
 }
 
 void CloudStreamSocket::connectToEntriesAsync(

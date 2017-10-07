@@ -40,6 +40,14 @@ struct ConnectingPeer
     ConnectingPeer();
 };
 
+struct CassandraConnection
+{
+    std::string host;
+    std::chrono::milliseconds delayBeforeRetryingInitialConnect;
+
+    CassandraConnection();
+};
+
 class Settings:
     public nx::utils::BasicServiceSettings
 {
@@ -57,14 +65,14 @@ public:
     const ListeningPeer& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
     const Http& http() const;
-    const QString& cassandraHost() const;
+    const CassandraConnection& cassandraConnection() const;
 
 private:
     utils::log::Settings m_logging;
     Http m_http;
     ListeningPeer m_listeningPeer;
     ConnectingPeer m_connectingPeer;
-    QString m_cassandraHost;
+    CassandraConnection m_cassandraConnection;
 
     virtual void loadSettings() override;
 

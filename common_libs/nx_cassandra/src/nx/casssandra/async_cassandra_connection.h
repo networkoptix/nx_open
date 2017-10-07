@@ -1,8 +1,11 @@
 #pragma once
 
 #include <string>
+
 #include <cassandra.h>
+
 #include <boost/optional/optional.hpp>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
@@ -188,39 +191,40 @@ private:
 #undef NX_GET_CASS_VALUE
 };
 
-class NX_CASSANDRA_API AsyncConnection
+//-------------------------------------------------------------------------------------------------
+
+class NX_CASSANDRA_API AbstractAsyncConnection
 {
 public:
-    AsyncConnection(const char* host);
-    ~AsyncConnection();
+    virtual ~AbstractAsyncConnection() = default;
 
-    AsyncConnection(const AsyncConnection&) = delete;
-    AsyncConnection& operator=(const AsyncConnection&) = delete;
+    virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) = 0;
 
-    AsyncConnection(AsyncConnection&&) = default;
-    AsyncConnection& operator=(AsyncConnection&&) = default;
-
-    void init(nx::utils::MoveOnlyFunc<void(CassError)> initCb);
-
-    void prepareQuery(
+    virtual void prepareQuery(
         const char* queryString,
-        nx::utils::MoveOnlyFunc<void(CassError, Query query)> prepareCb);
+        nx::utils::MoveOnlyFunc<void(CassError, Query query)> completionHandler) = 0;
 
-    void executeSelect(
+    virtual void executeSelect(
         Query query,
-        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb);
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> completionHandler) = 0;
 
-    void executeSelect(
+    virtual void executeSelect(
         const char* queryString,
-        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb);
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> completionHandler) = 0;
 
-    void executeUpdate(
+    virtual void executeUpdate(
         Query query,
-        nx::utils::MoveOnlyFunc<void(CassError)> updateCb);
+        nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) = 0;
 
-    void executeUpdate(
+    virtual void executeUpdate(
         const char* queryString,
-        nx::utils::MoveOnlyFunc<void(CassError)> updateCb);
+        nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) = 0;
+
+    virtual void wait() = 0;
+
+    /**
+     * Following methods are implemented on top of pure virtual ones.
+     */
 
     cf::future<CassError> init();
     cf::future<std::pair<CassError, Query>> prepareQuery(const char* queryString);
@@ -230,8 +234,44 @@ public:
 
     cf::future<CassError> executeUpdate(Query query);
     cf::future<CassError> executeUpdate(const char* queryString);
+};
 
-    void wait();
+class NX_CASSANDRA_API AsyncConnection:
+    public AbstractAsyncConnection
+{
+public:
+    AsyncConnection(const std::string& host);
+    ~AsyncConnection();
+
+    AsyncConnection(const AsyncConnection&) = delete;
+    AsyncConnection& operator=(const AsyncConnection&) = delete;
+
+    AsyncConnection(AsyncConnection&&) = default;
+    AsyncConnection& operator=(AsyncConnection&&) = default;
+
+    virtual void init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler);
+
+    virtual void prepareQuery(
+        const char* queryString,
+        nx::utils::MoveOnlyFunc<void(CassError, Query query)> completionHandler) override;
+
+    virtual void executeSelect(
+        Query query,
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> completionHandler) override;
+
+    virtual void executeSelect(
+        const char* queryString,
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> completionHandler) override;
+
+    virtual void executeUpdate(
+        Query query,
+        nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) override;
+
+    virtual void executeUpdate(
+        const char* queryString,
+        nx::utils::MoveOnlyFunc<void(CassError)> completionHandler) override;
+
+    virtual void wait() override;
 
 private:
     CassCluster* m_cluster = nullptr;
@@ -247,6 +287,25 @@ private:
     static void onPrepare(CassFuture* future, void* data);
     static void onSelect(CassFuture* future, void* data);
     static void onUpdate(CassFuture* future, void* data);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+using AsyncConnectionFactoryFunction =
+    std::unique_ptr<AbstractAsyncConnection>(const std::string& dbHostName);
+
+class NX_CASSANDRA_API AsyncConnectionFactory:
+    public nx::utils::BasicFactory<AsyncConnectionFactoryFunction>
+{
+    using base_type = nx::utils::BasicFactory<AsyncConnectionFactoryFunction>;
+
+public:
+    AsyncConnectionFactory();
+
+    static AsyncConnectionFactory& instance();
+
+private:
+    std::unique_ptr<AbstractAsyncConnection> defaultFactoryFunction(const std::string& dbHostName);
 };
 
 } // namespace cassandra

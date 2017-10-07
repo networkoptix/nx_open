@@ -82,6 +82,7 @@ struct ConnectionParameters:
 {
     std::chrono::milliseconds connectionAckAwaitTimeout;
     std::chrono::milliseconds connectionResultWaitTimeout;
+    std::chrono::milliseconds maxRelayInstanceSearchTime;
 
     ConnectionParameters();
 };

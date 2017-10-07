@@ -103,6 +103,10 @@ const QLatin1String kConnectionResultWaitTimeout("cloudConnect/connectionResultW
 constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout = 
     std::chrono::seconds(15);
 
+const QLatin1String kMaxRelayInstanceSearchTime("cloudConnect/maxRelayInstanceSearchTime");
+constexpr const std::chrono::seconds kDefaultMaxRelayInstanceSearchTime =
+    std::chrono::seconds(3);
+
 // Cloud connect methods start delays.
 
 const QLatin1String kUdpHolePunchingStartDelay("cloudConnect/udpHolePunchingStartDelay");
@@ -146,7 +150,8 @@ namespace conf {
 
 ConnectionParameters::ConnectionParameters():
     connectionAckAwaitTimeout(kDefaultConnectionAckAwaitTimeout),
-    connectionResultWaitTimeout(kDefaultConnectionResultWaitTimeout)
+    connectionResultWaitTimeout(kDefaultConnectionResultWaitTimeout),
+    maxRelayInstanceSearchTime(kDefaultMaxRelayInstanceSearchTime)
 {
 }
 
@@ -375,6 +380,11 @@ void Settings::loadConnectionParameters()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionResultWaitTimeout).toString(),
             kDefaultConnectionResultWaitTimeout);
+
+    m_connectionParameters.maxRelayInstanceSearchTime =
+        nx::utils::parseTimerDuration(
+            settings().value(kMaxRelayInstanceSearchTime).toString(),
+            kDefaultMaxRelayInstanceSearchTime);
 
     // Connection methods start delays.
     m_connectionParameters.udpHolePunchingStartDelay =
