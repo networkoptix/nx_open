@@ -4,7 +4,7 @@ import json
 import codecs
 import base64
 import zipfile
-from distutils import dir_util
+import distutils.dir_util
 import errno
 from StringIO import StringIO
 
@@ -136,8 +136,8 @@ def init_skin(customization_name, product='cloud_portal'):
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
-    dir_util.copy_tree(from_dir, target_dir)
-    dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
+    distutils.dir_util.copy_tree(from_dir, target_dir)
+    distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
     # 3. run fill_content
     fill_content(customization_name, product, preview=False, incremental=False)
     fill_content(customization_name, product, preview=True, incremental=False)
