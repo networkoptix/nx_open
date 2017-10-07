@@ -47,6 +47,7 @@ public:
 
     /** Default mode. Will have both "Single camera" and "Layout" tabs. */
     ExportSettingsDialog(QnMediaResourceWidget* widget,
+        bool allowLayoutExport,
         const QnTimePeriod& timePeriod,
         FileNameValidator isFileNameValid,
         QWidget* parent = nullptr);

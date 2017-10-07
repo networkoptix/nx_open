@@ -42,6 +42,7 @@ static constexpr int kNoDataDefaultFontSize = 18;
 
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
+    bool allowLayoutExport,
     const QnTimePeriod& timePeriod,
     FileNameValidator isFileNameValid,
     QWidget* parent)
@@ -49,6 +50,8 @@ ExportSettingsDialog::ExportSettingsDialog(
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
 {
     setMediaParams(widget->resource(), widget->item()->data(), widget->context());
+    if (!allowLayoutExport)
+        hideTab(Mode::Layout);
 
     const auto layout = widget->item()->layout()->resource();
     d->setLayout(layout);

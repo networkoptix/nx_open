@@ -263,15 +263,47 @@ void WorkbenchExportHandler::handleExportVideoAction()
     QScopedPointer<ExportSettingsDialog> dialog;
     if (widget)
     {
-        dialog.reset(isBookmark
-            ? new ExportSettingsDialog(widget, bookmark, isFileNameValid, mainWindow())
-            : new ExportSettingsDialog(widget, period, isFileNameValid, mainWindow()));
+        if (isBookmark)
+        {
+            dialog.reset(new ExportSettingsDialog(
+                widget,
+                bookmark,
+                isFileNameValid,
+                mainWindow()));
+        }
+        else
+        {
+            const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
+            const bool layoutExportAllowed = periods.intersects(period);
+
+            dialog.reset(new ExportSettingsDialog(
+                widget,
+                layoutExportAllowed,
+                period,
+                isFileNameValid,
+                mainWindow()));
+        }
     }
     else
     {
-        dialog.reset(isBookmark
-            ? new ExportSettingsDialog(mediaResource, context(), bookmark, isFileNameValid, mainWindow())
-            : new ExportSettingsDialog(mediaResource, context(), period, isFileNameValid, mainWindow()));
+        if (isBookmark)
+        {
+            dialog.reset(new ExportSettingsDialog(
+                mediaResource,
+                context(),
+                bookmark,
+                isFileNameValid,
+                mainWindow()));
+        }
+        else
+        {
+            dialog.reset(new ExportSettingsDialog(
+                mediaResource,
+                context(),
+                period,
+                isFileNameValid,
+                mainWindow()));
+        }
     }
 
     if (dialog->exec() != QDialog::Accepted)
