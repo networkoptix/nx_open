@@ -20,7 +20,7 @@
         <product.title>${company.name} libvms_gateway_core</product.title>
         <product.display.title>${company.name} VMS Gateway</product.display.title>
         <template>lib</template>
-        <targetName>vms_gateway</targetName>
+        <targetName>vms_gateway_core</targetName>
 
         <buildLib>sharedlib</buildLib>
 
