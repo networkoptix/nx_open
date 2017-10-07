@@ -75,6 +75,22 @@ ExportSettingsDialog::Private::~Private()
 {
 }
 
+void ExportSettingsDialog::Private::updateOverlaysVisibility(bool transcodingIsAllowed)
+{
+    if (transcodingIsAllowed)
+    {
+        for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
+            overlay(overlayType)->setHidden(false);
+    }
+    else
+    {
+        for (const auto overlayWidget: m_overlays)
+            overlayWidget->setHidden(true);
+    }
+
+    updateMediaImageProcessor();
+}
+
 void ExportSettingsDialog::Private::loadSettings()
 {
     m_exportMediaPersistentSettings = m_bookmarkName.isEmpty()
@@ -114,6 +130,7 @@ void ExportSettingsDialog::Private::loadSettings()
         selectOverlay(type);
 
     updateTranscodingSettings();
+    updateOverlaysVisibility(isTranscodingAllowed());
 }
 
 void ExportSettingsDialog::Private::saveSettings()
@@ -716,22 +733,7 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
             });
     }
 
-    connect(this, &Private::transcodingAllowedChanged, this,
-        [this](bool transcodingIsAllowed)
-        {
-            if (transcodingIsAllowed)
-            {
-                for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
-                    overlay(overlayType)->setHidden(false);
-            }
-            else
-            {
-                for (const auto overlayWidget: m_overlays)
-                    overlayWidget->setHidden(true);
-            }
-
-            updateMediaImageProcessor();
-        });
+    connect(this, &Private::transcodingAllowedChanged, this, &Private::updateOverlaysVisibility);
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()
