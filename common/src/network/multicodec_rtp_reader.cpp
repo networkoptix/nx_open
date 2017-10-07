@@ -137,7 +137,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
     if (position != AV_NOPTS_VALUE)
     {
-        m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */, 1 /* scale */);
+        m_RtpSession.sendPlay(position, AV_NOPTS_VALUE /*endTime */, m_RtpSession.getScale());
         createTrackParsers();
     }
 

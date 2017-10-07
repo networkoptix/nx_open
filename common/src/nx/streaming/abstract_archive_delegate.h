@@ -67,7 +67,7 @@ public:
     virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
 
     // this call inform delegate that reverse mode on/off
-    virtual void onReverseMode(qint64 displayTime, bool value) { Q_UNUSED(displayTime); Q_UNUSED(value); }
+    virtual void setSpeed(qint64 /*displayTime*/, double /*value*/) { }
 
     // for optimization. Inform delegate to pause after sending 1 frame
     virtual void setSingleshotMode(bool value) { Q_UNUSED(value); }
@@ -88,7 +88,7 @@ public:
     virtual void beforeSeek(qint64 time) { Q_UNUSED(time); }
 
     /** This function calls from reader */
-    virtual void beforeChangeReverseMode(bool reverseMode) { Q_UNUSED(reverseMode); }
+    virtual void beforeChangeSpeed(double /*speed*/) {}
 
     /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) { Q_UNUSED(startTime); Q_UNUSED(endTime); Q_UNUSED(frameStep); }

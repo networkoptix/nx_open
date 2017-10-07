@@ -29,7 +29,7 @@ public:
 
     virtual void beforeClose() override;
 
-    virtual void onReverseMode(qint64 displayTime, bool value);
+    virtual void setSpeed(qint64 displayTime, double value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
     virtual void beforeSeek(qint64 time) override;

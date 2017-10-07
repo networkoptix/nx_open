@@ -767,23 +767,27 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     return result;
 }
 
-void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
-    m_blockReopening = false;
-    int sign = value ? -1 : 1;
-    bool fromLive = value && m_position == DATETIME_NOW;
-    close();
+    m_position = displayTime;
+    m_rtspSession->setScale(value);
 
-    if (!m_opened && m_camera) {
-        m_rtspSession->setScale(qAbs(m_rtspSession->getScale()) * sign);
-        m_position = displayTime;
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = value < 0;
+
+    bool needControlSpeed = true; //< TODO: read from device.
+    bool needSendRequest = oldReverseMode != newReverseMode || needControlSpeed;
+    if (!needSendRequest)
+        return;
+    
+    bool fromLive = newReverseMode && m_position == DATETIME_NOW;
+    m_blockReopening = false;
+
+    if (!m_opened)
         openInternal();
-    }
-    else {
-        m_rtspSession->sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession->getScale()) * sign);
-    }
+    else 
+        m_rtspSession->sendPlay(displayTime, AV_NOPTS_VALUE, value);
     m_sendedCSec = m_rtspSession->lastSendedCSeq();
-    //m_waitBOF = true;
 
     if (fromLive)
         m_position = AV_NOPTS_VALUE;
@@ -871,11 +875,15 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
     }
 }
 
-void QnRtspClientArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
+void QnRtspClientArchiveDelegate::beforeChangeSpeed(double speed)
 {
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = speed < 0;
+
     // Reconnect If camera is offline and it is switch from live to archive
-    if (m_position == DATETIME_NOW) {
-        if (reverseMode)
+    if (oldReverseMode != newReverseMode && m_position == DATETIME_NOW)
+    {
+        if (newReverseMode)
             beforeSeek(AV_NOPTS_VALUE);
         else
             m_blockReopening = false;

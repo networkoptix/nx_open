@@ -139,13 +139,14 @@ void HanwhaNvrArchiveDelegate::beforeClose()
     m_streamReader->pleaseStop();
 }
 
-void HanwhaNvrArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void HanwhaNvrArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
     auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.setScale(value ? -1 : 1);
+    rtspClient.setScale(value);
     seek(displayTime, true /*findIFrame*/);
-    close();
-    open(m_streamReader->m_resource);
+    
+    if (!m_streamReader->isStreamOpened())
+        open(m_streamReader->m_resource);
 }
 
 void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)

@@ -478,12 +478,12 @@ QnConstResourceAudioLayoutPtr QnServerArchiveDelegate::getAudioLayout()
     return m_aviDelegate->getAudioLayout();
 }
 
-void QnServerArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnServerArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
     QnMutexLocker lk( &m_mutex );
 
-    m_reverseMode = value;
-    m_aviDelegate->onReverseMode(displayTime, value);
+    m_reverseMode = value < 0;
+    m_aviDelegate->setSpeed(displayTime, value);
 }
 
 AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
