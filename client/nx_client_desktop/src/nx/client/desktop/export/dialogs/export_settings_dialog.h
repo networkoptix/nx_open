@@ -3,6 +3,7 @@
 #include <functional>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/connective.h>
 
@@ -32,6 +33,7 @@ struct ExportLayoutSettings;
 class ExportSettingsDialog: public QnButtonBoxDialog
 {
     Q_OBJECT
+    Q_ENUMS(Mode)
     using base_type = QnButtonBoxDialog;
 
 public:
@@ -108,3 +110,5 @@ private:
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::client::desktop::ExportSettingsDialog::Mode, (metatype)(lexical))

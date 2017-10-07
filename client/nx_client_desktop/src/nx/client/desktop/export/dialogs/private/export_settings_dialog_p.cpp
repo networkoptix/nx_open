@@ -19,7 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 #include <nx/client/desktop/utils/proxy_image_provider.h>
 #include <nx/client/desktop/utils/transcoding_image_processor.h>
@@ -105,7 +105,7 @@ void ExportSettingsDialog::Private::loadSettings()
     if (lastExportDir.isEmpty())
         lastExportDir = QDir::homePath();
 
-    setMode(qnSettings->lastExportMode() == lit("layout") ? Mode::Layout : Mode::Media);
+    setMode(QnLexical::deserialized<Mode>(qnSettings->lastExportMode(), Mode::Media));
 
     m_exportMediaSettings.fileName.path = lastExportDir;
     m_exportMediaSettings.fileName.extension = m_exportMediaPersistentSettings.fileFormat;
@@ -135,6 +135,8 @@ void ExportSettingsDialog::Private::loadSettings()
 
 void ExportSettingsDialog::Private::saveSettings()
 {
+    qnSettings->setLastExportMode(QnLexical::serialized(m_mode));
+
     switch (m_mode)
     {
         case Mode::Media:
@@ -149,7 +151,6 @@ void ExportSettingsDialog::Private::saveSettings()
                 qnSettings->setExportBookmarkSettings(m_exportMediaPersistentSettings);
 
             qnSettings->setLastExportDir(m_exportMediaSettings.fileName.path);
-            qnSettings->setLastExportMode(lit("media"));
             break;
         }
 
@@ -157,7 +158,6 @@ void ExportSettingsDialog::Private::saveSettings()
         {
             qnSettings->setExportLayoutSettings(m_exportLayoutPersistentSettings);
             qnSettings->setLastExportDir(m_exportLayoutSettings.filename.path);
-            qnSettings->setLastExportMode(lit("layout"));
             break;
         }
     }

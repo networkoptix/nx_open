@@ -25,6 +25,7 @@
 #include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/app_info.h>
 
 namespace nx {
@@ -640,3 +641,5 @@ Filename ExportSettingsDialog::suggestedFileName(const Filename& baseName) const
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ExportSettingsDialog, Mode)
