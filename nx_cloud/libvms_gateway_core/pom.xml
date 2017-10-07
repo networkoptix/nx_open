@@ -10,14 +10,14 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>libvms_gateway</artifactId>
+    <artifactId>libvms_gateway_core</artifactId>
     <packaging>pom</packaging>
     <name>Nx Cloud VMS Gateway Library</name>
 
     <properties>
-        <guid>${libvms_gateway.guid}</guid>
+        <guid>${libvms_gateway_core.guid}</guid>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
-        <product.title>${company.name} libvms_gateway</product.title>
+        <product.title>${company.name} libvms_gateway_core</product.title>
         <product.display.title>${company.name} VMS Gateway</product.display.title>
         <template>lib</template>
         <targetName>vms_gateway</targetName>

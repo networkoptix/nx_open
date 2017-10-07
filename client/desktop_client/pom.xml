@@ -22,7 +22,7 @@
         <template>app</template>
 
         <qt.libs>core gui network opengl xml sql multimedia qtmultimediaquicktools_private concurrent webkit webkitwidgets qml quick quickwidgets xmlpatterns</qt.libs>
-        <global.libs>-lcommon -lnx_vms_utils -lnx_network -lappserver2 -lnx_client_core -lclient -lvms_gateway -lcloud_db_client -lnx_fusion -lnx_utils -lnx_audio -lnx_speech_synthesizer -lnx_media -lnx_kit</global.libs>
+        <global.libs>-lcommon -lnx_vms_utils -lnx_network -lappserver2 -lnx_client_core -lclient -lvms_gateway_core -lcloud_db_client -lnx_fusion -lnx_utils -lnx_audio -lnx_speech_synthesizer -lnx_media -lnx_kit</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
