@@ -17,12 +17,12 @@ from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
 #Hacked URLs
-CLOUD_DB_URL_HACK = 'http://cloud-test.hdw.mx:80/cdb'
-CLOUD_INSTANCE_URL_HACK = 'http://cloud-test.hdw.mx'
+CLOUD_DB_URL_HACK = 'http://beta.nxvms.com:80/cdb'
+CLOUD_INSTANCE_URL_HACK = 'http://beta.nxvms.com'
 
 #Correct urls
 #CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
-CLOUD_INSTANCE_URL = settings.CLOUD_CONNECT['gateway']
+CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
 
 
 def authenticate(request):
