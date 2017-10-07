@@ -14,6 +14,7 @@ namespace nx {
 namespace cdb {
 
 class AbstractSystemManager;
+class AbstractSystemHealthInfoProvider;
 
 class AbstractSystemMergeManager
 {
@@ -33,6 +34,7 @@ class SystemMergeManager:
 public:
     SystemMergeManager(
         AbstractSystemManager* systemManager,
+        const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::utils::db::AsyncSqlQueryExecutor* dbManager);
 
     virtual void startMergingSystems(
@@ -43,7 +45,17 @@ public:
 
 private:
     AbstractSystemManager* m_systemManager = nullptr;
+    const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::utils::db::AsyncSqlQueryExecutor* m_dbManager = nullptr;
+
+    api::ResultCode validateRequestInput(
+        const std::string& idOfSystemToMergeTo,
+        const std::string& idOfSystemToBeMerged);
+
+    nx::utils::db::DBResult updateSystemStateInDb(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& idOfSystemToMergeTo,
+        const std::string& idOfSystemToMergeBeMerged);
 };
 
 } // namespace cdb

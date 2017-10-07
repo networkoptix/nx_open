@@ -133,6 +133,7 @@ win* {
         NX_VMS_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
         NX_RELAYING_API=__declspec(dllimport) \
+        NX_VMS_GATEWAY_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \
@@ -144,6 +145,7 @@ win* {
         NX_VMS_UTILS_API= \
         UDT_API= \
         NX_RELAYING_API= \
+        NX_VMS_GATEWAY_API= \
 
 }
 

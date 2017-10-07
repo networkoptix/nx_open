@@ -20,7 +20,7 @@ namespace gateway {
  * First, tries to find connection in ListeningPeerPool.
  * If not succeeded, uses regular (cloud) connection.
  */
-class TargetPeerConnector:
+class NX_VMS_GATEWAY_API TargetPeerConnector:
     public network::aio::BasicPollable
 {
     using base_type = network::aio::BasicPollable;

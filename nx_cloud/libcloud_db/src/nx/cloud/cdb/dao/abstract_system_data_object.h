@@ -44,9 +44,10 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data) = 0;
 
-    virtual nx::utils::db::DBResult activateSystem(
+    virtual nx::utils::db::DBResult updateSystemStatus(
         nx::utils::db::QueryContext* const queryContext,
-        const std::string& systemId) = 0;
+        const std::string& systemId,
+        api::SystemStatus systemStatus) = 0;
 
     virtual nx::utils::db::DBResult fetchSystems(
         nx::utils::db::QueryContext* queryContext,

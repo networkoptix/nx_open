@@ -172,9 +172,10 @@ nx::utils::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::activateSystem(
+nx::utils::db::DBResult SystemDataObject::updateSystemStatus(
     nx::utils::db::QueryContext* const queryContext,
-    const std::string& systemId)
+    const std::string& systemId,
+    api::SystemStatus systemStatus)
 {
     QSqlQuery updateSystemStatusQuery(*queryContext->connection());
     updateSystemStatusQuery.prepare(
@@ -183,7 +184,7 @@ nx::utils::db::DBResult SystemDataObject::activateSystem(
         "WHERE id=:id");
     updateSystemStatusQuery.bindValue(
         ":statusCode",
-        QnSql::serialized_field(static_cast<int>(api::SystemStatus::activated)));
+        QnSql::serialized_field(static_cast<int>(systemStatus)));
     updateSystemStatusQuery.bindValue(
         ":id",
         QnSql::serialized_field(systemId));
@@ -192,8 +193,9 @@ nx::utils::db::DBResult SystemDataObject::activateSystem(
         std::numeric_limits<int>::max());
     if (!updateSystemStatusQuery.exec())
     {
-        NX_LOG(lit("Failed to read system list from DB. %1").
-            arg(updateSystemStatusQuery.lastError().text()), cl_logWARNING);
+        NX_WARNING(this, lm("Failed to update system %1 status to %2 from DB. %3")
+            .args(systemId, QnLexical::serialized(systemStatus),
+                updateSystemStatusQuery.lastError().text()));
         return nx::utils::db::DBResult::ioError;
     }
 

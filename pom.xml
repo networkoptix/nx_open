@@ -80,7 +80,7 @@
         <vms_gateway_ut.guid>{DFBAE289-29C2-4026-A8F6-B8A2D131DC75}</vms_gateway_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
         <cloud_connect_auto_test.guid>{D2C6C354-447F-4786-9270-FD2F73552322}</cloud_connect_auto_test.guid>
-        <libvms_gateway.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway.guid>
+        <libvms_gateway_core.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway_core.guid>
         <vms_gateway.guid>{A2C631CB-073C-4F1A-9B47-63C52B68B71C}</vms_gateway.guid>
         <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
         <librelaying.guid>{237616bc-45ea-43cf-a2c1-4049468d92a9}</librelaying.guid>
@@ -562,7 +562,7 @@
                 <module>client/nx_client_desktop</module>
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_media</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway_core</module>
             </modules>
         </profile>
         <profile>
@@ -675,7 +675,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>media_db_util</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway_core</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>common_libs/nx_cassandra</module>
                 <module>nx_cloud/librelaying</module>
@@ -829,7 +829,7 @@
                 <module>common_libs/nx_cassandra</module>
                 <module>media_db_util</module>
                 <module>testcamera</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway_core</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>nx_cloud/time_server</module>
                 <module>plugins/it930x_plugin</module>
@@ -1027,7 +1027,7 @@
                 <module>client/nx_client_desktop</module>
                 <module>client/desktop_client</module>
                 <module>client/applauncher</module>
-                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/libvms_gateway_core</module>
                 <module>common_libs/nx_audio</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>debsetup/client-deb</module>

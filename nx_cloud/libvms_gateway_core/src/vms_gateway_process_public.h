@@ -9,7 +9,7 @@ namespace gateway {
 
 class VmsGatewayProcess;
 
-class VmsGatewayProcessPublic:
+class NX_VMS_GATEWAY_API VmsGatewayProcessPublic:
     public QnStoppable
 {
 public:

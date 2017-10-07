@@ -11,8 +11,7 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-class VmsGatewayEmbeddable
-:
+class NX_VMS_GATEWAY_API VmsGatewayEmbeddable:
     public QObject,
     public Singleton<VmsGatewayEmbeddable>,
     private utils::test::ModuleLauncher<VmsGatewayProcessPublic>

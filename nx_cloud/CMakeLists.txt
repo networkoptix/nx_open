@@ -6,7 +6,7 @@ endif()
 
 if(withClouds OR withDesktopClient)
     add_subdirectory(librelaying)
-    add_subdirectory(libvms_gateway)
+    add_subdirectory(libvms_gateway_core)
 endif()
 
 if(withClouds)

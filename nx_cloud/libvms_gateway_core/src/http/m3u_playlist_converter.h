@@ -8,7 +8,7 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-class M3uPlaylistConverter:
+class NX_VMS_GATEWAY_API M3uPlaylistConverter:
     public AbstractMessageBodyConverter
 {
 public:
