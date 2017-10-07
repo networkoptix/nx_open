@@ -11,7 +11,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
 
-#include "libvms_gateway_app_info.h"
+#include "libvms_gateway_core_app_info.h"
 
 namespace {
 

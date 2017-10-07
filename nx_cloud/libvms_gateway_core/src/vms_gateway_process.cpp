@@ -20,12 +20,12 @@
 #include "http/connect_handler.h"
 #include "http/http_api_path.h"
 #include "http/proxy_handler.h"
-#include "libvms_gateway_app_info.h"
+#include "libvms_gateway_core_app_info.h"
 #include "stree/cdb_ns.h"
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE(libvms_gateway);
+    Q_INIT_RESOURCE(libvms_gateway_core);
     return 0;
 }
 
