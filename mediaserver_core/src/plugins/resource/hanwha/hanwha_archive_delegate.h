@@ -39,7 +39,7 @@ private:
     std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
-    qint64 m_currentPositionUsec = 0;
+    qint64 m_currentPositionUsec = AV_NOPTS_VALUE;
     bool m_previewMode = false;
 };
 
