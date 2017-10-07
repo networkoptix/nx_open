@@ -18,7 +18,7 @@
         <product.title>${company.name} vms_gateway</product.title>
 
         <qt.libs>core gui network concurrent sql xml</qt.libs>
-        <global.libs>-lvms_gateway_core -lnx_network</global.libs>
+        <global.libs>-lvms_gateway_core -lnx_network -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -37,11 +37,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>nx_network</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

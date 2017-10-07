@@ -20,7 +20,7 @@
         <root.dir>${basedir}/../../..</root.dir>
 
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lconnection_mediator -lvms_gateway_core -ltraffic_relay -lnx_cassandra -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lconnection_mediator -lvms_gateway_core -ltraffic_relay -lrelaying -lnx_cassandra -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
         <guid>${cloud_connect_integration_tests.guid}</guid>
 
