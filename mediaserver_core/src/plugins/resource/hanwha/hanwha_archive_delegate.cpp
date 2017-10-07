@@ -67,14 +67,23 @@ QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
 {
     if (!m_streamReader)
         return QnAbstractMediaDataPtr();
-    if (!m_streamReader->isStreamOpened() && !open(m_streamReader->m_resource))
-        return QnAbstractMediaDataPtr();
+    if (!m_streamReader->isStreamOpened())
+    {
+        if (m_currentPositionUsec != AV_NOPTS_VALUE)
+            m_streamReader->setPositionUsec(m_currentPositionUsec);
+        if (!open(m_streamReader->m_resource))
+            return QnAbstractMediaDataPtr();
+    }
 
     auto result = m_streamReader->getNextData();
-    if (result && !isForwardDirection())
+    if (result)
     {
-        result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
-        result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+        m_currentPositionUsec = result->timestamp;
+        if (!isForwardDirection())
+        {
+            result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+            result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+        }
     }
 
     if (result && m_endTimeUsec != AV_NOPTS_VALUE && result->timestamp > m_endTimeUsec)
@@ -105,10 +114,10 @@ qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
     else if (!itr->contains(timeMs))
         timeUsec = isForwardDirection() ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
 
-    if (m_previewMode && m_lastSeekTime == timeUsec)
+    if (m_previewMode && m_currentPositionUsec == timeUsec)
         return timeUsec;
 
-    m_lastSeekTime = timeUsec;
+    m_currentPositionUsec = timeUsec;
     m_streamReader->setPositionUsec(timeUsec);
     return timeUsec;
 }
