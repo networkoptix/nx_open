@@ -16,6 +16,7 @@ RUN dpkg-divert --local --rename --add /sbin/initctl \
         && apt-get install -y --no-install-recommends wget psmisc \
             libsm6 libice6 libaudio2 libogg0 libxfixes3 libxrender1 libfontconfig1 libgl1-mesa-glx libglib2.0-0 \
             dnsutils mysql-community-client strace gdb ca-certificates \
+            libpython2.7 libpython3.6 \
             libmysqlclient18 libmysqlclient20 openssh-client apache2-utils libltdl7 gettext-base \
             python python3.6 nginx-extras libncurses5 \
             libcurl3 libstdc++6 \
@@ -25,6 +26,8 @@ RUN dpkg-divert --local --rename --add /sbin/initctl \
         && python2 get-pip.py \
         && python3 get-pip.py \
         && rm /get-pip.py
+
+COPY docker/config_helper.py /usr/local/bin/
 
 # Set the locale
 RUN locale-gen en_US.UTF-8
