@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <nx/network/nettools.h>
+
 #include <plugins/resource/test_camera/testcamera_const.h>
 #include "test_camera_processor.h"
 
