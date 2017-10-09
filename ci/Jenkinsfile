@@ -85,9 +85,9 @@ def unsafe_main() {
 			requested_platform_names: requested_platform_names,
 			branch: branch,
 			build_number: env.BUILD_NUMBER.toInteger(),
-			configuration: 'release',
-			customization: 'default',
-			cloud_group: 'dev',
+			configuration: config.ci.configuration,
+			customization: config.ci.customization,
+			cloud_group: config.ci.cloud_group,
 			must_clean_workspace: must_clean_workspace,
 		]
 		slave_runner.run_slaves_stage(run_params)
