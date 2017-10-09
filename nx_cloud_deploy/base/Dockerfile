@@ -24,7 +24,7 @@ RUN dpkg-divert --local --rename --add /sbin/initctl \
         && chmod +x /usr/local/bin/dumb-init \
         && rm -rf /var/lib/apt/lists/* \
         && python2 get-pip.py \
-        && python3 get-pip.py \
+        && python3.6 get-pip.py \
         && rm /get-pip.py
 
 COPY docker/config_helper.py /usr/local/bin/
