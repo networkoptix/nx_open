@@ -67,12 +67,18 @@ OverlaySettingsPtr ExportImageOverlayPersistentSettings::createRuntimeSettings()
 
 void ExportTextOverlayPersistentSettingsBase::rescale(qreal factor)
 {
+    ExportOverlayPersistentSettings::rescale(factor);
+
+    const auto oldFontSize = fontSize;
+    fontSize = qMax(qRound(fontSize * factor), minimumFontSize());
+    if (fontSize == oldFontSize)
+        return;
+
+    const auto effectiveFactor = qreal(fontSize) / oldFontSize;
+    overlayWidth = qRound(overlayWidth * effectiveFactor);
+
     static constexpr int kMinimumRoundingRadius = 1;
     static constexpr int kMinimumIndent = 4;
-
-    ExportOverlayPersistentSettings::rescale(factor);
-    overlayWidth = qRound(overlayWidth * factor);
-    fontSize = qMax(qRound(fontSize * factor), minimumFontSize());
     indent = qMax(fontSize / 4, kMinimumIndent);
     roundingRadius = qMax(fontSize / 8, kMinimumRoundingRadius);
 }
