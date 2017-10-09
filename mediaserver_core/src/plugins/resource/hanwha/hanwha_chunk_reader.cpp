@@ -213,22 +213,21 @@ void HanwhaChunkLoader::onGotChunkData()
 {
     // This function should be fast because of large amount of records for recorded data
 
-    auto buffer = m_httpClient->fetchMessageBodyBuffer();
+    auto buffer = m_unfinishedLine;
+    buffer.append(m_httpClient->fetchMessageBodyBuffer());
     int index = buffer.lastIndexOf('\n');
     if (index == -1)
     {
-        m_unfinishedLine.append(buffer);
+        m_unfinishedLine = buffer;
         return;
     }
 
-    buffer.insert(0, m_unfinishedLine);
-
-    m_unfinishedLine = QByteArray(buffer.data() + index, buffer.size() - index);
+    m_unfinishedLine = buffer.mid(index + 1);
     buffer.truncate(index);
 
     QList<QByteArray> lines = buffer. split('\n');
     for (const auto& line: lines)
-        parseChunkData(line);
+        parseChunkData(line.trimmed());
 }
 
 bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
