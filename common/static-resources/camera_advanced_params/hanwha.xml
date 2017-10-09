@@ -7,13 +7,16 @@
         <group name="Video Source">
             <param id="image/flip/VerticalFlipEnable"
                     name="Flip Mode"
-                    dataType="Bool"/>
+                    dataType="Bool"
+                    aux="streamsToReopen=primary,secondary"/>
             <param id="image/flip/HorizontalFlipEnable"
                     name="Mirror Mode"
-                    dataType="Bool"/>
+                    dataType="Bool"
+                    aux="streamsToReopen=primary,secondary"/>
             <param id="image/flip/Rotate"
                     name="Hallway View"
-                    dataType="Enumeration"/>
+                    dataType="Enumeration"
+                    aux="streamsToReopen=primary,secondary"/> 
         </group>
         <group name="Audio Input">
             <param id="media/audioinput/Source"
@@ -792,8 +795,6 @@
                 <param id="image/camera/DayNightMode"
                         name="Mode"
                         dataType="Enumeration"
-                        range="Color,B/W,Auto,External"
-                        internalRange="Color,BW,Auto,ExternalBW"
                         aux="groupLead=dn"/>
                 <param id="image/camera/DayNightSwitchingMode"
                         name="Duration"
@@ -877,6 +878,12 @@
             </group>
         </group>
         <group name="Maintenance">
+            <param id="image/focus/Mode=SimpleFocus"
+                        name="Simple Focus"
+                        dataType="Button"
+                        writeCmd="control"
+                        description="Fits the focus automatically"
+                        aux="support=Image/Support/SimpleFocus"/>
             <param id="system/factoryreset/ExcludeSettings=Network"
                         name="Soft Reset"
                         dataType="Button"

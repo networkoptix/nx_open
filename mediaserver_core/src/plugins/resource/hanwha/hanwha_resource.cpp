@@ -249,6 +249,9 @@ bool HanwhaResource::getParamsPhysical(
                     if (!info)
                         continue;
 
+                    if (info->cgi() != cgi || info->submenu() != submenu)
+                        continue;
+
                     if (!info->isChannelIndependent())
                         parameterString += kHanwhaChannelPropertyTemplate.arg(getChannel());
 
@@ -261,9 +264,9 @@ bool HanwhaResource::getParamsPhysical(
 
                     if (!value)
                         value = defaultValue(parameterString.split(L'.').last(), info->profileDependency());
+
                     if (!value)
                         continue;
-
 
                     result.push_back(
                         QnCameraAdvancedParamValue(
@@ -334,11 +337,19 @@ bool HanwhaResource::setParamsPhysical(
         updateInfo.channelIndependent = info->isChannelIndependent();
         updateInfo.profile = profileByRole(info->profileDependency());
 
-        if (updateInfo.profile == profileByRole(Qn::ConnectionRole::CR_LiveVideo))
-            reopenPrimaryStream = true;
+        const auto streamsToReopen = info->streamsToReopen();
 
-        if (updateInfo.profile == profileByRole(Qn::ConnectionRole::CR_SecondaryLiveVideo))
+        if (updateInfo.profile == profileByRole(Qn::ConnectionRole::CR_LiveVideo)
+            || streamsToReopen.contains(Qn::ConnectionRole::CR_LiveVideo))
+        {
+            reopenPrimaryStream = true;
+        }
+
+        if (updateInfo.profile == profileByRole(Qn::ConnectionRole::CR_SecondaryLiveVideo)
+            || streamsToReopen.contains(Qn::ConnectionRole::CR_SecondaryLiveVideo))
+        {
             reopenSecondaryStream = true;
+        }
 
         requests[updateInfo][info->parameterName()] = toHanwhaAdvancedParameterValue(
             parameter,
@@ -900,6 +911,9 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
 CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 {
+    if (isNvr())
+        return CameraDiagnostics::NoErrorResult();
+
     QnCameraAdvancedParams parameters;
     QFile advancedParametersFile(kAdvancedParametersTemplateFile);
 
