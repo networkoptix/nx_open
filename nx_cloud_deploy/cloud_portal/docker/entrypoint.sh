@@ -49,12 +49,10 @@ do
             write_my_cnf
             echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
-            yes "yes" | /app/env/bin/python manage.py migrate
-            yes "yes" | /app/env/bin/python manage.py createcachetable
+            yes "yes" | python manage.py migrate
 
-            /app/env/bin/python manage.py initdb
-            /app/env/bin/python manage.py readstructure
-            /app/env/bin/python manage.py initbranding
+            python manage.py initdb
+            python manage.py readstructure
             ;;
         config)
             instantiate_configs
@@ -65,15 +63,18 @@ do
         web)
             write_my_cnf
 
-            /app/env/bin/python manage.py filldata
+            python manage.py filldata
 
             find /app/app/static | xargs touch
-            exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
+            exec gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
             ;;
         celery)
             write_my_cnf
+
+            python manage.py filldata all
+
             rm -f /tmp/*.pid
-            exec /app/env/bin/celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
+            exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         *)
             echo Usage: cloud_portal '[web|celery|config|copystatic|migratedb]'

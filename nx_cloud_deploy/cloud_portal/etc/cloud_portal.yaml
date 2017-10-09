@@ -16,10 +16,6 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$CLOUD_DB_HOST:3347'
 
-mail_from: '$MAIL_FROM'
-
-mail_prefix: '$MAIL_PREFIX'
-
 smtp:
     host: '$SMTP_HOST'
     user: '$SMTP_USER'
