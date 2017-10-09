@@ -1246,15 +1246,10 @@ void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 start
                 rangeVal += "clock";
         }
 
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            nx_http::HttpHeader("Range", rangeVal));
     }
-    else
-    {
-        rangeVal += "npt=0.000-";
-    }
-
-    nx_http::insertOrReplaceHeader(
-        &request->headers,
-        nx_http::HttpHeader("Range", rangeVal));
 }
 
 QByteArray QnRtspClient::getGuid()

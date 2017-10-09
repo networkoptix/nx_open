@@ -1015,9 +1015,8 @@ void QnRtspConnectionProcessor::processRangeHeader()
     Q_D(QnRtspConnectionProcessor);
     const auto rangeStr = nx_http::getHeaderValue(d->request.headers, "Range");
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
-    if (cameraResource && d->startTime == 0 && !d->useProprietaryFormat)
-        d->startTime = DATETIME_NOW;
+    if (!nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
+        d->startTime = AV_NOPTS_VALUE;
 }
 
 void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)

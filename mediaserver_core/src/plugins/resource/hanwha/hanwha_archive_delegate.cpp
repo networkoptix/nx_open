@@ -142,8 +142,11 @@ void HanwhaNvrArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
     auto& rtspClient = m_streamReader->rtspClient();
     rtspClient.setScale(value);
-    seek(displayTime, true /*findIFrame*/);
-    
+    if (displayTime != AV_NOPTS_VALUE)
+        seek(displayTime, true /*findIFrame*/);
+    else if (rtspClient.isOpened())
+        rtspClient.sendPlay(AV_NOPTS_VALUE /*startTime*/, AV_NOPTS_VALUE /*endTime */, value);
+
     if (!m_streamReader->isStreamOpened())
         open(m_streamReader->m_resource);
 }
