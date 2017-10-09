@@ -13,10 +13,12 @@
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
 #include "aio_event_handler.h"
 #include "../abstract_socket.h"
+#include "../cloud/address_resolver.h"
 #include "../socket_global.h"
 
 namespace nx {

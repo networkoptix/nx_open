@@ -10,6 +10,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/network/nettools.h>
+
 #include "onvif/soapwsddProxy.h"
 
 

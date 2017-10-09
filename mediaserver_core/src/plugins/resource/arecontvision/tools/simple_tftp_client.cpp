@@ -5,10 +5,12 @@
 #ifdef ENABLE_ARECONT
 
 #include <nx/network/socket.h>
-#include <nx/utils/log/log.h>
-#include <utils/common/byte_array.h>
-#include <nx/utils/system_error.h>
+#include <nx/network/nettools.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/system_error.h>
+
+#include <utils/common/byte_array.h>
 
 using namespace std;
 
