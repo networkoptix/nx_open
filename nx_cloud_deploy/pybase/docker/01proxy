@@ -1,3 +1,0 @@
-Acquire::http::Proxy "http://la.hdw.mx:3142";
-Acquire::HTTP::Proxy::apt.dockerproject.org "DIRECT";
-Acquire::HTTP::Proxy::deb.nodesource.com "DIRECT";

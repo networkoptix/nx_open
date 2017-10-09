@@ -50,9 +50,11 @@ do
             echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
             yes "yes" | python manage.py migrate
+            yes "yes" | python manage.py createcachetable
 
             python manage.py initdb
             python manage.py readstructure
+            python manage.py initbranding
             ;;
         config)
             instantiate_configs
@@ -66,13 +68,10 @@ do
             python manage.py filldata
 
             find /app/app/static | xargs touch
-            exec gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
+            exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
             ;;
         celery)
             write_my_cnf
-
-            python manage.py filldata all
-
             rm -f /tmp/*.pid
             exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
