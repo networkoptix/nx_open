@@ -91,6 +91,7 @@ def unsafe_main() {
 			must_clean_workspace: must_clean_workspace,
 		]
 		slave_runner.run_slaves_stage(run_params)
+		echo "revision_info: $slave_runner.revision_info"
 	}
 }
 
