@@ -7,6 +7,7 @@
 #include "aio/pollset_factory.h"
 #include "aio/aio_service.h"
 #include "cloud/address_resolver.h"
+#include "cloud/tunnel/connector_factory.h"
 #include "cloud/cloud_connect_settings.h"
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
