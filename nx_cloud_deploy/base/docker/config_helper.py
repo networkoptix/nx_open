@@ -60,7 +60,7 @@ if len(sys.argv) == 3:
 elif len(sys.argv) == 4:
     section, name = sys.argv[2:]
 
-    value = config_helper.get(section_name)
+    value = config_helper.get(section, name)
     try:
         print (value)
     except configparser.NoSectionError:
