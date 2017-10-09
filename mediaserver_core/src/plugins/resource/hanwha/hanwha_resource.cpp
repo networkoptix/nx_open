@@ -713,6 +713,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     
     if (!m_isNvr)
     {
+        helper.set(
+            lit("network/rtsp"),
+            {{lit("ProfileSessionPolicy"), lit("Disconnect")}});
+
         int fixedProfileCount = 0;
 
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
