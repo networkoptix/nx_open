@@ -54,6 +54,8 @@
 #include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <vms_gateway_embeddable.h>
@@ -500,8 +502,10 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
+    {
         nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
+    }
 
     // TODO: #mu ON/OFF switch in settings?
     nx::network::SocketGlobals::mediatorConnector().enable(true);

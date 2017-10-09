@@ -108,7 +108,7 @@ bool SocketGlobals::Ini::isHostDisabled(const HostAddress& host) const
 // SocketGlobals
 
 SocketGlobals::SocketGlobals(int initializationFlags):
-    m_impl(new SocketGlobalsImpl())
+    m_impl(std::make_unique<SocketGlobalsImpl>())
 {
     m_impl->m_initializationFlags = initializationFlags;
     if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
@@ -142,9 +142,6 @@ SocketGlobals::~SocketGlobals()
         if (init.second)
             init.second();
     }
-
-    delete m_impl;
-    m_impl = nullptr;
 }
 
 SocketGlobals::Ini& SocketGlobals::ini()

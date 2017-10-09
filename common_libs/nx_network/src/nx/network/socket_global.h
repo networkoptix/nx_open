@@ -116,7 +116,7 @@ private:
     // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
     // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
 
-    SocketGlobalsImpl* m_impl;
+    std::unique_ptr<SocketGlobalsImpl> m_impl;
 
     void initializeCloudConnectivity();
 };
