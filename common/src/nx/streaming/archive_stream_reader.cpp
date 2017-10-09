@@ -242,14 +242,37 @@ bool QnArchiveStreamReader::init()
 
     m_jumpMtx.unlock();
 
+    auto canProcessSpeedBeforeOpen = [&](double speed)
+    {
+        // Ignore zerro speed if item is opened on pause.
+        // It needs at least one frame to be loaded.
+        if (qFuzzyIsNull(speed))
+            return false;
+        bool imSeek = m_delegate->getFlags().testFlag(
+            QnAbstractArchiveDelegate::Flag_CanSeekImmediatly);
+        if (!imSeek)
+            return false;
+        bool negativeSpeedSupported = m_delegate->getFlags().testFlag(
+            QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed);
+        if (speed < 0 && !negativeSpeedSupported)
+            return false;
+        return true;
+    };
+
     m_delegate->setQuality(quality, true, resolution);
+    bool isSpeedCommandProcessed = false;
     // It is optimization: open and jump at same time
     if (jumpTime != qint64(AV_NOPTS_VALUE))
     {
-        if (speed != 1.0)
+        if (canProcessSpeedBeforeOpen(speed))
+        {
             m_delegate->setSpeed(jumpTime, speed);
+            isSpeedCommandProcessed = true;
+        }
         else
+        {
             m_delegate->seek(jumpTime, true);
+        }
     }
 
     bool opened = m_delegate->open(m_resource);
@@ -265,7 +288,7 @@ bool QnArchiveStreamReader::init()
     m_oldQuality = quality;
     m_oldQualityFastSwitch = true;
     m_oldResolution = resolution;
-    if (jumpTime != qint64(AV_NOPTS_VALUE))
+    if (isSpeedCommandProcessed)
         m_prevSpeed = speed;
     m_jumpMtx.unlock();
 

@@ -769,25 +769,23 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
 
 void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
+    if (value == 0.0)
+        return;
+
     m_position = displayTime;
     m_rtspSession->setScale(value);
 
     bool oldReverseMode = m_rtspSession->getScale() < 0;
     bool newReverseMode = value < 0;
 
-    bool needSendRequest = oldReverseMode != newReverseMode || m_camera->isDtsBased();
+    bool needSendRequest = !m_opened || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
     if (!needSendRequest)
         return;
     
     bool fromLive = newReverseMode && m_position == DATETIME_NOW;
     m_blockReopening = false;
 
-    if (!m_opened)
-        openInternal();
-    else 
-        m_rtspSession->sendPlay(displayTime, AV_NOPTS_VALUE, value);
-    m_sendedCSec = m_rtspSession->lastSendedCSeq();
-
+    seek(displayTime, /* findIFrame */ true);
     if (fromLive)
         m_position = AV_NOPTS_VALUE;
 }
