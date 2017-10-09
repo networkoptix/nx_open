@@ -15,6 +15,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/std/future.h>
 
+#include "aio_event_handler.h"
 #include "../abstract_socket.h"
 #include "../socket_global.h"
 

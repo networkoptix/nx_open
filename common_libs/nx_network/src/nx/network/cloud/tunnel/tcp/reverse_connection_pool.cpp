@@ -4,6 +4,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 
+#include "../outgoing_tunnel_pool.h"
+
 namespace nx {
 namespace network {
 namespace cloud {

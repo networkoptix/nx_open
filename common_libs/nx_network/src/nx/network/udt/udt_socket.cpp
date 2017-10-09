@@ -13,14 +13,17 @@
 #include <boost/optional.hpp>
 
 #include <udt/udt.h>
+
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/system_socket.h>
 #include <nx/utils/scope_guard.h>
 
 #include "udt_common.h"
 #include "udt_socket_impl.h"
 #include "../aio/async_socket_helper.h"
+#include "../cloud/address_resolver.h"
 #ifdef _WIN32
 #include "../win32_socket_tools.h"
 #endif

@@ -1,5 +1,6 @@
 #include "relay_api_client_stub.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>

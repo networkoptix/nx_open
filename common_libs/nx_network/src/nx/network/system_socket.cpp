@@ -6,7 +6,6 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <nx/utils/system_error.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
 
@@ -20,8 +19,10 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
+#include "cloud/address_resolver.h"
 
 #ifdef _WIN32
 /* Check that the typedef in AbstractSocket is correct. */

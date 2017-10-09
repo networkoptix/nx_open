@@ -1,10 +1,10 @@
 #include "cloud_url_validator.h"
 
-#include <api/network_proxy_factory.h>
-
-#include <core/resource/media_server_resource.h>
-
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
+
+#include <api/network_proxy_factory.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx {
 namespace network {

@@ -1,16 +1,9 @@
-/**********************************************************
-* 29 oct 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_POLLABLE_H
-#define NX_POLLABLE_H
+#pragma once 
 
 #include <memory>
 
 #include "../abstract_socket.h"
 #include "../common_socket_impl.h"
-
 
 namespace nx {
 namespace network {
@@ -21,13 +14,15 @@ class Pollable;
 static const int INVALID_SOCKET = -1;
 #endif
 
-//!Incapsulates system object that can be polled with \a PollSet
+/**
+ * Encapsulates system object that can be polled with PollSet.
+ */
 class NX_NETWORK_API Pollable
 {
 public:
-    /*!
-        \param fd Valid file descriptor. It is not closed on object destruction!
-    */
+    /**
+     * @param fd Valid file descriptor. It is not closed on object destruction!
+     */
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
         std::unique_ptr<CommonSocketImpl> impl = std::unique_ptr<CommonSocketImpl>() );
@@ -40,18 +35,19 @@ public:
     virtual ~Pollable() {}
 
     AbstractSocket::SOCKET_HANDLE handle() const;
-    /** Moves ownership pf system socket out of \a Socket instance.
-        Leaves \a Socket instance in undefined state.
-        \note Caller MUST ensure that there are no async socket operations on this instance
-    */
+    /**
+     * Moves ownership pf system socket out of Socket instance.
+     * Leaves Socket instance in undefined state.
+     * NOTE: Caller MUST ensure that there are no async socket operations on this instance.
+     */
     AbstractSocket::SOCKET_HANDLE takeHandle();
-    /*!
-        \note Zero timeout means infinite timeout
-    */
+    /**
+     * NOTE: Zero timeout means infinite timeout.
+     */
     bool getRecvTimeout( unsigned int* millis ) const;
-    /*!
-        \note Zero timeout means infinite timeout
-    */
+    /**
+     * NOTE: Zero timeout means infinite timeout.
+     */
     bool getSendTimeout( unsigned int* millis ) const;
 
     CommonSocketImpl* impl();
@@ -70,7 +66,5 @@ protected:
     unsigned int m_writeTimeoutMS;
 };
 
-}   //network
-}   //nx
-
-#endif  //NX_POLLABLE_H
+} // namespace network
+} // namespace nx

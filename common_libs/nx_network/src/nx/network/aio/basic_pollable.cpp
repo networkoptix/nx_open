@@ -1,5 +1,6 @@
 #include "basic_pollable.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/future.h>
 
 #include "../socket_global.h"

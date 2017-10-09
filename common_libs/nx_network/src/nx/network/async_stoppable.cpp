@@ -1,5 +1,6 @@
 #include "async_stoppable.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 

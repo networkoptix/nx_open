@@ -1,4 +1,3 @@
-
 #include <memory>
 
 #include <gtest/gtest.h>
@@ -6,7 +5,9 @@
 
 #include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/stun/server_connection.h>
@@ -18,6 +19,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <listening_peer_pool.h>

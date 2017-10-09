@@ -1,7 +1,9 @@
 #include "cloud_server_socket.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
 #include "tunnel/relay/relay_connection_acceptor.h"

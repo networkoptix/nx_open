@@ -7,6 +7,7 @@
 
 #include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/ping.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>

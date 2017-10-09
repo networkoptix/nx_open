@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+
 #include <libvms_gateway_core/src/test_support/vms_gateway_functional_test.h>
 
 #include <controller.h>

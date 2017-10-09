@@ -7,6 +7,8 @@
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/fusion/serialization/lexical.h>
 
+#include "mediator_connector.h"
+
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
 static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 

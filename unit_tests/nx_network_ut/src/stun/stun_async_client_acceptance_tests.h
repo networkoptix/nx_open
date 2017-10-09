@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/socket_factory.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/url/url_parse_helper.h>
