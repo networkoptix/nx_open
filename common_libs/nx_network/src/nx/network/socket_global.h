@@ -92,6 +92,8 @@ public:
     };
 
 private:
+    std::unique_ptr<SocketGlobalsImpl> m_impl;
+
     /**
      * @param initializationFlags Bitset of nx::network::InitializationFlags.
      */
@@ -102,23 +104,13 @@ private:
     SocketGlobals& operator=(const SocketGlobals&) = delete;
 
     void setDebugIniReloadTimer();
+    void initializeNetworking();
+    void initializeCloudConnectivity();
 
-    enum class InitState { none, inintializing, done, deinitializing };
-
-    static QnMutex s_mutex;
-    static std::atomic<InitState> s_initState;
-    static size_t s_counter;
-    static SocketGlobals* s_instance;
-
-private:
     // TODO: Initialization and deinitialization of this class is brocken by design (because of
     //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:
     // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
     // 2. CloudSocketGlobals (cloud singletones) - required for cloud sockets.
-
-    std::unique_ptr<SocketGlobalsImpl> m_impl;
-
-    void initializeCloudConnectivity();
 };
 
 //-------------------------------------------------------------------------------------------------

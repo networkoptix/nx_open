@@ -27,6 +27,7 @@
 #include <nx_ec/dummy_handler.h>
 
 #include <watchers/user_watcher.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>

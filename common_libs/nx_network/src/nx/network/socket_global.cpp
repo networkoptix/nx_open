@@ -45,6 +45,13 @@ private:
     std::unique_ptr<aio::AIOService> m_aioService;
 };
 
+enum class InitState { none, inintializing, done, deinitializing };
+
+static QnMutex s_mutex;
+static std::atomic<InitState> s_initState(InitState::none);
+static size_t s_counter(0);
+static SocketGlobals* s_instance = nullptr;
+
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -78,7 +85,7 @@ struct SocketGlobalsImpl
 
 bool SocketGlobals::Ini::isHostDisabled(const HostAddress& host) const
 {
-    if (SocketGlobals::s_initState != InitState::done)
+    if (s_initState != InitState::done)
         return false;
 
     // Here 'static const' is an optimization as reload is called only on start.
@@ -113,12 +120,6 @@ SocketGlobals::SocketGlobals(int initializationFlags):
     m_impl->m_initializationFlags = initializationFlags;
     if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
         m_impl->m_pollSetFactory.disableUdt();
-
-    m_impl->m_aioServiceGuard.initialize();
-
-#ifdef ENABLE_SSL
-    ssl::initOpenSSLGlobalLock();
-#endif
 }
 
 SocketGlobals::~SocketGlobals()
@@ -203,6 +204,7 @@ void SocketGlobals::init(int initializationFlags)
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
         s_instance = new SocketGlobals(initializationFlags);
 
+        s_instance->initializeNetworking();
         // TODO: #ak disable cloud based on m_initializationFlags.
         s_instance->initializeCloudConnectivity();
 
@@ -297,6 +299,15 @@ void SocketGlobals::setDebugIniReloadTimer()
         });
 }
 
+void SocketGlobals::initializeNetworking()
+{
+    m_impl->m_aioServiceGuard.initialize();
+
+#ifdef ENABLE_SSL
+    ssl::initOpenSSLGlobalLock();
+#endif
+}
+
 void SocketGlobals::initializeCloudConnectivity()
 {
     m_impl->m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>();
@@ -309,11 +320,6 @@ void SocketGlobals::initializeCloudConnectivity()
         m_impl->m_mediatorConnector->clientConnection());
     m_impl->m_debugIniReloadTimer = std::make_unique<aio::Timer>();
 }
-
-QnMutex SocketGlobals::s_mutex;
-std::atomic<SocketGlobals::InitState> SocketGlobals::s_initState(SocketGlobals::InitState::none);
-size_t SocketGlobals::s_counter(0);
-SocketGlobals* SocketGlobals::s_instance(nullptr);
 
 //-------------------------------------------------------------------------------------------------
 
