@@ -14,8 +14,9 @@ bool qnHasEventLoop(QThread* thread)
         return true;
 
     // Main thread of the GUI application will have event loop for sure.
-    if (thread == QCoreApplication::instance()->thread())
-        return dynamic_cast<QGuiApplication*>(QCoreApplication::instance());
+    auto appInstance = QCoreApplication::instance();
+    if (appInstance && thread == appInstance->thread())
+        return dynamic_cast<QGuiApplication*>(appInstance);
 
     return false;
 #else
