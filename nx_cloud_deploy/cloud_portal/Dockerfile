@@ -1,7 +1,7 @@
 FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
 
 COPY docker/pip.conf /root/.config/pip/pip.conf
-COPY docker/entrypoint.sh /app
+COPY docker/entrypoint.sh /app/
 COPY stage/cloud /app/app
 
 ARG CACHE_DATE
