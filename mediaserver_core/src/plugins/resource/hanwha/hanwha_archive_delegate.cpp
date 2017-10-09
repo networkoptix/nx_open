@@ -22,7 +22,6 @@ HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
     auto& rtspClient = m_streamReader->rtspClient();
-    //rtspClient.setAdditionAttribute("Rate-Control", "no");
 
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
@@ -114,8 +113,8 @@ qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
     else if (!itr->contains(timeMs))
         timeUsec = isForwardDirection() ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
 
-    if (m_previewMode && m_currentPositionUsec == timeUsec)
-        return timeUsec;
+    if (m_playbackMode == PlaybackMode::ThumbNails && m_currentPositionUsec == timeUsec)
+        return timeUsec; //< Ignore two thumbnails in the row from the same position.
 
     m_currentPositionUsec = timeUsec;
     m_streamReader->setPositionUsec(timeUsec);
@@ -152,15 +151,26 @@ void HanwhaNvrArchiveDelegate::setSpeed(qint64 displayTime, double value)
 void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
 {
     m_endTimeUsec = endTimeUsec;
-    m_previewMode = frameStepUsec > 1;
-    if (m_previewMode)
-    {
-        auto& rtspClient = m_streamReader->rtspClient();
-        rtspClient.setAdditionAttribute("Frames", "Intra");
-    }
-    m_streamReader->setSessionType(
-        m_previewMode ? HanwhaSessionType::preview : HanwhaSessionType::archive);
     seek(startTimeUsec, true /*findIFrame*/);
+}
+
+void HanwhaNvrArchiveDelegate::setPlaybackMode(PlaybackMode mode)
+{
+    m_playbackMode = mode;
+    auto& rtspClient = m_streamReader->rtspClient();
+    switch (mode)
+    {
+        case PlaybackMode::ThumbNails:
+            rtspClient.setAdditionAttribute("Frames", "Intra");
+            m_streamReader->setSessionType(HanwhaSessionType::preview);
+            break;
+        case PlaybackMode::Export:
+            rtspClient.setAdditionAttribute("Rate-Control", "no");
+            m_streamReader->setSessionType(HanwhaSessionType::fileExport);
+            break;
+        default:
+            break;
+    }
 }
 
 void HanwhaNvrArchiveDelegate::beforeSeek(qint64 time)

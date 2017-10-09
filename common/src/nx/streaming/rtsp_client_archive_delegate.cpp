@@ -775,8 +775,7 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
     bool oldReverseMode = m_rtspSession->getScale() < 0;
     bool newReverseMode = value < 0;
 
-    bool needControlSpeed = true; //< TODO: read from device.
-    bool needSendRequest = oldReverseMode != newReverseMode || needControlSpeed;
+    bool needSendRequest = oldReverseMode != newReverseMode || m_camera->isDtsBased();
     if (!needSendRequest)
         return;
     
