@@ -324,6 +324,12 @@ void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
 
     m_fullFrameSize = size;
 
+    if (m_fullFrameSize.isValid())
+    {
+        const auto newDimension = std::min(m_fullFrameSize.width(), m_fullFrameSize.height());
+        m_exportMediaPersistentSettings.setDimension(newDimension);
+    }
+
     const QPair<qreal, qreal> coefficients(
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());

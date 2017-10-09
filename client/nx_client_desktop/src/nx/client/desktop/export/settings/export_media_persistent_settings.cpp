@@ -17,10 +17,21 @@ namespace desktop {
 
 using OverlaySettingsPtr = nx::core::transcoding::OverlaySettingsPtr;
 
+void ExportOverlayPersistentSettings::rescale(qreal factor)
+{
+    offset *= factor;
+}
+
 ExportImageOverlayPersistentSettings::ExportImageOverlayPersistentSettings():
     image(lit(":/logo.png")),
     overlayWidth(image.width())
 {
+}
+
+void ExportImageOverlayPersistentSettings::rescale(qreal factor)
+{
+    ExportOverlayPersistentSettings::rescale(factor);
+    overlayWidth = qRound(overlayWidth * factor);
 }
 
 OverlaySettingsPtr ExportImageOverlayPersistentSettings::createRuntimeSettings() const
@@ -52,6 +63,18 @@ OverlaySettingsPtr ExportImageOverlayPersistentSettings::createRuntimeSettings()
     }
 
     return OverlaySettingsPtr(runtimeSettings.take());
+}
+
+void ExportTextOverlayPersistentSettingsBase::rescale(qreal factor)
+{
+    static constexpr int kMinimumRoundingRadius = 1;
+    static constexpr int kMinimumIndent = 4;
+
+    ExportOverlayPersistentSettings::rescale(factor);
+    overlayWidth = qRound(overlayWidth * factor);
+    fontSize = qMax(qRound(fontSize * factor), minimumFontSize());
+    indent = qMax(fontSize / 4, kMinimumIndent);
+    roundingRadius = qMax(fontSize / 8, kMinimumRoundingRadius);
 }
 
 OverlaySettingsPtr ExportTextOverlayPersistentSettingsBase::createRuntimeSettings() const
@@ -98,6 +121,12 @@ ExportBookmarkOverlayPersistentSettings::ExportBookmarkOverlayPersistentSettings
 {
     foreground = Qt::white;
     background = QColor(0x2E, 0x69, 0x96, 0xB3);
+}
+
+void ExportTimestampOverlayPersistentSettings::rescale(qreal factor)
+{
+    ExportOverlayPersistentSettings::rescale(factor);
+    fontSize = qMax(qRound(fontSize * factor), minimumFontSize());
 }
 
 OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettings() const
@@ -150,6 +179,18 @@ const ExportOverlayPersistentSettings* ExportMediaPersistentSettings::overlaySet
         default:
             return nullptr;
     }
+}
+
+void ExportMediaPersistentSettings::setDimension(int newDimension)
+{
+    if (dimension == newDimension)
+        return;
+
+    const auto factor = qreal(newDimension) / dimension;
+    dimension = newDimension;
+
+    for (int i = 0; i < int(ExportOverlayType::overlayCount); ++i)
+        overlaySettings(ExportOverlayType(i))->rescale(factor);
 }
 
 void ExportMediaPersistentSettings::updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const

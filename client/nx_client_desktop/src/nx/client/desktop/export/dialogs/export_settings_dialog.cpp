@@ -38,6 +38,13 @@ static const QSize kPreviewSize(512, 288);
 static constexpr int kBusyIndicatorDotRadius = 8;
 static constexpr int kNoDataDefaultFontSize = 18;
 
+template<class Widget>
+void setMaxOverlayWidth(Widget* settingsWidget, int width)
+{
+    QSignalBlocker blocker(settingsWidget);
+    settingsWidget->setMaxOverlayWidth(width);
+}
+
 } // namespace
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -267,9 +274,11 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(d, &Private::frameSizeChanged, this,
         [this](const QSize& size)
         {
-            ui->bookmarkSettingsPage->setMaxOverlayWidth(size.width());
-            ui->imageSettingsPage->setMaxOverlayWidth(size.width());
-            ui->textSettingsPage->setMaxOverlayWidth(size.width());
+
+            setMaxOverlayWidth(ui->bookmarkSettingsPage, size.width());
+            setMaxOverlayWidth(ui->imageSettingsPage, size.width());
+            setMaxOverlayWidth(ui->textSettingsPage, size.width());
+            updateSettingsWidgets();
         });
 
     if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
