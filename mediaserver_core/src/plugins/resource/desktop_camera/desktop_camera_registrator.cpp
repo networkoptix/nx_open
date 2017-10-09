@@ -27,12 +27,16 @@ void QnDesktopCameraRegistrator::run()
     sendResponse(nx_http::StatusCode::ok, QByteArray());
 
     const auto userName = getHeaderValue(d->request.headers, "user-name");
-    const auto userId = getHeaderValue(d->request.headers, "user-id");
+    auto uniqueId = getHeaderValue(d->request.headers, "unique-id");
+    // TODO: #GDM #3.2 Remove 3.1 compatibility layer.
+    if (uniqueId.isEmpty())
+        uniqueId = getHeaderValue(d->request.headers, "user-id");
 
+    // Make sure desktop camera of another user will not substitute existing one.
     if (auto searcher = QnDesktopCameraResourceSearcher::instance())
     {
         NX_VERBOSE(this, lm("Registered desktop camera %1").arg(userName));
-        searcher->registerCamera(d->socket, userName, userId);
+        searcher->registerCamera(d->socket, userName, uniqueId);
     }
 
     d->socket.clear();
