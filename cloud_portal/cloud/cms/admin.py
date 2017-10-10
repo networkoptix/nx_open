@@ -62,7 +62,7 @@ class ContextAdmin(CMSAdmin):
 
     def context_actions(self, obj):
         return format_html('<button class="btn"><a href="{}">edit content</a></button>',
-                           reverse('context_editor', args=[obj.id]))
+                           reverse('page_editor', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
         qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
@@ -114,7 +114,7 @@ class ContentVersionAdmin(CMSAdmin):
 
     def content_version_actions(self, obj):
         return format_html('<button class="btn"> <a href="{}">review version</a></button>',
-                           reverse('review_version', args=[obj.id]))
+                           reverse('version', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for current customization
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin

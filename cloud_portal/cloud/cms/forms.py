@@ -26,7 +26,7 @@ def convert_meta_to_description(meta):
 
 class CustomContextForm(forms.Form):
     language = forms.ModelChoiceField(
-        widget=forms.Select, label="Language", queryset=Language.objects.all())
+        widget=forms.Select, label="Language", queryset=Language.objects.all().values_list('code', flat=True))
 
     def remove_langauge(self):
         super(CustomContextForm, self)

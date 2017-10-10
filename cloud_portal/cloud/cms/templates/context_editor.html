@@ -22,8 +22,8 @@
     {% endif %}
 </fieldset>
 
-<form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned" enctype="multipart/form-data">
-    <input type="hidden" name="currentLanguage" value="{{ language.id }}">
+<form id="contextForm" action="{% url 'page_editor' context.id %}" method="post" class="aligned" enctype="multipart/form-data">
+    <input type="hidden" name="currentLanguage" value="{{ language.code }}">
     <input type="hidden" id="languageChanged">
     {% csrf_token %}
     {% for field in form %}

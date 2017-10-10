@@ -40,11 +40,11 @@
 					<td>
 						{% if record.language %}
 						<button class="btn"><a
-						   href="{% url 'context_editor' record.data_structure.context.id record.language.code %}">
+						   href="{% url 'page_editor' record.data_structure.context.id record.language.code %}">
 						   Edit Record
 						</a></button>
 						{% else %}
-						<button class="btn"><a href="{% url 'context_editor' record.data_structure.context.id %}">
+						<button class="btn"><a href="{% url 'page_editor' record.data_structure.context.id %}">
 						   Edit Record
 						</a></button>
 						{% endif %}
@@ -72,7 +72,7 @@
 	</div>
 </div>
 {% if not version.accepted_date %}
-<form action="{% url 'review_page_actions' version.id %}" method="post">
+<form action="{% url 'version_action' version.id %}" method="post">
 	{% csrf_token %}
 	<div class="submit-row">
         <button class="btn" type="submit" name="Preview">Generate Preview</button>

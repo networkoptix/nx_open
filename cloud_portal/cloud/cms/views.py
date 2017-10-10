@@ -26,46 +26,22 @@ class MyAdminSite(AdminSite):
 mysite = MyAdminSite()
 
 
-def get_post_parameters(request, context_id, language_id):
+def initialize_context_editor(request, context_id, language_code):
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-    context, language = get_context_and_language(
-        request.POST, context_id, language_id)
-    user = Account.objects.get(email=request.user)
+    context, language = get_context_and_language(request, context_id, language_code, customization)
 
-    if not language and 'language' in request.session:
-        languange = Language.objects.get(code=request.session['language'])
+    form_initialization = {'language': language.code}
 
-    if not language:
-        language = customization.default_language
+    if context:
+        form_initialization['context'] = context.id
 
     form = CustomContextForm(
-        initial={'language': language.id, 'context': context.id})
+        initial=form_initialization)
 
-    return context, language, form, customization, user
-
-
-def handle_get_view(request, context_id, language_code):
-    context, language, = None, None
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-    if context_id:
-        context = Context.objects.get(id=context_id)
-
-    if language_code:
-        language = Language.objects.get(code=language_code)
-
-    elif 'language' in request.session:
-        language = Language.objects.get(code=request.session['language'])
-
-    else:
-        language = customization.default_language
-
-    language_id = language.id
-
-    form = CustomContextForm(initial={'language': language_id})
     if context:
         form.add_fields(context, customization, language, request.user)
 
-    return context, form, customization, language
+    return context, customization, language, form
 
 
 def add_upload_error_messages(request, errors):
@@ -91,126 +67,97 @@ def advanced_touched_without_permission(request_data, customization, data_struct
     return False
 
 
-def handle_post_context_edit_view(request, context_id, language_id):
-    context, language, form, customization, user = get_post_parameters(
-        request, context_id, language_id)
+def context_editor_action(request, context_id, language_code):
+    context, customization, language, form = initialize_context_editor(request, context_id, language_code)
     request_data = request.POST
     request_files = request.FILES
 
     saved = True
     upload_errors = []
-    if not (user.is_superuser or user.has_perm('cms.edit_advanced'))\
+    preview_link = ""
+    saved_msg = "Changes have been saved."
+
+    if not (request.user.is_superuser or request.user.has_perm('cms.edit_advanced'))\
             and advanced_touched_without_permission(request_data, customization, context.datastructure_set.all()):
         raise PermissionDenied
-    if 'languageChanged' in request_data:
-        if 'currentLanguage' in request_data \
-           and request_data['currentLanguage']:
-            last_language = Language.objects.get(
-                id=request_data['currentLanguage'])
-            upload_errors = save_unrevisioned_records(context,
-                customization, last_language, context.datastructure_set.all(),
-                request_data, request_files, user)
-        else:
-            saved = False
 
-        if upload_errors:
-            add_upload_error_messages(request, upload_errors)
+    if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
+        last_language = Language.objects.get(
+            code=request_data['currentLanguage'])
 
-        messages.success(request, "Changes have been saved.")
+        upload_errors = save_unrevisioned_records(context,
+            customization, last_language, context.datastructure_set.all(),
+            request_data, request_files, request.user)
 
-    elif 'Preview' in request_data:
+    elif 'Preview' in request_data or 'SaveDraft' in request_data:
         upload_errors = save_unrevisioned_records(context,
             customization, language, context.datastructure_set.all(),
-            request_data, request_files, user)
+            request_data, request_files, request.user)
 
-        if upload_errors:
-            add_upload_error_messages(request, upload_errors)
-
-        messages.success(request,
-                         "Changes have been saved. Preview has been created.")
-
-    elif 'SaveDraft' in request_data:
-        upload_errors = save_unrevisioned_records(context,
-            customization, language, context.datastructure_set.all(),
-            request_data, request_files, user)
-
-        if upload_errors:
-            add_upload_error_messages(request, upload_errors)
-
-        messages.success(request, "Changes have been saved.")
+        if 'Preview' in request_data:
+            saved_msg += " Preview has been created."
 
     elif 'SendReview' in request_data:
         upload_errors = send_version_for_review(context,
             customization, language, context.datastructure_set.all(),
-            context.product, request_data, request_files, user)
+            context.product, request_data, request_files, request.user)
+        saved_msg += " A new version has been created."
 
-        if upload_errors:
-            add_upload_error_messages(request, upload_errors)
+    else:
+        saved = False
 
-        messages.success(
-            request,
-            "Changes have been saved. A new version has been created.")
+    if upload_errors:
+        add_upload_error_messages(request, upload_errors)
 
-        return None, None, None, None
+    if saved:
+        messages.success(request, saved_msg)
+        preview_link = generate_preview_link(context)
 
-    preview_link = generate_preview_link(context) if saved else ""
-
-    form.add_fields(context, customization, language, user)
-
-    return context, form, customization, language, preview_link
+    return context, customization, language, form, preview_link
 
 
 # Create your views here.
 @require_http_methods(["GET", "POST"])
 @permission_required('cms.edit_content')
-def context_edit_view(request, context=None, language=None):
+def page_editor(request, context_id=None, language_code=None):
     if request.method == "GET":
-        context, form, customization, language = handle_get_view(request, context, language)
-        return render(request, 'context_editor.html',
-                      {'context': context,
-                       'form': form,
-                       'customization': customization,
-                       'language': language,
-                       'user': request.user,
-                       'has_permission': mysite.has_permission(request),
-                       'site_url': mysite.site_url,
-                       'site_header': admin.site.site_header,
-                       'site_title': admin.site.site_title,
-                       'title': 'Edit %s for %s' % (context.name, context.product.name)})
+        context, customization, language, form = initialize_context_editor(request, context_id, language_code)
+        preview_link = ""
 
     else:
         if not request.user.has_perm('cms.edit_content'):
             raise PermissionDenied
 
-        context, form, customization, language, preview_link = handle_post_context_edit_view(request, context, language)
+        context, customization, language, form, preview_link = context_editor_action(request, context_id, language_code)
 
         if 'SendReview' in request.POST:
-            return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
+            return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
 
-        return render(request, 'context_editor.html',
-                      {'context': context,
-                       'form': form,
-                       'customization': customization,
-                       'language': language,
-                       'preview_link': preview_link,
-                       'user': request.user,
-                       'has_permission': mysite.has_permission(request),
-                       'site_url': mysite.site_url,
-                       'site_header': admin.site.site_header,
-                       'site_title': admin.site.site_title,
-                       'title': 'Edit %s for %s' % (context.name, context.product.name)})
+    return render(request, 'context_editor.html',
+                  {'context': context,
+                   'form': form,
+                   'customization': customization,
+                   'language': language,
+                   'preview_link': preview_link,
+                   'user': request.user,
+                   'has_permission': mysite.has_permission(request),
+                   'site_url': mysite.site_url,
+                   'site_header': admin.site.site_header,
+                   'site_title': admin.site.site_title,
+                   'title': 'Edit %s for %s' % (context.name, context.product.name)})
 
 
 @require_http_methods(["POST"])
 @permission_required('cms.change_contentversion')
-def review_version_request(request, version_id=None):
+def version_action(request, version_id=None):
 
     if not ContentVersion.objects.filter(id=version_id).exists():
         defaults.bad_request("Version does not exist")
 
     if "Preview" in request.POST:
         generate_preview(send_to_review=True)
-        return redirect(reverse('review_version', args=[version_id]) + "?preview")
+        return redirect(reverse('version', args=[version_id]) + "?preview")
+
     elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
@@ -222,13 +169,14 @@ def review_version_request(request, version_id=None):
         else:
             messages.success(request, "Version " +
                              str(version_id) + " has been published")
-        return redirect(reverse('review_version', args=[version_id]))
+        return redirect(reverse('version', args=[version_id]))
+
     return defaults.bad_request("File does not exist")
 
 
 @require_http_methods(["GET"])
 @permission_required('cms.change_contentversion')
-def review_version_view(request, version_id=None):
+def version(request, version_id=None):
     preview_link = ""
     if 'preview' in request.GET:
         preview_link = generate_preview_link()
