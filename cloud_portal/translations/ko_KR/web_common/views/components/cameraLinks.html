@@ -2,69 +2,74 @@
     <div ng-click="cameraLinks.enabled = false" class="pull-right">
         <span class="glyphicon glyphicon-remove"></span>
     </div>
-    <div class='camera-links-title'>Camera Details</div>
+    <div class='camera-links-title'>카메라 세부 정보</div>
     <table>
-        <tr ng-if="debugMode"><td>Playing</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
-        <tr><td>Name</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
+        <tr ng-if="debugMode"><td>재생 중</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
+        <tr><td>이름</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
-            <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
+            <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace ('}','')}}<br>
                 <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>
         </tr>
         <tr><td>IP (URL)</td><td class="camera-links-info"><a target="_blank" ng-href="{{activeCamera.url | checkProtocol}}">{{activeCamera.url}}</a></td></tr>
+        <tr>
+            <td>보기</td>
+            <td>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}"> 웹 </a>
+                <copy-button copy-data="formatLink(activeCamera, 0, 'web')"></copy-button>
+            </td>
+        </tr>
         <tr ng-repeat="stream in activeCamera.mediaStreams">
             <td>{{streamName(stream)}}</td>
             <td>
                 <span ng-repeat="transport in stream.transports">
-                    <a class="text-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>
-                    <span ng-if="stream.transports.length-1 != $index">&nbsp;/&nbsp;</span>
+                    <a class="text-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a> <span ng-if="stream.transports.length-1 != $index">/</span>
                 </span>
             </td>
         </tr>
         <tr>
-            <td>Download</td>
+            <td>다운로드</td>
             <td>
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">HIGH</a>
-                &nbsp;/&nbsp;
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">LOW</a>
-                &nbsp;/&nbsp;
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">PREVIEW</a>
+                다운로드:
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">High</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">Low</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">미리 보기</a>
             </td>
         </tr>
     </table>
     <div class="camera-links-break"></div>
-    <div class='camera-links-title'>Link settings</div>
+    <div class='camera-links-title'>링크 설정:</div>
     <table>
         <tr>
-            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;Use temporary key</label></td>
+            <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useAuth">&nbsp;임시 키 사용</label></td>
         </tr>
         <tr>
             <td colspan="2"><label><input type="checkbox" ng-model="linkSettings.useCredentials"
-                       ng-disabled="linkSettings.useAuth">&nbsp;Use credentials</label></td>
+                       ng-disabled="linkSettings.useAuth">&nbsp;인증 사용</label></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
-            <td><label class="camera-links-label" for="useLogin">Login</label></td>
+            <td><label class="camera-links-label" for="useLogin">로그인</label></td>
             <td><input id="useLogin" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.useLogin"></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
-            <td><label class="camera-links-label" for="usePassword">Password</label></td>
+            <td><label class="camera-links-label" for="usePassword">패스워드</label></td>
             <td><input id="usePassword" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.usePassword"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="duration">Duration (sec)</label></td>
+            <td><label class="camera-links-label" for="duration">지속 시간(초)</label></td>
             <td><input id="duration" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.duration"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="resolution">Resolution</label></td>
+            <td><label class="camera-links-label" for="resolution">해상도:</label></td>
             <td><input id="resolution" type="text" class="input-sm camera-links-info" 
                        ng-model="linkSettings.resolution"></td>
         </tr>
         <tr>
-            <td>Playing position</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
+            <td>재생 위치</td><td class="camera-links-info">{{liveMode?'live': position.toFixed(0)}}</td>
         </tr>
     </table>
 </div>

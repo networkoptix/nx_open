@@ -1,11 +1,11 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
+        La cuenta ha sido creada. <br> El mensaje de confirmación se envía a <br> {{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
-        Account is successfully created.
+        Cuenta creada exitósamente.
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
@@ -17,7 +17,7 @@
         <!-- /end of special hack -->
 
         <div class="form-group" validate-field>
-            <label for="firstName" class="col-sm-4 control-label">Su Nombre</label>
+            <label for="firstName" class="col-sm-4 control-label">Su nombre</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.firstName" id="firstName" maxlength="255"
                        required

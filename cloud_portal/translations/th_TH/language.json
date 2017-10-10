@@ -3,137 +3,134 @@
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
-    "okButton":"Ok",
+    "okButton":"ตกลง",
     "cancelButton":"ยกเลิก",
-    "loginTitle":"Log in to {{PRODUCT_NAME}}",
-    "loginButton":"Log in",
-    "logoutAuthorisedText":"",
-    "logoutAuthorisedTitle":"You are already logged in",
-    "logoutAuthorisedContinueButton":"Continue",
-    "logoutAuthorisedLogoutButton":"Log Out"
+    "loginTitle":"ยินดีต้อนรับสู่ {{PRODUCT_NAME}}",
+    "loginButton":"ลงชื่อเข้าสู่ระบบ",
+    "logoutAuthorisedTitle":"คุณกำลังอยู่ในระบบ",
+    "logoutAuthorisedContinueButton":"ดำเนิน​การ",
+    "logoutAuthorisedLogoutButton":"ออกจากระบบ"
   },
   "pageTitles":{
     "template":"{{title}} {{PRODUCT_NAME}}",
     "default":"{{PRODUCT_NAME}}",
-    "registerSuccess":"Welcome to",
-    "register":"Create account in",
-    "changePassword":"Change password -",
-    "account":"Account settings -",
-    "systems":"Systems -",
-    "system":"System -",
-    "systemShare":"Share System -",
-    "activate":"Activate account -",
-    "activateSent":"Activate account -",
-    "activateSuccess":"Account activated -",
-    "activateCode":"Activate account -",
-    "restorePassword":"Reset password -",
-    "restorePasswordSuccess":"Password saved -",
-    "restorePasswordCode":"Reset password -",
-    "view":"View cameras - ",
-    "contentPage":"",
-    "debug":"Debug",
-    "login":"Log in -",
-    "download":"Download {{VMS_NAME}}",
-    "downloadPlatform":"Download {{VMS_NAME}} for ",
-    "startPage":"",
-    "pageNotFound":"Page not found"
+    "registerSuccess":"ขอต้อนรับสู่:",
+    "register":"สร้างบัญชี",
+    "changePassword":"เปลี่ยนรหัสผ่าน -",
+    "account":"การตั้งค่าบัญชี -",
+    "systems":"ระบบ -",
+    "system":"ระบบ -",
+    "systemShare":"ระบบใช้ร่วมกัน-",
+    "activate":"เปิดใช้งานบัญชี -",
+    "activateSent":"เปิดใช้งานบัญชี -",
+    "activateSuccess":"บัญชีที่เปิดใช้งาน-",
+    "activateCode":"บัญชีที่ใช้งานได้ -",
+    "restorePassword":"กำหนดรหัสผ่านใหม่ -",
+    "restorePasswordSuccess":"บันทึกรหัสผ่านแล้ว -",
+    "restorePasswordCode":"กำหนดรหัสผ่านใหม่ -",
+    "view":"ดูกล้อง -",
+    "debug":"การ​แก้ไข​จุด​บกพร่อง",
+    "login":"ลงชื่อเข้าสู่ระบบ -",
+    "download":"ดาวน์โหลด {{VMS_NAME}}",
+    "downloadPlatform":"ดาวน์โหลด {{VMS_NAME}} สำหรับ",
+    "pageNotFound":"ไม่พบหน้านี้\n"
   },
   "systemStatuses":{
-    "notActivated":"not activated",
-    "activated":"activated",
-    "online":"online",
-    "offline":"offline",
-    "unavailable":"unavailable"
+    "notActivated":"ยังไม่ถูกเปิดใช้งาน",
+    "activated":"เปิดใช้งาน",
+    "online":"ออนไลน์",
+    "offline":"ออฟไลน์",
+    "unavailable":"ไม่พร้อมใช้งาน"
   },
   "accessRoles":{
     "disabled":{
       "label":"ปิดใช้งาน",
-      "description":"User is disabled and cannot log in to System"
+      "description":"ผู้ใช้ถูกปิดใช้งานและไม่สามารถเข้าสู่ระบบได้"
     },
     "Owner":{
       "label":"เจ้าของ",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "description":"การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแชร์และเชื่อมต่อ / ตัดการเชื่อมต่อระบบจากระบบคลาวด์"
     },
     "Viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"ผู้ชม",
+      "description":"สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้"
     },
     "Live Viewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"แสดงสด",
+      "description":"สามารถดูวิดีโอสดได้เท่านั้น"
     },
     "Advanced Viewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"แสดงขั้นสูง",
+      "description":"สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
     },
     "Administrator":{
       "label":"ผู้ดูแลระบบ",
-      "description":"Unrestricted access including the ability to share"
+      "description":"การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแบ่งปัน"
     },
     "Custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"แบบกำหนดเอง",
+      "description":"ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     },
     "cloudAdmin":{
       "label":"ผู้ดูแลระบบ",
-      "description":"Can configure System and share it"
+      "description":"สามารถกำหนดค่าระบบและแชร์ได้"
     },
     "customRole":{
-      "label":"Custom role",
-      "description":"Custom user role specified in System"
+      "label":"บทบาทที่กำหนดเอง",
+      "description":"บทบาทผู้ใช้แบบกำหนดเองที่ระบุในระบบ"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"เจ้าของ",
+      "description":"การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแชร์และเชื่อมต่อ / ตัดการเชื่อมต่อระบบจากระบบคลาวด์"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"ผู้ชม",
+      "description":"สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้"
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"แสดงสด",
+      "description":"สามารถดูวิดีโอสดได้เท่านั้น"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"แสดงขั้นสูง",
+      "description":"สามารถดูวิดีโอสดเรียกดูไฟล์จัดเก็บกำหนดค่ากล้องควบคุม PTZ ฯลฯ"
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"แบบกำหนดเอง",
+      "description":"ใช้แอ็พพลิเคชันไคลเอ็นต์ {{PRODUCT_NAME}} เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     }
   },
   "errorCodes":{
-    "ok":"ok",
-    "cantSendActivationPrefix":"Cannot send confirmation Email",
-    "cantDisconnectSystemPrefix":"Cannot delete System",
-    "cantUnshareWithMeSystemPrefix":"Cannot delete System",
-    "cantSharePrefix":"Cannot share System",
-    "cantGetUsersListPrefix":"Users list is unavailable",
-    "cantGetSystemsListPrefix":"System list is unavailable",
-    "cantRegisterPrefix":"Error occurred",
-    "cantGetSystemInfoPrefix":"System info is unavailable",
-    "cantChangeAccountPrefix":"Cannot save changes",
-    "cantChangePasswordPrefix":"Cannot save password",
-    "cantActivatePrefix":"Cannot activate your account",
-    "cantSendConfirmationPrefix":"Cannot send confirmation Email",
-    "cloudInvalidResponse":"Cloud DB returned an unexpected response",
-    "notAuthorized":"Incorrect Email or password",
-    "wrongParameters":"Some parameters on the form are incorrect",
-    "wrongCode":"Account is already activated or confirmation code is incorrect",
-    "wrongCodeRestore":"Confirmation code is already used or incorrect",
-    "forbidden":"You do not have permissions to perform this action",
-    "accountNotActivated":"This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked":"This account is blocked",
-    "notFound":"Not found",
-    "alreadyExists":"This account already exists",
-    "unknownError":"Unexpected error occured",
-    "accountAlreadyActivated":"This account is already activated",
-    "emailNotFound":"Account does not exist",
-    "EmailAlreadyExists":"This Email is already registered",
-    "oldPasswordMistmatch":"Current password is incorrect",
-    "passwordMismatch":"Wrong password",
-    "cantEditYourself":"Changing own permissions is not allowed",
+    "ok":"ตกลง",
+    "cantSendActivationPrefix":"ไม่สามารถส่งอีเมลยืนยัน",
+    "cantDisconnectSystemPrefix":"ไม่สามารถลบระบบได้",
+    "cantUnshareWithMeSystemPrefix":"ไม่สามารถลบระบบได้",
+    "cantSharePrefix":"ไม่สามารถแชร์ระบบ",
+    "cantGetUsersListPrefix":"รายการผู้ใช้ไม่พร้อมใช้งาน",
+    "cantGetSystemsListPrefix":"รายการระบบไม่พร้อมใช้งาน",
+    "cantRegisterPrefix":"เกิดข้อผิดพลาด",
+    "cantGetSystemInfoPrefix":"ข้อมูลระบบไม่พร้อมใช้งาน",
+    "cantChangeAccountPrefix":"ไม่สามารถบันทึกการเปลี่ยนแปลงได้",
+    "cantChangePasswordPrefix":"ไม่สามารถบันทึกรหัสผ่านได้",
+    "cantActivatePrefix":"ไม่สามารถเปิดใช้งานบัญชีของคุณได้",
+    "cantSendConfirmationPrefix":"ไม่สามารถส่งอีเมลยืนยัน",
+    "cloudInvalidResponse":"คลาวด์ DB การส่งคืนการตอบสนองที่ไม่คาดคิด",
+    "notAuthorized":"อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "wrongParameters":"พารามิเตอร์บางอย่างในแบบฟอร์มไม่ถูกต้อง",
+    "wrongCode":"บัญชีถูกเปิดใช้งานหรือรหัสยืนยันไม่ถูกต้อง",
+    "wrongCodeRestore":"ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
+    "forbidden":"การเข้าถึงถูกปฏิเสธ คุณไม่มีสิทธิ์ดำเนินการนี้.",
+    "accountNotActivated":"บัญชีนี้ยังไม่เปิดใช้งาน <a href=\"/activate\"> ส่งลิงก์การเปิดใช้งานอีกครั้ง </a>",
+    "accountBlocked":"บัญชีนี้ถูกปิดแล้ว",
+    "notFound":"ไม่​พบ",
+    "alreadyExists":"มีบัญชีอยู่แล้ว",
+    "unknownError":"เกิดข้อผิดพลาดที่ไม่คาดคิด",
+    "accountAlreadyActivated":"บัญชีนี้เปิดใช้งานแล้ว",
+    "emailNotFound":"ไม่มีบัญชีนี้อยู่",
+    "EmailAlreadyExists":"ลงทะเบียนอีเมล์นี้แล้ว",
+    "oldPasswordMistmatch":"ต้องระบุรหัสผ่านปัจจุบัน",
+    "passwordMismatch":"รหัสผ่านผิด",
+    "cantEditYourself":"ไม่อนุญาตให้เปลี่ยนสิทธิ์ของตัวเอง",
     "cantEditAdmin":"This user has administrator permissions",
     "cantOpenClient":"{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
     "lostConnection":"Connection to {{systemName}} lost",
@@ -155,12 +152,12 @@
     "permissionsSaved":"New permissions saved"
   },
   "system":{
-    "yourSystem":"Your System",
+    "yourSystem":"ระบบของคุณ",
     "mySystemSearch":"IMeMyMine",
     "unavailable":"System is unreachable",
     "offline":"System is offline",
     "openClient":"Open in {{VMS_NAME}}",
-    "confirmRenameTitle":"System name",
+    "confirmRenameTitle":"ชื่อระบบ",
     "confirmRenameAction":"บันทึก",
     "successRename":"System name saved",
     "confirmDisconnectTitle":"Disconnect System from {{PRODUCT_NAME}}?",
@@ -178,14 +175,13 @@
   "account":{
     "accountSavedSuccess":"Your account is successfully saved",
     "passwordChangedSuccess":"Your account is successfully saved",
-    "changePassword":"Change Password",
-    "newPasswordLabel":"New password",
+    "changePassword":"เปลี่ยนรหัสผ่าน",
+    "newPasswordLabel":"สร้างรหัสผ่านใหม่",
     "saveChanges":"บันทึก"
   },
   "downloads":{
     "noClientDetectedTitle":"Install {{VMS_NAME}} to view your System",
-    "noClientDetectedMessage":"",
-    "action":"Download {{VMS_NAME}}",
+    "action":"ดาวน์โหลด {{VMS_NAME}}",
     "mobile":{
       "ios":{
         "link":"{{IOS_APP_LINK}}"
@@ -197,16 +193,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{
@@ -217,24 +213,24 @@
       "mac":"X"
     },
     "appTypes":{
-      "client":"Client only",
-      "server":"Server only",
-      "bundle":"Client and Server",
-      "servertool":"Configuration tool"
+      "client":"ไคลเอ็นต์เท่านั้น",
+      "server":"เซิร์ฟเวอร์เท่านั้น",
+      "bundle":"ไคลเอ็นต์และเซิร์ฟเวอร์",
+      "servertool":"เครื่องมือกำหนดค่า"
     }
   },
   "activeActions":{
-    "sendConfirm":"Send",
-    "resetPassword":"Reset Password",
+    "sendConfirm":"ส่ง",
+    "resetPassword":"รีเซ็ตรหัสผ่าน",
     "setNewPassword":"บันทึกรหัสผ่าน",
-    "setNewPasswordLabel":"New password"
+    "setNewPasswordLabel":"สร้างรหัสผ่านใหม่"
   },
   "regActions":{
     "passwordLabel":"รหัสผ่าน",
-    "createAccount":"Create Account"
+    "createAccount":"สร้างบัญชี"
   },
   "header":{
-    "allSystems":"All Systems",
-    "systems":"Systems"
+    "allSystems":"ระบบทั้งหมด",
+    "systems":"ระบบ"
   }
 }

@@ -4,5 +4,5 @@ Gracias por unirse a {{PRODUCT_NAME}}. Visite el siguiente botón para confirmar
 
 Activar cuenta: {{config.portal_url}}/activar/{{message.code}}
 
-Si no se registrO en {{PRODUCT_NAME}}, solo ignore este correo electrónico.
+Si no se registró en {{PRODUCT_NAME}}, solo ignore este correo electrónico.
 Por favor no comparta el mensaje o el enlace con terceras partes.
