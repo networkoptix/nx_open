@@ -237,7 +237,7 @@ def nx_http_action(request):
 
     if hooks_event.exists():
         for hook in hooks_event:
-            raw_hook_event.send(sender=None, event_name=event, payload={'data': {'caption': caption}}, user=hook.user)
+            hook.deliver_hook(None, {'caption': caption})
             make_or_increment_rule('Hook Fired', hook.user.email, system_id, caption)
 
         return Response({'message': "Webhook fired for " + caption}, status=200)
