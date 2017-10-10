@@ -1,3 +1,5 @@
+.pragma library
+
 function isChild(item, parent)
 {
     while (item)

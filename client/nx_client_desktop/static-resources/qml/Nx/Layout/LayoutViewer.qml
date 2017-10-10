@@ -110,7 +110,7 @@ Control
                 {
                     id: layoutModel
 
-                    layoutId: layout ? layout.id : Nx.uuid("")
+                    layoutId: layout ? layout.id : NxGlobals.uuid("")
 
                     property rect previousRect: Qt.rect(0, 0, 0, 0)
 

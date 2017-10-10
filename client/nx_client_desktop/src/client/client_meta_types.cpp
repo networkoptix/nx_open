@@ -34,6 +34,7 @@
 
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/client/desktop/ui/scene/models/layout_model.h>
+#include <nx/client/desktop/ui/scene/instruments/instrument.h>
 
 namespace {
 
@@ -171,5 +172,7 @@ void QnClientMetaTypes::registerQmlTypes()
         lit("Cannot create instance of Workbench."));
     qmlRegisterUncreatableType<QnWorkbenchLayout>("Nx.Workbench", 1, 0, "WorkbenchLayout",
         lit("Cannot create instance of WorkbenchLayout."));
+
+    nx::client::desktop::ui::scene::Instrument::registerQmlType();
 }
 

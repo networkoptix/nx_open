@@ -19,6 +19,7 @@
 #include <helpers/nx_globals_object.h>
 #include <helpers/url_helper.h>
 #include <nx/client/core/animation/kinetic_animation.h>
+#include <nx/client/core/ui/frame_section.h>
 
 static QObject* createNxGlobals(QQmlEngine*, QJSEngine*)
 {
@@ -46,7 +47,7 @@ void QnClientCoreMetaTypes::initialize()
         "Nx.Animations", 1, 0, "KineticAnimation");
 
     qmlRegisterSingletonType<nx::client::core::NxGlobalsObject>(
-        "Nx", 1, 0, "Nx", &createNxGlobals);
+        "Nx", 1, 0, "NxGlobals", &createNxGlobals);
     qmlRegisterUncreatableType<QnUuid>(
         "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
     qRegisterMetaType<QnUrlHelper>();
@@ -54,6 +55,8 @@ void QnClientCoreMetaTypes::initialize()
         "Nx", 1, 0, "UrlHelper", QLatin1String("Cannot create an instance of UrlHelper."));
     qmlRegisterUncreatableType<QnSoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
+
+    nx::client::core::ui::FrameSection::registedQmlType();
 
     qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",
         QLatin1String("Cannot create an instance of QnMediaDewarpingParams."));
