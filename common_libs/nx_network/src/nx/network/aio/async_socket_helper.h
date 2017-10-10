@@ -126,7 +126,7 @@ public:
                     SocketGlobals::addressResolver().dnsResolver()
                     .isRequestIdKnown(this)), kFailureMessage);
 
-            if (this->m_socket->impl()->aioThread)
+            if (this->m_socket->impl()->aioThread.load())
             {
                 NX_CRITICAL(
                     !this->m_socket->impl()->aioThread.load()->isSocketBeingMonitored(this->m_socket),
