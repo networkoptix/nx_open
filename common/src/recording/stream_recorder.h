@@ -122,7 +122,7 @@ public:
     */
     void setServerTimeZoneMs(qint64 value);
 
-    void setTranscodeFilters(nx::core::transcoding::FilterChain filters);
+    void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
 
 signals:
     void recordingStarted();

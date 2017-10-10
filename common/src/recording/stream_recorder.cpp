@@ -1163,7 +1163,7 @@ void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
     m_motionHandler = handler;
 }
 
-void QnStreamRecorder::setTranscodeFilters(nx::core::transcoding::FilterChain filters)
+void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
 {
     m_transcodeFilters = filters;
 }
