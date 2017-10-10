@@ -7,7 +7,6 @@
     "cancelButton":"Abbrechen",
     "loginTitle":"Anmelden bei {{PRODUCT_NAME}}",
     "loginButton":"Anmelden",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Sie sind bereits eingeloggt",
     "logoutAuthorisedContinueButton":"Fortfahren",
     "logoutAuthorisedLogoutButton":"Abmelden"
@@ -30,12 +29,10 @@
     "restorePasswordSuccess":"Passwort gespeichert -",
     "restorePasswordCode":"Passwort zurücksetzen -",
     "view":"Kameras ansehen - ",
-    "contentPage":"",
     "debug":"Debug",
     "login":"Anmelden -",
     "download":"Download {{VMS_NAME}}",
     "downloadPlatform":"Download {{VMS_NAME}} für ",
-    "startPage":"",
     "pageNotFound":"Seite nicht gefunden"
   },
   "systemStatuses":{
@@ -184,7 +181,6 @@
   },
   "downloads":{
     "noClientDetectedTitle":"Installieren Sie {{VMS_NAME}}, um Ihr System anzusehen",
-    "noClientDetectedMessage":"",
     "action":"Download {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -197,16 +193,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{

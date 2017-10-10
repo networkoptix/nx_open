@@ -2,7 +2,9 @@
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> vous invite à rejoindre <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> et partage son système {{message.system_name}} avec vous.</p>
-{{/message.sharer_name}} {{^message.sharer_name}}
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
 <p>Vous êtes invités à vous joindre à <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>. Le système {{message.system_name}} a été partagé avec vous.</p>
 {{/message.sharer_name}}
 

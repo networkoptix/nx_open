@@ -1,27 +1,27 @@
 {
   "cameraLinks":{
-    "highStream":"High stream",
-    "lowStream":"Low stream",
-    "transcoding":"Transcoding",
-    "unknown":"Unknown",
-    "copyToClipboard":"Copy to clipboard",
-    "copyDefaultText":"Copy",
-    "copyActiveText":"Copied to clipboard"
+    "highStream":"Выс. кач-во",
+    "lowStream":"Низ. кач-во",
+    "transcoding":"Перекодирование",
+    "unknown":"Неизвестно",
+    "copyToClipboard":"скопировать в буфер обмена",
+    "copyDefaultText":"копировать",
+    "copyActiveText":"скопировано в буфер обмена"
   },
-  "systemOffline":"System Offline",
+  "systemOffline":"Система не в сети",
   "cameraStates":{
-    "offline":"Offline",
-    "error":"Error",
-    "unauthorized":"Authentication required",
-    "noData":"No data",
-    "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
-    "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
-    "flashOrWebmRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-    "noArmSupport":"This browser or device does not support video playback from ARM-based servers.",
-    "noFormat":"This browser or device does not support video playback from  this camera.",
-    "ieNoWebm":"Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-    "ieWin10":"Please, use Microsoft Edge or Google Chrome browsers.",
-    "ubuntuNX":"This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+    "offline":"Не в сети",
+    "error":"Ошибка",
+    "unauthorized":"Требуется аутентификация",
+    "noData":"Нет данных",
+    "iosVideoTooLarge":"iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+    "flashRequired":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM.",
+    "flashOrWebmRequired":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
+    "noArmSupport":"Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
+    "noFormat":"Этот браузер или устройство не поддерживает воспроизведение видео с этой камеры.",
+    "ieNoWebm":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+    "ieWin10":"Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+    "ubuntuNX":"Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
   },
-  "searchCamPlaceholder":"search"
+  "searchCamPlaceholder":"поиск"
 }
