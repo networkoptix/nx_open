@@ -93,6 +93,8 @@ if LOCAL_ENVIRONMENT:
         os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static/lang_en_US"),
     )
 
+ADMIN_TOOLS_INDEX_DASHBOARD = 'cloud.dashboard.CustomIndexDashboard'
+
 
 TEMPLATES = [
     {
