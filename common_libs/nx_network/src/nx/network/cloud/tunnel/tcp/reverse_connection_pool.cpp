@@ -21,8 +21,10 @@ static String getHostSuffix(const String& hostName)
 }
 
 ReverseConnectionPool::ReverseConnectionPool(
+    aio::AIOService* aioService,
     std::unique_ptr<MediatorConnection> mediatorConnection)
 :
+    base_type(aioService, nullptr),
     m_mediatorConnection(std::move(mediatorConnection)),
     m_acceptor(
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
@@ -44,7 +46,7 @@ ReverseConnectionPool::~ReverseConnectionPool()
 
 void ReverseConnectionPool::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    Parent::bindToAioThread(aioThread);
+    base_type::bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
     m_acceptor.bindToAioThread(aioThread);
 }
