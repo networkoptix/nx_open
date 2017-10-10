@@ -351,7 +351,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     menu()->newMenu(Qn::MainScope);
 #endif
 
-    if (!qnRuntime->isActiveXMode())
+    if (!qnRuntime->isActiveXMode() && !qnRuntime->isProfilerMode())
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
@@ -359,8 +359,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
          * * double buffering is disabled in drivers or in our program
          * Workaround must be disabled in activeX mode.
          */
-         QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-         Q_UNUSED(vsyncWorkaround);
+        auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+        Q_UNUSED(vsyncWorkaround);
     }
 
     updateWidgetsVisibility();

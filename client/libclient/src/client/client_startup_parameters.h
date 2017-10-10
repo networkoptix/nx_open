@@ -36,6 +36,7 @@ struct QnStartupParameters
     bool showFullInfo;
     bool exportedMode;  /*< Client was run from an exported video exe-file. */
     bool hiDpiDisabled = false;
+    bool profilerMode = false;
 
     bool selfUpdateMode;
     const static QString kSelfUpdateKey;

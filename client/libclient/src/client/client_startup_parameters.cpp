@@ -92,6 +92,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 
     addParserParam(commandLineParser, &result.clientUpdateDisabled, "--no-client-update");
     addParserParam(commandLineParser, &result.vsyncDisabled, "--no-vsync");
+    addParserParam(commandLineParser, &result.profilerMode, "--profiler");
 
     /* Runtime settings */
     addParserParam(commandLineParser, &result.ignoreVersionMismatch, "--no-version-mismatch-check");

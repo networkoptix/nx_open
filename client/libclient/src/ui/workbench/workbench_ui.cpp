@@ -113,7 +113,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QGraphicsLayout::setInstantInvalidatePropagation(true);
 
     /* Install and configure instruments. */
-    m_fpsCountingInstrument = new FpsCountingInstrument(1000, this);
+
+    // In profiler mode calculate fps 10 times more precisely.
+    const int kFpsUpdatePeriod = qnRuntime->isProfilerMode() ? 10000 : 1000;
+    m_fpsCountingInstrument = new FpsCountingInstrument(kFpsUpdatePeriod, this);
+
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
 
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
@@ -121,16 +125,23 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped, this, &QnWorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed, this, &QnWorkbenchUi::at_activityStarted);
-    connect(m_fpsCountingInstrument, &FpsCountingInstrument::fpsChanged, this, [this](qreal fps)
-    {
-#ifdef QN_SHOW_FPS_MS
-        QString fmt = lit("%1 (%2ms)");
-        m_fpsItem->setText(fmt.arg(QString::number(fps, 'g', 4)).arg(QString::number(1000 / fps, 'g', 4)));
-#else
-        m_fpsItem->setText(QString::number(fps, 'g', 4));
-#endif
-        m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
-    });
+    connect(m_fpsCountingInstrument, &FpsCountingInstrument::fpsChanged, this,
+        [this](qreal fps, qint64 frameTimeMs)
+        {
+            if (qnRuntime->isProfilerMode())
+            {
+                QString fmt = lit("%1 (%2ms)");
+                m_fpsItem->setText(fmt
+                    .arg(QString::number(fps, 'g', 4))
+                    .arg(frameTimeMs));
+            }
+            else
+            {
+                m_fpsItem->setText(QString::number(fps, 'g', 4));
+            }
+
+            m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
+        });
 
     /* Create controls. */
     createControlsWidget();
@@ -1333,7 +1344,7 @@ void QnWorkbenchUi::createFpsWidget()
     display()->view()->addAction(action(QnActions::ShowFpsAction));
     connect(action(QnActions::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);
-    setFpsVisible(false);
+    setFpsVisible(qnRuntime->isProfilerMode());
 }
 
 #pragma endregion Fps widget methods

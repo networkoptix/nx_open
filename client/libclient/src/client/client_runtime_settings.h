@@ -40,6 +40,9 @@ public:
         /** Current translation. */
         TRANSLATION_PATH,
 
+        /** Enable profiler mode with some additional logs and vsync workaround disabled. */
+        PROFILER_MODE,
+
         VARIABLE_COUNT
     };
 
@@ -60,6 +63,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,    ignoreVersionMismatch,  setIgnoreVersionMismatch,   IGNORE_VERSION_MISMATCH,    false)
         QN_DECLARE_RW_PROPERTY(bool,    isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(QString, translationPath,        setTranslationPath,         TRANSLATION_PATH,           QString())
+        QN_DECLARE_RW_PROPERTY(bool,    isProfilerMode,         setProfilerMode,            PROFILER_MODE,              false)
     QN_END_PROPERTY_STORAGE()
 
 };
