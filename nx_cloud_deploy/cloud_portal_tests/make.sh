@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=cloud_portal_tests
-VERSION=1.4
+VERSION=1.5
 
 function stage()
 {

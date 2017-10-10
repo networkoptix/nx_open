@@ -1,0 +1,21 @@
+        # Allow access to the letsencrypt ACME Challenge
+        location ~ /\.well-known\/acme-challenge {
+            allow all;
+        }
+
+        location ~ ^/(cdb|ec2)/ {
+            proxy_pass http://cloud_db:3346;
+        }
+
+        location = /api/cloud_modules.xml {
+            proxy_pass http://cloud_db:3346/cdb/cloud_modules.xml;
+        }
+
+        location /mediator {
+            proxy_pass http://connection_mediator:3355;
+        }
+
+        location /gateway {
+            proxy_pass http://vms_gateway:3347;
+        }
+
