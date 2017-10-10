@@ -89,10 +89,24 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
 
     auto macAddr = systemInfo.parameter<QString>("ConnectedMACAddress");
     auto model = systemInfo.parameter<QString>("Model");
-    if (!macAddr || !model)
+    if (!model)
         return QList<QnResourcePtr>();
     auto firmware = systemInfo.parameter<QString>("FirmwareVersion");
     
+    if (!macAddr || macAddr->isEmpty())
+    {
+        HanwhaRequestHelper helper(resource);
+        std::map<QString, QString> params{
+            { "interfaceName", "Network1" }
+        };
+        HanwhaResponse networkInfo = helper.view("network/interface", params);
+        if (!networkInfo.isSuccessful())
+            return QList<QnResourcePtr>();
+        macAddr = networkInfo.parameter<QString>("MACAddress");
+        if (!macAddr || macAddr->isEmpty())
+            return QList<QnResourcePtr>();
+    }
+
     resource->setMAC(QnMacAddress(*macAddr));
     resource->setModel(*model);
     resource->setName(*model);

@@ -171,6 +171,26 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     return CameraDiagnostics::NoErrorResult();
 }
 
+QSet<int> HanwhaStreamReader::availableProfiles(int channel) const
+{
+    QSet<int> result;
+    HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setIgnoreMutexAnalyzer(true);
+    const auto response = helper.view(
+        lit("media/videoprofilepolicy"),
+        { { kHanwhaChannelProperty, QString::number(channel) } });
+
+    if (!response.isSuccessful())
+        return result;
+
+    for (const auto& entry: response.response())
+    {
+        if (entry.first.endsWith("Profile"))
+            result << entry.second.toInt();
+    }
+    return result;
+}
+
 int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 {
     const auto channel = m_hanwhaResource->getChannel();
@@ -198,6 +218,7 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 
     int bestProfile = kHanwhaInvalidProfile;
     int bestScore = 0;
+    const auto profileFilter = availableProfiles(channel);
 
     for (const auto& profileEntry: channelProfiles)
     {
@@ -206,6 +227,9 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
             kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
                 ? kHanwhaCodecCoefficients.at(profile.codec)
                 : -1;
+
+        if (!profileFilter.contains(profile.number))
+            continue;
 
         const auto score = profile.resolution.width()
             * profile.resolution.height()
