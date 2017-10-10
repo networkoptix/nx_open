@@ -4,9 +4,9 @@
     "lowStream":"Low stream",
     "transcoding":"Transcoding",
     "unknown":"Unknown",
-    "copyToClipboard":"Copy to clipboard",
-    "copyDefaultText":"Copy",
-    "copyActiveText":"Copied to clipboard"
+    "copyToClipboard":"kopieer naar klembord",
+    "copyDefaultText":"kopiëren",
+    "copyActiveText":"gekopieerd naar het klembord"
   },
   "systemOffline":"System Offline",
   "cameraStates":{

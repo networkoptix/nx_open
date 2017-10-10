@@ -1,6 +1,6 @@
-New message
+ข้อความใหม่
 
-Type: {{message.type}}
-Data: {{{message.data}}}
+ประเภท: {{message.type}}
+ข้อมูล: {{{message.data}}}
 
-There is no specific template for this type of message
+ไม่มีแม่แบบเฉพาะสำหรับข้อความประเภทนี้

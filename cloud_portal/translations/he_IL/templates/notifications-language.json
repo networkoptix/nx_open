@@ -3,7 +3,7 @@
     "emailSubject":"אשר את החשבון שלך"
   },
   "restore_password":{
-    "emailSubject":"שחזר את הסיסמא שלך"
+    "emailSubject":"שחזר את הסיסמה שלך"
   },
   "system_invite":{
     "emailSubject":"מערכת הווידאו {{message.system_name}} שותפה איתך"

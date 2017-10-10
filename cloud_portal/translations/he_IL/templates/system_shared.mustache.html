@@ -2,7 +2,9 @@
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> המערכת המשותפת {{message.system_name}} איתך.</p>
-{{/message.sharer_name}} {{^message.sharer_name}}
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
 <p>המערכת {{message.system_name}} שותפה איתך.</p>
 {{/message.sharer_name}}
 
