@@ -148,78 +148,82 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
 enum ActionType
 {
-    undefinedAction         = 0,
+    undefinedAction = 0,
 
     /**
-        * Change camera output state.
-        *
-        * Parameters:
-        * - relayOutputID (string, required)          - id of output to trigger.
-        * - durationMs (uint, optional)               - timeout (in milliseconds) to reset camera state back.
-        */
-    cameraOutputAction      = 1,
+     * Change camera output state.
+     * actionParams:
+     * - relayOutputID (string, required)          - id of output to trigger.
+     * - durationMs (uint, optional)               - timeout (in milliseconds) to reset camera state back.
+     */
+    cameraOutputAction = 1,
 
-    bookmarkAction          = 3,
+    bookmarkAction = 3,
 
     /** Start camera recording. */
-    cameraRecordingAction   = 4,
+    cameraRecordingAction = 4,
 
     /** Activate panic recording mode. */
-    panicRecordingAction    = 5,
+    panicRecordingAction = 5,
 
     /**
-        * Send an email. This action can be executed from any endpoint.
-        *
-        * Parameters:
-        * - emailAddress (string, required)
-        */
-    sendMailAction          = 6,
+     * Send an email. This action can be executed from any endpoint.
+     * actionParams:
+     * - emailAddress (string, required)
+     */
+    sendMailAction = 6,
 
-    /** Write a record to the server's log. */
-    diagnosticsAction       = 7,
+    /** Write a record to the server log. */
+    diagnosticsAction = 7,
 
-    showPopupAction         = 8,
-
-    /**
-        * Parameters:
-        * - url (string, required)                    - url of sound, contains path to sound on the Server.
-        */
-    playSoundAction         = 9,
-    playSoundOnceAction     = 10,
+    showPopupAction = 8,
 
     /**
-        * Parameters:
-        * - sayText (string, required)                - text that will be provided to TTS engine.
-        */
-    sayTextAction           = 11,
+     * actionParams:
+     * - url (string, required) - Url of the sound, contains path to the sound on the server.
+     */
+    playSoundAction = 9,
 
     /**
-        * Execute given PTZ preset.
-        * Parameters:
-        * (resourceId, presetId)
-        */
-    executePtzPresetAction  = 12,
+     * actionParams:
+     * - url (string, required) - Url of the sound, contains path to the sound on the server.
+     */
+    playSoundOnceAction = 10,
 
     /**
-        * Show text overlay over the given camera(s).
-        * Parameters:
-        * - text (string, required)                    - text that will be displayed.
-        */
-    showTextOverlayAction   = 13,
+     * actionParams:
+     * - sayText (string, required) - Text that will be provided to TTS engine.
+     */
+    sayTextAction = 11,
 
     /**
-        * Put the given camera(s) to the Alarm Layout.
-        * Parameters:
-        * - users                                      - list of users, which will receive this alarm notification
-        */
+     * Execute given PTZ preset.
+     * actionParams:
+     * - resourceId
+     * - presetId
+     */
+    executePtzPresetAction = 12,
+
+    /**
+     * Show text overlay over the given camera(s).
+     * actionParams:
+     * - text (string, required) - Text that will be displayed.
+     */
+    showTextOverlayAction = 13,
+
+    /**
+     * Put the given camera(s) to the Alarm Layout.
+     * actionParams:
+     * - users - List of users which will receive this alarm notification.
+     */
     showOnAlarmLayoutAction = 14,
 
     /**
-        * Send HTTP request as an action.
-        * Parameters:
-        * - url                                        - full HTTP url to execute. username/password are stored as part of the URL
-        * - text                                       - HTTP message body for POST method
-        */
+     * Send HTTP request as an action.
+     * actionParams:
+     * - url - Full HTTP url to execute. Username/password are stored as part of the URL.
+     * - text - HTTP message body for POST method.
+     */
     execHttpRequestAction = 15,
 
     acknowledgeAction = 16

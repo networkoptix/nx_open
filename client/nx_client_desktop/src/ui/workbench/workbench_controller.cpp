@@ -126,33 +126,6 @@ QPoint invalidCursorPos()
     return invalidDragDelta();
 }
 
-QPoint modulo(const QPoint& pos, const QRect& rect)
-{
-    return QPoint(
-        rect.left() + (pos.x() - rect.left() + rect.width()) % rect.width(),
-        rect.top() + (pos.y() - rect.top() + rect.height()) % rect.height()
-    );
-}
-
-int distance(int l, int h, int v)
-{
-    if (l > h)
-        return distance(h, l, v);
-
-    if (v <= l)
-    {
-        return l - v;
-    }
-    else if (v >= h)
-    {
-        return v - h;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 /** Opacity of video items when they are dragged / resized. */
 const qreal widgetManipulationOpacity = 0.3;
 
@@ -465,6 +438,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(action::ToggleCurrentItemMaximizationStateAction), &QAction::triggered, this,
         &QnWorkbenchController::toggleCurrentItemMaximizationState);
 
+    updateCurrentLayoutInstruments();
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -474,36 +448,6 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
 Instrument* QnWorkbenchController::motionSelectionInstrument() const
 {
     return m_motionSelectionInstrument;
-}
-
-Instrument* QnWorkbenchController::itemRightClickInstrument() const
-{
-    return m_itemRightClickInstrument;
-}
-
-Instrument* QnWorkbenchController::moveInstrument() const
-{
-    return m_moveInstrument;
-}
-
-Instrument* QnWorkbenchController::resizingInstrument() const
-{
-    return m_resizingInstrument;
-}
-
-Instrument* QnWorkbenchController::rubberBandInstrument() const
-{
-    return m_rubberBandInstrument;
-}
-
-Instrument* QnWorkbenchController::itemLeftClickInstrument() const
-{
-    return m_itemLeftClickInstrument;
-}
-
-Instrument* QnWorkbenchController::sceneClickInstrument() const
-{
-    return m_sceneClickInstrument;
 }
 
 bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
@@ -1533,6 +1477,23 @@ void QnWorkbenchController::at_zoomedToggle_deactivated() {
 void QnWorkbenchController::updateCurrentLayoutInstruments()
 {
     const auto layout = workbench()->currentLayout();
+
+    const auto isMotionWidget = layout->flags().testFlag(QnLayoutFlag::MotionWidget);
+    if (isMotionWidget)
+    {
+        m_moveInstrument->setEnabled(false);
+        m_resizingInstrument->setEnabled(false);
+        m_wheelZoomInstrument->setEnabled(false);
+        m_handScrollInstrument->setEnabled(false);
+        m_itemLeftClickInstrument->setEnabled(false);
+        m_itemRightClickInstrument->setEnabled(false);
+        m_rubberBandInstrument->setEnabled(false);
+        m_sceneClickInstrument->setEnabled(false);
+        m_gridAdjustmentInstrument->setEnabled(false);
+        return;
+    }
+
+
     const auto resource = layout->resource();
     if (!resource)
     {
@@ -1542,14 +1503,14 @@ void QnWorkbenchController::updateCurrentLayoutInstruments()
         return;
     }
 
-    Qn::Permissions permissions = accessController()->permissions(resource);
-    bool writable = permissions & Qn::WritePermission;
+    const auto permissions = accessController()->permissions(resource);
+    const auto writable = permissions.testFlag(Qn::WritePermission);
 
     m_moveInstrument->setEnabled(writable && !resource->locked());
     m_resizingInstrument->setEnabled(writable && !resource->locked()
         && !layout->flags().testFlag(QnLayoutFlag::NoResize));
 
-    const bool fixedViewport = layout->flags().testFlag(QnLayoutFlag::FixedViewport);
+    const auto fixedViewport = layout->flags().testFlag(QnLayoutFlag::FixedViewport);
     m_wheelZoomInstrument->setEnabled(!fixedViewport);
     m_handScrollInstrument->setEnabled(!fixedViewport);
     m_gridAdjustmentInstrument->setEnabled(!fixedViewport);
