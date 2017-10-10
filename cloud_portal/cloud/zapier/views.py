@@ -17,12 +17,12 @@ from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
 #Hacked URLs
-CLOUD_DB_URL_HACK = 'http://cloud-test.hdw.mx:80/cdb'
-CLOUD_INSTANCE_URL_HACK = 'http://cloud-test.hdw.mx'
+CLOUD_DB_URL_HACK = 'http://beta.nxvms.com:80/cdb'
+CLOUD_INSTANCE_URL_HACK = 'http://beta.nxvms.com'
 
 #Correct urls
 #CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
-CLOUD_INSTANCE_URL = settings.CLOUD_CONNECT['gateway']
+CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
 
 
 def authenticate(request):
@@ -148,13 +148,9 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
 
 def make_or_increment_rule(action, email, system_id, caption, password=None,
                            description=None, source=None, target_url=None):
-    caption = sanitizer.sanitize(caption)
-
     rules_query = GeneratedRule.objects.filter(email=email, system_id=system_id, caption=caption)
 
     if action == 'Generic Event':
-        source = sanitizer.sanitize(source)
-        description = sanitizer.sanitize(description)
         rules_query = rules_query.filter(source=source, direction="Zapier to Nx")
 
         if not rules_query.exists():
@@ -167,7 +163,6 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
             increment_rule(rules_query[0])
 
     elif action == 'Http Action':
-        target_url = sanitizer.sanitize(target_url)
         rules_query = rules_query.filter(direction="Nx to Zapier")
         if not rules_query.exists():
             make_rule(action, email, password, system_id, caption=caption, zapier_trigger=target_url)
@@ -207,12 +202,12 @@ def get_systems(request):
 def zapier_send_generic_event(request):
     user, email, password = authenticate(request)
     system_id = request.data['systemId']
-    source = request.data['source']
-    caption = request.data['caption']
+    source = sanitizer.sanitize(request.data['source'])
+    caption = sanitizer.sanitize(request.data['caption'])
 
     query_params = {"source": source, "caption": caption}
 
-    description = request.data['description'] if 'description' in request.data else ""
+    description = sanitizer.sanitize(request.data['description']) if 'description' in request.data else ""
 
     if description:
         query_params['description'] = description
@@ -266,7 +261,7 @@ def subscribe_webhook(request):
     user, email, password = authenticate(request)
 
     system_id = request.query_params['system_id']
-    caption = request.query_params['caption']
+    caption = sanitizer.sanitize(request.query_params['caption'])
     target = request.data['target_url']
 
     event = system_id + " " + caption
