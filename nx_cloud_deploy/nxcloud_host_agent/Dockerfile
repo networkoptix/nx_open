@@ -1,7 +1,6 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/pybase:1.9
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
 
 RUN mkdir -p /app
-RUN virtualenv -p python3 /app/env
 
 WORKDIR /app
 
@@ -19,14 +18,14 @@ ARG NXCLOUD_VERSION
 ARG VERSION
 ARG MODULES
 
-RUN /app/env/bin/pip install --no-cache-dir nxcloud==${NXCLOUD_VERSION}
+RUN pip3 install --no-cache-dir nxcloud==${NXCLOUD_VERSION}
 
 ENV NXCLOUD_RUN_CONFIG /root/nxcloud_run_config.yaml
-ENV PATH /app/env/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV VERSION ${VERSION}
 ENV MODULES "${MODULES}"
 
-ENTRYPOINT ["/app/env/bin/nxcloud", "--mode=agent"]
+ENTRYPOINT ["nxcloud", "--mode=agent"]
 
 ARG VERSION
 ARG REVISION
