@@ -122,7 +122,7 @@ public:
     */
     void setServerTimeZoneMs(qint64 value);
 
-    void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
+    void setTranscodeFilters(nx::core::transcoding::FilterChain filters);
 
 signals:
     void recordingStarted();
@@ -229,7 +229,7 @@ private:
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
     StreamRecorderRole m_role;
-    nx::core::transcoding::FilterChain m_transcodeFilters;
+    boost::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;
 
     std::random_device m_rd;
     std::mt19937 m_gen;

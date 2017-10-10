@@ -681,12 +681,12 @@ int QnBusinessRuleViewModel::aggregationPeriod() const
     return m_aggregationPeriodSec;
 }
 
-void QnBusinessRuleViewModel::setAggregationPeriod(int msecs)
+void QnBusinessRuleViewModel::setAggregationPeriod(int seconds)
 {
-    if (m_aggregationPeriodSec == msecs)
+    if (m_aggregationPeriodSec == seconds)
         return;
 
-    m_aggregationPeriodSec = msecs;
+    m_aggregationPeriodSec = seconds;
     m_modified = true;
 
     emit dataChanged(Field::aggregation | Field::modified);

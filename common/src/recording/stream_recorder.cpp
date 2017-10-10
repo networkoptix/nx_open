@@ -21,13 +21,6 @@
 
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
-#include "transcoding/filters/contrast_image_filter.h"
-#include "transcoding/filters/time_image_filter.h"
-#include "transcoding/filters/fisheye_image_filter.h"
-#include "transcoding/filters/rotate_image_filter.h"
-#include "transcoding/filters/crop_image_filter.h"
-#include "transcoding/filters/tiled_image_filter.h"
-#include "transcoding/filters/scale_image_filter.h"
 
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "export/sign_helper.h"
@@ -698,8 +691,11 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
         // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-        const bool isTranscode = m_transcodeFilters.isTranscodingRequired(mediaDev)
-            || (m_dstVideoCodec != AV_CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType);
+        const bool isTranscode =
+            (m_transcodeFilters.is_initialized()
+                && m_transcodeFilters->isTranscodingRequired(mediaDev))
+            || (m_dstVideoCodec != AV_CODEC_ID_NONE
+                && m_dstVideoCodec != mediaData->compressionType);
 
         const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
 
@@ -780,8 +776,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);
-                    m_transcodeFilters.prepare(mediaDev, m_videoTranscoder->getResolution());
-                    m_videoTranscoder->setFilterList(m_transcodeFilters);
+
+                    m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
+                    m_videoTranscoder->setFilterList(*m_transcodeFilters);
                     m_videoTranscoder->setQuality(Qn::QualityHighest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
 
@@ -1166,7 +1163,7 @@ void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
     m_motionHandler = handler;
 }
 
-void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
+void QnStreamRecorder::setTranscodeFilters(nx::core::transcoding::FilterChain filters)
 {
     m_transcodeFilters = filters;
 }

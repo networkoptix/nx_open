@@ -27,15 +27,24 @@ public:
     FilterChain(const FilterChain&) = default;
     FilterChain& operator=(const FilterChain&) = default;
 
+    /**
+     * Prepare set of filters to apply to video data.
+     */
     void prepare(const QnMediaResourcePtr& resource,
         const QSize& srcFrameResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit);
 
-    void prepare(const QnConstResourceVideoLayoutPtr& videoLayout,
-        const QnMediaDewarpingParams& mediaDewarpingParams,
-        const QSize& srcFrameResolution,
+    /**
+     * Prepare set of filters to apply to an image. Main difference is that panoramic cameras
+     * screenshots do not require tiling (already transcoded), but aspect ratio must be calculated
+     * concerning video layout size.
+     */
+    void prepareForImage(const QnMediaResourcePtr& resource,
+        const QSize& fullImageResolution,
         const QSize& resolutionLimit = kDefaultResolutionLimit);
 
+    bool isImageTranscodingRequired(const QSize& fullImageResolution,
+        const QSize& resolutionLimit = kDefaultResolutionLimit) const;
     bool isTranscodingRequired(const QnConstResourceVideoLayoutPtr& videoLayout) const;
     bool isTranscodingRequired(const QnMediaResourcePtr& resource) const;
 
@@ -48,6 +57,17 @@ public:
     CLVideoDecoderOutputPtr apply(const CLVideoDecoderOutputPtr& source) const;
 
     void addLegacyFilter(QnAbstractImageFilterPtr filter);
+
+private:
+    void prepareVideoArFilter(const QSize& srcFrameResolution);
+    void prepareImageArFilter(const QnMediaResourcePtr& resource,
+        const QSize& fullImageResolution);
+    void prepareDewarpingFilter(const QnMediaResourcePtr& resource);
+    void prepareZoomWindowFilter();
+    void prepareImageEnhancementFilter();
+    void prepareRotationFilter();
+    void prepareOverlaysFilters();
+    void prepareDownscaleFilter(const QSize& srcFrameResolution, const QSize& resolutionLimit);
 
 private:
     bool m_ready = false;

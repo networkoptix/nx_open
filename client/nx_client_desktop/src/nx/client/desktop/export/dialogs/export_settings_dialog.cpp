@@ -42,7 +42,7 @@ static constexpr int kNoDataDefaultFontSize = 18;
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnTimePeriod& timePeriod,
-    IsFileNameValid isFileNameValid,
+    FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
@@ -68,19 +68,20 @@ ExportSettingsDialog::ExportSettingsDialog(
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnCameraBookmark& bookmark,
-    IsFileNameValid isFileNameValid,
+    FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFileNameValid, parent)
 {
     ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->layoutTab));
     setMediaResourceWidget(widget);
+    updateMode();
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
     const QnTimePeriod& timePeriod,
     const QnCameraBookmark& bookmark,
-    IsFileNameValid isFileNameValid,
+    FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     base_type(parent),
@@ -132,6 +133,8 @@ ExportSettingsDialog::ExportSettingsDialog(
     d->loadSettings();
     connect(this, &QDialog::accepted, d, &Private::saveSettings);
 
+    ui->tabWidget->setCurrentWidget(d->mode() == Mode::Media ? ui->cameraTab : ui->layoutTab);
+
     d->setTimePeriod(timePeriod);
 
     ui->rapidReviewSettingsPage->setSourcePeriodLengthMs(timePeriod.durationMs);
@@ -155,8 +158,14 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
         d, &Private::setLayoutReadOnly);
 
-    connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setMediaFilename);
     connect(ui->layoutFilenamePanel, &FilenamePanel::filenameChanged, d, &Private::setLayoutFilename);
+    connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged, this,
+        [this](const Filename& fileName)
+        {
+            d->setMediaFilename(fileName);
+            ui->transcodingButtonsWidget->setHidden(
+                FileExtensionUtils::isExecutable(fileName.extension));
+        });
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::dataChanged,
         d, &Private::setTimestampOverlaySettings);
@@ -210,7 +219,21 @@ ExportSettingsDialog::ExportSettingsDialog(
         ui->speedButton, &ui::SelectableTextButton::deactivate);
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
-    updateMode();
+
+    connect(d, &Private::transcodingAllowedChanged, this,
+        [this](bool transcodingIsAllowed)
+        {
+            ui->exportMediaSettingsPage->setTranscodingAllowed(transcodingIsAllowed);
+            if (transcodingIsAllowed)
+            {
+                ui->exportMediaSettingsPage->setApplyFilters(
+                    d->exportMediaPersistentSettings().applyFilters);
+            }
+            else
+            {
+                ui->cameraExportSettingsButton->click();
+            }
+        });
 
     if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
         ui->bookmarkButton->click(); //< Set current page to bookmark info.
@@ -291,6 +314,7 @@ void ExportSettingsDialog::setupSettingsButtons()
             const bool enabled = state != ui::SelectableTextButton::State::deactivated;
             d->setRapidReviewFrameStep(enabled ? ui->rapidReviewSettingsPage->frameStepMs() : 0);
             d->setStoredRapidReviewSettings({enabled, d->storedRapidReviewSettings().speed});
+            ui->transcodingButtonsWidget->layout()->activate();
         });
 
     ui->bookmarkButton->setDeactivatable(true);
@@ -422,7 +446,7 @@ void ExportSettingsDialog::updateTabWidgetSize()
     auto size = ui->tabWidget->minimumSizeHint();
     if (ui->tabWidget->tabBar()->isHidden())
         size.setHeight(size.height() - ui->tabWidget->tabBar()->sizeHint().height());
-    ui->tabWidget->setMaximumSize(size);
+    ui->tabWidget->setFixedSize(size);
 }
 
 void ExportSettingsDialog::updateMode()
@@ -449,6 +473,8 @@ void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts
             updateAlertsInternal(ui->severeLayoutAlertsLayout, severeAlerts, true);
             break;
     }
+
+    updateTabWidgetSize();
 }
 
 void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,

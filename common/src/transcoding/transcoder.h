@@ -118,6 +118,7 @@ protected:
 
 protected:
     QSize m_resolution;
+    QSize m_sourceResolution;
     QList<QnAbstractImageFilterPtr> m_filters;
     bool m_opened;
 };

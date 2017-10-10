@@ -24,6 +24,9 @@ public:
     bool applyFilters() const;
     void setApplyFilters(bool value);
 
+    bool transcodingAllowed() const;
+    void setTranscodingAllowed(bool value);
+
 signals:
     void dataChanged(bool applyFilters);
 
