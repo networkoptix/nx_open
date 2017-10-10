@@ -2,7 +2,9 @@
 
 {{#message.sharer_name}}
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> a partagé le système {{message.system_name}} avec vous.</p>
-{{/message.sharer_name}} {{^message.sharer_name}}
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
 <p>Le système {{message.system_name}} a été partagé avec vous.</p>
 {{/message.sharer_name}}
 

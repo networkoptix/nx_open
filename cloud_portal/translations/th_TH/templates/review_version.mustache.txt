@@ -1,10 +1,10 @@
-There is a new revision for {{ message.product }}
+มีการแก้ไขใหม่สำหรับ {{message.product}}
 
-Click on the link to review draft {{ message.id }} for {{ message.product }}
+คลิกที่ลิงก์เพื่อดูร่าง {{message.id}} สำหรับ {{message.product}}
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+ลิงก์ไปวิจารณ์: {{ config.portal_url }} / admin / cms / review_version{{ message.id }}
 
-On this page you can
-1) Create a preview to see the most recent changes.
-2) Publish this version which will update all content.
-3) Edit contexts by clicking on the edit record button. To see those changes you will need to create a new version.
+ในหน้านี้คุณสามารถทำได้
+1) สร้างตัวอย่างเพื่อดูการเปลี่ยนแปลงล่าสุด
+2) เผยแพร่เวอร์ชันนี้ซึ่งจะอัปเดตเนื้อหาทั้งหมด
+3) แก้ไขบริบทโดยคลิกที่ปุ่มแก้ไขบันทึก หากต้องการดูการเปลี่ยนแปลงเหล่านี้คุณจะต้องสร้างเวอร์ชันใหม่

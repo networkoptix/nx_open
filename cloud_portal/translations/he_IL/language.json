@@ -7,7 +7,6 @@
     "cancelButton":"ביטול",
     "loginTitle":"התחבר אל {{PRODUCT_NAME}}",
     "loginButton":"התחבר",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"אתה כבר מחובר",
     "logoutAuthorisedContinueButton":"המשך",
     "logoutAuthorisedLogoutButton":"יציאה"
@@ -17,7 +16,7 @@
     "default":"{{PRODUCT_NAME}}",
     "registerSuccess":"ברוכים הבאים ל",
     "register":"צור חשבון ב-",
-    "changePassword":"שנה סיסמא -",
+    "changePassword":"שנה סיסמה -",
     "account":"הגדרות חשבון -",
     "systems":"מערכות -",
     "system":"מערכת -",
@@ -26,16 +25,14 @@
     "activateSent":"הפעל חשבון -",
     "activateSuccess":"החשבון הופעל -",
     "activateCode":"הפעל חשבון -",
-    "restorePassword":"איפוס סיסמא",
-    "restorePasswordSuccess":"הסיסמא נשמרה -",
-    "restorePasswordCode":"איפוס סיסמא -",
+    "restorePassword":"איפוס סיסמה",
+    "restorePasswordSuccess":"הסיסמה נשמרה -",
+    "restorePasswordCode":"איפוס סיסמה -",
     "view":"הצג מצלמות - ",
-    "contentPage":"",
     "debug":"איתור באגים",
     "login":"התחבר -",
     "download":"הורד את {{VMS_NAME}}",
     "downloadPlatform":"הורד {{VMS_NAME}} עבור ",
-    "startPage":"",
     "pageNotFound":"דף לא נמצא"
   },
   "systemStatuses":{
@@ -114,11 +111,11 @@
     "cantRegisterPrefix":"אירעה שגיאה",
     "cantGetSystemInfoPrefix":"מידע מערכת לא זמין",
     "cantChangeAccountPrefix":"לא ניתן לשמור שינויים",
-    "cantChangePasswordPrefix":"לא ניתן לשמור סיסמא",
+    "cantChangePasswordPrefix":"לא ניתן לשמור סיסמה",
     "cantActivatePrefix":"לא ניתן להפעיל את החשבון שלך",
     "cantSendConfirmationPrefix":"אין אפשרות לשלוח מייל אישור",
     "cloudInvalidResponse":"בסיס הנתונים בענן החזיר תגובה לא צפויה",
-    "notAuthorized":"דוא\"ל או סיסמא שגויים",
+    "notAuthorized":"דוא\"ל או סיסמה שגויים",
     "wrongParameters":"פרמטרים מסוימים בטופס אינם נכונים",
     "wrongCode":"החשבון כבר הופעל או שקוד האישור שגוי",
     "wrongCodeRestore":"קוד האישור כבר בשימוש או שגוי",
@@ -131,8 +128,8 @@
     "accountAlreadyActivated":"חשבון זה כבר פעיל",
     "emailNotFound":"החשבון לא קיים",
     "EmailAlreadyExists":"האימייל הזה כבר רשום",
-    "oldPasswordMistmatch":"הסיסמא הנוכחית אינה נכונה",
-    "passwordMismatch":"סיסמא שגויה",
+    "oldPasswordMistmatch":"הסיסמה הנוכחית אינה נכונה",
+    "passwordMismatch":"סיסמה שגויה",
     "cantEditYourself":"שינוי הרשאות של המשתמש אינו מאופשר",
     "cantEditAdmin":"למשתמש זה יש הרשאות מנהל",
     "cantOpenClient":"{{VMS_NAME}} יישום לא אותר. <a href=\"/download\"> הורדה</a>",
@@ -142,7 +139,7 @@
   "passwordRequirements":{
     "minLengthMessage":"הסיסמה חייבת להכיל 8 תווים לפחות",
     "requiredMessage":"השתמש רק באותיות לטיניות, מספרים וסמלים במקלדת, הימנע מרווחים בהתחלה ובסוף",
-    "weakMessage":"השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמא שלך חזקה יותר",
+    "weakMessage":"השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
     "strongMessage":"סיסמה חזקה!",
     "commonMessage":"סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם"
   },
@@ -178,13 +175,12 @@
   "account":{
     "accountSavedSuccess":"החשבון שלך נשמר בהצלחה",
     "passwordChangedSuccess":"החשבון שלך נשמר בהצלחה",
-    "changePassword":"שנה סיסמא",
-    "newPasswordLabel":"סיסמא חדשה",
+    "changePassword":"שנה סיסמה",
+    "newPasswordLabel":"סיסמה חדשה",
     "saveChanges":"שמור"
   },
   "downloads":{
     "noClientDetectedTitle":"להתקין {{VMS_NAME}} כדי לצפות במערכת שלך",
-    "noClientDetectedMessage":"",
     "action":"הורד את {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -197,16 +193,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{
@@ -225,9 +221,9 @@
   },
   "activeActions":{
     "sendConfirm":"שלח",
-    "resetPassword":"איפוס סיסמא",
+    "resetPassword":"איפוס סיסמה",
     "setNewPassword":"שמור סיסמה",
-    "setNewPasswordLabel":"סיסמא חדשה"
+    "setNewPasswordLabel":"סיסמה חדשה"
   },
   "regActions":{
     "passwordLabel":"סיסמא",

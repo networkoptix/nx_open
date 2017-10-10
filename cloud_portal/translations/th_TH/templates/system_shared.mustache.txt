@@ -1,11 +1,11 @@
-System was shared with you
+ระบบถูกแชร์กับคุณ
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}} ระบบที่ใช้ร่วมกัน {{message.system_name}} กับคุณ
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-The system {{message.system_name}} was shared with you.
+ระบบ {{message.system_name}} ถูกแชร์กับคุณ
 {{/message.sharer_name}}
 
-Open the system: {{config.portal_url}}/systems/{{message.system_id}}
+เปิดระบบ: {{config.portal_url}} / systems / {{message.system_id}}
