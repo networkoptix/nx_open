@@ -4,7 +4,6 @@ from api.models import Account
 from cms.models import customization_cache
 
 
-
 def get_languages(customization=None):
     if not customization:
         customization = settings.CUSTOMIZATION

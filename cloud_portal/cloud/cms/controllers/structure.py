@@ -49,7 +49,8 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 
 def update_from_object(cms_structure):
     product_name = cms_structure['product']
-    default_language = customization_cache('default', 'default_language')
+
+    default_language = Customization.objects.get(name='default').default_language.code
     product_id = find_or_add_product(product_name).id
     order = 0
 
@@ -76,26 +77,29 @@ def update_from_object(cms_structure):
                 record_type = "text"
                 meta = None
                 advanced = False
+                optional = False
                 if len(record) == 3:
                     label, name, value = record
                 if len(record) == 4:
                     label, name, value, description = record
             else:
-                label = record['label']
                 name = record['name']
                 value = record['value']
+                label = record['label'] if 'label' in record else ""
                 old_name = record['old_name'] if 'old_name' in record else None
                 description = record['description'] if 'description' in record else None
                 record_type = record['type'] if 'type' in record else None
                 meta = record['meta'] if 'meta' in record else None
                 advanced = record['advanced'] if 'advanced' in record else False
+                optional = record['optional'] if 'optional' in record else False
 
             data_structure = find_or_add_data_structure(name, old_name, context.id, has_language)
 
             data_structure.order = order
             order += 1
-            data_structure.label = label if label else name
+            data_structure.lable = label
             data_structure.advanced = advanced
+            data_structure.optional = optional
             if description:
                 data_structure.description = description
             if record_type:
@@ -146,8 +150,9 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             continue
 
         if name.endswith('/'):
-            if not root:  # find root directory to ignore
+            if name.count('/') == 1:  # top level directories are customizations
                 root = name
+                customization_name = root.replace('/', '')
             continue  # not a file - ignore it
 
         short_name = name.replace(root, '')
@@ -192,7 +197,11 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             structure.save()
 
         if update_content:
-            customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+            customization = Customization.objects.filter(name=customization_name)
+            if not customization.exists():
+                log_messages.append(('warning', 'Ignored %s (customization %s not found)' % (name,customization_name)))
+                continue
+            customization = customization.first()
             # get latest value
             latest_value = structure.find_actual_value(customization)
             # check if file was changed
