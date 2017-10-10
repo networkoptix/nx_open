@@ -166,9 +166,10 @@ bool Socket<SocketInterfaceToImplement>::close()
     if (m_fd == -1)
         return true;
 
-    NX_ASSERT(
-        !nx::network::SocketGlobals::isInitialized() ||
-        !nx::network::SocketGlobals::aioService().isSocketBeingMonitored(static_cast<Pollable*>(this)));
+    if (this->impl()->aioThread.load())
+    {
+        NX_ASSERT(!this->impl()->aioThread.load()->isSocketBeingMonitored(this));
+    }
 
     auto fd = m_fd;
     m_fd = -1;
