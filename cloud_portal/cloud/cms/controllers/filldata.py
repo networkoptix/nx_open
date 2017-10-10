@@ -206,7 +206,8 @@ def fill_content(customization_name='default', product='cloud_portal',
         # get their datastructures
         # detect their contexts
 
-        changed_records = DataRecord.objects.filter(version_id=version_id)
+        changed_records = DataRecord.objects.filter(version_id=version_id, customization_id=customization.id)
+        # in case version_id is none - we need to filter by customization as well
         if not version_id:  # if version_id is None - check if records are actually latest
             changed_records_ids = [DataRecord.objects.
                                    filter(language_id=record.language_id,

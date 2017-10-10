@@ -128,7 +128,6 @@ def save_unrevisioned_records(context, customization, language, data_structures,
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
 
-
         if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
             continue
         if records.exists():
