@@ -1,14 +1,14 @@
 <div class="panel panel-default" process-loading="gettingSystemUsers">
     <div class="panel-body">
-        <h2>người sử dụng</h2>
+        <h2>Người sử dụng</h2>
     </div>
     <div class="table-responsive">
         <table class="table table-hover" ng-if="system.users.length">
             <thead>
             <tr>
-                <th>tên</th>
-                <th>Emai</th>
-                <th>Quyền</th>
+                <th>Tên người sử dụng</th>
+                <th>Email</th>
+                <th>Quyền truy nhập</th>
                 <th class="button-cell"></th>
                 <th class="button-cell"></th>
             </tr>
@@ -26,14 +26,14 @@
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeEdited"
                        ng-class="{disabled:locked[user.email]}"
-                       title="Edit permissions"
-                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline">&nbsp;&nbsp;Edit</span></span></a></td>
+                       title="Quyền chỉnh sửa"
+                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline"> &nbsp;&nbsp;Sửa </span></span></a></td>
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeDeleted"
                        ng-class="{disabled:locked[user.email]}"
-                       title="xóa bỏ"
-                       ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Delete</span></a></td>
+                       title="Xóa bỏ"
+                       ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline"> &nbsp;&nbsp;Xoá </span></a></td>
             </tr>
             </tbody>
         </table>

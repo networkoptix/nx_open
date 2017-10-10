@@ -1,6 +1,6 @@
-New message
+Thông điệp mới
 
-Type: {{message.type}}
-Data: {{{message.data}}}
+Loại: {{message.type}}
+Dữ liệu: {{{message.data}}}
 
-There is no specific template for this type of message
+Không có mẫu cụ thể nào cho loại thông báo này

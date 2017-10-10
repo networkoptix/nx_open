@@ -1,11 +1,11 @@
-System was shared with you
+Hệ thống đã được chia sẻ với bạn
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) shared system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) hệ thống chia sẻ {{message.system_name}} với bạn.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-The system {{message.system_name}} was shared with you.
+Hệ thống {{message.system_name}} đã được chia sẻ với bạn.
 {{/message.sharer_name}}
 
-Open the system: {{config.portal_url}}/systems/{{message.system_id}}
+Mở hệ thống: {{config.portal_url}} / systems / {{message.system_id}}

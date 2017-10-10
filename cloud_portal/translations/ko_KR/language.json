@@ -1,5 +1,5 @@
 {
-  "language_name":"국어",
+  "language_name":"언어",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
@@ -7,7 +7,6 @@
     "cancelButton":"취소",
     "loginTitle":"{{PRODUCT_NAME}}에 로그인",
     "loginButton":"로그인",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton":"계속",
     "logoutAuthorisedLogoutButton":"로그 아웃"
@@ -29,13 +28,11 @@
     "restorePassword":"패스워드 재설정",
     "restorePasswordSuccess":"패스워드 저장됨-",
     "restorePasswordCode":"패스워드 재설정",
-    "view":"View cameras - ",
-    "contentPage":"",
+    "view":"카메라 보기 -",
     "debug":"디버그",
     "login":"로그인 -",
     "download":"{{VMS_NAME}} 다운로드",
     "downloadPlatform":"에 대한 {{VMS_NAME}} 다운로드 ",
-    "startPage":"",
     "pageNotFound":"페이지를 찾을 수 없음"
   },
   "systemStatuses":{
@@ -83,28 +80,28 @@
       "description":"시스템에 지정된 사용자 지정 사용자 역할"
     },
     "owner":{
-      "label":"Owner",
-      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+      "label":"소유자",
+      "description":"클라우드에서 시스템을 공유하고 연결 / 연결 해제하는 기능을 포함한 무제한 액세스"
     },
     "viewer":{
-      "label":"Viewer",
-      "description":"Can view live video and browse the archive"
+      "label":"뷰어",
+      "description":"라이브 비디오를보고 아카이브를 열람 할 수 있습니다."
     },
     "liveViewer":{
-      "label":"Live Viewer",
-      "description":"Can only view live video"
+      "label":"라이브 뷰어",
+      "description":"라이브 비디오 만 볼 수 있음"
     },
     "advancedViewer":{
-      "label":"Advanced Viewer",
-      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+      "label":"고급 뷰어",
+      "description":"라이브 비디오를보고, 아카이브를 검색하고, 카메라를 구성하고, PTZ 등을 제어 할 수 있습니다."
     },
     "custom":{
-      "label":"Custom",
-      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+      "label":"사용자 정의",
+      "description":"{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     }
   },
   "errorCodes":{
-    "ok":"ok",
+    "ok":"OK",
     "cantSendActivationPrefix":"확인 이메일을 보낼 수 없습니다.",
     "cantDisconnectSystemPrefix":"시스템을 삭제할 수 없습니다.",
     "cantUnshareWithMeSystemPrefix":"시스템을 삭제할 수 없습니다.",
@@ -137,7 +134,7 @@
     "cantEditAdmin":"이 사용자는 관리자 권한이 있습니다.",
     "cantOpenClient":"{{VMS_NAME}} 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
     "lostConnection":"{{systemName}} 연결이 끊어졌습니다.",
-    "thisSystem":"the system"
+    "thisSystem":"시스템"
   },
   "passwordRequirements":{
     "minLengthMessage":"비밀번호는 최소 8자 이상 포함되어야 합니다.",
@@ -184,7 +181,6 @@
   },
   "downloads":{
     "noClientDetectedTitle":"시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다",
-    "noClientDetectedMessage":"",
     "action":"{{VMS_NAME}} 다운로드",
     "mobile":{
       "ios":{
@@ -196,17 +192,17 @@
     },
     "groups":{
       "windows":{
-        "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "label":"윈도우즈",
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{
@@ -234,7 +230,7 @@
     "createAccount":"계정 만들기"
   },
   "header":{
-    "allSystems":"All Systems",
+    "allSystems":"모든 시스템",
     "systems":"시스템"
   }
 }

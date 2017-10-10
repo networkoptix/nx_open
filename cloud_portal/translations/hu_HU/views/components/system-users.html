@@ -19,7 +19,8 @@
                 <td class="user-email">{{user.email}}</td>
                 <td class="user-role">
                     <span class="inactive" ng-if="!system.isAvailable"
-                        title="{{unavailableMessage}}">{{$root.L.accessRoles[user.accessRole].label || user.accessRole}}</span>                     <span ng-if="system.isAvailable">{{user.userRole.name || $root.L.accessRoles[user.accessRole].label || user.accessRole}}</span>
+                        title="{{unavailableMessage}}">{{$root.L.accessRoles[user.accessRole].label || user.accessRole}}</span>
+                    <span ng-if="system.isAvailable">{{user.userRole.name || $root.L.accessRoles[user.accessRole].label || user.accessRole}}</span>
                 </td>
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
