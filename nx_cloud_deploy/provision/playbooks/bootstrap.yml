@@ -1,0 +1,5 @@
+- hosts: all
+  vars_files:
+    - vars/telegraf.yml
+  roles:
+    - role: dj-wasabi.telegraf

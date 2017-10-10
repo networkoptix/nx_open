@@ -1,0 +1,13 @@
+FROM nginx:1.11.10
+MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
+
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx.tmpl /etc/docker-gen/templates/nginx.tmpl
+COPY docker/vhost.d /etc/nginx/vhost.d/
+COPY docker/entrypoint.sh /
+COPY docker/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
+
+RUN chmod +x /usr/local/bin/dumb-init
+
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
+CMD ["/entrypoint.sh"]

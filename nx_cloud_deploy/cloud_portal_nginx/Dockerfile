@@ -1,5 +1,4 @@
 FROM nginx:1.12.0-alpine
-MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 RUN apk add --no-cache apache2-utils
 
@@ -16,3 +15,15 @@ ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 STOPSIGNAL SIGKILL
 
 CMD ["/run_nginx.sh"]
+
+ARG VERSION
+ARG REVISION
+ARG BUILD_DATE
+ARG BUILD_HOST
+ARG BUILD_USER
+LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
+      version="$VERSION" \
+      revision="$REVISION" \
+      build-date="$BUILD_DATE" \
+      build-host="$BUILD_HOST" \
+      build-user="$BUILD_USER"
