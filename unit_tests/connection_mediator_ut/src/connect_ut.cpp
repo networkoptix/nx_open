@@ -12,6 +12,7 @@
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/http/http_client.h>
