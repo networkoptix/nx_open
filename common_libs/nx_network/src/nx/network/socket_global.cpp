@@ -62,16 +62,20 @@ struct SocketGlobalsImpl
     SocketGlobals::Ini m_ini;
     SocketGlobals::DebugIni m_debugIni;
 
-    // Is unique_ptr because it should be initiated after m_aioService but removed after.
-    std::unique_ptr<cloud::AddressResolver> m_addressResolver;
+    /**
+     * Regular networking services. (AddressResolver should be split to cloud and non-cloud).
+     */
 
+    std::unique_ptr<cloud::AddressResolver> m_addressResolver;
     aio::PollSetFactory m_pollSetFactory;
     AioServiceGuard m_aioServiceGuard;
     std::unique_ptr<aio::Timer> m_debugIniReloadTimer;
 
-    // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
-    std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
+    /**
+     * Cloud networking services.
+     */
 
+    std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     std::unique_ptr<cloud::MediatorAddressPublisher> m_addressPublisher;
     std::unique_ptr<cloud::OutgoingTunnelPool> m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;
@@ -205,7 +209,7 @@ void SocketGlobals::init(int initializationFlags)
         s_instance = new SocketGlobals(initializationFlags);
 
         s_instance->initializeNetworking();
-        // TODO: #ak disable cloud based on m_initializationFlags.
+        // TODO: #ak Disable cloud based on m_initializationFlags.
         s_instance->initializeCloudConnectivity();
 
         s_initState = InitState::done;
@@ -315,6 +319,7 @@ void SocketGlobals::initializeCloudConnectivity()
         m_impl->m_mediatorConnector->systemConnection());
     m_impl->m_outgoingTunnelPool = std::make_unique<cloud::OutgoingTunnelPool>();
     m_impl->m_tcpReversePool = std::make_unique<cloud::tcp::ReverseConnectionPool>(
+        &m_impl->m_aioServiceGuard.aioService(),
         m_impl->m_mediatorConnector->clientConnection());
     m_impl->m_addressResolver = std::make_unique<cloud::AddressResolver>(
         m_impl->m_mediatorConnector->clientConnection());

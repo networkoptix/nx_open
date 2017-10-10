@@ -59,7 +59,7 @@ void BasicPollable::pleaseStopSync(bool checkForLocks)
     else
     {
         NX_ASSERT(!m_aioService->isInAnyAioThread());
-        QnStoppableAsync::pleaseStopSync(checkForLocks);
+        QnStoppableAsync::pleaseStopSync(m_aioService, checkForLocks);
     }
 }
 

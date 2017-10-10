@@ -33,6 +33,9 @@ struct SocketGlobalsImpl;
 class NX_NETWORK_API SocketGlobals
 {
 public:
+    using CustomInit = void(*)();
+    using CustomDeinit = void(*)();
+
     struct DebugIni: nx::kit::IniConfig
     {
         DebugIni(): IniConfig("nx_network_debug.ini") { reload(); }
@@ -65,16 +68,13 @@ public:
     static cloud::tcp::ReverseConnectionPool& tcpReversePool();
     static int initializationFlags();
 
-    static void init(int initializationFlags = 0); /**< Should be called before any socket use */
-    static void deinit(); /**< Should be called when sockets are not needed any more */
+    static void init(int initializationFlags = 0); /**< Should be called before any socket use. */
+    static void deinit(); /**< Should be called when sockets are not needed any more. */
     static void verifyInitialization();
     static bool isInitialized();
 
     static void printArgumentsHelp(std::ostream* outputStream);
     static void applyArguments(const utils::ArgumentParser& arguments);
-
-    typedef void (*CustomInit)();
-    typedef void (*CustomDeinit)();
 
     /** Invokes @param init only once, calls @param deinit in destructor. */
     static void customInit(CustomInit init, CustomDeinit deinit = nullptr);
@@ -104,6 +104,7 @@ private:
     SocketGlobals& operator=(const SocketGlobals&) = delete;
 
     void setDebugIniReloadTimer();
+
     void initializeNetworking();
     void initializeCloudConnectivity();
 
