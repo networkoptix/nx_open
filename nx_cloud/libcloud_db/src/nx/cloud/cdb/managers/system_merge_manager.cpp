@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
+#include "../settings.h"
 #include "system_health_info_provider.h"
 #include "system_manager.h"
 
@@ -11,10 +12,12 @@ namespace cdb {
 SystemMergeManager::SystemMergeManager(
     AbstractSystemManager* systemManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
+    AbstractVmsGateway* vmsGateway,
     nx::utils::db::AsyncSqlQueryExecutor* dbManager)
     :
     m_systemManager(systemManager),
     m_systemHealthInfoProvider(systemHealthInfoProvider),
+    m_vmsGateway(vmsGateway),
     m_dbManager(dbManager)
 {
 }
@@ -22,23 +25,23 @@ SystemMergeManager::SystemMergeManager(
 void SystemMergeManager::startMergingSystems(
     const AuthorizationInfo& /*authzInfo*/,
     const std::string& idOfSystemToMergeTo,
-    data::SystemId idOfSystemToBeMerged,
+    const std::string& idOfSystemToBeMerged,
     std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Requested merge of system %1 into %2")
-        .args(idOfSystemToBeMerged.systemId, idOfSystemToMergeTo));
+        .args(idOfSystemToBeMerged, idOfSystemToMergeTo));
 
     const auto resultCode = validateRequestInput(
         idOfSystemToMergeTo,
-        idOfSystemToBeMerged.systemId);
+        idOfSystemToBeMerged);
     if (resultCode != api::ResultCode::ok)
         return completionHandler(resultCode);
 
     m_dbManager->executeUpdate(
         std::bind(&SystemMergeManager::updateSystemStateInDb, this, _1,
-            idOfSystemToMergeTo, idOfSystemToBeMerged.systemId),
+            idOfSystemToMergeTo, idOfSystemToBeMerged),
         [this, completionHandler = std::move(completionHandler)](
             nx::utils::db::QueryContext* /*queryContext*/,
             nx::utils::db::DBResult dbResult)

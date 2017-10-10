@@ -20,6 +20,7 @@
 #include "managers/system_manager.h"
 #include "managers/system_merge_manager.h"
 #include "managers/temporary_account_password_manager.h"
+#include "managers/vms_gateway.h"
 #include "stree/stree_manager.h"
 
 namespace nx {
@@ -73,6 +74,7 @@ private:
     std::unique_ptr<AbstractSystemHealthInfoProvider> m_systemHealthInfoProvider;
     nx::utils::StandaloneTimerManager m_timerManager;
     SystemManager m_systemManager;
+    VmsGateway m_vmsGateway;
     SystemMergeManager m_systemMergeManager;
     AuthenticationProvider m_authProvider;
     MaintenanceManager m_maintenanceManager;
