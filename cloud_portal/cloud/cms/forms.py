@@ -75,9 +75,6 @@ class CustomContextForm(forms.Form):
                 widget_type = forms.Textarea(
                     attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
-            if not data_structure.optional:
-                ds_description += "<br><p class='text-danger'>Required</p>"
-
             if data_structure.type == DataStructure.DATA_TYPES.image:
                 self.fields[data_structure.name] = forms.ImageField(label=ds_label,
                                                                     help_text=ds_description,

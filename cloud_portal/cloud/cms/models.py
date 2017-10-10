@@ -108,7 +108,7 @@ class DataStructure(models.Model):
                          (5, 'guid', 'GUID'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
-    default = models.TextField(default='')
+    default = models.TextField(default='', blank=True)
     translatable = models.BooleanField(default=True)
     meta_settings = JSONField(default=dict(), blank=True)
     advanced = models.BooleanField(default=False)

@@ -16,12 +16,20 @@ def is_FileField(field):
 
 @register.simple_tag
 def is_optional(data_structure_name, context):
-    return DataStructure.objects.get(context=context, name=data_structure_name).optional
+    query = DataStructure.objects.filter(context=context, name=data_structure_name)
+    if query.exists():
+        return query[0].optional
+    return False
 
 
 @register.simple_tag
 def has_value(data_structure_name, context, customization, language):
-    data_structure = DataStructure.objects.get(context=context, name=data_structure_name)
+    query = DataStructure.objects.filter(context=context, name=data_structure_name)
+
+    if query.exists():
+        data_structure = query[0]
+    else:
+        return False
 
     if not data_structure.translatable:
         language = None
