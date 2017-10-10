@@ -2,9 +2,31 @@ from django import forms
 from .models import *
 
 
+def convert_meta_to_description(meta):
+    meta_to_plain = {"format": "Format:  %s",
+                     "height": "Height: %spx",
+                     "height_le": "Height: not greater than %spx",
+                     "height_ge": "Height: not less than %spx",
+                     "width": "Width: %spx",
+                     "width_le": "Width: not greater than %spx",
+                     "width_ge": "Width: not less than %spx",
+                     "size": "Size limit: %s MB",
+                     }
+    converted_msg = ""
+    for k in meta:
+        if k in meta_to_plain:
+            value = meta[k]
+
+            if isinstance(value, list):
+                value = ", ".join(value)
+            converted_msg += "<br>" + meta_to_plain[k] % value
+
+    return converted_msg
+
+
 class CustomContextForm(forms.Form):
     language = forms.ModelChoiceField(
-        widget=forms.Select, label="Language", queryset=Language.objects.all())
+        widget=forms.Select, label="Language", queryset=Language.objects.all().values_list('code', flat=True))
 
     def remove_langauge(self):
         super(CustomContextForm, self)
@@ -20,9 +42,15 @@ class CustomContextForm(forms.Form):
             self.remove_langauge()
 
         for data_structure in data_structures:
-            ds_name = data_structure.label
+            ds_label = data_structure.label if data_structure.label else data_structure.name
 
             ds_description = data_structure.description
+
+            if data_structure.meta_settings:
+                ds_description += convert_meta_to_description(data_structure.meta_settings)
+
+            if data_structure.type == DataStructure.DATA_TYPES.guid:
+                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexdecimal characters (0-9, a-f, A-F)"
 
             ds_language = language
             if not data_structure.translatable:
@@ -48,7 +76,7 @@ class CustomContextForm(forms.Form):
                     attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
             if data_structure.type == DataStructure.DATA_TYPES.image:
-                self.fields[data_structure.name] = forms.ImageField(label=ds_name,
+                self.fields[data_structure.name] = forms.ImageField(label=ds_label,
                                                                     help_text=ds_description,
                                                                     initial=record_value,
                                                                     required=False,
@@ -56,15 +84,15 @@ class CustomContextForm(forms.Form):
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.file:
-                self.fields[data_structure.name] = forms.FileField(label=ds_name,
-                                                                    help_text=ds_description,
-                                                                    initial=record_value,
-                                                                    required=False,
-                                                                    disabled=disabled)
+                self.fields[data_structure.name] = forms.FileField(label=ds_label,
+                                                                   help_text=ds_description,
+                                                                   initial=record_value,
+                                                                   required=False,
+                                                                   disabled=disabled)
                 continue
 
             self.fields[data_structure.name] = forms.CharField(required=False,
-                                                               label=ds_name,
+                                                               label=ds_label,
                                                                help_text=ds_description,
                                                                initial=record_value,
                                                                widget=widget_type,
@@ -74,7 +102,8 @@ class CustomContextForm(forms.Form):
 class ProductSettingsForm(forms.Form):
     file = forms.FileField(
         label="File",
-        help_text="Archive with static files and images for content or stucture.json file",
+        help_text="Archive with static files and images for content or stucture.json file. "
+                  "Archive must have top-level directories named as customizations",
         required=True
     )
 

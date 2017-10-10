@@ -1,14 +1,15 @@
 from ..models import *
 import os
-import re
 import json
 import codecs
 import base64
 import zipfile
+import distutils.dir_util
+import errno
 from StringIO import StringIO
 
-
-SOURCE_DIR = 'static/{{customization}}/source/'
+SOURCE_DIR = 'static/_source/{{skin}}'
+TARGET_DIR = 'static/{{customization}}'
 
 
 def make_dir(filename):
@@ -19,18 +20,6 @@ def make_dir(filename):
         except OSError as exc:  # Guard against race condition
             if exc.errno != errno.EEXIST:
                 raise
-
-
-def context_for_file(filename, customization_name):
-    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
-    context_name = filename.replace(custom_dir, '')
-    match = re.search(r'lang_(.+?)/', context_name)
-    language = None
-    if match:
-        language = match.group(1)
-        context_name = context_name.replace(
-            match.group(0), 'lang_{{language}}/')
-    return context_name, language
 
 
 def target_file(file_name, customization, language_code, preview):
@@ -128,8 +117,9 @@ def read_customized_file(filename, customization_name, language_code=None, versi
 
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts)
-    target_file_name = target_file(context_path, customization, language_code, preview)
-    save_content(target_file_name, content)
+    if context.template:
+        target_file_name = target_file(context_path, customization, language_code, preview)
+        save_content(target_file_name, content)
 
 
 def generate_languages_json(customization, preview):
@@ -137,6 +127,20 @@ def generate_languages_json(customization, preview):
                       for lang in customization.languages.all()]
     target_file_name = target_file('static/languages.json', customization, None, preview)
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
+
+
+def init_skin(customization_name, product='cloud_portal'):
+    # 1. read skin for this customization
+    customization = Customization.objects.get(name=customization_name)
+    skin = customization.read_global_value('%SKIN%')
+    # 2. copy directory
+    from_dir = SOURCE_DIR.replace("{{skin}}", skin)
+    target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
+    distutils.dir_util.copy_tree(from_dir, target_dir)
+    distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
+    # 3. run fill_content
+    fill_content(customization_name, product, preview=False, incremental=False)
+    fill_content(customization_name, product, preview=True, incremental=False)
 
 
 def fill_content(customization_name='default', product='cloud_portal',
@@ -202,14 +206,15 @@ def fill_content(customization_name='default', product='cloud_portal',
         # get their datastructures
         # detect their contexts
 
-        changed_records = DataRecord.objects.filter(version_id=version_id)
+        changed_records = DataRecord.objects.filter(version_id=version_id, customization_id=customization.id)
+        # in case version_id is none - we need to filter by customization as well
         if not version_id:  # if version_id is None - check if records are actually latest
-            changed_records = [record for record in changed_records if
-                               record.id == DataRecord.objects.
-                               filter(language_id=record.language_id,
-                                      data_structure_id=record.data_structure_id,
-                                      customization_id=customization.id).
-                               latest('created_date').id]
+            changed_records_ids = [DataRecord.objects.
+                                   filter(language_id=record.language_id,
+                                          data_structure_id=record.data_structure_id,
+                                          customization_id=customization.id).
+                                   latest('created_date').id for record in changed_records]
+            changed_records = changed_records.filter(id__in=changed_records_ids)
 
         changed_context_ids = list(changed_records.values_list('data_structure__context_id', flat=True).distinct())
         changed_contexts = Context.objects.filter(id__in=changed_context_ids)
@@ -234,8 +239,10 @@ def fill_content(customization_name='default', product='cloud_portal',
         # if the default language is changed - we update all languages (lazy way)
         # otherwise - update only affected languages
         if incremental:
-            changed_languages = changed_records.filter(data_structure__context_id=context.id).values_list('language').distinct()
-            if changed_languages.filter(id=customization.default_language_id).exists():
+            changed_languages = list(changed_records.filter(data_structure__context_id=context.id).\
+                values_list('language__code', flat=True).distinct())
+
+            if customization.default_language.code in changed_languages:
                 # if default language changes - it can affect all languages in the context
                 changed_languages = customization.languages_list
 

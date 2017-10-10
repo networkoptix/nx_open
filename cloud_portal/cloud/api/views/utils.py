@@ -83,6 +83,7 @@ def downloads(request):
 
         # find settings for customizations
         if customization not in updates_json:
+            logger.error('Customization not in updates.json: ' + customization + '. Ask Boris to fix that.')
             customization = 'default'
         updates_record = updates_json[customization]
         latest_release = None
@@ -90,7 +91,7 @@ def downloads(request):
             latest_release = updates_record['current_release']
         if not latest_release:  # Hack for new customizations
             logger.error('No official release for customization: ' + customization + '. Ask Boris to fix that.')
-            latest_release = '3.0'
+            latest_release = '3.1'
         latest_version = updates_record['releases'][latest_release]
 
         build_number = latest_version.split('.')[-1]
@@ -101,6 +102,7 @@ def downloads(request):
         downloads_result = requests.get(downloads_path)
         downloads_json = None
 
+        # noinspection PyBroadException
         try:
             downloads_json = downloads_result.json()
         except:
@@ -110,14 +112,20 @@ def downloads(request):
         if not downloads_json or downloads_result.status_code != requests.codes.ok:
             # old or broken release - no downloads json
             # TODO: this is hardcode - remove it after release
-            latest_version = updates_record['releases']['3.0']
-            build_number = latest_version.split('.')[-1]        # Use the latest 3.0 public version
+            latest_version = updates_record['releases']['3.1']
+            build_number = latest_version.split('.')[-1]        # Use the latest 3.1 public version
             downloads_path = updates_path + '/' + build_number + '/downloads.json'
             downloads_result = requests.get(downloads_path)
             pass
 
         downloads_result.raise_for_status()
-        downloads_json = downloads_result.json()
+
+        # noinspection PyBroadException
+        try:
+            downloads_json = downloads_result.json()
+        except:
+            logger.error('Cannot find any releases for customization: ' + customization + '. Ask Boris to fix that.')
+            downloads_json = {}
 
         downloads_json['releaseNotes'] = updates_record['release_notes']
         downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
