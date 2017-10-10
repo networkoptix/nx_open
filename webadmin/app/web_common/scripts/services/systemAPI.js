@@ -225,11 +225,12 @@ angular.module('nxCommon')
         /* End of Authentication  */
 
         /* Server settings */
-        ServerConnection.prototype.getTime = function(serverId){
+        ServerConnection.prototype.getTime = function(serverId, localTime){
+            var local = localTime?'?local':'';
             if(serverId){
-                return this._get('/proxy/http/' + serverId + '/api/gettime?local');
+                return this._get('/proxy/http/' + serverId + '/api/gettime' + local);
             }
-            return this._get('/api/gettime?local');
+            return this._get('/api/gettime' + local);
         };
         /* End of Server settings */
 
