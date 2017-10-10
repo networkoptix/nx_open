@@ -85,22 +85,20 @@ def context_editor_action(request, context_id, language_code):
         last_language = Language.objects.get(
             code=request_data['currentLanguage'])
 
-        upload_errors = save_unrevisioned_records(context,
-            customization, last_language, context.datastructure_set.all(),
-            request_data, request_files, request.user)
+        upload_errors = save_unrevisioned_records(context, customization, last_language,
+                                                  context.datastructure_set.all(), request_data,
+                                                  request_files, request.user)
 
     elif 'Preview' in request_data or 'SaveDraft' in request_data:
-        upload_errors = save_unrevisioned_records(context,
-            customization, language, context.datastructure_set.all(),
-            request_data, request_files, request.user)
+        upload_errors = save_unrevisioned_records(context, customization, language, context.datastructure_set.all(),
+                                                  request_data, request_files, request.user)
 
         if 'Preview' in request_data:
             saved_msg += " Preview has been created."
 
     elif 'SendReview' in request_data:
-        upload_errors = send_version_for_review(context,
-            customization, language, context.datastructure_set.all(),
-            context.product, request_data, request_files, request.user)
+        upload_errors = send_version_for_review(context, customization, language, context.datastructure_set.all(),
+                                                context.product, request_data, request_files, request.user)
         saved_msg += " A new version has been created."
 
     else:
@@ -150,13 +148,13 @@ def page_editor(request, context_id=None, language_code=None):
 @require_http_methods(["POST"])
 @permission_required('cms.change_contentversion')
 def version_action(request, version_id=None):
-
+    preview_flag = ""
     if not ContentVersion.objects.filter(id=version_id).exists():
         defaults.bad_request("Version does not exist")
 
     if "Preview" in request.POST:
         generate_preview(send_to_review=True)
-        return redirect(reverse('version', args=[version_id]) + "?preview")
+        preview_flag = "?preview"
 
     elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
@@ -164,14 +162,20 @@ def version_action(request, version_id=None):
         customization = Customization.objects.get(name=settings.CUSTOMIZATION)
         publishing_errors = publish_latest_version(customization, request.user)
         if publishing_errors:
-            messages.error(request, "Version " +
-                             str(version_id) + publishing_errors)
+            messages.error(request, "Version {} {}".format(version_id, publishing_errors))
         else:
-            messages.success(request, "Version " +
-                             str(version_id) + " has been published")
-        return redirect(reverse('version', args=[version_id]))
+            messages.success(request, "Version {} has been published".format(version_id))
 
-    return defaults.bad_request("File does not exist")
+    elif "Force Update" in request.POST:
+        if not request.user.has_perm('cms.force_update'):
+            raise PermissionDenied
+        filldata.init_skin(settings.CUSTOMIZATION)
+        messages.success(request, "Version {} was force updated ".format(version_id))
+
+    else:
+        return defaults.bad_request("File does not exist")
+
+    return redirect(reverse('version', args=[version_id]) + preview_flag)
 
 
 @require_http_methods(["GET"])

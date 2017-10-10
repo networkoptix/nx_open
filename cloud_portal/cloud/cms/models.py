@@ -235,6 +235,7 @@ class ContentVersion(models.Model):
         verbose_name_plural = 'revisions'
         permissions = (
             ("publish_version", "Can publish content to production"),
+            ("force_update", "Can forcibly update content"),
         )
 
     customization = models.ForeignKey(Customization)

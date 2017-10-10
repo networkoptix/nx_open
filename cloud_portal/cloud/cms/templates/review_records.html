@@ -71,23 +71,27 @@
 	{% endfor %}
 	</div>
 </div>
-{% if not version.accepted_date %}
 <form action="{% url 'version_action' version.id %}" method="post">
 	{% csrf_token %}
 	<div class="submit-row">
-        <button class="btn" type="submit" name="Preview">Generate Preview</button>
-		{% if perms.cms.publish_version %}
-        <button class="btn" type="submit" name="Publish">Publish</button>
+		{% if perms.cms.force_update and version.state == 'current' %}
+			<button class="btn btn-danger pull-left" type="submit" name="Force Update">Force Update</button>
+		{% endif %}
+		{% if preview_link %}
+			<button class='btn btn-info' onClick="openPreview(event)">Open Preview</button>
+		{% endif %}
+		{% if not version.accepted_date %}
+        	<button class="btn btn-primary" type="submit" name="Preview">Generate Preview</button>
+			{% if perms.cms.publish_version %}
+        	<button class="btn btn-danger" type="submit" name="Publish">Publish</button>
+			{% endif %}
 		{% endif %}
 	</div>
 </form>
 {% if preview_link %}
-<div class="submit-row">
-    <button class='btn' onClick="openPreview()">Open Preview</button>
-</div>
-{% endif %}
 <script>
-    function openPreview(){
+    function openPreview(event){
+    	event.preventDefault();
         window.open("{{ preview_link }}");
     }
 </script>
