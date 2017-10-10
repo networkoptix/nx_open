@@ -10,12 +10,13 @@ function instantiate_config()
 {
     export CUSTOMIZATION=$1
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
+    mkdir --parents $CLOUD_PORTAL_CONF_DIR
 
     local CLOUD_PORTAL_HOST_var=CLOUD_PORTAL_HOST_$customization
     export CLOUD_PORTAL_HOST=${!CLOUD_PORTAL_HOST_var:-$CLOUD_PORTAL_HOST}
 
     tmp=$(tempfile)
-    envsubst < $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml > $tmp
+    envsubst < $CLOUD_PORTAL_BASE_CONF_DIR/../cloud_portal.yaml > $tmp
     mv $tmp $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
 }
 
@@ -50,8 +51,6 @@ do
             echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
             yes "yes" | python manage.py migrate
-
-            python manage.py initdb
             python manage.py readstructure
             ;;
         config)
@@ -66,13 +65,10 @@ do
             python manage.py filldata
 
             find /app/app/static | xargs touch
-            exec gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
+            exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
             ;;
         celery)
             write_my_cnf
-
-            python manage.py filldata all
-
             rm -f /tmp/*.pid
             exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
