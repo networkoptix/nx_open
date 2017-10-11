@@ -164,6 +164,12 @@ bool HanwhaResourceSearcher::processPacket(
     QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
         cameraMac = QnMacAddress(devInfo.serialNumber);
+    if (cameraMac.isNull())
+    {
+        NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
+            .arg(devInfo.udn).arg(devInfo.serialNumber));
+        return false;
+    }
 
     QString model(devInfo.modelName);
 
