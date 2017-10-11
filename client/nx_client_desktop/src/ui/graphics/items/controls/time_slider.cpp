@@ -5,7 +5,7 @@
 #include <limits>
 #include <array>
 
-#include <client/client_runtime_settings.h>
+#include <ini.h>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
@@ -3304,6 +3304,28 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     }
 
     dragProcessor()->mouseReleaseEvent(this, event);
+
+    const auto autoShiftPixels = nx::client::desktop::ini().autoShiftPixels;
+    if (autoShiftPixels > 0 && m_dragIsClick && event->button() == Qt::LeftButton)
+    {
+        const auto pos = valueFromPosition(event->pos());
+        const auto distanceToCenter = (m_windowEnd - m_windowStart) / 2;
+
+        const auto allowedOffset = m_msecsPerPixel * autoShiftPixels;
+        const auto leftOffset = pos - m_windowStart;
+        const auto rightOffset = m_windowEnd - pos;
+
+        if (leftOffset <= allowedOffset)
+        {
+            // Shift window to the left (negative).
+            shiftWindow(leftOffset - distanceToCenter, true);
+        }
+        else if (rightOffset <= allowedOffset)
+        {
+            // Shift window to the right (positive).
+            shiftWindow(distanceToCenter - rightOffset, true);
+        }
+    }
 
     if (m_options.testFlag(LeftButtonSelection) && m_options.testFlag(ClearSelectionOnClick)
         && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
