@@ -13,6 +13,18 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchCustomizer;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+
+class MainWindow;
+
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 /**
  * This class simplifies access to workbench context.
  *
@@ -74,7 +86,12 @@ protected:
 
     QnWorkbenchNavigator *navigator() const;
 
-    QWidget *mainWindow() const;
+    nx::client::desktop::ui::MainWindow* mainWindow() const;
+
+    /** @return The same as mainWindow() but casted to QWidget*, so caller don't need to include
+     * MainWindow header.
+     */
+    QWidget* mainWindowWidget() const;
 
 private:
     void init(QObject *parent, bool lazyInitialization = false);

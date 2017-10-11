@@ -1,5 +1,6 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
+import QtQuick.Window 2.2;
 import Nx.Models 1.0;
 import com.networkoptix.qml 1.0;
 
@@ -9,10 +10,9 @@ Rectangle
 {
     id: control;
 
-    width: context.pageSize.width;
-    height: context.pageSize.height;
-
     color: Style.colors.window;
+
+    readonly property bool active: Window.visibility !== Window.Hidden
 
     Rectangle
     {
@@ -208,7 +208,7 @@ Rectangle
                 {
                     id: modelLoader;
 
-                    active: (context.isVisible && screenHolder.visible);
+                    active: (control.active && screenHolder.visible);
 
                     sourceComponent: Component
                     {
@@ -489,13 +489,9 @@ Rectangle
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
     }
 
-    Connections
+    onActiveChanged:
     {
-        target: context;
-        onIsVisibleChanged:
-        {
-            if (grid.watcher.currentItem)
-                grid.watcher.currentItem.forceCollapsedState();
-        }
+        if (grid.watcher.currentItem)
+            grid.watcher.currentItem.forceCollapsedState();
     }
 }

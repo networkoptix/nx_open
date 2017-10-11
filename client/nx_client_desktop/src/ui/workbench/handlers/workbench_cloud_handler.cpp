@@ -60,7 +60,7 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 {
     if (!m_loginToCloudDialog)
     {
-        m_loginToCloudDialog = new QnLoginToCloudDialog(mainWindow());
+        m_loginToCloudDialog = new QnLoginToCloudDialog(mainWindowWidget());
         m_loginToCloudDialog->setLogin(qnClientCoreSettings->cloudLogin());
         m_loginToCloudDialog->show();
 

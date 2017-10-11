@@ -152,7 +152,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, period.startTimeMs);
         if (!server || server->getStatus() != Qn::Online)
         {
-            QnMessageBox::warning(mainWindow(),
+            QnMessageBox::warning(mainWindowWidget(),
                 tr("Server offline"),
                 tr("Bookmarks can only be added to an online server."));
             return;
@@ -166,7 +166,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.durationMs = period.durationMs;
     bookmark.cameraId = camera->getId();
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
@@ -197,13 +197,13 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
     {
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Server offline"),
             tr("Bookmarks can only be edited on an online Server."));
         return;
     }
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
@@ -226,7 +226,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete bookmark?"), bookmark.name.trimmed(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
@@ -247,7 +247,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete %n bookmarks?", "", bookmarks.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 

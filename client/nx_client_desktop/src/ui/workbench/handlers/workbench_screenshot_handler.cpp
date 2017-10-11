@@ -283,7 +283,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     QnResourceDisplayPtr display = widget->display();
 
-    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog(mainWindow()));
+    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog(mainWindowWidget()));
     dialog->setMaximum(count);
     dialog->setValue(current);
     dialog->setMinimumWidth(600);
@@ -344,7 +344,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     dialog->hide();
     qint64 endTime = QDateTime::currentMSecsSinceEpoch();
-    QnMessageBox::success(mainWindow(),
+    QnMessageBox::success(mainWindowWidget(),
         lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
@@ -406,7 +406,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 
     QScopedPointer<QnSessionAwareFileDialog> dialog(
         new QnSessionAwareFileDialog (
-        mainWindow(),
+        mainWindowWidget(),
         tr("Save Screenshot As..."),
         suggestion,
         allowedFormatFilter
@@ -453,7 +453,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 
             if (QFile::exists(fileName)
                 && !QnFileMessages::confirmOverwrite(
-                    mainWindow(), QFileInfo(fileName).fileName()))
+                    mainWindowWidget(), QFileInfo(fileName).fileName()))
             {
                 continue;
             }
@@ -467,7 +467,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         if (QFile::exists(fileName) && !QFile::remove(fileName))
         {
             QnFileMessages::overwriteFailed(
-                mainWindow(), QFileInfo(fileName).fileName());
+                mainWindowWidget(), QFileInfo(fileName).fileName());
             continue;
         }
 
@@ -543,7 +543,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     {
         hideProgress();
 
-        QnMessageBox::critical(mainWindow(), tr("Failed to save screenshot"));
+        QnMessageBox::critical(mainWindowWidget(), tr("Failed to save screenshot"));
         return;
     }
 
@@ -552,7 +552,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
     if (!m_screenshotProgressDialog) {
-        m_screenshotProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindow());
+        m_screenshotProgressDialog = new QnSessionAware<QnProgressDialog>(mainWindowWidget());
         m_screenshotProgressDialog->setWindowTitle(tr("Saving Screenshot..."));
         m_screenshotProgressDialog->setInfiniteProgress();
         // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality
@@ -636,7 +636,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
     if (!imageProvider)
     {
-        QnMessageBox::critical(mainWindow(), tr("Failed to take screenshot"));
+        QnMessageBox::critical(mainWindowWidget(), tr("Failed to take screenshot"));
         return;
     }
 

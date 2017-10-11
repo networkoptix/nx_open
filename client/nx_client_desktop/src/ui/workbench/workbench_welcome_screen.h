@@ -1,9 +1,6 @@
-
 #pragma once
 
-#include <QtCore/QUrl>
-#include <QtCore/QList>
-#include <QtCore/QObject>
+#include <QtQuickWidgets/QQuickWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/style/generic_palette.h>
@@ -14,53 +11,38 @@
 #include <utils/common/encoded_credentials.h>
 
 class QnCloudStatusWatcher;
-class QQuickView;
 class QnAppInfo;
 
-typedef QList<QUrl> UrlsList;
-
-class QnWorkbenchWelcomeScreen : public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
-
-    Q_PROPERTY(bool isVisible READ isVisible WRITE setVisible NOTIFY visibleChanged)
+    typedef Connective<QQuickWidget> base_type;
 
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged)
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
     Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
 
-    Q_PROPERTY(QSize pageSize READ pageSize WRITE setPageSize NOTIFY pageSizeChanged)
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
     Q_PROPERTY(bool globalPreloaderVisible READ globalPreloaderVisible WRITE setGlobalPreloaderVisible NOTIFY globalPreloaderVisibleChanged)
 
     Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
-    Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged);
+    Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged)
 
-    Q_PROPERTY(QnAppInfo* appInfo READ appInfo CONSTANT);
+    Q_PROPERTY(QnAppInfo* appInfo READ appInfo CONSTANT)
+
 public:
-    QnWorkbenchWelcomeScreen(QObject* parent);
+    QnWorkbenchWelcomeScreen(QQmlEngine* engine, QWidget* parent = nullptr);
 
-    virtual ~QnWorkbenchWelcomeScreen();
-
-    QWidget* widget();
+    virtual ~QnWorkbenchWelcomeScreen() override;
 
 public: // Properties
-    bool isVisible() const;
-
-    void setVisible(bool isVisible);
-
     QString cloudUserName() const;
 
     bool isLoggedInToCloud() const;
 
     bool isCloudEnabled() const;
-
-    QSize pageSize() const;
-
-    void setPageSize(const QSize& size);
 
     bool visibleControls() const;
 
@@ -137,15 +119,11 @@ public slots:
     void hideSystem(const QString& systemId, const QString& localSystemId);
 
 signals:
-    void visibleChanged();
-
     void cloudUserNameChanged();
 
     void isLoggedInToCloudChanged();
 
     void isCloudEnabledChanged();
-
-    void pageSizeChanged();
 
     void visibleControlsChanged();
 
@@ -172,21 +150,15 @@ private:
 
     void handleStartupTileAction(const QString& systemId, bool initial);
 
-private: // overrides
-    bool eventFilter(QObject* obj, QEvent* event) override;
+protected:
+    virtual void showEvent(QShowEvent* event) override;
+    virtual void hideEvent(QHideEvent* event) override;
 
 private:
-    typedef QPointer<QWidget> WidgetPtr;
-    typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
-
-    bool m_receivingResources;
-    bool m_visibleControls;
-    bool m_visible;
+    bool m_receivingResources = false;
+    bool m_visibleControls = false;
     QString m_connectingSystemName;
     const QnGenericPalette m_palette;
-    QQuickView* m_quickView;
-    const WidgetPtr m_widget;
-    QSize m_pageSize;
     QString m_message;
-    QnAppInfo* m_appInfo;
+    QnAppInfo* m_appInfo = nullptr;
 };

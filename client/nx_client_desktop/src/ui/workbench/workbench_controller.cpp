@@ -641,7 +641,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
     QKeyEvent *e = static_cast<QKeyEvent *>(event);
 
-    auto w = qobject_cast<MainWindow*>(mainWindow());
+    auto w = qobject_cast<MainWindow*>(mainWindowWidget());
     NX_EXPECT(w);
     if (w && w->handleKeyPress(e->key()))
         return;
@@ -1412,7 +1412,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     auto widget = widgets.at(0);
     if(widget->resource()->flags() & Qn::network)
         return;
-    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
+    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindowWidget()));
     dialog->exec();
 }
 

@@ -5,6 +5,7 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include <utils/common/warnings.h>
+#include <ui/widgets/main_window.h>
 
 #include "workbench_context.h"
 
@@ -151,8 +152,13 @@ QnWorkbenchNavigator *QnWorkbenchContextAware::navigator() const
     return context()->navigator();
 }
 
-QWidget *QnWorkbenchContextAware::mainWindow() const
+MainWindow* QnWorkbenchContextAware::mainWindow() const
 {
     NX_ASSERT(m_initialized, Q_FUNC_INFO, "Initialization failed");
     return context()->mainWindow();
+}
+
+QWidget* QnWorkbenchContextAware::mainWindowWidget() const
+{
+    return mainWindow();
 }
