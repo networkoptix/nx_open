@@ -2512,6 +2512,7 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
+        action(action::ToggleTimelineAction)->setChecked(true);
     }
 
     setOption(WindowResizingForbidden, enabled);
