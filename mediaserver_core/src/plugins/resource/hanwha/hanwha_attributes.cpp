@@ -121,36 +121,46 @@ bool HanwhaAttributes::parseCategories(
 
 bool HanwhaAttributes::parseAttributes(
     QXmlStreamReader& reader,
+    const QString& group)
+{
+    if (reader.name() == kHanwhaChannelNodeName)
+    {
+        bool success = false;
+        auto channelNumber = reader.attributes()
+            .value(kHanwhaChannelNumberAttribute)
+            .toInt(&success);
+
+        if (!success)
+            return false;
+
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+        return parseAttributes(reader, group, channelNumber);
+    }
+    else if (reader.name() == kHanwhaAttributeNodeName)
+    {
+        return parseAttributes(reader, group, kNoChannel);
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool HanwhaAttributes::parseAttributes(
+    QXmlStreamReader& reader,
     const QString& group,
     int channel)
 {
-    while (reader.name() == kHanwhaChannelNodeName || reader.name() == kHanwhaAttributeNodeName)
+    while (reader.name() == kHanwhaAttributeNodeName)
     {
-        if (reader.name() == kHanwhaChannelNodeName)
-        {
-            bool success = false;
-            auto channelNumber = reader.attributes()
-                .value(kHanwhaChannelNumberAttribute)
-                .toInt(&success);
+        auto attrs = reader.attributes();
+        auto attrName = attrs.value(kHanwhaNameAttribute).toString();
+        auto attrValue = attrs.value(kHanwhaValueAttribute).toString();
 
-            if (!success)
-                return false;
+        m_attributes[channel][group][attrName] = attrValue;
 
-            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-            if (!parseAttributes(reader, group, channelNumber))
-                READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-        }
-        else
-        {
-            auto attrs = reader.attributes();
-            auto attrName = attrs.value(kHanwhaNameAttribute).toString();
-            auto attrValue = attrs.value(kHanwhaValueAttribute).toString();
-
-            m_attributes[channel][group][attrName] = attrValue; 
-
-            reader.skipCurrentElement();
-            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-        }
+        reader.skipCurrentElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;

@@ -72,7 +72,8 @@ private:
 
     bool parseCategories(QXmlStreamReader& reader, const QString& group);
 
-    bool parseAttributes(QXmlStreamReader& reader, const QString& group, int channel = kNoChannel);
+    bool parseAttributes(QXmlStreamReader& reader, const QString& group);
+    bool parseAttributes(QXmlStreamReader& reader, const QString& group, int channel);
 
 private:
     using GroupName = QString;
