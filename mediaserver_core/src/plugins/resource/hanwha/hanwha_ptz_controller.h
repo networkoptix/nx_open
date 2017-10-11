@@ -11,21 +11,7 @@
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
-
-static const std::map<QString, Ptz::Capability> kHanwhaPtzCapabilityAttributes =
-{
-    {lit("Absolute.Pan"), Ptz::Capability::AbsolutePanCapability},
-    {lit("Absolute.Tilt"), Ptz::Capability::AbsoluteTiltCapability},
-    {lit("Absolute.Zoom"), Ptz::Capability::AbsoluteZoomCapability},
-    {lit("Continuous.Pan"), Ptz::Capability::ContinuousPanCapability},
-    {lit("Continuous.Tilt"), Ptz::Capability::ContinuousTiltCapability},
-    {lit("Continuous.Zoom"), Ptz::Capability::ContinuousZoomCapability},
-    {lit("Continuous.Focus"), Ptz::Capability::ContinuousFocusCapability},
-    {lit("Preset"), Ptz::Capability::NativePresetsPtzCapability},
-    {lit("AreaZoom"), Ptz::Capability::ViewportPtzCapability},
-    {lit("Home"), Ptz::Capability::HomePtzCapability}
-};
-
+    
 class HanwhaPtzController: public QnBasicPtzController
 {
     Q_OBJECT

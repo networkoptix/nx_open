@@ -38,6 +38,47 @@ namespace plugins {
 
 namespace {
 
+enum class PtzOperation
+{
+    add,
+    remove
+};
+
+struct PtzDescriptor
+{
+    PtzDescriptor(Ptz::Capabilities capability, PtzOperation operation = PtzOperation::add):
+        capability(capability), operation(operation)
+    {
+    }
+    
+    Ptz::Capabilities capability = Ptz::Capability::NoPtzCapabilities;
+    PtzOperation operation = PtzOperation::add;
+};
+
+static const std::map<QString, PtzDescriptor> kHanwhaPtzCapabilityAttributes =
+{
+    {lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability)},
+    {lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability)},
+    {lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability)},
+    {lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
+    {lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
+    {lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
+    {lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability)},
+    {lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
+    {lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
+    {lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability)},
+    {
+        lit("DigitalPTZ"),
+        PtzDescriptor(
+            Ptz::Capability::ContinuousZoomCapability |
+            Ptz::Capability::ContinuousTiltCapability |
+            Ptz::Capability::ContinuousPanCapability,
+            PtzOperation::remove
+        )
+    }
+};
+
+
 static const QString kAdvancedParametersTemplateFile = lit(":/camera_advanced_params/hanwha.xml");
 
 static const QString kEncodingTypeProperty = lit("EncodingType");
@@ -866,18 +907,22 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
             .arg(attributeToCheck.first)
             .arg(getChannel());
 
-        const auto& capability = attributeToCheck.second;
+        const auto& capability = attributeToCheck.second.capability;
 
         const auto attr = m_attributes.attribute<bool>(name);
-        if (!attr.is_initialized())
-            return CameraDiagnostics::NoErrorResult();
-
-        if (!attr.get())
+        if (!attr || !attr.get())
             continue;
 
-        m_ptzCapabilities |= capability;
-        if (capability == Ptz::NativePresetsPtzCapability)
-            m_ptzCapabilities |= Ptz::PresetsPtzCapability;
+        if (attributeToCheck.second.operation == PtzOperation::add)
+        {
+            m_ptzCapabilities |= capability;
+            if (capability == Ptz::NativePresetsPtzCapability)
+                m_ptzCapabilities |= Ptz::PresetsPtzCapability;
+        }
+        else
+        {
+            m_ptzCapabilities &= ~capability;
+        }
     }
 
     if (m_ptzCapabilities ==Ptz::NoPtzCapabilities)
