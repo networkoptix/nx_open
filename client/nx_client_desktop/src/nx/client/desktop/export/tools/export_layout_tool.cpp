@@ -68,8 +68,8 @@ struct ExportLayoutTool::Private
     // External file storage.
     QnStorageResourcePtr storage;
 
-    // Number of exported cameras with archive.
-    int camerasWithData = 0;
+    // Whether any archive has been exported.
+    bool exportedAnyData = false;
 
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
@@ -351,7 +351,7 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
 bool ExportLayoutTool::start()
 {
-    d->camerasWithData = 0;
+    d->exportedAnyData = false;
 
     if (!prepareStorage())
     {
@@ -412,7 +412,7 @@ bool ExportLayoutTool::exportNextCamera()
 
     if (d->resources.isEmpty())
     {
-        if (d->camerasWithData)
+        if (d->exportedAnyData)
         {
             finishExport(true);
         }
@@ -506,7 +506,7 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
         return;
     }
 
-    ++d->camerasWithData;
+    d->exportedAnyData = true;
 
     if (d->lastError != ExportProcessError::noError)
     {

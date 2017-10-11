@@ -11,7 +11,7 @@ namespace desktop {
 struct ExportLayoutPersistentSettings
 {
     bool readOnly = false;
-    FileExtension fileFormat = FileExtension::nov;
+    QString fileFormat;
 
     void updateRuntimeSettings(ExportLayoutSettings& runtimeSettings) const;
 };

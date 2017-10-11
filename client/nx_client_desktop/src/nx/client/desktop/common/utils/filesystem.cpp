@@ -5,7 +5,6 @@
 
 #include <utils/common/app_info.h>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 
@@ -13,87 +12,76 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-
-class FileSystemStrings
+QString FileSystemStrings::suffix(FileExtension ext)
 {
-    Q_DECLARE_TR_FUNCTIONS(FileSystemStrings)
-
-public:
-    static QString suffix(FileExtension ext)
+    switch (ext)
     {
-        switch (ext)
-        {
-            case FileExtension::avi:
-                return lit("avi");
-            case FileExtension::mkv:
-                return lit("mkv");
-            case FileExtension::mp4:
-                return lit("mp4");
-            case FileExtension::nov:
-                return lit("nov");
-            case FileExtension::exe64:
-            case FileExtension::exe86:
-                return lit("exe");
-            default:
-                NX_ASSERT(false, "Should never get here");
-                return QString();
-        }
+        case FileExtension::avi:
+            return lit("avi");
+        case FileExtension::mkv:
+            return lit("mkv");
+        case FileExtension::mp4:
+            return lit("mp4");
+        case FileExtension::nov:
+            return lit("nov");
+        case FileExtension::exe64:
+        case FileExtension::exe86:
+            return lit("exe");
+        default:
+            NX_ASSERT(false, "Should never get here");
+            return QString();
+    }
+}
+
+FileExtension FileSystemStrings::extension(const QString& suffix, FileExtension defaultValue)
+{
+    if (suffix == lit("exe"))
+    {
+        if (utils::AppInfo::isWin64())
+            return FileExtension::exe64;
+        return FileExtension::exe86;
     }
 
-    static FileExtension extension(const QString& suffix)
+    if (suffix == lit("avi"))
+        return FileExtension::avi;
+
+    if (suffix == lit("mp4"))
+        return FileExtension::mp4;
+
+    if (suffix == lit("nov"))
+        return FileExtension::nov;
+
+    return defaultValue;
+}
+
+QString FileSystemStrings::description(FileExtension extension)
+{
+    switch (extension)
     {
-        if (suffix == lit("exe"))
-        {
-            if (utils::AppInfo::isWin64())
-                return FileExtension::exe64;
-            return FileExtension::exe86;
-        }
+        case FileExtension::avi:
+            return tr("Audio Video Interleave");
+        case FileExtension::mkv:
+            return tr("Matroska");
+        case FileExtension::mp4:
+            return tr("MPEG-4 Part 14");
+        case FileExtension::nov:
+            return tr("%1 Media File").arg(QnAppInfo::organizationName());
+        case FileExtension::exe64:
+            return tr("Executable %1 Media File (x64)").arg(QnAppInfo::organizationName());
+        case FileExtension::exe86:
+            return tr("Executable %1 Media File (x86)").arg(QnAppInfo::organizationName());
 
-        if (suffix == lit("avi"))
-            return FileExtension::avi;
-
-        if (suffix == lit("mp4"))
-            return FileExtension::mp4;
-
-        if (suffix == lit("nov"))
-            return FileExtension::nov;
-
-        // Default value.
-        return FileExtension::mkv;
+        default:
+            NX_ASSERT(false, "Should never get here");
+            return QString();
     }
+}
 
-    static QString description(FileExtension extension)
-    {
-        switch (extension)
-        {
-            case FileExtension::avi:
-                return tr("Audio Video Interleave");
-            case FileExtension::mkv:
-                return tr("Matroska");
-            case FileExtension::mp4:
-                return tr("MPEG-4 Part 14");
-            case FileExtension::nov:
-                return tr("%1 Media File").arg(QnAppInfo::organizationName());
-            case FileExtension::exe64:
-                return tr("Executable %1 Media File (x64)").arg(QnAppInfo::organizationName());
-            case FileExtension::exe86:
-                return tr("Executable %1 Media File (x86)").arg(QnAppInfo::organizationName());
-
-            default:
-                NX_ASSERT(false, "Should never get here");
-                return QString();
-        }
-    }
-
-    static QString filterDescription(FileExtension ext)
-    {
-        const QString formatTemplate(lit("%1 (*.%2)"));
-        return formatTemplate.arg(description(ext)).arg(suffix(ext));
-    }
-};
-
-} // namespace
+QString FileSystemStrings::filterDescription(FileExtension ext)
+{
+    const QString formatTemplate(lit("%1 (*.%2)"));
+    return formatTemplate.arg(description(ext)).arg(suffix(ext));
+}
 
 bool FileExtensionUtils::isExecutable(FileExtension extension)
 {
@@ -186,5 +174,3 @@ bool Filename::operator==(const Filename& other) const
 } // namespace desktop
 } // namespace client
 } // namespace nx
-
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop, FileExtension)
