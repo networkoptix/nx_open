@@ -15,7 +15,6 @@ namespace {
 
 static constexpr int kMinimumWidth = 60;
 
-static constexpr int kMinimumFontSize = 10;
 static constexpr int kMaximumFontSize = 400;
 
 } // namespace
@@ -40,7 +39,8 @@ BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
     connect(ui->widthSpinBox, QnSpinboxIntValueChanged, ui->widthSlider, &QSlider::setValue);
 
     ui->widthSlider->setRange(kMinimumWidth, m_data.overlayWidth * 2);
-    ui->fontSizeSpinBox->setRange(kMinimumFontSize, kMaximumFontSize);
+    ui->fontSizeSpinBox->setRange(ExportBookmarkOverlayPersistentSettings::minimumFontSize(),
+        kMaximumFontSize);
     updateControls();
 
     connect(ui->descriptionCheckBox, &QCheckBox::stateChanged,

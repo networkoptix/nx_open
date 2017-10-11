@@ -740,7 +740,7 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ExportVideoAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Video..."))
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))

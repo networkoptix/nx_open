@@ -19,7 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 #include <nx/client/desktop/utils/proxy_image_provider.h>
 #include <nx/client/desktop/utils/transcoding_image_processor.h>
@@ -75,6 +75,22 @@ ExportSettingsDialog::Private::~Private()
 {
 }
 
+void ExportSettingsDialog::Private::updateOverlaysVisibility(bool transcodingIsAllowed)
+{
+    if (transcodingIsAllowed)
+    {
+        for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
+            overlay(overlayType)->setHidden(false);
+    }
+    else
+    {
+        for (const auto overlayWidget: m_overlays)
+            overlayWidget->setHidden(true);
+    }
+
+    updateMediaImageProcessor();
+}
+
 void ExportSettingsDialog::Private::loadSettings()
 {
     m_exportMediaPersistentSettings = m_bookmarkName.isEmpty()
@@ -89,13 +105,15 @@ void ExportSettingsDialog::Private::loadSettings()
     if (lastExportDir.isEmpty())
         lastExportDir = QDir::homePath();
 
-    setMode(qnSettings->lastExportMode() == lit("layout") ? Mode::Layout : Mode::Media);
+    setMode(QnLexical::deserialized<Mode>(qnSettings->lastExportMode(), Mode::Media));
 
     m_exportMediaSettings.fileName.path = lastExportDir;
-    m_exportMediaSettings.fileName.extension = m_exportMediaPersistentSettings.fileFormat;
+    m_exportMediaSettings.fileName.extension = FileSystemStrings::extension(
+        m_exportMediaPersistentSettings.fileFormat, FileExtension::mkv);
 
     m_exportLayoutSettings.filename.path = lastExportDir;
-    m_exportLayoutSettings.filename.extension = m_exportLayoutPersistentSettings.fileFormat;
+    m_exportLayoutSettings.filename.extension = FileSystemStrings::extension(
+        m_exportLayoutPersistentSettings.fileFormat, FileExtension::nov);
 
     auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
     if (!imageOverlay.name.trimmed().isEmpty())
@@ -114,10 +132,13 @@ void ExportSettingsDialog::Private::loadSettings()
         selectOverlay(type);
 
     updateTranscodingSettings();
+    updateOverlaysVisibility(isTranscodingAllowed());
 }
 
 void ExportSettingsDialog::Private::saveSettings()
 {
+    qnSettings->setLastExportMode(QnLexical::serialized(m_mode));
+
     switch (m_mode)
     {
         case Mode::Media:
@@ -132,7 +153,6 @@ void ExportSettingsDialog::Private::saveSettings()
                 qnSettings->setExportBookmarkSettings(m_exportMediaPersistentSettings);
 
             qnSettings->setLastExportDir(m_exportMediaSettings.fileName.path);
-            qnSettings->setLastExportMode(lit("media"));
             break;
         }
 
@@ -140,7 +160,6 @@ void ExportSettingsDialog::Private::saveSettings()
         {
             qnSettings->setExportLayoutSettings(m_exportLayoutPersistentSettings);
             qnSettings->setLastExportDir(m_exportLayoutSettings.filename.path);
-            qnSettings->setLastExportMode(lit("layout"));
             break;
         }
     }
@@ -305,6 +324,12 @@ void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
 
     m_fullFrameSize = size;
 
+    if (m_fullFrameSize.isValid())
+    {
+        const auto newDimension = std::min(m_fullFrameSize.width(), m_fullFrameSize.height());
+        m_exportMediaPersistentSettings.setDimension(newDimension);
+    }
+
     const QPair<qreal, qreal> coefficients(
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());
@@ -348,7 +373,7 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
     const auto transcodingWasAllowed = isTranscodingAllowed();
     m_exportMediaSettings.fileName = filename;
-    m_exportMediaPersistentSettings.fileFormat = filename.extension;
+    m_exportMediaPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Media);
 
     const bool transcodingIsAllowed = isTranscodingAllowed();
@@ -359,7 +384,7 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
     m_exportLayoutSettings.filename = filename;
-    m_exportLayoutPersistentSettings.fileFormat = filename.extension;
+    m_exportLayoutPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Layout);
 }
 
@@ -716,22 +741,7 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
             });
     }
 
-    connect(this, &Private::transcodingAllowedChanged, this,
-        [this](bool transcodingIsAllowed)
-        {
-            if (transcodingIsAllowed)
-            {
-                for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
-                    overlay(overlayType)->setHidden(false);
-            }
-            else
-            {
-                for (const auto overlayWidget: m_overlays)
-                    overlayWidget->setHidden(true);
-            }
-
-            updateMediaImageProcessor();
-        });
+    connect(this, &Private::transcodingAllowedChanged, this, &Private::updateOverlaysVisibility);
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()

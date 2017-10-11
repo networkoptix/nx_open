@@ -115,6 +115,7 @@ private:
     void overlayPositionChanged(ExportOverlayType type);
     void updateTranscodingSettings();
     void updateMediaImageProcessor();
+    void updateOverlaysVisibility(bool transcodingIsAllowed);
     QString cachedImageFileName() const;
 
     void setFrameSize(const QSize& size);

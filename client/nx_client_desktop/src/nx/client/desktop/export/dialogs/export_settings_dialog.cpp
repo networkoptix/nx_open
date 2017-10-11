@@ -25,6 +25,7 @@
 #include <utils/math/math.h>
 #include <nx/client/desktop/ui/common/selectable_text_button_group.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/app_info.h>
 
 namespace nx {
@@ -37,17 +38,27 @@ static const QSize kPreviewSize(512, 288);
 static constexpr int kBusyIndicatorDotRadius = 8;
 static constexpr int kNoDataDefaultFontSize = 18;
 
+template<class Widget>
+void setMaxOverlayWidth(Widget* settingsWidget, int width)
+{
+    QSignalBlocker blocker(settingsWidget);
+    settingsWidget->setMaxOverlayWidth(width);
+}
+
 } // namespace
 
 ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
+    bool allowLayoutExport,
     const QnTimePeriod& timePeriod,
     FileNameValidator isFileNameValid,
     QWidget* parent)
     :
     ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
 {
-    setMediaResourceWidget(widget);
+    setMediaParams(widget->resource(), widget->item()->data(), widget->context());
+    if (!allowLayoutExport)
+        hideTab(Mode::Layout);
 
     const auto layout = widget->item()->layout()->resource();
     d->setLayout(layout);
@@ -66,6 +77,19 @@ ExportSettingsDialog::ExportSettingsDialog(
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
+    const QnMediaResourcePtr& mediaResource,
+    QnWorkbenchContext* context,
+    const QnTimePeriod& timePeriod,
+    FileNameValidator isFileNameValid,
+    QWidget* parent)
+    :
+    ExportSettingsDialog(timePeriod, QnCameraBookmark(), isFileNameValid, parent)
+{
+    setMediaParams(mediaResource, QnLayoutItemData(), context);
+    hideTab(Mode::Layout);
+}
+
+ExportSettingsDialog::ExportSettingsDialog(
     QnMediaResourceWidget* widget,
     const QnCameraBookmark& bookmark,
     FileNameValidator isFileNameValid,
@@ -73,9 +97,21 @@ ExportSettingsDialog::ExportSettingsDialog(
     :
     ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFileNameValid, parent)
 {
-    ui->tabWidget->removeTab(ui->tabWidget->indexOf(ui->layoutTab));
-    setMediaResourceWidget(widget);
-    updateMode();
+    setMediaParams(widget->resource(), widget->item()->data(), widget->context());
+    hideTab(Mode::Layout);
+}
+
+ExportSettingsDialog::ExportSettingsDialog(
+    const QnMediaResourcePtr& mediaResource,
+    QnWorkbenchContext* context,
+    const QnCameraBookmark& bookmark,
+    FileNameValidator isFileNameValid,
+    QWidget* parent)
+    :
+    ExportSettingsDialog({bookmark.startTimeMs, bookmark.durationMs}, bookmark, isFileNameValid, parent)
+{
+    setMediaParams(mediaResource, QnLayoutItemData(), context);
+    hideTab(Mode::Layout);
 }
 
 ExportSettingsDialog::ExportSettingsDialog(
@@ -233,6 +269,16 @@ ExportSettingsDialog::ExportSettingsDialog(
             {
                 ui->cameraExportSettingsButton->click();
             }
+        });
+
+    connect(d, &Private::frameSizeChanged, this,
+        [this](const QSize& size)
+        {
+
+            setMaxOverlayWidth(ui->bookmarkSettingsPage, size.width());
+            setMaxOverlayWidth(ui->imageSettingsPage, size.width());
+            setMaxOverlayWidth(ui->textSettingsPage, size.width());
+            updateSettingsWidgets();
         });
 
     if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
@@ -514,21 +560,15 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         setAlertText(i, texts[i]);
 }
 
-void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
+void ExportSettingsDialog::setMediaParams(
+    const QnMediaResourcePtr& mediaResource,
+    const QnLayoutItemData& itemData,
+    QnWorkbenchContext* context)
 {
-    connect(d, &Private::frameSizeChanged, this,
-        [this](const QSize& size)
-        {
-            ui->bookmarkSettingsPage->setMaxOverlayWidth(size.width());
-            ui->imageSettingsPage->setMaxOverlayWidth(size.width());
-            ui->textSettingsPage->setMaxOverlayWidth(size.width());
-        });
-
-    const auto mediaResource = widget->resource();
     d->setMediaResource(mediaResource);
     ui->mediaPreviewWidget->setImageProvider(d->mediaImageProvider());
 
-    const auto timeWatcher = widget->context()->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
 
     const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
@@ -538,7 +578,6 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
 
     const auto resource = mediaResource->toResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    const auto itemData = widget->item()->data();
     const auto customAr = mediaResource->customAspectRatio();
 
     nx::core::transcoding::Settings available;
@@ -566,6 +605,16 @@ void ExportSettingsDialog::setMediaResourceWidget(QnMediaResourceWidget* widget)
         namePart + L'_' + timePart, L'_');
 
     ui->mediaFilenamePanel->setFilename(suggestedFileName(baseFileName));
+}
+
+void ExportSettingsDialog::hideTab(Mode mode)
+{
+    NX_ASSERT(ui->tabWidget->count() > 1);
+    ui->tabWidget->removeTab(mode == Mode::Media
+        ? ui->tabWidget->indexOf(ui->cameraTab)
+        : ui->tabWidget->indexOf(ui->layoutTab));
+
+    updateMode();
 }
 
 void ExportSettingsDialog::accept()
@@ -604,3 +653,5 @@ Filename ExportSettingsDialog::suggestedFileName(const Filename& baseName) const
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ExportSettingsDialog, Mode)
