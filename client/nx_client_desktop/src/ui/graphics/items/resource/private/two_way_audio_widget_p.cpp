@@ -166,7 +166,10 @@ namespace
 }
 
 
-QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner) :
+QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(
+    const QString& sourceId,
+    QnTwoWayAudioWidget* owner)
+    :
     base_type(),
     button(new QnImageButtonWidget(owner)),
     hint(new GraphicsLabel(owner)),
@@ -174,6 +177,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
 
     q_ptr(owner),
 
+    m_sourceId(sourceId),
     m_started(false),
     m_state(OK),
     m_requestHandle(0),
@@ -319,8 +323,10 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
     setState(Pressed);
 
-    m_requestHandle = server->restConnection()->twoWayAudioCommand(m_camera->getId(), true, [this]
-        (bool success, rest::Handle handle, const QnJsonRestResult& result)
+    m_requestHandle = server->restConnection()->twoWayAudioCommand(m_sourceId,
+        m_camera->getId(),
+        true,
+        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (handle != m_requestHandle)
                 return;
@@ -369,7 +375,8 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     // TODO: #GDM What should we do if we cannot stop streaming?
 
     /* Sending stop anyway, because we can get here in 'Streaming is not ready' error state. */
-    server->restConnection()->twoWayAudioCommand(m_camera->getId(), false, rest::ServerConnection::GetCallback());
+    server->restConnection()->twoWayAudioCommand(m_sourceId, m_camera->getId(), false,
+        rest::ServerConnection::GetCallback());
 }
 
 void QnTwoWayAudioWidgetPrivate::setFixedHeight(qreal height)
