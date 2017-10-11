@@ -32,7 +32,7 @@ struct ConnectingPeer
 
 struct CassandraConnection
 {
-    std::string hostName;
+    std::string host;
     std::chrono::milliseconds delayBeforeRetryingInitialConnect;
 
     CassandraConnection();

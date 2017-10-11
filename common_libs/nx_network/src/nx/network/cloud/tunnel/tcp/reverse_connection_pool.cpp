@@ -29,7 +29,7 @@ ReverseConnectionPool::ReverseConnectionPool(
     m_acceptor(
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
+            NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG2);
             getOrCreateHolder(hostName)->saveSocket(std::move(socket));
         }),
     m_isReconnectHandlerSet(false),
@@ -220,7 +220,8 @@ std::shared_ptr<ReverseConnectionHolder>
         it = holdersInSuffix.emplace(
             std::move(hostName),
             std::make_shared<ReverseConnectionHolder>(
-                m_mediatorConnection->getAioThread())).first;
+                m_mediatorConnection->getAioThread(),
+                hostName)).first;
     }
 
     return it->second;
