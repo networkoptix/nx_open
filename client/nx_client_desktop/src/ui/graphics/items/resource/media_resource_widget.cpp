@@ -36,6 +36,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/ptz/ptz_controller_pool.h>
@@ -945,7 +946,12 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
     if (!hasTwoWayAudio)
         return;
 
-    m_twoWayAudioWidget = new QnTwoWayAudioWidget();
+    const auto user = context()->user();
+    if (!user)
+        return;
+
+    m_twoWayAudioWidget = new QnTwoWayAudioWidget(QnDesktopResource::calculateUniqueId(
+        commonModule()->moduleGUID(), user->getId()));
     m_twoWayAudioWidget->setCamera(m_camera);
     m_twoWayAudioWidget->setFixedHeight(kTriggerButtonSize);
     context()->statisticsModule()->registerButton(lit("two_way_audio"), m_twoWayAudioWidget);
