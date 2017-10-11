@@ -1,6 +1,5 @@
 import QtQuick 2.5;
-
-import ".";
+import Nx.WelcomeScreen 1.0;
 
 Rectangle
 {

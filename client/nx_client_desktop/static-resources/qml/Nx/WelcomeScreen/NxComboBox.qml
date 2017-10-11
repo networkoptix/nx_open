@@ -1,8 +1,7 @@
 import QtQuick 2.6;
 import Qt.labs.controls 1.0;
 import Qt.labs.templates 1.0 as T
-
-import "."
+import Nx.WelcomeScreen 1.0;
 
 // TODO: inner shadow
 // TODO: implement exactly as in specification

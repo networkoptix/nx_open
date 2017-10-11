@@ -3,8 +3,7 @@ import QtQuick.Controls 1.2;
 import QtGraphicalEffects 1.0;
 import Qt.labs.controls 1.0;
 import com.networkoptix.qml 1.0;
-
-import "."
+import Nx.WelcomeScreen 1.0;
 
 Item
 {

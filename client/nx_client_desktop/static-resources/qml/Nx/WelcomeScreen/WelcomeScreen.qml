@@ -3,9 +3,8 @@ import QtQuick.Controls 1.2;
 import QtQuick.Window 2.2;
 import Nx 1.0;
 import Nx.Models 1.0;
+import Nx.WelcomeScreen 1.0;
 import com.networkoptix.qml 1.0;
-
-import "."
 
 Rectangle
 {

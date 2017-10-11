@@ -1,8 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.4;
 import QtQuick.Controls.Styles 1.4;
-
-import "."
+import Nx.WelcomeScreen 1.0;
 
 // TODO: left\right icons\btns implementation
 

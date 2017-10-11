@@ -1,8 +1,7 @@
 import QtQuick 2.6;
 import Nx 1.0;
 import Nx.Models 1.0;
-
-import "."
+import Nx.WelcomeScreen 1.0;
 
 BaseTile
 {

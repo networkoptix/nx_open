@@ -1,7 +1,6 @@
 import QtQuick 2.5;
 import Qt.labs.controls 1.0;
-
-import "."
+import Nx.WelcomeScreen 1.0;
 
 // TODO: add half-checked state (future)
 // TODO: add table-specific skin (future)
