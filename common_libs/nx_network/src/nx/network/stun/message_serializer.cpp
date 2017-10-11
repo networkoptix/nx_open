@@ -64,7 +64,7 @@ nx::network::server::SerializerState MessageSerializer::serializeMagicCookieAndT
         return nx::network::server::SerializerState::needMoreBufferSpace;
     }
 
-    NX_ASSERT(m_message->header.transactionId.size() == 12);
+    NX_ASSERT(m_message->header.transactionId.size() == Header::TRANSACTION_ID_SIZE);
     // Transaction ID
     if( buffer->WriteBytes( m_message->header.transactionId.data(),
                             m_message->header.transactionId.size() ) == NULL ) {
@@ -275,7 +275,7 @@ nx::network::server::SerializerState MessageSerializer::serializeAttributes( Mes
     return ret ? nx::network::server::SerializerState::done : nx::network::server::SerializerState::needMoreBufferSpace;
 }
 
-bool MessageSerializer::checkMessageIntegratiy() {
+bool MessageSerializer::checkMessageIntegrity() {
     // We just do some manually testing for the message validation and all the rules for
     // testing is based on the RFC. 
     // 1. Header
@@ -311,10 +311,15 @@ bool MessageSerializer::checkMessageIntegratiy() {
     return true;
 }
 
+static const int kDefaultMessageBufferSize = 128;
+
 nx::network::server::SerializerState MessageSerializer::serialize(
     nx::Buffer* const user_buffer,
     size_t* const bytesWritten )
 {
+    if (user_buffer->capacity() == 0)
+        user_buffer->reserve(kDefaultMessageBufferSize);
+
     for( int i = 0; ; ++i ) //TODO #ak ensure loop is not inifinite
     {
         if( i > 0 )
@@ -323,8 +328,7 @@ nx::network::server::SerializerState MessageSerializer::serialize(
             user_buffer->reserve( user_buffer->capacity() * 2 );
         }
 
-        NX_ASSERT(m_initialized && checkMessageIntegratiy());
-        NX_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
+        NX_ASSERT(m_initialized && checkMessageIntegrity());
         MessageSerializerBuffer buffer(user_buffer);
         *bytesWritten = user_buffer->size();
         // header serialization
@@ -347,7 +351,6 @@ nx::Buffer MessageSerializer::serialized(const Message& message)
     MessageSerializer serializator;
     serializator.setMessage(&message);
     nx::Buffer serializedMessage;
-    serializedMessage.reserve(100);
     size_t bytesWritten = 0;
     serializator.serialize(&serializedMessage, &bytesWritten);
     return serializedMessage;
