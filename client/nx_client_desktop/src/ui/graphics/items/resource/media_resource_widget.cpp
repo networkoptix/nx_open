@@ -2110,6 +2110,8 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
         ensureTwoWayAudioWidget();
     else if (key == Qn::kCombinedSensorsDescriptionParamName)
         updateAspectRatio();
+    else if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+        updateButtonsVisibility();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
