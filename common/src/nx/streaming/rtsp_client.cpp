@@ -25,10 +25,11 @@
 #include <nx/network/simple_http_client.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/system_error.h>
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -364,9 +365,8 @@ qint64 QnRtspTimeHelper::getUsecTime(
     const qint64 currentUs = currentMs * 1000;
     if (statistics.isEmpty() || m_ignoreCameraTime)
     {
-        NX_LOGX(lm("getUsecTime() -> %1 (%2)")
-            .args(currentUs, m_ignoreCameraTime ? "m_ignoreCameraTime=true" : "empty statistics"),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("getUsecTime() -> %1 (%2)")
+            .args(currentUs, m_ignoreCameraTime ? "m_ignoreCameraTime=true" : "empty statistics"));
         return currentUs;
     }
 
@@ -379,7 +379,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     const bool cameraTimeChanged = isCameraTimeChanged(statistics);
     const bool localTimeChanged = isLocalTimeChanged();
 
-    NX_LOGX(lm("getUsecTime() BEGIN: "
+    NX_VERBOSE(this, lm("getUsecTime() BEGIN: "
         "timestamp %1, rtpTime %2 (%3), nowMs %4, camera_from_nowMs %5, result_from_nowMs %6")
         .args(
             statistics.timestamp,
@@ -387,8 +387,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
             deltaMs(1000 / (double) frequency, m_prevRtpTime, rtpTime),
             deltaMs(1000, m_prevCurrentSeconds, currentSeconds),
             deltaMs(1000, currentSeconds, cameraSeconds),
-            deltaMs(1000, currentSeconds, resultSeconds)),
-        cl_logDEBUG2);
+            deltaMs(1000, currentSeconds, resultSeconds)));
     m_prevRtpTime = rtpTime;
     m_prevCurrentSeconds = currentSeconds;
 
@@ -401,15 +400,15 @@ qint64 QnRtspTimeHelper::getUsecTime(
         auto securityCamResource = m_resource.dynamicCast<QnSecurityCamResource>();
         if (securityCamResource)
         {
-            auto resourceData = qnCommon->dataPool()->data(securityCamResource);
+            auto resourceData = qnStaticCommon->dataPool()->data(securityCamResource);
             const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
                 Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
             if (ignoreCameraTimeIfBigJitter)
             {
                 m_ignoreCameraTime = true;
-                NX_LOGX(lm("Jitter exceeds %1 s; camera time will be ignored")
-                    .arg(IGNORE_CAMERA_TIME_THRESHOLD_S), cl_logDEBUG1);
-                NX_LOGX(lm("getUsecTime() -> %1").arg(currentUs), cl_logDEBUG2);
+                NX_DEBUG(this, lm("Jitter exceeds %1 s; camera time will be ignored")
+                    .arg(IGNORE_CAMERA_TIME_THRESHOLD_S));
+                NX_VERBOSE(this, lm("getUsecTime() -> %1").arg(currentUs));
                 return currentUs;
             }
         }
@@ -422,39 +421,39 @@ qint64 QnRtspTimeHelper::getUsecTime(
         {
             if (cameraTimeChanged)
             {
-                NX_LOGX(lm(
+                NX_DEBUG(this, lm(
                     "Camera time has been changed or receiving latency > %1 seconds. "
                     "Resync time for camera %2")
-                    .args(TIME_RESYNC_THRESHOLD_S, m_resId), cl_logDEBUG1);
+                    .args(TIME_RESYNC_THRESHOLD_S, m_resId));
             }
             else if (localTimeChanged)
             {
-                NX_LOGX(lm(
+                NX_DEBUG(this, lm(
                     "Local time has been changed. Resync time for camera %1")
-                    .arg(m_resId), cl_logDEBUG1);
+                    .arg(m_resId));
             }
             else
             {
-                NX_LOGX(lm(
+                NX_DEBUG(this, lm(
                     "RTSP time drift reached %1 seconds. Resync time for camera %2")
-                    .args(currentSeconds - resultSeconds, m_resId), cl_logDEBUG1);
+                    .args(currentSeconds - resultSeconds, m_resId));
             }
             m_lastWarnTime = currentUsecTime;
         }
 
         reset();
-        NX_LOGX(lm("getUsecTime(): Reset, calling recursively"), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("getUsecTime(): Reset, calling recursively"));
         const qint64 result =
             getUsecTime(rtpTime, statistics, frequency, /*recursionAllowed*/ false); //< recursion
-        NX_LOGX(lm("getUsecTime() END -> %1 (after recursion)").arg(result), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("getUsecTime() END -> %1 (after recursion)").arg(result));
         return result;
     }
     else
     {
         const qint64 result =
             ((m_ignoreCameraTime || gotInvalidTime) ? currentSeconds : resultSeconds) * 1000000LL;
-        NX_LOGX(lm("getUsecTime() END -> %1 (gotInvalidTime: %2)").args(
-            result, gotInvalidTime ? "true" : "false"), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("getUsecTime() END -> %1 (gotInvalidTime: %2)").args(
+            result, gotInvalidTime ? "true" : "false"));
         return result;
     }
 }
