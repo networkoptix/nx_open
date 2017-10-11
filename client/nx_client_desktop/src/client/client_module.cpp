@@ -374,6 +374,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
+    qnRuntime->setProfilerMode(startupParams.profilerMode);
 
     if (!startupParams.engineVersion.isEmpty())
     {

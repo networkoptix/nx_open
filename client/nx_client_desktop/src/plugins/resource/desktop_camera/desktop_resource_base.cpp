@@ -30,22 +30,18 @@ QnUuid QnDesktopResource::getDesktopResourceUuid()
     return kDesktopResourceUuid;
 }
 
-void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server)
+void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server, const QnUuid& userId)
 {
-    qDebug() << "Adding connection";
-
     if (m_connectionPool.find(server->getId()) != m_connectionPool.cend())
         return;
 
-    auto connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, server));
+    QnDesktopCameraConnectionPtr connection(new QnDesktopCameraConnection(this, server, userId));
     connection->start();
     m_connectionPool.emplace(server->getId(), std::move(connection));
 }
 
 void QnDesktopResource::removeConnection(const QnMediaServerResourcePtr &server)
 {
-    qDebug() << "removing connection";
-
     auto connection = m_connectionPool.find(server->getId());
     if (connection == m_connectionPool.end())
         return;
@@ -63,4 +59,9 @@ QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstract
         return desktopProvider->getAudioLayout();
 
     return QnConstResourceAudioLayoutPtr(nullptr);
+}
+
+QString QnDesktopResource::calculateUniqueId(const QnUuid& moduleId, const QnUuid& userId)
+{
+    return moduleId.toString() + userId.toString();
 }

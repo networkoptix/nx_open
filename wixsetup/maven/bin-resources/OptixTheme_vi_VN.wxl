@@ -4,9 +4,14 @@
   <String Id="Caption">Thiết lập [WixBundleName] - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/ Cài đặt | / Sửa | / Gỡ bỏ cài đặt | / Bố trí [directory] - cài đặt, sửa, gỡ cài đặt hoặc tạo bản sao cục bộ hoàn chỉnh của gói trong thư mục. Cài đặt là mặc định.
-/ Chế độ Thụ động | / Chế độ yên lặng - hiển thị giao diện người dùng tối thiểu không có nhắc nhở hoặc hiển thị. Theo mặc định giao diện người dùng và tất cả các nhắc nhở được hiển thị.
-/ Norestart - ngăn chặn bất kỳ nỗ lực để khởi động lại. Theo mặc định giao diện người dùng sẽ nhắc nhở trước khi khởi động lại. / Log log.txt - đăng nhập vào một tệp cụ thể. Theo mặc định, tạo tệp nhật ký %TEMP%.</String>
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
+   creates a complete local copy of the bundle in directory. Install is the default.
+
+/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
+   no prompts. By default UI and all prompts are displayed.
+
+/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
+/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Bạn có chắc muốn hủy bỏ không?</String>
   <String Id="ClientAndServer">Máy chủ và Máy trạm</String>
   <String Id="ClientOnly">Chỉ máy trạm</String>

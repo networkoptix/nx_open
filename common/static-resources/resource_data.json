@@ -2069,6 +2069,12 @@
                 "DW|DW-CPUHD*"
             ],
             "isMacAddressMandatory": false
+        },
+        {
+            "keys": [
+                "IQA*|IQEYE*"
+            ],
+            "ignoreONVIF": true
         }
     ]
 }

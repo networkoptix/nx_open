@@ -365,7 +365,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isActiveXMode())
+    if (!qnRuntime->isActiveXMode() && !qnRuntime->isProfilerMode())
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
@@ -373,8 +373,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
          * * double buffering is disabled in drivers or in our program
          * Workaround must be disabled in activeX mode.
          */
-         QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-         Q_UNUSED(vsyncWorkaround);
+        auto vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+        Q_UNUSED(vsyncWorkaround);
     }
 
     updateWidgetsVisibility();
