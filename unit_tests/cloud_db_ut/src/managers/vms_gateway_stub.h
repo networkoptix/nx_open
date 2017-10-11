@@ -1,5 +1,8 @@
 #pragma once
 
+#include <queue>
+#include <set>
+
 #include <nx/network/aio/basic_pollable.h>
 
 #include <nx/cloud/cdb/managers/vms_gateway.h>
@@ -20,9 +23,14 @@ public:
 
     void pause();
     void resume();
+    
+    bool performedRequestToSystem(const std::string& id) const;
 
 private:
     nx::network::aio::BasicPollable m_pollable;
+    bool m_paused = false;
+    std::queue<nx::utils::MoveOnlyFunc<void()>> m_queuedRequests;
+    std::set<std::string> m_systemsRequested;
 };
 
 } // namespace test

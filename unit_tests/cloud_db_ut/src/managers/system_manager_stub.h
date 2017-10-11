@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include <nx/cloud/cdb/managers/system_manager.h>
 
 namespace nx {
@@ -18,6 +20,11 @@ public:
         nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) override;
+
+    void addSystem(const api::SystemData& system);
+
+private:
+    std::map<std::string, api::SystemData> m_systems;
 };
 
 } // namespace test

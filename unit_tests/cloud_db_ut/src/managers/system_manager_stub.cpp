@@ -4,10 +4,12 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-boost::optional<api::SystemData> SystemManagerStub::findSystemById(const std::string& /*id*/) const
+boost::optional<api::SystemData> SystemManagerStub::findSystemById(const std::string& id) const
 {
-    // TODO
-    return boost::none;
+    const auto it = m_systems.find(id);
+    if (it == m_systems.end()) 
+        return boost::none;
+    return it->second;
 }
 
 nx::utils::db::DBResult SystemManagerStub::updateSystemStatus(
@@ -17,6 +19,11 @@ nx::utils::db::DBResult SystemManagerStub::updateSystemStatus(
 {
     // TODO
     return nx::utils::db::DBResult::ok;
+}
+
+void SystemManagerStub::addSystem(const api::SystemData& system)
+{
+    m_systems.emplace(system.id, system);
 }
 
 } // namespace test

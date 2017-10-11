@@ -73,11 +73,11 @@ protected:
         base_type::SetUp();
 
         m_vmsGatewayEmulator.registerRequestProcessorFunc(
-            "/gateway/*",
+            "/gateway/{systemId}/",
             std::bind(&SystemMerge::vmsApiRequestStub, this, _1, _2, _3, _4, _5));
         ASSERT_TRUE(m_vmsGatewayEmulator.bindAndListen());
 
-        addArg("-vmsGatewayUrl", lm("http://%1/gateway/{systemId}/")
+        addArg("-vmsGateway/url", lm("http://%1/gateway/{systemId}/")
             .args(m_vmsGatewayEmulator.serverAddress()).toStdString().c_str());
 
         ASSERT_TRUE(startAndWaitUntilStarted());
