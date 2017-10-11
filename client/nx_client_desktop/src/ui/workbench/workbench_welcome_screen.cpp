@@ -88,7 +88,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(
     NX_EXPECT(qnRuntime->isDesktopMode());
 
     rootContext()->setContextProperty(lit("context"), this);
-    setSource(lit("qrc:/qml/Nx/WelcomeScreen/WelcomeScreen.qml"));
+    setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
     setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     if (status() == QQuickWidget::Error)
