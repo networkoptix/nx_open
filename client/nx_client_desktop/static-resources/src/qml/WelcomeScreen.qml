@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import QtQuick.Window 2.2;
+import Nx 1.0;
 import Nx.Models 1.0;
 import com.networkoptix.qml 1.0;
 
@@ -389,7 +390,9 @@ Rectangle
             anchors.topMargin: 16;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            textControl.text: qsTr("You have no access to %1. Some features could be unavailable.").arg(context.appInfo.cloudName());
+            textControl.text:
+                qsTr("You have no access to %1. Some features could be unavailable.")
+                    .arg(AppInfo.cloudName());
         }
     }
 
@@ -483,7 +486,7 @@ Rectangle
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 8
 
-        text: context.appInfo.applicationVersion()
+        text: AppInfo.applicationVersion()
         standardColor: Style.darkerColor(Style.colors.windowText, 1)
 
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})

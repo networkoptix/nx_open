@@ -10,9 +10,6 @@
 #include <utils/common/connective.h>
 #include <utils/common/encoded_credentials.h>
 
-class QnCloudStatusWatcher;
-class QnAppInfo;
-
 class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -29,8 +26,6 @@ class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbe
     Q_PROPERTY(QString minSupportedVersion READ minSupportedVersion CONSTANT)
 
     Q_PROPERTY(QString message READ message WRITE setMessage NOTIFY messageChanged)
-
-    Q_PROPERTY(QnAppInfo* appInfo READ appInfo CONSTANT)
 
 public:
     QnWorkbenchWelcomeScreen(QQmlEngine* engine, QWidget* parent = nullptr);
@@ -67,8 +62,6 @@ public: // Properties
     void setMessage(const QString& message);
 
     QString message() const;
-
-    QnAppInfo* appInfo() const;
 
 public:
     void setupFactorySystem(const QString& serverUrl);
@@ -160,5 +153,4 @@ private:
     QString m_connectingSystemName;
     const QnGenericPalette m_palette;
     QString m_message;
-    QnAppInfo* m_appInfo = nullptr;
 };

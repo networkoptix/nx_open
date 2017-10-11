@@ -83,8 +83,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(
     :
     base_type(engine, parent),
     QnWorkbenchContextAware(parent),
-    m_palette(extractPalette()),
-    m_appInfo(new QnAppInfo(this))
+    m_palette(extractPalette())
 {
     NX_EXPECT(qnRuntime->isDesktopMode());
 
@@ -314,11 +313,6 @@ void QnWorkbenchWelcomeScreen::setMessage(const QString& message)
 QString QnWorkbenchWelcomeScreen::message() const
 {
     return m_message;
-}
-
-QnAppInfo* QnWorkbenchWelcomeScreen::appInfo() const
-{
-    return m_appInfo;
 }
 
 bool QnWorkbenchWelcomeScreen::isAcceptableDrag(const QList<QUrl>& urls)

@@ -26,6 +26,11 @@ static QObject* createNxGlobals(QQmlEngine*, QJSEngine*)
     return new nx::client::core::NxGlobalsObject();
 }
 
+static QObject* createAppInfo(QQmlEngine*, QJSEngine*)
+{
+    return new QnAppInfo();
+}
+
 void QnClientCoreMetaTypes::initialize()
 {
     qRegisterMetaType<QnStringSet>();
@@ -45,6 +50,8 @@ void QnClientCoreMetaTypes::initialize()
 
     qmlRegisterType<nx::client::core::animation::KineticAnimation>(
         "Nx.Animations", 1, 0, "KineticAnimation");
+
+    qmlRegisterSingletonType<QnAppInfo>("Nx", 1, 0, "AppInfo", &createAppInfo);
 
     qmlRegisterSingletonType<nx::client::core::NxGlobalsObject>(
         "Nx", 1, 0, "NxGlobals", &createNxGlobals);
