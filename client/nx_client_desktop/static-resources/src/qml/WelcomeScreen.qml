@@ -43,14 +43,14 @@ Rectangle
                 : Image.PreserveAspectFit);
         }
 
-
         NxSearchEdit
         {
             id: searchEdit;
 
+            readonly property int sourceRowsCount: grid.model ? grid.model.sourceRowCount : 0
             readonly property bool itemsOverflow:
-                grid.model.sourceRowsCount > pageSwitcher.kMaxPagesCount * grid.itemsPerPage
-            visible: grid.count > grid.itemsPerPage || itemsOverflow
+                sourceRowsCount > pageSwitcher.kMaxPagesCount * grid.itemsPerPage
+            visible: text.length || grid.count > grid.itemsPerPage || itemsOverflow
 
             anchors.bottom: gridHolder.top
             anchors.bottomMargin: 16

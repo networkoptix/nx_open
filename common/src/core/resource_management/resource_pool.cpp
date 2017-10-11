@@ -156,9 +156,11 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
     {
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
-            resource->getTypeId() == qnResTypePool->desktopCameraResourceType()->getId()) {
+            resource->getTypeId() == QnResourceTypePool::kDesktopCameraTypeUuid)
+        {
             qDebug() << "desktop camera added to resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
-            connect(resource, &QnResource::statusChanged, this, [this, resource] {
+            connect(resource, &QnResource::statusChanged, this, [this, resource]
+            {
                 qDebug() << "desktop camera status changed" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId() << resource->getStatus();
             });
         }
@@ -218,8 +220,9 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
-            resource->getTypeId() == qnResTypePool->desktopCameraResourceType()->getId()) {
-                qDebug() << "desktop camera removed from resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
+            resource->getTypeId() == QnResourceTypePool::kDesktopCameraTypeUuid)
+        {
+            qDebug() << "desktop camera removed from resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
         }
 #endif
 
