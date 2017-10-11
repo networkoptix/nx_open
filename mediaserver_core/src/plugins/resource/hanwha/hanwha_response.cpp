@@ -32,14 +32,15 @@ HanwhaResponse::HanwhaResponse(
     const nx::Buffer& rawBuffer,
     nx_http::StatusCode::Value statusCode,
     const QString& requestUrl,
-    const QString& groupBy)
-    :
+    const QString& groupBy,
+    bool isListMode)
+:
     m_statusCode(statusCode),
     m_groupBy(groupBy),
     m_requestUrl(requestUrl)
 
 {
-    parseBuffer(rawBuffer);
+    parseBuffer(rawBuffer, isListMode);
 }
 
 bool HanwhaResponse::isSuccessful() const
@@ -73,7 +74,7 @@ QString HanwhaResponse::requestUrl() const
     return m_requestUrl;
 }
 
-void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
+void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer, bool isListMode)
 {
     const auto groupBy = m_groupBy.toUtf8();
     auto lines = rawBuffer.split(L'\n');
@@ -116,9 +117,22 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
 
                 if (i == splitSize - 1)
                 {
-                    auto nameAndValue = part.split(L'=');
-                    if (nameAndValue.size() != 2)
-                        continue;
+                    QList<nx::Buffer> nameAndValue;
+                    if (isListMode)
+                    {
+                        const auto colonIndex = part.indexOf(L':');
+                        if (colonIndex == -1)
+                            continue;
+
+                        nameAndValue.push_back(part.left(colonIndex));
+                        nameAndValue.push_back(part.mid(colonIndex + 1));
+                    }
+                    else
+                    {
+                        nameAndValue = part.split(L'=');
+                        if (nameAndValue.size() != 2)
+                            continue;
+                    }
 
                     if (nameAndValue[0] == groupBy)
                     {

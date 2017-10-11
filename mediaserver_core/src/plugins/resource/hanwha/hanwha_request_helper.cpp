@@ -46,7 +46,6 @@ HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesP
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(attributesPath);
 
-    qDebug() << "URL" << url;
     if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
         return HanwhaAttributes(statusCode);
 
@@ -121,24 +120,32 @@ void HanwhaRequestHelper::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
 }
 
 QUrl HanwhaRequestHelper::buildRequestUrl(
+    QUrl deviceUrl,
+    const QString& cgi,
+    const QString& submenu,
+    const QString& action,
+    std::map<QString, QString> parameters)
+{
+    QUrlQuery query;
+
+    deviceUrl.setPath(kPathTemplate.arg(cgi));
+    query.addQueryItem(kSubmenu, submenu);
+    query.addQueryItem(kAction, action);
+
+    for (const auto& parameter : parameters)
+        query.addQueryItem(parameter.first, parameter.second);
+
+    deviceUrl.setQuery(query);
+    return deviceUrl;
+}
+
+QUrl HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
     std::map<QString, QString> parameters) const
 {
-    QUrl url(m_url);
-    QUrlQuery query;
-
-    url.setPath(kPathTemplate.arg(cgi));
-    query.addQueryItem(kSubmenu, submenu);
-    query.addQueryItem(kAction, action);
-
-    for (const auto& parameter: parameters)
-        query.addQueryItem(parameter.first, parameter.second);
-    
-    url.setQuery(query);
-
-    return url;
+    return buildRequestUrl(m_url, cgi, submenu, action, std::move(parameters));
 }
 
 QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const

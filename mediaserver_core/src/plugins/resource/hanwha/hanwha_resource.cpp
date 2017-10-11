@@ -631,6 +631,7 @@ CameraDiagnostics::Result HanwhaResource::init()
     int channelCount = sharedContext->channelCount(getAuth(), getUrl());
     loader->start(getAuth(), getUrl(), channelCount);
 
+    m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>(this);
     return result;
 }
 

@@ -6,6 +6,8 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <QDateTime>
+
 #include <nx/network/buffer.h>
 #include <nx/network/http/http_types.h>
 
@@ -38,7 +40,8 @@ public:
         const nx::Buffer& rawBuffer,
         nx_http::StatusCode::Value statusCode,
         const QString& requestUrl,
-        const QString& groupBy = QString());
+        const QString& groupBy = QString(),
+        bool isListMode = false);
 
     bool isSuccessful() const;
     int errorCode() const;
@@ -60,7 +63,7 @@ public:
     }
 
 private:
-    void parseBuffer(const nx::Buffer& rawBuffer);
+    void parseBuffer(const nx::Buffer& rawBuffer, bool isListMode = false);
     boost::optional<QString> findParameter(const QString& parameterName) const;
     
 private:

@@ -61,6 +61,13 @@ public:
 
     void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
 
+    static QUrl buildRequestUrl(
+        QUrl deviceUrl,
+        const QString& cgi,
+        const QString& submenu,
+        const QString& action,
+        std::map<QString, QString> parameters);
+
 private:
     QUrl buildRequestUrl(
         const QString& cgi,
