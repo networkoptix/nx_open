@@ -63,7 +63,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
 :
     QnResourceConsumer(res),
     m_RtpSession(/*shouldGuessAuthDigest*/ false, std::move(tcpSock)),
-    m_timeHelper(res->getUniqueId()),
+    m_timeHelper(res),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
     m_role(Qn::CR_Default),

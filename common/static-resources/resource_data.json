@@ -102,42 +102,42 @@
                 }
             ]
         },
-		{
-			"keys": [
-				"Advantech|ADAM-6050"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 12,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 6
-		},
-		{
-			"keys": [
-				"Advantech|ADAM-6051"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 14,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 2
-		},
-		{
-			"keys": [
-				"Advantech|ADAM-6052"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 8,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 8
-		},
-		{
-			"keys": [
-				"Advantech|ADAM-6060","Advantech|ADAM-6066"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 6,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 6
-		},
+        {
+            "keys": [
+                "Advantech|ADAM-6050"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 12,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 6
+        },
+        {
+            "keys": [
+                "Advantech|ADAM-6051"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 14,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 2
+        },
+        {
+            "keys": [
+                "Advantech|ADAM-6052"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 8,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 8
+        },
+        {
+            "keys": [
+                "Advantech|ADAM-6060","Advantech|ADAM-6066"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 6,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 6
+        },
         {
             "keys": [
                 "FLIR|AX8"
@@ -528,12 +528,12 @@
             ],
             "onvifPtzStopBroken": true
         },
-    	{
+        {
             "keys": [
                 "ArecontVision|??05", "ArecontVision|?155"
             ],
             "isRTSPSupported": false
-    	},
+        },
         {
             "keys": ["ArecontVision|20185DN"],
             "forceRtspSupport": true
@@ -627,7 +627,7 @@
                 "H264|N51820L",
                 "TRUEN Co., Ltd.|TN-P4230CSLXIR",
                 "TRUEN Co. Ltd.|*",
-				"Vista|VK2-3MPEFEDre",
+                "Vista|VK2-3MPEFEDre",
                 "eneo|IEP-63M2812M0A"
             ],
             "ptzTraits": "FourWayPtz"
@@ -665,7 +665,7 @@
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER",
-		"Pelco|D5220",
+        "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
@@ -1536,11 +1536,11 @@
                     "ve7,ve15"
                 ]
             },
-	        "trustToVideoSourceSize": false,
-	        "useExistingOnvifProfies": true,
-		    "controlFpsViaEncodingInterval": true,
-		    "forcedSecondaryStreamResolution": "352x288",
-		    "fpsBase": 25
+            "trustToVideoSourceSize": false,
+            "useExistingOnvifProfies": true,
+            "controlFpsViaEncodingInterval": true,
+            "forcedSecondaryStreamResolution": "352x288",
+            "fpsBase": 25
         },
         {
             "keys": [
@@ -1554,20 +1554,20 @@
                     "ve3,ve7"
                 ]
             },
-			"trustToVideoSourceSize": false,
-			"useExistingOnvifProfies": true,
-			"controlFpsViaEncodingInterval": true,
-			"forcedSecondaryStreamResolution": "352x288",
-			"fpsBase": 25
+            "trustToVideoSourceSize": false,
+            "useExistingOnvifProfies": true,
+            "controlFpsViaEncodingInterval": true,
+            "forcedSecondaryStreamResolution": "352x288",
+            "fpsBase": 25
         },
 		{
 			"keys": [
-				"Pelco|IMM12018",
-				"Pelco|IMM12027",
-				"Pelco|IMM12036"
-			],
-			"onvifVendorSubtype": "PelcoOptera"
-		},
+                "Pelco|IMM12018",
+                "Pelco|IMM12027",
+                "Pelco|IMM12036"
+            ],
+            "onvifVendorSubtype": "PelcoOptera"
+        },
         {
             "keys": [
                 "PelcoOptera|IMM12018",
@@ -1577,147 +1577,147 @@
             "doNotConfigureCamera": false,
             "ignoreMultisensors": true
         },
-		{
-			"keys": [
-				"PelcoOptera|IMM12018","Pelco|IMM12018"
-			],
-			"multiresourceVideoChannelMapping": [
-				{
-					"resourceChannel": 2,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 3,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [1]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [0]
-						}
-					]
-				}
-			],
-			"shouldAppearAsSingleChannel": true,
-			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=1;sensors=0,1,2"
-		},
-		{
-			"keys": [
-				"PelcoOptera|IMM12027","Pelco|IMM12027"
-			],
-			"multiresourceVideoChannelMapping": [
-				{
-					"resourceChannel": 2,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 3,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [1]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [0]
-						}
-					]
-				},
-				{
-					"resourceChannel": 5,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [3]
-						}
-					]
-				}
-			],
-			"shouldAppearAsSingleChannel": true,
-			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
-			"defaultAR":"4x3"
-		},
-		{
-			"keys": [
-				"PelcoOptera|IMM12036","Pelco|IMM12036"
-			],
-			"multiresourceVideoChannelMapping": [
-				{
-					"resourceChannel": 2,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 3,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [1]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [0]
-						}
-					]
-				}
-			],
-			"shouldAppearAsSingleChannel": true,
-			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=1;sensors=0,1,2"
-		},
-		{
-			"keys": [
-				"ACTI|A41", "ACTI|A81"
-			],
-			"forceONVIF": true,
+        {
+            "keys": [
+                "PelcoOptera|IMM12018","Pelco|IMM12018"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                }
+            ],
+            "shouldAppearAsSingleChannel": true,
+            "doNotAddVendorToDeviceName": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
+        },
+        {
+            "keys": [
+                "PelcoOptera|IMM12027","Pelco|IMM12027"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 5,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "shouldAppearAsSingleChannel": true,
+            "doNotAddVendorToDeviceName": true,
+            "videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
+            "defaultAR":"4x3"
+        },
+        {
+            "keys": [
+                "PelcoOptera|IMM12036","Pelco|IMM12036"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                }
+            ],
+            "shouldAppearAsSingleChannel": true,
+            "doNotAddVendorToDeviceName": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
+        },
+        {
+            "keys": [
+                "ACTI|A41", "ACTI|A81"
+            ],
+            "forceONVIF": true,
             "possibleDefaultCredentials": [
                 {
                     "user": "admin",
                     "password": "123456"
                 }
             ]
-		},
-		{
-			"keys": [
-				"DW|*|A*"
-			],
-			"showUrl": true,
-			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
+        },
+        {
+            "keys": [
+                "DW|*|A*"
+            ],
+            "showUrl": true,
+            "urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
             "desiredH264Profile": "High"
-		},
+        },
         {
             "keys":[
                 "DW|DWC-MTT4W*",
@@ -1832,7 +1832,7 @@
             "keys": [
                 "Cellinx|STH795"
             ],
-			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
+            "_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -1982,6 +1982,12 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "Surveillance Camera|DVB-4100-VS"
+            ],
+            "ignoreCameraTimeIfBigJitter": true
         }
     ]
 }
