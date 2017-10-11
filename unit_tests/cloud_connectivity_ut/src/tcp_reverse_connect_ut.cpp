@@ -2,6 +2,7 @@
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>

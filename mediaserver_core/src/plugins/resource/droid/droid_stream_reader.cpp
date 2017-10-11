@@ -1,8 +1,10 @@
 #ifdef ENABLE_DROID
 
-#include "network/h264_rtp_parser.h"
-
 #include "droid_stream_reader.h"
+
+#include <nx/network/nettools.h>
+
+#include "network/h264_rtp_parser.h"
 #include "droid_resource.h"
 
 static const int DROID_TIMEOUT = 3 * 1000;

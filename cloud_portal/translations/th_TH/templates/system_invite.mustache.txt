@@ -1,13 +1,13 @@
-Welcome to {{PRODUCT_NAME}}
+ยินดีต้อนรับสู่ {{PRODUCT_NAME}}
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join {{PRODUCT_NAME}} and shared his system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) กำลังเชิญคุณเข้าร่วม {{PRODUCT_NAME}} และแชร์ระบบของเขากับคุณ {{message.system_name}}
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-You are invited you to join {{PRODUCT_NAME}}.
-The system {{message.system_name}} was shared with you.
+คุณได้รับเชิญให้เข้าร่วม {{PRODUCT_NAME}}
+ระบบ {{message.system_name}} ถูกแชร์กับคุณ
 {{/message.sharer_name}}
 
-Register and view the system: {{config.portal_url}}/register/{{message.code}}
+ลงทะเบียนและใช้งานระบบ: {{config.portal_url}} / register / {{message.code}}
 

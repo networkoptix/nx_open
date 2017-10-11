@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 #include "basic_http_handler.h"
 #include "../listening_peer_manager.h"

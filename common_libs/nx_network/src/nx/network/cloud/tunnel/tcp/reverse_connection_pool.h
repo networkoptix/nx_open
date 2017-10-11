@@ -22,12 +22,14 @@ class ReverseConnectionHolder;
 class NX_NETWORK_API ReverseConnectionPool:
     public aio::BasicPollable
 {
-    using Parent = aio::BasicPollable;
+    using base_type = aio::BasicPollable;
 
 public:
     using MediatorConnection = hpm::api::MediatorClientTcpConnection;
 
-    explicit ReverseConnectionPool(std::unique_ptr<MediatorConnection> mediatorConnection);
+    ReverseConnectionPool(
+        aio::AIOService* aioService,
+        std::unique_ptr<MediatorConnection> mediatorConnection);
     virtual ~ReverseConnectionPool() override;
 
     ReverseConnectionPool(const ReverseConnectionPool&) = delete;

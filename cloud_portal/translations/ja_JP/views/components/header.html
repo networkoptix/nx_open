@@ -29,12 +29,12 @@
 
         <ul class="nav navbar-nav navbar-right auth-visible margin-right">
             <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
-                <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis"> {{activeSystem.name}} </span></a>
+                <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem.name}}</span></a>
             </li>
             <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
             <li uib-dropdown ng-if="systemCounter && !singleSystem" class="collapse-second">
                 <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">
-                    <span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + '' + L.header.systems}}</span><span class="icon-caret"></span>
+                    <span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}</span><span class="icon-caret"></span>
                 </a>
                 <ul uib-dropdown-menu class="dropdown-menu-left">
                     <li ng-if="activeSystem" class="hidden-expanded active"><a href="">{{activeSystem.name}}</a></li>
@@ -42,7 +42,7 @@
 
                     <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"
                         ng-if="system!=activeSystem">
-                        <a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} <span class="system-owner"> &mdash; {{system.ownerFullName}} </span></a>
+                        <a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}<span class="system-owner"> &mdash; {{system.ownerFullName}}</span></a>
                     </li>
                     <li role="separator" class="nav-divider"></li>
                     <li><a ng-href="/systems">{{$root.L.header.allSystems}}</a></li>
@@ -50,13 +50,13 @@
             </li>
             <li class="vertical-bar"></li>
             <li uib-dropdown class="collapse-first">
-                <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis"> {{account.email}} </span><span class="icon-caret"></span></a>
+                <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis">{{account.email}}</span><span class="icon-caret"></span></a>
                 <ul uib-dropdown-menu>
                     <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
                     <li class="hidden-expanded nav-divider" role="separator"></li>
 
-                    <li><a href="/アカウント/">アカウント設定</a></li>
-                    <li><a href="/アカウント/パスワード/">パスワードを変更</a></li>
+                    <li><a href="/account/">アカウント設定</a></li>
+                    <li><a href="/account/password/">パスワードを変更</a></li>
                     <li><a href="" ng-click="logout()">ログアウト</a></li>
 
                     <li class="nav-divider" role="separator" ng-if="account.is_staff"></li>

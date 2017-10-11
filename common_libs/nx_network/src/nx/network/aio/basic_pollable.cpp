@@ -1,5 +1,6 @@
 #include "basic_pollable.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/utils/std/future.h>
 
 #include "../socket_global.h"
@@ -58,7 +59,7 @@ void BasicPollable::pleaseStopSync(bool checkForLocks)
     else
     {
         NX_ASSERT(!m_aioService->isInAnyAioThread());
-        QnStoppableAsync::pleaseStopSync(checkForLocks);
+        QnStoppableAsync::pleaseStopSync(m_aioService, checkForLocks);
     }
 }
 

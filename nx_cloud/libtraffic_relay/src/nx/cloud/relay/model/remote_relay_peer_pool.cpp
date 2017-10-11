@@ -62,6 +62,7 @@ bool RemoteRelayPeerPool::connectToDb()
     return m_dbReady;
 }
 
+
 void RemoteRelayPeerPool::prepareDbStructure()
 {
     // TODO: Use DbStructureUpdater here (it will require some refactoring).

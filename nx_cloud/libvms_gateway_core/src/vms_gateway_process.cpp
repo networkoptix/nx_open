@@ -1,5 +1,8 @@
 #include "vms_gateway_process.h"
 
+#include <nx/network/cloud/cloud_connect_settings.h>
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/tcp/reverse_connection_pool.h>
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl/ssl_engine.h>
@@ -11,6 +14,7 @@
 #include <nx/utils/stree/stree_manager.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/platform/current_process.h>
+#include <nx/utils/timer_manager.h>
 
 #include <nx/cloud/relaying/relay_engine.h>
 

@@ -3,16 +3,16 @@
     "highStream":"High stream",
     "lowStream":"Low stream",
     "transcoding":"Transcoding",
-    "unknown":"Unknown",
-    "copyToClipboard":"Copy to clipboard",
-    "copyDefaultText":"Copy",
-    "copyActiveText":"Copied to clipboard"
+    "unknown":"ไม่ระบุ",
+    "copyToClipboard":"copy to clipboard",
+    "copyDefaultText":"copy",
+    "copyActiveText":"copied to clipboard"
   },
   "systemOffline":"System Offline",
   "cameraStates":{
-    "offline":"Offline",
+    "offline":"ออฟไลน์",
     "error":"Error",
-    "unauthorized":"Authentication required",
+    "unauthorized":"จำเป็นต้องระบุตัวตนผู้ใช้",
     "noData":"No data",
     "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
     "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",

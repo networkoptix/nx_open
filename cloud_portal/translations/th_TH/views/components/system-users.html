@@ -27,13 +27,13 @@
                        ng-if="system.isAvailable && user.canBeEdited"
                        ng-class="{disabled:locked[user.email]}"
                        title="Edit permissions"
-                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span><span class="visible-lg-inline">&nbsp;&nbsp;Edit</span></span></a></td>
+                       ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span>แก้ไข</span></a></td>
                 <td class="button-cell"><a href=''
                        class="hover-visible image-link"
                        ng-if="system.isAvailable && user.canBeDeleted"
                        ng-class="{disabled:locked[user.email]}"
                        title="ลบ"
-                       ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span><span class="visible-lg-inline">&nbsp;&nbsp;Delete</span></a></td>
+                       ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span>ลบทิ้ง</a></td>
             </tr>
             </tbody>
         </table>

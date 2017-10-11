@@ -10,11 +10,13 @@
 #include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
-#include "connection_mediator_url_fetcher.h"
 #include "mediator_client_connections.h"
 #include "mediator_server_connections.h"
 
 namespace nx {
+
+namespace network { namespace cloud { class ConnectionMediatorUrlFetcher; } }
+
 namespace hpm {
 namespace api {
 
@@ -39,6 +41,9 @@ class NX_NETWORK_API MediatorConnector:
 public:
     MediatorConnector();
     virtual ~MediatorConnector() override;
+
+    MediatorConnector(MediatorConnector&&) = delete;
+    MediatorConnector& operator=(MediatorConnector&&) = delete;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 

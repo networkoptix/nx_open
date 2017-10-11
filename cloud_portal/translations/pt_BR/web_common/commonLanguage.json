@@ -3,15 +3,15 @@
     "highStream":"High stream",
     "lowStream":"Low stream",
     "transcoding":"Transcoding",
-    "unknown":"Unknown",
-    "copyToClipboard":"Copy to clipboard",
-    "copyDefaultText":"Copy",
-    "copyActiveText":"Copied to clipboard"
+    "unknown":"Desconhecido",
+    "copyToClipboard":"copy to clipboard",
+    "copyDefaultText":"copy",
+    "copyActiveText":"copied to clipboard"
   },
   "systemOffline":"System Offline",
   "cameraStates":{
     "offline":"Offline",
-    "error":"Error",
+    "error":"Erro",
     "unauthorized":"Authentication required",
     "noData":"No data",
     "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",

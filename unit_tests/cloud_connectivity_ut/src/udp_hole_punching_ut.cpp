@@ -4,6 +4,7 @@
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/ssl_socket.h>
@@ -11,6 +12,7 @@
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/subscription.h>
 
 namespace nx {
 namespace network {

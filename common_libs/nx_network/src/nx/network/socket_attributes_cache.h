@@ -2,9 +2,8 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/abstract_socket.h>
 #include <nx/utils/system_error.h>
-
-#include "nx/network/abstract_socket.h"
 
 namespace nx {
 namespace network {

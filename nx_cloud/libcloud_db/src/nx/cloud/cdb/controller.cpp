@@ -44,9 +44,11 @@ Controller::Controller(const conf::Settings& settings):
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SyncronizationEngine),
+    m_vmsGateway(settings),
     m_systemMergeManager(
         &m_systemManager,
         *m_systemHealthInfoProvider,
+        &m_vmsGateway,
         &m_dbInstanceController.queryExecutor()),
     m_authProvider(
         settings,

@@ -1,35 +1,35 @@
 
 <div class="container" ng-if="accountMode">
-    <h1>Account</h1>
+    <h1>Tài khoản</h1>
     <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group">
-            <label class="col-sm-4 control-label">Email</label>
+            <label class="col-sm-4 control-label"> Email </label>
             <div class="col-sm-4">
                 <input type="text"  class="form-control" ng-model="account.email" readonly>
             </div>
         </div>
 
         <div class="form-group" validate-field>
-            <label for="firstName" class="col-sm-4 control-label">First name</label>
+            <label for="firstName" class="col-sm-4 control-label">Họ</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.first_name" name="firstName" id="firstName" maxlength="255" required>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">First name is required.</span>
+                <span class="help-block" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">Tên là bắt buộc.</span>
             </div>
         </div>
         <div class="form-group"  validate-field>
-            <label for="lastName"  class="col-sm-4 control-label">Last name</label>
+            <label for="lastName"  class="col-sm-4 control-label">Tên</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.last_name" name="lastName" id="lastName" maxlength="255"  required>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="accountForm.lastName.$touched && accountForm.lastName.$error.required">Last name is required.</span>
+                <span class="help-block" ng-if="accountForm.lastName.$touched && accountForm.lastName.$error.required">Tên là bắt buộc.</span>
             </div>
         </div>
         <div class="form-group"  validate-field>
-            <label for="lastName"  class="col-sm-4 control-label">Language</label>
+            <label for="lastName"  class="col-sm-4 control-label"> Ngôn ngữ </label>
             <div class="col-sm-4">
                 <language-select account-mode="true" ng-model="account.language"></language-select>
             </div>
@@ -40,7 +40,7 @@
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subscribe to Email newsletters</label>
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Đăng ký bản tin qua email</label>
                 </div>
             </div>
         </div>
@@ -56,17 +56,17 @@
 </div>
 
 <div class="container" ng-if="passwordMode" >
-    <h1>Change Password</h1>
+    <h1>Đổi mật khẩu</h1>
     <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group" validate-field>
-            <label for="password"  class="col-sm-4 control-label">Current password</label>
+            <label for="password"  class="col-sm-4 control-label">Mật khẩu hiện tại</label>
             <div class="col-sm-4">
                 <input type="password" class="form-control" ng-model="pass.password"
                        name="password"
                        id="password" required>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Current password is required.</span>
+                <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Mật khẩu hiện tại là bắt buộc.</span>
             </div>
         </div>
 

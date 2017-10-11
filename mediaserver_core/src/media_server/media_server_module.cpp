@@ -15,6 +15,7 @@
 #include "server/server_globals.h"
 #include <plugins/resource/onvif/onvif_helper.h>
 
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 
 #include <translation/translation_manager.h>

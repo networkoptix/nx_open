@@ -6,6 +6,7 @@
 #include "connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>

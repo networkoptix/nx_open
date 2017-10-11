@@ -1,13 +1,16 @@
 #include "cross_nat_connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection_watcher.h"
+#include "outgoing_tunnel_pool.h"
 #include "tcp/outgoing_reverse_tunnel_connection.h"
 #include "udp/connector.h"
+#include "../cloud_connect_settings.h"
 
 namespace nx {
 namespace network {
