@@ -25,6 +25,7 @@ class CustomIndexDashboard(Dashboard):
     Custom index dashboard for cloud.
     """
     def init_with_context(self, context):
+        user = context['user']
         site_name = get_admin_site_name(context)
         # append an app list module for "Applications"
         self.children.append(modules.AppList(
@@ -41,14 +42,14 @@ class CustomIndexDashboard(Dashboard):
             deletable=False,
             collapsible=False,
         ))
-
-        # append a recent actions module
-        self.children.append(modules.RecentActions(
-            _('Recent Actions'),
-            5,
-            deletable=False,
-            collapsible=False,
-        ))
+        if user.is_superuser:
+            # append a recent actions module
+            self.children.append(modules.RecentActions(
+                _('Recent Actions'),
+                5,
+                deletable=False,
+                collapsible=False,
+            ))
 
 
 class CustomAppIndexDashboard(AppIndexDashboard):
