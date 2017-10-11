@@ -287,7 +287,8 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
                 response.errorString()));
     }
 
-    *outUrl = response.response()[kHanwhaUriProperty];
+    auto rtspUri = response.response()[kHanwhaUriProperty];
+    *outUrl = m_hanwhaResource->fromOnvifDiscoveredUrl(rtspUri.toStdString(), false);
     return CameraDiagnostics::NoErrorResult();
 }
 
