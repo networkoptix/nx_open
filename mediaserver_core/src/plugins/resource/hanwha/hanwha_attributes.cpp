@@ -101,13 +101,19 @@ bool HanwhaAttributes::parseCategories(
     {
         auto category = reader.attributes().value(kHanwhaNameAttribute);
 
-        if (!reader.readNextStartElement())
-            return false;
-
-        if (!parseAttributes(reader, group))
-            return false;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+        if (reader.readNextStartElement())
+        {
+            if (!parseAttributes(reader, group))
+                return false;
+            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+        }
+        else
+        {
+            // It is an empty category section
+            reader.readNext();
+            if (reader.hasError())
+                return false;
+        }
     }
 
     return true;
