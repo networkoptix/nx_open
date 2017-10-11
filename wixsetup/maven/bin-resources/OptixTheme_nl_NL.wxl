@@ -4,13 +4,14 @@
   <String Id="Caption">[WixBundleName] Setup - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - Installeert, repareert, de-installeert of creëert een lokale kopie van de bundel in de map. De installatie is default.  
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
+   creates a complete local copy of the bundle in directory. Install is the default.
 
-/passive | /quiet -  toont een minimale UI zonder prompts of toont geen UI en 
-   geen prompts. Default UI en alle prompts worden getoond.
+/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
+   no prompts. By default UI and all prompts are displayed.
 
-/norestart   - onderdrukt alle pogingen om te herstarten. De default UI prompt voor de herstart.
-/log log.txt - logged naar specifiek bestand. Default word er een logbestand gecreëerd in %TEMP%.</String>
+/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
+/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Weet je zeker dat je dit wilt annuleren?</String>
   <String Id="ClientAndServer">Client en Server</String>
   <String Id="ClientOnly">Alleen client</String>

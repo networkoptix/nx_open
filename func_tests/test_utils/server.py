@@ -35,7 +35,7 @@ MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
-MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=1)  # timeout when waiting for server become online (pingable)
+MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=5)  # timeout when waiting for server become online (pingable)
 
 DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 

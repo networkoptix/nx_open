@@ -1130,7 +1130,7 @@
                     <result>
                         <caption>JSON with an error code, error message and a list of JSON objects in "reply" field:</caption>
                         <params>
-                            <param>TO
+                            <param>
                                 <name>actionType</name>
                                 <description>Type of the action.</description>
                                 <values>

@@ -7,16 +7,16 @@
         <tr ng-if="debugMode"><td>משחזר</td><td class="camera-links-info">{{transport}} - {{currentResolution}} עם {{player}}</td></tr>
         <tr><td>שם</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
-            <td>מזהה מצלמה</td>
+            <td>CameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
                 <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>
         </tr>
-        <tr><td>כתובת IP</td><td class="camera-links-info"><a target="_blank" ng-href="{{activeCamera.url | checkProtocol}}">{{activeCamera.url}}</a></td></tr>
+        <tr><td>IP (URL)</td><td class="camera-links-info"><a target="_blank" ng-href="{{activeCamera.url | checkProtocol}}">{{activeCamera.url}}</a></td></tr>
         <tr>
-            <td>הצג</td>
+            <td>תצוגה</td>
             <td>
-                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}">אינטרנט</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'web')}}">Web</a>
                 <copy-button copy-data="formatLink(activeCamera, 0, 'web')"></copy-button>
             </td>
         </tr>

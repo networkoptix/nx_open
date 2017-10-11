@@ -387,7 +387,11 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (data && m_codecId!= data->compressionType) {
         if (m_codecId != AV_CODEC_ID_NONE && data->context)
+        {
+            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+                return false; //< Can't switch decoder to new codec right now.
             resetDecoder(data);
+        }
         m_codecId = data->compressionType;
     }
 

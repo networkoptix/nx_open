@@ -21,7 +21,7 @@
                             </div>
 
                             <div ng-repeat="group in apiGroups">
-                                <b>{{group.groupName}} <span ng-if="group.urlPrefix">: {{group.urlPrefix}} /</span></b>
+                                <b>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></b>
                                 <ul>
                                     <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
@@ -43,7 +43,7 @@
 
                             <div ng-if="!activeFunction">
                                 <div ng-repeat="group in apiGroups">
-                                    <h3>{{group.groupName}} <span ng-if="group.urlPrefix"> : {{group.urlPrefix}} / </span></h3>
+                                    <h3>{{group.groupName}}<span ng-if="group.urlPrefix">: {{group.urlPrefix}}/</span></h3>
                                     <p>{{group.groupDescription}}</p>
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
@@ -57,9 +57,10 @@
                             </div>
                             <div ng-if="activeFunction">
                                 <h2>
-                                    {{activeFunction.caption || activeFunction.name}} <small><a ng-click="clearActiveFunction($event)"
+                                    {{activeFunction.caption || activeFunction.name}}
+                                    <small><a ng-click="clearActiveFunction($event)"
                                               title="back to functions list"
-                                              href="#/developers/api"> (X) </a></small>
+                                              href="#/developers/api">(X)</a></small>
                                 </h2>
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">독점</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
