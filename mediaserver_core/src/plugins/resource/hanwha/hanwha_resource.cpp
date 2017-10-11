@@ -36,7 +36,14 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+const QString HanwhaResource::kNormalizedSpeedPtzTrait("NormalizedSpeed");
+
 namespace {
+
+bool isTrue(const boost::optional<HanwhaCgiParameter>& param)
+{
+    return param && param->possibleValues().contains(kHanwhaTrue);
+}
 
 enum class PtzOperation
 {
@@ -927,6 +934,34 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
     if (m_ptzCapabilities ==Ptz::NoPtzCapabilities)
         return CameraDiagnostics::NoErrorResult();
+    
+    auto hasNormalizedSpeedParam = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/NormalizedSpeed"));
+    if (isTrue(hasNormalizedSpeedParam))
+        m_ptzTraits << QnPtzAuxilaryTrait(kNormalizedSpeedPtzTrait);
+    auto has3AxisPtz = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/3AxisPTZ"));
+    if (isTrue(has3AxisPtz))
+        m_ptzTraits.push_back(Ptz::EightWayPtzTrait);
+    else
+        m_ptzTraits.push_back(Ptz::FourWayPtzTrait);
+
+    auto panSpeedParameter = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/Pan"));
+    if (panSpeedParameter)
+    {
+        m_ptzLimits.minPanSpeed = panSpeedParameter->min();
+        m_ptzLimits.maxPanSpeed = panSpeedParameter->max();
+    }
+    auto tiltSpeedParameter = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/Tilt"));
+    if (tiltSpeedParameter)
+    {
+        m_ptzLimits.minTiltSpeed = tiltSpeedParameter->min();
+        m_ptzLimits.maxTiltSpeed = tiltSpeedParameter->max();
+    }
+    auto zoomSpeedParameter = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/Zoom"));
+    if (zoomSpeedParameter)
+    {
+        m_ptzLimits.minZoomSpeed = zoomSpeedParameter->min();
+        m_ptzLimits.maxZoomSpeed = zoomSpeedParameter->max();
+    }
 
     if ((m_ptzCapabilities & Ptz::AbsolutePtzCapabilities) == Ptz::AbsolutePtzCapabilities)
         m_ptzCapabilities |= Ptz::DevicePositioningPtzCapability;

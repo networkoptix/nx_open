@@ -70,6 +70,7 @@ private:
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
     mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;
+    QMap<QString, float> m_lastParamValue;
 
 };
 

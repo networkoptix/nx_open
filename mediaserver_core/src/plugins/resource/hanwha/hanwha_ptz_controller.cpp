@@ -18,9 +18,7 @@ namespace plugins {
 
 namespace {
 
-static const float kLowerPtzLimit = -100;
-static const float kHigherPtzLimit = 100;
-static const int kPtzCoefficient = 100;
+static const float kNormilizedLimit = 100;
 static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 
 } // namespace
@@ -58,15 +56,25 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
     HanwhaRequestHelper helper(m_hanwhaResource);
     const auto hanwhaSpeed = toHanwhaSpeed(speed);
 
+    std::map<QString, QString> params;
+    auto addIfNeed = [&](const QString& paramName, float value)
+    {
+        if (!qFuzzyEquals(value, m_lastParamValue[paramName]))
+            params.emplace(paramName, QString::number((int)value));
+        m_lastParamValue[paramName] = value;
+    };
+
+    params.emplace(kHanwhaChannelProperty, channel());
+    if (m_ptzTraits.contains(QnPtzAuxilaryTrait(HanwhaResource::kNormalizedSpeedPtzTrait)))
+        params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
+
+    addIfNeed(kHanwhaPanProperty, hanwhaSpeed.x());
+    addIfNeed(kHanwhaTiltProperty, hanwhaSpeed.y());
+    addIfNeed(kHanwhaZoomProperty, hanwhaSpeed.z());
+
     const auto response = helper.control(
         lit("ptzcontrol/continuous"),
-        {
-            {kHanwhaChannelProperty, channel()},
-            {kHanwhaPanProperty, QString::number((int)hanwhaSpeed.x())},
-            {kHanwhaTiltProperty, QString::number((int)hanwhaSpeed.y())},
-            {kHanwhaZoomProperty, QString::number((int)hanwhaSpeed.z())},
-            {kHanwhaNormalizedSpeedProperty, kHanwhaTrue}
-        });
+        params);
 
     return response.isSuccessful();
 }
@@ -245,9 +253,27 @@ QString HanwhaPtzController::channel() const
 QVector3D HanwhaPtzController::toHanwhaSpeed(const QVector3D& speed) const
 {
     QVector3D outSpeed;
-    outSpeed.setX(qBound(kLowerPtzLimit, speed.x() * kPtzCoefficient, kHigherPtzLimit));
-    outSpeed.setY(qBound(kLowerPtzLimit, speed.y() * kPtzCoefficient, kHigherPtzLimit));
-    outSpeed.setZ(qBound(kLowerPtzLimit, speed.z() * kPtzCoefficient, kHigherPtzLimit));
+
+    auto toNativeSpeed = [](float maxNegativeSpeed, float maxPositiveSpeed, float normalizedValue)
+    {
+        if (normalizedValue >= 0.0)
+            return normalizedValue * maxPositiveSpeed;
+        else
+            return normalizedValue * qAbs(maxNegativeSpeed);
+    };
+
+    if (m_ptzTraits.contains(QnPtzAuxilaryTrait(HanwhaResource::kNormalizedSpeedPtzTrait)))
+    {
+        outSpeed.setX(toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.x()));
+        outSpeed.setY(toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.y()));
+        outSpeed.setZ(toNativeSpeed(-kNormilizedLimit, kNormilizedLimit, speed.z()));
+    }
+    else
+    {
+        outSpeed.setX(toNativeSpeed(m_ptzLimits.minPanSpeed, m_ptzLimits.maxPanSpeed, speed.x()));
+        outSpeed.setY(toNativeSpeed(m_ptzLimits.minTiltSpeed, m_ptzLimits.maxTiltSpeed, speed.y()));
+        outSpeed.setZ(toNativeSpeed(m_ptzLimits.minZoomSpeed, m_ptzLimits.maxZoomSpeed, speed.z()));
+    }
 
     return outSpeed;
 }
