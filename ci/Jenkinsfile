@@ -15,7 +15,7 @@ config = null
 def main() {
 	try {
 		unsafe_main()
-	} catch (Exception|AssertionError x) {
+	} catch (Exception|AssertionError|NoSuchMethodError x) {
 		echo "Error running test: $x"
 		echo "---- sanitized stack: ----"
 		org.codehaus.groovy.runtime.StackTraceUtils.sanitize(x).printStackTrace()
