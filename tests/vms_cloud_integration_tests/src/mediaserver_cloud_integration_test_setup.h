@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include <nx/cloud/cdb/test_support/cdb_launcher.h>
@@ -33,8 +35,8 @@ public:
     nx::cdb::CdbLauncher* cdb();
     MediaServerLauncher& mediaServer();
 
-    MediaServerClient prepareMediaServerClient();
-    MediaServerClient prepareMediaServerClientFromCloudOwner();
+    std::unique_ptr<MediaServerClient> prepareMediaServerClient();
+    std::unique_ptr<MediaServerClient> prepareMediaServerClientFromCloudOwner();
     void configureSystemAsLocal();
     void connectSystemToCloud();
 

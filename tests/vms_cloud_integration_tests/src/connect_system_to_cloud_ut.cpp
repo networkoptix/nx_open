@@ -33,7 +33,7 @@ protected:
         params.back().resourceId = QnUserResource::kAdminGuid;
         params.back().name = nx::settings_names::kNameCloudSystemId;
         params.back().value = QString();
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2SetResourceParams(params));
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2SetResourceParams(params));
 
         switchToDefaultCredentials();
     }
@@ -45,7 +45,7 @@ protected:
         {
             QnModuleInformation moduleInformation;
             QnJsonRestResult resultCode =
-                mediaServerClient.getModuleInformation(&moduleInformation);
+                mediaServerClient->getModuleInformation(&moduleInformation);
             ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
             if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
@@ -60,7 +60,7 @@ protected:
         for (;;)
         {
             ec2::ApiUserDataList users;
-            if (mediaServerClient.ec2GetUsers(&users) == ec2::ErrorCode::ok)
+            if (mediaServerClient->ec2GetUsers(&users) == ec2::ErrorCode::ok)
             {
                 bool foundCloudUser = false;
                 for (const auto& user: users)
@@ -79,7 +79,7 @@ protected:
         for (;;)
         {
             ec2::ApiResourceParamDataList vmsSettings;
-            ec2::ErrorCode resultCode = mediaServerClient.ec2GetSettings(&vmsSettings);
+            ec2::ErrorCode resultCode = mediaServerClient->ec2GetSettings(&vmsSettings);
             ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
 
             const auto cloudSettingsAreEmpty =
@@ -178,7 +178,7 @@ protected:
     {
         auto mediaServerClient = prepareMediaServerClient();
         DetachFromCloudData params;
-        QnJsonRestResult resultCode = mediaServerClient.detachFromCloud(std::move(params));
+        QnJsonRestResult resultCode = mediaServerClient->detachFromCloud(std::move(params));
         ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
     }
 

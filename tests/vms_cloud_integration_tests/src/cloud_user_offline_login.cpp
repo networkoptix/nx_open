@@ -96,7 +96,7 @@ protected:
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         ec2::ApiResourceParamDataList vmsSettings;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetSettings(&vmsSettings));
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetSettings(&vmsSettings));
     }
 
     void thenAllUsersCanStillLogin()
@@ -104,20 +104,20 @@ protected:
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         for (const auto& account: m_additionalCloudUsers)
         {
-            mediaServerClient.setUserName(QString::fromStdString(account.email));
-            mediaServerClient.setPassword(QString::fromStdString(account.password));
+            mediaServerClient->setUserName(QString::fromStdString(account.email));
+            mediaServerClient->setPassword(QString::fromStdString(account.password));
             ec2::ApiUserDataList users;
-            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         }
     }
 
     void thenInvitedUserCanLoginToTheSystem()
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        mediaServerClient.setUserName(QString::fromStdString(m_invitedAccount.email));
-        mediaServerClient.setPassword(QString::fromStdString(m_invitedAccount.password));
+        mediaServerClient->setUserName(QString::fromStdString(m_invitedAccount.email));
+        mediaServerClient->setPassword(QString::fromStdString(m_invitedAccount.password));
         ec2::ApiUserDataList users;
-        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
     }
 
 private:
@@ -139,7 +139,7 @@ private:
             ec2::ApiResourceParamDataList params;
             ASSERT_EQ(
                 ec2::ErrorCode::ok,
-                mediaServerClient.ec2GetResourceParams(
+                mediaServerClient->ec2GetResourceParams(
                     QnUuid::fromStringSafe(cloudOwnerVmsUserId()),
                     &params));
             if (resourceParamPresent(params, nx::cdb::api::kVmsUserAuthInfoAttributeName))

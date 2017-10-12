@@ -1,4 +1,8 @@
+#include <memory>
+
 #include <gtest/gtest.h>
+
+#include <nx/network/url/url_builder.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
@@ -28,12 +32,14 @@ protected:
 
         ASSERT_EQ(
             QnJsonRestResult::NoError,
-            client.setupCloudSystem(std::move(request)).error);
+            client->setupCloudSystem(std::move(request)).error);
     }
 
     void thenSystemMustBeAccessibleWithCloudOwnerCredentials()
     {
-        MediaServerClient client(mediaServerEndpoint());
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
         client.setUserName(QString::fromStdString(accountEmail()));
         client.setPassword(QString::fromStdString(accountPassword()));
         ec2::ApiResourceParamDataList vmsSettings;
@@ -49,7 +55,9 @@ protected:
 
     void detachSystemFromCloud()
     {
-        MediaServerClient client(mediaServerEndpoint());
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
         client.setUserName(QString::fromStdString(accountEmail()));
         client.setPassword(QString::fromStdString(accountPassword()));
 
@@ -60,7 +68,9 @@ protected:
 
     void assertSystemAcceptsDefaultCredentials()
     {
-        MediaServerClient client(mediaServerEndpoint());
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
         client.setUserName("admin");
         client.setPassword("admin");
 
@@ -72,7 +82,9 @@ protected:
 
     void assertIfSystemHasNotBecameNew()
     {
-        MediaServerClient client(mediaServerEndpoint());
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
         client.setUserName("admin");
         client.setPassword("admin");
 

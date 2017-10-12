@@ -107,7 +107,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const QUrl m_baseRequestUrl;
+    QUrl m_baseRequestUrl;
     QString m_userName;
     QString m_password;
     // TODO: #ak Replace with std::set in c++17.
