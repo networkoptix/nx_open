@@ -24,7 +24,7 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
-//#include "media_server/serverutil.h"
+#include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
 
 namespace {
