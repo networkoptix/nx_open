@@ -2,9 +2,12 @@
 #define __SIMPLE_HTTP_CLIENT__
 
 #include <QtNetwork/QAuthenticator>
+#include <QtNetwork/QHostAddress>
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QSharedPointer>
+
+#include <nx/network/socket_common.h>
 
 #include "socket.h"
 

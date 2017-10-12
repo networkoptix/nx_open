@@ -1,25 +1,18 @@
-/**********************************************************
-* Sep 15, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "http_request_attr_reader.h"
 
 #include "cdb_ns.h"
 
-
 namespace nx {
 namespace cdb {
 
-HttpRequestResourceReader::HttpRequestResourceReader(const nx_http::Request& request)
-:
+HttpRequestResourceReader::HttpRequestResourceReader(const nx_http::Request& request):
     m_request(request)
 {
 }
 
-bool HttpRequestResourceReader::getAsVariant(int resID, QVariant* const value) const
+bool HttpRequestResourceReader::getAsVariant(int resId, QVariant* const value) const
 {
-    switch (resID)
+    switch (resId)
     {
         case attr::requestPath:
             *value = m_request.requestLine.url.path();
@@ -29,5 +22,5 @@ bool HttpRequestResourceReader::getAsVariant(int resID, QVariant* const value) c
     }
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx

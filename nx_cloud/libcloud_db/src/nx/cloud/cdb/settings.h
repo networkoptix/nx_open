@@ -99,6 +99,12 @@ public:
     Http();
 };
 
+class VmsGateway
+{
+public:
+    std::string url;
+};
+
 /**
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
@@ -131,6 +137,7 @@ public:
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
+    const VmsGateway& vmsGateway() const;
 
     void setDbConnectionOptions(const nx::utils::db::ConnectionOptions& options);
 
@@ -147,6 +154,7 @@ private:
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
     Http m_http;
+    VmsGateway m_vmsGateway;
 
     virtual void loadSettings() override;
 };

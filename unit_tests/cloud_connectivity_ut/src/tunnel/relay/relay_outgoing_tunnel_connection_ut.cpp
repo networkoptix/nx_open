@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/tunnel/relay/relay_outgoing_tunnel_connection.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>

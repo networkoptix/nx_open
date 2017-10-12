@@ -5,12 +5,24 @@
 # create report: added vs outdated
 import os
 import re
-from ...controllers import filldata, structure
+from ...controllers import structure
 from ...models import Product, Context, DataStructure
 from django.core.management.base import BaseCommand
 
 
-SOURCE_DIR = 'static/{{customization}}/source/'
+SOURCE_DIR = 'static/_source/{{skin}}/'
+
+
+def context_for_file(filename, skin_name):
+    custom_dir = SOURCE_DIR.replace("{{skin}}", skin_name)
+    context_name = filename.replace(custom_dir, '')
+    match = re.search(r'lang_(.+?)/', context_name)
+    language = None
+    if match:
+        language = match.group(1)
+        context_name = context_name.replace(
+            match.group(0), 'lang_{{language}}/')
+    return context_name, language
 
 
 def customizable_file(filename, ignore_not_english):
@@ -23,8 +35,8 @@ def customizable_file(filename, ignore_not_english):
     return supported_format and supported_directory
 
 
-def iterate_cms_files(customization_name, ignore_not_english):
-    custom_dir = SOURCE_DIR.replace("{{customization}}", customization_name)
+def iterate_cms_files(skin_name, ignore_not_english):
+    custom_dir = SOURCE_DIR.replace("{{skin}}", skin_name)
     for root, dirs, files in os.walk(custom_dir):
         for filename in files:
             file = os.path.join(root, filename)
@@ -51,7 +63,7 @@ def read_cms_strings(filename):
 
 
 def read_structure_file(filename, product_id, global_strings):
-    context_name, language = filldata.context_for_file(filename, 'default')
+    context_name, language = context_for_file(filename, 'blue')
 
     if language and language != "en_US":
         return
@@ -76,7 +88,7 @@ def read_structure(product_name):
     global_strings = DataStructure.objects.\
         filter(context__is_global=True, context__product_id=product_id).\
         values_list("name", flat=True)
-    for file in iterate_cms_files('default', True):
+    for file in iterate_cms_files('blue', True):
         read_structure_file(file, product_id, global_strings)
 
 

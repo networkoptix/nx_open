@@ -49,7 +49,7 @@
     </div>
 
     <div ng-if="restoring">
-        <h1>איפוס סיסמא</h1>
+        <h1>איפוס סיסמה</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-4 control-label">דוא"ל</label>
@@ -75,7 +75,7 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            הסיסמא נשמרה בהצלחה <br> <a href="/login"> כניסה </a>
+            הסיסמה נשמרה בהצלחה <br> <a href="/login"> כניסה </a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

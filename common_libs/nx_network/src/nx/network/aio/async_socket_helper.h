@@ -13,9 +13,12 @@
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
+#include "aio_event_handler.h"
 #include "../abstract_socket.h"
+#include "../cloud/address_resolver.h"
 #include "../socket_global.h"
 
 namespace nx {
@@ -122,9 +125,13 @@ public:
                 !(m_addressResolverIsInUse.load() &&
                     SocketGlobals::addressResolver().dnsResolver()
                     .isRequestIdKnown(this)), kFailureMessage);
-            NX_CRITICAL(
-                !SocketGlobals::aioService()
-                .isSocketBeingMonitored(this->m_socket), kFailureMessage);
+
+            if (this->m_socket->impl()->aioThread.load())
+            {
+                NX_CRITICAL(
+                    !this->m_socket->impl()->aioThread.load()->isSocketBeingMonitored(this->m_socket),
+                    kFailureMessage);
+            }
         }
     }
 

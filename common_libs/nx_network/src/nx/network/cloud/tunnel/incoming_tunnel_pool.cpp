@@ -1,5 +1,6 @@
 #include "incoming_tunnel_pool.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>

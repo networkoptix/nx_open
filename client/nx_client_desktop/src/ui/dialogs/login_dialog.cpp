@@ -25,6 +25,7 @@
 #include <network/system_helpers.h>
 
 #include <nx/utils/raii_guard.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/socket_global.h>
 #include <rest/server/json_rest_result.h>

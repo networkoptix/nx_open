@@ -4,6 +4,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 
+#include "../outgoing_tunnel_pool.h"
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -19,13 +21,15 @@ static String getHostSuffix(const String& hostName)
 }
 
 ReverseConnectionPool::ReverseConnectionPool(
+    aio::AIOService* aioService,
     std::unique_ptr<MediatorConnection> mediatorConnection)
 :
+    base_type(aioService, nullptr),
     m_mediatorConnection(std::move(mediatorConnection)),
     m_acceptor(
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
+            NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG2);
             getOrCreateHolder(hostName)->saveSocket(std::move(socket));
         }),
     m_isReconnectHandlerSet(false),
@@ -42,7 +46,7 @@ ReverseConnectionPool::~ReverseConnectionPool()
 
 void ReverseConnectionPool::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    Parent::bindToAioThread(aioThread);
+    base_type::bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
     m_acceptor.bindToAioThread(aioThread);
 }
@@ -216,7 +220,8 @@ std::shared_ptr<ReverseConnectionHolder>
         it = holdersInSuffix.emplace(
             std::move(hostName),
             std::make_shared<ReverseConnectionHolder>(
-                m_mediatorConnection->getAioThread())).first;
+                m_mediatorConnection->getAioThread(),
+                hostName)).first;
     }
 
     return it->second;

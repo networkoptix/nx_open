@@ -3,6 +3,7 @@
 
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
+#include <nx/network/cloud/tunnel/cross_nat_connector.h>
 #include <nx/network/cloud/tunnel/udp/connector.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>

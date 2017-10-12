@@ -4,6 +4,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>

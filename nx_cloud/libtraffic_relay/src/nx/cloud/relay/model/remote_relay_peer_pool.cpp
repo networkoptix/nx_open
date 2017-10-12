@@ -52,7 +52,7 @@ bool RemoteRelayPeerPool::connectToDb()
 {
     m_cassConnection = 
         nx::cassandra::AsyncConnectionFactory::instance().create(
-            m_settings.cassandraConnection().hostName);
+            m_settings.cassandraConnection().host);
 
     prepareDbStructure();
 
@@ -62,9 +62,10 @@ bool RemoteRelayPeerPool::connectToDb()
     return m_dbReady;
 }
 
+
 void RemoteRelayPeerPool::prepareDbStructure()
 {
-    // TODO: Imply DbStructureUpdater here (it will require some refactoring).
+    // TODO: Use DbStructureUpdater here (it will require some refactoring).
     NX_INFO(this, lm("Initiating connection to cassandra DB"));
 
     m_cassConnection->init()

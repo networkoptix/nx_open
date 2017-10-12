@@ -88,6 +88,10 @@ const int kDefaultTcpBacklogSize = 1024;
 const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
 const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
 
+//-------------------------------------------------------------------------------------------------
+// VmsGateway
+const QLatin1String kVmsGatewayUrl("vmsGateway/url");
+
 } // namespace
 
 
@@ -232,6 +236,11 @@ const Http& Settings::http() const
     return m_http;
 }
 
+const VmsGateway& Settings::vmsGateway() const
+{
+    return m_vmsGateway;
+}
+
 void Settings::setDbConnectionOptions(
     const nx::utils::db::ConnectionOptions& options)
 {
@@ -341,6 +350,9 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionInactivityPeriod).toString(),
             kDefaultConnectionInactivityPeriod));
+
+    //vmsGateway
+    m_vmsGateway.url = settings().value(kVmsGatewayUrl).toString().toStdString();
 }
 
 } // namespace conf

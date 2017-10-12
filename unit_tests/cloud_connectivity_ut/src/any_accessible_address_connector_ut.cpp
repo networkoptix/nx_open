@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/any_accessible_address_connector.h>
 #include <nx/network/socket_attributes_cache.h>
 #include <nx/network/socket_global.h>

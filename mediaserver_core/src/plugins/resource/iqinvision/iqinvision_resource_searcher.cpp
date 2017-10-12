@@ -1,6 +1,8 @@
 #include "iqinvision_resource_searcher.h"
 #if defined(ENABLE_IQE)
 
+#include <nx/network/nettools.h>
+
 #include "core/resource/camera_resource.h"
 #include "iqinvision_resource.h"
 #include "utils/common/sleep.h"

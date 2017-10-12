@@ -7,12 +7,12 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
-
 #include <core/resource_management/user_roles_manager.h>
+#include <common/common_module.h>
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
-#include <common/common_module.h>
 
 namespace {
 
