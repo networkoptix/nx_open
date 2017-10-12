@@ -521,6 +521,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LC_Free,
 
         /**
+         * For all new DVR/NVR devices except of VMAX
+         */
+        LC_Bridge,
+
+        /**
          * Invalid license. Required when the correct license type is not known in current version.
          */
         LC_Invalid,

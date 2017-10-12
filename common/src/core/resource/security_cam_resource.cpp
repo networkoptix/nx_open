@@ -457,6 +457,8 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
             m_cachedLicenseType = Qn::LC_IO;
         else if (resType && resType->getManufacture() == lit("VMAX"))
             m_cachedLicenseType =  Qn::LC_VMAX;
+        else if (isDtsBased())
+            m_cachedLicenseType = Qn::LC_Bridge;
         else if (resType && resType->getManufacture() == lit("NetworkOptix"))
             m_cachedLicenseType = Qn::LC_Free;
         else if (isAnalogEncoder())

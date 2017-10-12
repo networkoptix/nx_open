@@ -53,10 +53,12 @@ struct LicenseCompatibility
 
 /* Compatibility tree:
  * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder)
+ * Trial -> Edge -> Professional -> Bridge
  * Trial -> IO
  * Start -> Professional -> Analog -> (VMAX, AnalogEncoder)
+ * Start -> Professional -> Bridge
  */
-static std::array<LicenseCompatibility, 19> compatibleLicenseType =
+static std::array<LicenseCompatibility, 23> compatibleLicenseType =
 {
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_AnalogEncoder),
@@ -64,23 +66,27 @@ static std::array<LicenseCompatibility, 19> compatibleLicenseType =
     LicenseCompatibility(Qn::LC_Professional,   Qn::LC_Analog),
     LicenseCompatibility(Qn::LC_Professional,   Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Professional,   Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Professional,   Qn::LC_Bridge),
 
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_Professional),
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_Analog),
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Edge,           Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Edge,           Qn::LC_Bridge),
 
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_Professional),
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_Analog),
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Start,          Qn::LC_Bridge),
 
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Edge),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Professional),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Analog),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_IO),
-    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_AnalogEncoder)
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Bridge)
 };
 
 /************************************************************************/
@@ -460,6 +466,7 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const
         << Qn::LC_Professional
         << Qn::LC_Edge
         << Qn::LC_VMAX  //only main page
+        << Qn::LC_Bridge
         << Qn::LC_AnalogEncoder
         << Qn::LC_IO
         << Qn::LC_Start
