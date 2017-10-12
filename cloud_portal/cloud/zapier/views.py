@@ -12,7 +12,7 @@ from rest_hooks.signals import raw_hook_event
 
 from models import *
 from cloud import settings
-
+import urllib
 from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
@@ -215,10 +215,10 @@ def zapier_send_generic_event(request):
     make_or_increment_rule('Generic Event', email, system_id, caption,
                            password=password, description=description, source=source)
 
-    url = "{}/gateway/{}/api/createEvent"\
-        .format(CLOUD_INSTANCE_URL_HACK, system_id)
+    url = "{}/gateway/{}/api/createEvent?{}"\
+        .format(CLOUD_INSTANCE_URL_HACK, system_id, urllib.urlencode(query_params).replace('+', '%20'))
 
-    r = requests.get(url, data=None, params=query_params, auth=HTTPDigestAuth(email, password))
+    r = requests.get(url, data=None, auth=HTTPDigestAuth(email, password))
 
     if r.status_code != 200:
         Response({'message': "Error sending generic event to system"}, status=r.status_code)
@@ -237,7 +237,7 @@ def nx_http_action(request):
 
     if hooks_event.exists():
         for hook in hooks_event:
-            raw_hook_event.send(sender=None, event_name=event, payload={'data': {'caption': caption}}, user=hook.user)
+            hook.deliver_hook(None, {'caption': caption})
             make_or_increment_rule('Hook Fired', hook.user.email, system_id, caption)
 
         return Response({'message': "Webhook fired for " + caption}, status=200)
