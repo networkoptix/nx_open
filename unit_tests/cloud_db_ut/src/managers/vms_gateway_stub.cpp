@@ -11,17 +11,21 @@ VmsGatewayStub::~VmsGatewayStub()
 
 void VmsGatewayStub::merge(
     const std::string& targetSystemId,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    VmsRequestCompletionHandler completionHandler)
 {
+    RequestContext requestContext;
+    requestContext.systemId = targetSystemId;
+    requestContext.completionHandler = std::move(completionHandler);
+
     m_pollable.post(
-        [this, targetSystemId, completionHandler = std::move(completionHandler)]() mutable
+        [this, requestContext = std::move(requestContext)]() mutable
         {
-            m_systemsRequested.insert(targetSystemId);
+            m_systemsRequested.insert(requestContext.systemId);
 
             if (m_paused)
-                m_queuedRequests.push(std::move(completionHandler));
+                m_queuedRequests.push(std::move(requestContext));
             else
-                completionHandler();
+                reportRequestResult(std::move(requestContext));
         });
 }
 
@@ -38,8 +42,9 @@ void VmsGatewayStub::resume()
             m_paused = false;
             while (!m_queuedRequests.empty())
             {
-                m_queuedRequests.front()();
+                auto requestContext = std::move(m_queuedRequests.front());
                 m_queuedRequests.pop();
+                reportRequestResult(std::move(requestContext));
             }
         });
 }
@@ -47,6 +52,23 @@ void VmsGatewayStub::resume()
 bool VmsGatewayStub::performedRequestToSystem(const std::string& id) const
 {
     return m_systemsRequested.find(id) != m_systemsRequested.end();
+}
+
+void VmsGatewayStub::failEveryRequestToSystem(const std::string& id)
+{
+    m_malfunctioningSystems.insert(id);
+}
+
+void VmsGatewayStub::reportRequestResult(RequestContext requestContext)
+{
+    VmsRequestResult vmsRequestResult;
+
+    vmsRequestResult.resultCode = 
+        m_malfunctioningSystems.find(requestContext.systemId) == m_malfunctioningSystems.end()
+        ? VmsResultCode::ok
+        : VmsResultCode::networkError;
+
+    requestContext.completionHandler(std::move(vmsRequestResult));
 }
 
 } // namespace test

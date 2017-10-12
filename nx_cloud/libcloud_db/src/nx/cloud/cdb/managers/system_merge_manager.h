@@ -73,7 +73,11 @@ private:
         const std::string& idOfSystemToBeMerged);
 
     void start(MergeRequestContext* mergeRequestContext);
-    void processVmsMergeRequestResult(MergeRequestContext* mergeRequestContext);
+
+    void processVmsMergeRequestResult(
+        MergeRequestContext* mergeRequestContext,
+        VmsRequestResult vmsRequestResult);
+
     void processUpdateSystemResult(
         MergeRequestContext* mergeRequestContext,
         nx::utils::db::QueryContext* queryContext,
@@ -83,6 +87,10 @@ private:
         nx::utils::db::QueryContext* queryContext,
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToMergeBeMerged);
+
+    void finishMerge(
+        MergeRequestContext* mergeRequestContextPtr,
+        api::ResultCode resultCode);
 };
 
 } // namespace cdb

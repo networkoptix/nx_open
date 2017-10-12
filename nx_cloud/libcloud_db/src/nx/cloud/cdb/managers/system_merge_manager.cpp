@@ -102,23 +102,33 @@ api::ResultCode SystemMergeManager::validateRequestInput(
 
 void SystemMergeManager::start(MergeRequestContext* mergeRequestContext)
 {
+    using namespace std::placeholders;
+
     NX_VERBOSE(this, lm("Merge %1 into %2. Issuing request to system %1")
         .args(mergeRequestContext->idOfSystemToBeMerged, 
             mergeRequestContext->idOfSystemToMergeTo));
 
     m_vmsGateway->merge(
         mergeRequestContext->idOfSystemToBeMerged,
-        std::bind(&SystemMergeManager::processVmsMergeRequestResult, this, mergeRequestContext));
+        std::bind(&SystemMergeManager::processVmsMergeRequestResult, this, 
+            mergeRequestContext, _1));
 }
 
 void SystemMergeManager::processVmsMergeRequestResult(
-    MergeRequestContext* mergeRequestContext)
+    MergeRequestContext* mergeRequestContext,
+    VmsRequestResult vmsRequestResult)
 {
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Merge %1 into %2. Request to system %1 completed")
         .args(mergeRequestContext->idOfSystemToBeMerged,
             mergeRequestContext->idOfSystemToMergeTo));
+
+    if (vmsRequestResult.resultCode != VmsResultCode::ok)
+    {
+        finishMerge(mergeRequestContext, api::ResultCode::vmsRequestFailure);
+        return;
+    }
 
     m_dbManager->executeUpdate(
         std::bind(&SystemMergeManager::updateSystemStateInDb, this, _1,
@@ -138,15 +148,7 @@ void SystemMergeManager::processUpdateSystemResult(
             mergeRequestContextPtr->idOfSystemToMergeTo,
             nx::utils::db::toString(dbResult)));
 
-    std::unique_ptr<MergeRequestContext> mergeRequestContext;
-    {
-        QnMutexLocker lock(&m_mutex);
-        const auto it = m_currentRequests.find(mergeRequestContextPtr);
-        NX_CRITICAL(it != m_currentRequests.end());
-        mergeRequestContext.swap(it->second);
-    }
-    
-    mergeRequestContext->completionHandler(dbResultToApiResult(dbResult));
+    finishMerge(mergeRequestContextPtr, dbResultToApiResult(dbResult));
 }
 
 nx::utils::db::DBResult SystemMergeManager::updateSystemStateInDb(
@@ -158,6 +160,26 @@ nx::utils::db::DBResult SystemMergeManager::updateSystemStateInDb(
         queryContext,
         idOfSystemToMergeBeMerged,
         api::SystemStatus::beingMerged);
+}
+
+void SystemMergeManager::finishMerge(
+    MergeRequestContext* mergeRequestContextPtr,
+    api::ResultCode resultCode)
+{
+    NX_VERBOSE(this, lm("Merge %1 into %2. Reporting %3")
+        .args(mergeRequestContextPtr->idOfSystemToBeMerged,
+            mergeRequestContextPtr->idOfSystemToMergeTo,
+            QnLexical::serialized(resultCode)));
+        
+    std::unique_ptr<MergeRequestContext> mergeRequestContext;
+    {
+        QnMutexLocker lock(&m_mutex);
+        const auto it = m_currentRequests.find(mergeRequestContextPtr);
+        NX_CRITICAL(it != m_currentRequests.end());
+        mergeRequestContext.swap(it->second);
+    }
+
+    mergeRequestContext->completionHandler(resultCode);
 }
 
 } // namespace cdb

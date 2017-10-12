@@ -226,7 +226,7 @@ public:
                 &authInfo))
             return;
 
-        processRequest(
+        processRequest( 
             AuthorizationInfo(std::move(authInfo)),
             [this](api::ResultCode resultCode, Output... outData)
             {

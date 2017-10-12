@@ -1,14 +1,34 @@
 #pragma once
 
 #include <map>
+#include <string>
 
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/move_only_func.h>
+
+#include <nx/cloud/cdb/api/result_code.h>
 
 namespace nx {
 namespace cdb {
 
 namespace conf { class Settings; }
+
+enum class VmsResultCode
+{
+    ok,
+    invalidData,
+    networkError,
+    forbidden,
+    logicalError,
+};
+
+struct VmsRequestResult
+{
+    VmsResultCode resultCode = VmsResultCode::ok;
+    std::string vmsErrorDescription;
+};
+
+using VmsRequestCompletionHandler = nx::utils::MoveOnlyFunc<void(VmsRequestResult)>;
 
 class AbstractVmsGateway
 {
@@ -17,7 +37,7 @@ public:
 
     virtual void merge(
         const std::string& targetSystemId,
-        nx::utils::MoveOnlyFunc<void()> completionHandler) = 0;
+        VmsRequestCompletionHandler completionHandler) = 0;
 };
 
 class VmsGateway:
@@ -29,13 +49,13 @@ public:
 
     virtual void merge(
         const std::string& targetSystemId,
-        nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+        VmsRequestCompletionHandler completionHandler) override;
 
 private:
     struct RequestContext
     {
         std::unique_ptr<nx_http::AsyncClient> client;
-        nx::utils::MoveOnlyFunc<void()> completionHandler;
+        VmsRequestCompletionHandler completionHandler;
     };
 
     const conf::Settings& m_settings;
@@ -44,6 +64,7 @@ private:
     std::map<nx_http::AsyncClient*, RequestContext> m_activeRequests;
 
     void reportRequestResult(nx_http::AsyncClient* clientPtr);
+    VmsRequestResult prepareVmsResult(nx_http::AsyncClient* clientPtr);
 };
 
 } // namespace cdb

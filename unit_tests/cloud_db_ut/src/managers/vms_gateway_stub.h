@@ -19,18 +19,28 @@ public:
 
     virtual void merge(
         const std::string& targetSystemId,
-        nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+        VmsRequestCompletionHandler completionHandler) override;
 
     void pause();
     void resume();
     
     bool performedRequestToSystem(const std::string& id) const;
+    void failEveryRequestToSystem(const std::string& id);
 
 private:
+    struct RequestContext
+    {
+        std::string systemId;
+        VmsRequestCompletionHandler completionHandler;
+    };
+
     nx::network::aio::BasicPollable m_pollable;
     bool m_paused = false;
-    std::queue<nx::utils::MoveOnlyFunc<void()>> m_queuedRequests;
+    std::queue<RequestContext> m_queuedRequests;
     std::set<std::string> m_systemsRequested;
+    std::set<std::string> m_malfunctioningSystems;
+
+    void reportRequestResult(RequestContext requestContext);
 };
 
 } // namespace test

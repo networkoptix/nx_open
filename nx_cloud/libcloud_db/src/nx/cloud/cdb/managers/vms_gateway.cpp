@@ -28,12 +28,18 @@ VmsGateway::~VmsGateway()
 
 void VmsGateway::merge(
     const std::string& targetSystemId,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    VmsRequestCompletionHandler completionHandler)
 {
     const auto urlBase = m_settings.vmsGateway().url;
     if (urlBase.empty())
     {
-        m_asyncCall.post(std::move(completionHandler));
+        m_asyncCall.post(
+            [completionHandler = std::move(completionHandler)]()
+            {
+                VmsRequestResult vmsRequestResult;
+                vmsRequestResult.resultCode = VmsResultCode::invalidData;
+                completionHandler(std::move(vmsRequestResult));
+            });
         return;
     }
 
@@ -57,7 +63,7 @@ void VmsGateway::merge(
 
 void VmsGateway::reportRequestResult(nx_http::AsyncClient* clientPtr)
 {
-    nx::utils::MoveOnlyFunc<void()> completionHandler;
+    VmsRequestCompletionHandler completionHandler;
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -67,7 +73,7 @@ void VmsGateway::reportRequestResult(nx_http::AsyncClient* clientPtr)
         completionHandler = std::move(it->second.completionHandler);
     }
 
-    completionHandler();
+    completionHandler(prepareVmsResult(clientPtr));
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -76,6 +82,26 @@ void VmsGateway::reportRequestResult(nx_http::AsyncClient* clientPtr)
             return;
         m_activeRequests.erase(it);
     }
+}
+
+VmsRequestResult VmsGateway::prepareVmsResult(nx_http::AsyncClient* clientPtr)
+{
+    VmsRequestResult result;
+    result.resultCode = VmsResultCode::ok;
+
+    if (!clientPtr->response())
+    {
+        result.resultCode = VmsResultCode::networkError;
+        return result;
+    }
+
+    if (!nx_http::StatusCode::isSuccessCode(clientPtr->response()->statusLine.statusCode))
+    {
+        result.resultCode = VmsResultCode::logicalError;
+        return result;
+    }
+
+    return result;
 }
 
 } // namespace cdb

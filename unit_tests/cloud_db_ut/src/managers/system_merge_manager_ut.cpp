@@ -35,13 +35,28 @@ public:
 protected:
     void givenTwoOnlineSystems()
     {
+        givenOnlineMasterSystem();
+        givenOnlineSlaveSystem();
+    }
+
+    void givenOnlineMasterSystem()
+    {
         m_masterSystem = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
         m_systemHealthInfoProviderStub.setSystemStatus(m_masterSystem.id, true);
         m_systemManagerStub.addSystem(m_masterSystem);
+    }
 
+    void givenOnlineSlaveSystem()
+    {
         m_slaveSystem = cdb::test::BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
         m_systemHealthInfoProviderStub.setSystemStatus(m_slaveSystem.id, true);
         m_systemManagerStub.addSystem(m_slaveSystem);
+    }
+
+    void givenOnlineSlaveSystemThatFailsEveryRequest()
+    {
+        givenOnlineSlaveSystem();
+        m_vmsGatewayStub.failEveryRequestToSystem(m_slaveSystem.id);
     }
 
     void givenPausedVmsGateway()
@@ -83,10 +98,15 @@ protected:
         m_prevMergeResult = m_mergeResults.pop();
     }
 
-    void thenMergeSucceeded()
+    void thenMergeResultIs(api::ResultCode resultCode)
     {
         m_prevMergeResult = m_mergeResults.pop();
-        ASSERT_EQ(api::ResultCode::ok, *m_prevMergeResult);
+        ASSERT_EQ(resultCode, *m_prevMergeResult);
+    }
+
+    void thenMergeSucceeded()
+    {
+        thenMergeResultIs(api::ResultCode::ok);
     }
     
     void andRequestToSlaveSystemHasBeenInvoked()
@@ -146,6 +166,16 @@ TEST_F(SystemMergeManager, waits_for_every_request_completion_before_terminating
     whenResumeVmsGateway();
 
     thenMergeSucceeded();
+}
+
+TEST_F(SystemMergeManager, reports_error_on_vms_request_failure)
+{
+    givenOnlineMasterSystem();
+    givenOnlineSlaveSystemThatFailsEveryRequest();
+
+    whenStartMerge();
+
+    thenMergeResultIs(api::ResultCode::vmsRequestFailure);
 }
 
 } // namespace test
