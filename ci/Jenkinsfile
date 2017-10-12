@@ -73,9 +73,10 @@ def unsafe_main() {
 		def branch = env.BRANCH_NAME
 		def run_params = [
 			project_name: PROJECT_NAME,
+			jenkins_build_url: env.BUILD_URL,
 			requested_platform_names: requested_platform_names,
 			branch: branch,
-			build_number: env.BUILD_NUMBER.toInteger(),
+			build_num: env.BUILD_NUMBER.toInteger(),
 			configuration: config.ci.configuration,
 			customization: config.ci.customization,
 			cloud_group: config.ci.cloud_group,
