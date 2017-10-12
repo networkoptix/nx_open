@@ -1,15 +1,17 @@
 #include "hanwha_time_synchronizer.h"
 
+#include <map>
 #include <QtCore/QTimeZone>
 
-#include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <utils/common/synctime.h>
 
 #include "hanwha_resource.h"
 
-static constexpr std::chrono::minutes kRetryInterval(5);
-static constexpr std::chrono::hours kResyncInterval(1);
-static constexpr qint64 kAcceptableTimeDiffSecs = 5;
+static constexpr std::chrono::minutes kRetryInterval(5); //< Used after failure.
+static constexpr std::chrono::hours kResyncInterval(1); //< Used after successful check.
+static constexpr qint64 kAcceptableTimeDiffSecs = 5; //< Diff between device and mediaserver.
 
 static constexpr bool isTimeZoneSyncRequired = false;
 static QString getPosixTimeZone(const QTimeZone& timeZone)
@@ -36,17 +38,12 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-HanwhaTimeSyncronizer::HanwhaTimeSyncronizer(const HanwhaResource* resource):
-    m_resource(resource)
+HanwhaTimeSyncronizer::HanwhaTimeSyncronizer()
 {
     m_httpClient.bindToAioThread(m_timer.getAioThread());
-    verifyDateTime();
-
     m_syncTymeConnection = QObject::connect(
         qnSyncTime, &QnSyncTime::timeChanged,
         [this]() { retryVerificationIn(std::chrono::milliseconds::zero()); });
-
-    NX_DEBUG(this, lm("Initializer for %1").arg(m_resource->getUrl()));
 }
 
 HanwhaTimeSyncronizer::~HanwhaTimeSyncronizer()
@@ -58,9 +55,41 @@ HanwhaTimeSyncronizer::~HanwhaTimeSyncronizer()
         [this, &promise]()
         {
             m_httpClient.pleaseStopSync();
+            promise.set_value();
         });
 
     promise.get_future().wait();
+}
+
+void HanwhaTimeSyncronizer::start(const QAuthenticator& auth, const QUrl& url)
+{
+    utils::promise<void> promise;
+    m_timer.post(
+        [this, auth, url, &promise]() mutable
+        {
+            if (m_url != url || m_auth != auth)
+            {
+                m_auth = std::move(auth);
+                m_url = std::move(url);
+                m_timer.cancelSync();
+                m_startPromises.push_back(&promise);
+                verifyDateTime();
+            }
+            else
+            {
+                if (m_startPromises.empty())
+                    m_startPromises.push_back(&promise); //< Start as in progress, wait for it.
+                else
+                    promise.set_value(); //< Nothing to wait.
+            }
+        });
+
+    promise.get_future().wait();
+}
+
+void HanwhaTimeSyncronizer::setTimeZoneShiftHandler(TimeZoneShiftHandler handler)
+{
+    m_timer.post([this, h = std::move(handler)]() mutable { m_timeZoneHandler = std::move(h); });
 }
 
 static QDateTime toUtcDateTime(const QString& value)
@@ -75,77 +104,63 @@ void HanwhaTimeSyncronizer::verifyDateTime()
     doRequest(lit("view"), {}, /*isList*/ false,
         [this](HanwhaResponse response)
         {
-            const auto utcTime = response.parameter<QString>("UTCTime");
-            if (!utcTime)
+            const auto promiseGuard = makeScopeGuard([this](){ fireStartPromises(); });
+            try
             {
-                NX_WARNING(this, lm("No UTCTime in response from %1").arg(response.requestUrl()));
-                return retryVerificationIn(kRetryInterval);
-            }
+                const auto utcDateTime = toUtcDateTime(response.getOrThrow("UTCTime"));
+                NX_VERBOSE(this, lm("Device UTC time: %1").args(utcDateTime));
+                const auto localDateTime = toUtcDateTime(response.getOrThrow("LocalTime"));
+                NX_VERBOSE(this, lm("Device local time: %1").args(localDateTime));
 
-            const auto localTime = response.parameter<QString>("LocalTime");
-            if (!localTime)
+                // We do not know time zone, so we use UTC to compare with real UTC time.
+                updateTimeZoneShift(std::chrono::seconds(utcDateTime.secsTo(localDateTime)));
+
+                const auto serverDateTime = qnSyncTime->currentDateTime();
+                const auto timeDiffSecs = std::abs((int) utcDateTime.secsTo(serverDateTime));
+                if (timeDiffSecs > kAcceptableTimeDiffSecs)
+                {
+                    NX_DEBUG(this, lm("Camera has %1 time which is %2 seconds different")
+                        .args(utcDateTime, utcDateTime.secsTo(serverDateTime)));
+
+                    return setDateTime(serverDateTime);
+                }
+
+                // TODO: Uncomment in case we need to synchronize time zone as well.
+                // if (response.getOrThrow("POSIXTimeZone") != getPosixTimeZone(dateTime.timeZone()))
+                // {
+                //     NX_DEBUG(this, lm("Unexpected POSIXTimeZone: %1").arg(*posixTimeZone));
+                //     return setDateTime(now);
+                // }
+
+                NX_VERBOSE(this, lm("Current time diff is %1 which is ok").arg(timeDiffSecs));
+                retryVerificationIn(kResyncInterval);
+            }
+            catch (const std::runtime_error& exception)
             {
-                NX_WARNING(this, lm("No LocalTime in response from %1").arg(response.requestUrl()));
-                return retryVerificationIn(kRetryInterval);
+                NX_WARNING(this, exception.what());
             }
-
-            const auto utcDateTime = toUtcDateTime(*utcTime);
-            const auto localDateTime = toUtcDateTime(*localTime);
-
-            // We do not know time zone, so we use UTC to compare with real UTC time.
-            m_currentTimeZoneShiftSecs = utcDateTime.secsTo(localDateTime);
-            NX_VERBOSE(this, lm("Camera current time shift %1 secs from UTC")
-                .arg(m_currentTimeZoneShiftSecs));
-
-            const auto serverDateTime = qnSyncTime->currentDateTime();
-            const auto timeDiffSecs = std::abs((int) utcDateTime.secsTo(serverDateTime));
-            if (timeDiffSecs > kAcceptableTimeDiffSecs)
-            {
-                NX_DEBUG(this, lm("Camera has %1 time which is %2 seconds different")
-                    .args(utcDateTime, utcDateTime.secsTo(serverDateTime)));
-
-                return setDateTime(serverDateTime);
-            }
-
-            // TODO: Uncomment in case we need to maintain timezone as well.
-            /*
-            const auto posixTimeZone = response.parameter<QString>("POSIXTimeZone");
-            if (!posixTimeZone)
-            {
-                NX_WARNING(this, lm("No POSIXTimeZone in response from %1").arg(response.requestUrl()));
-                return retryVerificationIn(kRetryInterval);
-            }
-
-            if (*posixTimeZone != getPosixTimeZone(dateTime.timeZone()))
-            {
-                NX_DEBUG(this, lm("Unexpected POSIXTimeZone: %1").arg(*posixTimeZone));
-                return setDateTime(now);
-            }
-            */
-
-            NX_VERBOSE(this, lm("Current time diff is %1 secs which is ok").arg(timeDiffSecs));
-            retryVerificationIn(kResyncInterval);
         });
 }
 
 void HanwhaTimeSyncronizer::setDateTime(const QDateTime& dateTime)
 {
     const auto utc = dateTime.toUTC();
-    const auto local = utc.addSecs(m_currentTimeZoneShiftSecs);
+    const auto local = utc.addSecs(std::chrono::seconds(m_timeZoneShift).count());
+    std::map<QString, QString> params =
+    {
+        {"SyncType", "Manual"},
 
-    std::map<QString, QString> params;
-    params["SyncType"] = lit("Manual");
+        {"Year", QString::number(local.date().year())},
+        {"Month", QString::number(local.date().month())},
+        {"Day", QString::number(local.date().day())},
 
-    // TODO: If we want to change time zone, time should also be adjasted to new time zone.
-    // params["POSIXTimeZone"] = getPosixTimeZone(dateTime.timeZone());
+        {"Hour", QString::number(local.time().hour())},
+        {"Minute", QString::number(local.time().minute())},
+        {"Second", QString::number(local.time().second())},
 
-    params["Year"] = QString::number(local.date().year());
-    params["Month"] = QString::number(local.date().month());
-    params["Day"] = QString::number(local.date().day());
-
-    params["Hour"] = QString::number(local.time().hour());
-    params["Minute"] = QString::number(local.time().minute());
-    params["Second"] = QString::number(local.time().second());
+        // TODO: Uncomment in case we need to synchronize time zone as well.
+        // {"POSIXTimeZone", getPosixTimeZone(dateTime.timeZone())}
+    };
 
     NX_VERBOSE(this, lm("Setting %1").container(params));
     doRequest(lit("set"), std::move(params), /*isList*/ false,
@@ -158,6 +173,9 @@ void HanwhaTimeSyncronizer::setDateTime(const QDateTime& dateTime)
 
 void HanwhaTimeSyncronizer::retryVerificationIn(std::chrono::milliseconds timeout)
 {
+    if (!m_url.isValid())
+        return;
+
     const auto verify = [this](){ verifyDateTime(); };
     if (timeout.count() == 0)
         return m_timer.post(verify);
@@ -165,18 +183,34 @@ void HanwhaTimeSyncronizer::retryVerificationIn(std::chrono::milliseconds timeou
     m_timer.start(timeout, verify);
 }
 
+void HanwhaTimeSyncronizer::updateTimeZoneShift(std::chrono::seconds value)
+{
+    m_timeZoneShift = value;
+    NX_DEBUG(this, lm("Camera current time shift %1 secs from UTC").arg(value));
+    if (m_timeZoneHandler)
+        m_timeZoneHandler(value);
+}
+
+void HanwhaTimeSyncronizer::fireStartPromises()
+{
+    decltype(m_startPromises) promises;
+    std::swap(promises, m_startPromises);
+    for (const auto& p: promises)
+        p->set_value();
+}
+
 void HanwhaTimeSyncronizer::doRequest(
     const QString& action, std::map<QString, QString> params,
     bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler)
 {
     const auto url = HanwhaRequestHelper::buildRequestUrl(
-        m_resource->getUrl(), lit("system"), lit("date"), action, params);
+        m_url, lit("system"), lit("date"), action, params);
 
-    const auto auth = m_resource->getAuth();
-    m_httpClient.setUserName(auth.user());
-    m_httpClient.setUserPassword(auth.password());
+    m_httpClient.pleaseStopSync();
+    m_httpClient.setUserName(m_auth.user());
+    m_httpClient.setUserPassword(m_auth.password());
     m_httpClient.doGet(url,
-        [this, url, isList, handler=std::move(handler)]()
+        [this, url, isList, handler = std::move(handler)]()
         {
             if (!m_httpClient.hasRequestSuccesed())
             {

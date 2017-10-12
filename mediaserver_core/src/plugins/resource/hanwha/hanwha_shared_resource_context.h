@@ -10,6 +10,7 @@
 #include <nx/mediaserver/server_module_aware.h>
 
 #include <plugins/resource/hanwha/hanwha_common.h>
+#include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -34,6 +35,8 @@ public:
 
     std::shared_ptr<HanwhaChunkLoader> chunkLoader() const;
     int channelCount(const QAuthenticator& auth, const QUrl& url);
+    void startTimeSynchronizer(const QAuthenticator& auth, const QUrl& url);
+
 private:
     mutable QnMutex m_sessionMutex;
     mutable QnMutex m_channelCountMutex;
@@ -44,6 +47,8 @@ private:
 
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     int m_cachedChannelCount = 0;
+
+    std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 };
 
 } // namespace plugins

@@ -27,8 +27,14 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     AbstractSharedResourceContext(serverModule, sharedId),
     m_sharedId(sharedId),
     m_requestSemaphore(kMaxConcurrentRequestNumber),
-    m_chunkLoader(new HanwhaChunkLoader())
+    m_chunkLoader(new HanwhaChunkLoader()),
+    m_timeSynchronizer(new HanwhaTimeSyncronizer())
 {
+    m_timeSynchronizer->setTimeZoneShiftHandler(
+        [this](std::chrono::seconds timeZoneShift)
+        {
+            m_chunkLoader->setTimeZoneShift(timeZoneShift);
+        });
 }
 
 QString HanwhaSharedResourceContext::sessionKey(
@@ -93,6 +99,12 @@ int HanwhaSharedResourceContext::channelCount(const QAuthenticator& auth, const 
     if (attributes.isValid())
         m_cachedChannelCount = result;
     return result;
+}
+
+void HanwhaSharedResourceContext::startTimeSynchronizer(
+    const QAuthenticator& auth, const QUrl& url)
+{
+    m_timeSynchronizer->start(auth, url);
 }
 
 } // namespace plugins

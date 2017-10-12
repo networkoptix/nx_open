@@ -21,10 +21,10 @@ static const  char kEndTimeParamName[] = "EndTime";
 static std::chrono::seconds kUpdateChunksDelay(60);
 static std::chrono::seconds kResendRequestIfFail(10);
 
-QDateTime parseHanwhaDateTime(const QByteArray& value)
+QDateTime parseHanwhaDateTime(const QByteArray& value, std::chrono::seconds timeZoneShift)
 {
     auto dateTime = QDateTime::fromString(value, kHanwhaDateFormat);
-    dateTime.setOffsetFromUtc(0);
+    dateTime.setOffsetFromUtc(timeZoneShift.count());
     return dateTime;
 }
 
@@ -44,12 +44,14 @@ void HanwhaChunkLoader::start(const QAuthenticator& auth, const QUrl& cameraUrl,
 {
     {
         QnMutexLocker lock(&m_mutex);
+        m_auth = auth;
+        m_cameraUrl = cameraUrl;
         if (m_state != State::Initial)
             return; //< Already started
+
         m_state = State::updateTimeRange;
     }
-    m_auth = auth;
-    m_cameraUrl = cameraUrl;
+
     m_maxChannels = maxChannels;
     sendRequest();
 }
@@ -77,10 +79,13 @@ void HanwhaChunkLoader::sendRequest()
 
 void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
 {
-    m_httpClient->setUserName(m_auth.user());
-    m_httpClient->setUserPassword(m_auth.password());
-
-    QUrl loadChunksUrl(m_cameraUrl);
+    QUrl loadChunksUrl;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpClient->setUserName(m_auth.user());
+        m_httpClient->setUserPassword(m_auth.password());
+        loadChunksUrl = m_cameraUrl;
+    }
 
     loadChunksUrl.setPath("/stw-cgi/recording.cgi");
     QUrlQuery query;
@@ -109,10 +114,13 @@ qint64 HanwhaChunkLoader::latestChunkTime() const
 
 void HanwhaChunkLoader::sendLoadChunksRequest()
 {
-    m_httpClient->setUserName(m_auth.user());
-    m_httpClient->setUserPassword(m_auth.password());
-
-    QUrl loadChunksUrl(m_cameraUrl);
+    QUrl loadChunksUrl;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpClient->setUserName(m_auth.user());
+        m_httpClient->setUserPassword(m_auth.password());
+        loadChunksUrl = m_cameraUrl;
+    }
 
     loadChunksUrl.setPath("/stw-cgi/recording.cgi");
     QUrlQuery query;
@@ -193,9 +201,9 @@ void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
             QByteArray fieldValue = params[1];
 
             if (fieldName == kStartTimeParamName)
-                startTimeUsec = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch() * 1000;
+                startTimeUsec = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch() * 1000;
             else if (fieldName == kEndTimeParamName)
-                endTimeUsec = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch() * 1000;
+                endTimeUsec = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch() * 1000;
         }
     }
     if (startTimeUsec != AV_NOPTS_VALUE && endTimeUsec != AV_NOPTS_VALUE)
@@ -255,11 +263,11 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     QnTimePeriodList& chunks = m_chunks[channelNumber];
     if (fieldName == kStartTimeParamName)
     {
-        m_lastParsedStartTimeMs = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch();
+        m_lastParsedStartTimeMs = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch();
     }
     else if (fieldName == kEndTimeParamName)
     {
-        auto endTimeMs = parseHanwhaDateTime(fieldValue).toMSecsSinceEpoch();
+        auto endTimeMs = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch();
 
         QnTimePeriod timePeriod(m_lastParsedStartTimeMs, endTimeMs - m_lastParsedStartTimeMs);
         if (m_startTimeUsec == AV_NOPTS_VALUE || chunks.isEmpty())
@@ -306,6 +314,11 @@ QnTimePeriodList HanwhaChunkLoader::chunks(int channelNumber) const
         return QnTimePeriodList();
     QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
     return m_chunks[channelNumber].intersected(boundingPeriod);
+}
+
+void HanwhaChunkLoader::setTimeZoneShift(std::chrono::seconds timeZoneShift)
+{
+    m_timeZoneShift = timeZoneShift;
 }
 
 } // namespace plugins

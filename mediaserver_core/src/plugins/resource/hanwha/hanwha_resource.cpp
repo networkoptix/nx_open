@@ -627,11 +627,11 @@ CameraDiagnostics::Result HanwhaResource::init()
     auto sharedContext = qnServerModule
         ->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
-    auto loader = sharedContext->chunkLoader();
-    int channelCount = sharedContext->channelCount(getAuth(), getUrl());
-    loader->start(getAuth(), getUrl(), channelCount);
 
-    m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>(this);
+    int channelCount = sharedContext->channelCount(getAuth(), getUrl());
+    sharedContext->startTimeSynchronizer(getAuth(), getUrl());
+    sharedContext->chunkLoader()->start(getAuth(), getUrl(), channelCount);
+
     return result;
 }
 

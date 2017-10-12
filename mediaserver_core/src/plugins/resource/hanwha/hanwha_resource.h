@@ -9,7 +9,6 @@
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 #include <plugins/resource/hanwha/hanwha_stream_limits.h>
-#include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
@@ -272,7 +271,6 @@ private:
     std::atomic<bool> m_areInputPortsMonitored{false};
 
     nx::utils::TimerHolder m_timerHolder;
-    std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 };
 
 } // namespace plugins

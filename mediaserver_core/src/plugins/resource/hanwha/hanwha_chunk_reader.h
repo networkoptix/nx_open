@@ -39,6 +39,9 @@ public:
     qint64 startTimeUsec(int channelNumber) const;
     qint64 endTimeUsec(int channelNumber) const;
     QnTimePeriodList chunks(int channelNumber) const;
+
+    void setTimeZoneShift(std::chrono::seconds timeZoneShift);
+
 private:
     void onHttpClientDone();
     void onGotChunkData();
@@ -65,6 +68,8 @@ private:
     QAuthenticator m_auth;
     QUrl m_cameraUrl;
     mutable QnMutex m_mutex;
+
+    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};
 };
 
 } // namespace plugins

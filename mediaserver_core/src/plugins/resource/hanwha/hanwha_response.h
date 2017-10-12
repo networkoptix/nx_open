@@ -62,6 +62,16 @@ public:
             "Only QString, int, double, bool, AVCodecID, QSize specializations are allowed");
     }
 
+    template<typename T = QString>
+    T getOrThrow(const QString& name)
+    {
+        if (auto value = parameter<T>(name))
+            return *value;
+
+        static const auto errorMessage = QStringLiteral("Paramiter %1 is not found in response");
+        throw std::runtime_error(errorMessage.arg(name).toStdString()) ;
+    }
+
 private:
     void parseBuffer(const nx::Buffer& rawBuffer, bool isListMode = false);
     boost::optional<QString> findParameter(const QString& parameterName) const;

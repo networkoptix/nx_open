@@ -10,10 +10,13 @@ namespace plugins {
 
 class HanwhaResource;
 
+/**
+ * Synchronizes camera/NVR time with qSyncTime and keeps time zone shift updated.
+ */
 class HanwhaTimeSyncronizer
 {
 public:
-    HanwhaTimeSyncronizer(const HanwhaResource* resource);
+    HanwhaTimeSyncronizer();
     ~HanwhaTimeSyncronizer();
 
     HanwhaTimeSyncronizer(const HanwhaTimeSyncronizer&) = delete;
@@ -21,20 +24,31 @@ public:
     HanwhaTimeSyncronizer(HanwhaTimeSyncronizer&&) = delete;
     HanwhaTimeSyncronizer& operator=(HanwhaTimeSyncronizer&&) = delete;
 
+    void start(const QAuthenticator& auth, const QUrl& url);
+
+    using TimeZoneShiftHandler = utils::MoveOnlyFunc<void(std::chrono::seconds)>;
+    void setTimeZoneShiftHandler(TimeZoneShiftHandler handler);
+
 private:
     void verifyDateTime();
     void setDateTime(const QDateTime& dateTime);
     void retryVerificationIn(std::chrono::milliseconds timeout);
+    void updateTimeZoneShift(std::chrono::seconds value);
+    void fireStartPromises();
 
     void doRequest(
         const QString& action, std::map<QString, QString> params,
         bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler);
 
-    const HanwhaResource* const m_resource;
+    QAuthenticator m_auth;
+    QUrl m_url;
     QMetaObject::Connection m_syncTymeConnection;
     network::aio::Timer m_timer;
     nx_http::AsyncClient m_httpClient;
-    uint64_t m_currentTimeZoneShiftSecs = 0;
+
+    std::list<utils::promise<void>*> m_startPromises;
+    TimeZoneShiftHandler m_timeZoneHandler;
+    std::chrono::seconds m_timeZoneShift{0};
 };
 
 } // namespace plugins
