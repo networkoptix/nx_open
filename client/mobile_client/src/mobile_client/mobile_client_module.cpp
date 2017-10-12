@@ -2,6 +2,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QDesktopServices>
+#include <QtQml/QQmlEngine>
 
 #include <api/app_server_connection.h>
 
@@ -43,6 +44,8 @@
 #include <core/ptz/client_ptz_controller_pool.h>
 
 using namespace nx::mobile_client;
+
+static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 QnMobileClientModule::QnMobileClientModule(
     const QnMobileClientStartupParameters& startupParameters,
@@ -130,6 +133,20 @@ QnMobileClientModule::QnMobileClientModule(
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
     commonModule->instance<QnServerInterfaceWatcher>();
+
+    auto qmlRoot = startupParameters.qmlRoot.isEmpty() ? kQmlRoot : startupParameters.qmlRoot;
+    if (!qmlRoot.endsWith(L'/'))
+        qmlRoot.append(L'/');
+    NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
+
+    m_clientCoreModule->mainQmlEngine()->setBaseUrl(
+        qmlRoot.startsWith(lit("qrc:"))
+            ? QUrl(qmlRoot)
+            : QUrl::fromLocalFile(qmlRoot));
+    m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
+
+    if (QnAppInfo::applicationPlatform() == lit("ios"))
+        m_clientCoreModule->mainQmlEngine()->addImportPath(lit("qt_qml"));
 }
 
 QnMobileClientModule::~QnMobileClientModule()
