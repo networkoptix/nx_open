@@ -24,10 +24,10 @@
             <p>We've sent you a letter with activation link to {{data.email}}.<br>
             Please activate your account by visiting this link.</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">Confirme su cuenta</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Correo electrónico</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -36,8 +36,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">El correo electrónico se requerido</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Introduzca una dirección de correo electrónico válida</span>
                 </div>
             </div>
             <div class="form-group">
@@ -52,15 +52,15 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Password reset instructions are sent to Email <br>{{data.email}}
+            Las instrucciones del reinicio de la contraseña son enviadas al correo electrónico <br>{{data.email}}
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>Reset Password</h1>
+        <h1>Restablecer contraseña</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">Email</label>
+                <label for="email"  class="col-sm-4 control-label">Correo electrónico</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -69,8 +69,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">El correo electrónico es requerido</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Introduzca una dirección de correo electrónico válida</span>
                 </div>
             </div>
             <div class="form-group">
@@ -84,12 +84,12 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Password successfully saved<br>
-            <a href="/login">Log In</a>
+            Contraseña guardado correctamente<br>
+            <a href="/login">Iniciar Sesión</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1>Set New Password</h1>
+            <h1>Establecer nueva contraseña</h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">

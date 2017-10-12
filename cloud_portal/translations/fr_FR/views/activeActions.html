@@ -23,10 +23,10 @@
             <p>We've sent you a letter with activation link to {{data.email}}.<br>
             Please activate your account by visiting this link.</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">Confirmer votre compte</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Courriel</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -35,8 +35,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Courriel requis</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">S.V.P entrer un courriel valide</span>
                 </div>
             </div>
             <div class="form-group">
@@ -51,15 +51,15 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Password reset instructions are sent to Email <br>{{data.email}}
+            Instructions de réinitialisation de mot de passe envoyé au courriel<br>{{data.email}}
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>Reset Password</h1>
+        <h1>Réinitialiser mot de passe</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">Email</label>
+                <label for="email"  class="col-sm-4 control-label">Courriel</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -68,8 +68,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Courriel requis</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">S.V.P entrer un courriel valide</span>
                 </div>
             </div>
             <div class="form-group">
@@ -83,12 +83,11 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Password successfully saved<br>
-            <a href="/login">Log In</a>
+            Mot de passe enregistré avec succès<br>             <a href="/login">Connecter</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1>Set New Password</h1>
+            <h1>Définir nouveau mot de passe</h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">

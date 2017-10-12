@@ -24,10 +24,10 @@
             <p>We've sent you a letter with activation link to {{data.email}}.<br>
             Please activate your account by visiting this link.</p>
         </div>
-        <h1 ng-if="!data.email">Confirm your account</h1>
+        <h1 ng-if="!data.email">确认您的帐户</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">邮箱</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -36,8 +36,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">电子邮件是需要</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">请输入一个有效的电子邮件</span>
                 </div>
             </div>
             <div class="form-group">
@@ -52,15 +52,15 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Password reset instructions are sent to Email <br>{{data.email}}
+            密码重置命令发送电子邮件 <br>{{data.email}}
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>Reset Password</h1>
+        <h1>重置密码</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">Email</label>
+                <label for="email"  class="col-sm-4 control-label">邮箱</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -69,8 +69,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">电子邮件是需要</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">请输入一个有效的电子邮件</span>
                 </div>
             </div>
             <div class="form-group">
@@ -84,12 +84,12 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Password successfully saved<br>
-            <a href="/login">Log In</a>
+            成功保存密码<br>
+            <a href="/login">登入</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1>Set New Password</h1>
+            <h1>设置新密码</h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">
