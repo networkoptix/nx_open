@@ -21,7 +21,7 @@ public:
     void forEachEntry(EntryFunc func) const;
     void addEntry(const QString& remoteAddress,
         const QString& localAddress,
-        const QByteArray &responseData);
+        const QByteArray& responseData);
     void clearIfRead();
 
 private:
