@@ -57,33 +57,40 @@ QnResourceList QnActiResourceSearcher::findResources(void)
     QnResourceList result;
     QList<QByteArray> processedUuid;
 
-    auto data = QnMdnsListener::instance()->getData((std::uintptr_t) this);
-    for (int i = 0; i < data.size(); ++i)
-    {
-        if (shouldStop())
-            break;
-
-        QString remoteAddress = data[i].remoteAddress;
-        QByteArray uuidStr("ACTI");
-        uuidStr += data[i].remoteAddress.toUtf8();
-        QByteArray response = data[i].response;
-        if (response.contains("_http") && response.contains("_tcp") && response.contains("local"))
+    auto consumerData = QnMdnsListener::instance()->getData((std::uintptr_t) this);
+    consumerData->forEachEntry(
+        [this, &result, &processedUuid](
+            const QString& remoteAddress,
+            const QString& localAddress,
+            const QByteArray& responseData)
         {
-            if (processedUuid.contains(uuidStr))
-                continue;
-            if (response.contains("AXIS"))
-                continue;
+            if (shouldStop())
+                return;
 
-            auto response = getDeviceXmlAsync(
+            QByteArray uuidStr("ACTI");
+            uuidStr += remoteAddress.toUtf8();
+
+            if (!responseData.contains("_http")
+                || !responseData.contains("_tcp")
+                || !responseData.contains("local"))
+            {
+                return;
+            }
+
+            if (processedUuid.contains(uuidStr))
+                return;
+            if (responseData.contains("AXIS"))
+                return;
+
+            auto xmlResponse = getDeviceXmlAsync(
                 lit("http://%1:%2/%3")
                     .arg(remoteAddress)
                     .arg(kActiDeviceXmlPort)
                     .arg(kActiDeviceXmlPath));
 
-            processDeviceXml(response, remoteAddress, remoteAddress, result);
+            processDeviceXml(xmlResponse, localAddress, remoteAddress, result);
             processedUuid << uuidStr;
-        }
-    }
+        });
 
     return result;
 }
@@ -119,7 +126,6 @@ QByteArray QnActiResourceSearcher::getDeviceXmlAsync(const QUrl& url)
     {
         if (!m_httpInProgress.contains(url.host()))
         {
-            auto urlStr = url.toString();
             auto request = nx_http::AsyncHttpClient::create();
 
             connect(

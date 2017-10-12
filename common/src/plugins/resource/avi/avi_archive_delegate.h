@@ -105,6 +105,7 @@ private:
     bool m_fastStreamFind = false;
     bool m_hasVideo = true;
     qint64 m_lastSeekTime = AV_NOPTS_VALUE;
+    qint64 m_firstDts = 0; //< DTS of the very first video packet
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;
