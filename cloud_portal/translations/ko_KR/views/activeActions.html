@@ -9,18 +9,17 @@
             <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
         </h1>
     </div>
-
-    <div ng-if="reactivatingSuccess">
-        <h1 class="process-success">
-            확인 메시지가 이메일<br>{{data.email}}로 전송 됨
-        </h1>
-    </div>
     
-    <div ng-if="reactivating">
-        <h1>계정을 확인 하십시요</h1>
+    <div ng-if="reactivating" class="text-center">
+        <div ng-if='data.email'>
+            <h1>You have registered in Nx Cloud</h1>
+            <p>We've sent you a letter with activation link to {{data.email}}.<br>
+            Please activate your account by visiting this link.</p>
+        </div>
+        <h1 ng-if="!data.email">Confirm your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
-            <div class="form-group" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">이메일</label>
+            <div class="form-group" ng-if="!data.email" validate-field>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -29,11 +28,12 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> 이메일이 필요합니다. </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> 유효한 이메일을 입력하십시오. </span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="col-sm-offset-2 col-sm-8">
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="$root.L.activeActions.sendConfirm"></process-button>
@@ -44,15 +44,15 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            패스워드 재설정 지침이 이메일 <br>{{data.email}} 로 전송 되었읍니다.
+            Password reset instructions are sent to Email <br>{{data.email}}
         </h1>
     </div>
 
     <div ng-if="restoring">
-        <h1>패스워드 재설정</h1>
+        <h1>Reset Password</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">이메일</label>
+                <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -61,7 +61,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> 이메일이 필요합니다. </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> 유효한 이메일을 입력하십시오. </span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
                 </div>
             </div>
             <div class="form-group">
@@ -75,11 +76,12 @@
     </div>
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            패스워드가 성공적으로 저장 됨 <br> <a href="/login"> 로그인 </a>
+            Password successfully saved<br>
+            <a href="/login">Log In</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1>새 패스워드 설정</h1>
+            <h1>Set New Password</h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">
