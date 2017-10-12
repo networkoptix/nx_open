@@ -1,11 +1,24 @@
 #include "vms_gateway.h"
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/rest/http_rest_client.h>
+#include <nx/utils/log/log.h>
 
 #include "../settings.h"
 
 namespace nx {
 namespace cdb {
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, VmsResultCode,
+    (nx::cdb::VmsResultCode::ok, "ok")
+    (nx::cdb::VmsResultCode::invalidData, "invalidData")
+    (nx::cdb::VmsResultCode::networkError, "networkError")
+    (nx::cdb::VmsResultCode::forbidden, "forbidden")
+    (nx::cdb::VmsResultCode::logicalError, "logicalError")
+    (nx::cdb::VmsResultCode::unreachable, "unreachable")
+)
+
+//-------------------------------------------------------------------------------------------------
 
 VmsGateway::VmsGateway(const conf::Settings& settings):
     m_settings(settings)
@@ -30,40 +43,63 @@ void VmsGateway::merge(
     const std::string& targetSystemId,
     VmsRequestCompletionHandler completionHandler)
 {
+    using namespace std::placeholders;
+
     const auto urlBase = m_settings.vmsGateway().url;
     if (urlBase.empty())
-    {
-        m_asyncCall.post(
-            [completionHandler = std::move(completionHandler)]()
-            {
-                VmsRequestResult vmsRequestResult;
-                vmsRequestResult.resultCode = VmsResultCode::invalidData;
-                completionHandler(std::move(vmsRequestResult));
-            });
-        return;
-    }
+        return reportInvalidConfiguration(targetSystemId, std::move(completionHandler));
 
-    const auto requestUrl =
+    const auto baseRequestUrl =
         nx_http::rest::substituteParameters(urlBase, { targetSystemId });
 
-    // TODO: #ak Add request parameters.
-    // TODO: #ak Add authentication.
+    NX_VERBOSE(this, lm("Issuing merge request to %1. Url %2")
+        .args(targetSystemId, baseRequestUrl));
 
     RequestContext requestContext;
-    requestContext.client = std::make_unique<nx_http::AsyncClient>();
+    requestContext.client = std::make_unique<MediaServerClient>(QUrl(baseRequestUrl.c_str()));
     requestContext.completionHandler = std::move(completionHandler);
+    requestContext.targetSystemId = targetSystemId;
     auto clientPtr = requestContext.client.get();
+
+    // TODO: #ak Adding authentication.
 
     QnMutexLocker lock(&m_mutex);
     m_activeRequests.emplace(clientPtr, std::move(requestContext));
-    clientPtr->doGet(
-        QUrl(requestUrl.c_str()),
-        std::bind(&VmsGateway::reportRequestResult, this, clientPtr));
+    MergeSystemData mergeRequest = prepareMergeRequestParameters();
+    clientPtr->mergeSystems(
+        mergeRequest,
+        std::bind(&VmsGateway::reportRequestResult, this, clientPtr, _1));
 }
 
-void VmsGateway::reportRequestResult(nx_http::AsyncClient* clientPtr)
+void VmsGateway::reportInvalidConfiguration(
+    const std::string& targetSystemId,
+    VmsRequestCompletionHandler completionHandler)
+{
+    NX_VERBOSE(this, lm("Cannot issue merge request to %1. No url").args(targetSystemId));
+
+    m_asyncCall.post(
+        [completionHandler = std::move(completionHandler)]()
+        {
+            VmsRequestResult vmsRequestResult;
+            vmsRequestResult.resultCode = VmsResultCode::invalidData;
+            completionHandler(std::move(vmsRequestResult));
+        });
+}
+
+MergeSystemData VmsGateway::prepareMergeRequestParameters()
+{
+    // TODO
+    //mergeRequest.url = ;
+    //mergeRequest.takeRemoteSettings = true;
+    return MergeSystemData();
+}
+
+void VmsGateway::reportRequestResult(
+    MediaServerClient* clientPtr,
+    QnJsonRestResult result)
 {
     VmsRequestCompletionHandler completionHandler;
+    std::string targetSystemId;
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -71,9 +107,20 @@ void VmsGateway::reportRequestResult(nx_http::AsyncClient* clientPtr)
         if (it == m_activeRequests.end())
             return;
         completionHandler = std::move(it->second.completionHandler);
+        targetSystemId = it->second.targetSystemId;
     }
 
-    completionHandler(prepareVmsResult(clientPtr));
+    if (result.error == QnRestResult::Error::NoError)
+    {
+        NX_VERBOSE(this, lm("Merge request to %1 succeeded").args(targetSystemId));
+    }
+    else
+    {
+        NX_DEBUG(this, lm("Merge request to %1 failed with result code %2")
+            .args(targetSystemId, QnLexical::serialized(result.error)));
+    }
+
+    completionHandler(prepareVmsResult(clientPtr, result));
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -84,21 +131,49 @@ void VmsGateway::reportRequestResult(nx_http::AsyncClient* clientPtr)
     }
 }
 
-VmsRequestResult VmsGateway::prepareVmsResult(nx_http::AsyncClient* clientPtr)
+VmsRequestResult VmsGateway::prepareVmsResult(
+    MediaServerClient* clientPtr,
+    const QnJsonRestResult& vmsResult)
 {
     VmsRequestResult result;
     result.resultCode = VmsResultCode::ok;
+    result.vmsErrorDescription = vmsResult.errorString.toStdString();
 
-    if (!clientPtr->response())
-    {
-        result.resultCode = VmsResultCode::networkError;
-        return result;
-    }
+    if (vmsResult.error != QnRestResult::Error::NoError)
+        result = convertVmsResultToResultCode(clientPtr, vmsResult);
 
-    if (!nx_http::StatusCode::isSuccessCode(clientPtr->response()->statusLine.statusCode))
+    return result;
+}
+
+VmsRequestResult VmsGateway::convertVmsResultToResultCode(
+    MediaServerClient* clientPtr,
+    const QnJsonRestResult& vmsResult)
+{
+    VmsRequestResult result;
+    result.resultCode = VmsResultCode::networkError;
+
+    if (vmsResult.error == QnRestResult::Error::CantProcessRequest)
     {
-        result.resultCode = VmsResultCode::logicalError;
-        return result;
+        switch (clientPtr->prevResponseHttpStatusCode())
+        {
+            case nx_http::StatusCode::serviceUnavailable:
+            case nx_http::StatusCode::notFound:
+                result.resultCode = VmsResultCode::unreachable;
+                break;
+
+            case nx_http::StatusCode::badRequest:
+                result.resultCode = VmsResultCode::invalidData;
+                break;
+
+            case nx_http::StatusCode::unauthorized:
+            case nx_http::StatusCode::forbidden:
+                result.resultCode = VmsResultCode::forbidden;
+                break;
+
+            default:
+                result.resultCode = VmsResultCode::networkError;
+                break;
+        }
     }
 
     return result;

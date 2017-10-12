@@ -1,9 +1,9 @@
 #pragma once
 
+#include <api/model/configure_system_data.h>
 #include <rest/server/json_rest_handler.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/merge_systems_common.h>
-#include <media_server/serverutil.h>
 
 struct MergeSystemData;
 

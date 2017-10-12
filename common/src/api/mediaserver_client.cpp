@@ -1,13 +1,21 @@
 #include "mediaserver_client.h"
 
 #include <nx/network/http/fusion_data_http_client.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/type_utils.h>
 
-#include <nx/utils/sync_call.h>
-
-MediaServerClient::MediaServerClient(const SocketAddress& mediaServerEndpoint):
-    m_mediaServerEndpoint(mediaServerEndpoint)
+MediaServerClient::MediaServerClient(const QUrl& baseRequestUrl):
+    m_baseRequestUrl(baseRequestUrl)
 {
+}
+
+void MediaServerClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+    for (auto& val: m_activeClients)
+        val.first->bindToAioThread(aioThread);
 }
 
 void MediaServerClient::setUserName(const QString& userName)
@@ -116,6 +124,24 @@ QnJsonRestResult MediaServerClient::detachFromCloud(const DetachFromCloudData& r
         request);
 }
 
+void MediaServerClient::mergeSystems(
+    const MergeSystemData& request,
+    std::function<void(QnJsonRestResult)> completionHandler)
+{
+    performApiRequest("api/mergeSystems", request, std::move(completionHandler));
+}
+
+QnJsonRestResult MediaServerClient::mergeSystems(const MergeSystemData& request)
+{
+    using AsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const MergeSystemData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        static_cast<AsyncFuncPointer>(&MediaServerClient::mergeSystems),
+        request);
+}
+
 //-------------------------------------------------------------------------------------------------
 // /ec2/ requests
 
@@ -213,9 +239,20 @@ ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
             std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
 
     return syncCallWrapper(
-        static_cast<Ec2GetResourceParamsAsyncFuncPointer>(&MediaServerClient::ec2GetResourceParams),
+        static_cast<Ec2GetResourceParamsAsyncFuncPointer>(
+            &MediaServerClient::ec2GetResourceParams),
         resourceId,
         result);
+}
+
+nx_http::StatusCode::Value MediaServerClient::prevResponseHttpStatusCode() const
+{
+    return m_prevResponseHttpStatusCode;
+}
+
+void MediaServerClient::stopWhileInAioThread()
+{
+    m_activeClients.clear();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -233,31 +270,14 @@ void MediaServerClient::performGetRequest(
     using ActualOutputType =
         typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
-    //TODO #ak save client to container and remove in destructor
-
-    QUrl url(lm("http://%1/%2").arg(m_mediaServerEndpoint.toString()).arg(requestPath));
-    url.setUserName(m_userName);
-    url.setPassword(m_password);
-    nx_http::AuthInfo authInfo;
-    authInfo.username = m_userName;
-    authInfo.password = m_password;
-    auto fusionClient = std::make_shared<nx_http::FusionDataHttpClient<Input, ActualOutputType>>(
-        url, std::move(authInfo), inputData);
-    auto fusionClientPtr = fusionClient.get();
-    fusionClientPtr->execute(
-        [fusionClient = std::move(fusionClient),
-            completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode errorCode,
-                const nx_http::Response* response,
-                Output... outData)
+    performGetRequest(
+        [&inputData](const QUrl& url, nx_http::AuthInfo authInfo)
         {
-            return completionHandler(
-                errorCode,
-                response
-                    ? (nx_http::StatusCode::Value)response->statusLine.statusCode
-                    : nx_http::StatusCode::undefined,
-                std::move(outData)...);
-        });
+            return std::make_unique<nx_http::FusionDataHttpClient<Input, ActualOutputType>>(
+                url, std::move(authInfo), inputData);
+        },
+        requestPath,
+        std::move(completionHandler));
 }
 
 template<typename ... Output>
@@ -268,33 +288,70 @@ void MediaServerClient::performGetRequest(
         nx_http::StatusCode::Value statusCode,
         Output...)> completionHandler)
 {
-    // TODO: #ak think about a way to combine this method with the previous one
-
     using ActualOutputType =
         typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
-    QUrl url(lm("http://%1/%2").arg(m_mediaServerEndpoint.toString()).arg(requestPath));
-    url.setUserName(m_userName);
-    url.setPassword(m_password);
+    performGetRequest(
+        [](const QUrl& url, nx_http::AuthInfo authInfo)
+        {
+            return std::make_unique<nx_http::FusionDataHttpClient<void, ActualOutputType>>(
+                url, std::move(authInfo));
+        },
+        requestPath,
+        std::move(completionHandler));
+}
+
+template<typename CreateHttpClientFunc, typename ... Output>
+void MediaServerClient::performGetRequest(
+    CreateHttpClientFunc createHttpClientFunc,
+    const std::string& requestPath,
+    std::function<void(
+        SystemError::ErrorCode,
+        nx_http::StatusCode::Value statusCode,
+        Output...)> completionHandler)
+{
+    using ActualOutputType =
+        typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
+
+    QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+        .appendPath(QString::fromStdString(requestPath)).toUrl();
+    requestUrl.setUserName(m_userName);
+    requestUrl.setPassword(m_password);
     nx_http::AuthInfo authInfo;
     authInfo.username = m_userName;
     authInfo.password = m_password;
-    auto fusionClient = std::make_shared<nx_http::FusionDataHttpClient<void, ActualOutputType>>(
-        url, std::move(authInfo));
-    auto fusionClientPtr = fusionClient.get();
-    fusionClientPtr->execute(
-        [fusionClient = std::move(fusionClient),
-            completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode errorCode,
-                const nx_http::Response* response,
-                Output... outData)
+
+    auto fusionClient = createHttpClientFunc(requestUrl, std::move(authInfo));
+
+    post(
+        [this,
+            fusionClient = std::move(fusionClient),
+            completionHandler = std::move(completionHandler)]() mutable
         {
-            return completionHandler(
-                errorCode,
-                response
-                    ? (nx_http::StatusCode::Value)response->statusLine.statusCode
-                    : nx_http::StatusCode::undefined,
-                std::move(outData)...);
+            fusionClient->bindToAioThread(getAioThread());
+            auto fusionClientPtr = fusionClient.get();
+            m_activeClients.emplace(fusionClientPtr, std::move(fusionClient));
+            fusionClientPtr->execute(
+                [this, fusionClientPtr, completionHandler = std::move(completionHandler)](
+                    SystemError::ErrorCode errorCode,
+                    const nx_http::Response* response,
+                    Output... outData)
+                {
+                    auto clientIter = m_activeClients.find(fusionClientPtr);
+                    NX_ASSERT(clientIter != m_activeClients.end());
+                    auto client = std::move(clientIter->second);
+                    m_activeClients.erase(clientIter);
+
+                    m_prevResponseHttpStatusCode = 
+                        response
+                        ? (nx_http::StatusCode::Value)response->statusLine.statusCode
+                        : nx_http::StatusCode::undefined;
+
+                    return completionHandler(
+                        errorCode,
+                        m_prevResponseHttpStatusCode,
+                        std::move(outData)...);
+                });
         });
 }
 

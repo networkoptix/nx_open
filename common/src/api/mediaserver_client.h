@@ -1,27 +1,38 @@
 #pragma once
 
+#include <map>
+
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/mutex.h>
 
-#include <api/model/cloud_credentials_data.h>
-#include <api/model/detach_from_cloud_data.h>
-#include <api/model/setup_local_system_data.h>
-#include <api/model/setup_cloud_system_data.h>
-#include <api/model/system_settings_reply.h>
 #include <network/module_information.h>
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_result.h>
 
-class MediaServerClient
+#include "model/cloud_credentials_data.h"
+#include "model/detach_from_cloud_data.h"
+#include "model/merge_system_data.h"
+#include "model/setup_local_system_data.h"
+#include "model/setup_cloud_system_data.h"
+#include "model/system_settings_reply.h"
+
+class MediaServerClient:
+    public nx::network::aio::BasicPollable
 {
+    using base_type = nx::network::aio::BasicPollable;
+
 public:
-    MediaServerClient(const SocketAddress& mediaServerEndpoint);
+    MediaServerClient(const QUrl& baseRequestUrl);
     
     MediaServerClient(const MediaServerClient&) = delete;
     MediaServerClient& operator=(const MediaServerClient&) = delete;
     MediaServerClient(MediaServerClient&&) = default;
     MediaServerClient& operator=(MediaServerClient&&) = default;
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
     void setUserName(const QString& userName);
     void setPassword(const QString& password);
@@ -53,6 +64,11 @@ public:
         std::function<void(QnJsonRestResult)> completionHandler);
     QnJsonRestResult detachFromCloud(const DetachFromCloudData& request);
 
+    void mergeSystems(
+        const MergeSystemData& request,
+        std::function<void(QnJsonRestResult)> completionHandler);
+    QnJsonRestResult mergeSystems(const MergeSystemData& request);
+
     //---------------------------------------------------------------------------------------------
     // /ec2/ requests
 
@@ -81,10 +97,25 @@ public:
         const QnUuid& resourceId,
         ec2::ApiResourceParamDataList* result);
 
+    /**
+     * NOTE: Can only be called within request completion handler. 
+     *   Otherwise, result is not defined.
+     */
+    nx_http::StatusCode::Value prevResponseHttpStatusCode() const;
+
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
-    SocketAddress m_mediaServerEndpoint;
+    const QUrl m_baseRequestUrl;
     QString m_userName;
     QString m_password;
+    // TODO: #ak Replace with std::set in c++17.
+    std::map<
+        nx::network::aio::BasicPollable*,
+        std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
+    nx_http::StatusCode::Value m_prevResponseHttpStatusCode = 
+        nx_http::StatusCode::undefined;
 
     template<typename Input, typename ... Output>
     void performGetRequest(
@@ -97,6 +128,15 @@ private:
 
     template<typename ... Output>
     void performGetRequest(
+        const std::string& requestPath,
+        std::function<void(
+            SystemError::ErrorCode,
+            nx_http::StatusCode::Value statusCode,
+            Output...)> completionHandler);
+
+    template<typename CreateHttpClientFunc, typename ... Output>
+    void performGetRequest(
+        CreateHttpClientFunc createHttpClientFunc,
         const std::string& requestPath,
         std::function<void(
             SystemError::ErrorCode,

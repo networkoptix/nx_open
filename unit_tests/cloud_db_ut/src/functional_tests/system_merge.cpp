@@ -4,9 +4,12 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/test_http_server.h>
 
 #include <nx/cloud/cdb/managers/system_health_info_provider.h>
+
+#include <rest/server/json_rest_result.h>
 
 #include "test_setup.h"
 
@@ -73,7 +76,7 @@ protected:
         base_type::SetUp();
 
         m_vmsGatewayEmulator.registerRequestProcessorFunc(
-            "/gateway/{systemId}/",
+            "/gateway/{systemId}/api/mergeSystems",
             std::bind(&SystemMerge::vmsApiRequestStub, this, _1, _2, _3, _4, _5));
         ASSERT_TRUE(m_vmsGatewayEmulator.bindAndListen());
 
@@ -189,7 +192,16 @@ private:
         nx_http::RequestProcessedHandler completionHandler)
     {
         m_vmsApiRequests.push(std::move(request));
-        completionHandler(nx_http::StatusCode::ok);
+        
+        QnJsonRestResult response;
+        response.error = QnRestResult::Error::NoError;
+
+        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+        requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
+            "application/json",
+            QJson::serialized(response));
+
+        completionHandler(std::move(requestResult));
     }
 };
 

@@ -3,10 +3,13 @@
 #include <map>
 #include <string>
 
-#include <nx/network/http/http_async_client.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
+
+#include <api/mediaserver_client.h>
 
 namespace nx {
 namespace cdb {
@@ -20,7 +23,11 @@ enum class VmsResultCode
     networkError,
     forbidden,
     logicalError,
+    unreachable,
 };
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(VmsResultCode)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((VmsResultCode), (lexical))
 
 struct VmsRequestResult
 {
@@ -54,17 +61,33 @@ public:
 private:
     struct RequestContext
     {
-        std::unique_ptr<nx_http::AsyncClient> client;
+        std::unique_ptr<MediaServerClient> client;
+        std::string targetSystemId;
         VmsRequestCompletionHandler completionHandler;
     };
 
     const conf::Settings& m_settings;
     nx::network::aio::BasicPollable m_asyncCall;
     QnMutex m_mutex;
-    std::map<nx_http::AsyncClient*, RequestContext> m_activeRequests;
+    std::map<MediaServerClient*, RequestContext> m_activeRequests;
 
-    void reportRequestResult(nx_http::AsyncClient* clientPtr);
-    VmsRequestResult prepareVmsResult(nx_http::AsyncClient* clientPtr);
+    void reportInvalidConfiguration(
+        const std::string& targetSystemId,
+        VmsRequestCompletionHandler completionHandler);
+
+    MergeSystemData prepareMergeRequestParameters();
+
+    void reportRequestResult(
+        MediaServerClient* clientPtr,
+        QnJsonRestResult result);
+
+    VmsRequestResult prepareVmsResult(
+        MediaServerClient* clientPtr,
+        const QnJsonRestResult& result);
+
+    VmsRequestResult convertVmsResultToResultCode(
+        MediaServerClient* clientPtr,
+        const QnJsonRestResult& vmsResult);
 };
 
 } // namespace cdb

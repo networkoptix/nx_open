@@ -4,46 +4,28 @@
 
 #include <QtCore/QRegExp>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/media_server_resource.h"
-
-#include "nx_ec/ec_api.h"
-#include "nx_ec/dummy_handler.h"
-#include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
-#include "nx_ec/ec2_lib.h"
-#include <nx_ec/managers/abstract_user_manager.h>
-
-#include "api/app_server_connection.h"
-#include "common/common_module.h"
-#include "media_server/settings.h"
-#include "media_server/serverutil.h"
-#include "media_server/server_connector.h"
-#include "network/tcp_connection_priv.h"
-#include "nx/vms/discovery/manager.h"
-#include <network/connection_validator.h>
-
-#include "utils/common/app_info.h"
-#include "nx/fusion/model_functions.h"
-#include <nx/utils/log/log.h>
-#include "api/model/ping_reply.h"
-#include "audit/audit_manager.h"
-#include "rest/server/rest_connection_processor.h"
 #include <nx/network/http/custom_headers.h>
-
-#include <rest/helpers/permissions_helper.h>
-#include <network/authenticate_helper.h>
-#include <api/resource_property_adaptor.h>
-#include <api/global_settings.h>
 #include <nx/network/http/http_client.h>
-#include "system_settings_handler.h"
-#include <rest/server/json_rest_result.h>
-#include <api/model/system_settings_reply.h>
-#include "api/model/password_data.h"
+#include <nx/utils/log/log.h>
+
+#include <api/global_settings.h>
+#include <api/model/merge_system_data.h>
+#include <api/model/ping_reply.h>
+#include <api/resource_property_adaptor.h>
+#include <audit/audit_manager.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <network/connection_validator.h>
+#include <nx_ec/dummy_handler.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx/vms/discovery/manager.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
-#include <core/resource_management/resource_properties.h>
+
+//#include "media_server/serverutil.h"
+#include "media_server/server_connector.h"
 
 namespace {
 
@@ -77,37 +59,6 @@ namespace {
     }
 
 } // namespace
-
-struct MergeSystemData
-{
-    MergeSystemData():
-        takeRemoteSettings(false),
-        mergeOneServer(false),
-        ignoreIncompatible(false)
-    {
-    }
-
-    MergeSystemData(const QnRequestParams& params):
-        url(params.value(lit("url"))),
-        getKey(params.value(lit("getKey"))),
-        postKey(params.value(lit("postKey"))),
-        takeRemoteSettings(params.value(lit("takeRemoteSettings"), lit("false")) != lit("false")),
-        mergeOneServer(params.value(lit("oneServer"), lit("false")) != lit("false")),
-        ignoreIncompatible(params.value(lit("ignoreIncompatible"), lit("false")) != lit("false"))
-    {
-    }
-
-    QString url;
-    QString getKey;
-    QString postKey;
-    bool takeRemoteSettings;
-    bool mergeOneServer;
-    bool ignoreIncompatible;
-};
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    MergeSystemData, (json),
-    (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible))
 
 QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::AbstractTransactionMessageBus* messageBus):
     QnJsonRestHandler(),

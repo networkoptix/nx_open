@@ -1,10 +1,11 @@
 #pragma once
 
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
-#include <test_support/mediaserver_launcher.h>
-
-#include "mediaserver_client.h"
 #include <gtest/gtest.h>
+
+#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+
+#include <api/mediaserver_client.h>
+#include <test_support/mediaserver_launcher.h>
 
 struct TestParams
 {
