@@ -1,4 +1,5 @@
 import QtQuick 2.6;
+import Nx 1.0;
 
 import ".."
 
@@ -152,7 +153,7 @@ Column
 
         NxDotPreloader
         {
-            color: Style.colors.brightText;
+            color: ColorTheme.brightText;
             visible: control.isConnecting;
 
             anchors.centerIn: parent;

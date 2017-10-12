@@ -10,7 +10,7 @@ Rectangle
 {
     id: control;
 
-    color: Style.colors.window;
+    color: ColorTheme.window;
 
     readonly property bool active: Window.visibility !== Window.Hidden
 
@@ -18,7 +18,7 @@ Rectangle
     {
         width: parent.width;
         height: 2;
-        color: Style.colors.custom.titleBar.shadow;
+        color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.15);
     }
 
     Item
@@ -361,7 +361,7 @@ Rectangle
             {
                 anchors.centerIn: parent;
                 font: Style.fonts.notFoundMessages.caption;
-                color: Style.colors.windowText;
+                color: ColorTheme.windowText;
 
                 text: qsTr("Nothing found");
             }
@@ -411,7 +411,7 @@ Rectangle
         {
             id: preloaderLabel;
             text: qsTr("Loading...");
-            color: Style.colors.mid;
+            color: ColorTheme.mid;
             font: Style.fonts.preloader;
             anchors.horizontalCenter: parent.horizontalCenter;
             anchors.horizontalCenterOffset: 4;
@@ -450,8 +450,7 @@ Rectangle
         opacity: (visible ? 1.0 : 0.0);
 
         radius: 2;
-        color: Style.colorWithAlpha(
-            Style.darkerColor(Style.colors.brand, 2), 0.8);
+        color: ColorTheme.transparent(ColorTheme.colors.brand_d2, 0.8);
         width: messageLabel.implicitWidth;
         height: messageLabel.implicitHeight;
 
@@ -470,7 +469,7 @@ Rectangle
             id: messageLabel;
             anchors.centerIn: parent;
             font: Style.fonts.screenRecording;
-            standardColor: Style.colors.brandContrast;
+            standardColor: ColorTheme.colors.brand_contrast;
             leftPadding: 24;
             rightPadding: leftPadding;
             topPadding: 10;
@@ -486,7 +485,7 @@ Rectangle
         anchors.bottomMargin: 8
 
         text: AppInfo.applicationVersion()
-        standardColor: Style.darkerColor(Style.colors.windowText, 1)
+        standardColor: ColorTheme.darker(ColorTheme.windowText, 1)
 
         font: Qt.font({ pixelSize: 11, weight: Font.Normal})
     }

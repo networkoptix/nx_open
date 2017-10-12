@@ -1,36 +1,35 @@
-import QtQuick 2.6;
-import Nx.WelcomeScreen 1.0;
+import QtQuick 2.6
+import Nx 1.0
 
 Item
 {
-    id: control;
+    id: control
 
-    property alias textControl: captionControl;
-    property alias background: backgroundControl;
-    property int horizontalPadding: 12;
+    property alias textControl: captionControl
+    property alias background: backgroundControl
+    property int horizontalPadding: 12
 
-    implicitHeight: 32;
-    implicitWidth: captionControl.implicitWidth + horizontalPadding * 2;
+    implicitHeight: 32
+    implicitWidth: captionControl.implicitWidth + horizontalPadding * 2
 
     Rectangle
     {
-        id: backgroundControl;
+        id: backgroundControl
 
-        radius: 2;
-        anchors.fill: parent;
-        color: Style.custom.banner.warning.backgroundColor;
-        opacity: Style.custom.banner.warning.backgroundOpacity;
+        radius: 2
+        anchors.fill: parent
+        color: ColorTheme.transparent(ColorTheme.colors.red_main, 0.2)
     }
 
     NxLabel
     {
-        id: captionControl;
+        id: captionControl
 
-        color: Style.custom.banner.warning.textColor;
-        width: control.width - control.horizontalPadding;
-        anchors.left: parent.left;
-        anchors.leftMargin: control.horizontalPadding;
-        anchors.verticalCenter: parent.verticalCenter;
+        color: "#cf8989"
+        width: control.width - control.horizontalPadding
+        anchors.left: parent.left
+        anchors.leftMargin: control.horizontalPadding
+        anchors.verticalCenter: parent.verticalCenter
     }
 
 }

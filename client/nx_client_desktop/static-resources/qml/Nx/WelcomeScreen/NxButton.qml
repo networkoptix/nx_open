@@ -1,5 +1,6 @@
 import QtQuick 2.6;
 import Qt.labs.controls 1.0;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 Button
@@ -10,17 +11,19 @@ Button
 
     property bool isHovered: hoverArea.containsMouse;
     property bool isAccentButton: false;
-    property color bkgColor: (isAccentButton? Style.colors.brand : Style.colors.button);
+    property color backgroundColor:
+        isAccentButton ? ColorTheme.colors.brand_core : ColorTheme.button;
 
-    property color hoveredColor: Style.lighterColor(bkgColor);
-    property color pressedColor: (isAccentButton
-      ? Style.darkerColor(hoveredColor) : control.bkgColor);
+    property color hoveredColor: ColorTheme.lighter(backgroundColor, 1)
+    property color pressedColor:
+        isAccentButton ? ColorTheme.darker(hoveredColor, 1) : backgroundColor;
 
     property string iconUrl;
     property string hoveredIconUrl;
     property string pressedIconUrl;
 
     property bool showBackground: true;
+    property bool flat: false;
 
     height: 28;
 
@@ -77,43 +80,43 @@ Button
             anchors.fill: parent;
 
             color: (control.isHovered && !control.pressed ? control.hoveredColor
-                : (control.pressed ? control.pressedColor : control.bkgColor));
+                : (control.pressed ? control.pressedColor : control.backgroundColor));
 
             radius: 2;
 
-            border.color: (control.isAccentButton
-                ? Style.lighterColor(Style.colors.brand, 2) // TODO: add L4 colro - now it is only 2
-                : Style.darkerColor(Style.colors.brand, 4));
-            border.width: (control.activeFocus ? 1 : 0);
+            border.color: control.isAccentButton
+                ? ColorTheme.colors.brand_l4
+                : ColorTheme.colors.brand_d4;
+            border.width: control.activeFocus ? 1 : 0;
 
             Rectangle
             {
                 id: borderTop;
 
-                visible: control.pressed;
+                visible: !control.flat && control.pressed;
                 x: 1;
                 height:1;
                 width: parent.width - 2 * x;
                 anchors.top: parent.top;
                 anchors.topMargin: (control.activeFocus ? 1 : 0);
-                color: (control.isAccentButton
-                    ? Style.darkerColor(Style.colors.brand, 3)
-                    : Style.darkerColor(Style.colors.button, 2));
+                color: control.isAccentButton
+                    ? ColorTheme.colors.brand_d3
+                    : ColorTheme.darker(ColorTheme.button, 2);
             }
 
             Rectangle
             {
                 id: borderBottom;
 
-                visible: !control.pressed;
+                visible: !control.flat && !control.pressed;
                 x: 1;
                 height:1;
                 width: parent.width - 2 * x;
                 anchors.bottom: parent.bottom;
                 anchors.bottomMargin: (control.activeFocus ? 1 : 0);
-                color: (control.isAccentButton
-                    ? Style.darkerColor(Style.colors.brand, 3)
-                    : Style.darkerColor(Style.colors.button, control.isHovered ? 1 : 2));
+                color: control.isAccentButton
+                    ? ColorTheme.colors.brand_d3
+                    : ColorTheme.darker(ColorTheme.button, control.isHovered ? 1 : 2);
             }
         }
     }
@@ -127,8 +130,6 @@ Button
 
         text: control.text;
         font: Qt.font({ pixelSize: 13, weight: Font.Medium });
-        color: (control.isAccentButton
-            ? Style.colors.brandContrast
-            : Style.colors.buttonText);
+        color: control.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText;
     }
 }

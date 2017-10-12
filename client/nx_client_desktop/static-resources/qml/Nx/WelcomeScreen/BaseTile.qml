@@ -3,6 +3,7 @@ import QtQuick.Controls 1.2;
 import QtGraphicalEffects 1.0;
 import Qt.labs.controls 1.0;
 import com.networkoptix.qml 1.0;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 Item
@@ -259,7 +260,7 @@ Item
             visible: control.isExpanded;
             radius: Style.custom.systemTile.shadowRadius;
             samples: Style.custom.systemTile.shadowSamples;
-            color: Style.colors.shadow;
+            color: ColorTheme.shadow;
             source: tileArea;
         }
 
@@ -306,7 +307,7 @@ Item
             enabled: control.enabled;
 
             clip: true;
-            color: Style.colors.custom.systemTile.background;
+            color: ColorTheme.colors.dark7;
             anchors.fill: parent;
             radius: 2;
 
@@ -355,7 +356,8 @@ Item
                     elide: Text.ElideRight;
 
                     height: Style.custom.systemTile.systemNameLabelHeight;
-                    color: (control.isAvailable ? Style.colors.text : Style.colors.midlight);
+                    color:
+                        control.isAvailable ? ColorTheme.colors.light4 : ColorTheme.colors.dark13;
                     font: Style.fonts.systemTile.systemName;
                 }
 
@@ -385,8 +387,9 @@ Item
                     anchors.right: parent.right;
                     anchors.top: parent.top;
 
-                    bkgColor: tileArea.color;
-                    hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
+                    backgroundColor: tileArea.color;
+                    hoveredColor: ColorTheme.colors.dark9;
+                    flat: true;
                     enabled: !control.isConnecting;
 
                     onClicked: { control.toggle(); }
@@ -411,7 +414,7 @@ Item
                     pressedIconUrl: "qrc:/skin/welcome_page/tile_hide_pressed.png";
                     showBackground: false;
 
-                    bkgColor: tileArea.color;
+                    backgroundColor: tileArea.color;
                     onClicked: context.hideSystem(control.systemId, control.localId);
                 }
 
@@ -431,9 +434,8 @@ Item
             {
                 visible: control.isConnecting && !control.isExpanded;
                 anchors.centerIn: parent;
-                color: Style.colors.text;
+                color: ColorTheme.text;
             }
-
         }
     }
 }

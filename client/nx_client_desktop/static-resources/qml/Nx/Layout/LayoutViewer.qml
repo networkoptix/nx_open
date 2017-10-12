@@ -14,7 +14,7 @@ Control
 
     property var layout: null
 
-    background: Rectangle { color: ColorTheme.windowBackground }
+    background: Rectangle { color: ColorTheme.window }
 
     contentItem: FlickableView
     {

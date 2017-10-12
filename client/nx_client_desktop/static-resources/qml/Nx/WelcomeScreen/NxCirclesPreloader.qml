@@ -1,12 +1,12 @@
 import QtQuick 2.0;
 import Qt.labs.controls 1.0;
-import Nx.WelcomeScreen 1.0;
+import Nx 1.0;
 
 BusyIndicator
 {
     id: control;
 
-    property color color: Style.colors.mid;
+    property color color: ColorTheme.mid;
 
     implicitWidth: (repeater.count > 0 ? radiusByIndex(repeater.count - 1) * 2 : 30);
     implicitHeight: implicitWidth;

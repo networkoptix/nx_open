@@ -1,5 +1,5 @@
 import QtQuick 2.6;
-import Nx.WelcomeScreen 1.0;
+import Nx 1.0;
 
 NxTextEdit
 {
@@ -12,8 +12,8 @@ NxTextEdit
 
     property string query;
 
-    backgroundColor: Style.colors.window;
-    activeColor: Style.getPaletteColor("dark", 2);
+    backgroundColor: ColorTheme.window;
+    activeColor: ColorTheme.colors.dark3;
     textControlEnabled: (state != "masked");
 
     state: "masked";
@@ -104,11 +104,11 @@ NxTextEdit
         width: parent.width + 2;
         height: parent.height;
 
-        color: "#00000000";
+        color: "transparent";
         radius: 1;
-        border.color: (control.hasFocus || activationArea.containsMouse
-            ? Style.colors.mid
-            : Style.colors.dark)
+        border.color: control.hasFocus || activationArea.containsMouse
+            ? ColorTheme.mid
+            : ColorTheme.dark;
     }
 
 

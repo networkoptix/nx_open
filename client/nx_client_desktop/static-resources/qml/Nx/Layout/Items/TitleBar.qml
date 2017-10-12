@@ -41,7 +41,7 @@ Item
         font.pixelSize: 15
         font.weight: Font.Bold
 
-        color: ColorTheme.windowText
+        color: ColorTheme.brightText
     }
 
     Row

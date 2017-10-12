@@ -1,5 +1,6 @@
 import QtQuick 2.5;
 import Qt.labs.controls 1.0;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 // TODO: add half-checked state (future)
@@ -56,19 +57,19 @@ CheckBox
 
         isHovered: thisComponent.hovered;
 
-        standardColor: (thisComponent.checked ? Style.colors.text
-            : Style.colors.light);
-        hoveredColor: (thisComponent.checked ? Style.colors.brightText
-            : Style.lighterColor(Style.colors.light, 2));
-        disabledColor: Style.colors.light;
+        standardColor: thisComponent.checked ? ColorTheme.text : ColorTheme.light;
+        hoveredColor: thisComponent.checked
+            ? ColorTheme.brightText
+            : ColorTheme.lighter(ColorTheme.light, 2);
+        disabledColor: ColorTheme.light;
 
         Rectangle
         {
             // TODO: It is not possible to do dotted border. Make this in future
             anchors.fill: parent;
             visible: thisComponent.activeFocus;
-            color: "#00000000";
-            border.color: Style.darkerColor(Style.colors.brand, 4);
+            color: "transparent";
+            border.color: ColorTheme.colors.brand_d4;
         }
 
     }

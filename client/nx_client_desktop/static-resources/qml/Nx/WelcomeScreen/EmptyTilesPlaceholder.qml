@@ -1,4 +1,5 @@
 import QtQuick 2.6;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 Column
@@ -18,7 +19,7 @@ Column
 
         text: (searchingTimer.running ? impl.kSearchingServersText : impl.kNoServersFoundText);
         font: Style.fonts.notFoundMessages.caption;
-        color: Style.colors.windowText;
+        color: ColorTheme.windowText;
     }
 
     NxLabel
@@ -33,7 +34,7 @@ Column
 
         text: impl.kDescription;
         font: Style.fonts.notFoundMessages.description;
-        color: Style.colors.windowText;
+        color: ColorTheme.windowText;
     }
 
     Timer

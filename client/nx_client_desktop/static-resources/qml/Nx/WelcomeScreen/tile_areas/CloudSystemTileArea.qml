@@ -1,4 +1,5 @@
 import QtQuick 2.6;
+import Nx 1.0;
 
 import ".."
 
@@ -27,8 +28,8 @@ Column
         enabled: control.isAvailable;
         text: control.userName;
         font: Style.fonts.systemTile.info;
-        standardColor: Style.colors.text;
-        disabledColor: Style.colors.midlight;
+        standardColor: ColorTheme.text;
+        disabledColor: ColorTheme.midlight;
     }
 
     Item

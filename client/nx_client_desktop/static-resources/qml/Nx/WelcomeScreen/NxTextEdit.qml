@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.4;
 import QtQuick.Controls.Styles 1.4;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 // TODO: left\right icons\btns implementation
@@ -21,8 +22,8 @@ FocusScope
     property alias leftControl: leftControlLoader.item;
     property alias rightControl: rightControlLoader.item;
 
-    property color backgroundColor: Style.colors.shadow;
-    property color activeColor: Style.darkerColor(backgroundColor);
+    property color backgroundColor: ColorTheme.shadow;
+    property color activeColor: ColorTheme.darker(backgroundColor, 1);
 
     signal accepted();
 
@@ -86,7 +87,7 @@ FocusScope
                     color:
                     {
                         if (control.readOnly)
-                            return Style.colorWithAlpha(backgroundColor, 0.2);
+                            return ColorTheme.transparent(backgroundColor, 0.2);
 
                         if (control.activeFocus)
                             return activeColor;
@@ -99,11 +100,11 @@ FocusScope
                     border.color:
                     {
                         if (control.error)
-                            return Style.colors.red_main;
+                            return ColorTheme.colors.red_core;
                         if (control.readOnly)
-                            return Style.colorWithAlpha(Style.colors.shadow, 0.4);
+                            return ColorTheme.transparent(ColorTheme.shadow, 0.4);
 
-                        return Style.darkerColor(color);
+                        return ColorTheme.darker(color, 1);
                     }
 
                     Rectangle
@@ -115,7 +116,7 @@ FocusScope
                         height: 1;
                         x: 1;
                         width: parent.width - 2 * x;
-                        color: Style.darkerColor(Style.colors.shadow, 3);
+                        color: ColorTheme.darker(ColorTheme.shadow, 3);
                     }
 
                     Rectangle
@@ -127,14 +128,14 @@ FocusScope
                         width: 1;
                         y: 1;
                         height: parent.height - 2 * y;
-                        color: Style.darkerColor(Style.colors.shadow, 3);
+                        color: ColorTheme.darker(ColorTheme.shadow, 3);
                     }
                 }
 
                 font: (control.readOnly ? Style.textEdit.fontReadOnly : Style.textEdit.font);
-                textColor: Style.textEdit.color;
+                textColor: ColorTheme.text;
 
-                placeholderTextColor: Style.colors.midlight;
+                placeholderTextColor: ColorTheme.midlight;
                 renderType: Text.QtRendering;
             }
         }

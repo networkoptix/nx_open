@@ -1,7 +1,6 @@
 import QtQuick 2.6;
 import Nx 1.0;
 import Nx.Models 1.0;
-import Nx.WelcomeScreen 1.0;
 
 BaseTile
 {
@@ -38,16 +37,18 @@ BaseTile
     tileColor:
     {
         if (!control.isAvailable)
-            return Style.colors.custom.systemTile.disabled;
+            return ColorTheme.colors.dark5;
 
         if (control.isHovered)
         {
-            return (impl.isFactoryTile ? Style.colors.custom.systemTile.factorySystemHovered
-                : Style.colors.custom.systemTile.backgroundHovered);
+            return impl.isFactoryTile
+                ? ColorTheme.colors.dark10
+                : ColorTheme.colors.dark8;
         }
 
-        return (impl.isFactoryTile ? Style.colors.custom.systemTile.factorySystemBkg
-                : Style.colors.custom.systemTile.background);
+        return impl.isFactoryTile
+            ? ColorTheme.colors.dark9
+            : ColorTheme.colors.dark7;
     }
 
     property QtObject primaryIndicatorProperties: QtObject
@@ -74,19 +75,19 @@ BaseTile
         property color textColor:
         {
            if (wrongVersion || compatibleVersion || !isCompatible)
-               return Style.colors.shadow;
+               return ColorTheme.shadow;
            else
-               return Style.colors.windowText;
+               return ColorTheme.windowText;
         }
 
         property color color:
         {
             if (wrongVersion || !isCompatible)
-                return Style.colors.red_main;
+                return ColorTheme.colors.red_core;
             else if (compatibleVersion)
-                return Style.colors.yellow_main;
+                return ColorTheme.colors.yellow_core;
             else
-                return Style.colors.custom.systemTile.offlineIndicatorBkg;
+                return ColorTheme.colors.dark8;
         }
     }
 
@@ -94,8 +95,8 @@ BaseTile
     {
         property bool visible: control.safeMode;
         property string text: qsTr("SAFE MODE");
-        property color textColor: Style.colors.shadow;
-        property color color: Style.colors.yellow_main;
+        property color textColor: ColorTheme.shadow;
+        property color color: ColorTheme.colors.yellow_core;
     }
 
     NxPopupMenu
@@ -284,9 +285,9 @@ BaseTile
                 return kLocalSystemTileType;
         }
 
-        readonly property color standardColor: Style.colors.custom.systemTile.background;
-        readonly property color hoveredColor: Style.lighterColor(standardColor);
-        readonly property color inactiveColor: Style.colors.shadow;
+        readonly property color standardColor: ColorTheme.colors.dark7;
+        readonly property color hoveredColor: ColorTheme.lighter(standardColor, 1);
+        readonly property color inactiveColor: ColorTheme.shadow;
 
         readonly property bool hasSavedConnection:
         {

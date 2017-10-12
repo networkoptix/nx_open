@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import Qt.labs.controls 1.0;
 import Qt.labs.templates 1.0 as T
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 // TODO: inner shadow
@@ -155,10 +156,10 @@ ComboBox
 
         anchors.fill: parent;
 
-        color: (thisComponent.activeFocus
-            ? Style.darkerColor(Style.colors.shadow, 1)
-            : Style.colors.shadow);
-        border.color: Style.darkerColor(Style.colors.shadow, 1);
+        color: thisComponent.activeFocus
+            ? ColorTheme.darker(ColorTheme.shadow, 1)
+            : ColorTheme.shadow;
+        border.color: ColorTheme.darker(ColorTheme.shadow, 1);
         radius: 2;
     }
 
@@ -174,13 +175,13 @@ ComboBox
             rightPadding: 8;
 
             selectByMouse: true;
-            selectionColor: Style.textEdit.selectionColor;
+            selectionColor: ColorTheme.highlight;
             clip: true;
             width: parent.width - indicatorItem.width;
             height: parent.height;
             visible: thisComponent.isEditMode;
             font: Style.textEdit.font;
-            color: Style.textEdit.color;
+            color: ColorTheme.text;
             verticalAlignment: Text.AlignVCenter;
 
             KeyNavigation.tab: thisComponent.KeyNavigation.tab;
@@ -209,7 +210,7 @@ ComboBox
             anchors.fill: textInputItem;
             visible: !thisComponent.isEditMode;
             font: Style.textEdit.font;
-            color: Style.textEdit.color;
+            color: ColorTheme.text;
             verticalAlignment: Text.AlignVCenter;
         }
 
@@ -228,9 +229,9 @@ ComboBox
                 color:
                 {
                     if (thisComponent.pressed)
-                        return Style.lighterColor(Style.colors.shadow, 1);
+                        return ColorTheme.lighter(ColorTheme.shadow, 1);
                     if (hoverArea.containsMouse)
-                        return Style.lighterColor(Style.colors.shadow, 2);
+                        return ColorTheme.lighter(ColorTheme.shadow, 2);
                     return backgroundItem.color;
                 }
             }
@@ -268,7 +269,7 @@ ComboBox
         {
             id: popupBackground;
 
-            color: Style.dropDown.bkgColor;
+            color: ColorTheme.midlight;
             radius: 2;
             // TODO: shadow
         }
@@ -285,8 +286,7 @@ ComboBox
                 width: parent.width;
                 radius: 2;
 
-                color: (popupItem.isHovered ? Style.dropDown.hoveredBkgColor
-                    : Style.dropDown.bkgColor);
+                color: popupItem.isHovered ? ColorTheme.colors.brand_core : ColorTheme.midlight;
 
                 NxLabel
                 {
@@ -299,8 +299,8 @@ ComboBox
                     rightPadding: 8;
                     elide: Text.ElideRight;
 
-                    standardColor: Style.dropDown.textColor;
-                    hoveredColor: Style.dropDown.hoveredTextColor;
+                    standardColor: ColorTheme.text;
+                    hoveredColor: ColorTheme.colors.brand_contrast;
 
                     text: index >= 0 ? model[thisComponent.textRole] : "";
 

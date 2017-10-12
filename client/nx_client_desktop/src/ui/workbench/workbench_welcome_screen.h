@@ -3,7 +3,6 @@
 #include <QtQuickWidgets/QQuickWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/style/generic_palette.h>
 
 #include <nx/utils/raii_guard.h>
 
@@ -99,16 +98,6 @@ public slots:
         const QString& userName);
 
 public slots:
-    QColor getContrastColor(const QString& group);
-
-    QColor getPaletteColor(const QString& group, int index);
-
-    QColor getDarkerColor(const QColor& color, int offset = 1);
-
-    QColor getLighterColor(const QColor& color, int offset = 1);
-
-    QColor colorWithAlpha(QColor color, qreal alpha);
-
     void hideSystem(const QString& systemId, const QString& localSystemId);
 
 signals:
@@ -151,6 +140,5 @@ private:
     bool m_receivingResources = false;
     bool m_visibleControls = false;
     QString m_connectingSystemName;
-    const QnGenericPalette m_palette;
     QString m_message;
 };

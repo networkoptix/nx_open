@@ -9,7 +9,7 @@ Control
 {
     id: mainWindowRoot
 
-    background: Rectangle { color: ColorTheme.windowBackground }
+    background: Rectangle { color: ColorTheme.window }
 
     contentItem: LayoutViewer
     {

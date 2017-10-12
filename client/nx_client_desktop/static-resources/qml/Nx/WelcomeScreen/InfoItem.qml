@@ -1,4 +1,5 @@
 import QtQuick 2.5;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 MaskedComboBox
@@ -10,9 +11,9 @@ MaskedComboBox
     property string disabledIconUrl: iconUrl;
 
     property string hoverExtraIconUrl;
-    property color disabledLabelColor: Style.colors.midlight;
-    property color standardLabelColor: Style.colors.windowText;
-    property color hoveredLabelColor: Style.lighterColor(standardLabelColor, 4);
+    property color disabledLabelColor: ColorTheme.midlight;
+    property color standardLabelColor: ColorTheme.windowText;
+    property color hoveredLabelColor: ColorTheme.lighter(standardLabelColor, 4);
 
     isEditableComboBox: true;
 

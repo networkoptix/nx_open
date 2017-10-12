@@ -1,5 +1,6 @@
 import QtQuick 2.6;
 import Qt.labs.controls 1.0 as Labs;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 Labs.MenuItem
@@ -21,15 +22,14 @@ Labs.MenuItem
         width: control.availableWidth;
         height: control.availableHeight;
         text: control.text;
-        color: (hoverArea.containsMouse ? Style.menu.colorHovered : Style.menu.color);
+        color: hoverArea.containsMouse ? ColorTheme.colors.brand_contrast :ColorTheme.text;
         font: Style.menu.font;
     }
 
 
     background: Rectangle
     {
-        color: (hoverArea.containsMouse ?
-            Style.menu.backgroundHovered : Style.menu.background);
+        color: hoverArea.containsMouse ? ColorTheme.highlight : ColorTheme.midlight;
     }
 
     MouseArea

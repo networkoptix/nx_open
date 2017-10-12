@@ -1,4 +1,5 @@
 import QtQuick 2.5;
+import Nx 1.0;
 import Nx.WelcomeScreen 1.0;
 
 Rectangle
@@ -12,7 +13,7 @@ Rectangle
     property real maxWidth: 0
     property alias visibleTextWidth: labelText.visibleTextWidth
 
-    color: Style.colors.red_main;
+    color: ColorTheme.colors.red_core;
 
     radius: 2;
 

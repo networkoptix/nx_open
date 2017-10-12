@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QVariantMap>
+#include <QtGui/QColor>
 
 #include <nx/utils/singleton.h>
 
@@ -17,14 +18,17 @@ class ColorTheme: public QObject, public Singleton<ColorTheme>
 
 public:
     explicit ColorTheme(QObject* parent = nullptr);
+    virtual ~ColorTheme() override;
 
     QVariantMap colors() const;
 
-private:
-    void loadColors();
+    static Q_INVOKABLE QColor transparent(const QColor& color, qreal alpha);
+    Q_INVOKABLE QColor darker(const QColor& color, int offset) const;
+    Q_INVOKABLE QColor lighter(const QColor& color, int offset) const;
 
 private:
-    QVariantMap m_colors;
+    class Private;
+    QScopedPointer<Private> const d;
 };
 
 } // namespace desktop

@@ -1,4 +1,5 @@
 import QtQuick 2.6;
+import Nx 1.0;
 
 import ".."
 
@@ -50,7 +51,7 @@ Column
                 anchors.verticalCenter: imageItem.verticalCenter;
 
                 font: Style.fonts.systemTile.setupSystemLink;
-                color: Style.colors.custom.systemTile.setupSystemLink;
+                color: ColorTheme.colors.light12;
                 text: qsTr("Click to setup");
             }
         }

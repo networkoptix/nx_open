@@ -50,16 +50,6 @@ using namespace nx::client::desktop::ui;
 
 namespace {
 
-QnGenericPalette extractPalette()
-{
-    const auto proxy = dynamic_cast<QProxyStyle *>(qApp->style());
-    NX_ASSERT(proxy, Q_FUNC_INFO, "Invalid application style");
-    const auto style = dynamic_cast<QnNxStyle *>(proxy ? proxy->baseStyle() : nullptr);
-    NX_ASSERT(style, Q_FUNC_INFO, "Style of application is not NX");
-    return (style ? style->genericPalette() : QnGenericPalette());
-}
-
-
 QnResourceList extractResources(const QList<QUrl>& urls)
 {
     return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(urls));
@@ -82,8 +72,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(
     QWidget* parent)
     :
     base_type(engine, parent),
-    QnWorkbenchContextAware(parent),
-    m_palette(extractPalette())
+    QnWorkbenchContextAware(parent)
 {
     NX_EXPECT(qnRuntime->isDesktopMode());
 
@@ -493,34 +482,6 @@ void QnWorkbenchWelcomeScreen::createAccount()
 }
 
 //
-
-QColor QnWorkbenchWelcomeScreen::getContrastColor(const QString& group)
-{
-    return m_palette.colors(group).contrastColor();
-}
-
-QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString& group, int index)
-{
-    return m_palette.color(group, index);
-}
-
-QColor QnWorkbenchWelcomeScreen::getDarkerColor(const QColor& color, int offset)
-{
-    const auto paletteColor = m_palette.color(color);
-    return paletteColor.darker(offset);
-}
-
-QColor QnWorkbenchWelcomeScreen::getLighterColor(const QColor& color, int offset)
-{
-    const auto paletteColor = m_palette.color(color);
-    return paletteColor.lighter(offset);
-}
-
-QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
-{
-    color.setAlphaF(alpha);
-    return color;
-}
 
 void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString& localSystemId)
 {
