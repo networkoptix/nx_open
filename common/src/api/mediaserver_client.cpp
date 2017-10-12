@@ -314,6 +314,7 @@ void MediaServerClient::performGetRequest(
         typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
     QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+        .appendPath(QLatin1String("/"))
         .appendPath(QString::fromStdString(requestPath)).toUrl();
     requestUrl.setUserName(m_userName);
     requestUrl.setPassword(m_password);
