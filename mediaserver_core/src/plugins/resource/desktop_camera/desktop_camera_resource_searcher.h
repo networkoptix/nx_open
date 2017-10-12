@@ -25,15 +25,15 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, 
-        const QAuthenticator& auth, 
+    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url,
+        const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 
     virtual QnResourceList findResources() override;
 
     void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection,
-        const QString& userName, 
-        const QString& userId);
+        const QString& userName,
+        const QString& uniqueId);
 
     quint32 incCSeq(const TCPSocketPtr& socket);
 
@@ -58,7 +58,7 @@ private:
      * Does NOT lock the mutex.
      */
     bool isClientConnectedInternal(const QString& uniqueId) const;
-    
+
 private:
     QList<ClientConnectionInfo> m_connections;
     QnMutex m_mutex;

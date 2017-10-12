@@ -79,12 +79,6 @@ public:
     QnWorkbenchGridMapper *mapper() const;
 
     Instrument* motionSelectionInstrument() const;
-    Instrument* itemRightClickInstrument() const;
-    Instrument* moveInstrument() const;
-    Instrument* resizingInstrument() const;
-    Instrument* rubberBandInstrument() const;
-    Instrument* itemLeftClickInstrument() const;
-    Instrument* sceneClickInstrument() const;
 
     // TODO: #Elric split into menu_controller or smth like that
     bool isMenuEnabled() const {

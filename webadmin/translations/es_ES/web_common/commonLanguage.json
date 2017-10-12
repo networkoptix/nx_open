@@ -3,25 +3,25 @@
     "highStream":"Corriente de alta",
     "lowStream":"Corriente de baja",
     "transcoding":"Transcodificación",
-    "unknown":"Uesconocido",
-    "copyToClipboard":"copy to clipboard",
-    "copyDefaultText":"copy",
-    "copyActiveText":"copied to clipboard"
+    "unknown":"Desconocido",
+    "copyToClipboard":"copiar al portapapeles",
+    "copyDefaultText":"copiar",
+    "copyActiveText":"copiado al portapapeles"
   },
-  "systemOffline":"System Offline",
+  "systemOffline":"Sistema está desconectado",
   "cameraStates":{
     "offline":"Desconectado",
     "error":"Error",
     "unauthorized":"Autentificación requerida",
-    "noData":"No data",
-    "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
-    "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
-    "flashOrWebmRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-    "noArmSupport":"This browser or device does not support video playback from ARM-based servers.",
-    "noFormat":"This browser or device does not support video playback from  this camera.",
-    "ieNoWebm":"Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-    "ieWin10":"Please, use Microsoft Edge or Google Chrome browsers.",
-    "ubuntuNX":"This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
+    "noData":"No hay datos",
+    "iosVideoTooLarge":"iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
+    "flashRequired":"Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'> Instale Adobe Flash</a> para reproducir el video de servidores basados en ARM.",
+    "flashOrWebmRequired":"<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
+    "noArmSupport":"Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
+    "noFormat":"Este navegador o dispositivo no admite la reproducción de vídeo desde esta cámara.",
+    "ieNoWebm":"Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
+    "ieWin10":"Utilice navegadores Microsoft Edge o Google Chrome.",
+    "ubuntuNX":"Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar."
   },
-  "searchCamPlaceholder":"search"
+  "searchCamPlaceholder":"búsqueda"
 }

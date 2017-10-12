@@ -57,6 +57,7 @@
 #include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <nx/vms/utils/platform/autorun.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -1488,17 +1489,22 @@ ActionVisibility ResourceStatusCondition::check(const QnResourceList& resources,
     return found ? EnabledAction : InvisibleAction;
 }
 
-ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
+ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
+    QnWorkbenchContext* context)
 {
     const auto screenRecordingAction = context->action(action::ToggleScreenRecordingAction);
     if (screenRecordingAction)
     {
-
-        if (!context->user())
+        const auto user = context->user();
+        if (!user)
             return InvisibleAction;
 
+        const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
+            context->commonModule()->moduleGUID(), user->getId());
+
         /* Do not check real pointer type to speed up check. */
-        QnResourcePtr desktopCamera = context->resourcePool()->getResourceByUniqueId(context->commonModule()->moduleGUID().toString());
+        const auto desktopCamera = context->resourcePool()->getResourceByUniqueId(
+            desktopCameraId);
 #ifdef DESKTOP_CAMERA_DEBUG
         NX_ASSERT(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == commonModule()->remoteGUID()),
             Q_FUNC_INFO,

@@ -1,5 +1,5 @@
 {
-  "language_name":"LANGUAGE_NAME",
+  "language_name":"Polski",
   "dialogs":{
     "okButton":"OK",
     "openLink":"Otwórz ten link",
@@ -41,11 +41,10 @@
     "confirmDisconnectFromCloud":"Odłączyć system od {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Wszyscy użytkownicy chmury zostaną usunięci.</span><br><br>System będzie dostępny w sieci lokalnej dla lokalnego konta administratora.",
     "confirmDisconnectFromCloudAction":"Rozłącz",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
+    "disconnectedFromCloudSuccess":"System został odłączony od {{CLOUD_NAME}}",
+    "confirmDisconnectFromSystem":"Odłącz serwer z bieżącego systemu",
+    "confirmDisconnectFromSystemAction":"Odłącz",
+    "disconnectedFromSystemSuccess":"Serwer został odłączony od systemu",
     "connectedSuccess":"System został podłączony pomyślnie",
     "createLocalOwnerTitle":"Utwórz lokalnego administratora",
     "confirmChangePassword":"Zmień hasło administratora",

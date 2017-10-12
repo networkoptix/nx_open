@@ -55,8 +55,7 @@ QList<EventType> childEvents(EventType eventType)
             return {
                 cameraDisconnectEvent,
                 networkIssueEvent,
-                cameraIpConflictEvent,
-                softwareTriggerEvent };
+                cameraIpConflictEvent };
 
         case anyServerEvent:
             return {

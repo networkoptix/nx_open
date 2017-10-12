@@ -33,7 +33,7 @@
         <h2>{{Config.productName}} 시작</h2>
         <p>먼저 서버를 구성 하십시오. <br>옵션을 선택입니다.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
-        <button class="btn btn-primary" autofocus ng-click="next()">새로운 시스템을 설치</button>
+        <button class="btn btn-primary" autofocus ng-click="next()">신규 시스템 설정</button>
 
         <div class="horisontal-line-text">
             <span class="line"></span>
@@ -41,15 +41,15 @@
             <span class="line"></span>
         </div>
         <button class="btn btn-default" ng-click="skip()">기존 시스템에 추가</button><br>
-        <small>(if {{Config.productName}} has been already setup)</small><br>
+        <small>({{Config.productName}}가 이미 설정된 경우)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
-    <h2>시스템 이름을 입력합니다</h2>
+    <h2>시스템 이름을 입력하세요</h2>
     <p class="master-description">
-        이것은 시스템을 식별하거나 찾는데 도움을 줍니다.
+        이것은 시스템 식별 혹은 검색을 도와줍니다.
     </p>
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
@@ -109,7 +109,7 @@
                 <h3>로컬</h3>
                 <p>
                     로컬 네트워크에서만 사용합니다.<br>
-                    인터넷 연결이 필요치 않습니다.
+                    인터넷 연결이 필요 없습니다.
                 </p>
             </div>
         </div>
@@ -122,13 +122,14 @@
                 <h3>클라우드</h3>
                 <p>
                     어디서나 접속 가능<br>
-                    인터넷 연결 필수
+                    인터넷 연결 필수.
                 </p>
             </div>
         </div>
     </div>
     <p class="vertical-bottom">
-        <a ng-if="!settings.liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}" target="_blank" ng-click="openLink($event)"> 도와 결정</a>         <span ng-if="settings.liteClient"> 자세한 내용은: {{portalUrl}}</span>
+        <a ng-if="!settings.liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
+           target="_blank" ng-click="openLink($event)">결정 도움 </a> <span ng-if="settings.liteClient"> 자세히 알아보기: {{portalUrl}} </span>
     </p>
 </div>
 
@@ -178,7 +179,7 @@
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                로그인 상태 유지
+                로그인 유지
             </labe>
         </div>
 
@@ -193,7 +194,7 @@
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
                     forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
             <div class="help-block">
-                이메일과 비밀 번호 필요
+                이메일과 암호가 필요합니다.
             </div>
         </div>
 
@@ -205,7 +206,7 @@
 
         <div class="form-group" ng-if="settings.liteClient">
             <p class="help-block">
-                계정을 만드려면 접속하세요{{portalUrl}}
+                계정을 만들려면 {{portalUrl}} 을 방문하십시오.
             </p>
         </div>
     </form>
@@ -239,7 +240,7 @@
 +                    !forms.localForm.passwordInput.$dirty &&
 +                    !forms.localForm.localPasswordConfirmation.$touched">
             <div class="help-block">
-                다양한 문자와 최소 8자이상의 기호를 입력하세요
+                비밀번호는 다른 유형의 문자 및 기호를 포함한 8자이상 이어야 합니다.
             </div>
         </div>
         <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
@@ -327,7 +328,7 @@
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
     <h2>시스템 병합 중...</h2>
-    <p class="master-description">시간이 걸릴수 있습니다.</p>
+    <p class="master-description">잠시만 기다려 주세요</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
@@ -344,7 +345,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()"> 재시도</button>         <button class="btn btn-default" ng-click="skip()"> 별도 시스템 설치</button>
+        <button class="btn btn-default" ng-click="retry()"> 재시도</button>         <button class="btn btn-default" ng-click="skip()"> 별도 시스템  설치</button>
     </p>
 </div>
 
@@ -361,8 +362,8 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>{{Config.cloud.productName}}에 연결 하는 중...</h2>
-    <p class="master-description">시간이 걸릴수 있습니다.</p>
+    <h2>{{Config.cloud.productName}}에 연결중...</h2>
+    <p class="master-description">잠시만 기다려 주세요</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
@@ -386,7 +387,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
-    <p><b>네트워크 설정을 먼저 구성 하십시오</b></p>
+    <p><b>네트워크를 먼저 구성 하십시오</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
@@ -399,7 +400,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">설정을 저장하고 장치 재 부 팅</button>
+        <button class="btn btn-primary" ng-click="retry()">설정 저장후 장치 재 부 팅</button>
     </p>
 </div>
 
@@ -474,19 +475,16 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">Cancel</button>
-    <button class="btn btn-default"
+            ng-click="cancel()">취소</button>     <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary pull-right"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button class="btn btn-primary pull-right"
+ ng-click="next()">다음 <span class="glyphicon glyphicon-arrow-right"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="finish()">Finish</button>
+ ng-click="finish()">완료</button>
 </div>

@@ -32,7 +32,7 @@ public:
     QnTwoWayAudioWidgetColors colors;
 
 public:
-    QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner);
+    QnTwoWayAudioWidgetPrivate(const QString& sourceId, QnTwoWayAudioWidget* owner);
     virtual ~QnTwoWayAudioWidgetPrivate();
 
     void updateCamera(const QnVirtualCameraResourcePtr& camera);
@@ -64,6 +64,7 @@ private:
     Q_DECLARE_PUBLIC(QnTwoWayAudioWidget)
     QnTwoWayAudioWidget *q_ptr;
 
+    const QString m_sourceId;
     bool m_started;
     HintState m_state;
 

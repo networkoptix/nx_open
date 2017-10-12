@@ -11,7 +11,7 @@
     "errorNoNetwork":"מכשיר זה צריך חיבור רשת כדי לעבוד. <br>יש לחבר אותו לרשת המקומית או לרשת האינטרנט"
   },
   "passwordRequirements":{
-    "minLengthMessage":"סיסמא חייבת להכיל לפחות 8 תווים",
+    "minLengthMessage":"סיסמה חייבת להכיל לפחות 8 תווים",
     "requiredMessage":"רק אותיות לטינית, מספרים וסימני מקלדת מותרים",
     "weakMessage":"הסיסמה צריכה להכיל סוגים שונים של סמלים",
     "strongMessage":"סיסמה חזקה!",
@@ -29,7 +29,7 @@
     "confirmRestoreDefaultTitle":"שחזר להגדרות ברירת מחדל",
     "unexpectedError":"כשלון: שגיאה בלתי צפויה התרחשה",
     "connnetionError":"שגיאת חיבור",
-    "wrongPassword":"סיסמא שגויה.",
+    "wrongPassword":"סיסמה שגויה.",
     "error":"שגיאה: ",
     "restartNeeded":"שינויים שנשמרו. להפעיל מחדש את השרת בכדי להחיל את ההגדרות החדשות?",
     "settingsSaved":"ההגדרות נשמרו",
@@ -41,11 +41,10 @@
     "confirmDisconnectFromCloud":"נתק את המערכת מ {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
     "confirmDisconnectFromCloudAction":"התנתק",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
+    "disconnectedFromCloudSuccess":"המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
+    "confirmDisconnectFromSystem":"נתק שרת מהמערכת הנוכחית",
+    "confirmDisconnectFromSystemAction":"ניתוק",
+    "disconnectedFromSystemSuccess":"השרת נותק מהמערכת בהצלחה",
     "connectedSuccess":"מערכת חובר בהצלחה",
     "createLocalOwnerTitle":"צור מנהל המקומי",
     "confirmChangePassword":"שנה סיסמת מנהל מערכת",
@@ -63,7 +62,7 @@
   "join":{
     "systemIsUnreacheble":"אין אפשרות לגשת למערכת או שהמערכת אינה קיימת.",
     "incorrectCurrentPassword":"סיסמה נוכחית שגויה.",
-    "incorrectRemotePassword":"שם או הסיסמא שגויים.",
+    "incorrectRemotePassword":"שם או הסיסמה שגויים.",
     "incompatibleVersion":"לא ניתן להגיע למערכת, היא אנה קיימת או בעלת גירסה לא תואמת.",
     "wrongUrl":"אין אפשרות להתחבר לשרת שצוין.",
     "newSystemError":"אין אפשרות למזג מערכות. המערכת המרוחקת לא הוגדרה.",
@@ -83,7 +82,7 @@
     "incompatibleCloudState":"ענן מחובר"
   },
   "login":{
-    "incorrectPassword":"שם או הסיסמא שגויים"
+    "incorrectPassword":"שם או הסיסמה שגויים"
   },
   "navigaion":{
     "cannotGetUser":"תקלה בשרת: אין אפשרות לקבל את נתוני המשתמש הנוכחי"
