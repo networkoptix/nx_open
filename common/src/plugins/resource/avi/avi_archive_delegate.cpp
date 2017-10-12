@@ -348,19 +348,6 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
     return m_initialized;
 }
 
-/*
-void QnAviArchiveDelegate::doNotFindStreamInfo()
-{
-    // this call used for optimization. Avoid av_find_stream_info_call for server's chunks to increase speed
-    m_streamsFound=true;
-    if (m_formatContext)
-    {
-        for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
-            m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
-    }
-}
-*/
-
 void QnAviArchiveDelegate::close()
 {
     if (m_IOContext)
@@ -469,10 +456,15 @@ bool QnAviArchiveDelegate::findStreams()
             m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
         }
 
+        m_firstDts = 0;
         if (m_streamsFound)
         {
             m_durationUs = m_formatContext->duration;
             initLayoutStreams();
+            if (m_firstVideoIndex >= 0)
+                m_firstDts = m_formatContext->streams[m_firstVideoIndex]->first_dts;
+            if (m_firstDts == qint64(AV_NOPTS_VALUE))
+                m_firstDts = 0;
         }
         else {
             close();
@@ -567,31 +559,24 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
 {
     AVStream* stream = m_formatContext->streams[packet.stream_index];
     double timeBase = av_q2d(stream->time_base) * 1000000;
-    qint64 firstDts = m_firstVideoIndex >= 0 ? m_formatContext->streams[m_firstVideoIndex]->first_dts : 0;
-    if (firstDts == qint64(AV_NOPTS_VALUE))
-        firstDts = 0;
     qint64 packetTime = packet.dts != qint64(AV_NOPTS_VALUE) ? packet.dts : packet.pts;
-    //qint64 packetTime = qMax(packet.dts, packet.pts);
     if (packetTime == qint64(AV_NOPTS_VALUE))
         return AV_NOPTS_VALUE;
     else
-        return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUs;
+        return qMax(0ll, (qint64) (timeBase * (packetTime - m_firstDts))) +  m_startTimeUs;
 }
 
 void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet)
 {
     AVStream* stream = m_formatContext->streams[packet.stream_index];
     double timeBase = av_q2d(stream->time_base) * 1000000;
-    qint64 firstDts = m_firstVideoIndex >= 0 ? m_formatContext->streams[m_firstVideoIndex]->first_dts : 0;
-    if (firstDts == qint64(AV_NOPTS_VALUE))
-        firstDts = 0;
     qint64 packetTime = packet.dts != qint64(AV_NOPTS_VALUE) ? packet.dts : packet.pts;
     if (packetTime == qint64(AV_NOPTS_VALUE))
         video->timestamp = AV_NOPTS_VALUE;
     else
-        video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUs;
+        video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - m_firstDts))) +  m_startTimeUs;
     if (packet.pts != AV_NOPTS_VALUE) {
-        video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTimeUs;
+        video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - m_firstDts))) +  m_startTimeUs;
     }
 }
 
