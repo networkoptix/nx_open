@@ -1,6 +1,5 @@
 import QtQuick 2.5;
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 Rectangle
 {
@@ -28,7 +27,8 @@ Rectangle
         leftPadding: 8;
         rightPadding: leftPadding;
 
-        font: Style.fonts.systemTile.indicator;
+        font.pixelSize: 10;
+        font.weight: Font.Medium;
         elide: control.width < control.visibleTextWidth ? Text.ElideRight : Text.ElideNone
         color: control.textColor;
 

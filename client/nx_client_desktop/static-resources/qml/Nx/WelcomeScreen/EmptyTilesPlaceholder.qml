@@ -1,6 +1,5 @@
 import QtQuick 2.6;
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 Column
 {
@@ -18,7 +17,8 @@ Column
         wrapMode: Text.WordWrap;
 
         text: (searchingTimer.running ? impl.kSearchingServersText : impl.kNoServersFoundText);
-        font: Style.fonts.notFoundMessages.caption;
+        font.pixelSize: 24;
+        font.weight: Font.Light;
         color: ColorTheme.windowText;
     }
 
@@ -33,7 +33,8 @@ Column
         wrapMode: Text.WordWrap;
 
         text: impl.kDescription;
-        font: Style.fonts.notFoundMessages.description;
+        font.pixelSize: 13;
+        font.weight: Font.Light;
         color: ColorTheme.windowText;
     }
 

@@ -2,7 +2,6 @@ import QtQuick 2.6;
 import QtQuick.Controls 1.4;
 import QtQuick.Controls.Styles 1.4;
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 // TODO: left\right icons\btns implementation
 
@@ -132,7 +131,8 @@ FocusScope
                     }
                 }
 
-                font: (control.readOnly ? Style.textEdit.fontReadOnly : Style.textEdit.font);
+                font.pixelSize: 14;
+                font.weight: control.readOnly ? Font.Medium : Font.Normal;
                 textColor: ColorTheme.text;
 
                 placeholderTextColor: ColorTheme.midlight;

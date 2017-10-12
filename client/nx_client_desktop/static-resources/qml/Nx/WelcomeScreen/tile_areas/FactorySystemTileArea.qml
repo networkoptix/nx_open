@@ -20,7 +20,7 @@ Column
         anchors.left: parent.left;
         anchors.leftMargin: 4;
 
-        font: Style.fonts.systemTile.info;
+        font.pixelSize: 12;
         text: displayHost;
     }
 
@@ -50,7 +50,8 @@ Column
 
                 anchors.verticalCenter: imageItem.verticalCenter;
 
-                font: Style.fonts.systemTile.setupSystemLink;
+                font.pixelSize: 12;
+                font.weight: Font.Medium;
                 color: ColorTheme.colors.light12;
                 text: qsTr("Click to setup");
             }

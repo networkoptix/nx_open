@@ -1,6 +1,5 @@
 import QtQuick 2.5;
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 MaskedComboBox
 {
@@ -66,7 +65,7 @@ MaskedComboBox
 
             disableable: control.isAvailable;
             isHovered: hoverArea.containsMouse;
-            font: Style.fonts.systemTile.info;
+            font.pixelSize: 12;
             standardColor: control.standardLabelColor;
             hoveredColor: control.hoveredLabelColor;
             disabledColor: control.disabledLabelColor;

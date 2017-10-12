@@ -3,7 +3,6 @@ import QtQuick.Controls 1.2;
 import QtQuick.Window 2.2;
 import Nx 1.0;
 import Nx.Models 1.0;
-import Nx.WelcomeScreen 1.0;
 import com.networkoptix.qml 1.0;
 
 Rectangle
@@ -360,7 +359,8 @@ Rectangle
             NxLabel
             {
                 anchors.centerIn: parent;
-                font: Style.fonts.notFoundMessages.caption;
+                font.pixelSize: 24;
+                font.weight: Font.Light;
                 color: ColorTheme.windowText;
 
                 text: qsTr("Nothing found");
@@ -412,7 +412,8 @@ Rectangle
             id: preloaderLabel;
             text: qsTr("Loading...");
             color: ColorTheme.mid;
-            font: Style.fonts.preloader;
+            font.pixelSize: 36;
+            font.weight: Font.Light;
             anchors.horizontalCenter: parent.horizontalCenter;
             anchors.horizontalCenterOffset: 4;
         }
@@ -468,7 +469,7 @@ Rectangle
         {
             id: messageLabel;
             anchors.centerIn: parent;
-            font: Style.fonts.screenRecording;
+            font.pixelSize: 22;
             standardColor: ColorTheme.colors.brand_contrast;
             leftPadding: 24;
             rightPadding: leftPadding;

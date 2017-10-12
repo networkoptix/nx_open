@@ -1,14 +1,13 @@
 import QtQuick 2.6;
 import Qt.labs.controls 1.0 as Labs;
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 Labs.MenuItem
 {
     id: control;
 
     implicitWidth: label.implicitWidth + leftPadding + rightPadding;
-    implicitHeight: Style.menu.height;
+    implicitHeight: 24;
 
     label: Text
     {
@@ -23,7 +22,7 @@ Labs.MenuItem
         height: control.availableHeight;
         text: control.text;
         color: hoverArea.containsMouse ? ColorTheme.colors.brand_contrast :ColorTheme.text;
-        font: Style.menu.font;
+        font.pixelSize: 13;
     }
 
 

@@ -1,6 +1,5 @@
 import QtQuick 2.6
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 Text
 {
@@ -12,7 +11,7 @@ Text
     property bool disableable: true;
 
     property color standardColor: ColorTheme.windowText;
-    property color hoveredColor: ColorTheme.lighter(Style.label.color, 1);
+    property color hoveredColor: ColorTheme.lighter(standardColor, 1);
     property color disabledColor: standardColor;
     property var hoveredCursorShape: Qt.ArrowCursor;
     property real visibleTextWidth: visible
@@ -31,8 +30,8 @@ Text
         return (isHovered ? hoveredColor : standardColor);
     }
 
-    height: Style.label.height;
-    font: Style.label.font;
+    height: 16;
+    font.pixelSize: 13
 
     renderType: Text.QtRendering;
     verticalAlignment: Text.AlignVCenter;

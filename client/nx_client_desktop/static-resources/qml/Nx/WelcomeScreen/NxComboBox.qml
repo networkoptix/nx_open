@@ -2,7 +2,6 @@ import QtQuick 2.6;
 import Qt.labs.controls 1.0;
 import Qt.labs.templates 1.0 as T
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 // TODO: inner shadow
 // TODO: implement exactly as in specification
@@ -180,7 +179,7 @@ ComboBox
             width: parent.width - indicatorItem.width;
             height: parent.height;
             visible: thisComponent.isEditMode;
-            font: Style.textEdit.font;
+            font.pixelSize: 14
             color: ColorTheme.text;
             verticalAlignment: Text.AlignVCenter;
 
@@ -209,7 +208,7 @@ ComboBox
             clip: true;
             anchors.fill: textInputItem;
             visible: !thisComponent.isEditMode;
-            font: Style.textEdit.font;
+            font.pixelSize: 14;
             color: ColorTheme.text;
             verticalAlignment: Text.AlignVCenter;
         }

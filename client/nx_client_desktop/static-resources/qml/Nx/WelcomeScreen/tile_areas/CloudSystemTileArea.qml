@@ -27,7 +27,7 @@ Column
         disableable: false;
         enabled: control.isAvailable;
         text: control.userName;
-        font: Style.fonts.systemTile.info;
+        font.pixelSize: 12;
         standardColor: ColorTheme.text;
         disabledColor: ColorTheme.midlight;
     }

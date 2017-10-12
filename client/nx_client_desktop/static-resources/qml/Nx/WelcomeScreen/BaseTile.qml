@@ -4,7 +4,6 @@ import QtGraphicalEffects 1.0;
 import Qt.labs.controls 1.0;
 import com.networkoptix.qml 1.0;
 import Nx 1.0;
-import Nx.WelcomeScreen 1.0;
 
 Item
 {
@@ -258,8 +257,8 @@ Item
             anchors.fill: tileArea;
 
             visible: control.isExpanded;
-            radius: Style.custom.systemTile.shadowRadius;
-            samples: Style.custom.systemTile.shadowSamples;
+            radius: 24;
+            samples: 24;
             color: ColorTheme.shadow;
             source: tileArea;
         }
@@ -355,10 +354,11 @@ Item
 
                     elide: Text.ElideRight;
 
-                    height: Style.custom.systemTile.systemNameLabelHeight;
+                    height: 24;
                     color:
                         control.isAvailable ? ColorTheme.colors.light4 : ColorTheme.colors.dark13;
-                    font: Style.fonts.systemTile.systemName;
+                    font.pixelSize: 20;
+                    font.weight: Font.Light;
                 }
 
                 NxMenuButton

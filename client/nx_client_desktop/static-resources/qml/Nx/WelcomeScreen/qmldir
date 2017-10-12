@@ -1,3 +1,0 @@
-module Nx.WelcomeScreen
-
-singleton Style 1.0 Style.qml
