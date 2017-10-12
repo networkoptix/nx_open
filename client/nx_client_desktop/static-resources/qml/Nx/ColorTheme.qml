@@ -7,7 +7,7 @@ ColorThemeBase
     property color window: colors.dark4
     property color windowText: colors.light16
     property color shadow: colors.dark5
-    property color text: colors.light14
+    property color text: colors.light4
     property color light: colors.light10
     property color buttonText: colors.light4
     property color brightText: colors.light1
