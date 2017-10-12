@@ -103,7 +103,7 @@ bool HanwhaAttributes::parseCategories(
 
         if (reader.readNextStartElement())
         {
-            if (!parseAttributes(reader, group))
+            if (!parseChannelOrAttributes(reader, group))
                 return false;
             READ_NEXT_AND_RETURN_IF_NEEDED(reader);
         }
@@ -119,7 +119,7 @@ bool HanwhaAttributes::parseCategories(
     return true;
 }
 
-bool HanwhaAttributes::parseAttributes(
+bool HanwhaAttributes::parseChannelOrAttributes(
     QXmlStreamReader& reader,
     const QString& group)
 {

@@ -72,7 +72,7 @@ private:
 
     bool parseCategories(QXmlStreamReader& reader, const QString& group);
 
-    bool parseAttributes(QXmlStreamReader& reader, const QString& group);
+    bool parseChannelOrAttributes(QXmlStreamReader& reader, const QString& group);
     bool parseAttributes(QXmlStreamReader& reader, const QString& group, int channel);
 
 private:
