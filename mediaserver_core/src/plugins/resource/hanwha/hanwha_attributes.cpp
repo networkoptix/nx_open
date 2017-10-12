@@ -134,7 +134,10 @@ bool HanwhaAttributes::parseChannelOrAttributes(
             return false;
 
         READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-        return parseAttributes(reader, group, channelNumber);
+        if (!parseAttributes(reader, group, channelNumber))
+            return false;
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+        return true;
     }
     else if (reader.name() == kHanwhaAttributeNodeName)
     {
