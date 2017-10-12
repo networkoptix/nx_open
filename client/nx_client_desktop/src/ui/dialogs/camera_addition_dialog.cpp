@@ -243,39 +243,55 @@ void QnCameraAdditionDialog::clearTable() {
     ui->camerasTable->setRowCount(0);
 }
 
-int QnCameraAdditionDialog::fillTable(const QnManualResourceSearchList &cameras) {
+int QnCameraAdditionDialog::fillTable(QnManualResourceSearchList cameras)
+{
+    std::sort(cameras.begin(), cameras.end(),
+        [](const QnManualResourceSearchEntry& left, const QnManualResourceSearchEntry& right)
+        {
+            // Insert new cameras to the beginning, old to the end.
+            if (left.existsInPool != right.existsInPool)
+                return right.existsInPool;
+
+            if (left.name == right.name)
+                return QString::compare(left.uniqueId, right.uniqueId, Qt::CaseInsensitive) < 0;
+
+            return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
+        });
+
     clearTable();
 
     int newCameras = 0;
-    foreach(const QnManualResourceSearchEntry &info, cameras) {
-        bool enabledRow = !info.existsInPool;
+    for (const auto& info: cameras)
+    {
+        const bool isNewCamera = !info.existsInPool;
+        if (isNewCamera)
+            ++newCameras;
 
-        //insert new cameras to the beginning, old to the end
-        int row = enabledRow ? newCameras : ui->camerasTable->rowCount();
+        const int row = ui->camerasTable->rowCount();
         ui->camerasTable->insertRow(row);
-
-        if (enabledRow)
-            newCameras++;
 
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-        if (enabledRow) {
+        if (isNewCamera)
+        {
             checkItem->setCheckState(Qt::Checked);
-        } else {
+        }
+        else
+        {
             checkItem->setFlags(checkItem->flags() | Qt::ItemIsTristate);
-            checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
+            checkItem->setFlags(checkItem->flags() &~Qt::ItemIsEnabled);
             checkItem->setCheckState(Qt::PartiallyChecked);
         }
         checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualResourceSearchEntry>(info));
 
         QTableWidgetItem *manufItem = new QTableWidgetItem(info.vendor);
         manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
-        if (!enabledRow)
+        if (!isNewCamera)
             manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEnabled);
 
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
         nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEditable);
-        if (!enabledRow)
+        if (!isNewCamera)
             nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEnabled);
 
         QFont font = ui->camerasTable->font();
