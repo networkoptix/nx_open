@@ -14,9 +14,12 @@ public:
     LogMainTest()
     {
         logger = addLogger({lit("SomeTag"), lit("nx::utils::log::test")});
+        EXPECT_EQ(Level::none, maxLevel());
         logger->setDefaultLevel(levelFromString("INFO"));
+        EXPECT_EQ(Level::info, maxLevel());
         logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
         logger->setExceptionFilters({lit("nx::utils::log::test")});
+        EXPECT_EQ(Level::verbose, maxLevel());
     }
 
     ~LogMainTest()
@@ -68,7 +71,6 @@ TEST_F(LogMainTest, ExplicitTag)
 
 TEST_F(LogMainTest, This)
 {
-
     NX_ALWAYS(this, "Always");
     NX_ERROR(this, "Error");
     NX_WARNING(this, "Warning");
