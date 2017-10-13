@@ -3305,13 +3305,13 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
     dragProcessor()->mouseReleaseEvent(this, event);
 
-    const auto autoShiftPixels = nx::client::desktop::ini().autoShiftPixels;
-    if (autoShiftPixels > 0 && m_dragIsClick && event->button() == Qt::LeftButton)
+    const auto autoShiftAreaWidth = nx::client::desktop::ini().autoShiftAreaWidth;
+    if (autoShiftAreaWidth > 0 && m_dragIsClick && event->button() == Qt::LeftButton)
     {
         const auto pos = valueFromPosition(event->pos());
         const auto distanceToCenter = (m_windowEnd - m_windowStart) / 2;
 
-        const auto allowedOffset = m_msecsPerPixel * autoShiftPixels;
+        const auto allowedOffset = m_msecsPerPixel * autoShiftAreaWidth;
         const auto leftOffset = pos - m_windowStart;
         const auto rightOffset = m_windowEnd - pos;
 
