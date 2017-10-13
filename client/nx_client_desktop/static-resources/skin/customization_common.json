@@ -867,6 +867,14 @@
         "itemBackgroundColor": "dark5"
     },
 
+    "nx::client::desktop::EventTile": {
+        "palette": {
+            "default": {
+                "window": "dark9"
+            }
+        }
+    },
+
     "QnHudOverlayWidget": {
         "palette": {
             "default": {

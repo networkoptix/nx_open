@@ -15,6 +15,7 @@ struct Ini: public nx::kit::IniConfig
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
     NX_INI_FLAG(0, universalExportDialog, "Use universal export dialog instead of old export dialogs.");
+    NX_INI_FLAG(0, unifiedEventPanel, "Use unified event panel instead of old notifications panel.");
 };
 
 inline Ini& ini()

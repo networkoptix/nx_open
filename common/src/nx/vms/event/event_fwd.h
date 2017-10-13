@@ -42,6 +42,8 @@ typedef QList<RulePtr> RuleList;
 struct EventParameters;
 struct ActionParameters;
 
+class StringsHelper;
+
 } // namespace event
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
