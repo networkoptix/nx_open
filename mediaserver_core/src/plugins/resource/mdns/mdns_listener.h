@@ -1,9 +1,9 @@
-#ifndef __MDNS_LISTENER_H
-#define __MDNS_LISTENER_H
+#pragma once
 
 #ifdef ENABLE_MDNS
 
-#include <list>
+#include <stdint.h>
+#include <chrono>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QList>
@@ -11,6 +11,7 @@
 #include <QtCore/QStringList>
 
 #include <nx/network/socket.h>
+#include "mdns_consumer_data.h"
 
 
 namespace nx {
@@ -19,49 +20,36 @@ class UDPSocket;
 }   //network
 }   //nx
 
+
 class QnMdnsListener
 {
 public:
     QnMdnsListener();
     ~QnMdnsListener();
 
-    struct ConsumerData
-    {
-        ConsumerData(const QByteArray& response, const QString& localAddress, const QString& remoteAddress):
-                response(response), localAddress(localAddress), remoteAddress(remoteAddress) {}
-
-        QByteArray response;
-        QString localAddress;
-        QString remoteAddress;
-    };
-
-    typedef QList<ConsumerData> ConsumerDataList;
-
-    typedef QMap<std::uintptr_t, ConsumerDataList> ConsumersMap;
-
-    void registerConsumer(std::uintptr_t handle);
-    ConsumerDataList getData(std::uintptr_t handle);
+    void registerConsumer(uintptr_t id);
+    const ConsumerData *getData(uintptr_t id);
 
     static QnMdnsListener* instance();
 
     QStringList getLocalAddressList() const;
 
 private:
+    static const std::chrono::seconds kRefreshTimeout;
+
+    QList<AbstractDatagramSocket*> m_socketList;
+    AbstractDatagramSocket* m_receiveSocket;
+    QElapsedTimer m_socketLifeTime;
+    QStringList m_localAddressList;
+    detail::ConsumerDataListPtr m_consumersData;
+    std::chrono::time_point<std::chrono::steady_clock> m_lastRefreshTime;
+
     void updateSocketList();
     void readDataFromSocket();
     void deleteSocketList();
     QString getBestLocalAddress(const QString& remoteAddress);
-    void readSocketInternal(AbstractDatagramSocket* socket, QString localAddress);
-
-private:
-    QList<AbstractDatagramSocket*> m_socketList;
-    AbstractDatagramSocket* m_receiveSocket;
-    QElapsedTimer m_socketLifeTime;
-    //!list<pair<consumer id, consumer data> >. List is required to garantee, that consumers receive data in order they were registered
-    std::list<std::pair<std::uintptr_t, ConsumerDataList> > m_data;
-    QStringList m_localAddressList;
+    void readSocketInternal(AbstractDatagramSocket* socket, const QString& localAddress);
+    bool needRefresh() const;
 };
 
 #endif // ENABLE_MDNS
-
-#endif // __MDNS_LISTENER_H

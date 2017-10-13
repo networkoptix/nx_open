@@ -132,7 +132,7 @@ endfunction()
 
 function(nx_copy_current_package)
     file(GLOB contents ${CMAKE_CURRENT_LIST_DIR}/*)
-    file(COPY ${contents} DESTINATION .
+    file(COPY ${contents} DESTINATION ${CMAKE_BINARY_DIR}
         PATTERN ".rdpack" EXCLUDE
         PATTERN "*.cmake" EXCLUDE
     )

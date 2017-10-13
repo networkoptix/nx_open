@@ -1454,6 +1454,8 @@ void QnWorkbenchUi::createFpsWidget()
     m_fpsItem = new QnProxyLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
     m_fpsItem->setAcceptHoverEvents(false);
+    m_fpsItem->setText(lit("...."));
+    updateFpsGeometry();
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
     display()->setLayer(m_fpsItem, Qn::MessageBoxLayer);
