@@ -168,9 +168,8 @@ void EventRibbon::Private::updateView()
     const int position = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
     const int height = m_viewport->height();
 
-    Tile posToSearch;
-    posToSearch.position = position;
-    const auto first = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), posToSearch) - 1;
+    const auto first = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), position,
+        [](int left, const Tile& right) { return left < right.position; }) - 1;
 
     QSet<const Tile*> newVisibleTiles;
 

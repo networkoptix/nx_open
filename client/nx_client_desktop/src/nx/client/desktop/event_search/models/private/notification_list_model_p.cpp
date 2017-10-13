@@ -30,17 +30,11 @@ NotificationListModel::Private::~Private()
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
 {
-    //ScopedInsertRows insertRows(q, QModelIndex(), 0, 0);
-
-
 
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
 {
-    //ScopedRemoveRows removeRows(q, QModelIndex(), i, i);
-
-
 
 }
 

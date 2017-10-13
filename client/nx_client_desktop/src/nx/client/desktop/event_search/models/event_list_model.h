@@ -2,10 +2,12 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QAbstractListModel>
+#include <QtGui/QPixmap>
 
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace client {
@@ -26,7 +28,25 @@ public:
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
 protected:
-    void clear();
+    struct EventData
+    {
+        QnUuid id;
+        QString title;
+        QString description;
+        qint64 timestamp;
+        QPixmap icon;
+        QColor titleColor;
+
+        // TODO: #vktuin Actions
+        // TODO: #vktuin What else? Resource list?
+    };
+
+protected:
+    virtual bool addEvent(const EventData& event);
+    virtual bool removeEvent(const QnUuid& id);
+    virtual void clear();
+
+    virtual QString timestampText(qint64 timestampMs) const;
 
 private:
     class Private;

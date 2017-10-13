@@ -34,8 +34,6 @@ private:
 
         Tile() = default;
         Tile(EventTile* widget, const QnUuid& id): widget(widget), id(id) {}
-
-        bool operator<(const Tile& other) const { return position < other.position; }
     };
 
     void updateView();
