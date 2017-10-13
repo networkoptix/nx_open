@@ -13,8 +13,9 @@ namespace test {
 TEST(LogLogger, Levels)
 {
     const auto buffer = new Buffer();
+    const Logger::OnLevelChanged onLevelChanged = nullptr;
 
-    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer));
+    Logger logger(onLevelChanged, Level::info, std::unique_ptr<AbstractWriter>(buffer));
     ASSERT_EQ(Level::info, logger.defaultLevel());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::always));
@@ -52,8 +53,9 @@ TEST(LogLogger, Levels)
 TEST(LogLogger, Filters)
 {
     const auto buffer = new Buffer();
+    const Logger::OnLevelChanged onLevelChanged = nullptr;
 
-    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer));
+    Logger logger(onLevelChanged, Level::info, std::unique_ptr<AbstractWriter>(buffer));
     ASSERT_EQ((size_t) 0, logger.exceptionFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
@@ -99,7 +101,8 @@ TEST(LogLogger, Filters)
 TEST(LogLogger, Format)
 {
     const auto buffer = new Buffer();
-    Logger logger(Level::verbose, std::unique_ptr<AbstractWriter>(buffer));
+    const Logger::OnLevelChanged onLevelChanged = nullptr;
+    Logger logger(onLevelChanged, Level::verbose, std::unique_ptr<AbstractWriter>(buffer));
 
     logger.log(Level::always, QLatin1String("nx::aaa::Object(1)"), "First message");
     logger.log(Level::error, QLatin1String("nx::bbb::Object(2)"), "Second message");
