@@ -65,7 +65,7 @@ do
         web)
             write_my_cnf
 
-            python manage.py filldata all
+            python manage.py filldata
 
             find /app/app/static | xargs touch
             exec gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
@@ -73,6 +73,9 @@ do
         celery)
             write_my_cnf
             rm -f /tmp/*.pid
+
+            python manage.py filldata all
+
             exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         *)
