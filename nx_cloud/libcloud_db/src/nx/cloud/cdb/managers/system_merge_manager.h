@@ -72,7 +72,9 @@ private:
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged);
 
-    void start(MergeRequestContext* mergeRequestContext);
+    void issueVmsMergeRequest(
+        const AuthorizationInfo& authzInfo,
+        MergeRequestContext* mergeRequestContext);
 
     void processVmsMergeRequestResult(
         MergeRequestContext* mergeRequestContext,

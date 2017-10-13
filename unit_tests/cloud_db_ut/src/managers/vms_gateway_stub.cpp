@@ -10,18 +10,19 @@ VmsGatewayStub::~VmsGatewayStub()
 }
 
 void VmsGatewayStub::merge(
-    const std::string& /*username*/,
+    const std::string& username,
     const std::string& targetSystemId,
     VmsRequestCompletionHandler completionHandler)
 {
     RequestContext requestContext;
-    requestContext.systemId = targetSystemId;
+    requestContext.params.username = username;
+    requestContext.params.targetSystemId = targetSystemId;
     requestContext.completionHandler = std::move(completionHandler);
 
     m_pollable.post(
         [this, requestContext = std::move(requestContext)]() mutable
         {
-            m_systemsRequested.insert(requestContext.systemId);
+            m_systemsRequested.insert(requestContext.params.targetSystemId);
 
             if (m_paused)
                 m_queuedRequests.push(std::move(requestContext));
@@ -50,9 +51,9 @@ void VmsGatewayStub::resume()
         });
 }
 
-bool VmsGatewayStub::performedRequestToSystem(const std::string& id) const
+MergeRequestParameters VmsGatewayStub::popRequest()
 {
-    return m_systemsRequested.find(id) != m_systemsRequested.end();
+    return m_performedRequestsQueue.pop();
 }
 
 void VmsGatewayStub::failEveryRequestToSystem(const std::string& id)
@@ -65,9 +66,12 @@ void VmsGatewayStub::reportRequestResult(RequestContext requestContext)
     VmsRequestResult vmsRequestResult;
 
     vmsRequestResult.resultCode = 
-        m_malfunctioningSystems.find(requestContext.systemId) == m_malfunctioningSystems.end()
+        m_malfunctioningSystems.find(requestContext.params.targetSystemId) 
+            == m_malfunctioningSystems.end()
         ? VmsResultCode::ok
         : VmsResultCode::networkError;
+
+    m_performedRequestsQueue.push(requestContext.params);
 
     requestContext.completionHandler(std::move(vmsRequestResult));
 }

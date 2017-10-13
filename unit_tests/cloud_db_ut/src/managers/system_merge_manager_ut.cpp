@@ -10,6 +10,7 @@
 
 #include <nx/cloud/cdb/managers/system_merge_manager.h>
 #include <nx/cloud/cdb/settings.h>
+#include <nx/cloud/cdb/stree/cdb_ns.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "base_persistent_data_test.h"
@@ -30,6 +31,8 @@ public:
     {
         if (m_systemMergeManagerDestroyed)
             m_systemMergeManagerDestroyed->wait();
+
+        m_systemMergeManager.reset();
     }
 
 protected:
@@ -73,7 +76,9 @@ protected:
     {
         using namespace std::placeholders;
 
-        AuthorizationInfo authorizationInfo;
+        nx::utils::stree::ResourceContainer rc;
+        rc.put(attr::authAccountEmail, QString::fromStdString(m_ownerAccount.email));
+        AuthorizationInfo authorizationInfo(std::move(rc));
         m_systemMergeManager->startMergingSystems(
             authorizationInfo,
             m_masterSystem.id,
@@ -108,10 +113,17 @@ protected:
     {
         thenMergeResultIs(api::ResultCode::ok);
     }
-    
+
+    void thenRequestToSlaveSystemDoneOnBehalfOfSystemOwner()
+    {
+        auto requestParams = m_vmsGatewayStub.popRequest();
+        ASSERT_EQ(m_ownerAccount.email, requestParams.username);
+    }
+
     void andRequestToSlaveSystemHasBeenInvoked()
     {
-        ASSERT_TRUE(m_vmsGatewayStub.performedRequestToSystem(m_slaveSystem.id));
+        auto requestParams = m_vmsGatewayStub.popRequest();
+        ASSERT_EQ(m_slaveSystem.id, requestParams.targetSystemId);
     }
 
 private:
@@ -168,10 +180,12 @@ TEST_F(SystemMergeManager, waits_for_every_request_completion_before_terminating
     thenMergeSucceeded();
 }
 
-//TEST_F(SystemMergeManager, passes_authenticated_user_name_to_vms_gateway)
-//{
-//
-//}
+TEST_F(SystemMergeManager, passes_authenticated_user_name_to_vms_gateway)
+{
+    givenTwoOnlineSystems();
+    whenStartMerge();
+    thenRequestToSlaveSystemDoneOnBehalfOfSystemOwner();
+}
 
 TEST_F(SystemMergeManager, reports_error_on_vms_request_failure)
 {

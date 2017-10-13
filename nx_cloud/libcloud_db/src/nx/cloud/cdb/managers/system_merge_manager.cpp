@@ -6,6 +6,7 @@
 #include <nx/cloud/cdb/client/data/types.h>
 
 #include "../settings.h"
+#include "../stree/cdb_ns.h"
 #include "system_health_info_provider.h"
 #include "system_manager.h"
 
@@ -31,7 +32,7 @@ SystemMergeManager::~SystemMergeManager()
 }
 
 void SystemMergeManager::startMergingSystems(
-    const AuthorizationInfo& /*authzInfo*/,
+    const AuthorizationInfo& authzInfo,
     const std::string& idOfSystemToMergeTo,
     const std::string& idOfSystemToBeMerged,
     std::function<void(api::ResultCode)> completionHandler)
@@ -59,7 +60,7 @@ void SystemMergeManager::startMergingSystems(
 
     QnMutexLocker lock(&m_mutex);
     m_currentRequests.emplace(mergeRequestContextPtr, std::move(mergeRequestContext));
-    start(mergeRequestContextPtr);
+    issueVmsMergeRequest(authzInfo, mergeRequestContextPtr);
 }
 
 api::ResultCode SystemMergeManager::validateRequestInput(
@@ -100,7 +101,9 @@ api::ResultCode SystemMergeManager::validateRequestInput(
     return api::ResultCode::ok;
 }
 
-void SystemMergeManager::start(MergeRequestContext* mergeRequestContext)
+void SystemMergeManager::issueVmsMergeRequest(
+    const AuthorizationInfo& authzInfo,
+    MergeRequestContext* mergeRequestContext)
 {
     using namespace std::placeholders;
 
@@ -108,8 +111,10 @@ void SystemMergeManager::start(MergeRequestContext* mergeRequestContext)
         .args(mergeRequestContext->idOfSystemToBeMerged, 
             mergeRequestContext->idOfSystemToMergeTo));
 
+    const auto username = authzInfo.get<std::string>(attr::authAccountEmail);
+
     m_vmsGateway->merge(
-        std::string(), // TODO: Pass username.
+        username ? *username : std::string(),
         mergeRequestContext->idOfSystemToBeMerged,
         std::bind(&SystemMergeManager::processVmsMergeRequestResult, this, 
             mergeRequestContext, _1));

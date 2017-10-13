@@ -4,12 +4,19 @@
 #include <set>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/cdb/managers/vms_gateway.h>
 
 namespace nx {
 namespace cdb {
 namespace test {
+
+struct MergeRequestParameters
+{
+    std::string username;
+    std::string targetSystemId;
+};
 
 class VmsGatewayStub:
     public AbstractVmsGateway
@@ -24,14 +31,15 @@ public:
 
     void pause();
     void resume();
+
+    MergeRequestParameters popRequest();
     
-    bool performedRequestToSystem(const std::string& id) const;
     void failEveryRequestToSystem(const std::string& id);
 
 private:
     struct RequestContext
     {
-        std::string systemId;
+        MergeRequestParameters params;
         VmsRequestCompletionHandler completionHandler;
     };
 
@@ -40,6 +48,7 @@ private:
     std::queue<RequestContext> m_queuedRequests;
     std::set<std::string> m_systemsRequested;
     std::set<std::string> m_malfunctioningSystems;
+    nx::utils::SyncQueue<MergeRequestParameters> m_performedRequestsQueue;
 
     void reportRequestResult(RequestContext requestContext);
 };
