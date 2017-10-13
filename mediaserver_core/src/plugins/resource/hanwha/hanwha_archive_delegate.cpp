@@ -49,17 +49,13 @@ void HanwhaNvrArchiveDelegate::close()
 qint64 HanwhaNvrArchiveDelegate::startTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    return qnServerModule->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
-        ->chunkLoader()->startTimeUsec(hanwhaRes->getChannel());
+    return hanwhaRes->sharedContext()->chunkLoader()->startTimeUsec(hanwhaRes->getChannel());
 }
 
 qint64 HanwhaNvrArchiveDelegate::endTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    return qnServerModule->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
-        ->chunkLoader()->endTimeUsec(hanwhaRes->getChannel());
+    return hanwhaRes->sharedContext()->chunkLoader()->endTimeUsec(hanwhaRes->getChannel());
 }
 
 QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
@@ -103,9 +99,7 @@ bool HanwhaNvrArchiveDelegate::isForwardDirection() const
 qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    const auto chunks = qnServerModule->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
-        ->chunkLoader()->chunks(hanwhaRes->getChannel());
+    const auto chunks = hanwhaRes->sharedContext()->chunkLoader()->chunks(hanwhaRes->getChannel());
     const qint64 timeMs = timeUsec / 1000;
     auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection());
     if (itr == chunks.cend())

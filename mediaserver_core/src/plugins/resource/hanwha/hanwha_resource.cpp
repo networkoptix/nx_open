@@ -537,26 +537,18 @@ QString HanwhaResource::sessionKey(
     HanwhaSessionType sessionType,
     bool generateNewOne)
 {
-    auto sharedContext = qnServerModule
-        ->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
-    
-    if (!sharedContext)
-        return QString();
+    if (const auto context = sharedContext())
+        return m_sharedContext->sessionKey(sessionType, generateNewOne);
 
-    return sharedContext->sessionKey(sessionType, generateNewOne);
+    return QString();
 }
 
 QnSemaphore* HanwhaResource::requestSemaphore()
 {
-    auto sharedContext = qnServerModule
-        ->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    if (const auto context = sharedContext())
+        return m_sharedContext->requestSemaphore();
 
-    if (!sharedContext)
-        return nullptr;
-
-    return sharedContext->requestSemaphore();
+    return nullptr;
 }
 
 bool HanwhaResource::isVideoSourceActive()
@@ -592,6 +584,13 @@ CameraDiagnostics::Result HanwhaResource::initInternal()
 
 CameraDiagnostics::Result HanwhaResource::init()
 {
+    const auto sharedContext = qnServerModule->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_sharedContext = sharedContext;
+    }
+
     CameraDiagnostics::Result result = initSystem();
     if (!result)
         return result;
@@ -623,10 +622,6 @@ CameraDiagnostics::Result HanwhaResource::init()
     initMediaStreamCapabilities();
 
     saveParams();
-
-    auto sharedContext = qnServerModule
-        ->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
 
     int channelCount = sharedContext->channelCount(getAuth(), getUrl());
     sharedContext->startTimeSynchronizer(getAuth(), getUrl());
@@ -2430,6 +2425,12 @@ QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
     return appName + suffix;
 }
 
+std::shared_ptr<HanwhaSharedResourceContext> HanwhaResource::sharedContext() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_sharedContext;
+}
+
 QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
@@ -2442,10 +2443,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    auto sharedContext = qnServerModule
-        ->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
-    return sharedContext->chunkLoader()->chunks(getChannel());
+    return sharedContext()->chunkLoader()->chunks(getChannel());
 }
 
 } // namespace plugins

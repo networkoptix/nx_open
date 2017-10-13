@@ -24,7 +24,7 @@ class SharedContextPool:
     using SharedContextStorage = 
         QMap<
             AbstractSharedResourceContext::SharedId,
-            std::shared_ptr<AbstractSharedResourceContext>>;
+            std::weak_ptr<AbstractSharedResourceContext>>;
 public:
     SharedContextPool(QnMediaServerModule* serverModule);
 
@@ -36,11 +36,13 @@ public:
             return nullptr;
 
         QnMutexLocker lock(&m_mutex);
-        if (!m_sharedContexts.contains(sharedId))
-            m_sharedContexts[sharedId] = std::make_shared<ContextType>(serverModule(), sharedId);
+        if (const auto context = m_sharedContexts.value(sharedId).lock())
+            return std::dynamic_pointer_cast<ContextType>(context);
 
-        return std::dynamic_pointer_cast<ContextType>(m_sharedContexts[sharedId]);
-    };
+        const auto context = std::make_shared<ContextType>(serverModule(), sharedId);
+        m_sharedContexts[sharedId] = context;
+        return context;
+    }
 
 private:
     mutable QnMutex m_mutex;

@@ -8,6 +8,7 @@
 #include <plugins/resource/hanwha/hanwha_attributes.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 #include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 
@@ -105,6 +106,9 @@ public:
     QString nxProfileName(Qn::ConnectionRole role) const;
 
     static const QString kNormalizedSpeedPtzTrait;
+
+    std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -271,6 +275,7 @@ private:
     std::atomic<bool> m_areInputPortsMonitored{false};
 
     nx::utils::TimerHolder m_timerHolder;
+    std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
 };
 
 } // namespace plugins
