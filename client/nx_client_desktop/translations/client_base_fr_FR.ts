@@ -4300,7 +4300,7 @@ to %1</source>
     </message>
     <message>
         <source>Disabled by schedule</source>
-        <translation type="unfinished">Disabled by schedule</translation>
+        <translation>Désactivé selon l&apos;horaire</translation>
     </message>
 </context>
 <context>
@@ -7229,11 +7229,11 @@ to %1</source>
     </message>
     <message>
         <source>Enter password...</source>
-        <translation type="unfinished">Enter password...</translation>
+        <translation>Entrer mot de passe...</translation>
     </message>
     <message>
         <source>Administrator password</source>
-        <translation type="unfinished">Administrator password</translation>
+        <translation>Mot de passe Administrateur</translation>
     </message>
 </context>
 <context>

@@ -1393,7 +1393,7 @@
     <message>
         <location/>
         <source>Locked to Hardware Id:</source>
-        <translation>Gebunden an Hardware-ID:</translation>
+        <translation>Gebunden an Hardware-Id:</translation>
     </message>
 </context>
 <context>
@@ -1492,7 +1492,7 @@
     <message>
         <location/>
         <source>Hardware Id</source>
-        <translation>Hardware-ID</translation>
+        <translation>Hardware-Id</translation>
     </message>
 </context>
 <context>

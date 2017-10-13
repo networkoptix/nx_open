@@ -1037,23 +1037,22 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>File &quot;%1&quot; is used by another process.</source>
-        <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+        <translation>Tệp &quot;%1&quot; đã được sử dụng cho một ứng dụng khác.</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-        <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+        <translation>Không thể ghi tệp &quot;%1&quot;. Hãy thử với tên khác.</translation>
     </message>
     <message numerus="yes">
         <source>Filename should not contain the following reserved characters:
 %1</source>
-        <translation type="unfinished">
-            <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+        <translation>
+            <numerusform>Tên tệp không được chứa các ký tự dự sau: %1</numerusform>
         </translation>
     </message>
     <message>
         <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-        <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+        <translation>Tên tệp &quot;%1&quot; được dành riêng cho hệ điều hành. Hãy thử lại với tên khác.</translation>
     </message>
 </context>
 <context>
@@ -2615,7 +2614,7 @@ to %1</source>
     </message>
     <message>
         <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-        <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+        <translation>Đã kích hoạt tài khoản isn&apos;t. Vui lòng kiểm tra email của bạn và làm theo các bước như hướng dẫn </translation>
     </message>
 </context>
 <context>
@@ -4549,7 +4548,7 @@ to %1</source>
     </message>
     <message>
         <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-        <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+        <translation>Thông báo sẽ được hiển thị cho đến khi người dùng tạo bookmark để mô tả sự kiện</translation>
     </message>
 </context>
 <context>

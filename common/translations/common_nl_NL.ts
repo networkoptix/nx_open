@@ -255,18 +255,6 @@
         <translation>Zorg ervoor dat poort %1 toegankelijk is (bijv. geforward).</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-        <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in apparaatinstellingen.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-        <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in camera-instellingen.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-        <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in I/O instellingen.</translation>
-    </message>
-    <message>
         <source>If it does not help, restore factory defaults on the device web-page.</source>
         <translation>Als dit niet helpt, herstel dan de fabrieksinstellingen op de webpagina van het apparaat.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
         <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
         <translation>Camera is hersteld vanuit het archief. Verwijder de camera en voeg het opnieuw toe om live video te bekijken.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -550,7 +550,7 @@
     </message>
     <message>
         <source>Server with matching Hardware Id not found</source>
-        <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
+        <translation>Server met bijpassende Hardware-Id niet gevonden</translation>
     </message>
 </context>
 <context>
@@ -673,7 +673,7 @@
     </message>
     <message>
         <source>Hardware Id: %1</source>
-        <translation>Hardware ID</translation>
+        <translation>Hardware Id: %1</translation>
     </message>
     <message>
         <source>Time License</source>
