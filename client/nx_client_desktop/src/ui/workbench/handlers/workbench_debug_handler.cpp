@@ -141,10 +141,12 @@ public:
                 QList<Ptz::Capabilities> presets;
                 presets.push_back(Ptz::NoPtzCapabilities);
                 presets.push_back(Ptz::ContinuousZoomCapability);
-                presets.push_back(Ptz::ContinuousZoomCapability|Ptz::ContinuousFocusCapability|Ptz::AuxilaryPtzCapability);
-                presets.push_back(Ptz::ContinuousPanCapability| Ptz::ContinuousTiltCapability);
-                presets.push_back(Ptz::ContinuousPanCapability|Ptz::ContinuousTiltCapability|Ptz::ContinuousZoomCapability|Ptz::ContinuousFocusCapability|Ptz::AuxilaryPtzCapability|Ptz::PresetsPtzCapability);
-                presets.push_back(Ptz::ContinuousZoomCapability|Ptz::ContinuousFocusCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability);
+                presets.push_back(Ptz::ContinuousPanTiltCapabilities);
+                presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability | Ptz::PresetsPtzCapability);
 
                 for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
                 {
