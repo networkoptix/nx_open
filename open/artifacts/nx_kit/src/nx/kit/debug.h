@@ -23,7 +23,7 @@
 #endif
 
 #if !defined(NX_KIT_API)
-    #define NX_KIT_API
+    #define NX_KIT_API /*empty*/
 #endif
 
 namespace nx {
@@ -54,6 +54,16 @@ NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
 
 //-------------------------------------------------------------------------------------------------
 // Output
+
+/** Define if needed to redirect NX_PRINT... to qDebug(). */
+#if defined(NX_PRINT_TO_QDEBUG)
+    #define NX_DEBUG_STREAM qDebug().nospace().noquote()
+    #define NX_DEBUG_ENDL /*empty*/
+    static inline QDebug operator<<(QDebug d, const std::string& s)
+    {
+        return d << QString::fromStdString(s);
+    }
+#endif
 
 #if !defined(NX_DEBUG_INI)
     /** If needed, redefine to form a prefix for NX_DEBUG_ENABLE... macros. */

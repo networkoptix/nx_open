@@ -15,7 +15,7 @@ config = null
 def main() {
 	try {
 		unsafe_main()
-	} catch (Exception|AssertionError x) {
+	} catch (Exception|Error x) {
 		echo "Error running test: $x"
 		echo "---- sanitized stack: ----"
 		org.codehaus.groovy.runtime.StackTraceUtils.sanitize(x).printStackTrace()
@@ -52,17 +52,8 @@ def unsafe_main() {
 
 	stage('Checkout master') {
 		node ('master') {
-			checkout([
-                    $class: 'MercurialSCM',
-                    // credentialsId: NX_REPOSITORY_CREDENTIALS_ID,
-                    installation: '(Default)',
-                    revision: 'default',
-                    // source: 'ssh://hg@la.hdw.mx/devtools',
-                    source: '/home/vfedorov/repo/jenkins',
-                    subdir: 'jenkins',
-                ])
-
-			config = readYaml file: 'jenkins/config.yaml'
+			def config_text = libraryResource 'config.yaml'
+			config = readYaml text: config_text
 			echo "config = $config"
 
 			update_job_parameters(config)
@@ -82,9 +73,10 @@ def unsafe_main() {
 		def branch = env.BRANCH_NAME
 		def run_params = [
 			project_name: PROJECT_NAME,
+			jenkins_build_url: env.BUILD_URL,
 			requested_platform_names: requested_platform_names,
 			branch: branch,
-			build_number: env.BUILD_NUMBER.toInteger(),
+			build_num: env.BUILD_NUMBER.toInteger(),
 			configuration: config.ci.configuration,
 			customization: config.ci.customization,
 			cloud_group: config.ci.cloud_group,

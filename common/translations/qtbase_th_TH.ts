@@ -683,7 +683,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
+      <translation>ไม่สามารถใช้ &lt; b &gt; ชื่อ "%1" ได้ &lt;/b &gt;&lt; p &gt; ลองใช้ชื่ออื่น มีอักขระน้อยกว่าหรือ punctuations ไม่ทำเครื่องหมาย</translation>
     </message>
     <message>
       <source>Name</source>
@@ -717,7 +717,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 ไบต์</translation>
     </message>
   </context>
   <context>
@@ -775,26 +775,26 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation type="unfinished">file to open is a directory</translation>
+      <translation>ไฟล์เพื่อเปิดเป็นไดเรกทอรี</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation type="unfinished">Invalid device</translation>
+      <translation>อุปกรณ์ไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation type="unfinished">File not found</translation>
+      <translation>ไม่พบไฟล์</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>ไม่รองรับภาพประเภทนี้</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation type="unfinished">Unable to read image data</translation>
+      <translation>ไม่สามารถอ่านข้อมูลภาพ</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -809,15 +809,15 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation type="unfinished">Device is not set</translation>
+      <translation>ไม่ได้ตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation type="unfinished">Device not writable</translation>
+      <translation>อุปกรณ์ไม่สามารถเขียนได้</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>ไม่รองรับภาพประเภทนี้</translation>
     </message>
   </context>
   <context>
@@ -831,7 +831,7 @@ Do you want to delete it anyway?</translation>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation type="unfinished">Press shortcut</translation>
+      <translation>กดทางลัด</translation>
     </message>
     <message>
       <source>%1, ...</source>
@@ -986,7 +986,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation type="unfinished">Filename refers to a directory</translation>
+      <translation>ชื่อไฟล์หมายถึงไดเร็กทอรี</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
@@ -1092,7 +1092,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Application Configuration</source>
-      <translation type="unfinished">Application Configuration</translation>
+      <translation>กำหนดค่าแอ็พพลิเคชัน</translation>
     </message>
     <message>
       <source>Cache</source>
@@ -1112,7 +1112,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation type="unfinished">Shared Configuration</translation>
+      <translation>การกำหนดค่าที่ใช้ร่วมกัน</translation>
     </message>
     <message>
       <source>Shared Cache</source>
@@ -1138,7 +1138,7 @@ Do you want to delete it anyway?</translation>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>นี้คืออะไร</translation>
     </message>
   </context>
   <context>

@@ -1255,7 +1255,18 @@
                 <artifact.name.cloud.suffix>-${cloudGroup}</artifact.name.cloud.suffix>
             </properties>
         </profile>
-
+        <profile>
+            <id>help</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>help</name>
+                </property>
+            </activation>
+            <modules>
+                <module>help</module>
+            </modules>
+        </profile>
         <!-- End of artifact naming profiles -->
 
     </profiles>

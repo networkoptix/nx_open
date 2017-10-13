@@ -150,7 +150,17 @@ QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(c
 QnResourceList QnDesktopCameraResourceSearcher::findResources()
 {
     cleanupConnections();
-    return QnResourceList();
+
+    // We must provide all found cameras to avoid moving them to Offline status.
+    QnResourceList result;
+
+    QnMutexLocker lock(&m_mutex);
+    for (const auto &info: m_connections)
+    {
+        if (const auto camera = cameraFromConnection(info))
+            result << camera;
+    }
+    return result;
 }
 
 QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid& resourceTypeId,

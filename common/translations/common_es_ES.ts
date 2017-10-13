@@ -256,18 +256,6 @@
         <translation>Asegúrese de que el puerto %1 es accesible (por ejemplo, reenviar).</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-        <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del dispositivo.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-        <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración de la cámara.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-        <translation>Primero, trate de habilitar la grabación (si está desactivado) y disminuya los fotogramas en la configuración del módulo E/S.</translation>
-    </message>
-    <message>
         <source>If it does not help, restore factory defaults on the device web-page.</source>
         <translation>Si no funciona, restaurar valores predeterminados de fábrica en la página web del dispositivo.</translation>
     </message>
@@ -314,6 +302,18 @@
     <message>
         <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
         <translation>La cámara se ha restaurado del archivo. Elimine la cámara y agrégala de nuevo para ver el video en vivo.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

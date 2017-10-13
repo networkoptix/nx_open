@@ -39,12 +39,12 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 class QnRtspStatistic
 {
 public:
-    QnRtspStatistic(): timestamp(0), nptTime(0), localtime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
-    bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
+    QnRtspStatistic(): timestamp(0), ntpTime(0), localTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
+    bool isEmpty() const { return timestamp == 0 && ntpTime == 0; }
 
     quint32 timestamp;
-    double nptTime;
-    double localtime;
+    double ntpTime;
+    double localTime;
     qint64 receivedPackets;
     qint64 receivedOctets;
     quint32 ssrc;
@@ -53,39 +53,43 @@ public:
 class QnRtspTimeHelper
 {
 public:
-    QnRtspTimeHelper(const QString& resId);
+    QnRtspTimeHelper(const QString& resourceId, bool allowedIgnoreCameraTimeIfBigJitter);
     ~QnRtspTimeHelper();
 
     /*!
         \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
     */
-    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
-    QString getResID() const { return m_resId; }
+    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursionAllowed = true);
+    QString getResID() const { return m_resourceId; }
+
 private:
-    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+    double cameraTimeToLocalTime(double cameraSecondsSinceEpoch, double currentSecondsSinceEpoch);
     bool isLocalTimeChanged();
     bool isCameraTimeChanged(const QnRtspStatistic& statistics);
     void reset();
+
 private:
+    quint32 m_prevRtpTime = 0;
+    quint32 m_prevCurrentSeconds = 0;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
     //qint64 m_cameraTimeDrift;
     double m_rtcpReportTimeDiff;
 
     struct CamSyncInfo {
-        CamSyncInfo(): timeDiff(INT_MAX), driftSum(0) {}
+        CamSyncInfo(): timeDiff(INT_MAX) {}
         QnMutex mutex;
         double timeDiff;
-        QnUnsafeQueue<qint64> driftStats;
-        qint64 driftSum;
     };
 
     QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
-    QString m_resId;
+    QString m_resourceId;
+    bool m_allowedIgnoreCameraTimeIfBigJitter;
 
     static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
+    bool m_ignoreCameraTime = false;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);

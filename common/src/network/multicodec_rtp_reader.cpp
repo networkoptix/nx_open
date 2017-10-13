@@ -37,7 +37,6 @@ using namespace nx;
 
 namespace {
 
-static const int RTSP_RETRY_COUNT = 6;
 static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 static int SOCKET_READ_BUFFER_SIZE = 512*1024;
 
@@ -62,13 +61,25 @@ static Value defaultTransportToUse( RtpTransport::_auto );
 
 } // RtpTransport
 
+/*static*/ bool QnMulticodecRtpReader::allowedIgnoreCameraTimeIfBigJitter(
+    const QnResourcePtr& resource)
+{
+    auto securityCamResource = resource.dynamicCast<QnSecurityCamResource>();
+    if (securityCamResource)
+    {
+        const auto& resourceData = qnStaticCommon->dataPool()->data(securityCamResource);
+        return resourceData.value<bool>(Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
+    }
+    return false;
+}
+
 QnMulticodecRtpReader::QnMulticodecRtpReader(
-    const QnResourcePtr& res,
+    const QnResourcePtr& resource,
     std::unique_ptr<AbstractStreamSocket> tcpSock)
-:
-    QnResourceConsumer(res),
+    :
+    QnResourceConsumer(resource),
     m_RtpSession(/*shouldGuessAuthDigest*/ false, std::move(tcpSock)),
-    m_timeHelper(res->getUniqueId()),
+    m_timeHelper(resource->getUniqueId(), allowedIgnoreCameraTimeIfBigJitter(resource)),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
     m_role(Qn::CR_Default),
@@ -76,24 +87,28 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_rtpStarted(false),
     m_prefferedAuthScheme(nx_http::header::AuthScheme::digest)
 {
-    const auto& globalSettings = res->commonModule()->globalSettings();
+    const auto& globalSettings = resource->commonModule()->globalSettings();
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
-    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
+    QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (netRes)
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
         m_RtpSession.setTCPTimeout(1000 * 10);
 
-    QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
+    QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(resource);
     m_numberOfVideoChannels = 1;
     m_customVideoLayout.clear();
 
-    QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
+    QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
     if (camRes)
-        connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
-    Qn::directConnect(res.data(), &QnResource::propertyChanged, this, &QnMulticodecRtpReader::at_propertyChanged);
+    {
+        connect(this, &QnMulticodecRtpReader::networkIssue,
+            camRes.data(), &QnSecurityCamResource::networkIssue, Qt::DirectConnection);
+    }
+    Qn::directConnect(resource.data(), &QnResource::propertyChanged,
+        this, &QnMulticodecRtpReader::at_propertyChanged);
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()

@@ -8,16 +8,19 @@ namespace utils {
 namespace log {
 
 /** @return Main logger. */
-std::shared_ptr<Logger> NX_UTILS_API mainLogger();
+NX_UTILS_API std::shared_ptr<Logger> mainLogger();
 
 /** Creates a logger for specific filters. */
-std::shared_ptr<Logger> NX_UTILS_API addLogger(const std::set<QString>& filters);
+NX_UTILS_API std::shared_ptr<Logger> addLogger(const std::set<QString>& filters);
 
 /** @return Logger by tag or main if no specific logger is set. */
-std::shared_ptr<Logger> NX_UTILS_API getLogger(const QString& tag, bool allowMain = true);
+NX_UTILS_API std::shared_ptr<Logger> getLogger(const QString& tag, bool allowMainLogger = true);
 
 /** Removes specific loggers for filters, so such messagess will go to main log. */
-void NX_UTILS_API removeLoggers(const std::set<QString>& filters);
+NX_UTILS_API void removeLoggers(const std::set<QString>& filters);
+
+/** Get the maximum log level currently used by any logger registered via addLogger(). */
+NX_UTILS_API Level maxLevel();
 
 /**
  * Indicates if a message is going to be logged by any logger.
@@ -84,12 +87,15 @@ Stream makeStream(Level level, const Tag& tag)
 
 #define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, MESSAGE) do \
 { \
-    if (auto helper = nx::utils::log::detail::makeHelper(LEVEL, TAG)) \
-        helper.log(::toString(MESSAGE)); \
+    if (static_cast<nx::utils::log::Level>(LEVEL) <= nx::utils::log::maxLevel()) \
+    { \
+        if (auto helper = nx::utils::log::detail::makeHelper((LEVEL), (TAG))) \
+            helper.log(::toString(MESSAGE)); \
+    } \
 } while (0)
 
 #define NX_UTILS_LOG_STREAM(LEVEL, TAG) \
-    if (auto stream = nx::utils::log::detail::makeStream(LEVEL, TAG)) {} else stream <<
+    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} else stream <<
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG(__VA_ARGS__, \
