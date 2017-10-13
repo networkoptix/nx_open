@@ -1299,7 +1299,7 @@ bool AsyncClient::resendRequestWithAuthorization(
     header::WWWAuthenticate wwwAuthenticateHeader;
     wwwAuthenticateHeader.parse(wwwAuthenticateIter->second);
     if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic &&
-        credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty())
+        (credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty()))
     {
         header::BasicAuthorization basicAuthorization(
             credentials.username.toLatin1(),
