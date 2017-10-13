@@ -235,7 +235,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
     NX_ASSERT(rootItem);
 
     auto allEventTypes = m_filterCameraList.empty()
-        ? AnalyticsHelper(commonModule()).systemSupportedAnaliticEvents()
+        ? AnalyticsHelper(commonModule()).systemSupportedAnalyticsEvents()
         : AnalyticsHelper::supportedAnalyticsEvents(cameras(m_filterCameraList));
 
     if (allEventTypes.empty())
