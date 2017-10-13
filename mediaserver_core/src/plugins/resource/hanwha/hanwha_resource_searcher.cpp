@@ -97,7 +97,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     {
         HanwhaRequestHelper helper(resource);
         std::map<QString, QString> params{
-            { "interfaceName", "Network1" }
+            {"interfaceName", "Network1"}
         };
         HanwhaResponse networkInfo = helper.view("network/interface", params);
         if (!networkInfo.isSuccessful())
