@@ -23,8 +23,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RadassMode)
 
 using ModeByIdHash = QHash<QnUuid, RadassMode>;
 
-namespace
-{
+namespace {
 
 ModeByIdHash filtered(ModeByIdHash source, QnResourcePool* resourcePool)
 {
