@@ -10,17 +10,6 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-struct HanwhaAttributes::XmlElement
-{
-    XmlElement(const QStringRef& name, const QXmlStreamAttributes& attributes):
-        name(name), attributes(attributes)
-    {
-    }
-
-    QStringRef name;
-    QXmlStreamAttributes attributes;
-};
-
 HanwhaAttributes::HanwhaAttributes(nx_http::StatusCode::Value statusCode):
     m_statusCode(statusCode)
 {
@@ -33,7 +22,7 @@ HanwhaAttributes::HanwhaAttributes(
     m_statusCode(statusCode)
 {
     QXmlStreamReader reader(attributesXml);
-    parseXml(reader, XmlElementList());
+    parseXml(reader, QString(), kNoChannel);
     m_isValid = !reader.hasError();
 }
 
@@ -67,37 +56,28 @@ boost::optional<QString> HanwhaAttributes::findAttribute(
     return attribute->second;
 }
 
-void HanwhaAttributes::parseXml(QXmlStreamReader& reader, XmlElementList path)
+void HanwhaAttributes::parseXml(QXmlStreamReader& reader, const QString& group, int channel)
 {
     while (!reader.atEnd() && reader.readNextStartElement())
     {
-        if (reader.name() == kHanwhaAttributeNodeName)
-            parseAttribute(reader, path);
+        if (reader.name() == kHanwhaGroupNodeName)
+            parseXml(reader, reader.attributes().value(kHanwhaNameAttribute).toString(), channel);
+        else if (reader.name() == kHanwhaChannelNodeName)
+            parseXml(reader, group, reader.attributes().value("number").toInt());
+        else if (reader.name() == kHanwhaAttributeNodeName)
+            parseAttribute(reader, group, channel);
         else
-            parseXml(reader, path << XmlElement(reader.name(), reader.attributes()));
+            parseXml(reader, group, channel);
         reader.readNext();
     }
 }
 
-bool HanwhaAttributes::parseAttribute(QXmlStreamReader& reader, XmlElementList path)
+void HanwhaAttributes::parseAttribute(QXmlStreamReader& reader, const QString& group, int channel)
 {
-    QString group;
-    int channel = kNoChannel;
-    for (const auto& element: path)
-    {
-        if (element.name == "group")
-            group = element.attributes.value("name").toString();
-        else if (element.name == "channel")
-            channel = element.attributes.value("number").toInt();
-    }
-    if (group.isEmpty())
-        return false; //< Ignore unknown attributes placed not in a group.
-
     const auto& attrs = reader.attributes();
     const auto attrName = attrs.value(kHanwhaNameAttribute).toString();
     const auto attrValue = attrs.value(kHanwhaValueAttribute).toString();
     m_attributes[channel][group][attrName] = attrValue;
-    return true;
 }
 
 template<>

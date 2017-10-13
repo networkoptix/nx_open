@@ -62,16 +62,13 @@ public:
 
 private:
 
-    struct XmlElement;
-    using XmlElementList = QList<XmlElement>;
-
     boost::optional<QString> findAttribute(
         const QString& group,
         const QString& attributeName,
         int channel) const;
 
-    void parseXml(QXmlStreamReader& reader, XmlElementList path);
-    bool parseAttribute(QXmlStreamReader& reader, XmlElementList path);
+    void parseXml(QXmlStreamReader& reader, const QString& group, int channel);
+    void parseAttribute(QXmlStreamReader& reader, const QString& group, int channel);
 
 private:
     using GroupName = QString;
