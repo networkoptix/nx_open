@@ -437,10 +437,9 @@ qint64 QnRtspTimeHelper::getUsecTime(
     }
     else
     {
-        const qint64 result =
-            ((m_ignoreCameraTime || gotInvalidTime) ? currentSeconds : resultSeconds) * 1000000LL;
-        NX_VERBOSE(this, lm("getUsecTime() END -> %1 (gotInvalidTime: %2)").args(
-            result, gotInvalidTime ? "true" : "false"));
+        const qint64 result = (gotInvalidTime ? currentSeconds : resultSeconds) * 1000000LL;
+        NX_VERBOSE(this, lm("getUsecTime() END -> %1 (gotInvalidTime: %2)")
+            .args(result, gotInvalidTime ? "true" : "false"));
         return result;
     }
 }
