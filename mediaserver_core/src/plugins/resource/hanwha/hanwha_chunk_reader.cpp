@@ -35,9 +35,10 @@ HanwhaChunkLoader::HanwhaChunkLoader():
 
 HanwhaChunkLoader::~HanwhaChunkLoader()
 {
-    m_httpClient->pleaseStopSync();
+    m_terminated = true;
     if (m_nextRequestTimerId)
         nx::utils::TimerManager::instance()->deleteTimer(m_nextRequestTimerId);
+    m_httpClient->pleaseStopSync();
 }
 
 void HanwhaChunkLoader::start(const QAuthenticator& auth, const QUrl& cameraUrl, int maxChannels)
@@ -183,6 +184,8 @@ void HanwhaChunkLoader::onHttpClientDone()
 
 void HanwhaChunkLoader::startTimerForNextRequest(const std::chrono::milliseconds& delay)
 {
+    if (m_terminated)
+        return;
     m_nextRequestTimerId = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&HanwhaChunkLoader::sendRequest, this),
         delay);

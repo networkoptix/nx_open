@@ -70,6 +70,7 @@ private:
     mutable QnMutex m_mutex;
 
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};
+    std::atomic<bool> m_terminated{false};
 };
 
 } // namespace plugins
