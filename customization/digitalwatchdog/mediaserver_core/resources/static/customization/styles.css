@@ -80,3 +80,16 @@ a{
 a:visited{
     color:#F06200;
 }
+
+.info-icon.active {
+    color: #FF6C00 !important;
+}
+
+.video-settings-button:hover,
+.webclient-panel .dropdown-menu > li > a:hover{
+    background-color: #ee600d !important;
+}
+
+.webclient-panel .dropdown-menu > li > a.active{
+    background-color: #e65d0c !important;
+}
