@@ -1,9 +1,8 @@
 <div class="container-fluid">
 
     <div>
-        <h2 class="text-center">Welcome to Lite Client</h2>
-        <p class="text-center">Lite Client can show up to 4 live videos, <br>
-            and can be controlled either by keyboard and mouse connected to the device,<br> or through mobile app</p>
+        <h2 class="text-center">ยินดีต้อนรับสู่ Lite Client</h2>
+        <p class="text-center">Lite Client สามารถแสดงวิดีโอสดได้สูงสุด 4 รายการ <br> และสามารถควบคุมได้ด้วยแป้นพิมพ์และเมาส์ที่เชื่อมต่อกับอุปกรณ์ <br> หรือผ่านแอพมือถือ</p>
     </div>
     <div class="text-center">
         <div class="panel panel-default panel-inline system-info">
@@ -11,27 +10,27 @@
                 <p class="text-center">
                     <img src="images/lite_client/control_types_keyboard.png"> <img src="images/lite_client/control_types_mouse.png">
                 </p>
-                <h3 class="text-center">By keyboard/mouse</h3>
+                <h3 class="text-center">ด้วยแป้นพิมพ์ / เมาส์</h3>
                 <table>
                     <tbody>
                         <tr>
-                            <td>Select cell</td>
+                            <td>เลือกเซลล์</td>
                             <td class="text-right"><img src="images/lite_client/keyboard_asdw.png"></td>
-                            <td class="grey-text">or <img src="images/lite_client/mouse_click.png"> Single click</td>
+                            <td class="grey-text">หรือ <img src="images/lite_client/mouse_click.png"> คลิกเพียงครั้งเดียว</td>
                         </tr>
                         <tr>
-                            <td>Switch camera in a cell</td>
+                            <td>สลับกล้องในเซลล์</td>
                             <td class="text-right"><img src="images/lite_client/keyboard_ctrlarrows.png"></td>
-                            <td class="grey-text">or <img src="images/lite_client/mouse_wheel.png"> Wheel</td>
+                            <td class="grey-text">หรือ <img src="images/lite_client/mouse_wheel.png"> ล้อ</td>
                         </tr>
 
                         <tr>
-                            <td>Enter / exit fullscreen</td>
+                            <td>ป้อน / ออกจากแบบเต็มหน้าจอ</td>
                             <td class="text-right"><img src="images/lite_client/keyboard_enter.png"></td>
-                            <td class="grey-text">or <img src="images/lite_client/mouse_clickclick.png"> Double click</td>
+                            <td class="grey-text">หรือ <img src="images/lite_client/mouse_clickclick.png"> ดับเบิลคลิก</td>
                         </tr>
                         <tr>
-                            <td>Exit lite client</td>
+                            <td>ออกจาก lite client</td>
                             <td class="text-right"><img src="images/lite_client/keyboard_esc.png"></td>
                             <td class="grey-text"></td>
                         </tr>
@@ -44,20 +43,20 @@
                 <p class="text-center">
                     <img src="images/lite_client/control_mobile.png">
                 </p>
-                <h3 class="text-center">Through mobile app</h3>
+                <h3 class="text-center">ผ่านแอพบนมือถือ</h3>
                 <table>
                     <tbody>
-                        <tr><td>Install <b>{{Config.productName}}</b> app via Google Play or App Store</td></tr>
-                        <tr><td>Connect to system "{{settings.systemName}}" ({{IP}}:{{port}})</td></tr>
-                        <tr><td>Select "{{settings.name}}" screen in side menu</td></tr>
-                        <tr><td>Turn Lite Client on and select cameras to display</td></tr>
+                        <tr><td>ติดตั้ง <b> {{Config.productName}} </b> แอปผ่าน Google Play หรือ App Store</td></tr>
+                        <tr><td>เชื่อมต่อกับระบบ "{{settings.systemName}}" ({{IP}}: {{port}})</td></tr>
+                        <tr><td>เลือกหน้าจอ "{{settings.name}}" ในเมนูด้านข้าง</td></tr>
+                        <tr><td>เปิด Lite Client และเลือกกล้องที่จะแสดง</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
     <div class="text-center">
-        <button class="btn btn-primary btn-lg" ng-click="startCameras()" auto-focus enter-button>Launch Lite Client</button>
+        <button class="btn btn-primary btn-lg" ng-click="startCameras()" auto-focus enter-button>เปิดตัว Lite Client</button>
         <p class="grey-text">(Enter)</p>
     </div>
 </div>

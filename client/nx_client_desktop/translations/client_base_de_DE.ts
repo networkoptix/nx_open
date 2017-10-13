@@ -960,7 +960,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-        <translation>Hardware-ID vom Server mit dieser Lizenz stimmt nicht mit der Hardware-ID überein auf der die Lizenz aktiviert wurde.</translation>
+        <translation>Hardware-Id vom Server mit dieser Lizenz stimmt nicht mit der Hardware-Id überein auf der die Lizenz aktiviert wurde.</translation>
     </message>
 </context>
 <context>
@@ -1672,7 +1672,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 of %n devices</source>
         <translation>
-            <numerusform>%1 von %n Geräten</numerusform>
+            <numerusform>%1 von %n Gerät</numerusform>
             <numerusform>%1 von %n Geräten</numerusform>
         </translation>
     </message>
@@ -3707,7 +3707,7 @@ to %1</source>
     </message>
     <message>
         <source>Locked to Hardware Id</source>
-        <translation>Gebunden an Hardware-ID</translation>
+        <translation>Gebunden an Hardware-Id</translation>
     </message>
 </context>
 <context>
@@ -3983,11 +3983,11 @@ to %1</source>
     </message>
     <message>
         <source>This license is already activated and linked to Hardware Id %1</source>
-        <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 verbunden</translation>
+        <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-Id %1 verbunden</translation>
     </message>
     <message>
         <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-        <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 auf %2 verbunden</translation>
+        <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-Id %1 auf %2 verbunden</translation>
     </message>
     <message>
         <source>If the problem persists please contact Customer Support.</source>
@@ -4018,11 +4018,11 @@ to %1</source>
     </message>
     <message>
         <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-        <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
+        <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-Id an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
     <message>
         <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-        <translation>Senden Sie den Lizenzschlüssel und die Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
+        <translation>Senden Sie den Lizenzschlüssel und die Hardware-Id an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
 </context>
 <context>
@@ -4295,7 +4295,7 @@ to %1</source>
     </message>
     <message>
         <source>Disabled by schedule</source>
-        <translation type="unfinished">Disabled by schedule</translation>
+        <translation>Nach Zeitplan deaktiviert</translation>
     </message>
 </context>
 <context>
@@ -7224,11 +7224,11 @@ to %1</source>
     </message>
     <message>
         <source>Enter password...</source>
-        <translation type="unfinished">Enter password...</translation>
+        <translation>Passwort eingeben...</translation>
     </message>
     <message>
         <source>Administrator password</source>
-        <translation type="unfinished">Administrator password</translation>
+        <translation>Administratorpasswort</translation>
     </message>
 </context>
 <context>

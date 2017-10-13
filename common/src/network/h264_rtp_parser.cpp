@@ -136,7 +136,7 @@ void CLH264RtpParser::backupCurrentData(quint8* bufferStart)
     {
         memcpy(nextFrameBufRaw + offset, bufferStart + chunk.bufferOffset, chunk.len);
         chunk.bufferStart = nextFrameBufRaw;
-        chunk.bufferOffset = offset;
+        chunk.bufferOffset = (int) offset;
         offset += chunk.len;
     }
 }
@@ -173,10 +173,9 @@ bool CLH264RtpParser::isBufferOverflow() const
 }
 
 QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
-    const quint8            *rtpBuffer,
-    quint32                 rtpTime,
-    const QnRtspStatistic   &statistics
-)
+    const quint8* rtpBuffer,
+    quint32 rtpTime,
+    const QnRtspStatistic& statistics)
 {
     int addHeaderSize = 0;
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
@@ -192,31 +191,30 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
     result->compressionType = AV_CODEC_ID_H264;
     result->width = m_spsInitialized ? m_sps.getWidth() : -1;
     result->height = m_spsInitialized ? m_sps.getHeight() : -1;
-    if (m_keyDataExists) {
+    if (m_keyDataExists)
+    {
         result->flags = QnAbstractMediaData::MediaFlags_AVKey;
         if (!m_builtinSpsFound || !m_builtinPpsFound)
             serializeSpsPps(result->m_data);
     }
 
-    size_t spsNaluStartOffset = (size_t)-1;
+    size_t spsNaluStartOffset = (size_t) -1;
     size_t spsNaluSize = 0;
     for (size_t i = 0; i < m_chunks.size(); ++i)
     {
 
-        auto buffer = m_chunks[i].bufferStart ?
-            m_chunks[i].bufferStart : rtpBuffer;
+        auto buffer = m_chunks[i].bufferStart ? m_chunks[i].bufferStart : rtpBuffer;
 
         if (m_chunks[i].nalStart)
         {
-            if( (spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0) )
+            if ((spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0))
                 spsNaluSize = result->m_data.size() - spsNaluStartOffset;
 
             result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
 
-            auto nalType = (
-                *( buffer + m_chunks[i].bufferOffset ) & 0x1f);
+            auto nalType = *(buffer + m_chunks[i].bufferOffset) & 0x1f;
 
-            if( (m_chunks[i].len > 0) && (nalType == nuSPS) )
+            if ((m_chunks[i].len > 0) && (nalType == nuSPS))
                 spsNaluStartOffset = result->m_data.size();
         }
 
@@ -224,27 +222,32 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
             (const char*) buffer + m_chunks[i].bufferOffset, m_chunks[i].len);
     }
 
-    if( (spsNaluStartOffset != (size_t)-1) )
+    if (spsNaluStartOffset != (size_t) -1)
     {
-        //decoding sps to detect stream resolution change
-        decodeSpsInfo( QByteArray::fromRawData( result->m_data.constData() + spsNaluStartOffset, spsNaluSize ) );
+        // Decoding sps to detect stream resolution change.
+        decodeSpsInfo(QByteArray::fromRawData(
+            result->m_data.constData() + spsNaluStartOffset, (int) spsNaluSize));
     }
 
-    if (m_timeHelper) {
+    if (m_timeHelper)
+    {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
 #if 0
-        qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
-        if (qAbs(currentTime - result->timestamp) > 500*1000) {
+        qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+        if (qAbs(currentTime - result->timestamp) > 500 * 1000)
+        {
             qDebug()
                 << "large RTSP video jitter "
-                << (result->timestamp - currentTime)/1000
+                << (result->timestamp - currentTime) / 1000
                 << "RtpTime="
                 << rtpTime;
         }
 #endif
     }
     else
+    {
         result->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+    }
 
     clearInternalBuffer();
     return result;
@@ -509,7 +512,7 @@ bool CLH264RtpParser::processData(
                     return clearInternalBuffer();
 
                 nalUnitType = *curPtr & 0x1f;
-                m_chunks.emplace_back(curPtr-rtpBufferBase, nalUnitLen, true);
+                m_chunks.emplace_back((int) (curPtr - rtpBufferBase), nalUnitLen, true);
                 m_videoFrameSize += nalUnitLen + 4;
                 updateNalFlags(curPtr, bufferEnd - curPtr);
                 curPtr += nalUnitLen;
@@ -558,7 +561,9 @@ bool CLH264RtpParser::processData(
                 *curPtr = nalUnitType;
             }
             m_chunks.emplace_back(
-                (int) (curPtr-rtpBufferBase), bufferEnd - curPtr, m_packetPerNal == 0);
+                (int) (curPtr - rtpBufferBase),
+                (quint16) (bufferEnd - curPtr),
+                m_packetPerNal == 0);
             m_videoFrameSize += bufferEnd - curPtr + (m_packetPerNal == 0 ? 4 : 0);
             break;
         }
@@ -573,7 +578,8 @@ bool CLH264RtpParser::processData(
         {
             curPtr--;
             nalUnitType = *curPtr & 0x1f;
-            m_chunks.emplace_back(curPtr-rtpBufferBase, bufferEnd - curPtr, true);
+            m_chunks.emplace_back(
+                (int) (curPtr - rtpBufferBase), (quint16) (bufferEnd - curPtr), true);
             m_videoFrameSize += bufferEnd - curPtr + 4;
             updateNalFlags(curPtr, bufferEnd - curPtr);
             break; // ignore unknown data

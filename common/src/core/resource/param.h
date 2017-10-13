@@ -85,6 +85,7 @@ namespace Qn
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
+    static const QString IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME = lit("ignoreCameraTimeIfBigJitter");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");

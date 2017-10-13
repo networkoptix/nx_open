@@ -94,6 +94,16 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     if (camRes)
         connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
     Qn::directConnect(res.data(), &QnResource::propertyChanged, this, &QnMulticodecRtpReader::at_propertyChanged);
+
+    auto securityCamResource = res.dynamicCast<QnSecurityCamResource>();
+    if (securityCamResource)
+    {
+        auto resourceData = qnStaticCommon->dataPool()->data(securityCamResource);
+        const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
+            Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
+        if (ignoreCameraTimeIfBigJitter)
+            m_timeHelper.setTimePolicy(TimePolicy::IgnoreCameraTimeIfBigJitter);
+    }
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -741,7 +751,7 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
 
 void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
 {
-    m_timeHelper.setTrustToCameraTime(value);
+    m_timeHelper.setTimePolicy(TimePolicy::ForceCameraTime);
 }
 
 QnRtspClient& QnMulticodecRtpReader::rtspClient()

@@ -6,7 +6,7 @@
     <message>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>tiếng Việt</translation>
+        <translation>Tên ngôn ngữ</translation>
     </message>
 </context>
 <context>
@@ -89,7 +89,7 @@
     <message>
         <source>The discovered System %1 is incompatible with the current System.</source>
         <comment>%1 is name of System</comment>
-        <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+        <translation>Phát hiện %1 lỗi không tương thích với hệ thống hiện tại.</translation>
     </message>
 </context>
 <context>
@@ -255,18 +255,6 @@
         <translation>Hãy chắc chắn rằng cổng %1 có thể truy cập (ví dụ chuyển tiếp).</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-        <translation>Trước tiên, hãy thử bật ghi (nếu nó tắt) hảy giảm fps trong cài đặt thiết bị.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-        <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-        <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt mô-đun I / O.</translation>
-    </message>
-    <message>
         <source>If it does not help, restore factory defaults on the device web-page.</source>
         <translation>Nếu nó không giúp đỡ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web của thiết bị.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
         <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
         <translation>Camera đã được khôi phục lưu trữ. Xóa camera và thêm lại để xem Video trực tiếp.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
