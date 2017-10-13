@@ -379,7 +379,8 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
                 && (md->flags & AV_PKT_FLAG_KEY);
             if (m_nextIFrameTime == (qint64) AV_NOPTS_VALUE && isKeyFrame)
                 m_nextIFrameTime = md->timestamp;
-            NX_VERBOSE(this, lm("processData(): isKeyFrame: %1 (dataType == VIDEO: %2; flags & VA_PKT_FLAG_KEY: %3)")
+            NX_VERBOSE(this, lm("processData(): isKeyFrame: %1 "
+                "(dataType == VIDEO: %2; flags & VA_PKT_FLAG_KEY: %3)")
                 .arg(isKeyFrame ? "true" : "false")
                 .arg(md->dataType == QnAbstractMediaData::VIDEO ? "true" : "false")
                 .arg(md->flags & AV_PKT_FLAG_KEY ? "true" : "false")
