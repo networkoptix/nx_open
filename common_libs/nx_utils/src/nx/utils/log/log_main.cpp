@@ -10,7 +10,8 @@ class LoggerCollection
 {
 public:
     LoggerCollection():
-        m_mainLogger(std::make_shared<Logger>([this]() { updateMaxLevel(); }))
+        m_mainLogger(std::make_shared<Logger>(
+            Level::none, /*writer*/ nullptr, [this](){ onLevelChanged(); }))
     {
         updateMaxLevel();
     }
@@ -24,7 +25,8 @@ public:
     std::shared_ptr<Logger> add(const std::set<QString>& filters)
     {
         QnMutexLocker lock(&m_mutex);
-        const auto logger = std::make_shared<Logger>([this]() { updateMaxLevel(); });
+        const auto logger = std::make_shared<Logger>(
+            Level::none, /*writer*/ nullptr, [this](){ onLevelChanged(); });
         for(auto& f: filters)
             m_loggersByTags.emplace(f, logger);
 
@@ -53,32 +55,29 @@ public:
         updateMaxLevel();
     }
 
-    Level maxLevel() const;
+    Level maxLevel() const { return m_maxLevel; }
 
 private:
     void updateMaxLevel();
+
+    void onLevelChanged()
+    {
+        QnMutexLocker lock(&m_mutex);
+        updateMaxLevel();
+    }
 
 private:
     mutable QnMutex m_mutex;
     std::shared_ptr<Logger> m_mainLogger;
     std::map<QString, std::shared_ptr<Logger>> m_loggersByTags;
-    Level m_maxLevel = Level::none;
+    std::atomic<Level> m_maxLevel = Level::none;
 };
-
-Level LoggerCollection::maxLevel() const
-{
-    return m_maxLevel;
-}
 
 void LoggerCollection::updateMaxLevel()
 {
     m_maxLevel = m_mainLogger->maxLevel();
     for (const auto& element: m_loggersByTags)
-    {
-        const auto& logger = element.second;
-        if (logger->maxLevel() > m_maxLevel)
-            m_maxLevel = logger->maxLevel();
-    }
+        m_maxLevel = (Level) std::max((int) element.second->maxLevel(), (int) m_maxLevel.load());
 }
 
 static LoggerCollection* loggerCollection()
@@ -113,45 +112,6 @@ Level maxLevel()
 {
     return loggerCollection()->maxLevel();
 }
-
-namespace detail {
-
-Helper::Helper(Level level, const QString& tag):
-    m_level(level),
-    m_tag(tag)
-{
-    m_logger = getLogger(m_tag);
-    if (!m_logger->isToBeLogged(m_level, m_tag))
-        m_logger.reset();
-}
-
-void Helper::log(const QString& message)
-{
-    m_logger->logForced(m_level, m_tag, message);
-}
-
-Helper::operator bool() const
-{
-    return (bool) m_logger;
-}
-
-Stream::Stream(Level level, const QString& tag):
-    Helper(level, tag)
-{
-}
-
-Stream::~Stream()
-{
-    if (m_logger)
-        log(m_strings.join(' '));
-}
-
-Stream::operator bool() const
-{
-    return !(bool) m_logger;
-}
-
-} // namespace detail
 
 } // namespace log
 } // namespace utils

@@ -16,13 +16,13 @@ namespace utils {
 namespace log {
 
 Logger::Logger(
-    OnLevelChanged onLevelChanged,
     Level level,
-    std::unique_ptr<AbstractWriter> writer)
+    std::unique_ptr<AbstractWriter> writer,
+    OnLevelChanged onLevelChanged)
     :
     m_mutex(QnMutex::Recursive),
-    m_onLevelChanged(onLevelChanged),
-    m_defaultLevel(level)
+    m_defaultLevel(level),
+    m_onLevelChanged(std::move(onLevelChanged))
 {
     if (writer)
         m_writers.push_back(std::move(writer));

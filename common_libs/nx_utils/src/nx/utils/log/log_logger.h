@@ -15,9 +15,9 @@ public:
 
     /** Initializes log with minimal level and writers, no writers means std out and err. */
     Logger(
-        OnLevelChanged onLevelChanged = nullptr,
         Level level = Level::none,
-        std::unique_ptr<AbstractWriter> writer = nullptr);
+        std::unique_ptr<AbstractWriter> writer = nullptr,
+        OnLevelChanged onLevelChanged = nullptr);
 
     /** Writes message to every writer if it is to be logged. */
     void log(Level level, const QString& tag, const QString& message);
@@ -36,7 +36,7 @@ public:
     std::set<QString> exceptionFilters() const;
     void setExceptionFilters(std::set<QString> filters);
 
-    /** Report the maximum possible log level, according to the current settings. */
+    /** @return Maximum possible log level, according to the current settings. */
     Level maxLevel() const;
 
     void setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers = {});
@@ -46,7 +46,7 @@ public:
 
 private:
     mutable QnMutex m_mutex;
-    OnLevelChanged m_onLevelChanged;
+    const OnLevelChanged m_onLevelChanged;
     Level m_defaultLevel = Level::none;
     std::vector<std::unique_ptr<AbstractWriter>> m_writers;
     std::set<QString> m_exceptionFilters;
