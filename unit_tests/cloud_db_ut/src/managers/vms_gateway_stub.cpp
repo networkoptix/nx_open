@@ -10,6 +10,7 @@ VmsGatewayStub::~VmsGatewayStub()
 }
 
 void VmsGatewayStub::merge(
+    const std::string& /*username*/,
     const std::string& targetSystemId,
     VmsRequestCompletionHandler completionHandler)
 {

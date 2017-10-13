@@ -11,6 +11,8 @@
 
 #include <api/mediaserver_client.h>
 
+#include "account_manager.h"
+
 namespace nx {
 namespace cdb {
 
@@ -43,6 +45,7 @@ public:
     virtual ~AbstractVmsGateway() = default;
 
     virtual void merge(
+        const std::string& username,
         const std::string& targetSystemId,
         VmsRequestCompletionHandler completionHandler) = 0;
 };
@@ -51,10 +54,13 @@ class VmsGateway:
     public AbstractVmsGateway
 {
 public:
-    VmsGateway(const conf::Settings& settings);
+    VmsGateway(
+        const conf::Settings& settings,
+        const AbstractAccountManager& accountManager);
     virtual ~VmsGateway() override;
 
     virtual void merge(
+        const std::string& username,
         const std::string& targetSystemId,
         VmsRequestCompletionHandler completionHandler) override;
 
@@ -67,6 +73,7 @@ private:
     };
 
     const conf::Settings& m_settings;
+    const AbstractAccountManager& m_accountManager;
     nx::network::aio::BasicPollable m_asyncCall;
     QnMutex m_mutex;
     std::map<MediaServerClient*, RequestContext> m_activeRequests;
@@ -74,6 +81,10 @@ private:
     void reportInvalidConfiguration(
         const std::string& targetSystemId,
         VmsRequestCompletionHandler completionHandler);
+
+    bool addAuthentication(
+        const std::string& username,
+        MediaServerClient* clientPtr);
 
     MergeSystemData prepareMergeRequestParameters();
 

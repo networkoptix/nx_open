@@ -18,6 +18,7 @@ public:
     virtual ~VmsGatewayStub() override;
 
     virtual void merge(
+        const std::string& username,
         const std::string& targetSystemId,
         VmsRequestCompletionHandler completionHandler) override;
 

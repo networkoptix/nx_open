@@ -11,6 +11,9 @@
 
 #include <nx/cloud/cdb/managers/vms_gateway.h>
 #include <nx/cloud/cdb/settings.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
+
+#include "account_manager_stub.h"
 
 namespace nx {
 namespace cdb {
@@ -19,10 +22,17 @@ namespace test {
 class VmsGateway:
     public ::testing::Test
 {
-protected:    
+protected:
     void givenUnreachableVms()
     {
         m_mediaserverEmulator.reset();
+    }
+
+    void givenVmsWithAuthenticationEnabled()
+    {
+        m_mediaserverEmulator->setAuthenticationEnabled(true);
+        m_mediaserverEmulator->registerUserCredentials(
+            m_ownerAccount.email.c_str(), m_ownerAccount.password.c_str());
     }
 
     void whenIssueMergeRequest()
@@ -30,6 +40,7 @@ protected:
         using namespace std::placeholders;
 
         m_vmsGateway->merge(
+            m_ownerAccount.email,
             m_systemId,
             std::bind(&VmsGateway::saveMergeResult, this, _1));
     }
@@ -49,6 +60,18 @@ protected:
         ASSERT_EQ(resultCode, m_vmsRequestResults.pop().resultCode);
     }
 
+    void thenRequestIsAuthenticatedWithCredentialsSpecified()
+    {
+        auto vmsApiRequest = m_vmsApiRequests.pop();
+
+        const auto authorizationHeaderStr = nx_http::getHeaderValue(
+            vmsApiRequest.headers, nx_http::header::Authorization::NAME);
+        ASSERT_FALSE(authorizationHeaderStr.isEmpty());
+        nx_http::header::Authorization authorization;
+        ASSERT_TRUE(authorization.parse(authorizationHeaderStr));
+        ASSERT_EQ(m_ownerAccount.email, authorization.userid().toStdString());
+    }
+
     void assertVmsResponseResultsIn(
         nx_http::StatusCode::Value vmsHttpResponseStatusCode,
         VmsResultCode expectedCode)
@@ -59,6 +82,7 @@ protected:
     }
 
 private:
+    AccountManagerStub m_accountManagerStub;
     std::unique_ptr<TestHttpServer> m_mediaserverEmulator;
     nx::utils::SyncQueue<nx_http::Request> m_vmsApiRequests;
     nx::utils::SyncQueue<VmsRequestResult> m_vmsRequestResults;
@@ -66,10 +90,14 @@ private:
     std::unique_ptr<cdb::VmsGateway> m_vmsGateway;
     std::string m_systemId;
     boost::optional<nx_http::StatusCode::Value> m_forcedHttpResponseStatus;
+    AccountWithPassword m_ownerAccount;
 
     virtual void SetUp() override
     {
         using namespace std::placeholders;
+
+        m_ownerAccount = BusinessDataGenerator::generateRandomAccount();
+        m_accountManagerStub.addAccount(m_ownerAccount);
 
         m_mediaserverEmulator = std::make_unique<TestHttpServer>();
         m_mediaserverEmulator->registerRequestProcessorFunc(
@@ -82,7 +110,7 @@ private:
         std::array<const char*, 2> args{"-vmsGateway/url", vmsUrl.c_str()};
 
         m_settings.load((int)args.size(), args.data());
-        m_vmsGateway = std::make_unique<cdb::VmsGateway>(m_settings);
+        m_vmsGateway = std::make_unique<cdb::VmsGateway>(m_settings, m_accountManagerStub);
 
         m_systemId = QnUuid::createUuid().toSimpleByteArray().toStdString();
     }
@@ -129,7 +157,15 @@ TEST_F(VmsGateway, invokes_merge_request)
     thenMergeRequestSucceeded();
 }
 
-// TEST_F(VmsGateway, merge_request_authentication)
+TEST_F(VmsGateway, vms_merge_request_is_authenticated)
+{
+    givenVmsWithAuthenticationEnabled();
+
+    whenIssueMergeRequest();
+
+    thenMergeRequestSucceeded();
+    thenRequestIsAuthenticatedWithCredentialsSpecified();
+}
 
 TEST_F(VmsGateway, proper_error_is_reported_when_vms_is_unreachable)
 {

@@ -86,6 +86,11 @@ protected:
         ASSERT_TRUE(startAndWaitUntilStarted());
 
         m_ownerAccount = addActivatedAccount2();
+
+        m_vmsGatewayEmulator.setAuthenticationEnabled(true);
+        m_vmsGatewayEmulator.registerUserCredentials(
+            m_ownerAccount.email.c_str(),
+            m_ownerAccount.password.c_str());
     }
 
     void givenTwoSystemsWithSameOwner()
@@ -147,6 +152,17 @@ protected:
 
         ASSERT_EQ(m_slaveSystem.id, requestPathItems.front().toStdString());
         requestPathItems.pop_front();
+    }
+
+    void thenVmsRequestIsAuthenticatedWithOwnerCredentials()
+    {
+        m_prevVmsApiRequest = m_vmsApiRequests.pop();
+        const auto authorizationHeaderStr = nx_http::getHeaderValue(
+            m_prevVmsApiRequest->headers, nx_http::header::Authorization::NAME);
+        ASSERT_FALSE(authorizationHeaderStr.isEmpty());
+        nx_http::header::Authorization authorization;
+        ASSERT_TRUE(authorization.parse(authorizationHeaderStr));
+        ASSERT_EQ(m_ownerAccount.email, authorization.userid().toStdString());
     }
 
     void assertAnyOfPermissionsIsNotEnoughToMergeSystems(
@@ -223,6 +239,16 @@ TEST_F(SystemMerge, fails_if_either_system_is_offline)
 }
 
 // TEST_F(SystemMerge, fails_if_either_system_is_older_than_3_2)
+
+TEST_F(SystemMerge, vms_merge_request_is_authenticated_using_same_credentials_as_cloud_merge)
+{
+    givenTwoOnlineSystemsWithSameOwner();
+
+    whenMergeSystems();
+
+    thenMergeSucceeded();
+    thenVmsRequestIsAuthenticatedWithOwnerCredentials();
+}
 
 TEST_F(SystemMerge, fails_if_systems_have_different_owners)
 {

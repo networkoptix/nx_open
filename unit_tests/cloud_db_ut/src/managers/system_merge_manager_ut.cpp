@@ -168,6 +168,11 @@ TEST_F(SystemMergeManager, waits_for_every_request_completion_before_terminating
     thenMergeSucceeded();
 }
 
+//TEST_F(SystemMergeManager, passes_authenticated_user_name_to_vms_gateway)
+//{
+//
+//}
+
 TEST_F(SystemMergeManager, reports_error_on_vms_request_failure)
 {
     givenOnlineMasterSystem();

@@ -20,8 +20,12 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, VmsResultCode,
 
 //-------------------------------------------------------------------------------------------------
 
-VmsGateway::VmsGateway(const conf::Settings& settings):
-    m_settings(settings)
+VmsGateway::VmsGateway(
+    const conf::Settings& settings,
+    const AbstractAccountManager& accountManager)
+    :
+    m_settings(settings),
+    m_accountManager(accountManager)
 {
 }
 
@@ -40,6 +44,7 @@ VmsGateway::~VmsGateway()
 }
 
 void VmsGateway::merge(
+    const std::string& username,
     const std::string& targetSystemId,
     VmsRequestCompletionHandler completionHandler)
 {
@@ -52,16 +57,18 @@ void VmsGateway::merge(
     const auto baseRequestUrl =
         nx_http::rest::substituteParameters(urlBase, { targetSystemId });
 
-    NX_VERBOSE(this, lm("Issuing merge request to %1. Url %2")
-        .args(targetSystemId, baseRequestUrl));
+    NX_VERBOSE(this, lm("Issuing merge request to %1 on behalf of %2. Url %3")
+        .args(targetSystemId, username, baseRequestUrl));
 
     RequestContext requestContext;
     requestContext.client = std::make_unique<MediaServerClient>(QUrl(baseRequestUrl.c_str()));
-    requestContext.completionHandler = std::move(completionHandler);
     requestContext.targetSystemId = targetSystemId;
     auto clientPtr = requestContext.client.get();
 
-    // TODO: #ak Adding authentication.
+    if (!addAuthentication(username, clientPtr))
+        return reportInvalidConfiguration(targetSystemId, std::move(completionHandler));
+
+    requestContext.completionHandler = std::move(completionHandler);
 
     QnMutexLocker lock(&m_mutex);
     m_activeRequests.emplace(clientPtr, std::move(requestContext));
@@ -84,6 +91,23 @@ void VmsGateway::reportInvalidConfiguration(
             vmsRequestResult.resultCode = VmsResultCode::invalidData;
             completionHandler(std::move(vmsRequestResult));
         });
+}
+
+bool VmsGateway::addAuthentication(
+    const std::string& username,
+    MediaServerClient* clientPtr)
+{
+    auto account = m_accountManager.findAccountByUserName(username);
+    if (!account)
+    {
+        NX_VERBOSE(this, lm("Could not find account %1").args(username));
+        return false;
+    }
+    clientPtr->setUserCredentials(nx_http::Credentials(
+        account->email.c_str(),
+        nx_http::Ha1AuthToken(account->passwordHa1.c_str())));
+
+    return true;
 }
 
 MergeSystemData VmsGateway::prepareMergeRequestParameters()
