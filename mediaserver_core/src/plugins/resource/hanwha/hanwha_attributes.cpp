@@ -10,6 +10,17 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+struct HanwhaAttributes::XmlElement
+{
+    XmlElement(const QStringRef& name, const QXmlStreamAttributes& attributes):
+        name(name), attributes(attributes)
+    {
+    }
+
+    QStringRef name;
+    QXmlStreamAttributes attributes;
+};
+
 HanwhaAttributes::HanwhaAttributes(nx_http::StatusCode::Value statusCode):
     m_statusCode(statusCode)
 {
@@ -21,7 +32,9 @@ HanwhaAttributes::HanwhaAttributes(
     :
     m_statusCode(statusCode)
 {
-    m_isValid = parseXml(attributesXml);
+    QXmlStreamReader reader(attributesXml);
+    parseXml(reader, XmlElementList());
+    m_isValid = !reader.hasError();
 }
 
 bool HanwhaAttributes::isValid() const
@@ -54,118 +67,36 @@ boost::optional<QString> HanwhaAttributes::findAttribute(
     return attribute->second;
 }
 
-bool HanwhaAttributes::parseXml(const QString& attributesXml)
+void HanwhaAttributes::parseXml(QXmlStreamReader& reader, XmlElementList path)
 {
-    QXmlStreamReader reader(attributesXml);
-
-    if (!reader.readNextStartElement())
-        return false;
-
-    if (reader.name() == kHanwhaAttributesNodeName)
+    while (!reader.atEnd() && reader.readNextStartElement())
     {
-        if (!reader.readNextStartElement())
-            return false;
-
-        return parseGroups(reader);
-    }
-
-    if (reader.name() == kHanwhaGroupNodeName)
-        return parseGroups(reader);
-
-    return false;
-}
-
-bool HanwhaAttributes::parseGroups(QXmlStreamReader& reader)
-{
-    while (reader.name() == kHanwhaGroupNodeName)
-    {
-        auto group = reader.attributes().value(kHanwhaNameAttribute).toString();
-
-        if (!reader.readNextStartElement())
-            return false;
-
-        if (!parseCategories(reader, group))
-            return false;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    }
-
-    return true;
-}
-
-bool HanwhaAttributes::parseCategories(
-    QXmlStreamReader& reader,
-    const QString& group)
-{
-    while (reader.name() == kHanwhaCategoryNodeName)
-    {
-        auto category = reader.attributes().value(kHanwhaNameAttribute);
-
-        if (reader.readNextStartElement())
-        {
-            if (!parseChannelOrAttributes(reader, group))
-                return false;
-            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-        }
+        if (reader.name() == kHanwhaAttributeNodeName)
+            parseAttribute(reader, path);
         else
-        {
-            // It is an empty category section
-            reader.readNext();
-            if (reader.hasError())
-                return false;
-        }
-    }
-
-    return true;
-}
-
-bool HanwhaAttributes::parseChannelOrAttributes(
-    QXmlStreamReader& reader,
-    const QString& group)
-{
-    if (reader.name() == kHanwhaChannelNodeName)
-    {
-        bool success = false;
-        auto channelNumber = reader.attributes()
-            .value(kHanwhaChannelNumberAttribute)
-            .toInt(&success);
-
-        if (!success)
-            return false;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-        if (!parseAttributes(reader, group, channelNumber))
-            return false;
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-        return true;
-    }
-    else if (reader.name() == kHanwhaAttributeNodeName)
-    {
-        return parseAttributes(reader, group, kNoChannel);
-    }
-    else
-    {
-        return true;
+            parseXml(reader, path << XmlElement(reader.name(), reader.attributes()));
+        reader.readNext();
     }
 }
 
-bool HanwhaAttributes::parseAttributes(
-    QXmlStreamReader& reader,
-    const QString& group,
-    int channel)
+bool HanwhaAttributes::parseAttribute(QXmlStreamReader& reader, XmlElementList path)
 {
-    while (reader.name() == kHanwhaAttributeNodeName)
+    QString group;
+    int channel = kNoChannel;
+    for (const auto& element: path)
     {
-        auto attrs = reader.attributes();
-        auto attrName = attrs.value(kHanwhaNameAttribute).toString();
-        auto attrValue = attrs.value(kHanwhaValueAttribute).toString();
-
-        m_attributes[channel][group][attrName] = attrValue;
-
-        reader.skipCurrentElement();
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+        if (element.name == "group")
+            group = element.attributes.value("name").toString();
+        else if (element.name == "channel")
+            channel = element.attributes.value("number").toInt();
     }
+    if (group.isEmpty())
+        return false; //< Ignore unknown attributes placed not in a group.
 
+    const auto& attrs = reader.attributes();
+    const auto attrName = attrs.value(kHanwhaNameAttribute).toString();
+    const auto attrValue = attrs.value(kHanwhaValueAttribute).toString();
+    m_attributes[channel][group][attrName] = attrValue;
     return true;
 }
 
