@@ -40,8 +40,10 @@ protected:
         MediaServerClient client(
             nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setEndpoint(mediaServerEndpoint()));
-        client.setUserName(QString::fromStdString(accountEmail()));
-        client.setPassword(QString::fromStdString(accountPassword()));
+
+        client.setUserCredentials(nx_http::Credentials(
+            accountEmail().c_str(),
+            nx_http::PasswordAuthToken(accountPassword().c_str())));
         ec2::ApiResourceParamDataList vmsSettings;
         ASSERT_EQ(ec2::ErrorCode::ok, client.ec2GetSettings(&vmsSettings));
     }
@@ -58,8 +60,9 @@ protected:
         MediaServerClient client(
             nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setEndpoint(mediaServerEndpoint()));
-        client.setUserName(QString::fromStdString(accountEmail()));
-        client.setPassword(QString::fromStdString(accountPassword()));
+        client.setUserCredentials(nx_http::Credentials(
+            accountEmail().c_str(),
+            nx_http::PasswordAuthToken(accountPassword().c_str())));
 
         ASSERT_EQ(
             QnJsonRestResult::NoError,
@@ -71,8 +74,9 @@ protected:
         MediaServerClient client(
             nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setEndpoint(mediaServerEndpoint()));
-        client.setUserName("admin");
-        client.setPassword("admin");
+        client.setUserCredentials(nx_http::Credentials(
+            "admin",
+            nx_http::PasswordAuthToken("admin")));
 
         ec2::ApiResourceParamDataList vmsSettings;
         ASSERT_EQ(
@@ -85,8 +89,9 @@ protected:
         MediaServerClient client(
             nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setEndpoint(mediaServerEndpoint()));
-        client.setUserName("admin");
-        client.setPassword("admin");
+        client.setUserCredentials(nx_http::Credentials(
+            "admin",
+            nx_http::PasswordAuthToken("admin")));
 
         for (;;)
         {

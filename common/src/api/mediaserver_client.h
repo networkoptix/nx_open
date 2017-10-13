@@ -3,6 +3,7 @@
 #include <map>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
@@ -34,8 +35,7 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
-    void setUserName(const QString& userName);
-    void setPassword(const QString& password);
+    void setUserCredentials(const nx_http::Credentials& userCredentials);
 
     //---------------------------------------------------------------------------------------------
     // /api/ requests
@@ -108,8 +108,7 @@ protected:
 
 private:
     const QUrl m_baseRequestUrl;
-    QString m_userName;
-    QString m_password;
+    nx_http::Credentials m_userCredentials;
     // TODO: #ak Replace with std::set in c++17.
     std::map<
         nx::network::aio::BasicPollable*,

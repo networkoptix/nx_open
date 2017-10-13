@@ -112,13 +112,15 @@ std::unique_ptr<MediaServerClient> MediaServerCloudIntegrationTest::prepareMedia
             .setEndpoint(mediaServerEndpoint()));
     if (!m_ownerCredentials.first.isEmpty())
     {
-        mediaServerClient->setUserName(m_ownerCredentials.first);
-        mediaServerClient->setPassword(m_ownerCredentials.second);
+        mediaServerClient->setUserCredentials(nx_http::Credentials(
+            m_ownerCredentials.first,
+            nx_http::PasswordAuthToken(m_ownerCredentials.second)));
     }
     else
     {
-        mediaServerClient->setUserName(m_defaultOwnerCredentials.first);
-        mediaServerClient->setPassword(m_defaultOwnerCredentials.second);
+        mediaServerClient->setUserCredentials(nx_http::Credentials(
+            m_defaultOwnerCredentials.first,
+            nx_http::PasswordAuthToken(m_defaultOwnerCredentials.second)));
     }
     return mediaServerClient;
 }
@@ -129,8 +131,10 @@ std::unique_ptr<MediaServerClient>
     auto mediaServerClient = std::make_unique<MediaServerClient>(
         nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
             .setEndpoint(mediaServerEndpoint()));
-    mediaServerClient->setUserName(m_ownerAccount.email.c_str());
-    mediaServerClient->setPassword(m_ownerAccount.password.c_str());
+
+    mediaServerClient->setUserCredentials(nx_http::Credentials(
+        m_ownerAccount.email.c_str(),
+        nx_http::PasswordAuthToken(m_ownerAccount.password.c_str())));
     return mediaServerClient;
 }
 

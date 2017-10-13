@@ -104,8 +104,10 @@ protected:
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
         for (const auto& account: m_additionalCloudUsers)
         {
-            mediaServerClient->setUserName(QString::fromStdString(account.email));
-            mediaServerClient->setPassword(QString::fromStdString(account.password));
+            mediaServerClient->setUserCredentials(nx_http::Credentials(
+                account.email.c_str(),
+                nx_http::PasswordAuthToken(account.password.c_str())));
+
             ec2::ApiUserDataList users;
             ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         }
@@ -114,8 +116,11 @@ protected:
     void thenInvitedUserCanLoginToTheSystem()
     {
         auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
-        mediaServerClient->setUserName(QString::fromStdString(m_invitedAccount.email));
-        mediaServerClient->setPassword(QString::fromStdString(m_invitedAccount.password));
+
+        mediaServerClient->setUserCredentials(nx_http::Credentials(
+            m_invitedAccount.email.c_str(),
+            nx_http::PasswordAuthToken(m_invitedAccount.password.c_str())));
+
         ec2::ApiUserDataList users;
         ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
     }

@@ -18,14 +18,9 @@ void MediaServerClient::bindToAioThread(nx::network::aio::AbstractAioThread* aio
         val.first->bindToAioThread(aioThread);
 }
 
-void MediaServerClient::setUserName(const QString& userName)
+void MediaServerClient::setUserCredentials(const nx_http::Credentials& userCredentials)
 {
-    m_userName = userName;
-}
-
-void MediaServerClient::setPassword(const QString& password)
-{
-    m_password = password;
+    m_userCredentials = userCredentials;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -316,11 +311,8 @@ void MediaServerClient::performGetRequest(
     QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
         .appendPath(QLatin1String("/"))
         .appendPath(QString::fromStdString(requestPath)).toUrl();
-    requestUrl.setUserName(m_userName);
-    requestUrl.setPassword(m_password);
     nx_http::AuthInfo authInfo;
-    authInfo.username = m_userName;
-    authInfo.password = m_password;
+    authInfo.user = m_userCredentials;
 
     auto fusionClient = createHttpClientFunc(requestUrl, std::move(authInfo));
 
