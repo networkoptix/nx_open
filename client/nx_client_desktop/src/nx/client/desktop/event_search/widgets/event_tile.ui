@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>311</width>
-    <height>69</height>
+    <height>109</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -26,6 +26,26 @@
    <property name="spacing">
     <number>8</number>
    </property>
+   <item row="2" column="1" colspan="2">
+    <widget class="QLabel" name="previewLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="timestampLabel">
+     <property name="text">
+      <string notr="true">&lt;0:00:00&gt;</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="iconLabel">
      <property name="minimumSize">
@@ -58,13 +78,6 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="timestampLabel">
-     <property name="text">
-      <string notr="true">&lt;0:00:00&gt;</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1" colspan="2">
     <widget class="QLabel" name="descriptionLabel">
      <property name="text">
@@ -75,8 +88,8 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="2">
-    <widget class="QLabel" name="previewLabel">
+   <item row="3" column="1">
+    <widget class="nx::client::desktop::ActionPushButton" name="actionButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -84,12 +97,19 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string notr="true"/>
+      <string notr="true">&lt;Action&gt;</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::client::desktop::ActionPushButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/client/desktop/common/widgets/action_push_button.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

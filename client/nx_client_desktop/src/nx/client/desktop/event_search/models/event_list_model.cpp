@@ -1,6 +1,10 @@
 #include "event_list_model.h"
 #include "private/event_list_model_p.h"
 
+#include <QtCore/QDateTime>
+
+#include <utils/common/synctime.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -81,7 +85,11 @@ void EventListModel::clear()
 
 QString EventListModel::timestampText(qint64 timestampMs) const
 {
-    return QString(); // TODO: #vkutin
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
+    if (qnSyncTime->currentDateTime().date() != dateTime.date())
+        return dateTime.date().toString(Qt::DefaultLocaleShortDate);
+
+    return dateTime.time().toString(Qt::DefaultLocaleShortDate);
 }
 
 } // namespace

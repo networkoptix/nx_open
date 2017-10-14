@@ -10,9 +10,11 @@
 
 namespace nx {
 namespace client {
-namespace desktop {
+namespace desktop
+{
 
-namespace {
+namespace
+{
 
 static constexpr auto kRoundingRadius = 2;
 
@@ -26,7 +28,7 @@ static constexpr int kDescriptionFontWeight = QFont::Normal;
 
 } // namespace
 
-EventTile::EventTile(QWidget* parent):
+EventTile::EventTile(QWidget* parent) :
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile())
 {
@@ -149,6 +151,16 @@ void EventTile::setImage(const QPixmap& value)
 {
     ui->previewLabel->setPixmap(value);
     ui->previewLabel->setHidden(value.isNull());
+}
+
+QAction* EventTile::action() const
+{
+    return ui->actionButton->action();
+}
+
+void EventTile::setAction(QAction* value)
+{
+    ui->actionButton->setAction(value);
 }
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)

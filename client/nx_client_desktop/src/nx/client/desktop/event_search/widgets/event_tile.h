@@ -1,9 +1,11 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QWidget>
 
 #include <ui/customization/customized.h>
+#include <nx/utils/disconnect_helper.h>
 
 class QModelIndex;
 
@@ -53,6 +55,9 @@ public:
 
     QPixmap image() const;
     void setImage(const QPixmap& value);
+
+    QAction* action() const;
+    void setAction(QAction* value);
 
     // Creates a tile widget for a data model item using the following roles:
     //     Qt::DisplayRole for title
