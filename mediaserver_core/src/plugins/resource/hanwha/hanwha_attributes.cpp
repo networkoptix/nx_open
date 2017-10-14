@@ -23,7 +23,8 @@ HanwhaAttributes::HanwhaAttributes(
 {
     QXmlStreamReader reader(attributesXml);
     parseXml(reader, QString(), kNoChannel);
-    m_isValid = !reader.hasError();
+    m_isValid = !reader.hasError() || 
+        reader.error() == QXmlStreamReader::PrematureEndOfDocumentError;
 }
 
 bool HanwhaAttributes::isValid() const
@@ -60,15 +61,14 @@ void HanwhaAttributes::parseXml(QXmlStreamReader& reader, const QString& group, 
 {
     while (!reader.atEnd() && reader.readNextStartElement())
     {
+        if (reader.name() == kHanwhaAttributeNodeName)
+            parseAttribute(reader, group, channel);
         if (reader.name() == kHanwhaGroupNodeName)
             parseXml(reader, reader.attributes().value(kHanwhaNameAttribute).toString(), channel);
         else if (reader.name() == kHanwhaChannelNodeName)
             parseXml(reader, group, reader.attributes().value("number").toInt());
-        else if (reader.name() == kHanwhaAttributeNodeName)
-            parseAttribute(reader, group, channel);
         else
             parseXml(reader, group, channel);
-        reader.readNext();
     }
 }
 

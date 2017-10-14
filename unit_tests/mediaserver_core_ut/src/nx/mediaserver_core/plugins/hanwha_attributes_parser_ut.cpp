@@ -7,7 +7,7 @@ namespace mediaserver_core {
 namespace plugins {
 namespace test {
 
-const char testData[] = 
+const char testData1[] =
 R"xml(<?xml version="1.0" encoding="UTF-8"?>
 <capabilities xmlns="http://www.samsungtechwin.com/AttributesSchema">
     <attributes>
@@ -65,16 +65,19 @@ R"xml(<?xml version="1.0" encoding="UTF-8"?>
 </capabilities>
 )xml";
 
+const char testData2[] =
+R"xml(<group name="System"><category name="Property"></category><category name="Support"></category><category name="Limit"><attribute name="MaxChannel" type="int" value="16" accesslevel="user"/></category></group>)xml";
+
 TEST(HanwhaAttributesParser, main)
 {
-    HanwhaAttributes attributes(testData, nx_http::StatusCode::ok);
-
+    HanwhaAttributes attributes;
     auto attrValue = [&](const QString& path)
     {
         auto result = attributes.attribute<QString>(path);
         return result ? *result : QString();
     };
 
+    attributes = HanwhaAttributes(testData1, nx_http::StatusCode::ok);
     ASSERT_EQ("True",  attrValue("System/ISPVersion"));
     ASSERT_EQ("False", attrValue("System/PTZBoardVersion"));
     ASSERT_EQ("False", attrValue("System/InterfaceBoardVersion"));
@@ -88,9 +91,11 @@ TEST(HanwhaAttributesParser, main)
     ASSERT_EQ("True",  attrValue("Media/DeviceAudioOutput/0"));
     ASSERT_EQ("", attrValue("Media/DeviceAudioOutput/1"));
     ASSERT_EQ("", attrValue("Media/DeviceAudioOutput"));
-
     ASSERT_TRUE(attributes.isValid());
 
+    attributes = HanwhaAttributes(testData2, nx_http::StatusCode::ok);
+    ASSERT_EQ("16", attrValue("System/MaxChannel"));
+    ASSERT_TRUE(attributes.isValid());
 }
 
 } // namespace test
