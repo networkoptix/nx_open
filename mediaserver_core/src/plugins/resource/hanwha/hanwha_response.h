@@ -32,6 +32,8 @@ static const int kUnknownError = 1;
 class HanwhaResponse
 {
 public:
+    static const int kNoChannel = -1;
+
     explicit HanwhaResponse(
         nx_http::StatusCode::Value statusCode,
         const QString& requestUrl);
@@ -51,7 +53,7 @@ public:
     QString requestUrl() const;
     
     template<typename T>
-    boost::optional<T> parameter(const QString& parameterName) const
+    boost::optional<T> parameter(const QString& parameterName, int channel = kNoChannel) const
     {
         static_assert(std::is_same<T, int>::value
             || std::is_same<T, double>::value
@@ -74,7 +76,7 @@ public:
 
 private:
     void parseBuffer(const nx::Buffer& rawBuffer, bool isListMode = false);
-    boost::optional<QString> findParameter(const QString& parameterName) const;
+    boost::optional<QString> findParameter(const QString& parameterName, int channel) const;
     
 private:
     int m_errorCode = HanwhaError::kNoError;
@@ -86,22 +88,22 @@ private:
 };
 
 template<>
-boost::optional<bool> HanwhaResponse::parameter<bool>(const QString& parameterName) const;
+boost::optional<bool> HanwhaResponse::parameter<bool>(const QString& parameterName, int channel) const;
 
 template<>
-boost::optional<int> HanwhaResponse::parameter<int>(const QString& parameterName) const;
+boost::optional<int> HanwhaResponse::parameter<int>(const QString& parameterName, int channel) const;
 
 template<>
-boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName) const;
+boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName, int channel) const;
 
 template<>
-boost::optional<AVCodecID> HanwhaResponse::parameter<AVCodecID>(const QString& parameterName) const;
+boost::optional<AVCodecID> HanwhaResponse::parameter<AVCodecID>(const QString& parameterName, int channel) const;
 
 template<>
-boost::optional<QSize> HanwhaResponse::parameter<QSize>(const QString& parameterName) const;
+boost::optional<QSize> HanwhaResponse::parameter<QSize>(const QString& parameterName, int channel) const;
 
 template<>
-boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName) const;
+boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName, int channel) const;
 
 } // namespace plugins
 } // namespace mediaserver_core

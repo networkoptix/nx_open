@@ -185,9 +185,10 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer, bool isListMode)
     }
 }
 
-boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterName) const
+boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterName, int channel) const
 {
-    auto itr = m_response.find(parameterName);
+    auto itr = m_response.find(channel == kNoChannel 
+        ? parameterName : lit("Channel.%1.%2").arg(channel).arg(parameterName));
     if (itr == m_response.cend())
         return boost::none;
 
@@ -195,39 +196,39 @@ boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterN
 }
 
 template<>
-boost::optional<bool> HanwhaResponse::parameter<bool>(const QString& parameterName) const
+boost::optional<bool> HanwhaResponse::parameter<bool>(const QString& parameterName, int channel) const
 {
-    return toBool(findParameter(parameterName));
+    return toBool(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<int> HanwhaResponse::parameter<int>(const QString& parameterName) const
+boost::optional<int> HanwhaResponse::parameter<int>(const QString& parameterName, int channel) const
 {
-    return toInt(findParameter(parameterName));
+    return toInt(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName) const
+boost::optional<double> HanwhaResponse::parameter<double>(const QString& parameterName, int channel) const
 {
-    return toDouble(findParameter(parameterName));
+    return toDouble(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<AVCodecID> HanwhaResponse::parameter<AVCodecID>(const QString& parameterName) const
+boost::optional<AVCodecID> HanwhaResponse::parameter<AVCodecID>(const QString& parameterName, int channel) const
 {
-    return toCodecId(findParameter(parameterName));
+    return toCodecId(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<QSize> HanwhaResponse::parameter<QSize>(const QString& parameterName) const
+boost::optional<QSize> HanwhaResponse::parameter<QSize>(const QString& parameterName, int channel) const
 {
-    return toQSize(findParameter(parameterName));
+    return toQSize(findParameter(parameterName, channel));
 }
 
 template<>
-boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName) const
+boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& parameterName, int channel) const
 {
-    return findParameter(parameterName);
+    return findParameter(parameterName, channel);
 }
 
 } // namespace plugins

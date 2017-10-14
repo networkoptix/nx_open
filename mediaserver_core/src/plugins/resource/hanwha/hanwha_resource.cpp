@@ -1027,62 +1027,22 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
 CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 {
     const auto channel = getChannel();
+    
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    auto response = helper.view(
+        lit("media/audiooutput"),
+        {{kHanwhaChannelProperty, QString::number(getChannel())}});
 
-    const auto codec = m_cgiParameters.parameter(
-        lit("media/audiooutput/set/DecodingType"));
-
-    if (!codec || codec->possibleValues().isEmpty())
+    const auto isAudioOutputEnabled = response.parameter<bool>(lit("Enable"), getChannel());
+    if (!isAudioOutputEnabled || !isAudioOutputEnabled.get())
         return CameraDiagnostics::NoErrorResult();
 
-    const auto bitrateParam = m_cgiParameters.parameter(lit("media/audiooutput/set/Bitrate"));
-    int bitrateKbps = 0;
-    if (bitrateParam && !bitrateParam->possibleValues().isEmpty())
-        bitrateKbps = bitrateParam->possibleValues()[0].toInt();
+    const auto bitrateParam = response.parameter<int>(lit("Bitrate"), getChannel());
+    int bitrateKbps = bitrateParam ? *bitrateParam : 0;
 
     m_audioTransmitter.reset(new OnvifAudioTransmitter(this));
     if (bitrateKbps > 0)
         m_audioTransmitter->setBitrateKbps(bitrateKbps);
-
-#if 0
-    // Not used so far. Our devices can't change codec, so we need to use current value only.
-
-    QnAudioFormat audioFormat;
-
-    const auto sampleRate = m_cgiParameters.parameter(lit("media/audiooutput/set/SampleRate"));
-    int maxSampleRate = 0;
-    if (sampleRate)
-    {
-        for (const auto& value: sampleRate->possibleValues())
-            maxSampleRate = std::max(maxSampleRate, value.toInt());
-    }
-
-    const auto channelsMode = m_cgiParameters.parameter(lit("media/audiooutput/set/Mode"));
-    if (channelsMode)
-    {
-        for (const auto& value: channelsMode->possibleValues())
-        {
-            if (value == "Stereo")
-                audioFormat.setChannelCount(2);
-        }
-    }
-
-    for (const auto& codec: codec->possibleValues())
-    {
-        audioFormat.setCodec(codec);
-
-        if (m_audioTransmitter->isCompatible(audioFormat))
-        {
-            m_audioTransmitter->setOutputFormat(audioFormat);
-            if (maxBitrate > 0)
-                m_audioTransmitter->setBitrateKbps(maxBitrate);
-            if (codec == "G711")
-                audioFormat.setSampleRate(8000); //< Sample rate is predefined in RFC for this codec.
-            else if (maxSampleRate > 0)
-                audioFormat.setSampleRate(maxSampleRate);
-            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
-        }
-    }
-#endif
 
     setCameraCapability(Qn::AudioTransmitCapability, true);
     return CameraDiagnostics::NoErrorResult();
