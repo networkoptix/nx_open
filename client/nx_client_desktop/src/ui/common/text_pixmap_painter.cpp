@@ -1,19 +1,24 @@
 #include "text_pixmap_painter.h"
 
+#include <nx/client/core/utils/geometry.h>
+
 #include "text_pixmap_cache.h"
-#include "geometry.h"
 
-namespace {
-    const int maxPointSize = 64;
-    const int maxPixelSize = 64;
-}
+void QnTextPixmapPainter::drawText(
+    QPainter* painter,
+    const QRectF& rect,
+    Qt::Alignment alignment,
+    const QString& text,
+    const QFont& font,
+    const QColor& color)
+{
+    using nx::client::core::utils::Geometry;
 
-void QnTextPixmapPainter::drawText(QPainter *painter, const QRectF &rect, Qt::Alignment alignment, const QString &text, const QFont &font, const QColor &color) {
     QPixmap pixmap = QnTextPixmapCache::instance()->pixmap(text, font, color);
 
     painter->drawPixmap(
-        QnGeometry::expanded(
-            QnGeometry::aspectRatio(pixmap.rect()),
+        Geometry::expanded(
+            Geometry::aspectRatio(pixmap.rect()),
             rect,
             Qt::KeepAspectRatio,
             alignment
@@ -23,6 +28,11 @@ void QnTextPixmapPainter::drawText(QPainter *painter, const QRectF &rect, Qt::Al
     );
 }
 
-void QnTextPixmapPainter::drawText(QPainter *painter, const QRectF &rect, Qt::Alignment alignment, const QString &text) {
+void QnTextPixmapPainter::drawText(
+    QPainter* painter,
+    const QRectF& rect,
+    Qt::Alignment alignment,
+    const QString& text)
+{
     drawText(painter, rect, alignment, text, painter->font(), painter->pen().color());
 }

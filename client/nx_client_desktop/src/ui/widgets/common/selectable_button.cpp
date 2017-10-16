@@ -1,8 +1,10 @@
 #include "selectable_button.h"
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <ui/common/geometry.h>
 #include <ui/style/helper.h>
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -104,7 +106,7 @@ void QnSelectableButton::paintEvent(QPaintEvent* event)
 
     if (option.state.testFlag(QStyle::State_HasFocus))
     {
-        option.rect = QnGeometry::dilated(option.rect, 1);
+        option.rect = Geometry::dilated(option.rect, 1);
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter, this);
     }
 }
@@ -117,7 +119,7 @@ void QnSelectableButton::paintMarker(QPainter* painter, const QBrush& brush)
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
 
     painter->drawRoundedRect(
-        QnGeometry::eroded(frameRect, m_markerFrameWidth / 2.0),
+        Geometry::eroded(frameRect, m_markerFrameWidth / 2.0),
         m_roundingRadius, m_roundingRadius);
 }
 

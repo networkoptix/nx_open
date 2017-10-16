@@ -7,9 +7,11 @@
 #include <nx/utils/log/log.h>
 #include <core/resource/camera_resource.h>
 #include <camera/single_thumbnail_loader.h>
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <ini.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace nx {
 namespace client {
@@ -126,7 +128,7 @@ void EntropixImageEnhancer::Private::enhanceScreenshot(
 
     const auto& colorImageData = imageToByteArray(colorImage);
     const auto& blackAndWhiteImageData = imageToByteArray(blackAndWhiteImage);
-    const auto& rect = QnGeometry::subRect(colorImage.rect(), zoomRect).toRect();
+    const auto& rect = Geometry::subRect(colorImage.rect(), zoomRect).toRect();
 
     auto makePart =
         [](const QByteArray& name, const QByteArray& body)

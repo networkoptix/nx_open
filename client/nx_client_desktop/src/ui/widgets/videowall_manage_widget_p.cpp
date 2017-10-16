@@ -19,7 +19,10 @@
 
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/utils/app_info.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -114,7 +117,7 @@ bool QnVideowallManageWidgetPrivate::BaseModelItem::hasFlag(StateFlags flag) con
 }
 
 QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
-    QRect body = eroded(geometry, bodyMargin);
+    QRect body = Geometry::eroded(geometry, bodyMargin);
     if (!isPartOfScreen())
         return body;
     int offset = bodyMargin * partScreenCoeff;
@@ -416,7 +419,7 @@ void QnVideowallManageWidgetPrivate::ModelScreen::setFree(bool value) {
 void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter, const TransformationProcess &process) const {
     {
         Q_Q(const QnVideowallManageWidget);
-        QRect targetRect = eroded(geometry, frameMargin);
+        QRect targetRect = Geometry::eroded(geometry, frameMargin);
 
         QPainterPath path;
         path.addRect(targetRect);
@@ -658,7 +661,7 @@ QRect QnVideowallManageWidgetPrivate::targetRect(const QRect &rect) const
     if (m_unitedGeometry.isNull())    // TODO: #GDM #VW replace by model.Valid
         return QRect();
 
-    return expanded(aspectRatio(m_unitedGeometry), rect, Qt::KeepAspectRatio).toRect();
+    return Geometry::expanded(Geometry::aspectRatio(m_unitedGeometry), rect, Qt::KeepAspectRatio).toRect();
 }
 
 void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps &snaps, bool value)
@@ -893,13 +896,13 @@ void QnVideowallManageWidgetPrivate::resizeItem(BaseModelItem &item, const QPoin
 }
 
 QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(const QRect &geometry, const QPoint &pos) const {
-    QRect leftAnchor    (dilated(QRect(geometry.left(), geometry.top(), 0, geometry.height()), transformationOffset));
-    QRect centerXAnchor (dilated(QRect(geometry.center().x(), geometry.top(), 0, geometry.height()), transformationOffset));
-    QRect rightAnchor   (dilated(QRect(geometry.left() + geometry.width(), geometry.top(), 0, geometry.height()), transformationOffset));
+    QRect leftAnchor    (Geometry::dilated(QRect(geometry.left(), geometry.top(), 0, geometry.height()), transformationOffset));
+    QRect centerXAnchor (Geometry::dilated(QRect(geometry.center().x(), geometry.top(), 0, geometry.height()), transformationOffset));
+    QRect rightAnchor   (Geometry::dilated(QRect(geometry.left() + geometry.width(), geometry.top(), 0, geometry.height()), transformationOffset));
 
-    QRect topAnchor     (dilated(QRect(geometry.left(), geometry.top(), geometry.width(), 0), transformationOffset));
-    QRect centerYAnchor (dilated(QRect(geometry.left(), geometry.center().y(), geometry.width(), 0), transformationOffset));
-    QRect bottomAnchor  (dilated(QRect(geometry.left(), geometry.top() + geometry.height(), geometry.width(), 0), transformationOffset));
+    QRect topAnchor     (Geometry::dilated(QRect(geometry.left(), geometry.top(), geometry.width(), 0), transformationOffset));
+    QRect centerYAnchor (Geometry::dilated(QRect(geometry.left(), geometry.center().y(), geometry.width(), 0), transformationOffset));
+    QRect bottomAnchor  (Geometry::dilated(QRect(geometry.left(), geometry.top() + geometry.height(), geometry.width(), 0), transformationOffset));
 
     auto in = [pos](const QRect &first, const QRect &second) {
         return first.contains(pos) && second.contains(pos);
@@ -960,7 +963,7 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedResizeGeometry(const Base
         bool intersectsPartOf = false;
         for(auto part = screen->parts.cbegin(); part != screen->parts.cend(); part++) {
             QRect intersected = part->geometry.intersected(geometry);
-            if (1.0 * area(intersected) / area(part->geometry) > minAreaOverlapping) {
+            if (1.0 * Geometry::area(intersected) / Geometry::area(part->geometry) > minAreaOverlapping) {
                 if (valid)
                     *valid &= part->free();
                 result = result.united(part->geometry);
@@ -997,7 +1000,7 @@ QList<T> bestMatchingGeometry(const QList<T> &source, const QRect &geometry, int
         result << source[0];
 
     std::partial_sort_copy(source.cbegin(), source.cend(), result.begin(), result.end(), [&geometry](const T& left, const T& right) {
-        return QnGeometry::area(left.geometry.intersected(geometry)) > QnGeometry::area(right.geometry.intersected(geometry));
+        return Geometry::area(left.geometry.intersected(geometry)) > nx::client::core::utils::Geometry::area(right.geometry.intersected(geometry));
     });
     return result;
 }

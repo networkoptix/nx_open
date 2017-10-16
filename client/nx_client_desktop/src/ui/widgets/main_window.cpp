@@ -102,11 +102,14 @@
 #include <utils/screen_manager.h>
 
 #include <nx/client/desktop/ui/workbench/handlers/layout_tours_handler.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
 #include "dwm.h"
+
+using nx::client::core::utils::Geometry;
 
 namespace nx {
 namespace client {
@@ -836,7 +839,7 @@ Qt::WindowFrameSection MainWindow::windowFrameSectionAt(const QPoint &pos) const
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(
             Qn::calculateRectangularFrameSections(
                     rect(),
-                    QnGeometry::eroded(rect(), m_frameMargins),
+                    Geometry::eroded(rect(), m_frameMargins),
                     QRect(pos, pos)));
 
     if (m_options.testFlag(TitleBarDraggable) &&

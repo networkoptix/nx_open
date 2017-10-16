@@ -23,6 +23,7 @@
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/aligner.h>
 #include <ui/common/read_only.h>
 
@@ -52,6 +53,7 @@
 #include "client/client_settings.h"
 
 using namespace nx::client::desktop::ui;
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -997,7 +999,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
                             painter->setBrush(brushColor);
                         }
 
-                        painter->drawRect(QnGeometry::eroded(QRectF(option->rect), 0.5));
+                        painter->drawRect(Geometry::eroded(QRectF(option->rect), 0.5));
 
                         if (auto button = qobject_cast<const QAbstractButton*>(widget))
                             painter->drawText(option->rect, Qt::AlignCenter, button->text());

@@ -9,6 +9,7 @@
 #include <utils/threaded_image_loader.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <client/client_settings.h>
 
@@ -36,6 +37,7 @@
 #endif
 
 using namespace nx::client::desktop;
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -483,7 +485,7 @@ void QnGridBackgroundItem::setImage(const QImage& image)
     if (!d->imagesMemCache.contains(d->imageData.fileName))
         d->imagesMemCache.insert(d->imageData.fileName, image);
 
-    d->imageAspectRatio = QnGeometry::aspectRatio(image.size());
+    d->imageAspectRatio = Geometry::aspectRatio(image.size());
 
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
@@ -573,11 +575,11 @@ void QnGridBackgroundItem::paint(
         switch (d->imageData.mode)
         {
             case Qn::ImageBehaviour::Fit:
-                targetRect = QnGeometry::expanded(d->imageAspectRatio,
+                targetRect = Geometry::expanded(d->imageAspectRatio,
                     display()->viewportGeometry(), Qt::KeepAspectRatio, Qt::AlignCenter);
                 break;
             case Qn::ImageBehaviour::Crop:
-                targetRect = QnGeometry::expanded(d->imageAspectRatio,
+                targetRect = Geometry::expanded(d->imageAspectRatio,
                     display()->viewportGeometry(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
                 break;
             default:

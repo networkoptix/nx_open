@@ -61,10 +61,11 @@
 #include <utils/math/color_transformations.h>
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
-
+#include <nx/client/core/utils/geometry.h>
 
 using namespace style;
 using namespace nx::client::desktop::ui;
+using nx::client::core::utils::Geometry;
 
 namespace
 {
@@ -103,7 +104,7 @@ namespace
     {
         QPainterPath path;
 
-        QRectF arrowRect = QnGeometry::aligned(QSizeF(size, size), rect);
+        QRectF arrowRect = Geometry::aligned(QSizeF(size, size), rect);
 
         RectCoordinates rc(arrowRect);
 
@@ -658,7 +659,7 @@ void QnNxStyle::drawPrimitive(
             QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
             QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
-            painter->drawRoundedRect(QnGeometry::eroded(QRectF(option->rect), 0.5), 1.0, 1.0);
+            painter->drawRoundedRect(Geometry::eroded(QRectF(option->rect), 0.5), 1.0, 1.0);
             return;
         }
 
@@ -1018,7 +1019,7 @@ void QnNxStyle::drawPrimitive(
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
             static const qreal kToolTipRoundingRadius = 2.5;
-            painter->drawRoundedRect(eroded(QRectF(option->rect), 0.5),
+            painter->drawRoundedRect(Geometry::eroded(QRectF(option->rect), 0.5),
                 kToolTipRoundingRadius, kToolTipRoundingRadius);
 
             return;
@@ -1041,7 +1042,7 @@ void QnNxStyle::drawPrimitive(
                 {
                     QnScopedPainterAntialiasingRollback aaRollback(painter, true);
                     QnScopedPainterPenRollback penRollback(painter, QPen(mainColor.color(), frame->lineWidth));
-                    painter->drawRoundedRect(QnGeometry::eroded(QRectF(frame->rect), 0.5), Metrics::kGroupBoxCornerRadius, Metrics::kGroupBoxCornerRadius);
+                    painter->drawRoundedRect(Geometry::eroded(QRectF(frame->rect), 0.5), Metrics::kGroupBoxCornerRadius, Metrics::kGroupBoxCornerRadius);
                 }
             }
             return;
@@ -1167,7 +1168,7 @@ void QnNxStyle::drawPrimitive(
             QColor shadowRoundingColor = option->palette.shadow().color();
             shadowRoundingColor.setAlphaF(0.5);
             painter->fillRect(QRect(option->rect.bottomRight() - QPoint(2, 2), option->rect.bottomRight()), shadowRoundingColor);
-            painter->drawRoundedRect(QnGeometry::eroded(QRectF(option->rect), 0.5), 2.0, 2.0);
+            painter->drawRoundedRect(Geometry::eroded(QRectF(option->rect), 0.5), 2.0, 2.0);
             return;
         }
 
@@ -1310,7 +1311,7 @@ void QnNxStyle::drawPrimitive(
                 QnScopedPainterAntialiasingRollback aaRollback(painter, true);
                 QnScopedPainterBrushRollback brushRollback(painter, brush);
                 QnScopedPainterPenRollback penRollback(painter, brush.color());
-                painter->drawRoundedRect(QnGeometry::eroded(QRectF(widget->rect()), 0.5), 2.0, 2.0);
+                painter->drawRoundedRect(Geometry::eroded(QRectF(widget->rect()), 0.5), 2.0, 2.0);
             }
             return;
         }
@@ -2024,7 +2025,7 @@ void QnNxStyle::drawControl(
 
                     QRect iconRect = textRect;
                     iconRect.setWidth(iconWithPadding);
-                    iconRect = aligned(iconSize, iconRect);
+                    iconRect = Geometry::aligned(iconSize, iconRect);
                     tab->icon.paint(painter, iconRect);
                 }
 
@@ -2950,7 +2951,7 @@ QRect QnNxStyle::subElementRect(
                 if (qobject_cast<const QnDialog*>(buttonBox->parentWidget()))
                 {
                     int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
-                    return QnGeometry::dilated(option->rect, margin);
+                    return Geometry::dilated(option->rect, margin);
                 }
             }
             break;
@@ -2960,7 +2961,7 @@ QRect QnNxStyle::subElementRect(
         {
             return QnNxStylePrivate::isTextButton(option)
                 ? option->rect
-                : QnGeometry::eroded(option->rect, 1);
+                : Geometry::eroded(option->rect, 1);
         }
 
         case SE_ProgressBarGroove:
@@ -3043,7 +3044,7 @@ QRect QnNxStyle::subElementRect(
             {
                 QSize size = tabBar->leftButtonSize;
                 size.setHeight(std::min(size.height(), tabBar->rect.height()));
-                return aligned(size, tabBar->rect, Qt::AlignLeft | Qt::AlignVCenter);
+                return Geometry::aligned(size, tabBar->rect, Qt::AlignLeft | Qt::AlignVCenter);
             }
             break;
         }
@@ -3054,7 +3055,7 @@ QRect QnNxStyle::subElementRect(
             {
                 QSize size = tabBar->rightButtonSize;
                 size.setHeight(std::min(size.height(), tabBar->rect.height()));
-                return aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
+                return Geometry::aligned(size, tabBar->rect, Qt::AlignRight | Qt::AlignVCenter);
             }
             break;
         }

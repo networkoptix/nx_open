@@ -27,6 +27,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/selection_overlay_widget.h>
 #include <ui/common/cursor_cache.h>
@@ -60,6 +61,7 @@
 #include <nx/utils/string.h>
 
 using namespace nx::client::desktop::ui;
+using nx::client::core::utils::Geometry;
 
 namespace {
 const qreal kButtonsSize = 24.0;
@@ -377,7 +379,7 @@ float QnResourceWidget::visualChannelAspectRatio() const
     if (!channelLayout())
         return visualAspectRatio();
 
-    qreal layoutAspectRatio = QnGeometry::aspectRatio(channelLayout()->size());
+    qreal layoutAspectRatio = Geometry::aspectRatio(channelLayout()->size());
     if (QnAspectRatio::isRotated90(rotation()))
         return visualAspectRatio() * layoutAspectRatio;
     else
@@ -402,7 +404,7 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qrea
     {
         /* Calculate bounds of the rotated item. */
         qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : defaultVisualAspectRatio();
-        return encloseRotatedGeometry(enclosingGeometry, aspectRatio, rotation);
+        return Geometry::encloseRotatedGeometry(enclosingGeometry, aspectRatio, rotation);
     }
     else
     {
@@ -525,7 +527,7 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFram
             result.setHeight(constraint.width() / m_aspectRatio);
             break;
         default:
-            result = expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+            result = Geometry::expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
             break;
     }
 
@@ -587,7 +589,7 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
         return result;
 
     if (which == Qt::MinimumSize)
-        return expanded(m_aspectRatio, result, Qt::KeepAspectRatioByExpanding);
+        return Geometry::expanded(m_aspectRatio, result, Qt::KeepAspectRatioByExpanding);
 
     return result;
 }
@@ -595,14 +597,16 @@ QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) 
 QRectF QnResourceWidget::channelRect(int channel) const
 {
     /* Channel rect is handled at shader level if dewarping is enabled. */
-    QRectF rect = ((m_options & DisplayDewarped) || zoomRect().isNull()) ? this->rect() : unsubRect(this->rect(), zoomRect());
+    QRectF rect = ((m_options & DisplayDewarped) || zoomRect().isNull())
+        ? this->rect()
+        : Geometry::unsubRect(this->rect(), zoomRect());
 
     if (m_channelsLayout->channelCount() == 1)
         return rect;
 
-    QSizeF channelSize = cwiseDiv(rect.size(), m_channelsLayout->size());
+    QSizeF channelSize = Geometry::cwiseDiv(rect.size(), m_channelsLayout->size());
     return QRectF(
-        rect.topLeft() + cwiseMul(m_channelsLayout->position(channel), channelSize),
+        rect.topLeft() + Geometry::cwiseMul(m_channelsLayout->position(channel), channelSize),
         channelSize
     );
 }
@@ -635,7 +639,7 @@ QRectF QnResourceWidget::exposedRect(int channel, bool accountForViewport, bool 
 
     if (useRelativeCoordinates)
     {
-        return QnGeometry::toSubRect(channelRect, result);
+        return Geometry::toSubRect(channelRect, result);
     }
     else
     {

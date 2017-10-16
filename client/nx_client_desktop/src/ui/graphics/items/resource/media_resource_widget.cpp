@@ -57,9 +57,9 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/text_pixmap_cache.h>
-#include <ui/common/geometry.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/html_text_item.h>
@@ -111,6 +111,8 @@
 
 using namespace nx;
 using namespace client::desktop::ui;
+
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -744,9 +746,9 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
         {
             const auto& sensor = camera->combinedSensorsDescription().mainSensor();
             if (sensor.isValid())
-                sourceSize = QnGeometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
+                sourceSize = Geometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
         }
-        return QnGeometry::aspectRatio(sourceSize);
+        return Geometry::aspectRatio(sourceSize);
     }
 
     if (camera)
@@ -783,25 +785,27 @@ bool QnMediaResourceWidget::hasVideo() const
 
 QPoint QnMediaResourceWidget::mapToMotionGrid(const QPointF &itemPos)
 {
-    QPointF gridPosF(cwiseDiv(itemPos, cwiseDiv(size(), motionGridSize())));
+    QPointF gridPosF(Geometry::cwiseDiv(itemPos, Geometry::cwiseDiv(size(), motionGridSize())));
     QPoint gridPos(qFuzzyFloor(gridPosF.x()), qFuzzyFloor(gridPosF.y()));
 
-    return bounded(gridPos, QRect(QPoint(0, 0), motionGridSize()));
+    return Geometry::bounded(gridPos, QRect(QPoint(0, 0), motionGridSize()));
 }
 
 QPointF QnMediaResourceWidget::mapFromMotionGrid(const QPoint &gridPos)
 {
-    return cwiseMul(gridPos, cwiseDiv(size(), motionGridSize()));
+    return Geometry::cwiseMul(gridPos, Geometry::cwiseDiv(size(), motionGridSize()));
 }
 
 QSize QnMediaResourceWidget::motionGridSize() const
 {
-    return cwiseMul(channelLayout()->size(), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+    return Geometry::cwiseMul(
+        channelLayout()->size(), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
 }
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const
 {
-    return cwiseMul(channelLayout()->position(channel), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+    return Geometry::cwiseMul(
+        channelLayout()->position(channel), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
 }
 
 void QnMediaResourceWidget::suspendHomePtzController()
@@ -1400,13 +1404,13 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
     const QRectF& channelRect,
     const QRectF& paintRect)
 {
-    QRectF sourceSubRect = toSubRect(channelRect, paintRect);
+    QRectF sourceSubRect = Geometry::toSubRect(channelRect, paintRect);
 
     if (m_camera && m_camera->hasCombinedSensors())
     {
         const auto& sensor = m_camera->combinedSensorsDescription().mainSensor();
         if (sensor.isValid())
-            sourceSubRect = subRect(sensor.geometry, sourceSubRect);
+            sourceSubRect = Geometry::subRect(sensor.geometry, sourceSubRect);
     }
 
     Qn::RenderStatus result = Qn::NothingRendered;
@@ -1573,7 +1577,7 @@ void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect,
 
     painter->drawRect(progressBarRect);
     painter->fillRect(
-        subRect(progressBarRect, QRectF(0, 0, progress / 100.0, 1)),
+        Geometry::subRect(progressBarRect, QRectF(0, 0, progress / 100.0, 1)),
         palette().highlight());
 }
 
@@ -2132,8 +2136,8 @@ void QnMediaResourceWidget::updateAspectRatio()
     }
 
     qreal aspectRatio = baseAspectRatio *
-        QnGeometry::aspectRatio(channelLayout()->size()) *
-        (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
+        Geometry::aspectRatio(channelLayout()->size()) *
+        (zoomRect().isNull() ? 1.0 : Geometry::aspectRatio(zoomRect()));
 
     setAspectRatio(aspectRatio);
 }

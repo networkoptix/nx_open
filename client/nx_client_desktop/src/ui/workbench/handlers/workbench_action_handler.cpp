@@ -61,6 +61,8 @@
 
 #include <client_core/client_core_module.h>
 
+#include <nx/client/core/utils/geometry.h>
+
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/client/desktop/ui/messages/local_files_messages.h>
@@ -179,6 +181,8 @@
 #include <core/resource/fake_media_server.h>
 
 #include <nx/client/desktop/ui/main_window.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -1546,7 +1550,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : QnGeometry::aspectRatio(viewportGeometry);
+        : Geometry::aspectRatio(viewportGeometry);
 
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 

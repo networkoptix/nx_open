@@ -12,8 +12,11 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/warnings.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <utils/math/coordinate_transformations.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace {
     const QColor arrowColor(255, 0, 0, 96);
@@ -44,10 +47,10 @@ namespace {
 
     QPointF calculateOrigin(QGraphicsView *view, QGraphicsWidget *widget) {
         QRect viewportRect = view->viewport()->rect();
-        qreal viewportDiameter = QnGeometry::length(view->mapToScene(viewportRect.bottomRight()) - view->mapToScene(viewportRect.topLeft()));
+        qreal viewportDiameter = Geometry::length(view->mapToScene(viewportRect.bottomRight()) - view->mapToScene(viewportRect.topLeft()));
 
         QRectF widgetRect = widget->rect();
-        qreal widgetDiameter = QnGeometry::length(widget->mapToScene(widgetRect.bottomRight()) - widget->mapToScene(widgetRect.topLeft()));
+        qreal widgetDiameter = Geometry::length(widget->mapToScene(widgetRect.bottomRight()) - widget->mapToScene(widgetRect.topLeft()));
 
         QPointF widgetCenter = widget->mapToScene(widget->transformOriginPoint());
 
@@ -59,7 +62,7 @@ namespace {
 
             /* Perform calculations in the dimension of the line connecting viewport and widget centers,
              * zero at viewport center. */
-            qreal distance = QnGeometry::length(viewportCenter - widgetCenter);
+            qreal distance = Geometry::length(viewportCenter - widgetCenter);
             qreal lo = qMax(-viewportDiameter / 2, distance - widgetDiameter / 2);
             qreal hi = qMin(viewportDiameter / 2, distance + widgetDiameter / 2);
             qreal pos = (lo + hi) / 2;
@@ -78,7 +81,7 @@ namespace {
     }
 
     qreal calculateItemAngle(QGraphicsWidget *, const QPointF &itemPoint, const QPointF &itemOrigin) {
-        return QnGeometry::atan2(itemPoint - itemOrigin);
+        return Geometry::atan2(itemPoint - itemOrigin);
     }
 
     qreal calculateSceneAngle(QGraphicsWidget *widget, const QPointF &scenePoint, const QPointF &sceneOrigin) {
@@ -93,7 +96,8 @@ namespace {
 
 } // anonymous namespace
 
-class RotationItem: public QGraphicsObject, protected QnGeometry {
+class RotationItem: public QGraphicsObject
+{
 public:
     RotationItem(QGraphicsItem *parent = NULL):
         QGraphicsObject(parent),
@@ -131,7 +135,7 @@ public:
         QPointF viewportOrigin = sceneToViewport.map(m_sceneOrigin);
 
         /* Precalculate shape parameters. */
-        qreal radius = qMax(minRadius, this->length(viewportOrigin - viewportHead));
+        qreal radius = qMax(minRadius, Geometry::length(viewportOrigin - viewportHead));
 
         qreal width = arrowWidth;
         qreal halfWidth = arrowWidth / 2;
@@ -157,7 +161,7 @@ public:
         QnScopedPainterPenRollback penRollback(painter, arrowOutlineColor);
         QnScopedPainterBrushRollback brushRollback(painter, arrowColor);
         painter->translate(viewportOrigin);
-        painter->rotate(atan2(viewportHead - viewportOrigin) / M_PI * 180.0);
+        painter->rotate(Geometry::atan2(viewportHead - viewportOrigin) / M_PI * 180.0);
         painter->drawPath(shape);
     }
 
@@ -374,7 +378,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
     target()->setRotation(m_lastRotation);
 
     QPoint viewportOrigin = info->view()->mapFromScene(m_sceneOrigin);
-    if(length(viewportOrigin - info->mouseViewportPos()) < ignoreRadius)
+    if(Geometry::length(viewportOrigin - info->mouseViewportPos()) < ignoreRadius)
         return;
 
     QPointF itemOrigin = target()->mapFromScene(m_sceneOrigin);
@@ -406,7 +410,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
         target()->setRotation(newRotation);
 
         QPointF newItemCenter = target()->transformOriginPoint();
-        qreal scale = scaleFactor(itemSize, target()->size(), Qt::KeepAspectRatio);
+        qreal scale = Geometry::scaleFactor(itemSize, target()->size(), Qt::KeepAspectRatio);
         QPointF newItemOrigin = newItemCenter + (itemOrigin - itemCenter) * scale;
 
         itemOrigin = newItemOrigin;
@@ -421,7 +425,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
 
     /* Calculate rotation head position in scene coordinates. */
     qreal sceneAngle = m_originAngle + newRotation / 180.0 * M_PI;
-    qreal headDistance = length(m_sceneOrigin - info->mouseScenePos());
+    qreal headDistance = Geometry::length(m_sceneOrigin - info->mouseScenePos());
     QPointF sceneHead = m_sceneOrigin + polarToCartesian<QPointF>(headDistance, sceneAngle);
 
     /* Update rotation item. */

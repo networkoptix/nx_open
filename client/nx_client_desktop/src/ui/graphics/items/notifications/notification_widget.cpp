@@ -8,7 +8,6 @@
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
-#include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/standard/graphics_label.h>

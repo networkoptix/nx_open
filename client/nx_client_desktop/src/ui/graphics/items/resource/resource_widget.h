@@ -12,7 +12,6 @@
 #include <core/resource/resource_media_layout.h>
 
 #include <ui/common/constrained_resizable.h>
-#include <ui/common/geometry.h>
 #include <ui/common/fixed_rotation.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/help_topic_queryable.h>
@@ -41,8 +40,7 @@ class QnResourceWidget:
     public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
     public QnWorkbenchContextAware,
     public ConstrainedResizable,
-    public HelpTopicQueryable,
-    protected QnGeometry
+    public HelpTopicQueryable
 {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)

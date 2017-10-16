@@ -47,9 +47,11 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
 #include <nx/client/desktop/utils/mime_data.h>
+#include <nx/client/core/utils/geometry.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -508,8 +510,8 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
 
     auto drawFixedThumbnail = [painter, &paintRect](const QPixmap& thumb)
         {
-            auto ar = QnGeometry::aspectRatio(thumb.size());
-            auto rect = QnGeometry::expanded(ar, paintRect, Qt::KeepAspectRatio).toRect();
+            auto ar = Geometry::aspectRatio(thumb.size());
+            auto rect = Geometry::expanded(ar, paintRect, Qt::KeepAspectRatio).toRect();
             painter->drawPixmap(rect, thumb);
         };
 
@@ -559,7 +561,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
             painter->translate(paintRect.center());
             painter->rotate(data.rotation);
             painter->translate(-paintRect.center());
-            drawPixmap(QnGeometry::encloseRotatedGeometry(paintRect, QnGeometry::aspectRatio(sourceRect), data.rotation));
+            drawPixmap(Geometry::encloseRotatedGeometry(paintRect, Geometry::aspectRatio(sourceRect), data.rotation));
         }
         else
         {

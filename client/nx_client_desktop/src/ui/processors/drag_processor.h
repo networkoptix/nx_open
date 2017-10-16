@@ -4,8 +4,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <ui/common/geometry.h>
-
 #include "drag_info.h"
 #include "drag_process_handler.h"
 
@@ -37,10 +35,11 @@ class DragProcessHandler;
  * function was called, then <tt>finishDrag()</tt> will also be called even
  * if this drag processor or target surface is destroyed.
  */
-class DragProcessor: public QObject, protected QnGeometry {
-    Q_OBJECT;
-    Q_FLAGS(Flags Flag);
-    Q_ENUMS(State);
+class DragProcessor: public QObject
+{
+    Q_OBJECT
+    Q_FLAGS(Flags Flag)
+    Q_ENUMS(State)
 
 public:
     enum State {
@@ -55,11 +54,11 @@ public:
          * This flag disables the compression. */
         DontCompress = 0x1, // TODO: #Elric #enum
     };
-    Q_DECLARE_FLAGS(Flags, Flag);
+    Q_DECLARE_FLAGS(Flags, Flag)
 
-    DragProcessor(QObject *parent = NULL);
+    DragProcessor(QObject* parent = nullptr);
 
-    virtual ~DragProcessor();
+    virtual ~DragProcessor() override;
 
     State state() const {
         return m_state;

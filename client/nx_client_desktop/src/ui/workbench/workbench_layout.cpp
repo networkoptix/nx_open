@@ -14,14 +14,13 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <utils/common/warnings.h>
-#include <ui/common/geometry.h>
 #include <ui/style/globals.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
 #include "workbench_layout_synchronizer.h"
 #include "workbench_utility.h"
-
 
 #include "extensions/workbench_stream_synchronizer.h"
 
@@ -29,6 +28,8 @@
 
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -642,7 +643,7 @@ const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items() const
 
 bool QnWorkbenchLayout::isFreeSlot(const QPointF& gridPos, const QSize& size) const
 {
-    QPoint gridCell = (gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0).toPoint();
+    QPoint gridCell = (gridPos - Geometry::toPoint(QSizeF(size)) / 2.0).toPoint();
     return !m_itemMap.isOccupied(QRect(gridCell, size));
 }
 
@@ -651,14 +652,14 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& si
 {
     if (!metric)
     {
-        QnDistanceMagnitudeCalculator metric(gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0);
+        QnDistanceMagnitudeCalculator metric(gridPos - Geometry::toPoint(QSizeF(size)) / 2.0);
         return closestFreeSlot(gridPos, size, &metric); /* Use default metric if none provided. */
     }
 
     NX_DEBUG(kFreeSlotTag, lm("Seek for closestFreeSlot to %1 of size %2").args(gridPos, size));
 
     /* Grid cell where starting search position lies. */
-    QPoint gridCell = (gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0).toPoint();
+    QPoint gridCell = (gridPos - Geometry::toPoint(QSizeF(size)) / 2.0).toPoint();
 
     /* Current bests. */
     qreal bestDistance = std::numeric_limits<qreal>::max();

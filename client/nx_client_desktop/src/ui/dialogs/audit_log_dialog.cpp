@@ -20,6 +20,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 
@@ -42,7 +43,6 @@
 
 #include <utils/common/event_processors.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
@@ -668,7 +668,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : QnGeometry::aspectRatio(viewportGeometry);
+        : nx::client::core::utils::Geometry::aspectRatio(viewportGeometry);
 
     if (resList.size() == 1)
     {

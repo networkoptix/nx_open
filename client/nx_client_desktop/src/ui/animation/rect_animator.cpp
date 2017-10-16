@@ -2,7 +2,9 @@
 #include <cmath> /* For std::abs, std::exp & std::log. */
 #include <QtCore/QRectF>
 #include <utils/common/warnings.h>
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::utils::Geometry;
 
 RectAnimator::RectAnimator(QObject *parent):
     base_type(parent),
@@ -29,8 +31,8 @@ int RectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) co
 
     static const qreal eps = 1.0e-6;
 
-    qreal startDiagonal = QnGeometry::length(startRect.size());
-    qreal targetDiagonal = QnGeometry::length(targetRect.size());
+    qreal startDiagonal = Geometry::length(startRect.size());
+    qreal targetDiagonal = Geometry::length(targetRect.size());
 
     /* Formulas below don't do well with zero diagonals, so we adjust them. */
     if(qFuzzyIsNull(startDiagonal)) {
@@ -43,8 +45,10 @@ int RectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) co
         targetDiagonal = startDiagonal * eps;
     }
 
-    qreal movementSpeed = absoluteMovementSpeed() + relativeMovementSpeed() * (startDiagonal + targetDiagonal) / 2;
-    qreal movementTime = QnGeometry::length(targetRect.center() - startRect.center()) / movementSpeed;
+    qreal movementSpeed =
+        absoluteMovementSpeed() + relativeMovementSpeed() * (startDiagonal + targetDiagonal) / 2;
+    qreal movementTime =
+        Geometry::length(targetRect.center() - startRect.center()) / movementSpeed;
 
     qreal scalingTime = std::abs(std::log(startDiagonal / targetDiagonal)) / m_logScalingSpeed;
 

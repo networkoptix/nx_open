@@ -1,16 +1,22 @@
 #include "constrained_resizable.h"
 
+#include <nx/client/core/utils/geometry.h>
+
 QRectF ConstrainedResizable::constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint, const QSizeF &constrainedSize)
 {
+    using nx::client::core::utils::Geometry;
+
     if(qFuzzyEquals(constrainedSize, geometry.size()))
         return geometry;
 
     if(pinSection == Qt::NoSection || pinSection == Qt::TitleBarArea)
-        return QnGeometry::scaled(geometry, constrainedSize, pinPoint, Qt::IgnoreAspectRatio);
+        return Geometry::scaled(geometry, constrainedSize, pinPoint, Qt::IgnoreAspectRatio);
 
     QPointF pinSectionPoint = Qn::calculatePinPoint(geometry, pinSection);
     QRectF result(
-        pinSectionPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(pinSectionPoint - geometry.topLeft(), geometry.size()), constrainedSize),
+        pinSectionPoint - Geometry::cwiseMul(
+            Geometry::cwiseDiv(pinSectionPoint - geometry.topLeft(), geometry.size()),
+            constrainedSize),
         constrainedSize
         );
 

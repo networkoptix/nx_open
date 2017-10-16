@@ -5,6 +5,9 @@
 #include <ui/style/globals.h>
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::utils::Geometry;
 
 QnWorkbenchGridMapper::QnWorkbenchGridMapper(QObject *parent):
     QObject(parent),
@@ -60,12 +63,12 @@ void QnWorkbenchGridMapper::setSpacing(qreal spacing)
 
 QPointF QnWorkbenchGridMapper::mapToGridF(const QPointF &pos) const
 {
-    return cwiseDiv(pos - m_origin, toPoint(m_cellSize + m_spacing));
+    return Geometry::cwiseDiv(pos - m_origin, Geometry::toPoint(m_cellSize + m_spacing));
 }
 
 QPointF QnWorkbenchGridMapper::mapFromGridF(const QPointF &gridPos) const
 {
-    return m_origin + cwiseMul(gridPos, toPoint(m_cellSize + m_spacing));
+    return m_origin + Geometry::cwiseMul(gridPos, Geometry::toPoint(m_cellSize + m_spacing));
 }
 
 QPoint QnWorkbenchGridMapper::mapToGrid(const QPointF &pos) const {
@@ -79,12 +82,12 @@ QPointF QnWorkbenchGridMapper::mapFromGrid(const QPoint &gridPos) const {
 
 QSizeF QnWorkbenchGridMapper::mapToGridF(const QSizeF &size) const
 {
-    return cwiseDiv(size + m_spacing, m_cellSize + m_spacing);
+    return Geometry::cwiseDiv(size + m_spacing, m_cellSize + m_spacing);
 }
 
 QSizeF QnWorkbenchGridMapper::mapFromGridF(const QSizeF &gridSize) const
 {
-    return cwiseMul(gridSize, m_cellSize + m_spacing) - m_spacing;
+    return Geometry::cwiseMul(gridSize, m_cellSize + m_spacing) - m_spacing;
 }
 
 QSize QnWorkbenchGridMapper::mapToGrid(const QSizeF &size) const {
@@ -116,9 +119,9 @@ QRect QnWorkbenchGridMapper::mapToGrid(const QRectF &rect) const {
     QSize gridSize = mapToGrid(rect.size());
 
     /* Compute top-left corner of the rect expanded to integer cell size. */
-    QPointF topLeft = rect.center() - toPoint(mapFromGrid(gridSize)) / 2;
+    QPointF topLeft = rect.center() - Geometry::toPoint(mapFromGrid(gridSize)) / 2;
 
-    QPoint gridTopLeft = mapToGrid(topLeft + toPoint(m_cellSize) / 2);
+    QPoint gridTopLeft = mapToGrid(topLeft + Geometry::toPoint(m_cellSize) / 2);
     return QRect(gridTopLeft, gridSize);
 }
 
@@ -128,5 +131,5 @@ QRectF QnWorkbenchGridMapper::mapFromGrid(const QRect &gridRect) const {
 
 QPointF QnWorkbenchGridMapper::mapDeltaToGridF(const QPointF &delta) const
 {
-    return cwiseDiv(delta, toPoint(m_cellSize + m_spacing));
+    return Geometry::cwiseDiv(delta, Geometry::toPoint(m_cellSize + m_spacing));
 }

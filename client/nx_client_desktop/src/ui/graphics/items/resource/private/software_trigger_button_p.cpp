@@ -6,7 +6,6 @@
 #include <QtWidgets/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
-#include <ui/common/geometry.h>
 #include <ui/graphics/items/generic/slider_tooltip_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/icon.h>
@@ -16,6 +15,7 @@
 #include <ui/style/software_trigger_pixmaps.h>
 #include <ui/widgets/common/busy_indicator.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -510,12 +510,12 @@ QPixmap SoftwareTriggerButtonPrivate::generatePixmap(
     painter.setPen(frame.isValid() ? QPen(frame, kFrameLineWidth) : QPen(Qt::NoPen));
 
     painter.drawEllipse(frame.isValid()
-        ? QnGeometry::eroded(QRectF(buttonRect()), kFrameLineWidth / 2.0)
+        ? nx::client::core::utils::Geometry::eroded(QRectF(buttonRect()), kFrameLineWidth / 2.0)
         : buttonRect());
 
     if (!icon.isNull())
     {
-        const auto pixmapRect = QnGeometry::aligned(
+        const auto pixmapRect = nx::client::core::utils::Geometry::aligned(
             icon.size() / icon.devicePixelRatio(),
             buttonRect());
 

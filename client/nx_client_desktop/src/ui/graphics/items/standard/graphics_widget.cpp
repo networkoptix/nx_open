@@ -13,14 +13,15 @@
 
 #include <utils/common/warnings.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/frame_section.h>
 #include <ui/common/constrained_geometrically.h>
 #include <ui/common/scene_transformations.h>
-#include <ui/common/geometry.h>
 #include <ui/common/cursor_cache.h>
 
 #include "graphics_widget_scene_data.h"
 
+using nx::client::core::utils::Geometry;
 
 namespace {
     const char *qn_sceneDataPropertyName = "_qn_sceneData";
@@ -237,13 +238,15 @@ void GraphicsWidget::setResizeEffectRadius(qreal resizeEffectRadius) {
     d_func()->resizeEffectRadius = resizeEffectRadius;
 }
 
-MarginsF GraphicsWidget::contentsMargins() const {
+QMarginsF GraphicsWidget::contentsMargins() const
+{
     qreal left, top, right, bottom;
     getContentsMargins(&left, &top, &right, &bottom);
-    return MarginsF(left, top, right, bottom);
+    return QMarginsF(left, top, right, bottom);
 }
 
-void GraphicsWidget::setContentsMargins(const MarginsF &margins) {
+void GraphicsWidget::setContentsMargins(const QMarginsF& margins)
+{
     setContentsMargins(margins.left(), margins.top(), margins.right(), margins.bottom());
 }
 
@@ -672,7 +675,7 @@ bool GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
     case Qt::TitleBarArea:
         if(handlingFlags & GraphicsWidget::ItemHandlesMovement) {
             QSizeF size = q->size();
-            windowData->startPinPoint = QnGeometry::cwiseDiv(event->pos(), size);
+            windowData->startPinPoint = Geometry::cwiseDiv(event->pos(), size);
 
             /* Make sure we don't get NaNs in startPinPoint. */
             if(qFuzzyIsNull(size.width()))
@@ -743,7 +746,7 @@ bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
 
         QPointF newPos;
         if(windowData->grabbedSection == Qt::TitleBarArea) {
-            newPos = q->mapToParent(event->pos() - QnGeometry::cwiseMul(windowData->startPinPoint, newSize));
+            newPos = q->mapToParent(event->pos() - Geometry::cwiseMul(windowData->startPinPoint, newSize));
         } else {
             newPos = q->pos() + windowData->startPinPoint - q->mapToParent(Qn::calculatePinPoint(QRectF(QPointF(0.0, 0.0), newSize), windowData->grabbedSection));
         }

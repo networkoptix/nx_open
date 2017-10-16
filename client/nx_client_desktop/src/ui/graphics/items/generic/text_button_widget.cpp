@@ -5,9 +5,11 @@
 
 #include <ui/common/palette.h>
 #include <ui/common/text_pixmap_cache.h>
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <utils/math/linear_combination.h>
+
+using nx::client::core::utils::Geometry;
 
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -109,9 +111,9 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
         endState,
         progress,
         widget,
-        QnGeometry::expanded(
-            QnGeometry::aspectRatio(pixmap(0).size()),
-            QnGeometry::eroded(rect, frameWidth()),
+        Geometry::expanded(
+            Geometry::aspectRatio(pixmap(0).size()),
+            Geometry::eroded(rect, frameWidth()),
             Qt::KeepAspectRatio,
             m_alignment
         )

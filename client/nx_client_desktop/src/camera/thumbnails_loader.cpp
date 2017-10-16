@@ -11,6 +11,8 @@ extern "C"
 #include <QtCore/QTimer>
 #include <QtGui/QImage>
 
+#include <nx/client/core/utils/geometry.h>
+
 #include <utils/math/math.h>
 #include <utils/common/synctime.h>
 #include <utils/common/performance.h>
@@ -19,8 +21,6 @@ extern "C"
 #include "core/resource/camera_history.h"
 
 #include "decoders/video/ffmpeg_video_decoder.h"
-
-#include "ui/common/geometry.h"
 
 #include "plugins/resource/avi/thumbnails_archive_delegate.h"
 #include "nx/streaming/archive_stream_reader.h"
@@ -34,6 +34,8 @@ extern "C"
 
 #include <recording/time_period.h>
 #include "core/resource/media_server_resource.h"
+
+using nx::client::core::utils::Geometry;
 
 namespace {
     const qint64 defaultUpdateInterval = 10 * 1000; /* 10 seconds. */
@@ -231,9 +233,9 @@ qreal QnThumbnailsLoader::getAspectRatio()
     // todo: need update aspect ratio in future
 
     if (m_scaleSourceSize.isEmpty())
-        return QnGeometry::aspectRatio(m_scaleSourceSize);
+        return Geometry::aspectRatio(m_scaleSourceSize);
     if (m_cachedAspectRatio == 0)
-        m_cachedAspectRatio = QnGeometry::aspectRatio(m_scaleSourceSize);
+        m_cachedAspectRatio = Geometry::aspectRatio(m_scaleSourceSize);
     return m_cachedAspectRatio;
 }
 
@@ -241,7 +243,7 @@ void QnThumbnailsLoader::updateTargetSizeLocked(bool invalidate) {
     QSize targetSize;
 
     if(!m_scaleSourceSize.isEmpty() && !m_boundingSize.isEmpty())
-        targetSize = QnGeometry::expanded(getAspectRatio(), m_boundingSize, Qt::KeepAspectRatio).toSize();
+        targetSize = Geometry::expanded(getAspectRatio(), m_boundingSize, Qt::KeepAspectRatio).toSize();
 
     if(m_targetSize == targetSize)
         return;

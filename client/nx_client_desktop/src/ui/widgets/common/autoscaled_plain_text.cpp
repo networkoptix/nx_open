@@ -2,11 +2,12 @@
 
 #include <QtGui/QPainter>
 
-#include <ui/common/geometry.h>
 #include <utils/common/event_processors.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/client/core/utils/geometry.h>
 
+using nx::client::core::utils::Geometry;
 
 class QnAutoscaledPlainTextPrivate: public QObject
 {
@@ -60,7 +61,7 @@ public:
         Q_Q(const QnAutoscaledPlainText);
         auto sizeToFit = q->contentsRect().size();
 
-        qreal factor = 1.0 / QnGeometry::scaleFactor(sizeHint, sizeToFit, Qt::KeepAspectRatio);
+        qreal factor = 1.0 / Geometry::scaleFactor(sizeHint, sizeToFit, Qt::KeepAspectRatio);
 
         m_effectiveFont = q->font();
         m_effectiveFontValid = true;

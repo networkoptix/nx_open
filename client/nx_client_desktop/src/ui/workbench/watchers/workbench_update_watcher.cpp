@@ -20,7 +20,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
-#include <ui/common/geometry.h>
 
 #include <update/update_checker.h>
 #include <update/update_info.h>

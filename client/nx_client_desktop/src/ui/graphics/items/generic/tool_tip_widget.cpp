@@ -11,10 +11,12 @@
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace  {
 
@@ -28,12 +30,12 @@ namespace  {
             QPointF pos1 = QPointF(x, y);
             QPointF delta = pos1 - pos0;
 
-            qreal edgeLength = QnGeometry::length(delta);
+            qreal edgeLength = Geometry::length(delta);
             qreal segmentLength = qMin(tailWidth, edgeLength);
             qreal relativeSegmentLength = segmentLength / edgeLength;
 
             qreal t;
-            QnGeometry::closestPoint(pos0, pos1, tailPos, &t);
+            Geometry::closestPoint(pos0, pos1, tailPos, &t);
 
             qreal t0 = t - relativeSegmentLength / 2.0;
             qreal t1 = t + relativeSegmentLength / 2.0;
@@ -108,7 +110,7 @@ QPointF QnToolTipWidget::tailPos() const {
 
 Qt::Edges QnToolTipWidget::tailBorder() const
 {
-    QPointF distance = m_tailPos - QnGeometry::closestPoint(rect(), m_tailPos);
+    QPointF distance = m_tailPos - Geometry::closestPoint(rect(), m_tailPos);
     if (qFuzzyIsNull(distance))
         return Qt::Edges();
 

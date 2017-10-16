@@ -20,6 +20,7 @@
 #include <helpers/url_helper.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/core/ui/frame_section.h>
+#include <nx/client/core/utils/geometry.h>
 
 static QObject* createNxGlobals(QQmlEngine*, QJSEngine*)
 {
@@ -64,6 +65,7 @@ void QnClientCoreMetaTypes::initialize()
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
 
     nx::client::core::ui::FrameSection::registedQmlType();
+    nx::client::core::utils::Geometry::registerQmlType();
 
     qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",
         QLatin1String("Cannot create an instance of QnMediaDewarpingParams."));

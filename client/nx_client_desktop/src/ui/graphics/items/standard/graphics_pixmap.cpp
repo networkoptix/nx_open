@@ -4,8 +4,10 @@
 
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
-#include <ui/common/geometry.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::utils::Geometry;
 
 class GraphicsPixmapPrivate {
 public:
@@ -43,7 +45,7 @@ void GraphicsPixmap::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         return;
 
     QRectF rect = d->pixmap.rect();
-    rect = QnGeometry::scaled(rect, option->rect.size(), rect.center(), d->aspectRatioMode);
+    rect = Geometry::scaled(rect, option->rect.size(), rect.center(), d->aspectRatioMode);
     rect.moveCenter(option->rect.center());
     paintPixmapSharp(painter, d->pixmap, rect.toRect());
 }

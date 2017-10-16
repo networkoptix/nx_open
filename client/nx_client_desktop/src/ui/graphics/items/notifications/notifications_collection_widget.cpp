@@ -29,7 +29,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 

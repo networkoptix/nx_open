@@ -12,10 +12,12 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/fusion/model_functions.h>
-#include <ui/common/geometry.h>
+#include <nx/client/core/utils/geometry.h>
 #include <ui/style/skin.h>
 
 #include <utils/common/delayed.h>
+
+using nx::client::core::utils::Geometry;
 
 namespace {
 
@@ -190,7 +192,7 @@ QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourceP
             return result;
 
         const auto stream = camera->defaultStream();
-        result = QnGeometry::cwiseMul(stream.getResolution(), tiling);
+        result = Geometry::cwiseMul(stream.getResolution(), tiling);
     }
     // Only height is given, calculating width by aspect ratio
     else if (result.width() <= 0)
