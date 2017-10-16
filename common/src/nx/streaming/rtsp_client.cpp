@@ -862,6 +862,14 @@ void QnRtspClient::addCommonHeaders(nx_http::HttpHeaders& headers)
     headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
 }
 
+void QnRtspClient::addAdditionalHeaders(
+    const QString& requestName,
+    nx_http::HttpHeaders* outHeaders)
+{
+    for (const auto& header: m_additionalHeaders[requestName])
+        nx_http::insertOrReplaceHeader(outHeaders, header);
+}
+
 nx_http::Request QnRtspClient::createDescribeRequest()
 {
     m_sdpTracks.clear();
@@ -1276,6 +1284,8 @@ nx_http::Request QnRtspClient::createPlayRequest( qint64 startPos, qint64 endPos
     addRangeHeader( &request, startPos, endPos );
     if (m_scaleHeaderEnabled)
         request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
+    addAdditionalHeaders(lit("PLAY"), &request.headers);
+    request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
     if( m_numOfPredefinedChannels )
     {
         nx_http::insertOrReplaceHeader(
@@ -1329,7 +1339,7 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
         m_keepAliveTime.restart();
         return true;
     }
-    
+
     return false;
 
 }
@@ -2034,4 +2044,9 @@ void QnRtspClient::setDateTimeFormat(const DateTimeFormat& format)
 void QnRtspClient::setScaleHeaderEnabled(bool value)
 {
     m_scaleHeaderEnabled = value;
+}
+
+void QnRtspClient::addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header)
+{
+    nx_http::insertOrReplaceHeader(&m_additionalHeaders[requestName], header);
 }

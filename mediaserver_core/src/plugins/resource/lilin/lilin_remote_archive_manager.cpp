@@ -91,6 +91,12 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
     return true;
 }
 
+void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
+    std::function<void(const std::vector<RemoteArchiveEntry>&)> callback)
+{
+    // Do nothing.
+}
+
 bool LilinRemoteArchiveManager::fetchArchiveEntry(const QString& entryId, BufferType* outBuffer)
 {
     auto response = doRequest(kChunkDownloadTemplate.arg(entryId), true);
@@ -130,7 +136,9 @@ std::unique_ptr<nx_http::HttpClient> LilinRemoteArchiveManager::initHttpClient()
     return httpClient;
 }
 
-boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(const QString& requestPath, bool expectOnlyBody /*= false*/)
+boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(
+    const QString& requestPath,
+    bool expectOnlyBody /*= false*/)
 {
     auto httpClient = initHttpClient();
 
@@ -229,6 +237,17 @@ boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dat
         return boost::none;
 
     return dateTime.toMSecsSinceEpoch();
+}
+
+RemoteArchiveCapabilities LilinRemoteArchiveManager::capabilities() const
+{
+    return RemoteArchiveCapability::RemoveChunkCapability
+        | RemoteArchiveCapability::FullChunkCapability;
+}
+
+QnAbstractArchiveDelegate* LilinRemoteArchiveManager::archiveDelegate()
+{
+    return nullptr;
 }
 
 } // namespace plugins

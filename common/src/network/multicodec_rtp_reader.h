@@ -96,6 +96,8 @@ public:
      * Default value is false.
      */
     void setTrustToCameraTime(bool value);
+
+    void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 

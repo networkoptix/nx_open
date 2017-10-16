@@ -9,6 +9,7 @@
 #include "hanwha_resource_searcher.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
+#include "hanwha_chunk_reader.h"
 
 #include <QtCore/QMap>
 
@@ -30,7 +31,6 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <media_server/media_server_module.h>
-#include "hanwha_chunk_reader.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -172,6 +172,14 @@ HanwhaResource::~HanwhaResource()
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 {
     return new HanwhaStreamReader(toSharedPointer(this));
+}
+
+nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveManager()
+{
+    if (!m_remoteArchiveManager)
+        m_remoteArchiveManager = std::make_unique<HanwhaRemoteArchiveManager>(this);
+
+    return m_remoteArchiveManager.get();
 }
 
 bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
@@ -500,6 +508,32 @@ QnSemaphore* HanwhaResource::requestSemaphore()
     return sharedContext->requestSemaphore();
 }
 
+std::shared_ptr<HanwhaChunkLoader> HanwhaResource::chunkLoader()
+{
+    auto sharedContext = qnServerModule
+        ->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+
+    if (!sharedContext)
+        return nullptr;
+
+    return sharedContext->chunkLoader();
+}
+
+QnAbstractArchiveDelegate* HanwhaResource::remoteArchiveDelegate()
+{
+    if (isNvr())
+        return nullptr;
+
+    if (!m_remoteArchiveDelegate)
+    {
+        m_remoteArchiveDelegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
+        m_remoteArchiveDelegate->setRateControlEnabled(false);
+    }
+
+    return m_remoteArchiveDelegate.get();
+}
+
 bool HanwhaResource::isVideoSourceActive()
 {
     HanwhaRequestHelper helper(toSharedPointer(this));
@@ -557,6 +591,10 @@ CameraDiagnostics::Result HanwhaResource::init()
     if (!result)
         return result;
 
+    result = initRemoteArchive();
+    if (!result)
+        return result;
+
     result = initAdvancedParameters();
     if (!result)
         return result;
@@ -565,12 +603,17 @@ CameraDiagnostics::Result HanwhaResource::init()
 
     saveParams();
 
-    auto sharedContext = qnServerModule
-        ->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
-    auto loader = sharedContext->chunkLoader();
-    int channelCount = sharedContext->channelCount(getAuth(), getUrl());
-    loader->start(getAuth(), getUrl(), channelCount);
+    if (isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability))
+    {
+        auto sharedContext = qnServerModule
+            ->sharedContextPool()
+            ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
+
+        auto loader = sharedContext->chunkLoader();
+        loader->setIsCameraLoader(!isNvr());
+        int channelCount = sharedContext->channelCount(getAuth(), getUrl());
+        loader->start(getAuth(), getUrl(), channelCount);
+    }
 
     return result;
 }
@@ -996,7 +1039,9 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    setCameraCapability(Qn::RemoteArchiveCapability, false);
+    if (!isNvr())
+        setCameraCapability(Qn::RemoteArchiveCapability, true);
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2334,7 +2379,7 @@ QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
 QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
-        return new HanwhaNvrArchiveDelegate(toSharedPointer());
+        return new HanwhaArchiveDelegate(toSharedPointer());
     return nullptr;
 }
 

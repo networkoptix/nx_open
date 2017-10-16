@@ -792,8 +792,6 @@
                 <param id="image/camera/DayNightMode"
                         name="Mode"
                         dataType="Enumeration"
-                        range="Color,B/W,Auto,External"
-                        internalRange="Color,BW,Auto,ExternalBW"
                         aux="groupLead=dn"/>
                 <param id="image/camera/DayNightSwitchingMode"
                         name="Duration"

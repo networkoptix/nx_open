@@ -323,6 +323,8 @@ public:
 
     void setDateTimeFormat(const DateTimeFormat& format);
     void setScaleHeaderEnabled(bool value);
+    void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
+
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -357,6 +359,8 @@ private:
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
     bool sendRequestInternal(nx_http::Request&& request);
     void addCommonHeaders(nx_http::HttpHeaders& headers);
+    void addAdditionalHeaders(const QString& requestName, nx_http::HttpHeaders* outHeaders);
+
     QByteArray nptPosToString(qint64 posUsec) const;
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
@@ -421,6 +425,8 @@ private:
     QByteArray m_serverInfo;
     DateTimeFormat m_dateTimeFormat = DateTimeFormat::Numeric;
     bool m_scaleHeaderEnabled = true;
+    using RequestName = QString;
+    QMap<RequestName, nx_http::HttpHeaders> m_additionalHeaders;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

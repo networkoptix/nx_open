@@ -10,6 +10,8 @@
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
+#include <plugins/resource/hanwha/hanwha_archive_delegate.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
 #include <nx/utils/timer_holder.h>
@@ -24,6 +26,8 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+class HanwhaChunkLoader;
+
 class HanwhaResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
@@ -33,6 +37,8 @@ public:
     virtual ~HanwhaResource() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+
+    virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager() override;
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
 
@@ -71,6 +77,10 @@ public:
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
     QnSemaphore* requestSemaphore();
+
+    std::shared_ptr<HanwhaChunkLoader> chunkLoader();
+
+    QnAbstractArchiveDelegate* remoteArchiveDelegate();
 
     bool isVideoSourceActive();
 
@@ -270,6 +280,8 @@ private:
     std::atomic<bool> m_areInputPortsMonitored{false};
 
     nx::utils::TimerHolder m_timerHolder;
+    std::unique_ptr<HanwhaRemoteArchiveManager> m_remoteArchiveManager;
+    std::unique_ptr<HanwhaArchiveDelegate> m_remoteArchiveDelegate;
 };
 
 } // namespace plugins

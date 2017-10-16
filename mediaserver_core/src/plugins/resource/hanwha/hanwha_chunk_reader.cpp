@@ -1,6 +1,7 @@
 #if defined(ENABLE_HANWHA)
 
 #include <QtCore/QDateTime>
+#include <QtCore/QUrlQuery>
 
 #include "hanwha_chunk_reader.h"
 #include "utils/common/synctime.h"
@@ -40,13 +41,18 @@ HanwhaChunkLoader::~HanwhaChunkLoader()
         nx::utils::TimerManager::instance()->deleteTimer(m_nextRequestTimerId);
 }
 
+void HanwhaChunkLoader::setIsCameraLoader(bool isCameraLoader)
+{
+    m_isCameraLoader = isCameraLoader;
+}
+
 void HanwhaChunkLoader::start(const QAuthenticator& auth, const QUrl& cameraUrl, int maxChannels)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_state != State::Initial)
+        if (m_state != State::initial)
             return; //< Already started
-        m_state = State::updateTimeRange;
+        m_state = nextState(m_state);
     }
     m_auth = auth;
     m_cameraUrl = cameraUrl;
@@ -57,7 +63,7 @@ void HanwhaChunkLoader::start(const QAuthenticator& auth, const QUrl& cameraUrl,
 bool HanwhaChunkLoader::isStarted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state != State::Initial;
+    return m_state != State::initial;
 }
 
 void HanwhaChunkLoader::sendRequest()
@@ -67,7 +73,7 @@ void HanwhaChunkLoader::sendRequest()
     case State::updateTimeRange:
         sendUpdateTimeRangeRequest();
         break;
-    case State::LoadingChunks:
+    case State::loadingChunks:
         sendLoadChunksRequest();
         break;
     default:
@@ -124,10 +130,14 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     auto endDateTime = QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1);
     query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateFormat));
     query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateFormat));
+
     QStringList channelsParam;
     for (int i = 0; i < m_maxChannels; ++i)
         channelsParam << QString::number(i);
-    query.addQueryItem("ChannelIdList", channelsParam.join(','));
+
+    if (!m_isCameraLoader)
+        query.addQueryItem("ChannelIdList", channelsParam.join(','));
+
     loadChunksUrl.setQuery(query);
     m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
     m_httpClient->setOnSomeMessageBodyAvailable(
@@ -147,6 +157,8 @@ void HanwhaChunkLoader::onHttpClientDone()
             .arg(m_httpClient->url().toString())
             .arg(m_httpClient->lastSysErrorCode()));
         startTimerForNextRequest(kResendRequestIfFail);
+        setError();
+        m_wait.wakeAll();
         return;
     }
     const int statusCode = m_httpClient->response()->statusLine.statusCode;
@@ -156,19 +168,24 @@ void HanwhaChunkLoader::onHttpClientDone()
             .arg(m_httpClient->url().toString())
             .arg(statusCode));
         startTimerForNextRequest(kResendRequestIfFail);
+        setError();
+        m_wait.wakeAll();
         return;
     }
 
-    if (m_state == State::LoadingChunks)
+    if (m_state == State::loadingChunks)
     {
-        m_state = State::updateTimeRange;
+        m_state = nextState(m_state);
+        m_chunksLoadedAtLeastOnce = true;
+        m_wait.wakeAll();
         startTimerForNextRequest(kUpdateChunksDelay); //< Send next request after delay
     }
     else if(m_state == State::updateTimeRange)
     {
         parseTimeRangeData(m_httpClient->fetchMessageBodyBuffer());
-
-        m_state = State::LoadingChunks;
+        m_state = nextState(m_state);
+        m_timeRangeLoadedAtLeastOnce = true;
+        m_wait.wakeAll();
         sendRequest(); //< Send next request immediately
     }
 }
@@ -229,6 +246,8 @@ void HanwhaChunkLoader::onGotChunkData()
     QList<QByteArray> lines = buffer. split('\n');
     for (const auto& line: lines)
         parseChunkData(line);
+
+    emit gotChunks();
 }
 
 bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
@@ -301,12 +320,59 @@ qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
 QnTimePeriodList HanwhaChunkLoader::chunks(int channelNumber) const
 {
     QnMutexLocker lock(&m_mutex);
+    return chunksUnsafe(channelNumber);
+}
+
+QnTimePeriodList HanwhaChunkLoader::chunksSync(int channelNumber) const
+{
+    QnMutexLocker lock(&m_mutex);
+    while ((!m_chunksLoadedAtLeastOnce || (!m_timeRangeLoadedAtLeastOnce && !m_isCameraLoader))
+        && !m_errorOccured)
+    {
+        m_wait.wait(&m_mutex);
+    }
+
+    if (m_errorOccured)
+        m_errorOccured = false;
+
+    return chunksUnsafe(channelNumber);
+}
+
+QnTimePeriodList HanwhaChunkLoader::chunksUnsafe(int channelNumber) const
+{
     const qint64 startTimeMs = m_startTimeUsec / 1000;
     const qint64 endTimeMs = m_endTimeUsec / 1000;
     if (m_chunks.size() <= channelNumber)
         return QnTimePeriodList();
-    QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
-    return m_chunks[channelNumber].intersected(boundingPeriod);
+
+    if (!m_isCameraLoader)
+    {
+        QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
+        return m_chunks[channelNumber].intersected(boundingPeriod);
+    }
+
+    return m_chunks[channelNumber];
+}
+
+void HanwhaChunkLoader::setError()
+{
+    m_errorOccured = true;
+    m_chunksLoadedAtLeastOnce = false;
+    m_timeRangeLoadedAtLeastOnce = false;
+}
+
+HanwhaChunkLoader::State HanwhaChunkLoader::nextState(State currentState) const
+{
+    if (m_isCameraLoader)
+        return State::loadingChunks;
+
+    if (currentState == State::loadingChunks)
+        return State::updateTimeRange;
+
+    if (currentState == State::updateTimeRange)
+        return State::loadingChunks;
+
+    return State::updateTimeRange;
 }
 
 } // namespace plugins

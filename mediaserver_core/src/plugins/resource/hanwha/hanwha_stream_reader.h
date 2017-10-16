@@ -21,13 +21,16 @@ public:
 
     void setPositionUsec(qint64 value);
     void setSessionType(HanwhaSessionType value);
+    void setRateControlEnabled(bool enabled);
+    void setPlaybackRange(int64_t startTimeMs, int64_t endtimeMs);
+
     virtual ~HanwhaStreamReader() override;
 protected: 
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
         const QnLiveStreamParams& params) override;
     
-    friend class HanwhaNvrArchiveDelegate;
+    friend class HanwhaArchiveDelegate;
 private:
     HanwhaProfileParameters makeProfileParameters(
         int profileNumber,
@@ -46,7 +49,10 @@ private:
     QnRtspClient& rtspClient();
 private:
     HanwhaResourcePtr m_hanwhaResource;
+    bool m_rateControlEnabled = true;
     HanwhaSessionType m_sessionType = HanwhaSessionType::live;
+    int64_t m_startTimeMs = 0;
+    int64_t m_endTimeMs = 0;
 };
 
 } // namespace plugins

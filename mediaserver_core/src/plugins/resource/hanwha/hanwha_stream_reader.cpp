@@ -73,6 +73,8 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
     m_rtpReader.setRole(role);
     m_rtpReader.setTrustToCameraTime(m_hanwhaResource->isNvr());
+    if (!m_rateControlEnabled)
+        m_rtpReader.addRequestHeader(lit("PLAY"), nx_http::HttpHeader("Rate-Control", "no"));
 
     m_rtpReader.setRequest(streamUrlString);
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);
@@ -229,6 +231,11 @@ bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
 
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)
 {
+    if (getRole() == Qn::CR_Archive && !m_hanwhaResource->isNvr())
+    {
+        QUrl url(m_hanwhaResource->getUrl());
+    }
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
@@ -283,6 +290,17 @@ QString HanwhaStreamReader::rtpTransport() const
 void HanwhaStreamReader::setPositionUsec(qint64 value)
 {
     m_rtpReader.setPositionUsec(value);
+}
+
+void HanwhaStreamReader::setRateControlEnabled(bool enabled)
+{
+    m_rateControlEnabled = enabled;
+}
+
+void HanwhaStreamReader::setPlaybackRange(int64_t startTimeMs, int64_t endtimeMs)
+{
+    m_startTimeMs = startTimeMs;
+    m_endTimeMs = endtimeMs;
 }
 
 QnRtspClient& HanwhaStreamReader::rtspClient()

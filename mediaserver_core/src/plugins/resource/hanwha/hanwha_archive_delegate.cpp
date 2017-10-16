@@ -14,7 +14,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource)
+HanwhaArchiveDelegate::HanwhaArchiveDelegate(const QnResourcePtr& resource)
 {
     auto hanwhaRes = resource.dynamicCast<HanwhaResource>();
     NX_ASSERT(hanwhaRes);
@@ -32,22 +32,23 @@ HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource
     m_flags |= Flag_CanSeekImmediatly;
 }
 
-HanwhaNvrArchiveDelegate::~HanwhaNvrArchiveDelegate()
+HanwhaArchiveDelegate::~HanwhaArchiveDelegate()
 {
     m_streamReader.reset();
 }
 
-bool HanwhaNvrArchiveDelegate::open(const QnResourcePtr &resource)
+bool HanwhaArchiveDelegate::open(const QnResourcePtr &resource)
 {
+    m_streamReader->setRateControlEnabled(m_rateControlEnabled);
     return (bool) m_streamReader->openStreamInternal(false, QnLiveStreamParams());
 }
 
-void HanwhaNvrArchiveDelegate::close()
+void HanwhaArchiveDelegate::close()
 {
     m_streamReader->closeStream();
 }
 
-qint64 HanwhaNvrArchiveDelegate::startTime() const
+qint64 HanwhaArchiveDelegate::startTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
     return qnServerModule->sharedContextPool()
@@ -55,7 +56,7 @@ qint64 HanwhaNvrArchiveDelegate::startTime() const
         ->chunkLoader()->startTimeUsec(hanwhaRes->getChannel());
 }
 
-qint64 HanwhaNvrArchiveDelegate::endTime() const
+qint64 HanwhaArchiveDelegate::endTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
     return qnServerModule->sharedContextPool()
@@ -63,7 +64,7 @@ qint64 HanwhaNvrArchiveDelegate::endTime() const
         ->chunkLoader()->endTimeUsec(hanwhaRes->getChannel());
 }
 
-QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
+QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 {
     if (!m_streamReader)
         return QnAbstractMediaDataPtr();
@@ -86,13 +87,13 @@ QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
     return result;
 }
 
-bool HanwhaNvrArchiveDelegate::isForwardDirection() const
+bool HanwhaArchiveDelegate::isForwardDirection() const
 {
     auto& rtspClient = m_streamReader->rtspClient();
     return rtspClient.getScale() >= 0;
 }
 
-qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
+qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
     const auto chunks = qnServerModule->sharedContextPool()
@@ -113,24 +114,24 @@ qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
     return timeUsec;
 }
 
-QnConstResourceVideoLayoutPtr HanwhaNvrArchiveDelegate::getVideoLayout()
+QnConstResourceVideoLayoutPtr HanwhaArchiveDelegate::getVideoLayout()
 {
     static QSharedPointer<QnDefaultResourceVideoLayout> videoLayout(new QnDefaultResourceVideoLayout());
     return videoLayout;
 }
 
-QnConstResourceAudioLayoutPtr HanwhaNvrArchiveDelegate::getAudioLayout()
+QnConstResourceAudioLayoutPtr HanwhaArchiveDelegate::getAudioLayout()
 {
     static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout(new QnEmptyResourceAudioLayout());
     return audioLayout;
 }
 
-void HanwhaNvrArchiveDelegate::beforeClose()
+void HanwhaArchiveDelegate::beforeClose()
 {
     m_streamReader->pleaseStop();
 }
 
-void HanwhaNvrArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void HanwhaArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     auto& rtspClient = m_streamReader->rtspClient();
     rtspClient.setScale(value ? -1 : 1);
@@ -139,7 +140,7 @@ void HanwhaNvrArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     open(m_streamReader->m_resource);
 }
 
-void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
+void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
 {
     m_endTimeUsec = endTimeUsec;
     m_previewMode = frameStepUsec > 1;
@@ -153,9 +154,14 @@ void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec
     seek(startTimeUsec, true /*findIFrame*/);
 }
 
-void HanwhaNvrArchiveDelegate::beforeSeek(qint64 time)
+void HanwhaArchiveDelegate::beforeSeek(qint64 time)
 {
     // TODO: implement me
+}
+
+void HanwhaArchiveDelegate::setRateControlEnabled(bool enabled)
+{
+    m_rateControlEnabled = enabled;
 }
 
 } // namespace plugins

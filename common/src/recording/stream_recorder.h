@@ -124,6 +124,8 @@ public:
 
     void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
 
+    int64_t lastFileSize() const;
+
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -237,6 +239,7 @@ private:
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
     MotionHandler m_motionHandler;
+    int64_t m_lastFileSize = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

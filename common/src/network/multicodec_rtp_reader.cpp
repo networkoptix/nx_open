@@ -744,6 +744,13 @@ void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
     m_timeHelper.setTrustToCameraTime(value);
 }
 
+void QnMulticodecRtpReader::addRequestHeader(
+    const QString& requestName,
+    const nx_http::HttpHeader& header)
+{
+    m_RtpSession.addRequestHeader(requestName, header);
+}
+
 QnRtspClient& QnMulticodecRtpReader::rtspClient()
 {
     return m_RtpSession;

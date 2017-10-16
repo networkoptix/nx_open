@@ -24,14 +24,16 @@ class HanwhaChunkLoader: public QObject
 
     enum class State
     {
-        Initial,
+        initial,
         updateTimeRange,
-        LoadingChunks
+        loadingChunks
     };
 
 public:
     HanwhaChunkLoader();
     virtual ~HanwhaChunkLoader();
+
+    void setIsCameraLoader(bool isCameraLoader);
 
     void start(const QAuthenticator& auth, const QUrl& url, int channelCount);
     bool isStarted() const;
@@ -39,7 +41,16 @@ public:
     qint64 startTimeUsec(int channelNumber) const;
     qint64 endTimeUsec(int channelNumber) const;
     QnTimePeriodList chunks(int channelNumber) const;
+    QnTimePeriodList chunksSync(int channelNumber) const;
+
+signals:
+    void gotChunks();
+
 private:
+    QnTimePeriodList chunksUnsafe(int channelNumber) const;
+    void setError();
+    State nextState(State currentState) const;
+
     void onHttpClientDone();
     void onGotChunkData();
     bool parseChunkData(const QByteArray& data);
@@ -52,7 +63,7 @@ private:
     qint64 latestChunkTime() const;
 private:
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
-    State m_state = State::Initial;
+    State m_state = State::initial;
     QByteArray m_unfinishedLine;
     std::vector<QnTimePeriodList> m_chunks;
     qint64 m_nextRequestTimerId = 0;
@@ -65,6 +76,13 @@ private:
     QAuthenticator m_auth;
     QUrl m_cameraUrl;
     mutable QnMutex m_mutex;
+
+    //< Is this loader for camera or for NVR
+    bool m_isCameraLoader = false;
+    std::atomic<bool> m_chunksLoadedAtLeastOnce{false};
+    std::atomic<bool> m_timeRangeLoadedAtLeastOnce{false};
+    mutable std::atomic<bool> m_errorOccured{false};
+    mutable QnWaitCondition m_wait;
 };
 
 } // namespace plugins

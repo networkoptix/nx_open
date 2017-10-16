@@ -12,11 +12,11 @@ namespace plugins {
 
 class HanwhaStreamReader;
 
-class HanwhaNvrArchiveDelegate: public QnAbstractArchiveDelegate
+class HanwhaArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    HanwhaNvrArchiveDelegate(const QnResourcePtr& res);
-    virtual ~HanwhaNvrArchiveDelegate();
+    HanwhaArchiveDelegate(const QnResourcePtr& res);
+    virtual ~HanwhaArchiveDelegate();
 
     virtual bool open(const QnResourcePtr &resource) override;
     virtual void close() override;
@@ -33,11 +33,14 @@ public:
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
     virtual void beforeSeek(qint64 time) override;
+
+    void setRateControlEnabled(bool enabled);
 private:
     bool isForwardDirection() const;
 private:
     std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
+    int m_rateControlEnabled = true;
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
     qint64 m_lastSeekTime = AV_NOPTS_VALUE;
     bool m_previewMode = false;

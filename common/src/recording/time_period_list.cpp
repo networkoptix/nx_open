@@ -404,6 +404,12 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period)
     }
 }
 
+void QnTimePeriodList::excludeTimePeriodList(const QnTimePeriodList& timePeriodList)
+{
+    for (const auto& timePeriod: timePeriodList)
+        excludeTimePeriod(timePeriod);
+}
+
 void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint)
 {
     qint64 erasePoint = dividerPoint;
