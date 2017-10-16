@@ -252,10 +252,45 @@ int QnCameraAdditionDialog::fillTable(QnManualResourceSearchList cameras)
             if (left.existsInPool != right.existsInPool)
                 return right.existsInPool;
 
-            if (left.name == right.name)
-                return QString::compare(left.uniqueId, right.uniqueId, Qt::CaseInsensitive) < 0;
+            const auto leftUrl(QUrl::fromUserInput(left.url));
+            const auto rightUrl(QUrl::fromUserInput(right.url));
 
-            return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
+            // Try to sort by IP address first.
+            const auto leftIp = HostAddress::ipV4from(leftUrl.host());
+            const auto rightIp = HostAddress::ipV4from(rightUrl.host());
+            if (leftIp.is_initialized() && rightIp.is_initialized() &&
+                leftIp->S_un.S_addr != rightIp->S_un.S_addr)
+            {
+                return leftIp->S_un.S_addr < rightIp->S_un.S_addr;
+            }
+
+            // Sort by host then.
+            if (leftUrl.host() != rightUrl.host())
+                return leftUrl.host() < rightUrl.host();
+
+            // Sort cameras on the same host by channels of the recorder.
+            static const QString kChannelParameter = lit("channel");
+            const QUrlQuery leftQuery(leftUrl);
+            const QUrlQuery rightQuery(rightUrl);
+            if (leftQuery.hasQueryItem(kChannelParameter)
+                || rightQuery.hasQueryItem(kChannelParameter))
+            {
+                const auto leftChannel = leftQuery.queryItemValue(kChannelParameter).toInt();
+                const auto rightChannel = rightQuery.queryItemValue(kChannelParameter).toInt();
+
+                // Default value is 0, so we can safely compare existing channel with absent.
+                NX_EXPECT(leftChannel != rightChannel, "Two cameras on the same host?");
+                if (leftChannel != rightChannel)
+                    return leftChannel < rightChannel;
+            }
+
+            if (left.name != right.name)
+            {
+                return nx::utils::naturalStringCompare(
+                    left.name, right.name, Qt::CaseInsensitive) < 0;
+            }
+
+            return left.uniqueId < right.uniqueId;
         });
 
     clearTable();
