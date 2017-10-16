@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_video_profile.h"
 #include "hanwha_utils.h"
 
@@ -23,7 +25,8 @@ const QSet<QString> kKnownBuiltinProfiles = {
     lit("RightHalfView"),
     lit("FisheyeView"),
     lit("Dewarp1"),
-    lit("Dewarp2")
+    lit("Dewarp2"),
+    lit("Live4NVR")
 };
 
 } // namespace
@@ -82,3 +85,5 @@ bool HanwhaVideoProfile::isBuiltinProfile() const
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

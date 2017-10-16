@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_advanced_parameter_info.h"
 #include "hanwha_utils.h"
 
@@ -282,3 +284,6 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)
+

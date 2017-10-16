@@ -5,7 +5,10 @@
 
 #include <nx/sdk/metadata/abstract_event_metadata_packet.h>
 #include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
+#include <nx/vms/event/events/events.h>
+#include <nx/vms/event/events/events_fwd.h>
 
+#include <core/resource/security_cam_resource.h>
 #include <nx/mediaserver/event/event_connector.h>
 
 namespace nx {
@@ -52,18 +55,24 @@ void EventHandler::handleMetadata(
 
         setLastEventState(eventTypeId, eventState);
 
-        qnEventRuleConnector->at_analyticsSdkEvent(
+        auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
             m_resource,
             m_pluginId,
             eventTypeId,
             eventState,
             eventData->caption(),
             eventData->description(),
+            eventData->auxilaryData(),
             eventPacket->timestampUsec());
+
+        if (m_resource->captureEvent(sdkEvent))
+            continue;
+
+        qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
     }
 }
 
-void EventHandler::setResource(const QnResourcePtr& resource)
+void EventHandler::setResource(const QnSecurityCamResourcePtr& resource)
 {
     m_resource = resource;
 }

@@ -14,6 +14,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING("http://96.64.226.250:8888/image",
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
+    NX_INI_FLAG(0, universalExportDialog, "Use universal export dialog instead of old export dialogs.");
 };
 
 inline Ini& ini()

@@ -253,9 +253,9 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
     }
 }
 
-QImage QnCamDisplay::getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality)
+QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality)
 {
-    QList<QnAbstractImageFilterPtr> filters;
+    nx::core::transcoding::FilterChain filters;
     CLVideoDecoderOutputPtr frame;
     bool filtersReady = false;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -268,8 +268,10 @@ QImage QnCamDisplay::getScreenshot(const QnImageFilterHelper& imageProcessingPar
                 if (!filtersReady)
                 {
                     filtersReady = true;
-                    filters = imageProcessingParams.createFilterChain(QSize(frame->width, frame->height));
+                    filters = QnImageFilterHelper::createFilterChain(imageProcessingParams,
+                        QSize(frame->width, frame->height));
                 }
+                frame = filters.apply(frame);
                 for(auto filter: filters)
                 {
                     frame = filter->updateImage(frame);

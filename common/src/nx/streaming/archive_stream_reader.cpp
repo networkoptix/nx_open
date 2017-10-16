@@ -416,7 +416,7 @@ begin_label:
         }
         else {
             if (m_resource->hasFlags(Qn::local))
-                mFirstTime = false; // Do not try to reopen local file if it can't be opened.
+                mFirstTime = false; //< Do not try to reopen local file if it can't be opened.
             // If media data can't be opened report 'no data'
             return createEmptyPacket(m_reverseMode);
         }

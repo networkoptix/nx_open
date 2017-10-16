@@ -17,7 +17,7 @@ public:
         nx::sdk::Error error,
         nx::sdk::metadata::AbstractMetadataPacket* metadata) override;
 
-    void setResource(const QnResourcePtr& resource);
+    void setResource(const QnSecurityCamResourcePtr& resource);
 
     void setPluginId(const QnUuid& pluginId);
 
@@ -26,7 +26,7 @@ private:
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
 
 private:
-    QnResourcePtr m_resource;
+    QnSecurityCamResourcePtr m_resource;
     QnUuid m_pluginId;
     QMap<QnUuid, nx::vms::event::EventState> m_eventStateMap;
 

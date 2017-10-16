@@ -899,6 +899,23 @@ vms::event::ActionDataList QnServerDb::getActions(const QnEventLogRequestData& r
             query.value(businessRuleIdx).toByteArray());
         actionData.aggregationCount = query.value(aggregationCntIdx).toInt();
 
+        if (actionData.eventParams.eventType == vms::event::cameraMotionEvent
+            || actionData.eventParams.eventType == vms::event::cameraInputEvent
+            || actionData.eventParams.eventType == vms::event::analyticsSdkEvent
+            || actionData.actionType == vms::event::ActionType::bookmarkAction
+            || actionData.actionType == vms::event::ActionType::acknowledgeAction)
+        {
+            QnNetworkResourcePtr camRes =
+                resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
+            if (camRes)
+            {
+                if (QnStorageManager::isArchiveTimeExists(
+                    camRes->getUniqueId(), actionData.eventParams.eventTimestampUsec / 1000))
+                {
+                    actionData.flags |= vms::event::ActionData::VideoLinkExists;
+                }
+            }
+        }
         result.push_back(std::move(actionData));
     }
 

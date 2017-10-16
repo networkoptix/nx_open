@@ -443,6 +443,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     scheduled_request_is_completed_after_reconnect,
     request_result_is_reported_even_if_connect_always_fails);
 
+
 } // namespace test
 } // namespace stun
 } // namespace nx

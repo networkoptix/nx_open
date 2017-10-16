@@ -31,6 +31,9 @@ private slots:
 private:
     void updateSdkEventTypesModel();
     void updateSelectedEventType();
+    nx::vms::event::EventParameters createEventParameters(
+        const QnUuid& driverId,
+        const QnUuid& analyticsEventTypeId);
 
 private:
     QScopedPointer<Ui::AnalyticsSdkEventWidget> ui;

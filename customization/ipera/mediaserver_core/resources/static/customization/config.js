@@ -1,14 +1,14 @@
 Config.helpLinks.push({
-    url: "http://support.networkoptix.com",
+    url: "mailto:support@flyvi.ru",
     title: "Support",
     target: "new" // new|frame
 });
 
-Config.helpLinks.push({
+/*Config.helpLinks.push({
     url: "http://networkoptix.com/calculator/#/",
     title: "Hardware calculator",
     target: "new" // new|frame
-});
+});*/
 
 Config.helpLinks.push({
     url: "https://itunes.apple.com/eg/app/id1090087835",

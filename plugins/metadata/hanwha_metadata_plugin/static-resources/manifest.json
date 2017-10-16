@@ -62,7 +62,7 @@
                 "localization": {
                 }
             },
-            "internalName": "VideoAnalytics.AppearDisappear",
+            "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
             "description": "Object %1 ",
             "positiveState": "appeared",
             "negativeState": "disappeared",
@@ -128,7 +128,7 @@
                 "localization": {
                 }
             },
-            "internalName": "DryContactInput",
+            "internalName": "AlarmInput.",
             "description": "Dry contact input has been %1",
             "positiveState": "activated",
             "negativeState": "deactivated",

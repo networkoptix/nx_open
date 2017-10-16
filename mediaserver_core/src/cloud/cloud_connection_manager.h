@@ -13,10 +13,32 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
-class CloudConnectionManager:
+class AbstractCloudConnectionManager:
     public QObject,
+    public nx::hpm::api::AbstractCloudSystemCredentialsProvider
+{
+    Q_OBJECT
+
+public:
+    virtual ~AbstractCloudConnectionManager() = default;
+
+    virtual bool boundToCloud() const = 0;
+
+    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
+        const QString& cloudSystemId,
+        const QString& cloudAuthKey) const = 0;
+
+    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection() = 0;
+
+    virtual void processCloudErrorCode(nx::cdb::api::ResultCode resultCode) = 0;
+
+signals:
+    void cloudBindingStatusChanged(bool boundToCloud);
+};
+
+class CloudConnectionManager:
+    public AbstractCloudConnectionManager,
     public Qn::EnableSafeDirectConnection,
-    public nx::hpm::api::AbstractCloudSystemCredentialsProvider,
     public QnCommonModuleAware
 {
     Q_OBJECT
@@ -28,25 +50,27 @@ public:
     virtual boost::optional<nx::hpm::api::SystemCredentials>
         getSystemCredentials() const override;
 
-    bool boundToCloud() const;
+    virtual bool boundToCloud() const override;
     /**
      * @return null if not connected to the cloud.
      */
-    std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
+    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
         const QString& cloudSystemId,
-        const QString& cloudAuthKey) const;
-    std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
-    const nx::cdb::api::ConnectionFactory& connectionFactory() const;
+        const QString& cloudAuthKey) const override;
 
-    void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
+    virtual std::unique_ptr<nx::cdb::api::Connection> getCloudConnection() override;
+
+    virtual void processCloudErrorCode(nx::cdb::api::ResultCode resultCode) override;
+
+    const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     bool detachSystemFromCloud();
 
     bool removeCloudUsers();
+
 signals:
-    void cloudBindingStatusChanged(bool boundToCloud);
     void connectedToCloud();
     void disconnectedFromCloud();
 

@@ -107,6 +107,9 @@ namespace Qn
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
 
+    // Mediaserver common info
+    static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");
+
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");

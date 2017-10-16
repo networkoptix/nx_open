@@ -19,6 +19,7 @@ public:
         EventState toggleState,
         const QString& caption,
         const QString& description,
+        const QString& auxiliaryData,
         qint64 timeStampUsec);
 
     const QnUuid& driverId() const;
@@ -30,11 +31,14 @@ public:
 
     virtual bool checkEventParams(const EventParameters &params) const override;
 
+    QString auxiliaryData() const;
+
 private:
     const QnUuid m_driverId;
     const QnUuid m_eventId;
     const QString m_caption;
     const QString m_description;
+    const QString m_auxiliaryData;
 };
 
 } // namespace event

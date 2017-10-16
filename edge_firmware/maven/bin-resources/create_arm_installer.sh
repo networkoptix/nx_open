@@ -474,6 +474,7 @@ buildInstaller()
     cp -r "$CURRENT_BUILD_DIR"/update.* "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR"/install.sh "$ZIP_DIR/"
     create_archive "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
+    cp "$CURRENT_BUILD_DIR/$ZIP_FILENAME" "$CURRENT_BUILD_DIR/$ZIP_INSTALLER_FILENAME"
 }
 
 # [in] WORK_DIR

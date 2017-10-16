@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <plugins/resource/hanwha/hanwha_cgi_parameter.h>
 
 #include <vector>
@@ -19,8 +21,6 @@ extern "C" {
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
-
-extern const std::set<QString> kHanwhaStreamLimitParameters;
 
 struct HanwhaStreamLimits
 {
@@ -57,3 +57,5 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

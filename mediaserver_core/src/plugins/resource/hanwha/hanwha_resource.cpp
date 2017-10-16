@@ -6,18 +6,25 @@
 #include "hanwha_request_helper.h"
 #include "hanwha_stream_reader.h"
 #include "hanwha_ptz_controller.h"
+#include "hanwha_resource_searcher.h"
 
 #include <QtCore/QMap>
 
+#include <plugins/resource/onvif/onvif_audio_transmitter.h>
+#include <plugins/plugin_internal_tools.h>
 #include <utils/xml/camera_advanced_param_reader.h>
-#include <core/resource/camera_advanced_param.h>
 #include <camera/camera_pool.h>
+#include <common/common_module.h>
 
 #include <nx/utils/log/log.h>
-#include <plugins/resource/onvif/onvif_audio_transmitter.h>
-#include <core/resource/media_stream_capability.h>
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/vms/event/events/events.h>
+#include <nx/sdk/metadata/abstract_metadata_plugin.h>
+
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource/media_stream_capability.h>
+#include <core/resource/camera_advanced_param.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -30,10 +37,18 @@ static const QString kAdvancedParametersTemplateFile = lit(":/camera_advanced_pa
 static const QString kEncodingTypeProperty = lit("EncodingType");
 static const QString kResolutionProperty = lit("Resolution");
 static const QString kBitrateControlTypeProperty = lit("BitrateControlType");
-static const QString kGovLengthProperty = lit("GovLength");
-static const QString kCodecProfileProperty = lit("CodecProfile");
-static const QString kEntropyCoding = lit("EntropyCoding");
+static const QString kGovLengthProperty = lit("GOVLength");
+static const QString kCodecProfileProperty = lit("Profile");
+static const QString kEntropyCodingProperty = lit("EntropyCoding");
+static const QString kBitrateProperty = lit("Bitrate");
+static const QString kFramePriorityProperty = lit("PriorityType");
+
 static const QString kNvrDeviceType = lit("NVR");
+static const QString kHanwhaVideoSourceStateOn = lit("On");
+
+//Taken from Hanwha metadata plugin manifest.json
+static const QnUuid kHanwhaInputPortEventId =
+    QnUuid(lit("{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}"));
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -64,11 +79,28 @@ static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamPro
         {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamCodecProfileParamName},
         {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamCodecProfileParamName}
     }},
-    {kEntropyCoding,
+    {kEntropyCodingProperty,
     {
         {Qn::ConnectionRole::CR_LiveVideo, Qn::kPrimaryStreamEntropyCodingParamName},
         {Qn::ConnectionRole::CR_SecondaryLiveVideo, Qn::kSecondaryStreamEntropyCodingParamName}
     }}
+};
+
+static const std::set<QString> kHanwhaStreamLimitParameters = {
+    lit("Resolution"),
+    lit("FrameRate"),
+    lit("Bitrate"),
+    lit("EncodingType"),
+    lit("H264.BitrateControlType"),
+    lit("H264.GOVLength"),
+    lit("H264.PriorityType"),
+    lit("H264.Profile"),
+    lit("H264.EntropyCoding"),
+    lit("H265.BitrateControlType"),
+    lit("H265.GOVLength"),
+    lit("H265.PriorityType"),
+    lit("H265.Profile"),
+    lit("H265.EntropyCoding"),
 };
 
 struct UpdateInfo
@@ -84,20 +116,20 @@ struct UpdateInfo
 
 bool operator<(const UpdateInfo& lhs, const UpdateInfo& rhs)
 {
-    if (lhs.cgi < rhs.cgi)
-        return true;
+    if (lhs.cgi != rhs.cgi)
+        return lhs.cgi < rhs.cgi;
 
-    if (lhs.submenu < rhs.submenu)
-        return true;
+    if (lhs.submenu != rhs.submenu)
+        return lhs.submenu < rhs.submenu;
 
-    if (lhs.action < rhs.action)
-        return true;
+    if (lhs.action != rhs.action)
+        return lhs.action < rhs.action;
 
-    if (lhs.profile < rhs.profile)
-        return true;
+    if (lhs.profile != rhs.profile)
+        return lhs.profile < rhs.profile;
 
-    if (lhs.channelIndependent && !rhs.channelIndependent)
-        return true;
+    if (lhs.channelIndependent != rhs.channelIndependent)
+        return lhs.channelIndependent < rhs.channelIndependent;
 
     return false;
 }
@@ -222,10 +254,10 @@ bool HanwhaResource::getParamsPhysical(
                     auto value = response.parameter<QString>(parameterString);
 
                     if (!value)
-                        value = tryToGetSpecificParameterDefault(parameterString, response);
-
+                        value = defaultValue(parameterString.split(L'.').last(), info->profileDependency());
                     if (!value)
                         continue;
+
 
                     result.push_back(
                         QnCameraAdvancedParamValue(
@@ -348,6 +380,137 @@ bool HanwhaResource::setParamsPhysical(
     return success;
 }
 
+QnIOPortDataList HanwhaResource::getRelayOutputList() const
+{
+    QnIOPortDataList result;
+    for (const auto& entry: m_ioPortTypeById)
+    {
+        if (entry.portType == Qn::PT_Output)
+            result.push_back(entry);
+    }
+
+    return result;
+}
+
+QnIOPortDataList HanwhaResource::getInputPortList() const
+{
+    QnIOPortDataList result;
+    for (const auto& entry : m_ioPortTypeById)
+    {
+        if (entry.portType == Qn::PT_Input)
+            result.push_back(entry);
+    }
+
+    return result;
+}
+
+bool HanwhaResource::setRelayOutputState(
+    const QString& ouputId,
+    bool activate,
+    unsigned int autoResetTimeoutMs)
+{
+    const auto info = portInfoFromId(ouputId);
+    const auto state = activate ? lit("On") : lit("Off");
+
+    HanwhaRequestHelper::Parameters parameters = 
+        {{lit("%1.%2.State").arg(info.prefix).arg(info.number), state}};
+
+    if (info.submenu == lit("alarmoutput"))
+    {
+        parameters.emplace(
+            lit("%1.%2.ManualDuration")
+                .arg(info.prefix)
+                .arg(info.number),
+            lit("Always"));
+    }
+
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    const auto response = helper.control(
+        lit("io/%1").arg(info.submenu),
+        parameters);
+
+    return response.isSuccessful();
+}
+
+bool HanwhaResource::startInputPortMonitoringAsync(
+    std::function<void(bool)>&& completionHandler)
+{
+    m_areInputPortsMonitored = true;
+    return true;
+}
+
+void HanwhaResource::stopInputPortMonitoringAsync()
+{
+    m_areInputPortsMonitored = false;
+}
+
+bool HanwhaResource::isInputPortMonitored() const
+{
+    return m_areInputPortsMonitored;
+}
+
+bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
+{
+    if (!m_areInputPortsMonitored)
+        return false;
+    
+    const auto analyticsEvent = event.dynamicCast<nx::vms::event::AnalyticsSdkEvent>();
+    if (!analyticsEvent)
+        return false;
+
+    const auto parameters = analyticsEvent->getRuntimeParams();
+    if (parameters.analyticsEventId() != kHanwhaInputPortEventId)
+        return false;
+
+    emit cameraInput(
+        toSharedPointer(this),
+        analyticsEvent->auxiliaryData(),
+        analyticsEvent->getToggleState() == nx::vms::event::EventState::active,
+        parameters.eventTimestampUsec);
+
+    return true;
+}
+
+bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const
+{
+    return base_type::doesEventComeFromAnalyticsDriver(eventType)
+        || eventType == nx::vms::event::EventType::cameraInputEvent;
+}
+
+QString HanwhaResource::sessionKey(
+    HanwhaSessionType sessionType,
+    bool generateNewOne)
+{
+    auto discoveryManager = commonModule()->resourceDiscoveryManager();
+    if (!discoveryManager)
+        return QString();
+
+    auto searcher = dynamic_cast<HanwhaResourceSearcher*>(
+        discoveryManager->searcherByManufacture(kHanwhaManufacturerName));
+
+    if (!searcher)
+        return QString();
+
+    return searcher->sessionKey(toSharedPointer(this), sessionType, generateNewOne);
+}
+
+bool HanwhaResource::isVideoSourceActive()
+{
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    auto response = helper.view(lit("media/videosource"));
+
+    if (!response.isSuccessful())
+        return false;
+
+    const auto state = response.parameter<QString>(
+        lit("Channel.%1.State").arg(getChannel()));
+
+    if (!state.is_initialized())
+        return false;
+
+    return state == kHanwhaVideoSourceStateOn;
+}
+
 int HanwhaResource::maxProfileCount() const
 {
     return m_maxProfileCount;
@@ -409,12 +572,15 @@ void HanwhaResource::initMediaStreamCapabilities()
         QString::fromLatin1(QJson::serialized(m_capabilities)));
 }
 
-nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::ConnectionRole role)
+nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::ConnectionRole role) const
 {
-    if (m_isNvr)
-        return nx::media::CameraStreamCapability();
-
     nx::media::CameraStreamCapability capability;
+    if (m_isNvr)
+    {
+        capability.maxFps = 1;
+        return capability;
+    }
+
     const auto codec = streamCodec(role);
     const auto resolution = streamResolution(role);
     const auto bitrateControlType = streamBitrateControl(role);
@@ -437,7 +603,7 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
         ? limits->defaultCbrBitrate
         : limits->defaultVbrBitrate;
 
-    capability.defaultFps = limits->defaultFps;
+    capability.defaultFps = limits->defaultFps > 0 ? limits->defaultFps : limits->maxFps;
     capability.maxFps = limits->maxFps;
 
     return capability;
@@ -532,10 +698,10 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     {
         int fixedProfileCount = 0;
 
-        const auto startSequence = kHanwhaChannelPropertyTemplate.arg(channel);
+        const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: profiles.response())
         {
-            const bool isFixedProfile = entry.first.startsWith(startSequence)
+            const bool isFixedProfile = entry.first.startsWith(channelPrefix)
                 && entry.first.endsWith(kHanwhaIsFixedProfileProperty)
                 && entry.second == kHanwhaTrue;
 
@@ -553,7 +719,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         }
 
         m_maxProfileCount = *maxProfileCount;
-        hasDualStreaming = *maxProfileCount - fixedProfileCount > 1;
+        hasDualStreaming = m_maxProfileCount - fixedProfileCount > 1;
         auto result = fetchStreamLimits(&m_streamLimits);
 
         if (!result)
@@ -580,6 +746,11 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         if (!result)
             return result;
     }
+    else if (!isVideoSourceActive())
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("Video source is not active"));
+    }
 
     const bool hasAudio = m_attributes.attribute<int>(
         lit("Media/MaxAudioInput/%1").arg(channel)) > 0;
@@ -594,48 +765,61 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 {
     QnIOPortDataList ioPorts;
 
-    const auto alarmInputs = m_cgiParameters.parameter(
-        lit("eventstatus/eventstatus/check/AlarmInput"));
+    const auto maxAlarmInputs = m_attributes.attribute<int>(
+        lit("Eventsource/MaxAlarmInput"));
 
-    if (alarmInputs && alarmInputs->isValid())
+    const auto maxAlarmOutputs = m_attributes.attribute<int>(
+        lit("IO/MaxAlarmOutput"));
+
+    const auto maxAuxDevices = m_attributes.attribute<int>(
+        lit("IO/MaxAux"));
+    
+    if (maxAlarmInputs.is_initialized() && *maxAlarmInputs > 0)
     {
-        const auto inputs = alarmInputs->possibleValues();
-        if (!inputs.isEmpty())
-            setCameraCapability(Qn::RelayInputCapability, true);
-
-        for (const auto& input: inputs)
+        setCameraCapability(Qn::RelayInputCapability, true);
+        for (auto i = 1; i <= maxAlarmInputs.get(); ++i)
         {
             QnIOPortData inputPortData;
             inputPortData.portType = Qn::PT_Input;
-            inputPortData.id = lit("HanwhaAlarmInput.%1").arg(input);
-            inputPortData.inputName = tr("Alarm Input #%1").arg(input);
+            inputPortData.id = lit("AlarmInput.%1").arg(i);
+            inputPortData.inputName = tr("Alarm Input #%1").arg(i);
 
+            m_ioPortTypeById[inputPortData.id] = inputPortData;
             ioPorts.push_back(inputPortData);
         }
     }
 
-    const auto alarmOutputs = m_cgiParameters
-        .parameter(lit("eventstatus/eventstatus/check/AlarmOutput"));
-
-    if (alarmOutputs && alarmOutputs->isValid())
+    if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
     {
-        const auto outputs = alarmOutputs->possibleValues();
-        if (!outputs.isEmpty())
-            setCameraCapability(Qn::RelayOutputCapability, true);
-
-        for (const auto& output : outputs)
+        setCameraCapability(Qn::RelayOutputCapability, true);
+        for (auto i = 1; i <= maxAlarmOutputs.get(); ++i)
         {
             QnIOPortData outputPortData;
             outputPortData.portType = Qn::PT_Output;
-            outputPortData.id = lit("HanwhaAlarmOutput.%1").arg(output);
-            outputPortData.outputName = tr("Alarm Output #%1").arg(output);
+            outputPortData.id = lit("AlarmOutput.%1").arg(i);
+            outputPortData.outputName = tr("Alarm Output #%1").arg(i);
 
+            m_ioPortTypeById[outputPortData.id] = outputPortData;
+            ioPorts.push_back(outputPortData);
+        }
+    }
+
+    if (maxAuxDevices.is_initialized() && *maxAuxDevices > 0)
+    {
+        setCameraCapability(Qn::RelayOutputCapability, true);
+        for (auto i = 1; i <= maxAuxDevices.get(); ++i)
+        {
+            QnIOPortData outputPortData;
+            outputPortData.portType = Qn::PT_Output;
+            outputPortData.id = lit("Aux.%1").arg(i);
+            outputPortData.outputName = tr("Auxiliary Device #%1").arg(i);
+
+            m_ioPortTypeById[outputPortData.id] = outputPortData;
             ioPorts.push_back(outputPortData);
         }
     }
 
     setIOPorts(ioPorts);
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1137,12 +1321,8 @@ QString HanwhaResource::streamCodecProfile(AVCodecID codec, Qn::ConnectionRole r
         ? Qn::kPrimaryStreamCodecProfileParamName
         : Qn::kSecondaryStreamCodecProfileParamName;
 
-    QString profile = getProperty(propertyName);
-
-    if (!profile.isEmpty())
-        return suggestCodecProfile(codec, profile);
-
-    return suggestCodecProfile(codec, lit("INVALID_PROFILE"));
+    const QString profile = getProperty(propertyName);
+    return suggestCodecProfile(codec, role, profile);
 }
 
 QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const
@@ -1164,17 +1344,10 @@ QSize HanwhaResource::streamResolution(Qn::ConnectionRole role) const
 
 int HanwhaResource::streamFrameRate(Qn::ConnectionRole role, int desiredFps) const
 {
-    if (role == Qn::ConnectionRole::CR_LiveVideo)
-        return closestFrameRate(role, desiredFps);
-
-    bool success = false;
-    const auto userDefinedFps = getProperty(Qn::kSecondaryStreamFpsParamName)
-        .toInt(&success);
-
-    if (!success)
-        return closestFrameRate(role, desiredSecondStreamFps());
-
-    return closestFrameRate(role, desiredFps);
+    int userDefinedFps = 0;
+    if (role == Qn::ConnectionRole::CR_SecondaryLiveVideo)
+        userDefinedFps = getProperty(Qn::kSecondaryStreamFpsParamName).toInt();
+    return closestFrameRate(role, userDefinedFps ? userDefinedFps : desiredFps);
 }
 
 int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
@@ -1281,7 +1454,7 @@ QSize HanwhaResource::defaultResolutionForStream(Qn::ConnectionRole role) const
 
 int HanwhaResource::defaultGovLengthForStream(Qn::ConnectionRole role) const
 {
-    return kHanwhaInvalidGovLength;
+    return mediaCapabilityForRole(role).maxFps;
 }
 
 Qn::BitrateControl HanwhaResource::defaultBitrateControlForStream(Qn::ConnectionRole role) const
@@ -1332,7 +1505,7 @@ Qn::EntropyCoding HanwhaResource::defaultEntropyCodingForStream(Qn::ConnectionRo
 
 QString HanwhaResource::defaultCodecProfileForStream(Qn::ConnectionRole role) const
 {
-    const auto codec = defaultCodecForStream(role);
+    const auto codec = streamCodec(role);
     
     const auto codecProfileParameter = m_cgiParameters.parameter(
         lit("media/videoprofile/add_update/%1.Profile").arg(toHanwhaString(codec)));
@@ -1350,10 +1523,7 @@ QString HanwhaResource::defaultCodecProfileForStream(Qn::ConnectionRole role) co
     if (possibleValues.contains(lit("Main")))
         return lit("Main");
 
-    if (possibleValues.contains(lit("Baseline")))
-        return lit("Baseline");
-
-    return QString();
+    return possibleValues.first();
 }
 
 int HanwhaResource::defaultFrameRateForStream(Qn::ConnectionRole role) const
@@ -1376,13 +1546,24 @@ QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRol
         return QString::number(defaultGovLengthForStream(role));
     else if (parameter == kCodecProfileProperty)
         return defaultCodecProfileForStream(role);
-    else if (parameter == kEntropyCoding)
+    else if (parameter == kEntropyCodingProperty)
         return toHanwhaString(defaultEntropyCodingForStream(role));
+    else if (parameter == kBitrateProperty)
+    {
+        int bitrateKbps = mediaCapabilityForRole(role).defaultBitrateKbps;
+        if (bitrateKbps > 0)
+            return QString::number(bitrateKbps);
+    }
+    else if (parameter == kFramePriorityProperty)
+        return lit("FrameRate");
 
     return QString();
 }
 
-QString HanwhaResource::suggestCodecProfile(AVCodecID codec, QString desiredProfile) const
+QString HanwhaResource::suggestCodecProfile(
+    AVCodecID codec,
+    Qn::ConnectionRole role,
+    const QString& desiredProfile) const
 {
     const QStringList* profiles = nullptr;
     if (codec == AV_CODEC_ID_H264)
@@ -1390,13 +1571,10 @@ QString HanwhaResource::suggestCodecProfile(AVCodecID codec, QString desiredProf
     else if (codec == AV_CODEC_ID_HEVC)
         profiles = &m_streamLimits.hevcProfiles;
 
-    if (!profiles || profiles->isEmpty())
-        return QString();
-
-    if (profiles->contains(desiredProfile))
+    if (profiles && profiles->contains(desiredProfile))
         return desiredProfile;
 
-    return profiles->last();
+    return defaultCodecProfileForStream(role);
 }
 
 QSize HanwhaResource::bestSecondaryResolution(
@@ -1506,7 +1684,7 @@ bool HanwhaResource::fillRanges(
     QnCameraAdvancedParams* inOutParameters,
     const HanwhaCgiParameters& cgiParameters) const
 {
-    for (const auto& id : inOutParameters->allParameterIds())
+    for (const auto& id: inOutParameters->allParameterIds())
     {
         auto parameter = inOutParameters->getParameterById(id);
         auto info = advancedParameterInfo(id);
@@ -1723,142 +1901,6 @@ void HanwhaResource::updateToChannel(int value)
     suffix = lit("-channel %1").arg(value + 1);
     if (value > 0 && !getName().endsWith(suffix))
         setName(getName() + suffix);
-}
-
-boost::optional<QString> HanwhaResource::tryToGetSpecificParameterDefault(
-    const QString& parameterString,
-    const HanwhaResponse& response) const
-{
-    const auto split = parameterString.split(L'.');
-    if (split.size() < 5)
-        return boost::none;
-
-    auto codec = fromHanwhaString<AVCodecID>(split[4]);
-
-    if (parameterString.endsWith(lit(".PriorityType")))
-        return lit("CompressionLevel");
-
-    if (parameterString.endsWith(lit(".EntropyCoding")))
-        return lit("CABAC");
-
-    if (parameterString.endsWith(lit(".BitrateControlType")))
-        return lit("VBR");
-
-    if (parameterString.endsWith(lit(".Profile")))
-    {
-        if (codec == AV_CODEC_ID_H264)
-            return lit("High");
-
-        if (codec == AV_CODEC_ID_HEVC)
-            return lit("Main");
-
-        return boost::none;
-    }
-
-    if (parameterString.endsWith(lit(".GOVLength")))
-    {
-        auto defaultGovLength = calculateDefaultGovLength(parameterString, response);
-        if (!defaultGovLength.is_initialized())
-            return boost::none;
-
-        return QString::number(*defaultGovLength);
-    }
-
-    if (parameterString.endsWith(lit(".Bitrate")))
-    {
-        auto defaultBitrate = calculateDefaultBitrate(parameterString, response);
-        if (!defaultBitrate.is_initialized())
-            return boost::none;
-
-        return QString::number(*defaultBitrate);
-    }
-
-    return boost::none;
-}
-
-boost::optional<int> HanwhaResource::calculateDefaultBitrate(
-    const QString& parameterString,
-    const HanwhaResponse& response) const
-{
-    int channel = kHanwhaInvalidChannel;
-    int profile = kHanwhaInvalidProfile;
-    AVCodecID codec = AV_CODEC_ID_NONE;
-
-    std::tie(channel, profile, codec) = channelProfileCodec(parameterString);
-
-    if (channel == kHanwhaInvalidChannel || profile == kHanwhaInvalidProfile)
-        return boost::none;
-
-    const auto resolution = response.parameter<QSize>(
-        lit("Channel.%1.Profile.%2.Resolution")
-            .arg(channel)
-            .arg(profile));
-
-    if (!resolution.is_initialized())
-        return boost::none;
-
-    auto limits = m_codecInfo.limits(
-        getChannel(),
-        codec,
-        lit("General"),
-        *resolution);
-
-    if (!limits)
-        return boost::none;
-
-    return limits->defaultCbrBitrate;
-}
-
-boost::optional<int> HanwhaResource::calculateDefaultGovLength(
-    const QString& parameterString,
-    const HanwhaResponse& response) const
-{
-    int channel = kHanwhaInvalidChannel;
-    int profile = kHanwhaInvalidProfile;
-    
-    std::tie(channel, profile, std::ignore) = channelProfileCodec(parameterString);
-
-    if (channel == kHanwhaInvalidChannel || profile == kHanwhaInvalidProfile)
-        return boost::none;
-
-    const auto fps = response.parameter<int>(
-        lit("Channel.%1.Profile.%2.FrameRate")
-            .arg(channel)
-            .arg(profile));
-
-    if (!fps)
-        return boost::none;
-
-    return *fps * 2;
-}
-
-std::tuple<int, int, AVCodecID> HanwhaResource::channelProfileCodec(const QString& parameterString) const
-{
-    const std::tuple<int, int, AVCodecID> invalidResult = std::make_tuple(
-        kHanwhaInvalidChannel,
-        kHanwhaInvalidProfile,
-        AV_CODEC_ID_NONE);
-
-    const auto split = parameterString.split(L'.');
-    if (split.size() < 6)
-        return invalidResult;
-
-    if (split[0] != kHanwhaChannelProperty && split[2] != kHanwhaProfileNumberProperty)
-        return invalidResult;
-
-    bool success = false;
-    const auto channel = split[1].toInt(&success);
-
-    if (!success)
-        return invalidResult;
-
-    const auto profile = split[3].toInt(&success);
-    if (!success)
-        return invalidResult;
-
-    const auto codec = fromHanwhaString<AVCodecID>(split[4]);
-
-    return std::make_tuple(channel, profile, codec);
 }
 
 QString HanwhaResource::toHanwhaAdvancedParameterValue(
@@ -2171,7 +2213,7 @@ bool HanwhaResource::resetProfileToDefault(Qn::ConnectionRole role)
         kBitrateControlTypeProperty,
         kGovLengthProperty,
         kCodecProfileProperty,
-        kEntropyCoding
+        kEntropyCodingProperty
     };
 
     std::map<QString, QString> parameters;
@@ -2207,9 +2249,43 @@ QString HanwhaResource::propertyByPrameterAndRole(
     return entry->second;
 }
 
+HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id) const
+{
+    HanwhaPortInfo result;
+    auto split = id.split(L'.');
+    if (split.size() != 2)
+        return result;
+
+    result.prefix = split[0];
+    result.number = split[1];
+    result.submenu = result.prefix.toLower();
+
+    return result;
+}
+
 bool HanwhaResource::isNvr() const
 {
     return m_isNvr;
+}
+
+QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
+{
+    const auto nxProfileNameParameter = m_cgiParameters
+        .parameter(lit("media/videoprofile/add_update/Name"));
+
+    const auto maxLength = nxProfileNameParameter && nxProfileNameParameter->maxLength() > 0
+        ? nxProfileNameParameter->maxLength()
+        : kHanwhaProfileNameMaxLength;
+        
+    auto suffix = role == Qn::ConnectionRole::CR_LiveVideo
+        ? kHanwhaPrimaryNxProfileSuffix
+        : kHanwhaSecondaryNxProfileSuffix;
+
+    auto appName = QnAppInfo::productNameLong()
+        .mid(0, maxLength - suffix.length())
+        .remove(QRegExp("[^a-zA-Z]"));
+
+    return appName + suffix;
 }
 
 } // namespace plugins

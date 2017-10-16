@@ -82,7 +82,17 @@ QSettings* MSSettings::roSettings()
     return m_roSettings.get();
 }
 
+const QSettings* MSSettings::roSettings() const
+{
+    return m_roSettings.get();
+}
+
 QSettings* MSSettings::runTimeSettings()
+{
+    return m_rwSettings.get();
+}
+
+const QSettings* MSSettings::runTimeSettings() const
 {
     return m_rwSettings.get();
 }

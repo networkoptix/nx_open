@@ -81,7 +81,6 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <nx/utils/collection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -3013,11 +3012,14 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
 
             // checking existing widgets with same screen sets
             // take any other item on this widget
-            int otherIdx = qnIndexOf(indices, [&item](const QnVideoWallItemIndex &idx) { return idx.uuid() != item.uuid; });
-            if ((otherIdx >= 0)
-                && (indices[otherIdx].item().pcUuid == item.pcUuid)
-                && (indices[otherIdx].item().screenSnaps.screens() == item.screenSnaps.screens()))
+            const auto other = std::find_if(indices.cbegin(), indices.cend(),
+                [&item](const QnVideoWallItemIndex &idx) { return idx.uuid() != item.uuid; });
+            if (other != indices.cend()
+                && (other->item().pcUuid == item.pcUuid)
+                && (other->item().screenSnaps.screens() == item.screenSnaps.screens()))
+            {
                 return workbenchItem;
+            }
 
             // our item is the only item on the widget, we can modify it as we want
             if (indices.size() == 1 && indices.first().item().uuid == item.uuid)

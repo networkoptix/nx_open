@@ -21,7 +21,6 @@
 #include <plugins/resource/flir/flir_onvif_resource.h>
 #include <plugins/resource/vivotek/vivotek_resource.h>
 #include <plugins/resource/lilin/lilin_resource.h>
-#include <plugins/resource/hanwha/hanwha_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -59,8 +58,8 @@ static const char* IGNORE_VENDORS[][2] =
     {"Network Optix", "*"}, // Nx cameras
     {"Digital Watchdog", "XPM-FL72-48MP"}, //For some reasons we want to use ISD resource instead Onvif Digital Watchdog one.
     {"Network Optix", "*"}, // Nx Cameras
-    {"Hanwha Techwin", "*" },
-    {"Samsung Techwin", "*" }
+    {"Hanwha Techwin*", "*" },
+    {"Samsung Techwin*", "*" }
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -449,10 +448,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new VivotekResource());
 	else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
         resource = QnPlOnvifResourcePtr(new LilinResource());
-    else if (manufacture.toLower().contains(QLatin1String("samsung techwin")))
-        resource = QnPlOnvifResourcePtr(new HanwhaResource());
-    else if (manufacture.toLower().contains(QLatin1String("hanwha techwin")))
-        resource = QnPlOnvifResourcePtr(new HanwhaResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
