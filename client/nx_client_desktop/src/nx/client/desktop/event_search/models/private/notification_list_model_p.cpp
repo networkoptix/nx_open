@@ -1,8 +1,14 @@
 #include "notification_list_model_p.h"
 
+#include <business/business_resource_validation.h>
+#include <client/client_settings.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 
+#include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -30,7 +36,6 @@ NotificationListModel::Private::~Private()
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
 {
-
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
