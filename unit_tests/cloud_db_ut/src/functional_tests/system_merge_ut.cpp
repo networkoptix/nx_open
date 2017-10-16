@@ -1,6 +1,10 @@
 #include <set>
 
+#include <boost/optional.hpp>
+
 #include <gtest/gtest.h>
+
+#include <nx/network/http/test_http_server.h>
 
 #include <nx/cloud/cdb/managers/system_health_info_provider.h>
 
@@ -64,7 +68,17 @@ public:
 protected:
     virtual void SetUp() override
     {
+        using namespace std::placeholders;
+
         base_type::SetUp();
+
+        m_vmsGatewayEmulator.registerRequestProcessorFunc(
+            "/gateway/{systemId}/",
+            std::bind(&SystemMerge::vmsApiRequestStub, this, _1, _2, _3, _4, _5));
+        ASSERT_TRUE(m_vmsGatewayEmulator.bindAndListen());
+
+        addArg("-vmsGateway/url", lm("http://%1/gateway/{systemId}/")
+            .args(m_vmsGatewayEmulator.serverAddress()).toStdString().c_str());
 
         ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -119,6 +133,19 @@ protected:
         ASSERT_EQ(api::SystemStatus::beingMerged, system.status);
     }
 
+    void thenVmsApiMergeRequestHasBeenIssuedToSlaveSystem()
+    {
+        m_prevVmsApiRequest = m_vmsApiRequests.pop();
+
+        auto requestPath = m_prevVmsApiRequest->requestLine.url.path();
+        auto requestPathItems = requestPath.split('/', QString::SkipEmptyParts);
+
+        requestPathItems.pop_front(); //< Skipping api prefix.
+
+        ASSERT_EQ(m_slaveSystem.id, requestPathItems.front().toStdString());
+        requestPathItems.pop_front();
+    }
+
     void assertAnyOfPermissionsIsNotEnoughToMergeSystems(
         std::vector<api::SystemAccessRole> accessRolesToCheck)
     {
@@ -141,6 +168,9 @@ private:
     api::ResultCode m_prevResultCode = api::ResultCode::ok;
     SystemHealthInfoProviderStub* m_systemHealthInfoProviderStub = nullptr;
     SystemHealthInfoProviderFactory::Function m_factoryBak;
+    TestHttpServer m_vmsGatewayEmulator;
+    nx::utils::SyncQueue<nx_http::Request> m_vmsApiRequests;
+    boost::optional<nx_http::Request> m_prevVmsApiRequest;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         ec2::ConnectionManager*,
@@ -149,6 +179,17 @@ private:
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();
         m_systemHealthInfoProviderStub = systemHealthInfoProvider.get();
         return std::move(systemHealthInfoProvider);
+    }
+
+    void vmsApiRequestStub(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        m_vmsApiRequests.push(std::move(request));
+        completionHandler(nx_http::StatusCode::ok);
     }
 };
 
@@ -194,7 +235,13 @@ TEST_F(SystemMerge, fails_if_initiating_user_does_not_have_permissions)
     assertAnyOfPermissionsIsNotEnoughToMergeSystems(accessRolesToTest);
 }
 
-// TEST_F(SystemMerge, merge_request_invokes_merge_request_to_slave_system)
+TEST_F(SystemMerge, merge_request_invokes_merge_request_to_slave_system)
+{
+    givenTwoOnlineSystemsWithSameOwner();
+    whenMergeSystems();
+    thenVmsApiMergeRequestHasBeenIssuedToSlaveSystem();
+}
+
 // TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
 
 } // namespace test

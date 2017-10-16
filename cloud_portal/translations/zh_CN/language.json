@@ -1,19 +1,18 @@
 {
   "language_name":"LANGUAGE_NAME",
   "productName":"{{PRODUCT_NAME}}",
-  "clientProtocol":"{{CLIENT_PROTOCOL}}",
+  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
     "okButton":"确定",
     "cancelButton":"取消",
     "loginTitle":"登录到 {{PRODUCT_NAME}}",
     "loginButton":"登录",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"您已经登录",
     "logoutAuthorisedContinueButton":"继续",
     "logoutAuthorisedLogoutButton":"退出登录"
   },
   "pageTitles":{
-    "template":"{{title}}{{PRODUCT_NAME}}",
+    "template":"{{title}} {{PRODUCT_NAME}}",
     "default":"{{PRODUCT_NAME}}",
     "registerSuccess":"欢迎来到",
     "register":"创建帐户中",
@@ -30,12 +29,10 @@
     "restorePasswordSuccess":"保存的密码-",
     "restorePasswordCode":"重置密码-",
     "view":"查看相机 - ",
-    "contentPage":"",
     "debug":"调试",
     "login":"登录-",
     "download":"下载 {{VMS_NAME}}",
     "downloadPlatform":"下载的 {{VMS_NAME}} ",
-    "startPage":"",
     "pageNotFound":"找不到页面"
   },
   "systemStatuses":{
@@ -184,7 +181,6 @@
   },
   "downloads":{
     "noClientDetectedTitle":"安装 {{VMS_NAME}} 来查看您的系统",
-    "noClientDetectedMessage":"",
     "action":"下载 {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -197,16 +193,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{

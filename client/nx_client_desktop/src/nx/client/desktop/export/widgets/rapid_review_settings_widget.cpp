@@ -11,7 +11,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 
 namespace nx {
 namespace client {
@@ -24,9 +24,14 @@ const int kInfoFontPixelSize = 16;
 
 QString durationMsToString(qint64 durationMs)
 {
+    using HumanReadable = core::HumanReadable;
+
     static const QString kSeparator(L' ');
-    return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds,
-        QTimeSpan::SuffixFormat::Short, kSeparator);
+
+    return HumanReadable::timeSpan(std::chrono::milliseconds(durationMs),
+        HumanReadable::DaysAndTime | HumanReadable::Milliseconds,
+        HumanReadable::SuffixFormat::Short,
+        kSeparator);
 }
 
 } // namespace

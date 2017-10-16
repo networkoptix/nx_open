@@ -1,5 +1,11 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls admin_static %}
+{% load static %}
+
+{% block extrahead %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
 
 {% block extrastyle %}
     {{ block.super }}
@@ -33,24 +39,25 @@
 				<tr>
 					<td>
 						{% if record.language %}
-						<a class="button"
-						   href="{% url 'context_editor' record.data_structure.context.id record.language.code %}">
+						<button class="btn"><a
+						   href="{% url 'page_editor' record.data_structure.context.id record.language.code %}">
 						   Edit Record
-						</a>
+						</a></button>
 						{% else %}
-						<a class="button"
-						   href="{% url 'context_editor' record.data_structure.context.id %}">
+						<button class="btn"><a href="{% url 'page_editor' record.data_structure.context.id %}">
 						   Edit Record
-						</a>
+						</a></button>
 						{% endif %}
 					</td>
 					<td>{{ record.language.code }}</td>
 					<td>{{ record.data_structure.name }}</td>
 					<td>
 					{% if record.data_structure.type == 1 %}
-						<img style="max-height: 200px; max-width: 200px;" src="data:image/png;base64,{{record}}">
+						<img class="preview-image review-preview" src="data:image/png;base64,{{record}}">
 					{% elif record.data_structure.type == 0 %}
 						{{record}}
+					{% elif record.data_structure.type == 4 %}
+						<a href="{% url 'download_file' record.data_structure.name %}?version_id={{version.id}}&lang={{record.language.code}}&draft" download>Download</a>
 					{% else %}
 						<div style="overflow-y: scroll; max-height: 350px; padding: 5px; border: 1px solid silver">{{record|safe}}</div>
 					{% endif %}
@@ -64,15 +71,29 @@
 	{% endfor %}
 	</div>
 </div>
-{% if not version.accepted_date %}
-<form action="{% url 'review_page_actions' %}" method="post">
+<form action="{% url 'version_action' version.id %}" method="post">
 	{% csrf_token %}
 	<div class="submit-row">
-        <button class="button" type="submit" name="Preview">Preview</button>
-		{% if perms.cms.publish_version %}
-        <button class="button" type="submit" name="Publish">Publish</button>
+		{% if perms.cms.force_update and version.state == 'current' %}
+			<button class="btn btn-danger pull-left" type="submit" name="Force Update">Force Update</button>
+		{% endif %}
+		{% if preview_link %}
+			<button class='btn btn-info' onClick="openPreview(event)">Open Preview</button>
+		{% endif %}
+		{% if not version.accepted_date %}
+        	<button class="btn btn-primary" type="submit" name="Preview">Generate Preview</button>
+			{% if perms.cms.publish_version %}
+        	<button class="btn btn-danger" type="submit" name="Publish">Publish</button>
+			{% endif %}
 		{% endif %}
 	</div>
 </form>
+{% if preview_link %}
+<script>
+    function openPreview(event){
+    	event.preventDefault();
+        window.open("{{ preview_link }}");
+    }
+</script>
 {% endif %}
 {% endblock %}

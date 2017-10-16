@@ -48,7 +48,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/unused.h>
 
 #include <utils/math/color_transformations.h>
@@ -874,19 +874,19 @@ QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
 {
-    qint64 deltaMs = qnSyncTime->currentDateTime().toMSecsSinceEpoch() - backupTimeMs;
-    bool inTheFuture = deltaMs < 0;
+    auto deltaMs = qnSyncTime->currentDateTime().toMSecsSinceEpoch() - backupTimeMs;
+    const auto inTheFuture = deltaMs < 0;
     if (inTheFuture)
         deltaMs = -deltaMs;
 
     if (inTheFuture || deltaMs > kMinDeltaForMessageMs)
     {
-        QTimeSpan span(deltaMs);
-        span.normalize();
-
+        const auto duration = std::chrono::milliseconds(std::abs(deltaMs));
+        using HumanReadable = nx::client::core::HumanReadable;
+        const auto timeSpan = HumanReadable::timeSpan(duration);
         return inTheFuture
-            ? tr("in %1").arg(span.toApproximateString())
-            : tr("%1 before now").arg(span.toApproximateString());
+            ? tr("in %1").arg(timeSpan)
+            : tr("%1 before now").arg(timeSpan);
     }
 
     return QString();

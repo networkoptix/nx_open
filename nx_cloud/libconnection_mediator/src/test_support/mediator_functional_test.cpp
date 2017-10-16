@@ -13,6 +13,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>

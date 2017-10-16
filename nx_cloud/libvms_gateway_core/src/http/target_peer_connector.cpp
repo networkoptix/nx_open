@@ -1,6 +1,7 @@
 #include "target_peer_connector.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {

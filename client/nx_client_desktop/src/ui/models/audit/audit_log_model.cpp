@@ -30,7 +30,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <utils/math/math.h>
 
 using namespace nx;
@@ -285,14 +285,15 @@ QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate
 
 QString QnAuditLogModel::formatDuration(int durationSecs)
 {
-    qint64 durationMs = durationSecs * 1000;
-
+    const auto duration = std::chrono::seconds(durationSecs);
     static const QString kSeparator(L' ');
-    return QTimeSpan(durationMs).toApproximateString(
-        QTimeSpan::kDoNotSuppressSecondUnit,
-        Qt::Days | Qt::Hours | Qt::Minutes,
-        QTimeSpan::SuffixFormat::Short,
-        kSeparator);
+
+    using HumanReadable = client::core::HumanReadable;
+    return HumanReadable::timeSpan(duration,
+        HumanReadable::Days | HumanReadable::Hours | HumanReadable::Minutes,
+        HumanReadable::SuffixFormat::Short,
+        kSeparator,
+        HumanReadable::kNoSuppressSecondUnit);
 }
 
 QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)

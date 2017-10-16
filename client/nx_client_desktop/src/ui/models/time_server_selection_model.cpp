@@ -19,7 +19,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>
 
@@ -522,11 +522,15 @@ bool QnTimeServerSelectionModel::isSelected(quint64 priority)
 
 QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
 {
-    static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
+    const auto duration = std::chrono::milliseconds(offsetMs);
     static const QString kSeparator(L' ');
 
-    return QTimeSpan(offsetMs).toApproximateString(QTimeSpan::kDoNotSuppressSecondUnit, kFormat,
-        QTimeSpan::SuffixFormat::Short, kSeparator);
+    using HumanReadable = nx::client::core::HumanReadable;
+    return HumanReadable::timeSpan(duration,
+        HumanReadable::Hours | HumanReadable::Minutes | HumanReadable::Seconds,
+        HumanReadable::SuffixFormat::Short,
+        kSeparator,
+        HumanReadable::kNoSuppressSecondUnit);
 }
 
 QVariant QnTimeServerSelectionModel::offsetForeground(qint64 offsetMs) const

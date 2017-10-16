@@ -4,7 +4,7 @@
 {{message.sharer_name}} ({{message.sharer_email}}) が {{message.system_name}}を共有しました
 {{/message.sharer_name}}
 
-{{/message.sharer_name}}
+{{^message.sharer_name}}
 {{message.system_name}} が共有されました
 {{/message.sharer_name}}
 

@@ -5,22 +5,29 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from PIL import Image
-import base64
+import base64, re, uuid
 
 from .filldata import fill_content
 from api.models import Account
 from cms.models import *
 
 
-def get_context_and_language(request_data, context_id, language_id):
+def get_context_and_language(request, context_id, language_code, customization):
     context = Context.objects.get(id=context_id) if context_id else None
-    language = Language.objects.get(id=language_id) if language_id else None
+    language = Language.objects.get(code=language_code) if language_code else None
 
-    if not context and 'context' in request_data and request_data['context']:
-        context = Context.objects.get(id=request_data['context'])
+    if request.method == "POST":
+        if not context and 'context' in request.POST and request.POST['context']:
+            context = Context.objects.get(id=request.POST['context'])
 
-    if not language and 'language' in request_data and request_data['language']:
-        language = Language.objects.get(id=request_data['language'])
+        if not language and 'language' in request.POST and request.POST['language']:
+            language = Language.objects.get(code=request.POST['language'])
+
+    if not language:
+        if 'language' in request.session:
+            language = Language.objects.get(code=request.session['language'])
+        else:
+            language = customization.default_language
 
     return context, language
 
@@ -51,7 +58,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
              customization.name)
 
 
-def save_unrevisioned_records(customization, language, data_structures,
+def save_unrevisioned_records(context, customization, language, data_structures,
                               request_data, request_files, user):
     upload_errors = []
     for data_structure in data_structures:
@@ -69,7 +76,7 @@ def save_unrevisioned_records(customization, language, data_structures,
         if data_structure.type == DataStructure.DATA_TYPES.image\
                 or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
-            if data_structure_name in request_files:
+            if data_structure_name in request_files and request_files[data_structure_name]:
                 new_record_value, meta, invalid_file_type = handle_file_upload(
                     request_files[data_structure_name], data_structure)
 
@@ -78,7 +85,7 @@ def save_unrevisioned_records(customization, language, data_structures,
                         (data_structure_name,
                          "Invalid file type. Uploaded file is {}. It should be {}."\
                          .format(request_files[data_structure_name].content_type,
-                                 data_structure.meta_settings['format'])))
+                                 " or ".join(data_structure.meta_settings['format']))))
                     continue
 
                 # Gets the meta_settings form the DataStructure to check if the sizes are valid
@@ -93,7 +100,7 @@ def save_unrevisioned_records(customization, language, data_structures,
 
                     elif data_structure.type == DataStructure.DATA_TYPES.file:
                         if 'file_size' in meta\
-                                and request_files[data_structure_name].size > meta['file_size']:
+                                and request_files[data_structure_name].size/1048576 > meta['file_size']:
                             size_errors = (data_structure_name, 'File size is {} it should be less than {}'\
                                            .format(request_data[data_structure_name].size,
                                                    meta['file_size']))
@@ -101,11 +108,32 @@ def save_unrevisioned_records(customization, language, data_structures,
                         upload_errors.extend(size_errors)
                         continue
             # If neither case do nothing for this record
-            else:
+            elif not data_structure.optional or 'delete_' + data_structure_name not in request_data:
                 continue
+
+        elif data_structure.type == DataStructure.DATA_TYPES.guid:
+
+            # if the guid is valid it will go to the next set of checks
+            new_record_value = request_data[data_structure_name] if data_structure_name in request_data else ""
+            is_guid = re.match('\{[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}\}',
+                               new_record_value)
+
+            # if its option and not a valid guid set error message and go to next DataStructure
+            if new_record_value and not is_guid:
+                upload_errors.append((data_structure_name, 'Invalid GUID {} it should formatted like {}'\
+                                           .format(new_record_value,
+                                                   "{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}")))
+                continue
+
+            # no guid submitted or default value and is not optional generate a guid
+            elif not data_structure.optional and not new_record_value: # and not data_structure.default:
+                new_record_value = '{' + str(uuid.uuid4()) + '}'
+                upload_errors.append((data_structure_name,
+                                      'No submitted GUID or default value. GUID has been generated.' \
+                                      .format(new_record_value)))
+
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
-
 
         if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
             continue
@@ -122,6 +150,11 @@ def save_unrevisioned_records(customization, language, data_structures,
                             value=new_record_value,
                             created_by=user)
         record.save()
+
+    fill_content(customization_name=customization.name,
+                 preview=True,
+                 incremental=True,
+                 changed_context=context)
 
     return upload_errors
 
@@ -167,13 +200,17 @@ def remove_unused_records(customization):
             record.delete()
 
 
+def generate_preview_link(context=None):
+    return context.url + "?preview" if context else "/content/about?preview"
+
+
 def generate_preview(context=None, send_to_review=False):
     fill_content(customization_name=settings.CUSTOMIZATION,
                  preview=True,
                  incremental=True,
                  changed_context=context,
                  send_to_review=send_to_review)
-    return context.url + "?preview" if context else "?preview"
+    return generate_preview_link(context)
 
 
 def publish_latest_version(customization, user):
@@ -183,7 +220,7 @@ def publish_latest_version(customization, user):
     return publish_errors
 
 
-def send_version_for_review(customization, language, data_structures,
+def send_version_for_review(context, customization, language, data_structures,
                             product, request_data, request_files, user):
     old_versions = ContentVersion.objects.filter(accepted_date=None)
 
@@ -192,7 +229,7 @@ def send_version_for_review(customization, language, data_structures,
         strip_version_from_records(old_version)
         old_version.delete()
 
-    upload_errors = save_unrevisioned_records(
+    upload_errors = save_unrevisioned_records(context,
         customization, language, data_structures,
         request_data, request_files, user)
 
@@ -221,11 +258,19 @@ def get_records_for_version(version):
     return contexts
 
 
+def is_valid_file_type(file_type, meta_types):
+    for meta_type in meta_types:
+        if meta_type in file_type:
+            return False
+    return True
+
+
 def handle_file_upload(file, data_structure):
     encoded_string = base64.b64encode(file.read())
     file_type = file.content_type
 
-    if 'format' in data_structure.meta_settings and data_structure.meta_settings['format'] not in file_type:
+    if 'format' in data_structure.meta_settings and\
+            is_valid_file_type(file_type.lower(), data_structure.meta_settings['format']):
         return None, None, True
 
     if data_structure.type == DataStructure.DATA_TYPES.image:

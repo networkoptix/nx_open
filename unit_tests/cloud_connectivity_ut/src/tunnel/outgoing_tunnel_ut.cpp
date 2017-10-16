@@ -1,12 +1,8 @@
-/**********************************************************
-* Feb 4, 2016
-* akolesnikov
-***********************************************************/
-
 #include <atomic>
 
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>

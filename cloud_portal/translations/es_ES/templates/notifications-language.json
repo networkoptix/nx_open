@@ -12,6 +12,6 @@
     "emailSubject":"Sistema de video {{message.system_name}} fue compartido con usted"
   },
   "review_version":{
-    "emailSubject":"Version {{message.id}} is ready to be reviewed"
+    "emailSubject":"La versión {{message.id}} está lista para ser revisada"
   }
 }

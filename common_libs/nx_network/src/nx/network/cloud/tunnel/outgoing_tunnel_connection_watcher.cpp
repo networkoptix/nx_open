@@ -1,5 +1,6 @@
 #include "outgoing_tunnel_connection_watcher.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
 

@@ -6,14 +6,14 @@
                 <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !session.mobileAppNotified">
                     <div class="pull-right" >
                         <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
-                            Install
+                            安裝
                         </a>
                         <span class="webclient-button caption-row invisible-xs"
                               ng-click="mobileAppAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
                     </div>
                     <div>
                         <span class="caption-row ">
-                            Please, use the mobile application to view video
+                            請使用行動應用程式來瀏覽影像
                         </span>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                                             <span class="glyphicon glyphicon-cog"></span>
                                         </span>
                                         <ul class="dropdown-menu video-settings" ng-class="{'no-fullscreen': !enableFullScreen}">
-                                            <li class="video-settings-title">Quality</li>
+                                            <li class="video-settings-title">畫質</li>
                                             <li class="video-settings-divider"></li>
                                             <li ng-repeat="resolution in availableResolutions" class="video-settings-item">
                                                 <a ng-class="{active:resolution == activeResolution}"
@@ -47,7 +47,7 @@
                                             </li>
 
                                             <li class="video-settings-divider buffer" ng-if="debugMode"></li>
-                                            <li class="video-settings-title" ng-if="debugMode">Video Player</li>
+                                            <li class="video-settings-title" ng-if="debugMode">影像播放器</li>
                                             <li class="video-settings-divider"  ng-if="debugMode"></li>
                                             <li ng-repeat="format in manualFormats" class="video-settings-item" ng-if="debugMode">
                                                 <a ng-class="{active:format == activeFormat}"
@@ -56,7 +56,7 @@
                                             <li class="video-settings-divider buffer" ng-if="isWebAdmin || debugMode"></li>
                                             <li class="video-settings-button" ng-if="isWebAdmin || debugMode"
                                                 ng-click="cameraLinks.enabled=!cameraLinks.enabled">
-                                                <span class="glyphicon glyphicon-cog"></span>Camera Details
+                                                <span class="glyphicon glyphicon-cog"></span>攝影機詳細資訊
                                             </li>
                                         </ul>
                                     </div>

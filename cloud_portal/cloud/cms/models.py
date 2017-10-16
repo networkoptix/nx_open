@@ -98,20 +98,22 @@ class DataStructure(models.Model):
     context = models.ForeignKey(Context)
     name = models.CharField(max_length=1024)
     description = models.TextField()
-    label = models.CharField(max_length=1024)
+    label = models.CharField(max_length=1024, blank=True)
 
     DATA_TYPES = Choices((0, 'text', 'Text'),
                          (1, 'image', 'Image'),
                          (2, 'html', 'HTML'),
                          (3, 'long_text', 'Long Text'),
-                         (4, 'file', 'File'))
+                         (4, 'file', 'File'),
+                         (5, 'guid', 'GUID'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
-    default = models.TextField(default='')
+    default = models.TextField(default='', blank=True)
     translatable = models.BooleanField(default=True)
-    meta_settings = JSONField(default=dict())
+    meta_settings = JSONField(default=dict(), blank=True)
     advanced = models.BooleanField(default=False)
     order = models.IntegerField(default=100000)
+    optional = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -122,7 +124,7 @@ class DataStructure(models.Model):
                     DataStructure.DATA_TYPES.text)
 
     def find_actual_value(self, customization, language=None, version_id=None):
-        content_value = None
+        content_value = ""
         content_record = None
         # try to get translated content
         if language and self.translatable:
@@ -156,7 +158,7 @@ class DataStructure(models.Model):
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 
-        if not content_value:  # if no value - use default value from structure
+        if not content_value and not self.optional:  # if no value - use default value from structure
             content_value = self.default
 
         return content_value
@@ -233,6 +235,7 @@ class ContentVersion(models.Model):
         verbose_name_plural = 'revisions'
         permissions = (
             ("publish_version", "Can publish content to production"),
+            ("force_update", "Can forcibly update content"),
         )
 
     customization = models.ForeignKey(Customization)

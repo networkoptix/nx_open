@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/atomic_unique_ptr.h>

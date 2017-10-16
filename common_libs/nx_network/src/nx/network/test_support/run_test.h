@@ -1,7 +1,8 @@
 #pragma once
 
-#include <nx/utils/test_support/run_test.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/test_support/run_test.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {

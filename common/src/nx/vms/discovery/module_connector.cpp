@@ -1,9 +1,11 @@
 #include "module_connector.h"
 
-#include <nx/utils/log/log.h>
-#include <rest/server/json_rest_result.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
+
+#include <rest/server/json_rest_result.h>
 
 namespace nx {
 namespace vms {

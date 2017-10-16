@@ -3,19 +3,11 @@
 #include <set>
 #include <deque>
 
-#include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/scope_guard.h>
 
-#include "cloud_module_url_fetcher.h"
 #include "mediator_client_connections.h"
-
-
-//!Types used in resolving peer names
-/*!
-    \note It is not a DNS implementation! It is something proprietary used to
-        get network address of NX peer
-*/
 
 namespace nx {
 namespace network {
