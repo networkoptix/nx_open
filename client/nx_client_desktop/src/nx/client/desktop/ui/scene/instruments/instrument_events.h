@@ -16,9 +16,9 @@ class MouseEvent: public QObject
 
     Q_PROPERTY(QPoint position MEMBER position CONSTANT)
     Q_PROPERTY(QPoint globalPosition MEMBER globalPosition CONSTANT)
-    Q_PROPERTY(Qt::MouseButton button MEMBER button CONSTANT)
-    Q_PROPERTY(Qt::MouseButtons buttons MEMBER buttons CONSTANT)
-    Q_PROPERTY(Qt::KeyboardModifiers modifiers MEMBER modifiers CONSTANT)
+    Q_PROPERTY(int button MEMBER button CONSTANT)
+    Q_PROPERTY(int buttons MEMBER buttons CONSTANT)
+    Q_PROPERTY(int modifiers MEMBER modifiers CONSTANT)
 
     Q_PROPERTY(bool accepted MEMBER accepted)
 
