@@ -69,7 +69,7 @@ public:
         \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
     */
     qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursionAllowed = true);
-    QString getResID() const { return m_resId; }
+    QString getResID() const { return m_resourceId; }
 
     void setTimePolicy(TimePolicy policy);
 private:
@@ -92,7 +92,7 @@ private:
     };
 
     QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
-    QString m_resId;
+    QString m_resourceId;
 
     static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;

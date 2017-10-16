@@ -223,14 +223,10 @@ QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>>
     QnRtspTimeHelper::m_camClock;
 
 
-QnRtspTimeHelper::QnRtspTimeHelper(const QnResourcePtr& resource):
-    const QString& resourceId,
-    bool allowedIgnoreCameraTimeIfBigJitter)
-    :
+QnRtspTimeHelper::QnRtspTimeHelper(const QString& resourceId):
     m_localStartTime(0),
     m_rtcpReportTimeDiff(INT_MAX),
-    m_resource(resource),
-    m_resId(resource->getUniqueId())
+    m_resourceId(resourceId)
 {
     {
         QnMutexLocker lock(&m_camClockMutex);
@@ -368,7 +364,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     if (statistics.isEmpty() || m_timePolicy == TimePolicy::ForceLocalTime)
     {
         NX_VERBOSE(this, lm("getUsecTime(%1) -> %2 (%3)")
-            .arg(m_resId)
+            .arg(m_resourceId)
             .arg(currentUs)
             .arg(m_timePolicy == TimePolicy::ForceLocalTime
                 ? "ignoreCameraTime=true" 
@@ -382,7 +378,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     if (m_timePolicy == TimePolicy::ForceCameraTime)
     {
         NX_VERBOSE(this, lm("getUsecTime(%1) -> %2 (%3)")
-            .arg(m_resId)
+            .arg(m_resourceId)
             .arg(currentUs)
             .arg("ignoreLocalTime=true"));
 
