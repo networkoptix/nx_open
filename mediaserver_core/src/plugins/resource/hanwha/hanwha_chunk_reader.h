@@ -52,7 +52,7 @@ private:
     void startTimerForNextRequest(const std::chrono::milliseconds& delay);
     void sendRequest();
     void parseTimeRangeData(const QByteArray& data);
-    qint64 latestChunkTime() const;
+    qint64 latestChunkTimeMs() const;
 private:
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     State m_state = State::Initial;

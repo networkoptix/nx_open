@@ -28,6 +28,11 @@ QDateTime parseHanwhaDateTime(const QByteArray& value, std::chrono::seconds time
     return dateTime;
 }
 
+QDateTime toHanwhaDateTime(qint64 value, std::chrono::seconds timeZoneShift)
+{
+    return QDateTime::fromMSecsSinceEpoch(value, Qt::OffsetFromUTC, timeZoneShift.count());
+}
+
 HanwhaChunkLoader::HanwhaChunkLoader():
     m_httpClient(new nx_http::AsyncClient())
 {
@@ -102,15 +107,17 @@ void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
     m_httpClient->doGet(loadChunksUrl);
 }
 
-qint64 HanwhaChunkLoader::latestChunkTime() const
+qint64 HanwhaChunkLoader::latestChunkTimeMs() const
 {
-    qint64 result = 0;
+    qint64 resultMs = 0;
     for (const auto& timePeriods: m_chunks)
     {
         if (!timePeriods.empty())
-            result = std::max(result, timePeriods.back().startTimeMs);
+            resultMs = std::max(resultMs, timePeriods.back().startTimeMs);
     }
-    return result;
+    if (m_startTimeUsec == AV_NOPTS_VALUE)
+        return resultMs;
+    return std::max(resultMs, m_startTimeUsec / 1000);
 }
 
 void HanwhaChunkLoader::sendLoadChunksRequest()
@@ -128,8 +135,8 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     query.addQueryItem("msubmenu", "timeline");
     query.addQueryItem("action", "view");
     query.addQueryItem("Type", "All");
-    //query.addQueryItem("FromDate", "1970-01-01 00:00:00");
-    auto startDateTime = QDateTime::fromMSecsSinceEpoch(latestChunkTime());
+    
+    auto startDateTime = toHanwhaDateTime(latestChunkTimeMs(), m_timeZoneShift);
     auto endDateTime = QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1);
     query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateFormat));
     query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateFormat));
