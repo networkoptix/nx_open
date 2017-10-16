@@ -256,13 +256,12 @@ int QnCameraAdditionDialog::fillTable(QnManualResourceSearchList cameras)
             const auto rightUrl(QUrl::fromUserInput(right.url));
 
             // Try to sort by IP address first.
-            const auto leftIp = HostAddress::ipV4from(leftUrl.host());
-            const auto rightIp = HostAddress::ipV4from(rightUrl.host());
-            if (leftIp.is_initialized() && rightIp.is_initialized() &&
-                leftIp->S_un.S_addr != rightIp->S_un.S_addr)
-            {
-                return leftIp->S_un.S_addr < rightIp->S_un.S_addr;
-            }
+            bool leftIpOk = true;
+            const auto leftIp = QHostAddress(leftUrl.host()).toIPv4Address(&leftIpOk);
+            bool rightIpOk = true;
+            const auto rightIp = QHostAddress(rightUrl.host()).toIPv4Address(&rightIpOk);
+            if (leftIpOk && rightIpOk && leftIp != rightIp)
+                return leftIp < rightIp;
 
             // Sort by host then.
             if (leftUrl.host() != rightUrl.host())
