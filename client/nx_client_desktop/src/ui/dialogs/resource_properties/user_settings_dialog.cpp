@@ -537,6 +537,10 @@ void QnUserSettingsDialog::applyChanges()
 
         qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);
     }
+    else
+    {
+        qnResourcesChangesManager->cleanAccessibleResources(m_user->getId());
+    }
 
     /* We may fill password field to change current user password. */
     m_user->resetPassword();
