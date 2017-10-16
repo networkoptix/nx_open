@@ -1,12 +1,15 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Instruments 1.0
+import nx.client.core.utils 1.0
 
 Item
 {
     id: resourceItem
 
     property var modelData
+
+    property var rotationAllowed: contentItem.item && contentItem.item.rotationAllowed
 
     MouseArea
     {
@@ -36,17 +39,36 @@ Item
         }
     }
 
+    RotationInstrument
+    {
+        id: rotationInstrument
+
+        item: mouseArea
+        target: contentItem
+        enabled: rotationAllowed
+
+        onStarted:
+        {
+            contentPositionAnimation.complete()
+        }
+    }
+
     ResizeInstrument
     {
         id: resizeInstrument
 
         item: mouseArea
         target: contentItem
+
+        onStarted:
+        {
+            contentPositionAnimation.complete()
+        }
     }
 
     DragInstrument
     {
-        id: rotationInstrument
+        id: dragInstrument
 
         item: mouseArea
         target: contentItem
@@ -67,11 +89,6 @@ Item
     {
         id: contentItem
 
-        x: 0
-        y: 0
-        width: parent.width
-        height: parent.height
-
         sourceComponent:
         {
             if (!modelData.resource)
@@ -87,14 +104,50 @@ Item
                 return webPageItemComponent
         }
 
-        NumberAnimation
+        property rect enclosedGeometry: Geometry.encloseRotatedGeometry(
+            Qt.rect(0, 0, parent.width, parent.height),
+            Geometry.aspectRatio(Qt.size(parent.width, parent.height)),
+            rotation)
+
+        width: enclosedGeometry.width
+        height: enclosedGeometry.height
+
+        Binding
+        {
+            target: contentItem
+            property: "x"
+            value: (resourceItem.width - contentItem.width) / 2
+            when: !contentPositionAnimation.running
+        }
+        Binding
+        {
+            target: contentItem
+            property: "y"
+            value: (resourceItem.height - contentItem.height) / 2
+            when: !contentPositionAnimation.running
+        }
+
+        ParallelAnimation
         {
             id: contentPositionAnimation
-            target: contentItem
-            properties: "x,y"
-            to: 0
-            duration: 250
-            easing.type: Easing.OutCubic
+
+            NumberAnimation
+            {
+                target: contentItem
+                property: "x"
+                to: (resourceItem.width - contentItem.width) / 2
+                duration: 250
+                easing.type: Easing.OutCubic
+            }
+            NumberAnimation
+            {
+                target: contentItem
+                property: "y"
+                to: (resourceItem.height - contentItem.height) / 2
+                duration: 250
+                easing.type: Easing.OutCubic
+            }
+
             onStopped: resourceItem.parent.z = 0
         }
     }

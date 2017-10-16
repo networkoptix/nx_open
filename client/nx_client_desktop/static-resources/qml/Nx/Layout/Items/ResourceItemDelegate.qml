@@ -5,7 +5,11 @@ Item
 {
     property var modelData
 
+    property bool rotationAllowed: false
+
     readonly property alias titleBar: titleBar
+
+    readonly property real parentRotation: parent ? parent.rotation : 0
 
     Rectangle
     {
@@ -13,9 +17,21 @@ Item
         color: ColorTheme.colors.dark5
     }
 
-    TitleBar
+    Item
     {
-        id: titleBar
-        titleText: modelData.resource ? modelData.resource.name : ""
+        id: ui
+
+        anchors.centerIn: parent
+
+        rotation: -Math.round(parentRotation / 90) * 90
+
+        width: rotation % 180 === 0 ? parent.width : parent.height
+        height: rotation % 180 === 0 ? parent.height : parent.width
+
+        TitleBar
+        {
+            id: titleBar
+            titleText: modelData.resource ? modelData.resource.name : ""
+        }
     }
 }
