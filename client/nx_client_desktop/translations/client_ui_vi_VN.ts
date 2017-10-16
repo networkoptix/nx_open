@@ -115,12 +115,12 @@
     <message>
         <location/>
         <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-        <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+        <translation>Nếu kích hoạt chế độ màn hình HD Graphics có thể cho hình ảnh không rõ nét. Chúng tôi đề nghị để lựa chọn như sau.</translation>
     </message>
     <message>
         <location/>
         <source>Disable blur</source>
-        <translation type="unfinished">Disable blur</translation>
+        <translation>Vô hiệu hoá mờ</translation>
     </message>
 </context>
 <context>

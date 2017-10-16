@@ -789,18 +789,36 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2CD63C2F-IS",
-                "Hikvision|DS-2CD2132F-IWS",
-                "Hikvision|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD4A26FWD-IZS",
+                "HIKVISION|DS-2CD2132F-IWS",
+                "HIKVISION|DS-2CD2655FWD-IZS",
+                "HIKVISION|DS-2CD2742FWD-IS",
+                "HIKVISION|DS-2CD2942F-IS",
+                "HIKVISION|DS-2CD4A26FWD-IZS",
+                "HIKVISION|DS-2CD63C2F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
-                "HIKVISION|DS-2CD4A26FWD-IZS"
+                "Hikvision|DS-2CD2132F-IWS",
+                "Hikvision|DS-2CD2655FWD-IZS",
+                "Hikvision|DS-2CD2742FWD-IS",
+                "Hikvision|DS-2CD2942F-IS",
+                "Hikvision|DS-2CD4A26FWD-IZS",
+                "Hikvision|DS-2CD63C2F-IS",
+                "Hikvision|DS-2DE4A220IW-DE"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
         {
             "keys": [
-                "Hikvision|DS-2CD2132F-IWS"
+                "HIKVISION|DS-2CD2132F-IWS",
+                "HIKVISION|DS-2CD2655FWD-IZS",
+                "HIKVISION|DS-2CD2742FWD-IS",
+                "HIKVISION|DS-2CD2942F-IS",
+                "HIKVISION|DS-2CD4A26FWD-IZS",
+                "HIKVISION|DS-2DE4A220IW-DE",
+                "Hikvision|DS-2CD2132F-IWS",
+                "Hikvision|DS-2CD2742FWD-IS",
+                "Hikvision|DS-2CD2942F-IS",
+                "Hikvision|DS-2CD4A26FWD-IZS",
+                "Hikvision|DS-2DE4A220IW-DE"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"

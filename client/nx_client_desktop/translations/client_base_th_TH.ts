@@ -2410,15 +2410,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Dual-Streaming and motion detection not supported for this camera</source>
-        <translation type="unfinished">Dual-Streaming and motion detection not supported for this camera</translation>
+        <translation>ไม่สนับสนุนการสตรีมแบบคู่และการตรวจจับการเคลื่อนไหวสำหรับกล้องนี้</translation>
     </message>
     <message>
         <source>Motion detection disabled</source>
-        <translation type="unfinished">Motion detection disabled</translation>
+        <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งาน</translation>
     </message>
     <message>
         <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation type="unfinished">To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</translation>
+        <translation>เพื่อให้มั่นใจว่าได้รับการสนับสนุนและเปิดใช้งานได้ให้ไปที่แท็บ &quot;Motion&quot; ในการตั้งค่ากล้อง</translation>
     </message>
 </context>
 <context>
@@ -2449,7 +2449,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Show on Layout</source>
-        <translation type="unfinished">Show on Layout</translation>
+        <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
     </message>
     <message>
         <source>Event Log...</source>
@@ -2481,25 +2481,25 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Changes to the following %n devices are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <translation>
+            <numerusform>การเปลี่ยนแปลงอุปกรณ์ต่อไปนี้ %n จะไม่ได้รับการบันทึก:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Changes to the following %n cameras are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <translation>
+            <numerusform>การเปลี่ยนแปลงใน %n กล้องต่อไปนี้จะไม่ได้รับการบันทึก:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Changes to the following %n I/O Modules are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <translation>
+            <numerusform>การเปลี่ยนแปลงต่อไปนี้ %n โมดูล I / O ไม่ได้รับการบันทึก:</numerusform>
         </translation>
     </message>
     <message>
         <source>Apply changes before switching to another camera?</source>
-        <translation type="unfinished">Apply changes before switching to another camera?</translation>
+        <translation>ใช้การเปลี่ยนแปลงก่อนเปลี่ยนไปใช้กล้องอื่นหรือไม่?</translation>
     </message>
 </context>
 <context>
@@ -2521,7 +2521,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished">Confirm Password</translation>
+        <translation>ยืนยันรหัสผ่าน</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
@@ -2529,11 +2529,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Current Password</source>
-        <translation type="unfinished">Current Password</translation>
+        <translation>พาสเวิร์ดปัจจุบัน</translation>
     </message>
     <message>
         <source>To modify your password please enter the existing one.</source>
-        <translation type="unfinished">To modify your password please enter the existing one.</translation>
+        <translation>ในการแก้ไขรหัสผ่านโปรดป้อนรหัสผ่านที่มีอยู่</translation>
     </message>
     <message>
         <source>Invalid current password.</source>
@@ -2557,52 +2557,48 @@ to view more bookmarks</source>
         <source>Connect to your Systems
 from anywhere with any
 devices</source>
-        <translation type="unfinished">Connect to your Systems
-from anywhere with any
-devices</translation>
+        <translation>เชื่อมต่อกับระบบของคุณได้จากทุกที่ด้วยอุปกรณ์ใดก็ได้</translation>
     </message>
     <message>
         <source>Known limitations</source>
-        <translation type="unfinished">Known limitations</translation>
+        <translation>ข้อจำกัดที่ทราบ</translation>
     </message>
     <message>
         <source>Disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Disconnect System from %1</translation>
+        <translation>ยกเลิกการเชื่อมต่อระบบจาก %1</translation>
     </message>
     <message>
         <source>Open %1 Portal</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Open %1 Portal</translation>
+        <translation>เปิด %1 พอร์ทัล ...</translation>
     </message>
     <message>
         <source>Create %1 Account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Create %1 Account</translation>
+        <translation>สร้างบัญชี</translation>
     </message>
     <message>
         <source>Connect System to %1...</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Connect System to %1...</translation>
+        <translation>เชื่อมต่อระบบกับ %1 ...</translation>
     </message>
     <message>
         <source>Create %1
 account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Create %1
-account</translation>
+        <translation>สร้างบัญชี %1</translation>
     </message>
     <message>
         <source>Connect System
 to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Connect System
-to %1</translation>
+        <translation>เชื่อมต่อระบบกับ %1 ...</translation>
     </message>
     <message>
         <source>%1 is in Beta.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">%1 is in Beta.</translation>
+        <translation>%1 อยู่ในรุ่นเบต้า</translation>
     </message>
     <message>
         <source>Learn more about %1</source>
@@ -2618,14 +2614,14 @@ to %1</translation>
     </message>
     <message>
         <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-        <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+        <translation>บัญชี isn&apos; เปิดใช้งานแล้ว โปรดตรวจสอบอีเมลของคุณและทำตามคำแนะนำที่ระบุไว้</translation>
     </message>
 </context>
 <context>
     <name>QnCloudStatusPanel</name>
     <message>
         <source>Logging in...</source>
-        <translation type="unfinished">Logging in...</translation>
+        <translation>กำลังเข้าสู่ระบบ...</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
@@ -2641,7 +2637,7 @@ to %1</translation>
     <name>QnCloudUserPanelWidget</name>
     <message>
         <source>Account Settings</source>
-        <translation type="unfinished">Account Settings</translation>
+        <translation>การตั้งค่าบัญชี</translation>
     </message>
 </context>
 <context>
@@ -2660,34 +2656,34 @@ to %1</translation>
     </message>
     <message>
         <source>Forgot password?</source>
-        <translation type="unfinished">Forgot password?</translation>
+        <translation>ลืมรหัสผ่าน?</translation>
     </message>
     <message>
         <source>Connect to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Connect to %1</translation>
+        <translation>เชื่อมต่อไปยัง %1$s</translation>
     </message>
     <message>
         <source>Enter %1 Account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Enter %1 Account</translation>
+        <translation>ป้อน %1 บัญชี</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCloudDialogPrivate</name>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished">None of your servers is connected to the Internet.</translation>
+        <translation>ไม่มีเซิร์ฟเวอร์ใดของคุณเชื่อมต่อกับอินเทอร์เน็ต</translation>
     </message>
     <message>
         <source>System connected to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">System connected to %1</translation>
+        <translation>ระบบเชื่อมต่อกับ %1</translation>
     </message>
     <message>
         <source>Failed to connect System to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Failed to connect System to %1</translation>
+        <translation>ไม่สามารถเชื่อมต่อระบบกับ %1</translation>
     </message>
 </context>
 <context>
@@ -2741,45 +2737,45 @@ to %1</translation>
     </message>
     <message>
         <source>LDAP Server connection timed out.</source>
-        <translation type="unfinished">LDAP Server connection timed out.</translation>
+        <translation>การเชื่อมต่อเซิร์ฟเวอร์ LDAP หมดเวลาแล้ว</translation>
     </message>
     <message>
         <source>Failed to connect to Server</source>
-        <translation type="unfinished">Failed to connect to Server</translation>
+        <translation>เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ</translation>
     </message>
     <message>
         <source>Incorrect username or password</source>
-        <translation type="unfinished">Incorrect username or password</translation>
+        <translation>ชื่อ​ผู้​ใช้​หรือ​รหัส​ผ่าน​ไม่​ถูก​ต้อง</translation>
     </message>
     <message>
         <source>Server may be restarting now. Please try again later.</source>
-        <translation type="unfinished">Server may be restarting now. Please try again later.</translation>
+        <translation>เซิร์ฟเวอร์อาจกำลังรีสตาร์ทเดี๋ยวนี้ กรุณาลองใหม่อีกครั้งในภายหลัง.</translation>
     </message>
     <message>
         <source>Please check access credentials and try again.</source>
-        <translation type="unfinished">Please check access credentials and try again.</translation>
+        <translation>โปรดตรวจสอบข้อมูลรับรองการเข้าถึงและลองอีกครั้ง</translation>
     </message>
     <message>
         <source>Incompatible Server</source>
-        <translation type="unfinished">Incompatible Server</translation>
+        <translation>เซิร์ฟเวอร์ที่ใช้ร่วมกันไม่ได้</translation>
     </message>
     <message>
         <source>Client and Server have different versions</source>
-        <translation type="unfinished">Client and Server have different versions</translation>
+        <translation>ไคลเอ็นต์และเซิร์ฟเวอร์มีเวอร์ชันต่างกัน</translation>
     </message>
     <message>
         <source>Client - %1</source>
         <comment>%1 is version</comment>
-        <translation type="unfinished">Client - %1</translation>
+        <translation>ไคลเอ็นต์ - %1</translation>
     </message>
     <message>
         <source>Server - %1</source>
         <comment>%1 is version</comment>
-        <translation type="unfinished">Server - %1</translation>
+        <translation>เซิร์ฟเวอร์ - %1</translation>
     </message>
     <message>
         <source>Download Client version %1?</source>
-        <translation type="unfinished">Download Client version %1?</translation>
+        <translation>ดาวน์โหลด Client เวอร์ชัน %1 หรือไม่?</translation>
     </message>
     <message>
         <source>Download</source>
@@ -2791,47 +2787,47 @@ to %1</translation>
     </message>
     <message>
         <source>Failed to download and launch version %1</source>
-        <translation type="unfinished">Failed to download and launch version %1</translation>
+        <translation>ไม่สามารถดาวน์โหลดและเปิดใช้งานเวอร์ชัน %1</translation>
     </message>
     <message>
         <source>Try Again</source>
-        <translation type="unfinished">Try Again</translation>
+        <translation>ลองอีกครั้ง</translation>
     </message>
     <message>
         <source>Restart %1 in compatibility mode will be required.</source>
-        <translation type="unfinished">Restart %1 in compatibility mode will be required.</translation>
+        <translation>ต้องเริ่มใหม่ %1 ในโหมดความเข้ากันได้</translation>
     </message>
     <message>
         <source>Failed to restart %1 in compatibility mode</source>
-        <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
+        <translation>ไม่สามารถรีสตาร์ท %1 ในโหมดความเข้ากันได้</translation>
     </message>
     <message>
         <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
+        <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
         <source>You have to download another version of %1 to connect to this Server.</source>
-        <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
+        <translation>คุณต้องดาวน์โหลด %1 รุ่นอื่นเพื่อเชื่อมต่อกับเซิร์ฟเวอร์นี้</translation>
     </message>
     <message>
         <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-        <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
+        <translation>คุณต้องรีสตาร์ท %1 ในโหมดความเข้ากันได้เพื่อเชื่อมต่อกับเซิร์ฟเวอร์นี้</translation>
     </message>
     <message>
         <source>Restart %1 in compatibility mode?</source>
-        <translation type="unfinished">Restart %1 in compatibility mode?</translation>
+        <translation>เริ่มต้นใหม่ %1 ในโหมดความเข้ากันได้หรือไม่?</translation>
     </message>
     <message>
         <source>Failed to restart %1</source>
-        <translation type="unfinished">Failed to restart %1</translation>
+        <translation>ไม่สามารถรีสตาร์ท %1</translation>
     </message>
     <message>
         <source>Client version: %1.</source>
-        <translation type="unfinished">Client version: %1.</translation>
+        <translation>ไคลเอ็นต์รุ่น: %1</translation>
     </message>
     <message>
         <source>Server version: %1.</source>
-        <translation type="unfinished">Server version: %1.</translation>
+        <translation>เวอร์ชันเซิร์ฟเวอร์: %1</translation>
     </message>
     <message>
         <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
@@ -2945,15 +2941,15 @@ to %1</translation>
     </message>
     <message>
         <source>Failed to restore database</source>
-        <translation type="unfinished">Failed to restore database</translation>
+        <translation>ไม่สามารถอ่านฐานข้อมูลที่ใช้ระบุตำแหน่งที่ตั้งของไอพี!</translation>
     </message>
     <message>
         <source>System configuration will be restored from backup, Server application will be restarted.</source>
-        <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
+        <translation>การกำหนดค่าระบบจะถูกเรียกคืนจากการสำรองข้อมูลแอพพลิเคชันเซิร์ฟเวอร์จะเริ่มใหม่</translation>
     </message>
     <message>
         <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-        <translation type="unfinished">You can create a backup for System configurations that can be restored in case of failure.</translation>
+        <translation>คุณสามารถสร้างการสำรองข้อมูลสำหรับการกำหนดค่าระบบที่สามารถเรียกคืนได้ในกรณีของความล้มเหลว.</translation>
     </message>
 </context>
 <context>
@@ -2968,11 +2964,11 @@ to %1</translation>
     </message>
     <message>
         <source>Could not find audio encoder &quot;%1&quot;.</source>
-        <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+        <translation>ไม่พบตัวเข้ารหัสเสียง &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Primary audio device is not selected.</source>
-        <translation type="unfinished">Primary audio device is not selected.</translation>
+        <translation>ไม่ได้เลือกอุปกรณ์เสียงหลัก</translation>
     </message>
 </context>
 <context>
@@ -2999,22 +2995,22 @@ to %1</translation>
     </message>
     <message>
         <source>Could not find audio encoder &quot;%1&quot;.</source>
-        <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+        <translation>ไม่พบตัวเข้ารหัสเสียง &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Could not initialize audio device &quot;%1&quot;.</source>
-        <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
+        <translation>ไม่สามารถเริ่มต้นอุปกรณ์เสียง &quot;%1&quot;</translation>
     </message>
     <message>
         <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-        <translation type="unfinished">44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+        <translation>ระบบเสียงไม่สนับสนุนรูปแบบเสียง 44.1 kHz และ 48 kHz โปรดเลือกอุปกรณ์เสียงอื่นหรือ &quot;none&quot; ในการตั้งค่าการบันทึกหน้าจอ</translation>
     </message>
 </context>
 <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Next</translation>
+        <translation>ถัดไป</translation>
     </message>
     <message>
         <source>Enter password to continue.</source>
@@ -3022,7 +3018,7 @@ to %1</translation>
     </message>
     <message>
         <source>Set local owner password</source>
-        <translation type="unfinished">Set local owner password</translation>
+        <translation>ตั้งรหัสผ่านของเจ้าของท้องถิ่น</translation>
     </message>
     <message>
         <source>Login</source>
@@ -3034,15 +3030,15 @@ to %1</translation>
     </message>
     <message>
         <source>Internal Error</source>
-        <translation type="unfinished">Internal Error</translation>
+        <translation>ข้อผิดพลาดภายใน</translation>
     </message>
     <message>
         <source>Wrong Password</source>
-        <translation type="unfinished">Wrong Password</translation>
+        <translation>รหัสผ่านผิด</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished">Confirm Password</translation>
+        <translation>ยืนยันรหัสผ่าน</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
@@ -3050,7 +3046,7 @@ to %1</translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation type="unfinished">Disconnect</translation>
+        <translation>ตัดการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>All cloud users will be deleted.</source>
@@ -3059,21 +3055,21 @@ to %1</translation>
     <message>
         <source>Failed to disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Failed to disconnect System from %1</translation>
+        <translation>ไม่สามารถเชื่อมต่อระบบกับ %1</translation>
     </message>
     <message>
         <source>Disconnect System from %1?</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Disconnect System from %1?</translation>
+        <translation>ยกเลิกการเชื่อมต่อระบบจาก %1</translation>
     </message>
     <message>
         <source>You will be disconnected from this System and able to login again through local network with local account</source>
-        <translation type="unfinished">You will be disconnected from this System and able to login again through local network with local account</translation>
+        <translation>คุณจะถูกตัดการเชื่อมต่อจากระบบนี้และสามารถเข้าสู่ระบบอีกครั้งผ่านทางเครือข่ายท้องถิ่นด้วยบัญชีท้องถิ่น</translation>
     </message>
     <message>
         <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+        <translation>คุณจะไม่สามารถเชื่อมต่อกับระบบนี้กับบัญชี %1 หลังจากที่คุณยกเลิกการเชื่อมต่อระบบนี้จาก %1</translation>
     </message>
 </context>
 <context>
@@ -3120,7 +3116,7 @@ to %1</translation>
     </message>
     <message>
         <source>No events</source>
-        <translation type="unfinished">No events</translation>
+        <translation>ไม่พบเหตุการณ์</translation>
     </message>
 </context>
 <context>
@@ -3166,29 +3162,29 @@ to %1</translation>
     </message>
     <message>
         <source>Open camera</source>
-        <translation type="unfinished">Open camera</translation>
+        <translation>เปิดกล้อง</translation>
     </message>
     <message numerus="yes">
         <source>and %n users more...</source>
-        <translation type="unfinished">
-            <numerusform>and %n users more...</numerusform>
+        <translation>
+            <numerusform>และผู้ใช้ %n เพิ่มเติม...</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n more...</source>
-        <translation type="unfinished">
-            <numerusform>and %n more...</numerusform>
+        <translation>
+            <numerusform>และอื่น ๆ ...</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Removed subjects</source>
-        <translation type="unfinished">
-            <numerusform>%n Removed subjects</numerusform>
+        <translation>
+            <numerusform>%n ลบหัวข้อ</numerusform>
         </translation>
     </message>
     <message>
         <source>Subject removed</source>
-        <translation type="unfinished">Subject removed</translation>
+        <translation>ลบหัวเรื่องแล้ว</translation>
     </message>
 </context>
 <context>
@@ -3206,7 +3202,7 @@ to %1</translation>
     </message>
     <message>
         <source>%1 has no PTZ presets</source>
-        <translation type="unfinished">%1 has no PTZ presets</translation>
+        <translation>%1 ไม่มีการตั้งค่าล่วงหน้าของ PTZ</translation>
     </message>
 </context>
 <context>
@@ -3274,11 +3270,11 @@ to %1</translation>
     <name>QnFileMessages</name>
     <message>
         <source>Overwrite existing file?</source>
-        <translation type="unfinished">Overwrite existing file?</translation>
+        <translation>เขียนทับแฟ้มที่มีอยู่หรือไม่?</translation>
     </message>
     <message>
         <source>Failed to overwrite file</source>
-        <translation type="unfinished">Failed to overwrite file</translation>
+        <translation>ไม่สามารถเขียนทับไฟล์ได้</translation>
     </message>
 </context>
 <context>
@@ -3289,15 +3285,15 @@ to %1</translation>
     </message>
     <message>
         <source>Auto calibration failed</source>
-        <translation type="unfinished">Auto calibration failed</translation>
+        <translation>การสอบเทียบอัตโนมัติล้มเหลว</translation>
     </message>
     <message>
         <source>Image is not round.</source>
-        <translation type="unfinished">Image is not round.</translation>
+        <translation>ภาพไม่กลม</translation>
     </message>
     <message>
         <source>Image might be too dim.</source>
-        <translation type="unfinished">Image might be too dim.</translation>
+        <translation>ภาพอาจจะมืดเกินไป</translation>
     </message>
 </context>
 <context>
@@ -3308,7 +3304,7 @@ to %1</translation>
     </message>
     <message>
         <source>Folder already added</source>
-        <translation type="unfinished">Folder already added</translation>
+        <translation>โฟลเดอร์ที่เพิ่มไว้แล้ว</translation>
     </message>
 </context>
 <context>
@@ -3339,15 +3335,15 @@ to %1</translation>
     </message>
     <message>
         <source>Bookmarks</source>
-        <translation type="unfinished">Bookmarks</translation>
+        <translation>บุ๊คมาร์ค</translation>
     </message>
     <message>
         <source>Device List</source>
-        <translation type="unfinished">Device List</translation>
+        <translation>รายชื่ออุปกรณ์</translation>
     </message>
     <message>
         <source>Camera List</source>
-        <translation type="unfinished">Camera List</translation>
+        <translation>รายชื่อกล้อง</translation>
     </message>
     <message>
         <source>Open Event Rules Management</source>
@@ -3355,11 +3351,11 @@ to %1</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
-        <translation type="unfinished">Open Audit Trail Log</translation>
+        <translation>เปิดบันทึกบันทึกการตรวจสอบ</translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation type="unfinished">Monitor All Servers on a Single Layout</translation>
+        <translation>ตรวจสอบเซิร์ฟเวอร์ทั้งหมดในรูปแบบเดียว</translation>
     </message>
     <message>
         <source>Open Device List</source>
@@ -3374,11 +3370,11 @@ to %1</translation>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>Video card drivers are outdated or not installed</source>
-        <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+        <translation>ไดรเวอร์การ์ดแสดงผลล้าสมัยหรือไม่ได้ติดตั้ง</translation>
     </message>
     <message>
         <source>%1 may not work properly.</source>
-        <translation type="unfinished">%1 may not work properly.</translation>
+        <translation>%1 อาจทำงานไม่ถูกต้อง</translation>
     </message>
 </context>
 <context>
@@ -3439,7 +3435,7 @@ to %1</translation>
     </message>
     <message>
         <source>On click</source>
-        <translation type="unfinished">On click</translation>
+        <translation>เมื่อคลิก</translation>
     </message>
     <message>
         <source>Duration</source>
@@ -3453,16 +3449,16 @@ to %1</translation>
     <message>
         <source>Toggle state</source>
         <comment>IO Output Port Action</comment>
-        <translation type="unfinished">Toggle state</translation>
+        <translation>สลับเสียง</translation>
     </message>
     <message>
         <source>Impulse</source>
         <comment>IO Output Port Action</comment>
-        <translation type="unfinished">Impulse</translation>
+        <translation>แรงกระตุ้น</translation>
     </message>
     <message>
         <source>Id</source>
-        <translation type="unfinished">Id</translation>
+        <translation>ไอดี</translation>
     </message>
 </context>
 <context>
@@ -3477,25 +3473,25 @@ to %1</translation>
     </message>
     <message>
         <source>multiple values</source>
-        <translation type="unfinished">multiple values</translation>
+        <translation>หลายค่า</translation>
     </message>
 </context>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
         <source>Failed to turn off I/O port %1</source>
-        <translation type="unfinished">Failed to turn off I/O port %1</translation>
+        <translation>ไม่สามารถปิดพอร์ต I / O %1</translation>
     </message>
     <message>
         <source>Failed to turn on I/O port %1</source>
-        <translation type="unfinished">Failed to turn on I/O port %1</translation>
+        <translation>ไม่สามารถเปิดพอร์ต I / O %1</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+        <translation>กำลังส่งออกไปที่ &quot;%1&quot; ...</translation>
     </message>
     <message>
         <source>Could not export device %1.</source>
@@ -3520,7 +3516,7 @@ to %1</translation>
     </message>
     <message>
         <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-        <translation type="unfinished">File &quot;%1&quot; is used by another process. Please try another name.</translation>
+        <translation>ชื่อไฟล์ &quot;%1&quot; สงวนไว้สำหรับระบบปฏิบัติการ โปรดลองชื่ออื่น</translation>
     </message>
 </context>
 <context>
@@ -3535,31 +3531,31 @@ to %1</translation>
     </message>
     <message>
         <source>No picture</source>
-        <translation type="unfinished">No picture</translation>
+        <translation>ไม่มีรูปภาพ</translation>
     </message>
     <message>
         <source>Error while loading picture</source>
-        <translation type="unfinished">Error while loading picture</translation>
+        <translation>เกิดข้อผิดพลาดขณะโหลดรูปภาพ</translation>
     </message>
     <message>
         <source>Error while uploading picture</source>
-        <translation type="unfinished">Error while uploading picture</translation>
+        <translation>เกิดข้อผิดพลาดขณะอัปโหลดภาพ</translation>
     </message>
     <message>
         <source>Picture cannot be read</source>
-        <translation type="unfinished">Picture cannot be read</translation>
+        <translation>ไม่สามารถอ่านรูปภาพได้</translation>
     </message>
     <message>
         <source>Picture cannot be loaded</source>
-        <translation type="unfinished">Picture cannot be loaded</translation>
+        <translation>รูปภาพไม่สามารถโหลดได้</translation>
     </message>
     <message>
         <source>cells</source>
-        <translation type="unfinished">cells</translation>
+        <translation>เซลล์</translation>
     </message>
     <message>
         <source>Picture is too big. Maximum size is %1 MB</source>
-        <translation type="unfinished">Picture is too big. Maximum size is %1 MB</translation>
+        <translation>รูปภาพใหญ่เกินไป ขนาดสูงสุดคือ %1 MB</translation>
     </message>
 </context>
 <context>
@@ -3606,7 +3602,7 @@ to %1</translation>
     </message>
     <message>
         <source>DN</source>
-        <translation type="unfinished">DN</translation>
+        <translation>DN</translation>
     </message>
     <message>
         <source>Name</source>
@@ -3633,7 +3629,7 @@ to %1</translation>
     </message>
     <message>
         <source>No new users found.</source>
-        <translation type="unfinished">No new users found.</translation>
+        <translation>ไม่พบผู้ใช้ใหม่</translation>
     </message>
     <message>
         <source>Timed Out</source>
@@ -3641,7 +3637,7 @@ to %1</translation>
     </message>
     <message>
         <source>Import Selected</source>
-        <translation type="unfinished">Import Selected</translation>
+        <translation>นำเข้าที่เลือกแล้ว</translation>
     </message>
 </context>
 <context>
@@ -3676,7 +3672,7 @@ to %1</translation>
     </message>
     <message>
         <source>Locked to Hardware Id</source>
-        <translation type="unfinished">Locked to Hardware Id</translation>
+        <translation>ถูกล็อคไปยังรหัสฮาร์ดแวร์</translation>
     </message>
 </context>
 <context>
@@ -3711,7 +3707,7 @@ to %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Error</translation>
+        <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
         <source>Server not found</source>
@@ -3719,11 +3715,11 @@ to %1</translation>
     </message>
     <message>
         <source>Expires</source>
-        <translation type="unfinished">Expires</translation>
+        <translation>หมดอายุแล้ว</translation>
     </message>
     <message>
         <source>License is active</source>
-        <translation type="unfinished">License is active</translation>
+        <translation>ใบอนุญาตใช้งานอยู่</translation>
     </message>
     <message>
         <source>License is expired</source>
@@ -3731,25 +3727,25 @@ to %1</translation>
     </message>
     <message>
         <source>Expires soon</source>
-        <translation type="unfinished">Expires soon</translation>
+        <translation>หมดอายุเร็ว ๆ นี้</translation>
     </message>
     <message>
         <source>License expires today</source>
-        <translation type="unfinished">License expires today</translation>
+        <translation>ใบอนุญาตหมดอายุวันนี้</translation>
     </message>
     <message>
         <source>License expires tomorrow</source>
-        <translation type="unfinished">License expires tomorrow</translation>
+        <translation>ใบอนุญาตหมดอายุวันพรุ่งนี้</translation>
     </message>
     <message numerus="yes">
         <source>License expires in %n days</source>
-        <translation type="unfinished">
-            <numerusform>License expires in %n days</numerusform>
+        <translation>
+            <numerusform>ใบอนุญาตหมดอายุใน %n วัน</numerusform>
         </translation>
     </message>
     <message>
         <source>Qty</source>
-        <translation type="unfinished">Qty</translation>
+        <translation>จำนวน</translation>
     </message>
 </context>
 <context>
@@ -3768,59 +3764,59 @@ to %1</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished">Export</translation>
+        <translation>ส่งออก</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
-        <translation type="unfinished">Export licenses to a file</translation>
+        <translation>ส่งออกใบอนุญาตไปยังไฟล์</translation>
     </message>
     <message>
         <source>Copy To Clipboard</source>
-        <translation type="unfinished">Copy To Clipboard</translation>
+        <translation>คัดลอกไปยังคลิปบอร์ด</translation>
     </message>
     <message>
         <source>Incompatible license</source>
-        <translation type="unfinished">Incompatible license</translation>
+        <translation>ใบอนุญาตที่เข้ากันไม่ได้</translation>
     </message>
     <message>
         <source>License you are trying to activate is incompatible with your software.</source>
-        <translation type="unfinished">License you are trying to activate is incompatible with your software.</translation>
+        <translation>ใบอนุญาตที่คุณพยายามเปิดใช้งานไม่สามารถใช้ร่วมกับซอฟต์แวร์ของคุณได้</translation>
     </message>
     <message>
         <source>You already activated this license</source>
-        <translation type="unfinished">You already activated this license</translation>
+        <translation>คุณได้เปิดใช้งานใบอนุญาตนี้แล้ว</translation>
     </message>
     <message>
         <source>License activated</source>
-        <translation type="unfinished">License activated</translation>
+        <translation>เปิดใช้งานใบอนุญาตแล้ว</translation>
     </message>
     <message>
         <source>Failed to remove license from Server</source>
-        <translation type="unfinished">Failed to remove license from Server</translation>
+        <translation>ไม่สามารถนำสิทธิ์การใช้งานออกจากเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Invalid activation key file</source>
-        <translation type="unfinished">Invalid activation key file</translation>
+        <translation>ไฟล์คีย์การเปิดใช้งานไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Select a valid activation key file to continue.</source>
-        <translation type="unfinished">Select a valid activation key file to continue.</translation>
+        <translation>เลือกแฟ้มคีย์การเปิดใช้งานที่ถูกต้องเพื่อดำเนินการต่อ</translation>
     </message>
     <message>
         <source>This device accepts single channel license only</source>
-        <translation type="unfinished">This device accepts single channel license only</translation>
+        <translation>อุปกรณ์นี้ยอมรับใบอนุญาตช่องสัญญาณเดียวเท่านั้น</translation>
     </message>
     <message>
         <source>Database error occurred.</source>
-        <translation type="unfinished">Database error occurred.</translation>
+        <translation>มีข้อผิดพลาดของฐานข้อมูล</translation>
     </message>
     <message>
         <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-        <translation type="unfinished">Invalid data received. Please contact Customer Support to report the issue.</translation>
+        <translation>ข้อมูลไม่ถูกต้องที่ได้รับ โปรดติดต่อศูนย์บริการลูกค้าเพื่อรายงานปัญหา</translation>
     </message>
     <message>
         <source>Failed to activate license</source>
-        <translation type="unfinished">Failed to activate license</translation>
+        <translation>ไม่สามารถเปิดใช้งานสัญญาอนุญาต</translation>
     </message>
     <message>
         <source>Network error</source>
@@ -3828,11 +3824,11 @@ to %1</translation>
     </message>
     <message>
         <source>If the problem persists, please contact Customer Support.</source>
-        <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
+        <translation>หากปัญหายังคงมีอยู่โปรดติดต่อฝ่ายบริการลูกค้า</translation>
     </message>
     <message>
         <source>License already activated on another server</source>
-        <translation type="unfinished">License already activated on another server</translation>
+        <translation>ใบอนุญาตใช้งานอยู่แล้วบนเซิร์ฟเวอร์อื่น</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %1 are required</source>
@@ -3848,56 +3844,56 @@ to %1</translation>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
-        <translation type="unfinished">Please make sure it is entered correctly.</translation>
+        <translation>โปรดตรวจสอบให้แน่ใจว่าป้อนถูกต้อง</translation>
     </message>
     <message numerus="yes">
         <source>Deactivate licenses?</source>
-        <translation type="unfinished">
-            <numerusform>Deactivate licenses?</numerusform>
+        <translation>
+            <numerusform>ปิดใช้งานใบอนุญาตหรือไม่?</numerusform>
         </translation>
     </message>
     <message>
         <source>Failed to deactivate license</source>
-        <translation type="unfinished">Failed to deactivate license</translation>
+        <translation>ไม่สามารถปิดใช้งานใบอนุญาต</translation>
     </message>
     <message numerus="yes">
         <source>Failed to deactivate %n licenses</source>
-        <translation type="unfinished">
-            <numerusform>Failed to deactivate %n licenses</numerusform>
+        <translation>
+            <numerusform>ไม่สามารถยกเลิกการใช้งาน %n ใบอนุญาต</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n licenses cannot be deactivated</source>
-        <translation type="unfinished">
-            <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <translation>
+            <numerusform>%1 จาก %n ใบอนุญาตไม่สามารถปิดการใช้งานได้</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot deactivate licenses</source>
-        <translation type="unfinished">
-            <numerusform>Cannot deactivate licenses</numerusform>
+        <translation>
+            <numerusform>ไม่สามารถยกเลิกการอนุญาตได้</numerusform>
         </translation>
     </message>
     <message>
         <source>Cannot connect to the License Server</source>
-        <translation type="unfinished">Cannot connect to the License Server</translation>
+        <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์สิทธิ์การใช้งานได้</translation>
     </message>
     <message>
         <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-        <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+        <translation>โปรดตรวจสอบให้แน่ใจว่าเซิร์ฟเวอร์ของคุณมีการเชื่อมต่ออินเทอร์เน็ตที่ใช้งานอยู่หรือตรวจสอบการตั้งค่าไฟร์วอลล์</translation>
     </message>
     <message>
         <source>License Server error</source>
-        <translation type="unfinished">License Server error</translation>
+        <translation>ข้อผิดพลาดของเซิร์ฟเวอร์ใบอนุญาต</translation>
     </message>
     <message>
         <source>License deactivated</source>
-        <translation type="unfinished">License deactivated</translation>
+        <translation>ปิดการใช้งานใบอนุญาตแล้ว</translation>
     </message>
     <message numerus="yes">
         <source>%n licenses deactivated</source>
-        <translation type="unfinished">
-            <numerusform>%n licenses deactivated</numerusform>
+        <translation>
+            <numerusform>ปิดสิทธิ์การใช้งาน %n รายการ</numerusform>
         </translation>
     </message>
     <message>
@@ -3906,51 +3902,51 @@ to %1</translation>
     </message>
     <message>
         <source>Deactivate</source>
-        <translation type="unfinished">Deactivate</translation>
+        <translation>ปิดใช้งาน</translation>
     </message>
     <message numerus="yes">
         <source>%n channels.</source>
-        <translation type="unfinished">
-            <numerusform>%n channels.</numerusform>
+        <translation>
+            <numerusform>%n ช่อง</numerusform>
         </translation>
     </message>
     <message>
         <source>Please contact Customer Support.</source>
-        <translation type="unfinished">Please contact Customer Support.</translation>
+        <translation>กรุณาติดต่อฝ่ายสนับสนุน</translation>
     </message>
     <message numerus="yes">
         <source>Deactivate %n Other</source>
-        <translation type="unfinished">
-            <numerusform>Deactivate %n Other</numerusform>
+        <translation>
+            <numerusform>ปิดใช้งาน %n อื่น ๆ</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid License Key</source>
-        <translation type="unfinished">Invalid License Key</translation>
+        <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Please contact Customer Support to obtain a valid License Key.</source>
-        <translation type="unfinished">Please contact Customer Support to obtain a valid License Key.</translation>
+        <translation>โปรดติดต่อฝ่ายบริการลูกค้าเพื่อขอรับรหัสสัญญาอนุญาตที่ถูกต้อง</translation>
     </message>
     <message>
         <source>Please contact Customer Support to activate License Key manually.</source>
-        <translation type="unfinished">Please contact Customer Support to activate License Key manually.</translation>
+        <translation>โปรดติดต่อฝ่ายบริการลูกค้าเพื่อขอรับรหัสสัญญาอนุญาตที่ถูกต้อง</translation>
     </message>
     <message>
         <source>Please contact Customer Support to get a valid License Key.</source>
-        <translation type="unfinished">Please contact Customer Support to get a valid License Key.</translation>
+        <translation>โปรดติดต่อฝ่ายบริการลูกค้าเพื่อขอรหัสสัญญาอนุญาตที่ถูกต้อง</translation>
     </message>
     <message>
         <source>This license is already activated and linked to Hardware Id %1</source>
-        <translation type="unfinished">This license is already activated and linked to Hardware Id %1</translation>
+        <translation>ใบอนุญาตนี้ได้เปิดใช้งานและเชื่อมโยงกับ Hardware Id %1 แล้ว</translation>
     </message>
     <message>
         <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-        <translation type="unfinished">This license is already activated and linked to Hardware Id %1 on %2</translation>
+        <translation>ใบอนุญาตนี้ได้เปิดใช้งานแล้วและเชื่อมโยงกับ Hardware Id %1 ใน %2</translation>
     </message>
     <message>
         <source>If the problem persists please contact Customer Support.</source>
-        <translation type="unfinished">If the problem persists please contact Customer Support.</translation>
+        <translation>หากปัญหายังคงมีอยู่โปรดติดต่อฝ่ายบริการลูกค้า</translation>
     </message>
 </context>
 <context>
@@ -3977,11 +3973,11 @@ to %1</translation>
     </message>
     <message>
         <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished">Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+        <translation>โปรดส่งอีเมลพร้อมรหัสสัญญาอนุญาตและรหัสฮาร์ดแวร์ที่ให้ไว้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
     </message>
     <message>
         <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished">Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</translation>
+        <translation>โปรดส่ง ID คีย์ใบอนุญาตและฮาร์ดแวร์ให้กับ %1 เพื่อรับไฟล์ Activation Key</translation>
     </message>
 </context>
 <context>
@@ -4016,7 +4012,7 @@ to %1</translation>
     <message>
         <source>Failed to login to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Failed to login to %1</translation>
+        <translation>ไม่สามารถเข้าสู่ระบบ %1</translation>
     </message>
 </context>
 <context>
@@ -4043,27 +4039,27 @@ to %1</translation>
     </message>
     <message>
         <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-        <translation type="unfinished">Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
+        <translation>ไฟล์การตั้งค่าเป็นแบบอ่านอย่างเดียว โปรดติดต่อผู้ดูแลระบบของคุณ การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม</translation>
     </message>
     <message>
         <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-        <translation type="unfinished">Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</translation>
+        <translation>ไม่สามารถบันทึกการตั้งค่าได้ โปรดติดต่อผู้ดูแลระบบของคุณ การเปลี่ยนแปลงทั้งหมดจะหายไปหลังจากออกจากโปรแกรม</translation>
     </message>
     <message>
         <source>Restart required</source>
-        <translation type="unfinished">Restart required</translation>
+        <translation>ต้องเริ่มต้นใหม่</translation>
     </message>
     <message>
         <source>Restart Now</source>
-        <translation type="unfinished">Restart Now</translation>
+        <translation>รีสตาร์ทเลย</translation>
     </message>
     <message>
         <source>Restart Later</source>
-        <translation type="unfinished">Restart Later</translation>
+        <translation>รีสตาร์ทภายหลัง</translation>
     </message>
     <message>
         <source>Some changes will take effect only after %1 restart</source>
-        <translation type="unfinished">Some changes will take effect only after %1 restart</translation>
+        <translation>การเปลี่ยนแปลงบางอย่างจะมีผลเฉพาะเมื่อเริ่มต้นใหม่อีกครั้ง %1</translation>
     </message>
 </context>
 <context>
@@ -4094,7 +4090,7 @@ to %1</translation>
     </message>
     <message>
         <source>Overwrite existing connection?</source>
-        <translation type="unfinished">Overwrite existing connection?</translation>
+        <translation>เขียนทับการเชื่อมต่อที่มีอยู่หรือไม่?</translation>
     </message>
     <message>
         <source>Delete connection?</source>
@@ -4102,11 +4098,11 @@ to %1</translation>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
-        <translation type="unfinished">There is another connection with the same name.</translation>
+        <translation>มีแฟ้มหรือโฟลเดอร์ที่ มีชื่อเดียวกัน.</translation>
     </message>
     <message>
         <source>none</source>
-        <translation type="unfinished">none</translation>
+        <translation>ไม่มี</translation>
     </message>
 </context>
 <context>
@@ -4125,11 +4121,11 @@ to %1</translation>
     </message>
     <message>
         <source>Forgot password?</source>
-        <translation type="unfinished">Forgot password?</translation>
+        <translation>ลืมรหัสผ่าน?</translation>
     </message>
     <message>
         <source>Learn more about</source>
-        <translation type="unfinished">Learn more about</translation>
+        <translation>เรียนรู้เพิ่มเติมเกี่ยวกับ</translation>
     </message>
     <message>
         <source>Log in to %1</source>
@@ -4139,7 +4135,7 @@ to %1</translation>
     <message>
         <source>Welcome to %1!</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Welcome to %1!</translation>
+        <translation>ยินดีต้อนรับสู่ %1</translation>
     </message>
 </context>
 <context>
@@ -4201,11 +4197,11 @@ to %1</translation>
     </message>
     <message>
         <source>PTZ</source>
-        <translation type="unfinished">PTZ</translation>
+        <translation>PTZ</translation>
     </message>
     <message>
         <source>Dewarping</source>
-        <translation type="unfinished">Dewarping</translation>
+        <translation>Dewarping</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -4225,7 +4221,7 @@ to %1</translation>
     </message>
     <message>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
+        <translation>%1 (ทัวร์ &quot;%2&quot; มีการใช้งานอยู่)</translation>
     </message>
     <message>
         <source>Zoom Window</source>
@@ -4241,23 +4237,23 @@ to %1</translation>
     </message>
     <message>
         <source>Failed to invoke trigger %1 (%2)</source>
-        <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+        <translation>ไม่สามารถเรียกใช้ทริกเกอร์ %1 (%2)</translation>
     </message>
     <message>
         <source>press and hold</source>
         <comment>Soft Trigger</comment>
-        <translation type="unfinished">press and hold</translation>
+        <translation>กดค้างไว้</translation>
     </message>
     <message>
         <source>Disabled by schedule</source>
-        <translation type="unfinished">Disabled by schedule</translation>
+        <translation>ปิดใช้งานตามกำหนดเวลา</translation>
     </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
     <message>
         <source>http(s)://host:port</source>
-        <translation type="unfinished">http(s)://host:port</translation>
+        <translation>http (s): // โฮสต์: พอร์ต</translation>
     </message>
     <message>
         <source>%1 (current)</source>
@@ -4281,7 +4277,7 @@ to %1</translation>
     </message>
     <message>
         <source>The login cannot be empty.</source>
-        <translation type="unfinished">The login cannot be empty.</translation>
+        <translation>การเข้าสู่ระบบต้องไม่ว่างเปล่า</translation>
     </message>
     <message>
         <source>New Server</source>
@@ -4289,27 +4285,27 @@ to %1</translation>
     </message>
     <message>
         <source>Failed to merge Systems</source>
-        <translation type="unfinished">Failed to merge Systems</translation>
+        <translation>ไม่สามารถผสานรวมระบบ</translation>
     </message>
     <message>
         <source>URL is invalid.</source>
-        <translation type="unfinished">URL is invalid.</translation>
+        <translation>URL ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>You are about to merge the current System %1 with System</source>
-        <translation type="unfinished">You are about to merge the current System %1 with System</translation>
+        <translation>คุณกำลังจะผสานระบบปัจจุบัน %1 กับระบบ</translation>
     </message>
     <message>
         <source>This is the current System URL.</source>
-        <translation type="unfinished">This is the current System URL.</translation>
+        <translation>นี่คือ URL ระบบปัจจุบัน</translation>
     </message>
     <message>
         <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-        <translation type="unfinished">Servers from the other System will appear in the resource tree when the database synchronization is finished.</translation>
+        <translation>เซิร์ฟเวอร์จากระบบอื่น ๆ จะปรากฏในโครงสร้างข้อมูลเมื่อการซิงโครไนซ์ฐานข้อมูลเสร็จสิ้น</translation>
     </message>
     <message>
         <source>Systems will be merged shortly</source>
-        <translation type="unfinished">Systems will be merged shortly</translation>
+        <translation>ระบบจะรวมในไม่ช้า</translation>
     </message>
     <message>
         <source>You will be reconnected.</source>
@@ -4320,7 +4316,7 @@ to %1</translation>
     <name>QnMessageBox</name>
     <message>
         <source>Overwrite</source>
-        <translation type="unfinished">Overwrite</translation>
+        <translation>เขียนทับ</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -4332,30 +4328,30 @@ to %1</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished">Skip</translation>
+        <translation>ข้าม</translation>
     </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
         <source>Secondary stream disabled for these cameras</source>
-        <translation type="unfinished">Secondary stream disabled for these cameras</translation>
+        <translation>สตรีมทุติยภูมิถูกปิดใช้งานสำหรับกล้องเหล่านี้</translation>
     </message>
     <message>
         <source>Set Recording to &quot;Always&quot;</source>
-        <translation type="unfinished">Set Recording to &quot;Always&quot;</translation>
+        <translation>ตั้งค่าการบันทึกเป็น &quot;Always&quot;</translation>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
-        <translation type="unfinished">Enable Secondary Stream</translation>
+        <translation>เปิดใช้สตรีมรอง</translation>
     </message>
     <message>
         <source>multiple values</source>
-        <translation type="unfinished">multiple values</translation>
+        <translation>หลายค่า</translation>
     </message>
     <message>
         <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation type="unfinished">&quot;Motion + Low - Res&quot; recording option cannot be set.</translation>
+        <translation>ไม่สามารถตั้งค่าตัวเลือกการบันทึก &quot;Motion + ต่ำ - Res&quot;</translation>
     </message>
 </context>
 <context>
@@ -4397,23 +4393,23 @@ to %1</translation>
     <name>QnNetworkSpeedStrings</name>
     <message>
         <source>B/s</source>
-        <translation type="unfinished">B/s</translation>
+        <translation>B / S</translation>
     </message>
     <message>
         <source>MB/s</source>
-        <translation type="unfinished">MB/s</translation>
+        <translation>MB / s</translation>
     </message>
     <message>
         <source>KB/s</source>
-        <translation type="unfinished">KB/s</translation>
+        <translation>KB / s</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more notifications</source>
-        <translation type="unfinished">
-            <numerusform>%n more notifications</numerusform>
+        <translation>
+            <numerusform>%n การแจ้งเตือนเพิ่มเติม</numerusform>
         </translation>
     </message>
 </context>
@@ -4445,34 +4441,34 @@ to %1</translation>
     </message>
     <message>
         <source>Failed to add file</source>
-        <translation type="unfinished">Failed to add file</translation>
+        <translation>ไม่สามารถเพิ่มไฟล์</translation>
     </message>
     <message>
         <source>Failed to set new title</source>
-        <translation type="unfinished">Failed to set new title</translation>
+        <translation>ไม่สามารถตั้งชื่อใหม่</translation>
     </message>
     <message>
         <source>Delete sound?</source>
-        <translation type="unfinished">Delete sound?</translation>
+        <translation>ลบเสียง?</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
         <source>Downloading sound list...</source>
-        <translation type="unfinished">Downloading sound list...</translation>
+        <translation>กำลังดาวน์โหลดรายการเสียง ...</translation>
     </message>
     <message>
         <source>No Sound</source>
-        <translation type="unfinished">No Sound</translation>
+        <translation>ไม่มีเสียง</translation>
     </message>
     <message>
         <source>Downloading sound...</source>
-        <translation type="unfinished">Downloading sound...</translation>
+        <translation>กำลังดาวน์โหลดเสียง ...</translation>
     </message>
     <message>
         <source>Uploading sound...</source>
-        <translation type="unfinished">Uploading sound...</translation>
+        <translation>กำลังอัปโหลดเสียง ...</translation>
     </message>
 </context>
 <context>
@@ -4490,58 +4486,58 @@ to %1</translation>
     <name>QnPerformanceTest</name>
     <message>
         <source>For full - featured mode, please use another computer</source>
-        <translation type="unfinished">For full - featured mode, please use another computer</translation>
+        <translation>สำหรับโหมดเต็มรูปแบบโปรดใช้คอมพิวเตอร์เครื่องอื่น</translation>
     </message>
     <message>
         <source>%1 can work in configuration mode only</source>
-        <translation type="unfinished">%1 can work in configuration mode only</translation>
+        <translation>%1 สามารถทำงานได้เฉพาะในโหมดกำหนดค่าเท่านั้น</translation>
     </message>
     <message>
         <source>Performance of this computer allows running %1 in configuration mode only.</source>
-        <translation type="unfinished">Performance of this computer allows running %1 in configuration mode only.</translation>
+        <translation>ประสิทธิภาพของคอมพิวเตอร์เครื่องนี้ช่วยให้สามารถใช้งานโหมดการตั้งค่าได้ %1 เท่านั้น</translation>
     </message>
 </context>
 <context>
     <name>QnPermissionsWidget</name>
     <message>
         <source>Edit camera settings</source>
-        <translation type="unfinished">Edit camera settings</translation>
+        <translation>แก้ไขการตั้งค่ากล้อง</translation>
     </message>
     <message>
         <source>This is also required to create/edit PTZ presets and tours.</source>
-        <translation type="unfinished">This is also required to create/edit PTZ presets and tours.</translation>
+        <translation>จำเป็นต้องใช้เพื่อสร้าง / แก้ไข PTZ ที่ตั้งไว้ล่วงหน้าและทัวร์</translation>
     </message>
     <message>
         <source>Control video walls</source>
-        <translation type="unfinished">Control video walls</translation>
+        <translation>ควบคุมภาพวิดีโอผนัง</translation>
     </message>
     <message>
         <source>View event log</source>
-        <translation type="unfinished">View event log</translation>
+        <translation>ดูแฟ้มบันทึกเหตุการณ์</translation>
     </message>
     <message>
         <source>View archive</source>
-        <translation type="unfinished">View archive</translation>
+        <translation>ดูที่เก็บถาวร</translation>
     </message>
     <message>
         <source>Export archive</source>
-        <translation type="unfinished">Export archive</translation>
+        <translation>ส่งออกคลัง</translation>
     </message>
     <message>
         <source>View bookmarks</source>
-        <translation type="unfinished">View bookmarks</translation>
+        <translation>ดูบุ๊คมาร์ค</translation>
     </message>
     <message>
         <source>Modify bookmarks</source>
-        <translation type="unfinished">Modify bookmarks</translation>
+        <translation>แก้ไขบุ๊กมาร์ก</translation>
     </message>
     <message>
         <source>User Input</source>
-        <translation type="unfinished">User Input</translation>
+        <translation>ป้อนข้อมูลผู้ใช้</translation>
     </message>
     <message>
         <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-        <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
+        <translation>PTZ, เอาต์พุตอุปกรณ์, เสียง 2 ทิศทาง, ทริกเกอร์นุ่ม</translation>
     </message>
 </context>
 <context>
@@ -4552,7 +4548,7 @@ to %1</translation>
     </message>
     <message>
         <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-        <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+        <translation>การแจ้งเตือนจะปรากฏจนกว่าผู้ใช้รายหนึ่งที่เห็นจะสร้างบุ๊กมาร์กพร้อมคำอธิบายกิจกรรม</translation>
     </message>
 </context>
 <context>
@@ -4581,7 +4577,7 @@ to %1</translation>
     </message>
     <message>
         <source>Hotkey</source>
-        <translation type="unfinished">Hotkey</translation>
+        <translation>ปุ่มลัด:</translation>
     </message>
     <message>
         <source>Home</source>
@@ -4669,11 +4665,11 @@ to %1</translation>
     </message>
     <message>
         <source>Hotkey used by preset &quot;%1&quot;</source>
-        <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
+        <translation>ใช้แป้นลัดตามค่าที่ตั้งล่วงหน้า &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Hotkey used by tour &quot;%1&quot;</source>
-        <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
+        <translation>คีย์ลัดที่ทัวร์ใช้ &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -4727,7 +4723,7 @@ to %1</translation>
     </message>
     <message>
         <source>%1 (Primary)</source>
-        <translation type="unfinished">%1 (Primary)</translation>
+        <translation>%1 (หลัก)</translation>
     </message>
     <message>
         <source>Select folder...</source>
@@ -4739,35 +4735,35 @@ to %1</translation>
     </message>
     <message>
         <source>Average</source>
-        <translation type="unfinished">Average</translation>
+        <translation>ปานกลาง</translation>
     </message>
     <message>
         <source>Performance</source>
-        <translation type="unfinished">Performance</translation>
+        <translation>ประสิทธิภาพ</translation>
     </message>
     <message>
         <source>Native</source>
-        <translation type="unfinished">Native</translation>
+        <translation>พื้นเมือง</translation>
     </message>
     <message>
         <source>Quarter Native</source>
-        <translation type="unfinished">Quarter Native</translation>
+        <translation>พื้นเมืองไตรมาส</translation>
     </message>
     <message>
         <source>1920x1080</source>
-        <translation type="unfinished">1920x1080</translation>
+        <translation>1920x1080</translation>
     </message>
     <message>
         <source>1280x720</source>
-        <translation type="unfinished">1280x720</translation>
+        <translation>1280x720</translation>
     </message>
     <message>
         <source>640x480</source>
-        <translation type="unfinished">640x480</translation>
+        <translation>640x480</translation>
     </message>
     <message>
         <source>320x240</source>
-        <translation type="unfinished">320x240</translation>
+        <translation>320x240</translation>
     </message>
 </context>
 <context>
@@ -4839,27 +4835,27 @@ to %1</translation>
     <message numerus="yes">
         <source>Total %1 %n devices</source>
         <comment>%1 is long dash, do not replace</comment>
-        <translation type="unfinished">
-            <numerusform>Total %1 %n devices</numerusform>
+        <translation>
+            <numerusform>รวม %1 อุปกรณ์ %n</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Total %1 %n cameras</source>
         <comment>%1 is long dash, do not replace</comment>
-        <translation type="unfinished">
-            <numerusform>Total %1 %n cameras</numerusform>
+        <translation>
+            <numerusform>รวมกล้อง %1 %n</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Total %1 %n I/O modules</source>
         <comment>%1 is long dash, do not replace</comment>
-        <translation type="unfinished">
-            <numerusform>Total %1 %n I/O modules</numerusform>
+        <translation>
+            <numerusform>รวม %1 %n โมดูล I / O</numerusform>
         </translation>
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished">Bitrate</translation>
+        <translation>บิตเรท</translation>
     </message>
 </context>
 <context>
@@ -4898,35 +4894,35 @@ to %1</translation>
     <message>
         <source>Role %1 has no %2 permission</source>
         <comment>%1 is the name of selected role, %2 is permission name</comment>
-        <translation type="unfinished">Role %1 has no %2 permission</translation>
+        <translation>บทบาท %1 ไม่มีสิทธิ์ในการใช้ %2</translation>
     </message>
     <message>
         <source>Selected roles have no %1 permission</source>
         <comment>%1 is permission name</comment>
-        <translation type="unfinished">Selected roles have no %1 permission</translation>
+        <translation>บทบาทที่เลือกไม่มีสิทธิ์ในการใช้งาน %1</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 selected roles have no %2 permission</source>
         <comment>%1 is number of selected roles, %2 is permission name</comment>
-        <translation type="unfinished">
-            <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <translation>
+            <numerusform>%n จาก %1 บทบาทที่เลือกไม่มีสิทธิ์ในการได้รับ %2</numerusform>
         </translation>
     </message>
     <message>
         <source>User %1 has no %2 permission</source>
         <comment>%1 is the name of selected user, %2 is permission name</comment>
-        <translation type="unfinished">User %1 has no %2 permission</translation>
+        <translation>ผู้ใช้ %1 ไม่มีสิทธิ์ในการใช้ %2</translation>
     </message>
     <message>
         <source>Selected users have no %1 permission</source>
         <comment>%1 is permission name</comment>
-        <translation type="unfinished">Selected users have no %1 permission</translation>
+        <translation>ผู้ใช้ที่เลือกไม่มีสิทธิ์ในการใช้งาน %1</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 selected users have no %2 permission</source>
         <comment>%1 is number of selected users, %2 is permission name</comment>
-        <translation type="unfinished">
-            <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <translation>
+            <numerusform>%n จาก %1 ผู้ใช้ที่เลือกไม่มีสิทธิ์ในการใช้ %2</numerusform>
         </translation>
     </message>
 </context>
@@ -4957,7 +4953,7 @@ to %1</translation>
     <name>QnResourceItemDelegate</name>
     <message>
         <source>Health Monitor</source>
-        <translation type="unfinished">Health Monitor</translation>
+        <translation>การตรวจสอบสุขภาพ</translation>
     </message>
 </context>
 <context>
@@ -4986,7 +4982,7 @@ to %1</translation>
     <name>QnResourceTreeModelNode</name>
     <message>
         <source>Servers</source>
-        <translation type="unfinished">Servers</translation>
+        <translation>เซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Other Systems</source>
@@ -4998,7 +4994,7 @@ to %1</translation>
     </message>
     <message>
         <source>Web Pages</source>
-        <translation type="unfinished">Web Pages</translation>
+        <translation>เว็บเพจ:</translation>
     </message>
     <message>
         <source>Cameras &amp; Resources</source>
@@ -5006,7 +5002,7 @@ to %1</translation>
     </message>
     <message>
         <source>Layouts</source>
-        <translation type="unfinished">Layouts</translation>
+        <translation>เค้าโครง</translation>
     </message>
     <message>
         <source>All Cameras &amp; Resources</source>
@@ -5014,7 +5010,7 @@ to %1</translation>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished">All Shared Layouts</translation>
+        <translation>เลย์เอาต์ร่วมกันทั้งหมด</translation>
     </message>
     <message>
         <source>Shared Layouts</source>
@@ -5022,11 +5018,11 @@ to %1</translation>
     </message>
     <message>
         <source>Local Files</source>
-        <translation type="unfinished">Local Files</translation>
+        <translation>ไฟล์ท้องถิ่น</translation>
     </message>
     <message>
         <source>Showreels</source>
-        <translation type="unfinished">Showreels</translation>
+        <translation>Showreels</translation>
     </message>
     <message>
         <source>Showreel</source>
@@ -5071,11 +5067,11 @@ to %1</translation>
     </message>
     <message>
         <source>Invalid URL</source>
-        <translation type="unfinished">Invalid URL</translation>
+        <translation>URL ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>URL already added</source>
-        <translation type="unfinished">URL already added</translation>
+        <translation>URL ที่เพิ่มไว้แล้ว</translation>
     </message>
 </context>
 <context>
@@ -5093,7 +5089,7 @@ to %1</translation>
     </message>
     <message>
         <source>No bookmarks</source>
-        <translation type="unfinished">No bookmarks</translation>
+        <translation>ไม่มีบุ๊กมาร์ก</translation>
     </message>
     <message>
         <source>Search</source>
@@ -5124,11 +5120,11 @@ to %1</translation>
     </message>
     <message>
         <source>Created</source>
-        <translation type="unfinished">Created</translation>
+        <translation>สร้าง</translation>
     </message>
     <message>
         <source>Creator</source>
-        <translation type="unfinished">Creator</translation>
+        <translation>ผู้สร้าง</translation>
     </message>
 </context>
 <context>
@@ -5158,11 +5154,11 @@ to %1</translation>
     </message>
     <message>
         <source>Select devices...</source>
-        <translation type="unfinished">Select devices...</translation>
+        <translation>เลือกอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Select cameras...</source>
-        <translation type="unfinished">Select cameras...</translation>
+        <translation>เลือกกล้อง ...</translation>
     </message>
 </context>
 <context>
@@ -5173,16 +5169,16 @@ to %1</translation>
     </message>
     <message>
         <source>All Servers</source>
-        <translation type="unfinished">All Servers</translation>
+        <translation>เซิร์ฟเวอร์ทั้งหมด</translation>
     </message>
     <message>
         <source>Select Servers...</source>
-        <translation type="unfinished">Select Servers...</translation>
+        <translation>เลือกผู้ใช้งาน...</translation>
     </message>
     <message numerus="yes">
         <source>%n Servers</source>
-        <translation type="unfinished">
-            <numerusform>%n Servers</numerusform>
+        <translation>
+            <numerusform>%n เซิร์ฟเวอร์</numerusform>
         </translation>
     </message>
 </context>
@@ -5190,7 +5186,7 @@ to %1</translation>
     <name>QnSelectUsersButton</name>
     <message>
         <source>Any User</source>
-        <translation type="unfinished">Any User</translation>
+        <translation>ผู้ใช้ใด ๆ</translation>
     </message>
     <message>
         <source>All Users</source>
@@ -5202,8 +5198,8 @@ to %1</translation>
     </message>
     <message numerus="yes">
         <source>%n Users</source>
-        <translation type="unfinished">
-            <numerusform>%n Users</numerusform>
+        <translation>
+            <numerusform>%n ผู้ใช้</numerusform>
         </translation>
     </message>
 </context>
@@ -5211,33 +5207,33 @@ to %1</translation>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
         <source>%n additional</source>
-        <translation type="unfinished">
-            <numerusform>%n additional</numerusform>
+        <translation>
+            <numerusform>%n เพิ่มเติม</numerusform>
         </translation>
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation type="unfinished">User %1 has invalid email address</translation>
+        <translation>ผู้ใช้ %1 มีที่อยู่อีเมลไม่ถูกต้อง</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform>%n of %1 users have invalid email address</numerusform>
+        <translation>
+            <numerusform>%n ของ %1 ผู้ใช้มีอีเมล์ไม่ถูกต้อง</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid email address %1</source>
-        <translation type="unfinished">Invalid email address %1</translation>
+        <translation>ที่อยู่อีเมลไม่ถูกต้อง %1</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <translation>
+            <numerusform>%n จาก %1 ที่อยู่อีเมลเพิ่มเติมไม่ถูกต้อง</numerusform>
         </translation>
     </message>
     <message>
         <source>Send email to %1</source>
-        <translation type="unfinished">Send email to %1</translation>
+        <translation>ส่งอีเมลไปที่ %1</translation>
     </message>
 </context>
 <context>
@@ -5290,7 +5286,7 @@ to %1</translation>
     </message>
     <message>
         <source>Apply changes before switching to another server?</source>
-        <translation type="unfinished">Apply changes before switching to another server?</translation>
+        <translation>ใช้การเปลี่ยนแปลงก่อนเปลี่ยนไปใช้เซิร์ฟเวอร์อื่นหรือไม่?</translation>
     </message>
     <message>
         <source>Server Web Page</source>
@@ -5329,11 +5325,11 @@ to %1</translation>
     </message>
     <message>
         <source>server will take devices automatically from offline servers</source>
-        <translation type="unfinished">server will take devices automatically from offline servers</translation>
+        <translation>เซิร์ฟเวอร์จะรับอุปกรณ์จากเซิร์ฟเวอร์ออฟไลน์โดยอัตโนมัติ</translation>
     </message>
     <message>
         <source>server will take cameras automatically from offline servers</source>
-        <translation type="unfinished">server will take cameras automatically from offline servers</translation>
+        <translation>เซิร์ฟเวอร์จะรับกล้องโดยอัตโนมัติจากเซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
     <message>
         <source>Failover</source>
@@ -5375,185 +5371,185 @@ to %1</translation>
     </message>
     <message>
         <source>Latest Available Update</source>
-        <translation type="unfinished">Latest Available Update</translation>
+        <translation>อัพเดตล่าสุดที่มีให้</translation>
     </message>
     <message>
         <source>Download the Latest Version Update File</source>
-        <translation type="unfinished">Download the Latest Version Update File</translation>
+        <translation>ดาวน์โหลดไฟล์อัพเดตเวอร์ชันล่าสุด</translation>
     </message>
     <message>
         <source>Selected Version</source>
-        <translation type="unfinished">Selected Version</translation>
+        <translation>เวอร์ชันที่เลือก</translation>
     </message>
     <message>
         <source>Download Update File</source>
-        <translation type="unfinished">Download Update File</translation>
+        <translation>ดาวน์โหลดไฟล์อัปเดต</translation>
     </message>
     <message>
         <source>Browse for Update File...</source>
-        <translation type="unfinished">Browse for Update File...</translation>
+        <translation>เรียกค้นไฟล์อัปเดต ...</translation>
     </message>
     <message>
         <source>Selected Update File</source>
-        <translation type="unfinished">Selected Update File</translation>
+        <translation>ไฟล์อัปเดตที่เลือก</translation>
     </message>
     <message>
         <source>Download in External Browser</source>
-        <translation type="unfinished">Download in External Browser</translation>
+        <translation>ดาวน์โหลดในเบราเซอร์ภายนอก</translation>
     </message>
     <message>
         <source>Copy Link to Clipboard</source>
-        <translation type="unfinished">Copy Link to Clipboard</translation>
+        <translation>คัดลอกลิงก์ไปยังคลิปบอร์ด</translation>
     </message>
     <message>
         <source>Unable to check updates on the Internet.</source>
-        <translation type="unfinished">Unable to check updates on the Internet.</translation>
+        <translation>ไม่สามารถตรวจสอบการอัปเดตบนอินเทอร์เน็ต</translation>
     </message>
     <message>
         <source>Unknown build number.</source>
-        <translation type="unfinished">Unknown build number.</translation>
+        <translation>หมายเลขการสร้างที่ไม่รู้จัก</translation>
     </message>
     <message>
         <source>Downgrade to an earlier version is prohibited.</source>
-        <translation type="unfinished">Downgrade to an earlier version is prohibited.</translation>
+        <translation>ลดระดับลงเป็นเวอร์ชันก่อนหน้านี้</translation>
     </message>
     <message>
         <source>Updates for one or more servers were not found.</source>
-        <translation type="unfinished">Updates for one or more servers were not found.</translation>
+        <translation>ไม่พบการปรับปรุงสำหรับเซิร์ฟเวอร์อย่างน้อยหนึ่งเครื่อง</translation>
     </message>
     <message>
         <source>Client update was not found.</source>
-        <translation type="unfinished">Client update was not found.</translation>
+        <translation>ไม่พบการปรับปรุงไคลเอ็นต์</translation>
     </message>
     <message>
         <source>Unable to extract update file. No free space left on the disk.</source>
-        <translation type="unfinished">Unable to extract update file. No free space left on the disk.</translation>
+        <translation>ไม่สามารถดึงข้อมูลแฟ้มการปรับปรุง ไม่มีเนื้อที่ว่างบนดิสก์</translation>
     </message>
     <message>
         <source>Update Finished...</source>
-        <translation type="unfinished">Update Finished...</translation>
+        <translation>อัปเดตเสร็จสิ้น ...</translation>
     </message>
     <message>
         <source>Checking for updates...</source>
-        <translation type="unfinished">Checking for updates...</translation>
+        <translation>ตรวจสอบการปรับปรุง...</translation>
     </message>
     <message>
         <source>Downloading updates...</source>
-        <translation type="unfinished">Downloading updates...</translation>
+        <translation>กำลังดาวน์โหลดการอัปเดต ...</translation>
     </message>
     <message>
         <source>Installing client update...</source>
-        <translation type="unfinished">Installing client update...</translation>
+        <translation>กำลังติดตั้งการอัปเดตไคลเอ็นต์ ...</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...</source>
-        <translation type="unfinished">Installing updates to incompatible servers...</translation>
+        <translation>กำลังติดตั้งการอัปเดตไปยังเซิร์ฟเวอร์ที่เข้ากันไม่ได้ ...</translation>
     </message>
     <message>
         <source>Pushing updates to servers...</source>
-        <translation type="unfinished">Pushing updates to servers...</translation>
+        <translation>กำลังอัปเดตเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
         <source>Installing updates...</source>
-        <translation type="unfinished">Installing updates...</translation>
+        <translation>กำลังติดตั้งโปรแกรม...</translation>
     </message>
     <message>
         <source>Specific Build...</source>
-        <translation type="unfinished">Specific Build...</translation>
+        <translation>สร้างเฉพาะ ...</translation>
     </message>
     <message>
         <source>Update to Specific Build</source>
-        <translation type="unfinished">Update to Specific Build</translation>
+        <translation>อัปเดตการสร้างเฉพาะ</translation>
     </message>
     <message>
         <source>Update System</source>
-        <translation type="unfinished">Update System</translation>
+        <translation>ปรับปรุงระบบ</translation>
     </message>
     <message>
         <source>System update in process</source>
-        <translation type="unfinished">System update in process</translation>
+        <translation>การอัปเดตระบบในกระบวนการ</translation>
     </message>
     <message>
         <source>Cancel Update</source>
-        <translation type="unfinished">Cancel Update</translation>
+        <translation>ยกเลิกการอัปเดต</translation>
     </message>
     <message>
         <source>Continue in Background</source>
-        <translation type="unfinished">Continue in Background</translation>
+        <translation>ดำเนินการต่อในเบื้องหลัง</translation>
     </message>
     <message numerus="yes">
         <source>Not enough free space at %n Servers:</source>
-        <translation type="unfinished">
-            <numerusform>Not enough free space at %n Servers:</numerusform>
+        <translation>
+            <numerusform>เนื้อที่ว่างไม่เพียงพอที่ %n เซิร์ฟเวอร์:</numerusform>
         </translation>
     </message>
     <message>
         <source>Attempt to update may fail or cause Server malfunction.</source>
-        <translation type="unfinished">Attempt to update may fail or cause Server malfunction.</translation>
+        <translation>การพยายามอัปเดตอาจล้มเหลวหรือทำให้เซิร์ฟเวอร์ทำงานไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Force Update</source>
-        <translation type="unfinished">Force Update</translation>
+        <translation>กำลังปรับปรุง</translation>
     </message>
     <message>
         <source>Server update completed</source>
-        <translation type="unfinished">Server update completed</translation>
+        <translation>การอัปเดตเซิร์ฟเวอร์เสร็จสมบูรณ์แล้ว</translation>
     </message>
     <message>
         <source>Update completed</source>
-        <translation type="unfinished">Update completed</translation>
+        <translation>อัปเดตเสร็จสมบูรณ์แล้ว</translation>
     </message>
     <message>
         <source>Update canceled</source>
-        <translation type="unfinished">Update canceled</translation>
+        <translation>ยกเลิกการอัปเดตแล้ว</translation>
     </message>
     <message>
         <source>All Servers already updated</source>
-        <translation type="unfinished">All Servers already updated</translation>
+        <translation>เซิร์ฟเวอร์ทั้งหมดอัปเดตแล้ว</translation>
     </message>
     <message>
         <source>Update failed</source>
-        <translation type="unfinished">Update failed</translation>
+        <translation>การปรับปรุงล้มเหลว</translation>
     </message>
     <message>
         <source>Please update %1 manually using an installation package.</source>
-        <translation type="unfinished">Please update %1 manually using an installation package.</translation>
+        <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
     </message>
     <message>
         <source>%1 will be restarted to the updated version.</source>
-        <translation type="unfinished">%1 will be restarted to the updated version.</translation>
+        <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
     </message>
     <message>
         <source>Update cannot be canceled at this stage</source>
-        <translation type="unfinished">Update cannot be canceled at this stage</translation>
+        <translation>ไม่สามารถยกเลิกการอัปเดตได้ในขั้นตอนนี้</translation>
     </message>
     <message>
         <source>Please wait until it is finished.</source>
-        <translation type="unfinished">Please wait until it is finished.</translation>
+        <translation>โปรดรอจนกว่าจะเสร็จสิ้น</translation>
     </message>
     <message>
         <source>All components in your System are up to date.</source>
-        <translation type="unfinished">All components in your System are up to date.</translation>
+        <translation>ส่วนประกอบทั้งหมดในระบบของคุณเป็นข้อมูลล่าสุด</translation>
     </message>
     <message>
         <source>All components in your System are up to this version.</source>
-        <translation type="unfinished">All components in your System are up to this version.</translation>
+        <translation>คอมโพเนนต์ทั้งหมดในระบบของคุณอยู่ในเวอร์ชันนี้</translation>
     </message>
     <message>
         <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
         <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-        <translation type="unfinished">Incompatible %1 instance. To update disconnect System from %1 first.</translation>
+        <translation>อินสแตนซ์ %1 ที่ไม่สามารถใช้ร่วมกันได้ ในการยกเลิกการเชื่อมต่อระบบจาก %1 ก่อน</translation>
     </message>
 </context>
 <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
         <source>Unsaved changes:</source>
-        <translation type="unfinished">Unsaved changes:</translation>
+        <translation>การเปลี่ยนแปลงที่ไม่ได้บันทึก:</translation>
     </message>
     <message>
         <source>Save changes before exit?</source>
-        <translation type="unfinished">Save changes before exit?</translation>
+        <translation>บันทึกการเปลี่ยนแปลงก่อนออก?</translation>
     </message>
 </context>
 <context>
@@ -5563,8 +5559,7 @@ to %1</translation>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
         <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-        <translation type="unfinished">Html tags could be used within custom text:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
+        <translation>แท็ก HTML สามารถใช้ในข้อความที่กำหนดเอง: &lt;h4&gt; ไฮเปอร์ (h1-h6) &lt;/h4&gt; อาจแตกต่างกันไป &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; และ &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; ข้อความอาจเป็น &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; หรือ &lt;i&gt;italic&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5602,39 +5597,39 @@ to %1</translation>
     </message>
     <message>
         <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-        <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+        <translation>การตรวจจับการเคลื่อนไหวจะทำงานได้ก็ต่อเมื่อมีการดูกล้องเท่านั้น เปิดใช้งานการบันทึกเพื่อให้สามารถทำงานได้ตลอดเวลา</translation>
     </message>
     <message>
         <source>FPS too high</source>
-        <translation type="unfinished">FPS too high</translation>
+        <translation>FPS สูงเกินไป</translation>
     </message>
     <message>
         <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-        <translation type="unfinished">FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</translation>
+        <translation>FPS ในกำหนดการลดลงจาก %1 ถึง %2 ซึ่งเป็นค่าสูงสุดสำหรับกล้องนี้</translation>
     </message>
     <message>
         <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-        <translation type="unfinished">For software motion detection, 2 FPS are reserved for the secondary stream.</translation>
+        <translation>สำหรับการตรวจจับการเคลื่อนไหวของซอฟต์แวร์จะมีการสำรองเฟรม FPS ไว้สำหรับสตรีมทุติยภูมิ</translation>
     </message>
     <message>
         <source>FPS in the schedule was lowered from %1 to %2.</source>
-        <translation type="unfinished">FPS in the schedule was lowered from %1 to %2.</translation>
+        <translation>FPS ในกำหนดการลดลงจาก %1 ถึง %2</translation>
     </message>
     <message>
         <source>Secondary stream disabled for this camera</source>
-        <translation type="unfinished">Secondary stream disabled for this camera</translation>
+        <translation>สตรีมทุติยภูมิปิดใช้งานสำหรับกล้องนี้</translation>
     </message>
     <message>
         <source>Set Recording to &quot;Always&quot;</source>
-        <translation type="unfinished">Set Recording to &quot;Always&quot;</translation>
+        <translation>ตั้งค่าการบันทึกเป็น &quot;Always&quot;</translation>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
-        <translation type="unfinished">Enable Secondary Stream</translation>
+        <translation>เปิดใช้สตรีมรอง</translation>
     </message>
     <message>
         <source>Reset motion regions to default?</source>
-        <translation type="unfinished">Reset motion regions to default?</translation>
+        <translation>รีเซ็ตพื้นที่เคลื่อนไหวเป็นค่าเริ่มต้นหรือไม่</translation>
     </message>
     <message>
         <source>This action cannot be undone.</source>
@@ -5642,7 +5637,7 @@ to %1</translation>
     </message>
     <message>
         <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation type="unfinished">&quot;Motion + Low - Res&quot; recording option cannot be set.</translation>
+        <translation>ไม่สามารถตั้งค่าตัวเลือกการบันทึก &quot;Motion + ต่ำ - Res&quot;</translation>
     </message>
 </context>
 <context>
@@ -5657,11 +5652,11 @@ to %1</translation>
     </message>
     <message>
         <source>SMTP Server</source>
-        <translation type="unfinished">SMTP Server</translation>
+        <translation>เซิร์ฟเวอร์ SMTP</translation>
     </message>
     <message>
         <source>Server cannot be empty.</source>
-        <translation type="unfinished">Server cannot be empty.</translation>
+        <translation>เซิร์ฟเวอร์ต้องไม่ว่างเปล่า</translation>
     </message>
     <message>
         <source>User</source>
@@ -5673,15 +5668,15 @@ to %1</translation>
     </message>
     <message>
         <source>System Signature</source>
-        <translation type="unfinished">System Signature</translation>
+        <translation>ระบบลายเซ็น</translation>
     </message>
     <message>
         <source>Support Signature</source>
-        <translation type="unfinished">Support Signature</translation>
+        <translation>สนับสนุนลายเซ็น</translation>
     </message>
     <message>
         <source>Enter a short System description here.</source>
-        <translation type="unfinished">Enter a short System description here.</translation>
+        <translation>ป้อนคำอธิบายระบบสั้นที่นี่</translation>
     </message>
 </context>
 <context>
@@ -5704,19 +5699,19 @@ to %1</translation>
     </message>
     <message>
         <source>System Signature</source>
-        <translation type="unfinished">System Signature</translation>
+        <translation>ระบบลายเซ็น</translation>
     </message>
     <message>
         <source>Support Signature</source>
-        <translation type="unfinished">Support Signature</translation>
+        <translation>สนับสนุนลายเซ็น</translation>
     </message>
     <message>
         <source>No preset found. Use &quot;Advanced&quot; option.</source>
-        <translation type="unfinished">No preset found. Use &quot;Advanced&quot; option.</translation>
+        <translation>ไม่พบที่ตั้งล่วงหน้า ใช้ตัวเลือก &quot;Advanced&quot;</translation>
     </message>
     <message>
         <source>Enter a short System description here.</source>
-        <translation type="unfinished">Enter a short System description here.</translation>
+        <translation>ป้อนคำอธิบายระบบสั้นที่นี่</translation>
     </message>
 </context>
 <context>
@@ -5727,11 +5722,11 @@ to %1</translation>
     </message>
     <message>
         <source>TLS</source>
-        <translation type="unfinished">TLS</translation>
+        <translation>TLS</translation>
     </message>
     <message>
         <source>SSL</source>
-        <translation type="unfinished">SSL</translation>
+        <translation>SSL</translation>
     </message>
     <message>
         <source>Unsecured</source>
@@ -5747,15 +5742,15 @@ to %1</translation>
     </message>
     <message>
         <source>Connection timed out</source>
-        <translation type="unfinished">Connection timed out</translation>
+        <translation>หมดเวลาการเชื่อมต่อ</translation>
     </message>
     <message>
         <source>Authentication failed</source>
-        <translation type="unfinished">Authentication failed</translation>
+        <translation>รับรองความถูกต้องล้มเหลว</translation>
     </message>
     <message>
         <source>SMTP Error %1</source>
-        <translation type="unfinished">SMTP Error %1</translation>
+        <translation>ข้อผิดพลาด SMTP %1</translation>
     </message>
     <message>
         <source>Network error</source>
@@ -5763,29 +5758,29 @@ to %1</translation>
     </message>
     <message>
         <source>Invalid parameters</source>
-        <translation type="unfinished">Invalid parameters</translation>
+        <translation>พารามิเตอร์ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Cannot perform the test.</source>
-        <translation type="unfinished">Cannot perform the test.</translation>
+        <translation>ไม่สามารถทำการทดสอบได้</translation>
     </message>
     <message>
         <source>No Servers connected to Internet</source>
-        <translation type="unfinished">No Servers connected to Internet</translation>
+        <translation>ไม่มีเซิร์ฟเวอร์เชื่อมต่อกับอินเทอร์เน็ต</translation>
     </message>
 </context>
 <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
         <source>User Input</source>
-        <translation type="unfinished">User Input</translation>
+        <translation>ป้อนข้อมูลผู้ใช้</translation>
     </message>
 </context>
 <context>
     <name>QnSpeedSlider</name>
     <message>
         <source>%1x</source>
-        <translation type="unfinished">%1x</translation>
+        <translation>%1x</translation>
     </message>
     <message>
         <source>Paused</source>
@@ -5796,7 +5791,7 @@ to %1</translation>
     <name>QnStatusOverlayController</name>
     <message>
         <source>NOT ENOUGH LICENCES</source>
-        <translation type="unfinished">NOT ENOUGH LICENCES</translation>
+        <translation>ไม่ได้รับใบอนุญาต</translation>
     </message>
     <message>
         <source>NO DATA</source>
@@ -5804,7 +5799,7 @@ to %1</translation>
     </message>
     <message>
         <source>UNAUTHORIZED</source>
-        <translation type="unfinished">UNAUTHORIZED</translation>
+        <translation>ไม่ได้รับอนุญาต</translation>
     </message>
     <message>
         <source>NO SIGNAL</source>
@@ -5812,15 +5807,15 @@ to %1</translation>
     </message>
     <message>
         <source>SERVER UNAVAILABLE</source>
-        <translation type="unfinished">SERVER UNAVAILABLE</translation>
+        <translation>เซิร์ฟเวอร์ไม่พร้อมใช้งาน</translation>
     </message>
     <message>
         <source>NO ACCESS</source>
-        <translation type="unfinished">NO ACCESS</translation>
+        <translation>ไม่มีการเข้าถึง</translation>
     </message>
     <message>
         <source>DEVICE DISABLED</source>
-        <translation type="unfinished">DEVICE DISABLED</translation>
+        <translation>อุปกรณ์ถูกปิดใช้งาน</translation>
     </message>
     <message>
         <source>Device Settings</source>
@@ -5836,7 +5831,7 @@ to %1</translation>
     </message>
     <message>
         <source>Diagnostics</source>
-        <translation type="unfinished">Diagnostics</translation>
+        <translation>การวินิจฉัย</translation>
     </message>
     <message>
         <source>Enable</source>
@@ -5848,7 +5843,7 @@ to %1</translation>
     </message>
     <message>
         <source>Please check authentication information</source>
-        <translation type="unfinished">Please check authentication information</translation>
+        <translation>โปรดตรวจสอบข้อมูลการตรวจสอบสิทธิ์</translation>
     </message>
 </context>
 <context>
@@ -5876,14 +5871,14 @@ to %1</translation>
     <message numerus="yes">
         <source>%n TB</source>
         <comment>TB - terabytes</comment>
-        <translation type="unfinished">
-            <numerusform>%n TB</numerusform>
+        <translation>
+            <numerusform>%1 Tb</numerusform>
         </translation>
     </message>
     <message>
         <source>TB</source>
         <comment>TB - terabytes</comment>
-        <translation type="unfinished">TB</translation>
+        <translation>เทราไบต์</translation>
     </message>
 </context>
 <context>
@@ -5898,7 +5893,7 @@ to %1</translation>
     </message>
     <message>
         <source>Backup is in progress...</source>
-        <translation type="unfinished">Backup is in progress...</translation>
+        <translation>กำลังดำเนินการสำรองข้อมูล ...</translation>
     </message>
     <message>
         <source>Main</source>
@@ -5910,11 +5905,11 @@ to %1</translation>
     </message>
     <message>
         <source>Add more drives to use them as backup storage.</source>
-        <translation type="unfinished">Add more drives to use them as backup storage.</translation>
+        <translation>เพิ่มไดรฟ์เพื่อใช้เป็นที่เก็บข้อมูลสำรอง</translation>
     </message>
     <message>
         <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-        <translation type="unfinished">Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</translation>
+        <translation>เปลี่ยนบางส่วนของพื้นที่เก็บข้อมูลข้างต้นเพื่อเปิดใช้การสำรองข้อมูล &quot;Main&quot; ถึง &quot;Backup&quot;</translation>
     </message>
     <message>
         <source>Apply changes to start backup.</source>
@@ -6327,15 +6322,15 @@ to %1</translation>
     <name>QnTimeServerSelectionWidget</name>
     <message>
         <source>System time is synchronized with the Internet and is independent from server local times.</source>
-        <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
+        <translation>เวลาของระบบถูกซิงโครไนซ์กับอินเทอร์เน็ตและไม่ขึ้นกับเวลาท้องถิ่นของเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-        <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+        <translation>เวลาระบบถูกซิงโครไนซ์กับเวลาท้องถิ่นของเซิร์ฟเวอร์ที่เลือกและไม่ขึ้นกับเซิร์ฟเวอร์อื่น ๆ</translation>
     </message>
     <message>
         <source>No server has Internet access. Time is not being synchronized.</source>
-        <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
+        <translation>ไม่มีเซิร์ฟเวอร์ที่มีการเข้าถึงอินเทอร์เน็ต เวลาไม่ได้ซิงโครไนซ์</translation>
     </message>
 </context>
 <context>
@@ -6346,72 +6341,72 @@ to %1</translation>
     </message>
     <message>
         <source>No thumbnails available</source>
-        <translation type="unfinished">No thumbnails available</translation>
+        <translation>ไม่มีภาพขนาดย่อ</translation>
     </message>
     <message>
         <source>hh:mm</source>
         <comment>Format for displaying hours and minutes on timeline.</comment>
-        <translation type="unfinished">hh:mm</translation>
+        <translation>HH: mm</translation>
     </message>
     <message>
         <source>h ap</source>
         <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished">h ap</translation>
+        <translation>h ap</translation>
     </message>
     <message>
         <source>dd</source>
         <comment>Format for displaying days on timeline.</comment>
-        <translation type="unfinished">dd</translation>
+        <translation>dd</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <translation type="unfinished">MMMM</translation>
+        <translation>MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <translation type="unfinished">yyyy</translation>
+        <translation>yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+        <translation>dd MMMM yyyy hh: mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+        <translation>dd MMMM yyyy hh: mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy h ap</translation>
+        <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <translation type="unfinished">dd MMMM yyyy</translation>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <translation type="unfinished">MMMM yyyy</translation>
+        <translation>MMMM d, yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <translation type="unfinished">yyyy</translation>
+        <translation>yyyy</translation>
     </message>
     <message>
         <source>h:mm ap</source>
         <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished">h:mm ap</translation>
+        <translation>h: mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
+        <translation>dd MMMM yyyy h: mm ap</translation>
     </message>
 </context>
 <context>
@@ -6429,7 +6424,7 @@ to %1</translation>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Hold to Speak</source>
-        <translation type="unfinished">Hold to Speak</translation>
+        <translation>กดค้างเพื่อพูด</translation>
     </message>
     <message>
         <source>Input device is not selected</source>
@@ -6437,7 +6432,7 @@ to %1</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
-        <translation type="unfinished">Streaming is not ready yet</translation>
+        <translation>การสตรีมยังไม่พร้อม</translation>
     </message>
     <message>
         <source>Network error</source>
@@ -6533,11 +6528,11 @@ to %1</translation>
     </message>
     <message>
         <source>Local user</source>
-        <translation type="unfinished">Local user</translation>
+        <translation>ผู้ใช้ท้องถิ่น</translation>
     </message>
     <message>
         <source>Cloud user</source>
-        <translation type="unfinished">Cloud user</translation>
+        <translation>ผู้ใช้ระบบคลาวด์</translation>
     </message>
     <message>
         <source>Login</source>
@@ -6545,7 +6540,7 @@ to %1</translation>
     </message>
     <message>
         <source>Role</source>
-        <translation type="unfinished">Role</translation>
+        <translation>สิทธิพิเศษ</translation>
     </message>
 </context>
 <context>
@@ -6584,14 +6579,14 @@ to %1</translation>
     </message>
     <message>
         <source>Control Video Walls</source>
-        <translation type="unfinished">Control Video Walls</translation>
+        <translation>ควบคุมภาพวิดีโอผนัง</translation>
     </message>
 </context>
 <context>
     <name>QnUserManagementWidget</name>
     <message>
         <source>Edit</source>
-        <translation type="unfinished">Edit</translation>
+        <translation>แก้ไข</translation>
     </message>
 </context>
 <context>
@@ -6606,7 +6601,7 @@ to %1</translation>
     </message>
     <message>
         <source>Role</source>
-        <translation type="unfinished">Role</translation>
+        <translation>สิทธิพิเศษ</translation>
     </message>
     <message>
         <source>Email</source>
@@ -6617,39 +6612,39 @@ to %1</translation>
     <name>QnUserRoleSettingsWidget</name>
     <message>
         <source>Role name cannot be empty.</source>
-        <translation type="unfinished">Role name cannot be empty.</translation>
+        <translation>ชื่อไม่สามารถเว้นว่างได้</translation>
     </message>
     <message>
         <source>Role with same name already exists.</source>
-        <translation type="unfinished">Role with same name already exists.</translation>
+        <translation>มีบทบาทที่มีชื่อเดียวกันแล้ว</translation>
     </message>
 </context>
 <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
         <source>No users have this role</source>
-        <translation type="unfinished">No users have this role</translation>
+        <translation>ไม่มีผู้ใช้คนนี้มีบทบาทนี้</translation>
     </message>
     <message>
         <source>Custom with no permissions</source>
-        <translation type="unfinished">Custom with no permissions</translation>
+        <translation>กำหนดเองโดยไม่มีสิทธิ์</translation>
     </message>
     <message>
         <source>Users will have no permissions unless changed later.</source>
-        <translation type="unfinished">Users will have no permissions unless changed later.</translation>
+        <translation>ผู้ใช้จะได้ไม่มีสิทธิ์ถ้าการเปลี่ยนแปลงในภายหลัง</translation>
     </message>
     <message>
         <source>Assign a new role</source>
-        <translation type="unfinished">Assign a new role</translation>
+        <translation>กำหนดบทบาทใหม่</translation>
     </message>
     <message>
         <source>Delete such users</source>
-        <translation type="unfinished">Delete such users</translation>
+        <translation>ลบผู้ใช้ดังกล่าว</translation>
     </message>
     <message numerus="yes">
         <source>Please select an action to perform on %n users with this role</source>
-        <translation type="unfinished">
-            <numerusform>Please select an action to perform on %n users with this role</numerusform>
+        <translation>
+            <numerusform>โปรดเลือกการดำเนินการที่จะดำเนินการใน %n ผู้ใช้ที่มีบทบาทนี้</numerusform>
         </translation>
     </message>
 </context>
@@ -6657,7 +6652,7 @@ to %1</translation>
     <name>QnUserRolesDialog</name>
     <message>
         <source>Role Info</source>
-        <translation type="unfinished">Role Info</translation>
+        <translation>ข้อมูลบทบาท</translation>
     </message>
     <message>
         <source>Permissions</source>
@@ -6665,26 +6660,26 @@ to %1</translation>
     </message>
     <message>
         <source>Cameras &amp;&amp; Resources</source>
-        <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+        <translation>กล้องและทรัพยากรทั้งหมด</translation>
     </message>
     <message>
         <source>Layouts</source>
-        <translation type="unfinished">Layouts</translation>
+        <translation>เค้าโครง</translation>
     </message>
     <message>
         <source>New Role</source>
-        <translation type="unfinished">New Role</translation>
+        <translation>บทบาทใหม่</translation>
     </message>
     <message>
         <source>New Role %1</source>
-        <translation type="unfinished">New Role %1</translation>
+        <translation>บทบาทใหม่ %1</translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
         <source>User Information</source>
-        <translation type="unfinished">User Information</translation>
+        <translation>ข้อมูลระบบ</translation>
     </message>
     <message>
         <source>Permissions</source>
@@ -6692,15 +6687,15 @@ to %1</translation>
     </message>
     <message>
         <source>Cameras &amp;&amp; Resources</source>
-        <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+        <translation>กล้องและทรัพยากรทั้งหมด</translation>
     </message>
     <message>
         <source>Layouts</source>
-        <translation type="unfinished">Layouts</translation>
+        <translation>เค้าโครง</translation>
     </message>
     <message>
         <source>Send Invite</source>
-        <translation type="unfinished">Send Invite</translation>
+        <translation>ส่งคำเชิญ</translation>
     </message>
     <message>
         <source>New User...</source>
@@ -6708,11 +6703,11 @@ to %1</translation>
     </message>
     <message>
         <source>User Settings - %1 (readonly)</source>
-        <translation type="unfinished">User Settings - %1 (readonly)</translation>
+        <translation>การตั้งค่าเซิร์ฟเวอร์ - %1 (อ่านได้อย่างเดียว)</translation>
     </message>
     <message>
         <source>User Settings - %1</source>
-        <translation type="unfinished">User Settings - %1</translation>
+        <translation>การตั้งค่าเซิร์ฟเวอร์ - %1</translation>
     </message>
     <message>
         <source>Enabled</source>
@@ -6720,16 +6715,16 @@ to %1</translation>
     </message>
     <message>
         <source>User is disabled</source>
-        <translation type="unfinished">User is disabled</translation>
+        <translation>ผู้ใช้ถูกปิดใช้งาน</translation>
     </message>
     <message>
         <source>Apply changes before switching to another user?</source>
-        <translation type="unfinished">Apply changes before switching to another user?</translation>
+        <translation>ใช้การเปลี่ยนแปลงก่อนเปลี่ยนไปใช้ผู้ใช้รายอื่นหรือไม่?</translation>
     </message>
     <message>
         <source>This user has not yet signed up for %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">This user has not yet signed up for %1</translation>
+        <translation>ผู้ใช้รายนี้ยังไม่ได้สมัคร %1</translation>
     </message>
 </context>
 <context>
@@ -6768,7 +6763,7 @@ to %1</translation>
     </message>
     <message>
         <source>Email cannot be empty.</source>
-        <translation type="unfinished">Email cannot be empty.</translation>
+        <translation>อีเมลต้องไม่ว่างเปล่า</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6776,7 +6771,7 @@ to %1</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished">Confirm Password</translation>
+        <translation>ยืนยันรหัสผ่าน</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
@@ -6784,14 +6779,14 @@ to %1</translation>
     </message>
     <message>
         <source>Cloud user with specified email already exists.</source>
-        <translation type="unfinished">Cloud user with specified email already exists.</translation>
+        <translation>ผู้ใช้ระบบคลาวด์กับอีเมลที่ระบุแล้ว</translation>
     </message>
 </context>
 <context>
     <name>QnValidatorStrings</name>
     <message>
         <source>Email cannot be empty.</source>
-        <translation type="unfinished">Email cannot be empty.</translation>
+        <translation>อีเมลต้องไม่ว่างเปล่า</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
@@ -6803,7 +6798,7 @@ to %1</translation>
     </message>
     <message>
         <source>Avoid leading and trailing spaces.</source>
-        <translation type="unfinished">Avoid leading and trailing spaces.</translation>
+        <translation>หลีกเลี่ยงช่องว่างด้านบนและด้านหลัง</translation>
     </message>
 </context>
 <context>
@@ -6822,11 +6817,11 @@ to %1</translation>
     </message>
     <message>
         <source>Display %1</source>
-        <translation type="unfinished">Display %1</translation>
+        <translation>แสดง %1</translation>
     </message>
     <message>
         <source>Delete &quot;%1&quot;?</source>
-        <translation type="unfinished">Delete &quot;%1&quot;?</translation>
+        <translation>ลบข้อมูลเข้าสู่ระบบ &quot;%1&quot;?</translation>
     </message>
 </context>
 <context>
@@ -6837,13 +6832,13 @@ to %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
-        <translation type="unfinished">PC %1 - Display %2</translation>
+        <translation>PC %1 - แสดงผล %2</translation>
     </message>
     <message numerus="yes">
         <source>PC %1 - Displays %2</source>
         <comment>%2 will be substituted by _list_ of displays</comment>
-        <translation type="unfinished">
-            <numerusform>PC %1 - Displays %2</numerusform>
+        <translation>
+            <numerusform>PC %1 - แสดงผล %2</numerusform>
         </translation>
     </message>
 </context>
@@ -6873,11 +6868,11 @@ to %1</translation>
     </message>
     <message>
         <source>URL cannot be empty.</source>
-        <translation type="unfinished">URL cannot be empty.</translation>
+        <translation>URL ต้องไม่ว่างเปล่า</translation>
     </message>
     <message>
         <source>Wrong URL format.</source>
-        <translation type="unfinished">Wrong URL format.</translation>
+        <translation>รูปแบบ URL ไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>Web Page</source>
@@ -6911,16 +6906,16 @@ to %1</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online Server.</source>
-        <translation type="unfinished">Bookmarks can only be edited on an online Server.</translation>
+        <translation>บุ๊กมาร์กสามารถแก้ไขได้บนเซิร์ฟเวอร์ออนไลน์เท่านั้น</translation>
     </message>
     <message>
         <source>Delete bookmark?</source>
-        <translation type="unfinished">Delete bookmark?</translation>
+        <translation>ลบบุ๊คมาร์ค?</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n bookmarks?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n bookmarks?</numerusform>
+        <translation>
+            <numerusform>ลบบุ๊คมาร์ค %n รายการ?</numerusform>
         </translation>
     </message>
 </context>
@@ -6937,11 +6932,11 @@ to %1</translation>
     <message>
         <source>%1 in %2</source>
         <comment>%1 is user name, %2 is name of system</comment>
-        <translation type="unfinished">%1 in %2</translation>
+        <translation>%1 ใน %2</translation>
     </message>
     <message>
         <source>Could not connect to server. Video Wall will be closed.</source>
-        <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
+        <translation>ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ กำแพงวิดีโอจะถูกปิด</translation>
     </message>
 </context>
 <context>
@@ -6964,7 +6959,7 @@ to %1</translation>
     </message>
     <message>
         <source>Timestamps:</source>
-        <translation type="unfinished">Timestamps:</translation>
+        <translation>ประทับเวลา:</translation>
     </message>
     <message>
         <source>Exporting Video</source>
@@ -6972,7 +6967,7 @@ to %1</translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished">Exporting to &quot;%1&quot;...</translation>
+        <translation>กำลังส่งออกไปที่ &quot;%1&quot; ...</translation>
     </message>
     <message>
         <source>Export Layout As...</source>
@@ -7020,183 +7015,183 @@ to %1</translation>
     </message>
     <message>
         <source>File already used for recording</source>
-        <translation type="unfinished">File already used for recording</translation>
+        <translation>ไฟล์ที่ใช้ในการบันทึกแล้ว</translation>
     </message>
     <message>
         <source>Please choose another name or wait until recording is finished.</source>
-        <translation type="unfinished">Please choose another name or wait until recording is finished.</translation>
+        <translation>โปรดเลือกชื่ออื่นหรือรอจนกว่าการบันทึกจะเสร็จสิ้น</translation>
     </message>
     <message>
         <source>You are about to export a long video</source>
-        <translation type="unfinished">You are about to export a long video</translation>
+        <translation>คุณกำลังจะส่งออกวิดีโอยาว</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-        <translation type="unfinished">It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+        <translation>อาจต้องใช้พื้นที่ฮาร์ดดิสก์กิกะไบต์กิกะไบต์และใช้เวลาหลายนาทีในการดำเนินการ</translation>
     </message>
     <message>
         <source>Export anyway?</source>
-        <translation type="unfinished">Export anyway?</translation>
+        <translation>ส่งออกหรือไม่?</translation>
     </message>
     <message>
         <source>Export to AVI anyway?</source>
-        <translation type="unfinished">Export to AVI anyway?</translation>
+        <translation>ส่งออกไปยัง AVI ได้หรือไม่?</translation>
     </message>
     <message>
         <source>Selected format not recommended</source>
-        <translation type="unfinished">Selected format not recommended</translation>
+        <translation>ไม่แนะนำให้เลือกรูปแบบ</translation>
     </message>
     <message>
         <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-        <translation type="unfinished">To avoid video downscaling, NOV or EXE formats are recommended for this camera.</translation>
+        <translation>เพื่อหลีกเลี่ยงการลดขนาดวิดีโอแนะนำให้ใช้รูปแบบ NOV หรือ EXE สำหรับกล้องนี้</translation>
     </message>
     <message>
         <source>Export with transcoding?</source>
-        <translation type="unfinished">Export with transcoding?</translation>
+        <translation>ส่งออกด้วยการแปลงรหัส?</translation>
     </message>
     <message>
         <source>It will increase CPU usage and may take significant time.</source>
-        <translation type="unfinished">It will increase CPU usage and may take significant time.</translation>
+        <translation>จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
     </message>
     <message>
         <source>EXE format not recommended</source>
-        <translation type="unfinished">EXE format not recommended</translation>
+        <translation>ไม่แนะนำให้เลือกรูปแบบ</translation>
     </message>
     <message>
         <source>Export to EXE anyway?</source>
-        <translation type="unfinished">Export to EXE anyway?</translation>
+        <translation>ส่งออกไปยัง EXE หรือไม่?</translation>
     </message>
     <message>
         <source>Failed to export Multi-Video</source>
-        <translation type="unfinished">Failed to export Multi-Video</translation>
+        <translation>ไม่สามารถส่งออกวิดีโอได้หลายรายการ</translation>
     </message>
     <message>
         <source>Local files not allowed for Multi-Video export</source>
-        <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
+        <translation>ไฟล์ท้องถิ่นไม่ได้รับอนุญาตสำหรับการส่งออกวิดีโอหลายรายการ</translation>
     </message>
     <message>
         <source>Please remove all local files from the layout and try again.</source>
-        <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
+        <translation>โปรดลบไฟล์ในระบบทั้งหมดออกจากเค้าโครงและลองอีกครั้ง</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished">Export</translation>
+        <translation>ส่งออก</translation>
     </message>
     <message>
         <source>You are about to export a lot of video</source>
-        <translation type="unfinished">You are about to export a lot of video</translation>
+        <translation>คุณกำลังจะส่งออกวิดีโอเป็นจำนวนมาก</translation>
     </message>
     <message>
         <source>Too short period selected</source>
-        <translation type="unfinished">Too short period selected</translation>
+        <translation>เลือกระยะเวลาสั้นเกินไป</translation>
     </message>
     <message>
         <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-        <translation type="unfinished">For exporting as Rapid Review, video length should be at least 10 seconds.</translation>
+        <translation>สำหรับการส่งออกเป็น Rapid Review ความยาววิดีโอควรมีอย่างน้อย 10 วินาที</translation>
     </message>
     <message>
         <source>Export completed</source>
-        <translation type="unfinished">Export completed</translation>
+        <translation>การส่งออกเสร็จสมบูรณ์</translation>
     </message>
     <message>
         <source>Failed to export video</source>
-        <translation type="unfinished">Failed to export video</translation>
+        <translation>ไม่สามารถส่งออกวิดีโอ</translation>
     </message>
     <message>
         <source>AVI format is not recommended</source>
-        <translation type="unfinished">AVI format is not recommended</translation>
+        <translation>ไม่แนะนำให้ใช้รูปแบบ AVI</translation>
     </message>
     <message>
         <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-        <translation type="unfinished">For exporting a non-continuous recording MKV or some other format is recommended.</translation>
+        <translation>สำหรับการส่งออก MKV แบบไม่ต่อเนื่องหรือรูปแบบอื่น ๆ แนะนำ</translation>
     </message>
     <message>
         <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-        <translation type="unfinished">EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</translation>
+        <translation>ไฟล์ EXE ที่มากกว่า 4 GB ไม่สามารถเปิดโดยคลิกสองครั้งเนื่องจากมีข้อจำกัดของ Windows</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
         <source>Systems will be merged shortly</source>
-        <translation type="unfinished">Systems will be merged shortly</translation>
+        <translation>ระบบจะรวมในไม่ช้า</translation>
     </message>
     <message>
         <source>Servers from the other System will appear in the resource tree.</source>
-        <translation type="unfinished">Servers from the other System will appear in the resource tree.</translation>
+        <translation>เซิร์ฟเวอร์จากระบบอื่น ๆ จะปรากฏในโครงสร้างข้อมูล</translation>
     </message>
     <message>
         <source>Failed to merge Systems</source>
-        <translation type="unfinished">Failed to merge Systems</translation>
+        <translation>ไม่สามารถผสานรวมระบบ</translation>
     </message>
     <message>
         <source>Failed to update Server</source>
-        <translation type="unfinished">Failed to update Server</translation>
+        <translation>ไม่สามารถอัปเดตเซิร์ฟเวอร์</translation>
     </message>
     <message>
         <source>Total amount of licenses will decrease</source>
-        <translation type="unfinished">Total amount of licenses will decrease</translation>
+        <translation>จำนวนใบอนุญาตจะลดลง</translation>
     </message>
     <message>
         <source>Cloud Systems cannot be merged</source>
-        <translation type="unfinished">Cloud Systems cannot be merged</translation>
+        <translation>ไม่สามารถผสานระบบคลาวด์</translation>
     </message>
     <message>
         <source>Connecting to the current System...</source>
-        <translation type="unfinished">Connecting to the current System...</translation>
+        <translation>กำลังเชื่อมต่อกับระบบปัจจุบัน ...</translation>
     </message>
     <message>
         <source>It will appear in the resource tree when the database synchronization is finished.</source>
-        <translation type="unfinished">It will appear in the resource tree when the database synchronization is finished.</translation>
+        <translation>จะปรากฏในโครงสร้างข้อมูลเมื่อการซิงโครไนซ์ฐานข้อมูลเสร็จสิ้น</translation>
     </message>
     <message>
         <source>Server will be connected to System shortly</source>
-        <translation type="unfinished">Server will be connected to System shortly</translation>
+        <translation>เซิร์ฟเวอร์จะเชื่อมต่อกับระบบในไม่ช้า</translation>
     </message>
     <message>
         <source>Enter password...</source>
-        <translation type="unfinished">Enter password...</translation>
+        <translation>ใส่รหัสผ่าน...</translation>
     </message>
     <message>
         <source>Administrator password</source>
-        <translation type="unfinished">Administrator password</translation>
+        <translation>รหัสผ่านผู้ดูแลระบบ</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
         <source>The following %n items are not saved:</source>
-        <translation type="unfinished">
-            <numerusform>The following %n items are not saved:</numerusform>
+        <translation>
+            <numerusform>ไม่ได้บันทึกรายการต่อไปนี้ %n รายการ:</numerusform>
         </translation>
     </message>
     <message>
         <source>Changing System configuration not allowed in Safe Mode</source>
-        <translation type="unfinished">Changing System configuration not allowed in Safe Mode</translation>
+        <translation>การเปลี่ยนการกำหนดค่าระบบที่ไม่ได้รับอนุญาตในเซฟโหมด</translation>
     </message>
     <message>
         <source>Failed to save changes</source>
-        <translation type="unfinished">Failed to save changes</translation>
+        <translation>ไม่สามารถบันทึกการเปลี่ยนแปลงได้</translation>
     </message>
     <message numerus="yes">
         <source>The following %n items are not deleted:</source>
-        <translation type="unfinished">
-            <numerusform>The following %n items are not deleted:</numerusform>
+        <translation>
+            <numerusform>รายการต่อไปนี้ %n จะไม่ถูกลบ:</numerusform>
         </translation>
     </message>
     <message>
         <source>Deleting objects not allowed in Safe Mode</source>
-        <translation type="unfinished">Deleting objects not allowed in Safe Mode</translation>
+        <translation>การลบวัตถุที่ไม่ได้รับอนุญาตในเซฟโหมด</translation>
     </message>
     <message numerus="yes">
         <source>Failed to delete %n items:</source>
-        <translation type="unfinished">
-            <numerusform>Failed to delete %n items:</numerusform>
+        <translation>
+            <numerusform>ไม่สามารถลบ %n รายการ:</numerusform>
         </translation>
     </message>
     <message>
         <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
-        <translation type="unfinished">System is in Safe Mode. It is not allowed to make any changes except license activation.</translation>
+        <translation>ระบบในเซฟโหมดได้ ไม่อนุญาตการเปลี่ยนแปลงใด ๆ ยกเว้นการเปิดใช้งานสิทธิ์การใช้งาน</translation>
     </message>
 </context>
 <context>
@@ -7214,7 +7209,7 @@ to %1</translation>
     </message>
     <message>
         <source>Recording in %1...</source>
-        <translation type="unfinished">Recording in %1...</translation>
+        <translation>กำลังบันทึกใน %1 ...</translation>
     </message>
     <message>
         <source>Recorded Video</source>
@@ -7230,7 +7225,7 @@ to %1</translation>
     </message>
     <message>
         <source>Failed to start recording</source>
-        <translation type="unfinished">Failed to start recording</translation>
+        <translation>ไม่สามารถเริ่มบันทึกได้</translation>
     </message>
 </context>
 <context>
@@ -7281,11 +7276,11 @@ to %1</translation>
     </message>
     <message>
         <source>Failed to save screenshot</source>
-        <translation type="unfinished">Failed to save screenshot</translation>
+        <translation>ไม่สามารถบันทึกภาพหน้าจอ</translation>
     </message>
     <message>
         <source>Failed to take screenshot</source>
-        <translation type="unfinished">Failed to take screenshot</translation>
+        <translation>ไม่สามารถใช้ภาพหน้าจอ</translation>
     </message>
 </context>
 <context>
@@ -7296,11 +7291,11 @@ to %1</translation>
     </message>
     <message>
         <source>%1 version available</source>
-        <translation type="unfinished">%1 version available</translation>
+        <translation>มีเวอร์ชัน %1</translation>
     </message>
     <message>
         <source>Major issues have been fixed. Update is strongly recommended.</source>
-        <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
+        <translation>ประเด็นสำคัญได้รับการแก้ไขแล้ว ขอแนะนำอย่างยิ่ง</translation>
     </message>
     <message>
         <source>Update...</source>
@@ -7308,7 +7303,7 @@ to %1</translation>
     </message>
     <message>
         <source>Do not notify again about this update</source>
-        <translation type="unfinished">Do not notify again about this update</translation>
+        <translation>อย่าแจ้งให้ทราบอีกครั้งเกี่ยวกับการอัปเดตนี้</translation>
     </message>
 </context>
 <context>
@@ -7331,33 +7326,33 @@ to %1</translation>
     </message>
     <message>
         <source>Video Wall license required</source>
-        <translation type="unfinished">Video Wall license required</translation>
+        <translation>ใบอนุญาตผนังวิดีโอที่จำเป็น</translation>
     </message>
     <message>
         <source>To enable this feature, please activate a Video Wall license.</source>
-        <translation type="unfinished">To enable this feature, please activate a Video Wall license.</translation>
+        <translation>หากต้องการเปิดใช้งานคุณลักษณะนี้โปรดเปิดใช้งานใบอนุญาตสำหรับวิดีโอวอลล์</translation>
     </message>
     <message>
         <source>Failed to apply changes</source>
-        <translation type="unfinished">Failed to apply changes</translation>
+        <translation>ไม่สามารถใช้การเปลี่ยนแปลงได้</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate a Video Wall license.</source>
-        <translation type="unfinished">To enable Video Wall, please activate a Video Wall license.</translation>
+        <translation>หากต้องการเปิดใช้งาน Video Wall โปรดเปิดใช้งานใบอนุญาต Video Wall</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n items?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n items?</numerusform>
+        <translation>
+            <numerusform>ลบ %n รายการหรือไม่?</numerusform>
         </translation>
     </message>
     <message>
         <source>Stop Video Wall?</source>
-        <translation type="unfinished">Stop Video Wall?</translation>
+        <translation>หยุดกำแพงวิดีโอหรือไม่?</translation>
     </message>
     <message>
         <source>To start it again, you should have physical access to its computer.</source>
-        <translation type="unfinished">To start it again, you should have physical access to its computer.</translation>
+        <translation>ในการเริ่มต้นใหม่อีกครั้งคุณควรเข้าถึงทางกายภาพกับคอมพิวเตอร์</translation>
     </message>
     <message>
         <source>Stop</source>
@@ -7365,130 +7360,130 @@ to %1</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n matrices?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n matrices?</numerusform>
+        <translation>
+            <numerusform>ลบเมทริกซ์ %n หรือไม่?</numerusform>
         </translation>
     </message>
     <message>
         <source>More Video Wall licenses required</source>
-        <translation type="unfinished">More Video Wall licenses required</translation>
+        <translation>ใบอนุญาตผนังวิดีโอที่จำเป็น</translation>
     </message>
     <message>
         <source>Control session cannot be started.</source>
-        <translation type="unfinished">Control session cannot be started.</translation>
+        <translation>ไม่สามารถเริ่มเซสชันควบคุมได้</translation>
     </message>
     <message>
         <source>Cannot save empty matrix</source>
-        <translation type="unfinished">Cannot save empty matrix</translation>
+        <translation>ไม่สามารถบันทึกเมทริกซ์ว่างได้</translation>
     </message>
     <message>
         <source>Screen is being controlled by another user</source>
-        <translation type="unfinished">Screen is being controlled by another user</translation>
+        <translation>หน้าจอกำลังควบคุมโดยผู้ใช้รายอื่น</translation>
     </message>
     <message>
         <source>Activate one more license to start Video Wall control session.</source>
-        <translation type="unfinished">Activate one more license to start Video Wall control session.</translation>
+        <translation>เปิดใช้งานใบอนุญาตอีกหนึ่งใบเพื่อเริ่มต้นเซ็ตอัพ Video Wall</translation>
     </message>
     <message>
         <source>Enter the name of Video Wall to create:</source>
-        <translation type="unfinished">Enter the name of Video Wall to create:</translation>
+        <translation>ใส่ชื่อของจอแสดงผล ของการสร้าง:</translation>
     </message>
     <message>
         <source>Activate one more license to start Video Wall.</source>
-        <translation type="unfinished">Activate one more license to start Video Wall.</translation>
+        <translation>เปิดใช้งานสิทธิ์การใช้งานเพิ่มเติมหนึ่งเริ่มวิดีโอวอลล์</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
         <source>New Web Page</source>
-        <translation type="unfinished">New Web Page</translation>
+        <translation>หน้าเว็บใหม่</translation>
     </message>
     <message>
         <source>Edit Web Page</source>
-        <translation type="unfinished">Edit Web Page</translation>
+        <translation>แก้ไขเว็บเพจ</translation>
     </message>
 </context>
 <context>
     <name>Resources</name>
     <message>
         <source>There is another layout with the same name</source>
-        <translation type="unfinished">There is another layout with the same name</translation>
+        <translation>มีรูปแบบอื่นที่มีชื่อเดียวกัน</translation>
     </message>
     <message>
         <source>You do not have permission to overwrite it.</source>
-        <translation type="unfinished">You do not have permission to overwrite it.</translation>
+        <translation>คุณไม่มีสิทธิ์ในการแก้ไข</translation>
     </message>
     <message>
         <source>Overwrite existing layout?</source>
-        <translation type="unfinished">Overwrite existing layout?</translation>
+        <translation>เขียนทับโครงร่างที่มีอยู่หรือไม่?</translation>
     </message>
     <message>
         <source>There is another layout with the same name.</source>
-        <translation type="unfinished">There is another layout with the same name.</translation>
+        <translation>มีรูปแบบอื่นที่มีชื่อเดียวกัน</translation>
     </message>
     <message numerus="yes">
         <source>User will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform>User will still have access to %n removed resources:</numerusform>
+        <translation>
+            <numerusform>ผู้ใช้ยังคงสามารถเข้าถึงแหล่งข้อมูลที่ถูกลบออกได้ %n:</numerusform>
         </translation>
     </message>
     <message>
         <source>To remove access, please go to User Settings.</source>
-        <translation type="unfinished">To remove access, please go to User Settings.</translation>
+        <translation>หากต้องการนำสิทธิ์การเข้าถึงออกโปรดไปที่การตั้งค่าของผู้ใช้</translation>
     </message>
     <message numerus="yes">
         <source>All users with this role will get access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will get access to %n resources:</numerusform>
+        <translation>
+            <numerusform>ผู้ใช้ทั้งหมดที่มีบทบาทนี้จะได้รับสิทธิ์เข้าถึงแหล่งข้อมูล %n:</numerusform>
         </translation>
     </message>
     <message>
         <source>To remove access, please go to Role Settings.</source>
-        <translation type="unfinished">To remove access, please go to Role Settings.</translation>
+        <translation>หากต้องการนำสิทธิ์การเข้าถึงออกโปรดไปที่การตั้งค่าบทบาท</translation>
     </message>
     <message numerus="yes">
         <source>All users with this role will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+        <translation>
+            <numerusform>ผู้ใช้ทั้งหมดที่มีบทบาทนี้จะยังสามารถเข้าถึงทรัพยากรที่ถูกนำออก %n:</numerusform>
         </translation>
     </message>
     <message>
         <source>Changes will affect other users</source>
-        <translation type="unfinished">Changes will affect other users</translation>
+        <translation>การเปลี่ยนแปลงจะมีผลต่อผู้ใช้รายอื่น</translation>
     </message>
     <message>
         <source>This layout is shared with other users, so you change it for them too.</source>
-        <translation type="unfinished">This layout is shared with other users, so you change it for them too.</translation>
+        <translation>เค้าโครงนี้แชร์กับผู้ใช้คนอื่น ๆ ดังนั้นคุณจึงต้องเปลี่ยนให้เหมาะกับพวกเขาด้วย</translation>
     </message>
     <message numerus="yes">
         <source>User will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>User will lose access to %n resources:</numerusform>
+        <translation>
+            <numerusform>ผู้ใช้จะสูญเสียสิทธิ์การเข้าถึงทรัพยากร %n:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>All users with this role will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <translation>
+            <numerusform>ผู้ใช้ทั้งหมดที่มีบทบาทนี้จะไม่สามารถเข้าถึงทรัพยากร %n:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n shared layouts?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n shared layouts?</numerusform>
+        <translation>
+            <numerusform>ลบ %n รูปแบบที่ใช้ร่วมกันหรือไม่?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-        <translation type="unfinished">
-            <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+        <translation>
+            <numerusform>รูปแบบ %n เหล่านี้ถูกแชร์กับผู้ใช้คนอื่น ๆ ดังนั้นคุณจึงลบรูปแบบเหล่านี้ด้วย</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Remove %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform>Remove %n items from layout?</numerusform>
+        <translation>
+            <numerusform>นำ %n รายการออกจากเค้าโครงหรือไม่?</numerusform>
         </translation>
     </message>
     <message>
@@ -7497,16 +7492,16 @@ to %1</translation>
     </message>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-        <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+        <translation>คุณกำลังจะลบทรัพยากรบางอย่างที่คุณเข้าจากผนังวิดีโอเท่านั้น คุณจะมองไม่เห็นในรายการของทรัพยากรหลังจากมัน และจะไม่สามารถเพิ่มลงในวิดีโอวอลล์อีกครั้ง</translation>
     </message>
     <message>
         <source>You will lose access to following resources:</source>
-        <translation type="unfinished">You will lose access to following resources:</translation>
+        <translation>คุณจะสูญเสียการเข้าถึงแหล่งข้อมูลต่อไปนี้:</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n users?</source>
-        <translation type="unfinished">
-            <numerusform>Delete %n users?</numerusform>
+        <translation>
+            <numerusform>ลบ %n ผู้ใช้หรือไม่?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7685,7 +7680,7 @@ to %1</translation>
     </message>
     <message>
         <source>Start Showreel</source>
-        <translation>เริ่ม Showreel</translation>
+        <translation type="unfinished">Start Showreel</translation>
     </message>
     <message>
         <source>Stop Tour</source>
@@ -7855,7 +7850,7 @@ to %1</translation>
     </message>
     <message>
         <source>Confirm files deleting</source>
-        <translation type="unfinished">Confirm files deleting</translation>
+        <translation>ยืนยันการลบไฟล์</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
@@ -7865,7 +7860,7 @@ to %1</translation>
     </message>
     <message>
         <source>There is another user with the same name</source>
-        <translation type="unfinished">There is another user with the same name</translation>
+        <translation>มีผู้ใช้รายอื่นที่มีชื่อเดียวกัน</translation>
     </message>
     <message>
         <source>Rename</source>
@@ -7885,15 +7880,15 @@ to %1</translation>
     </message>
     <message>
         <source>Image too big</source>
-        <translation type="unfinished">Image too big</translation>
+        <translation>ภาพใหญ่เกินไป</translation>
     </message>
     <message>
         <source>Maximum size is %1 MB.</source>
-        <translation type="unfinished">Maximum size is %1 MB.</translation>
+        <translation>ขนาดสูงสุดคือ %1 MB</translation>
     </message>
     <message>
         <source>Failed to upload image</source>
-        <translation type="unfinished">Failed to upload image</translation>
+        <translation>อัปโหลดภาพไม่สำเร็จ</translation>
     </message>
     <message>
         <source>Client</source>
@@ -7905,11 +7900,11 @@ to %1</translation>
     </message>
     <message>
         <source>Please update all components to the version %1</source>
-        <translation type="unfinished">Please update all components to the version %1</translation>
+        <translation>โปรดอัปเดตคอมโพเนนต์ทั้งหมดเป็นเวอร์ชัน %1</translation>
     </message>
     <message>
         <source>Components of System have different versions:</source>
-        <translation type="unfinished">Components of System have different versions:</translation>
+        <translation>ส่วนประกอบของระบบมีเวอร์ชันต่างกัน:</translation>
     </message>
     <message>
         <source>Update...</source>
@@ -7917,7 +7912,7 @@ to %1</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished">Skip</translation>
+        <translation>ข้าม</translation>
     </message>
     <message>
         <source>Beta version %1</source>
@@ -7925,30 +7920,30 @@ to %1</translation>
     </message>
     <message>
         <source>Some functionality may be unavailable or not working properly.</source>
-        <translation type="unfinished">Some functionality may be unavailable or not working properly.</translation>
+        <translation>ฟังก์ชันการทำงานบางอย่างอาจใช้ไม่ได้หรือทำงานไม่ถูกต้อง</translation>
     </message>
     <message>
         <source>System sends anonymous usage statistics</source>
-        <translation type="unfinished">System sends anonymous usage statistics</translation>
+        <translation>ระบบจะส่งสถิติการใช้งานที่ไม่ระบุตัวตน</translation>
     </message>
     <message>
         <source>It will be used by software development team to improve your user experience.</source>
-        <translation type="unfinished">It will be used by software development team to improve your user experience.</translation>
+        <translation>จะใช้โดยทีมพัฒนาซอฟต์แวร์เพื่อปรับปรุงประสบการณ์การใช้งานของคุณ</translation>
     </message>
     <message>
         <source>To disable it, go to System Administration dialog.</source>
-        <translation type="unfinished">To disable it, go to System Administration dialog.</translation>
+        <translation>หากต้องการปิดใช้งานให้ไปที่กล่องโต้ตอบการจัดการระบบ</translation>
     </message>
     <message>
         <source>Failed to open server web page</source>
-        <translation type="unfinished">Failed to open server web page</translation>
+        <translation>ไม่สามารถเปิดเว็บเซิร์ฟเวอร์ได้</translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
         <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-        <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+        <translation>ใช้ลูกศรบนแป้นพิมพ์เพื่อเปลี่ยนรูปแบบ เมื่อต้องการออกจาก showreel ให้กด Esc</translation>
     </message>
     <message>
         <source>Press any key to stop the tour.</source>
@@ -7959,22 +7954,22 @@ to %1</translation>
     <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
     <message>
         <source>Switch by %1</source>
-        <translation type="unfinished">Switch by %1</translation>
+        <translation>เปลี่ยนโดย %1</translation>
     </message>
     <message>
         <source>Display for</source>
-        <translation type="unfinished">Display for</translation>
+        <translation>แสดงผลสำหรับ</translation>
     </message>
     <message>
         <source>Display selected for</source>
-        <translation type="unfinished">Display selected for</translation>
+        <translation>เลือกรายการที่เลือกไว้แล้ว</translation>
     </message>
 </context>
 <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
         <source>Delete layout tour %1?</source>
-        <translation type="unfinished">Delete layout tour %1?</translation>
+        <translation>ลบทัวร์เค้าโครง %1 หรือไม่?</translation>
     </message>
     <message>
         <source>Showreel</source>
@@ -7982,7 +7977,7 @@ to %1</translation>
     </message>
     <message>
         <source>Showreel %1</source>
-        <translation type="unfinished">Showreel %1</translation>
+        <translation>Showreel %1</translation>
     </message>
 </context>
 <context>

@@ -510,7 +510,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Show </source>
-      <translation>Toon</translation>
+      <translation>Toon </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
