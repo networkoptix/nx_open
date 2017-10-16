@@ -57,43 +57,26 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
     const auto hanwhaSpeed = toHanwhaSpeed(speed);
 
     std::map<QString, QString> params;
-    auto addParam = [&](const QString& paramName, float value)
+    auto addIfNeed = [&](const QString& paramName, float value)
     {
-        params.emplace(paramName, QString::number((int)value));
+        if (!qFuzzyEquals(value, m_lastParamValue[paramName]))
+            params.emplace(paramName, QString::number((int)value));
+        m_lastParamValue[paramName] = value;
     };
 
     params.emplace(kHanwhaChannelProperty, channel());
     if (m_ptzTraits.contains(QnPtzAuxilaryTrait(HanwhaResource::kNormalizedSpeedPtzTrait)))
         params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
 
-    const bool isPanTilt = !qFuzzyIsNull(hanwhaSpeed.x()) || !qFuzzyIsNull(hanwhaSpeed.y());
-    if (isPanTilt || m_lastPanTilt)
-    {
-        addParam(kHanwhaPanProperty, hanwhaSpeed.x());
-        addParam(kHanwhaTiltProperty, hanwhaSpeed.y());
-        const auto response = helper.control(
-            lit("ptzcontrol/continuous"),
-            params);
+    addIfNeed(kHanwhaPanProperty, hanwhaSpeed.x());
+    addIfNeed(kHanwhaTiltProperty, hanwhaSpeed.y());
+    addIfNeed(kHanwhaZoomProperty, hanwhaSpeed.z());
 
-        if (!response.isSuccessful())
-            return false;
-    }
-    m_lastPanTilt = isPanTilt;
-    
-    const bool isZoom = !qFuzzyIsNull(hanwhaSpeed.z());
-    if (isZoom || m_lastZoom)
-    {
-        addParam(kHanwhaZoomProperty, hanwhaSpeed.z());
-        const auto response = helper.control(
-            lit("ptzcontrol/continuous"),
-            params);
+    const auto response = helper.control(
+        lit("ptzcontrol/continuous"),
+        params);
 
-        if (!response.isSuccessful())
-            return false;
-    }
-    m_lastZoom = isZoom;
-
-    return true;
+    return response.isSuccessful();
 }
 
 bool HanwhaPtzController::continuousFocus(qreal speed)
