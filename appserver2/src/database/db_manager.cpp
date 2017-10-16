@@ -604,7 +604,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
                     return false;
             }
-            
+
             if (m_resyncFlags.testFlag(ResyncUserAccessRights))
             {
                 if (!rebuildUserAccessRightsTransactions())
@@ -612,7 +612,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
                     return false;
             }
-            
+
             if (m_resyncFlags.testFlag(ResyncUserAccessRights))
             {
                 if (!rebuildUserAccessRightsTransactions())
@@ -1613,7 +1613,7 @@ bool QnDbManager::fixDefaultBusinessRuleGuids()
     {
         auto oldValue = itr.key();
         auto newValue = itr.value();
-        
+
         query.addBindValue(QnSql::serialized_field(newValue));
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
@@ -2751,7 +2751,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     const QByteArray userOrRoleId = data.userId.toRfc4122();
 
     QString insertQueryString = R"(
-            INSERT OR REPLACE 
+            INSERT OR REPLACE
             INTO vms_access_rights
             (userOrRoleId, resourceIds)
             values
@@ -2762,7 +2762,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     insertQuery.setForwardOnly(true);
     if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    
+
     insertQuery.addBindValue(QnSql::serialized_field(data.userId));
     insertQuery.addBindValue(QnUbjson::serialized(data.resourceIds));
 
@@ -4706,12 +4706,12 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
             return false;
         }
 
-        if (abstractTran.command == ApiCommand::removeAccessRights 
+        if (abstractTran.command == ApiCommand::removeAccessRights
             || abstractTran.command == ApiCommand::setAccessRights)
         {
             recordsToDelete << tranGuid;
         }
-        else if (abstractTran.command == ApiCommand::removeUser 
+        else if (abstractTran.command == ApiCommand::removeUser
             || abstractTran.command == ApiCommand::removeUserRole)
         {
             ApiIdData data;
@@ -4723,7 +4723,7 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
             recordsToAdd << data;
         }
     }
-    
+
     for (const auto& data: recordsToDelete)
     {
         QSqlQuery delQuery(m_sdb);
