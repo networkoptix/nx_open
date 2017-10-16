@@ -61,27 +61,16 @@ HanwhaTimeSyncronizer::~HanwhaTimeSyncronizer()
     promise.get_future().wait();
 }
 
-void HanwhaTimeSyncronizer::start(const QAuthenticator& auth, const QUrl& url)
+void HanwhaTimeSyncronizer::start(HanwhaResourcePtr resource)
 {
     utils::promise<void> promise;
     m_timer.post(
-        [this, auth, url, &promise]() mutable
+        [this, resource, &promise]() mutable
         {
-            if (m_url != url || m_auth != auth)
-            {
-                m_auth = std::move(auth);
-                m_url = std::move(url);
-                m_timer.cancelSync();
-                m_startPromises.push_back(&promise);
-                verifyDateTime();
-            }
-            else
-            {
-                if (m_startPromises.empty())
-                    m_startPromises.push_back(&promise); //< Start as in progress, wait for it.
-                else
-                    promise.set_value(); //< Nothing to wait.
-            }
+            m_resource = resource;
+            m_timer.cancelSync();
+            m_startPromises.push_back(&promise);
+            verifyDateTime();
         });
 
     promise.get_future().wait();
@@ -105,6 +94,9 @@ void HanwhaTimeSyncronizer::verifyDateTime()
         [this](HanwhaResponse response)
         {
             const auto promiseGuard = makeScopeGuard([this](){ fireStartPromises(); });
+            if (!response.isSuccessful())
+                return retryVerificationIn(kRetryInterval);
+
             try
             {
                 const auto utcDateTime = toUtcDateTime(response.getOrThrow("UTCTime"));
@@ -164,8 +156,11 @@ void HanwhaTimeSyncronizer::setDateTime(const QDateTime& dateTime)
 
     NX_VERBOSE(this, lm("Setting %1").container(params));
     doRequest(lit("set"), std::move(params), /*isList*/ false,
-        [this, utc](HanwhaResponse /*response*/)
+        [this, utc](HanwhaResponse response)
         {
+            if (!response.isSuccessful())
+                return retryVerificationIn(kRetryInterval);
+
             NX_DEBUG(this, lm("Time is succesfully syncronized to %1").arg(utc));
             retryVerificationIn(kResyncInterval);
         });
@@ -173,7 +168,7 @@ void HanwhaTimeSyncronizer::setDateTime(const QDateTime& dateTime)
 
 void HanwhaTimeSyncronizer::retryVerificationIn(std::chrono::milliseconds timeout)
 {
-    if (!m_url.isValid())
+    if (!m_resource)
         return;
 
     const auto verify = [this](){ verifyDateTime(); };
@@ -203,19 +198,21 @@ void HanwhaTimeSyncronizer::doRequest(
     const QString& action, std::map<QString, QString> params,
     bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler)
 {
+    const auto auth = m_resource->getAuth();
     const auto url = HanwhaRequestHelper::buildRequestUrl(
-        m_url, lit("system"), lit("date"), action, params);
+        m_resource->getUrl(), lit("system"), lit("date"), action, params);
 
     m_httpClient.pleaseStopSync();
-    m_httpClient.setUserName(m_auth.user());
-    m_httpClient.setUserPassword(m_auth.password());
+    m_httpClient.setUserName(auth.user());
+    m_httpClient.setUserPassword(auth.password());
     m_httpClient.doGet(url,
         [this, url, isList, handler = std::move(handler)]()
         {
             if (!m_httpClient.hasRequestSuccesed())
             {
                 NX_DEBUG(this, lm("Failed request: %1").arg(url));
-                return retryVerificationIn(kRetryInterval);
+                return handler(HanwhaResponse(
+                    nx_http::StatusCode::serviceUnavailable, url.toString()));
             }
 
             auto body = m_httpClient.fetchMessageBodyBuffer();
