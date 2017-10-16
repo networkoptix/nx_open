@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <common/common_globals.h>
 #include <core/resource/camera_advanced_param.h> 
 
@@ -71,3 +73,6 @@ private:
 } // namespace plugins
 } // namespace meduiaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)
+

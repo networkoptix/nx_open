@@ -37,6 +37,8 @@ public:
 
     void submitToResource();
 
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
 signals:
     void hasChangesChanged();
 

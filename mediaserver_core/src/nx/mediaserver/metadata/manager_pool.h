@@ -7,7 +7,6 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <common/common_module.h>
 #include <common/common_module_aware.h>
 #include <utils/common/connective.h>
 
@@ -18,6 +17,8 @@
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
+
+class QnMediaServerModule;
 
 namespace nx {
 namespace mediaserver {
@@ -39,16 +40,16 @@ public:
     std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
 };
 
-class ManagerPool: 
-    public Connective<QObject>,
-    public QnCommonModuleAware
+class ManagerPool final: 
+    public Connective<QObject>
 {
     using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
     using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
 
     Q_OBJECT
 public:
-    ManagerPool(QnCommonModule* commonModule);
+    ManagerPool(QnMediaServerModule* commonModule);
+    ~ManagerPool();
     void init();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
@@ -106,6 +107,7 @@ private:
 
 private:
     ResourceMetadataContextMap m_contexts;
+    QnMediaServerModule* m_serverModule;
 };
 
 } // namespace metadata

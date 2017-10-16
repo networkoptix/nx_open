@@ -33,7 +33,7 @@ inline size_t testClientCount()
 
 static const bool kEnableTestDebugOutput = false;
 template<typename Message>
-static void testDebugOutput(const Message& message)
+static inline void testDebugOutput(const Message& message)
 {
     if (kEnableTestDebugOutput)
         NX_LOG(lm("nx::network::test: %1").arg(message), cl_logDEBUG1);
@@ -491,7 +491,7 @@ void socketTransferAsync(
 }
 
 template<typename Sender, typename Receiver>
-void transferSyncAsync(Sender* sender, Receiver* receiver)
+inline void transferSyncAsync(Sender* sender, Receiver* receiver)
 {
     ASSERT_EQ(sender->AbstractCommunicatingSocket::send(kTestMessage), kTestMessage.size()) << SystemError::getLastOSErrorText().toStdString();
 
@@ -513,7 +513,7 @@ void transferSyncAsync(Sender* sender, Receiver* receiver)
 }
 
 template<typename Sender, typename Receiver>
-static void transferAsyncSync(Sender* sender, Receiver* receiver)
+static inline void transferAsyncSync(Sender* sender, Receiver* receiver)
 {
     nx::utils::promise<void> promise;
     sender->sendAsync(
@@ -532,7 +532,7 @@ static void transferAsyncSync(Sender* sender, Receiver* receiver)
 }
 
 template<typename Sender, typename Receiver>
-static void transferSync(Sender* sender, Receiver* receiver)
+static inline void transferSync(Sender* sender, Receiver* receiver)
 {
     ASSERT_EQ(sender->AbstractCommunicatingSocket::send(kTestMessage), kTestMessage.size()) << SystemError::getLastOSErrorText().toStdString();
 
@@ -541,7 +541,7 @@ static void transferSync(Sender* sender, Receiver* receiver)
 }
 
 template<typename Sender, typename Receiver>
-static void transferAsync(Sender* sender, Receiver* receiver)
+static inline void transferAsync(Sender* sender, Receiver* receiver)
 {
     nx::utils::promise<void> sendPromise;
     sender->sendAsync(

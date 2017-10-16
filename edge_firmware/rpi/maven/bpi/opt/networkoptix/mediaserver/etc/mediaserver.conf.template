@@ -5,7 +5,7 @@ minStorageSpace=1000000000
 port=7001
 resourceInitThreadsCount=8
 allowSslConnections=true
-logLevel=ALWAYS
+logLevel=INFO
 statisticsReportAllowed=true
 hlsTargetDurationMS=3000
 

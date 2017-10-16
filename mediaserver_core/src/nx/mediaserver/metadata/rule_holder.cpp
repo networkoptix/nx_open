@@ -4,12 +4,28 @@
 #include <algorithm>
 
 #include <nx/vms/event/rule.h>
+#include <plugins/plugin_internal_tools.h>
+#include <core/resource/security_cam_resource.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
+namespace {
+
+static const QnUuid kInputPortAnalyticsEventId =
+    QnUuid(lit("{dda94af6-c699-4b33-acfb-a164830430e7}"));
+
+} // namespace
+
 using namespace nx::vms;
+
+RuleHolder::RuleHolder(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
 
 std::set<QnUuid> RuleHolder::addRule(const nx::vms::event::RulePtr& rule)
 {
@@ -35,7 +51,7 @@ std::set<QnUuid> RuleHolder::updateRule(const nx::vms::event::RulePtr& rule)
     if (!watched && analyticsSdkEventRule && !disabled)
         return addRuleUnsafe(rule);
 
-    auto eventTypeId = rule->eventParams().analyticsEventId();
+    auto eventTypeId = analyticsEventIdFromRule(rule);
     bool eventIsTheSame = m_ruleEventMap[ruleId] == eventTypeId;
 
     // Change rule event id
@@ -126,7 +142,7 @@ std::set<QnUuid> RuleHolder::resetRules(const nx::vms::event::RuleList& rules)
         for (const auto& res : ruleResources)
         {
             auto& resourceEvents = m_resourceEventMap[res];
-            auto eventTypeId = rule->eventParams().analyticsEventId();
+            auto eventTypeId = analyticsEventIdFromRule(rule);
 
             m_resourceRuleMap[res].insert(ruleId);
             m_ruleEventMap[ruleId] = eventTypeId;
@@ -174,7 +190,7 @@ std::set<QnUuid> RuleHolder::addRuleUnsafe(const nx::vms::event::RulePtr& rule)
     for (const auto& res : ruleResources)
     {
         auto& resourceEvents = m_resourceEventMap[res];
-        auto eventTypeId = rule->eventParams().analyticsEventId();
+        auto eventTypeId = analyticsEventIdFromRule(rule);
 
         m_resourceRuleMap[res].insert(ruleId);
         m_ruleEventMap[ruleId] = eventTypeId;
@@ -223,7 +239,32 @@ bool RuleHolder::isRuleBeingWatched(const QnUuid& ruleId) const
 
 bool RuleHolder::isAnalyticsSdkEventRule(const event::RulePtr& rule) const
 {
-    return rule->eventType() == event::EventType::analyticsSdkEvent;
+    const auto ruleEventType = rule->eventType();
+    const auto ruleResources = rule->eventResources();
+
+    return std::any_of(
+        ruleResources.cbegin(),
+        ruleResources.cend(), 
+        [ruleEventType, this](const QnUuid& resourceId)
+        {
+            const auto resourcePool = commonModule()->resourcePool();
+            const auto camera = resourcePool->getResourceById<QnSecurityCamResource>(resourceId);
+            if (!camera)
+                return false;
+
+            return camera->doesEventComeFromAnalyticsDriver(ruleEventType);
+        });
+}
+
+QnUuid RuleHolder::analyticsEventIdFromRule(const nx::vms::event::RulePtr& rule) const
+{
+    if (rule->eventType() == nx::vms::event::EventType::analyticsSdkEvent)
+        return rule->eventParams().analyticsEventId();
+
+    if (rule->eventType() == nx::vms::event::EventType::cameraInputEvent)
+        return kInputPortAnalyticsEventId;
+
+    return QnUuid();
 }
 
 std::set<QnUuid> RuleHolder::calculateResourceEvents(const QnUuid& resourceId) const

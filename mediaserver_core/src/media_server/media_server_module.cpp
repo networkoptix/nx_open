@@ -133,6 +133,7 @@ QnMediaServerModule::QnMediaServerModule(
     auto streamingChunkTranscoder = store(
         new StreamingChunkTranscoder(
             commonModule()->resourcePool(),
+            nullptr, //< TODO: #ak pass videoCameraPool here. Currently, it is created later.
             StreamingChunkTranscoder::fBeginOfRangeInclusive));
 
     m_streamingChunkCache = store(new StreamingChunkCache(
@@ -172,7 +173,7 @@ QnMediaServerModule::QnMediaServerModule(
             commonModule()->eventRuleManager()));
 
     m_metadataManagerPoolThread = new QThread(this);
-    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(commonModule()));
+    m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
 

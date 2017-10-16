@@ -24,7 +24,7 @@ struct NX_NETWORK_API QnInterfaceAndAddr
     {
     }
 
-    QHostAddress networkAddress() const;
+    QHostAddress subNetworkAddress() const;
     QHostAddress broadcastAddress() const;
 
     QString name;

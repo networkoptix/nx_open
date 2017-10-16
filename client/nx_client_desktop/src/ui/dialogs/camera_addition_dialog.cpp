@@ -249,12 +249,13 @@ int QnCameraAdditionDialog::fillTable(const QnManualResourceSearchList &cameras)
     int newCameras = 0;
     foreach(const QnManualResourceSearchEntry &info, cameras) {
         bool enabledRow = !info.existsInPool;
-        if (enabledRow)
-            newCameras++;
 
         //insert new cameras to the beginning, old to the end
-        int row = enabledRow ? 0 : ui->camerasTable->rowCount();
+        int row = enabledRow ? newCameras : ui->camerasTable->rowCount();
         ui->camerasTable->insertRow(row);
+
+        if (enabledRow)
+            newCameras++;
 
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);

@@ -30,11 +30,12 @@
 struct LicenseTypeInfo
 {
     LicenseTypeInfo();
-    LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM);
+    LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM, bool allowedToShareChannel);
 
     Qn::LicenseType licenseType;
     QnLatin1Array className;
     bool allowedForARM;
+    bool allowedToShareChannel;
 };
 
 class QnLicense

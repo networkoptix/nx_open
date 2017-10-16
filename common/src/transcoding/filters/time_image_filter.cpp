@@ -60,24 +60,27 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
         metric = QFontMetrics(m_timeFont);
     }
 
+    const int horizontalOffset = metric.averageCharWidth() / 2;
+    const int textHeight = metric.height();
+    const int textWidth = metric.width(timeStr);
     switch(m_params.corner)
     {
     case Qt::TopLeftCorner:
         m_bufYOffs = 0;
-        m_dateTimeXOffs = metric.averageCharWidth()/2;
+        m_dateTimeXOffs = horizontalOffset;
         break;
     case Qt::TopRightCorner:
         m_bufYOffs = 0;
-        m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
+        m_dateTimeXOffs = frame->width - textWidth - horizontalOffset;
         break;
     case Qt::BottomRightCorner:
-        m_bufYOffs = frame->height - metric.height();
-        m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
+        m_bufYOffs = frame->height - textHeight;
+        m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - horizontalOffset;
         break;
     case Qt::BottomLeftCorner:
     default:
-        m_bufYOffs = frame->height - metric.height();
-        m_dateTimeXOffs = metric.averageCharWidth()/2;
+        m_bufYOffs = frame->height - textHeight;
+        m_dateTimeXOffs = horizontalOffset;
         break;
     }
 
@@ -87,13 +90,12 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
     m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
     m_dateTimeYOffs = metric.ascent();
 
-    int drawWidth = metric.width(timeStr);
-    int drawHeight = metric.height();
-    drawWidth = qPower2Ceil((unsigned) drawWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
+    const auto drawWidth = qPower2Ceil((unsigned) textWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
     qFreeAligned(m_imageBuffer);
 	delete m_timeImg;
-    m_imageBuffer = (uchar*) qMallocAligned(drawWidth * drawHeight * 4, CL_MEDIA_ALIGNMENT);
-    m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
+    m_imageBuffer = (uchar*) qMallocAligned(drawWidth * textHeight * 4, CL_MEDIA_ALIGNMENT);
+    m_timeImg = new QImage(m_imageBuffer, drawWidth, textHeight, drawWidth * 4,
+        QImage::Format_ARGB32_Premultiplied);
 }
 
 qint64 QnTimeImageFilter::calcHash(const quint8* data, int width, int height, int linesize)

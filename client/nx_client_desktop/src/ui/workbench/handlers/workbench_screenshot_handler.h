@@ -5,6 +5,8 @@
 
 #include <common/common_globals.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
@@ -24,22 +26,23 @@ struct QnScreenshotParameters
 {
     QnScreenshotParameters();
 
-    qint64 utcTimestampMsec;
-    bool isUtc;
-    qint64 displayTimeMsec;
+    QnMediaResourcePtr resource;
+    qint64 utcTimestampMsec = 0;
+    bool isUtc = false;
+    qint64 displayTimeMsec = 0;
     QString filename;
     QnTimeStampParams timestampParams;
     QnItemDewarpingParams itemDewarpingParams;
-    QnMediaDewarpingParams mediaDewarpingParams;
     ImageCorrectionParams imageCorrectionParams;
     QRectF zoomRect;
-    qreal customAspectRatio;
-    qreal rotationAngle;
+    qreal customAspectRatio = 0;
+    qreal rotationAngle = 0;
 
     QString timeString() const;
 };
 
 /* Proxy class, that starts loading instantly after base provider is set and notifies only once. */
+// TODO: #vkutin #gdm Use nx::client::desktop::ProxyImageProvider instead
 class QnScreenshotLoader: public QnImageProvider {
     Q_OBJECT
 public:

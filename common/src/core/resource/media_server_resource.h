@@ -121,6 +121,9 @@ public:
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
     qint64 currentStatusTime() const;
 
+    /** Server local timezone. */
+    qint64 utcOffset(qint64 defaultValue = Qn::InvalidUtcOffset) const;
+
     void beforeDestroy();
 
     /**

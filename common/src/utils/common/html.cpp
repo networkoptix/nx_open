@@ -221,3 +221,9 @@ bool mightBeHtml(const QStringList& lines)
         [](const QString& line) { return mightBeHtml(line); });
 }
 
+QString ensureHtml(const QString& source)
+{
+    return mightBeHtml(source)
+        ? source
+        : Qt::convertFromPlainText(source);
+}

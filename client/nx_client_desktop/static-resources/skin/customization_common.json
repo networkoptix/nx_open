@@ -825,6 +825,29 @@
         "palette": { "default": { "window": "dark8" } }
     },
 
+    "nx::client::desktop::ui::SelectableTextButton": {
+        "palette": {
+            "_": "selected",
+            "active": {
+                "window": "dark5",
+                "dark": "dark5",
+                "midlight": "dark5",
+                "shadow": "dark4",
+                "windowText": "light10",
+                "text": "light10"
+            },
+            "_": "not selected",
+            "inactive": {
+                "window": "dark10",
+                "dark": "dark6",
+                "shadow": "transparent",
+                "midlight": "dark11",
+                "windowText": "light14",
+                "text": "light16"
+            }
+        }
+    },
+
     "nx::client::desktop::ui::graphics::SoftwareTriggerButton": {
         "palette": {
             "default": {
