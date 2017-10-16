@@ -1,13 +1,64 @@
 #include <gtest/gtest.h>
 
 #include <plugins/resource/hanwha/hanwha_attributes.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 namespace test {
 
-const char testData1[] =
+struct HanwhaAttributesParser: ::testing::Test
+{
+    HanwhaAttributes attributes;
+
+    QString attrValue(const QString& path)
+    {
+        auto result = attributes.attribute<QString>(path);
+        return result ? *result : QString();
+    }
+
+    void shortTest(const QString& data)
+    {
+        attributes = HanwhaAttributes(data, nx_http::StatusCode::ok);
+        ASSERT_TRUE(attributes.isValid());
+
+        ASSERT_EQ("16", attrValue("System/MaxChannel"));
+    }
+
+    void longTest(const QString& data)
+    {
+        attributes = HanwhaAttributes(data, nx_http::StatusCode::ok);
+        ASSERT_TRUE(attributes.isValid());
+
+        ASSERT_EQ("True",  attrValue("System/ISPVersion"));
+        ASSERT_EQ("False", attrValue("System/PTZBoardVersion"));
+        ASSERT_EQ("False", attrValue("System/InterfaceBoardVersion"));
+        ASSERT_EQ("True",  attrValue("System/ConfigRestore"));
+        ASSERT_EQ("1",     attrValue("System/NICCount"));
+        ASSERT_EQ("10",    attrValue("Network/MaxIPv4Filter"));
+        ASSERT_EQ("1",     attrValue("Media/MaxAudioInput/0"));
+        ASSERT_EQ("1",     attrValue("Media/MaxAudioOutput/0"));
+        ASSERT_EQ("3", attrValue("Media/MaxAudioInput/1"));
+        ASSERT_EQ("3", attrValue("Media/MaxAudioOutput/1"));
+        ASSERT_EQ("True",  attrValue("Media/DeviceAudioOutput/0"));
+        ASSERT_EQ("", attrValue("Media/DeviceAudioOutput/1"));
+        ASSERT_EQ("", attrValue("Media/DeviceAudioOutput"));
+    }
+};
+
+static const char kShortXml[] =
+R"xml(
+<group name="System">
+    <category name="Property"></category>
+    <category name="Support"></category>
+    <category name="Limit">
+        <attribute name="MaxChannel" type="int" value="16" accesslevel="user"/>
+    </category>
+</group>
+)xml";
+
+static const char kLongXml[] =
 R"xml(<?xml version="1.0" encoding="UTF-8"?>
 <capabilities xmlns="http://www.samsungtechwin.com/AttributesSchema">
     <attributes>
@@ -65,38 +116,19 @@ R"xml(<?xml version="1.0" encoding="UTF-8"?>
 </capabilities>
 )xml";
 
-const char testData2[] =
-R"xml(<group name="System"><category name="Property"></category><category name="Support"></category><category name="Limit"><attribute name="MaxChannel" type="int" value="16" accesslevel="user"/></category></group>)xml";
-
-TEST(HanwhaAttributesParser, main)
+static QString removeWhiteSpace(const QString& s)
 {
-    HanwhaAttributes attributes;
-    auto attrValue = [&](const QString& path)
-    {
-        auto result = attributes.attribute<QString>(path);
-        return result ? *result : QString();
-    };
-
-    attributes = HanwhaAttributes(testData1, nx_http::StatusCode::ok);
-    ASSERT_EQ("True",  attrValue("System/ISPVersion"));
-    ASSERT_EQ("False", attrValue("System/PTZBoardVersion"));
-    ASSERT_EQ("False", attrValue("System/InterfaceBoardVersion"));
-    ASSERT_EQ("True",  attrValue("System/ConfigRestore"));
-    ASSERT_EQ("1",     attrValue("System/NICCount"));
-    ASSERT_EQ("10",    attrValue("Network/MaxIPv4Filter"));
-    ASSERT_EQ("1",     attrValue("Media/MaxAudioInput/0"));
-    ASSERT_EQ("1",     attrValue("Media/MaxAudioOutput/0"));
-    ASSERT_EQ("3", attrValue("Media/MaxAudioInput/1"));
-    ASSERT_EQ("3", attrValue("Media/MaxAudioOutput/1"));
-    ASSERT_EQ("True",  attrValue("Media/DeviceAudioOutput/0"));
-    ASSERT_EQ("", attrValue("Media/DeviceAudioOutput/1"));
-    ASSERT_EQ("", attrValue("Media/DeviceAudioOutput"));
-    ASSERT_TRUE(attributes.isValid());
-
-    attributes = HanwhaAttributes(testData2, nx_http::StatusCode::ok);
-    ASSERT_EQ("16", attrValue("System/MaxChannel"));
-    ASSERT_TRUE(attributes.isValid());
+    auto lines = s.split('\n');
+    for (auto& line: lines)
+        line = line.trimmed();
+    return lines.join("");
 }
+
+TEST_F(HanwhaAttributesParser, ShortFormated) { shortTest(kShortXml); }
+TEST_F(HanwhaAttributesParser, ShortCompact) { shortTest(removeWhiteSpace(kShortXml)); }
+
+TEST_F(HanwhaAttributesParser, LongFormated) { longTest(kLongXml); }
+TEST_F(HanwhaAttributesParser, LongCompact) { longTest(removeWhiteSpace(kLongXml)); }
 
 } // namespace test
 } // namespace plugins
