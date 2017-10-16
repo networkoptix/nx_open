@@ -41,6 +41,7 @@ struct HanwhaAttributesParser: ::testing::Test
         ASSERT_EQ("1",     attrValue("Media/MaxAudioOutput/0"));
         ASSERT_EQ("3", attrValue("Media/MaxAudioInput/1"));
         ASSERT_EQ("3", attrValue("Media/MaxAudioOutput/1"));
+        ASSERT_EQ("commonValue", attrValue("Media/CommonLimit"));
         ASSERT_EQ("True",  attrValue("Media/DeviceAudioOutput/0"));
         ASSERT_EQ("", attrValue("Media/DeviceAudioOutput/1"));
         ASSERT_EQ("", attrValue("Media/DeviceAudioOutput"));
@@ -92,6 +93,7 @@ R"xml(<?xml version="1.0" encoding="UTF-8"?>
                     <attribute accesslevel="guest" value="3" type="int" name="MaxAudioInput"/>
                     <attribute accesslevel="guest" value="3" type="int" name="MaxAudioOutput"/>
                 </channel>
+                <attribute accesslevel="guest" value="commonValue" type="string"  name="CommonLimit"/>
             </category>
             <category name="Support">
                 <channel number="0">
