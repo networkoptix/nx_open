@@ -15,6 +15,15 @@ namespace client {
 namespace core {
 namespace utils {
 
+namespace {
+
+static QObject* createInstance(QQmlEngine* /*engine*/, QJSEngine* /*jsEngine*/)
+{
+    return new Geometry();
+}
+
+} // namespace
+
 QPointF Geometry::cwiseAdd(const QPointF& l, const QPointF& r)
 {
     return l + r;
@@ -674,11 +683,6 @@ QRectF Geometry::encloseRotatedGeometry(
     geom = scaled(geom, scale, geom.center());
 
     return geom;
-}
-
-static QObject* createInstance(QQmlEngine* /*engine*/, QJSEngine* /*jsEngine*/)
-{
-    return new Geometry();
 }
 
 void Geometry::registerQmlType()
