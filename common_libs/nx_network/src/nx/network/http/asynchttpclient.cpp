@@ -1068,7 +1068,9 @@ bool AsyncHttpClient::sendRequestToNewLocation(const Response& response)
 
     m_contentLocationUrl = QUrl(QLatin1String(locationIter->second));
 
-    composeRequest(m_request.requestLine.method);
+    const auto method = m_request.requestLine.method;
+    m_request = nx_http::Request();
+    composeRequest(method);
     initiateHttpMessageDelivery();
     return true;
 }
