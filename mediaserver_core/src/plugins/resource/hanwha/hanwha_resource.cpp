@@ -595,10 +595,6 @@ CameraDiagnostics::Result HanwhaResource::init()
     if (!result)
         return result;
 
-    result = initAttributes();
-    if (!result)
-        return result;
-
     result = initMedia();
     if (!result)
         return result;
@@ -622,11 +618,6 @@ CameraDiagnostics::Result HanwhaResource::init()
     initMediaStreamCapabilities();
 
     saveParams();
-
-    int channelCount = sharedContext->channelCount(getAuth(), getUrl());
-    sharedContext->startTimeSynchronizer(getAuth(), getUrl());
-    sharedContext->chunkLoader()->start(getAuth(), getUrl(), channelCount);
-
     return result;
 }
 
@@ -693,58 +684,24 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
 
 CameraDiagnostics::Result HanwhaResource::initSystem()
 {
-    HanwhaRequestHelper helper(toSharedPointer(this));
-    auto response = helper.view(lit("system/deviceinfo"));
-
-    if (!response.isSuccessful())
-    {
-        return error(
-            response,
-            CameraDiagnostics::CameraInvalidParams(
-                lit("Can not fetch device information")));
-    }
-
-    const auto firmware = response.parameter<QString>(lit("FirmwareVersion"));
-    const auto deviceType = response.parameter<QString>(lit("DeviceType"));
+    auto info = sharedContext()->loadInformation(toSharedPointer(this));
+    if (info.diagnostics.errorCode != CameraDiagnostics::ErrorCode::noError)
+        return info.diagnostics;
 
     m_isNvr = false;
-    if (deviceType && deviceType->trimmed() == kNvrDeviceType)
+    if (info.deviceType == kNvrDeviceType)
     {
         m_isNvr = true;
         //setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
         setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
     }
-    
-    if (!firmware.is_initialized())
-        return CameraDiagnostics::NoErrorResult();
 
-    if (!firmware->isEmpty())
-        setFirmware(firmware.get());
+    if (!info.firmware.isEmpty())
+        setFirmware(info.firmware);
 
+    m_attributes = std::move(info.attributes);
+    m_cgiParameters = std::move(info.cgiParamiters);
     return CameraDiagnostics::NoErrorResult();
-}
-
-CameraDiagnostics::Result HanwhaResource::initAttributes()
-{
-    HanwhaRequestHelper helper(toSharedPointer(this));
-    m_attributes = helper.fetchAttributes(lit("attributes"));
-    
-    if (!m_attributes.isValid())
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Camera attributes are invalid"));
-    }
-
-    m_cgiParameters = helper.fetchCgiParameters(lit("cgis"));
-
-    if (!m_cgiParameters.isValid())
-    {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("Camera cgi parameters are invalid"));
-    }
-
-    return CameraDiagnostics::NoErrorResult();
-
 }
 
 CameraDiagnostics::Result HanwhaResource::initMedia()

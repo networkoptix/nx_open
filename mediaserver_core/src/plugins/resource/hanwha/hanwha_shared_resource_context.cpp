@@ -37,6 +37,66 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
         });
 }
 
+static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, const QString& url)
+{
+    HanwhaDeviceInfo info{CameraDiagnostics::NoErrorResult()};
+    HanwhaRequestHelper helper(auth, url);
+    helper.setIgnoreMutexAnalyzer(true);
+
+    auto deviceinfo = helper.view(lit("system/deviceinfo"));
+    if (!deviceinfo.isSuccessful())
+    {
+        return {error(deviceinfo,
+            CameraDiagnostics::CameraInvalidParams(
+                lit("Can not fetch device information")))};
+    }
+
+    if (auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
+        info.deviceType = std::move(value->trimmed());
+
+    if (auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
+        info.firmware = std::move(value->trimmed());
+
+    info.attributes = helper.fetchAttributes(lit("attributes"));
+    if (!info.attributes.isValid())
+    {
+        return {CameraDiagnostics::CameraInvalidParams(
+            lit("Camera attributes are invalid"))};
+    }
+
+    info.cgiParamiters = helper.fetchCgiParameters(lit("cgis"));
+    if (!info.cgiParamiters.isValid())
+    {
+        return {CameraDiagnostics::CameraInvalidParams(
+            lit("Camera cgi parameters are invalid"))};
+    }
+
+    auto attributes = helper.fetchAttributes(lit("attributes/System"));
+    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
+    info.channelCount = maxChannels ? *maxChannels : 1;
+
+    return info;
+}
+
+HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const HanwhaResourcePtr& resource)
+{
+    const auto auth = resource->getAuth();
+    const auto url = resource->getUrl();
+
+    QnMutexLocker lock(&m_informationMutex);
+    if (m_lastAuth != auth || m_lastUrl != url)
+    {
+        m_lastAuth = auth;
+        m_lastUrl = url;
+        m_cachedInformation = requestAndLoadInformation(auth, url);
+
+        m_chunkLoader->start(auth, url, m_cachedInformation.channelCount);
+        m_timeSynchronizer->start(resource);
+    }
+
+    return m_cachedInformation;
+}
+
 QString HanwhaSharedResourceContext::sessionKey(
     HanwhaSessionType sessionType,
     bool generateNewOne)
@@ -82,29 +142,6 @@ QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
 std::shared_ptr<HanwhaChunkLoader> HanwhaSharedResourceContext::chunkLoader() const
 {
     return m_chunkLoader;
-}
-
-int HanwhaSharedResourceContext::channelCount(const QAuthenticator& auth, const QUrl& url)
-{
-    QnMutexLocker lock(&m_channelCountMutex);
-
-    if (m_cachedChannelCount)
-        return m_cachedChannelCount;
-
-    HanwhaRequestHelper helper(auth, url.toString());
-    helper.setIgnoreMutexAnalyzer(true);
-    auto attributes = helper.fetchAttributes(lit("attributes/System"));
-    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
-    int result = maxChannels ? *maxChannels : 1;
-    if (attributes.isValid())
-        m_cachedChannelCount = result;
-    return result;
-}
-
-void HanwhaSharedResourceContext::startTimeSynchronizer(
-    const QAuthenticator& auth, const QUrl& url)
-{
-    m_timeSynchronizer->start(auth, url);
 }
 
 } // namespace plugins

@@ -118,7 +118,6 @@ protected:
 private:
     CameraDiagnostics::Result init();
     CameraDiagnostics::Result initSystem();
-    CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();

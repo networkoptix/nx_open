@@ -26,7 +26,7 @@ class SharedContextPool:
             AbstractSharedResourceContext::SharedId,
             std::weak_ptr<AbstractSharedResourceContext>>;
 public:
-    SharedContextPool(QnMediaServerModule* serverModule);
+    SharedContextPool(QnMediaServerModule* serverModule, QObject* parent = nullptr);
 
     template<typename ContextType>
     std::shared_ptr<ContextType> sharedContext(const QnSecurityCamResourcePtr& resource)
