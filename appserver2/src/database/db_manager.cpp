@@ -2748,15 +2748,18 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
 
 ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 {
-    const QByteArray userOrRoleId = data.userId.toRfc4122();
+    if (data.resourceIds.empty())
+        return cleanAccessRights(data.userId);
 
-    QString insertQueryString = R"(
+    const auto userOrRoleId = data.userId.toRfc4122();
+
+    const QString insertQueryString = R"sql(
             INSERT OR REPLACE
             INTO vms_access_rights
             (userOrRoleId, resourceIds)
             values
            (:userOrRoleId, :resourceIds)
-        )";
+        )sql";
 
     QSqlQuery insertQuery(m_sdb);
     insertQuery.setForwardOnly(true);
