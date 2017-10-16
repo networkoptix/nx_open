@@ -47,7 +47,7 @@ public:
 private:
     mutable QnMutex m_mutex;
     const OnLevelChanged m_onLevelChanged;
-    Level m_defaultLevel = Level::none;
+    Level m_defaultLevel;
     std::vector<std::unique_ptr<AbstractWriter>> m_writers;
     std::set<QString> m_exceptionFilters;
 };

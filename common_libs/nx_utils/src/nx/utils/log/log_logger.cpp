@@ -21,8 +21,8 @@ Logger::Logger(
     OnLevelChanged onLevelChanged)
     :
     m_mutex(QnMutex::Recursive),
-    m_defaultLevel(level),
-    m_onLevelChanged(std::move(onLevelChanged))
+    m_onLevelChanged(std::move(onLevelChanged)),
+    m_defaultLevel(level)
 {
     if (writer)
         m_writers.push_back(std::move(writer));

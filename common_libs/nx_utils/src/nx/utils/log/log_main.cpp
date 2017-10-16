@@ -70,7 +70,7 @@ private:
     mutable QnMutex m_mutex;
     std::shared_ptr<Logger> m_mainLogger;
     std::map<QString, std::shared_ptr<Logger>> m_loggersByTags;
-    std::atomic<Level> m_maxLevel = Level::none;
+    std::atomic<Level> m_maxLevel{Level::none};
 };
 
 void LoggerCollection::updateMaxLevel()
