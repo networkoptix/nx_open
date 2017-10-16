@@ -37,6 +37,7 @@ namespace mediaserver_core {
 namespace plugins {
 
 const QString HanwhaResource::kNormalizedSpeedPtzTrait("NormalizedSpeed");
+const QString HanwhaResource::kHas3AxisPtz("3AxisPTZ");
 
 namespace {
 
@@ -893,9 +894,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         m_ptzTraits << QnPtzAuxilaryTrait(kNormalizedSpeedPtzTrait);
     auto has3AxisPtz = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/3AxisPTZ"));
     if (isTrue(has3AxisPtz))
-        m_ptzTraits.push_back(Ptz::EightWayPtzTrait);
-    else
-        m_ptzTraits.push_back(Ptz::FourWayPtzTrait);
+        m_ptzTraits << QnPtzAuxilaryTrait(kHas3AxisPtz);
 
     auto panSpeedParameter = m_cgiParameters.parameter(lit("ptzcontrol/continuous/control/Pan"));
     if (panSpeedParameter)

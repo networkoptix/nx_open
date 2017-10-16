@@ -53,27 +53,38 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
 
 bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
     const auto hanwhaSpeed = toHanwhaSpeed(speed);
 
     std::map<QString, QString> params;
-    auto addIfNeed = [&](const QString& paramName, float value)
-    {
-        if (!qFuzzyEquals(value, m_lastParamValue[paramName]))
-            params.emplace(paramName, QString::number((int)value));
-        m_lastParamValue[paramName] = value;
-    };
-
     params.emplace(kHanwhaChannelProperty, channel());
-    if (m_ptzTraits.contains(QnPtzAuxilaryTrait(HanwhaResource::kNormalizedSpeedPtzTrait)))
-        params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
+    QString command;
+    if (speed.isNull())
+    {
+        command = lit("ptzcontrol/stop");
+        params.emplace("OperationType", "All");
+        m_lastParamValue.clear();
+    }
+    else
+    {
+        command = lit("ptzcontrol/continuous");
+        auto addIfNeed = [&](const QString& paramName, float value)
+        {
+            if (!qFuzzyEquals(value, m_lastParamValue[paramName]))
+                params.emplace(paramName, QString::number((int)value));
+            m_lastParamValue[paramName] = value;
+        };
 
-    addIfNeed(kHanwhaPanProperty, hanwhaSpeed.x());
-    addIfNeed(kHanwhaTiltProperty, hanwhaSpeed.y());
-    addIfNeed(kHanwhaZoomProperty, hanwhaSpeed.z());
+        if (m_ptzTraits.contains(QnPtzAuxilaryTrait(HanwhaResource::kNormalizedSpeedPtzTrait)))
+            params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
 
+        addIfNeed(kHanwhaPanProperty, hanwhaSpeed.x());
+        addIfNeed(kHanwhaTiltProperty, hanwhaSpeed.y());
+        addIfNeed(kHanwhaZoomProperty, hanwhaSpeed.z());
+    }
+
+    HanwhaRequestHelper helper(m_hanwhaResource);
     const auto response = helper.control(
-        lit("ptzcontrol/continuous"),
+        command,
         params);
 
     return response.isSuccessful();

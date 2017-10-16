@@ -106,6 +106,7 @@ public:
     QString nxProfileName(Qn::ConnectionRole role) const;
 
     static const QString kNormalizedSpeedPtzTrait;
+    static const QString kHas3AxisPtz;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
