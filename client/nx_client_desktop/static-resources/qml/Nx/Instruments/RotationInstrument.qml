@@ -97,12 +97,7 @@ Instrument
         if (!target)
             return
 
-        var x = position.x - item.width / 2
-        var y = position.y - item.height / 2
-        var angle = Math.atan(y / x)
-        if (x < 0)
-            angle += Math.PI
-
+        var angle = -Math.atan2(position.x - item.width / 2, position.y - item.height / 2)
         return MathUtils.toDegrees(angle)
     }
 
