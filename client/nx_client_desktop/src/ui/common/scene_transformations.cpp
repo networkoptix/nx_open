@@ -3,7 +3,7 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/log/assert.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

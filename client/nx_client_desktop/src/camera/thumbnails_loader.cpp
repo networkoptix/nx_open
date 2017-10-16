@@ -35,7 +35,7 @@ extern "C"
 #include <recording/time_period.h>
 #include "core/resource/media_server_resource.h"
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
     const qint64 defaultUpdateInterval = 10 * 1000; /* 10 seconds. */

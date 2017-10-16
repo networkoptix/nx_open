@@ -10,7 +10,7 @@
 #include <ui/style/helper.h>
 #include <utils/common/event_processors.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

@@ -17,7 +17,7 @@
 
 #include <utils/common/delayed.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

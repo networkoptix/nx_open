@@ -14,7 +14,7 @@
 #include "ui/graphics/opengl/gl_shortcuts.h"
 #include "opengl_renderer.h"
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

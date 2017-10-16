@@ -5,7 +5,7 @@
 #include <client/client_globals.h>
 #include <nx/client/core/utils/geometry.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

@@ -51,7 +51,7 @@
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

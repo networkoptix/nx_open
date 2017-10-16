@@ -13,7 +13,6 @@
 namespace nx {
 namespace client {
 namespace core {
-namespace utils {
 
 namespace {
 
@@ -687,10 +686,9 @@ QRectF Geometry::encloseRotatedGeometry(
 
 void Geometry::registerQmlType()
 {
-    qmlRegisterSingletonType<Geometry>("nx.client.core.utils", 1, 0, "Geometry", &createInstance);
+    qmlRegisterSingletonType<Geometry>("nx.client.core", 1, 0, "Geometry", &createInstance);
 }
 
-} // namespace utils
 } // namespace core
 } // namespace client
 } // namespace nx

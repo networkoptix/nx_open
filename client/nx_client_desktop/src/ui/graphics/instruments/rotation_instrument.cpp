@@ -16,7 +16,7 @@
 
 #include <utils/math/coordinate_transformations.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
     const QColor arrowColor(255, 0, 0, 96);

@@ -11,7 +11,7 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/utils/geometry.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

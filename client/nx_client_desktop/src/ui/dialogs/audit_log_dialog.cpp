@@ -668,7 +668,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     qreal displayAspectRatio = viewportGeometry.isNull()
         ? desiredItemAspectRatio
-        : nx::client::core::utils::Geometry::aspectRatio(viewportGeometry);
+        : nx::client::core::Geometry::aspectRatio(viewportGeometry);
 
     if (resList.size() == 1)
     {

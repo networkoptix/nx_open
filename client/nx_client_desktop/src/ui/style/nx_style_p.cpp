@@ -15,7 +15,7 @@
 #include <nx/client/core/utils/geometry.h>
 
 using namespace style;
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

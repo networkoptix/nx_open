@@ -510,12 +510,12 @@ QPixmap SoftwareTriggerButtonPrivate::generatePixmap(
     painter.setPen(frame.isValid() ? QPen(frame, kFrameLineWidth) : QPen(Qt::NoPen));
 
     painter.drawEllipse(frame.isValid()
-        ? nx::client::core::utils::Geometry::eroded(QRectF(buttonRect()), kFrameLineWidth / 2.0)
+        ? nx::client::core::Geometry::eroded(QRectF(buttonRect()), kFrameLineWidth / 2.0)
         : buttonRect());
 
     if (!icon.isNull())
     {
-        const auto pixmapRect = nx::client::core::utils::Geometry::aligned(
+        const auto pixmapRect = nx::client::core::Geometry::aligned(
             icon.size() / icon.devicePixelRatio(),
             buttonRect());
 

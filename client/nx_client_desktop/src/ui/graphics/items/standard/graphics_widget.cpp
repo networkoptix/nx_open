@@ -21,7 +21,7 @@
 
 #include "graphics_widget_scene_data.h"
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
     const char *qn_sceneDataPropertyName = "_qn_sceneData";

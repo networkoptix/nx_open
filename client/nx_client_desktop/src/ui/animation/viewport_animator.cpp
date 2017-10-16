@@ -10,7 +10,7 @@
 #include <utils/math/magnitude.h>
 #include "viewport_geometry_accessor.h"
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 ViewportAnimator::ViewportAnimator(QObject *parent):
     base_type(parent),

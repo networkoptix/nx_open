@@ -7,7 +7,6 @@
 namespace nx {
 namespace client {
 namespace core {
-namespace utils {
 
 class Geometry: public QObject
 {
@@ -360,7 +359,6 @@ public:
     static void registerQmlType();
 };
 
-} // namespace utils
 } // namespace core
 } // namespace client
 } // namespace nx

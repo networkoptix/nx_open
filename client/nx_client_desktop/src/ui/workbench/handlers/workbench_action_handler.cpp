@@ -182,7 +182,7 @@
 
 #include <nx/client/desktop/ui/main_window.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

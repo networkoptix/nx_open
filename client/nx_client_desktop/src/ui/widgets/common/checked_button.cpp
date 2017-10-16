@@ -8,7 +8,7 @@
 #include "utils/math/linear_combination.h"
 #include <nx/client/core/utils/geometry.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
     int lineWidth = 4;

@@ -151,7 +151,7 @@ void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     if (d->pressedControl == QStyle::SC_ScrollBarSlider)
     {
         QRectF sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, NULL);
-        qint64 newPosition = valueFromPosition(event->pos() - nx::client::core::utils::Geometry::cwiseMul(d->relativeClickOffset, sliderRect.size()));
+        qint64 newPosition = valueFromPosition(event->pos() - nx::client::core::Geometry::cwiseMul(d->relativeClickOffset, sliderRect.size()));
         int m = style()->pixelMetric(QStyle::PM_MaximumDragDistance, &opt, NULL);
         if (m >= 0)
         {

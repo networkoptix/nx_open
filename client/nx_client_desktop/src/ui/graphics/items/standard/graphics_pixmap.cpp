@@ -7,7 +7,7 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <nx/client/core/utils/geometry.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 class GraphicsPixmapPrivate {
 public:

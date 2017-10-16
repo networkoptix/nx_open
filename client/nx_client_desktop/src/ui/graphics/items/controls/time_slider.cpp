@@ -49,7 +49,7 @@
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace
 {

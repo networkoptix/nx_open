@@ -5,7 +5,7 @@
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <nx/utils/unused.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

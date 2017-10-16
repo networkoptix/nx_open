@@ -4,7 +4,7 @@
 #include <utils/common/warnings.h>
 #include <nx/client/core/utils/geometry.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 RectAnimator::RectAnimator(QObject *parent):
     base_type(parent),

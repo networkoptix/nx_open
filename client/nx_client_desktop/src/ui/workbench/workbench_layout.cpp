@@ -29,7 +29,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

@@ -12,7 +12,7 @@
 #include <ui/graphics/items/resource/resource_widget.h> //TODO: #GDM move enum to client globals
 #include <ui/style/skin.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

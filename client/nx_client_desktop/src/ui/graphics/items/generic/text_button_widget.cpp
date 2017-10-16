@@ -9,7 +9,7 @@
 
 #include <utils/math/linear_combination.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),

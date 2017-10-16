@@ -18,7 +18,7 @@
 #include <ui/animation/variant_animator.h>
 #include "grid_highlight_item.h"
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
     const char *pointPropertyName = "_qn_itemPoint";

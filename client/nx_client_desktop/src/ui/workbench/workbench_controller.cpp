@@ -107,7 +107,7 @@
 #include <nx/client/core/utils/geometry.h>
 
 using namespace nx::client::desktop::ui;
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG

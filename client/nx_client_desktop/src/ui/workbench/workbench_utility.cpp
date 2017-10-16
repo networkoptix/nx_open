@@ -4,7 +4,7 @@
 
 #include <nx/client/core/utils/geometry.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 QnDistanceMagnitudeCalculator::QnDistanceMagnitudeCalculator(const QPointF& origin):
     m_origin(origin),

@@ -13,7 +13,7 @@
 #include <utils/common/warnings.h>
 #include <ui/animation/animation_event.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

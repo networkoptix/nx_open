@@ -16,7 +16,7 @@
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace  {
 

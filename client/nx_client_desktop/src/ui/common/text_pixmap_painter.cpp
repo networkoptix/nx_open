@@ -12,7 +12,7 @@ void QnTextPixmapPainter::drawText(
     const QFont& font,
     const QColor& color)
 {
-    using nx::client::core::utils::Geometry;
+    using nx::client::core::Geometry;
 
     QPixmap pixmap = QnTextPixmapCache::instance()->pixmap(text, font, color);
 

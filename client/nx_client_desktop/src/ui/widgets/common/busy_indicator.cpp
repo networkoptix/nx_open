@@ -7,7 +7,7 @@
 #include <ui/animation/animation_timer.h>
 #include <nx/client/core/utils/geometry.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 /*
 * QnBusyIndicatorBase

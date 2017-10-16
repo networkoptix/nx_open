@@ -11,7 +11,7 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 // -------------------------------------------------------------------------- //
 // GraphicsLabelPrivate

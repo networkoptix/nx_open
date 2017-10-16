@@ -61,7 +61,7 @@
 #include <nx/utils/string.h>
 
 using namespace nx::client::desktop::ui;
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 const qreal kButtonsSize = 24.0;

@@ -351,11 +351,11 @@ void QnLayoutSettingsDialog::updateControls() {
     qreal targetAspectRatio = bestAspectRatioForCells();
     // TODO: #GDM #Common do not change if values were changed manually?
     if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0 && !cellsAreBestAspected()) {
-        QSize minSize = nx::client::core::utils::Geometry::expanded(
+        QSize minSize = nx::client::core::Geometry::expanded(
             targetAspectRatio,
             qnGlobals->layoutBackgroundMinSize(),
             Qt::KeepAspectRatioByExpanding).toSize();
-        QSize maxSize = nx::client::core::utils::Geometry::expanded(
+        QSize maxSize = nx::client::core::Geometry::expanded(
             targetAspectRatio,
             qnGlobals->layoutBackgroundMaxSize(),
             Qt::KeepAspectRatio).toSize();

@@ -22,7 +22,7 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/app_info.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -1000,7 +1000,7 @@ QList<T> bestMatchingGeometry(const QList<T> &source, const QRect &geometry, int
         result << source[0];
 
     std::partial_sort_copy(source.cbegin(), source.cend(), result.begin(), result.end(), [&geometry](const T& left, const T& right) {
-        return Geometry::area(left.geometry.intersected(geometry)) > nx::client::core::utils::Geometry::area(right.geometry.intersected(geometry));
+        return Geometry::area(left.geometry.intersected(geometry)) > Geometry::area(right.geometry.intersected(geometry));
     });
     return result;
 }

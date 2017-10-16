@@ -292,7 +292,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
     QRectF imageRect(rect);
     if (!m_imageMargins.isNull())
-        imageRect = nx::client::core::utils::Geometry::eroded(imageRect, m_imageMargins);
+        imageRect = nx::client::core::Geometry::eroded(imageRect, m_imageMargins);
 
     if (!m_initialized)
         initializeVao(imageRect);

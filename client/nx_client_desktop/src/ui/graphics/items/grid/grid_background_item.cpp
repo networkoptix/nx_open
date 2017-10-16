@@ -37,7 +37,7 @@
 #endif
 
 using namespace nx::client::desktop;
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

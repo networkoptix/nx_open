@@ -20,7 +20,7 @@
 #include <utils/image_provider.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
 

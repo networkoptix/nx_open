@@ -33,7 +33,7 @@
 #endif
 #include "utils/color_space/image_correction.h"
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 namespace {
     const int ROUND_COEFF = 8;

@@ -4,7 +4,7 @@
 
 QRectF ConstrainedResizable::constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint, const QSizeF &constrainedSize)
 {
-    using nx::client::core::utils::Geometry;
+    using nx::client::core::Geometry;
 
     if(qFuzzyEquals(constrainedSize, geometry.size()))
         return geometry;

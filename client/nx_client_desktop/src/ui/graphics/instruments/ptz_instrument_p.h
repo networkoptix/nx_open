@@ -16,7 +16,7 @@
 
 #include "selection_item.h"
 
-using nx::client::core::utils::Geometry;
+using nx::client::core::Geometry;
 
 // -------------------------------------------------------------------------- //
 // PtzArrowItem
