@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Client.Desktop.Ui.Scene 1.0
+import nx.client.core.utils 1.0
 
 Instrument
 {
@@ -51,8 +52,11 @@ Instrument
 
         if (!_started)
         {
-            if (MathUtils.distance(_pressPosition, mouse.globalPosition) < threshold)
+            if (Geometry.length(Geometry.cwiseSub(
+                _pressPosition, mouse.globalPosition)) < threshold)
+            {
                 return
+            }
 
             _started = true
             dragInstrument.started()

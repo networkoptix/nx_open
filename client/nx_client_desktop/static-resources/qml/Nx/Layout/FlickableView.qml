@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Animations 1.0
+import nx.client.core.utils 1.0
 
 Item
 {
@@ -127,7 +128,7 @@ Item
         function implicitContentSize()
         {
             return haveContentSize
-                ? MathUtils.scaledSize(Qt.size(contentAspectRatio, 1), Qt.size(width, height))
+                ? Geometry.scaled(contentAspectRatio, Qt.size(width, height))
                 : Qt.size(0, 0)
         }
     }
@@ -445,7 +446,7 @@ Item
 
     function fitInView(instant)
     {
-        if (!d.haveContentSize)
+        if (!d.haveContentSize || (zoomedItem && zoomedItem.height === 0))
             return
 
         stickyScaleActivationTimer.stop()
@@ -482,9 +483,11 @@ Item
             contentSourceW * implicitContentSize.width,
             contentSourceH * implicitContentSize.height)
 
-        var newSize = MathUtils.scaledSize(
-            Qt.size(implicitContentGeometry.width, implicitContentGeometry.height),
-            Qt.size(availableWidth, availableHeight))
+        var newSize = implicitContentGeometry.height > 0
+            ? Geometry.scaled(
+                Qt.size(implicitContentGeometry.width, implicitContentGeometry.height),
+                Qt.size(availableWidth, availableHeight))
+            : Qt.size(0, 0)
         var newScale = newSize.width / implicitContentGeometry.width
 
         var newContentWidth = implicitContentSize.width * newScale
@@ -540,7 +543,7 @@ Item
         if (width === 0 || height === 0)
             return Qt.rect(0, 0, aspectRatio, 1)
 
-        var size = MathUtils.scaledSize(Qt.size(aspectRatio, 1), Qt.size(width, height))
+        var size = Geometry.scaled(aspectRatio, Qt.size(width, height))
         return Qt.rect(
             (width - size.width) / 2,
             (height - size.height) / 2,

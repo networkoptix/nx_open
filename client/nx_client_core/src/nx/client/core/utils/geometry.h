@@ -15,6 +15,8 @@ class Geometry: public QObject
 
 public:
     /* Some coefficient-wise arithmetic functions follow. */
+    Q_INVOKABLE static QPointF cwiseAdd(const QPointF& l, const QPointF& r);
+    Q_INVOKABLE static QPointF cwiseSub(const QPointF& l, const QPointF& r);
     Q_INVOKABLE static QPointF cwiseMul(const QPointF& l, const QPointF& r);
     Q_INVOKABLE static QPoint cwiseMul(const QPoint& l, const QPoint& r);
     Q_INVOKABLE static QPointF cwiseDiv(const QPointF& l, const QPointF& r);
@@ -165,7 +167,10 @@ public:
      * @param mode Aspect ratio mode.
      * @return Scale factor.
      */
-    Q_INVOKABLE static qreal scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mode);
+    Q_INVOKABLE static qreal scaleFactor(
+        QSizeF size,
+        QSizeF bounds,
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
 
     Q_INVOKABLE static QPointF bounded(const QPointF& pos, const QRectF& bounds);
     Q_INVOKABLE static QPoint bounded(const QPoint& pos, const QRect& bounds);
@@ -181,7 +186,7 @@ public:
     Q_INVOKABLE static QSizeF bounded(
         const QSizeF& size,
         const QSizeF& maxSize,
-        Qt::AspectRatioMode mode);
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
 
     /**
      * Expands the given size to given maxSize.
@@ -193,7 +198,7 @@ public:
     Q_INVOKABLE static QSizeF expanded(
         const QSizeF& size,
         const QSizeF& maxSize,
-        Qt::AspectRatioMode mode);
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
 
     /**
      * Expands an infinitely small size with the given aspect ratio to the given maximal size.
@@ -205,7 +210,7 @@ public:
     Q_INVOKABLE static QSizeF expanded(
         qreal aspectRatio,
         const QSizeF& maxSize,
-        Qt::AspectRatioMode mode);
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
 
     /**
      * Expands an infinitely small rectangle with the given aspect ratio to the given maximal
@@ -219,7 +224,7 @@ public:
     Q_INVOKABLE static QRectF expanded(
         qreal aspectRatio,
         const QRectF& maxRect,
-        Qt::AspectRatioMode mode,
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio,
         Qt::Alignment alignment = Qt::AlignCenter);
 
     /**
@@ -235,13 +240,23 @@ public:
         qreal aspectRatio,
         const QSizeF& maxSize,
         const QPointF& center,
-        Qt::AspectRatioMode mode);
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
+
+    Q_INVOKABLE static QSizeF scaled(
+        qreal aspectRatio,
+        const QSizeF& maxSize,
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
+
+    Q_INVOKABLE static QSizeF scaled(
+        const QSizeF& size,
+        const QSizeF& maxSize,
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
 
     Q_INVOKABLE static QRectF scaled(
         const QRectF& rect,
         const QSizeF& size,
         const QPointF& fixedPoint,
-        Qt::AspectRatioMode mode);
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatio);
 
     Q_INVOKABLE static QRectF scaled(
         const QRectF& rect,

@@ -15,6 +15,16 @@ namespace client {
 namespace core {
 namespace utils {
 
+QPointF Geometry::cwiseAdd(const QPointF& l, const QPointF& r)
+{
+    return l + r;
+}
+
+QPointF Geometry::cwiseSub(const QPointF& l, const QPointF& r)
+{
+    return l - r;
+}
+
 QPointF Geometry::cwiseMul(const QPointF& l, const QPointF& r)
 {
     return QPointF(l.x() * r.x(), l.y() * r.y());
@@ -335,19 +345,7 @@ QSizeF Geometry::expanded(const QSizeF& size, const QSizeF& maxSize, Qt::AspectR
 
 QSizeF Geometry::expanded(qreal aspectRatio, const QSizeF& maxSize, Qt::AspectRatioMode mode)
 {
-    if (mode == Qt::IgnoreAspectRatio)
-        return maxSize;
-
-    bool expanding = mode == Qt::KeepAspectRatioByExpanding;
-    bool toGreaterAspectRatio = maxSize.width() / maxSize.height() > aspectRatio;
-
-    QSizeF result = maxSize;
-    if (expanding ^ toGreaterAspectRatio)
-        result.setWidth(result.height() * aspectRatio);
-    else
-        result.setHeight(result.width() / aspectRatio);
-
-    return result;
+    return scaled(aspectRatio, maxSize, mode);
 }
 
 QRectF Geometry::expanded(
@@ -370,6 +368,28 @@ QRectF Geometry::expanded(
 {
     return expanded(
         aspectRatio, QRectF(center - toPoint(maxSize) / 2, maxSize), mode, Qt::AlignCenter);
+}
+
+QSizeF Geometry::scaled(qreal aspectRatio, const QSizeF& maxSize, Qt::AspectRatioMode mode)
+{
+    if (mode == Qt::IgnoreAspectRatio)
+        return maxSize;
+
+    bool expanding = mode == Qt::KeepAspectRatioByExpanding;
+    bool toGreaterAspectRatio = maxSize.width() / maxSize.height() > aspectRatio;
+
+    QSizeF result = maxSize;
+    if (expanding ^ toGreaterAspectRatio)
+        result.setWidth(result.height() * aspectRatio);
+    else
+        result.setHeight(result.width() / aspectRatio);
+
+    return result;
+}
+
+QSizeF Geometry::scaled(const QSizeF& size, const QSizeF& maxSize, Qt::AspectRatioMode mode)
+{
+    return expanded(aspectRatio(size), maxSize, mode);
 }
 
 QRectF Geometry::scaled(
