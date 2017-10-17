@@ -13,9 +13,10 @@ namespace test {
 TEST(LogLogger, Levels)
 {
     const auto buffer = new Buffer();
-    const Logger::OnLevelChanged onLevelChanged = nullptr;
+    int levelChangedCount = 0;
+    const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
-    Logger logger(onLevelChanged, Level::info, std::unique_ptr<AbstractWriter>(buffer));
+    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer), onLevelChanged);
     ASSERT_EQ(Level::info, logger.defaultLevel());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::always));
@@ -32,7 +33,9 @@ TEST(LogLogger, Levels)
     logger.log(Level::verbose, QString(), "eee");
     ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 
+    EXPECT_EQ(0, levelChangedCount);
     logger.setDefaultLevel(Level::error);
+    EXPECT_EQ(1, levelChangedCount);
     ASSERT_EQ(Level::error, logger.defaultLevel());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::always));
@@ -48,14 +51,18 @@ TEST(LogLogger, Levels)
     logger.log(Level::debug, QString(), "ddd");
     logger.log(Level::verbose, QString(), "eee");
     ASSERT_EQ((size_t) 1, buffer->takeMessages().size());
+
+    EXPECT_EQ(1, levelChangedCount);
 }
 
 TEST(LogLogger, Filters)
 {
     const auto buffer = new Buffer();
-    const Logger::OnLevelChanged onLevelChanged = nullptr;
+    int levelChangedCount = 0;
+    const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
 
-    Logger logger(onLevelChanged, Level::info, std::unique_ptr<AbstractWriter>(buffer));
+    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer), onLevelChanged);
+    EXPECT_EQ(0, levelChangedCount);
     ASSERT_EQ((size_t) 0, logger.exceptionFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
@@ -96,13 +103,18 @@ TEST(LogLogger, Filters)
     logger.log(Level::debug, QLatin1String("nx::first::className3"), "ccc");
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
     ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
+
+    EXPECT_EQ(2, levelChangedCount);
 }
 
 TEST(LogLogger, Format)
 {
     const auto buffer = new Buffer();
-    const Logger::OnLevelChanged onLevelChanged = nullptr;
-    Logger logger(onLevelChanged, Level::verbose, std::unique_ptr<AbstractWriter>(buffer));
+    int levelChangedCount = 0;
+    const Logger::OnLevelChanged onLevelChanged = [&levelChangedCount](){ ++levelChangedCount; };
+
+    Logger logger(Level::verbose, std::unique_ptr<AbstractWriter>(buffer), onLevelChanged);
+    EXPECT_EQ(0, levelChangedCount);
 
     logger.log(Level::always, QLatin1String("nx::aaa::Object(1)"), "First message");
     logger.log(Level::error, QLatin1String("nx::bbb::Object(2)"), "Second message");
@@ -131,6 +143,8 @@ TEST(LogLogger, Format)
     verifyMessage(4, QLatin1String("DEBUG nx::eee::Object(5): Fivth message"));
     verifyMessage(5, QLatin1String("VERBOSE nx::fff::Object(6): Sixth message"));
     verifyMessage(6, QLatin1String("VERBOSE : Message without tag"));
+
+    EXPECT_EQ(0, levelChangedCount);
 }
 
 } // namespace test

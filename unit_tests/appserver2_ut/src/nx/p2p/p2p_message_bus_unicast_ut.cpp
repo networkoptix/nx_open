@@ -33,7 +33,7 @@ public:
         }
     }
 protected:
-    static const int kWaitTimeout = 1000 * 10;
+    static const int kWaitTimeout = 1000 * 15;
 
     bool isAllServersOnlineCond()
     {
@@ -61,6 +61,7 @@ protected:
             auto intervals = bus->delayIntervals();
             intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
             intervals.outConnectionsInterval = std::chrono::milliseconds(1);
+            intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
             bus->setDelayIntervals(intervals);
             QObject::connect(
                 server->moduleInstance()->commonModule()->messageProcessor(),
