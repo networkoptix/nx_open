@@ -4,17 +4,20 @@
 #include <QtGui/QPainter>
 
 #include <client/client_globals.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
+#include <ui/style/skin.h>
+
+#include <nx/client/desktop/ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace client {
-namespace desktop
-{
+namespace desktop {
 
-namespace
-{
+namespace {
 
 static constexpr auto kRoundingRadius = 2;
 
@@ -33,6 +36,10 @@ EventTile::EventTile(QWidget* parent) :
     ui(new Ui::EventTile())
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_Hover);
+
+    ui->closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
+    ui->closeButton->setIconSize(QnSkin::maximumSize(ui->closeButton->icon()));
 
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
@@ -57,6 +64,8 @@ EventTile::EventTile(QWidget* parent) :
     font.setPixelSize(kDescriptionFontPixelSize);
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+
+    connect(ui->closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, &EventTile::linkActivated);
 }
@@ -183,15 +192,47 @@ EventTile* EventTile::createFrom(const QModelIndex& index, QWidget* parent)
         index.data(Qn::DescriptionTextRole).toString(),
         parent);
 
+    tile->setToolTip(index.data(Qt::ToolTipRole).toString());
+
+    setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
+
     const auto color = index.data(Qt::ForegroundRole).value<QColor>();
     if (color.isValid())
         tile->setTitleColor(color);
 
     // TODO: #vkutin Preview?
 
-    // TODO: #vkutin Actions?
-
     return tile;
+}
+
+bool EventTile::event(QEvent* event)
+{
+    switch (event->type())
+    {
+        case QEvent::Enter:
+        case QEvent::HoverEnter:
+            ui->stackedWidget->setCurrentWidget(ui->closeButtonPage);
+            break;
+
+        case QEvent::Leave:
+        case QEvent::HoverLeave:
+            ui->stackedWidget->setCurrentWidget(ui->timestampPage);
+            break;
+
+        case QEvent::MouseButtonPress:base_type::event(event);
+            base_type::event(event);
+            event->accept();
+            return true;
+
+        case QEvent::MouseButtonRelease:
+            emit clicked();
+            break;
+
+        default:
+            break;
+    }
+
+    return base_type::event(event);
 }
 
 } // namespace

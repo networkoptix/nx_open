@@ -51,9 +51,15 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::TimestampTextRole:
             return QVariant::fromValue(timestampText(event.timestamp));
 
-        // TODO: #vkutin We might want brief description for Qn::DescriptionTextRole
-        // and full description for Qt::ToolTipRole.
+        case Qn::ActionIdRole:
+            return QVariant::fromValue(event.actionId);
+
+        case Qn::ActionParametersRole:
+            return QVariant::fromValue(event.actionParameters);
+
         case Qt::ToolTipRole:
+            return QVariant::fromValue(event.toolTip);
+
         case Qn::DescriptionTextRole:
         case Qt::AccessibleDescriptionRole:
             return QVariant::fromValue(event.description);
@@ -85,6 +91,9 @@ void EventListModel::clear()
 
 QString EventListModel::timestampText(qint64 timestampMs) const
 {
+    if (timestampMs <= 0)
+        return QString();
+
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs);
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
         return dateTime.date().toString(Qt::DefaultLocaleShortDate);

@@ -74,11 +74,11 @@ int EventListModel::Private::indexOf(const QnUuid& id) const
     const auto found = std::lower_bound(m_events.cbegin(), m_events.cend(), sequentialNumber,
         [](const EventDescriptor& left, qint64 right)
         {
-            return left.sequentialNumber < right;
+            return left.sequentialNumber > right;
         });
 
     return found != m_events.cend()
-        ? std::distance(found, m_events.cbegin())
+        ? std::distance(m_events.cbegin(), found)
         : -1;
 }
 

@@ -41,7 +41,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     QObject(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_systemHealth(new EventRibbon(/*q*/)),
+    m_systemHealth(new EventRibbon(q)),
     m_notifications(new EventRibbon(q)),
     m_systemHealthModel(new SystemHealthListModel(this)),
     m_notificationsModel(new NotificationListModel(this))
@@ -57,31 +57,72 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
     layout->addWidget(headerWidget);
-    //layout->addWidget(m_systemHealth);
+    layout->addWidget(m_systemHealth);
     layout->addWidget(m_notifications);
 
     m_systemHealth->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_notifications->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-/*
-    // TODO: #vkutin #removeme Debug shit
-    auto timer = new QTimer(this);
-    timer->start(1000);
+    // TODO: #vkutin In the future I might replace EventRibbon::addTile/removeTile with
+    // EventRibbon::setModel(EventListModel*) if every custom action can be described in EventData
 
-    connect(timer, &QTimer::timeout, this,
-        [this]()
-    {
-        const auto tile = new EventTile();
-        tile->setTitle(lit("Tile %1").arg(++g_number));
-        tile->setIcon(qnSkin->pixmap(lit("buttons/acknowledge.png")));
-        tile->setTimestamp(lit("now"));
-        m_normal->addTile(tile);
-    });
-    */
+    const auto connectToModel =
+        [this](EventRibbon* ribbon, EventListModel* model)
+        {
+            connect(model, &QAbstractListModel::rowsInserted, this,
+                [this, ribbon, model](const QModelIndex& /*parent*/, int first, int last)
+                {
+                    for (int i = first; i <= last; ++i)
+                    {
+                        const auto index = model->index(i);
+                        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+                        auto tile = newEventTile(index);
+                        ribbon->addTile(tile, uuid);
+
+                        connect(tile, &EventTile::closeRequested, this,
+                            [model, uuid]() { model->removeEvent(uuid); });
+                    }
+                });
+
+            connect(model, &QAbstractListModel::rowsAboutToBeRemoved, this,
+                [this, ribbon, model](const QModelIndex& /*parent*/, int first, int last)
+                {
+                    for (int i = first; i <= last; ++i)
+                    {
+                        const auto index = model->index(i);
+                        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+                        ribbon->removeTile(uuid);
+                    }
+                });
+        };
+
+    connectToModel(m_systemHealth, m_systemHealthModel);
+    connectToModel(m_notifications, m_notificationsModel);
 }
 
 NotificationListWidget::Private::~Private()
 {
+}
+
+EventTile* NotificationListWidget::Private::newEventTile(const QModelIndex& index) const
+{
+    auto tile = EventTile::createFrom(index);
+
+    const QVariant actionIdData = index.data(Qn::ActionIdRole);
+    if (actionIdData.canConvert<ui::action::IDType>())
+    {
+        const auto actionId = actionIdData.value<ui::action::IDType>();
+        const auto actionParameters = index.data(Qn::ActionParametersRole)
+            .value<ui::action::Parameters>();
+
+        connect(tile, &EventTile::clicked, this,
+            [this, actionId, actionParameters]()
+            {
+                menu()->triggerIfPossible(actionId, actionParameters);
+            });
+    }
+
+    return tile;
 }
 
 QToolButton* NotificationListWidget::Private::newActionButton(

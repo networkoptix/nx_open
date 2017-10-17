@@ -28,6 +28,7 @@ private:
 private:
     SystemHealthListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
+    QHash<QPair<QnSystemHealth::MessageType, QnResource*>, QnUuid> m_uuidHash;
 };
 
 } // namespace

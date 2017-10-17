@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>311</width>
+    <width>310</width>
     <height>109</height>
    </rect>
   </property>
@@ -26,27 +26,7 @@
    <property name="spacing">
     <number>8</number>
    </property>
-   <item row="2" column="1" colspan="2">
-    <widget class="QLabel" name="previewLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string notr="true"/>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="timestampLabel">
-     <property name="text">
-      <string notr="true">&lt;0:00:00&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
+   <item row="0" column="0" alignment="Qt::AlignTop">
     <widget class="QLabel" name="iconLabel">
      <property name="minimumSize">
       <size>
@@ -76,14 +56,13 @@
      <property name="text">
       <string notr="true">&lt;Event Name&gt;</string>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QLabel" name="descriptionLabel">
-     <property name="text">
-      <string notr="true">&lt;Textual description of the event&gt;</string>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
      <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="openExternalLinks">
       <bool>true</bool>
      </property>
     </widget>
@@ -98,6 +77,109 @@
      </property>
      <property name="text">
       <string notr="true">&lt;Action&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" alignment="Qt::AlignTop">
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="timestampPage">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item alignment="Qt::AlignRight">
+        <widget class="QLabel" name="timestampLabel">
+         <property name="text">
+          <string notr="true">&lt;0:00:00&gt;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="closeButtonPage">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item alignment="Qt::AlignRight|Qt::AlignTop">
+        <widget class="QPushButton" name="closeButton">
+         <property name="minimumSize">
+          <size>
+           <width>17</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>17</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string notr="true"/>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2">
+    <widget class="QLabel" name="descriptionLabel">
+     <property name="text">
+      <string notr="true">&lt;Textual description of the event&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="2">
+    <widget class="QLabel" name="previewLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string notr="true"/>
      </property>
     </widget>
    </item>

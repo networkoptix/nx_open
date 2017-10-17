@@ -6,6 +6,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <nx/client/desktop/ui/actions/action.h>
+#include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
@@ -27,23 +29,25 @@ public:
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+    virtual bool removeEvent(const QnUuid& id);
+
 protected:
     struct EventData
     {
         QnUuid id;
         QString title;
         QString description;
-        qint64 timestamp;
+        QString toolTip;
+        qint64 timestamp = 0;
         QPixmap icon;
         QColor titleColor;
-
-        // TODO: #vktuin Actions
-        // TODO: #vktuin What else? Resource list?
+        int helpId = -1;
+        ui::action::IDType actionId = ui::action::NoAction;
+        ui::action::Parameters actionParameters;
     };
 
 protected:
     virtual bool addEvent(const EventData& event);
-    virtual bool removeEvent(const QnUuid& id);
     virtual void clear();
 
     virtual QString timestampText(qint64 timestampMs) const;

@@ -68,11 +68,16 @@ public:
     static EventTile* createFrom(const QModelIndex& index, QWidget* parent = nullptr);
 
 signals:
+    void clicked();
+
+    void closeRequested();
+
     // Links can be passed and displayed in description field.
     void linkActivated(const QString& link);
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
+    virtual bool event(QEvent* event) override;
 
 private:
     QScopedPointer<Ui::EventTile> ui;

@@ -14,7 +14,7 @@ EventRibbon::EventRibbon(QWidget* parent):
     d(new Private(this))
 {
     // TODO: #removeme #vkutin This is just for testing.
-    setMinimumSize(0, 800);
+    setMinimumSize(0, 500);
 }
 
 EventRibbon::~EventRibbon()

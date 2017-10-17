@@ -15,6 +15,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class EventTile;
 class EventRibbon;
 
 class NotificationListWidget::Private:
@@ -28,6 +29,7 @@ public:
     virtual ~Private() override;
 
 private:
+    EventTile* newEventTile(const QModelIndex& index) const;
     QToolButton* newActionButton(ui::action::IDType actionId, int helpTopicId);
 
 private:

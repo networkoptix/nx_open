@@ -116,7 +116,37 @@ void EventRibbon::Private::addTile(EventTile* tileWidget, const QnUuid& id)
 
 void EventRibbon::Private::removeTile(const QnUuid& id)
 {
-    // TODO: #vkutin Implement me!
+    // TODO: #vkutin Right now this is slow.
+    auto toRemove = std::find_if(m_tiles.begin(), m_tiles.end(),
+        [id](const Tile& tile) { return tile.id == id; });
+
+    if (toRemove == m_tiles.end())
+        return;
+
+    m_totalHeight -= (toRemove->widget->height() + kDefaultTileSpacing);
+
+    toRemove->widget->deleteLater();
+
+    int position = toRemove->position;
+    for (auto iter = toRemove + 1; iter != m_tiles.end(); ++iter)
+    {
+        iter->position = position;
+        position += iter->widget->height() + kDefaultTileSpacing;
+    }
+
+    m_visibleTiles.remove(&*toRemove);
+    m_tiles.erase(toRemove);
+
+    updateScrollRange();
+
+    // TODO: #vkutin Compensate for scroll position if deleted item is before current view.
+    // TODO: #vkutin Don't update view if deleted item is after current view.
+
+    m_scrollBar->setVisible(m_totalHeight > m_viewport->height());
+
+    updateView();
+
+    q->updateGeometry();
 }
 
 void EventRibbon::Private::updateAllPositions()

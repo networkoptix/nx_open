@@ -291,6 +291,7 @@ namespace Qn
         TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
         DescriptionTextRole,                        /**< Role for generic description text (QString). */
+        ActionParametersRole,                       /**< Role for action parameters (ui::action::Parameters). */
 
         RoleCount
     };
