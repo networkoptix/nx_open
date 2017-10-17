@@ -3,6 +3,7 @@
 #if defined(ENABLE_HANWHA)
 
 #include <QtCore/QMap>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/semaphore.h>
@@ -12,6 +13,7 @@
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -28,8 +30,15 @@ struct HanwhaDeviceInfo
     HanwhaCgiParameters cgiParamiters;
     int channelCount = 0;
 
+    QString macAddress;
+    QString model;
+
+    HanwhaResponse videoSources;
+    HanwhaResponse videoProfiles;
+
     HanwhaDeviceInfo(CameraDiagnostics::Result diagnostics = CameraDiagnostics::NotImplementedResult()):
         diagnostics(diagnostics) {}
+    bool isValid() const { return (bool) diagnostics; }
 };
 
 class HanwhaSharedResourceContext:
@@ -41,7 +50,8 @@ public:
         QnMediaServerModule* serverModule,
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
-    HanwhaDeviceInfo loadInformation(const HanwhaResourcePtr& resource);
+    HanwhaDeviceInfo loadInformation(const QAuthenticator& auth, const QUrl& url);
+    void start(const QAuthenticator& auth, const QUrl& url);
 
     QString sessionKey(
         HanwhaSessionType sessionType,
@@ -57,7 +67,7 @@ private:
 
     mutable QnMutex m_informationMutex;
     QAuthenticator m_lastAuth;
-    QString m_lastUrl;
+    QUrl m_lastUrl;
     HanwhaDeviceInfo m_cachedInformation;
 
     mutable QnMutex m_sessionMutex;
@@ -66,6 +76,7 @@ private:
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
+    nx::utils::ElapsedTimer m_cacheUpdateTimer;
 };
 
 } // namespace plugins

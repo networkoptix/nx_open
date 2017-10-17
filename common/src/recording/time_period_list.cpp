@@ -412,29 +412,29 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
     const_iterator srcItr = begin();
     const_iterator dstItr = periodList.begin();
     QnTimePeriodList result;
-    QnTimePeriod substructPeriod = *dstItr;
+    QnTimePeriod subtractPeriod = *dstItr;
 
     while (srcItr != end())
     {
-        while (srcItr != end() && srcItr->startTimeMs < substructPeriod.startTimeMs)
+        while (srcItr != end() && srcItr->startTimeMs < subtractPeriod.startTimeMs)
             result << *srcItr++;
         if (!result.isEmpty())
-            result.last().truncate(substructPeriod.startTimeMs);
+            result.last().truncate(subtractPeriod.startTimeMs);
 
-        while (srcItr != end() && srcItr->endTimeMs() <= substructPeriod.endTimeMs())
+        while (srcItr != end() && srcItr->endTimeMs() <= subtractPeriod.endTimeMs())
             srcItr++;
         if (srcItr != end())
         {
             result << *srcItr++;
-            result.last().truncateFront(substructPeriod.endTimeMs());
+            result.last().truncateFront(subtractPeriod.endTimeMs());
         }
-        
+
         if (dstItr != periodList.end() - 1)
         {
-            substructPeriod = *(++dstItr);
+            subtractPeriod = *(++dstItr);
             if (!result.isEmpty())
             {
-                result.last().truncate(substructPeriod.startTimeMs);
+                result.last().truncate(subtractPeriod.startTimeMs);
                 if (result.last().isEmpty())
                     result.pop_back();
             }

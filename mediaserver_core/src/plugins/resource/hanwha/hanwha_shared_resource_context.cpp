@@ -15,6 +15,7 @@ namespace plugins {
 namespace {
 
 static const int kMaxConcurrentRequestNumber = 5;
+static const std::chrono::minutes kCacheDataTimeout(1);
 
 } // namespace
 
@@ -37,10 +38,10 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
         });
 }
 
-static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, const QString& url)
+static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, const QUrl& url)
 {
     HanwhaDeviceInfo info{CameraDiagnostics::NoErrorResult()};
-    HanwhaRequestHelper helper(auth, url);
+    HanwhaRequestHelper helper(auth, url.toString());
     helper.setIgnoreMutexAnalyzer(true);
 
     auto deviceinfo = helper.view(lit("system/deviceinfo"));
@@ -50,6 +51,31 @@ static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, co
             CameraDiagnostics::CameraInvalidParams(
                 lit("Can not fetch device information")))};
     }
+
+    if (auto value = deviceinfo.parameter<QString>("ConnectedMACAddress"))
+        info.macAddress = *value;
+    
+    if (info.macAddress.isEmpty())
+    {
+        HanwhaRequestHelper helper(auth, url.toString());
+        helper.setIgnoreMutexAnalyzer(true);
+        std::map<QString, QString> params{
+            { "interfaceName", "Network1" }
+        };
+        HanwhaResponse networkInfo = helper.view("network/interface", params);
+        if (!networkInfo.isSuccessful())
+        {
+            return{ error(deviceinfo,
+                CameraDiagnostics::CameraInvalidParams(
+                    lit("Can not fetch device information"))) };
+        }
+
+        if (auto value = deviceinfo.parameter<QString>("MACAddress"))
+            info.macAddress = *value;
+    }
+
+    if (auto value = deviceinfo.parameter<QString>("Model"))
+        info.model = *value;
 
     if (auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
         info.deviceType = std::move(value->trimmed());
@@ -71,6 +97,32 @@ static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, co
             lit("Camera cgi parameters are invalid"))};
     }
 
+    {
+        HanwhaRequestHelper helper(auth, url.toString());
+        helper.setIgnoreMutexAnalyzer(true);
+        info.videoSources = helper.view(lit("media/videosource"));
+        if (!info.videoSources.isSuccessful())
+        {
+            return{ CameraDiagnostics::RequestFailedResult(
+                info.videoSources.requestUrl(),
+                info.videoSources.errorString()) };
+        }
+    }
+
+    {
+        HanwhaRequestHelper helper(auth, url.toString());
+        helper.setIgnoreMutexAnalyzer(true);
+        info.videoProfiles = helper.view(lit("media/videoprofile"));
+        bool isCriticalError = !info.videoProfiles.isSuccessful()
+            && info.videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError;
+        if (isCriticalError)
+        {
+            return {CameraDiagnostics::RequestFailedResult(
+                info.videoProfiles.requestUrl(),
+                info.videoProfiles.errorString())};
+        }
+    }
+
     auto attributes = helper.fetchAttributes(lit("attributes/System"));
     const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
     info.channelCount = maxChannels ? *maxChannels : 1;
@@ -78,23 +130,27 @@ static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, co
     return info;
 }
 
-HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const HanwhaResourcePtr& resource)
+HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const QAuthenticator& auth, const QUrl& srcUrl)
 {
-    const auto auth = resource->getAuth();
-    const auto url = resource->getUrl();
-
+    bool isExpired = m_cacheUpdateTimer.hasExpired(kCacheDataTimeout);
+    QUrl url(srcUrl);
+    url.setQuery(QUrlQuery());
     QnMutexLocker lock(&m_informationMutex);
-    if (m_lastAuth != auth || m_lastUrl != url)
+    if (m_lastAuth != auth || m_lastUrl != url || isExpired || !m_cachedInformation.diagnostics)
     {
         m_lastAuth = auth;
         m_lastUrl = url;
+        m_cacheUpdateTimer.restart();
         m_cachedInformation = requestAndLoadInformation(auth, url);
-
-        m_chunkLoader->start(auth, url, m_cachedInformation.channelCount);
-        m_timeSynchronizer->start(resource);
     }
 
     return m_cachedInformation;
+}
+
+void HanwhaSharedResourceContext::start(const QAuthenticator& auth, const QUrl& url)
+{
+    m_chunkLoader->start(auth, url, m_cachedInformation.channelCount);
+    m_timeSynchronizer->start(auth, url);
 }
 
 QString HanwhaSharedResourceContext::sessionKey(

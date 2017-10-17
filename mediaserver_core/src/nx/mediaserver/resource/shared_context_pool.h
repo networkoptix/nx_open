@@ -34,7 +34,12 @@ public:
         AbstractSharedResourceContext::SharedId sharedId = resource->getSharedId();
         if (sharedId.isEmpty())
             return nullptr;
+        return sharedContext<ContextType>(sharedId);
+    }
 
+    template<typename ContextType>
+    std::shared_ptr<ContextType> sharedContext(AbstractSharedResourceContext::SharedId sharedId)
+    {
         QnMutexLocker lock(&m_mutex);
         if (const auto context = m_sharedContexts.value(sharedId).lock())
             return std::dynamic_pointer_cast<ContextType>(context);

@@ -61,16 +61,24 @@ HanwhaTimeSyncronizer::~HanwhaTimeSyncronizer()
     promise.get_future().wait();
 }
 
-void HanwhaTimeSyncronizer::start(HanwhaResourcePtr resource)
+void HanwhaTimeSyncronizer::start(const QAuthenticator& auth, const QUrl& url)
 {
     utils::promise<void> promise;
     m_timer.post(
-        [this, resource, &promise]() mutable
+        [this, auth, url, &promise]() mutable
         {
-            m_resource = resource;
-            m_timer.cancelSync();
-            m_startPromises.push_back(&promise);
-            verifyDateTime();
+            if (m_auth != auth || m_url != url)
+            {
+                m_auth = auth;
+                m_url = url;
+                m_timer.cancelSync();
+                m_startPromises.push_back(&promise);
+                verifyDateTime();
+            }
+            else
+            {
+                promise.set_value();
+            }
         });
 
     promise.get_future().wait();
@@ -168,7 +176,7 @@ void HanwhaTimeSyncronizer::setDateTime(const QDateTime& dateTime)
 
 void HanwhaTimeSyncronizer::retryVerificationIn(std::chrono::milliseconds timeout)
 {
-    if (!m_resource)
+    if (m_url.isEmpty())
         return;
 
     const auto verify = [this](){ verifyDateTime(); };
@@ -198,13 +206,12 @@ void HanwhaTimeSyncronizer::doRequest(
     const QString& action, std::map<QString, QString> params,
     bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler)
 {
-    const auto auth = m_resource->getAuth();
     const auto url = HanwhaRequestHelper::buildRequestUrl(
-        m_resource->getUrl(), lit("system"), lit("date"), action, params);
+        m_url, lit("system"), lit("date"), action, params);
 
     m_httpClient.pleaseStopSync();
-    m_httpClient.setUserName(auth.user());
-    m_httpClient.setUserPassword(auth.password());
+    m_httpClient.setUserName(m_auth.user());
+    m_httpClient.setUserPassword(m_auth.password());
     m_httpClient.doGet(url,
         [this, url, isList, handler = std::move(handler)]()
         {
