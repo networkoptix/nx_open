@@ -64,7 +64,7 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterUncreatableType<QnSoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
 
-    nx::client::core::ui::FrameSection::registedQmlType();
+    nx::client::core::FrameSection::registedQmlType();
     nx::client::core::Geometry::registerQmlType();
 
     qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",

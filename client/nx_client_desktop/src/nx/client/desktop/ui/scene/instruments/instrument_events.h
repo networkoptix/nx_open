@@ -34,6 +34,22 @@ public:
     bool accepted = false;
 };
 
+class HoverEvent: public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(QPoint position MEMBER position CONSTANT)
+
+    Q_PROPERTY(bool accepted MEMBER accepted)
+
+public:
+    HoverEvent(const QHoverEvent* event);
+
+    QPoint position;
+
+    bool accepted = false;
+};
+
 } // namespace scene
 } // namespace ui
 } // namespace desktop
@@ -41,3 +57,4 @@ public:
 } // namespace nx
 
 QML_DECLARE_TYPE(nx::client::desktop::ui::scene::MouseEvent)
+QML_DECLARE_TYPE(nx::client::desktop::ui::scene::HoverEvent)

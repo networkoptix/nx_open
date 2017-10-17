@@ -6,7 +6,6 @@
 namespace nx {
 namespace client {
 namespace core {
-namespace ui {
 
 class FrameSection: public QObject
 {
@@ -33,10 +32,11 @@ public:
         const QRectF& rect,
         qreal frameWidth);
 
+    Q_INVOKABLE static Qt::WindowFrameSection toQtWindowFrameSection(Section section);
+
     static void registedQmlType();
 };
 
-} // namespace ui
 } // namespace core
 } // namespace client
 } // namespace nx

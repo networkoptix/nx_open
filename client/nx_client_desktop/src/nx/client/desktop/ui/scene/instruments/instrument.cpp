@@ -26,6 +26,9 @@ public:
     bool handleMouseButtonRelease(QMouseEvent* event);
     bool handleMouseMove(QMouseEvent* event);
     bool handleMouseButtonDblClick(QMouseEvent* event);
+    bool handleHoverEnter(QHoverEvent* event);
+    bool handleHoverLeave(QHoverEvent* event);
+    bool handleHoverMove(QHoverEvent* event);
 };
 
 Instrument::Instrument(QObject* parent):
@@ -66,6 +69,27 @@ bool Instrument::Private::handleMouseButtonDblClick(QMouseEvent* event)
     MouseEvent mouse(event);
     emit q->mouseDblClick(&mouse);
     return mouse.accepted;
+}
+
+bool Instrument::Private::handleHoverEnter(QHoverEvent* event)
+{
+    HoverEvent hover(event);
+    emit q->hoverEnter(&hover);
+    return hover.accepted;
+}
+
+bool Instrument::Private::handleHoverLeave(QHoverEvent* event)
+{
+    HoverEvent hover(event);
+    emit q->hoverLeave(&hover);
+    return hover.accepted;
+}
+
+bool Instrument::Private::handleHoverMove(QHoverEvent* event)
+{
+    HoverEvent hover(event);
+    emit q->hoverMove(&hover);
+    return hover.accepted;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -133,6 +157,12 @@ bool Instrument::eventFilter(QObject* object, QEvent* event)
             return d->handleMouseMove(static_cast<QMouseEvent*>(event));
         case QEvent::MouseButtonDblClick:
             return d->handleMouseButtonDblClick(static_cast<QMouseEvent*>(event));
+        case QEvent::HoverEnter:
+            return d->handleHoverEnter(static_cast<QHoverEvent*>(event));
+        case QEvent::HoverLeave:
+            return d->handleHoverLeave(static_cast<QHoverEvent*>(event));
+        case QEvent::HoverMove:
+            return d->handleHoverMove(static_cast<QHoverEvent*>(event));
 
         default:
             break;
@@ -143,9 +173,11 @@ bool Instrument::eventFilter(QObject* object, QEvent* event)
 
 void Instrument::registerQmlType()
 {
-    qmlRegisterType<Instrument>("Nx.Client.Desktop.Ui.Scene", 1, 0, "Instrument");
-    qmlRegisterUncreatableType<MouseEvent>("Nx.Client.Desktop.Ui.Scene", 1, 0, "MouseEvent",
+    qmlRegisterType<Instrument>("nx.client.desktop", 1, 0, "Instrument");
+    qmlRegisterUncreatableType<MouseEvent>("nx.client.desktop", 1, 0, "MouseEvent",
         lit("Cannot create instance of MouseEvent"));
+    qmlRegisterUncreatableType<HoverEvent>("nx.client.desktop", 1, 0, "HoverEvent",
+        lit("Cannot create instance of HoverEvent"));
 }
 
 } // namespace scene

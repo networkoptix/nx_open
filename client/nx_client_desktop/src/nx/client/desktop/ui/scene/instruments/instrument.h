@@ -11,6 +11,7 @@ namespace ui {
 namespace scene {
 
 class MouseEvent;
+class HoverEvent;
 
 class Instrument: public QObject
 {
@@ -42,6 +43,9 @@ signals:
     void mouseRelease(nx::client::desktop::ui::scene::MouseEvent* mouse);
     void mouseMove(nx::client::desktop::ui::scene::MouseEvent* mouse);
     void mouseDblClick(nx::client::desktop::ui::scene::MouseEvent* mouse);
+    void hoverEnter(nx::client::desktop::ui::scene::HoverEvent* hover);
+    void hoverLeave(nx::client::desktop::ui::scene::HoverEvent* hover);
+    void hoverMove(nx::client::desktop::ui::scene::HoverEvent* hover);
 
 private:
     class Private;

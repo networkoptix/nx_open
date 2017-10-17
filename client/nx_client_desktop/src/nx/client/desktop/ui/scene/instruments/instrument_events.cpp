@@ -15,6 +15,11 @@ MouseEvent::MouseEvent(const QMouseEvent* event):
 {
 }
 
+HoverEvent::HoverEvent(const QHoverEvent* event):
+    position(event->pos())
+{
+}
+
 } // namespace scene
 } // namespace ui
 } // namespace desktop
