@@ -8,7 +8,13 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
-static constexpr std::chrono::seconds kHostExpirationPeriod = std::chrono::seconds(31);
+static std::chrono::milliseconds s_connectionLessHolderExpirationTimeout = std::chrono::seconds(31);
+
+void ReverseConnectionHolder::setConnectionlessHolderExpirationTimeout(
+    std::chrono::milliseconds value)
+{
+    s_connectionLessHolderExpirationTimeout = value;
+}
 
 ReverseConnectionHolder::ReverseConnectionHolder(
     aio::AbstractAioThread* aioThread,
@@ -71,9 +77,10 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
 
 bool ReverseConnectionHolder::isActive() const
 {
+    const auto expirationTime = m_prevConnectionTime + s_connectionLessHolderExpirationTimeout;
     return 
         m_socketCount > 0 ||
-        (std::chrono::steady_clock::now() < m_prevConnectionTime + kHostExpirationPeriod);
+        (std::chrono::steady_clock::now() < expirationTime);
 }
 
 size_t ReverseConnectionHolder::socketCount() const
