@@ -19,12 +19,12 @@
 	{% for context_name, records in contexts.items %}
 		<h2>{{ context_name }} for {{ records.0.data_structure.context.product.name }}</h2>
 		<fieldset>
-		    <h3>{{ records.0.data_structure.context.description }}</h3>
+		    <p>{{ records.0.data_structure.context.description }}</p>
 		    {% if records.0.data_structure.context.translatable %}
-		    <h3>Page can be translated</h3>
+		    <p>Page can be translated</p>
 		    {% endif %}
 		    {% if records.0.data_structure.context.url %}
-		    <h3> Link to Page: <a href="{{ records.0.data_structure.context.url }}">{{ records.0.data_structure.context.url }}</a></h3>
+		    <p> Link to Page: <a href="{{ records.0.data_structure.context.url }}">{{ records.0.data_structure.context.url }}</a></p>
 		    {% endif %}
 		</fieldset>
 		<table style="width: 100%">
@@ -39,12 +39,12 @@
 				<tr>
 					<td>
 						{% if record.language %}
-						<button class="btn"><a
+						<button class="btn btn-sm btn-info"><a
 						   href="{% url 'page_editor' record.data_structure.context.id record.language.code %}">
 						   Edit Record
 						</a></button>
 						{% else %}
-						<button class="btn"><a href="{% url 'page_editor' record.data_structure.context.id %}">
+						<button class="btn btn-sm btn-info"><a href="{% url 'page_editor' record.data_structure.context.id %}">
 						   Edit Record
 						</a></button>
 						{% endif %}
@@ -75,15 +75,15 @@
 	{% csrf_token %}
 	<div class="submit-row">
 		{% if perms.cms.force_update and version.state == 'current' %}
-			<button class="btn btn-danger pull-left" type="submit" name="Force Update">Force Update</button>
+			<button class="btn btn-sm btn-danger pull-left" type="submit" name="Force Update">Force Update</button>
 		{% endif %}
 		{% if preview_link %}
-			<button class='btn btn-info' onClick="openPreview(event)">Open Preview</button>
+			<button class='btn btn-sm btn-info' onClick="openPreview(event)">Open Preview</button>
 		{% endif %}
 		{% if not version.accepted_date %}
-        	<button class="btn btn-primary" type="submit" name="Preview">Generate Preview</button>
+        	<button class="btn btn-sm btn-primary" type="submit" name="Preview">Generate Preview</button>
 			{% if perms.cms.publish_version %}
-        	<button class="btn btn-danger" type="submit" name="Publish">Publish</button>
+        	<button class="btn btn-sm btn-danger" type="submit" name="Publish">Publish</button>
 			{% endif %}
 		{% endif %}
 	</div>
