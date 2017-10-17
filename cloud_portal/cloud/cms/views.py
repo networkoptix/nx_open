@@ -264,7 +264,7 @@ def product_settings(request, product_id):
                     'success': messages.SUCCESS,
                     'warning': messages.WARNING,
                 }[item[0]]
-            messages.add_message(request, log_type, item[1])
+                messages.add_message(request, log_type, item[1])
     else:
         form = ProductSettingsForm()
 

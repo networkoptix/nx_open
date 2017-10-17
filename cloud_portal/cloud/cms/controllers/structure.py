@@ -145,6 +145,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             log_messages.append(('warning', 'Not found structure.json file'))
 
     for name in zip_file.namelist():
+        # log_messages.append(('info', 'Processing %s' % name))
         if name.startswith('__') or name.endswith('structure.json'):  # Ignore trash in archive from MACs or **structure.json files
             log_messages.append(('info', 'Ignored: %s' % name))
             continue
@@ -179,6 +180,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
         # try to find relevant data structure and update its default (maybe)
         structure = DataStructure.objects.filter(name=short_name)
         if not structure.exists():
+            log_messages.append(('warning', 'Ignored: %s (data structure %s does not exist)' % (name, short_name)))
             continue
         structure = structure.first()
 
@@ -218,4 +220,5 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             )
             record.save()
             log_messages.append(('success', 'Updated value for data structure %s using %s' % (structure.label, name)))
+    log_messages.append(('success', 'Finished'))
     return log_messages
