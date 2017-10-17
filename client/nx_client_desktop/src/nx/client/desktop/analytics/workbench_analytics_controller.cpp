@@ -282,7 +282,8 @@ QRectF WorkbenchAnalyticsController::adjustZoomRect(const QRectF& value) const
         return result;
 
     // Zoom rects are stored in relative coordinates, so aspect ratio must be 1.0
-    result = QnGeometry::expanded(1.0, result, Qt::KeepAspectRatioByExpanding);
+    if (!ini().allowCustomArZoomWindows)
+        result = QnGeometry::expanded(1.0, result, Qt::KeepAspectRatioByExpanding);
     result = QnGeometry::movedInto(result, kFullRect);
     return result;
 }

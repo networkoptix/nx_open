@@ -19,6 +19,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableAnalytics, "Enable analytics engine");
     NX_INI_FLAG(0, demoAnalyticsDriver, "Enable demo analytics driver");
     NX_INI_FLAG(0, externalMetadata, "Use external metadata for local files.");
+    NX_INI_FLAG(0, allowCustomArZoomWindows, "Allow zoom windows to have custom aspect ratio.");
 };
 
 inline Ini& ini()
