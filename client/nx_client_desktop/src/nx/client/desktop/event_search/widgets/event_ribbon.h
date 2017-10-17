@@ -20,8 +20,8 @@ public:
     EventRibbon(QWidget* parent = nullptr);
     virtual ~EventRibbon() override;
 
-    void addTile(EventTile* tile, const QnUuid& id);
-    void removeTile(const QnUuid& id);
+    void insertTile(int index, EventTile* tile);
+    void removeTiles(int first, int count);
 
     virtual QSize sizeHint() const override;
 

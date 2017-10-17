@@ -83,11 +83,17 @@ EventRibbon::Private::~Private()
 {
 }
 
-void EventRibbon::Private::addTile(EventTile* tileWidget, const QnUuid& id)
+void EventRibbon::Private::insertTile(int index, EventTile* tileWidget)
 {
     NX_EXPECT(tileWidget);
     if (!tileWidget)
         return;
+
+    if (index < 0 || index > m_tiles.count())
+    {
+        NX_ASSERT(false, Q_FUNC_INFO, "Insertion index is out of range");
+        return;
+    }
 
     tileWidget->setParent(m_viewport);
     tileWidget->setVisible(true);
@@ -95,57 +101,66 @@ void EventRibbon::Private::addTile(EventTile* tileWidget, const QnUuid& id)
     tileWidget->setGeometry(0, kOutside, m_currentWidth, calculateHeight(tileWidget));
     const auto delta = tileWidget->height() + kDefaultTileSpacing;
 
-    for (auto& tile: m_tiles)
-        tile.position += delta;
+    const auto position = (index > 0)
+        ? m_tiles[index - 1].position + m_tiles[index - 1].widget->height() + kDefaultTileSpacing
+        : 0;
 
-    // TODO: #vkutin Fast lookup by id? Checking for duplicates?
-    m_tiles.push_front(Tile(tileWidget, id));
+    for (int i = index; i < m_tiles.count(); ++i)
+        m_tiles[i].position += delta;
+
+    m_tiles.insert(index, Tile(tileWidget, position));
+
     m_totalHeight += delta;
-
     updateScrollRange();
 
-    if (m_scrollBar->value() > delta)
+    if (position + delta < m_scrollBar->value())
         m_scrollBar->setValue(m_scrollBar->value() + delta);
 
-    m_scrollBar->setVisible(m_totalHeight > m_viewport->height());
-
     updateView();
-
     q->updateGeometry();
 }
 
-void EventRibbon::Private::removeTile(const QnUuid& id)
+void EventRibbon::Private::removeTiles(int first, int count)
 {
-    // TODO: #vkutin Right now this is slow.
-    auto toRemove = std::find_if(m_tiles.begin(), m_tiles.end(),
-        [id](const Tile& tile) { return tile.id == id; });
-
-    if (toRemove == m_tiles.end())
+    NX_EXPECT(count);
+    if (count == 0)
         return;
 
-    m_totalHeight -= (toRemove->widget->height() + kDefaultTileSpacing);
-
-    toRemove->widget->deleteLater();
-
-    int position = toRemove->position;
-    for (auto iter = toRemove + 1; iter != m_tiles.end(); ++iter)
+    if (first < 0 || count < 0 || first + count > m_tiles.count())
     {
-        iter->position = position;
-        position += iter->widget->height() + kDefaultTileSpacing;
+        NX_ASSERT(false, Q_FUNC_INFO, "Removal range is invalid");
+        return;
     }
 
-    m_visibleTiles.remove(&*toRemove);
-    m_tiles.erase(toRemove);
+    int delta = 0;
+
+    const int last = first + count - 1;
+    const int nextPosition = m_tiles[last].position + m_tiles[last].widget->height()
+        + kDefaultTileSpacing;
+
+    for (int i = first; i <= last; ++i)
+    {
+        delta += m_tiles[first].widget->height() + kDefaultTileSpacing;
+        m_tiles[first].widget->deleteLater();
+        m_tiles.removeAt(first);
+    }
+
+    auto newVisible = m_visible - nx::utils::IntegerRange(first, count);
+    newVisible = newVisible.left | (newVisible.right - count);
+    NX_EXPECT(!newVisible.right);
+    m_visible = newVisible.left;
+
+    m_totalHeight -= delta;
+
+    for (int i = first; i < m_tiles.count(); ++i)
+        m_tiles[i].position -= delta;
+
+    if (nextPosition < m_scrollBar->value())
+        m_scrollBar->setValue(m_scrollBar->value() - delta);
 
     updateScrollRange();
 
-    // TODO: #vkutin Compensate for scroll position if deleted item is before current view.
-    // TODO: #vkutin Don't update view if deleted item is after current view.
-
-    m_scrollBar->setVisible(m_totalHeight > m_viewport->height());
-
     updateView();
-
     q->updateGeometry();
 }
 
@@ -188,6 +203,7 @@ void EventRibbon::Private::updateScrollRange()
     const auto viewHeight = m_viewport->height();
     m_scrollBar->setMaximum(qMax(m_totalHeight - viewHeight, 1));
     m_scrollBar->setPageStep(viewHeight);
+    m_scrollBar->setVisible(m_totalHeight > viewHeight);
 }
 
 void EventRibbon::Private::updateView()
@@ -201,27 +217,25 @@ void EventRibbon::Private::updateView()
     const auto first = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), position,
         [](int left, const Tile& right) { return left < right.position; }) - 1;
 
-    QSet<const Tile*> newVisibleTiles;
-
+    int visibleCount = 0;
     int currentPosition = first->position - position;
-    for (auto iter = first; iter != m_tiles.end(); ++iter)
+
+    for (auto iter = first; iter != m_tiles.end() && currentPosition < height; ++iter, ++visibleCount)
     {
         iter->widget->move(0, currentPosition);
-        newVisibleTiles.insert(&*iter);
-
         currentPosition += iter->widget->height() + kDefaultTileSpacing;
-        if (currentPosition >= height)
-            break;
     }
+
+    nx::utils::IntegerRange newVisible(std::distance(m_tiles.cbegin(), first), visibleCount);
 
     // We cannot hide tiles because their lazy layouts would stop telling us correct size hints.
-    for (auto tile: m_visibleTiles)
+    for (int i = m_visible.first(); i <= m_visible.last(); ++i)
     {
-        if (!newVisibleTiles.contains(tile))
-            tile->widget->move(0, kOutside);
+        if (!newVisible.contains(i))
+            m_tiles[i].widget->move(0, kOutside);
     }
 
-    m_visibleTiles = newVisibleTiles;
+    m_visible = newVisible;
     m_viewport->update();
 }
 

@@ -2,6 +2,8 @@
 
 #include "../event_ribbon.h"
 
+#include <nx/utils/integer_range.h>
+
 class QScrollBar;
 
 namespace nx {
@@ -18,8 +20,8 @@ public:
     Private(EventRibbon* q);
     virtual ~Private() override;
 
-    void addTile(EventTile* tileWidget, const QnUuid& id);
-    void removeTile(const QnUuid& id);
+    void insertTile(int index, EventTile* tileWidget);
+    void removeTiles(int first, int count);
 
     int totalHeight() const;
 
@@ -29,11 +31,10 @@ private:
     struct Tile
     {
         EventTile* widget = nullptr;
-        QnUuid id;
         int position = 0;
 
         Tile() = default;
-        Tile(EventTile* widget, const QnUuid& id): widget(widget), id(id) {}
+        Tile(EventTile* widget, int position = 0): widget(widget), position(position) {}
     };
 
     void updateView();
@@ -52,9 +53,7 @@ private:
     int m_totalHeight = 0;
     int m_currentWidth = 0;
 
-    QSet<const Tile*> m_visibleTiles;
-    int m_position = 0;
-    int m_height = 0;
+    nx::utils::IntegerRange m_visible;
 };
 
 } // namespace

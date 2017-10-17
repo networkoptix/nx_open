@@ -21,14 +21,14 @@ EventRibbon::~EventRibbon()
 {
 }
 
-void EventRibbon::addTile(EventTile* tile, const QnUuid& id)
+void EventRibbon::insertTile(int index, EventTile* tile)
 {
-    d->addTile(tile, id);
+    d->insertTile(index, tile);
 }
 
-void EventRibbon::removeTile(const QnUuid& id)
+void EventRibbon::removeTiles(int first, int count)
 {
-    d->removeTile(id);
+    d->removeTiles(first, count);
 }
 
 QSize EventRibbon::sizeHint() const

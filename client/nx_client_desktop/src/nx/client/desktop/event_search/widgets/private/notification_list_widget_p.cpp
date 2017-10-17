@@ -76,8 +76,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
                     {
                         const auto index = model->index(i);
                         const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+
                         auto tile = newEventTile(index);
-                        ribbon->addTile(tile, uuid);
+                        ribbon->insertTile(i, tile);
 
                         connect(tile, &EventTile::closeRequested, this,
                             [model, uuid]() { model->removeEvent(uuid); });
@@ -87,12 +88,7 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
             connect(model, &QAbstractListModel::rowsAboutToBeRemoved, this,
                 [this, ribbon, model](const QModelIndex& /*parent*/, int first, int last)
                 {
-                    for (int i = first; i <= last; ++i)
-                    {
-                        const auto index = model->index(i);
-                        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
-                        ribbon->removeTile(uuid);
-                    }
+                    ribbon->removeTiles(first, last - first + 1);
                 });
         };
 
