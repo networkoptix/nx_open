@@ -1326,8 +1326,8 @@ void MediaServerProcess::loadResourcesFromECS(
                 return;
         }
 
-        QMultiHash<QnUuid, QUrl> additionalAddressesById;
-        QMultiHash<QnUuid, QUrl> ignoredAddressesById;
+        QMultiHash<QnUuid, nx::utils::Url> additionalAddressesById;
+        QMultiHash<QnUuid, nx::utils::Url> ignoredAddressesById;
         for (const ec2::ApiDiscoveryData &data: discoveryDataList)
         {
             additionalAddressesById.insert(data.id, data.url);
@@ -1340,7 +1340,7 @@ void MediaServerProcess::loadResourcesFromECS(
             QList<SocketAddress> addresses;
             ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses);
 
-            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer.id);
+            QList<nx::utils::Url> additionalAddresses = additionalAddressesById.values(mediaServer.id);
             for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
                 const SocketAddress addr(it->host(), it->port());
                 if (it->port() == -1 && addresses.contains(addr))

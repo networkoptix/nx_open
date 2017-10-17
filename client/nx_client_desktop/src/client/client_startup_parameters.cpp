@@ -123,7 +123,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     return result;
 }
 
-QString QnStartupParameters::createAuthenticationString(const QUrl& url,
+QString QnStartupParameters::createAuthenticationString(const nx::utils::Url& url,
     const QnSoftwareVersion& version)
 {
     // For old clients use compatible format
@@ -134,7 +134,7 @@ QString QnStartupParameters::createAuthenticationString(const QUrl& url,
     return kEncodeAuthMagic + encoded.encoded();
 }
 
-QUrl QnStartupParameters::parseAuthenticationString(QString string)
+nx::utils::Url QnStartupParameters::parseAuthenticationString(QString string)
 {
     if (string.startsWith(kEncodeAuthMagic))
     {
@@ -142,10 +142,10 @@ QUrl QnStartupParameters::parseAuthenticationString(QString string)
         string = QnEncodedString::fromEncoded(string).value();
     }
 
-    return QUrl::fromUserInput(string);
+    return nx::utils::Url::fromUserInput(string);
 }
 
-QUrl QnStartupParameters::parseAuthenticationString() const
+nx::utils::Url QnStartupParameters::parseAuthenticationString() const
 {
     return parseAuthenticationString(authenticationString);
 }

@@ -282,7 +282,7 @@ void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
     QStringList arguments;
     arguments << lit("--videowall");
     arguments << videoWallUuid.toString();
-    QUrl url = commonModule->currentUrl();
+    nx::utils::Url url = commonModule->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
     arguments << lit("--auth");
@@ -705,7 +705,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
 {
     QStringList arguments = args;
 
-    QUrl url = commonModule()->currentUrl();
+    nx::utils::Url url = commonModule()->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
 

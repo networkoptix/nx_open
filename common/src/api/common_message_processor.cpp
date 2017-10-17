@@ -219,16 +219,16 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     if (data.id.isNull())
         return;
 
-    QUrl url(data.url);
+    nx::utils::Url url(data.url);
 
     QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server) {
         if (!data.ignore) {
-            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
+            QList<nx::utils::Url> urls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
             urls.append(url);
             commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(data.id, urls);
         } else {
-            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
+            QList<nx::utils::Url> urls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
             urls.append(url);
             commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(data.id, urls);
         }
@@ -236,8 +236,8 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     }
 
     QList<SocketAddress> addresses = server->getNetAddrList();
-    QList<QUrl> additionalUrls = server->getAdditionalUrls();
-    QList<QUrl> ignoredUrls = server->getIgnoredUrls();
+    QList<nx::utils::Url> additionalUrls = server->getAdditionalUrls();
+    QList<nx::utils::Url> ignoredUrls = server->getIgnoredUrls();
 
     if (addInformation) {
         if (!additionalUrls.contains(url) && !addresses.contains(SocketAddress(url.host(), url.port())))

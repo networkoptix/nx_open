@@ -28,7 +28,7 @@ public:
         stopWhileInAioThread();
     }
 
-    virtual void connect(const QUrl&, ConnectHandler) override {}
+    virtual void connect(const nx::utils::Url&, ConnectHandler) override {}
     MOCK_METHOD3(setIndicationHandler, bool(int, IndicationHandler, void*));
     MOCK_METHOD2(addOnReconnectedHandler, void(ReconnectHandler, void*));
     MOCK_METHOD3(addConnectionTimer, bool(std::chrono::milliseconds, TimerHandler, void*));

@@ -188,7 +188,8 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 
     setCreateStreamSocketFunc(
         []( bool /*sslRequired*/,
-            nx::network::NatTraversalSupport /*natTraversalRequired*/) ->
+            nx::network::NatTraversalSupport /*natTraversalRequired*/,
+            boost::optional<int> /*ipVersion*/) ->
                 std::unique_ptr< AbstractStreamSocket >
         {
             return std::make_unique<CloudStreamSocket>(AF_INET);

@@ -8,7 +8,7 @@
 namespace nx_upnp {
 namespace test {
 
-static const QUrl URL( lit("http://192.168.20.1:52869/ctl/IPConn") );
+static const nx::utils::Url URL( lit("http://192.168.20.1:52869/ctl/IPConn") );
 static const auto TCP = AsyncClient::Protocol::TCP;
 static const QString INTERNAL_IP = lit( "192.168.20.77" );
 static const QString EXTERNAL_IP = lit( "10.0.2.161" );

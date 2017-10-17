@@ -95,7 +95,7 @@ namespace {
 
 QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent) :
     QnNetworkPeerTask(parent),
-    m_mainUpdateUrl(QUrl(qnSettings->updateFeedUrl())),
+    m_mainUpdateUrl(nx::utils::Url(qnSettings->updateFeedUrl())),
     m_target(target)
 {
 }
@@ -222,7 +222,7 @@ bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
 
 void QnCheckForUpdatesPeerTask::checkBuildOnline()
 {
-    QUrl url(lit("%1/%2/%3")
+    nx::utils::Url url(lit("%1/%2/%3")
         .arg(m_updateLocationPrefix).arg(m_target.version.build()).arg(buildInformationSuffix));
 
     auto httpClient = nx_http::AsyncHttpClient::create();
@@ -415,7 +415,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
             const auto modification = variant.key().mid(arch.size() + 1);
 
             QnUpdateFileInformationPtr info(
-                new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + variant->file)));
+                new QnUpdateFileInformation(m_target.version, nx::utils::Url(urlPrefix + variant->file)));
             info->baseFileName = variant->file;
             info->fileSize = variant->size;
             info->md5 = variant->md5;
@@ -443,7 +443,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
         if (!variant.file.isEmpty())
         {
             m_clientUpdateFile.reset(
-                new QnUpdateFileInformation(m_target.version, QUrl(urlPrefix + variant.file)));
+                new QnUpdateFileInformation(m_target.version, nx::utils::Url(urlPrefix + variant.file)));
             m_clientUpdateFile->baseFileName = variant.file;
             m_clientUpdateFile->fileSize = variant.size;
             m_clientUpdateFile->md5 = variant.md5;

@@ -22,7 +22,7 @@ QnMergeSystemsTool::QnMergeSystemsTool(QObject* parent):
 {
 }
 
-void QnMergeSystemsTool::pingSystem(const QUrl& url, const QAuthenticator& userAuth)
+void QnMergeSystemsTool::pingSystem(const nx::utils::Url &url, const QAuthenticator& userAuth)
 {
     if (!m_twoStepRequests.isEmpty())
         return;
@@ -46,7 +46,7 @@ void QnMergeSystemsTool::pingSystem(const QUrl& url, const QAuthenticator& userA
 }
 
 
-int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QAuthenticator& userAuth, bool ownSettings)
+int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const nx::utils::Url &url, const QAuthenticator& userAuth, bool ownSettings)
 {
     NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2")
             .arg(proxy->getApiUrl().toString(QUrl::RemovePassword))
@@ -128,7 +128,7 @@ void QnMergeSystemsTool::at_getNonceForPingFinished(
 
 int QnMergeSystemsTool::configureIncompatibleServer(
     const QnMediaServerResourcePtr& proxy,
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& userAuth)
 {
     TwoStepRequestCtx ctx;

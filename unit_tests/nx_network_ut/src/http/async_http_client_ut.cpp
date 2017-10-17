@@ -140,7 +140,7 @@ protected:
 
     void testResult(const QString& path, const nx_http::BufferType& expectedResult)
     {
-        const QUrl url(lit("http://%1%2")
+        const nx::utils::Url url(lit("http://%1%2")
             .arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         nx::utils::promise<void> promise;
@@ -161,7 +161,7 @@ protected:
 private:
     nx::utils::SyncQueue<nx_http::Request> m_receivedRequests;
 
-    QUrl commonTestUrl(const QString& requestPath) const
+    nx::utils::Url commonTestUrl(const QString& requestPath) const
     {
         return nx::network::url::Builder().setScheme("http")
             .setEndpoint(testHttpServer().serverAddress())
@@ -241,7 +241,7 @@ TEST_F(AsyncHttpClient, ServerModRewrite)
 }
 
 namespace {
-static void testHttpClientForFastRemove(const QUrl& url)
+static void testHttpClientForFastRemove(const nx::utils::Url& url)
 {
     // use different delays (10us - 0.5s) to catch problems on different stages
     for (uint time = 10; time < 500000; time *= 2)
@@ -269,7 +269,7 @@ TEST_F(AsyncHttpClient, FastRemove)
 
 TEST_F(AsyncHttpClient, FastRemoveBadHost)
 {
-    QUrl url(lit("http://doestNotExist.host/"));
+    nx::utils::Url url(lit("http://doestNotExist.host/"));
 
     for (int i = 0; i < 1000; ++i)
     {
@@ -307,7 +307,7 @@ TEST_F(AsyncHttpClient, motionJpegRetrieval)
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //fetching mjpeg with async http client
-    const QUrl url(lit("http://127.0.0.1:%1/mjpg").arg(m_testHttpServer->serverAddress().port));
+    const nx::utils::Url url(lit("http://127.0.0.1:%1/mjpg").arg(m_testHttpServer->serverAddress().port));
 
     struct ClientContext
     {
@@ -390,7 +390,7 @@ public:
     }
 
 protected:
-    void doRequest(const QUrl& url, const QByteArray& message)
+    void doRequest(const nx::utils::Url& url, const QByteArray& message)
     {
         static const int kWaitTimeoutMs = 1000 * 10;
 
@@ -411,7 +411,7 @@ protected:
 private:
     struct TestRequestContext
     {
-        QUrl url;
+        nx::utils::Url url;
         QByteArray message;
     };
 
@@ -430,7 +430,7 @@ private:
 
         for (std::size_t i = 0; i < m_requests.size(); ++i)
         {
-            m_requests[i].url = QUrl(
+            m_requests[i].url = nx::utils::Url(
                 lit("http://127.0.0.1/AsyncHttpClientTestMultiRequest_%1").arg(i));
             m_requests[i].message = lit("SimpleMessage_%1").arg(i).toLatin1();
         }
@@ -668,7 +668,7 @@ TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
             }));
     ASSERT_TRUE(testHttpServer().bindAndListen());
 
-    QUrl testUrl(lit("http://%1%2")
+    nx::utils::Url testUrl(lit("http://%1%2")
         .arg(testHttpServer().serverAddress().toString())
         .arg(QString::fromLatin1(testPath)));
 
@@ -703,7 +703,7 @@ protected:
         const auto query = QUrl::toPercentEncoding("param1=test#%20#&param2");
         const auto fragment = QUrl::toPercentEncoding("#frag%20ment");
 
-        m_testUrl = QUrl(lit("http://%1%2?%3#%4")
+        m_testUrl = nx::utils::Url(lit("http://%1%2?%3#%4")
             .arg(testHttpServer().serverAddress().toString())
             .arg(testPath()).arg(QLatin1String(query)).arg(QLatin1String(fragment)));
 
@@ -734,9 +734,9 @@ protected:
 
 private:
     nx::utils::SyncQueue<nx_http::Request> m_receivedRequests;
-    nx::utils::SyncQueue<QUrl> m_urlsFromReceivedRequests;
+    nx::utils::SyncQueue<nx::utils::Url> m_urlsFromReceivedRequests;
     nx_http::HttpClient m_httpClient;
-    QUrl m_testUrl;
+    nx::utils::Url m_testUrl;
 
     void init()
     {
@@ -751,9 +751,9 @@ private:
         ASSERT_TRUE(testHttpServer().bindAndListen());
     }
 
-    QUrl commonTestUrl() const
+    nx::utils::Url commonTestUrl() const
     {
-        return QUrl(lm("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath()));
+        return nx::utils::Url(lm("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath()));
     }
 
     void onRequestReceived(
@@ -869,9 +869,9 @@ private:
     SocketAddress m_serverEndpoint;
     std::vector<ClientContext> m_clients;
 
-    QUrl serverUrl() const
+    nx::utils::Url serverUrl() const
     {
-        return QUrl(lit("http://%1/tst").arg(m_serverEndpoint.toString()));
+        return nx::utils::Url(lit("http://%1/tst").arg(m_serverEndpoint.toString()));
     }
 
     void issueRequests()
@@ -985,7 +985,7 @@ protected:
 
     void performRequestToInvalidUrl()
     {
-        m_httpClient->doGet(QUrl("http://example.com:58249/test"));
+        m_httpClient->doGet(nx::utils::Url("http://example.com:58249/test"));
     }
 
     void assertRequestSucceeded()
@@ -1005,10 +1005,10 @@ private:
         int requestsReceived = 0;
     };
 
-    QUrl m_testUrl;
+    nx::utils::Url m_testUrl;
     nx::utils::SyncQueue<std::unique_ptr<nx_http::Response>> m_responseQueue;
     nx_http::AsyncHttpClientPtr m_httpClient;
-    std::queue<QUrl> m_scheduledRequests;
+    std::queue<nx::utils::Url> m_scheduledRequests;
     std::map<
         nx_http::HttpServerConnection*,
         std::unique_ptr<HttpConnectionContext>> m_connectionToContext;
@@ -1224,7 +1224,7 @@ X-Nx-Result-Code: ok
         << SystemError::getLastOSErrorText().toStdString();
     testTcpServer.start();
 
-    QUrl url(lit("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));
+    nx::utils::Url url(lit("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));
     url.setUserName("don't tell");
     url.setPassword("anyone");
     nx_http::HttpClient httpClient;

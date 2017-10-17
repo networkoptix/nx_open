@@ -42,11 +42,11 @@ public:
     QList<SocketAddress> getNetAddrList() const;
 
     // TODO: #dklychkov Use QSet instead of QList
-    void setAdditionalUrls(const QList<QUrl> &urls);
-    QList<QUrl> getAdditionalUrls() const;
+    void setAdditionalUrls(const QList<nx::utils::Url> &urls);
+    QList<nx::utils::Url> getAdditionalUrls() const;
 
-    void setIgnoredUrls(const QList<QUrl> &urls);
-    QList<QUrl> getIgnoredUrls() const;
+    void setIgnoredUrls(const QList<nx::utils::Url> &urls);
+    QList<nx::utils::Url> getIgnoredUrls() const;
 
     boost::optional<SocketAddress> getCloudAddress() const;
 
@@ -160,8 +160,8 @@ private:
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
     QList<SocketAddress> m_netAddrList;
-    QList<QUrl> m_additionalUrls;
-    QList<QUrl> m_ignoredUrls;
+    QList<nx::utils::Url> m_additionalUrls;
+    QList<nx::utils::Url> m_ignoredUrls;
     bool m_sslAllowed = false;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;

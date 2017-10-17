@@ -41,18 +41,18 @@ protected:
 
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
 
-        m_relayServerUrl = QUrl(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
+        m_relayServerUrl = nx::utils::Url(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
         m_relayServerUrl.setUserName("server1.system1");
     }
 
-    QUrl relayServerUrl() const
+    nx::utils::Url relayServerUrl() const
     {
         return m_relayServerUrl;
     }
 
 private:
     TestHttpServer m_testHttpServer;
-    QUrl m_relayServerUrl;
+    nx::utils::Url m_relayServerUrl;
 
     void processIncomingConnection(
         nx_http::HttpServerConnection* const connection,

@@ -35,7 +35,7 @@ public:
     virtual void openConnectionToTheTargetHost(
         const nx::String& /*sessionId*/,
         nx::cloud::relay::api::OpenRelayConnectionHandler handler) override;
-    virtual QUrl url() const override;
+    virtual nx::utils::Url url() const override;
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 
     int scheduledRequestCount() const;

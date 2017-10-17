@@ -118,10 +118,10 @@ void QnUpdateProcess::run() {
 
 void QnUpdateProcess::downloadUpdates() {
 
-    QHash<QUrl, QString> downloadTargets;
-    QMultiHash<QUrl, QnUuid> peerAssociations;
-    QHash<QUrl, QString> hashByUrl;
-    QHash<QUrl, qint64> fileSizeByUrl;
+    QHash<nx::utils::Url, QString> downloadTargets;
+    QMultiHash<nx::utils::Url, QnUuid> peerAssociations;
+    QHash<nx::utils::Url, QString> hashByUrl;
+    QHash<nx::utils::Url, qint64> fileSizeByUrl;
 
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
         QList<QnUuid> peers = m_idBySystemInformation.values(it.key());
@@ -297,7 +297,7 @@ void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, i
         return;
     }
 
-    QHash<QUrl, QString> resultingFiles = task->resultingFiles();
+    QHash<nx::utils::Url, QString> resultingFiles = task->resultingFiles();
 
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
         if (resultingFiles.contains(it.value()->url))

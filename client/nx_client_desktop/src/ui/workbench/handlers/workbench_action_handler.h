@@ -258,10 +258,10 @@ private:
     struct ServerRequest
     {
         QnMediaServerResourcePtr server;
-        QUrl url;
+        nx::utils::Url url;
     };
 
-    std::multimap<QUrl, ServerRequest> m_serverRequests;
+    std::multimap<nx::utils::Url, ServerRequest> m_serverRequests;
 };
 
 } // namespace workbench
