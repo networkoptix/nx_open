@@ -1,8 +1,14 @@
 #include "demo_analytics_driver.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
 #include <QtCore/QTimer>
 
+#include <ini.h>
+
 #include <nx/utils/random.h>
+
+#include <nx/fusion/model_functions.h>
 
 namespace {
 
@@ -28,15 +34,37 @@ DemoAnalyticsDriver::DemoAnalyticsDriver(QObject* parent):
     addTimer->setSingleShot(false);
     connect(addTimer, &QTimer::timeout, this, &DemoAnalyticsDriver::addRegionIfNeeded);
     addTimer->start();
+
+    m_elapsed.start();
+}
+
+DemoAnalyticsDriver::~DemoAnalyticsDriver()
+{
+    if (ini().externalMetadata)
+    {
+        QDir dir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+        QFile file(dir.absoluteFilePath(lit("track.metadata")));
+        file.open(QIODevice::WriteOnly);
+        file.write(QJson::serialized(m_track));
+        file.close();
+    }
 }
 
 void DemoAnalyticsDriver::tick()
 {
+    QnObjectDetectionMetadataTrack track;
+    track.timestampMs = m_elapsed.elapsed();
+
     for (auto region = m_regions.begin(); region != m_regions.end(); )
     {
         region->tick();
         if (region->isValid())
         {
+            QnObjectDetectionInfo info;
+            info.objectId = region->id;
+            info.boundingBox = region->geometry;
+            track.objects.push_back(info);
+
             emit regionAddedOrChanged(region->id, region->geometry);
             ++region;
         }
@@ -46,6 +74,10 @@ void DemoAnalyticsDriver::tick()
             region = m_regions.erase(region);
         }
     }
+
+    if (track.objects.empty() && !m_track.empty() && m_track.back().objects.empty())
+        return;
+    m_track.push_back(track);
 }
 
 void DemoAnalyticsDriver::addRegionIfNeeded()

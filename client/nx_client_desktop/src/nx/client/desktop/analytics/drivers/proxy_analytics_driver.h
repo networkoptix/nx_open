@@ -13,12 +13,11 @@ class ProxyAnalyticsDriver: public AbstractAnalyticsDriver
     using base_type = AbstractAnalyticsDriver;
 
 public:
-    explicit ProxyAnalyticsDriver(const QnVirtualCameraResourcePtr& camera,
-        QObject* parent = nullptr);
+    explicit ProxyAnalyticsDriver(const QnResourcePtr& resource, QObject* parent = nullptr);
 
 
 private:
-    const QnVirtualCameraResourcePtr m_camera;
+    const QnResourcePtr m_resource;
 };
 
 } // namespace desktop

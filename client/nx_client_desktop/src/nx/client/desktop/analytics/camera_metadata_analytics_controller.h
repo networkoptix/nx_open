@@ -19,21 +19,17 @@ class MetadataAnalyticsController:
     Q_OBJECT
 
 public:
-    void gotMetadataPacket(
-        const QnVirtualCameraResourcePtr& camera, const QnCompressedMetadataPtr& metadata);
+    void gotMetadataPacket(const QnResourcePtr& resource, const QnCompressedMetadataPtr& metadata);
+    void gotMetadata(const QnResourcePtr& resource, const QnObjectDetectionMetadata& metadata);
+    void gotFrame(const QnResourcePtr& resource, qint64 timestampUs);
 
 signals:
-    void rectangleAddedOrChanged(
-        const QnVirtualCameraResourcePtr& camera, const QnUuid& rectId, const QRectF& rect);
+    void frameReceived(const QnResourcePtr& resource, qint64 timestampUs);
 
-    void rectangleRemoved(const QnVirtualCameraResourcePtr& camera, const QnUuid& rectId);
+    void rectangleAddedOrChanged(const QnResourcePtr& resource, const QnUuid& rectId,
+        const QRectF& rect);
 
-private:
-    QRectF toQRectF(const QnRect& rect);
-
-    void handleObjectDetectionMetadata(
-        const QnVirtualCameraResourcePtr& camera,
-        const QnObjectDetectionMetadata& objectDetectionMetadata);
+    void rectangleRemoved(const QnResourcePtr& resource, const QnUuid& rectId);
 
 private:
     std::map<QnUuid, std::set<QnUuid>> m_rectMap;

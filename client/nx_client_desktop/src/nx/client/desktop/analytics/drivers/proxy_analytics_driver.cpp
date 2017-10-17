@@ -6,20 +6,20 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-ProxyAnalyticsDriver::ProxyAnalyticsDriver(const QnVirtualCameraResourcePtr& camera,
+ProxyAnalyticsDriver::ProxyAnalyticsDriver(const QnResourcePtr& resource,
     QObject* parent)
     :
     base_type(parent),
-    m_camera(camera)
+    m_resource(resource)
 {
     connect(qnMetadataAnalyticsController,
         &MetadataAnalyticsController::rectangleAddedOrChanged,
         this,
-        [this](const QnVirtualCameraResourcePtr& camera,
+        [this](const QnResourcePtr& resource,
             const QnUuid& rectUuid,
             const QRectF& rect)
         {
-            if (camera != m_camera)
+            if (resource != m_resource)
                 return;
 
             emit regionAddedOrChanged(rectUuid, rect);
@@ -28,9 +28,9 @@ ProxyAnalyticsDriver::ProxyAnalyticsDriver(const QnVirtualCameraResourcePtr& cam
     connect(qnMetadataAnalyticsController,
         &MetadataAnalyticsController::rectangleRemoved,
         this,
-        [this](const QnVirtualCameraResourcePtr& camera, const QnUuid& rectUuid)
+        [this](const QnResourcePtr& resource, const QnUuid& rectUuid)
         {
-            if (camera != m_camera)
+            if (resource != m_resource)
                 return;
 
             emit regionRemoved(rectUuid);

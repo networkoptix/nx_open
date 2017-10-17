@@ -3,8 +3,11 @@
 #include <QtCore/QRectF>
 #include <QtCore/QPointF>
 #include <QtCore/QSizeF>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/client/desktop/analytics/drivers/abstract_analytics_driver.h>
+
+#include <analytics/common/object_detection_metadata.h>
 
 namespace nx {
 namespace client {
@@ -16,6 +19,7 @@ class DemoAnalyticsDriver: public AbstractAnalyticsDriver
 
 public:
     explicit DemoAnalyticsDriver(QObject* parent = nullptr);
+    virtual ~DemoAnalyticsDriver() override;
 
 private:
     void tick();
@@ -34,6 +38,9 @@ private:
     };
 
     QList<DemoRegion> m_regions;
+
+    QElapsedTimer m_elapsed;
+    std::vector<QnObjectDetectionMetadataTrack> m_track;
 };
 
 } // namespace desktop

@@ -10,13 +10,13 @@ namespace client {
 namespace desktop {
 
 void MetadataAnalyticsController::gotMetadataPacket(
-    const QnVirtualCameraResourcePtr& camera,
+    const QnResourcePtr& resource,
     const QnCompressedMetadataPtr& metadata)
 {
-    if (!camera)
+    if (!resource)
         return;
 
-    bool metadataIsOk = metadata
+    const auto metadataIsOk = metadata
         && metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA
         && metadata->metadataType == MetadataType::ObjectDetection;
 
@@ -26,47 +26,38 @@ void MetadataAnalyticsController::gotMetadataPacket(
     QnObjectDetectionMetadata objectDetectionMetadata;
     objectDetectionMetadata.deserialize(metadata);
 
-    handleObjectDetectionMetadata(camera, objectDetectionMetadata);
+    gotMetadata(resource, objectDetectionMetadata);
 }
 
-QRectF MetadataAnalyticsController::toQRectF(const QnRect& rect)
-{
-    QRectF rectf;
-    rectf.setRect(
-        rect.topLeft.x,
-        rect.topLeft.y,
-        rect.bottomRight.x - rect.topLeft.x,
-        rect.bottomRight.y - rect.topLeft.y);
-
-    return rectf;
-}
-
-void MetadataAnalyticsController::handleObjectDetectionMetadata(
-        const QnVirtualCameraResourcePtr& camera,
-        const QnObjectDetectionMetadata& objectDetectionMetadata)
+void MetadataAnalyticsController::gotMetadata(const QnResourcePtr& resource,
+    const QnObjectDetectionMetadata& metadata)
 {
     std::map<QnUuid, QRectF> rectangles;
-    auto& prevRectangles = m_rectMap[camera->getId()];
-    auto detectedObjects = objectDetectionMetadata.detectedObjects;
+    auto& prevRectangles = m_rectMap[resource->getId()];
+    auto detectedObjects = metadata.detectedObjects;
 
     for (const auto& obj: detectedObjects)
-        rectangles[obj.objectId] = toQRectF(obj.boundingBox);
-
+        rectangles[obj.objectId] = obj.boundingBox.toRectF();
 
     for (const auto& uuid: prevRectangles)
     {
-        auto found = rectangles.find(uuid);
+        const auto found = rectangles.find(uuid);
 
         if (found == rectangles.end())
-            emit rectangleRemoved(camera, uuid);
+            emit rectangleRemoved(resource, uuid);
     }
 
     prevRectangles.clear();
     for (const auto& item: rectangles)
     {
         prevRectangles.insert(item.first);
-        emit rectangleAddedOrChanged(camera, item.first, item.second);
+        emit rectangleAddedOrChanged(resource, item.first, item.second);
     }
+}
+
+void MetadataAnalyticsController::gotFrame(const QnResourcePtr& resource, qint64 timestampUs)
+{
+    emit frameReceived(resource, timestampUs);
 }
 
 } // namespace desktop

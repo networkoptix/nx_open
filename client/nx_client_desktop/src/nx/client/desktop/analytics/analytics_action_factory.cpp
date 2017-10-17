@@ -5,7 +5,7 @@
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
-#include "drivers/analytics_drivers_factory.h"
+#include <nx/client/desktop/analytics/drivers/analytics_drivers_factory.h>
 
 namespace nx {
 namespace client {

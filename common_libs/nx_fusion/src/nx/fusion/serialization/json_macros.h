@@ -32,6 +32,9 @@ struct BriefChecker
     bool operator()(const std::vector<U>& value) const { return value.empty(); }
 
     template<class U>
+    bool operator()(const std::set<U>& value) const { return value.empty(); }
+
+    template<class U>
     bool operator()(const QList<U>& value) const { return value.empty(); }
 
     bool operator()(const QString& value) const { return value.isEmpty(); }

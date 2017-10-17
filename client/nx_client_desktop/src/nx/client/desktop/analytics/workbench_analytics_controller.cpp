@@ -196,8 +196,6 @@ void WorkbenchAnalyticsController::constructLayout()
             }
         }
     }
-
-    //resourcePool()->addResource(m_layout);
 }
 
 void WorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect)
