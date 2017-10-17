@@ -359,14 +359,11 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
-    if (ini().enableAnalytics)
-    {
-        factory(StartAnalyticsAction)
-            .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-            .text(ContextMenu::tr("Start Analytics..."))
-            .childFactory(new AnalyticsActionFactory(manager))
-            .condition(condition::hasFlags(Qn::server_live_cam, MatchMode::All));
-    }
+    factory(StartAnalyticsAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Start Analytics..."))
+        .childFactory(new AnalyticsActionFactory(manager))
+        .condition(AnalyticsActionFactory::condition());
 
     factory()
         .flags(TitleBar)

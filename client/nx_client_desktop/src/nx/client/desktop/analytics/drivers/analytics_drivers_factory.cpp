@@ -14,6 +14,9 @@ namespace desktop {
 AbstractAnalyticsDriverPtr AnalyticsDriversFactory::createAnalyticsDriver(
     const QnResourcePtr& resource)
 {
+    if (!supportsAnalytics(resource))
+        return AbstractAnalyticsDriverPtr();
+
     if (!ini().enableAnalytics)
         return AbstractAnalyticsDriverPtr();
 
@@ -28,7 +31,24 @@ AbstractAnalyticsDriverPtr AnalyticsDriversFactory::createAnalyticsDriver(
     if (ini().demoAnalyticsDriver)
         return AbstractAnalyticsDriverPtr(new DemoAnalyticsDriver());
 
+    NX_ASSERT(false, "Inconsistency with supportsAnalytics() function");
     return AbstractAnalyticsDriverPtr();
+}
+
+bool AnalyticsDriversFactory::supportsAnalytics(const QnResourcePtr& resource)
+{
+    if (!ini().enableAnalytics)
+        return false;
+
+    if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+        return true;
+
+    if (ini().externalMetadata)
+    {
+
+    }
+
+    return ini().demoAnalyticsDriver;
 }
 
 } // namespace desktop

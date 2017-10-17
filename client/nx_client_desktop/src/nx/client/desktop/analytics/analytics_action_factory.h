@@ -15,6 +15,8 @@ public:
     explicit AnalyticsActionFactory(QObject* parent);
     virtual QList<QAction*> newActions(const ui::action::Parameters& parameters,
         QObject* parent) override;
+
+    static ui::action::ConditionWrapper condition();
 };
 
 } // namespace desktop

@@ -209,45 +209,6 @@ private:
     CheckDelegate m_delegate;
 };
 
-class ResourceCondition: public Condition
-{
-public:
-    using CheckDelegate = std::function<bool(const QnResourcePtr& resource)>;
-
-    ResourceCondition(CheckDelegate delegate, MatchMode matchMode):
-        m_delegate(delegate),
-        m_matchMode(matchMode)
-    {
-    }
-
-    ActionVisibility check(const QnResourceList& resources,
-        QnWorkbenchContext* /*context*/)
-    {
-        return GenericCondition::check<QnResourcePtr>(resources, m_matchMode,
-            [this](const QnResourcePtr& resource) { return m_delegate(resource); })
-            ? EnabledAction
-            : InvisibleAction;
-    }
-
-    ActionVisibility check(const QnResourceWidgetList& widgets,
-        QnWorkbenchContext* /*context*/)
-    {
-        return GenericCondition::check<QnResourceWidget*>(widgets, m_matchMode,
-            [this](QnResourceWidget* widget)
-            {
-                if (auto resource = ParameterTypes::resource(widget))
-                    return m_delegate(resource);
-                return false;
-            })
-            ? EnabledAction
-            : InvisibleAction;
-    }
-
-private:
-    CheckDelegate m_delegate;
-    MatchMode m_matchMode;
-};
-
 TimePeriodType periodType(const QnTimePeriod& period)
 {
     if (period.isNull())
@@ -339,6 +300,37 @@ ConditionWrapper operator||(ConditionWrapper&& l, ConditionWrapper&& r)
 ConditionWrapper operator!(ConditionWrapper&& l)
 {
     return ConditionWrapper(new NegativeCondition(std::move(l)));
+}
+
+ResourceCondition::ResourceCondition(ResourceCondition::CheckDelegate delegate,
+    MatchMode matchMode)
+    :
+    m_delegate(delegate),
+    m_matchMode(matchMode)
+{
+}
+
+ActionVisibility ResourceCondition::check(const QnResourceList& resources,
+    QnWorkbenchContext* /*context*/)
+{
+    return GenericCondition::check<QnResourcePtr>(resources, m_matchMode,
+        [this](const QnResourcePtr& resource) { return m_delegate(resource); })
+        ? EnabledAction
+        : InvisibleAction;
+}
+
+ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets,
+    QnWorkbenchContext* /*context*/)
+{
+    return GenericCondition::check<QnResourceWidget*>(widgets, m_matchMode,
+        [this](QnResourceWidget* widget)
+        {
+            if (auto resource = ParameterTypes::resource(widget))
+                return m_delegate(resource);
+            return false;
+        })
+        ? EnabledAction
+        : InvisibleAction;
 }
 
 bool VideoWallReviewModeCondition::isVideoWallReviewMode(QnWorkbenchContext* context) const

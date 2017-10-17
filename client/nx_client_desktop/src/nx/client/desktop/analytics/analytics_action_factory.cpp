@@ -4,6 +4,8 @@
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/actions/action_conditions.h>
+#include "drivers/analytics_drivers_factory.h"
 
 namespace nx {
 namespace client {
@@ -51,6 +53,16 @@ QList<QAction*> AnalyticsActionFactory::newActions(const ui::action::Parameters&
     }
 
     return result;
+}
+
+ui::action::ConditionWrapper AnalyticsActionFactory::condition()
+{
+    return new ui::action::ResourceCondition(
+        [](const QnResourcePtr& resource)
+        {
+            return AnalyticsDriversFactory::supportsAnalytics(resource);
+        },
+        MatchMode::All);
 }
 
 } // namespace desktop

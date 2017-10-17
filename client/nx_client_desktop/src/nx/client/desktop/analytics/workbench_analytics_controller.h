@@ -50,6 +50,7 @@ private:
     const int m_matrixSize;
     QnResourcePtr m_resource;
     QnLayoutResourcePtr m_layout;
+    AbstractAnalyticsDriverPtr m_driver;
 
     struct ElementData
     {

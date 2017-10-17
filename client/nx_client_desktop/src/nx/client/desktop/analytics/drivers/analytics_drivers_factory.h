@@ -12,6 +12,7 @@ class AnalyticsDriversFactory
 {
 public:
     static AbstractAnalyticsDriverPtr createAnalyticsDriver(const QnResourcePtr& resource);
+    static bool supportsAnalytics(const QnResourcePtr& resource);
 };
 
 } // namespace desktop

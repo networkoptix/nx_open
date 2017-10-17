@@ -56,7 +56,8 @@ WorkbenchAnalyticsController::WorkbenchAnalyticsController(
     :
     base_type(parent),
     m_matrixSize(matrixSize),
-    m_resource(resource)
+    m_resource(resource),
+    m_driver(driver)
 {
     constructLayout();
 
@@ -196,7 +197,7 @@ void WorkbenchAnalyticsController::constructLayout()
         }
     }
 
-    resourcePool()->addResource(m_layout);
+    //resourcePool()->addResource(m_layout);
 }
 
 void WorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect)
