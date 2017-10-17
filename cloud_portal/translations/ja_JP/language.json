@@ -174,6 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"あなたのアカウントは正常に保存されました",
+    "activationLinkSent":"Activation Link Sent",
     "passwordChangedSuccess":"あなたのアカウントは正常に保存されました",
     "changePassword":"パスワードを変更",
     "newPasswordLabel":"新規パスワード",
@@ -220,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"送信",
+    "sendConfirm":"Resend activation link",
     "resetPassword":"パスワードリセット",
     "setNewPassword":"パスワードを保存",
     "setNewPasswordLabel":"新規パスワード"

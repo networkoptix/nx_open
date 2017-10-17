@@ -3,15 +3,15 @@
     "highStream":"Luồng tốc độ cao",
     "lowStream":"Luồng tốc độ thấp",
     "transcoding":"Đang chuyển mã",
-    "unknown":"không biết",
+    "unknown":"Không xác định",
     "copyToClipboard":"chép vào bảng nháp",
     "copyDefaultText":"sao chép",
     "copyActiveText":"sao chép vào clipboard"
   },
   "systemOffline":"Hệ thống offline",
   "cameraStates":{
-    "offline":"ẩn",
-    "error":"lỗi",
+    "offline":"Ngoại tuyến",
+    "error":"Lỗi",
     "unauthorized":"Yêu cầu xác thực",
     "noData":"Không có dữ liệu",
     "iosVideoTooLarge":"ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
