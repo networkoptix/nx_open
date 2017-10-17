@@ -47,6 +47,8 @@ languages:
     - zh_CN
     - zh_TW
     - hu_HU
+    - th_TH
+
 queue_name: '$INSTANCE_NAME'
 
 max_retries: 10

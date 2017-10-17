@@ -44,6 +44,7 @@ languages:
     - ko_KR
     - tr_TR
     - hu_HU
+    - th_TH
 
 queue_name: '$INSTANCE_NAME'
 
