@@ -305,10 +305,12 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 
 bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
+    #define VERBOSE(S) NX_VERBOSE(this, lm("%1 %2").args(__func__, (S)))
+
     if (m_needReopen)
     {
         m_needReopen = false;
-        NX_VERBOSE(this, lm("processData() EXIT: Reopening"));
+        VERBOSE("EXIT: Reopening");
         close();
     }
 
@@ -316,7 +318,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
     if (!md)
     {
-        NX_VERBOSE(this, lm("processData() EXIT: Unknown data"));
+        VERBOSE("EXIT: Unknown data");
         return true; // skip unknown data
     }
     if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp > m_EofDateTime)
@@ -335,12 +337,11 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
             m_recordingFinished = true;
             m_endOfData = true;
-            NX_VERBOSE(this, lm("processData() END: Stopping; m_endOfData: false; error: %1")
-                .arg(isOk ? "true" : "false"));
+            VERBOSE(lm("END: Stopping; m_endOfData: false; error: %1").arg(isOk ? "true" : "false"));
         }
         else
         {
-            NX_VERBOSE(this, lm("processData() END: Stopping; m_endOfData: true"));
+            VERBOSE("END: Stopping; m_endOfData: true");
         }
 
         pleaseStop();
@@ -349,7 +350,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
     if (md->dataType == QnAbstractMediaData::META_V1)
     {
-        NX_VERBOSE(this, lm("processData(): META_V1"));
+        VERBOSE("META_V1");
         if (needSaveData(md))
             saveData(md);
     }
@@ -358,7 +359,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         m_prebuffer.push(md);
         if (m_prebufferingUsec == 0)
         {
-            NX_VERBOSE(this, lm("processData(): no pre-buffering"));
+            VERBOSE("no pre-buffering");
             m_nextIFrameTime = AV_NOPTS_VALUE;
             while (!m_prebuffer.isEmpty())
             {
@@ -376,16 +377,16 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
                 && (md->flags & AV_PKT_FLAG_KEY);
             if (m_nextIFrameTime == (qint64) AV_NOPTS_VALUE && isKeyFrame)
                 m_nextIFrameTime = md->timestamp;
-            NX_VERBOSE(this, lm("processData(): isKeyFrame: %1 (dataType == VIDEO: %2; flags & VA_PKT_FLAG_KEY: %3)")
-                .arg(isKeyFrame ? "true" : "false")
-                .arg(md->dataType == QnAbstractMediaData::VIDEO ? "true" : "false")
-                .arg(md->flags & AV_PKT_FLAG_KEY ? "true" : "false")
-            );
+            VERBOSE(lm("isKeyFrame: %1 "
+                "(dataType == VIDEO: %2; flags & VA_PKT_FLAG_KEY: %3)").args(
+                    isKeyFrame ? "true" : "false",
+                    md->dataType == QnAbstractMediaData::VIDEO ? "true" : "false",
+                    md->flags & AV_PKT_FLAG_KEY ? "true" : "false"));
 
             if (m_nextIFrameTime != (qint64) AV_NOPTS_VALUE
                 && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
             {
-                NX_VERBOSE(this, lm("processData(): find next I-Frame"));
+                VERBOSE("find next I-Frame");
                 while (!m_prebuffer.isEmpty() && m_prebuffer.front()->timestamp < m_nextIFrameTime)
                 {
                     QnConstAbstractMediaDataPtr d;
@@ -404,7 +405,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
     if (m_waitEOF && m_dataQueue.size() == 0)
     {
-        NX_VERBOSE(this, lm("processData(): closing"));
+        VERBOSE("closing");
         close();
         m_waitEOF = false;
     }
@@ -415,14 +416,16 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
             ((md->timestamp - m_startDateTime) * 100LL) / (m_EofDateTime - m_startDateTime);
         if (progress != m_lastProgress)
         {
-            NX_VERBOSE(this, lm("processData(): progress"));
+            VERBOSE("progress");
             emit recordingProgress(progress);
             m_lastProgress = progress;
         }
     }
 
-    NX_VERBOSE(this, lm("processData() END"));
+    VERBOSE("END");
     return true;
+
+    #undef VERBOSE
 }
 
 void QnStreamRecorder::cleanFfmpegContexts()

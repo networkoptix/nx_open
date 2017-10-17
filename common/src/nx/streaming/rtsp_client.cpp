@@ -359,11 +359,13 @@ static QString deltaMs(double scale, double base, double value)
 qint64 QnRtspTimeHelper::getUsecTime(
     quint32 rtpTime, const QnRtspStatistic& statistics, int frequency, bool recursionAllowed)
 {
+    #define VERBOSE(S) NX_VERBOSE(this, lm("%1() %2").args(__func__, (S)))
+
     const qint64 currentUs = qnSyncTime->currentUSecsSinceEpoch();
     const qint64 currentMs = (/*rounding*/ 500 + currentUs) / 1000;
     if (statistics.isEmpty() || m_timePolicy == TimePolicy::ForceLocalTime)
     {
-        NX_VERBOSE(this, lm("getUsecTime(%1) -> %2 (%3)")
+        VERBOSE(lm("-> %2 (%3), resourceId: %1")
             .arg(m_resourceId)
             .arg(currentUs)
             .arg(m_timePolicy == TimePolicy::ForceLocalTime
@@ -377,7 +379,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     const double cameraSeconds = statistics.ntpTime + rtpTimeDiff / (double) frequency;
     if (m_timePolicy == TimePolicy::ForceCameraTime)
     {
-        NX_VERBOSE(this, lm("getUsecTime(%1) -> %2 (%3)")
+        VERBOSE(lm("-> %2 (%3), resourceId: %1")
             .arg(m_resourceId)
             .arg(currentUs)
             .arg("ignoreLocalTime=true"));
@@ -391,7 +393,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
     const bool cameraTimeChanged = isCameraTimeChanged(statistics);
     const bool localTimeChanged = isLocalTimeChanged();
 
-    NX_VERBOSE(this, lm("getUsecTime() BEGIN: "
+    VERBOSE(lm("BEGIN: "
         "timestamp %1, rtpTime %2 (%3), nowMs %4, camera_from_nowMs %5, result_from_nowMs %6")
         .args(
             statistics.timestamp,
@@ -413,7 +415,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
         m_timePolicy = TimePolicy::ForceLocalTime;
         NX_DEBUG(this, lm("Jitter exceeds %1 s; camera time will be ignored")
             .arg(IGNORE_CAMERA_TIME_THRESHOLD_S));
-        NX_VERBOSE(this, lm("getUsecTime() -> %1").arg(currentUs));
+        VERBOSE(lm("-> %1").arg(currentUs));
         return currentUs;
     }
 
@@ -445,20 +447,21 @@ qint64 QnRtspTimeHelper::getUsecTime(
         }
 
         reset();
-        NX_VERBOSE(this, lm("getUsecTime(): Reset, calling recursively"));
+        VERBOSE("Reset, calling recursively");
         const qint64 result =
             getUsecTime(rtpTime, statistics, frequency, /*recursionAllowed*/ false); //< recursion
-        NX_VERBOSE(this, lm("getUsecTime() END -> %1 (after recursion)").arg(result));
+        VERBOSE(lm("END -> %1 (after recursion)").arg(result));
         return result;
     }
     else
     {
-        const qint64 result =
-            (gotInvalidTime ? currentSeconds : resultSeconds) * 1000000LL;
-        NX_VERBOSE(this, lm("getUsecTime() END -> %1 (gotInvalidTime: %2)").args(
-            result, gotInvalidTime ? "true" : "false"));
+        const qint64 result = (gotInvalidTime ? currentSeconds : resultSeconds) * 1000000LL;
+        VERBOSE(lm("END -> %1 (gotInvalidTime: %2)")
+            .args(result, gotInvalidTime ? "true" : "false"));
         return result;
     }
+
+    #undef VERBOSE
 }
 
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
