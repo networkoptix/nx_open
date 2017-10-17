@@ -58,6 +58,7 @@ extern "C"
 #include <nx/utils/random.h>
 #include <nx/fusion/serialization/lexical_enum.h>
 #include <media_server/media_server_module.h>
+#include <plugins/resource/avi/thumbnails_archive_delegate.h>
 
 class QnTcpListener;
 
@@ -130,8 +131,7 @@ public:
 
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
-        liveMode(Mode_Live),
-        auditRecordMode(Mode_Live),
+        playbackMode(PlaybackMode::Live),
         lastMediaPacketTime(AV_NOPTS_VALUE),
         dataProcessor(0),
         sessionTimeOut(0),
@@ -153,9 +153,9 @@ public:
 
     QnAbstractMediaStreamDataProviderPtr getCurrentDP()
     {
-        if (liveMode == Mode_ThumbNails)
+        if (playbackMode == PlaybackMode::ThumbNails)
             return thumbnailsDP;
-        else if (liveMode == Mode_Live)
+        else if (playbackMode == PlaybackMode::Live)
             return liveDpHi;
         else
             return archiveDP;
@@ -199,9 +199,8 @@ public:
     QnLiveStreamProviderPtr liveDpLow;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
-    Mode liveMode;
+    PlaybackMode playbackMode;
     AuditHandle auditRecordHandle;
-    Mode auditRecordMode;
     QElapsedTimer lastReportTime;
     qint64 lastMediaPacketTime;
 
@@ -344,7 +343,7 @@ void QnRtspConnectionProcessor::parseRequest()
     else
         d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
 
-    if (getStreamingMode() != Mode_Live)
+    if (getStreamingMode() != PlaybackMode::Live)
         d->peerHasAccess = resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
 
     if (!d->peerHasAccess)
@@ -880,7 +879,7 @@ int QnRtspConnectionProcessor::composeDescribe()
         sdp << additionSDP;
     }
 
-    if (d->liveMode != Mode_ThumbNails && d->useProprietaryFormat)
+    if (d->playbackMode != PlaybackMode::ThumbNails && d->useProprietaryFormat)
     {
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
         d->trackInfo.insert(d->metadataChannelNum, trackInfo);
@@ -1016,9 +1015,8 @@ void QnRtspConnectionProcessor::processRangeHeader()
     Q_D(QnRtspConnectionProcessor);
     const auto rangeStr = nx_http::getHeaderValue(d->request.headers, "Range");
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
-    if (cameraResource && d->startTime == 0 && !d->useProprietaryFormat)
-        d->startTime = DATETIME_NOW;
+    if (!nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
+        d->startTime = AV_NOPTS_VALUE;
 }
 
 void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)
@@ -1091,7 +1089,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
             cameraRes->initAsync(true);
     }
-    if (camera && d->liveMode == Mode_Live)
+    if (camera && d->playbackMode == PlaybackMode::Live)
     {
         if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized()) {
             d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
@@ -1134,18 +1132,28 @@ void QnRtspConnectionProcessor::createDataProvider()
         QnMutexLocker lock(&d->archiveDpMutex);
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->toResource()->createDataProvider(Qn::CR_Archive)));
         if (d->archiveDP)
+        {
             d->archiveDP->setGroupId(d->clientGuid);
+            d->archiveDP->getArchiveDelegate()->setPlaybackMode(d->playbackMode);
+        }
     }
 
-    if (!d->thumbnailsDP && d->liveMode == Mode_ThumbNails)
+    if (!d->thumbnailsDP && d->playbackMode == PlaybackMode::ThumbNails)
     {
         QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(d->mediaRes->toResource());
         QnAbstractArchiveDelegate* archiveDelegate = nullptr;
         if (camRes)
+        {
             archiveDelegate = camRes->createArchiveDelegate();
+            if (archiveDelegate &&
+                !archiveDelegate->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanProcessMediaStep))
+            {
+                archiveDelegate = new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(archiveDelegate));
+            }
+        }
         if (!archiveDelegate)
             archiveDelegate = new QnServerArchiveDelegate(); // default value
-
+        archiveDelegate->setPlaybackMode(d->playbackMode);
         d->thumbnailsDP.reset(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr(), archiveDelegate));
         d->thumbnailsDP->setGroupId(QnUuid::createUuid().toString().toUtf8());
     }
@@ -1226,16 +1234,16 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
 
 }
 
-Mode QnRtspConnectionProcessor::getStreamingMode() const
+PlaybackMode QnRtspConnectionProcessor::getStreamingMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
 
     if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
-        return Mode_ThumbNails;
+        return PlaybackMode::ThumbNails;
     else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
-        return Mode_Live;
-
-    return Mode_Archive;
+        return PlaybackMode::Live;
+    const bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+    return isExport ? PlaybackMode::Export : PlaybackMode::Archive;
 }
 
 int QnRtspConnectionProcessor::composePlay()
@@ -1245,7 +1253,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
 
-    d->liveMode = getStreamingMode();
+    d->playbackMode = getStreamingMode();
 
     createDataProvider();
     checkQuality();
@@ -1279,7 +1287,8 @@ int QnRtspConnectionProcessor::composePlay()
     QnVideoCameraPtr camera;
     if (d->mediaRes)
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
-    if (d->liveMode == Mode_Live) {
+    if (d->playbackMode == PlaybackMode::Live)
+    {
         if (camera)
             camera->inUse(d);
         if (d->archiveDP)
@@ -1313,7 +1322,7 @@ int QnRtspConnectionProcessor::composePlay()
 
     Qn::ResourceStatus status = getResource()->toResource()->getStatus();
 
-    d->dataProcessor->setLiveMode(d->liveMode == Mode_Live);
+    d->dataProcessor->setLiveMode(d->playbackMode == PlaybackMode::Live);
 
     if (!d->useProprietaryFormat)
     {
@@ -1332,7 +1341,8 @@ int QnRtspConnectionProcessor::composePlay()
     }
 
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
-    if (d->liveMode == Mode_Live)
+
+    if (d->playbackMode == PlaybackMode::Live)
     {
         auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (!camera)
@@ -1374,7 +1384,8 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->setLiveQuality(d->quality);
         d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
     }
-    else if (d->liveMode == Mode_Archive && d->archiveDP)
+    else if ((d->playbackMode == PlaybackMode::Archive || d->playbackMode == PlaybackMode::Export) 
+              && d->archiveDP)
     {
         d->archiveDP->addDataProcessor(d->dataProcessor);
 
@@ -1404,7 +1415,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->archiveDP->unlock();
 
     }
-    else if (d->liveMode == Mode_ThumbNails && d->thumbnailsDP)
+    else if (d->playbackMode == PlaybackMode::ThumbNails && d->thumbnailsDP)
     {
         d->thumbnailsDP->addDataProcessor(d->dataProcessor);
         d->thumbnailsDP->setRange(d->startTime, d->endTime, nx_http::getHeaderValue(d->request.headers, "x-media-step").toLongLong(), d->lastPlayCSeq);
@@ -1425,13 +1436,13 @@ int QnRtspConnectionProcessor::composePlay()
 
     if (currentDP)
         currentDP->start();
-    if (d->liveMode == Mode_Live && d->liveDpLow)
+    if (d->playbackMode == PlaybackMode::Live && d->liveDpLow)
         d->liveDpLow->start();
 
-    if (d->liveMode != Mode_ThumbNails)
+    if (d->playbackMode != PlaybackMode::ThumbNails)
     {
-        const qint64 startTimeUsec = d->liveMode == Mode_Live ? DATETIME_NOW : d->startTime;
-        bool isExport = nx_http::getHeaderValue(d->request.headers, Qn::EC2_MEDIA_ROLE) == "export";
+        const qint64 startTimeUsec = d->playbackMode == PlaybackMode::Live ? DATETIME_NOW : d->startTime;
+        bool isExport = d->playbackMode == PlaybackMode::Export;
         d->auditRecordHandle = qnAuditManager->notifyPlaybackStarted(authSession(), d->mediaRes->toResource()->getId(), startTimeUsec, isExport);
         d->lastReportTime.restart();
     }
@@ -1478,7 +1489,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             checkQuality();
             d->qualityFastSwitch = false;
 
-            if (d->liveMode == Mode_Live)
+            if (d->playbackMode == PlaybackMode::Live)
             {
                 auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
                 QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());

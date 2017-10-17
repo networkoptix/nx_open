@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation>&amp;HTML :</translation>
+      <translation type="unfinished">&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -836,7 +836,7 @@ Vous voulez quand même le supprimer ?</translation>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation>%1, ...</translation>
+      <translation type="unfinished">%1, ...</translation>
     </message>
   </context>
   <context>

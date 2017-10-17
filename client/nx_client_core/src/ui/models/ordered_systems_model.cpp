@@ -6,47 +6,19 @@
 #include <nx/utils/math/fuzzy.h>
 #include <client/forgotten_systems_manager.h>
 
-QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
-    base_type(parent),
-    m_source(new QnSystemsModel(this)),
-    m_weights(),
-    m_unknownSystemsWeight(0.0)
-{
-    NX_ASSERT(qnSystemWeightsManager, "QnSystemWeightsManager is not available");
-    if (!qnSystemWeightsManager)
-        return;
+namespace {
 
-    setSourceModel(m_source);
-
-    connect(m_source, &QnSystemsModel::minimalVersionChanged,
-        this, &QnOrderedSystemsModel::minimalVersionChanged);
-
-    connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
-        this, &QnOrderedSystemsModel::handleWeightsChanged);
-
-    // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
-
-    if (qnForgottenSystemsManager)
-    {
-        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
-            this, &QnOrderedSystemsModel::forceUpdate);
-        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
-            this, &QnOrderedSystemsModel::forceUpdate);
-    }
-
-    handleWeightsChanged();
-}
-
-bool QnOrderedSystemsModel::getWeightFromData(
+bool getWeightFromData(
+    const QnWeightsDataHash& weights,
     const QModelIndex& modelIndex,
-    qreal& weight) const
+    qreal& weight)
 {
     const auto fillWeightByRole =
-        [this, modelIndex](int role, qreal& weight)
+        [weights, modelIndex](int role, qreal& weight)
         {
             const auto id = modelIndex.data(role).toString();
-            const auto itWeight = m_weights.find(id);
-            if (itWeight == m_weights.end())
+            const auto itWeight = weights.find(id);
+            if (itWeight == weights.end())
                 return false;
 
             weight = itWeight.value().weight;
@@ -72,6 +44,106 @@ bool QnOrderedSystemsModel::getWeightFromData(
     return result;
 }
 
+class FilterModel: public QnSortFilterListModel
+{
+    using base_type = QnSortFilterListModel;
+public:
+    FilterModel(QObject* parent = nullptr);
+
+    QnSystemsModel* systemsModel();
+
+    bool filterAcceptsRow(
+        int sourceRow,
+        const QModelIndex& sourceParent) const override;
+
+    void setWeights(const QnWeightsDataHash& weights);
+
+private:
+    const QScopedPointer<QnSystemsModel> m_systemsModel;
+    QnWeightsDataHash m_weights;
+};
+
+FilterModel::FilterModel(QObject* parent):
+    base_type(parent),
+    m_systemsModel(new QnSystemsModel())
+{
+    setSourceModel(m_systemsModel.data());
+}
+
+QnSystemsModel* FilterModel::systemsModel()
+{
+    return m_systemsModel.data();
+}
+
+void FilterModel::setWeights(const QnWeightsDataHash& weights)
+{
+    if (m_weights == weights)
+        return;
+
+    m_weights = weights;
+    forceUpdate();
+}
+
+bool FilterModel::filterAcceptsRow(
+    int sourceRow,
+    const QModelIndex& /* sourceParent */) const
+{
+    const auto dataIndex = sourceModel()->index(sourceRow, 0);
+    // Filters out offline non-cloud systems with last connection more than N (defined) days ago
+    if (!dataIndex.isValid())
+        return true;
+
+    if (dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
+        return true;    //< Skips every connectable system
+
+    const auto id = dataIndex.data(QnSystemsModel::SystemIdRoleId).toString();
+    if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
+        return false;
+
+    if (dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
+        return true;    //< Skips offline cloud systems
+
+    qreal weight = 0.0;
+    if (!getWeightFromData(m_weights, dataIndex, weight))
+        return true;
+
+    static const auto kMinWeight = 0.00001;
+    return (weight > kMinWeight);
+}
+
+} // namespace
+
+QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
+    base_type(parent),
+    m_weights(),
+    m_unknownSystemsWeight(0.0)
+{
+    NX_ASSERT(qnSystemWeightsManager, "QnSystemWeightsManager is not available");
+    if (!qnSystemWeightsManager)
+        return;
+
+    const auto wildcardFilteredModel = new FilterModel(this);
+    setSourceModel(wildcardFilteredModel);
+
+    connect(wildcardFilteredModel->systemsModel(), &QnSystemsModel::minimalVersionChanged,
+        this, &QnOrderedSystemsModel::minimalVersionChanged);
+
+    connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
+        this, &QnOrderedSystemsModel::handleWeightsChanged);
+
+    // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
+
+    if (qnForgottenSystemsManager)
+    {
+        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
+            this, &QnOrderedSystemsModel::forceUpdate);
+        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
+            this, &QnOrderedSystemsModel::forceUpdate);
+    }
+
+    handleWeightsChanged();
+}
+
 QString QnOrderedSystemsModel::minimalVersion() const
 {
     if (auto systemsModel = dynamic_cast<QnSystemsModel*>(sourceModel()))
@@ -88,7 +160,9 @@ void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
 qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
 {
     qreal result = 0.0;
-    return (getWeightFromData(modelIndex, result) ? result : m_unknownSystemsWeight);
+    return getWeightFromData(m_weights, modelIndex, result)
+        ? result
+        : m_unknownSystemsWeight;
 }
 
 bool QnOrderedSystemsModel::lessThan(
@@ -127,33 +201,6 @@ bool QnOrderedSystemsModel::lessThan(
     return (leftWeight > rightWeight);  // System with greater weight will be placed at begin
 }
 
-bool QnOrderedSystemsModel::filterAcceptsRow(
-    int sourceRow,
-    const QModelIndex& /* sourceParent */) const
-{
-    const auto dataIndex = sourceModel()->index(sourceRow, 0);
-    // Filters out offline non-cloud systems with last connection more than N (defined) days ago
-    if (!dataIndex.isValid())
-        return true;
-
-    if (dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
-        return true;    //< Skips every connectable system
-
-    const auto id = dataIndex.data(QnSystemsModel::SystemIdRoleId).toString();
-    if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
-        return false;
-
-    if (dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
-        return true;    //< Skips offline cloud systems
-
-    qreal weight = 0.0;
-    if (!getWeightFromData(dataIndex, weight))
-        return true;
-
-    static const auto kMinWeight = 0.00001;
-    return (weight > kMinWeight);
-}
-
 void QnOrderedSystemsModel::handleWeightsChanged()
 {
     const bool sameUnknownWeight = qFuzzyEquals(m_unknownSystemsWeight,
@@ -165,6 +212,9 @@ void QnOrderedSystemsModel::handleWeightsChanged()
 
     m_unknownSystemsWeight = qnSystemWeightsManager->unknownSystemsWeight();
     m_weights = qnSystemWeightsManager->weights();
+
+    const auto filterModel = static_cast<FilterModel*>(sourceModel());
+    filterModel->setWeights(m_weights);
 
     forceUpdate();
 }

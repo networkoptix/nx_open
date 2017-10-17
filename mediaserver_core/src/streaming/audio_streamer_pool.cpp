@@ -29,15 +29,13 @@ QnAudioStreamerPool::QnAudioStreamerPool(QnCommonModule* commonModule):
 {
 }
 
-QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QnUuid& clientId) const
+QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId) const
 {
-    for (const auto& res : resourcePool()->getResourcesWithFlag(Qn::desktop_camera))
+    if (auto camera = resourcePool()->getResourceByUniqueId(sourceId))
     {
-        if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId ||
-            res->getId() == clientId)
-        {
-            return qnCameraPool->getVideoCamera(res);
-        }
+        NX_ASSERT(camera->hasFlags(Qn::desktop_camera));
+        if (camera->hasFlags(Qn::desktop_camera))
+            return qnCameraPool->getVideoCamera(camera);
     }
     return QnVideoCameraPtr();
 }
@@ -52,7 +50,11 @@ QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QnUui
     return resource;
 }
 
-bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error, const QnRequestParams &params)
+bool QnAudioStreamerPool::startStopStreamToResource(const QString& sourceId,
+    const QnUuid& resourceId,
+    Action action,
+    QString& error,
+    const QnRequestParams& params)
 {
     auto resource = getTransmitDestination(resourceId);
     if (!resource)
@@ -62,11 +64,11 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
         return false;
     }
 
-    auto sourceCam = getTransmitSource(clientId);
+    auto sourceCam = getTransmitSource(sourceId);
     if (!sourceCam)
     {
         error = lit("Client PC with id '%1' is not found.")
-            .arg(clientId.toString());
+            .arg(sourceId);
         return false;
     }
 
@@ -74,7 +76,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     if(!desktopDataProvider)
     {
         error = lit("Client PC with id '%1' is found but not ready to stream audio yet.")
-            .arg(clientId.toString());
+            .arg(sourceId);
         return false;
     }
 
@@ -92,7 +94,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     }
     else
     {
-        QString key = clientId.toString() + resourceId.toString();
+        QString key = sourceId + resourceId.toString();
         auto& proxyTransmitter = m_proxyTransmitters[key];
         if (!proxyTransmitter)
             proxyTransmitter.reset(new QnProxyAudioTransmitter(resource, params));

@@ -32,6 +32,21 @@ void ExportMediaSettingsWidget::setApplyFilters(bool value)
     ui->filtersCheckBox->setChecked(value);
 }
 
+bool ExportMediaSettingsWidget::transcodingAllowed() const
+{
+    return ui->filtersCheckBox->isEnabledTo(this);
+}
+
+void ExportMediaSettingsWidget::setTranscodingAllowed(bool value)
+{
+    ui->filtersCheckBox->setEnabled(value);
+    if (value)
+        return;
+
+    QSignalBlocker scopedBlocker(ui->filtersCheckBox);
+    ui->filtersCheckBox->setChecked(false);
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

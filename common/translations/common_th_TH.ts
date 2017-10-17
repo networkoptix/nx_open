@@ -13,83 +13,83 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>รหัสผ่านหรือชื่อผู้ใช้ไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
+      <translation>ผู้ใช้นี้ไม่มีสิทธิ์สำหรับการดำเนินการที่ร้องขอ</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation type="unfinished">Cannot create database backup.</translation>
+      <translation>ไม่สามารถสร้างการสำรองฐานข้อมูล</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation type="unfinished">System name is not configured yet.</translation>
+      <translation>ยังไม่ได้กำหนดค่าชื่อระบบ</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with Starter licenses.</translation>
+      <translation>คุณกำลังจะรวมระบบกับสิทธิ์การใช้งานเริ่มต้น</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>ใบอนุญาตเริ่มต้นเพียงหนึ่งได้ต่อระบบ ดังนั้นจะถูกยกเลิกใบอนุญาตสอง</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation type="unfinished">Merge anyway?</translation>
+      <translation>ผสานต่อไปหรือไม่</translation>
     </message>
     <message>
       <source>System was not found.</source>
-      <translation type="unfinished">System was not found.</translation>
+      <translation>ระบบไม่พบ</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
+      <translation>ระบบ %1 ที่ค้นพบมีเวอร์ชันที่เข้ากันไม่ได้ %2</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to the other System because current System is already connected to %1.</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับระบบอื่นได้เนื่องจากระบบปัจจุบันได้เชื่อมต่อกับ %1 แล้ว</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is in safe mode.</translation>
+      <translation>ระบบที่ค้นพบ %1 อยู่ในเซฟโหมด</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">Could not configure the remote System %1.</translation>
+      <translation>ไม่สามารถกำหนดค่าระบบจากระยะไกล %1</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
+      <translation>ทั้งสองระบบเชื่อมต่อกับ %1 ไม่รวม Merge</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">These Systems are built with different %1 URL. Merge is not allowed.</translation>
+      <translation>ระบบเหล่านี้สร้างขึ้นด้วย URL %1 ต่างกัน ไม่รวม Merge</translation>
     </message>
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
+      <translation>ระบบคลาวด์สามารถเท่าผสานกัน ด้วยเลย ระบบชื่อและรหัสผ่านจะถูกนำจากระบบคลาวด์</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>ระบบใหม่</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
     </message>
   </context>
   <context>
@@ -97,7 +97,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>เหตุการณ์ของระบบ</translation>
     </message>
   </context>
   <context>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>ได้รับการตอบสนองที่ไม่ดีจากเซิร์ฟเวอร์ %1: "%2".</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>อินพุต / เอาต์พุต มีข้อผิดพลาดเกิดขึ้น ข้อความ OS: "%1".</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -180,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>คำขออุปกรณ์ &quot;%1&quot; ล้มเหลวโดยมีข้อผิดพลาด &quot;%2&quot;</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>คำขออุปกรณ์ &quot;%1&quot; ล้มเหลวโดยมีข้อผิดพลาด &quot;%2&quot;</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>คำขออุปกรณ์ &quot;%1&quot; ล้มเหลวโดยมีข้อผิดพลาด &quot;%2&quot;</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -256,63 +256,63 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings.</translation>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings.</translation>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</translation>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>ไม่สามารถเปิด URL สื่อ %1 ไม่สามารถเชื่อมต่อกับพอร์ตสื่อ %2</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>ไม่สามารถเปิด URL สื่อ %1 การเชื่อมต่อกับพอร์ต %2 ปิดโดยไม่คาดคิด</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>ไม่สามารถแยกวิเคราะห์การตอบสนองของอุปกรณ์ URL %1 ชื่อคำขอ %2</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>ไม่สามารถแยกวิเคราะห์การตอบสนองของอุปกรณ์ URL %1 ชื่อคำขอ %2</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>ไม่สามารถแยกวิเคราะห์การตอบสนองของอุปกรณ์ URL %1 ชื่อคำขอ %2</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>ไม่มีสื่อบันทึกที่สนับสนุนที่ URL %1</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>ไม่ได้รับอนุญาต URL %1</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
+      <translation>ไม่สามารถเปิด URL สื่อ %1 โปรโตคอลสื่อที่ไม่รองรับ %2</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>กล้องถูกเรียกคืนจากที่จัดเก็บ ลบกล้องและเพิ่มอีกครั้งเพื่อดูวิดีโอสด</translation>
     </message>
   </context>
   <context>
@@ -339,23 +339,23 @@
     </message>
     <message>
       <source>Could not initialize resampling context, error code: %1</source>
-      <translation type="unfinished">Could not initialize resampling context, error code: %1</translation>
+      <translation>ไม่สามารถเริ่มต้นการบริบทใหม่รหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers, error code: %1</source>
-      <translation type="unfinished">Could not allocate sample buffers, error code: %1</translation>
+      <translation>ไม่สามารถจัดสรรบัฟเฟอร์ตัวอย่างรหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not send audio frame to encoder, Error code: %1.</translation>
+      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio packet from encoder, Error code: %1.</translation>
+      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio frame from decoder, Error code: %1.</translation>
+      <translation>ไม่สามารถส่งกรอบเสียงไปยังรหัสเข้ารหัสรหัสข้อผิดพลาด: %1</translation>
     </message>
   </context>
   <context>
@@ -408,11 +408,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>ขอบ</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -424,7 +424,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>เริ่มต้น</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -452,7 +452,7 @@
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>ใบอนุญาตวีดีโอวอร์ วีดีโอ </translation>
+      <translation>ใบอนุญาตวีดีโอวอร์ วีดีโอ</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
@@ -472,11 +472,11 @@
     </message>
     <message>
       <source>Free</source>
-      <translation type="unfinished">Free</translation>
+      <translation>ฟรี</translation>
     </message>
     <message>
       <source>Free license</source>
-      <translation type="unfinished">Free license</translation>
+      <translation>ใบอนุญาตฟรี</translation>
     </message>
     <message>
       <source>Time</source>
@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>เวลาใบอนุญาต</translation>
     </message>
   </context>
   <context>
@@ -503,14 +503,14 @@
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
-        <numerusform>Activate %n more %1.</numerusform>
+      <translation>
+        <numerusform>เปิดใช้ %n อีก %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
+      <translation>
+        <numerusform>จะใช้ %n มากกว่า %1</numerusform>
       </translation>
     </message>
   </context>
@@ -526,7 +526,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>ใบอนุญาตหมดอายุ</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -538,7 +538,7 @@
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>ประเภทใบอนุญาตนี้ต้องใช้เวอร์ชันซอฟต์แวร์ที่สูงกว่า</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -546,14 +546,14 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <translation>ไม่พบเซิร์ฟเวอร์ที่มี Id ฮาร์ดแวร์ที่ตรงกัน</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>เซิร์ฟเวอร์ใหม่</translation>
     </message>
   </context>
   <context>
@@ -655,19 +655,19 @@
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation type="unfinished">Licensed To: %1</translation>
+      <translation>ได้รับอนุญาตให้ %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation type="unfinished">Watermark: %1</translation>
+      <translation>ลายน้ำ: %1</translation>
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <translation>รหัสฮาร์ดแวร์: %1</translation>
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>เวลาใบอนุญาต</translation>
     </message>
   </context>
   <context>
@@ -703,32 +703,32 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Lo</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>สวัสดี</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
@@ -763,14 +763,14 @@
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>ประเภทรีซอร์สไม่ถูกต้องสำหรับการส่งออกข้อมูล</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>ระบบที่ไม่มีชื่อ</translation>
     </message>
   </context>
   <context>
@@ -805,88 +805,88 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>วินาที</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>นาที</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>ชั่วโมง</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>วัน</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>สัปดาห์</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation type="unfinished">mos</translation>
+      <translation>mos</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation type="unfinished">yrs</translation>
+      <translation>ปี</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
+      <translation>
+        <numerusform>มิลลิวินาที</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -899,43 +899,43 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>นาที</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>ชั่วโมง</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>วัน</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
+      <translation>
+        <numerusform>สัปดาห์</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
+      <translation>
+        <numerusform>เดือน</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
+      <translation>
+        <numerusform>ปี</numerusform>
       </translation>
     </message>
   </context>
@@ -943,7 +943,7 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation>เปิดการแปลงรหัส CL ไม่ได้ดำเนินการ.</translation>
+      <translation>การแปลงรหัส OpenCL ไม่ได้ดำเนินการ.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
@@ -951,11 +951,11 @@
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>เปิด CL แปลงไม่ได้ดำเนินการ.</translation>
+      <translation>OpenCL แปลงไม่ได้ดำเนินการ.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>ไม่รู้จัก การแปลง </translation>
+      <translation>ไม่รู้จัก การแปลง</translation>
     </message>
   </context>
   <context>
@@ -982,7 +982,7 @@
     </message>
     <message>
       <source>Custom Role</source>
-      <translation type="unfinished">Custom Role</translation>
+      <translation>บทบาทที่กำหนดเอง</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -990,31 +990,31 @@
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation type="unfinished">Can manage all cameras and bookmarks.</translation>
+      <translation>สามารถจัดการกล้องและบุ๊กมาร์กทั้งหมดได้</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation type="unfinished">Can view all cameras and export video.</translation>
+      <translation>สามารถดูกล้องทั้งหมดและส่งออกวิดีโอได้</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation type="unfinished">Can view live video from all cameras.</translation>
+      <translation>สามารถดูวิดีโอสดจากกล้องทั้งหมด</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation type="unfinished">Custom user role.</translation>
+      <translation>บทบาทผู้ใช้ที่กำหนดเอง</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation type="unfinished">Custom permissions.</translation>
+      <translation>สิทธิ์ที่กำหนดเอง</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation type="unfinished">Has access to whole System and can do everything.</translation>
+      <translation>มีสิทธิ์เข้าถึงระบบทั้งหมดและสามารถทำทุกอย่างได้</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+      <translation>มีสิทธิ์เข้าถึงระบบทั้งหมดและสามารถจัดการได้ สามารถสร้างผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -1085,8 +1085,8 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Motion on Cameras</numerusform>
+      <translation>
+        <numerusform>การเคลื่อนไหวบนกล้อง</numerusform>
       </translation>
     </message>
     <message>
@@ -1127,38 +1127,38 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Devices</numerusform>
+      <translation>
+        <numerusform>สัญญาณอินพุตบนอุปกรณ์</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Input Signal on Cameras</numerusform>
+      <translation>
+        <numerusform>สัญญาณอินพุตบนกล้อง</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Devices Disconnected</numerusform>
+      <translation>
+        <numerusform>ขาดการเชื่อมต่อกับอุปกรณ์</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation type="unfinished">
-        <numerusform>Cameras Disconnected</numerusform>
+      <translation>
+        <numerusform>หยุด​เชื่อม​ต่อ​กล้อง​แล้ว</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Devices IP Conflict</numerusform>
+      <translation>
+        <numerusform>ความขัดแย้งทางอุปกรณ์ IP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
-        <numerusform>Cameras IP Conflict</numerusform>
+      <translation>
+        <numerusform>ข้อขัดแย้ง IP ของกล้อง</numerusform>
       </translation>
     </message>
     <message>
@@ -1171,7 +1171,7 @@
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน  %1</translation>
+      <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน %1</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
@@ -1203,7 +1203,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>เซิร์ฟเวอร์ &quot;%1&quot; ล้มเหลว</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1217,19 +1217,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>เซิร์ฟเวอร์ &quot;%1&quot; ขัดแย้ง</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>เริ่มต้นเซิร์ฟเวอร์ &quot;%1&quot; แล้ว</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>เซิร์ฟเวอร์ &quot;%1&quot; มีปัญหาเกี่ยวกับใบอนุญาต</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>เซิร์ฟเวอร์ "%1" ได้เสร็จสิ้นการสำรองข้อมูลเก็บถาวร</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1241,7 +1241,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>มีเหตุการณ์ %1 หลายครั้ง</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1270,7 +1270,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
@@ -1283,7 +1283,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>ทริกเกอร์: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1293,8 +1293,8 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n ครั้ง, ครั้งแรก: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1337,7 +1337,7 @@
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>อุปกรณ์ไม่ตอบสนองต่อคำขอเครือข่าย</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -1345,7 +1345,7 @@
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>วิดีโอหยุดลงอย่างกะทันหัน</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
@@ -1357,11 +1357,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD disk %1 เต็ม ดิสก์มีข้อมูลมากเกินไปที่ไม่ได้รับการจัดการโดย VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>ดิสก์ระบบ &quot;%1&quot; ใกล้เต็มแล้ว</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1385,7 +1385,7 @@
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
+      <translation>การสำรองข้อมูลที่เก็บถาวรเสร็จสิ้น แต่ไม่ครบถ้วนเนื่องจากเวลาการสำรองข้อมูลเสร็จสิ้น ข้อมูลสำรองไว้ที่ %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
@@ -1397,15 +1397,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+      <translation>ใบอนุญาตไม่เพียงพอ การบันทึกถูกปิดใช้งานบนอุปกรณ์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+      <translation>ใบอนุญาตไม่เพียงพอ การบันทึกถูกปิดใช้งานบนอุปกรณ์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+      <translation>ใบอนุญาตไม่เพียงพอ การบันทึกถูกปิดใช้งานบนอุปกรณ์ต่อไปนี้:</translation>
     </message>
     <message>
       <source>start</source>
@@ -1425,31 +1425,31 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>ชื่อทริกเกอร์</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>สิทธิพิเศษ</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>ผู้ใช้ %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
+      <translation>
+        <numerusform>%n บทบาท</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>ผู้ดูแลระบบทั้งหมด</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>ผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1457,23 +1457,23 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>ทริกเกอร์ซอฟต์แวร์</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>ทริกเกอร์ซอฟต์แวร์ %1 ที่ %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>มีการเรียกใช้งาน Soft Trigger %1 หลายครั้ง</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>ส่งอีเมล์</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>รับทราบ</translation>
     </message>
   </context>
   <context>

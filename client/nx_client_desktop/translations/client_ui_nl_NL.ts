@@ -115,7 +115,7 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>Intel HD grafisch display kan worden geconfronteerd met kwesties als vervagen is ingeschakeld. Wij raden aan deze optie ongewijzigd te laten.</translation>
+      <translation>Intel HD grafisch display kan worden geconfronteerd met fouten als vervagen is ingeschakeld. Wij raden aan deze optie ongewijzigd te laten.</translation>
     </message>
     <message>
       <location/>
@@ -181,7 +181,7 @@
     <message>
       <location/>
       <source>Event rules</source>
-      <translation>Event regels</translation>
+      <translation>Gebeurtnisregels</translation>
     </message>
     <message>
       <location/>
@@ -437,12 +437,12 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Event regels</translation>
+      <translation>Gebeurtnisregels</translation>
     </message>
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>Gebeurtenissenlog...</translation>
+      <translation>Logboek...</translation>
     </message>
     <message>
       <location/>
@@ -727,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation>Input ID</translation>
+      <translation>Input Id</translation>
     </message>
   </context>
   <context>
@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation>Uitgang ID:</translation>
+      <translation>Uitgang Id:</translation>
     </message>
   </context>
   <context>
@@ -957,7 +957,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Gebeurtenissenlog</translation>
+      <translation>Logboek</translation>
     </message>
     <message>
       <location/>
@@ -977,7 +977,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event regels...</translation>
+      <translation>Gebeurtenisregels...</translation>
     </message>
   </context>
   <context>
@@ -1112,12 +1112,12 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>Div.</translation>
+      <translation>Diversen</translation>
     </message>
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation>Auto pauze video</translation>
+      <translation>Video automatisch pauzeren</translation>
     </message>
     <message>
       <location/>
@@ -1224,7 +1224,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
       <source>Layout Settings</source>
-      <translation>Layoutinstellingen</translation>
+      <translation>Instellingen schermindeling</translation>
     </message>
     <message>
       <location/>
@@ -1234,7 +1234,7 @@
     <message>
       <location/>
       <source>Layout is Locked</source>
-      <translation>Layout is vergrendeld</translation>
+      <translation>Schermindeling is vergrendeld</translation>
     </message>
     <message>
       <location/>
@@ -1355,7 +1355,7 @@
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation>Rol om toe te wijzen aan geïmporteerde gebruikers</translation>
+      <translation>Profiel om toe te wijzen aan geïmporteerde gebruikers</translation>
     </message>
     <message>
       <location/>
@@ -1393,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation>Gelieerd aan hardware ID:</translation>
+      <translation>Gelieerd aan Hardware Id:</translation>
     </message>
   </context>
   <context>
@@ -1447,7 +1447,7 @@
     <message>
       <location/>
       <source>Select License File...</source>
-      <translation>Selecteer Licentiebestand...</translation>
+      <translation>Selecteer activatiebestand...</translation>
     </message>
     <message>
       <location/>
@@ -1487,12 +1487,12 @@
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation>Activering sleutelbestand</translation>
+      <translation>Activatiebestand</translation>
     </message>
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation>Hardware ID</translation>
+      <translation>Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -1569,7 +1569,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Personalisatie</translation>
+      <translation>Persoonlijke instellingen</translation>
     </message>
     <message>
       <location/>
@@ -1609,7 +1609,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>Toon extra informatie in de boom</translation>
+      <translation>Toon het IP adres achter het apparaat</translation>
     </message>
     <message>
       <location/>
@@ -1619,7 +1619,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation>Showreel cyclus</translation>
+      <translation>Showreelcyclus</translation>
     </message>
   </context>
   <context>
@@ -1816,7 +1816,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation>Kies een specifieke build</translation>
+      <translation>Kies een specifieke versie</translation>
     </message>
   </context>
   <context>
@@ -2022,7 +2022,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation>Systeem Administratie</translation>
+      <translation>Systeembeheer</translation>
     </message>
   </context>
   <context>
@@ -2103,7 +2103,7 @@
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
+      <translation>Profielen bewerken...</translation>
     </message>
   </context>
   <context>
@@ -2205,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Een krachtige computer wordt aanbevolen voor &quot;Beste&quot; kwaliteit en resolutie.</translation>
+      <translation>Wij adviseren een krachtige computer te gebruiken voor de &quot;Beste&quot; kwaliteit en resolutie.</translation>
     </message>
     <message>
       <location/>
@@ -2238,12 +2238,12 @@
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
-      <translation>Bronbestanden</translation>
+      <translation>Systeemoverzicht</translation>
     </message>
     <message>
       <location/>
       <source>Search</source>
-      <translation>Zoek</translation>
+      <translation>Zoeken</translation>
     </message>
   </context>
   <context>
@@ -2330,7 +2330,7 @@
     <message>
       <location/>
       <source>Force Alarm Layout opening</source>
-      <translation>Forceer het openen van een alarmlayout</translation>
+      <translation>Forceer het openen van een alarm scherm</translation>
     </message>
     <message>
       <location/>
@@ -2514,7 +2514,7 @@
     <message>
       <location/>
       <source>TextLabel</source>
-      <translation>Text label</translation>
+      <translation type="unfinished">TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2736,7 +2736,7 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>Rollen</translation>
+      <translation>Profielen</translation>
     </message>
     <message>
       <location/>
@@ -2813,7 +2813,7 @@
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation>Rol verwijderen</translation>
+      <translation>Profiel verwijderen</translation>
     </message>
   </context>
   <context>
@@ -2821,18 +2821,18 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation>Gebruikersrollen</translation>
+      <translation>Gebruikersprofielen</translation>
     </message>
     <message>
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation>Er zijn nog geen aangepaste gebruikersrollen. Klik op de &quot;Nieuwe rol&quot; knop om deze aan ​​te maken.</translation>
+      <translation>Er zijn nog geen aangepaste gebruikersprofielen. Klik op de &quot;Nieuwe rol&quot; knop om deze aan ​​te maken.</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation>Nieuwe rol</translation>
+      <translation>Nieuwe profiel</translation>
     </message>
   </context>
   <context>
@@ -2845,12 +2845,12 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location/>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Rollen bewerken...</translation>
+      <translation>Profielen bewerken...</translation>
     </message>
   </context>
   <context>

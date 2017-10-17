@@ -16,6 +16,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 static const QString kPresetsPropertyKey = lit("ptzPresets");
+static const QString kPtzPresetMappingPropertyName = lit("presetMapping");
 
 struct QnPtzPreset: public boost::equality_comparable1<QnPtzPreset>
 {
@@ -76,5 +77,7 @@ struct QnPtzPresetRecord
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzPresetRecord, (json)(eq));
 
 using QnPtzPresetRecordHash = QHash<QString, QnPtzPresetRecord>;
+
+using QnPtzPresetMapping = QMap<QString, QnPtzPreset>;
 
 Q_DECLARE_METATYPE(QnPtzPresetRecordHash);

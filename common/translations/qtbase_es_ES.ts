@@ -32,7 +32,7 @@
     </message>
     <message>
       <source>Quit %1</source>
-      <translation>Salir de %1</translation>
+      <translation>Salir %1</translation>
     </message>
     <message>
       <source>About %1</source>
@@ -51,7 +51,7 @@
     </message>
     <message>
       <source>Step &amp;down</source>
-      <translation>Re&amp;ducir</translation>
+      <translation>&amp;Reducir</translation>
     </message>
   </context>
   <context>
@@ -62,7 +62,7 @@
     </message>
     <message>
       <source>Increase</source>
-      <translation>Incremento</translation>
+      <translation>Incrementar</translation>
     </message>
     <message>
       <source>Decrease</source>
@@ -70,7 +70,7 @@
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation>MuestraMenu</translation>
+      <translation>MostrarMenu</translation>
     </message>
     <message>
       <source>SetFocus</source>
@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>Conmutar</translation>
+      <translation>Alternar</translation>
     </message>
     <message>
       <source>Scroll Left</source>
@@ -102,11 +102,11 @@
     </message>
     <message>
       <source>Next Page</source>
-      <translation>Siguiente Página</translation>
+      <translation>Página Siguiente</translation>
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation>Desencadena la acción</translation>
+      <translation>Dispara la acción</translation>
     </message>
     <message>
       <source>Increase the value</source>
@@ -138,11 +138,11 @@
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation>Desplazar hacia arriba</translation>
+      <translation>Desplaza hacia arriba</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation>Desplazar hacia abajo</translation>
+      <translation>Desplaza hacia abajo</translation>
     </message>
     <message>
       <source>Goes back a page</source>
@@ -184,7 +184,7 @@
     </message>
     <message>
       <source>Config</source>
-      <translation>Configuración</translation>
+      <translation>Config</translation>
     </message>
     <message>
       <source>Preference</source>
@@ -283,7 +283,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation>Colores &amp;básicos</translation>
+      <translation>&amp;Colores básicos</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
@@ -339,7 +339,7 @@ Press ESC to cancel</source>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>Aceptar</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -434,7 +434,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Go forward</source>
-      <translation>Ir hacia adelante</translation>
+      <translation>Ir adelante</translation>
     </message>
     <message>
       <source>Parent Directory</source>
@@ -442,7 +442,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation>Vaya al directorio principal</translation>
+      <translation>Vaya al directorio superior</translation>
     </message>
     <message>
       <source>Create New Folder</source>
@@ -470,11 +470,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Files of type:</source>
-      <translation>Ficheros de tipo:</translation>
+      <translation>Archivos de tipo:</translation>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation>Buscar en el directorio</translation>
+      <translation>Buscar directorio</translation>
     </message>
     <message>
       <source>Open</source>
@@ -490,7 +490,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation>&amp;Nombre de fichero:</translation>
+      <translation>Archivo &amp;nombre:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
@@ -506,7 +506,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation>Todos los ficheros (*)</translation>
+      <translation>Todos los archivos(*)</translation>
     </message>
     <message>
       <source>Show </source>
@@ -514,7 +514,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation>Cambia&amp;r de nombre</translation>
+      <translation>&amp;Cambiar de nombre</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
@@ -522,7 +522,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>Mostrar los fic&amp;heros ocultos</translation>
+      <translation>Mostrar &amp;archivos ocultos</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
@@ -530,7 +530,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>Todos los ficheros (*)</translation>
+      <translation>Todos los archivos (*)</translation>
     </message>
     <message>
       <source>Directories</source>
@@ -547,7 +547,7 @@ Verique que el nombre del directorio es correcto.</translation>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation>El fichero %1 ya existe.
+      <translation>%1 ya existe.
 ¿Desea reemplazarlo?</translation>
     </message>
     <message>
@@ -555,8 +555,8 @@ Do you want to replace it?</source>
 File not found.
 Please verify the correct file name was given.</source>
       <translation>%1
-Fichero no encontrado.
-Verifique que el nombre del fichero es correcto.</translation>
+Archivo no encontrado.
+Verifique que el nombre de archivo es correcto.</translation>
     </message>
     <message>
       <source>New Folder</source>
@@ -574,7 +574,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation>¿Estas seguro que quieres borrarlo &apos;%1&apos;?</translation>
+      <translation>¿Estas seguro que quieres borrar &apos;%1&apos;?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
@@ -590,7 +590,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>Mi equipo</translation>
+      <translation>Mi Computadora</translation>
     </message>
     <message>
       <source>Drive</source>
@@ -603,7 +603,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>File</source>
-      <translation>Fichero</translation>
+      <translation>Archivo</translation>
     </message>
     <message>
       <source>File Folder</source>
@@ -658,19 +658,19 @@ Do you want to delete it anyway?</source>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TiB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GiB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation>%1 MiB</translation>
+      <translation>%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation>%1 KiB</translation>
+      <translation>%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
@@ -678,7 +678,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation>Nombre de fichero no válido</translation>
+      <translation>Nombre de archivo no válido</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
@@ -708,11 +708,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>Mi equipo</translation>
+      <translation>Mi Computadora</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation>Equipo</translation>
+      <translation>Computadora</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
@@ -723,7 +723,7 @@ Do you want to delete it anyway?</source>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation>&amp;Aceptar</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -747,7 +747,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>LTR</translation>
     </message>
   </context>
   <context>
@@ -758,11 +758,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation>Demasiados ficheros abiertos simultáneamente</translation>
+      <translation>Demasiados archivos abiertos simultáneamente</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation>No hay ningún fichero o directorio con ese nombre</translation>
+      <translation>No hay ningún archivo o directorio con ese nombre</translation>
     </message>
     <message>
       <source>No space left on device</source>
@@ -830,7 +830,7 @@ Do you want to delete it anyway?</source>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation>Atajo de prensa</translation>
+      <translation>Pulsar atajo</translation>
     </message>
     <message>
       <source>%1, ...</source>
@@ -924,7 +924,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Abort</source>
-      <translation>Interrumpir</translation>
+      <translation>Abortar</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -956,7 +956,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Reinicializar</translation>
+      <translation>Reiniciar</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -996,7 +996,7 @@ Do you want to delete it anyway?</source>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation>Desplazar hasta aquí</translation>
+      <translation>Desplazar aquí</translation>
     </message>
     <message>
       <source>Left edge</source>
@@ -1160,7 +1160,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation>Copiar la ubicación del en&amp;lace</translation>
+      <translation>Copiar la ubicación del &amp;enlace</translation>
     </message>
     <message>
       <source>&amp;Paste</source>

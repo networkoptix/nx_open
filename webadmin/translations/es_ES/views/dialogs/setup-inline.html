@@ -130,7 +130,7 @@
     </div>
     <p class="vertical-bottom">
         <a ng-if="!settings.liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
-           target="_blank" ng-click="openLink($event)">Ayudarme a decidir</a>
+           target="_blank" ng-click="openLink($event)">Ayúdame a decidir</a>
         <span ng-if="settings.liteClient">Aprende más:{{portalUrl}}</span>
     </p>
 </div>
@@ -140,13 +140,13 @@
     <div class="master-icon">
         <span class="icon-account"></span>
     </div>
-    <h2>{{Config.cloud.productName}}cuenta</h2>
+    <h2>{{Config.cloud.productName}} cuenta</h2>
     <p class="master-description">
         Una cuenta es necesaria para utilizar el sistema de nube {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Crear una nueva cuenta</button>&nbsp;&nbsp;
-        <button class="btn btn-default" ng-click="next('cloudLogin', true)">Use existente</button>
+        <button class="btn btn-default" ng-click="next('cloudLogin', true)">Usar existente</button>
     </p>
 </div>
 
@@ -242,7 +242,7 @@
 +                    !forms.localForm.passwordInput.$dirty &&
 +                    !forms.localForm.localPasswordConfirmation.$touched">
             <div class="help-block">
-                La contraseña debe contener distintos tipos de caracteres y tener al menos 8 Símbolos
+                La contraseña debe contener distintos tipos de caracteres y tener al menos 8 símbolos
             </div>
         </div>
         <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
@@ -290,7 +290,7 @@
                    typeahead-show-hint="true"
                    typeahead-focus-first="false"
                    typeahead-focus
- placeholder="Sistema existente URL (https://host:port)"
+ placeholder="URL de sistema existente (https://host:port)"
                    required
  class="form-control">
 
@@ -301,7 +301,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Nombre del usuario" required>
+                   placeholder="Usuario" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -329,13 +329,13 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Unir systemas...</h2>
+    <h2>Unir systemas ...</h2>
     <p class="master-description">Puede tardar varios minutos</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Unir systemas...</h2>
+    <h2>Unir systemas ...</h2>
     <p class="master-description">Intentando conectar con el sistema</p>
 </div>
 
@@ -347,7 +347,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
         <button class="btn btn-default" ng-click="skip()">Configurar un sistema separado</button>
     </p>
 </div>
@@ -359,14 +359,14 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Conectar a {{Config.cloud.productName}}...</h2>
-    <p class="master-description">Puede tomar vario tiempo</p>
+    <h2>Conectar a {{Config.cloud.productName}} ...</h2>
+    <p class="master-description">Puede tomar varios minutos</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
@@ -374,7 +374,7 @@
     <h2>El sistema está listo para su uso</h2>
     <p>Nombre del usuario</p>
     <h4>{{settings.cloudEmail}}</h4>
-    <p>El compartimiento y ajustes de la cuenta</p>
+    <p>Compartir y configuración de cuenta</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="abrir {{Config.cloud.productName}}"
            ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
@@ -414,7 +414,7 @@
         Configurar la conexión a Internet en el servidor para poder<br>para conectarse en cualquier lugar con {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
         <button class="btn btn-default" ng-click="skip()">Configuración de sistema local</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
@@ -429,7 +429,7 @@
         Compruebe la conexión a Internet.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
         <button class="btn btn-default" ng-click="skip()">Configuración de sistema local</button>
     </p>
 </div>
@@ -441,7 +441,7 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
         <button class="btn btn-default" ng-click="skip()">Configuración de sistema local</button>
     </p>
 </div>
@@ -453,7 +453,7 @@
         Descripción del error: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
+        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
     </p>
 </div>
 
@@ -482,19 +482,16 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">Cancel</button>
-    <button class="btn btn-default"
+            ng-click="cancel()">Cancelar</button>     <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-    <button class="btn btn-primary pull-right"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
-    <button class="btn btn-primary pull-right"
+ ng-click="next()">Siguiente <span class="glyphicon glyphicon-arrow-right"></span></button> <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
             auto-focus
- ng-click="finish()">Finish</button>
+ ng-click="finish()">Fin</button>
 </div>

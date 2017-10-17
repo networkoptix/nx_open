@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 #include <QtCore/QString>
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QCoreApplication>
 
 namespace nx {
 namespace client {
@@ -24,6 +25,18 @@ class FileExtensionUtils
 {
 public:
     static bool isExecutable(FileExtension extension);
+};
+
+class FileSystemStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(FileSystemStrings)
+
+public:
+    static QString suffix(FileExtension ext);
+    static FileExtension extension(const QString& suffix,
+        FileExtension defaultValue = FileExtension::mkv);
+    static QString description(FileExtension extension);
+    static QString filterDescription(FileExtension ext);
 };
 
 class FileExtensionModel: public QAbstractListModel

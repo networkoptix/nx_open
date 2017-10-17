@@ -111,13 +111,20 @@ bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader, const QString&
     {
         auto submenuName = reader.attributes().value(kHanwhaNameAttribute).toString();
 
-        if (!reader.readNextStartElement())
-            return false;
+        if (reader.readNextStartElement())
+        {
+            if (!parseActions(reader, cgi, submenuName))
+                return false;
 
-        if (!parseActions(reader, cgi, submenuName))
-            return false;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+        }
+        else
+        {
+            // It is an empty submenu section
+            reader.readNext();
+            if (reader.hasError())
+                return false;
+        }
     }
 
     return true;

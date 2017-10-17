@@ -74,13 +74,12 @@ private:
     static QnMutex m_createSocketMutex;
 };
 
-enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
-
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessorPrivate;
 class QnRtspFfmpegEncoder;
+enum class PlaybackMode;
 
 class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 {
@@ -123,7 +122,7 @@ private:
     void initResponse(int code = 200, const QString& message = "OK");
     void generateSessionId();
     void sendResponse(int code, const QByteArray& contentType);
-    Mode getStreamingMode() const;
+    PlaybackMode getStreamingMode() const;
 
     int numOfVideoChannels();
     int composeDescribe();

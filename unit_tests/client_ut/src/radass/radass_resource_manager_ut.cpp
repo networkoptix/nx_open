@@ -321,31 +321,6 @@ TEST_F(RadassResourceManagerTest, saveAndLoadPersistentData)
     ASSERT_EQ(RadassMode::High, manager()->mode(layout()));
 }
 
-TEST_F(RadassResourceManagerTest, cleanupNonExistentDataIfRemoveLayout)
-{
-    manager()->switchLocalSystemId(kSystemId1);
-    QnLayoutItemIndexList items;
-    items << addCamera();
-    manager()->setMode(items, RadassMode::High);
-    resourcePool()->removeResource(layout());
-    manager()->saveData(kSystemId1, resourcePool());
-
-    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
-}
-
-TEST_F(RadassResourceManagerTest, cleanupNonExistentDataIfRemoveItem)
-{
-    manager()->switchLocalSystemId(kSystemId1);
-    QnLayoutItemIndexList items;
-    items << addCamera();
-    manager()->setMode(items, RadassMode::High);
-    layout()->removeItem(items.first().uuid());
-    manager()->saveData(kSystemId1, resourcePool());
-
-    ASSERT_EQ(RadassMode::Auto, manager()->mode(items));
-}
-
-
 } // namespace desktop
 } // namespace client
 } // namespace nx

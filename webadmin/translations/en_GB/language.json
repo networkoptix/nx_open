@@ -43,7 +43,6 @@
     "confirmDisconnectFromCloudAction":"Disconnect",
     "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
     "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
     "confirmDisconnectFromSystemAction":"Detach",
     "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
     "connectedSuccess":"System was connected successfully",

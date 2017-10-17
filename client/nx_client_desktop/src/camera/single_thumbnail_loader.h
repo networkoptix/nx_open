@@ -12,16 +12,23 @@
 class QnSingleThumbnailLoader: public QnImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT
-
     using base_type = QnImageProvider;
+    using ThumbnailFormat = QnThumbnailRequestData::ThumbnailFormat;
+    using AspectRatio = QnThumbnailRequestData::AspectRatio;
+    using RoundMethod = QnThumbnailRequestData::RoundMethod;
 
 public:
-    explicit QnSingleThumbnailLoader(const QnVirtualCameraResourcePtr &camera,
+    explicit QnSingleThumbnailLoader(const QnVirtualCameraResourcePtr& camera,
         qint64 msecSinceEpoch = QnThumbnailRequestData::kLatestThumbnail,
         int rotation = QnThumbnailRequestData::kDefaultRotation,
-        const QSize &size = QSize(),
-        QnThumbnailRequestData::ThumbnailFormat format = QnThumbnailRequestData::JpgFormat,
-        QObject *parent = NULL);
+        const QSize& size = QSize(),
+        ThumbnailFormat format = QnThumbnailRequestData::JpgFormat,
+        AspectRatio aspectRatio = AspectRatio::AutoAspectRatio,
+        RoundMethod roundMethod = RoundMethod::KeyFrameAfterMethod,
+        QObject* parent = nullptr);
+
+    explicit QnSingleThumbnailLoader(const QnThumbnailRequestData& data,
+        QObject* parent = nullptr);
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;

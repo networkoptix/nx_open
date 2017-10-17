@@ -1038,25 +1038,23 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Fichier &quot;%1&quot; est utilisé par un autre processus.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Fichier &quot;%1&quot; ne peut pas être écrit. Veuillez essayer un autre nom.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants: %1</numerusform>
+        <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Nom de fichier &quot;%1&quot; est réservé par le système d'exploitation. Veuillez essayer un autre nom.</translation>
     </message>
   </context>
   <context>
@@ -2672,11 +2670,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Courriel ou mot de passe incorrect</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>Compte non activé. S.V.P. vérifiez votre courriel et suivez les instructions fournies</translation>
     </message>
   </context>
   <context>
@@ -4327,6 +4325,10 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>appuyez et maintenez</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Désactivé selon l'horaire</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4628,7 +4630,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>La notification s'affiche jusqu'à ce que l'un des utilisateurs qui le voient crée un signet avec la description de l'événement</translation>
     </message>
   </context>
   <context>
@@ -7217,14 +7219,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Entrer mot de passe...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Mot de passe Administrateur</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Les systèmes seront fusionnées sous peu</translation>
     </message>
@@ -7245,10 +7239,6 @@ to %1</source>
       <translation>Montant total de licences diminuera</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Mot de passe ne peut pas être vide.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Systèmes nuage ne peuvent pas être fusionnées</translation>
     </message>
@@ -7263,6 +7253,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Le serveur sera bientôt connecté au système</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Entrer mot de passe...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Mot de passe Administrateur</translation>
     </message>
   </context>
   <context>
@@ -7815,11 +7813,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Arrêter le tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Démarrer le tour</translation>
     </message>
   </context>
   <context>
@@ -8084,8 +8082,8 @@ to %1</source>
       <translation>Utilisez les flèches du clavier pour changer les mises en page. Pour quitter le showreel appuyez sur Echap(Esc).</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Appuyez sur n'importe quelle touche pour arrêter le tour.</translation>
     </message>
   </context>
   <context>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <plugin
 		name="DIGITALWATCHDOG-pravis"
-		version="1" 
+		version="1"
 		unique_id="B6BBB9F4-A10B-43A9-928D-907A4E54B4E5">
 	<parameters>
 		<group name = "Imaging">
@@ -20,7 +20,7 @@
 						range = "0,255"
                         readCmd  = "get_sensor_param?message=32,0007"
                         writeCmd ="set_sensor_param?message=32,0007,255,$"/>
-                <param  id = "saturation" 
+                <param  id = "saturation"
 					    name="Color Saturation"
 					    description="Color saturation of the image."
                         dataType = "Number"
@@ -44,7 +44,7 @@
                         readCmd  = "pravis_get_wdrinfo"
                         writeCmd = "set_fwenv?isp_mode=$"/>
 			</group>
-            
+
             <group name = "Lens">
 				<param  name = "Flicker Mode"
 						description = "Set the camera flicker type."
@@ -59,7 +59,8 @@
 		<group name = "Maintenance">
 			<param id = "sysReboot"
 					dataType="Button"
-					name="System Reboot" 
+					name="System Reboot"
+                    confirmation="Are you sure you want to reboot the device?"
 					description="This operation reboots the device."
                     writeCmd ="pravis_reboot_ip"/>
 		</group>

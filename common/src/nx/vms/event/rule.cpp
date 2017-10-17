@@ -129,9 +129,9 @@ int Rule::aggregationPeriod() const
     return m_aggregationPeriod;
 }
 
-void Rule::setAggregationPeriod(int msecs)
+void Rule::setAggregationPeriod(int seconds)
 {
-    m_aggregationPeriod = msecs;
+    m_aggregationPeriod = seconds;
 }
 
 bool Rule::isDisabled() const
@@ -267,14 +267,14 @@ QMap<QnUuid, QnUuid> Rule::remappedGuidsToFix()
     for (auto itr = intValues.begin(); itr != intValues.end(); ++itr)
     {
         result.insert(
-            intToGuid(itr.key(), kGuidPostfix), 
+            intToGuid(itr.key(), kGuidPostfix),
             intToGuid(itr.value(), kGuidPostfix));
     }
 
     for (int i = 0; i <= 19; ++i)
     {
         result.insert(
-            intToGuid(i, koldGuidPostfix), 
+            intToGuid(i, koldGuidPostfix),
             intToGuid(i, kGuidPostfix));
     }
 

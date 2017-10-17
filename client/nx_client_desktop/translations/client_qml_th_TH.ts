@@ -5,22 +5,22 @@
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
-      <translation type="unfinished">Searching servers in your local network...</translation>
+      <translation>ค้นหาเซิร์ฟเวอร์ในเครือข่ายภายใน...</translation>
     </message>
     <message>
       <source>No servers found</source>
-      <translation type="unfinished">No servers found</translation>
+      <translation>ไม่พบเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation type="unfinished">Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</translation>
+      <translation>ตรวจสอบการเชื่อมต่อเครือข่ายของคุณ หรือกดปุ่ม "เชื่อมการป้อนเซิร์ฟเวอร์รู้จักอยู่</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation type="unfinished">Click to setup</translation>
+      <translation>คลิกเพื่อตั้งค่า</translation>
     </message>
   </context>
   <context>
@@ -39,7 +39,7 @@
     </message>
     <message>
       <source>Auto-login</source>
-      <translation type="unfinished">Auto-login</translation>
+      <translation>เข้าสู่ระบบอัตโนมัติ</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -57,46 +57,46 @@
     <name>SystemTile</name>
     <message>
       <source>SAFE MODE</source>
-      <translation type="unfinished">SAFE MODE</translation>
+      <translation>เซฟโหมด</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>เข้ากันไม่ได้</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ออฟไลน์</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>ไม่สามารถเข้าถึงได้</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>เซิร์ฟเวอร์ใหม่</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>ไม่พบสิ่งใด</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation type="unfinished">You have no access to %1. Some features could be unavailable.</translation>
+      <translation>คุณไม่มีสิทธิ์เข้าถึง %1 คุณลักษณะบางอย่างอาจใช้ไม่ได้</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>กำลังโหลด ...</translation>
+      <translation>กำลังโหลด...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น ...</translation>
+      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์...</translation>
     </message>
   </context>
 </TS>

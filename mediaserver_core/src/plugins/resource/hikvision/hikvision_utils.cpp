@@ -316,9 +316,9 @@ bool makeResolutionList(
             auto sArea = s.width() * s.height();
 
             if (fArea != sArea)
-                return fArea < sArea;
+                return fArea > sArea;
 
-            return f.width() < s.width();
+            return f.width() > s.width();
         });
 
     return true;

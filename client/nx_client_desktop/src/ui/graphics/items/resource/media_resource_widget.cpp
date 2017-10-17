@@ -36,6 +36,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/ptz/ptz_controller_pool.h>
@@ -945,7 +946,12 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
     if (!hasTwoWayAudio)
         return;
 
-    m_twoWayAudioWidget = new QnTwoWayAudioWidget();
+    const auto user = context()->user();
+    if (!user)
+        return;
+
+    m_twoWayAudioWidget = new QnTwoWayAudioWidget(QnDesktopResource::calculateUniqueId(
+        commonModule()->moduleGUID(), user->getId()));
     m_twoWayAudioWidget->setCamera(m_camera);
     m_twoWayAudioWidget->setFixedHeight(kTriggerButtonSize);
     context()->statisticsModule()->registerButton(lit("two_way_audio"), m_twoWayAudioWidget);
@@ -1442,15 +1448,15 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     {
         ensureMotionSelectionCache();
 
-        auto metadata = m_renderer->lastFrameMetadata(channel);
-        if (!metadata || metadata->dataType != QnAbstractMediaData::DataType::META_V1)
-            return;
-
-        paintMotionGrid(
-            painter,
-            channel,
-            rect,
-            std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+        const auto metadata = m_renderer->lastFrameMetadata(channel);
+        if (metadata && metadata->dataType == QnAbstractMediaData::DataType::META_V1)
+        {
+            paintMotionGrid(
+                painter,
+                channel,
+                rect,
+                std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+        }
 
         paintMotionSensitivity(painter, channel, rect);
 
@@ -2110,6 +2116,8 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
         ensureTwoWayAudioWidget();
     else if (key == Qn::kCombinedSensorsDescriptionParamName)
         updateAspectRatio();
+    else if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+        updateButtonsVisibility();
 }
 
 void QnMediaResourceWidget::updateAspectRatio()
@@ -2512,6 +2520,7 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
+        action(action::ToggleTimelineAction)->setChecked(true);
     }
 
     setOption(WindowResizingForbidden, enabled);

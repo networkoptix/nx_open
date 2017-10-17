@@ -255,7 +255,7 @@ TEST_F(PersistentScheduler, unsubscribe)
 
     QnUuid taskId = whenSubscribedOnce();
 
-    int firedAlready;
+    std::atomic<int> firedAlready;
     user->unsubscribe(
         taskId,
         [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
@@ -263,7 +263,13 @@ TEST_F(PersistentScheduler, unsubscribe)
             firedAlready = task.fired;
         });
 
-    std::this_thread::sleep_for(kSleepTimeout);
+    waitForPredicateBecomeTrue(
+        [&firedAlready, this, taskId]()
+        {
+            return firedAlready == user->tasks()[taskId].fired
+                && !user->tasks()[taskId].subscribed;
+        },
+        "PersistentScheduler.unsubscribe");
 
     ASSERT_EQ(firedAlready, user->tasks()[taskId].fired);
     ASSERT_FALSE(user->tasks()[taskId].subscribed);

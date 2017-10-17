@@ -106,7 +106,10 @@ bool HanwhaMappedPresetManager::activateNativePreset(const QString& nativePreset
     HanwhaRequestHelper helper(m_hanwhaResource);
     const auto response = helper.control(
         lit("ptzcontrol/preset"),
-        {{kHanwhaPresetNumberProperty, number}});
+        {
+            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+            {kHanwhaPresetNumberProperty, number}
+        });
 
     return response.isSuccessful();
 }

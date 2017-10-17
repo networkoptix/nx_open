@@ -69,7 +69,7 @@ AnalyticsHelper::AnalyticsHelper(QnCommonModule* commonModule, QObject* parent):
 {
 }
 
-QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemSupportedAnaliticEvents() const
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemSupportedAnalyticsEvents() const
 {
     QList<EventDescriptor> result;
     AnalyticsEventTypeWithRefStorage storage(&result);

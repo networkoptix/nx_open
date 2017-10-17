@@ -14,6 +14,7 @@
 
 #include <ui/common/read_only.h>
 #include <ui/style/custom_style.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/utils/math/fuzzy.h>
@@ -209,9 +210,22 @@ public:
 
         m_layout->insertStretch(0);
         m_layout->insertWidget(0, button);
-        connect(button, &QPushButton::clicked, this, [this] {
-            emit valueChanged(m_id, QString());
-        });
+        connect(button, &QPushButton::clicked, this,
+            [this, confirmation = parameter.confirmation]
+            {
+                if (!confirmation.isEmpty())
+                {
+                    auto result = QnMessageBox::question(
+                        this,
+                        confirmation,
+                        QString(),
+                        QDialogButtonBox::Yes | QDialogButtonBox::Cancel);
+
+                    if (result != QDialogButtonBox::Yes)
+                        return;
+                }
+                emit valueChanged(m_id, QString());
+            });
     }
 
     virtual QString value() const override	{ return QString(); }
