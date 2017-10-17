@@ -181,3 +181,16 @@ inline void serialize(const nx::utils::Url& url, QString* target)
     *target = url.toString();
 }
 
+inline QDataStream& operator<<(QDataStream& stream, const nx::utils::Url& url)
+{
+    stream << url.toString();
+    return stream;
+}
+
+inline QDataStream& operator>>(QDataStream& stream, nx::utils::Url& url)
+{
+    QString urlString;
+    stream >> urlString;
+    url = nx::utils::Url(urlString);
+    return stream;
+}

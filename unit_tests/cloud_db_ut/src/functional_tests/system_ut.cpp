@@ -306,7 +306,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 
     {
         nx_http::HttpClient client;
-        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=1").arg(testSetup->endpoint().port));
+        nx::utils::Url url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=1").arg(testSetup->endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
@@ -314,7 +314,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 
     {
         nx_http::HttpClient client;
-        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
+        nx::utils::Url url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
             arg(testSetup->endpoint().port).arg(QString::fromStdString(system1.id)));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
@@ -327,10 +327,10 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
         nx_http::HttpClient client;
         QString urlStr(
             lm("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
-                arg(testSetup->endpoint().port).arg(QUrl::toPercentEncoding(QString::fromStdString(system1.id))));
+                arg(testSetup->endpoint().port).arg(nx::utils::Url::toPercentEncoding(QString::fromStdString(system1.id))));
         urlStr.replace(lit("{"), lit("%7B"));
         urlStr.replace(lit("}"), lit("%7D"));
-        QUrl url(urlStr);
+        nx::utils::Url url(urlStr);
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
@@ -684,7 +684,7 @@ TEST_F(FtSystemNotification, notification_of_system_removal)
 
             // Checking HTTP status code.
             nx_http::HttpClient httpClient;
-            QUrl requestUrl(lit("http://127.0.0.1:%1/cdb/auth/get_nonce").arg(endpoint().port));
+            nx::utils::Url requestUrl(lit("http://127.0.0.1:%1/cdb/auth/get_nonce").arg(endpoint().port));
             requestUrl.setUserName(QString::fromStdString(system1.id));
             requestUrl.setPassword(QString::fromStdString(system1.authKey));
             ASSERT_TRUE(httpClient.doGet(requestUrl));

@@ -17,7 +17,7 @@ public:
     static const char* handlerMethodName();
 
 public slots:
-    void handleUrl(const QUrl& url);
+    void handleUrl(const nx::utils::Url& url);
 
 private:
     QPointer<QnMobileClientUiController> m_uiController;

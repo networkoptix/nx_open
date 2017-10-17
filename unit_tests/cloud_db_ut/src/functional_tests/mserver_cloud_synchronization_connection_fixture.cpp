@@ -98,7 +98,7 @@ void Ec2MserverCloudSynchronizationConnection::useAnotherSystem()
     m_system = addRandomSystemToAccount(m_account);
 }
 
-QUrl Ec2MserverCloudSynchronizationConnection::cdbSynchronizationUrl() const
+nx::utils::Url Ec2MserverCloudSynchronizationConnection::cdbSynchronizationUrl() const
 {
     return network::url::Builder().setScheme("http")
         .setHost(endpoint().address.toString()).setPort(endpoint().port);

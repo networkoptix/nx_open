@@ -582,7 +582,7 @@ void QnCheckForUpdatesPeerTask::loadServersFromSettings()
         const auto infoMap = alternative.toMap();
 
         UpdateServerInfo serverInfo;
-        serverInfo.url = infoMap.value(lit("url")).toUrl();
+        serverInfo.url = nx::utils::Url::fromQUrl(infoMap.value(lit("url")).toUrl());
         if (!serverInfo.url.isValid())
             continue;
 
