@@ -73,6 +73,13 @@ void MappedPresetManager::loadMappings()
     m_presetMapping = QJson::deserialized<QnPtzPresetMapping>(
         m_resource->getProperty(kPtzPresetMappingPropertyName).toUtf8(),
         QnPtzPresetMapping());
+
+    m_nxToNativeId.clear();
+    for (const auto devicePresetId: m_presetMapping.keys())
+    {
+        const auto nxPresetId = m_presetMapping[devicePresetId].id;
+        m_nxToNativeId[nxPresetId] = devicePresetId;
+    }
 }
 
 void MappedPresetManager::createOrUpdateMapping(const QString& devicePresetId, const QnPtzPreset& nxPreset)
