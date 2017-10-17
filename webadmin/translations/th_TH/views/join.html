@@ -1,6 +1,7 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true"> &times; </span> <span class="sr-only"> ปิด </span></button> <h3 class="modal-title"> ผสานระบบ </h3>
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">ปิด</span></button>
+        <h3 class="modal-title">ผสานระบบ</h3>
     </div>
 
     <div class="col-sm-12">
@@ -47,7 +48,7 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">รหัสผ่านปัจจุบันสำหรับระบบนี้)</label>
+            <label for="currentSystemPassword" class="control-label">รหัสผ่านปัจจุบัน(สำหรับระบบนี้)</label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="รหัสผ่าน" required />
             </div>
@@ -56,7 +57,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>ระบบปัจจุบันกำลังจะถูกผสานเข้าด้วยกัน <b> {{systems.systemName}} </b> ด้วยระบบ <b> {{systems.joinSystemName}} </b></p>
             <p>
-                ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบต่อไปนี้: <0 /> <label> <2 /> {{systems.systemName}} (ปัจจุบัน) </label> <0 /> <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}} </label>
+                ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบต่อไปนี้:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

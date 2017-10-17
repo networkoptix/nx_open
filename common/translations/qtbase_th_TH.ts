@@ -98,11 +98,11 @@
     </message>
     <message>
       <source>Previous Page</source>
-      <translation type="unfinished">Previous Page</translation>
+      <translation>หน้าก่อนหน้า</translation>
     </message>
     <message>
       <source>Next Page</source>
-      <translation type="unfinished">Next Page</translation>
+      <translation>หน้าถัดไป</translation>
     </message>
     <message>
       <source>Triggers the action</source>
@@ -130,27 +130,27 @@
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation type="unfinished">Scrolls to the left</translation>
+      <translation>เลื่อนไปทางซ้าย</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation type="unfinished">Scrolls to the right</translation>
+      <translation>เลื่อนไปทางขวา</translation>
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation type="unfinished">Scrolls up</translation>
+      <translation>เลื่อนขึ้น</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation type="unfinished">Scrolls down</translation>
+      <translation>เลื่อนลง</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation type="unfinished">Goes back a page</translation>
+      <translation>ย้อนกลับหน้า</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation type="unfinished">Goes to the next page</translation>
+      <translation>ไปยังหน้าถัดไป</translation>
     </message>
   </context>
   <context>
@@ -161,7 +161,7 @@
     </message>
     <message>
       <source>Yes to All</source>
-      <translation type="unfinished">Yes to All</translation>
+      <translation>ใช่ทั้งหมด</translation>
     </message>
     <message>
       <source>No</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>No to All</source>
-      <translation type="unfinished">No to All</translation>
+      <translation>ไม่ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -216,11 +216,11 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>สำเนา</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>แปะ</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -231,22 +231,22 @@
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation type="unfinished">Don&apos;t Save</translation>
+      <translation>Don&apos;t บันทึก</translation>
     </message>
   </context>
   <context>
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation type="unfinished">Hu&amp;e:</translation>
+      <translation>Hu &amp; e:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
-      <translation type="unfinished">&amp;Sat:</translation>
+      <translation>&amp;Sat:</translation>
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation type="unfinished">&amp;Val:</translation>
+      <translation>&amp;Val:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
@@ -271,12 +271,11 @@
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation type="unfinished">Cursor at %1, %2
-Press ESC to cancel</translation>
+      <translation>เคอร์เซอร์ที่ %1, %2 กด ESC เพื่อยกเลิก</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation type="unfinished">&amp;Pick Screen Color</translation>
+      <translation>&amp; เลือกสีของหน้าจอ</translation>
     </message>
     <message>
       <source>Select Color</source>
@@ -314,26 +313,26 @@ Press ESC to cancel</translation>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>ก่อนเที่ยงวัน</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>น.</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>หลังเที่ยงวัน</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>น.</translation>
     </message>
   </context>
   <context>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>นี้คืออะไร&apos;s</translation>
     </message>
   </context>
   <context>
@@ -531,7 +530,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation type="unfinished">All files (*)</translation>
+      <translation>ทุกไฟล์ (*)</translation>
     </message>
     <message>
       <source>Directories</source>
@@ -570,12 +569,11 @@ Please verify the correct file name was given.</source>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation type="unfinished">&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</translation>
+      <translation>&apos;%1&apos; มีการป้องกันการเขียน คุณต้องการลบหรือไม่?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
+      <translation>คุณต้องการลบบุ๊คมาร์คจำนวน "%1" หน้าใช่หรือไม่?</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
@@ -600,7 +598,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation type="unfinished">%1 File</translation>
+      <translation>%1 ไฟล์</translation>
     </message>
     <message>
       <source>File</source>
@@ -644,15 +642,15 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation type="unfinished">Alt+Left</translation>
+      <translation>Alt + ซ้าย</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation type="unfinished">Alt+Right</translation>
+      <translation>Alt + ขวา</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation type="unfinished">Alt+Up</translation>
+      <translation>Alt + ขึ้น</translation>
     </message>
   </context>
   <context>
@@ -667,15 +665,15 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation type="unfinished">%1 MB</translation>
+      <translation>%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation type="unfinished">%1 KB</translation>
+      <translation>%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 ไบต์</translation>
     </message>
     <message>
       <source>Invalid filename</source>

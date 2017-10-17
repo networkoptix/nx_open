@@ -155,7 +155,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources()
     QnResourceList result;
 
     QnMutexLocker lock(&m_mutex);
-    for (const auto &info: m_connections)
+    for (const auto& info: m_connections)
     {
         if (const auto camera = cameraFromConnection(info))
             result << camera;
