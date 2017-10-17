@@ -643,6 +643,15 @@ qint64 QnMediaServerResource::currentStatusTime() const
     return m_statusTimer.elapsed();
 }
 
+qint64 QnMediaServerResource::utcOffset(qint64 defaultValue) const
+{
+    bool present = true;
+    const auto offset = getProperty(Qn::kTimezoneUtcOffset).toLongLong(&present);
+    if (present && offset != Qn::InvalidUtcOffset)
+        return offset;
+    return defaultValue;
+}
+
 QString QnMediaServerResource::getAuthKey() const
 {
     return m_authKey;

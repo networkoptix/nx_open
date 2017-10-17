@@ -573,46 +573,46 @@ AsyncConnection::AsyncConnection(const std::string& hostName):
     cass_cluster_set_contact_points(m_cluster, hostName.c_str());
 }
 
-void AsyncConnection::init(nx::utils::MoveOnlyFunc<void(CassError)> initCb)
+void AsyncConnection::init(nx::utils::MoveOnlyFunc<void(CassError)> completionHandler)
 {
     incPending();
     CassFuture* future = cass_session_connect(m_session, m_cluster);
     cass_future_set_callback(
         future,
         &onDone,
-        makeErrorCbContext(this, std::move(initCb)));
+        makeErrorCbContext(this, std::move(completionHandler)));
     cass_future_free(future);
 }
 
 void AsyncConnection::prepareQuery(
     const char* queryString,
-    nx::utils::MoveOnlyFunc<void(CassError, Query query)> prepareCb)
+    nx::utils::MoveOnlyFunc<void(CassError, Query query)> completionHandler)
 {
     incPending();
     CassFuture* future = cass_session_prepare(m_session, queryString);
     cass_future_set_callback(
         future,
         &onPrepare,
-        makeQueryCbContext(this, std::move(prepareCb)));
+        makeQueryCbContext(this, std::move(completionHandler)));
     cass_future_free(future);
 }
 
 void AsyncConnection::executeSelect(
     Query query,
-    nx::utils::MoveOnlyFunc<void(CassError, QueryResult)> selectCb)
+    nx::utils::MoveOnlyFunc<void(CassError, QueryResult)> completionHandler)
 {
     incPending();
     CassFuture* future = cass_session_execute(m_session, query.m_statement);
     cass_future_set_callback(
         future,
         &onSelect,
-        makeSelectCbContext(this, std::move(query), std::move(selectCb)));
+        makeSelectCbContext(this, std::move(query), std::move(completionHandler)));
     cass_future_free(future);
 }
 
 void AsyncConnection::executeSelect(
     const char* queryString,
-    nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb)
+    nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> completionHandler)
 {
     incPending();
     CassStatement* statement = cass_statement_new(queryString, 0);
@@ -620,26 +620,26 @@ void AsyncConnection::executeSelect(
     cass_future_set_callback(
         future,
         &onSelect,
-        makeSelectCbContext(this, Query(statement), std::move(selectCb)));
+        makeSelectCbContext(this, Query(statement), std::move(completionHandler)));
     cass_future_free(future);
 }
 
 void AsyncConnection::executeUpdate(
     Query query,
-    nx::utils::MoveOnlyFunc<void(CassError)> updateCb)
+    nx::utils::MoveOnlyFunc<void(CassError)> completionHandler)
 {
     incPending();
     CassFuture* future = cass_session_execute(m_session, query.m_statement);
     cass_future_set_callback(
         future,
         &onUpdate,
-        makeUpdateCbContext(this, std::move(query), std::move(updateCb)));
+        makeUpdateCbContext(this, std::move(query), std::move(completionHandler)));
     cass_future_free(future);
 }
 
 void AsyncConnection::executeUpdate(
     const char* queryString,
-    nx::utils::MoveOnlyFunc<void(CassError)> updateCb)
+    nx::utils::MoveOnlyFunc<void(CassError)> completionHandler)
 {
     incPending();
     CassStatement* statement = cass_statement_new(queryString, 0);
@@ -647,7 +647,7 @@ void AsyncConnection::executeUpdate(
     cass_future_set_callback(
         future,
         &onUpdate,
-        makeUpdateCbContext(this, Query(statement), std::move(updateCb)));
+        makeUpdateCbContext(this, Query(statement), std::move(completionHandler)));
     cass_future_free(future);
 }
 

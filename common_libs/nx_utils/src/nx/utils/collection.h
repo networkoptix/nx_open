@@ -1,4 +1,4 @@
-/* This file was derived from ArXLib with permission of the copyright holder. 
+/* This file was derived from ArXLib with permission of the copyright holder.
  * See http://code.google.com/p/arxlib/. */
 #ifndef QN_COLLECTION_H
 #define QN_COLLECTION_H
@@ -100,8 +100,8 @@ namespace QnCollection {
      * operation.
      *
      * This problem is solved by introducing proper bindings.
-     * 
-     * Note that QList, QVector and QLinkedList support STL-style insertion out of the box. 
+     *
+     * Note that QList, QVector and QLinkedList support STL-style insertion out of the box.
      */
 
     template<class T, class Iterator, class Element>
@@ -146,7 +146,7 @@ namespace QnCollection {
     void clear(Collection &collection) {
         collection.clear();
     }
-    
+
 
     template<class List, class Pred>
     int indexOf(const List &list, int from, const Pred &pred) {
@@ -167,7 +167,7 @@ namespace QnCollection {
 
 
     template<class Collection>
-    struct collection_category: 
+    struct collection_category:
         QnCollectionDetail::collection_category<Collection>
     {};
 
@@ -192,10 +192,10 @@ namespace QnCollection {
  * What this class does is it allows to iterate through Qt hash/map containers
  * using the same interface as with STL ones --- that is, iterator dereferencing
  * yields an <tt>std::pair</tt>.
- * 
+ *
  * This can be extremely useful when writing generic algorithms that are supposed
  * to work both with Qt and STL containers. The way to use this class is to
- * replace <tt>begin</tt> and <tt>end</tt> calls in your code with 
+ * replace <tt>begin</tt> and <tt>end</tt> calls in your code with
  * <tt>boost::begin</tt> and <tt>boost::end</tt>. It is that simple.
  */
 template<class Iterator, class Value, class Reference>
@@ -270,58 +270,12 @@ QN_REGISTER_QT_STL_MAP_ITERATOR(QMap);
 QN_REGISTER_QT_STL_MAP_ITERATOR(QMultiMap);
 #undef QN_REGISTER_QT_STL_MAP_ITERATOR
 
-#if 0
-/* And the same thing for QJsonObject. */
-
-namespace boost {
-    struct range_mutable_iterator<QJsonObject> {
-        typedef QnStlMapIterator<QJsonObject::iterator, std::pair<const QString, QJsonValue>, std::pair<QString, QJsonValueRef> > type;
-    };
-                                                                                
-    struct range_const_iterator<QJsonObject> {
-        typedef QnStlMapIterator<QJsonObject::const_iterator, std::pair<const QString, QJsonValue>, std::pair<const QString, const QJsonValueRef> > type;
-    };
-} /* namespace boost */
-                                                                                
-
-inline typename boost::range_mutable_iterator<QJsonObject>::type
-range_begin(QJsonObject &x) {
-    return typename boost::range_mutable_iterator<QJsonObject>::type(x.begin());
-}
-                                                                                
-inline typename boost::range_const_iterator<QJsonObject>::type
-range_begin(const QJsonObject &x) {
-    return typename boost::range_const_iterator<QJsonObject>::type(x.begin());
-}
-
-inline typename boost::range_mutable_iterator<QJsonObject>::type
-range_end(QJsonObject &x) {
-    return typename boost::range_mutable_iterator<QJsonObject>::type(x.end());
-}
-
-template<class Key, class T>
-inline typename boost::range_const_iterator<QJsonObject>::type
-range_end(const QJsonObject &x) {
-    return typename boost::range_const_iterator<QJsonObject>::type(x.end());
-}
-#endif
-
 // TODO: #Elric remove
 /* Compatibility layer. */
 
 template<class List>
 void qnResizeList(List &list, int size) {
     QnCollection::resize(list, size);
-}
-
-template<class List, class Pred>
-int qnIndexOf(const List &list, int from, const Pred &pred) {
-    return QnCollection::indexOf(list, from, pred);
-}
-
-template<class List, class Pred>
-int qnIndexOf(const List &list, const Pred &pred) {
-    return QnCollection::indexOf(list, pred);
 }
 
 #endif // QN_COLLECTION_H

@@ -7,6 +7,7 @@
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "../settings.h"
 
@@ -51,7 +52,7 @@ bool RemoteRelayPeerPool::connectToDb()
 {
     m_cassConnection = 
         nx::cassandra::AsyncConnectionFactory::instance().create(
-            m_settings.cassandraConnection().hostName);
+            m_settings.cassandraConnection().host);
 
     prepareDbStructure();
 
@@ -63,7 +64,7 @@ bool RemoteRelayPeerPool::connectToDb()
 
 void RemoteRelayPeerPool::prepareDbStructure()
 {
-    // TODO: Imply DbStructureUpdater here (it will require some refactoring).
+    // TODO: Use DbStructureUpdater here (it will require some refactoring).
     NX_INFO(this, lm("Initiating connection to cassandra DB"));
 
     m_cassConnection->init()
@@ -502,6 +503,24 @@ RemoteRelayPeerPool::~RemoteRelayPeerPool()
 {
     if (m_dbReady)
         m_cassConnection->wait();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static RemoteRelayPeerPoolFactory::FactoryFunc remoteRelayPeerPoolFactoryFunc;
+
+std::unique_ptr<model::AbstractRemoteRelayPeerPool> RemoteRelayPeerPoolFactory::create(
+    const conf::Settings& settings)
+{
+    if (remoteRelayPeerPoolFactoryFunc)
+        return remoteRelayPeerPoolFactoryFunc(settings);
+
+    return std::make_unique<model::RemoteRelayPeerPool>(settings);
+}
+
+void RemoteRelayPeerPoolFactory::setFactoryFunc(FactoryFunc func)
+{
+    remoteRelayPeerPoolFactoryFunc.swap(func);
 }
 
 } // namespace model

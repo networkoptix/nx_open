@@ -1,8 +1,14 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/abstract_socket.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/dns_resolver.h>
 #include <nx/network/resolve/custom_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/socket_factory.h>
 #include <nx/utils/random.h>
 
 namespace nx {

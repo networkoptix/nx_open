@@ -603,6 +603,16 @@ ConditionWrapper isLayoutTourReviewMode();
 /** Check that fisheye cameras can save position only when dewarping is enabled. */
 ConditionWrapper canSavePtzPosition();
 
+ConditionWrapper hasTimePeriod();
+
+ConditionWrapper hasArgument(int key, int targetTypeId = -1);
+
+template<class T>
+ConditionWrapper hasArgumentOfType(int key)
+{
+    return hasArgument(key, qMetaTypeId<T>());
+}
+
 /** Check if the resource is Entropix camera. */
 ConditionWrapper isEntropixCamera();
 

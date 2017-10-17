@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_stream_limits.h"
 #include "hanwha_utils.h"
 
@@ -10,23 +12,6 @@ namespace {
 const std::pair<int, int> kInvalidIntegerLimits = {-1, -1};
 
 } // namespace
-
-const std::set<QString> kHanwhaStreamLimitParameters = {
-    lit("Resolution"),
-    lit("FrameRate"),
-    lit("Bitrate"),
-    lit("EncodingType"),
-    lit("H264.BitrateControlType"),
-    lit("H264.GOVLength"),
-    lit("H264.PriorityType"),
-    lit("H264.Profile"),
-    lit("H264.EntropyCoding"),
-    lit("H265.BitrateControlType"),
-    lit("H265.GOVLength"),
-    lit("H265.PriorityType"),
-    lit("H265.Profile"),
-    lit("H265.EntropyCoding"),
-};
 
 bool HanwhaStreamLimits::setLimit(const HanwhaCgiParameter& parameter)
 {
@@ -118,3 +103,5 @@ bool HanwhaStreamLimits::setIntegerLimits(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

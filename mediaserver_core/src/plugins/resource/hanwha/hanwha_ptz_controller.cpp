@@ -28,7 +28,7 @@ static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
     QnBasicPtzController(resource),
     m_hanwhaResource(resource),
-    m_presetManager(std::make_unique<HanwhaMixedPresetManager>(resource, this))
+    m_presetManager(std::make_unique<HanwhaMappedPresetManager>(resource))
 {
 }
 
@@ -121,7 +121,7 @@ bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* p
         return false;
 
     HanwhaRequestHelper helper(m_hanwhaResource);
-    helper.setAllowLocks(true);
+    helper.setIgnoreMutexAnalyzer(true);
 
     const auto response = helper.view(
         lit("ptzcontrol/query"),

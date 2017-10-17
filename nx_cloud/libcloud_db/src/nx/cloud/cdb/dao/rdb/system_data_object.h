@@ -43,9 +43,10 @@ public:
         nx::utils::db::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data) override;
 
-    virtual nx::utils::db::DBResult activateSystem(
+    virtual nx::utils::db::DBResult updateSystemStatus(
         nx::utils::db::QueryContext* const queryContext,
-        const std::string& systemId) override;
+        const std::string& systemId,
+        api::SystemStatus systemStatus) override;
 
     virtual nx::utils::db::DBResult fetchSystems(
         nx::utils::db::QueryContext* queryContext,

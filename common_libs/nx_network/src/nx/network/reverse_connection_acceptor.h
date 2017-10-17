@@ -8,6 +8,7 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "aio/aio_service.h"
 #include "aio/basic_pollable.h"
 #include "socket_global.h"
 

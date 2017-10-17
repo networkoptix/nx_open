@@ -93,7 +93,7 @@ void HttpView::registerApiHandlers(
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
-    SystemHealthInfoProvider* const systemHealthInfoProvider,
+    AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
     ec2::ConnectionManager* const ec2ConnectionManager,
@@ -195,7 +195,7 @@ void HttpView::registerApiHandlers(
 
     registerHttpHandler(
         kSystemHealthHistoryPath,
-        &SystemHealthInfoProvider::getSystemHealthHistory, systemHealthInfoProvider,
+        &AbstractSystemHealthInfoProvider::getSystemHealthHistory, systemHealthInfoProvider,
         EntityType::system, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ void HttpView::registerApiHandlers(
     registerWriteOnlyRestHandler<data::SystemId>(
         nx_http::Method::post,
         kSystemsMergedToASpecificSystem,
-        EntityType::system, DataActionType::update,
+        EntityType::system, DataActionType::insert,
         [this](
             const AuthorizationInfo& authzInfo,
             const std::vector<nx_http::StringType>& restPathParams,
@@ -213,7 +213,7 @@ void HttpView::registerApiHandlers(
             m_controller->systemMergeManager().startMergingSystems(
                 authzInfo,
                 restPathParams[0].toStdString(),
-                std::move(inputData),
+                std::move(inputData.systemId),
                 std::move(completionHandler));
         });
 

@@ -3,11 +3,14 @@
 #include <fstream>
 
 #include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/cross_nat_connector.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/test_support/socket_test_helper.h>
-
 #include <nx/utils/string.h>
+#include <nx/utils/timer_manager.h>
 
 static const auto kDefaultTotalConnections = 100;
 static const int kDefaultMaxConcurrentConnections = 1;

@@ -4,9 +4,10 @@
 
 #include <nx/cloud/cdb/api/result_code.h>
 
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/subscription.h>
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/subscription.h>
 
 #include "../access_control/auth_types.h"
 #include "../dao/rdb/system_health_history_data_object.h"
@@ -57,6 +58,29 @@ private:
     nx::utils::SubscriptionId m_systemStatusChangedSubscriptionId;
 
     void onSystemStatusChanged(std::string systemId, api::SystemHealth systemHealth);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+using SystemHealthInfoProviderFactoryFunction = 
+    std::unique_ptr<AbstractSystemHealthInfoProvider>(
+        ec2::ConnectionManager* ec2ConnectionManager,
+        nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
+
+class SystemHealthInfoProviderFactory:
+    public nx::utils::BasicFactory<SystemHealthInfoProviderFactoryFunction>
+{
+    using base_type = nx::utils::BasicFactory<SystemHealthInfoProviderFactoryFunction>;
+
+public:
+    SystemHealthInfoProviderFactory();
+
+    static SystemHealthInfoProviderFactory& instance();
+
+private:
+    std::unique_ptr<AbstractSystemHealthInfoProvider> defaultFactory(
+        ec2::ConnectionManager* ec2ConnectionManager,
+        nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
 };
 
 } // namespace cdb

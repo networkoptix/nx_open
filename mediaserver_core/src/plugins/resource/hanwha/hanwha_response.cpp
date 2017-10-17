@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_response.h"
 #include "hanwha_utils.h"
 
@@ -103,7 +105,6 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
                 if (i == splitSize - 1)
                 {
                     auto nameAndValue = part.split(L'=');
-
                     if (nameAndValue.size() != 2)
                         continue;
 
@@ -147,11 +148,12 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer)
         }
         else
         {
-            auto split = line.split(L'=');
-            if (split.size() != 2)
+            auto separatorPosition = line.indexOf(L'=');
+            if (separatorPosition == -1)
                 continue;
 
-            m_response[currentGroupPrefix + split[0].trimmed()] = split[1].trimmed();
+            m_response[currentGroupPrefix + line.left(separatorPosition).trimmed()]
+                = line.mid(separatorPosition + 1).trimmed();
             m_errorCode = HanwhaError::kNoError;
         }
     }
@@ -205,3 +207,5 @@ boost::optional<QString> HanwhaResponse::parameter<QString>(const QString& param
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

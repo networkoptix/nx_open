@@ -23,7 +23,7 @@ void serializeToUrl(const InputData& data, QUrl* const url)
 {
     QUrlQuery urlQuery;
     serializeToUrlQuery(data, &urlQuery);
-    urlQuery.addQueryItem("format", QnLexical::serialized(Qn::JsonFormat));
+    urlQuery.addQueryItem(QLatin1String("format"), QnLexical::serialized(Qn::JsonFormat));
     url->setQuery(urlQuery);
 }
 
@@ -73,7 +73,7 @@ public:
 
     virtual ~BaseFusionDataHttpClient() = default;
 
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
         m_httpClient.bindToAioThread(aioThread);

@@ -7,28 +7,6 @@ namespace cloud {
 namespace relay {
 namespace view {
 
-const char* BeginListeningHandler::kPath = api::kServerIncomingConnectionsPath;
-
-BeginListeningHandler::BeginListeningHandler(
-    controller::AbstractListeningPeerManager* listeningPeerManager)
-    :
-    base_type(
-        listeningPeerManager,
-        &controller::AbstractListeningPeerManager::beginListening)
-{
-}
-
-api::BeginListeningRequest BeginListeningHandler::prepareRequestData(
-    nx_http::HttpServerConnection* const /*connection*/,
-    const nx_http::Request& /*httpRequest*/)
-{
-    api::BeginListeningRequest inputData;
-    inputData.peerName = requestPathParams()[0].toStdString();
-    return inputData;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 const char* CreateClientSessionHandler::kPath = api::kServerClientSessionsPath;
 
 CreateClientSessionHandler::CreateClientSessionHandler(

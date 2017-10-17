@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENIRONMENT = False
+LOCAL_ENVIRONMENT = False
 conf = get_config()
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
@@ -43,7 +43,13 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = (
+    'admin_tools',
+    'admin_tools.menu',
+    'admin_tools.theming',
+    'admin_tools.dashboard',
+
     'django.contrib.admin',
+    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -51,12 +57,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_celery_results',
     'rest_framework',
+    'rest_hooks',
     'corsheaders',
     'notifications',
     'api',
     'cms',
+    'zapier',
     'tinymce'
 )
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -76,11 +85,16 @@ ROOT_URLCONF = 'cloud.urls'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # /app/app
 STATIC_LOCATION = os.path.join(BASE_DIR, "static")  # this is used for email_engine to find templates
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static/common")
-STATICFILES_DIRS = (
-    os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static"),
-    os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static/lang_en_US"),
-)
+STATIC_ROOT = os.path.join(BASE_DIR, "static/common/static")
+if LOCAL_ENVIRONMENT:
+    STATIC_ROOT = os.path.join(BASE_DIR, "static/common")
+    STATICFILES_DIRS = (
+        os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static"),
+        os.path.join(STATIC_LOCATION, CUSTOMIZATION, "static/lang_en_US"),
+    )
+
+ADMIN_TOOLS_INDEX_DASHBOARD = 'cloud.dashboard.CustomIndexDashboard'
+
 
 TEMPLATES = [
     {
@@ -89,9 +103,8 @@ TEMPLATES = [
             STATIC_ROOT,
             os.path.join(STATIC_LOCATION, CUSTOMIZATION),  # get rid of app/app hardcode
             os.path.join(STATIC_LOCATION, CUSTOMIZATION, 'templates'),
-            os.path.join(BASE_DIR, 'templates')
+            os.path.join(BASE_DIR, 'django_templates'),
         ),
-        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -100,6 +113,11 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
             ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'admin_tools.template_loaders.Loader',
+            ]
         },
     },
 ]
@@ -143,7 +161,7 @@ CACHES = {
     }
 }
 
-if LOCAL_ENIRONMENT:
+if LOCAL_ENVIRONMENT:
     conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
     CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
@@ -245,6 +263,9 @@ REST_FRAMEWORK = {
        'rest_framework.permissions.AllowAny',
     )
 }
+HOOK_EVENTS = {
+    'user.send_zap_request': None
+}
 
 # Celery settings section
 
@@ -319,7 +340,7 @@ LINKS_LIVE_TIMEOUT = 300  # Five minutes
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
     'requiredRegex': re.compile("^[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$"),
-    'commonList': 'static/{}/static/scripts/commonPasswordsList.json'.format(CUSTOMIZATION)
+    'commonList': 'static/_source/blue/static/scripts/commonPasswordsList.json'
 }
 
 common_list_file = PASSWORD_REQUIREMENTS['commonList']

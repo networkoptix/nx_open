@@ -1,8 +1,8 @@
-Welcome to {{PRODUCT_NAME}}
+ยินดีต้อนรับสู่ {{PRODUCT_NAME}}
 
-Thank you for joining {{PRODUCT_NAME}}. Please visit the button below to confirm your Email address and activate the account.
+ขอขอบคุณที่เข้าร่วม {{PRODUCT_NAME}} เลือกปุ่มด้านล่างเพื่อยืนยันที่อยู่อีเมลของคุณและเริ่มใช้งานบัญชี
 
-Activate account: {{config.portal_url}}/activate/{{message.code}}
+เปิดใช้งานบัญชี: {{config.portal_url}}/activate/{{message.code}}
 
-If you didn't register in {{PRODUCT_NAME}}, just ignore this email.
-Please do not share the message or the link with third parties.
+หากคุณไม่ได้ลงทะเบียนใน {{PRODUCT_NAME}} แค่ไม่สนใจอีเมลนี้
+โปรดอย่าส่งข้อความหรือลิงก์นี้ให้กับบุคคลอื่น

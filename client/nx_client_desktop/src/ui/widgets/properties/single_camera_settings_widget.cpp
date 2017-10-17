@@ -936,12 +936,8 @@ void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
 {
     QUrl url(urlString);
 
-    bool removeCredentials = false;
-    if (m_camera)
-    {
-        removeCredentials = 
-            !m_camera->getProperty(kRemoveCredentialsFromWebPageUrl).isEmpty();
-    }
+    const bool removeCredentials = m_camera 
+        && !m_camera->getProperty(kRemoveCredentialsFromWebPageUrl).isEmpty();
 
     if (!m_readOnly && !removeCredentials)
     {

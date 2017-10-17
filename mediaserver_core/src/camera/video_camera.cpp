@@ -18,10 +18,9 @@
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 
-#include <media_server/settings.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <media_server/media_server_module.h>
+#include <media_server/settings.h>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -348,15 +347,18 @@ void QnVideoCameraGopKeeper::clearVideoData()
 
 // --------------- QnVideoCamera ----------------------------
 
-QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
+QnVideoCamera::QnVideoCamera(
+    const MSSettings& settings,
+    const QnResourcePtr& resource)
 :
+    m_settings(settings),
     m_resource(resource),
     m_primaryGopKeeper(nullptr),
     m_secondaryGopKeeper(nullptr),
-    m_loStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
+    m_loStreamHlsInactivityPeriodMS(m_settings.roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
-    m_hiStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
+    m_hiStreamHlsInactivityPeriodMS(m_settings.roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
@@ -487,7 +489,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
+                duration_cast<microseconds>(m_settings.hlsTargetDuration()).count());
     }
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
@@ -498,7 +500,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
+                duration_cast<microseconds>(m_settings.hlsTargetDuration()).count());
         }
     }
 }
@@ -718,6 +720,11 @@ nx_hls::HLSLivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQu
         : nx_hls::HLSLivePlaylistManagerPtr();
 }
 
+QnResourcePtr QnVideoCamera::resource() const
+{
+    return m_resource;
+}
+
 //!Starts caching live stream, if not started
 /*!
     \return true, if started, false if failed to start
@@ -791,7 +798,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
             MEDIA_CACHE_SIZE_MILLIS,
             MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
 
-        int removedChunksToKeepCount = qnServerModule->roSettings()->value(
+        int removedChunksToKeepCount = m_settings.roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
             nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
 

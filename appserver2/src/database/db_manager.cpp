@@ -34,6 +34,7 @@
 #include <database/migrations/reparent_videowall_layouts.h>
 #include <database/migrations/add_default_webpages_migration.h>
 #include <database/migrations/cleanup_removed_transactions.h>
+#include <database/migrations/access_rights_db_migration.h>
 
 #include <network/system_helpers.h>
 
@@ -603,6 +604,14 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                 if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
                     return false;
             }
+            
+            if (m_resyncFlags.testFlag(ResyncUserAccessRights))
+            {
+                if (!rebuildUserAccessRightsTransactions())
+                    return false;
+                if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+                    return false;
+            }
 
         }
 
@@ -971,8 +980,16 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "xtype_guid", guids))
         return false;
 
+    if (!updateBusinessRulesGuids())
+        return false;
+
+    return true;
+}
+
+bool QnDbManager::updateBusinessRulesGuids()
+{
     // update default rules
-    guids = getGuidList(
+    auto guids = getGuidList(
         R"sql(
             SELECT id, id
             FROM vms_businessrule
@@ -1551,7 +1568,63 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20170802_cleanup_client_info_list.sql")))
         return ec2::db::cleanupClientInfoList(m_sdb);
 
+    if (updateName.endsWith(lit("/99_20170928_update_business_rules_guids.sql")))
+    {
+        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
+    }
+
+    if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
+        return ec2::db::migrateAccessRightsToUbjsonFormat(m_sdb, this) && resyncIfNeeded(ResyncUserAccessRights);
+
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
+    return true;
+}
+
+bool QnDbManager::fixDefaultBusinessRuleGuids()
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr(lit("SELECT 1 FROM vms_businessrule WHERE guid = :guid"));
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    QSqlQuery updQuery(m_sdb);
+    QString udpQueryStr(lit("\
+        UPDATE vms_businessrule \
+        SET guid = :newValue  \
+        WHERE guid = :oldValue"));
+    if (!prepareSQLQuery(&updQuery, udpQueryStr, Q_FUNC_INFO))
+        return false;
+
+    QSqlQuery delQuery(m_sdb);
+    QString delQueryStr(lit("DELETE FROM vms_businessrule where guid = :guid"));
+    if (!prepareSQLQuery(&delQuery, delQueryStr, Q_FUNC_INFO))
+        return false;
+
+    auto remapTable = nx::vms::event::Rule::remappedGuidsToFix();
+    for (auto itr = remapTable.begin(); itr != remapTable.end(); ++itr)
+    {
+        auto oldValue = itr.key();
+        auto newValue = itr.value();
+        
+        query.addBindValue(QnSql::serialized_field(newValue));
+        if (!execSQLQuery(&query, Q_FUNC_INFO))
+            return false;
+        const bool isNewValueExists = query.next();
+        if (isNewValueExists)
+        {
+            delQuery.addBindValue(QnSql::serialized_field(oldValue));
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+        else
+        {
+            updQuery.addBindValue(QnSql::serialized_field(newValue));
+            updQuery.addBindValue(QnSql::serialized_field(oldValue));
+            if (!execSQLQuery(&updQuery, Q_FUNC_INFO))
+                return false;
+        }
+    }
+
     return true;
 }
 
@@ -2282,11 +2355,6 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
     if (err != ErrorCode::ok)
         return err;
 
-    /* Cleanup user shared resources. */
-    err = cleanAccessRights(guid);
-    if (err != ErrorCode::ok)
-        return err;
-
     return ErrorCode::ok;
 }
 
@@ -2677,117 +2745,27 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 {
     const QByteArray userOrRoleId = data.userId.toRfc4122();
 
-    /* Get list of resources, user already has access to. */
-    QSet<qint32> accessibleResources;
-
-    {
-        QString selectQueryString = R"(
-            SELECT resource_ptr_id
-            FROM vms_access_rights
-            WHERE guid = :userOrRoleId
+    QString insertQueryString = R"(
+            INSERT OR REPLACE 
+            INTO vms_access_rights
+            (userOrRoleId, resourceIds)
+            values
+           (:userOrRoleId, :resourceIds)
         )";
 
-        QSqlQuery selectQuery(m_sdb);
-        selectQuery.setForwardOnly(true);
-        if (!prepareSQLQuery(&selectQuery, selectQueryString, Q_FUNC_INFO))
-            return ErrorCode::dbError;
+    QSqlQuery insertQuery(m_sdb);
+    insertQuery.setForwardOnly(true);
+    if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+    
+    insertQuery.addBindValue(QnSql::serialized_field(data.userId));
+    insertQuery.addBindValue(QnUbjson::serialized(data.resourceIds));
 
-        selectQuery.bindValue(":userOrRoleId", userOrRoleId);
-        if (!execSQLQuery(&selectQuery, Q_FUNC_INFO))
-            return ErrorCode::dbError;
-
-        while (selectQuery.next())
-            accessibleResources.insert(selectQuery.value(0).toInt());
-    }
-
-    QSet<qint32> newAccessibleResources;
-    for (const QnUuid& resourceId : data.resourceIds)
-    {
-        qint32 resource_ptr_id = getResourceInternalId(resourceId);
-        if (resource_ptr_id <= 0)
-            continue;   /* Just skip invalid id's. */
-        newAccessibleResources << resource_ptr_id;
-    }
-
-    QSet<qint32> resourcesToAdd = newAccessibleResources - accessibleResources;
-    if (!resourcesToAdd.empty())
-    {
-        QString insertQueryString = R"(
-            INSERT INTO vms_access_rights
-            (guid, resource_ptr_id)
-            VALUES
-        )";
-
-        QStringList values;
-
-        for (const qint32& resource_ptr_id : resourcesToAdd)
-             values << QString("(:userOrRoleId, %1)").arg(resource_ptr_id);
-         insertQueryString.append(values.join(L',')).append(L';');
-
-        QSqlQuery insertQuery(m_sdb);
-        insertQuery.setForwardOnly(true);
-        if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
-            return ErrorCode::dbError;
-        insertQuery.bindValue(":userOrRoleId", userOrRoleId);
-
-        if (!execSQLQuery(&insertQuery, Q_FUNC_INFO))
-            return ErrorCode::dbError;
-    }
-
-    QSet<qint32> resourcesToRemove = accessibleResources - newAccessibleResources;
-    if (!resourcesToRemove.empty())
-    {
-        QStringList values;
-        for (const qint32& resource_ptr_id : resourcesToRemove)
-            values << QString::number(resource_ptr_id);
-        QString resourcesToRemoveIds = values.join(L',');
-
-        QSqlQuery removeQuery(m_sdb);
-        QString removeQueryStr
-        (R"(
-            DELETE FROM vms_access_rights
-            WHERE guid = :userOrRoleId
-            AND resource_ptr_id IN (%1);
-        )");
-        /* We cannot bind this value via QSql as it puts numbers to braces */
-        removeQueryStr = removeQueryStr.arg(resourcesToRemoveIds);
-
-        if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
-            return ErrorCode::dbError;
-
-        removeQuery.bindValue(":userOrRoleId", userOrRoleId);
-        if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
-            return ErrorCode::dbError;
-    }
-
-    /* This whole function should be optimized out in release */
-    auto validate = [this, data, newAccessibleResources]()
-    {
-        ApiAccessRightsDataList allAccessRights;
-        if (doQueryNoLock(nullptr, allAccessRights) != ErrorCode::ok)
-            return false;
-
-        for (auto updated: allAccessRights)
-        {
-            if (updated.userId != data.userId)
-                continue;
-            QSet<qint32> accessible;
-            for (const QnUuid& id : updated.resourceIds)
-            {
-                qint32 resource_ptr_id = getResourceInternalId(id);
-                if (resource_ptr_id <= 0)
-                    return false;
-                accessible << resource_ptr_id;
-            }
-            return accessible == newAccessibleResources;
-        }
-        return newAccessibleResources.isEmpty();
-    };
-    NX_ASSERT(validate());
+    if (!execSQLQuery(&insertQuery, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }
-
 
 ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrRoleId)
 {
@@ -2795,7 +2773,7 @@ ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrRoleId)
     QString queryStr
     (R"(
         DELETE FROM vms_access_rights
-        WHERE guid = :userOrRoleId;
+        WHERE userOrRoleId = :userOrRoleId;
      )");
 
     if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
@@ -3043,29 +3021,12 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
     case ApiCommand::removeCameraUserAttributes:
         return removeCameraAttributes(tran.params.id);
     case ApiCommand::removeAccessRights:
-        return removeResourceAccessRights(tran.params.id);
+        return cleanAccessRights(tran.params.id);
     case ApiCommand::removeResourceStatus:
         return removeResourceStatus(tran.params.id);
     default:
         return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
-}
-
-ErrorCode QnDbManager::removeResourceAccessRights(const QnUuid& id)
-{
-    auto internalResourceId = getResourceInternalId(id);
-
-    QSqlQuery removeQuery(m_sdb);
-    QString removeQueryStr("DELETE FROM vms_access_rights WHERE resource_ptr_id = :resourceId;");
-
-    if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    removeQuery.bindValue(":resourceId", internalResourceId);
-    if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-
-    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::removeResourceStatus(const QnUuid& id)
@@ -3760,10 +3721,9 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessR
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     const QString queryStr = R"(
-        SELECT rights.guid as userId, resource.guid as resourceId
-        FROM vms_access_rights rights
-        JOIN vms_resource resource on resource.id = rights.resource_ptr_id
-        ORDER BY rights.guid
+        SELECT userOrRoleId, resourceIds
+        FROM vms_access_rights
+        ORDER BY userOrRoleId
     )";
 
     if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
@@ -3772,24 +3732,13 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessR
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
-    ApiAccessRightsData current;
     while (query.next())
     {
-        QnUuid userId = QnUuid::fromRfc4122(query.value(0).toByteArray());
-        if (userId != current.userId)
-        {
-            if (!current.userId.isNull())
-                accessRightsList.push_back(current);
-
-            current.userId = userId;
-            current.resourceIds.clear();
-        }
-
-        QnUuid resourceId = QnUuid::fromRfc4122(query.value(1).toByteArray());
-        current.resourceIds.push_back(resourceId);
+        ApiAccessRightsData data;
+        data.userId = QnUuid::fromRfc4122(query.value(0).toByteArray());
+        data.resourceIds = QnUbjson::deserialized<std::vector<QnUuid>>(query.value(1).toByteArray());
+        accessRightsList.push_back(std::move(data));
     }
-    if (!current.userId.isNull())
-        accessRightsList.push_back(current);
 
     return ErrorCode::ok;
 }
@@ -4722,6 +4671,83 @@ void QnDbManager::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager
 QnTransactionLog* QnDbManager::transactionLog() const
 {
     return m_tranLog;
+}
+
+bool QnDbManager::rebuildUserAccessRightsTransactions()
+{
+    // migrate transaction log
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    if (!SqlQueryExecutionHelper::prepareSQLQuery(
+        &query,
+        lit("SELECT tran_guid, tran_data from transaction_log"),
+        Q_FUNC_INFO))
+    {
+        return false;
+    }
+    if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    QVector<QnUuid> recordsToDelete;
+    QVector<ApiIdData> recordsToAdd;
+    while (query.next())
+    {
+        QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        QnAbstractTransaction abstractTran;
+        QByteArray srcData = query.value(1).toByteArray();
+        QnUbjsonReader<QByteArray> stream(&srcData);
+        if (!QnUbjson::deserialize(&stream, &abstractTran))
+        {
+            NX_WARNING(this, "Can't deserialize transaction from transaction log");
+            return false;
+        }
+
+        if (abstractTran.command == ApiCommand::removeAccessRights 
+            || abstractTran.command == ApiCommand::setAccessRights)
+        {
+            recordsToDelete << tranGuid;
+        }
+        else if (abstractTran.command == ApiCommand::removeUser 
+            || abstractTran.command == ApiCommand::removeUserRole)
+        {
+            ApiIdData data;
+            if (!QnUbjson::deserialize(&stream, &data))
+            {
+                NX_WARNING(this, "Can't deserialize transaction from transaction log");
+                return false;
+            }
+            recordsToAdd << data;
+        }
+    }
+    
+    for (const auto& data: recordsToDelete)
+    {
+        QSqlQuery delQuery(m_sdb);
+        if (!SqlQueryExecutionHelper::prepareSQLQuery(
+            &delQuery,
+            lit("DELETE FROM transaction_log WHERE tran_guid = ?"),
+            Q_FUNC_INFO))
+        {
+            return false;
+        }
+
+        delQuery.addBindValue(QnSql::serialized_field(data));
+        if (!SqlQueryExecutionHelper::execSQLQuery(&delQuery, Q_FUNC_INFO))
+            return false;
+    }
+
+    for (const auto& data: recordsToAdd)
+    {
+        QnTransaction<ApiIdData> transaction(
+            ApiCommand::removeAccessRights,
+            commonModule()->moduleGUID(),
+            data);
+        transactionLog()->fillPersistentInfo(transaction);
+        if (transactionLog()->saveTransaction(transaction) != ErrorCode::ok)
+            return false;
+    }
+
+    return true;
 }
 
 } // namespace detail

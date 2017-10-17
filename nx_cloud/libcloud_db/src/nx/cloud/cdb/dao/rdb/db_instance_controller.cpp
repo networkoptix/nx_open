@@ -10,12 +10,6 @@ namespace cdb {
 namespace dao {
 namespace rdb {
 
-namespace {
-
-constexpr auto kDbRepeatedConnectionAttemptDelay = std::chrono::seconds(5);
-
-} // namespace
-
 DbInstanceController::DbInstanceController(
     const nx::utils::db::ConnectionOptions& dbConnectionOptions,
     boost::optional<unsigned int> dbVersionToUpdateTo)

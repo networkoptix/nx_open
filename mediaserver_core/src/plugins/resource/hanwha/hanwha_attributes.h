@@ -58,8 +58,6 @@ public:
 
     bool isValid() const;
 
-    int channelCount() const;
-
     nx_http::StatusCode::Value statusCode() const;
 
 private:

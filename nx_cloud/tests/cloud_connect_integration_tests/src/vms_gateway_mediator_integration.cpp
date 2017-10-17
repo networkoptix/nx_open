@@ -3,7 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include <libvms_gateway/src/test_support/vms_gateway_functional_test.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+
+#include <libvms_gateway_core/src/test_support/vms_gateway_functional_test.h>
 
 #include <controller.h>
 #include <mediator_service.h>

@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/utils/std/future.h>
 
-#include <nx/cloud/relay/controller/connect_session_manager.h>
 #include <nx/cloud/relay/settings.h>
 
 #include "basic_test_fixture.h"

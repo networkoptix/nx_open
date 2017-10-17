@@ -1289,10 +1289,11 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         return;
     }
 
-    if (auto password = client->authCacheItem().password)
+    if (client->authCacheItem().userCredentials.authToken.type == nx_http::AuthTokenType::password)
     {
-        m_remotePeerCredentials.setUser(client->authCacheItem().userName);
-        m_remotePeerCredentials.setPassword(*password);
+        m_remotePeerCredentials.setUser(client->authCacheItem().userCredentials.username);
+        m_remotePeerCredentials.setPassword(
+            client->authCacheItem().userCredentials.authToken.value);
     }
 
     if (getState() == QnTransactionTransportBase::Error || getState() == QnTransactionTransportBase::Closed) {

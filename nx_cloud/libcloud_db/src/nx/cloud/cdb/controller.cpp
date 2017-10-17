@@ -17,9 +17,7 @@ Controller::Controller(const conf::Settings& settings):
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
-    m_tempPasswordManager(
-        settings,
-        &m_dbInstanceController.queryExecutor()),
+    m_tempPasswordManager(&m_dbInstanceController.queryExecutor()),
     m_accountManager(
         settings,
         m_streeManager,
@@ -33,18 +31,22 @@ Controller::Controller(const conf::Settings& settings):
         &m_dbInstanceController.queryExecutor()),
     m_vmsP2pCommandBus(&m_ec2SyncronizationEngine),
     m_systemHealthInfoProvider(
-        &m_ec2SyncronizationEngine.connectionManager(),
-        &m_dbInstanceController.queryExecutor()),
+        SystemHealthInfoProviderFactory::instance().create(
+            &m_ec2SyncronizationEngine.connectionManager(),
+            &m_dbInstanceController.queryExecutor())),
     m_systemManager(
         settings,
         &m_timerManager,
         &m_accountManager,
-        m_systemHealthInfoProvider,
+        *m_systemHealthInfoProvider,
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SyncronizationEngine),
+    m_vmsGateway(settings, m_accountManager),
     m_systemMergeManager(
         &m_systemManager,
+        *m_systemHealthInfoProvider,
+        &m_vmsGateway,
         &m_dbInstanceController.queryExecutor()),
     m_authProvider(
         settings,
@@ -123,9 +125,9 @@ ec2::SyncronizationEngine& Controller::ec2SyncronizationEngine()
     return m_ec2SyncronizationEngine;
 }
 
-SystemHealthInfoProvider& Controller::systemHealthInfoProvider()
+AbstractSystemHealthInfoProvider& Controller::systemHealthInfoProvider()
 {
-    return m_systemHealthInfoProvider;
+    return *m_systemHealthInfoProvider;
 }
 
 SystemManager& Controller::systemManager()

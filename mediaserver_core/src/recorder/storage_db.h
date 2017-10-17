@@ -99,6 +99,7 @@ private:
     QString m_dbFileName;
     uint8_t m_dbVersion;
     UuidToHash m_uuidToHash;
+    UuidToHash m_readUuidToHash;
     UuidToCatalogs m_readData;
 
     nx::media_db::Error m_lastReadError;

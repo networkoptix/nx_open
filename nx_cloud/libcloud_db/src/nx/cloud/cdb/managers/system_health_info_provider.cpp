@@ -88,5 +88,29 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
         });
 }
 
+//-------------------------------------------------------------------------------------------------
+
+using namespace std::placeholders;
+
+SystemHealthInfoProviderFactory::SystemHealthInfoProviderFactory():
+    base_type(std::bind(&SystemHealthInfoProviderFactory::defaultFactory, this, _1, _2))
+{
+}
+
+SystemHealthInfoProviderFactory& SystemHealthInfoProviderFactory::instance()
+{
+    static SystemHealthInfoProviderFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<AbstractSystemHealthInfoProvider> SystemHealthInfoProviderFactory::defaultFactory(
+    ec2::ConnectionManager* ec2ConnectionManager,
+    nx::utils::db::AsyncSqlQueryExecutor* const dbManager)
+{
+    return std::make_unique<SystemHealthInfoProvider>(
+        ec2ConnectionManager,
+        dbManager);
+}
+
 } // namespace cdb
 } // namespace nx

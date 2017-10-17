@@ -361,30 +361,53 @@ void AsyncClient::setUserAgent(const QString& userAgent)
 
 void AsyncClient::setUserName(const QString& userName)
 {
-    m_userName = userName;
+    m_user.username = userName;
 }
 
 void AsyncClient::setUserPassword(const QString& userPassword)
 {
-    m_userPassword = userPassword;
+    AuthToken authToken;
+    authToken.setPassword(userPassword);
+    setUserAuthToken(authToken);
+}
+
+void AsyncClient::setUserAuthToken(const AuthToken& userToken)
+{
+    m_user.authToken = userToken;
+}
+
+void AsyncClient::setUserCredentials(const Credentials& userCredentials)
+{
+    m_user = userCredentials;
 }
 
 void AsyncClient::setProxyUserName(const QString& userName)
 {
-    m_proxyUserName = userName;
+    m_proxyUser.username = userName;
 }
 
 void AsyncClient::setProxyUserPassword(const QString& userPassword)
 {
-    m_proxyUserPassword = userPassword;
+    AuthToken authToken;
+    authToken.setPassword(userPassword);
+    setProxyUserAuthToken(authToken);
+}
+
+void AsyncClient::setProxyUserAuthToken(const AuthToken& proxyUserToken)
+{
+    m_proxyUser.authToken = proxyUserToken;
+}
+
+void AsyncClient::setProxyUserCredentials(const Credentials& userCredentials)
+{
+    m_proxyUser = userCredentials;
 }
 
 void AsyncClient::setAuth(const AuthInfo& auth)
 {
-    setUserName(auth.username);
-    setUserPassword(auth.password);
-    setProxyUserName(auth.proxyUsername);
-    setProxyUserPassword(auth.proxyPassword);
+    m_user = auth.user;
+    m_proxyUser = auth.proxyUser;
+
     setProxyVia(auth.proxyEndpoint);
 }
 
@@ -990,7 +1013,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
                 m_ha1RecalcTried = true;
             }
 
-            if (!m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()))
+            if (!m_authorizationTried && (!m_user.username.isEmpty() || !m_user.authToken.empty()))
             {
                 //trying authorization
                 if (resendRequestWithAuthorization(response))
@@ -1003,7 +1026,7 @@ bool AsyncClient::repeatRequestIfNeeded(const Response& response)
         case StatusCode::proxyAuthenticationRequired:
         {
             if (!m_proxyAuthorizationTried &&
-                (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
+                (!m_proxyUser.username.isEmpty() || !m_proxyUser.authToken.empty()))
             {
                 if (resendRequestWithAuthorization(response, true))
                     return true;
@@ -1081,14 +1104,14 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
 
     // Adding user credentials.
     if (!m_contentLocationUrl.userName().isEmpty())
-        m_userName = m_contentLocationUrl.userName();
+        m_user.username = m_contentLocationUrl.userName();
     else
-        m_contentLocationUrl.setUserName(m_userName);
+        m_contentLocationUrl.setUserName(m_user.username);
 
     if (!m_contentLocationUrl.password().isEmpty())
-        m_userPassword = m_contentLocationUrl.password();
+        m_user.authToken.setPassword(m_contentLocationUrl.password());
     else
-        m_contentLocationUrl.setPassword(m_userPassword);
+        m_contentLocationUrl.setPassword(m_user.authToken.value);
 
     prepareRequestHeaders(useHttp11, httpMethod);
 }
@@ -1149,12 +1172,12 @@ void AsyncClient::addAppropriateAuthenticationInformation()
 {
     // Adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and to 3.0 (generate user's digest after changing realm).
     // TODO: #ak Remove it after version prior to 3.0 support is over.
-    if (!m_userName.isEmpty() &&
+    if (!m_user.username.isEmpty() &&
         m_request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME) == m_request.headers.end())
     {
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
-            HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()));
+            HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_user.username.toUtf8()));
     }
 
     if (m_precalculatedAuthorizationDisabled)
@@ -1169,9 +1192,11 @@ void AsyncClient::addAppropriateAuthenticationInformation()
             &m_request,
             &m_authCacheItem))
     {
-        if (m_authType == AuthType::authBasic)
+        if (m_authType == AuthType::authBasic && m_user.authToken.type == AuthTokenType::password)
         {
-            header::BasicAuthorization basicAuthorization(m_userName.toLatin1(), m_userPassword.toLatin1());
+            header::BasicAuthorization basicAuthorization(
+                m_user.username.toLatin1(),
+                m_user.authToken.value.toLatin1());
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(
@@ -1277,8 +1302,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     const StringType authorizationHeaderName =
         isProxy ? StringType("Proxy-Authorization") : header::Authorization::NAME;
-    const QString userName = isProxy ? m_proxyUserName : m_userName;
-    const QString userPassword = isProxy ? m_proxyUserPassword : m_userPassword;
+    const auto credentials = isProxy ? m_proxyUser : m_user;
 
     // If response contains WWW-Authenticate with Digest authentication, 
     // generating "Authorization: Digest" header and adding it to custom headers.
@@ -1291,21 +1315,23 @@ bool AsyncClient::resendRequestWithAuthorization(
 
     header::WWWAuthenticate wwwAuthenticateHeader;
     wwwAuthenticateHeader.parse(wwwAuthenticateIter->second);
-    if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic)
+    if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic &&
+        (credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty()))
     {
-        header::BasicAuthorization basicAuthorization(userName.toLatin1(), userPassword.toLatin1());
+        header::BasicAuthorization basicAuthorization(
+            credentials.username.toLatin1(),
+            credentials.authToken.value.toLatin1());
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
             nx_http::HttpHeader(
                 authorizationHeaderName,
                 basicAuthorization.serialized()));
+
         // TODO: #ak MUST add to cache only after OK response.
         m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
             m_contentLocationUrl,
             m_request.requestLine.method,
-            userName.toLatin1(),
-            userPassword.toLatin1(),
-            boost::optional<BufferType>(),
+            credentials,
             std::move(wwwAuthenticateHeader),
             std::move(basicAuthorization));
         AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
@@ -1315,13 +1341,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         header::DigestAuthorization digestAuthorizationHeader;
         if (!calcDigestResponse(
                 m_request.requestLine.method,
-                userName.toUtf8(),
-                m_authType != AuthType::authDigestWithPasswordHash
-                    ? userPassword.toUtf8()
-                    : boost::optional<nx_http::BufferType>(),
-                m_authType == AuthType::authDigestWithPasswordHash
-                    ? userPassword.toLatin1()
-                    : boost::optional<nx_http::BufferType>(),
+                credentials,
                 m_contentLocationUrl.toString(QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority).toUtf8(),
                 wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
@@ -1338,13 +1358,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
             m_contentLocationUrl,
             m_request.requestLine.method,
-            userName.toLatin1(),
-            m_authType == AuthType::authDigestWithPasswordHash
-                ? boost::optional<BufferType>()
-                : boost::optional<BufferType>(userPassword.toLatin1()),
-            m_authType == AuthType::authDigestWithPasswordHash
-                ? boost::optional<BufferType>(userPassword.toLatin1())
-                : boost::optional<BufferType>(),
+            credentials,
             std::move(wwwAuthenticateHeader),
             std::move(digestAuthorizationHeader));
         AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
@@ -1370,7 +1384,7 @@ void AsyncClient::doSomeCustomLogic(
 {
     // TODO: #ak This method is not part of http, so it should not be in this class.
 
-    if (m_authType == AuthType::authDigestWithPasswordHash)
+    if (m_user.authToken.type != AuthTokenType::password)
         return;
 
     auto realmIter = response.headers.find(Qn::REALM_HEADER_NAME);
@@ -1378,9 +1392,12 @@ void AsyncClient::doSomeCustomLogic(
         return;
 
     // Calculating user's digest with new realm.
-    const auto newRealmDigest = calcHa1(m_userName.toUtf8(), realmIter->second, m_userPassword.toUtf8());
+    const auto newRealmDigest = calcHa1(
+        m_user.username.toUtf8(),
+        realmIter->second,
+        m_user.authToken.value.toUtf8());
     const auto cryptSha512Hash = linuxCryptSha512(
-        m_userPassword.toUtf8(),
+        m_user.authToken.value.toUtf8(),
         generateSalt(LINUX_CRYPT_SALT_LENGTH));
 
     nx_http::insertOrReplaceHeader(

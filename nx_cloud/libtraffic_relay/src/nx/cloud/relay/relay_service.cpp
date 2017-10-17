@@ -20,7 +20,7 @@ std::vector<SocketAddress> RelayService::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
-const model::ListeningPeerPool& RelayService::listeningPeerPool() const
+const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() const
 {
     return m_model->listeningPeerPool();
 }
@@ -35,10 +35,8 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     Model model(settings);
-    for (;;)
+    while (!model.doMandatoryInitialization())
     {
-        if (model.doMandatoryInitialization())
-            break;
         if (isTerminated())
             return -1;
 

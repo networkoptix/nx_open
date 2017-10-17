@@ -6,7 +6,6 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <nx/utils/system_error.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
 
@@ -20,8 +19,10 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include "aio/aio_service.h"
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
+#include "cloud/address_resolver.h"
 
 #ifdef _WIN32
 /* Check that the typedef in AbstractSocket is correct. */
@@ -165,9 +166,10 @@ bool Socket<SocketInterfaceToImplement>::close()
     if (m_fd == -1)
         return true;
 
-    NX_ASSERT(
-        !nx::network::SocketGlobals::isInitialized() ||
-        !nx::network::SocketGlobals::aioService().isSocketBeingMonitored(static_cast<Pollable*>(this)));
+    if (this->impl()->aioThread.load())
+    {
+        NX_ASSERT(!this->impl()->aioThread.load()->isSocketBeingMonitored(this));
+    }
 
     auto fd = m_fd;
     m_fd = -1;
@@ -1496,17 +1498,20 @@ UDPSocket::UDPSocket(int ipVersion):
     m_destAddr()
 {
     setBroadcast();
+
     int buff_size = 1024 * 512;
     if (::setsockopt(handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof(buff_size)) < 0)
     {
         //error
     }
 
+    // Made with an assumption that SO_LINGER may cause ::close system call to block 
+    // on win32 with some network drivers when network inteface fails.
     struct linger lingerOptions;
     memset(&lingerOptions, 0, sizeof(lingerOptions));
     if (setsockopt(
             handle(), SOL_SOCKET, SO_LINGER,
-            (const char*)&lingerOptions, sizeof(lingerOptions)) < 0) 
+            (const char*) &lingerOptions, sizeof(lingerOptions)) < 0)
     {
         // Ignoring for now.
     }

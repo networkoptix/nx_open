@@ -1,6 +1,7 @@
 #include "cloud_connection_manager.h"
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
 
 #include <api/app_server_connection.h>

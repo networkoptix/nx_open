@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "connection_mediator_url_fetcher.h"
+
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
 static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
 

@@ -4,10 +4,6 @@
 
 namespace nx_http {
 
-AuthInfoCache::AuthInfoCache()
-{
-}
-
 bool AuthInfoCache::addAuthorizationHeader(
     const nx::utils::Url& url,
     Request* const request,
@@ -32,7 +28,7 @@ bool AuthInfoCache::addAuthorizationHeader(
     if( request->requestLine.method != authzData.method )
         return false;
 
-    if( authzData.userName != url.userName() )
+    if( authzData.userCredentials.username != url.userName() )
         return false;
 
     if( authzData.authorizationHeader &&
@@ -53,10 +49,8 @@ bool AuthInfoCache::addAuthorizationHeader(
         //generating Authorization based on previously received WWW-Authenticate header
         return addAuthorization(
             request,
-            authzData.userName,
-            authzData.password,
-            authzData.ha1,
-            *authzData.wwwAuthenticateHeader );
+            authzData.userCredentials,
+            *authzData.wwwAuthenticateHeader);
     }
     else
     {

@@ -7,13 +7,12 @@
     "cancelButton":"Annuler",
     "loginTitle":"Connexion à {{PRODUCT_NAME}}",
     "loginButton":"Connexion",
-    "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Vous êtes déjà connecté",
     "logoutAuthorisedContinueButton":"Continuer",
     "logoutAuthorisedLogoutButton":"Déconnecter"
   },
   "pageTitles":{
-    "template":"{{title}}{{PRODUCT_NAME}}",
+    "template":"{{title}} {{PRODUCT_NAME}}",
     "default":"{{PRODUCT_NAME}}",
     "registerSuccess":"Bienvenue sur",
     "register":"Créer compte dans",
@@ -30,12 +29,10 @@
     "restorePasswordSuccess":"Mot de passe sauvé -",
     "restorePasswordCode":"Réinitialiser mot de passe -",
     "view":"Voir les caméras - ",
-    "contentPage":"",
     "debug":"Débogage",
     "login":"Connexion -",
     "download":"Télécharger {{VMS_NAME}}",
     "downloadPlatform":"Télécharger {{VMS_NAME}} pour ",
-    "startPage":"",
     "pageNotFound":"Page non trouvée"
   },
   "systemStatuses":{
@@ -184,7 +181,6 @@
   },
   "downloads":{
     "noClientDetectedTitle":"Installer {{VMS_NAME}} pour visionner votre Système",
-    "noClientDetectedMessage":"",
     "action":"Télécharger {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -197,16 +193,16 @@
     "groups":{
       "windows":{
         "label":"Windows",
-        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+        "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
         "label":"Mac OS",
-        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+        "supported":"OSX 10.11 El Capitan, OSX 10.12 Sierra"
       },
       "linux":{
         "label":"Ubuntu Linux",
         "shortLabel":"Ubuntu",
-        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+        "supported":"Ubuntu 14.04 LTS, 16.04 LTS"
       }
     },
     "platforms":{

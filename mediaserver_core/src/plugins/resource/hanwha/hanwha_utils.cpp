@@ -1,3 +1,5 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 
@@ -85,7 +87,7 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
         return HanwhaChannelProfiles();
 
     HanwhaChannelProfiles profiles;
-    for (const auto& entry : response.response())
+    for (const auto& entry: response.response())
     {
         const auto split = entry.first.split(L'.');
         const auto splitSize = split.size();
@@ -115,25 +117,6 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
     }
 
     return profiles;
-}
-
-QString nxProfileName(Qn::ConnectionRole role)
-{
-    auto suffix = role == Qn::ConnectionRole::CR_LiveVideo
-        ? kHanwhaPrimaryNxProfileSuffix
-        : kHanwhaSecondaryNxProfileSuffix;
-
-    auto appName = QnAppInfo::productNameLong()
-        .mid(0, kHanwhaProfileNameMaxLength - suffix.length())
-        .remove(QRegExp("[^a-zA-Z]"));
-
-    return appName + suffix;
-}
-
-bool isNxProfile(const QString& profileName)
-{
-    return profileName == nxProfileName(Qn::ConnectionRole::CR_LiveVideo)
-        || profileName == nxProfileName(Qn::ConnectionRole::CR_SecondaryLiveVideo);
 }
 
 template<>
@@ -506,3 +489,5 @@ bool ratioComparator(const QString& lhs, const QString& rhs)
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

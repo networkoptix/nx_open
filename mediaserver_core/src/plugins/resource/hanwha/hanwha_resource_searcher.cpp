@@ -7,17 +7,22 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/scope_guard.h>
 
 #include "hanwha_resource_searcher.h"
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
+#include "hanwha_common.h"
 
-namespace
-{
-    static const QString kUpnpBasicDeviceType("Basic");
-    static const QString kHanwhaManufacturerName("Hanwha Techwin");
-    static const QString kHanwhaCameraName("Hanwha_Common");
-}
+namespace {
+
+static const QString kUpnpBasicDeviceType("Basic");
+static const QString kHanwhaCameraName("Hanwha_Common");
+static const QString kHanwhaResourceTypeName = lit("Hanwha_Sunapi");
+static const QString kHanwhaDefaultUser = lit("admin");
+static const QString kHanwhaDefaultPassword = lit("4321");
+
+} // namespace
 
 namespace nx {
 namespace mediaserver_core {
@@ -30,9 +35,17 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
-QnResourcePtr HanwhaResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+HanwhaResourceSearcher::~HanwhaResourceSearcher()
+{
+    nx_upnp::DeviceSearcher::instance()->unregisterHandler(this, kUpnpBasicDeviceType);
+}
+
+QnResourcePtr HanwhaResourceSearcher::createResource(
+    const QnUuid &resourceTypeId,
+    const QnResourceParams& /*params*/)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    NX_EXPECT(!resourceType.isNull());
     if (resourceType.isNull())
     {
         NX_WARNING(this, lm("No resource type for Hanwha camera. Id = %1").arg(resourceTypeId));
@@ -43,7 +56,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(const QnUuid &resourceTypeI
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
-    result = QnVirtualCameraResourcePtr( new HanwhaResource() );
+    result = QnVirtualCameraResourcePtr(new HanwhaResource());
     result->setTypeId(resourceTypeId);
     return result;
 }
@@ -60,7 +73,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();
 
-    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+    auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
@@ -94,8 +107,8 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     result << resource;
     const int channel = resource->getChannel();
     if (isSearchAction)
-        addMultichannelResources(result);
-    else if (channel > 0 || getChannels(resource) > 1)
+        addMultichannelResources(result, auth);
+    else if (channel > 0 || getChannels(resource, auth) > 1)
         resource->updateToChannel(channel);
     return result;
 }
@@ -146,15 +159,18 @@ bool HanwhaResourceSearcher::processPacket(
 
 	{
 		QnMutexLocker lock(&m_mutex);
-		if (m_alreadFoundMacAddresses.find(cameraMac.toString()) != m_alreadFoundMacAddresses.end())
+        const bool alreadyFound = m_alreadFoundMacAddresses.find(cameraMac.toString())
+            != m_alreadFoundMacAddresses.end();
+
+		if (alreadyFound)
             return true;
     }
 
     decltype(m_foundUpnpResources) foundUpnpResources;
 
     QAuthenticator defaultAuth;
-    defaultAuth.setUser("admin");
-    defaultAuth.setPassword("4321");
+    defaultAuth.setUser(kHanwhaDefaultUser);
+    defaultAuth.setPassword(kHanwhaDefaultPassword);
     createResource(devInfo, cameraMac, defaultAuth, foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
@@ -170,12 +186,14 @@ void HanwhaResourceSearcher::createResource(
     const QAuthenticator& auth,
     QnResourceList& result)
 {
-
-    auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+    auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
+    QnResourceData resourceData = qnStaticCommon
+        ->dataPool()
+        ->data(devInfo.manufacturer, devInfo.modelName);
+
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
@@ -192,32 +210,38 @@ void HanwhaResourceSearcher::createResource(
         resource->setDefaultAuth(auth);
 
     result << resource;
-    addMultichannelResources(result);
+
+    auto resPool = commonModule()->resourcePool();
+    auto rpRes = resPool->getNetResourceByPhysicalId(
+        resource->getUniqueId()).dynamicCast<HanwhaResource>();
+
+    addMultichannelResources(result, rpRes ? rpRes->getAuth() : auth);
 }
 
-int HanwhaResourceSearcher::getChannels(const HanwhaResourcePtr& resource)
+int HanwhaResourceSearcher::getChannels(
+    const HanwhaResourcePtr& resource,
+    const QAuthenticator& auth)
 {
     auto result = m_channelsByCamera.value(resource->getUniqueId());
     if (result > 0)
         return result;
     
-
-    HanwhaRequestHelper helper(resource);
+    HanwhaRequestHelper helper(auth, resource->getUrl());
     auto attributes = helper.fetchAttributes(lit("attributes/System"));
-    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
-    if (maxChannels)
-        result = *maxChannels;
 
-    m_channelsByCamera.insert(resource->getUniqueId(), result);
+    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
+    result = maxChannels ? *maxChannels : 1;
+    if (attributes.isValid())
+        m_channelsByCamera.insert(resource->getUniqueId(), result);
     return result;
 }
 
 template <typename T>
-void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
+void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
     HanwhaResourcePtr firstResource = result.first().template dynamicCast<HanwhaResource>();
 
-    const auto channels = getChannels(firstResource);
+    const auto channels = getChannels(firstResource, auth);
     if (channels > 1)
     {
         firstResource->updateToChannel(0);
@@ -225,7 +249,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
         {
             HanwhaResourcePtr resource(new HanwhaResource());
 
-            auto rt = qnResTypePool->getResourceTypeByName(lit("Hanwha_Sunapi"));
+            auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
             if (rt.isNull())
                 return;
 
@@ -235,7 +259,6 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setModel(firstResource->getName());
             resource->setMAC(firstResource->getMAC());
 
-            auto auth = firstResource->getAuth();
             if (!auth.isNull())
                 resource->setDefaultAuth(auth);
 
@@ -245,6 +268,47 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result)
             result.push_back(resource);
         }
     }
+}
+
+QString HanwhaResourceSearcher::sessionKey(
+    const HanwhaResourcePtr resource,
+    HanwhaSessionType /*sessionType*/,
+    bool generateNewOne) const
+{
+
+    const auto groupId = resource->getGroupId();
+    if (groupId.isEmpty())
+        return QString();
+
+    SessionKeyPtr data;
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto itr = m_sessionKeys.find(groupId);
+        if (itr == m_sessionKeys.end())
+        {
+            itr = m_sessionKeys.insert(
+                groupId,
+                std::make_shared<SessionKeyData>());
+        }
+        data = itr.value();
+    }
+
+    QnMutexLocker lock(&data->lock);
+    if (data->sessionKey.isEmpty())
+    {
+        HanwhaRequestHelper helper(resource);
+        helper.setIgnoreMutexAnalyzer(true);
+        const auto response = helper.view(lit("media/sessionkey"));
+        if (!response.isSuccessful())
+            return QString();
+
+        const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
+        if (!sessionKey.is_initialized())
+            return QString();
+
+        data->sessionKey = *sessionKey;
+    }
+    return data->sessionKey;
 }
 
 } // namespace plugins

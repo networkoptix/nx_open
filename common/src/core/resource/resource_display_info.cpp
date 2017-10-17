@@ -7,12 +7,12 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
-
 #include <core/resource_management/user_roles_manager.h>
+#include <common/common_module.h>
 
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
-#include <common/common_module.h>
 
 namespace {
 
@@ -23,9 +23,14 @@ QString extractHost(const QString& url)
     int startPos = url.indexOf(lit("://"));
     startPos = startPos == -1 ? 0 : startPos + 3;
 
-    int endPos = url.indexOf(L':', startPos);
-    if (endPos == -1)
-        endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
+    static const std::array<QChar, 4> kStopChars = { L':', L'/', L'?', L'#' };
+    int endPos = -1;
+    for (const auto& stopChar: kStopChars)
+    {
+        endPos = url.indexOf(stopChar, startPos);
+        if (endPos != -1)
+            break;
+    }
 
     endPos = endPos == -1 ? url.size() : endPos;
 

@@ -127,6 +127,18 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
+QnAbstractResourceSearcher* QnResourceDiscoveryManager::searcherByManufacture(
+    const QString& manufacture) const
+{
+    for (const auto& searcher: m_searchersList)
+    {
+        if (searcher && searcher->manufacture() == manufacture)
+            return searcher;
+    }
+
+    return nullptr;
+}
+
 QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;

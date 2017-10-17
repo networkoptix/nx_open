@@ -289,23 +289,32 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     return true;
 }
 
-bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras) const
+bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)
 {
     if (cameras.size() < 2)
         return false;
+    QSet<QString> cameraGroups;
     QSet<int> portList;
+
     for (const auto& netRes: cameras)
     {
         auto camera = netRes.dynamicCast<QnSecurityCamResource>();
         if (!camera || !camera->needCheckIpConflicts())
             continue;
+
+        QString groupId = camera->getGroupId().isEmpty() ? camera->getId().toString() : camera->getGroupId();
+        cameraGroups << groupId;
+        portList << QUrl(camera->getUrl()).port();
+
+        if (cameraGroups.size() < 2)
+            continue; //< Several cameras with same group so far
+
         if (!camera->isManuallyAdded())
-            return true;
-        const int port = QUrl(camera->getUrl()).port();
-        if (portList.contains(port))
             return true; //< Conflict detected
-        portList << port;
+        if (portList.size() < cameraGroups.size())
+            return true; //< For manually added cameras it is allowed to have several cameras with same IP but different ports.
     }
+
     return false;
 }
 

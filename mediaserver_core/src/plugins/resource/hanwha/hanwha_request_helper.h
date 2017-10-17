@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <map>
 
 #include <QtCore/QUrl>
@@ -19,6 +21,7 @@ public:
     using Parameters = std::map<QString, QString>;
 
     HanwhaRequestHelper(const QnSecurityCamResourcePtr& resource);
+    HanwhaRequestHelper(const QAuthenticator& auth, const QString& url);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
 
@@ -56,7 +59,7 @@ public:
         const QString& path,
         const Parameters& parameters = Parameters());
 
-    void setAllowLocks(bool allowLocks);
+    void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
 
 private:
     utils::Url buildRequestUrl(
@@ -80,11 +83,13 @@ private:
         const QString& groupBy = QString());
 
 private:
-    const QnSecurityCamResourcePtr m_resource;
-    bool m_allowLocks = false;
+    const QAuthenticator m_auth;
+    const QString m_url;
+    bool m_ignoreMutexAnalyzer = false;
 };
 
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
 
+#endif // defined(ENABLE_HANWHA)

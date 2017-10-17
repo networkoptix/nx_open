@@ -7,7 +7,7 @@
 #include <nx/utils/basic_factory.h>
 
 #include "abstract_tunnel_connector.h"
-#include "cross_nat_connector.h"
+#include "abstract_cross_nat_connector.h"
 #include "tunnel.h"
 #include "tunnel_attributes.h"
 
@@ -77,7 +77,7 @@ public:
      */
     virtual void stopWhileInAioThread() override;
 
-    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

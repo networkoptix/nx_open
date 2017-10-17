@@ -110,6 +110,7 @@ public:
     void addDeviceServer(QnAbstractResourceSearcher* serv);
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
+    QnAbstractResourceSearcher* searcherByManufacture(const QString& manufacture) const;
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 

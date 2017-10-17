@@ -23,7 +23,7 @@ class Controller;
 class EventManager;
 class MaintenanceManager;
 class SystemManager;
-class SystemHealthInfoProvider;
+class AbstractSystemHealthInfoProvider;
 
 namespace conf { class Settings; }
 namespace ec2{ class ConnectionManager; }
@@ -93,7 +93,7 @@ private:
         const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager,
-        SystemHealthInfoProvider* const systemHealthInfoProvider,
+        AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
         AuthenticationProvider* const authProvider,
         EventManager* const eventManager,
         ec2::ConnectionManager* const ec2ConnectionManager,

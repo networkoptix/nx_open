@@ -17,14 +17,17 @@ public:
     class NX_UTILS_API ScopedIncrement
     {
     public:
+        ScopedIncrement() = default;
         ScopedIncrement(Counter* const counter);
         ScopedIncrement(ScopedIncrement&& right);
         ScopedIncrement(const ScopedIncrement& right);
 
+        ScopedIncrement& operator=(ScopedIncrement&& right);
+
         ~ScopedIncrement();
 
     private:
-        Counter* m_counter;
+        Counter* m_counter = nullptr;
     };
 
     Counter(int initialCount = 0, QObject* parent = NULL);

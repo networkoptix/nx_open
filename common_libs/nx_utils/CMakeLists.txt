@@ -7,6 +7,10 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
+endif()
+
 if(IOS)
     set(ios_sources "src/nx/utils/log/log_ios.mm")
 endif()

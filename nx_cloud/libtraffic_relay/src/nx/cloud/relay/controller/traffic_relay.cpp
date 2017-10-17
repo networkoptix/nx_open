@@ -1,5 +1,6 @@
 #include "traffic_relay.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>

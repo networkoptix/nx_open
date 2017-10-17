@@ -5,6 +5,7 @@
 
 #include "outgoing_tunnel_connection.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>

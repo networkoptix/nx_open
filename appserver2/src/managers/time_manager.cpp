@@ -855,17 +855,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
             nx_http::StringType::number(peerIter->second.rttMillis.get()));
     }
 
-    clientPtr->setUserName( peerIter->second.authData.userName );
-    if( peerIter->second.authData.password )
-    {
-        clientPtr->setAuthType( nx_http::AuthType::authBasicAndDigest );
-        clientPtr->setUserPassword( peerIter->second.authData.password.get() );
-    }
-    else if( peerIter->second.authData.ha1 )
-    {
-        clientPtr->setAuthType( nx_http::AuthType::authDigestWithPasswordHash );
-        clientPtr->setUserPassword( peerIter->second.authData.ha1.get() );
-    }
+    clientPtr->setUserCredentials(peerIter->second.authData.userCredentials);
 
     clientPtr->doGet( targetUrl );
     peerIter->second.syncTimerID.reset();
@@ -909,7 +899,8 @@ void TimeSynchronizationManager::timeSyncRequestDone(
     //scheduling next synchronization
     if( m_terminated )
         return;
-        peerIter->second.syncTimerID =
+
+    peerIter->second.syncTimerID =
         nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(

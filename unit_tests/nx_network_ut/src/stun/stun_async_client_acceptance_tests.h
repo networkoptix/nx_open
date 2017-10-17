@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/socket_factory.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/abstract_async_client.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -441,6 +442,7 @@ REGISTER_TYPED_TEST_CASE_P(StunAsyncClientAcceptanceTest,
     request_scheduled_after_connection_forcibly_closed,
     scheduled_request_is_completed_after_reconnect,
     request_result_is_reported_even_if_connect_always_fails);
+
 
 } // namespace test
 } // namespace stun

@@ -1,8 +1,3 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
@@ -25,7 +20,8 @@
 #include "abstract_nonce_provider.h"
 #include "cloud_user_info_pool.h"
 
-class CloudConnectionManager;
+class AbstractCloudConnectionManager;
+class AbstractCloudUserInfoPool;
 
 /**
  * If server connected to cloud generates nonce suitable for authentication with cloud account credentials.
@@ -41,7 +37,9 @@ public:
      * @param defaultGenerator Used if no connection to cloud.
      */
     CdbNonceFetcher(
-        CloudConnectionManager* const cloudConnectionManager,
+        nx::utils::StandaloneTimerManager* timerManager,
+        AbstractCloudConnectionManager* const cloudConnectionManager,
+        AbstractCloudUserInfoPool* cloudUserInfoPool,
         AbstractNonceProvider* defaultGenerator);
     ~CdbNonceFetcher();
 
@@ -55,8 +53,6 @@ public:
         const nx_http::BufferType& nonce,
         nx_http::BufferType* const cloudNonce,
         nx_http::BufferType* const nonceTrailer);
-
-    const CloudUserInfoPool& cloudUserInfoPool() const;
 
 protected:
     static nx::Buffer generateNonceTrailer(std::function<short()> genFunc);
@@ -73,7 +69,7 @@ private:
     };
 
     mutable QnMutex m_mutex;
-    CloudConnectionManager* const m_cloudConnectionManager;
+    AbstractCloudConnectionManager* const m_cloudConnectionManager;
     AbstractNonceProvider* m_defaultGenerator;
     //map<cdb_nonce, valid_time>
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
@@ -83,8 +79,8 @@ private:
     std::random_device m_rd;
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;
-    nx::utils::TimerManager* m_timerManager;
-    CloudUserInfoPool m_cloudUserInfoPool;
+    nx::utils::StandaloneTimerManager* m_timerManager;
+    AbstractCloudUserInfoPool* m_cloudUserInfoPool;
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);

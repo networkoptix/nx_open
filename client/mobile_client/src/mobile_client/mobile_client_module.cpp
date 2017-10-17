@@ -35,6 +35,8 @@
 #include "mobile_client_translation_manager.h"
 #include "mobile_client_app_info.h"
 #include "mobile_client_startup_parameters.h"
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>

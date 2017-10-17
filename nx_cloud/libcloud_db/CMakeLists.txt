@@ -1,6 +1,10 @@
 set(product.title "${company.name} libcloud_db")
 set(product.display.title "${company.name} Cloud Database")
 
+if(LINUX)
+    add_compile_options("-Werror" "-Wall" "-Wextra")
+endif()
+
 nx_configure_file(
     maven/filter-resources/libcloud_db_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})

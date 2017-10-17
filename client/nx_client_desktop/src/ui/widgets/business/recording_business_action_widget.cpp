@@ -108,9 +108,10 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
         int fixedDuration = params.durationMs / 1000;
         ui->fixedDurationCheckBox->setChecked(fixedDuration > 0);
         if (fixedDuration > 0)
-        {
             ui->fixedDurationSpinBox->setValue(fixedDuration);
-        }
+
+        ui->afterSpinBox->setEnabled(!ui->fixedDurationCheckBox->isChecked());
+        ui->afterLabel->setEnabled(ui->afterSpinBox->isEnabled());
     }
 }
 

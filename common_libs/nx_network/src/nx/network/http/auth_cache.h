@@ -12,16 +12,16 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/url.h>
 
+#include "auth_tools.h"
 #include "http_types.h"
 
 namespace nx_http {
 
 struct AuthInfo
 {
-    QString username;
-    QString password;
-    QString proxyUsername;
-    QString proxyPassword;
+    Credentials user;
+    Credentials proxyUser;
+    // TODO: #ak Remove proxyEndpoint from here.
     SocketAddress proxyEndpoint;
 };
 
@@ -34,103 +34,38 @@ public:
     public:
         nx::utils::Url url;
         StringType method;
-        StringType userName;
-        boost::optional<StringType> password;
-        boost::optional<BufferType> ha1;
+        Credentials userCredentials;
         std::shared_ptr<header::WWWAuthenticate> wwwAuthenticateHeader;
         std::shared_ptr<header::Authorization> authorizationHeader;
 
-        AuthorizationCacheItem() {}
-        template<
-            typename WWWAuthenticateRef,
-            typename AuthorizationRef
-        >
+        AuthorizationCacheItem() = default;
+
         AuthorizationCacheItem(
             const nx::utils::Url& url,
             const StringType& method,
-            const StringType& userName,
-            boost::optional<StringType> password,
-            boost::optional<BufferType> ha1,
-            WWWAuthenticateRef&& wwwAuthenticateHeader,
-            AuthorizationRef&& authorization )
+            const Credentials& userCredentials,
+            header::WWWAuthenticate wwwAuthenticateHeader,
+            header::Authorization authorization)
         :
-            url( url ),
-            method( method ),
-            userName( userName ),
-            password( std::move(password) ),
-            ha1( std::move(ha1) ),
+            url(url),
+            method(method),
+            userCredentials(userCredentials),
             wwwAuthenticateHeader(
                 std::make_shared<header::WWWAuthenticate>(
-                    std::forward<WWWAuthenticateRef>(wwwAuthenticateHeader) ) ),
+                    std::move(wwwAuthenticateHeader))),
             authorizationHeader(
                 std::make_shared<header::Authorization>(
-                    std::forward<AuthorizationRef>(authorization) ) )
+                    std::move(authorization)))
         {
         }
 
-        //AuthorizationCacheItem( AuthorizationCacheItem&& right ) = default;
-        AuthorizationCacheItem( AuthorizationCacheItem&& right )
-        :
-            url( std::move(right.url) ),
-            method( std::move(right.method) ),
-            userName( std::move(right.userName) ),
-            password( std::move(right.password ) ),
-            ha1( std::move(right.ha1 ) ),
-            wwwAuthenticateHeader( std::move(right.wwwAuthenticateHeader ) ),
-            authorizationHeader( std::move(right.authorizationHeader ) )
-        {
-        }
-
-        //AuthorizationCacheItem( const AuthorizationCacheItem& right ) = default;
-        AuthorizationCacheItem( const AuthorizationCacheItem& right )
-        :
-            url( right.url ),
-            method( right.method ),
-            userName( right.userName ),
-            password( right.password ),
-            ha1( right.ha1 ),
-            wwwAuthenticateHeader( right.wwwAuthenticateHeader ),
-            authorizationHeader( right.authorizationHeader )
-        {
-        }
-
-        //AuthorizationCacheItem& operator=( const AuthorizationCacheItem& ) = default;
-        AuthorizationCacheItem& operator=( const AuthorizationCacheItem& right )
-        {
-            if( &right == this )
-                return *this;
-
-            url = right.url;
-            method = right.method;
-            userName = right.userName;
-            password = right.password;
-            ha1 = right.ha1;
-            wwwAuthenticateHeader = right.wwwAuthenticateHeader;
-            authorizationHeader = right.authorizationHeader;
-
-            return *this;
-        }
-
-        //AuthorizationCacheItem& operator=( AuthorizationCacheItem&& ) = default;
-        AuthorizationCacheItem& operator=( AuthorizationCacheItem&& right )
-        {
-            if( &right == this )
-                return *this;
-
-            url = std::move(right.url);
-            method = std::move(right.method);
-            userName = std::move(right.userName);
-            password = std::move(right.password);
-            ha1 = std::move(right.ha1);
-            wwwAuthenticateHeader = std::move(right.wwwAuthenticateHeader);
-            authorizationHeader = std::move(right.authorizationHeader);
-
-            return *this;
-        }
+        AuthorizationCacheItem(AuthorizationCacheItem&& right) = default;
+        AuthorizationCacheItem(const AuthorizationCacheItem& right) = default;
+        AuthorizationCacheItem& operator=(const AuthorizationCacheItem&) = default;
+        AuthorizationCacheItem& operator=(AuthorizationCacheItem&&) = default;
     };
 
-
-    AuthInfoCache();
+    AuthInfoCache() = default;
 
     //!Save successful authorization information in cache for later use
     template<typename AuthorizationCacheItemRef>

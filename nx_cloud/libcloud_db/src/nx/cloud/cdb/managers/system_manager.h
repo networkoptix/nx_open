@@ -62,6 +62,11 @@ public:
     virtual ~AbstractSystemManager() = default;
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const = 0;
+
+    virtual nx::utils::db::DBResult updateSystemStatus(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        api::SystemStatus systemStatus) = 0;
 };
 
 /**
@@ -149,6 +154,11 @@ public:
         std::function<void(api::ResultCode)> completionHandler);
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
+
+    virtual nx::utils::db::DBResult updateSystemStatus(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        api::SystemStatus systemStatus) override;
 
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
@@ -419,11 +429,9 @@ private:
         const QnMutexLockerBase& lock,
         SystemDictionary& systemByIdIndex,
         typename SystemDictionary::iterator systemIter);
-    void systemActivated(
-        nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
-        std::string systemId);
+    template<typename Handler>
+    void updateSystemInCache(std::string systemId, Handler handler);
+    void updateSystemStatusInCache(std::string systemId, api::SystemStatus systemStatus);
 
     nx::utils::db::DBResult saveUserSessionStart(
         nx::utils::db::QueryContext* queryContext,

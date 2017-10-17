@@ -131,7 +131,7 @@ public:
         keepAliveConnectionUrl.setPath(nx::network::url::normalizePath(
             keepAliveConnectionUrl.path() + "/" + 
             nx_http::rest::substituteParameters(
-                nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId.c_str()})));
+                nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId}).c_str()));
 
         m_webSocketConnector = std::make_unique<nx_http::AsyncClient>();
         nx::network::websocket::addClientHeaders(m_webSocketConnector.get(), "NxDiscovery");

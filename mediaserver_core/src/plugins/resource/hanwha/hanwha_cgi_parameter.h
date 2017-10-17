@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_HANWHA)
+
 #include <set>
 
 #include <QtCore/QString>
@@ -70,6 +72,9 @@ public:
     QString formatInfo() const;
     void setFormatInfo(const QString& formatInfo);
 
+    int maxLength() const;
+    void setMaxLength(int maxLength);
+
     QStringList possibleValues() const;
     void setPossibleValues(QStringList possibleValues);
 
@@ -91,6 +96,7 @@ private:
 
     QString m_formatString;
     QString m_formatInfo;
+    int m_maxLength = 0;
 
     QStringList m_possibleValues;
 };
@@ -98,3 +104,6 @@ private:
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)
+

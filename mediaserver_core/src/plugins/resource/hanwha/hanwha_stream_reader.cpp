@@ -1,16 +1,26 @@
 #if defined(ENABLE_HANWHA)
 
+#include <QtCore/QUrlQuery>
+
 #include "hanwha_stream_reader.h"
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 
+#include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace mediaserver_core {
-namespace plugins { 
+namespace plugins {
+
+namespace {
+
+static const QString kLive4NvrProfileName = lit("Live4NVR");
+static const int kHanwhaDefaultPrimaryStreamProfile = 2;
+
+} // namespace
 
 HanwhaStreamReader::HanwhaStreamReader(const HanwhaResourcePtr& res):
     QnRtpStreamReader(res),
@@ -27,34 +37,42 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     const QnLiveStreamParams& params)
 {
     const auto role = getRole();
-    QString streamUrl;
-    int nxProfileNumber = kHanwhaInvalidProfile;
+    QString streamUrlString;
+    int profileToOpen = kHanwhaInvalidProfile;
     if (!m_hanwhaResource->isNvr())
-    {
-        nxProfileNumber = m_hanwhaResource->profileByRole(role);
-        if (nxProfileNumber == kHanwhaInvalidProfile)
-        {
-            return CameraDiagnostics::CameraInvalidParams(
-                lit("No profile for %1 stream").arg(
-                    role == Qn::ConnectionRole::CR_LiveVideo
-                    ? lit("primary")
-                    : lit("secondary")));
-        }
+        profileToOpen = m_hanwhaResource->profileByRole(role);
+    else
+        profileToOpen = chooseNvrChannelProfile(role);
 
-        if (isCameraControlRequired)
-        {
-            auto result = updateProfile(nxProfileNumber, params);
-            if (!result)
-                return result;
-        }
+    if (!isCorrectProfile(profileToOpen))
+    {
+        return CameraDiagnostics::CameraInvalidParams(
+            lit("No profile for %1 stream").arg(
+                role == Qn::ConnectionRole::CR_LiveVideo
+                ? lit("primary")
+                : lit("secondary")));
     }
-    auto result = streamUri(nxProfileNumber, &streamUrl);
+
+    if (isCameraControlRequired)
+    {
+        auto result = updateProfile(profileToOpen, params);
+        if (!result)
+            return result;
+    }
+    
+    auto result = streamUri(profileToOpen, &streamUrlString);
     if (!result)
         return result;
 
+    if (m_hanwhaResource->isNvr())
+    {
+        streamUrlString.append(lit("&session=%1")
+            .arg(m_hanwhaResource->sessionKey(HanwhaSessionType::live)));
+    }
+
     m_rtpReader.setRole(role);
-    m_rtpReader.setRequest(streamUrl);
-    m_hanwhaResource->updateSourceUrl(streamUrl, role);
+    m_rtpReader.setRequest(streamUrlString);
+    m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
     return m_rtpReader.openStream();
 }
@@ -69,7 +87,7 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
     const auto resolution = m_hanwhaResource->streamResolution(role);
     const auto frameRate = m_hanwhaResource->streamFrameRate(role, parameters.fps);
     const auto govLength = m_hanwhaResource->streamGovLength(role);
-    const auto bitrateControl = m_hanwhaResource->streamBitrateControl(role);
+    const auto bitrateControl = m_hanwhaResource->streamBitrateControl(role); //< cbr/vbr
     const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters);
 
     const auto govLengthParameterName = 
@@ -119,6 +137,12 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     int profileNumber,
     const QnLiveStreamParams& parameters)
 {
+    if (m_hanwhaResource->isNvr())
+    {
+        // TODO: #dmishin implement profile configuration for NVR if needed.
+        return CameraDiagnostics::NoErrorResult(); 
+    }   
+
     if (profileNumber == kHanwhaInvalidProfile)
     {
         return CameraDiagnostics::CameraPluginErrorResult(
@@ -126,6 +150,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setIgnoreMutexAnalyzer(true);
     const auto profileParameters = makeProfileParameters(profileNumber, parameters);
 
     m_hanwhaResource->beforeConfigureStream(getRole());
@@ -143,6 +168,62 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     return CameraDiagnostics::NoErrorResult();
 }
 
+int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
+{
+    const auto channel = m_hanwhaResource->getChannel();
+
+    HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setIgnoreMutexAnalyzer(true);
+    const auto response = helper.view(
+        lit("media/videoprofile"),
+        {{kHanwhaChannelProperty, QString::number(channel)}});
+    
+    if (!response.isSuccessful())
+        return kHanwhaInvalidProfile;
+
+    const auto profiles = parseProfiles(response);
+    if (profiles.empty())
+        return kHanwhaInvalidProfile;
+    
+    if (profiles.find(channel) == profiles.cend())
+        return kHanwhaInvalidProfile;
+
+    const auto& channelProfiles = profiles.at(channel);
+
+    if (channelProfiles.empty())
+        return kHanwhaInvalidProfile;
+
+    int bestProfile = kHanwhaInvalidProfile;
+    int bestScore = 0;
+
+    for (const auto& profileEntry: channelProfiles)
+    {
+        const auto profile = profileEntry.second;
+        const auto codecCoefficient =
+            kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
+                ? kHanwhaCodecCoefficients.at(profile.codec)
+                : -1;
+
+        const auto score = profile.resolution.width()
+            * profile.resolution.height()
+            * codecCoefficient
+            + profile.frameRate;
+
+        if (score > bestScore)
+        {
+            bestScore = score;
+            bestProfile = profile.number;
+        }
+    }
+
+    return bestProfile;
+}
+
+bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
+{
+    return profileNumber != kHanwhaInvalidProfile || m_hanwhaResource->isNvr();
+}
+
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)
 {
     using ParameterMap = std::map<QString, QString>;
@@ -158,10 +239,12 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
 
     if (m_hanwhaResource->isNvr())
         params.emplace(kHanwhaClientTypeProperty, "PC");
-    else
+    
+    if (profileNumber != kHanwhaInvalidProfile)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
     HanwhaRequestHelper helper(m_hanwhaResource);
+    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/streamuri"), params);
 
     if (!response.isSuccessful())

@@ -1,5 +1,8 @@
+#if defined(ENABLE_HANWHA)
+
 #include "hanwha_cgi_parameters.h"
 #include "hanwha_common.h"
+#include "hanwha_utils.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -96,7 +99,7 @@ bool HanwhaCgiParameters::parseCgis(QXmlStreamReader& reader)
         if (!parseSubmenus(reader, cgiName))
             return false;
 
-        reader.readNextStartElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -114,7 +117,7 @@ bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader, const QString&
         if (!parseActions(reader, cgi, submenuName))
             return false;
 
-        reader.readNextStartElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -129,11 +132,23 @@ bool HanwhaCgiParameters::parseActions(
     {
         auto actionName = reader.attributes().value(kHanwhaNameAttribute).toString();
         actionName.replace(L'/', L'_');
+        
+        while (!reader.hasError() && !reader.atEnd())
+        {
+            const auto tokenType = reader.readNext();
+            const bool isElement = tokenType == QXmlStreamReader::EndElement
+                || tokenType == QXmlStreamReader::StartElement;
 
-        reader.readNext();
+            if (isElement)
+                break;
+        }
+
+        if (reader.atEnd())
+            return reader.hasError();
+
         if (reader.isEndElement())
         {
-            reader.readNextStartElement();
+            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
             continue;
         }
 
@@ -142,7 +157,8 @@ bool HanwhaCgiParameters::parseActions(
             if (!parseParameters(reader, cgi, submenu, actionName))
                 return false;
         }
-        reader.readNextStartElement();
+
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -173,10 +189,19 @@ bool HanwhaCgiParameters::parseParameters(
         parameter.setIsRequestParameter(isRequestParameter);
         parameter.setIsResponseParameter(isResponseParameter);
 
-        reader.readNext();
+        while (!reader.hasError() && !reader.atEnd())
+        {
+            const auto tokenType = reader.readNext();
+            bool isElement = tokenType == QXmlStreamReader::EndElement
+                || tokenType == QXmlStreamReader::StartElement;
+
+            if (isElement)
+                break;
+        }
+        
         if (reader.isEndElement())
         {
-            reader.readNextStartElement();
+            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
             continue;
         }
 
@@ -186,7 +211,7 @@ bool HanwhaCgiParameters::parseParameters(
                 return false;
         }
         
-        reader.readNextStartElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
     return true;
@@ -202,7 +227,13 @@ bool HanwhaCgiParameters::parseDataType(
     if (reader.name() != kHanwhaDataTypeNodeName)
         return false;
 
-    reader.readNextStartElement();
+    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+
+    if (reader.name() == kHanwhaDataTypeNodeName)
+    {
+        reader.skipCurrentElement();
+        return true;
+    }
 
     if (reader.name() == kHanwhaEnumNodeName || reader.name() == kHanwhaCsvNodeName)
     {
@@ -239,7 +270,7 @@ bool HanwhaCgiParameters::parseDataType(
 
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
     else if (reader.name() == kHanwhaFloatNodeName)
     {
@@ -257,7 +288,7 @@ bool HanwhaCgiParameters::parseDataType(
 
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
     else if (reader.name() == kHanwhaBooleanNodeName)
     {
@@ -271,7 +302,7 @@ bool HanwhaCgiParameters::parseDataType(
         
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
     else if (reader.name() == kHanwhaStringNodeName)
     {
@@ -280,17 +311,19 @@ bool HanwhaCgiParameters::parseDataType(
         const auto attributes = reader.attributes();
         const auto formatInfo = attributes.value(kHanwhaFormatInfoAttribute).toString();
         const auto format = attributes.value(kHanwhaFormatAttribute).toString();
+        const auto maxLength = attributes.value(kHanwhaMaxLengthAttribute).toInt();
 
         parameter.setFormatInfo(formatInfo);
         parameter.setFormatString(format);
+        parameter.setMaxLength(maxLength);
 
         m_parameters[cgi][submenu][action][parameter.name()] = parameter;
 
-        reader.readNextStartElement();
+        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
     }
 
-    reader.readNextStartElement();
-    reader.readNextStartElement();
+    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
 
     return true;
 }
@@ -298,3 +331,5 @@ bool HanwhaCgiParameters::parseDataType(
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

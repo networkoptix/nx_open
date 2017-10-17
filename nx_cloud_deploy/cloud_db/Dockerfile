@@ -1,4 +1,4 @@
-FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:1.5
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:latest
 
 ADD stage/qt /opt/networkoptix/qt
 ADD stage/cloud_db /opt/networkoptix/cloud_db

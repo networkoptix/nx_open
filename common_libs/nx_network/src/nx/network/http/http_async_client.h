@@ -24,7 +24,6 @@ enum class AuthType
 {
     authBasicAndDigest,
     authDigest,
-    authDigestWithPasswordHash,
     authBasic,
 };
 
@@ -216,11 +215,17 @@ public:
     void setSubsequentReconnectTries(int reconnectTries);
     void setTotalReconnectTries(int reconnectTries);
     void setUserAgent(const QString& userAgent);
+
     void setUserName(const QString& userName);
     void setUserPassword(const QString& userPassword);
+    void setUserAuthToken(const AuthToken& userToken);
+    void setUserCredentials(const Credentials& userCredentials);
     void setProxyUserName(const QString& userName);
     void setProxyUserPassword(const QString& userPassword);
+    void setProxyUserAuthToken(const AuthToken& proxyUserToken);
+    void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
+
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
@@ -289,10 +294,8 @@ private:
     BufferType m_responseBuffer;
     BufferType m_receivedBytesLeft;
     QString m_userAgent;
-    QString m_userName;
-    QString m_userPassword;
-    QString m_proxyUserName;
-    QString m_proxyUserPassword;
+    Credentials m_user;
+    Credentials m_proxyUser;
     boost::optional<SocketAddress> m_proxyEndpoint;
     bool m_authorizationTried;
     bool m_proxyAuthorizationTried;

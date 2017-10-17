@@ -6,6 +6,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/cloud/relaying/http_view/begin_listening_http_handler.h>
+
 #include "http_handlers.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
@@ -54,7 +56,7 @@ std::vector<SocketAddress> View::httpEndpoints() const
 
 void View::registerApiHandlers()
 {
-    registerApiHandler<view::BeginListeningHandler>(
+    registerApiHandler<relaying::BeginListeningHandler>(
         nx_http::Method::post,
         &m_controller->listeningPeerManager());
     registerApiHandler<view::CreateClientSessionHandler>(
@@ -65,7 +67,7 @@ void View::registerApiHandlers()
         &m_controller->connectSessionManager());
 
     // TODO: #ak Following handlers are here for compatiblity with 3.1-beta. Remove after 3.1 release.
-    registerApiHandler<view::BeginListeningHandler>(
+    registerApiHandler<relaying::BeginListeningHandler>(
         nx_http::Method::options,
         &m_controller->listeningPeerManager());
     registerApiHandler<view::ConnectToPeerHandler>(
