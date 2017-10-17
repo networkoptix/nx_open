@@ -1,5 +1,5 @@
 {
-  "language_name":"tiếng Việt",
+  "language_name":"Tiếng Việt",
   "dialogs":{
     "okButton":"Ok",
     "openLink":"Truy cập liên kết này",
@@ -38,7 +38,7 @@
     "confirmRestoreSettingsNotNetwork":"Đặt lại cấu hình máy chủ? Cài đặt lưu trữ và mạng sẽ được lưu.",
     "unavailable":"Không khả dụng",
     "unsafePortConfirm":"Không an toàn khi sử dụng số cổng dưới 1025. Máy chủ có thể không truy cập được. Bạn vẫn muốn tiếp tục?",
-    "confirmDisconnectFromCloud":"Ngắt kết nối Hệ thống từ {{PRODUCT_NAME}}",
+    "confirmDisconnectFromCloud":"Ngắt kết nối Hệ thống từ {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Tất cả người dùng đám mây sẽ bị xóa.</span><br><br>Hệ thống có thể truy cập qua mạng nội bộ bằng tài khoản quản trị viên cục bộ.",
     "confirmDisconnectFromCloudAction":"Ngắt kết nối",
     "disconnectedFromCloudSuccess":"Hệ thống đã bị ngắt kết nối khỏi {{CLOUD_NAME}} thành công",

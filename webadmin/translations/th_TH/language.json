@@ -2,20 +2,20 @@
   "language_name":"ภาษาไทย",
   "dialogs":{
     "okButton":"ตกลง",
-    "openLink":"Visit this link",
-    "openLinkWithTitle":"To {{title}} visit this link"
+    "openLink":"ไปที่ลิงก์นี้",
+    "openLinkWithTitle":"ไปที่ {{title}} ไปที่ลิงก์นี้"
   },
   "setup":{
-    "createAccount":"create account",
-    "errorNoHDD":"This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
-    "errorNoNetwork":"This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
+    "createAccount":"สร้างบัญชี",
+    "errorNoHDD":"อุปกรณ์นี้มีวัตถุประสงค์เพื่อทำงานกับฮาร์ดดิสก์ที่ติดตั้ง <br>กรุณาปิดอุปกรณ์ และติดตั้งฮาร์ดดิสก์ไดรฟ์",
+    "errorNoNetwork":"อุปกรณ์นี้ต้องการการเชื่อมต่อเครือข่ายเพื่อใช้งานได้.<br>กรุณาเชื่อมต่อเครือข่ายกับอินเทอร์เน็ตในระบบเครือข่ายภายใน"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Password must be at least 8 characters long",
-    "requiredMessage":"Only latin letters, numbers and keyboard symbols are allowed",
-    "weakMessage":"Password should contain different types of symbols",
-    "strongMessage":"Strong password!",
-    "commonMessage":"This password is in list of most popular passwords"
+    "minLengthMessage":"รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัว",
+    "requiredMessage":"อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น",
+    "weakMessage":"รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน",
+    "strongMessage":"รหัสผ่านที่แข็งแกร่ง!",
+    "commonMessage":"รหัสผ่านนี้อยู่ในรายการรหัสผ่านที่ได้รับความนิยมมากที่สุด"
   },
   "settings":{
     "tabs":{
@@ -23,34 +23,34 @@
       "system":"ระบบ",
       "device":"อุุปกรณ์"
     },
-    "confirmRestart":"Restart server?",
-    "couldntCheckInternet":"Could not check cloud connection",
-    "confirmRestoreDefault":"Clear database and settings? This process will take some time and server will be restarted afterwards.",
-    "confirmRestoreDefaultTitle":"Restore factory defaults",
-    "unexpectedError":"Failed: unexpected error has happened",
+    "confirmRestart":"รีสตาร์ทเซิร์ฟเวอร์หรือไม่?",
+    "couldntCheckInternet":"ไม่สามารถตรวจสอบการเชื่อมต่อกับระบบคลาวด์ได้",
+    "confirmRestoreDefault":"ล้างฐานข้อมูลและการตั้งค่า? ขั้นตอนนี้จะใช้เวลาสักพักและเซิร์ฟเวอร์จะเริ่มต้นใหม่หลังจากนั้น",
+    "confirmRestoreDefaultTitle":"เรียกคืนค่าเริ่มต้นจากโรงงาน",
+    "unexpectedError":"ล้มเหลว: มีข้อผิดพลาดที่ไม่คาดคิดเกิดขึ้น",
     "connnetionError":"การเชื่อมต่อผิดพลาด",
-    "wrongPassword":"Wrong password.",
-    "error":"Error: ",
-    "restartNeeded":"Changes saved. Restart server to apply new settings?",
-    "settingsSaved":"Settings saved",
-    "confirmHardwareRestart":"Restart server operation system?",
-    "confirmRestoreSettings":"Restore all server settings? Archive will be saved, but network settings will be reset.",
-    "confirmRestoreSettingsNotNetwork":"Reset server configuration? Archive and network settings will be saved.",
-    "unavailable":"Unavailable",
-    "unsafePortConfirm":"It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
-    "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
-    "confirmDisconnectFromCloudAction":"Disconnect",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
-    "connectedSuccess":"System was connected successfully",
-    "createLocalOwnerTitle":"Create local administrator",
-    "confirmChangePassword":"Change admin password",
-    "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",
-    "confirmChangePasswordAction":"Save new password",
-    "nx1ControlHint":"Client application has been started. Use a keyboard/mouse or mobile application to control it."
+    "wrongPassword":"รหัสผ่านผิด.",
+    "error":"ข้อผิดพลาด: ",
+    "restartNeeded":"บันทึกการเปลี่ยนแปลงแล้ว รีสตาร์ทเซิร์ฟเวอร์เพื่อใช้การตั้งค่าใหม่หรือไม่?",
+    "settingsSaved":"การตั้งค่าที่บันทึกไว้",
+    "confirmHardwareRestart":"รีสตาร์ทระบบการทำงานของเซิร์ฟเวอร์หรือไม่?",
+    "confirmRestoreSettings":"คืนค่าการตั้งค่าเซิร์ฟเวอร์ทั้งหมด จะถูกบันทึกเก็บถาวร แต่จะถูกรีเซ็ตการตั้งค่าเครือข่าย",
+    "confirmRestoreSettingsNotNetwork":"ตั้งค่าการกำหนดค่าเซิร์ฟเวอร์ จะมีบันทึกการตั้งค่าการเก็บถาวรและเครือข่าย",
+    "unavailable":"ไม่มี",
+    "unsafePortConfirm":"ไม่ปลอดภัยที่จะใช้หมายเลขพอร์ตน้อยกว่า 1025 เซิร์ฟเวอร์อาจไม่สามารถเข้าถึงได้ ดำเนินการต่อ?",
+    "confirmDisconnectFromCloud":"ยกเลิกการเชื่อมต่อระบบจาก {{CLOUD_NAME}}",
+    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>ผู้ใช้ระบบคลาวด์ทั้งหมดจะถูกลบออก</span><br><br>ระบบสามารถเข้าถึงได้ผ่านเครือข่ายท้องถิ่นโดยใช้บัญชีผู้ดูแลระบบภายใน",
+    "confirmDisconnectFromCloudAction":"ตัดการเชื่อมต่อ",
+    "disconnectedFromCloudSuccess":"ระบบถูกตัดการเชื่อมต่อจาก {{CLOUD_NAME}} เรียบร้อยแล้ว",
+    "confirmDisconnectFromSystem":"แยกออกจากระบบเซิร์ฟเวอร์",
+    "confirmDisconnectFromSystemAction":"ถอดออก",
+    "disconnectedFromSystemSuccess":"เซิร์ฟเวอร์ถูกแยกออกจากระบบสำเร็จแล้ว",
+    "connectedSuccess":"เชื่อมต่อระบบเรียบร้อยแล้ว",
+    "createLocalOwnerTitle":"สร้างผู้ดูแลระบบภายใน",
+    "confirmChangePassword":"เปลี่ยนรหัสผ่านผู้ดูแลระบบ",
+    "confirmChangePasswordTitle":"ระบบเปลี่ยนรหัสผ่าน มันจะมีผลต่อผู้ใช้ 'ผู้ดูแลระบบ' และผ่านรากสำหรับเซิร์ฟเวอร์",
+    "confirmChangePasswordAction":"บันทึกรหัสผ่านใหม่",
+    "nx1ControlHint":"แอ็พพลิเคชันไคลเอ็นต์ได้เริ่มต้นแล้ว ใช้แป้นพิมพ์ / เมาส์หรือแอปพลิเคชันมือถือเพื่อควบคุม"
   },
   "info":{
     "tabs":{
@@ -72,9 +72,9 @@
     "cloudBothError":"ไม่สามารถผสานระบบ ทั้งสองระบบมีการเชื่อมต่อไปที่ cloud คุณจำเป็นต้องตัดการเชื่อมต่อครั้งแรก",
     "cloudHostConflict":"ไม่สามารถผสานระบบ เนื่องจากเซิร์ฟเวอร์อยู่กับโฮสต์เมฆแตกต่างกัน",
     "licenceError":"คำเตือน! คุณกำลังจะผสานรวมสิทธิ์การใช้งานระบบกับ Starter อนุญาตได้หนึ่งใบต่อระบบดังนั้นใบอนุญาตที่สองจะถูกยกเลิกการใช้งาน รวมหรือไม่?",
-    "connectionFailed":"การเชื่อมต่อล้มเหลว",
+    "connectionFailed":"การเชื่อมต่อล้มเหลว: ",
     "unknownError":"ข้อผิดพลาดที่ไม่รู้จัก",
-    "mergeFailed":"ผสานล้มเหลว:",
+    "mergeFailed":"ผสานล้มเหลว: ",
     "mergeSucceed":"ผสานสำเร็จ",
     "newSystemDisplayName":"ระบบใหม่",
     "incompatibleProtocol":"รุ่นที่เข้ากันไม่ได้",
@@ -108,9 +108,9 @@
     "free":"ฟรี",
     "total":"ทั้งหมด",
     "occupied":"ครอบครอง",
-    "reserved":"Reserved"
+    "reserved":"สงวนไว้แล้ว"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"{{PRODUCT_NAME}} เว็บอินเทอร์เฟซ"
   }
 }
