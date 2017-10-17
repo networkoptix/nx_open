@@ -118,10 +118,11 @@ std::shared_ptr<ReverseConnectionSource>
             return nullptr;
         }
 
-        if (const auto connections = hostIterator->second->socketCount())
+        // TODO: #ak Not active objects MUST be removed, not stored forever.
+        if (hostIterator->second->isActive())
         {
-            NX_LOGX(lm("Return holder for %1 with %2 connections(s)")
-                .args(hostName, connections), cl_logDEBUG1);
+            NX_LOGX(lm("Return holder for %1 with %2 connection(s)")
+                .args(hostName, hostIterator->second->socketCount()), cl_logDEBUG1);
             return hostIterator->second;
         }
 
