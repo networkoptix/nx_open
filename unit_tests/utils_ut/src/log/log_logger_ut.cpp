@@ -13,8 +13,9 @@ namespace test {
 TEST(LogLogger, Levels)
 {
     const auto buffer = new Buffer();
+    const Logger::OnLevelChanged onLevelChanged = nullptr;
 
-    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer));
+    Logger logger(onLevelChanged, Level::info, std::unique_ptr<AbstractWriter>(buffer));
     ASSERT_EQ(Level::info, logger.defaultLevel());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::always));
@@ -54,8 +55,9 @@ static Tag makeTag(const char* tag) { return Tag(QString::fromUtf8(tag)); }
 TEST(LogLogger, Filters)
 {
     const auto buffer = new Buffer();
+    const Logger::OnLevelChanged onLevelChanged = nullptr;
 
-    Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer));
+    Logger logger(onLevelChanged, Level::info, std::unique_ptr<AbstractWriter>(buffer));
     ASSERT_EQ((size_t) 0, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, makeTag("nx::first::className1")));
@@ -106,7 +108,8 @@ TEST(LogLogger, Filters)
 TEST(LogLogger, Format)
 {
     const auto buffer = new Buffer();
-    Logger logger(Level::verbose, std::unique_ptr<AbstractWriter>(buffer));
+    const Logger::OnLevelChanged onLevelChanged = nullptr;
+    Logger logger(onLevelChanged, Level::verbose, std::unique_ptr<AbstractWriter>(buffer));
 
     logger.log(Level::always, makeTag("nx::aaa::Object(1)"), "First message");
     logger.log(Level::error, makeTag("nx::bbb::Object(2)"), "Second message");

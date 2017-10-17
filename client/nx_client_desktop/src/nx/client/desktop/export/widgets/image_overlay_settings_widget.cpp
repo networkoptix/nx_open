@@ -1,6 +1,8 @@
 #include "image_overlay_settings_widget.h"
 #include "ui_image_overlay_settings_widget.h"
 
+#include <limits>
+
 #include <QtGui/QImageReader>
 #include <QtWidgets/QApplication>
 
@@ -26,6 +28,8 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
 
     ui->opacitySlider->setProperty(style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
+
+    ui->sizeSlider->setMaximum(std::numeric_limits<int>::max());
 
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ ui->sizeLabel, ui->opacityLabel });

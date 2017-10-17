@@ -1,70 +1,59 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>개발자 도구</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            개발자 도구를 통한 제품개선 이나 대화를 시작하고 싶으십니까?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">의견을 남겨 주세요</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>일반 이벤트 생성기</h3>
         <p>
-            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
-            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            일반 이벤트는 타시스템에 규정된 규칙엔진에 의거, 트리거신호를 통하여 이벤트를 전송합니다.
+            일반 이벤트 생성기는 HTTP기반 일반 이벤트 호출을 생성하는 도구입니다.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">일반 이벤트 생성기</a></p>
     </div>
     <div>
         <h3>서버 API</h3>
         <p>
-            서버 API는 타 SW를 위한 기본 API 호출 정보를 제공합니다. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            서버 API는 다른시스템의 연동을 기본 API 호출 정보를 제공합니다. 개발자는 일반적인 클라이이언트 기능(쿼리/리소스운용) 및 서버기능 (카메라, 사용자, 권한), 시스템내의 라이브전송, 영상녹화포함한 이벤트생성, 규칙생성, 카메라제어등 모든 기능에 대하여 권한을 습득합니다. 그리고, 또한.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+            <a href="#/developers/api"><b> API 시험 도구 (신규) </b></a> - API 테스트를 위한 도구가 있는 개발문서 <br> <a href="#/developers/changelog"> API 변경사항 </a> - 변경된 API 목록 <br> <a id="api-doc" href="api.xml" target="_blank"> API 문서 </a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>카메라 세부 정보</h3>
         <p>
-            Special panel for a webclient which displays additional information for cameras:
+            Web Admin 인터페이스의 카메라에 대한 개발자에게 친숙한 추가 정보를 표시합니다.
         </p>
         <ul>
             <li>카메라 ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>사용가능한 모든 비디오 스트림 주소</li>
+            <li>브라우저에서 직접 동영상 내보내기</li>
         </ul>
         <p>
-            To open Camera Details Panel - open <a href="#/view">web client</a>, select camera,
-            settings icon (gear), then choose "Camera Details"
+            카메라 세부 정보 패널을 열려면 Web Admin 인터페이스로 이동하고 <a href="#/view">보기를 선택하십시오 </a>, 대상 카메라를 선택하고 설정 아이콘 (장비)을 클릭 한 다음 "카메라 세부 정보"를 선택하십시오.
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">카메라 세부 정보 보기</a></p>
     </div>
     <div>
-        <h3>비디오 소스 통합 SDK</h3>
+        <h3>영상관련 통합SDK</h3>
         <p>
-            비디오 소스 통합 SDK 시스템으로 거의 모든 라이브 또는 녹화 비디오 소스 (IP 카메라, Nvr, Dvr, 등) 을 통합 하는 기능을 제공 합니다. SDK는 검색, 표시, 검출 및 영상 재생 방법을 만듭니다. I/O장치 및 모션 검출정보를 연동하는데 사용가능합니다.
+            영상관련 통합SDK는 시스템내 모든 라이브 또는 녹화영상정보(IP 카메라, NVR, DVR, 등...) 에 대하여 가상통합 하는 기능을 제공 합니다. SDK는 검색, 표시, 검출 및 영상녹화에 대한 방법을 생성할수 있습니다. I/O장치 및 모션 검출정보를 연동하는데 사용가능합니다.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >SDK 가져오기</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >sDK 받기</a></p>
     </div>
 
     <div>
-        <h3>저장소 SDK</h3>
+        <h3>저장소 관련 SDK</h3>
         <p>
-            Storage SDK는 시스템에 잠재적인 스토리지를 통합 하는 기능을 제공 합니다. 그것은 개발자에서 읽기 또는 쓰기 모든 저장소 위치에 있습니다: 하나는 로컬, 원격, 및 심지어 클라우드. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            저장소 SDK는 시스템에 잠재적인 스토리지를 통합 하는 기능을 제공 합니다. 이것을 통하여 개발자들은 모든저장소에 대하여(내외부, 클라우드) 읽기 또는 쓰기를 수행할수 있습니다. 저장 장치 플러그인을 만들려면 I / O 스트림 (파일이있는 경우), 파일 삭제, 폴더의 파일 목록 등과 같은 표준 기능을 구현해야합니다. 저장소 SDK에는 FTP 서버를 저장 위치로 사용하기위한 예제가 포함되어 있습니다.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >SDK 가져오기</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >SDK 받기</a></p>
     </div>
 </div>

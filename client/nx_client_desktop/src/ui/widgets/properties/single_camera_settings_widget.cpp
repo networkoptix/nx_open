@@ -483,6 +483,8 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
                     -1,
                     kFisheyeThumbnailSize,
                     QnThumbnailRequestData::JpgFormat,
+                    QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
+                    QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
                     this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }

@@ -11,9 +11,6 @@
 #include <transcoding/ffmpeg_audio_transcoder.h>
 
 #include <transcoding/filters/abstract_image_filter.h>
-#include <transcoding/filters/tiled_image_filter.h>
-#include <transcoding/filters/scale_image_filter.h>
-#include <transcoding/filters/rotate_image_filter.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
@@ -168,7 +165,9 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 
-    for(auto filter: m_filters)
+    m_sourceResolution = m_resolution;
+
+    for (auto filter: m_filters)
         setResolution(filter->updatedResolution(getResolution()));
 
     return true;
@@ -302,8 +301,10 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setQuality(quality);
             ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
            // m_transcodingSettings.codec = codec;
-            ffmpegTranscoder->setFilterList(QnImageFilterHelper::createFilterChain(
-                m_transcodingSettings, resolution));
+            auto filterChain = QnImageFilterHelper::createFilterChain(
+                m_transcodingSettings);
+            filterChain.prepare(m_transcodingSettings.resource, resolution);
+            ffmpegTranscoder->setFilterList(filterChain); //TODO: #GDM #3.2 Update to FilterChain
 
             if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
                 // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version

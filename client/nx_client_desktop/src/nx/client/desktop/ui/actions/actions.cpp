@@ -750,19 +750,21 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ExportVideoAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Video..."))
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition((condition::hasTimePeriod() || condition::hasArgument(Qn::CameraBookmarkRole))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(ConditionWrapper(new ExportCondition(true))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportLayoutAction)
@@ -776,7 +778,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(ConditionWrapper(new ExportCondition(true))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ThumbnailsSearchAction)
@@ -1015,14 +1018,6 @@ void initialize(Manager* manager, Action* root)
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
 
-    factory(RadassAction)
-        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Resolution..."))
-        .childFactory(new RadassActionFactory(manager))
-        .condition(ConditionWrapper(new ChangeResolutionCondition())
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
-
     factory()
         .flags(Scene | SingleTarget)
         .childFactory(new PtzPresetsToursFactory(manager))
@@ -1134,6 +1129,13 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("270 degrees"))
             .condition(new RotateItemCondition());
     } factory.endSubMenu();
+
+    factory(RadassAction)
+        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Resolution..."))
+        .childFactory(new RadassActionFactory(manager))
+        .condition(ConditionWrapper(new ChangeResolutionCondition())
+            && !condition::isLayoutTourReviewMode());
 
     factory()
         .flags(Scene | Tree)

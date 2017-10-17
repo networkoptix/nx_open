@@ -74,7 +74,7 @@ void ExportOverlayWidget::setText(const QString& value)
         return;
 
     d->text = value;
-    update();
+    updateLayout();
 }
 
 QImage ExportOverlayWidget::image() const
@@ -114,6 +114,7 @@ void ExportOverlayWidget::updateLayout()
     const QRectF geometry(pos(), d->unscaledRect.size() * d->scale);
     setGeometry(geometry.toAlignedRect());
     updatePosition(pos());
+    update();
 }
 
 void ExportOverlayWidget::updateCursor()

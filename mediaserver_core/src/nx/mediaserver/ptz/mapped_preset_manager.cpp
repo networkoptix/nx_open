@@ -8,12 +8,6 @@ namespace nx {
 namespace mediaserver {
 namespace ptz {
 
-namespace {
-
-static const QString kPresetMappingProperty = lit("presetMapping");
-
-} // namespace
-
 MappedPresetManager::MappedPresetManager(const QnResourcePtr& resource):
     m_resource(resource)
 {
@@ -32,12 +26,16 @@ bool MappedPresetManager::createPreset(const QnPtzPreset& preset)
 
 bool MappedPresetManager::updatePreset(const QnPtzPreset& preset)
 {
-    QnPtzPreset devicePreset;
-    bool result = normalizeNativePreset(preset.id, &devicePreset);
-    if (!result)
-        return result;
+    QString devicePresetId;
+    {
+        QnMutexLocker lock(&m_mutex);
+        devicePresetId = m_nxToNativeId.value(preset.id);
+    }
 
-    createOrUpdateMapping(devicePreset.id, preset);    
+    if (devicePresetId.isEmpty())
+        devicePresetId = preset.id;
+
+    createOrUpdateMapping(devicePresetId, preset);    
     return true;
 }
 
@@ -72,19 +70,19 @@ bool MappedPresetManager::activatePreset(const QString& nxPresetId, qreal speed)
 void MappedPresetManager::loadMappings()
 {
     QnMutexLocker lock(&m_mutex);
-    m_presetMapping = QJson::deserialized<PresetMapping>(
-        m_resource->getProperty(kPresetMappingProperty).toUtf8(),
-        PresetMapping());
+    m_presetMapping = QJson::deserialized<QnPtzPresetMapping>(
+        m_resource->getProperty(kPtzPresetMappingPropertyName).toUtf8(),
+        QnPtzPresetMapping());
 }
 
 void MappedPresetManager::createOrUpdateMapping(const QString& devicePresetId, const QnPtzPreset& nxPreset)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        m_presetMapping[devicePresetId] = nxPreset.name;
+        m_presetMapping[devicePresetId] = nxPreset;
         m_nxToNativeId[nxPreset.id] = devicePresetId;
         const QString serialized = QJson::serialized(m_presetMapping);
-        m_resource->setProperty(kPresetMappingProperty, serialized);
+        m_resource->setProperty(kPtzPresetMappingPropertyName, serialized);
     }
 
     m_resource->saveParams();
@@ -98,7 +96,7 @@ void MappedPresetManager::removeMapping(const QString& nxPresetId, const QString
         m_nxToNativeId.remove(nxPresetId);
 
         const QString serialized = QJson::serialized(m_presetMapping);
-        m_resource->setProperty(kPresetMappingProperty, serialized);
+        m_resource->setProperty(kPtzPresetMappingPropertyName, serialized);
     }
 
     m_resource->saveParams();
@@ -109,12 +107,44 @@ void MappedPresetManager::applyMapping(
     QnPtzPresetList* outNxPresets) const
 {
     QnMutexLocker lock(&m_mutex);
-    for (const auto& preset: devicePresets)
+    QSet<QString> currentDevicePresets;
+    for (const auto& devicePreset: devicePresets)
     {
-        if (m_presetMapping.contains(preset.id))
-            outNxPresets->push_back(QnPtzPreset(preset.id, m_presetMapping[preset.id]));
+        currentDevicePresets.insert(devicePreset.id);
+        if (m_presetMapping.contains(devicePreset.id))
+        {
+            auto presetId = m_presetMapping[devicePreset.id].id;
+            if (presetId.isEmpty())
+                presetId = devicePreset.id;
+
+            outNxPresets->push_back(
+                QnPtzPreset(presetId, m_presetMapping[devicePreset.id].name));
+        }
         else
-            outNxPresets->push_back(preset);
+        {
+            outNxPresets->push_back(devicePreset);
+        }
+    }
+
+    bool hasChanges = false;
+    for (auto itr = m_presetMapping.begin(); itr != m_presetMapping.end();)
+    {
+        if (!currentDevicePresets.contains(itr.key()))
+        {
+            itr = m_presetMapping.erase(itr);
+            hasChanges = true;
+        }
+        else
+        {
+            ++itr;
+        }
+    }
+
+    if (hasChanges)
+    {
+        const QString serialized = QJson::serialized(m_presetMapping);
+        m_resource->setProperty(kPtzPresetMappingPropertyName, serialized);
+        m_resource->saveParams();
     }
 }
 

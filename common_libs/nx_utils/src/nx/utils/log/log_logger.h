@@ -11,8 +11,13 @@ namespace log {
 class NX_UTILS_API Logger
 {
 public:
+    typedef std::function<void()> OnLevelChanged;
+
     /** Initializes log with minimal level and writers, no writers means std out and err. */
-    Logger(Level defaultLevel = Level::none, std::unique_ptr<AbstractWriter> writer = nullptr);
+    Logger(
+        OnLevelChanged onLevelChanged = nullptr,
+        Level defaultLevel = Level::none,
+        std::unique_ptr<AbstractWriter> writer = nullptr);
 
     /** Writes message to every writer if it is to be logged. */
     void log(Level level, const Tag& tag, const QString& message);
@@ -31,6 +36,9 @@ public:
     LevelFilters levelFilters() const;
     void setLevelFilters(LevelFilters filters);
 
+    /** Report the maximum possible log level, according to the current settings. */
+    Level maxLevel() const;
+
     void setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers = {});
     void setWriter(std::unique_ptr<AbstractWriter> writer);
 
@@ -38,6 +46,7 @@ public:
 
 private:
     mutable QnMutex m_mutex;
+    OnLevelChanged m_onLevelChanged;
     Level m_defaultLevel = Level::none;
     std::vector<std::unique_ptr<AbstractWriter>> m_writers;
     LevelFilters m_levelFilters;

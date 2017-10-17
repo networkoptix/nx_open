@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 
 #include <map>
 #include <vector>
@@ -53,7 +54,7 @@ public:
     void init();
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
-    void at_rulesUpdated(const std::set<QnUuid>& affectedResources);
+    void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
 public slots:
     void initExistingResources();
@@ -77,7 +78,7 @@ private:
 
     bool canFetchMetadataFromResource(const QnSecurityCamResourcePtr& camera) const;
 
-    bool fetchMetadataForResource(const QnUuid& resourceId, std::set<QnUuid>& eventTypeIds);
+    bool fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid>& eventTypeIds);
 
     template<typename T>
     boost::optional<T> deserializeManifest(const char* manifestString) const

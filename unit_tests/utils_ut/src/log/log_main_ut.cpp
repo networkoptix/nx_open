@@ -17,9 +17,12 @@ public:
     LogMainTest()
     {
         logger = addLogger({kTestTag, kNamespaceTag});
+        EXPECT_EQ(Level::none, maxLevel());
         logger->setDefaultLevel(levelFromString("INFO"));
+        EXPECT_EQ(Level::info, maxLevel());
         logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
         logger->setLevelFilters(LevelFilters{{kNamespaceTag, Level::verbose}});
+        EXPECT_EQ(Level::verbose, maxLevel());
     }
 
     ~LogMainTest()

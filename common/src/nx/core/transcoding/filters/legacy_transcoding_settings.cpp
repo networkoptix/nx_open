@@ -30,15 +30,8 @@ bool LegacyTranscodingSettings::isEmpty() const
     if (timestampParams.enabled)
         return false;
 
-    //if (codec != AV_CODEC_ID_NONE)
-    //    return false;
-
     return true;
-
-
 }
-
-
 
 } // namespace transcoding
 } // namespace core

@@ -26,7 +26,7 @@ public:
     virtual QStringList getAudioTracksInfo() const;
     virtual unsigned int getCurrentAudioChannel() const;
     virtual bool setAudioChannel(unsigned int num);
-    virtual bool isReverseMode() const { return m_reverseMode;}
+    virtual bool isReverseMode() const { return m_speed < 0;}
 
     /** Is not used and not implemented. */
     virtual bool isNegativeSpeedSupported() const;
@@ -124,14 +124,12 @@ protected:
     volatile bool m_wakeup;
     qint64 m_tmpSkipFramesToTime;
 private:
-    void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE);
+    void setSpeedInternal(double speed, qint64 currentTimeHint = AV_NOPTS_VALUE);
     bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
 private slots:
 private:
     int m_selectedAudioChannel;
     bool m_eof;
-    bool m_reverseMode;
-    bool m_prevReverseMode;
     FrameTypeExtractor* m_frameTypeExtractor;
     qint64 m_lastGopSeekTime;
     QVector<int> m_audioCodecs;
@@ -173,6 +171,8 @@ private:
     QSize m_oldResolution;
     bool m_isStillImage;
     double m_speed;
+    double m_prevSpeed;
+	
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
     QnAbstractMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;

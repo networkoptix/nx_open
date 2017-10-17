@@ -60,6 +60,13 @@ add_custom_command(
             "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
 )
 
+set_source_files_properties(
+    "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+    "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.json"
+    PROPERTIES
+        RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources"
+)
+
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"

@@ -44,7 +44,6 @@ extern "C"
 #endif
 //#define USE_SINGLE_PBO_PER_FRAME
 #endif
-#include "transcoding/filters/contrast_image_filter.h"
 
 #include <nx/streaming/config.h>
 
@@ -176,7 +175,7 @@ public:
 
         /* Maximal texture size. */
         int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-        NX_INFO(this, lm("OpenGL max texture size: %1.").arg(maxTextureSize));
+        NX_VERBOSE(this, lm("OpenGL max texture size: %1.").arg(maxTextureSize));
 
         /* Clamp constant. */
 //        clampConstant = GL_CLAMP;

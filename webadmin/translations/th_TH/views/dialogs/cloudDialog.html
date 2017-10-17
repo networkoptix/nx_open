@@ -1,6 +1,6 @@
 
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"> <span aria-hidden="true"> &times; </span> <span class="sr-only"> ปิด </span></button>
     <h3 class="modal-title" ng-bind-html="title"></h3>
 </div>
 
@@ -9,24 +9,21 @@
 
     <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
 
-    <alert type="info" ng-if="connecting">Connecting system to... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
-        This may last about a minute.</alert>
+    <alert type="info" ng-if="connecting">ระบบเชื่อมต่อไปยัง ... <span class="product-name"> {{Config.cloud.productName}} </span> ... <br> นี่อาจใช้เวลาประมาณหนึ่งนาที</alert>
 
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control" ng-readonly="!connect"
-                   type="email" placeholder="Cloud Email" required auto-focus autocomplete="new-password">
+                   type="email" placeholder="อีเมล Cloud" required auto-focus autocomplete="new-password">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" required placeholder="Cloud Password" autocomplete="new-password">
+                   type="password" required placeholder="รหัสผ่านระบบคลาวด์" autocomplete="new-password">
         </div>
     </form>
 
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-
-    <button class="btn btn-primary" ng-click="action()" ng-disabled="cloudForm.$invalid || succeed">{{actionLabel}}</button>
+    <button class="btn btn-default" ng-click="cancel()"> ยกเลิก </button> <button class="btn btn-primary" ng-click="action()" ng-disabled="cloudForm.$invalid || succeed"> {{actionLabel}} </button>
 </div>

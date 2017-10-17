@@ -10,8 +10,9 @@ class LoggerCollection
 {
 public:
     LoggerCollection():
-        m_mainLogger(std::make_shared<Logger>())
+        m_mainLogger(std::make_shared<Logger>([this]() { updateMaxLevel(); }))
     {
+        updateMaxLevel();
     }
 
     std::shared_ptr<Logger> main()
@@ -23,14 +24,15 @@ public:
     std::shared_ptr<Logger> add(const std::set<Tag>& filters)
     {
         QnMutexLocker lock(&m_mutex);
-        const auto logger = std::make_shared<Logger>();
+        const auto logger = std::make_shared<Logger>([this]() { updateMaxLevel(); });
         for(auto& f: filters)
             m_loggersByTags.emplace(f, logger);
 
+        updateMaxLevel();
         return logger;
     }
 
-    std::shared_ptr<Logger> get(const Tag& tag, bool allowMain) const
+    std::shared_ptr<Logger> get(const Tag& tag, bool allowMainLogger) const
     {
         QnMutexLocker lock(&m_mutex);
         for (auto& it: m_loggersByTags)
@@ -39,7 +41,7 @@ public:
                 return it.second;
         }
 
-        return allowMain ? m_mainLogger : std::shared_ptr<Logger>();
+        return allowMainLogger ? m_mainLogger : std::shared_ptr<Logger>();
     }
 
     void remove(const std::set<Tag>& filters)
@@ -47,13 +49,37 @@ public:
         QnMutexLocker lock(&m_mutex);
         for (const auto f: filters)
             m_loggersByTags.erase(f);
+
+        updateMaxLevel();
     }
+
+    Level maxLevel() const;
+
+private:
+    void updateMaxLevel();
 
 private:
     mutable QnMutex m_mutex;
     std::shared_ptr<Logger> m_mainLogger;
     std::map<Tag, std::shared_ptr<Logger>> m_loggersByTags;
+    Level m_maxLevel = Level::none;
 };
+
+Level LoggerCollection::maxLevel() const
+{
+    return m_maxLevel;
+}
+
+void LoggerCollection::updateMaxLevel()
+{
+    m_maxLevel = m_mainLogger->maxLevel();
+    for (const auto& element: m_loggersByTags)
+    {
+        const auto& logger = element.second;
+        if (logger->maxLevel() > m_maxLevel)
+            m_maxLevel = logger->maxLevel();
+    }
+}
 
 static LoggerCollection* loggerCollection()
 {
@@ -73,14 +99,19 @@ std::shared_ptr<Logger> addLogger(const std::set<Tag>& filters)
     return loggerCollection()->add(filters);
 }
 
-std::shared_ptr<Logger> getLogger(const Tag& tag, bool allowMain)
+std::shared_ptr<Logger> getLogger(const Tag& tag, bool allowMainLogger)
 {
-    return loggerCollection()->get(tag, allowMain);
+    return loggerCollection()->get(tag, allowMainLogger);
 }
 
 void removeLoggers(const std::set<Tag>& filters)
 {
     loggerCollection()->remove(filters);
+}
+
+Level maxLevel()
+{
+    return loggerCollection()->maxLevel();
 }
 
 bool isToBeLogged(Level level, const Tag& tag)

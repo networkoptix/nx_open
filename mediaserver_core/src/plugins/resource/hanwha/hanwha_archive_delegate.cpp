@@ -1,0 +1,182 @@
+#if defined(ENABLE_HANWHA)
+
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
+#include <utils/common/util.h>
+
+#include "hanwha_archive_delegate.h"
+#include "hanwha_stream_reader.h"
+#include "hanwha_resource.h"
+#include "hanwha_shared_resource_context.h"
+#include "hanwha_chunk_reader.h"
+
+namespace nx {
+namespace mediaserver_core {
+namespace plugins {
+
+HanwhaNvrArchiveDelegate::HanwhaNvrArchiveDelegate(const QnResourcePtr& resource)
+{
+    auto hanwhaRes = resource.dynamicCast<HanwhaResource>();
+    NX_ASSERT(hanwhaRes);
+    m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
+    m_streamReader->setRole(Qn::CR_Archive);
+    m_streamReader->setSessionType(HanwhaSessionType::archive);
+    auto& rtspClient = m_streamReader->rtspClient();
+
+    m_flags |= Flag_CanOfflineRange;
+    m_flags |= Flag_CanProcessNegativeSpeed;
+    m_flags |= Flag_CanOfflineLayout;
+    m_flags |= Flag_CanOfflineHasVideo;
+    m_flags |= Flag_UnsyncTime;
+    m_flags |= Flag_CanSeekImmediatly;
+}
+
+HanwhaNvrArchiveDelegate::~HanwhaNvrArchiveDelegate()
+{
+    m_streamReader.reset();
+}
+
+bool HanwhaNvrArchiveDelegate::open(const QnResourcePtr &resource)
+{
+    return (bool) m_streamReader->openStreamInternal(false, QnLiveStreamParams());
+}
+
+void HanwhaNvrArchiveDelegate::close()
+{
+    m_streamReader->closeStream();
+}
+
+qint64 HanwhaNvrArchiveDelegate::startTime() const
+{
+    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
+    return hanwhaRes->sharedContext()->chunkLoader()->startTimeUsec(hanwhaRes->getChannel());
+}
+
+qint64 HanwhaNvrArchiveDelegate::endTime() const
+{
+    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
+    return hanwhaRes->sharedContext()->chunkLoader()->endTimeUsec(hanwhaRes->getChannel());
+}
+
+QnAbstractMediaDataPtr HanwhaNvrArchiveDelegate::getNextData()
+{
+    if (!m_streamReader)
+        return QnAbstractMediaDataPtr();
+    if (!m_streamReader->isStreamOpened())
+    {
+        if (m_currentPositionUsec != AV_NOPTS_VALUE)
+            m_streamReader->setPositionUsec(m_currentPositionUsec);
+        if (!open(m_streamReader->m_resource))
+            return QnAbstractMediaDataPtr();
+    }
+
+    auto result = m_streamReader->getNextData();
+    if (result)
+    {
+        m_currentPositionUsec = result->timestamp;
+        if (!isForwardDirection())
+        {
+            result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+            result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+        }
+    }
+
+    if (result && m_endTimeUsec != AV_NOPTS_VALUE && result->timestamp > m_endTimeUsec)
+    {
+        QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
+        rez->timestamp = isForwardDirection() ? DATETIME_NOW : 0;
+        return rez;
+    }
+    return result;
+}
+
+bool HanwhaNvrArchiveDelegate::isForwardDirection() const
+{
+    auto& rtspClient = m_streamReader->rtspClient();
+    return rtspClient.getScale() >= 0;
+}
+
+qint64 HanwhaNvrArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
+{
+    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
+    const auto chunks = hanwhaRes->sharedContext()->chunkLoader()->chunks(hanwhaRes->getChannel());
+    const qint64 timeMs = timeUsec / 1000;
+    auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection());
+    if (itr == chunks.cend())
+        timeUsec = isForwardDirection() ? DATETIME_NOW : 0;
+    else if (!itr->contains(timeMs))
+        timeUsec = isForwardDirection() ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
+
+    if (m_playbackMode == PlaybackMode::ThumbNails && m_currentPositionUsec == timeUsec)
+        return timeUsec; //< Ignore two thumbnails in the row from the same position.
+
+    m_currentPositionUsec = timeUsec;
+    m_streamReader->setPositionUsec(timeUsec);
+    return timeUsec;
+}
+
+QnConstResourceVideoLayoutPtr HanwhaNvrArchiveDelegate::getVideoLayout()
+{
+    static QSharedPointer<QnDefaultResourceVideoLayout> videoLayout(new QnDefaultResourceVideoLayout());
+    return videoLayout;
+}
+
+QnConstResourceAudioLayoutPtr HanwhaNvrArchiveDelegate::getAudioLayout()
+{
+    static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout(new QnEmptyResourceAudioLayout());
+    return audioLayout;
+}
+
+void HanwhaNvrArchiveDelegate::beforeClose()
+{
+    m_streamReader->pleaseStop();
+}
+
+void HanwhaNvrArchiveDelegate::setSpeed(qint64 displayTime, double value)
+{
+    auto& rtspClient = m_streamReader->rtspClient();
+    rtspClient.setScale(value);
+    if (displayTime != AV_NOPTS_VALUE)
+        seek(displayTime, true /*findIFrame*/);
+    else if (rtspClient.isOpened())
+        rtspClient.sendPlay(AV_NOPTS_VALUE /*startTime*/, AV_NOPTS_VALUE /*endTime */, value);
+
+    if (!m_streamReader->isStreamOpened())
+        open(m_streamReader->m_resource);
+}
+
+void HanwhaNvrArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
+{
+    m_endTimeUsec = endTimeUsec;
+    seek(startTimeUsec, true /*findIFrame*/);
+}
+
+void HanwhaNvrArchiveDelegate::setPlaybackMode(PlaybackMode mode)
+{
+    m_playbackMode = mode;
+    auto& rtspClient = m_streamReader->rtspClient();
+    switch (mode)
+    {
+        case PlaybackMode::ThumbNails:
+            rtspClient.setAdditionAttribute("Frames", "Intra");
+            m_streamReader->setSessionType(HanwhaSessionType::preview);
+            break;
+        case PlaybackMode::Export:
+            rtspClient.setAdditionAttribute("Rate-Control", "no");
+            m_streamReader->setSessionType(HanwhaSessionType::fileExport);
+            break;
+        default:
+            break;
+    }
+}
+
+void HanwhaNvrArchiveDelegate::beforeSeek(qint64 time)
+{
+    // TODO: implement me
+}
+
+} // namespace plugins
+} // namespace mediaserver_core
+} // namespace nx
+
+#endif // defined(ENABLE_HANWHA)

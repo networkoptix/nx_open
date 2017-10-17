@@ -15,8 +15,13 @@ namespace nx {
 namespace utils {
 namespace log {
 
-Logger::Logger(Level defaultLevel, std::unique_ptr<AbstractWriter> writer):
+Logger::Logger(
+    OnLevelChanged onLevelChanged,
+    Level defaultLevel,
+    std::unique_ptr<AbstractWriter> writer)
+    :
     m_mutex(QnMutex::Recursive),
+    m_onLevelChanged(onLevelChanged),
     m_defaultLevel(defaultLevel)
 {
     if (writer)
@@ -75,6 +80,8 @@ void Logger::setDefaultLevel(Level level)
 {
     QnMutexLocker lock(&m_mutex);
     m_defaultLevel = level;
+    if (m_onLevelChanged)
+        m_onLevelChanged();
 }
 
 LevelFilters Logger::levelFilters() const
@@ -87,6 +94,16 @@ void Logger::setLevelFilters(LevelFilters filters)
 {
     QnMutexLocker lock(&m_mutex);
     m_levelFilters = std::move(filters);
+    if (m_onLevelChanged)
+        m_onLevelChanged();
+}
+
+Level Logger::maxLevel() const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_levelFilters.empty())
+        return Level::verbose;
+    return m_defaultLevel;
 }
 
 void Logger::setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers)

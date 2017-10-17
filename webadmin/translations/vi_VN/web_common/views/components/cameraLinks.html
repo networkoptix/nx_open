@@ -7,8 +7,8 @@
         <tr ng-if="debugMode"><td>Đang phát</td><td class="camera-links-info">{{transport}} - {{currentResolution}} với {{player}}</td></tr>
         <tr><td>Tên</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
-            <td>Camera Id</td>
-            <td class="camera-links-info buffer">{{ActiveCamera.id.replace ('{', ''). Replace ('}', '')}}<br>
+            <td>CameraID</td>
+            <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
                 <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>
         </tr>
@@ -24,7 +24,8 @@
             <td>{{streamName(stream)}}</td>
             <td>
                 <span ng-repeat="transport in stream.transports">
-                    <a class="text-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}"> {{transport}} </a> <span ng-if="stream.transports.length-1 != $index"> &nbsp; / &nbsp; </span>
+                    <a class="text-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>
+                    <span ng-if="stream.transports.length-1 != $index">&nbsp;/&nbsp;</span>
                 </span>
             </td>
         </tr>

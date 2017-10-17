@@ -235,7 +235,7 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
     NX_ASSERT(rootItem);
 
     auto allEventTypes = m_filterCameraList.empty()
-        ? AnalyticsHelper(commonModule()).systemSupportedAnaliticEvents()
+        ? AnalyticsHelper(commonModule()).systemSupportedAnalyticsEvents()
         : AnalyticsHelper::supportedAnalyticsEvents(cameras(m_filterCameraList));
 
     if (allEventTypes.empty())
@@ -284,8 +284,29 @@ void QnEventLogDialog::updateAnalyticsEvents()
     if (!item)
         return;
 
+    const auto selectedIndex = ui->eventComboBox->currentIndex();
+    const auto selectedEventType = selectedIndex.data(EventTypeRole).toInt();
+    const auto selectedEventSubType = selectedEventType == analyticsSdkEvent
+        ? selectedIndex.data(EventSubtypeRole).value<QnUuid>()
+        : QnUuid();
+
     item->removeRows(0, item->rowCount());
     createAnalyticsEventTree(item);
+
+    if (!selectedEventSubType.isNull())
+    {
+        const auto newlyCreatedItem = m_eventTypesModel->match(
+            m_eventTypesModel->index(0, 0),
+            EventSubtypeRole,
+            /*value*/ qVariantFromValue(selectedEventSubType),
+            /*hits*/ 1,
+            Qt::MatchExactly | Qt::MatchRecursive);
+
+        if (newlyCreatedItem.size() == 1)
+            ui->eventComboBox->setCurrentIndex(newlyCreatedItem[0]);
+        else
+            ui->eventComboBox->setCurrentIndex(index);
+    }
 }
 
 bool QnEventLogDialog::isFilterExist() const

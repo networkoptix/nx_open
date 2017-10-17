@@ -19,13 +19,15 @@ class HanwhaStreamReader: public QnRtpStreamReader
 public:
     HanwhaStreamReader(const HanwhaResourcePtr& res);
 
+    void setPositionUsec(qint64 value);
+    void setSessionType(HanwhaSessionType value);
     virtual ~HanwhaStreamReader() override;
-
 protected: 
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
         const QnLiveStreamParams& params) override;
-
+    
+    friend class HanwhaNvrArchiveDelegate;
 private:
     HanwhaProfileParameters makeProfileParameters(
         int profileNumber,
@@ -35,16 +37,17 @@ private:
         int profileNumber,
         const QnLiveStreamParams& parameters);
 
+    QSet<int> availableProfiles(int channel) const;
     int chooseNvrChannelProfile(Qn::ConnectionRole role) const;
     bool isCorrectProfile(int profileNumber) const;
 
     CameraDiagnostics::Result streamUri(int profileNumber, QString* outUrl);
 
     QString rtpTransport() const;
-
+    QnRtspClient& rtspClient();
 private:
     HanwhaResourcePtr m_hanwhaResource;
-    
+    HanwhaSessionType m_sessionType = HanwhaSessionType::live;
 };
 
 } // namespace plugins

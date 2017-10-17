@@ -101,7 +101,7 @@ public:
     void setActionParams(const nx::vms::event::ActionParameters& params);
 
     int aggregationPeriod() const;
-    void setAggregationPeriod(int secs);
+    void setAggregationPeriod(int seconds);
 
     bool disabled() const;
     void setDisabled(const bool value);

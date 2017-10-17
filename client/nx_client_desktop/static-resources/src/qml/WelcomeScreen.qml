@@ -32,7 +32,10 @@ Rectangle
         {
             width: 320;
             height: 120;
-            y: ((searchEdit.y - height) / 2);
+            y: searchEdit.visible
+                ? (searchEdit.y - height) / 2
+                : (gridHolder.y + grid.y - height) / 2
+
             anchors.horizontalCenter: parent.horizontalCenter;
             source: "qrc:/skin/welcome_page/logo.png"
             fillMode: ((sourceSize.height < height) && (sourceSize.width < width)
@@ -40,17 +43,20 @@ Rectangle
                 : Image.PreserveAspectFit);
         }
 
-
         NxSearchEdit
         {
             id: searchEdit;
 
-            visible: grid.totalItemsCount > grid.itemsPerPage
+            readonly property int sourceRowsCount: grid.model ? grid.model.sourceRowCount : 0
+            readonly property bool itemsOverflow:
+                sourceRowsCount > pageSwitcher.kMaxPagesCount * grid.itemsPerPage
+            visible: text.length || grid.count > grid.itemsPerPage || itemsOverflow
 
             anchors.bottom: gridHolder.top
             anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
             z: (grid.watcher.isSomeoneActive ? 0 : 1000);
+
         }
 
         Item
@@ -96,7 +102,6 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: (model ? model.sourceRowsCount : 0);
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -322,12 +327,14 @@ Rectangle
             {
                 id: pageSwitcher;
 
+                readonly property int kMaxPagesCount: 10
+
                 visible: (pagesCount > 1);
                 anchors.horizontalCenter: gridHolder.horizontalCenter;
                 anchors.top: gridHolder.bottom;
                 anchors.topMargin: 22;
 
-                pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
+                pagesCount: Math.min(grid.pagesCount, kMaxPagesCount);
 
                 onCurrentPageChanged:
                 {
@@ -374,7 +381,7 @@ Rectangle
             anchors.bottomMargin: 64;   // Magic const by design
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            text: grid.totalItemsCount > 0
+            text: grid.count > 0
                 ? qsTr("Connect to Another Server...")
                 : qsTr("Connect to Server...")
 

@@ -5,16 +5,13 @@
         </div>
         <div class="col-md-8 col-md-pull-4">
             <alert type="danger" ng-if="settings.flags.noHDD">
-                This device is intended to work with hard disk drive installed.<br>
-                Please turn off the device and install a hard disk drive.
+                อุปกรณ์นี้มีวัตถุประสงค์เพื่อทำงานกับฮาร์ดดิสก์ที่ติดตั้ง <br>กรุณาปิดอุปกรณ์ และติดตั้งฮาร์ดดิสก์ไดรฟ์
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
-                This device needs network connection to work.<br>
-                Please connect it to the local network ot Internet
+                อุปกรณ์นี้ต้องการเชื่อมต่อเครือข่ายการทำงาน <br>โปรดเชื่อมต่อกับท้องถิ่น ot ของเครือข่ายอินเทอร์เน็ต
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
-                This device has wrong network configuration.<br>
-                Please connect it to the network or set a correct IP address.
+                อุปกรณ์นี้มีการกำหนดค่าเครือข่ายไม่ถูกต้อง <br>โปรดเชื่อมต่อกับเครือข่าย หรือกำหนดที่อยู่ IP ถูกต้อง
             </alert>
 
 
@@ -22,50 +19,47 @@
                 <tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Port</h3>
+                            <h3>พอร์ท</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="พอร์ท" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
 
                                 <div class="col-xs-6">
-                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">Change port</button>
+                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">เปลี่ยนพอร์ต</button>
                                 </div>
                             </div>
                         </form>
                     </div>
 
                     <div>
-                        <h3>Reset server</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            The server will be detached from the current system. Video archive will remain intact.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <h3>รีเซ็ตเซิร์ฟเวอร์</h3>
+                        <p>การดำเนินการนี้จะเปลี่ยนเซิร์ฟเวอร์นี้เป็นค่าเริ่มต้น (ล้างฐานข้อมูลและตั้งค่าใหม่)
+                            เซิร์ฟเวอร์ที่จะแยกออกจากระบบปัจจุบัน ที่เก็บวิดีโอจะยังคงเดิม</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">เรียกคืนค่าเริ่มต้นจากโรงงาน</button></p>
                     </div>
                     <div>
-                        <h3>Detach server from the system</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                        <h3>แยกออกจากระบบเซิร์ฟเวอร์</h3>
+                        <p>การดำเนินการนี้จะแยกเซิร์ฟเวอร์จากระบบที่เก็บรักษาฐานข้อมูลผู้ใช้ภายในและการกำหนดค่า ที่เก็บวิดีโอจะยังคงเดิม <b> ผู้ใช้ระบบคลาวด์จะถูกลบ </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">แยกออกจากระบบ</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>รีสตาร์ท</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()"> รีสตาร์ทเซิร์ฟเวอร์ </button> <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> Reboot </button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>เปลี่ยนรหัสผ่านผู้ดูแลระบบ</h3>
+                            <p>ถ้าระบบอยู่ในระบบ (ไม่ได้เชื่อมต่อกับระบบคลาวด์) ระบบจะเปลี่ยนรหัสผ่านสำหรับผู้ใช้ "admin" และรหัสผ่านการกู้คืน (root) บนเซิร์ฟเวอร์บางเครื่อง <br> มิฉะนั้นจะเป็นการเปลี่ยนรหัสผ่านการกู้คืนเท่านั้น</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">เปลี่ยนรหัสผ่าน</button>
                             </div>
                         </form>
                     </div>
@@ -80,15 +74,15 @@
                             </div>
 
                             <div class="col-md-6">
-                                <button type="button" class="btn btn-default" ng-click="renameSystem()">Rename system</button>
+                                <button type="button" class="btn btn-default" ng-click="renameSystem()">เปลี่ยนชื่อระบบ</button>
                             </div>
                         </div>
                     </div>
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Merge systems</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Merge Systems</button></p>
+                            <h3>รวมระบบ</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">รวมระบบ</button></p>
                         </form>
                     </div>
 
@@ -96,19 +90,18 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>This system is linked to {{Config.cloud.productName}}, system owner: <b>{{cloudAccountName}}</b></p>
-                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Disconnect from {{Config.cloud.productName}}</button></p>
+                            <p>ระบบนี้เชื่อมโยงกับ {{Config.cloud.productName}} เจ้าของระบบ: <b> {{cloudAccountName}} </b></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">ตัดการเชื่อมต่อจาก {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
-                                  target="_blank">Go to {{Config.cloud.productName}} Portal</a></p>
+                                  target="_blank">ไปที่ {{Config.cloud.productName}} พอร์ทัล</a></p>
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <alert type="warning">This system is not linked to {{Config.cloud.productName}}
-                                <a ng-if="!mode.liteClient"
+                            <alert type="warning">ระบบนี้ไม่ได้เชื่อมโยงกับ {{Config.cloud.productName}} <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Learn more</a></alert>
-                            <alert type="error" ng-if="!hasInternetOnServer">Connect the server to the Internet to perform setup {{Config.cloud.productName}}</alert>
+                                   target="_blank"> เรียนรู้เพิ่มเติม </a></alert>
+                            <alert type="error" ng-if="!hasInternetOnServer">เชื่อมต่อเซิร์ฟเวอร์กับอินเทอร์เน็ตเพื่อดำเนินการติดตั้ง {{Config.cloud.productName}}</alert>
                             <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet connection required to connect System to {{Config.cloud.productName}}</alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"

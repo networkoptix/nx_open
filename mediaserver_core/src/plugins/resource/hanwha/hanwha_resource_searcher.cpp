@@ -35,11 +35,6 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
 
-HanwhaResourceSearcher::~HanwhaResourceSearcher()
-{
-    nx_upnp::DeviceSearcher::instance()->unregisterHandler(this, kUpnpBasicDeviceType);
-}
-
 QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnUuid &resourceTypeId,
     const QnResourceParams& /*params*/)
@@ -94,10 +89,24 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
 
     auto macAddr = systemInfo.parameter<QString>("ConnectedMACAddress");
     auto model = systemInfo.parameter<QString>("Model");
-    if (!macAddr || !model)
+    if (!model)
         return QList<QnResourcePtr>();
     auto firmware = systemInfo.parameter<QString>("FirmwareVersion");
     
+    if (!macAddr || macAddr->isEmpty())
+    {
+        HanwhaRequestHelper helper(resource);
+        std::map<QString, QString> params{
+            {"interfaceName", "Network1"}
+        };
+        HanwhaResponse networkInfo = helper.view("network/interface", params);
+        if (!networkInfo.isSuccessful())
+            return QList<QnResourcePtr>();
+        macAddr = networkInfo.parameter<QString>("MACAddress");
+        if (!macAddr || macAddr->isEmpty())
+            return QList<QnResourcePtr>();
+    }
+
     resource->setMAC(QnMacAddress(*macAddr));
     resource->setModel(*model);
     resource->setName(*model);
@@ -155,6 +164,12 @@ bool HanwhaResourceSearcher::processPacket(
     QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
         cameraMac = QnMacAddress(devInfo.serialNumber);
+    if (cameraMac.isNull())
+    {
+        NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
+            .arg(devInfo.udn).arg(devInfo.serialNumber));
+        return false;
+    }
 
     QString model(devInfo.modelName);
 
@@ -269,47 +284,6 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
             result.push_back(resource);
         }
     }
-}
-
-QString HanwhaResourceSearcher::sessionKey(
-    const HanwhaResourcePtr resource,
-    HanwhaSessionType /*sessionType*/,
-    bool generateNewOne) const
-{
-
-    const auto groupId = resource->getGroupId();
-    if (groupId.isEmpty())
-        return QString();
-
-    SessionKeyPtr data;
-    {
-        QnMutexLocker lock(&m_mutex);
-        auto itr = m_sessionKeys.find(groupId);
-        if (itr == m_sessionKeys.end())
-        {
-            itr = m_sessionKeys.insert(
-                groupId,
-                std::make_shared<SessionKeyData>());
-        }
-        data = itr.value();
-    }
-
-    QnMutexLocker lock(&data->lock);
-    if (data->sessionKey.isEmpty())
-    {
-        HanwhaRequestHelper helper(resource);
-        helper.setIgnoreMutexAnalyzer(true);
-        const auto response = helper.view(lit("media/sessionkey"));
-        if (!response.isSuccessful())
-            return QString();
-
-        const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
-        if (!sessionKey.is_initialized())
-            return QString();
-
-        data->sessionKey = *sessionKey;
-    }
-    return data->sessionKey;
 }
 
 } // namespace plugins

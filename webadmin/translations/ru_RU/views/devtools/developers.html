@@ -1,19 +1,18 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Средства разработки</h2>
         <p>
-            Are you happy developing intergrations? Let us know.
+            Есть идея, как улучшить наши инструменты для разработчиков или хотите просто поговорить?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Оставить отзыв</a></p>
     </div>
 
     <div>
         <h3>Генератор произвольных событий</h3>
         <p>
-            Generic Events is a special kind of events for 3rd party systems to trigger actions in the VMS.
-            To create Generic Event integrated system needs to make HTTP request to the Server (using Server API).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            Произвольное событие - способ отправки событий из сторонних систем. Произвольные события могут использоваться для запуска системных действий в механизме событий и правил.
+            Генератор произвольных событий - инструмент, который выполняет вызовы произвольных событий HTTP.
         </p>
         <p><a href="#/developers/events">Генератор произвольных событий</a></p>
     </div>
@@ -23,27 +22,26 @@
             API сервера обеспечивает стандартный набор API вызовов для внешних систем. Это дает возможность разработчикам получать доступ к почти каждой функции системы, доступной в обычном клиенте: запросу и управлению системными ресурсами (серверы, камеры, пользователи, полномочия), получению живого видео или архива из системы, генерирации событий, созданию правил, управлению PTZ-камерами и многому другому.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API documentation</a>
+            <a href="#/developers/api"><b>Инструмент тестирования API (новый)</b></a>
+            - интерактивная документация с инструментами для тестирования вызовов API<br>
+            <a href="#/developers/changelog">API-журнал изменений</a>
+             - список изменений в API, могущих затронуть текущий функционал<br>
+            <a id="api-doc" href="api.xml" target="_blank">Документация API</a>
         </p>
 
     </div>
     <div>
         <h3>Панель сведений о камере</h3>
         <p>
-            Special panel for a webclient which displays additional information for cameras:
+            Отображает дополнительную информацию по камерам, полезную для разработчиков, в интерфейсе Web Admin:
         </p>
         <ul>
             <li>Идентификатор камеры</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>Ссылки для всех доступных видеопотоков</li>
+            <li>Прямой экспорт видео из браузера</li>
         </ul>
         <p>
-            Чтобы открыть панель сведений о камере - откройте <a href="#/view">web-клиент</a>, выберите камеру, 
-            значок настроек (шестеренка), затем выберите «Сведения о камере»
+            Чтобы открыть панель сведений о камерах - перейдите в интерфейс веб-администратора, выберите <a href="#/view">Вид</a>,             выберите желаемую камеру, щелкните значок настроек (шестеренка), затем выберите "Сведения о камере"
         </p>
         <p><a href="#/view/?cameraLinks">открыть панель сведений о камере</a></p>
     </div>

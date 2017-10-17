@@ -46,8 +46,9 @@ enum class HanwhaSessionType
 {
     undefined,
     live,
-    playback,
-    backup
+    archive,
+    preview,
+    fileExport
 };
 
 //TODO: #dmishin consider using Fusion instead of custom methods.

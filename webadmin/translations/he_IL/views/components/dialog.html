@@ -10,7 +10,7 @@
         <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
             <div class="form-group" validate-field>
                 <input ng-model="settings.localLogin" name="localLogin" class="form-control"
-                       type="text" placeholder="כניסה" required readonly>
+                       type="text" placeholder="שם משתמש" required readonly>
             </div>
             <password-input ng-model="settings.localPassword"></password-input>
             <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
@@ -18,7 +18,7 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
                 <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                       type="password" autocomplete="new-password" placeholder="הקלד סיסמא בשנית" required>
+                       type="password" autocomplete="new-password" placeholder="הקלד סיסמה בשנית" required>
             </div>
 
             <div class="form-group has-error"
@@ -36,16 +36,16 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword">
                 <div class="help-block">
-                    הסיסמאות אינן תואמות
+                    הסיסמהות אינן תואמות
                 </div>
             </div>
         </form>
     </div>
     <div ng-if="settings.needOldPassword">
         <form class="form" name="oldPasswordForm" novalidate>
-            <label for="oldSystemPassword" class="control-label">הזן את הסיסמא הנוכחית בכדי להמשיך.</label>
+            <label for="oldSystemPassword" class="control-label">הזן את הסיסמה הנוכחית בכדי להמשיך.</label>
             <input id="oldSystemPassword" type="password" ng-model="settings.oldPassword"
-                   class="form-control" placeholder="סיסמא" required auto-focus>
+                   class="form-control" placeholder="סיסמה" required auto-focus>
         </form>
     </div>
 </div>

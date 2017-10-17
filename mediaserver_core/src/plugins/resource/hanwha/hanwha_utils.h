@@ -85,6 +85,8 @@ boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str);
 
 boost::optional<QSize> toQSize(const boost::optional<QString>& str);
 
+boost::optional<QSize> toQDateTime(const boost::optional<QString>& str);
+
 HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
 
 template<typename T>
@@ -151,6 +153,8 @@ QString toHanwhaString(bool value);
 QString toHanwhaString(AVCodecID codecId);
 
 QString toHanwhaString(const QSize& value);
+
+QString toHanwhaString(const QDateTime& value);
 
 QString toHanwhaString(Qn::BitrateControl codecId);
 

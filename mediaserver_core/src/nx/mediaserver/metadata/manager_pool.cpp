@@ -108,7 +108,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     releaseResourceMetadataManagers(camera);
 }
 
-void ManagerPool::at_rulesUpdated(const std::set<QnUuid>& affectedResources)
+void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 {
     for (const auto& resourceId: affectedResources)
     {
@@ -239,7 +239,7 @@ bool ManagerPool::canFetchMetadataFromResource(const QnSecurityCamResourcePtr& c
         && (status == Qn::Online || status == Qn::Recording);
 }
 
-bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, std::set<QnUuid>& eventTypeIds)
+bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid>& eventTypeIds)
 {
     auto context = m_contexts.find(resourceId);
     if (context == m_contexts.cend())

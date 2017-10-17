@@ -440,7 +440,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     }
 
 
-    NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
+    //NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
     if (periods.isEmpty())
     {
         periods = tail;
