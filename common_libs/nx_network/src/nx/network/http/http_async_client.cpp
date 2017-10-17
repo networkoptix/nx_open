@@ -432,11 +432,11 @@ void AsyncClient::stopWhileInAioThread()
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
     NX_LOGX(lm("Opened connection to url %1. Result code %2")
-        .arg(m_contentLocationUrl).arg(errorCode), cl_logDEBUG2);
+        .args(m_contentLocationUrl, errorCode), cl_logDEBUG2);
 
     qWarning()
         << lm("Opened connection to url %1. Result code %2")
-                .arg(m_contentLocationUrl).arg(errorCode);
+                .args(m_contentLocationUrl.toString(), errorCode);
 
     if (m_terminated)
         return;
@@ -687,12 +687,9 @@ void AsyncClient::initiateTcpConnection()
     NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
         .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
 
-    qWarning()
-        << lm("Opening connection to %1. url %2, socket %3, ipVersion: %4")
-                .arg(remoteAddress)
-                .arg(m_contentLocationUrl)
-                .arg(m_socket->handle())
-                .arg(ipVersion == AF_INET ? "V4" : "V6");
+    qWarning() << lm("[HTTP client] Address to connect %1").arg(remoteAddress.toString());
+    qWarning() << lm("[HTTP client] Url to connect %1").arg(m_contentLocationUrl.toString());
+    qWarning() << lm("[HTTP client] Socket version connect %1").arg(ipVersion == AF_INET ? "V4" : "V6");
 
     m_socket->bindToAioThread(getAioThread());
     m_connectionClosed = false;

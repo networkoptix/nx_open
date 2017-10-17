@@ -810,10 +810,13 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     if (!isNonBlockingModeBak && !this->setNonBlockingMode(true))
         return false;
 
+    qWarning() << lm("SYSTEM SOCKET connect (%1) to: %2").args(this->m_fd, remoteAddress);
     int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
     if (connectResult != 0)
     {
-        if (SystemError::getLastOSErrorCode() != SystemError::inProgress)
+        auto errorCode = SystemError::getLastOSErrorCode();
+        qWarning() << lm("SYSTEM SOCKET connect to %1 error: %2").args(remoteAddress, errorCode);
+        if (errorCode != SystemError::inProgress)
             return false;
         if (isNonBlockingModeBak)
             return true;        //async connect started

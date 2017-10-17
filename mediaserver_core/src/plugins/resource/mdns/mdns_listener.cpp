@@ -117,7 +117,8 @@ void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString 
     {
         SocketAddress remoteEndpoint;
         int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), &remoteEndpoint );
-        if (datagramSize > 0) {
+        if (datagramSize > 0)
+        {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             if (m_localAddressList.contains(remoteEndpoint.address.toString()))
                 continue; // ignore own packets

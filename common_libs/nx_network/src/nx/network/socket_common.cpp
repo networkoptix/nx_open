@@ -253,11 +253,7 @@ HostAddress::Addr6WithScope HostAddress::ipV6from(const QString& ip)
 
     NX_ASSERT(isStringWithScopeIdValid || !isScopeIdPresent);
     if (!isStringWithScopeIdValid && isScopeIdPresent)
-    {
-        qWarning() << lm("Invalid ipv6 address string %1").arg(ip);
-        NX_VERBOSE(typeid(HostAddress), lm("Invalid ipv6 address string %1").arg(ip));
         return result;
-    }
 
     if (isScopeIdPresent)
     {
@@ -267,21 +263,22 @@ HostAddress::Addr6WithScope HostAddress::ipV6from(const QString& ip)
 
         if (!ok)
         {
-            qWarning() << lm("Invalid ipv6 address string %1").arg(ip);
             NX_VERBOSE(typeid(HostAddress), lm("Invalid ipv6 address string %1").arg(ip));
             return result;
         }
     }
 
-    if (inet_pton(AF_INET6, ipString.toLatin1().data(), &result.first))
+
+    struct in6_addr addr6;
+    if (inet_pton(AF_INET6, ipString.toLatin1().data(), &addr6))
     {
+        result.first = addr6;
         result.second = scopeId == std::numeric_limits<uint32_t>::max() 
             ? boost::none 
             : boost::optional<uint32_t>(scopeId);
         return result;
     }
 
-    qWarning() << lm("Invalid ipv6 address string %1").arg(ip);
     NX_VERBOSE(typeid(HostAddress), lm("Invalid ipv6 address string %1").arg(ip));
     return result;
 }

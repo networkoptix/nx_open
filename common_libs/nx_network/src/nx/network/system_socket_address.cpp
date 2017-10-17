@@ -45,22 +45,23 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
     else if (ipVersion == AF_INET6)
     {
         const auto ipV6 = endpoint.address.ipV6();
-        if (ipV6.first)
-        {
-            const auto a = new sockaddr_in6;
-            memset(a, 0, sizeof(*a));
-            ptr.reset((sockaddr*)a);
-            size = sizeof(sockaddr_in6);
-
-            a->sin6_family = AF_INET6;
-            a->sin6_addr = ipV6.first.get();
-            a->sin6_port = htons(endpoint.port);
-            if (endpoint.address.scopeId())
-                a->sin6_scope_id = endpoint.address.scopeId().get();
-            else
-                a->sin6_scope_id = 0;
+        if (!(bool) ipV6.first)
             return;
-        }
+
+        const auto a = new sockaddr_in6;
+        memset(a, 0, sizeof(*a));
+        ptr.reset((sockaddr*)a);
+        size = sizeof(sockaddr_in6);
+
+        a->sin6_flowinfo = 0;
+        a->sin6_family = AF_INET6;
+        a->sin6_addr = ipV6.first.get();
+        a->sin6_port = htons(endpoint.port);
+
+        if (endpoint.address.scopeId())
+            a->sin6_scope_id = ipV6.second.get();
+        else
+            a->sin6_scope_id = 0;
     }
 
     SystemError::setLastErrorCode(SystemError::hostNotFound);
