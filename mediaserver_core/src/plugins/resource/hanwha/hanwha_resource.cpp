@@ -554,13 +554,10 @@ QnSemaphore* HanwhaResource::requestSemaphore()
 
 bool HanwhaResource::isVideoSourceActive()
 {
-    HanwhaRequestHelper helper(toSharedPointer(this));
-    auto response = helper.view(lit("media/videosource"));
-
-    if (!response.isSuccessful())
+    auto info = sharedContext()->loadInformation(getAuth(), getUrl());
+    if (!info.isValid())
         return false;
-
-    const auto state = response.parameter<QString>(
+    const auto state = info.videoSources.parameter<QString>(
         lit("Channel.%1.State").arg(getChannel()));
 
     if (!state.is_initialized())
@@ -619,6 +616,9 @@ CameraDiagnostics::Result HanwhaResource::init()
     initMediaStreamCapabilities();
 
     saveParams();
+
+    sharedContext->start(getAuth(), getUrl());
+
     return result;
 }
 
@@ -685,8 +685,8 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
 
 CameraDiagnostics::Result HanwhaResource::initSystem()
 {
-    auto info = sharedContext()->loadInformation(toSharedPointer(this));
-    if (info.diagnostics.errorCode != CameraDiagnostics::ErrorCode::noError)
+    auto info = sharedContext()->loadInformation(getAuth(), getUrl());
+    if (!info.isValid())
         return info.diagnostics;
 
     m_isNvr = false;
@@ -707,25 +707,16 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
-    HanwhaRequestHelper helper(toSharedPointer(this));
-    const auto profiles = helper.view(lit("media/videoprofile"));
-    bool isCriticalError = !profiles.isSuccessful()
-        && profiles.errorCode() != kHanwhaConfigurationNotFoundError;
-
-    if (isCriticalError)
-    {
-        return error(
-            profiles,
-            CameraDiagnostics::RequestFailedResult(
-                profiles.requestUrl(),
-                profiles.errorString()));
-    }
+    auto info = sharedContext()->loadInformation(getAuth(), getUrl());
+    if (!info.isValid())
+        return info.diagnostics;
 
     bool hasDualStreaming = false;
     const auto channel = getChannel();
     
     if (!m_isNvr)
     {
+        HanwhaRequestHelper helper(toSharedPointer(this));
         helper.set(
             lit("network/rtsp"),
             {{lit("ProfileSessionPolicy"), lit("Disconnect")}});
@@ -733,7 +724,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         int fixedProfileCount = 0;
 
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
-        for (const auto& entry: profiles.response())
+        for (const auto& entry: info.videoProfiles.response())
         {
             const bool isFixedProfile = entry.first.startsWith(channelPrefix)
                 && entry.first.endsWith(kHanwhaIsFixedProfileProperty)

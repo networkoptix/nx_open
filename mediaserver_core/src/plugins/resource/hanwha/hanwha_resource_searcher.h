@@ -8,6 +8,7 @@
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/network/upnp/upnp_search_handler.h>
 #include <core/resource/resource_fwd.h>
+#include "hanwha_shared_resource_context.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -51,12 +52,12 @@ private:
         QnResourceList& result );
 
     bool isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const;
-    int getChannels(const HanwhaResourcePtr& resource, const QAuthenticator& auth);
 
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
+    HanwhaDeviceInfo cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url);
 private:
-
+    QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData
     {
         QString sessionKey;
