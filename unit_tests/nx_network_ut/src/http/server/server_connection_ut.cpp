@@ -73,7 +73,7 @@ TEST_F(HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProce
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //fetching mjpeg with async http client
-    const QUrl url(QString("http://127.0.0.1:%1%2").
+    const nx::utils::Url url(QString("http://127.0.0.1:%1%2").
         arg(m_testHttpServer->serverAddress().port).arg(DelayingRequestHandler::PATH));
 
     auto client = nx_http::AsyncHttpClient::create();

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtCore/QByteArray>
-#include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
 #include <vector>
@@ -47,14 +46,13 @@ public:
     const Hanwha::DriverManifest& driverManifest() const;
 
 private:
-    boost::optional<QList<QnUuid>> fetchSupportedEvents(
-        const QUrl& url,
+    boost::optional<QList<QnUuid>> fetchSupportedEvents(const utils::Url &url,
         const QAuthenticator& auth);
 
     boost::optional<QList<QnUuid>> eventsFromParameters(
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters);
 
-    QUrl buildAttributesUrl(const QUrl& resourceUrl) const;
+    utils::Url buildAttributesUrl(const utils::Url &resourceUrl) const;
 private:
     QByteArray m_manifest;
     Hanwha::DriverManifest m_driverManifest;

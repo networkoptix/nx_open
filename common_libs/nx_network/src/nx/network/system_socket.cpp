@@ -408,7 +408,6 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
         return false;
     }
 
-    qWarning() << "created socket type =" << type << "proto =" << protocol << "ip version" << m_ipVersion;
     int on = 1;
     if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
         return false;
@@ -812,12 +811,10 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     if (!isNonBlockingModeBak && !this->setNonBlockingMode(true))
         return false;
 
-    qWarning() << lm("SYSTEM SOCKET connect (%1) to: %2").args(this->m_fd, remoteAddress);
     int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
     if (connectResult != 0)
     {
         auto errorCode = SystemError::getLastOSErrorCode();
-        qWarning() << lm("SYSTEM SOCKET connect to %1 error: %2").args(remoteAddress, errorCode);
         if (errorCode != SystemError::inProgress)
             return false;
         if (isNonBlockingModeBak)

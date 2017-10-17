@@ -34,7 +34,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 
     // TODO: maybe it's better to move it out and use signal?..
     if (const auto manager = commonModule()->moduleDiscoveryManager())
-        manager->checkEndpoint(QUrl(transaction.params.url), transaction.params.id);
+        manager->checkEndpoint(nx::utils::Url(transaction.params.url), transaction.params.id);
 
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }

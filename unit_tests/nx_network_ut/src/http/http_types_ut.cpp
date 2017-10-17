@@ -422,7 +422,7 @@ TEST( HttpRequestTest, RequestLine_parse )
         nx_http::RequestLine requestLine;
         ASSERT_TRUE( requestLine.parse( nx_http::BufferType( "GET /hren/hren/hren?hren=hren&hren HTTP/1.0" ) ) );
         ASSERT_EQ( requestLine.method, nx_http::BufferType("GET") );
-        ASSERT_EQ( requestLine.url, QUrl("/hren/hren/hren?hren=hren&hren") );
+        ASSERT_EQ( requestLine.url, nx::utils::Url("/hren/hren/hren?hren=hren&hren") );
         ASSERT_EQ( requestLine.version, nx_http::http_1_0 );
     }
 
@@ -430,7 +430,7 @@ TEST( HttpRequestTest, RequestLine_parse )
         nx_http::RequestLine requestLine;
         ASSERT_TRUE( requestLine.parse( nx_http::BufferType( "  PUT   /abc?def=ghi&jkl   HTTP/1.1" ) ) );
         ASSERT_EQ( requestLine.method, nx_http::BufferType("PUT") );
-        ASSERT_EQ( requestLine.url, QUrl("/abc?def=ghi&jkl") );
+        ASSERT_EQ( requestLine.url, nx::utils::Url("/abc?def=ghi&jkl") );
         ASSERT_EQ( requestLine.version, nx_http::http_1_1 );
     }
 

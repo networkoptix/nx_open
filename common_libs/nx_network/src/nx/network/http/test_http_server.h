@@ -125,7 +125,7 @@ public:
 
     bool registerRedirectHandler(
         const QString& resourcePath,
-        const QUrl& location);
+        const nx::utils::Url& location);
 
     // used for test purpose
     void setPersistentConnectionEnabled(bool value);

@@ -40,9 +40,8 @@ namespace detail
         Q_OBJECT
 
     public:
-        GetFileOperation(
-            int _id,
-            const QUrl& baseUrl,
+        GetFileOperation(int _id,
+            const nx::utils::Url &baseUrl,
             const QString& filePath,
             const QString& localDirPath,
             const QString& hashTypeName,

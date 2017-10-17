@@ -44,7 +44,7 @@ private:
     Hanwha::DriverManifest m_driverManifest;
     QByteArray m_deviceManifest;
 
-    QUrl m_url;
+    nx::utils::Url m_url;
     QString m_model;
     QString m_firmware;
     QAuthenticator m_auth;

@@ -156,7 +156,7 @@ namespace detail
 
     ListDirectoryOperation::ListDirectoryOperation(
         int _id,
-        const QUrl& baseUrl,
+        const nx::utils::Url& baseUrl,
         const QString& _dirPath,
         const QString& localTargetDirPath,
         AbstractRDirSynchronizationEventHandler* _handler )

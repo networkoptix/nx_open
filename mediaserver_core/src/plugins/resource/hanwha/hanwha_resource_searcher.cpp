@@ -37,7 +37,8 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
 
 HanwhaResourceSearcher::~HanwhaResourceSearcher()
 {
-    nx_upnp::DeviceSearcher::instance()->unregisterHandler(this, kUpnpBasicDeviceType);
+    if (nx_upnp::DeviceSearcher::instance())
+        nx_upnp::DeviceSearcher::instance()->unregisterHandler(this, kUpnpBasicDeviceType);
 }
 
 QnResourcePtr HanwhaResourceSearcher::createResource(

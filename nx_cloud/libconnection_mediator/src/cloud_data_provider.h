@@ -2,11 +2,10 @@
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QUrl>
-
 #include <nx/utils/timer_manager.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 #include <nx/cloud/cdb/api/connection.h>
 
@@ -50,7 +49,7 @@ class AbstractCloudDataProviderFactory
 public:
     typedef std::function<
         std::unique_ptr<AbstractCloudDataProvider>(
-            const boost::optional<QUrl>& cdbUrl,
+            const boost::optional<nx::utils::Url>& cdbUrl,
             const std::string& user,
             const std::string& password,
             std::chrono::milliseconds updateInterval,
@@ -58,8 +57,7 @@ public:
 
     virtual ~AbstractCloudDataProviderFactory() {}
 
-    static std::unique_ptr<AbstractCloudDataProvider> create(
-        const boost::optional<QUrl>& cdbUrl,
+    static std::unique_ptr<AbstractCloudDataProvider> create(const boost::optional<nx::utils::Url> &cdbUrl,
         const std::string& user,
         const std::string& password,
         std::chrono::milliseconds updateInterval,
@@ -81,7 +79,7 @@ public:
     static const std::chrono::milliseconds DEFAULT_UPDATE_INTERVAL;
 
     CloudDataProvider(
-        const boost::optional<QUrl>& cdbUrl,
+        const boost::optional<nx::utils::Url>& cdbUrl,
         const std::string& user,
         const std::string& password,
         std::chrono::milliseconds updateInterval = DEFAULT_UPDATE_INTERVAL,

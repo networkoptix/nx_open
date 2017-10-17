@@ -197,7 +197,7 @@ void P2pMessageBusTestBase::connectServers(const Appserver2Ptr& srcServer, const
     const auto addr = dstServer->moduleInstance()->endpoint();
     auto peerId = dstServer->moduleInstance()->commonModule()->moduleGUID();
 
-    QUrl url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
+    nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
     srcServer->moduleInstance()->ecConnection()->messageBus()->
         addOutgoingConnectionToPeer(peerId, url);
 }

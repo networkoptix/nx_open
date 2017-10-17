@@ -2,6 +2,7 @@
 
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/url.h>
 #include <client_core/local_connection_data.h>
 #include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
@@ -99,9 +100,9 @@ private:
 
         // Obsolete values.
 
-        QN_DECLARE_RW_PROPERTY(QList<QUrl>,
+        QN_DECLARE_RW_PROPERTY(QList<nx::utils::Url>,
             knownServerUrls, setKnownServerUrls,
-            KnownServerUrls, QList<QUrl>())
+            KnownServerUrls, QList<nx::utils::Url>())
     QN_END_PROPERTY_STORAGE()
 
 private:

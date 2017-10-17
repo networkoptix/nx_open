@@ -6,7 +6,7 @@
 #include <nx/utils/sync_call.h>
 #include <nx/utils/type_utils.h>
 
-MediaServerClient::MediaServerClient(const QUrl& baseRequestUrl):
+MediaServerClient::MediaServerClient(const nx::utils::Url& baseRequestUrl):
     m_baseRequestUrl(baseRequestUrl)
 {
 }
@@ -266,7 +266,7 @@ void MediaServerClient::performGetRequest(
         typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
     performGetRequest(
-        [&inputData](const QUrl& url, nx_http::AuthInfo authInfo)
+        [&inputData](const nx::utils::Url& url, nx_http::AuthInfo authInfo)
         {
             return std::make_unique<nx_http::FusionDataHttpClient<Input, ActualOutputType>>(
                 url, std::move(authInfo), inputData);
@@ -287,7 +287,7 @@ void MediaServerClient::performGetRequest(
         typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
     performGetRequest(
-        [](const QUrl& url, nx_http::AuthInfo authInfo)
+        [](const nx::utils::Url& url, nx_http::AuthInfo authInfo)
         {
             return std::make_unique<nx_http::FusionDataHttpClient<void, ActualOutputType>>(
                 url, std::move(authInfo));
@@ -308,7 +308,7 @@ void MediaServerClient::performGetRequest(
     using ActualOutputType =
         typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
-    QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+    nx::utils::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
         .appendPath(QLatin1String("/"))
         .appendPath(QString::fromStdString(requestPath)).toUrl();
     nx_http::AuthInfo authInfo;

@@ -24,7 +24,7 @@ namespace detail
 {
     GetFileOperation::GetFileOperation(
         int _id,
-        const QUrl& baseUrl,
+        const nx::utils::Url& baseUrl,
         const QString& filePath,
         const QString& localDirPath,
         const QString& hashTypeName,
@@ -396,7 +396,7 @@ namespace detail
         }
 
         //starting async http request to get remote file size
-        QUrl downloadUrl = baseUrl;
+        nx::utils::Url downloadUrl = baseUrl;
         downloadUrl.setPath( downloadUrl.path() + "/" + entryPath );
         m_httpClient = nx_http::AsyncHttpClient::create();
         connect(
@@ -456,7 +456,7 @@ namespace detail
             m_state = State::sDownloadingFile;
         }
 
-        QUrl downloadUrl = baseUrl;
+        nx::utils::Url downloadUrl = baseUrl;
         downloadUrl.setPath( downloadUrl.path() + "/" + entryPath );
 
         m_httpClient = nx_http::AsyncHttpClient::create();

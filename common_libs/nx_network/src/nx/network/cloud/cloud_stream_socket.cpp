@@ -267,7 +267,6 @@ void CloudStreamSocket::connectAsync(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     NX_LOGX(lm("connectAsync. %1").arg(address), cl_logDEBUG2);
-    qWarning() << lm("connectAsync. %1").arg(address);
 
     nx::network::SocketGlobals::addressResolver().resolveAsync(
         address.address,
@@ -276,7 +275,6 @@ void CloudStreamSocket::connectAsync(
                 SystemError::ErrorCode code, std::deque<AddressEntry> dnsEntries) mutable
         {
             NX_LOGX(lm("done resolve. %1, %2").arg(code).arg(dnsEntries.size()), cl_logDEBUG2);
-            qWarning() << lm("done resolve. %1, %2").arg(code).arg(dnsEntries.size());
 
             if (operationGuard->lock())
             {
@@ -403,7 +401,6 @@ void CloudStreamSocket::connectToEntriesAsync(
 
     for (auto& entry: dnsEntries)
     {
-        qWarning() << "entry to connect:" << entry.host.toString() << port;
         if (entry.type != AddressType::direct)
             continue;
 

@@ -16,8 +16,7 @@ class UrlWithIpV6AndScopeId
 public:
     UrlWithIpV6AndScopeId(const QString& url): m_url(url.toLower())
     {
-        if (!parseWith(kUrlWithIpInBracketsWithScopeIdRx))
-            parseWith(kUrlIpWithoutBracketsWithScopeIdRx);
+        parse();
     }
 
     QString urlWithoutScopeId() const
@@ -36,28 +35,28 @@ public:
     }
 
 private:
-    const static QRegExp kUrlWithIpInBracketsWithScopeIdRx;
-    const static QRegExp kUrlIpWithoutBracketsWithScopeIdRx;
+    const static QRegExp kUrlRx;
 
     const QString m_url;
     mutable QString m_newUrl;
     mutable int m_scopeId = -1;
 
-    bool parseWith(const QRegExp& rx) const
+    bool parse() const
     {
         int pos;
-        if ((pos = rx.indexIn(m_url)) == -1)
+        if ((pos = kUrlRx.indexIn(m_url)) == -1)
             return false;
 
-        QString ipWithScopeId = rx.cap(1);
-        QString ip = rx.cap(2);
+        QString ipWithScopeId = kUrlRx.cap(1);
+        QString ip = kUrlRx.cap(2);
+        ip = '[' + ip + ']';
 
-        if (!validateCharAfterIp(rx.matchedLength()))
+        if (!validateCharAfterIp(kUrlRx.matchedLength()))
             return false;
 
         m_newUrl = m_url;
         m_newUrl.replace(ipWithScopeId, ip);
-        m_scopeId = rx.cap(3).toInt();
+        m_scopeId = kUrlRx.cap(3).toInt();
 
         return true;
     }
@@ -69,18 +68,16 @@ private:
             return true;
 
         const auto nextChar = m_url[pos];
-        if (nextChar != '/' && nextChar != '#' && nextChar != '?')
+        if (nextChar != '/' && nextChar != '#' && nextChar != '?' && nextChar != ':')
             return false;
 
         return true;
     }
 };
 
-const QRegExp UrlWithIpV6AndScopeId::kUrlWithIpInBracketsWithScopeIdRx(
-    "^[a-z][a-z,\\-+.]+:\\/\\/((\\[[0-9:a-f]+\\])%([0-9]+)).*");
+const QRegExp UrlWithIpV6AndScopeId::kUrlRx(
+    "^[a-z][a-z,\\-+.]+:\\/\\/[^\\]]*(\\[([0-9:a-f]+)%([0-9]+)\\])");
 
-const QRegExp UrlWithIpV6AndScopeId::kUrlIpWithoutBracketsWithScopeIdRx(
-    "^[a-z][a-z,\\-+.]+:\\/\\/(([0-9:a-f]+)%([0-9]+)).*");
 
 class IpWithScopeId
 {
@@ -129,7 +126,7 @@ Url::Url(const QString& url)
         url,
         [this](const QString& url)
         {
-            m_url = QUrl::fromUserInput(url);
+            m_url = QUrl(url);
         });
 }
 
@@ -139,7 +136,7 @@ Url& Url::operator=(const QString& url)
         url,
         [this](const QString& url)
         {
-            m_url = QUrl::fromUserInput(url);
+            m_url = QUrl(url);
         });
     return *this;
 }
@@ -498,7 +495,7 @@ QByteArray Url::toPercentEncoding(
 
 namespace url {
 
-bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags)
+bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags flags)
 {
     if (flags.testFlag(ComparisonFlag::All))
         return lhs == rhs;

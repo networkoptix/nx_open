@@ -84,7 +84,7 @@ std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
     return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
-void MediatorConnector::mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl)
+void MediatorConnector::mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModulesXmlUrl)
 {
     QnMutexLocker lock(&m_mutex);
     m_mediatorUrlFetcher->setModulesXmlUrl(cloudModulesXmlUrl);

@@ -64,7 +64,7 @@ protected:
     void givenResourceServer()
     {
         ASSERT_TRUE(m_resourceServer->bindAndListen());
-        m_actualUrl = QUrl(lm("http://%1%2")
+        m_actualUrl = nx::utils::Url(lm("http://%1%2")
             .arg(m_resourceServer->serverAddress().toString())
             .arg(nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath)));
     }
@@ -72,7 +72,7 @@ protected:
     void givenRedirectServer()
     {
         ASSERT_TRUE(m_redirector->bindAndListen());
-        m_redirectUrl = QUrl(lm("http://%1%2")
+        m_redirectUrl = nx::utils::Url(lm("http://%1%2")
             .arg(m_redirector->serverAddress().toString()).arg(kTestPath));
         ASSERT_TRUE(m_redirector->registerRedirectHandler(kTestPath, m_actualUrl));
     }
@@ -110,8 +110,8 @@ private:
     std::unique_ptr<TestHttpServer> m_redirector;
     std::unique_ptr<TestHttpServer> m_resourceServer;
     nx_http::HttpClient m_httpClient;
-    QUrl m_redirectUrl;
-    QUrl m_actualUrl;
+    nx::utils::Url m_redirectUrl;
+    nx::utils::Url m_actualUrl;
 };
 
 TEST_F(AsyncHttpClientRedirect, simple_redirect_by_301_and_location)

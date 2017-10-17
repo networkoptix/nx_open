@@ -108,7 +108,7 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto url = QUrl(QString(resourceInfo.url));
+    auto url = nx::utils::Url(QString(resourceInfo.url));
 
     QAuthenticator auth;
     auth.setUser(resourceInfo.login);
@@ -145,7 +145,7 @@ const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth)
 {
     using namespace nx::mediaserver_core::plugins;
@@ -170,7 +170,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
     return eventsFromParameters(parameters);
 }
 
-QUrl HanwhaMetadataPlugin::buildAttributesUrl(const QUrl& resourceUrl) const
+nx::utils::Url HanwhaMetadataPlugin::buildAttributesUrl(const nx::utils::Url& resourceUrl) const
 {
     auto url = resourceUrl;
     url.setPath(kAttributesPath);

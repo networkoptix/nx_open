@@ -62,7 +62,7 @@ public:
     /**
      * NOTE: Mediator url resolution will still happen by referring to specified address.
      */
-    void mockupCloudModulesXmlUrl(const QUrl& cloudModulesXmlUrl);
+    void mockupCloudModulesXmlUrl(const utils::Url &cloudModulesXmlUrl);
     /**
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.

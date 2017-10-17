@@ -32,13 +32,13 @@ static void testHostAddress(
 
     if (ipv6)
     {
-        const auto ip =  host.ipV6();
+        const auto ip =  host.ipV6().first;
         ASSERT_TRUE((bool)ip);
         ASSERT_EQ(0, memcmp(&ip.get(), &ipv6.get(), sizeof(in6_addr)));
     }
     else
     {
-        ASSERT_FALSE((bool)host.ipV6());
+        ASSERT_FALSE((bool)host.ipV6().first);
     }
 }
 
@@ -74,8 +74,8 @@ TEST(HostAddress, Base)
     testHostAddress("127.0.0.1", "::1", htonl(INADDR_LOOPBACK), in6addr_loopback);
 
     const auto kIpV4a = HostAddress::ipV4from(QString("12.34.56.78"));
-    const auto kIpV6a = HostAddress::ipV6from(QString("::ffff:c22:384e"));
-    const auto kIpV6b = HostAddress::ipV6from(QString("2001:db8:0:2::1"));
+    const auto kIpV6a = HostAddress::ipV6from(QString("::ffff:c22:384e")).first;
+    const auto kIpV6b = HostAddress::ipV6from(QString("2001:db8:0:2::1")).first;
 
     ASSERT_TRUE((bool)kIpV4a);
     ASSERT_TRUE((bool)kIpV6a);

@@ -26,7 +26,7 @@ class MediaServerClient:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    MediaServerClient(const QUrl& baseRequestUrl);
+    MediaServerClient(const nx::utils::Url &baseRequestUrl);
     
     MediaServerClient(const MediaServerClient&) = delete;
     MediaServerClient& operator=(const MediaServerClient&) = delete;
@@ -107,7 +107,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const QUrl m_baseRequestUrl;
+    const nx::utils::Url m_baseRequestUrl;
     nx_http::Credentials m_userCredentials;
     // TODO: #ak Replace with std::set in c++17.
     std::map<

@@ -172,7 +172,7 @@ TEST_F(AddressResolver, HostNameResolve3)
         ASSERT_GE(ips.size(), 1U);
         ASSERT_TRUE(ips.front().isIpAddress());
         ASSERT_TRUE((bool)ips.front().ipV4());
-        ASSERT_TRUE((bool)ips.front().ipV6());
+        ASSERT_TRUE((bool)ips.front().ipV6().first);
         ASSERT_NE(0U, ips.front().ipV4()->s_addr);
     }
 
@@ -187,7 +187,7 @@ TEST_F(AddressResolver, HostNameResolve3)
         const QString kTestHost = QLatin1String("some-test-host-543242145.com");
         std::vector<HostAddress> kTestAddresses;
         kTestAddresses.push_back(*HostAddress::ipV4from("12.34.56.78"));
-        kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd"));
+        kTestAddresses.push_back(*HostAddress::ipV6from("1234::abcd").first);
 
         dnsResolver.addEtcHost(kTestHost, kTestAddresses);
 
@@ -314,7 +314,7 @@ public:
     AddressResolverNat64()
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
-        std::vector<HostAddress> ipList{HostAddress(*kV6.ipV6()), HostAddress(*kV4.ipV4())};
+        std::vector<HostAddress> ipList{HostAddress(*kV6.ipV6().first), HostAddress(*kV4.ipV4())};
         SocketGlobals::addressResolver().dnsResolver().addEtcHost(kV4.toString(), ipList);
     }
 
@@ -349,11 +349,11 @@ TEST_F(AddressResolverNat64, IPv6) // NAT64 returns 2 addresses: mapped IP v6 an
 
     ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
     ASSERT_TRUE(entries.front().host.isIpAddress());
-    ASSERT_EQ(0, memcmp(&kV6.ipV6().get(), &entries.front().host.ipV6().get(), sizeof(in6_addr)));
+    ASSERT_EQ(0, memcmp(&kV6.ipV6().first.get(), &entries.front().host.ipV6().first.get(), sizeof(in6_addr)));
 
     ASSERT_EQ(cloud::AddressType::direct, entries.back().type);
     ASSERT_TRUE(entries.back().host.isIpAddress());
-    ASSERT_EQ(0, memcmp(&kV4.ipV6().get(), &entries.back().host.ipV6().get(), sizeof(in6_addr)));
+    ASSERT_EQ(0, memcmp(&kV4.ipV6().first.get(), &entries.back().host.ipV6().first.get(), sizeof(in6_addr)));
 }
 
 } // namespace test

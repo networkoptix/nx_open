@@ -43,7 +43,7 @@ NxGlobalsObject::NxGlobalsObject(QObject* parent):
 {
 }
 
-QnUrlHelper NxGlobalsObject::url(const QUrl& url) const
+QnUrlHelper NxGlobalsObject::url(const nx::utils::Url& url) const
 {
     return QnUrlHelper(url);
 }

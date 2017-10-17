@@ -87,7 +87,6 @@ void AnyAccessibleAddressConnector::connectToEntryAsync(const AddressEntry& dnsE
 {
     using namespace std::placeholders;
 
-    qWarning() << Q_FUNC_INFO << "address type:" << (int) dnsEntry.type;
     switch (dnsEntry.type)
     {
         case AddressType::direct:
@@ -124,8 +123,6 @@ bool AnyAccessibleAddressConnector::establishDirectConnection(const SocketAddres
     using namespace std::placeholders;
 
     NX_LOGX(lm("Trying direct connection to %1").arg(endpoint), cl_logDEBUG2);
-
-    qWarning() << lm("Trying direct connection to %1").arg(endpoint) << "ip version:" << m_ipVersion;
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());

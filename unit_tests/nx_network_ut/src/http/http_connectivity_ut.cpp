@@ -218,7 +218,7 @@ protected:
 
         auto httpClient = std::make_unique<nx_http::HttpClient>();
 
-        const QUrl url(lit("%1://%2%3")
+        const nx::utils::Url url(lit("%1://%2%3")
             .arg(scheme)
             .arg(httpServer->serverAddress().toString())
             .arg(kRestHandlerPath));

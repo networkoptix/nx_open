@@ -55,7 +55,7 @@ public:
      *     pinged just once.
      */
     void checkEndpoint(SocketAddress endpoint, QnUuid expectedId = QnUuid());
-    void checkEndpoint(const QUrl& url, QnUuid expectedId = QnUuid());
+    void checkEndpoint(const utils::Url &url, QnUuid expectedId = QnUuid());
 
     template<typename Ptr, typename Found, typename Changed, typename Lost>
     void onSignals(Ptr ptr, Found foundSlot, Changed changedSlot, Lost lostSlot)

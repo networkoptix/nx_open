@@ -36,36 +36,21 @@ TEST(ServerListensBothIpv6AndIpv4, main)
     bool ipv4AddressPresent = false;
     bool ipv6AddressPresent = false;
 
-    qWarning() << "port is" << mediaServerLauncher->port();
-
     nx_http::HttpClient httpClient;
     nx::utils::Url testUrl("http://host:111/static/index.html");
     testUrl.setPort(mediaServerLauncher->port());
 
     for (const auto& addr: addressesToTest)
     {
-        qWarning() << "Testing addr" << addr.address.toString();
         if (addr.address.isPureIpV6())
-        {
             ipv6AddressPresent = true;
-            qWarning() << "IS IPV6";
-        }
         else if ((bool) addr.address.ipV4())
-        {
             ipv4AddressPresent = true;
-            qWarning() << "IS IPV4";
-        }
         else
-        {
             ASSERT_TRUE(false);
-        }
 
-        qWarning() << "TEST ADDRESS" << addr.address.toString();
         testUrl.setHost(addr.address.toString());
-        qWarning() << "TEST URL" << testUrl.toString();
-
         ASSERT_TRUE(httpClient.doGet(testUrl));
-        qWarning() << "Success";
     }
 
     EXPECT_TRUE(ipv4AddressPresent);

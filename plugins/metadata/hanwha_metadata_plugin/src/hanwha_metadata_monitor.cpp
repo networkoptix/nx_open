@@ -22,7 +22,7 @@ namespace {
 
 HanwhaMetadataMonitor::HanwhaMetadataMonitor(
     const Hanwha::DriverManifest& manifest,
-    const QUrl& url, 
+    const nx::utils::Url& url,
     const QAuthenticator& auth)
     :
     m_manifest(manifest),
@@ -67,9 +67,9 @@ void HanwhaMetadataMonitor::setHandler(const Handler& handler)
     m_handler = handler;
 }
 
-QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
+utils::Url HanwhaMetadataMonitor::buildMonitoringUrl(const utils::Url &url) const
 {
-    return QUrl(kMonitorUrlTemplate
+    return nx::utils::Url(kMonitorUrlTemplate
         .arg(url.host())
         .arg(url.port(kDefaultHttpPort)));
 }

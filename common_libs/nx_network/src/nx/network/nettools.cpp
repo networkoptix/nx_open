@@ -139,15 +139,6 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 
 namespace {
 
-/** Qt on linux returns ipv6 address with "%enp0s3" suffix. */
-// static QString fixIpv6AddressString(const QString& ipv6Str)
-// {
-//     int unexpectedSuffixPos = ipv6Str.indexOf('%');
-//     if (unexpectedSuffixPos == -1)
-//         return ipv6Str;
-//     return ipv6Str.mid(0, unexpectedSuffixPos);
-// }
-
 static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
     const QString& ipv6AddrString,
     const QString& ifaceName,

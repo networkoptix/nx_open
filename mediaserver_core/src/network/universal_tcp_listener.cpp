@@ -87,8 +87,6 @@ AbstractStreamServerSocket* QnUniversalTcpListener::addServerSocketToMultipleSoc
         nx::network::NatTraversalSupport::enabled,
         ipVersion);
 
-    std::cout << "---- Socket " << ipVersion << " created ----" << std::endl;
-
     if (!tcpServerSocket->setReuseAddrFlag(true) ||
         !tcpServerSocket->bind(localAddress) ||
         !tcpServerSocket->listen())
@@ -96,8 +94,6 @@ AbstractStreamServerSocket* QnUniversalTcpListener::addServerSocketToMultipleSoc
         setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
-
-    std::cout << "---- Socket " << ipVersion << " bound and is listened on ----" << std::endl;
 
     auto result = tcpServerSocket.get();
     if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
@@ -124,8 +120,6 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         localAddress.address == HostAddress::anyHost
         || (bool)localAddress.address.isPureIpV6();
 
-    qWarning() << "address" << localAddress.address.toString() << "== ANY" << (localAddress.address == HostAddress::anyHost);
-
     AbstractStreamServerSocket* ipV4ServerSocket = nullptr;
     if (needToAddIpV4Socket)
     {
@@ -151,7 +145,6 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
                 multipleServerSocket.get(),
                 AF_INET6))
         {
-            std::cout << "---- Adding ipv6 socket to multipleServerSocket FAILED ----" << std::endl;
             return nullptr;
         }
         ++m_totalListeningSockets;
@@ -159,7 +152,6 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     }
 
     #ifdef LISTEN_ON_UDT_SOCKET
-        std::cout << "---- Listening on UDT is ON ----" << std::endl;
         auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
         if (!udtServerSocket->setReuseAddrFlag(true) ||
             !udtServerSocket->bind(localAddress) ||
@@ -181,8 +173,8 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         if (sslNeeded)
         {
             m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
-                std::move(m_serverSocket), true);
-            std::cout << "---- SSL is ON ----" << std::endl;
+                std::move(m_serverSocket),
+                true);
         }
     #endif
 

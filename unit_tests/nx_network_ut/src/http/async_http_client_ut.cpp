@@ -121,7 +121,7 @@ protected:
 
     void httpsTest(const QString& scheme, const QString& path)
     {
-        const QUrl url(lit("%1://%2/%3")
+        const nx::utils::Url url(lit("%1://%2/%3")
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         nx::utils::promise<void> promise;

@@ -121,6 +121,10 @@ private:
     void parse(const QString& url, SetUrlFunc setUrlFunc);
 };
 
+inline quint32 qHash(const Url& url)
+{
+    return qHash(url.toString());
+}
 
 namespace url {
 
@@ -142,9 +146,9 @@ enum class UrlPart
 using ComparisonFlag = UrlPart;
 Q_DECLARE_FLAGS(ComparisonFlags, ComparisonFlag)
 
-NX_UTILS_API bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags = ComparisonFlag::All);
+NX_UTILS_API bool equal(const nx::utils::Url& lhs, const nx::utils::Url& rhs, ComparisonFlags flags = ComparisonFlag::All);
 
-inline bool addressesEqual(const QUrl& lhs, const QUrl& rhs)
+inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
 {
     return equal(lhs, rhs, ComparisonFlag::Address);
 }
@@ -176,3 +180,4 @@ inline void serialize(const nx::utils::Url& url, QString* target)
 {
     *target = url.toString();
 }
+
