@@ -1,10 +1,15 @@
-#include "metadata_analytics_controller.h"
+#include "camera_metadata_analytics_controller.h"
 
 #include <set>
 
 #include <core/resource/camera_resource.h>
+#include <analytics/common/object_detection_metadata.h>
 
-void QnMetadataAnalyticsController::gotMetadataPacket(
+namespace nx {
+namespace client {
+namespace desktop {
+
+void MetadataAnalyticsController::gotMetadataPacket(
     const QnVirtualCameraResourcePtr& camera,
     const QnCompressedMetadataPtr& metadata)
 {
@@ -24,7 +29,7 @@ void QnMetadataAnalyticsController::gotMetadataPacket(
     handleObjectDetectionMetadata(camera, objectDetectionMetadata);
 }
 
-QRectF QnMetadataAnalyticsController::toQRectF(const QnRect& rect)
+QRectF MetadataAnalyticsController::toQRectF(const QnRect& rect)
 {
     QRectF rectf;
     rectf.setRect(
@@ -36,7 +41,7 @@ QRectF QnMetadataAnalyticsController::toQRectF(const QnRect& rect)
     return rectf;
 }
 
-void QnMetadataAnalyticsController::handleObjectDetectionMetadata(
+void MetadataAnalyticsController::handleObjectDetectionMetadata(
         const QnVirtualCameraResourcePtr& camera,
         const QnObjectDetectionMetadata& objectDetectionMetadata)
 {
@@ -63,3 +68,7 @@ void QnMetadataAnalyticsController::handleObjectDetectionMetadata(
         emit rectangleAddedOrChanged(camera, item.first, item.second);
     }
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

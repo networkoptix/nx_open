@@ -8,11 +8,15 @@
 #include <analytics/common/object_detection_metadata.h>
 #include <core/resource/resource_fwd.h>
 
-class QnMetadataAnalyticsController:
+namespace nx {
+namespace client {
+namespace desktop {
+
+class MetadataAnalyticsController:
     public QObject,
-    public Singleton<QnMetadataAnalyticsController>
+    public Singleton<MetadataAnalyticsController>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     void gotMetadataPacket(
@@ -35,4 +39,8 @@ private:
     std::map<QnUuid, std::set<QnUuid>> m_rectMap;
 };
 
-#define qnMetadataAnalyticsController QnMetadataAnalyticsController::instance()
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
+#define qnMetadataAnalyticsController nx::client::desktop::MetadataAnalyticsController::instance()

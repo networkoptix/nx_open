@@ -10,7 +10,7 @@
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
-#include <analytics/metadata_analytics_controller.h>
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 
 #include "core/resource/camera_resource.h"

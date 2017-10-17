@@ -67,8 +67,8 @@
 #include <plugins/storage/file_storage/qtfile_storage_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
-#include <analytics/metadata_analytics_controller.h>
 
 #include <server/server_storage_manager.h>
 
@@ -76,7 +76,6 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/synctime.h>
 
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
@@ -329,7 +328,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-    commonModule->store(new QnMetadataAnalyticsController());
+    commonModule->store(new nx::client::desktop::MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 

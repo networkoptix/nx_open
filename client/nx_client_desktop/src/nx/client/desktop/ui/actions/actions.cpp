@@ -1,13 +1,15 @@
 #include "actions.h"
-#include "config.h"
 
 #include <core/resource/device_dependent_strings.h>
+
+#include <ini.h>
 
 #include <client/client_runtime_settings.h>
 
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/analytics/analytics_action_factory.h>
 #include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -21,8 +23,6 @@
 #include <nx/network/app_info.h>
 
 #include <nx/utils/app_info.h>
-
-#include <ini.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ui::action, IDType)
 
@@ -364,7 +364,7 @@ void initialize(Manager* manager, Action* root)
         factory(StartAnalyticsAction)
             .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
             .text(ContextMenu::tr("Start Analytics..."))
-            .childFactory(new AnalyticsModeActionFactory(manager))
+            .childFactory(new AnalyticsActionFactory(manager))
             .condition(condition::hasFlags(Qn::server_live_cam, MatchMode::All));
     }
 

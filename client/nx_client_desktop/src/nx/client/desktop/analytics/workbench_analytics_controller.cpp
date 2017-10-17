@@ -8,10 +8,11 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 
+#include <nx/client/desktop/analytics/drivers/abstract_analytics_driver.h>
+
 #include <ui/common/geometry.h>
 #include <ui/graphics/items/resource/resource_widget.h> //TODO: #GDM move enum to client globals
 #include <ui/style/skin.h>
-
 
 namespace {
 
@@ -46,54 +47,48 @@ static const QnResourceWidget::Options kSlaveItemOptions =
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
-QnAbstractAnalyticsDriver::QnAbstractAnalyticsDriver(QObject* parent /*= nullptr*/):
-    QObject(parent)
-{
-}
-
-QnWorkbenchAnalyticsController::QnWorkbenchAnalyticsController(
+WorkbenchAnalyticsController::WorkbenchAnalyticsController(
     int matrixSize,
-    const QnVirtualCameraResourcePtr& camera,
-    QnAbstractAnalyticsDriver* driver,
+    const QnResourcePtr& resource,
+    const AbstractAnalyticsDriverPtr& driver,
     QObject* parent)
     :
     base_type(parent),
     m_matrixSize(matrixSize),
-    m_camera(camera)
+    m_resource(resource)
 {
     constructLayout();
 
     if (driver)
     {
-        connect(driver, &QnAbstractAnalyticsDriver::regionAddedOrChanged, this,
-            &QnWorkbenchAnalyticsController::addOrChangeRegion);
-        connect(driver, &QnAbstractAnalyticsDriver::regionRemoved, this,
-            &QnWorkbenchAnalyticsController::removeRegion);
+        connect(driver, &AbstractAnalyticsDriver::regionAddedOrChanged, this,
+            &WorkbenchAnalyticsController::addOrChangeRegion);
+        connect(driver, &AbstractAnalyticsDriver::regionRemoved, this,
+            &WorkbenchAnalyticsController::removeRegion);
     }
 }
 
-QnWorkbenchAnalyticsController::~QnWorkbenchAnalyticsController()
+WorkbenchAnalyticsController::~WorkbenchAnalyticsController()
 {
 }
 
-int QnWorkbenchAnalyticsController::matrixSize() const
+int WorkbenchAnalyticsController::matrixSize() const
 {
     return m_matrixSize;
 }
 
-QnVirtualCameraResourcePtr QnWorkbenchAnalyticsController::camera() const
+QnResourcePtr WorkbenchAnalyticsController::resource() const
 {
-    return m_camera;
+    return m_resource;
 }
 
-QnLayoutResourcePtr QnWorkbenchAnalyticsController::layout() const
+QnLayoutResourcePtr WorkbenchAnalyticsController::layout() const
 {
     return m_layout;
 }
 
-void QnWorkbenchAnalyticsController::addOrChangeRegion(const QnUuid& id, const QRectF& region)
+void WorkbenchAnalyticsController::addOrChangeRegion(const QnUuid& id, const QRectF& region)
 {
     auto result = m_mapping.end();
     for (auto iter = m_mapping.begin(); iter != m_mapping.end(); ++iter)
@@ -106,10 +101,8 @@ void QnWorkbenchAnalyticsController::addOrChangeRegion(const QnUuid& id, const Q
         }
 
         // First free item.
-        else if (result == m_mapping.end() && iter->regionId.isNull())
-        {
+        if (result == m_mapping.end() && iter->regionId.isNull())
             result = iter;
-        }
     }
 
     if (result == m_mapping.end())
@@ -127,7 +120,7 @@ void QnWorkbenchAnalyticsController::addOrChangeRegion(const QnUuid& id, const Q
     updateZoomRect(result->itemId, region);
 }
 
-void QnWorkbenchAnalyticsController::removeRegion(const QnUuid& id)
+void WorkbenchAnalyticsController::removeRegion(const QnUuid& id)
 {
     auto iter = std::find_if(m_mapping.begin(), m_mapping.end(),
         [id](const ElementData& data)
@@ -150,7 +143,7 @@ void QnWorkbenchAnalyticsController::removeRegion(const QnUuid& id)
     }
 }
 
-void QnWorkbenchAnalyticsController::constructLayout()
+void WorkbenchAnalyticsController::constructLayout()
 {
     const int centralItemSize = (m_matrixSize + 1) / 2;
     const int centralItemPosition = (m_matrixSize - centralItemSize) / 2;
@@ -163,19 +156,14 @@ void QnWorkbenchAnalyticsController::constructLayout()
 
     m_layout->addFlags(Qn::local);
     m_layout->setCellSpacing(kDefaultCellSpacing);
-
-    auto ar = m_camera->aspectRatio();
-    if (ar.isValid())
-        m_layout->setCellAspectRatio(ar.toFloat());
-
     m_layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
 
     auto updateName = [this]
         {
-            m_layout->setName(tr("%1 Analytics").arg(m_camera->getName()));
+            m_layout->setName(tr("%1 Analytics").arg(m_resource->getName()));
         };
     updateName();
-    connect(m_camera, &QnResource::nameChanged, this, updateName);
+    connect(m_resource, &QnResource::nameChanged, this, updateName);
 
     m_layout->setId(QnUuid::createUuid());
     m_layout->setData(Qt::DecorationRole, qnSkin->icon("layouts/preview_search.png"));
@@ -184,8 +172,8 @@ void QnWorkbenchAnalyticsController::constructLayout()
     m_mainItem.flags = Qn::Pinned;
     m_mainItem.uuid = QnUuid::createUuid();
     m_mainItem.combinedGeometry = centralItemRect;
-    m_mainItem.resource.id = m_camera->getId();
-    m_mainItem.resource.uniqueId = m_camera->getUniqueId();
+    m_mainItem.resource.id = m_resource->getId();
+    m_mainItem.resource.uniqueId = m_resource->getUniqueId();
     qnResourceRuntimeDataManager->setLayoutItemData(m_mainItem.uuid,
         Qn::ItemWidgetOptions,
         kMasterItemOptions);
@@ -211,7 +199,7 @@ void QnWorkbenchAnalyticsController::constructLayout()
     resourcePool()->addResource(m_layout);
 }
 
-void QnWorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect)
+void WorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect)
 {
     NX_ASSERT(!itemId.isNull());
     if (itemId.isNull())
@@ -229,7 +217,7 @@ void QnWorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId, const 
     m_layout->updateItem(item);
 }
 
-QRectF QnWorkbenchAnalyticsController::adjustZoomRect(const QRectF& value) const
+QRectF WorkbenchAnalyticsController::adjustZoomRect(const QRectF& value) const
 {
     if (value.isEmpty())
         return value;
@@ -247,12 +235,12 @@ QRectF QnWorkbenchAnalyticsController::adjustZoomRect(const QRectF& value) const
     return result;
 }
 
-bool QnWorkbenchAnalyticsController::isDynamic() const
+bool WorkbenchAnalyticsController::isDynamic() const
 {
     return m_matrixSize <= 0;
 }
 
-QnUuid QnWorkbenchAnalyticsController::addSlaveItem(const QPoint& position)
+QnUuid WorkbenchAnalyticsController::addSlaveItem(const QPoint& position)
 {
     static const QSize kDefaultItemSize(1, 1);
 
@@ -286,7 +274,6 @@ QnUuid QnWorkbenchAnalyticsController::addSlaveItem(const QPoint& position)
     return item.uuid;
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
