@@ -157,7 +157,7 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
 void HanwhaChunkLoader::onHttpClientDone()
 {
     nx_http::AsyncClient::State state = m_httpClient->state();
-    if (state == nx_http::AsyncClient::sFailed)
+    if (state == nx_http::AsyncClient::State::sFailed)
     {
         NX_WARNING(this, lm("Http request %1 failed with error %2")
             .arg(m_httpClient->url().toString())

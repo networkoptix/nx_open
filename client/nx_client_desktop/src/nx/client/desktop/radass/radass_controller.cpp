@@ -335,7 +335,7 @@ struct RadassController::Private
 
         // Switch HQ->LQ if visual item size is small.
         const auto reader = display->getArchiveReader();
-        NX_VERBOSE(this) "optimizeConsumerQuality" << *consumer;
+        NX_VERBOSE(this) << "optimizeConsumerQuality" << *consumer;
 
         if (isForcedHqDisplay(display) && !isFFSpeed(display))
         {

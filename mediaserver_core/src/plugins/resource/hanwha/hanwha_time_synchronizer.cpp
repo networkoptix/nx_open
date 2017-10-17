@@ -208,7 +208,7 @@ void HanwhaTimeSyncronizer::doRequest(
     m_httpClient.doGet(url,
         [this, url, isList, handler = std::move(handler)]()
         {
-            if (!m_httpClient.hasRequestSuccesed())
+            if (!m_httpClient.hasRequestSucceeded())
             {
                 NX_DEBUG(this, lm("Failed request: %1").arg(url));
                 return handler(HanwhaResponse(
