@@ -94,7 +94,7 @@ public:
 
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;
-    Q_INVOKABLE QUrl getLastUsedUrl() const;
+    Q_INVOKABLE nx::utils::Url getLastUsedUrl() const;
     Q_INVOKABLE nx::utils::Url getInitialUrl() const;
 
     Q_INVOKABLE nx::utils::Url getWebSocketUrl() const;

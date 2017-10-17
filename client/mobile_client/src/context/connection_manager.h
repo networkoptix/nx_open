@@ -9,6 +9,7 @@
 #include <utils/common/software_version.h>
 #include <common/common_globals.h>
 #include <client/client_connection_status.h>
+#include <nx/utils/url.h>
 
 class QnConnectionManagerPrivate;
 class QnConnectionManager: public QObject, public QnConnectionContextAware

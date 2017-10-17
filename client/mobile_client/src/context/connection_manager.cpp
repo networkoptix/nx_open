@@ -1,6 +1,5 @@
 #include "connection_manager.h"
 
-#include <QtCore/QUrl>
 #include <QtGui/QGuiApplication>
 #include <QtCore/QMetaEnum>
 

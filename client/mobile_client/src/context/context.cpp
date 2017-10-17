@@ -236,7 +236,7 @@ QString QnContext::getLastUsedSystemName() const
     return qnSettings->lastUsedConnection().systemName;
 }
 
-QUrl QnContext::getLastUsedUrl() const
+nx::utils::Url QnContext::getLastUsedUrl() const
 {
     return qnSettings->lastUsedConnection().urlWithCredentials();
 }

@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+#include <nx/utils/url.h>
 
 class QnMobileClientUiController;
 class QnMobileClientUriHandler : public QObject

@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 class QnMobileClientUiControllerPrivate;
 class QnMobileClientUiController : public QObject
