@@ -34,6 +34,8 @@ class HanwhaResponse
 public:
     static const int kNoChannel = -1;
 
+    HanwhaResponse() {}
+
     explicit HanwhaResponse(
         nx_http::StatusCode::Value statusCode,
         const QString& requestUrl);
