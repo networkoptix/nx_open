@@ -74,6 +74,16 @@ public:
      */
     qint64 distanceToTime(qint64 timeMs) const;
 
+    /**
+     * Truncate period duration to the specified timeMs. This functions does nothing if truncate point is outside period.
+     */
+    void truncate(qint64 timeMs);
+
+    /**
+     * Truncate period start time to the specified timeMs. This functions does nothing if truncate point is outside period.
+     */
+    void truncateFront(qint64 timeMs);
+
     QByteArray serialize() const;
     QnTimePeriod& deserialize(const QByteArray& data);
 

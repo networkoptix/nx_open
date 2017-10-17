@@ -5,24 +5,15 @@
 
 #include <client_core/connection_context_aware.h>
 
+#include <nx/client/desktop/analytics/analytics_fwd.h>
+
 #include <utils/common/connective.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
-class QnAbstractAnalyticsDriver: public QObject
-{
-    Q_OBJECT
-public:
-    QnAbstractAnalyticsDriver(QObject* parent = nullptr);
-signals:
-    void regionAddedOrChanged(const QnUuid& id, const QRectF& region);
-    void regionRemoved(const QnUuid& id);
-};
-
-class QnWorkbenchAnalyticsController:
+class WorkbenchAnalyticsController:
     public Connective<QObject>,
     public QnConnectionContextAware
 {
@@ -30,21 +21,34 @@ class QnWorkbenchAnalyticsController:
     using base_type = Connective<QObject>;
 
 public:
-    QnWorkbenchAnalyticsController(
+    WorkbenchAnalyticsController(
         int matrixSize,
-        const QnVirtualCameraResourcePtr& camera,
-        QnAbstractAnalyticsDriver* driver,
+        const QnResourcePtr& resource,
+        const AbstractAnalyticsDriverPtr& driver,
         QObject* parent = nullptr);
-    virtual ~QnWorkbenchAnalyticsController() override;
+    virtual ~WorkbenchAnalyticsController() override;
 
     int matrixSize() const;
-    QnVirtualCameraResourcePtr camera() const;
+    QnResourcePtr resource() const;
     QnLayoutResourcePtr layout() const;
 
     void addOrChangeRegion(const QnUuid& id, const QRectF& region);
     void removeRegion(const QnUuid& id);
 
 private:
+    struct ElementData
+    {
+        QnUuid itemId;
+        QnUuid regionId;
+    };
+
+    struct ElementMapping
+    {
+        QList<ElementData> mapping;
+        QnLayoutItemData source;
+        int nextColorIdx = 0;
+    };
+
     void constructLayout();
     void updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect);
 
@@ -53,25 +57,18 @@ private:
 
     bool isDynamic() const;
 
-    QnUuid addSlaveItem(const QPoint& position);
+    QnUuid addSlaveItem(ElementMapping& source, const QPoint& position);
 
 private:
     const int m_matrixSize;
-    QnVirtualCameraResourcePtr m_camera;
+    QnResourcePtr m_resource;
     QnLayoutResourcePtr m_layout;
+    AbstractAnalyticsDriverPtr m_driver;
 
-    struct ElementData
-    {
-        QnUuid itemId;
-        QnUuid regionId;
-    };
-    QList<ElementData> m_mapping;
-
-    QnLayoutItemData m_mainItem;
-    int m_nextColorIdx = 0;
+    ElementMapping m_main;
+    ElementMapping m_enhanced;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

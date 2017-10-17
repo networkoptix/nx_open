@@ -1,7 +1,6 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <client_core/connection_context_aware.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -10,30 +9,28 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
-class QnWorkbenchAnalyticsController;
+class WorkbenchAnalyticsController;
 
-class QnWorkbenchAnalyticsHandler:
+class AnalyticsActionHandler:
     public Connective<QObject>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    QnWorkbenchAnalyticsHandler(QObject* parent = nullptr);
-    virtual ~QnWorkbenchAnalyticsHandler() override;
+    explicit AnalyticsActionHandler(QObject* parent = nullptr);
+    virtual ~AnalyticsActionHandler() override;
 
 private:
     void startAnalytics();
     void cleanupControllers();
 
 private:
-    using ControllerPtr = QSharedPointer<QnWorkbenchAnalyticsController>;
+    using ControllerPtr = QSharedPointer<WorkbenchAnalyticsController>;
     QList<ControllerPtr> m_controllers;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

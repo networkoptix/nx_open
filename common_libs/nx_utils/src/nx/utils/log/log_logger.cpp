@@ -16,12 +16,12 @@ namespace utils {
 namespace log {
 
 Logger::Logger(
-    OnLevelChanged onLevelChanged,
     Level defaultLevel,
-    std::unique_ptr<AbstractWriter> writer)
+    std::unique_ptr<AbstractWriter> writer,
+    OnLevelChanged onLevelChanged)
     :
     m_mutex(QnMutex::Recursive),
-    m_onLevelChanged(onLevelChanged),
+    m_onLevelChanged(std::move(onLevelChanged)),
     m_defaultLevel(defaultLevel)
 {
     if (writer)
@@ -101,9 +101,10 @@ void Logger::setLevelFilters(LevelFilters filters)
 Level Logger::maxLevel() const
 {
     QnMutexLocker lock(&m_mutex);
-    if (!m_levelFilters.empty())
-        return Level::verbose;
-    return m_defaultLevel;
+    Level maxLevel = m_defaultLevel;
+    for (const auto& element: m_levelFilters)
+         maxLevel = std::max(maxLevel, element.second);
+    return maxLevel;
 }
 
 void Logger::setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers)
