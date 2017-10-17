@@ -404,6 +404,45 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period)
     }
 }
 
+void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
+{
+    if (empty() || periodList.isEmpty())
+        return;
+
+    const_iterator srcItr = begin();
+    const_iterator dstItr = periodList.begin();
+    QnTimePeriodList result;
+    QnTimePeriod substructPeriod = *dstItr;
+
+    while (srcItr != end())
+    {
+        while (srcItr != end() && srcItr->startTimeMs < substructPeriod.startTimeMs)
+            result << *srcItr++;
+        if (!result.isEmpty())
+            result.last().truncate(substructPeriod.startTimeMs);
+
+        while (srcItr != end() && srcItr->endTimeMs() <= substructPeriod.endTimeMs())
+            srcItr++;
+        if (srcItr != end())
+        {
+            result << *srcItr++;
+            result.last().truncateFront(substructPeriod.endTimeMs());
+        }
+        
+        if (dstItr != periodList.end() - 1)
+        {
+            substructPeriod = *(++dstItr);
+            if (!result.isEmpty())
+            {
+                result.last().truncate(substructPeriod.startTimeMs);
+                if (result.last().isEmpty())
+                    result.pop_back();
+            }
+        }
+    }
+    *this = result;
+}
+
 void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint)
 {
     qint64 erasePoint = dividerPoint;
