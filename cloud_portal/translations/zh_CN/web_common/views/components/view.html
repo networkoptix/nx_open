@@ -23,7 +23,7 @@
             <td>
                 <div class="view-wrapper">
                     <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
-                                  show-camera-panel="showCameraPanel" class="cameras-panel-toggle"
+                                  show-camera-panel="showCameraPanel" class="cameras-panel-wrapper"
                                   ng-class="{'hide-panel':!showCameraPanel}"></camera-panel>
                 </div>
             </td>
@@ -39,7 +39,7 @@
                                             <span class="glyphicon glyphicon-cog"></span>
                                         </span>
                                         <ul class="dropdown-menu video-settings" ng-class="{'no-fullscreen': !enableFullScreen}">
-                                            <li class="video-settings-title">画质</li>
+                                            <li class="video-settings-title">质量</li>
                                             <li class="video-settings-divider"></li>
                                             <li ng-repeat="resolution in availableResolutions" class="video-settings-item">
                                                 <a ng-class="{active:resolution == activeResolution}"
@@ -85,20 +85,20 @@
                                           camera-links="cameraLinks"></camera-links>
                             <camera-view-informer flags="{'status':activeCamera.status,
                                                           'positionSelected': positionSelected,
-                                                          'iOSVideoTooLarge': iOSVideoTooLarge}">
+                                                          'iOSVideoTooLarge': iOSVideoTooLarge}"
+                                                  preview="preview">
                             </camera-view-informer>
                             <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
                                                         (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
-                                         vg-update-time="updateTime($currentTime, $duration)" preview="activeCamera.fullPreview"
+                                         vg-update-time="updateTime($currentTime, $duration)"
                                          vg-player-ready="playerReady($API)" rotation="rotation" playing="positionProvider.playing"
                                          vg-src="activeVideoSource" player="player" active-format="activeFormat">
                             </videowindow>
                         </div>
 
-                        <div class="stick-to-bottom" ng-class="{invisible:liveOnly && !activeCamera}">
+                        <div class="stick-to-bottom" ng-class="{invisible:!activeCamera}">
                             <timeline
                                     can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
-                                    live-only="liveOnly"
                                     records-provider="activeVideoRecords"
                                     position-handler="switchPosition"
                                     play-handler="switchPlaying" can-view-archive="canViewArchive"

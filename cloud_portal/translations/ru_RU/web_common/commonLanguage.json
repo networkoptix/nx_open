@@ -3,7 +3,7 @@
     "highStream":"Выс. кач-во",
     "lowStream":"Низ. кач-во",
     "transcoding":"Перекодирование",
-    "unknown":"Неизвестно",
+    "unknown":"Неизвестный",
     "copyToClipboard":"скопировать в буфер обмена",
     "copyDefaultText":"копировать",
     "copyActiveText":"скопировано в буфер обмена"

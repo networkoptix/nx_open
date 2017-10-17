@@ -5,7 +5,7 @@
     <div class='camera-links-title'>Thông tin về camera</div>
     <table>
         <tr ng-if="debugMode"><td>Đang phát</td><td class="camera-links-info">{{transport}} - {{currentResolution}} với {{player}}</td></tr>
-        <tr><td>tên</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
+        <tr><td>Tên</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
             <td>CameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
@@ -62,7 +62,7 @@
                        ng-model="linkSettings.duration"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="resolution">Nghị quyết:</label></td>
+            <td><label class="camera-links-label" for="resolution">Độ phân giải</label></td>
             <td><input id="resolution" type="text" class="input-sm camera-links-info" 
                        ng-model="linkSettings.resolution"></td>
         </tr>

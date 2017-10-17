@@ -17,17 +17,16 @@
             <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
         </h1>
     </div>
-
-    <div ng-if="reactivatingSuccess">
-        <h1 class="process-success">
-            Подтверждающее сообщение отправлено на Email <br>{{data.email}}
-        </h1>
-    </div>
     
-    <div ng-if="reactivating">
-        <h1>Подтвердить свою учетную запись</h1>
+    <div ng-if="reactivating" class="text-center">
+        <div ng-if='data.email'>
+            <h1>You have registered in Nx Cloud</h1>
+            <p>We've sent you a letter with activation link to {{data.email}}.<br>
+            Please activate your account by visiting this link.</p>
+        </div>
+        <h1 ng-if="!data.email">Подтвердить свою учетную запись</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
-            <div class="form-group" validate-field>
+            <div class="form-group" ng-if="!data.email" validate-field>
                 <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
@@ -42,7 +41,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
+                <div class="col-sm-offset-2 col-sm-8">
                     <process-button process="reactivate"
                                     form="reactivateAccount"
                                     button-text="$root.L.activeActions.sendConfirm"></process-button>
