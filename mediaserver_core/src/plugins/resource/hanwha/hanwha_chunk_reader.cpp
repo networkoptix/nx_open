@@ -72,14 +72,14 @@ void HanwhaChunkLoader::sendRequest()
 {
     switch (m_state)
     {
-    case State::updateTimeRange:
-        sendUpdateTimeRangeRequest();
-        break;
-    case State::LoadingChunks:
-        sendLoadChunksRequest();
-        break;
-    default:
-        break;
+        case State::updateTimeRange:
+            sendUpdateTimeRangeRequest();
+            break;
+        case State::LoadingChunks:
+            sendLoadChunksRequest();
+            break;
+        default:
+            break;
     }
 }
 
@@ -115,6 +115,8 @@ qint64 HanwhaChunkLoader::latestChunkTimeMs() const
         if (!timePeriods.empty())
             resultMs = std::max(resultMs, timePeriods.back().startTimeMs);
     }
+
+    QnMutexLocker lock(&m_mutex);
     if (m_startTimeUsec == AV_NOPTS_VALUE)
         return resultMs;
     return std::max(resultMs, m_startTimeUsec / 1000);
@@ -135,7 +137,7 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     query.addQueryItem("msubmenu", "timeline");
     query.addQueryItem("action", "view");
     query.addQueryItem("Type", "All");
-    
+
     auto startDateTime = toHanwhaDateTime(latestChunkTimeMs(), m_timeZoneShift);
     auto endDateTime = QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1);
     query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateFormat));
@@ -180,7 +182,7 @@ void HanwhaChunkLoader::onHttpClientDone()
         m_state = State::updateTimeRange;
         startTimerForNextRequest(kUpdateChunksDelay); //< Send next request after delay
     }
-    else if(m_state == State::updateTimeRange)
+    else if (m_state == State::updateTimeRange)
     {
         parseTimeRangeData(m_httpClient->fetchMessageBodyBuffer());
 
@@ -243,8 +245,10 @@ void HanwhaChunkLoader::onGotChunkData()
     m_unfinishedLine = buffer.mid(index + 1);
     buffer.truncate(index);
 
-    QList<QByteArray> lines = buffer. split('\n');
-    for (const auto& line: lines)
+    QList<QByteArray> lines = buffer.split('\n');
+
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& line : lines)
         parseChunkData(line.trimmed());
 }
 
@@ -253,7 +257,7 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     int channelNumberPos = line.indexOf('.') + 1;
     if (channelNumberPos == 0)
         return true; //< Skip header line
-    int channelNumberPosEnd = line.indexOf('.', channelNumberPos+1);
+    int channelNumberPosEnd = line.indexOf('.', channelNumberPos + 1);
     QByteArray channelNumberData = line.mid(channelNumberPos, channelNumberPosEnd - channelNumberPos);
     int channelNumber = channelNumberData.toInt();
 
@@ -291,7 +295,7 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
             QnTimePeriodList::overwriteTail(chunks, periods, timePeriod.startTimeMs);
         }
     }
-    
+
     return true;
 }
 
