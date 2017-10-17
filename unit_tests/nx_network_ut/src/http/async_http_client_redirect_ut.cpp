@@ -4,6 +4,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/string.h>
+#include <nx/utils/thread/sync_queue.h>
 
 namespace nx_http {
 namespace test {
@@ -25,11 +26,19 @@ public:
 protected:
     void givenTwoHttpServersWithRedirection()
     {
+        using namespace std::placeholders;
+
         givenResourceServer();
         ASSERT_TRUE(m_resourceServer->registerStaticProcessor(
             nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
             kTestMessageBody,
-            "text/plain"));
+            "text/plain",
+            nx_http::Method::get));
+
+        ASSERT_TRUE(m_resourceServer->registerRequestProcessorFunc(
+            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            std::bind(&AsyncHttpClientRedirect::savePostedResource, this, _1, _2, _3, _4, _5),
+            nx_http::Method::post));
 
         givenRedirectServer();
     }
@@ -82,6 +91,11 @@ protected:
         ASSERT_TRUE(m_httpClient.doGet(m_redirectUrl));
     }
 
+    void whenPostingResourceToRedirectionServer()
+    {
+        m_httpClient.doPost(m_redirectUrl, "text/plain", kTestMessageBody);
+    }
+
     void thenClientShouldFetchResourceFromActualLocation()
     {
         ASSERT_NE(nullptr, m_httpClient.response());
@@ -106,12 +120,38 @@ protected:
         ASSERT_EQ(StatusCode::movedPermanently, m_httpClient.response()->statusLine.statusCode);
     }
 
+    void thenResourceFinallyPostedToContentServer()
+    {
+        ASSERT_EQ(kTestMessageBody, m_postResourceRequests.pop().messageBody);
+    }
+
+    void thenRequestToContentServerDoesNotContainDuplicateHeaders()
+    {
+        auto request = m_postResourceRequests.pop();
+        for (const auto& header: request.headers)
+        {
+            ASSERT_EQ(1U, request.headers.count(header.first));
+        }
+    }
+
 private:
     std::unique_ptr<TestHttpServer> m_redirector;
     std::unique_ptr<TestHttpServer> m_resourceServer;
     nx_http::HttpClient m_httpClient;
     QUrl m_redirectUrl;
     QUrl m_actualUrl;
+    nx::utils::SyncQueue<nx_http::Request> m_postResourceRequests;
+
+    void savePostedResource(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        m_postResourceRequests.push(std::move(request));
+        completionHandler(nx_http::StatusCode::ok);
+    }
 };
 
 TEST_F(AsyncHttpClientRedirect, simple_redirect_by_301_and_location)
@@ -134,6 +174,20 @@ TEST_F(AsyncHttpClientRedirect, redirect_of_authorized_resource)
     givenRedirectServer();
     whenRequestingRedirectedResource();
     thenClientShouldFetchResourceFromActualLocation();
+}
+
+TEST_F(AsyncHttpClientRedirect, message_body_is_redirected)
+{
+    givenTwoHttpServersWithRedirection();
+    whenPostingResourceToRedirectionServer();
+    thenResourceFinallyPostedToContentServer();
+}
+
+TEST_F(AsyncHttpClientRedirect, no_duplicate_headers_in_redirected_request)
+{
+    givenTwoHttpServersWithRedirection();
+    whenPostingResourceToRedirectionServer();
+    thenRequestToContentServerDoesNotContainDuplicateHeaders();
 }
 
 } // namespace test

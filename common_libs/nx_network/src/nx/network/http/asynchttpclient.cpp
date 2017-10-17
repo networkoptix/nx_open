@@ -1069,7 +1069,6 @@ bool AsyncHttpClient::sendRequestToNewLocation(const Response& response)
     m_contentLocationUrl = QUrl(QLatin1String(locationIter->second));
 
     const auto method = m_request.requestLine.method;
-    m_request = nx_http::Request();
     composeRequest(method);
     initiateHttpMessageDelivery();
     return true;
@@ -1126,29 +1125,33 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     nx_http::insertOrReplaceHeader(
         &m_request.headers,
         HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
-    m_request.headers.emplace(
-        "User-Agent",
-        m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());
+    nx_http::insertOrReplaceHeader(
+        &m_request.headers,
+        HttpHeader(
+            "User-Agent",
+            m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1()));
     if (useHttp11)
     {
         if (httpMethod == nx_http::Method::get || httpMethod == nx_http::Method::head)
         {
-            //m_request.headers.insert( std::make_pair("Accept", "*/*") );
             if (m_contentEncodingUsed)
                 m_request.headers.insert(std::make_pair("Accept-Encoding", "gzip"));
-            //else
-            //    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
         }
-        //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
 
         if (m_additionalHeaders.count("Connection") == 0)
-            m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
+        {
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                HttpHeader("Connection", "keep-alive"));
+        }
 
         if (m_additionalHeaders.count("Host") == 0)
         {
-            m_request.headers.emplace(
-                "Host",
-                nx::network::url::getEndpoint(m_contentLocationUrl).toString().toUtf8());
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                HttpHeader(
+                    "Host",
+                    nx::network::url::getEndpoint(m_contentLocationUrl).toString().toUtf8()));
         }
     }
 
