@@ -129,7 +129,7 @@ def read_structure_json(filename):
 
 
 def process_zip(file_descriptor, user, update_structure, update_content):
-    log_messages = ()
+    log_messages = []
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
     root = None

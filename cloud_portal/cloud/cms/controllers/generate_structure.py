@@ -58,7 +58,7 @@ def find_structure(name, context, structure_type, meta=None, description=""):
             if db_structure.description:
                 description = db_structure.description
             if db_structure.type:
-                structure_type = DataStructure.DATA_TYPES[db_structure.type][2]
+                structure_type = DataStructure.DATA_TYPES[db_structure.type]
 
         data_structure = OrderedDict([
             ("label", label),
