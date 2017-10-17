@@ -29,7 +29,7 @@ namespace detail {
 class Helper
 {
 public:
-    Helper(): m_level(Level::none) {} //< Constructing a helper which does not log anything.
+    Helper(): m_level(Level::none), m_tag() {} //< Constructing a helper which does not log anything.
 
     Helper(Level level, const Tag& tag): m_level(level), m_tag(std::move(tag))
     {
