@@ -14,5 +14,5 @@ urlpatterns = [
 
     url(r'version_action/(?P<version_id>.+?)/', version_action, name="version_action"),
 
-    url(r'version/(?P<version_id>.+?)/', version, name="version"),
+    url(r'^version/(?P<version_id>.+?)/', version, name="version"),
 ]
