@@ -21,11 +21,11 @@ static const  char kEndTimeParamName[] = "EndTime";
 static std::chrono::seconds kUpdateChunksDelay(60);
 static std::chrono::seconds kResendRequestIfFail(10);
 
-QDateTime parseHanwhaDateTime(const QByteArray& value, std::chrono::seconds timeZoneShift)
+qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift)
 {
     auto dateTime = QDateTime::fromString(value, kHanwhaDateFormat);
     dateTime.setOffsetFromUtc(timeZoneShift.count());
-    return dateTime;
+    return std::max(0LL, dateTime.toMSecsSinceEpoch());
 }
 
 QDateTime toHanwhaDateTime(qint64 value, std::chrono::seconds timeZoneShift)
@@ -211,9 +211,9 @@ void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
             QByteArray fieldValue = params[1];
 
             if (fieldName == kStartTimeParamName)
-                startTimeUsec = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch() * 1000;
+                startTimeUsec = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
             else if (fieldName == kEndTimeParamName)
-                endTimeUsec = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch() * 1000;
+                endTimeUsec = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift) * 1000;
         }
     }
     if (startTimeUsec != AV_NOPTS_VALUE && endTimeUsec != AV_NOPTS_VALUE)
@@ -273,11 +273,11 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     QnTimePeriodList& chunks = m_chunks[channelNumber];
     if (fieldName == kStartTimeParamName)
     {
-        m_lastParsedStartTimeMs = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch();
+        m_lastParsedStartTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
     }
     else if (fieldName == kEndTimeParamName)
     {
-        auto endTimeMs = parseHanwhaDateTime(fieldValue, m_timeZoneShift).toMSecsSinceEpoch();
+        auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
 
         QnTimePeriod timePeriod(m_lastParsedStartTimeMs, endTimeMs - m_lastParsedStartTimeMs);
         if (m_startTimeUsec == AV_NOPTS_VALUE || chunks.isEmpty())
