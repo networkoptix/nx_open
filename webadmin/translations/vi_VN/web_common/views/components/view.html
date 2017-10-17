@@ -5,7 +5,9 @@
             <td colspan="2" class="alert">
                 <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !session.mobileAppNotified">
                     <div class="pull-right" >
-                        Cài đặt
+                        <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
+Cài đặt
+</a>
                         <span class="webclient-button caption-row invisible-xs"
                               ng-click="mobileAppAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
                     </div>
