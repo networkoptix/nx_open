@@ -159,7 +159,8 @@ def process_zip(file_descriptor, user, update_structure, update_content):
         short_name = name.replace(root, '')
 
         if short_name.startswith('help/'):  # Ignore help
-            log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
+            if short_name == 'help/':
+                log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
             continue
 
         # now we have name
@@ -186,7 +187,8 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
         # if data structure is not FILE or IMAGE - print to log and ignore
         if structure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            log_messages.append(('warning', 'Ignored: %s (data structure is not a file)' % name))
+            log_messages.append(('warning', 'Ignored: %s (data structure type is %s, not a %s or %s)' %
+                                 (name, structure.type, DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file)))
             continue
 
         data = zip_file.read(name)

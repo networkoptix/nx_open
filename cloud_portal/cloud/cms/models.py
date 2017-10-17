@@ -120,8 +120,7 @@ class DataStructure(models.Model):
 
     @staticmethod
     def get_type(name):
-        return next((data_type[0] for data_type in DataStructure.DATA_TYPES if name in data_type),
-                    DataStructure.DATA_TYPES.text)
+        return getattr(DataStructure.DATA_TYPES, name, DataStructure.DATA_TYPES.text)
 
     def find_actual_value(self, customization, language=None, version_id=None):
         content_value = ""
