@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Qtcore/QElapsedTimer>
 #include <chrono>
+
+#include <QtCore/QElapsedTimer>
 
 namespace nx {
 namespace utils {
