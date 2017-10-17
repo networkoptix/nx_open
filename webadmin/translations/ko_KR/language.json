@@ -41,7 +41,7 @@
     "confirmDisconnectFromCloud":"{{CLOUD_NAME}} 에서 시스템을 분리",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'> 모든 클라우드 사용자 삭제 됩니다.</span> <br><br>로컬 네트워크에서 관리자 계정을 통해 액세스할 수 있을 것입니다.",
     "confirmDisconnectFromCloudAction":"연결 끊기",
-    "disconnectedFromCloudSuccess":"시스템은 성공적으로 {{CLOUD_NAME}}에서 분리되었습니다.",
+    "disconnectedFromCloudSuccess":"시스템은 성공적으로 {{CLOUD_NAME}} 에서 분리되었습니다.",
     "confirmDisconnectFromSystem":"현재 시스템에서 서버 분리",
     "confirmDisconnectFromSystemAction":"분리",
     "disconnectedFromSystemSuccess":"서버가 시스템에서 성공적으로 분리되었습니다.",

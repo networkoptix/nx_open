@@ -102,30 +102,27 @@
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank"> เรียนรู้เพิ่มเติม </a></alert>
                             <alert type="error" ng-if="!hasInternetOnServer">เชื่อมต่อเซิร์ฟเวอร์กับอินเทอร์เน็ตเพื่อดำเนินการติดตั้ง {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet connection required to connect System to {{Config.cloud.productName}}</alert>
+                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">ต้องการเชื่อมต่อระบบ {{Config.cloud.productName}} เชื่อมต่ออินเทอร์เน็ต</alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
-                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
-                                <a ng-if="!mode.liteClient"  class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">เชื่อมต่อกับ {{Config.cloud.productName}}</button>                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
-                                   target="_blank">Create {{Config.cloud.productName}} Account</a></p>
+                                   target="_blank">สร้างบัญชี {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
                 </tab>
 
                 <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
-                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <h3> การตั้งค่าเครือข่ายอุปกรณ์ </h3> <network-settings settings="networkSettings[0]" ng-if="networkSettings"> </network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()"> บันทึกการตั้งค่าและรีบูตเครื่อง </button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
-                        <h3>Date and Time</h3>
+                        <h3>วันและเวลา</h3>
                         <form name="timeSettings">
                             <table>
                                 <tbody>
                                     <tr>
-                                        <td><label for="timeZone">Time zone</label></td>
+                                        <td><label for="timeZone">โซนเวลา</label></td>
                                         <td><label for="date">วันที่</label></td>
                                         <td><label for="time">เวลา</label></td>
                                         <td></td>
@@ -161,18 +158,16 @@
                                 </tbody>
                             </table>
                         </form>
-                        <button class="btn btn-default" ng-click="saveDateTime()">Save Date and Time</button>
+                        <button class="btn btn-default" ng-click="saveDateTime()">บันทึกวันที่และเวลา</button>
                     </div>
                     <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
-                        <h3>Restore Server Settings</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Full Restore</button>
-                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restore Everything But Network</button></p>
+                        <h3>คืนค่าการตั้งค่าเซิร์ฟเวอร์</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()"> การคืนค่าแบบเต็ม </button> <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()"> คืนค่าทุกอย่าง แต่เครือข่าย </button></p>
                     </div>
                     <div ng-if="canRunClient || canStopClient">
-                        <h3>Run client application on server</h3>
-                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">Run client</button>
-                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Stop client</button></p>
-                        <p>Use a keyboard/mouse or mobile application to control it.</p>
+                        <h3>เรียกใช้แอพลิเคชันไคลเอนต์บนเซิร์ฟเวอร์</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()"> เรียกใช้ไคลเอ็นต์ </button> <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()"> หยุดไคลเอ็นต์ </button></p>
+                        <p>ใช้แป้นพิมพ์ / เมาส์หรือแอปพลิเคชันมือถือเพื่อควบคุม</p>
                     </div>
                 </tab>
             </tabset>

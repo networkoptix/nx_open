@@ -47,7 +47,7 @@
     "disconnectedFromSystemSuccess":"サーバーがシステムから正常に切離されました",
     "connectedSuccess":"システムが正常に接続されています",
     "createLocalOwnerTitle":"ローカルの管理者を登録",
-    "confirmChangePassword":"adminパスワードの変更",
+    "confirmChangePassword":"Adminパスワードの変更",
     "confirmChangePasswordTitle":"システム パスワードを変更しますか? 一部のサーバー ユーザー 'admin' と root のパスワードに影響します",
     "confirmChangePasswordAction":"新しいパスワードを保存",
     "nx1ControlHint":"クライアント アプリケーションが開始されました　キーボード/マウス、またはモバイル アプリケーションを使用して制御します"
