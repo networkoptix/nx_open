@@ -171,9 +171,11 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             if context.exists():
                 context = context.first()
                 try:
-                    context.template = zip_file.read(name).decode("utf-8")
-                    context.save()
-                    log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
+                    template = zip_file.read(name).decode("utf-8")
+                    if context.template != template:
+                        context.template = template
+                        context.save()
+                        log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
                 except UnicodeDecodeError:
                     log_messages.append(('error', 'Ignored: %s (file is not UTF-encoded)' % name))
                 continue
@@ -196,9 +198,10 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
         if update_structure:
             # if set_defaults or data structure has no default value - save it
-            structure.default = data64
-            log_messages.append(('success', 'Updated default for data structure %s using %s' % (structure.label, name)))
-            structure.save()
+            if structure.default != data64:
+                structure.default = data64
+                log_messages.append(('success', 'Updated default for data structure %s using %s' % (structure.label, name)))
+                structure.save()
 
         if update_content:
             customization = Customization.objects.filter(name=customization_name)
@@ -210,7 +213,6 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             latest_value = structure.find_actual_value(customization)
             # check if file was changed
             if latest_value == data64:
-                log_messages.append(('info', 'Ignored %s (content not changed)' % name))
                 continue
 
             # add new dataRecrod
