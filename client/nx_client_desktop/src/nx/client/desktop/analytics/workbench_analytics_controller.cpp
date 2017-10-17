@@ -1,5 +1,9 @@
 #include "workbench_analytics_controller.h"
 
+#include <QtCore/QFileInfo>
+
+#include <ini.h>
+
 #include <client/client_globals.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -91,57 +95,73 @@ QnLayoutResourcePtr WorkbenchAnalyticsController::layout() const
 
 void WorkbenchAnalyticsController::addOrChangeRegion(const QnUuid& id, const QRectF& region)
 {
-    auto result = m_mapping.end();
-    for (auto iter = m_mapping.begin(); iter != m_mapping.end(); ++iter)
-    {
-        // Item is already controlled.
-        if (iter->regionId == id)
+    auto addOrUpdateRegionInternal = [this, id, region](ElementMapping& mapping)
         {
-            result = iter;
-            break;
-        }
+            auto result = mapping.mapping.end();
+            for (auto iter = mapping.mapping.begin(); iter != mapping.mapping.end(); ++iter)
+            {
+                // Item is already controlled.
+                if (iter->regionId == id)
+                {
+                    result = iter;
+                    break;
+                }
 
-        // First free item.
-        if (result == m_mapping.end() && iter->regionId.isNull())
-            result = iter;
-    }
+                // First free item.
+                if (result == mapping.mapping.end() && iter->regionId.isNull())
+                    result = iter;
+            }
 
-    if (result == m_mapping.end())
-    {
-        if (!isDynamic())
-            return;
+            if (result == mapping.mapping.end())
+            {
+                if (!isDynamic())
+                    return;
 
-        ElementData data;
-        data.itemId = addSlaveItem(QPoint());
-        m_mapping.push_back(data);
-        result = m_mapping.end() - 1;
-    }
+                ElementData data;
+                data.itemId = addSlaveItem(mapping, QPoint());
+                mapping.mapping.push_back(data);
+                result = mapping.mapping.end() - 1;
+            }
 
-    result->regionId = id;
-    updateZoomRect(result->itemId, region);
+            result->regionId = id;
+            updateZoomRect(result->itemId, region);
+        };
+
+    addOrUpdateRegionInternal(m_main);
+    if (ini().enableEntropixEnhancer && !m_enhanced.source.uuid.isNull())
+        addOrUpdateRegionInternal(m_enhanced);
 }
 
 void WorkbenchAnalyticsController::removeRegion(const QnUuid& id)
 {
-    auto iter = std::find_if(m_mapping.begin(), m_mapping.end(),
-        [id](const ElementData& data)
+    auto removeRegionInternal =
+        [this, id](ElementMapping& mapping)
         {
-            return data.regionId == id;
-        });
 
-    if (iter == m_mapping.end())
-        return;
+            auto iter = std::find_if(mapping.mapping.begin(), mapping.mapping.end(),
+                [id](const ElementData& data)
+            {
+                return data.regionId == id;
+            });
 
-    if (isDynamic())
-    {
-        m_layout->removeItem(iter->itemId);
-        m_mapping.erase(iter);
-    }
-    else
-    {
-        iter->regionId = QnUuid();
-        updateZoomRect(iter->itemId, QRectF());
-    }
+            if (iter == mapping.mapping.end())
+                return;
+
+            if (isDynamic())
+            {
+                m_layout->removeItem(iter->itemId);
+                mapping.mapping.erase(iter);
+            }
+            else
+            {
+                iter->regionId = QnUuid();
+                updateZoomRect(iter->itemId, QRectF());
+            }
+        };
+
+    removeRegionInternal(m_main);
+    if (ini().enableEntropixEnhancer && !m_enhanced.source.uuid.isNull())
+        removeRegionInternal(m_enhanced);
 }
 
 void WorkbenchAnalyticsController::constructLayout()
@@ -151,6 +171,7 @@ void WorkbenchAnalyticsController::constructLayout()
     const QRect centralItemRect = isDynamic()
         ? QRect(0, 0, 2, 2)
         : QRect(centralItemPosition, centralItemPosition, centralItemSize, centralItemSize);
+    const int enhancedOffset = m_matrixSize;
 
     // Construct and add a new layout.
     m_layout.reset(new QnLayoutResource());
@@ -170,18 +191,44 @@ void WorkbenchAnalyticsController::constructLayout()
     m_layout->setData(Qt::DecorationRole, qnSkin->icon("layouts/preview_search.png"));
 
     // Add main item.
-    m_mainItem.flags = Qn::Pinned;
-    m_mainItem.uuid = QnUuid::createUuid();
-    m_mainItem.combinedGeometry = centralItemRect;
-    m_mainItem.resource.id = m_resource->getId();
-    m_mainItem.resource.uniqueId = m_resource->getUniqueId();
-    qnResourceRuntimeDataManager->setLayoutItemData(m_mainItem.uuid,
+    m_main.source.flags = Qn::Pinned;
+    m_main.source.uuid = QnUuid::createUuid();
+    m_main.source.combinedGeometry = centralItemRect;
+    m_main.source.resource.id = m_resource->getId();
+    m_main.source.resource.uniqueId = m_resource->getUniqueId();
+    qnResourceRuntimeDataManager->setLayoutItemData(m_main.source.uuid,
         Qn::ItemWidgetOptions,
         kMasterItemOptions);
-    m_layout->addItem(m_mainItem);
+    m_layout->addItem(m_main.source);
+
+    if (ini().enableEntropixEnhancer)
+    {
+        QString enhancedVideoName = m_resource->getUrl();
+        const auto extension = QFileInfo(enhancedVideoName).suffix();
+        enhancedVideoName.replace(extension, lit("enhanced.")+extension);
+        if (const auto enhanced = resourcePool()->getResourceByUrl(enhancedVideoName))
+        {
+            m_resource->addFlags(Qn::sync);
+            enhanced->addFlags(Qn::sync);
+
+            m_enhanced.source.flags = Qn::Pinned;
+            m_enhanced.source.uuid = QnUuid::createUuid();
+            m_enhanced.source.combinedGeometry = QRect(centralItemPosition + enhancedOffset,
+                centralItemPosition, centralItemSize, centralItemSize);
+            m_enhanced.source.resource.id = enhanced->getId();
+            m_enhanced.source.resource.uniqueId = enhanced->getUniqueId();
+            qnResourceRuntimeDataManager->setLayoutItemData(m_enhanced.source.uuid,
+                Qn::ItemWidgetOptions,
+                kMasterItemOptions);
+
+            m_layout->addItem(m_enhanced.source);
+        }
+    }
 
     if (!isDynamic())
     {
+        const bool hasEnhanced = ini().enableEntropixEnhancer && !m_enhanced.source.uuid.isNull();
+
         // Add zoom windows.
         for (int x = 0; x < m_matrixSize; ++x)
         {
@@ -191,8 +238,14 @@ void WorkbenchAnalyticsController::constructLayout()
                     continue;
 
                 ElementData element;
-                element.itemId = addSlaveItem(QPoint(x, y));
-                m_mapping.push_back(element);
+                element.itemId = addSlaveItem(m_main, QPoint(x, y));
+                m_main.mapping.push_back(element);
+
+                if (hasEnhanced)
+                {
+                    element.itemId = addSlaveItem(m_enhanced, QPoint(enhancedOffset + x, y));
+                    m_enhanced.mapping.push_back(element);
+                }
             }
         }
     }
@@ -239,7 +292,8 @@ bool WorkbenchAnalyticsController::isDynamic() const
     return m_matrixSize <= 0;
 }
 
-QnUuid WorkbenchAnalyticsController::addSlaveItem(const QPoint& position)
+QnUuid WorkbenchAnalyticsController::addSlaveItem(ElementMapping& mapping,
+    const QPoint& position)
 {
     static const QSize kDefaultItemSize(1, 1);
 
@@ -248,7 +302,7 @@ QnUuid WorkbenchAnalyticsController::addSlaveItem(const QPoint& position)
     if (isDynamic())
     {
         item.flags = Qn::PendingGeometryAdjustment;
-        QPointF targetPoint = m_mainItem.combinedGeometry.bottomRight();
+        QPointF targetPoint = mapping.source.combinedGeometry.bottomRight();
         item.combinedGeometry = QRectF(targetPoint, targetPoint);
     }
     else
@@ -256,14 +310,14 @@ QnUuid WorkbenchAnalyticsController::addSlaveItem(const QPoint& position)
         item.flags = Qn::Pinned;
         item.combinedGeometry = QRect(position, kDefaultItemSize);
     }
-    item.resource = m_mainItem.resource;
+    item.resource = mapping.source.resource;
     item.zoomRect = QRectF();
-    item.zoomTargetUuid = m_mainItem.uuid;
+    item.zoomTargetUuid = mapping.source.uuid;
     qnResourceRuntimeDataManager->setLayoutItemData(item.uuid,
         Qn::ItemFrameDistinctionColorRole,
-        kFrameColors[m_nextColorIdx]);
+        kFrameColors[mapping.nextColorIdx]);
 
-    m_nextColorIdx = (m_nextColorIdx + 1) % kFrameColors.size();
+    mapping.nextColorIdx = (mapping.nextColorIdx + 1) % kFrameColors.size();
 
     qnResourceRuntimeDataManager->setLayoutItemData(item.uuid,
         Qn::ItemWidgetOptions,

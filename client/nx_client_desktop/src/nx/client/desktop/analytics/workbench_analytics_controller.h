@@ -36,6 +36,19 @@ public:
     void removeRegion(const QnUuid& id);
 
 private:
+    struct ElementData
+    {
+        QnUuid itemId;
+        QnUuid regionId;
+    };
+
+    struct ElementMapping
+    {
+        QList<ElementData> mapping;
+        QnLayoutItemData source;
+        int nextColorIdx = 0;
+    };
+
     void constructLayout();
     void updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect);
 
@@ -44,7 +57,7 @@ private:
 
     bool isDynamic() const;
 
-    QnUuid addSlaveItem(const QPoint& position);
+    QnUuid addSlaveItem(ElementMapping& source, const QPoint& position);
 
 private:
     const int m_matrixSize;
@@ -52,15 +65,8 @@ private:
     QnLayoutResourcePtr m_layout;
     AbstractAnalyticsDriverPtr m_driver;
 
-    struct ElementData
-    {
-        QnUuid itemId;
-        QnUuid regionId;
-    };
-    QList<ElementData> m_mapping;
-
-    QnLayoutItemData m_mainItem;
-    int m_nextColorIdx = 0;
+    ElementMapping m_main;
+    ElementMapping m_enhanced;
 };
 
 } // namespace desktop
