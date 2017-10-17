@@ -54,6 +54,11 @@ void ProxyHandler::processRequest(
     m_requestCompletionHandler = std::move(completionHandler);
     m_request = std::move(request);
 
+    NX_VERBOSE(this,
+        lm("Establishing connection to %1 to serve request %2 from %3 with SSL=%4")
+        .args(m_targetHost.target, m_request.requestLine.url,
+            connection->socket()->getForeignAddress(), m_sslConnectionRequired));
+
     m_targetPeerConnector = std::make_unique<TargetPeerConnector>(
         nullptr,
         m_targetHost.target);
