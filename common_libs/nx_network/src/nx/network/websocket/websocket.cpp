@@ -27,6 +27,8 @@ WebSocket::WebSocket(
     m_aliveTimeout(kAliveTimeout),
     m_lastError(SystemError::noError)
 {
+    m_socket->setRecvTimeout(0);
+    m_socket->setSendTimeout(0);
     aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
     m_pingTimer->bindToAioThread(m_socket->getAioThread());
     m_aliveTimer->bindToAioThread(m_socket->getAioThread());
