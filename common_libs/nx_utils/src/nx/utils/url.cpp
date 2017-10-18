@@ -324,8 +324,8 @@ void Url::setHost(const QString &host, QUrl::ParsingMode mode)
 QString Url::host(QUrl::ComponentFormattingOptions options) const
 {
     return (bool) m_ipV6ScopeId
-            ? m_url.host(options) + '%' + QString::number(*m_ipV6ScopeId)
-            : m_url.host(options);
+        ? m_url.host(options) + '%' + QString::number(*m_ipV6ScopeId)
+        : m_url.host(options);
 }
 
 void Url::setPort(int port)
