@@ -50,8 +50,8 @@ public:
         QnMediaServerModule* serverModule,
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
-    HanwhaDeviceInfo loadInformation(const QAuthenticator& auth, const QUrl& url);
-    void start(const QAuthenticator& auth, const QUrl& url);
+    HanwhaDeviceInfo loadInformation(const QAuthenticator& auth, const nx::utils::Url& url);
+    void start(const QAuthenticator& auth, const nx::utils::Url& url);
 
     QString sessionKey(
         HanwhaSessionType sessionType,
@@ -67,7 +67,7 @@ private:
 
     mutable QnMutex m_informationMutex;
     QAuthenticator m_lastAuth;
-    QUrl m_lastUrl;
+    nx::utils::Url m_lastUrl;
     HanwhaDeviceInfo m_cachedInformation;
 
     mutable QnMutex m_sessionMutex;

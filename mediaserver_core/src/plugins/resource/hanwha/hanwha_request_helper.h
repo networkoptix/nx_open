@@ -61,8 +61,8 @@ public:
 
     void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
 
-    static QUrl buildRequestUrl(
-        QUrl deviceUrl,
+    static nx::utils::Url buildRequestUrl(
+        nx::utils::Url deviceUrl,
         const QString& cgi,
         const QString& submenu,
         const QString& action,

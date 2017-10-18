@@ -403,7 +403,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
         for (const auto& creds: possibleCreds)
         {
             QAuthenticator auth = creds.toAuthenticator();
-            nx::utils::Url url(lit("//") + mdnsResponse.remoteAddress);
+            nx::utils::Url url(lit("//") + mdnsRemoteAddress);
             url.setPort(port);
             if (testCredentials(url, auth))
             {

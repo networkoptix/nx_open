@@ -270,7 +270,7 @@ bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& reques
     if (QnUuid(targetHeader->second) == commonModule()->moduleGUID())
         return true; //< Self proxy is not a proxy.
 
-    if (!QUrlQuery(request.requestLine.url).hasQueryItem(lit("authKey")))
+    if (!QUrlQuery(request.requestLine.url.toQUrl()).hasQueryItem(lit("authKey")))
         return true; //< Temporary authorization is required.
 
     const auto requestPath = request.requestLine.url.path();

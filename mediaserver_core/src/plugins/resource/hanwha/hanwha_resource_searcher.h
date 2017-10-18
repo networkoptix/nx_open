@@ -55,7 +55,7 @@ private:
 
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
-    HanwhaDeviceInfo cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url);
+    HanwhaDeviceInfo cachedDeviceInfo(const QAuthenticator& auth, const utils::Url &url);
 private:
     QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData

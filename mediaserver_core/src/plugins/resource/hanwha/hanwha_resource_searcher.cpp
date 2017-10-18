@@ -30,7 +30,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-HanwhaDeviceInfo HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url)
+HanwhaDeviceInfo HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url)
 {
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
     m_sharedContext[sharedId] = qnServerModule->sharedContextPool()->

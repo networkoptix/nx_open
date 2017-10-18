@@ -33,7 +33,7 @@ public:
     HanwhaChunkLoader();
     virtual ~HanwhaChunkLoader();
 
-    void start(const QAuthenticator& auth, const QUrl& url, int channelCount);
+    void start(const QAuthenticator& auth, const utils::Url &url, int channelCount);
     bool isStarted() const;
 
     qint64 startTimeUsec(int channelNumber) const;
@@ -66,7 +66,7 @@ private:
 
     int m_maxChannels = 0;
     QAuthenticator m_auth;
-    QUrl m_cameraUrl;
+    nx::utils::Url m_cameraUrl;
     mutable QnMutex m_mutex;
 
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};

@@ -38,7 +38,7 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
         });
 }
 
-static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, const QUrl& url)
+static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, const nx::utils::Url& url)
 {
     HanwhaDeviceInfo info{CameraDiagnostics::NoErrorResult()};
     HanwhaRequestHelper helper(auth, url.toString());
@@ -130,10 +130,10 @@ static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, co
     return info;
 }
 
-HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const QAuthenticator& auth, const QUrl& srcUrl)
+HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const QAuthenticator& auth, const nx::utils::Url& srcUrl)
 {
     bool isExpired = m_cacheUpdateTimer.hasExpired(kCacheDataTimeout);
-    QUrl url(srcUrl);
+    nx::utils::Url url(srcUrl);
     url.setQuery(QUrlQuery());
     QnMutexLocker lock(&m_informationMutex);
     if (m_lastAuth != auth || m_lastUrl != url || isExpired || !m_cachedInformation.diagnostics)
@@ -147,7 +147,7 @@ HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const QAuthenticat
     return m_cachedInformation;
 }
 
-void HanwhaSharedResourceContext::start(const QAuthenticator& auth, const QUrl& url)
+void HanwhaSharedResourceContext::start(const QAuthenticator& auth, const nx::utils::Url& url)
 {
     m_chunkLoader->start(auth, url, m_cachedInformation.channelCount);
     m_timeSynchronizer->start(auth, url);

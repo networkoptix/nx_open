@@ -61,7 +61,7 @@ HanwhaTimeSyncronizer::~HanwhaTimeSyncronizer()
     promise.get_future().wait();
 }
 
-void HanwhaTimeSyncronizer::start(const QAuthenticator& auth, const QUrl& url)
+void HanwhaTimeSyncronizer::start(const QAuthenticator& auth, const nx::utils::Url& url)
 {
     utils::promise<void> promise;
     m_timer.post(

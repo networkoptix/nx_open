@@ -120,7 +120,7 @@ void HanwhaRequestHelper::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
 }
 
 utils::Url HanwhaRequestHelper::buildRequestUrl(
-    QUrl deviceUrl,
+    nx::utils::Url deviceUrl,
     const QString& cgi,
     const QString& submenu,
     const QString& action,
@@ -139,7 +139,7 @@ utils::Url HanwhaRequestHelper::buildRequestUrl(
     return deviceUrl;
 }
 
-QUrl HanwhaRequestHelper::buildRequestUrl(
+nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
     const QString& action,

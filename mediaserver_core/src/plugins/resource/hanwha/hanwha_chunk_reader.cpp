@@ -46,7 +46,7 @@ HanwhaChunkLoader::~HanwhaChunkLoader()
     m_httpClient->pleaseStopSync();
 }
 
-void HanwhaChunkLoader::start(const QAuthenticator& auth, const QUrl& cameraUrl, int maxChannels)
+void HanwhaChunkLoader::start(const QAuthenticator& auth, const nx::utils::Url& cameraUrl, int maxChannels)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -85,7 +85,7 @@ void HanwhaChunkLoader::sendRequest()
 
 void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
 {
-    QUrl loadChunksUrl;
+    nx::utils::Url loadChunksUrl;
     {
         QnMutexLocker lock(&m_mutex);
         m_httpClient->setUserName(m_auth.user());
@@ -122,7 +122,7 @@ qint64 HanwhaChunkLoader::latestChunkTimeMs() const
 
 void HanwhaChunkLoader::sendLoadChunksRequest()
 {
-    QUrl loadChunksUrl;
+    nx::utils::Url loadChunksUrl;
     {
         QnMutexLocker lock(&m_mutex);
         m_httpClient->setUserName(m_auth.user());
