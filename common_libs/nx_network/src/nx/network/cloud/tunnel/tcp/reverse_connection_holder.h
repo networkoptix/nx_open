@@ -50,6 +50,8 @@ public:
     void saveSocket(std::unique_ptr<AbstractStreamSocket> socket);
     bool isActive() const;
 
+    static void setConnectionlessHolderExpirationTimeout(std::chrono::milliseconds value);
+
 private:
     void startCleanupTimer(std::chrono::milliseconds timeLeft);
     void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
