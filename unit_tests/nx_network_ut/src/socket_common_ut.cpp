@@ -85,14 +85,26 @@ TEST(HostAddress, Base)
     testHostAddress(nullptr, "2001:db8:0:2::1", boost::none, kIpV6b);
 }
 
+TEST(HostAddress, IpV6FromString)
+{
+    HostAddress addr("fd00::9465:d2ff:fe64:2772%1");
+    ASSERT_TRUE(addr.isIpAddress());
+    ASSERT_TRUE(addr.isPureIpV6());
+
+    in6_addr addr6;
+    ASSERT_TRUE(inet_pton(AF_INET6, "fd00::9465:d2ff:fe64:2772", &addr6));
+    ASSERT_TRUE(memcmp(&addr6, &addr.ipV6().first.get(), sizeof(in6_addr)) == 0);
+    ASSERT_EQ(1, addr.ipV6().second.get());
+}
+
 TEST(HostAddress, IsLocal)
 {
     ASSERT_TRUE(HostAddress("127.0.0.1").isLocal());
     ASSERT_TRUE(HostAddress("10.0.2.103").isLocal());
     ASSERT_TRUE(HostAddress("172.17.0.2").isLocal());
     ASSERT_TRUE(HostAddress("192.168.1.1").isLocal());
-    ASSERT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772").isLocal());
-    ASSERT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29").isLocal());
+    ASSERT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772%1").isLocal());
+    ASSERT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29%2").isLocal());
     ASSERT_TRUE(HostAddress("::ffff:172.25.4.8").isLocal());
 
     ASSERT_FALSE(HostAddress("12.34.56.78").isLocal());
