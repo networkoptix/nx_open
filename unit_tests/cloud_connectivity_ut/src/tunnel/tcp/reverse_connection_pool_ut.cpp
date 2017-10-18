@@ -100,6 +100,7 @@ public:
     ReverseConnectionPool():
         m_acceptingHostName(lm("%1.%1").args(QnUuid::createUuid().toSimpleByteArray()).toUtf8()),
         m_reverseConnectionPool(
+            &nx::network::SocketGlobals::aioService(),
             std::make_unique<MediatorClientTcpConnectionStub>(
                 std::make_shared<stun::test::AsyncClientMock>())),
         m_reverseConnector(
