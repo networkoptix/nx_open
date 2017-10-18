@@ -25,11 +25,9 @@ class NX_NETWORK_API ReverseConnectionPool:
     using base_type = aio::BasicPollable;
 
 public:
-    using MediatorConnection = hpm::api::MediatorClientTcpConnection;
-
     ReverseConnectionPool(
         aio::AIOService* aioService,
-        std::unique_ptr<MediatorConnection> mediatorConnection);
+        std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> mediatorConnection);
     virtual ~ReverseConnectionPool() override;
 
     ReverseConnectionPool(const ReverseConnectionPool&) = delete;
@@ -56,7 +54,7 @@ private:
     bool registerOnMediator(bool waitForRegistration = false);
     std::shared_ptr<ReverseConnectionHolder> getOrCreateHolder(const String& hostName);
 
-    std::unique_ptr<MediatorConnection> m_mediatorConnection;
+    std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> m_mediatorConnection;
     ReverseAcceptor m_acceptor;
     HostAddress m_publicIp;
     bool m_isReconnectHandlerSet;
