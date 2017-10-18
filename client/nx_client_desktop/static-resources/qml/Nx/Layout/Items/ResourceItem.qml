@@ -12,6 +12,14 @@ Item
 
     property var rotationAllowed: contentItem.item && contentItem.item.rotationAllowed
 
+    QtObject
+    {
+        id: d
+
+        readonly property int kReturnToBoundsAnimationDuration: 250
+        readonly property int kReturnToBoundsAnimationEasing: Easing.OutCubic
+    }
+
     MouseArea
     {
         id: mouseArea
@@ -38,12 +46,6 @@ Item
 
             flickableView.fitInView()
         }
-
-        CursorManager
-        {
-            id: cursorManager
-            target: mouseArea
-        }
     }
 
     RotationInstrument
@@ -54,10 +56,7 @@ Item
         target: contentItem
         enabled: rotationAllowed
 
-        onStarted:
-        {
-            contentPositionAnimation.complete()
-        }
+        onStarted: contentGeometryAnimation.complete()
     }
 
     ResizeInstrument
@@ -69,11 +68,16 @@ Item
         cursorManager: cursorManager
 
         frameWidth: 4 / contentItem.width * resourceItem.width
+        minWidth: gridLayout.cellSize.width / 2
+        minHeight: gridLayout.cellSize.height / 3
 
         onStarted:
         {
-            contentPositionAnimation.complete()
+            contentGeometryAnimation.complete()
+            resourceItem.parent.z = 1
         }
+
+        onFinished: contentGeometryAnimation.start()
     }
 
     DragInstrument
@@ -85,14 +89,24 @@ Item
 
         onStarted:
         {
-            contentPositionAnimation.stop()
+            contentGeometryAnimation.stop()
             resourceItem.parent.z = 1
         }
 
-        onFinished:
-        {
-            contentPositionAnimation.start()
-        }
+        onFinished: contentGeometryAnimation.start()
+    }
+
+    Item
+    {
+        id: cursorHolder
+        anchors.fill: contentItem
+        anchors.margins: resizeInstrument.resizing ? -64 : -resizeInstrument.frameWidth
+    }
+
+    CursorManager
+    {
+        id: cursorManager
+        target: cursorHolder
     }
 
     Loader
@@ -119,43 +133,74 @@ Item
             Geometry.aspectRatio(Qt.size(parent.width, parent.height)),
             rotation)
 
-        width: enclosedGeometry.width
-        height: enclosedGeometry.height
+        readonly property bool enableGeometryBindings:
+            !contentGeometryAnimation.running
+            && !resizeInstrument.resizing
 
         Binding
         {
             target: contentItem
             property: "x"
-            value: (resourceItem.width - contentItem.width) / 2
-            when: !contentPositionAnimation.running
+            value: (resourceItem.width - contentItem.enclosedGeometry.width) / 2
+            when: contentItem.enableGeometryBindings
         }
         Binding
         {
             target: contentItem
             property: "y"
-            value: (resourceItem.height - contentItem.height) / 2
-            when: !contentPositionAnimation.running
+            value: (resourceItem.height - contentItem.enclosedGeometry.height) / 2
+            when: contentItem.enableGeometryBindings
+        }
+        Binding
+        {
+            target: contentItem
+            property: "width"
+            value: contentItem.enclosedGeometry.width
+            when: contentItem.enableGeometryBindings
+        }
+        Binding
+        {
+            target: contentItem
+            property: "height"
+            value: contentItem.enclosedGeometry.height
+            when: contentItem.enableGeometryBindings
         }
 
         ParallelAnimation
         {
-            id: contentPositionAnimation
+            id: contentGeometryAnimation
 
             NumberAnimation
             {
                 target: contentItem
                 property: "x"
-                to: (resourceItem.width - contentItem.width) / 2
-                duration: 250
-                easing.type: Easing.OutCubic
+                to: (resourceItem.width - contentItem.enclosedGeometry.width) / 2
+                duration: d.kReturnToBoundsAnimationDuration
+                easing.type: d.kReturnToBoundsAnimationEasing
             }
             NumberAnimation
             {
                 target: contentItem
                 property: "y"
-                to: (resourceItem.height - contentItem.height) / 2
-                duration: 250
-                easing.type: Easing.OutCubic
+                to: (resourceItem.height - contentItem.enclosedGeometry.height) / 2
+                duration: d.kReturnToBoundsAnimationDuration
+                easing.type: d.kReturnToBoundsAnimationEasing
+            }
+            NumberAnimation
+            {
+                target: contentItem
+                property: "width"
+                to: contentItem.enclosedGeometry.width
+                duration: d.kReturnToBoundsAnimationDuration
+                easing.type: d.kReturnToBoundsAnimationEasing
+            }
+            NumberAnimation
+            {
+                target: contentItem
+                property: "height"
+                to: contentItem.enclosedGeometry.height
+                duration: d.kReturnToBoundsAnimationDuration
+                easing.type: d.kReturnToBoundsAnimationEasing
             }
 
             onStopped: resourceItem.parent.z = 0

@@ -32,7 +32,15 @@ public:
         const QRectF& rect,
         qreal frameWidth);
 
+    Q_INVOKABLE static bool isEdge(Section section);
+    Q_INVOKABLE static bool isCorner(Section section);
+
     Q_INVOKABLE static Qt::WindowFrameSection toQtWindowFrameSection(Section section);
+
+    Q_INVOKABLE static QPointF sectionCenterPoint(const QRectF& rect, Section section);
+    Q_INVOKABLE static Section oppositeSection(Section section);
+
+    Q_INVOKABLE static QSizeF sizeDelta(const QPointF& dragDelta, Section section);
 
     static void registedQmlType();
 };
