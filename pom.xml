@@ -914,7 +914,8 @@
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
-                <gcc.version>4.9.3</gcc.version>
+                <gcc.version>4.9.4</gcc.version>
+                <qt.version>5.6.1-2</qt.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
@@ -1268,7 +1269,18 @@
                 <artifact.name.cloud.suffix>-${cloudGroup}</artifact.name.cloud.suffix>
             </properties>
         </profile>
-
+        <profile>
+            <id>help</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>help</name>
+                </property>
+            </activation>
+            <modules>
+                <module>help</module>
+            </modules>
+        </profile>
         <!-- End of artifact naming profiles -->
 
     </profiles>

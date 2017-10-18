@@ -1150,33 +1150,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -4320,6 +4293,10 @@ to %1</source>
         <comment>Soft Trigger</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Disabled by schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
@@ -7209,14 +7186,6 @@ to %1</source>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-        <source>Enter Password...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Administrator Password</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Systems will be merged shortly</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7237,10 +7206,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password cannot be empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cloud Systems cannot be merged</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7254,6 +7219,14 @@ to %1</source>
     </message>
     <message>
         <source>Server will be connected to System shortly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter password...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administrator password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8076,7 +8049,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
+        <source>Press any key to stop the tour.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -50,6 +50,8 @@ void LegacyExportMediaTool::start()
     emit rangeChanged(0, 100);
     emit valueChanged(0);
 
+    const auto filterChain = QnImageFilterHelper::createFilterChain(d->settings.imageParameters);
+
     d->camera->exportMediaPeriodToFile(
         d->settings.timePeriod,
         d->settings.fileName,
@@ -58,7 +60,7 @@ void LegacyExportMediaTool::start()
         StreamRecorderRole::fileExport,
         d->settings.serverTimeZoneMs,
         d->settings.timelapseFrameStepMs,
-        d->settings.imageParameters
+        filterChain
     );
 }
 

@@ -25,8 +25,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace
-{
+namespace {
 
 /** Maximum sane duration: 30 minutes of recording. */
 static const qint64 kMaxRecordingDurationMs = 1000 * 60 * 30;
@@ -50,7 +49,7 @@ bool validateLength(const ExportMediaSettings& settings, qint64 durationMs)
     const auto exportSpeed = qMax(1ll, settings.timelapseFrameStepMs
         / kTimelapseBaseFrameStepMs);
 
-    // TODO: #GDM implement more precise estimation
+    // TODO: #GDM #Future implement more precise estimation
     return durationMs / exportSpeed <= kMaxRecordingDurationMs;
 }
 
@@ -61,16 +60,19 @@ qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint6
 
     if (const auto camera = mediaResource.dynamicCast<QnVirtualCameraResource>())
     {
-        //TODO: #GDM Cache bitrates in resource
+        //TODO: #GDM #3.2 Cache bitrates in resource
         auto bitrateInfos = QJson::deserialized<CameraBitrates>(
             camera->getProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME).toUtf8());
+
         if (!bitrateInfos.streams.empty())
+        {
             maxBitrateMBps = std::max_element(
                 bitrateInfos.streams.cbegin(), bitrateInfos.streams.cend(),
                 [](const CameraBitrateInfo& l, const CameraBitrateInfo &r)
                 {
                     return l.actualBitrate < r.actualBitrate;
                 })->actualBitrate;
+        }
     }
 
     return maxBitrateMBps * durationMs / (kMsPerSecond * kBitsPerByte);
@@ -118,7 +120,7 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     if (settings.fileName.extension == FileExtension::avi && periods.size() > 1)
         results.set(int(Result::nonContinuosAvi));
 
-    if  (!validateLength(settings, durationMs))
+    if (!validateLength(settings, durationMs))
         results.set(int(Result::tooLong));
 
     core::transcoding::FilterChain filters(settings.transcodingSettings);
@@ -142,27 +144,47 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
     const ExportLayoutSettings& settings)
 {
     Results results;
-    if (FileExtensionUtils::isExecutable(settings.filename.extension))
-    {
-        // TODO: #GDM estimated binary size for layout.
-        //if (exeFileIsTooBig(settings.layout, durationMs))
-        //    results.set(int(Result::tooBigExeFile));
-    }
+
+    const auto isExecutable = FileExtensionUtils::isExecutable(settings.filename.extension);
+    qint64 totalDurationMs = 0;
+    qint64 estimatedTotalSizeMb = 0;
 
     const auto resPool = qnClientCoreModule->commonModule()->resourcePool();
     for (const auto& item: settings.layout->getItems())
     {
         const auto resource = resPool->getResourceByDescriptor(item.resource);
-        if (resource && !resource.dynamicCast<QnVirtualCameraResource>())
+        if (!resource)
+            continue;
+
+        // TODO: #GDM #3.1.1 What's with re-export from exported layouts?
+        if (!resource.dynamicCast<QnVirtualCameraResource>())
         {
             results.set(int(Result::nonCameraResources));
-            break;
+            continue;
         }
+
+        const auto mediaResource = resource.dynamicCast<QnMediaResource>();
+        if (!mediaResource)
+        {
+            results.set(int(Result::nonCameraResources));
+            continue;
+        }
+
+        const auto loader = qnClientModule->cameraDataManager()->loader(mediaResource, false);
+        const auto durationMs = loader
+            ? loader->periods(Qn::RecordingContent).intersected(settings.period).duration()
+            : settings.period.durationMs;
+
+        totalDurationMs += durationMs;
+        if (isExecutable)
+            estimatedTotalSizeMb += estimatedExportVideoSizeMb(mediaResource, durationMs);
     }
 
-    // Rough estimation.
-    if (settings.period.durationMs * settings.layout->getItems().size() > 1000 * 60 * 30)
+    if (totalDurationMs > kMaxRecordingDurationMs)
         results.set(int(Result::tooLong));
+
+    if (isExecutable && estimatedTotalSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb)
+        results.set(int(Result::tooBigExeFile));
 
     return results;
 }

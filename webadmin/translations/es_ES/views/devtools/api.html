@@ -25,7 +25,7 @@
                                 <ul>
                                     <li ng-repeat="function in group.functions | orderBy:'name' | filter: {searchLabel:searchFunc}"
                                         ng-if="!function.proprietary || allowProprietary">
-                                        <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                        <span class="label label-danger" ng-if="function.proprietary">propietario</span>
                                         <b><a ng-click="setActiveFunction(group,function,$event)"
                                               ng-href="#/developers/api{{function.url}}"
                                               ng-bind-html="(function.caption || function.name) | escape | highlight:searchFunc"></a></b>
@@ -48,14 +48,9 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: {$:searchFunc}"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
-                                            <a ng-click="setActiveFunction(group,function,$event)"
-                                               ng-href="#/developers/api{{function.url}}">
-                                                <b ng-if="function.caption"
-                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b>
-                                                <span ng-if="function.method">{{function.method}}:</span>
-                                                <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b>
-                                            </a>
+                                            <span class="label label-danger" ng-if="function.proprietary">propietario</span>                                             <a ng-click="setActiveFunction(group,function,$event)"
+                                               ng-href="#/developers/api{{function.url}}"><b ng-if="function.caption"
+                                                   ng-bind-html="function.caption | escape | highlight:searchFunc"></b> <span ng-if="function.method">{{function.method}}:</span> <b ng-bind-html="function.url | escape | highlight:searchFunc" ></b></a>
                                             <span ng-bind-html="function.description.xml | highlight:searchFunc" class="api-description-strip"></span>
                                         </li>
                                     </ul>
@@ -68,30 +63,24 @@
                                               title="back to functions list"
                                               href="#/developers/api">(X)</a></small>
                                 </h2>
-                                <span class="label label-danger" ng-if="activeFunction.proprietary">proprietary</span>
+                                <span class="label label-danger" ng-if="activeFunction.proprietary">propietario</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
                                 <ng-include src="Config.viewsDir + 'devtools/api_form.html'"
                                             ng-if="apiMethod.method"></ng-include>
 
                                 <div ng-if="activeFunction.result.params || activeFunction.result.caption">
-                                    <h3>Resultados</h3>
+                                    <h3>Resultado</h3>
                                     <p>{{activeFunction.result.caption}}</p>
                                     <ul ng-if="activeFunction.result.params">
                                         <li ng-repeat="param in activeFunction.result.params">
-                                            <div class="label label-danger" ng-if="param.proprietary">proprietary</div>
-                                            <div class="label label-danger" ng-if="param.optional=='false'">required</div>
+                                            <div class="label label-danger" ng-if="param.proprietary">propietario</div>
+                                            <div class="label label-danger" ng-if="param.optional=='false'">requerido</div>
                                             <b>{{param.name}}</b>
                                             <span ng-if="param.description.xml" ng-bind-html="param.description.xml"></span>
                                             <span ng-if="param.values">
-                                                Values:
-                                                <ul>
-                                                    <li ng-repeat="value in param.values">
-                                                        <b>{{value.name}}</b>
-                                                        <span ng-if="value.description.xml"
-                                                              ng-bind-html="value.description.xml"></span>
-                                                    </li>
-                                                </ul>
+                                                Valores: <ul><li ng-repeat="value in param.values"><b>{{value.name}}</b> <span ng-if="value.description.xml"
+                                                              ng-bind-html="value.description.xml"></span>                                                     </li>                                                 </ul>
                                             </span>
                                         </li>
                                     </ul>

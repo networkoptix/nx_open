@@ -60,9 +60,9 @@ void QnSyncPlayArchiveDelegate::setSingleshotMode(bool value)
     m_ownerDelegate->setSingleshotMode(value);
 }
 
-void QnSyncPlayArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnSyncPlayArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
-    m_ownerDelegate->onReverseMode(displayTime, value);
+    m_ownerDelegate->setSpeed(displayTime, value);
 }
 
 /*
@@ -126,9 +126,9 @@ void QnSyncPlayArchiveDelegate::beforeSeek(qint64 time)
     m_ownerDelegate->beforeSeek(time);
 }
 
-void QnSyncPlayArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
+void QnSyncPlayArchiveDelegate::beforeChangeSpeed(double speed)
 {
-    m_ownerDelegate->beforeChangeReverseMode(reverseMode);
+    m_ownerDelegate->beforeChangeSpeed(speed);
 }
 
 bool QnSyncPlayArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch, const QSize& size)

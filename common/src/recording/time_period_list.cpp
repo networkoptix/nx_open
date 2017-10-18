@@ -404,6 +404,45 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period)
     }
 }
 
+void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
+{
+    if (empty() || periodList.isEmpty())
+        return;
+
+    const_iterator srcItr = begin();
+    const_iterator dstItr = periodList.begin();
+    QnTimePeriodList result;
+    QnTimePeriod subtractPeriod = *dstItr;
+
+    while (srcItr != end())
+    {
+        while (srcItr != end() && srcItr->startTimeMs < subtractPeriod.startTimeMs)
+            result << *srcItr++;
+        if (!result.isEmpty())
+            result.last().truncate(subtractPeriod.startTimeMs);
+
+        while (srcItr != end() && srcItr->endTimeMs() <= subtractPeriod.endTimeMs())
+            srcItr++;
+        if (srcItr != end())
+        {
+            result << *srcItr++;
+            result.last().truncateFront(subtractPeriod.endTimeMs());
+        }
+
+        if (dstItr != periodList.end() - 1)
+        {
+            subtractPeriod = *(++dstItr);
+            if (!result.isEmpty())
+            {
+                result.last().truncate(subtractPeriod.startTimeMs);
+                if (result.last().isEmpty())
+                    result.pop_back();
+            }
+        }
+    }
+    *this = result;
+}
+
 void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint)
 {
     qint64 erasePoint = dividerPoint;
@@ -440,7 +479,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     }
 
 
-    NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
+    //NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
     if (periods.isEmpty())
     {
         periods = tail;

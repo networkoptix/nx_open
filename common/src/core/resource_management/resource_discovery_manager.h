@@ -165,7 +165,6 @@ private:
     QnResourceList findNewResources();
 
     void appendManualDiscoveredResources(QnResourceList& resources);
-    void dtsAssignment();
 
     void updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();

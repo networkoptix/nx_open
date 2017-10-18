@@ -24,7 +24,9 @@ class QnDesktopCameraConnection: public QnLongRunnable, public QnConnectionConte
 public:
     typedef QnLongRunnable base_type;
 
-    QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &server);
+    QnDesktopCameraConnection(QnDesktopResource* owner,
+        const QnMediaServerResourcePtr& server,
+        const QnUuid& userId);
     virtual ~QnDesktopCameraConnection();
 
     virtual void pleaseStop() override;
@@ -37,6 +39,7 @@ private:
 private:
     QnDesktopResource* m_owner;
     QnMediaServerResourcePtr m_server;
+    QnUuid m_userId;
     std::shared_ptr<QnDesktopCameraConnectionProcessor> processor;
     QSharedPointer<AbstractStreamSocket> tcpSocket;
     std::unique_ptr<nx_http::HttpClient> httpClient;

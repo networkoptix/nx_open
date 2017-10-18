@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import Nx.Models 1.0;
+
 import com.networkoptix.qml 1.0;
 
 import "."
@@ -32,7 +33,10 @@ Rectangle
         {
             width: 320;
             height: 120;
-            y: ((searchEdit.y - height) / 2);
+            y: searchEdit.visible
+                ? (searchEdit.y - height) / 2
+                : (gridHolder.y + grid.y - height) / 2
+
             anchors.horizontalCenter: parent.horizontalCenter;
             source: "qrc:/skin/welcome_page/logo.png"
             fillMode: ((sourceSize.height < height) && (sourceSize.width < width)
@@ -40,12 +44,11 @@ Rectangle
                 : Image.PreserveAspectFit);
         }
 
-
         NxSearchEdit
         {
             id: searchEdit;
 
-            visible: grid.totalItemsCount > grid.itemsPerPage
+            visible: grid.totalCount > grid.itemsPerPage
 
             anchors.bottom: gridHolder.top
             anchors.bottomMargin: 16
@@ -75,6 +78,7 @@ Rectangle
                 readonly property int tileHeight: 96;
                 readonly property int tileWidth: 280;
                 readonly property int tileSpacing: 16;
+                property int totalCount: model ? model.sourceRowsCount : 0
 
                 readonly property int maxColsCount:
                 {
@@ -96,7 +100,6 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: (model ? model.sourceRowsCount : 0);
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -322,12 +325,14 @@ Rectangle
             {
                 id: pageSwitcher;
 
+                readonly property int kMaxPagesCount: 10
+
                 visible: (pagesCount > 1);
                 anchors.horizontalCenter: gridHolder.horizontalCenter;
                 anchors.top: gridHolder.bottom;
                 anchors.topMargin: 22;
 
-                pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
+                pagesCount: Math.min(grid.pagesCount, kMaxPagesCount);
 
                 onCurrentPageChanged:
                 {
@@ -343,7 +348,7 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: (!grid.model || (grid.model.sourceRowsCount == 0));
+            visible: (!grid.model || (grid.totalCount == 0));
         }
 
         Item
@@ -374,7 +379,7 @@ Rectangle
             anchors.bottomMargin: 64;   // Magic const by design
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            text: grid.totalItemsCount > 0
+            text: grid.count > 0
                 ? qsTr("Connect to Another Server...")
                 : qsTr("Connect to Server...")
 

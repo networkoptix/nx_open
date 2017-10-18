@@ -14,8 +14,6 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_media_stream_info.h>
 
-class QnAbstractDTSFactory;
-
 class CameraMediaStreams;
 class CameraBitrates;
 class CameraBitrateInfo;
@@ -28,11 +26,6 @@ class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
     using base_type = QnSecurityCamResource;
 public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
-
-    QnAbstractDTSFactory* getDTSFactory();
-    void setDTSFactory(QnAbstractDTSFactory* factory);
-    void lockDTSFactory();
-    void unLockDTSFactory();
 
     virtual QString getUniqueId() const override;
 
@@ -58,7 +51,6 @@ public:
     QnAspectRatio aspectRatio() const;
 
 private:
-    QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
     std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;

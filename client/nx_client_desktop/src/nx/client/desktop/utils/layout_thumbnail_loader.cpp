@@ -374,14 +374,14 @@ void LayoutThumbnailLoader::doLoadAsync()
         QSharedPointer<QnSingleThumbnailLoader> loader(new QnSingleThumbnailLoader(
             camera, d->msecSinceEpoch, 0, thumbnailSize, d->format));
 
-        connect(loader.data(), &QnImageProvider::statusChanged,
+        connect(loader.data(), &QnImageProvider::statusChanged, this,
             [this, loader, rotation, scaledCellRect](Qn::ThumbnailStatus status)
             {
                 d->updateTileStatus(status, QnGeometry::aspectRatio(loader->sizeHint()),
                     scaledCellRect, rotation);
             });
 
-        connect(loader.data(), &QnImageProvider::imageChanged,
+        connect(loader.data(), &QnImageProvider::imageChanged, this,
             [this, loader, rotation, scaledCellRect, zoomRect](const QImage& tile)
             {
                 d->drawTile(tile, QnGeometry::aspectRatio(loader->sizeHint()),

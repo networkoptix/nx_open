@@ -15,6 +15,11 @@ namespace {
 
 static constexpr qreal kSelectionOpacity = 0.2;
 
+bool isZoomWindow(QnResourceWidget* widget)
+{
+    return widget->frameDistinctionColor().isValid();
+}
+
 } // namespace
 
 namespace nx {
@@ -53,18 +58,21 @@ QColor SelectionWidget::calculateFrameColor() const
         case QnResourceWidget::SelectionState::focusedAndSelected:
         case QnResourceWidget::SelectionState::selected:
             return qnNxStyle->mainColor(QnNxStyle::Colors::kBrand);
+
         case QnResourceWidget::SelectionState::focused:
-            return (m_widget->frameDistinctionColor().isValid()
+            return isZoomWindow(m_widget)
                 ? m_widget->frameDistinctionColor().lighter()
-                : qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(4));
+                : qnNxStyle->mainColor(QnNxStyle::Colors::kBrand).darker(4);
+
         case QnResourceWidget::SelectionState::inactiveFocused:
-            return (m_widget->frameDistinctionColor().isValid()
+            return isZoomWindow(m_widget)
                 ? m_widget->frameDistinctionColor()
-                : qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(3));
+                : qnNxStyle->mainColor(QnNxStyle::Colors::kBase).lighter(3);
+
         default:
-            return (m_widget->frameDistinctionColor().isValid()
+            return isZoomWindow(m_widget)
                 ? m_widget->frameDistinctionColor()
-                : Qt::transparent);
+                : Qt::transparent;
     }
 }
 
@@ -86,13 +94,18 @@ void SelectionWidget::paintInnerFrame(QPainter* painter)
 {
     static const int kInnerBorderWidth = 2;
 
+
     switch (m_widget->selectionState())
     {
         case QnResourceWidget::SelectionState::invalid:
         case QnResourceWidget::SelectionState::notSelected:
         case QnResourceWidget::SelectionState::selected:
+        {
             // Skipe inner frame painting.
-            return;
+            if (!isZoomWindow(m_widget))
+                return;
+            break;
+        }
 
         case QnResourceWidget::SelectionState::inactiveFocused:
         case QnResourceWidget::SelectionState::focused:
@@ -114,8 +127,12 @@ void SelectionWidget::paintOuterFrame(QPainter* painter)
     {
         case QnResourceWidget::SelectionState::invalid:
         case QnResourceWidget::SelectionState::notSelected:
+        {
             // Skipe outer frame painting.
-            return;
+            if (!isZoomWindow(m_widget))
+                return;
+            break;
+        }
 
         case QnResourceWidget::SelectionState::inactiveFocused:
         case QnResourceWidget::SelectionState::focused:

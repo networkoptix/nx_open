@@ -14,7 +14,9 @@
             <tr ng-if="user.isAdmin"><td>Minden szerver</td><td>
                 <div ng-repeat="server in mediaServers" ng-class="{active:server.active}">
                     <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" ></icon>
-                    <a ng-if="server.status=='Online'" ng-href="{{server.apiUrl}}" target="_blank"><b>{{server.name}}</b> {{server.apiUrlFormatted}}</a>                     <span ng-if="server.status!='Online'" ><b>{{server.name}}</b> {{server.apiUrlFormatted}}</span> {{server.active?'(current)':''}}
+                    <a ng-if="server.status=='Online'" ng-href="{{server.apiUrl}}" target="_blank"><b>{{server.name}}</b> {{server.apiUrlFormatted}}</a>
+                    <span ng-if="server.status!='Online'" ><b>{{server.name}}</b> {{server.apiUrlFormatted}}</span>
+                    {{server.active?'(current)':''}}
                 </div>
             </td></tr>
         </table>

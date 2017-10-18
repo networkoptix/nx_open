@@ -53,7 +53,7 @@ void QnCameraMotionMaskWidget::init()
 
     createWorkbenchLayout();
 
-    QnWorkbenchDisplay *display = m_context->display();
+    auto display = m_context->display();
     display->setLightMode(Qn::LightModeFull);
     display->setScene(m_scene.data());
     display->setView(m_view.data());
@@ -61,12 +61,6 @@ void QnCameraMotionMaskWidget::init()
     m_controller.reset(new QnWorkbenchController(display));
 
     /* Disable unused instruments. */
-    m_controller->itemRightClickInstrument()->disable();
-    m_controller->moveInstrument()->disable();
-    m_controller->resizingInstrument()->disable();
-    m_controller->rubberBandInstrument()->disable();
-    m_controller->itemLeftClickInstrument()->disable();
-    m_controller->sceneClickInstrument()->disable();
     m_controller->setMenuEnabled(false);
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
@@ -102,7 +96,9 @@ void QnCameraMotionMaskWidget::createWorkbenchLayout()
 {
     const auto workbenchLayout = qnWorkbenchLayoutsFactory->create(this);
     workbenchLayout->setCellSpacing(0);
-    workbenchLayout->setFlags(workbenchLayout->flags() | QnLayoutFlag::FixedViewport);
+    workbenchLayout->setFlags(workbenchLayout->flags()
+        | QnLayoutFlag::FixedViewport
+        | QnLayoutFlag::MotionWidget);
     m_context->workbench()->setCurrentLayout(workbenchLayout);
 }
 

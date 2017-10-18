@@ -548,10 +548,16 @@ void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
     }
 }
 
-void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target)
+void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target, int defaultPort)
 {
-    for (const auto& addr : source.split(L';', QString::SkipEmptyParts))
-        target.push_back(addr);
+    for (const auto& part: source.split(L';', QString::SkipEmptyParts))
+    {
+        SocketAddress endpoint(part);
+        if (endpoint.port == 0)
+            endpoint.port = (uint16_t) defaultPort;
+
+        target.push_back(std::move(endpoint));
+    }
 }
 
 static QString serializeNetAddrList(const QList<SocketAddress>& netAddrList)
@@ -608,7 +614,7 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
     fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
 
     QList<SocketAddress> resNetAddrList;
-    deserializeNetAddrList(src.networkAddresses, resNetAddrList);
+    deserializeNetAddrList(src.networkAddresses, resNetAddrList, QUrl(src.url).port());
 
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);

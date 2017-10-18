@@ -37,7 +37,7 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const
     return Qn::Online;
 }
 
-QnLayoutResourcePtr QnLayoutResource::clone() const
+QnLayoutResourcePtr QnLayoutResource::clone(QHash<QnUuid, QnUuid>* remapHash) const
 {
     QnLayoutResourcePtr result(new QnLayoutResource(commonModule()));
 
@@ -63,6 +63,8 @@ QnLayoutResourcePtr QnLayoutResource::clone() const
     }
     for (int i = 0; i < items.size(); i++)
         items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
+    if (remapHash)
+        *remapHash = newUuidByOldUuid;
 
     result->setItems(items);
     return result;

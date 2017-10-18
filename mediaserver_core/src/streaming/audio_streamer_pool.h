@@ -23,8 +23,15 @@ public:
         Stop
     };
 
-    bool startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString& error, const QnRequestParams &params);
-    bool startStopStreamToResource(QnAbstractStreamDataProviderPtr desktopDataProvider, const QnUuid& resourceId, Action action, QString &error);
+    bool startStopStreamToResource(const QString& sourceId,
+        const QnUuid& resourceId,
+        Action action,
+        QString& error,
+        const QnRequestParams& params);
+    bool startStopStreamToResource(QnAbstractStreamDataProviderPtr desktopDataProvider,
+        const QnUuid& resourceId,
+        Action action,
+        QString& error);
 
     QnAbstractStreamDataProviderPtr getActionDataProvider(const nx::vms::event::AbstractActionPtr& action);
     bool destroyActionDataProvider(const nx::vms::event::AbstractActionPtr& action);
@@ -32,7 +39,7 @@ public:
 private:
     QString calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const;
 
-    QnVideoCameraPtr getTransmitSource(const QnUuid& clientId) const;
+    QnVideoCameraPtr getTransmitSource(const QString& sourceId) const;
     QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId) const;
 private:
     QnMutex m_prolongedProvidersMutex;

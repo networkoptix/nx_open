@@ -13,8 +13,6 @@ EventRuleWatcher::EventRuleWatcher(QObject* parent):
     Connective<QObject>(parent),
     m_ruleHolder(qnServerModule->commonModule())
 {
-    qRegisterMetaType<std::set<QnUuid>>();
-
     auto ruleManager = qnServerModule
         ->commonModule()
         ->eventRuleManager();
@@ -54,7 +52,7 @@ void EventRuleWatcher::at_ruleRemoved(const QnUuid& ruleId)
     emit rulesUpdated(m_ruleHolder.removeRule(ruleId));
 }
 
-std::set<QnUuid> EventRuleWatcher::watchedEventsForResource(const QnUuid& resourceId)
+QSet<QnUuid> EventRuleWatcher::watchedEventsForResource(const QnUuid& resourceId)
 {
     return m_ruleHolder.watchedEvents(resourceId);
 }

@@ -557,20 +557,19 @@ struct ModifyResourceAccess
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
-        if (isRemove)
-            return commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
-
         bool result = false;
-        if (!target)
+        if (isRemove)
+            result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
+        else if (!target)
             result = commonModule->resourceAccessManager()->canCreateResource(userResource, param);
         else
             result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
-            NX_LOG(lit("Modify resource access returned false for transaction %1. User resource isNull: %2. Target resource isNull %3")
-                .arg(getTransactionDescriptorByParam<Param>()->getName())
-                .arg(!(bool)userResource)
-                .arg(!(bool)target),
+            NX_LOG(lit("%1 resource access returned false. User resource: %3. Target resource: %4")
+                .arg(isRemove ? "Remove" : "Modify")
+                .arg(userResource ? userResource->getId().toString() : QString())
+                .arg(target ? target->getId().toString() : QString()),
                 cl_logWARNING);
 
         return result;

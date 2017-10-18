@@ -4,14 +4,16 @@
 
 #include <core/ptz/ptz_limits.h>
 
-#include <plugins/resource/onvif/onvif_resource.h>
-#include <plugins/resource/hanwha/hanwha_attributes.h>
-#include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
+#include <plugins/resource/hanwha/hanwha_attributes.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
+#include <plugins/resource/hanwha/hanwha_stream_limits.h>
+#include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
+#include <nx/utils/timer_holder.h>
 
 extern "C" {
 
@@ -50,7 +52,7 @@ public:
     virtual QnIOPortDataList getInputPortList() const override;
 
     virtual bool setRelayOutputState(
-        const QString& ouputId,
+        const QString& outputId,
         bool activate,
         unsigned int autoResetTimeoutMs = 0) override;
 
@@ -65,7 +67,11 @@ public:
 
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const override;
 
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
+
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
+
+    QnSemaphore* requestSemaphore();
 
     bool isVideoSourceActive();
 
@@ -99,15 +105,20 @@ public:
 
     QString nxProfileName(Qn::ConnectionRole role) const;
 
+    static const QString kNormalizedSpeedPtzTrait;
+    static const QString kHas3AxisPtz;
+
+    std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
-
+    virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
+    virtual bool allowRtspVideoLayout() const override { return false; }
 private:
     CameraDiagnostics::Result init();
     CameraDiagnostics::Result initSystem();
-    CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
@@ -239,6 +250,8 @@ private:
 
     HanwhaPortInfo portInfoFromId(const QString& id) const;
 
+    bool setRelayOutputStateInternal(const QString& outputId, bool activate);
+
 private:
     using AdvancedParameterId = QString;
 
@@ -260,6 +273,9 @@ private:
     nx::media::CameraMediaCapability m_capabilities;
     QMap<QString, QnIOPortData> m_ioPortTypeById;
     std::atomic<bool> m_areInputPortsMonitored{false};
+
+    nx::utils::TimerHolder m_timerHolder;
+    std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
 };
 
 } // namespace plugins

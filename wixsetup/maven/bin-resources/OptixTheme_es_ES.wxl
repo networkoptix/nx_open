@@ -22,7 +22,7 @@
   <String Id="HelpCloseButton">Cerrar</String>
   <String Id="InstallAcceptCheckbox">Acepto los términos y condiciones de la licencia</String>
   <String Id="InstallOptionsButton">Opciones</String>
-  <String Id="InstallInstallButton">Instala</String>
+  <String Id="InstallInstallButton">Aceptar e Instalar</String>
   <String Id="InstallCloseButton">Cerrar</String>
   <String Id="OptionsHeader">Opciones de instalación</String>
   <String Id="OptionsLocationLabel">Ubicación de la instalación:</String>
@@ -61,13 +61,13 @@
   <String Id="InstallLicenseText">Haciendo clic en \"Aceptar e instalar\" usted se compromete a</String>
   <String Id="Options">Opciones</String>
   <String Id="SelectApps">Seleccione aplicaciones para instalarse:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="msierrFirewallCannotConnect">No se puede conectar al Cortafuegos de Windows. ([2] [3] [4] [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Configuración de Cortafuegos de Windows</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Configurando el cortafuegos de Windows</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Retrocediendo la configuración de Cortafuegos de Windows</String>
+  <String Id="WixExecFirewallExceptionsInstall">Instalación de la configuración de Cortafuegos de Windows</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Retrocediendo la configuración de Cortafuegos de Windows</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Desinstalación de la configuración de Cortafuegos de Windows</String>
+  <String Id="Product_ArchMismatch_x86">Este paquete está diseñado para sistemas operativos de 32 bits. El programa de instalación saldrá ahora.</String>
+  <String Id="Product_ArchMismatch_x64">Este paquete está diseñado para sistemas operativos de 64 bits. El programa de instalación saldrá ahora.</String>
 </WixLocalization>
