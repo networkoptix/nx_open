@@ -161,6 +161,11 @@ protected:
             request.requestLine.url.toString(QUrl::FullyEncoded).toUtf8());
     }
 
+    void addAdditionalHttpHeader(const nx::String& name, const nx::String& value)
+    {
+        m_httpClient.addAdditionalHeader(name, value);
+    }
+
 private:
     std::unique_ptr<TestHttpServer> m_redirector;
     std::unique_ptr<TestHttpServer> m_resourceServer;
@@ -212,6 +217,8 @@ TEST_F(AsyncHttpClientRedirect, message_body_is_redirected)
 
 TEST_F(AsyncHttpClientRedirect, no_duplicate_headers_in_redirected_request)
 {
+    addAdditionalHttpHeader("TestHeader", "Value");
+
     givenTwoHttpServersWithRedirection();
     whenPostingResourceToRedirectionServer();
     thenRequestToContentServerDoesNotContainDuplicateHeaders();
