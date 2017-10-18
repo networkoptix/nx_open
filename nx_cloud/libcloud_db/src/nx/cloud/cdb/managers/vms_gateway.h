@@ -47,6 +47,7 @@ public:
     virtual void merge(
         const std::string& username,
         const std::string& targetSystemId,
+        const std::string& systemIdToMergeTo,
         VmsRequestCompletionHandler completionHandler) = 0;
 };
 
@@ -62,6 +63,7 @@ public:
     virtual void merge(
         const std::string& username,
         const std::string& targetSystemId,
+        const std::string& systemIdToMergeTo,
         VmsRequestCompletionHandler completionHandler) override;
 
 private:
@@ -86,7 +88,8 @@ private:
         const std::string& username,
         MediaServerClient* clientPtr);
 
-    MergeSystemData prepareMergeRequestParameters();
+    MergeSystemData prepareMergeRequestParameters(
+        const std::string& systemIdToMergeTo);
 
     void reportRequestResult(
         MediaServerClient* clientPtr,

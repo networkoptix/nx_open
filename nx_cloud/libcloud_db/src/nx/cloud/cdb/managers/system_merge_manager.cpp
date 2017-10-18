@@ -116,6 +116,7 @@ void SystemMergeManager::issueVmsMergeRequest(
     m_vmsGateway->merge(
         username ? *username : std::string(),
         mergeRequestContext->idOfSystemToBeMerged,
+        mergeRequestContext->idOfSystemToMergeTo,
         std::bind(&SystemMergeManager::processVmsMergeRequestResult, this, 
             mergeRequestContext, _1));
 }

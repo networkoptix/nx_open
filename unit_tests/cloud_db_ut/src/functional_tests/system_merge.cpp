@@ -122,6 +122,11 @@ protected:
         m_prevResultCode = mergeSystems(m_ownerAccount, m_masterSystem.id, m_slaveSystem.id);
     }
 
+    void whenSlaveSystemFailsEveryRequest()
+    {
+        m_vmsApiResult = nx_http::StatusCode::internalServerError;
+    }
+
     void thenResultCodeIs(api::ResultCode resultCode)
     {
         ASSERT_EQ(resultCode, m_prevResultCode);
@@ -190,6 +195,7 @@ private:
     TestHttpServer m_vmsGatewayEmulator;
     nx::utils::SyncQueue<nx_http::Request> m_vmsApiRequests;
     boost::optional<nx_http::Request> m_prevVmsApiRequest;
+    boost::optional<nx_http::StatusCode::Value> m_vmsApiResult;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         ec2::ConnectionManager*,
@@ -212,7 +218,8 @@ private:
         QnJsonRestResult response;
         response.error = QnRestResult::Error::NoError;
 
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+        nx_http::RequestResult requestResult(
+            m_vmsApiResult ? *m_vmsApiResult : nx_http::StatusCode::ok);
         requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
             "application/json",
             QJson::serialized(response));
@@ -280,7 +287,15 @@ TEST_F(SystemMerge, merge_request_invokes_merge_request_to_slave_system)
     thenVmsApiMergeRequestHasBeenIssuedToSlaveSystem();
 }
 
-// TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
+TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
+{
+    givenTwoOnlineSystemsWithSameOwner();
+    
+    whenSlaveSystemFailsEveryRequest();
+    whenMergeSystems();
+
+    thenResultCodeIs(api::ResultCode::vmsRequestFailure);
+}
 
 } // namespace test
 } // namespace cdb

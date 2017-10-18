@@ -22,6 +22,12 @@ namespace test {
 class VmsGateway:
     public ::testing::Test
 {
+public:
+    VmsGateway():
+        m_idOfSystemToMergeTo(QnUuid::createUuid().toSimpleString().toStdString())
+    {
+    }
+
 protected:
     void givenUnreachableVms()
     {
@@ -42,12 +48,28 @@ protected:
         m_vmsGateway->merge(
             m_ownerAccount.email,
             m_systemId,
+            m_idOfSystemToMergeTo,
             std::bind(&VmsGateway::saveMergeResult, this, _1));
     }
 
     void thenMergeRequestIsReceivedByServer()
     {
-        m_vmsApiRequests.pop();
+        m_prevReceivedVmsApiRequest = m_vmsApiRequests.pop();
+    }
+
+    void andMergeRequestParametersAreExpected()
+    {
+        const auto mergeRequestData = 
+            QJson::deserialized<MergeSystemData>(m_prevReceivedVmsApiRequest->messageBody);
+
+        ASSERT_FALSE(mergeRequestData.mergeOneServer);
+        ASSERT_TRUE(mergeRequestData.takeRemoteSettings);
+        ASSERT_FALSE(mergeRequestData.ignoreIncompatible);
+        // TODO getKey
+        // TODO postKey
+        QUrl remoteSystemUrl(mergeRequestData.url);
+        ASSERT_EQ(nx_http::kSecureUrlSchemeName, remoteSystemUrl.scheme());
+        ASSERT_EQ(m_idOfSystemToMergeTo, remoteSystemUrl.host().toStdString());
     }
 
     void thenMergeRequestSucceeded()
@@ -85,10 +107,12 @@ private:
     AccountManagerStub m_accountManagerStub;
     std::unique_ptr<TestHttpServer> m_mediaserverEmulator;
     nx::utils::SyncQueue<nx_http::Request> m_vmsApiRequests;
+    boost::optional<nx_http::Request> m_prevReceivedVmsApiRequest;
     nx::utils::SyncQueue<VmsRequestResult> m_vmsRequestResults;
     conf::Settings m_settings;
     std::unique_ptr<cdb::VmsGateway> m_vmsGateway;
     std::string m_systemId;
+    std::string m_idOfSystemToMergeTo;
     boost::optional<nx_http::StatusCode::Value> m_forcedHttpResponseStatus;
     AccountWithPassword m_ownerAccount;
 
@@ -165,6 +189,14 @@ TEST_F(VmsGateway, vms_merge_request_is_authenticated)
 
     thenMergeRequestSucceeded();
     thenRequestIsAuthenticatedWithCredentialsSpecified();
+}
+
+TEST_F(VmsGateway, merge_request_parameteres_are_correct)
+{
+    whenIssueMergeRequest();
+ 
+    thenMergeRequestIsReceivedByServer();
+    andMergeRequestParametersAreExpected();
 }
 
 TEST_F(VmsGateway, proper_error_is_reported_when_vms_is_unreachable)
