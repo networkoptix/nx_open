@@ -182,6 +182,8 @@ static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
 
+static const QString kHanwhaNvrDeviceType = lit("NVR");
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx

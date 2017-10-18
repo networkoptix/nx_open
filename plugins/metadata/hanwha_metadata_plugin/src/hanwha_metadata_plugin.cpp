@@ -1,4 +1,4 @@
-#include "hanwha_metadata_plugin.h"
+﻿#include "hanwha_metadata_plugin.h"
 #include "hanwha_metadata_manager.h"
 #include "hanwha_common.h"
 #include "hanwha_attributes_parser.h"
@@ -10,6 +10,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
+#include <plugins/resource/hanwha/hanwha_request_helper.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
 
@@ -103,8 +104,8 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
 {
     *outError = Error::noError;
 
-    auto vendor = QString(resourceInfo.vendor).toLower();
-    
+    const auto vendor = QString(resourceInfo.vendor).toLower();
+
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
@@ -114,18 +115,37 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     auth.setUser(resourceInfo.login);
     auth.setPassword(resourceInfo.password);
 
-    auto supportedEvents = fetchSupportedEvents(url, auth);
+    auto supportedEvents = fetchSupportedEvents(url, auth, resourceInfo.channel);
     if (!supportedEvents)
         return nullptr;
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
     deviceManifest.supportedEventTypes = *supportedEvents;
 
-    auto manager = new HanwhaMetadataManager();
+    const QString sharedId(resourceInfo.sharedId);
+    std::shared_ptr<HanwhaMetadataMonitor> monitor;
 
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto monitorItr = m_monitors.find(sharedId);
+        if (monitorItr == m_monitors.cend())
+        {
+            monitorItr = m_monitors.insert(
+                sharedId,
+                std::make_shared<HanwhaMetadataMonitor>(
+                    driverManifest(),
+                    url,
+                    auth));
+        }
+
+        monitor = monitorItr.value();
+    }
+
+    auto manager = new HanwhaMetadataManager(this);
     manager->setResourceInfo(resourceInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
+    manager->setMonitor(monitor);
 
     return manager;
 }
@@ -146,41 +166,29 @@ const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
     const QUrl& url,
-    const QAuthenticator& auth)
+    const QAuthenticator& auth,
+    int channel)
 {
     using namespace nx::mediaserver_core::plugins;
 
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(auth.user());
-    httpClient.setUserPassword(auth.password());
-    httpClient.setSendTimeoutMs(kAttributesTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kAttributesTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kAttributesTimeout.count());
+    HanwhaRequestHelper helper(auth, url.toString());
+    const auto parameters = helper.fetchCgiParameters(lit("cgis"));
 
-    if (!httpClient.doGet(buildAttributesUrl(url)))
+    if (!parameters.isValid())
         return boost::none;
 
-    nx::Buffer buffer;
-    while (!httpClient.eof())
-        buffer.append(httpClient.fetchMessageBodyBuffer());
+    const auto eventStatuses = helper.check(lit("eventstatus/eventstatus"));
 
-    auto statusCode = (nx_http::StatusCode::Value)httpClient.response()->statusLine.statusCode;
-    HanwhaCgiParameters parameters(buffer, statusCode);
+    if (!eventStatuses.isSuccessful())
+        return boost::none;
 
-    return eventsFromParameters(parameters);
-}
-
-QUrl HanwhaMetadataPlugin::buildAttributesUrl(const QUrl& resourceUrl) const
-{
-    auto url = resourceUrl;
-    url.setPath(kAttributesPath);
-    url.setQuery(QUrlQuery());
-
-    return url;
+    return eventsFromParameters(parameters, eventStatuses, channel);
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
-    const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters)
+    const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
+    const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
+    int channel)
 {
     if (!parameters.isValid())
         return boost::none;
@@ -194,7 +202,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     QList<QnUuid> result;
 
     auto supportedEvents = supportedEventsParameter->possibleValues();
-    for (const auto& eventName : supportedEvents)
+    for (const auto& eventName: supportedEvents)
     {
         bool gotValidParameter = false;
 
@@ -212,7 +220,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
 
             if (gotValidParameter)
             {
-                auto supportedAreaAnalytics = 
+                auto supportedAreaAnalytics =
                     supportedAreaAnalyticsParameter->possibleValues();
 
                 for (const auto& videoAnalytics: supportedAreaAnalytics)
@@ -224,6 +232,22 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
 
                     if (!guid.isNull())
                         result.push_back(guid);
+                }
+            }
+            else
+            {
+                const auto parameters = eventStatuses.response();
+                for (const auto& entry: parameters)
+                {
+                    const auto& eventName = entry.first;
+                    if (eventName.startsWith(lit("Channel.%1.VideoAnalytics.").arg(channel)))
+                    {
+                        guid = m_driverManifest.eventTypeByInternalName(
+                            lit("VideoAnalytics.") + eventName.split(L'.').last());
+
+                        if (!guid.isNull())
+                            result.push_back(guid);
+                    }
                 }
             }
 
@@ -243,7 +267,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
                 if (!guid.isNull())
                     result.push_back(guid);
             }
-            
+
         }
 
         if (eventName == kAudioAnalytics)
@@ -277,6 +301,17 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
 const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const
 {
     return m_driverManifest;
+}
+
+void HanwhaMetadataPlugin::managerRemoved(const QString& sharedId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto monitor = m_monitors.value(sharedId);
+    if (!monitor)
+        return;
+
+    if (monitor.use_count() == 1)
+        m_monitors.remove(sharedId);
 }
 
 } // namespace plugins

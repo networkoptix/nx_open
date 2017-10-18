@@ -13,9 +13,11 @@ struct ResourceInfo
         model[0] = 0;
         firmware[0] = 0;
         uid[0] = 0;
+        sharedId[0] = 0;
         url[0] = 0;
         login[0] = 0;
         password[0] = 0;
+        channel = 0;
     }
 
     static const int kStringParameterMaxLength = 256;
@@ -25,9 +27,11 @@ struct ResourceInfo
     char model[kStringParameterMaxLength];
     char firmware[kStringParameterMaxLength];
     char uid[kStringParameterMaxLength];
+    char sharedId[kStringParameterMaxLength];
     char url[kTextParameterMaxLength];
     char login[kStringParameterMaxLength];
     char password[kStringParameterMaxLength];
+    int channel;
 };
 
 struct Ratio

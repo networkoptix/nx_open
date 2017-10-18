@@ -62,9 +62,22 @@ void HanwhaMetadataMonitor::stopMonitoring()
         httpClient->pleaseStopSync();
 }
 
-void HanwhaMetadataMonitor::setHandler(const Handler& handler)
+void HanwhaMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
 {
-    m_handler = handler;
+    QnMutexLocker lock(&m_mutex);
+    m_handlers[handlerId] = handler;
+}
+
+void HanwhaMetadataMonitor::removeHandler(const QString& handlerId)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_handlers.remove(handlerId);
+}
+
+void HanwhaMetadataMonitor::clearHandlers()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_handlers.clear();
 }
 
 QUrl HanwhaMetadataMonitor::buildMonitoringUrl(const QUrl& url) const
@@ -99,7 +112,13 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
     httpClient->setMessageBodyReadTimeoutMs(
         std::chrono::duration_cast<std::chrono::milliseconds>(kKeepAliveTimeout).count());
 
-    auto handler = [this](const HanwhaEventList& events) { m_handler(events); };
+    auto handler = 
+        [this](const HanwhaEventList& events)
+        {
+            QnMutexLocker lock(&m_mutex);
+            for (const auto handler: m_handlers)
+                handler(events);
+        };
 
     m_contentParser = std::make_unique<nx_http::MultipartContentParser>();
     m_contentParser->setForceParseAsBinary(true);

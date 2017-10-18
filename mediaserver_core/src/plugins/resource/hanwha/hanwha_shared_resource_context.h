@@ -33,11 +33,17 @@ struct HanwhaDeviceInfo
     QString macAddress;
     QString model;
 
+    HanwhaResponse eventStatuses;
     HanwhaResponse videoSources;
     HanwhaResponse videoProfiles;
 
-    HanwhaDeviceInfo(CameraDiagnostics::Result diagnostics = CameraDiagnostics::NotImplementedResult()):
-        diagnostics(diagnostics) {}
+    HanwhaDeviceInfo(
+        CameraDiagnostics::Result diagnostics = CameraDiagnostics::NotImplementedResult())
+        :
+        diagnostics(diagnostics)
+    {
+    }
+
     bool isValid() const { return (bool) diagnostics; }
 };
 
@@ -62,7 +68,7 @@ public:
 
 private:
     mutable QnMutex m_channelCountMutex;
-    
+
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
     mutable QnMutex m_informationMutex;

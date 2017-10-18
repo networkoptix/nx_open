@@ -4,6 +4,7 @@
 #include "hanwha_request_helper.h"
 #include "hanwha_resource.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_common.h"
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -44,88 +45,87 @@ static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, co
     HanwhaRequestHelper helper(auth, url.toString());
     helper.setIgnoreMutexAnalyzer(true);
 
-    auto deviceinfo = helper.view(lit("system/deviceinfo"));
+    const auto deviceinfo = helper.view(lit("system/deviceinfo"));
     if (!deviceinfo.isSuccessful())
     {
-        return {error(deviceinfo,
+        return error(
+            deviceinfo,
             CameraDiagnostics::CameraInvalidParams(
-                lit("Can not fetch device information")))};
+                lit("Can not fetch device information")));
     }
 
-    if (auto value = deviceinfo.parameter<QString>("ConnectedMACAddress"))
+    if (const auto value = deviceinfo.parameter<QString>("ConnectedMACAddress"))
         info.macAddress = *value;
-    
+
     if (info.macAddress.isEmpty())
     {
-        HanwhaRequestHelper helper(auth, url.toString());
-        helper.setIgnoreMutexAnalyzer(true);
-        std::map<QString, QString> params{
-            { "interfaceName", "Network1" }
-        };
-        HanwhaResponse networkInfo = helper.view("network/interface", params);
+        const HanwhaRequestHelper::Parameters params = {{ "interfaceName", "Network1" }};
+        const auto networkInfo = helper.view("network/interface", params);
         if (!networkInfo.isSuccessful())
         {
-            return{ error(deviceinfo,
+            return error(
+                deviceinfo,
                 CameraDiagnostics::CameraInvalidParams(
-                    lit("Can not fetch device information"))) };
+                    lit("Can not fetch device information")));
         }
 
-        if (auto value = deviceinfo.parameter<QString>("MACAddress"))
+        if (const auto value = deviceinfo.parameter<QString>("MACAddress"))
             info.macAddress = *value;
     }
 
-    if (auto value = deviceinfo.parameter<QString>("Model"))
+    if (const auto value = deviceinfo.parameter<QString>("Model"))
         info.model = *value;
 
-    if (auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
-        info.deviceType = std::move(value->trimmed());
+    if (const auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
+        info.deviceType = value->trimmed();
 
-    if (auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
-        info.firmware = std::move(value->trimmed());
+    if (const auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
+        info.firmware = value->trimmed();
 
     info.attributes = helper.fetchAttributes(lit("attributes"));
     if (!info.attributes.isValid())
-    {
-        return {CameraDiagnostics::CameraInvalidParams(
-            lit("Camera attributes are invalid"))};
-    }
+        return CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid"));
 
     info.cgiParamiters = helper.fetchCgiParameters(lit("cgis"));
     if (!info.cgiParamiters.isValid())
-    {
-        return {CameraDiagnostics::CameraInvalidParams(
-            lit("Camera cgi parameters are invalid"))};
-    }
+        return CameraDiagnostics::CameraInvalidParams(lit("Camera cgi parameters are invalid"));
 
+    if (info.deviceType == kHanwhaNvrDeviceType)
     {
-        HanwhaRequestHelper helper(auth, url.toString());
-        helper.setIgnoreMutexAnalyzer(true);
         info.videoSources = helper.view(lit("media/videosource"));
         if (!info.videoSources.isSuccessful())
         {
-            return{ CameraDiagnostics::RequestFailedResult(
-                info.videoSources.requestUrl(),
-                info.videoSources.errorString()) };
+            return error(
+                info.videoSources,
+                CameraDiagnostics::RequestFailedResult(
+                    info.videoSources.requestUrl(),
+                    info.videoSources.errorString()));
         }
-    }
 
-    {
-        HanwhaRequestHelper helper(auth, url.toString());
-        helper.setIgnoreMutexAnalyzer(true);
-        info.videoProfiles = helper.view(lit("media/videoprofile"));
-        bool isCriticalError = !info.videoProfiles.isSuccessful()
-            && info.videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError;
-        if (isCriticalError)
+        info.eventStatuses = helper.check(lit("eventstatus/eventstatus"));
+        if (!info.eventStatuses.isSuccessful())
         {
-            return {CameraDiagnostics::RequestFailedResult(
-                info.videoProfiles.requestUrl(),
-                info.videoProfiles.errorString())};
+            return error(
+                info.eventStatuses,
+                CameraDiagnostics::RequestFailedResult(
+                    info.eventStatuses.requestUrl(),
+                    info.eventStatuses.errorString()));
         }
     }
 
-    auto attributes = helper.fetchAttributes(lit("attributes/System"));
-    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
-    info.channelCount = maxChannels ? *maxChannels : 1;
+    info.videoProfiles = helper.view(lit("media/videoprofile"));
+    const bool isCriticalError = !info.videoProfiles.isSuccessful()
+        && info.videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError;
+
+    if (isCriticalError)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            info.videoProfiles.requestUrl(),
+            info.videoProfiles.errorString());
+    }
+
+    const auto maxChannels = info.attributes.attribute<int>(lit("System/MaxChannel"));
+    info.channelCount = maxChannels.is_initialized() ? *maxChannels : 1;
 
     return info;
 }
@@ -134,7 +134,7 @@ HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const QAuthenticat
 {
     bool isExpired = m_cacheUpdateTimer.hasExpired(kCacheDataTimeout);
     QUrl url(srcUrl);
-    url.setQuery(QUrlQuery());
+
     QnMutexLocker lock(&m_informationMutex);
     if (m_lastAuth != auth || m_lastUrl != url || isExpired || !m_cachedInformation.diagnostics)
     {
@@ -184,7 +184,7 @@ QString HanwhaSharedResourceContext::sessionKey(
         const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
         if (!sessionKey.is_initialized())
             return QString();
-        
+
         m_sessionKeys[sessionType] = *sessionKey;
     }
     return m_sessionKeys.value(sessionType);

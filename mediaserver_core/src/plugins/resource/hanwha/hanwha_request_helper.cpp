@@ -27,10 +27,12 @@ const QString kAction = lit("action");
 
 } // namespace
 
-HanwhaRequestHelper::HanwhaRequestHelper(const HanwhaResourcePtr& resource):
+HanwhaRequestHelper::HanwhaRequestHelper(const HanwhaResourcePtr& resource, bool bypass):
     m_auth(resource->getAuth()),
     m_url(resource->getUrl()),
-    m_requestSemaphore(resource->requestSemaphore())
+    m_channel(QString::number(resource->getChannel())),
+    m_requestSemaphore(resource->requestSemaphore()),
+    m_bypass(bypass)
 {
 }
 
@@ -73,7 +75,7 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
 {
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
-    
+
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
         return HanwhaResponse(statusCode, url.toString());
@@ -112,6 +114,11 @@ HanwhaResponse HanwhaRequestHelper::remove(const QString& path, const Parameters
 HanwhaResponse HanwhaRequestHelper::control(const QString& path, const Parameters& parameters)
 {
     return splitAndDoRequest(lit("control"), path, parameters);
+}
+
+HanwhaResponse HanwhaRequestHelper::check(const QString& path, const Parameters& parameters)
+{
+    return splitAndDoRequest(lit("check"), path, parameters);
 }
 
 void HanwhaRequestHelper::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
@@ -177,8 +184,12 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
     httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
 
+    auto realUrl = m_bypass
+        ? makeBypassUrl(url)
+        : url;
+
     QnSemaphoreLocker lock(m_requestSemaphore);
-    if (!httpClient.doGet(url))
+    if (!httpClient.doGet(realUrl))
         return false;
 
     while (!httpClient.eof())
@@ -211,6 +222,22 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     }
 
     return doRequest(split[0], split[1], action, parameters, groupBy);
+}
+
+QUrl HanwhaRequestHelper::makeBypassUrl(const QUrl& url) const
+{
+    QUrl bypassUrl(url);
+    bypassUrl.setPath(lit("/stw-cgi/bypass.cgi"));
+
+    QUrlQuery bypassQuery;
+    bypassQuery.addQueryItem(lit("msubmenu"), lit("bypass"));
+    bypassQuery.addQueryItem(lit("action"), lit("control"));
+    bypassQuery.addQueryItem(lit("Channel"), m_channel);
+    bypassQuery.addQueryItem(lit("BypassURI"), url.path() + lit("?") + url.query());
+
+    bypassUrl.setQuery(bypassQuery);
+
+    return bypassUrl;
 }
 
 } // namespace plugins

@@ -345,6 +345,11 @@ bool ManagerPool::resourceInfoFromResource(
         ResourceInfo::kStringParameterMaxLength);
 
     strncpy(
+        outResourceInfo->sharedId,
+        camera->getSharedId().toStdString().c_str(),
+        ResourceInfo::kStringParameterMaxLength);
+
+    strncpy(
         outResourceInfo->url,
         camera->getUrl().toUtf8().data(),
         ResourceInfo::kTextParameterMaxLength);
@@ -359,6 +364,8 @@ bool ManagerPool::resourceInfoFromResource(
         outResourceInfo->password,
         auth.password().toUtf8().data(),
         ResourceInfo::kStringParameterMaxLength);
+
+    outResourceInfo->channel = camera->getChannel();
 
     return true;
 }
