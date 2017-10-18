@@ -97,6 +97,16 @@ TEST(HostAddress, IpV6FromString)
     ASSERT_EQ(1, addr.ipV6().second.get());
 }
 
+TEST(HostAddress, IpToStringV6)
+{
+    in6_addr addr6;
+    ASSERT_TRUE(inet_pton(AF_INET6, "fd00::9465:d2ff:fe64:2772", &addr6));
+    ASSERT_EQ("fd00::9465:d2ff:fe64:2772%1", HostAddress::ipToString(addr6, 1).get());
+
+    HostAddress addr(addr6, 1);
+    ASSERT_EQ("fd00::9465:d2ff:fe64:2772%1", addr.toString());
+}
+
 TEST(HostAddress, IsLocal)
 {
     ASSERT_TRUE(HostAddress("127.0.0.1").isLocal());
