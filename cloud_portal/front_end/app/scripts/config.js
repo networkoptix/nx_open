@@ -211,7 +211,8 @@ var Config = {
         updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
         flashChromelessPath: "components/flashlsChromeless.swf",
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
-        staticResources: "static/web_common/"
+        staticResources: "static/web_common/",
+        maxCrashCount: 2
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
