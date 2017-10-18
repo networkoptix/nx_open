@@ -22,6 +22,8 @@ public:
     Q_INVOKABLE static QPointF cwiseMul(const QPointF& l, const QSizeF& r);
     Q_INVOKABLE static QPoint cwiseMul(const QPoint& l, const QSize& r);
     Q_INVOKABLE static QPointF cwiseDiv(const QPointF& l, const QSizeF& r);
+    Q_INVOKABLE static QSizeF cwiseAdd(const QSizeF& l, const QSizeF& r);
+    Q_INVOKABLE static QSizeF cwiseSub(const QSizeF& l, const QSizeF& r);
     Q_INVOKABLE static QSizeF cwiseMul(const QSizeF& l, const QSizeF& r);
     Q_INVOKABLE static QSize cwiseMul(const QSize& l, const QSize& r);
     Q_INVOKABLE static QSizeF cwiseDiv(const QSizeF& l, const QSizeF& r);

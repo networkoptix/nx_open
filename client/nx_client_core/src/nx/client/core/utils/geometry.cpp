@@ -63,6 +63,16 @@ QPointF Geometry::cwiseDiv(const QPointF& l, const QSizeF& r)
     return QPointF(l.x() / r.width(), l.y() / r.height());
 }
 
+QSizeF Geometry::cwiseAdd(const QSizeF& l, const QSizeF& r)
+{
+    return l + r;
+}
+
+QSizeF Geometry::cwiseSub(const QSizeF& l, const QSizeF& r)
+{
+    return l - r;
+}
+
 QSizeF Geometry::cwiseMul(const QSizeF& l, const QSizeF& r)
 {
     return QSizeF(l.width() * r.width(), l.height() * r.height());
