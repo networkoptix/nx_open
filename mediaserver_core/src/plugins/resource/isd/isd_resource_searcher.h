@@ -58,8 +58,9 @@ private:
 
     bool isDwOrIsd(const QString& vendorName, const QString& model) const;
 
-    QnResourcePtr processMdnsResponse (
-        const QnMdnsListener::ConsumerData& mdnsResponse,
+    QnResourcePtr processMdnsResponse(
+        const QString& mdnsResponse,
+        const QString& mdnsRemoteAddress,
         const QnResourceList& alreadyFoundResources);
 
 private:

@@ -398,9 +398,10 @@ copyBpiSpecificFiles()
     echo "Copying (bpi) root/"
     cp -r "$CURRENT_BUILD_DIR/root" "$TAR_DIR/"
 
-    local -r TOOLS_DIR="$TAR_DIR/root/tools/nx"
+    local -r TOOLS_PATH="root/tools/$CUSTOMIZATION"
+    local -r TOOLS_DIR="$TAR_DIR/$TOOLS_PATH"
     local -r CONF_FILE="mediaserver.conf.template"
-    echo "Copying $CONF_FILE (used for factory reset) to root/tools/nx/"
+    echo "Copying $CONF_FILE (used for factory reset) to $TOOLS_PATH/"
     mkdir -p "$TOOLS_DIR"
     cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$CONF_FILE" "$TOOLS_DIR/"
 }

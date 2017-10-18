@@ -270,6 +270,7 @@ signals:
 
     void systemNameChanged();
     void localSystemIdChanged();
+    void localSystemIdChangedDirect();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void auditTrailPeriodDaysChanged();

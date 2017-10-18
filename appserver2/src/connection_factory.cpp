@@ -891,10 +891,151 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     /**%apidoc GET /ec2/getEventRules
      * Return all event rules.
+     * %// ATTENTION: Many text duplications with /api/getEvents and /api/createEvent, and with
+     *     comments in structs EventMetaData, EventParameters, and enums in ApiBusinessRuleData.
      * %param[default] format
      * %param[opt] id Event rule unique id. If omitted, return data for all event rules.
      * %return List of event rule objects in the requested format.
-     *     %// TODO: Describe ApiBusinessRuleData fields.
+     *     %param id Event rule unique id.
+     *     %param eventType One of the fixed values, or an integer starting from 1000 which denote
+     *         a user-defined event, or an integer in range 500..599 which denote a system health
+     *         event.
+     *         %value undefinedEvent Event type is not defined.
+     *         %value cameraMotionEvent Motion has occurred on a camera.
+     *         %value cameraInputEvent Camera input signal is received.
+     *         %value cameraDisconnectEvent Camera was disconnected.
+     *         %value storageFailureEvent Storage read error has occurred.
+     *         %value networkIssueEvent Network issue: packet lost, RTP timeout, etc.
+     *         %value cameraIpConflictEvent Found some cameras with same IP address.
+     *         %value serverFailureEvent Connection to server lost.
+     *         %value serverConflictEvent Two or more servers are running.
+     *         %value serverStartEvent Server started.
+     *         %value licenseIssueEvent Not enough licenses.
+     *         %value backupFinishedEvent Archive backup done.
+     *         %value softwareTriggerEvent Software triggers.
+     *         %value systemHealthEvent Equals 500. First system health message.
+     *         %value maxSystemHealthEvent Equals 599. Last possible system health message.
+     *         %value anyCameraEvent Event group.
+     *         %value anyServerEvent Event group.
+     *         %value anyEvent Event group.
+     *         %value userDefinedEvent Equals 1000. First user-defined event.
+     *     %param eventResourceIds List of event resource ids.
+     *     %param eventCondition String containing a JSON object, some fields of which depend on
+     *         eventType. Defines the filter for an event to make the rule applicable.
+     *         <ul>
+     *         <li>eventType (string) - Event type. "undefinedEvent" means any.</li>
+     *         <li>eventTimestampUsec (integer) - Event timestamp (in milliseconds); 0 means
+     *             any.</li>
+     *         <li>eventResourceId (string) - Event source - id of a camera or a server.
+     *             "{00000000-0000-0000-0000-000000000000}" means any.</li>
+     *         <li>resourceName (string) - Name of the resource which caused the event. Empty
+     *             string means any.</li>
+     *        <li>sourceServerId (string) - Id of a server that generated the event.
+     *            "{00000000-0000-0000-0000-000000000000}" means any.</li>
+     *        <li>reasonCode (string, fixed values) - Used in certain event types. "none" means
+     *            any. Has one of the following values:
+     *            <ul>
+     *            <li>none</li>
+     *            <li>networkNoFrame</li>
+     *            <li>networkConnectionClosed</li>
+     *            <li>networkRtpPacketLoss</li>
+     *            <li>serverTerminated</li>
+     *            <li>serverStarted</li>
+     *            <li>storageIoError</li>
+     *            <li>storageTooSlow</li>
+     *            <li>storageFull</li>
+     *            <li>systemStorageFull</li>
+     *            <li>licenseRemoved</li>
+     *            <li>backupFailedNoBackupStorageError</li>
+     *            <li>backupFailedSourceStorageError</li>
+     *            <li>backupFailedSourceFileError</li>
+     *            <li>backupFailedTargetFileError</li>
+     *            <li>backupFailedChunkError</li>
+     *            <li>backupEndOfPeriod</li>
+     *            <li>backupDone</li>
+     *            <li>backupCancelled</li>
+     *            <li>networkNoResponseFromDevice</li>
+     *            </ul>
+     *            </li>
+     *         <li>inputPortId (string) - Used for input events only. Empty string means
+     *             "any".</li>
+     *         <li>caption (string) - Short event description. Empty string means any.</li>
+     *         <li>description (string) - Long event description. Empty string means any.</li>
+     *         <li>metadata (object) - Imposes filtering based on the event metadata fields.
+     *             The object contains the following fields:
+     *             <ul>
+     *             <li>cameraRefs (list of strings) - Camera ids. Empty means any.</li>
+     *             </ul>
+     *             In the future, more fields can be added.
+     *             </li>
+     *         </ul>
+     *     %param eventState One of the fixed values.
+     *         %value inactive
+     *         %value active
+     *         %value undefined Also used in event rule to associate non-toggle action with event
+     *             with any toggle state.
+     *     %param actionType Type of the action. The object fields in actionParams field depend on
+     *         this value, as shown in particular values description.
+     *         %value undefinedAction
+     *         %value cameraOutputAction Change camera output state.
+     *             actionParams:
+     *             - relayOutputID (string, required) - Id of output to trigger.
+     *             - durationMs (uint, optional) - Timeout (in milliseconds) to reset the camera
+     *                state back.
+     *         %value bookmarkAction
+     *         %value cameraRecordingAction Start camera recording.
+     *         %value panicRecordingAction Activate panic recording mode.
+     *         %value sendMailAction Send an email. This action can be executed from any endpoint.
+     *             actionParams:
+     *             - emailAddress (string, required)
+     *         %value diagnosticsAction Write a record to the server log.
+     *         %value showPopupAction
+     *         %value playSoundAction
+     *             actionParams:
+     *             - url (string, required) - Url of the sound, contains path to the sound on the
+     *                 server.
+     *         %value playSoundOnceAction
+     *             actionParams:
+     *             - url (string, required) - Url of the sound, contains path to the sound on the
+     *                 server.
+     *         %value sayTextAction
+     *             actionParams:
+     *             - sayText (string, required) - Text that will be provided to TTS engine.
+     *         %value executePtzPresetAction Execute given PTZ preset.
+     *             actionParams:
+     *             - resourceId
+     *             - presetId
+     *         %value showTextOverlayAction Show text overlay over the given camera(s).
+     *             actionParams:
+     *             - text (string, required) - Text that will be displayed.
+     *         %value showOnAlarmLayoutAction Put the given camera(s) to the Alarm Layout.
+     *             actionParams:
+     *             - users - List of users which will receive this alarm notification.
+     *         %value execHttpRequestAction Send HTTP request as an action.
+     *             actionParams:
+     *             - url - Full HTTP url to execute. Username/password are stored as part of the
+     *                 URL.
+     *             - text - HTTP message body for POST method.
+     *         %value acknowledgeAction
+     *     %param actionResourceIds List of action resource ids.
+     *     %param actionParams String containing a JSON object which fields depend on actionType.
+     *     %param aggregationPeriod Period (in seconds) during which the consecutive similar events
+     *         are aggregated into a single event.
+     *     %param disabled Whether the rule is disabled.
+     *         %value false
+     *         %value true
+     *     %param comment An arbitrary comment to the rule.
+     *     %param schedule String containing a lower-case hex array of 21 bytes, which is a bit
+     *         mask for a week (starting on Monday), where each consecutive bit corresponds to an
+     *         hour and equals 1 for "enabled" and 0 for "disabled".
+     *         Thus, the first byte describes the first 8 hours of Monday after midnight, and the
+     *         last byte describes the last 8 hours of Sunday before midnight; in a byte, the
+     *         highest significant bit corresponds to the earliest hour.
+     *         Example: Enable all hours in a week except for the Monday interval from 7am to 9am:
+     *         <code>fe7fffffffffffffffffffffffffffffffffffffff</code>
+     *     %param system Whether the rule is a built-in one, which cannot be deleted.
+     *         %value false
+     *         %value true
      * %// AbstractBusinessEventManager::getBusinessRules
      */
     regGet<QnUuid, ApiBusinessRuleDataList>(p, ApiCommand::getEventRules);
@@ -903,6 +1044,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
 
     // AbstractBusinessEventManager::save
     regUpdate<ApiBusinessRuleData>(p, ApiCommand::saveEventRule);
+
     // AbstractBusinessEventManager::deleteRule
     regUpdate<ApiIdData>(p, ApiCommand::removeEventRule);
 

@@ -22,8 +22,16 @@ struct QnPtzLimits: public boost::equality_comparable1<QnPtzLimits>
     qreal minFov = 0;
     qreal maxFov = 360;
     int maxPresetNumber = 0; //< -1 means unlimited
+
+    qreal minPanSpeed = -1.0;
+    qreal maxPanSpeed = 1.0;
+    qreal minTiltSpeed = -1.0;
+    qreal maxTiltSpeed = 1.0;
+    qreal minZoomSpeed = -1.0;
+    qreal maxZoomSpeed = 1.0;
 };
-#define QnPtzLimits_Fields (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov)(maxPresetNumber)
+#define QnPtzLimits_Fields (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov)(maxPresetNumber)\
+        (minPanSpeed)(maxPanSpeed)(minTiltSpeed)(maxTiltSpeed)(minZoomSpeed)(maxZoomSpeed)
 
 Q_DECLARE_TYPEINFO(QnPtzLimits, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnPtzLimits);

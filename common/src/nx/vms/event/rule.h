@@ -54,7 +54,7 @@ public:
 
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
-    void setAggregationPeriod(int secs);
+    void setAggregationPeriod(int seconds);
 
     bool isDisabled() const;
     void setDisabled(bool disabled);

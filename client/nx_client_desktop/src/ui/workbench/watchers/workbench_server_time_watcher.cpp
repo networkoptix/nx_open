@@ -95,7 +95,9 @@ qint64 QnWorkbenchServerTimeWatcher::displayOffset(const QnMediaResourcePtr &res
 QDateTime QnWorkbenchServerTimeWatcher::serverTime(const QnMediaServerResourcePtr& server,
     qint64 msecsSinceEpoch)
 {
-    const auto utcOffsetMs = server->utcOffset();
+    const auto utcOffsetMs = server
+        ? server->utcOffset()
+        : Qn::InvalidUtcOffset;
 
     QDateTime result;
     if (utcOffsetMs != Qn::InvalidUtcOffset)

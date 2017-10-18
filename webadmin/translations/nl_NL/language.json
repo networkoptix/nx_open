@@ -1,5 +1,5 @@
 {
-  "language_name":"LANGUAGE_NAME",
+  "language_name":"Dutch",
   "dialogs":{
     "okButton":"Oké",
     "openLink":"Bezoek deze link",
@@ -41,11 +41,10 @@
     "confirmDisconnectFromCloud":"Verbinding verbreken met systeem {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Alle cloud gebruikersaccounts worden verwijderd.</span><br><br>Het systeem zal toegankelijk zijn via het lokale netwerk middels het lokale administrator account.",
     "confirmDisconnectFromCloudAction":"Verbinding verbreken",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
+    "disconnectedFromCloudSuccess":"Systeem is succesvol afgesloten van {{CLOUD_NAME}}",
+    "confirmDisconnectFromSystem":"Maak de server los van het huidige systeem",
+    "confirmDisconnectFromSystemAction":"Losmaken",
+    "disconnectedFromSystemSuccess":"Server is succesvol losgemaakt van het systeem",
     "connectedSuccess":"Verbinding maken met het systeem is mislukt",
     "createLocalOwnerTitle":"Maak een lokaal administrator account aan",
     "confirmChangePassword":"Verander het administrator wachtwoord",

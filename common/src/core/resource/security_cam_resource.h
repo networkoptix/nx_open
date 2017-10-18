@@ -167,6 +167,8 @@ public:
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
 
+    virtual QString getSharedId() const;
+
     void setScheduleDisabled(bool value);
     bool isScheduleDisabled() const;
 

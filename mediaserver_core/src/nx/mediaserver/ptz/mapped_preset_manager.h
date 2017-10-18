@@ -7,8 +7,6 @@ namespace nx {
 namespace mediaserver {
 namespace ptz {
 
-using PresetMapping = QMap<QString, QString>;
-
 class MappedPresetManager
 {
 
@@ -42,7 +40,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     QnResourcePtr m_resource;
-    PresetMapping m_presetMapping;
+    mutable QnPtzPresetMapping m_presetMapping;
     QMap<QString, QString> m_nxToNativeId;
 };
 

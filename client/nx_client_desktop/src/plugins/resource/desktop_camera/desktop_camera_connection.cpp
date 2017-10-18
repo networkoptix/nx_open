@@ -217,11 +217,15 @@ void QnDesktopCameraConnectionProcessor::sendData(const char* data, int len)
 
 // --------------- QnDesktopCameraconnection ------------------
 
-QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &server):
+QnDesktopCameraConnection::QnDesktopCameraConnection(
+    QnDesktopResource* owner,
+    const QnMediaServerResourcePtr& server,
+    const QnUuid& userId)
+    :
     QnLongRunnable(),
     m_owner(owner),
     m_server(server),
-    processor(0)
+    m_userId(userId)
 {
 }
 
@@ -282,7 +286,10 @@ void QnDesktopCameraConnection::run()
         }
 
         httpClient->addAdditionalHeader("user-name", auth.user().toUtf8());
+        // TODO: #GDM #3.2 Remove 3.1 compatibility layer.
         httpClient->addAdditionalHeader("user-id", commonModule()->moduleGUID().toByteArray());
+        httpClient->addAdditionalHeader("unique-id",
+            QnDesktopResource::calculateUniqueId(commonModule()->moduleGUID(), m_userId).toUtf8());
         httpClient->setSendTimeoutMs(CONNECT_TIMEOUT);
         httpClient->setResponseReadTimeoutMs(CONNECT_TIMEOUT);
 

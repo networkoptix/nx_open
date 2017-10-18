@@ -95,7 +95,8 @@ void TestHttpServer::registerUserCredentials(
 bool TestHttpServer::registerStaticProcessor(
     const QString& path,
     QByteArray msgBody,
-    const nx_http::StringType& mimeType)
+    const nx_http::StringType& mimeType,
+    nx_http::StringType method)
 {
     return registerRequestProcessor<nx_http::server::handler::StaticData>(
         path, [=]() -> std::unique_ptr<nx_http::server::handler::StaticData>
@@ -103,13 +104,15 @@ bool TestHttpServer::registerStaticProcessor(
             return std::make_unique<nx_http::server::handler::StaticData>(
                 mimeType,
                 std::move(msgBody));
-        });
+        },
+        method);
 }
 
 bool TestHttpServer::registerFileProvider(
     const QString& httpPath,
     const QString& filePath,
-    const nx_http::StringType& mimeType)
+    const nx_http::StringType& mimeType,
+    nx_http::StringType method)
 {
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly))
@@ -118,7 +121,8 @@ bool TestHttpServer::registerFileProvider(
     return registerStaticProcessor(
         httpPath,
         std::move(fileContents),
-        mimeType);
+        mimeType,
+        method);
 }
 
 bool TestHttpServer::registerContentProvider(
@@ -147,19 +151,22 @@ bool TestHttpServer::registerContentProvider(
             {
                 completionHandler(nx_http::StatusCode::internalServerError);
             }
-        });
+        },
+        nx_http::Method::get);
 }
 
 bool TestHttpServer::registerRedirectHandler(
     const QString& resourcePath,
-    const nx::utils::Url& location)
+    const nx::utils::Url& location,
+    nx_http::StringType method)
 {
     return registerRequestProcessor<nx_http::server::handler::Redirect>(
         resourcePath,
         [location]() -> std::unique_ptr<nx_http::server::handler::Redirect>
         {
             return std::make_unique<nx_http::server::handler::Redirect>(location);
-        });
+        },
+        method);
 }
 
 //-------------------------------------------------------------------------------------------------

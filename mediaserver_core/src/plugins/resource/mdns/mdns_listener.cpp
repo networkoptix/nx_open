@@ -2,8 +2,6 @@
 
 #ifdef ENABLE_MDNS
 
-#include <memory>
-
 #include <nx/network/nettools.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_factory.h>
@@ -18,6 +16,7 @@
 static quint16 MDNS_PORT = 5353;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
 static QString groupAddress(QLatin1String("224.0.0.251"));
+static const int kMaxMdnsPacketCount = 128;
 
 
 using nx::network::UDPSocket;
@@ -25,10 +24,12 @@ using nx::network::UDPSocket;
 // -------------- QnMdnsListener ------------
 
 static QnMdnsListener* QnMdnsListener_instance = nullptr;
+const std::chrono::seconds QnMdnsListener::kRefreshTimeout(1);
 
 QnMdnsListener::QnMdnsListener()
 :
-    m_receiveSocket(0)
+    m_receiveSocket(0),
+    m_consumersData(new detail::ConsumerDataList)
 {
     updateSocketList();
     readDataFromSocket();
@@ -43,31 +44,32 @@ QnMdnsListener::~QnMdnsListener()
     deleteSocketList();
 }
 
-void QnMdnsListener::registerConsumer(std::uintptr_t handle)
+void QnMdnsListener::registerConsumer(std::uintptr_t id)
 {
-    m_data.push_back( std::make_pair( handle, ConsumerDataList() ) );
+    m_consumersData->registerConsumer(id);
 }
 
-QnMdnsListener::ConsumerDataList QnMdnsListener::getData(std::uintptr_t handle)
+const ConsumerData* QnMdnsListener::getData(std::uintptr_t id)
 {
-    std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator itr;
-    const std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator itEnd = m_data.end();
-    for( itr = m_data.begin();
-        itr != itEnd;
-        ++itr )
-    {
-        if( itr->first == handle )
-            break;
-    }
+    auto data = m_consumersData->data(id);
+    NX_ASSERT(
+        (bool) data,
+        lm("No such consumer %1, did you forget to register?").args((uint64_t) id));
 
-    //ConsumersMap::iterator itr = m_data.find(handle);
-    if (itr == m_data.end())
-        return QnMdnsListener::ConsumerDataList();
-    if (itr == m_data.begin())
+    if (data == nullptr)
+        return nullptr;
+
+    if (needRefresh())
+    {
+        m_consumersData->clearRead();
         readDataFromSocket();
-    ConsumerDataList rez = itr->second;
-    itr->second.clear();
-    return rez;
+    }
+    return data;
+}
+
+bool QnMdnsListener::needRefresh() const
+{
+    return std::chrono::steady_clock::now() - m_lastRefreshTime > kRefreshTimeout;
 }
 
 QString QnMdnsListener::getBestLocalAddress(const QString& remoteAddress)
@@ -79,7 +81,10 @@ QString QnMdnsListener::getBestLocalAddress(const QString& remoteAddress)
     int bestIndex = 0;
     for (int i = 0; i < m_localAddressList.size(); ++i)
     {
-        int eq = strEqualAmount(m_localAddressList[i].toLatin1().constData(), remoteAddress.toLatin1().constData());
+        int eq = strEqualAmount(
+            m_localAddressList[i].toLatin1().constData(),
+            remoteAddress.toLatin1().constData());
+
         if (eq > bestEq) {
             bestEq = eq;
             bestIndex = i;
@@ -108,32 +113,28 @@ void QnMdnsListener::readDataFromSocket()
         request.toDatagram(datagram);
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, MDNS_PORT);
     }
+
+    m_lastRefreshTime = std::chrono::steady_clock::now();
 }
 
-void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString localAddress)
+void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, const QString& localAddress)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
     {
         SocketAddress remoteEndpoint;
-        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), &remoteEndpoint );
-        if (datagramSize > 0)
-        {
-            QByteArray responseData((const char*) tmpBuffer, datagramSize);
-            if (m_localAddressList.contains(remoteEndpoint.address.toString()))
-                continue; // ignore own packets
-            if (localAddress.isEmpty())
-                localAddress = getBestLocalAddress(remoteEndpoint.address.toString());
+        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), &remoteEndpoint);
+        if (datagramSize <= 0)
+            continue;
 
-            const std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator itEnd = m_data.end();
-            for( std::list<std::pair<std::uintptr_t, ConsumerDataList> >::iterator
-                it = m_data.begin();
-                it != itEnd;
-                ++it )
-            {
-                it->second.append(ConsumerData(responseData, localAddress, remoteEndpoint.address.toString()));
-            }
-        }
+        QByteArray responseData((const char*) tmpBuffer, datagramSize);
+        if (m_localAddressList.contains(remoteEndpoint.address.toString()))
+            continue; //< ignore own packets
+
+        const auto& laddr = localAddress.isEmpty()
+                ? getBestLocalAddress(remoteEndpoint.address.toString())
+                : localAddress;
+        m_consumersData->addData(remoteEndpoint.address.toString(), laddr, responseData);
     }
 }
 

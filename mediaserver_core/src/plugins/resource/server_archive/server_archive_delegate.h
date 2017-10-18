@@ -31,7 +31,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
     virtual AVCodecContext* setAudioChannel(int num);
-    virtual void onReverseMode(qint64 displayTime, bool value);
+    virtual void setSpeed(qint64 displayTime, double value);
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize &) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;

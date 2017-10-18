@@ -306,7 +306,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>חוקי אירוע...</translation>
+      <translation>חוקים...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -858,19 +858,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation>סרטון...</translation>
+      <translation>סיור פריסות...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation>סרטון חדש...</translation>
+      <translation>סיור פריסות חדש...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>הסר מהסרטון</translation>
+      <translation>הסר סיור פריסות</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>צור סרטון</translation>
+      <translation>צור סיור פריסות</translation>
     </message>
   </context>
   <context>
@@ -1037,29 +1037,25 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>קובץ &quot;%1&quot; נמצא בשימוש על ידי תהליך אחר.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>לא ניתן לכתוב את הקובץ &quot;%1&quot;. נסה שם אחר.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
+        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
+        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
+        <numerusform>שם הקובץ לא אמור להכיל את התווים השמורים הבאים: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>שם הקובץ &quot;%1&quot; שמור על ידי מערכת ההפעלה. נסה שם אחר.</translation>
     </message>
   </context>
   <context>
@@ -1086,7 +1082,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password must be at least 8 characters long.</source>
-      <translation>סיסמא חייבת להכיל לפחות 8 תווים.</translation>
+      <translation>סיסמה חייבת להכיל לפחות 8 תווים.</translation>
     </message>
     <message>
       <source>Common</source>
@@ -1094,7 +1090,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation>סיסמה זו נמצאת ברשימת הסיסמאות הפופולרי ביותר.</translation>
+      <translation>סיסמה זו נמצאת ברשימת הסיסמהות הפופולרי ביותר.</translation>
     </message>
     <message>
       <source>Incorrect</source>
@@ -1277,11 +1273,11 @@ to view more bookmarks</source>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>כאשר אתה נותן גישה לפריסות מסוימות אתה נותן גישה לכל המצלמות שבהם. המשתמש יקבל גישה אל כל המצלמות החדשות בפריסות אלה.</translation>
+      <translation>כאשר אתה נותן גישה לפריסות מסוימות אתה נותן גישה לכל המצלמות שבהן. המשתמש יקבל גישה אל כל המצלמות החדשות בפריסות אלה.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>כל מצלמות &amp; משאבים</translation>
+      <translation>כל המצלמות והמשאבים</translation>
     </message>
   </context>
   <context>
@@ -1505,7 +1501,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>פעולה %n</numerusform>
         <numerusform>%n פעולות</numerusform>
         <numerusform>%n פעולות</numerusform>
@@ -1709,7 +1705,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>הסיסמא אינה נכונה.</translation>
+      <translation>הסיסמה אינה נכונה.</translation>
     </message>
     <message>
       <source>Select Build</source>
@@ -1773,7 +1769,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שרת %n</numerusform>
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
@@ -1790,11 +1786,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Stops</source>
-      <translation>עצירות</translation>
+      <translation>מסתיים</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation>התחלות</translation>
+      <translation>מתחיל</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -1806,7 +1802,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Occurs</source>
-      <translation>התרחשות</translation>
+      <translation>מתרחש</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -1903,7 +1899,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>אין חוקי אירוע</translation>
+      <translation>אין חוקים</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2351,7 +2347,7 @@ to view more bookmarks</source>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>מקליט</translation>
+      <translation>הקלטה</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2636,7 +2632,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>אימות סיסמא</translation>
+      <translation>אימות סיסמה</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2644,11 +2640,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Current Password</source>
-      <translation>סיסמא נוכחית</translation>
+      <translation>סיסמה נוכחית</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>כדי לשנות את הסיסמא שלך, יש להזין את הסיסמא הנוכחית.</translation>
+      <translation>כדי לשנות את הסיסמה שלך, יש להזין את הסיסמה הנוכחית.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
@@ -2726,11 +2722,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>דוא"ל או סיסמה שגויים</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>החשבון לא הופעל. בדוק את האימייל שלך ובצע את ההוראות המצורפות</translation>
     </message>
   </context>
   <context>
@@ -2772,7 +2768,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>שכחת סיסמא?</translation>
+      <translation>שכחת סיסמה?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
@@ -2861,7 +2857,7 @@ to %1</source>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation>שם משתמש או סיסמא שגויים</translation>
+      <translation>שם משתמש או סיסמה שגויים</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
@@ -3130,7 +3126,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation>הזן סיסמא כדי להמשיך.</translation>
+      <translation>הזן סיסמה כדי להמשיך.</translation>
     </message>
     <message>
       <source>Set local owner password</source>
@@ -3154,7 +3150,7 @@ to %1</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>אימות סיסמא</translation>
+      <translation>אימות סיסמה</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -3212,7 +3208,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
@@ -3221,7 +3217,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>רשימת תיעוד אירועים ל %1 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
         <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
@@ -3453,7 +3449,7 @@ to %1</source>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>חוקי אירוע</translation>
+      <translation>חוקים</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3731,7 +3727,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3848,7 +3844,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;השרת לא נמצא></translation>
+      <translation>השרת לא נמצא</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -4300,7 +4296,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>שכחת סיסמא?</translation>
+      <translation>שכחת סיסמה?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4423,6 +4419,10 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>לחץ והחזק</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>מושבת לפי לוח זמנים</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4526,7 +4526,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>לא ניתן להגדיר אפשרות הקלטה של &quot;תנועה + תזרים משני&quot;.</translation>
+      <translation>לא ניתן להגדיר אפשרות הקלטה של "תנועה + תזרים משני".</translation>
     </message>
   </context>
   <context>
@@ -4683,7 +4683,7 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>זה נדרש גם ליצור / לערוך פריסטים וסיורים.</translation>
+      <translation>נדרש גם ליצור / לערוך פריסטים וסיורים.</translation>
     </message>
     <message>
       <source>Control video walls</source>
@@ -4726,7 +4726,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>ההודעה תוצג עד שאחד המשתמשים שיראה אותה ייצור סימניה עם תיאור האירוע</translation>
     </message>
   </context>
   <context>
@@ -4797,7 +4797,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>בערך דקה %n</numerusform>
         <numerusform>בערך %n דקות</numerusform>
         <numerusform>בערך %n דקות</numerusform>
@@ -5009,7 +5009,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;מצלמות משרתים אחרים ומצלמות שהוסרו></translation>
+      <translation>מצלמות משרתים אחרים ומצלמות שהוסרו</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -5208,7 +5208,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>כל מצלמות ומשאבים</translation>
+      <translation>כל המצלמות והמשאבים</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5224,11 +5224,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>סרטונים</translation>
+      <translation>סיורי פריסות</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation>סרטון</translation>
+      <translation>סיור פריסות</translation>
     </message>
   </context>
   <context>
@@ -5858,7 +5858,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>לא ניתן להגדיר אפשרות הקלטה של &quot;תנועה + תזרים משני&quot;.</translation>
+      <translation>לא ניתן להגדיר אפשרות הקלטה של "תנועה + תזרים משני".</translation>
     </message>
   </context>
   <context>
@@ -5928,7 +5928,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>לא נמצא פריסט. השתמש באפשרות &quot;מתקדם&quot;.</translation>
+      <translation>לא נמצא פריסט. השתמש באפשרות "מתקדם".</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -6775,7 +6775,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6832,7 +6832,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6981,7 +6981,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7013,7 +7013,7 @@ to %1</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>אימות סיסמא</translation>
+      <translation>אימות סיסמה</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -7361,14 +7361,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>הכנס סיסמה...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>סיסמת מנהל</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>המערכות ימוזגו בקרוב</translation>
     </message>
@@ -7389,10 +7381,6 @@ to %1</source>
       <translation>סך כל הרשיונות יקטן</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>הסיסמא לא יכולה להיות ריקה.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>אין אפשרות למזג מערכות ענן</translation>
     </message>
@@ -7407,6 +7395,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>השרת יחובר למערכת בקרוב</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>הכנס סיסמא...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>סיסמת מנהל</translation>
     </message>
   </context>
   <context>
@@ -7867,19 +7863,19 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation>האם להחליף סרטון קיים?</translation>
+      <translation>האם להחליף סיור פריסות קיים?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>קיים סרטון אחר עם אותו שם.</translation>
+      <translation>קיים סיור פריסות אחר עם אותו שם.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
       <translation>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
       </translation>
     </message>
   </context>
@@ -7964,7 +7960,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>גרור פריסה או מצלמה לכאן כדי להוסיף אותה לסרטון</translation>
+      <translation>גרור פריסה או מצלמה לכאן כדי להוסיף אותה לסיור פריסות</translation>
     </message>
   </context>
   <context>
@@ -8005,11 +8001,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>עצור סיור</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>התחל סיור</translation>
     </message>
   </context>
   <context>
@@ -8285,11 +8281,11 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסרטון לחץ על Esc.</translation>
+      <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסיור לחץ על Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>לחץ על כל מקש על מנת להפסיק את הסיור.</translation>
     </message>
   </context>
   <context>
@@ -8315,11 +8311,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreel</source>
-      <translation>סרטון</translation>
+      <translation>סיור פריסות</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation>סרטון %1</translation>
+      <translation>סיור פריסות %1</translation>
     </message>
   </context>
   <context>

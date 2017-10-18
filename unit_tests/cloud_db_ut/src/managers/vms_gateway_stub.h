@@ -27,6 +27,7 @@ public:
     virtual void merge(
         const std::string& username,
         const std::string& targetSystemId,
+        const std::string& idOfSystemToMergeTo,
         VmsRequestCompletionHandler completionHandler) override;
 
     void pause();

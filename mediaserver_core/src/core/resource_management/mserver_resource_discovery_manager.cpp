@@ -20,7 +20,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_searcher.h>
 #include <core/resource_management/data_only_camera_resource.h>
-#include <plugins/storage/dts/abstract_dts_searcher.h>
 #include <plugins/resource/desktop_camera/desktop_camera_resource.h>
 #include <common/common_module.h>
 #include <media_server/settings.h>

@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/rest/http_rest_client.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
 #include "../settings.h"
@@ -46,6 +47,7 @@ VmsGateway::~VmsGateway()
 void VmsGateway::merge(
     const std::string& username,
     const std::string& targetSystemId,
+    const std::string& systemIdToMergeTo,
     VmsRequestCompletionHandler completionHandler)
 {
     using namespace std::placeholders;
@@ -72,7 +74,7 @@ void VmsGateway::merge(
 
     QnMutexLocker lock(&m_mutex);
     m_activeRequests.emplace(clientPtr, std::move(requestContext));
-    MergeSystemData mergeRequest = prepareMergeRequestParameters();
+    MergeSystemData mergeRequest = prepareMergeRequestParameters(systemIdToMergeTo);
     clientPtr->mergeSystems(
         mergeRequest,
         std::bind(&VmsGateway::reportRequestResult, this, clientPtr, _1));
@@ -110,12 +112,20 @@ bool VmsGateway::addAuthentication(
     return true;
 }
 
-MergeSystemData VmsGateway::prepareMergeRequestParameters()
+MergeSystemData VmsGateway::prepareMergeRequestParameters(
+    const std::string& systemIdToMergeTo)
 {
-    // TODO
-    //mergeRequest.url = ;
-    //mergeRequest.takeRemoteSettings = true;
-    return MergeSystemData();
+    MergeSystemData mergeSystemData;
+    mergeSystemData.mergeOneServer = false;
+    mergeSystemData.takeRemoteSettings = true;
+    mergeSystemData.ignoreIncompatible = false;
+    // TODO getKey
+    // TODO postKey
+    mergeSystemData.url =
+        nx::network::url::Builder().setScheme(nx_http::kSecureUrlSchemeName)
+            .setHost(systemIdToMergeTo.c_str()).toString();
+    
+    return mergeSystemData;
 }
 
 void VmsGateway::reportRequestResult(

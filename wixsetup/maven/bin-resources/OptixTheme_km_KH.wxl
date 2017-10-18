@@ -22,7 +22,7 @@
   <String Id="HelpCloseButton">Close</String>
   <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
   <String Id="InstallOptionsButton">Options</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">Accept and Install</String>
   <String Id="InstallCloseButton">Close</String>
   <String Id="OptionsHeader">Setup Options</String>
   <String Id="OptionsLocationLabel">Install location:</String>

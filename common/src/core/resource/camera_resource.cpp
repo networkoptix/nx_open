@@ -46,7 +46,6 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_dtsFactory(0),
     m_issueCounter(0),
     m_lastIssueTimer()
 {}
@@ -404,26 +403,6 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 }
 
 // --------------- QnVirtualCameraResource ----------------------
-
-QnAbstractDTSFactory* QnVirtualCameraResource::getDTSFactory()
-{
-    return m_dtsFactory;
-}
-
-void QnVirtualCameraResource::setDTSFactory(QnAbstractDTSFactory* factory)
-{
-    m_dtsFactory = factory;
-}
-
-void QnVirtualCameraResource::lockDTSFactory()
-{
-    m_mutex.lock();
-}
-
-void QnVirtualCameraResource::unLockDTSFactory()
-{
-    m_mutex.unlock();
-}
 
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {

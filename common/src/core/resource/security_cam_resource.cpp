@@ -142,7 +142,7 @@ bool QnSecurityCamResource::removeProperty(const QString& key)
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
-    return hasParam(lit("groupplay"));
+    return hasParam(Qn::kGroupPlayParamName);
 }
 
 const QnResource* QnSecurityCamResource::toResource() const {
@@ -457,6 +457,8 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
             m_cachedLicenseType = Qn::LC_IO;
         else if (resType && resType->getManufacture() == lit("VMAX"))
             m_cachedLicenseType =  Qn::LC_VMAX;
+        else if (isDtsBased())
+            m_cachedLicenseType = Qn::LC_Bridge;
         else if (resType && resType->getManufacture() == lit("NetworkOptix"))
             m_cachedLicenseType = Qn::LC_Free;
         else if (isAnalogEncoder())
@@ -775,7 +777,19 @@ void QnSecurityCamResource::setGroupId(const QString& value) {
 
 }
 
-QString QnSecurityCamResource::getModel() const {
+QString QnSecurityCamResource::getSharedId() const
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_groupId.isEmpty())
+            return m_groupId;
+    }
+    
+    return getUniqueId();
+}
+
+QString QnSecurityCamResource::getModel() const
+{
     SAFE(return m_model)
 }
 

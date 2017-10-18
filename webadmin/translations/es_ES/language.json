@@ -2,7 +2,7 @@
   "language_name":"Español",
   "dialogs":{
     "okButton":"Ok",
-    "openLink":"Visita este enlace",
+    "openLink":"Visitar este enlace",
     "openLinkWithTitle":"Para {{title}} visitar este enlace"
   },
   "setup":{
@@ -23,63 +23,62 @@
       "system":"Sistema",
       "device":"Dispositivo"
     },
-    "confirmRestart":"¿Desea reiniciar el servidor?",
-    "couldntCheckInternet":"No podría comprobar conexión de nube",
-    "confirmRestoreDefault":"¿Configuración y base de datos de claro? Este proceso tomará algún tiempo y el servidor se reiniciará luego.",
+    "confirmRestart":"¿Reiniciar el servidor?",
+    "couldntCheckInternet":"No se pudo comprobar conexión de nube",
+    "confirmRestoreDefault":"¿Borrar configuración y base de datos? Este proceso tomará algún tiempo y el servidor se reiniciará luego.",
     "confirmRestoreDefaultTitle":"Restaurar valores predeterminados de fábrica",
     "unexpectedError":"Error: error inesperado ha ocurrido",
     "connnetionError":"Error de conexión",
     "wrongPassword":"Contraseña incorrecta.",
     "error":"Error: ",
-    "restartNeeded":"Guarda los cambios. ¿Reinicie el servidor para aplicar la nueva configuración?",
-    "settingsSaved":"Ajustes guardados",
+    "restartNeeded":"Los cambios se han guardado. ¿Reinicie el servidor para aplicar la nueva configuración?",
+    "settingsSaved":"Configuraciones guardadas",
     "confirmHardwareRestart":"¿Reiniciar el sistema operativo de servidor?",
-    "confirmRestoreSettings":"¿Restaurar todos los ajustes de servidor? Se guardará el archivo, pero se restablecerá la configuración de la red.",
+    "confirmRestoreSettings":"¿Restaurar todas las configuraciones del servidor? Se guardará el archivo, pero se restablecerá la configuración de la red.",
     "confirmRestoreSettingsNotNetwork":"¿Restablecer la configuración del servidor? Configuración de red y el archivo se guardará.",
     "unavailable":"No Disponible",
     "unsafePortConfirm":"No es seguro utilizar puerto número 1025 menos. Servidor podría no ser accesible. ¿Continuar de todos modos?",
     "confirmDisconnectFromCloud":"Desconecte el sistema de {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'> todos los usuarios de la nube se eliminarán.</span> <br><br>Sistema será accesible a través de red local con cuenta de administrador local.",
     "confirmDisconnectFromCloudAction":"Desconectar",
-    "disconnectedFromCloudSuccess":"System was disconnected from {{CLOUD_NAME}} successfully",
-    "confirmDisconnectFromSystem":"Detach server from current system",
-    "confirmDisconnectFromSystemTitle":"",
-    "confirmDisconnectFromSystemAction":"Detach",
-    "disconnectedFromSystemSuccess":"Server was detached from the system successfully",
+    "disconnectedFromCloudSuccess":"Sistema fue desconectado de {{CLOUD_NAME}} con éxito",
+    "confirmDisconnectFromSystem":"Separar el servidor del sistema actual",
+    "confirmDisconnectFromSystemAction":"Separar",
+    "disconnectedFromSystemSuccess":"Servidor fue separado del sistema con éxito",
     "connectedSuccess":"Sistema fue conectado con éxito",
     "createLocalOwnerTitle":"Crear administrador local",
     "confirmChangePassword":"Cambiar contraseña de admin",
     "confirmChangePasswordTitle":"¿Cambiar contraseña del sistema? Afectará a usuario 'admin' y la contraseña de root para algunos servidores",
     "confirmChangePasswordAction":"Guardar nueva contraseña",
-    "nx1ControlHint":"Aplicación de cliente se ha iniciado. Utilizar un teclado y ratón o una aplicación móvil para controlarla."
+    "nx1ControlHint":"Aplicación de cliente se ha iniciado. Utilizar un teclado/ratón o una aplicación móvil para controlarla."
   },
   "info":{
     "tabs":{
-      "healthMonitoring":"Vigilancia de la salud",
+      "healthMonitoring":"Monitoreo de Salud",
       "storage":"Almacenamiento",
       "log":"Registro"
     }
   },
   "join":{
     "systemIsUnreacheble":"Sistema es inaccesible o no existe.",
-    "incorrectCurrentPassword":"Incorrecta de la contraseña actual.",
+    "incorrectCurrentPassword":"Contraseña actual es incorrecto.",
     "incorrectRemotePassword":"Nombre de usuario o contraseña son incorrectos.",
     "incompatibleVersion":"Sistema es inalcanzable, no existe o tiene versión incompatible.",
     "wrongUrl":"No se puede conectar al servidor especificado.",
-    "newSystemError":"No puede combinar sistemas. Sistema remoto no está configurado.",
-    "safeMode":"No puede combinar sistemas. Sistema remoto está en modo seguro.",
-    "configError":"No puede combinar sistemas. Tal vez uno de los sistemas está en modo seguro.",
-    "cloudError":"No puede combinar sistemas. Sistema dependiente esté conectado a la nube. Es necesario desconectarlo primero.",
-    "cloudBothError":"No puede combinar sistemas. Ambos sistemas están conectados a la nube. Necesitas desconectarte uno primero.",
-    "cloudHostConflict":"No puede combinar sistemas, porque los servidores están construidos con hosts diferentes nube",
-    "licenceError":"¡Advertencia! Estás a punto de fusionar sistemas de licencias de arranque. Sólo una licencia de arranque está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
+    "newSystemError":"No se puede unir sistemas. Sistema remoto no está configurado.",
+    "safeMode":"No se puede unir sistemas. Sistema remoto está en modo seguro.",
+    "configError":"No se puede unir sistemas. Tal vez uno de los sistemas está en modo seguro.",
+    "cloudError":"No se puede combinar sistemas. Sistema dependiente esté conectado a la nube. Es necesario desconectarlo primero.",
+    "cloudBothError":"No se puede combinar sistemas. Ambos sistemas están conectados a la nube. Necesitas desconectarte uno primero.",
+    "cloudHostConflict":"No se puede combinar sistemas, porque los servidores están construidos con hosts diferentes nube",
+    "licenceError":"¡Advertencia! Estás a punto de unir sistemas con licencias Starter. Sólo una licencia Starter está permitida por sistema, por lo que la segunda licencia se desactivará. ¿De todos modos desea fusionar?",
     "connectionFailed":"Error de conexión: ",
     "unknownError":"Error desconocido",
     "mergeFailed":"Error en la combinación: ",
-    "mergeSucceed":"Combinación fue un éxito.",
-    "newSystemDisplayName":"Nuevo sistema de",
+    "mergeSucceed":"Unión fue exitosa.",
+    "newSystemDisplayName":"Nuevo sistema",
     "incompatibleProtocol":"versión incompatible",
-    "incompatibleCloudHost":"nube de conflicto",
+    "incompatibleCloudHost":"conflicto de nube",
     "incompatibleCloudState":"nube conectada"
   },
   "login":{
@@ -112,6 +111,6 @@
     "reserved":"Reservado"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"{{PRODUCT_NAME}} interfaz web"
   }
 }

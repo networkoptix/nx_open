@@ -387,6 +387,7 @@ Qn::PanicMode QnMediaServerResource::getPanicMode() const
 Qn::PanicMode QnMediaServerResource::calculatePanicMode() const
 {
     QString strVal = getProperty(QnMediaResource::panicRecordingKey());
+    NX_DEBUG(this, lm("%1 calculated panic mode %2").args(getId(), strVal));
     Qn::PanicMode result = Qn::PM_None;
     QnLexical::deserialize(strVal, &result);
     return result;
@@ -395,8 +396,10 @@ Qn::PanicMode QnMediaServerResource::calculatePanicMode() const
 void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
     if(getPanicMode() == panicMode)
         return;
+
     QString strVal;
     QnLexical::serialize(panicMode, &strVal);
+    NX_DEBUG(this, lm("%1 change panic mode to %2").args(getId(), strVal));
     setProperty(QnMediaResource::panicRecordingKey(), strVal);
     m_panicModeCache.update();
 }

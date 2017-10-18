@@ -103,7 +103,14 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
         ? request.msecSinceEpoch
         : request.msecSinceEpoch * kUsecPerMs;
 
-    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(request.camera, timeUSec, request.size, request.roundMethod, request.rotation);
+    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(
+        request.camera,
+        timeUSec,
+        request.size,
+        request.roundMethod,
+        request.rotation,
+        request.aspectRatio);
+
     if (!outFrame)
     {
         result = QByteArray();

@@ -1,6 +1,7 @@
 #include "bookmark_overlay_settings_widget.h"
 #include "ui_bookmark_overlay_settings_widget.h"
 
+#include <limits>
 #include <ui/common/aligner.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -14,7 +15,6 @@ namespace {
 
 static constexpr int kMinimumWidth = 60;
 
-static constexpr int kMinimumFontSize = 10;
 static constexpr int kMaximumFontSize = 400;
 
 } // namespace
@@ -28,6 +28,8 @@ BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
     ui->widthSlider->setProperty(style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
 
+    ui->widthSlider->setMaximum(std::numeric_limits<int>::max());
+
     auto aligner = new QnAligner(this);
     aligner->addWidgets({ui->widthLabel, ui->fontSizeLabel});
 
@@ -37,7 +39,8 @@ BookmarkOverlaySettingsWidget::BookmarkOverlaySettingsWidget(QWidget* parent):
     connect(ui->widthSpinBox, QnSpinboxIntValueChanged, ui->widthSlider, &QSlider::setValue);
 
     ui->widthSlider->setRange(kMinimumWidth, m_data.overlayWidth * 2);
-    ui->fontSizeSpinBox->setRange(kMinimumFontSize, kMaximumFontSize);
+    ui->fontSizeSpinBox->setRange(ExportBookmarkOverlayPersistentSettings::minimumFontSize(),
+        kMaximumFontSize);
     updateControls();
 
     connect(ui->descriptionCheckBox, &QCheckBox::stateChanged,

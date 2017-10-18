@@ -501,6 +501,23 @@
                                 </value>
                             </values>
                         </param>
+                        <param>
+                            <name>aspectRatio</name>
+                            <description>
+                                Allows to avoid scaling the image to the aspect ratio from camera settings.
+                            </description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>auto</name>
+                                    <description>Default value. Honor aspect ratio from camera settings.</description>
+                                </value>
+                                <value>
+                                    <name>source</name>
+                                    <description>Use the source frame aspect ratio, despite the value in camera settings.</description>
+                                </value>
+                            </values>
+                        </param>
                         <param proprietary="true">
                             <name>local</name>
                             <description>If present, the request should not be redirected to another server.</description>
@@ -1130,7 +1147,7 @@
                     <result>
                         <caption>JSON with an error code, error message and a list of JSON objects in "reply" field:</caption>
                         <params>
-                            <param>TO
+                            <param>
                                 <name>actionType</name>
                                 <description>Type of the action.</description>
                                 <values>

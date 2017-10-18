@@ -201,6 +201,22 @@ qint64 QnTimePeriod::distanceToTime(qint64 timeMs) const
         return startTimeMs - timeMs;
 }
 
+void QnTimePeriod::truncate(qint64 timeMs)
+{
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+        durationMs = timeMs - startTimeMs;
+}
+
+void QnTimePeriod::truncateFront(qint64 timeMs)
+{
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        if (durationMs != infiniteDuration())
+            durationMs = endTimeMs() - timeMs;
+        startTimeMs = timeMs;
+    }
+}
+
 bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)
 {
     return ((first.startTimeMs == other.startTimeMs)

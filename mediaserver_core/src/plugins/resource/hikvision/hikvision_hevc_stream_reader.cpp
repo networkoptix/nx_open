@@ -31,6 +31,14 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
         return result;
 
     auto role = getRole();
+    if (role == Qn::CR_LiveVideo && 
+        !m_hikvisionResource->getPtzConfigurationToken().isEmpty() &&
+        m_hikvisionResource->getPtzProfileToken().isEmpty())
+    {
+        // Need to assign some Onvif profile to execute PTZ commands
+        m_hikvisionResource->findDefaultPtzProfileToken();
+    }
+
     auto streamingUrl = buildHikvisionStreamUrl(channelProperties.rtspPortNumber);
     m_hikvisionResource->updateSourceUrl(streamingUrl.toString(), getRole());
     if (!isCameraControlRequired)

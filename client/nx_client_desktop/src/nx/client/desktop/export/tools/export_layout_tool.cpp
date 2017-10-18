@@ -3,6 +3,10 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QEventLoop>
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
@@ -63,6 +67,9 @@ struct ExportLayoutTool::Private
 
     // External file storage.
     QnStorageResourcePtr storage;
+
+    // Whether any archive has been exported.
+    bool exportedAnyData = false;
 
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
@@ -182,15 +189,18 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     QnLayoutItemDataMap items;
 
     // Take resource pool from the original layout.
-    const auto resourcePool = d->settings.layout->resourcePool();
-    NX_ASSERT(resourcePool, "Export of temporary layout is forbidden");
+    auto resourcePool = d->settings.layout->resourcePool();
     if (!resourcePool)
-        return result;
+        resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
-    for (const auto& item : m_layout->getItems())
+    for (const auto& item: m_layout->getItems())
     {
         const auto resource = resourcePool->getResourceByDescriptor(item.resource);
-        if (!resource.dynamicCast<QnVirtualCameraResource>())
+        const bool skip = mode() == ExportLayoutSettings::Mode::Export
+            ? !resource.dynamicCast<QnVirtualCameraResource>()
+            : (resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page));
+
+        if (skip)
             continue;
 
         QnLayoutItemData localItem = item;
@@ -341,6 +351,8 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
 bool ExportLayoutTool::start()
 {
+    d->exportedAnyData = false;
+
     if (!prepareStorage())
     {
         d->lastError = ExportProcessError::fileAccess;
@@ -400,7 +412,15 @@ bool ExportLayoutTool::exportNextCamera()
 
     if (d->resources.isEmpty())
     {
-        finishExport(true);
+        if (d->exportedAnyData)
+        {
+            finishExport(true);
+        }
+        else
+        {
+            d->lastError = ExportProcessError::dataNotFound;
+            finishExport(false);
+        }
         return false;
     }
 
@@ -411,31 +431,6 @@ bool ExportLayoutTool::exportNextCamera()
 void ExportLayoutTool::finishExport(bool success)
 {
     d->finishExport();
-
-    //TODO: #GDM restore functionality and move it to handler
-    /*
-    switch (d->settings.mode)
-    {
-        case ExportLayoutSettings::Mode::LocalSave:
-        {
-            // Take resource pool from the original layout.
-            const auto resourcePool = d->settings.layout->resourcePool();
-            NX_ASSERT(resourcePool);
-            if (!resourcePool)
-                return;
-            auto existing = resourcePool->getResourceByUrl(d->settings.filename.completeFileName())
-                .dynamicCast<QnLayoutResource>();
-            // Update existing layout.
-            NX_ASSERT(existing);
-            if (existing)
-            {
-                existing->update(m_layout);
-                snapshotManager()->store(existing);
-            }
-            break;
-        }
-    }
-    */
 
     // TODO: #GDM This is more correct "Save as" handling, but it does not work yet.
     /*
@@ -488,9 +483,6 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     qint64 serverTimeZone = QnWorkbenchServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
-    QnLegacyTranscodingSettings settings;
-    settings.resource = m_currentCamera->resource();
-
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
         lit("mkv"),
@@ -498,7 +490,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
         role,
         serverTimeZone,
         0,
-        settings);
+        nx::core::transcoding::FilterChain());
 
     return true;
 }
@@ -507,6 +499,15 @@ void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct&
     const QString& /*filename*/)
 {
     d->lastError = convertError(status.lastError);
+    if (d->lastError == ExportProcessError::dataNotFound)
+    {
+        d->lastError = ExportProcessError::noError;
+        exportNextCamera();
+        return;
+    }
+
+    d->exportedAnyData = true;
+
     if (d->lastError != ExportProcessError::noError)
     {
         finishExport(false);

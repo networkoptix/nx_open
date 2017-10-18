@@ -12,6 +12,7 @@ VmsGatewayStub::~VmsGatewayStub()
 void VmsGatewayStub::merge(
     const std::string& username,
     const std::string& targetSystemId,
+    const std::string& /*idOfSystemToMergeTo*/,
     VmsRequestCompletionHandler completionHandler)
 {
     RequestContext requestContext;

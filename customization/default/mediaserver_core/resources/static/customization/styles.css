@@ -74,4 +74,16 @@ fieldset[disabled] .btn-primary.active {
 #top.navbar-default .navbar-toggle .icon-bar {
     background-color: #009bd5; }
 
+.info-icon.active {
+    color: #2FA2DB !important;
+}
+
+.video-settings-button:hover,
+.webclient-panel .dropdown-menu > li > a:hover{
+    background-color: #009bd5 !important;
+}
+
+.webclient-panel .dropdown-menu > li > a.active{
+    background-color: #0096ce !important;
+}
 

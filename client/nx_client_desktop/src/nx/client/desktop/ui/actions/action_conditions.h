@@ -95,6 +95,23 @@ ConditionWrapper operator&&(ConditionWrapper&& l, ConditionWrapper&& r);
 ConditionWrapper operator||(ConditionWrapper&& l, ConditionWrapper&& r);
 ConditionWrapper operator!(ConditionWrapper&& l);
 
+class ResourceCondition: public Condition
+{
+public:
+    using CheckDelegate = std::function<bool(const QnResourcePtr& resource)>;
+
+    ResourceCondition(CheckDelegate delegate, MatchMode matchMode);
+
+    ActionVisibility check(const QnResourceList& resources,
+        QnWorkbenchContext* /*context*/);
+
+    ActionVisibility check(const QnResourceWidgetList& widgets,
+        QnWorkbenchContext* /*context*/);
+
+private:
+    CheckDelegate m_delegate;
+    MatchMode m_matchMode;
+};
 
 /** Base condition class for actions that should be visible in videowall review mode only. */
 class VideoWallReviewModeCondition: public Condition

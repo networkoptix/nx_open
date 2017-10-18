@@ -188,7 +188,7 @@ std::vector<QString> LilinRemoteArchiveManager::getDirectoryList()
 
 
     auto dirStr = QString::fromLatin1(response.get()).trimmed();
-    for (const auto& dir : dirStr.split(QRegExp(lit("\,|\:"))))
+    for (const auto& dir : dirStr.split(QRegExp(lit(",|:"))))
         result.push_back(dir.trimmed());
 
     return result;

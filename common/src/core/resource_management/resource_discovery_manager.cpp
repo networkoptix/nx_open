@@ -24,8 +24,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 
-#include <plugins/storage/dts/abstract_dts_searcher.h>
-
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
@@ -530,7 +528,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
     if (processDiscoveredResources(resources, SearchType::Full))
     {
-        dtsAssignment();
         return resources;
     }
     else {
@@ -678,35 +675,6 @@ bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
 
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {
     return m_searchersList;
-}
-
-void QnResourceDiscoveryManager::dtsAssignment()
-{
-    const auto& resPool = commonModule()->resourcePool();
-    for (int i = 0; i < m_dstList.size(); ++i)
-    {
-        //QList<QnDtsUnit> unitsLst =  QnColdStoreDTSSearcher::instance().findDtsUnits();
-        QList<QnDtsUnit> unitsLst =  m_dstList[i]->findDtsUnits();
-
-        for(const QnDtsUnit& unit: unitsLst)
-        {
-            QnResourcePtr res = resPool->getResourceByUniqueId(unit.resourceID);
-            if (!res)
-                continue;
-
-            QnVirtualCameraResourcePtr vcRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
-            if (!vcRes)
-                continue;
-
-            NX_ASSERT(unit.factory!=0);
-
-#ifdef ENABLE_DATA_PROVIDERS
-            vcRes->lockDTSFactory();
-            vcRes->setDTSFactory(unit.factory);
-            vcRes->unLockDTSFactory();
-#endif
-        }
-    }
 }
 
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const

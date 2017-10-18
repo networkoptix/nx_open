@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <client/client_settings.h>
+
 #include "decoders/video/abstract_video_decoder.h"
 #include "utils/math/math.h"
 #include "nx/utils/thread/long_runnable.h"
@@ -14,12 +16,7 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "../client/client_settings.h"
-#include "transcoding/filters/contrast_image_filter.h"
-#include "transcoding/filters/fisheye_image_filter.h"
-#include "transcoding/filters/filter_helper.h"
 #include <camera/video_decoder_factory.h>
-
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -497,7 +494,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     dec->setOutPictureSize(getMaxScreenSize());
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
-    if (dec->getWidth() > 0) {
+    if (dec->getWidth() > 0) 
+    {
         scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
@@ -536,6 +534,16 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
         while (dec->decode(emptyData, &m_tmpFrame))
         {
+            if (scaleFactor == QnFrameScaler::factor_unknown && dec->getWidth() > 0)
+            {
+                scaleFactor = determineScaleFactor(
+                    m_renderList, 
+                    data->channelNumber, 
+                    dec->getWidth(), 
+                    dec->getHeight(), 
+                    force_factor);
+            }
+
             QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
             if (!downscaleFrame(m_tmpFrame, tmpOutFrame, scaleFactor, pixFmt))
                 continue;

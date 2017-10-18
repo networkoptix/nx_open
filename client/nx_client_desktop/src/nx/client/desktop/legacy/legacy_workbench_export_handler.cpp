@@ -17,6 +17,7 @@
 
 #include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -481,8 +482,9 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
                     const int bigValue = std::numeric_limits<int>::max();
                     NX_ASSERT(resolution.isValid());
 
-                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters,
-                        resolution, QSize(bigValue, bigValue));
+                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters);
+                    filterChain.prepare(imageParameters.resource, resolution,
+                        QSize(bigValue, bigValue));
                     if (filterChain.isDownscaleRequired(resolution))
                     {
                         transcodeWarnShown = true;
@@ -680,7 +682,10 @@ void WorkbenchExportHandler::exportTimeSelection(const ui::action::Parameters& p
         ? widget->item()->data()
         : createDefaultLayoutItemData(mediaResource);
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+    const auto period = bookmark.isNull()
+        ? parameters.argument<QnTimePeriod>(Qn::TimePeriodRole)
+        : QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);
 
     exportTimeSelectionInternal(mediaResource, dataProvider, itemData, period, timelapseFrameStepMs);
 }

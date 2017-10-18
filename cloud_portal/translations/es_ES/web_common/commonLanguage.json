@@ -12,7 +12,7 @@
   "cameraStates":{
     "offline":"Desconectado",
     "error":"Error",
-    "unauthorized":"Autenticación necesaria",
+    "unauthorized":"Autentificación requerida",
     "noData":"No hay datos",
     "iosVideoTooLarge":"iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
     "flashRequired":"Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'> Instale Adobe Flash</a> para reproducir el video de servidores basados en ARM.",

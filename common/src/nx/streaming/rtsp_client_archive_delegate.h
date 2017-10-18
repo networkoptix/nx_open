@@ -40,7 +40,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
-    virtual void onReverseMode(qint64 displayTime, bool value) override;
+    virtual void setSpeed(qint64 displayTime, double value) override;
 
     virtual bool isRealTimeSource() const override;
     virtual void beforeClose() override;
@@ -55,7 +55,7 @@ public:
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override;
 
     virtual void beforeSeek(qint64 time) override;
-    virtual void beforeChangeReverseMode(bool reverseMode) override;
+    virtual void beforeChangeSpeed(double speed) override;
 
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;

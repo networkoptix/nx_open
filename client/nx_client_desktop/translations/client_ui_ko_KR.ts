@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>흐림 효과가 설정된 경우 Intel HD 그래픽 디스플레이에 문제가 발생할 수 있습니다. 옵션을 그대로 두는 것을 권합니다.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>흐림 효과 사용 안 함</translation>
     </message>
   </context>
   <context>
@@ -419,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>At</translation>
     </message>
   </context>
   <context>
@@ -699,7 +699,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>&quot; 시스템이 카메라 설정 최적화하도록 허용 &quot;이 시스템 관리에서 비활성화되었습니다.</translation>
     </message>
     <message>
       <location/>
@@ -709,17 +709,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>PTZ 제어</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>자체 preset 설정 사용 중지, 대신 시스템 preset 설정 사용</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>경고! 카메라 자체 preset 설정은 사용할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -727,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>입력 Id</translation>
     </message>
   </context>
   <context>
@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>출력 Id:</translation>
     </message>
   </context>
   <context>
@@ -1393,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>하드웨어 Id에 잠김:</translation>
     </message>
   </context>
   <context>
@@ -1492,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>하드웨어 Id:</translation>
     </message>
   </context>
   <context>
@@ -1619,7 +1619,7 @@
     <message>
       <location/>
       <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <translation>Showreel Cycle</translation>
     </message>
   </context>
   <context>
@@ -1688,7 +1688,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>사용자에게 재생</translation>
     </message>
   </context>
   <context>
@@ -1706,7 +1706,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>강제 승인</translation>
     </message>
   </context>
   <context>
@@ -2205,7 +2205,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>최상 화질및 해상도를 위해서는 강력한 PC 시용를 권합니다.</translation>
     </message>
     <message>
       <location/>
@@ -2271,7 +2271,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>사용자와 대화하기</translation>
     </message>
   </context>
   <context>
@@ -2611,7 +2611,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>사용할 수 있는</translation>
     </message>
     <message>
       <location/>
@@ -2621,7 +2621,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>아이콘</translation>
     </message>
   </context>
   <context>
@@ -2736,22 +2736,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>역할들:</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>모든 사용자 표시</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>사용자 선택</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>검색과 일치하는 것이 없습니다,</translation>
     </message>
   </context>
   <context>
@@ -2787,7 +2787,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>인터넷으로 시간 동기화</translation>
     </message>
   </context>
   <context>
@@ -2827,8 +2827,7 @@
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>사용자 지정 역할이 설정되어 있지 않습니다. New Role 버튼을 눌러 새로 생성하세요</translation>
     </message>
     <message>
       <location/>

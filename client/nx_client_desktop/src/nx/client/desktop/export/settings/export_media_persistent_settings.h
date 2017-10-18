@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/data/export_media_settings.h>
 
 namespace nx {
@@ -25,6 +26,7 @@ struct ExportOverlayPersistentSettings
 
     virtual ~ExportOverlayPersistentSettings() = default;
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const = 0;
+    virtual void rescale(qreal factor);
 };
 #define ExportOverlayPersistentSettings_Fields (offset)(alignment)
 
@@ -37,6 +39,7 @@ struct ExportImageOverlayPersistentSettings: public ExportOverlayPersistentSetti
 
     ExportImageOverlayPersistentSettings();
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
+    virtual void rescale(qreal factor) override;
 };
 #define ExportImageOverlayPersistentSettings_Fields \
     ExportOverlayPersistentSettings_Fields \
@@ -52,7 +55,10 @@ struct ExportTextOverlayPersistentSettingsBase: public ExportOverlayPersistentSe
     QColor background = QColor(0, 0, 0, 0x7F);
     qreal roundingRadius = 4.0;
 
+    static constexpr int minimumFontSize() { return 10; }
+
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
+    virtual void rescale(qreal factor) override;
 };
 #define ExportTextOverlayPersistentSettingsBase_Fields \
     ExportOverlayPersistentSettings_Fields \
@@ -81,7 +87,10 @@ struct ExportTimestampOverlayPersistentSettings: public ExportOverlayPersistentS
     QColor foreground = Qt::white;
     QColor outline = Qt::black;
 
+    static constexpr int minimumFontSize() { return 10; }
+
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
+    virtual void rescale(qreal factor) override;
 };
 #define ExportTimestampOverlayPersistentSettings_Fields \
     ExportOverlayPersistentSettings_Fields \
@@ -100,6 +109,9 @@ struct ExportRapidReviewPersistentSettings
 struct ExportMediaPersistentSettings
 {
     bool applyFilters = false;
+    QString fileFormat;
+
+    int dimension = 1080; //< Smaller dimension of exported resolution.
 
     ExportRapidReviewPersistentSettings rapidReview;
 
@@ -117,8 +129,9 @@ struct ExportMediaPersistentSettings
     const ExportOverlayPersistentSettings* overlaySettings(ExportOverlayType type) const;
 
     void updateRuntimeSettings(ExportMediaSettings& runtimeSettings) const;
+    void setDimension(int newDimension);
 };
-#define ExportMediaPersistentSettings_Fields (applyFilters)(rapidReview)\
+#define ExportMediaPersistentSettings_Fields (applyFilters)(fileFormat)(dimension)(rapidReview)\
     (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)
 
 #define EXPORT_MEDIA_PERSISTENT_TYPES \

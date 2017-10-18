@@ -1337,13 +1337,14 @@ void MediaServerProcess::loadResourcesFromECS(
 
         for(const auto &mediaServer: mediaServerList)
         {
+            const auto defaultPort = QUrl(mediaServer.url).port();
             QList<SocketAddress> addresses;
-            ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses);
+            ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses, defaultPort);
 
             QList<nx::utils::Url> additionalAddresses = additionalAddressesById.values(mediaServer.id);
             for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
-                const SocketAddress addr(it->host(), it->port());
-                if (it->port() == -1 && addresses.contains(addr))
+                const SocketAddress addr(it->host(), it->port(defaultPort));
+                if (addresses.contains(addr))
                     it = additionalAddresses.erase(it);
                 else
                     ++it;

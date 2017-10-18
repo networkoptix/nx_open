@@ -61,18 +61,14 @@ public:
     nx_http::StatusCode::Value statusCode() const;
 
 private:
+
     boost::optional<QString> findAttribute(
         const QString& group,
         const QString& attributeName,
         int channel) const;
 
-    bool parseXml(const QString& attributesXml);
-
-    bool parseGroups(QXmlStreamReader& reader);
-
-    bool parseCategories(QXmlStreamReader& reader, const QString& group);
-
-    bool parseAttributes(QXmlStreamReader& reader, const QString& group, int channel = kNoChannel);
+    void parseXml(QXmlStreamReader& reader, const QString& group, int channel);
+    void parseAttribute(QXmlStreamReader& reader, const QString& group, int channel);
 
 private:
     using GroupName = QString;

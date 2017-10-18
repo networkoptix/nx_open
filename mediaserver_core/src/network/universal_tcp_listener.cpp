@@ -264,15 +264,20 @@ void QnUniversalTcpListener::applyModToRequest(nx_http::Request* request)
 bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& request)
 {
     const auto targetHeader = request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
-    if (targetHeader != request.headers.end()
-        && QnUuid(targetHeader->second) != commonModule()->moduleGUID())
+    if (targetHeader == request.headers.end())
+        return true; //< Only server proxy allowed.
+
+    if (QnUuid(targetHeader->second) == commonModule()->moduleGUID())
+        return true; //< Self proxy is not a proxy.
+
+    if (!QUrlQuery(request.requestLine.url).hasQueryItem(lit("authKey")))
+        return true; //< Temporary authorization is required.
+
+    const auto requestPath = request.requestLine.url.path();
+    for (const auto& path: m_unauthorizedForwardingPaths)
     {
-        const auto requestPath = request.requestLine.url.path();
-        for (const auto& path: m_unauthorizedForwardingPaths)
-        {
-            if (requestPath.startsWith(path))
-                return false;
-        }
+        if (requestPath.startsWith(path))
+            return false;
     }
 
     return true;

@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Új rendszer</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>A felfedezett %1 rendszer nem kompatibilis az aktuális rendszerrel.</translation>
     </message>
   </context>
   <context>
@@ -440,7 +440,7 @@
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>Edge licencek</translation>
+      <translation>edge licenc</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
@@ -1313,7 +1313,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

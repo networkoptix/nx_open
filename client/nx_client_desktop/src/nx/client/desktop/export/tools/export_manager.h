@@ -13,7 +13,12 @@ namespace desktop {
 
 struct ExportProcessInfo
 {
-    const QnUuid id = QnUuid::createUuid();
+    explicit ExportProcessInfo(const QnUuid& id):
+        id(id)
+    {
+    }
+
+    const QnUuid id;
     int rangeStart = 0;
     int rangeEnd = 100;
     int progressValue = 0;
@@ -27,7 +32,7 @@ class ExportProcess: public Connective<QObject>
     Q_OBJECT
 
 public:
-    explicit ExportProcess(AbstractExportTool* tool, QObject* parent = nullptr);
+    ExportProcess(const QnUuid& id, AbstractExportTool* tool, QObject* parent = nullptr);
     virtual ~ExportProcess() override;
 
     const ExportProcessInfo& info() const;
@@ -59,8 +64,8 @@ public:
 
     virtual ~ExportManager();
 
-    QnUuid exportMedia(const ExportMediaSettings& settings);
-    QnUuid exportLayout(const ExportLayoutSettings& settings);
+    QnUuid exportMedia(const QnUuid& id, const ExportMediaSettings& settings);
+    QnUuid exportLayout(const QnUuid& id, const ExportLayoutSettings& settings);
     void stopExport(const QnUuid& exportProcessId);
 
     ExportProcessInfo info(const QnUuid& exportProcessId) const;

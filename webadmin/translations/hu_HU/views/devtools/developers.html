@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>Fejlesztői eszközök</h2>
         <p>
-            Elégedett az integráció fejlesztéssel? Szívesen fogadjuk visszajelzését.
+            Van valami ötlete a fejlesztői eszközök javításával kapcsolatban vagy csak szeretne megvitatni valamit?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Várjuk visszajezését</a></p>
     </div>
@@ -11,9 +11,9 @@
     <div>
         <h3>Általános esemény generátor</h3>
         <p>
-            Az általános esemény egy speciális esemény 3. rendszerek részére VMS műveletek indításához.
-            Általános esemény létrehozásához az integrált rendszerben HTTP kérés szükséges a szerver felé (szerver API használatával).
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            Az általános esemény egy módszer, amely harmadik féltől származó eseményeket küld a rendszernek,
+            melyek az Események & Szabályok engine-ben aktiválnak rendszerműveleteket.
+            Az általános eseménygenerátor egy eszköz ami HTTP általános eseményhívások létrehozását segíti.
         </p>
         <p><a href="#/developers/events">Általános esemény generátor</a></p>
     </div>
@@ -24,10 +24,10 @@
 minden a hagyományos kliensben elérhető jellemző hozzáféréséhez: rendszer források (szerverek, kamerák, felhasználók, engedélyek), élő és rögzített videók lekérésére, események létrehozására, szabályok írására, PTZ kamerák vezérlésére, stb.
         </p>
         <p>
-            <a href="#/developers/api"><b>API teszt eszköz (új)</b></a>
-            - interaktív dokumentáció Teszt API hívás eszközökkel<br>
+            <a href="#/developers/api"><b>API teszteszköz (új)</b></a>
+            - interaktív dokumentáció eszközökkel API hívások teszteléséhez<br>
             <a href="#/developers/changelog">API változáslog</a>
-            - API törés változások listája<br>
+            - változások listája az API-ban<br>
             <a id="api-doc" href="api.xml" target="_blank">API dokumentáció</a>
         </p>
 
@@ -35,7 +35,7 @@ minden a hagyományos kliensben elérhető jellemző hozzáféréséhez: rendsze
     <div>
         <h3>Kamera részletek panel</h3>
         <p>
-            Speciális panel a webkliens számára, amely további kamera információk megjelnítésére szolgál:
+            További fejlesztőbarát információkat jelenít meg a kamerákhoz a Web admin felületen:
         </p>
         <ul>
             <li>Kamera ID</li>
@@ -43,8 +43,8 @@ minden a hagyományos kliensben elérhető jellemző hozzáféréséhez: rendsze
             <li>Közvetlen videó exportálás a böngészőből</li>
         </ul>
         <p>
-            A kamera részletek panel megnyitásához - nyissa meg a <a href="#/view">web klienst</a>, váassza ki a kamerát,
-            beállítások ikon (fogaskerék), majd válassza a "Kamera részletek" pontot
+            A kamera részletek panel megnyitásához - navigáljon a Web admin felülethez, válassza a <a href="#/view">Nézet</a>  pontot,
+            válassza ki a kívánt kamerát, kattintson a beállításikonra (fogaskerék), majd válassza a "Kamera részletek" pontot.
         </p>
         <p><a href="#/view/?cameraLinks">kamera részletek panel megnyitása</a></p>
     </div>

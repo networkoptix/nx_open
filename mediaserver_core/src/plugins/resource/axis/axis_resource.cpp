@@ -40,6 +40,7 @@ namespace {
     const quint16 DEFAULT_AXIS_API_PORT = 80;
     const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
     const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+    const QString AXIS_TWO_WAY_AUDIO_MODES("Properties.Audio.DuplexMode");
     const QString AXIS_FIRMWARE_VERSION_PARAM_NAME("Properties.Firmware.Version");
 
     QnAudioFormat toAudioFormat(const QString& codecName)
@@ -914,8 +915,22 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
 
 bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
 {
+    QString duplexModeList;
+    auto status = readAxisParameter(http, AXIS_TWO_WAY_AUDIO_MODES, &duplexModeList);
+    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+        return true;
+    bool twoWayAudioFound = false;
+    for (auto value: duplexModeList.split(','))
+    {
+        value = value.toLower().trimmed();
+        if (value.contains("full") || value.contains("half") || value.contains("speaker"))
+            twoWayAudioFound = true;
+    }
+    if (!twoWayAudioFound)
+        return true;
+    
     QString outputFormats;
-    auto status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
+    status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
     if (status != CLHttpStatus::CL_HTTP_SUCCESS)
         return true;
 

@@ -102,7 +102,8 @@ struct QnCameraAdvancedParameter
     QString range;
     QString name;
     QString description;
-    QString tag;  
+    QString confirmation; //< Confirmation message. Actual only for the buttons now.
+    QString tag;
     bool readOnly = false;
     QString readCmd; //< Read parameter command line. Isn't used in UI.
     QString writeCmd; //< Write parameter command line. Isn't used in UI.
@@ -136,6 +137,7 @@ QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
     (range)\
     (name)\
     (description)\
+    (confirmation)\
     (tag)\
     (readOnly)\
     (readCmd)\
