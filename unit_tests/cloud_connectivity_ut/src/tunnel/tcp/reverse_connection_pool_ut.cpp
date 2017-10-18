@@ -33,7 +33,7 @@ public:
     }
 
     virtual void resolveDomain(
-        nx::hpm::api::ResolveDomainRequest resolveData,
+        nx::hpm::api::ResolveDomainRequest /*resolveData*/,
         utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolveDomainResponse)> completionHandler) override
@@ -46,7 +46,7 @@ public:
     }
 
     virtual void resolvePeer(
-        nx::hpm::api::ResolvePeerRequest resolveData,
+        nx::hpm::api::ResolvePeerRequest /*resolveData*/,
         utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolvePeerResponse)> completionHandler) override
@@ -59,7 +59,7 @@ public:
     }
 
     virtual void connect(
-        nx::hpm::api::ConnectRequest connectData,
+        nx::hpm::api::ConnectRequest /*connectData*/,
         utils::MoveOnlyFunc<void(
             stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode,
@@ -76,7 +76,7 @@ public:
     }
 
     virtual void bind(
-        nx::hpm::api::ClientBindRequest request,
+        nx::hpm::api::ClientBindRequest /*request*/,
         utils::MoveOnlyFunc<void(
             nx::hpm::api::ResultCode,
             nx::hpm::api::ClientBindResponse)> completionHandler) override
