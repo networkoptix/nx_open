@@ -267,6 +267,10 @@ angular.module('nxCommon')
                         mouseOverElements = null;
                         return;
                     }
+                    if(event.touches){
+                        event.pageX = event.touches[0].pageX;
+                        event.pageY = event.touches[0].pageY;
+                    }
 
                     if($(event.target).is('canvas') && event.offsetX){
                         mouseXOverTimeline = event.offsetX;
@@ -455,6 +459,10 @@ angular.module('nxCommon')
                 viewport.click(viewportClick);
                 viewport.mousewheel(viewportMouseWheel);
 
+                //For touch screens
+                viewport.on('touchstart', viewportMouseDown);
+                viewport.on('touchmove', viewportMouseMove);
+                viewport.on('touchstop', viewportMouseLeave);
 
                 // Actual browser events handling
 
