@@ -143,13 +143,24 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     return auth;
 }
 
+bool QnNetworkResource::isDefaultAuth() const
+{
+    auto currentAuth = getAuth();
+    auto defaultAuth = getAuthInternal(getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME));
+    return currentAuth == defaultAuth;
+}
+
 QAuthenticator QnNetworkResource::getAuth() const
 {
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    return getAuthInternal(value);
+}
 
-    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
+QAuthenticator QnNetworkResource::getAuthInternal(const QString& encodedAuth) const
+{
+    QString value = nx::utils::decodeStringFromHexStringAES128CBC(encodedAuth);
 
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;

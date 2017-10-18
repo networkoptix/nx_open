@@ -717,6 +717,37 @@
                           Duration of -1 means the last chunk is being recorded now.</caption>
                     </result>
                 </function>
+                <function>
+                    <name>changeCameraPassword</name>
+                    <description>
+                    Change password for already existing user on a camera.</description>
+                    <permissions>Administrator.</permissions>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
+                                MAC address (not supported for certain cameras).</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>user</name>
+                            <description>
+                              User name.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>password</name>
+                            <description>
+                              New password to set.</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON result with error code</caption>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>

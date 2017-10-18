@@ -310,6 +310,12 @@ public:
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
 
+    /**
+     * Update user password at the camera. This function is able to change password for existing user only.
+     */
+    virtual bool setCameraCredentialsSync(
+        const QAuthenticator& auth, QString* outErrorString = nullptr) { return false; }
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

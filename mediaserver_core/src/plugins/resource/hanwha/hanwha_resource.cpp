@@ -622,6 +622,8 @@ CameraDiagnostics::Result HanwhaResource::init()
 
     initMediaStreamCapabilities();
 
+    setCameraCapability(Qn::SetUserPasswordCapability, true);
+
     saveParams();
 
     sharedContext->start(getAuth(), getUrl());
@@ -2400,6 +2402,50 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
         return QnTimePeriodList();
 
     return sharedContext()->chunkLoader()->chunks(getChannel());
+}
+
+bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString)
+{
+    HanwhaRequestHelper helper(toSharedPointer(this));
+    auto response = helper.view(lit("security/users"));
+    if (!response.isSuccessful())
+    {
+        if (outErrorString)
+            *outErrorString = response.errorString();
+        return false;
+    }
+
+    QString userIndex;
+    const auto data = response.response();
+    for (auto itr = data.begin(); itr != data.end(); ++itr)
+    {
+        // Line example: Users.0=admin/Samsung2/True/True//True//True
+        if (itr->second.split('/')[0] == auth.user())
+        {
+            userIndex = itr->first.split('.').last();
+            break;
+        }
+    }
+    if (userIndex.isEmpty())
+    {
+        if (outErrorString)
+            *outErrorString = lm("User %1 not found").arg(auth.user());
+        return false;
+    }
+
+    std::map<QString, QString> params;
+    params.emplace(lit("UserID"), auth.user());
+    params.emplace(lit("Password"), auth.password());
+    params.emplace(lit("Index"), userIndex);
+    response = helper.set(lit("security/users"), params);
+    if (!response.isSuccessful())
+    {
+        if (outErrorString)
+            *outErrorString = response.errorString();
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace plugins
