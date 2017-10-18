@@ -6,6 +6,7 @@
 #include <client/client_globals.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/common/palette.h>
+#include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 
@@ -33,13 +34,21 @@ static constexpr int kDescriptionFontWeight = QFont::Normal;
 
 EventTile::EventTile(QWidget* parent) :
     base_type(parent, Qt::FramelessWindowHint),
-    ui(new Ui::EventTile())
+    ui(new Ui::EventTile()),
+    m_closeButton(new QPushButton(this))
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    ui->closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
-    ui->closeButton->setIconSize(QnSkin::maximumSize(ui->closeButton->icon()));
+    m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
+    m_closeButton->setIconSize(QnSkin::maximumSize(m_closeButton->icon()));
+    m_closeButton->setFixedSize(m_closeButton->iconSize());
+    m_closeButton->setFlat(true);
+    auto sizePolicy = ui->timestampLabel->sizePolicy();
+    sizePolicy.setRetainSizeWhenHidden(true);
+    ui->timestampLabel->setSizePolicy(sizePolicy);
+    auto anchor = new QnWidgetAnchor(m_closeButton);
+    anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
 
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
@@ -65,7 +74,7 @@ EventTile::EventTile(QWidget* parent) :
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
 
-    connect(ui->closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
+    connect(m_closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
     connect(ui->descriptionLabel, &QLabel::linkActivated, this, &EventTile::linkActivated);
 }
@@ -211,12 +220,14 @@ bool EventTile::event(QEvent* event)
     {
         case QEvent::Enter:
         case QEvent::HoverEnter:
-            ui->stackedWidget->setCurrentWidget(ui->closeButtonPage);
+            ui->timestampLabel->setHidden(true);
+            m_closeButton->setHidden(false);
             break;
 
         case QEvent::Leave:
         case QEvent::HoverLeave:
-            ui->stackedWidget->setCurrentWidget(ui->timestampPage);
+            ui->timestampLabel->setHidden(false);
+            m_closeButton->setHidden(true);
             break;
 
         case QEvent::MouseButtonPress:base_type::event(event);

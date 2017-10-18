@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>310</width>
-    <height>109</height>
+    <width>477</width>
+    <height>161</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -80,81 +80,14 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2" alignment="Qt::AlignTop">
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="0" column="2">
+    <widget class="QLabel" name="timestampLabel">
+     <property name="text">
+      <string notr="true">&lt;0:00:00&gt;</string>
      </property>
-     <property name="currentIndex">
-      <number>0</number>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
-     <widget class="QWidget" name="timestampPage">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item alignment="Qt::AlignRight">
-        <widget class="QLabel" name="timestampLabel">
-         <property name="text">
-          <string notr="true">&lt;0:00:00&gt;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="closeButtonPage">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item alignment="Qt::AlignRight|Qt::AlignTop">
-        <widget class="QPushButton" name="closeButton">
-         <property name="minimumSize">
-          <size>
-           <width>17</width>
-           <height>10</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>17</width>
-           <height>10</height>
-          </size>
-         </property>
-         <property name="text">
-          <string notr="true"/>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item row="1" column="1" colspan="2">

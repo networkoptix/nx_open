@@ -81,6 +81,7 @@ protected:
 
 private:
     QScopedPointer<Ui::EventTile> ui;
+    QPushButton* const m_closeButton = nullptr;
 };
 
 } // namespace
