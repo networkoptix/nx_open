@@ -227,6 +227,7 @@ table.webclient-window>tbody>tr>td{
     display: inline-block;
     position: relative;
     z-index: 1;
+    cursor: pointer;
 
     .clear-button{
       float: left;
@@ -314,6 +315,7 @@ table.webclient-window>tbody>tr>td{
     height:40px;
     padding: 0 8px !important;
     line-height: 40px;
+    cursor: pointer;
 
     &:hover{
       background-color: $additional_light3 !important;
@@ -400,6 +402,7 @@ table.webclient-window>tbody>tr>td{
     font-weight: 500 !important;
     color: $dark9 !important;
     line-height: 34px;
+    cursor: pointer;
   }
 
   small{
@@ -635,6 +638,7 @@ table.webclient-window>tbody>tr>td{
   width: 24px;
   margin: 6px;
   line-height: 20px;
+  cursor: pointer;
 }
 
 .video-settings{
