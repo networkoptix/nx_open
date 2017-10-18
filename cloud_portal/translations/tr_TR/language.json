@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Hesabınız başarıyla kaydedildi",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"Aktivasyon linki gönderildi",
     "passwordChangedSuccess":"Hesabınız başarıyla kaydedildi",
     "changePassword":"Parola Değiştir",
     "newPasswordLabel":"Yeni Parola",
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"Aktivasyon linki gönder",
     "resetPassword":"Parolayı sıfırla -",
     "setNewPassword":"Parolayı kaydet",
     "setNewPasswordLabel":"Yeni Parola"

@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Ваша учетная запись успешно сохранена",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"Ссылка для активации отправлена",
     "passwordChangedSuccess":"Ваша учетная запись успешно сохранена",
     "changePassword":"Изменить пароль",
     "newPasswordLabel":"Новый пароль",
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"Повторно отправить ссылку активации",
     "resetPassword":"Сброс пароля",
     "setNewPassword":"Сохранить пароль",
     "setNewPasswordLabel":"Новый пароль"

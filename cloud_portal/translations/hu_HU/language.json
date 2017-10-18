@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"A fiók mentése sikeres",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"Aktiválási link elküldve",
     "passwordChangedSuccess":"A fiók mentése sikeres",
     "changePassword":"Jelszómódosítás",
     "newPasswordLabel":"Új jelszó",
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"Aktiválási link újraküldése",
     "resetPassword":"Jelszó visszaállítása",
     "setNewPassword":"Jelszó mentése",
     "setNewPasswordLabel":"Új jelszó"

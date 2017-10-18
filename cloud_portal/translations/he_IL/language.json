@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"החשבון שלך נשמר בהצלחה",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"קישור הפעלה נשלח",
     "passwordChangedSuccess":"החשבון שלך נשמר בהצלחה",
     "changePassword":"שנה סיסמה",
     "newPasswordLabel":"סיסמה חדשה",
@@ -221,13 +221,13 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"שלח את קישור ההפעלה שוב",
     "resetPassword":"איפוס סיסמה",
     "setNewPassword":"שמור סיסמה",
     "setNewPasswordLabel":"סיסמה חדשה"
   },
   "regActions":{
-    "passwordLabel":"סיסמא",
+    "passwordLabel":"סיסמה",
     "createAccount":"צור חשבון"
   },
   "header":{
