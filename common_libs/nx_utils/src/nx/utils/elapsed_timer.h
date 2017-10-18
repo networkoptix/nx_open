@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Qtcore/QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <chrono>
 
 namespace nx {
