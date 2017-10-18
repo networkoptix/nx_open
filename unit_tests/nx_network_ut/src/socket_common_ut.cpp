@@ -49,9 +49,9 @@ static void testHostAddress(
     boost::optional<in6_addr> ipv6)
 {
     if (string4)
-        testHostAddress(string4, ipv4, ipv6, string4, false);
+        testHostAddress(string4, ipv4, ipv6, string4, true);
 
-    testHostAddress(string6, ipv4, ipv6, string6, false);
+    testHostAddress(string6, ipv4, ipv6, string6, true);
 
     if (ipv4)
     {

@@ -376,8 +376,12 @@ protected:
     Role serverRole = Role::undefined;
     bool m_tearDownInProgress = false;
 
+    static const nx::Buffer kFrameBuffer;
+
     const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
 };
+
+const nx::Buffer WebSocket::kFrameBuffer("hello");
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
 {
@@ -723,7 +727,6 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
     int receivedMessageCount = 0;
     const int kMessageFrameCount = 100;
     const int kTotalMessageCount = 20;
-    const nx::Buffer kFrameBuffer("hello");
 
     clientSendCb =
         [&](SystemError::ErrorCode ecode, size_t)
@@ -779,7 +782,6 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
     int receivedFrameCount = 0;
     const int kMessageFrameCount = 100;
     const int kTotalMessageCount = 20;
-    const nx::Buffer kFrameBuffer("hello");
 
     clientSendCb =
         [&](SystemError::ErrorCode ecode, size_t)
