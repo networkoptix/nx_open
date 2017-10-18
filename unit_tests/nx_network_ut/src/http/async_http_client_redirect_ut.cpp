@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <QUrlQuery>
+
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -60,7 +62,27 @@ protected:
             kTestMessageBody,
             "text/plain"));
 
-        // Enabling authentication.
+        withAuthentification();
+    }
+
+    void givenResourceServer()
+    {
+        ASSERT_TRUE(m_resourceServer->bindAndListen());
+        m_actualUrl = QUrl(lm("http://localhost:%1%2")
+            .arg(m_resourceServer->serverAddress().port)
+            .arg(nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath)));
+    }
+
+    void givenRedirectServer()
+    {
+        ASSERT_TRUE(m_redirector->bindAndListen());
+        m_redirectUrl = QUrl(lm("http://127.0.0.1:%1%2")
+            .arg(m_redirector->serverAddress().port).arg(kTestPath));
+        ASSERT_TRUE(m_redirector->registerRedirectHandler(kTestPath, m_actualUrl));
+    }
+
+    void withAuthentification()
+    {
         const QString userName = nx::utils::generateRandomName(7);
         const QString password = nx::utils::generateRandomName(7);
         m_httpClient.setUserName(userName);
@@ -70,30 +92,22 @@ protected:
         m_resourceServer->registerUserCredentials(userName.toUtf8(), password.toUtf8());
     }
 
-    void givenResourceServer()
-    {
-        ASSERT_TRUE(m_resourceServer->bindAndListen());
-        m_actualUrl = QUrl(lm("http://%1%2")
-            .arg(m_resourceServer->serverAddress().toString())
-            .arg(nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath)));
-    }
-
-    void givenRedirectServer()
-    {
-        ASSERT_TRUE(m_redirector->bindAndListen());
-        m_redirectUrl = QUrl(lm("http://%1%2")
-            .arg(m_redirector->serverAddress().toString()).arg(kTestPath));
-        ASSERT_TRUE(m_redirector->registerRedirectHandler(kTestPath, m_actualUrl));
-    }
-
     void whenRequestingRedirectedResource()
     {
         ASSERT_TRUE(m_httpClient.doGet(m_redirectUrl));
     }
 
-    void whenPostingResourceToRedirectionServer()
+    void whenPostingResourceToRedirectionServer(std::map<QString, QString> params = {})
     {
-        m_httpClient.doPost(m_redirectUrl, "text/plain", kTestMessageBody);
+        QUrlQuery query;
+        for (const auto& param: params)
+            query.addQueryItem(param.first, param.second);
+
+        auto url = m_redirectUrl;
+        url.setQuery(query.query());
+
+        m_httpClient.addAdditionalHeader("Nx-Additional-Header", "value");
+        m_httpClient.doPost(url, "text/plain", kTestMessageBody);
     }
 
     void thenClientShouldFetchResourceFromActualLocation()
@@ -129,9 +143,22 @@ protected:
     {
         auto request = m_postResourceRequests.pop();
         for (const auto& header: request.headers)
-        {
-            ASSERT_EQ(1U, request.headers.count(header.first));
-        }
+            ASSERT_EQ(1U, request.headers.count(header.first)) << header.first.data();
+    }
+
+    void thenDigestUrlIsCorrectAndFullyEncoded()
+    {
+        auto request = m_postResourceRequests.pop();
+        const auto hostHeader = request.headers.find("Host");
+        ASSERT_NE(hostHeader, request.headers.end());
+        ASSERT_EQ(hostHeader->second, lm("%1:%2").args(m_actualUrl.host(),m_actualUrl.port()));
+
+        const auto authHeader = request.headers.find(nx_http::header::Authorization::NAME);
+        ASSERT_NE(authHeader, request.headers.end());
+        nx_http::header::Authorization auth(nx_http::header::AuthScheme::digest);
+        ASSERT_TRUE(auth.parse(authHeader->second));
+        ASSERT_EQ(auth.digest->params["uri"],
+            request.requestLine.url.toString(QUrl::FullyEncoded).toUtf8());
     }
 
 private:
@@ -188,6 +215,15 @@ TEST_F(AsyncHttpClientRedirect, no_duplicate_headers_in_redirected_request)
     givenTwoHttpServersWithRedirection();
     whenPostingResourceToRedirectionServer();
     thenRequestToContentServerDoesNotContainDuplicateHeaders();
+}
+
+TEST_F(AsyncHttpClientRedirect, digest_url_is_correct)
+{
+    givenTwoHttpServersWithRedirection();
+    withAuthentification();
+
+    whenPostingResourceToRedirectionServer({{"param", "value"}});
+    thenDigestUrlIsCorrectAndFullyEncoded();
 }
 
 } // namespace test
