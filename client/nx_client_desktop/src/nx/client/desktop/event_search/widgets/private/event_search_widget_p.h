@@ -16,8 +16,12 @@ public:
     Private(EventSearchWidget* q);
     virtual ~Private() override;
 
+    QnVirtualCameraResourcePtr camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
+
 private:
     EventSearchWidget* q = nullptr;
+    QnVirtualCameraResourcePtr m_camera;
 };
 
 } // namespace

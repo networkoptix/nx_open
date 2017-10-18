@@ -13,8 +13,6 @@ EventRibbon::EventRibbon(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     d(new Private(this))
 {
-    // TODO: #removeme #vkutin This is just for testing.
-    setMinimumSize(0, 500);
 }
 
 EventRibbon::~EventRibbon()

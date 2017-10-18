@@ -41,25 +41,26 @@ EventPanel::Private::~Private()
 
 QnVirtualCameraResourcePtr EventPanel::Private::camera() const
 {
-    return m_camera;
+    return m_cameraTab->camera();
 }
 
 void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (m_camera == camera)
+    if (this->camera() == camera)
         return;
 
-    m_camera = camera;
+    m_cameraTab->setCamera(camera);
 
-    if (m_camera)
+    const auto index = m_tabs->indexOf(m_cameraTab);
+    if (camera)
     {
-        const auto index = m_tabs->indexOf(m_cameraTab);
         if (index < 0)
-            m_tabs->addTab(m_cameraTab, m_camera->getName());
+            m_tabs->addTab(m_cameraTab, camera->getName());
+        else
+            m_tabs->setTabText(index, camera->getName());
     }
     else
     {
-        const auto index = m_tabs->indexOf(m_cameraTab);
         if (index >= 0)
             m_tabs->removeTab(index);
     }

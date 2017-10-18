@@ -34,9 +34,6 @@ namespace client {
 namespace desktop
 {
 
-// TODO: #vkutin #removeme Debug shit
-// int g_number = 0;
-
 NotificationListWidget::Private::Private(NotificationListWidget* q) :
     QObject(),
     QnWorkbenchContextAware(q),

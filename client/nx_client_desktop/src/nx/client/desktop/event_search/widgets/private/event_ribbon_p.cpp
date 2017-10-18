@@ -58,7 +58,7 @@ EventRibbon::Private::Private(EventRibbon* q):
 
             const auto margin = style::Metrics::kStandardPadding;
             const auto extra = m_scrollBar->isHidden() ? 0 : m_scrollBar->width();
-            viewportAnchor->setMargins(margin, 1, margin + extra, 0);
+            viewportAnchor->setMargins(margin, 0, margin + extra, 0);
         };
 
     installEventHandler(m_scrollBar, {QEvent::Show, QEvent::Hide}, this, updateViewportMargins);

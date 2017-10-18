@@ -24,12 +24,8 @@ public:
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 private:
-    static void makeTranslucent(QWidget* widget);
-
-private:
     EventPanel* q = nullptr;
     QTabWidget* m_tabs = nullptr;
-    QnVirtualCameraResourcePtr m_camera;
 
     NotificationListWidget* m_systemTab = nullptr;
     EventSearchWidget* m_cameraTab = nullptr;

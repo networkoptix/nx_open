@@ -15,6 +15,16 @@ EventSearchWidget::~EventSearchWidget()
 {
 }
 
+QnVirtualCameraResourcePtr EventSearchWidget::camera() const
+{
+    return d->camera();
+}
+
+void EventSearchWidget::setCamera(const QnVirtualCameraResourcePtr& camera)
+{
+    d->setCamera(camera);
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

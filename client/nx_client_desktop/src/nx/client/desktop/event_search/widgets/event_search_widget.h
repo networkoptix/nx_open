@@ -3,6 +3,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -15,6 +17,9 @@ class EventSearchWidget: public QWidget
 public:
     EventSearchWidget(QWidget* parent = nullptr);
     virtual ~EventSearchWidget() override;
+
+    QnVirtualCameraResourcePtr camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 private:
     class Private;
