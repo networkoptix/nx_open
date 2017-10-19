@@ -205,10 +205,13 @@ table.webclient-window>tbody>tr>td{
 /* Cameras search */
 .cameras-search{
   height: 44px;
-  font-size: 13px;
   background-color: $additional_light2;
   color: $light16;
   position: relative;
+
+  &.active{
+    background-color: $light1 !important;
+  }
 
   &>*{
     background: transparent;
@@ -246,10 +249,12 @@ table.webclient-window>tbody>tr>td{
     }
 
     .info-icon{
-      line-height: 54px;
+      line-height: 46px;
       float: right;
       width: 44px;
-      height: 44px;
+      height: 43px;
+      font-size: 16px;
+
       &:hover, &.active:hover{
         background-color: $additional_light3 !important;  
       }
@@ -272,15 +277,16 @@ table.webclient-window>tbody>tr>td{
     border: none;
     box-shadow: none;
     outline: none !important;
-    font-size: 16px;
+    font-size: 13px;
     border-bottom: 1px solid $light6;
     line-height: 44px;
+    color: black;
     
     &:hover{
       background-color: $light2;
     }
 
-    &.active,&:active,
+    &:active,
     &:focus{
       background-color: $light1;
     }
@@ -626,6 +632,7 @@ table.webclient-window>tbody>tr>td{
 .hide-excess-text {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .video-name{
