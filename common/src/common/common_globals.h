@@ -41,7 +41,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020,
         AudioTransmitCapability             = 0x040,
-        RemoteArchiveCapability             = 0x100
+        RemoteArchiveCapability             = 0x100,
+        SetUserPasswordCapability           = 0x200 //< Can change password on a camera.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -119,7 +120,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
         LogicalPtzCoordinateSpace,
-        InvalidPtzCoordinateSpace 
+        InvalidPtzCoordinateSpace
     };
 
     enum PtzObjectType {

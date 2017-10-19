@@ -18,5 +18,10 @@ void ElapsedTimer::restart()
     m_timer.restart();
 }
 
+void ElapsedTimer::invalidate()
+{
+    m_timer.invalidate();
+}
+
 } // namespace utils
 } // namespace nx

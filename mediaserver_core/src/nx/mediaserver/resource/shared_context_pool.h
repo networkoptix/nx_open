@@ -21,7 +21,7 @@ class SharedContextPool:
     public ServerModuleAware
 {
     Q_OBJECT
-    using SharedContextStorage = 
+    using SharedContextStorage =
         QMap<
             AbstractSharedResourceContext::SharedId,
             std::weak_ptr<AbstractSharedResourceContext>>;
@@ -44,7 +44,7 @@ public:
         if (const auto context = m_sharedContexts.value(sharedId).lock())
             return std::dynamic_pointer_cast<ContextType>(context);
 
-        const auto context = std::make_shared<ContextType>(serverModule(), sharedId);
+        const auto context = std::make_shared<ContextType>(sharedId);
         m_sharedContexts[sharedId] = context;
         return context;
     }

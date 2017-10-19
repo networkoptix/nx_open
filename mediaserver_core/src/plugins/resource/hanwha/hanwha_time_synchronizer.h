@@ -24,7 +24,7 @@ public:
     HanwhaTimeSyncronizer(HanwhaTimeSyncronizer&&) = delete;
     HanwhaTimeSyncronizer& operator=(HanwhaTimeSyncronizer&&) = delete;
 
-    void start(const QAuthenticator& auth, const QUrl& url);
+    void start(HanwhaSharedResourceContext* resourceConext);
 
     using TimeZoneShiftHandler = utils::MoveOnlyFunc<void(std::chrono::seconds)>;
     void setTimeZoneShiftHandler(TimeZoneShiftHandler handler);
@@ -40,8 +40,7 @@ private:
         const QString& action, std::map<QString, QString> params,
         bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler);
 
-    QAuthenticator m_auth;
-    QUrl m_url;
+    HanwhaSharedResourceContext* m_resourceConext = nullptr;
     QMetaObject::Connection m_syncTymeConnection;
     network::aio::Timer m_timer;
     nx_http::AsyncClient m_httpClient;

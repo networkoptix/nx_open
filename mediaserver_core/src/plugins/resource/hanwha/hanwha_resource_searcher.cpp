@@ -32,10 +32,14 @@ namespace plugins {
 
 HanwhaDeviceInfo HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url)
 {
+    // This is not the same context as for resources, bc we do not have MAC address before hand.
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
-    m_sharedContext[sharedId] = qnServerModule->sharedContextPool()->
-        sharedContext<HanwhaSharedResourceContext>(sharedId);
-    return m_sharedContext[sharedId]->loadInformation(auth, url);
+    const auto context = qnServerModule->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(sharedId);
+
+    context->setRecourceAccess(url, auth);
+    m_sharedContext[sharedId] = context;
+    return context->loadInformation();
 }
 
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):

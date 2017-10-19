@@ -117,8 +117,8 @@ public:
     /** Returns edge, analog or digital class */
     virtual Qn::LicenseType licenseType() const;
 
-    /** 
-     * Returns true if all cameras in a same camera group should share 1 license 
+    /**
+     * Returns true if all cameras in a same camera group should share 1 license
      */
     bool isSharingLicenseInGroup() const;
 
@@ -309,6 +309,12 @@ public:
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
+
+    /**
+     * Update user password at the camera. This function is able to change password for existing user only.
+     */
+    virtual bool setCameraCredentialsSync(
+        const QAuthenticator& auth, QString* outErrorString = nullptr);
 
 public slots:
     virtual void inputPortListenerAttached();
