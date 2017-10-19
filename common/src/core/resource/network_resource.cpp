@@ -118,7 +118,6 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     const QnUuid &resourceId,
     const QnUuid &resourceTypeId)
 {
-    // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(
         commonModule,
@@ -132,22 +131,12 @@ QAuthenticator QnNetworkResource::getResourceAuth(
             resourceId,
             resourceTypeId);
 
-    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
-
-    const QStringList& credentialsList = value.split(lit(":"));
-    QAuthenticator auth;
-    if (credentialsList.size() >= 1)
-        auth.setUser(credentialsList[0]);
-    if (credentialsList.size() >= 2)
-        auth.setPassword(credentialsList[1]);
-    return auth;
+    return getAuthInternal(value);
 }
 
 bool QnNetworkResource::isDefaultAuth() const
 {
-    auto currentAuth = getAuth();
-    auto defaultAuth = getAuthInternal(getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME));
-    return currentAuth == defaultAuth;
+    return getAuth() == getDefaultAuth();
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
@@ -158,7 +147,13 @@ QAuthenticator QnNetworkResource::getAuth() const
     return getAuthInternal(value);
 }
 
-QAuthenticator QnNetworkResource::getAuthInternal(const QString& encodedAuth) const
+QAuthenticator QnNetworkResource::getDefaultAuth() const
+{
+    QString value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    return getAuthInternal(value);
+}
+
+QAuthenticator QnNetworkResource::getAuthInternal(const QString& encodedAuth)
 {
     QString value = nx::utils::decodeStringFromHexStringAES128CBC(encodedAuth);
 

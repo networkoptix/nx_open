@@ -50,6 +50,7 @@ public:
         const QnUuid &resourceId,
         const QnUuid &resourceTypeId);
     QAuthenticator getAuth() const;
+    QAuthenticator getDefaultAuth() const;
 
     /**
      * Returns true if camera credential was auto detected by media server.
@@ -111,7 +112,7 @@ public:
     static QnUuid physicalIdToId(const QString& uniqId);
     virtual void initializationDone() override;
 private:
-    QAuthenticator getAuthInternal(const QString& encodedAuth) const;
+    static QAuthenticator getAuthInternal(const QString& encodedAuth);
 private:
     //QAuthenticator m_auth;
     bool m_authenticated;
