@@ -24,7 +24,7 @@ HanwhaMetadataManager::HanwhaMetadataManager(HanwhaMetadataPlugin* plugin):
 HanwhaMetadataManager::~HanwhaMetadataManager()
 {
     stopFetchingMetadata();
-    m_plugin->managerRemoved(m_sharedId);
+    m_plugin->managerStoppedToUseMonitor(m_sharedId);
 }
 
 void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -98,6 +98,10 @@ Error HanwhaMetadataManager::stopFetchingMetadata()
     if (m_monitor)
         m_monitor->removeHandler(m_uniqueId);
 
+    NX_ASSERT(m_plugin);
+    if (m_plugin)
+        m_plugin->managerStoppedToUseMonitor(m_sharedId);
+
     return Error::noError;
 }
 
@@ -135,7 +139,7 @@ void HanwhaMetadataManager::setDriverManifest(const Hanwha::DriverManifest& mani
     m_driverManifest = manifest;
 }
 
-void HanwhaMetadataManager::setMonitor(std::shared_ptr<HanwhaMetadataMonitor> monitor)
+void HanwhaMetadataManager::setMonitor(HanwhaMetadataMonitor* monitor)
 {
     m_monitor = monitor;
 }

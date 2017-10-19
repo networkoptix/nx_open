@@ -50,7 +50,7 @@ public:
 
     const Hanwha::DriverManifest& driverManifest() const;
 
-    void managerRemoved(const QString& sharedId);
+    void managerStoppedToUseMonitor(const QString& sharedId);
 
 private:
     boost::optional<QList<QnUuid>> fetchSupportedEvents(
@@ -64,10 +64,22 @@ private:
         int channel);
 
 private:
+    struct MonitorCounter
+    {
+        std::unique_ptr<HanwhaMetadataMonitor> monitor;
+        int counter = 0;
+
+        MonitorCounter(std::unique_ptr<HanwhaMetadataMonitor> metadataMonitor):
+            monitor(std::move(metadataMonitor))
+        {
+        }
+    };
+
+private:
     mutable QnMutex m_mutex;
     QByteArray m_manifest;
     Hanwha::DriverManifest m_driverManifest;
-    QMap<QString, std::shared_ptr<HanwhaMetadataMonitor>> m_monitors;
+    QMap<QString, std::shared_ptr<MonitorCounter>> m_monitors;
 };
 
 } // namespace plugins

@@ -123,7 +123,7 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     const QString sharedId(resourceInfo.sharedId);
-    std::shared_ptr<HanwhaMetadataMonitor> monitor;
+    HanwhaMetadataManager* manager;
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -132,20 +132,19 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
         {
             monitorItr = m_monitors.insert(
                 sharedId,
-                std::make_shared<HanwhaMetadataMonitor>(
-                    driverManifest(),
-                    url,
-                    auth));
+                std::make_shared<MonitorCounter>(
+                    std::make_unique<HanwhaMetadataMonitor>(driverManifest(), url, auth)));
         }
 
-        monitor = monitorItr.value();
-    }
+        auto monitorCounter = monitorItr.value();
+        ++monitorCounter->counter;
 
-    auto manager = new HanwhaMetadataManager(this);
-    manager->setResourceInfo(resourceInfo);
-    manager->setDeviceManifest(QJson::serialized(deviceManifest));
-    manager->setDriverManifest(driverManifest());
-    manager->setMonitor(monitor);
+        manager = new HanwhaMetadataManager(this);
+        manager->setResourceInfo(resourceInfo);
+        manager->setDeviceManifest(QJson::serialized(deviceManifest));
+        manager->setDriverManifest(driverManifest());
+        manager->setMonitor(monitorCounter->monitor.get());
+    }
 
     return manager;
 }
@@ -303,14 +302,16 @@ const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const
     return m_driverManifest;
 }
 
-void HanwhaMetadataPlugin::managerRemoved(const QString& sharedId)
+void HanwhaMetadataPlugin::managerStoppedToUseMonitor(const QString& sharedId)
 {
     QnMutexLocker lock(&m_mutex);
-    auto monitor = m_monitors.value(sharedId);
-    if (!monitor)
+    auto monitorCounter = m_monitors.value(sharedId);
+    if (!monitorCounter)
         return;
 
-    if (monitor.use_count() == 1)
+    --monitorCounter->counter;
+    NX_ASSERT(monitorCounter->counter >= 0);
+    if (monitorCounter->counter <= 0)
         m_monitors.remove(sharedId);
 }
 

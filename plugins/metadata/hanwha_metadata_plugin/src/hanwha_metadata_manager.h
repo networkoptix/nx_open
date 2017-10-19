@@ -41,7 +41,7 @@ public:
     void setDeviceManifest(const QByteArray& manifest);
     void setDriverManifest(const Hanwha::DriverManifest& manifest);
 
-    void setMonitor(std::shared_ptr<HanwhaMetadataMonitor> monitor);
+    void setMonitor(HanwhaMetadataMonitor* monitor);
 
 private:
     Hanwha::DriverManifest m_driverManifest;
@@ -56,7 +56,7 @@ private:
     int m_channel;
 
     HanwhaMetadataPlugin* m_plugin;
-    std::shared_ptr<HanwhaMetadataMonitor> m_monitor;
+    HanwhaMetadataMonitor* m_monitor;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
 };
 
