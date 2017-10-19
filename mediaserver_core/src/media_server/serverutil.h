@@ -87,7 +87,7 @@ bool isLocalAppServer(const QString &host);
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeLocalSystemId(
+bool configureLocalSystem(
     const ConfigureSystemData& data,
     ec2::AbstractTransactionMessageBus* messageBus);
 

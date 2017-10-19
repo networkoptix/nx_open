@@ -112,7 +112,7 @@ int QnConfigureRestHandler::execute(
             return CODE_OK;
         }
 
-        if (!changeLocalSystemId(data, m_messageBus))
+        if (!configureLocalSystem(data, m_messageBus))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: can't change local system Id"), cl_logWARNING);

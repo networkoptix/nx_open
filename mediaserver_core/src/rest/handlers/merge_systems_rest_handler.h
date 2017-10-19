@@ -35,30 +35,6 @@ private:
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult &result);
 
-    bool applyCurrentSettings(
-        const QUrl &remoteUrl,
-        const QString& getKey,
-        const QString& postKey,
-        bool oneServer,
-        const QnRestConnectionProcessor* owner);
-
-    bool applyRemoteSettings(
-        const QUrl &remoteUrl,
-        const QnUuid& systemId,
-        const QString& systemName,
-        const QString& getKey,
-        const QString& postKey,
-        const QnRestConnectionProcessor* owner);
-
-    void setMergeError(
-        QnJsonRestResult& result,
-        utils::MergeSystemsStatus::Value mergeStatus);
-
-    bool executeRemoteConfigure(
-        const ConfigureSystemData& data,
-        const QUrl &remoteUrl,
-        const QString& postKey,
-        const QnRestConnectionProcessor* owner);
 private:
     ec2::AbstractTransactionMessageBus* m_messageBus;
 };
