@@ -3098,7 +3098,7 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>搜索到 %1 从 %2时间段的事件日志 - %n </numerusform>
+        <numerusform>搜索到 %1 从 %2时间段的事件日志 - %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
