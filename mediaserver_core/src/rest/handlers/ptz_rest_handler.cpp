@@ -30,6 +30,8 @@ static const QStringList kCameraIdParams{kCameraIdParam, kDeprecatedResourceIdPa
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
+static const nx::utils::log::Tag kLogTag(lit("QnPtzRestHandler"));
+
 bool checkUserAccess(
     const Qn::UserAccessData& accessRights,
     const QnSecurityCamResourcePtr& camera,
@@ -128,9 +130,11 @@ void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function
 
     while (AsyncFunc nextFunction = m_workers[sequence].nextCommand)
     {
-        NX_VERBOSE("QnPtzRestHandler", lm("Before execute PTZ command sync. Sequence %1").arg(sequence));
+        NX_VERBOSE(kLogTag,
+            lm("Before execute PTZ command sync. Sequence %1").arg(sequence));
         m_workers[sequence].nextCommand = AsyncFunc();
-        NX_VERBOSE("QnPtzRestHandler", lm("After execute PTZ command sync. Sequence %1").arg(sequence));
+        NX_VERBOSE(kLogTag,
+            lm("After execute PTZ command sync. Sequence %1").arg(sequence));
         m_asyncExecMutex.unlock();
         nextFunction();
         m_asyncExecMutex.lock();
@@ -146,13 +150,15 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
 
     if (m_workers[sequence].inProgress)
     {
-        NX_VERBOSE("QnPtzRestHandler", lm("Postpone executing async PTZ command because of current worker. Sequence %1").arg(sequence));
+        NX_VERBOSE(kLogTag,
+            lm("Postpone executing async PTZ command because of current worker. Sequence %1").arg(sequence));
         m_workers[sequence].nextCommand = function;
     }
     else
     {
         m_workers[sequence].inProgress = true;
-        NX_VERBOSE("QnPtzRestHandler", lm("Start executing async PTZ command. Sequence %1").arg(sequence));
+        NX_VERBOSE(kLogTag,
+            lm("Start executing async PTZ command. Sequence %1").arg(sequence));
         QtConcurrent::run(std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
     }
     return CODE_OK;

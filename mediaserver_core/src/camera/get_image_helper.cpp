@@ -11,6 +11,8 @@
 #include <nx/utils/log/log_main.h>
 
 static const int MAX_GOP_LEN = 100;
+static const nx::utils::log::Tag kLogTag(lit("QnGetImageHelper"));
+
 
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate, qint64 ceilTime)
 {
@@ -251,7 +253,7 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
     AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
     if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
     {
-        NX_WARNING("QnGetImageHelper",
+        NX_WARNING(kLogTag,
             lm("Can't initialize ffmpeg encoder to encode image. codec=%1, pixel format=%2, size=%3x%4")
             .arg(codecId)
             .arg(pixelFormat)
@@ -270,7 +272,7 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
         }
         else
         {
-            NX_WARNING("QnGetImageHelper",
+            NX_WARNING(kLogTag,
                 lm("Can't encode image. codec=%1, pixel format=%2, size=%3x%4, errCode=%5")
                 .arg(codecId)
                 .arg(pixelFormat)

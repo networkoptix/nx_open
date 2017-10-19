@@ -182,7 +182,7 @@ bool HanwhaRequestHelper::doRequestInternal(
     QnSemaphoreLocker lock(m_resourceContext->requestSemaphore());
     if (!httpClient.doGet(realUrl))
     {
-        NX_VERBOSE(m_resourceContext, lm("%1 has failed").args(realUrl));
+        NX_VERBOSE(m_resourceContext.get(), lm("%1 has failed").args(realUrl));
         return false;
     }
 
@@ -191,7 +191,7 @@ bool HanwhaRequestHelper::doRequestInternal(
         outBuffer->append(httpClient.fetchMessageBodyBuffer());
 
     *outStatusCode = (nx_http::StatusCode::Value) httpClient.response()->statusLine.statusCode;
-    NX_VERBOSE(m_resourceContext, lm("%1 result %2").args(
+    NX_VERBOSE(m_resourceContext.get(), lm("%1 result %2").args(
         httpClient.contentLocationUrl(), httpClient.response()->statusLine.statusCode));
 
     return true;
