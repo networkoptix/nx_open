@@ -191,7 +191,9 @@ bool HanwhaRequestHelper::doRequestInternal(
         outBuffer->append(httpClient.fetchMessageBodyBuffer());
 
     *outStatusCode = (nx_http::StatusCode::Value) httpClient.response()->statusLine.statusCode;
-    NX_VERBOSE(m_resourceContext, lm("%1 result %2").args(url, httpClient.response()->statusLine.statusCode));
+    NX_VERBOSE(m_resourceContext, lm("%1 result %2").args(
+        httpClient.contentLocationUrl(), httpClient.response()->statusLine.statusCode));
+
     return true;
 }
 

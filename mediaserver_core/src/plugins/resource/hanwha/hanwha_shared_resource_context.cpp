@@ -35,6 +35,11 @@ using namespace nx::mediaserver::resource;
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
+    information([this](){ return loadInformation(); }, kCacheDataTimeout),
+    cgiParamiters([this](){ return loadCgiParamiters(); }, kCacheDataTimeout),
+    eventStatuses([this](){ return loadEventStatuses(); }, kCacheDataTimeout),
+    videoSources([this](){ return loadVideoSources(); }, kCacheDataTimeout),
+    videoProfiles([this](){ return loadVideoProfiles(); }, kCacheDataTimeout),
     m_sharedId(sharedId),
     m_requestSemaphore(kMaxConcurrentRequestNumber)
 {
@@ -57,10 +62,11 @@ void HanwhaSharedResourceContext::setRecourceAccess(
         m_lastSuccessfulUrlTimer.invalidate();
     }
 
-    {
-        QnMutexLocker lock(&m_informationMutex);
-        m_cachedInformationTimer.invalidate();
-    }
+    information.invalidate();
+    cgiParamiters.invalidate();
+    eventStatuses.invalidate();
+    videoSources.invalidate();
+    videoProfiles.invalidate();
 }
 
 void HanwhaSharedResourceContext::setLastSucessfulUrl(const QUrl& value)
@@ -88,112 +94,6 @@ QAuthenticator HanwhaSharedResourceContext::authenticator() const
 QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
 {
     return &m_requestSemaphore;
-}
-
-HanwhaDeviceInfo HanwhaSharedResourceContext::requestAndLoadInformation()
-{
-    HanwhaDeviceInfo info{CameraDiagnostics::NoErrorResult()};
-    HanwhaRequestHelper helper(shared_from_this());
-    helper.setIgnoreMutexAnalyzer(true);
-
-    const auto deviceinfo = helper.view(lit("system/deviceinfo"));
-    if (!deviceinfo.isSuccessful())
-    {
-        return error(
-            deviceinfo,
-            CameraDiagnostics::CameraInvalidParams(
-                lit("Can not fetch device information")));
-    }
-
-    if (const auto value = deviceinfo.parameter<QString>("ConnectedMACAddress"))
-        info.macAddress = *value;
-
-    if (info.macAddress.isEmpty())
-    {
-        const HanwhaRequestHelper::Parameters params = {{ "interfaceName", "Network1" }};
-        const auto networkInfo = helper.view("network/interface", params);
-        if (!networkInfo.isSuccessful())
-        {
-            return error(
-                deviceinfo,
-                CameraDiagnostics::CameraInvalidParams(
-                    lit("Can not fetch device information")));
-        }
-
-        if (const auto value = deviceinfo.parameter<QString>("MACAddress"))
-            info.macAddress = *value;
-    }
-
-    if (const auto value = deviceinfo.parameter<QString>("Model"))
-        info.model = *value;
-
-    if (const auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
-        info.deviceType = value->trimmed();
-
-    if (const auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
-        info.firmware = value->trimmed();
-
-    info.attributes = helper.fetchAttributes(lit("attributes"));
-    if (!info.attributes.isValid())
-        return CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid"));
-
-    info.cgiParamiters = helper.fetchCgiParameters(lit("cgis"));
-    if (!info.cgiParamiters.isValid())
-        return CameraDiagnostics::CameraInvalidParams(lit("Camera cgi parameters are invalid"));
-
-    if (info.deviceType == kHanwhaNvrDeviceType)
-    {
-        info.videoSources = helper.view(lit("media/videosource"));
-        if (!info.videoSources.isSuccessful())
-        {
-            return error(
-                info.videoSources,
-                CameraDiagnostics::RequestFailedResult(
-                    info.videoSources.requestUrl(),
-                    info.videoSources.errorString()));
-        }
-
-        info.eventStatuses = helper.check(lit("eventstatus/eventstatus"));
-        if (!info.eventStatuses.isSuccessful())
-        {
-            return error(
-                info.eventStatuses,
-                CameraDiagnostics::RequestFailedResult(
-                    info.eventStatuses.requestUrl(),
-                    info.eventStatuses.errorString()));
-        }
-    }
-
-    info.videoProfiles = helper.view(lit("media/videoprofile"));
-    const bool isCriticalError = !info.videoProfiles.isSuccessful()
-        && info.videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError;
-
-    if (isCriticalError)
-    {
-        return CameraDiagnostics::RequestFailedResult(
-            info.videoProfiles.requestUrl(),
-            info.videoProfiles.errorString());
-    }
-
-    const auto maxChannels = info.attributes.attribute<int>(lit("System/MaxChannel"));
-    info.channelCount = maxChannels.is_initialized() ? *maxChannels : 1;
-
-    return info;
-}
-
-HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation()
-{
-    QnMutexLocker lock(&m_informationMutex);
-    if (!m_cachedInformationTimer.hasExpired(kCacheDataTimeout)
-        // TODO: Remove second condition and replace with different timeout in case of failure.
-        && m_cachedInformation.diagnostics.errorCode == CameraDiagnostics::ErrorCode::noError)
-    {
-        return m_cachedInformation;
-    }
-
-    m_cachedInformation = requestAndLoadInformation();
-    m_cachedInformationTimer.restart();
-    return m_cachedInformation;
 }
 
 void HanwhaSharedResourceContext::startServices()
@@ -242,6 +142,122 @@ QString HanwhaSharedResourceContext::sessionKey(
 std::shared_ptr<HanwhaChunkLoader> HanwhaSharedResourceContext::chunkLoader() const
 {
     return m_chunkLoader;
+}
+
+HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+
+    const auto deviceinfo = helper.view(lit("system/deviceinfo"));
+    if (!deviceinfo.isSuccessful())
+    {
+        return {error(
+            deviceinfo,
+            CameraDiagnostics::CameraInvalidParams(
+                lit("Can not fetch device information")))};
+    }
+
+    HanwhaInformation info;
+    if (const auto value = deviceinfo.parameter<QString>("ConnectedMACAddress"))
+        info.macAddress = *value;
+
+    if (info.macAddress.isEmpty())
+    {
+        const HanwhaRequestHelper::Parameters params = {{ "interfaceName", "Network1" }};
+        const auto networkInfo = helper.view("network/interface", params);
+        if (!networkInfo.isSuccessful())
+        {
+            return {error(
+                deviceinfo,
+                CameraDiagnostics::CameraInvalidParams(
+                    lit("Can not fetch device information")))};
+        }
+
+        if (const auto value = deviceinfo.parameter<QString>("MACAddress"))
+            info.macAddress = *value;
+    }
+
+    if (const auto value = deviceinfo.parameter<QString>("Model"))
+        info.model = *value;
+
+    if (const auto value = deviceinfo.parameter<QString>(lit("DeviceType")))
+        info.deviceType = value->trimmed();
+
+    if (const auto value = deviceinfo.parameter<QString>(lit("FirmwareVersion")))
+        info.firmware = value->trimmed();
+
+    info.attributes = helper.fetchAttributes(lit("attributes"));
+    if (!info.attributes.isValid())
+        return {CameraDiagnostics::CameraInvalidParams(lit("Camera attributes are invalid"))};
+
+    const auto maxChannels = info.attributes.attribute<int>(lit("System/MaxChannel"));
+    info.channelCount = maxChannels.is_initialized() ? *maxChannels : 1;
+
+    return {CameraDiagnostics::NoErrorResult(), std::move(info)};
+}
+
+HanwhaResult<HanwhaCgiParameters> HanwhaSharedResourceContext::loadCgiParamiters()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+
+    auto cgiParamiters = helper.fetchCgiParameters(lit("cgis"));
+    if (!cgiParamiters.isValid())
+        return {CameraDiagnostics::CameraInvalidParams(lit("Camera cgi parameters are invalid"))};
+
+    return {CameraDiagnostics::NoErrorResult(), std::move(cgiParamiters)};
+}
+
+HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadEventStatuses()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+
+    auto eventStatuses = helper.check(lit("eventstatus/eventstatus"));
+    if (!eventStatuses.isSuccessful())
+    {
+        return {error(
+            eventStatuses,
+            CameraDiagnostics::RequestFailedResult(
+                eventStatuses.requestUrl(), eventStatuses.errorString()))};
+    }
+
+    return {CameraDiagnostics::NoErrorResult(), std::move(eventStatuses)};
+}
+
+HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoSources()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+
+    auto videoSources = helper.view(lit("media/videosource"));
+    if (!videoSources.isSuccessful())
+    {
+        return {error(
+            videoSources,
+            CameraDiagnostics::RequestFailedResult(
+                videoSources.requestUrl(),
+                videoSources.errorString()))};
+    }
+
+    return {CameraDiagnostics::NoErrorResult(), std::move(videoSources)};
+}
+
+HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+
+    auto videoProfiles = helper.view(lit("media/videoprofile"));
+    if (!videoProfiles.isSuccessful()
+        && videoProfiles.errorCode() != kHanwhaConfigurationNotFoundError)
+    {
+        return {CameraDiagnostics::RequestFailedResult(
+            videoProfiles.requestUrl(), videoProfiles.errorString())};
+    }
+
+    return {CameraDiagnostics::NoErrorResult(), std::move(videoProfiles)};
 }
 
 } // namespace plugins

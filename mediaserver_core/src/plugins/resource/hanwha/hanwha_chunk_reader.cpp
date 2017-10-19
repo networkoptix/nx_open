@@ -55,8 +55,12 @@ void HanwhaChunkLoader::start(HanwhaSharedResourceContext* resourceContext)
         if (m_state != State::Initial)
             return; //< Already started
 
+        if (auto information = resourceContext->information())
+            m_maxChannels = information->channelCount;
+        else
+            return; //< Unable to start wothout channel number.
+
         m_resourceContext = resourceContext;
-        m_maxChannels = m_resourceContext->loadInformation().channelCount;
         m_state = State::updateTimeRange;
         NX_DEBUG(this, lm("Started for %1 channels on %2").args(m_maxChannels, resourceContext->url()));
     }
