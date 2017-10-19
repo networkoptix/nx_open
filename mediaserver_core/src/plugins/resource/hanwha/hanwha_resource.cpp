@@ -2437,7 +2437,7 @@ bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QStrin
     params.emplace(lit("UserID"), auth.user());
     params.emplace(lit("Password"), auth.password());
     params.emplace(lit("Index"), userIndex);
-    response = helper.set(lit("security/users"), params);
+    response = helper.update(lit("security/users"), params);
     if (!response.isSuccessful())
     {
         if (outErrorString)

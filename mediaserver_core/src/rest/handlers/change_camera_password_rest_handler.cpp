@@ -35,7 +35,7 @@ int QnChangeCameraPasswordRestHandler::executePost(
     {
         result.setError(
             QnJsonRestResult::InvalidParameter,
-            lit("Missing required field %1").arg(missedField));
+            lit("Missing required field '%1'").arg(missedField));
         return nx_http::StatusCode::ok;
     }
 
@@ -50,6 +50,8 @@ int QnChangeCameraPasswordRestHandler::executePost(
     }
 
     QAuthenticator auth;
+    auth.setUser(data.user);
+    auth.setPassword(data.password);
     QString errorString;
     if (!camera->setCameraCredentialsSync(auth, &errorString))
     {
