@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
 
 #include <api/model/audit/auth_session.h>
@@ -18,15 +19,18 @@ namespace utils {
 class SystemMergeProcessor
 {
 public:
-    SystemMergeProcessor(
-        QnCommonModule* commonModule,
-        const QString& dataDirectory);
+    SystemMergeProcessor(QnCommonModule* commonModule);
+
+    /**
+     * Disabled by default.
+     */
+    void enableDbBackup(const QString& dataDirectory);
 
     nx_http::StatusCode::Value merge(
         Qn::UserAccessData accessRights,
         const QnAuthSession& authSession,
         MergeSystemData data,
-        QnJsonRestResult& result);
+        QnJsonRestResult* result);
 
     /**
      * Valid only after successful SystemMergeProcessor::merge call.
@@ -35,12 +39,13 @@ public:
 
 private:
     QnCommonModule* m_commonModule;
-    const QString m_dataDirectory;
+    QString m_dataDirectory;
     QnAuthSession m_authSession;
     QnModuleInformationWithAddresses m_remoteModuleInformation;
+    bool m_dbBackupEnabled = false;
 
     void setMergeError(
-        QnJsonRestResult& result,
+        QnJsonRestResult* result,
         ::utils::MergeSystemsStatus::Value mergeStatus);
 
     bool applyCurrentSettings(
@@ -60,6 +65,19 @@ private:
         const ConfigureSystemData& data,
         const QUrl &remoteUrl,
         const QString& postKey);
+
+    bool isResponseOK(const nx_http::HttpClient& client);
+
+    nx_http::StatusCode::Value getClientResponse(const nx_http::HttpClient& client);
+
+    template <class ResultDataType>
+    bool executeRequest(
+        const QUrl &remoteUrl,
+        const QString& getKey,
+        ResultDataType& result,
+        const QString& path);
+
+    void addAuthToRequest(QUrl& request, const QString& remoteAuthKey);
 };
 
 } // namespace utils

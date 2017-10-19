@@ -34,44 +34,24 @@ static const QnSoftwareVersion kMinimalVersion(2, 3);
 
 static const std::chrono::milliseconds kRequestTimeout = std::chrono::minutes(1);
 
-bool isResponseOK(const nx_http::HttpClient& client)
-{
-    if (!client.response())
-        return false;
-    return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
-}
-
-nx_http::StatusCode::Value getClientResponse(const nx_http::HttpClient& client)
-{
-    if (client.response())
-        return (nx_http::StatusCode::Value) client.response()->statusLine.statusCode;
-    else
-        return nx_http::StatusCode::undefined;
-}
-
-void addAuthToRequest(QUrl& request, const QString& remoteAuthKey)
-{
-    QUrlQuery query(request.query());
-    query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
-    request.setQuery(query);
-}
-
 } // namespace
 
-SystemMergeProcessor::SystemMergeProcessor(
-    QnCommonModule* commonModule,
-    const QString& dataDirectory)
-    :
-    m_commonModule(commonModule),
-    m_dataDirectory(dataDirectory)
+SystemMergeProcessor::SystemMergeProcessor(QnCommonModule* commonModule):
+    m_commonModule(commonModule)
 {
+}
+
+void SystemMergeProcessor::enableDbBackup(const QString& dataDirectory)
+{
+    m_dbBackupEnabled = true;
+    m_dataDirectory = dataDirectory;
 }
 
 nx_http::StatusCode::Value SystemMergeProcessor::merge(
     Qn::UserAccessData accessRights,
     const QnAuthSession& authSession,
     MergeSystemData data,
-    QnJsonRestResult& result)
+    QnJsonRestResult* result)
 {
     m_authSession = authSession;
 
@@ -81,7 +61,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     if (data.url.isEmpty())
     {
         NX_LOG(lit("SystemMergeProcessor. Request missing required parameter \"url\""), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
+        result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("url")));
         return nx_http::StatusCode::badRequest;
     }
@@ -91,7 +71,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     {
         NX_LOG(lit("SystemMergeProcessor. Received invalid parameter url %1")
             .arg(data.url), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
+        result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::InvalidParameter, lit("url")));
         return nx_http::StatusCode::badRequest;
     }
@@ -99,7 +79,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     if (data.getKey.isEmpty())
     {
         NX_LOG(lit("SystemMergeProcessor. Request missing required parameter \"getKey\""), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
+        result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return nx_http::StatusCode::badRequest;
     }
@@ -150,7 +130,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
     m_remoteModuleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
-    result.setReply(m_remoteModuleInformation);
+    result->setReply(m_remoteModuleInformation);
 
     if (m_remoteModuleInformation.version < kMinimalVersion)
     {
@@ -232,14 +212,17 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
         return nx_http::StatusCode::badRequest;
     }
 
-    if (!nx::vms::utils::backupDatabase(
-            m_dataDirectory,
-            m_commonModule->ec2Connection()))
+    if (m_dbBackupEnabled)
     {
-        NX_LOG(lit("SystemMergeProcessor. takeRemoteSettings %1. Failed to backup database")
-            .arg(data.takeRemoteSettings), cl_logDEBUG1);
-        setMergeError(result, MergeStatus::backupFailed);
-        return nx_http::StatusCode::internalServerError;
+        if (!nx::vms::utils::backupDatabase(
+                m_dataDirectory,
+                m_commonModule->ec2Connection()))
+        {
+            NX_LOG(lit("SystemMergeProcessor. takeRemoteSettings %1. Failed to backup database")
+                .arg(data.takeRemoteSettings), cl_logDEBUG1);
+            setMergeError(result, MergeStatus::backupFailed);
+            return nx_http::StatusCode::internalServerError;
+        }
     }
 
     if (data.takeRemoteSettings)
@@ -297,10 +280,10 @@ const QnModuleInformationWithAddresses& SystemMergeProcessor::remoteModuleInform
 }
 
 void SystemMergeProcessor::setMergeError(
-    QnJsonRestResult& result,
+    QnJsonRestResult* result,
     ::utils::MergeSystemsStatus::Value mergeStatus)
 {
-    result.setError(
+    result->setError(
         QnJsonRestResult::CantProcessRequest,
         ::utils::MergeSystemsStatus::toString(mergeStatus));
 }
@@ -406,37 +389,6 @@ bool SystemMergeProcessor::executeRemoteConfigure(
     return true;
 }
 
-template <class ResultDataType>
-bool executeRequest(
-    const QUrl &remoteUrl,
-    const QString& getKey,
-    ResultDataType& result,
-    const QString& path)
-{
-    nx_http::HttpClient client;
-    client.setResponseReadTimeoutMs(kRequestTimeout.count());
-    client.setSendTimeoutMs(kRequestTimeout.count());
-    client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
-
-    QUrl requestUrl(remoteUrl);
-    requestUrl.setPath(path);
-    addAuthToRequest(requestUrl, getKey);
-    if (!client.doGet(requestUrl) || !isResponseOK(client))
-    {
-        auto status = getClientResponse(client);
-        NX_LOG(lit("SystemMergeProcessor::applyRemoteSettings. Failed to invoke %1: %2")
-            .arg(path)
-            .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
-        return false;
-    }
-
-    nx_http::BufferType response;
-    while (!client.eof())
-        response.append(client.fetchMessageBodyBuffer());
-
-    return QJson::deserialize(response, &result);
-}
-
 bool SystemMergeProcessor::applyRemoteSettings(
     const QUrl& remoteUrl,
     const QnUuid& systemId,
@@ -504,8 +456,6 @@ bool SystemMergeProcessor::applyRemoteSettings(
         return false;
     }
 
-    // TODO: #ak nx::ServerSetting::setAuthKey.
-
     // put current server info to a foreign system to allow authorization via server key
     {
         QnMediaServerResourcePtr mServer = 
@@ -546,6 +496,60 @@ bool SystemMergeProcessor::applyRemoteSettings(
     }
 
     return true;
+}
+
+bool SystemMergeProcessor::isResponseOK(const nx_http::HttpClient& client)
+{
+    if (!client.response())
+        return false;
+    return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
+}
+
+nx_http::StatusCode::Value SystemMergeProcessor::getClientResponse(
+    const nx_http::HttpClient& client)
+{
+    if (client.response())
+        return (nx_http::StatusCode::Value) client.response()->statusLine.statusCode;
+    else
+        return nx_http::StatusCode::undefined;
+}
+
+template <class ResultDataType>
+bool SystemMergeProcessor::executeRequest(
+    const QUrl &remoteUrl,
+    const QString& getKey,
+    ResultDataType& result,
+    const QString& path)
+{
+    nx_http::HttpClient client;
+    client.setResponseReadTimeoutMs(kRequestTimeout.count());
+    client.setSendTimeoutMs(kRequestTimeout.count());
+    client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+
+    QUrl requestUrl(remoteUrl);
+    requestUrl.setPath(path);
+    addAuthToRequest(requestUrl, getKey);
+    if (!client.doGet(requestUrl) || !isResponseOK(client))
+    {
+        auto status = getClientResponse(client);
+        NX_LOG(lit("SystemMergeProcessor::applyRemoteSettings. Failed to invoke %1: %2")
+            .arg(path)
+            .arg(QLatin1String(nx_http::StatusCode::toString(status))), cl_logDEBUG1);
+        return false;
+    }
+
+    nx_http::BufferType response;
+    while (!client.eof())
+        response.append(client.fetchMessageBodyBuffer());
+
+    return QJson::deserialize(response, &result);
+}
+
+void SystemMergeProcessor::addAuthToRequest(QUrl& request, const QString& remoteAuthKey)
+{
+    QUrlQuery query(request.query());
+    query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
+    request.setQuery(query);
 }
 
 } // namespace utils

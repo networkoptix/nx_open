@@ -58,14 +58,13 @@ int QnMergeSystemsRestHandler::execute(
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
-    nx::vms::utils::SystemMergeProcessor systemMergeProcessor(
-        owner->commonModule(),
-        getDataDirectory());
+    nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
+    systemMergeProcessor.enableDbBackup(getDataDirectory());
     const auto resultCode = systemMergeProcessor.merge(
         owner->accessRights(),
         owner->authSession(),
         data,
-        result);
+        &result);
     if (resultCode != nx_http::StatusCode::ok)
     {
         NX_DEBUG(this, lm("Merge with %1 failed with result %2")
