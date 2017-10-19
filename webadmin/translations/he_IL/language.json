@@ -13,9 +13,9 @@
   "passwordRequirements":{
     "minLengthMessage":"סיסמה חייבת להכיל לפחות 8 תווים",
     "requiredMessage":"רק אותיות לטינית, מספרים וסימני מקלדת מותרים",
-    "weakMessage":"הסיסמה צריכה להכיל סוגים שונים של סמלים",
+    "weakMessage":"הסיסמא צריכה להכיל סוגים שונים של סמלים",
     "strongMessage":"סיסמה חזקה!",
-    "commonMessage":"סיסמה זו נמצאת ברשימת הסיסמאות הפופולריות ביותר"
+    "commonMessage":"סיסמה זו נמצאת ברשימת הסיסמהות הפופולריות ביותר"
   },
   "settings":{
     "tabs":{
@@ -40,7 +40,7 @@
     "unsafePortConfirm":"אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
     "confirmDisconnectFromCloud":"נתק את המערכת מ {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
-    "confirmDisconnectFromCloudAction":"התנתק",
+    "confirmDisconnectFromCloudAction":"נתק",
     "disconnectedFromCloudSuccess":"המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
     "confirmDisconnectFromSystem":"נתק שרת מהמערכת הנוכחית",
     "confirmDisconnectFromSystemAction":"ניתוק",
@@ -49,7 +49,7 @@
     "createLocalOwnerTitle":"צור מנהל המקומי",
     "confirmChangePassword":"שנה סיסמת מנהל מערכת",
     "confirmChangePasswordTitle":"האם לשנות את סיסמת המערכת? פעולה זו תשפיע על המשתמש 'admin' ועל סיסמת ה root עבור שרתים מסוימים",
-    "confirmChangePasswordAction":"שמור סיסמה חדשה",
+    "confirmChangePasswordAction":"שמור סיסמא חדשה",
     "nx1ControlHint":"יישום הלקוח הופעל. השתמש מקלדת/עכבר או יישום נייד כדי לשלוט בו."
   },
   "info":{
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"ממשק אינטרנט ל {{PRODUCT_NAME}}"
+  },
+  "common":{
+    "systemOffline":"השרת אינו זמין",
+    "cameraLinks":{
+      "copyToClipboard":"העתק ללוח",
+      "highStream":"תזרים ראשי",
+      "copyDefaultText":"העתק",
+      "unknown":"לא ידוע",
+      "lowStream":"תזרים משני",
+      "transcoding":"המרה",
+      "copyActiveText":"הועתק ללוח"
+    },
+    "searchCamPlaceholder":"חיפוש",
+    "cameraStates":{
+      "noFormat":"דפדפן או התקן זה אינו תומך בהפעלת וידאו ממצלמה זו.",
+      "ieWin10":"השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
+      "iosVideoTooLarge":"iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
+      "unauthorized":"נדרש אימות",
+      "ubuntuNX":"דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת.",
+      "ieNoWebm":"התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
+      "flashOrWebmRequired":"יש <a href='https://get.adobe.com/flashplayer/' target='_blank'> להתקין Adobe Flash</a> או <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM codec</a> עבור הצגת וידאו ב- Internet Explorer.",
+      "noArmSupport":"דפדפן או התקן זה אינו תומך בהפעלת וידאו משרתים מבוססי ARM.",
+      "error":"שגיאה",
+      "offline":"לא מקוון",
+      "noData":"אין נתונים",
+      "flashRequired":"אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי ARM."
+    }
   }
 }

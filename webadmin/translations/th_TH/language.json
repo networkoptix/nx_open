@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} เว็บอินเทอร์เฟซ"
+  },
+  "common":{
+    "systemOffline":"ระบบออฟไลน์",
+    "cameraLinks":{
+      "copyToClipboard":"คัดลอกไปยังคลิปบอร์ด",
+      "highStream":"สตรีมสูง",
+      "copyDefaultText":"สำเนา",
+      "unknown":"ม่รู้จัก",
+      "lowStream":"สตรีมต่ำ",
+      "transcoding":"การแปลงรหัส",
+      "copyActiveText":"คัดลอกไปยังคลิปบอร์ด"
+    },
+    "searchCamPlaceholder":"ค้นหา",
+    "cameraStates":{
+      "noFormat":"เบราเซอร์หรืออุปกรณ์นี้ไม่รองรับการเล่นวิดีโอจากกล้องนี้",
+      "ieWin10":"โปรดใช้ Microsoft Edge หรือเบราว์เซอร์ Google Chrome",
+      "iosVideoTooLarge":"iOS ไม่สนับสนุนวิดีโอที่ใหญ่กว่า fullHD (2MP: 1920x1080)",
+      "unauthorized":"จำเป็นต้องระบุตัวตนผู้ใช้",
+      "ubuntuNX":"เบราว์เซอร์นี้ไม่สนับสนุนวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM โปรดใช้เบราว์เซอร์ Chromium แทน",
+      "ieNoWebm":"โปรดติดตั้ง <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับ Internet Explorer",
+      "flashOrWebmRequired":"โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> หรือ<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับเล่นวิดีโอใน Internet Explorer",
+      "noArmSupport":"เบราว์เซอร์หรืออุปกรณ์นี้ไม่สนับสนุนการเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM",
+      "error":"ข้อผิดพลาด",
+      "offline":"ออฟไลน์",
+      "noData":"ไม่มีข้อมูล",
+      "flashRequired":"โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> สำหรับเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM"
+    }
   }
 }

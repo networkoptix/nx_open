@@ -622,7 +622,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation>shortcut</translation>
+      <translation>Shortcut</translation>
     </message>
     <message>
       <source>Unknown</source>

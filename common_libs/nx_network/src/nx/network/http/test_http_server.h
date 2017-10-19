@@ -78,26 +78,34 @@ public:
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
         const QString& path,
-        std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc )
+        std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc,
+        nx_http::StringType method = nx_http::kAnyMethod)
     {
         return m_httpMessageDispatcher.registerRequestProcessor(
             path,
-            std::move(factoryFunc) );
+            std::move(factoryFunc),
+            method);
     }
 
     template<typename RequestHandlerType>
-    bool registerRequestProcessor(const QString& path)
+    bool registerRequestProcessor(
+        const QString& path,
+        nx_http::StringType method = nx_http::kAnyMethod)
     {
         return m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
             path,
             []() -> std::unique_ptr<RequestHandlerType>
             {
                 return std::make_unique<RequestHandlerType>();
-            });
+            },
+            method);
     }
 
     template<typename Func>
-    bool registerRequestProcessorFunc(const QString& path, Func func)
+    bool registerRequestProcessorFunc(
+        const QString& path,
+        Func func,
+        nx_http::StringType method = nx_http::kAnyMethod)
     {
         using RequestHandlerType = nx_http::server::handler::CustomRequestHandler<const Func&>;
 
@@ -106,18 +114,21 @@ public:
             [func = std::move(func)]() -> std::unique_ptr<RequestHandlerType>
             {
                 return std::make_unique<RequestHandlerType>(func);
-            });
+            },
+            method);
     }
 
     bool registerStaticProcessor(
         const QString& path,
         QByteArray msgBody,
-        const nx_http::StringType& mimeType);
+        const nx_http::StringType& mimeType,
+        nx_http::StringType method = nx_http::kAnyMethod);
 
     bool registerFileProvider(
         const QString& httpPath,
         const QString& filePath,
-        const nx_http::StringType& mimeType);
+        const nx_http::StringType& mimeType,
+        nx_http::StringType method = nx_http::kAnyMethod);
 
     bool registerContentProvider(
         const QString& httpPath,
@@ -125,7 +136,8 @@ public:
 
     bool registerRedirectHandler(
         const QString& resourcePath,
-        const QUrl& location);
+        const QUrl& location,
+        nx_http::StringType method = nx_http::kAnyMethod);
 
     // used for test purpose
     void setPersistentConnectionEnabled(bool value);

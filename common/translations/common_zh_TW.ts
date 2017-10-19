@@ -255,18 +255,6 @@
       <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>攝影機是從錄影資料中找回的. 刪除相機並重加一遍以瀏覽即時影像.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
     </message>
   </context>
   <context>

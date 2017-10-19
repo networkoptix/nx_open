@@ -113,7 +113,8 @@ public:
 
     template<typename RequestHandlerType>
     bool registerRequestProcessor(
-        const QString& path = kAnyPath, const nx_http::StringType& method = kAnyMethod)
+        const QString& path = kAnyPath,
+        const nx_http::StringType& method = kAnyMethod)
     {
         return registerRequestProcessor<RequestHandlerType>(
             path,
