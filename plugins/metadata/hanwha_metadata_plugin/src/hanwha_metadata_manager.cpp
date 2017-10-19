@@ -53,7 +53,7 @@ Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* hand
 
             for (const auto& hanwhaEvent : events)
             {
-                if (hanwhaEvent.channel.is_initialized() && !hanwhaEvent.channel != m_channel)
+                if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
                     return;
 
                 auto event = new CommonDetectedEvent();
