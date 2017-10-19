@@ -103,6 +103,6 @@ Instrument
 
     function normalizedAngle(angle)
     {
-        return (angle + 180) % 360 - 180
+        return (angle + 360) % 360
     }
 }

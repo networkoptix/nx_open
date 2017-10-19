@@ -133,10 +133,12 @@ Item
                 return webPageItemComponent
         }
 
-        property rect enclosedGeometry: Geometry.encloseRotatedGeometry(
-            Qt.rect(0, 0, parent.width, parent.height),
-            Geometry.aspectRatio(Qt.size(parent.width, parent.height)),
-            rotation)
+        property rect enclosedGeometry: parent.width === 0 || parent.height === 0
+            ? Qt.rect(0, 0, 0, 0)
+            : Geometry.encloseRotatedGeometry(
+                Qt.rect(0, 0, parent.width, parent.height),
+                Geometry.aspectRatio(Qt.size(parent.width, parent.height)),
+                rotation)
 
         readonly property bool enableGeometryBindings:
             !contentGeometryAnimation.running
@@ -216,6 +218,12 @@ Item
             }
 
             onStopped: resourceItem.parent.z = 0
+        }
+
+        Behavior on rotation
+        {
+            enabled: !rotationInstrument.rotating
+            NumberAnimation { duration: 200 }
         }
     }
 
