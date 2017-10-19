@@ -20,6 +20,7 @@
 #include <common/common_module.h>
 #include <rest/server/rest_connection_processor.h>
 #include <network/tcp_listener.h>
+#include <nx/utils/log/log_main.h>
 
 namespace {
 
@@ -121,7 +122,9 @@ void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function
 
     while (AsyncFunc nextFunction = m_workers[sequence].nextCommand)
     {
+        NX_VERBOSE("QnPtzRestHandler", lm("Before execute PTZ command sync. Sequence %1").arg(sequence));
         m_workers[sequence].nextCommand = AsyncFunc();
+        NX_VERBOSE("QnPtzRestHandler", lm("After execute PTZ command sync. Sequence %1").arg(sequence));
         m_asyncExecMutex.unlock();
         nextFunction();
         m_asyncExecMutex.lock();
@@ -137,11 +140,13 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
 
     if (m_workers[sequence].inProgress)
     {
+        NX_VERBOSE("QnPtzRestHandler", lm("Postpone executing async PTZ command because of current worker. Sequence %1").arg(sequence));
         m_workers[sequence].nextCommand = function;
     }
     else
     {
         m_workers[sequence].inProgress = true;
+        NX_VERBOSE("QnPtzRestHandler", lm("Start executing async PTZ command. Sequence %1").arg(sequence));
         QtConcurrent::run(std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
     }
     return CODE_OK;
@@ -213,8 +218,12 @@ int QnPtzRestHandler::executePost(
 
     switch (command)
     {
-        case Qn::ContinuousMovePtzCommand:      return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousMove, this, controller, params, result));
-        case Qn::ContinuousFocusPtzCommand:     return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousFocus, this, controller, params, result));
+        case Qn::ContinuousMovePtzCommand:
+            NX_VERBOSE(this, lm("Before execute ContinuousMovePtzCommand. %1").arg(params));
+            return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousMove, this, controller, params, result));
+        case Qn::ContinuousFocusPtzCommand:
+            NX_VERBOSE(this, lm("Before execute ContinuousFocusPtzCommand. %1").arg(params));
+            return execCommandAsync(hash, std::bind(&QnPtzRestHandler::executeContinuousFocus, this, controller, params, result));
 
         case Qn::AbsoluteDeviceMovePtzCommand:
         case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
