@@ -108,7 +108,13 @@ bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
         return true; // do not check if empty
 
     if (m_sequencedRequests[id].sequence > sequence)
+    {
+        NX_VERBOSE(
+            this,
+            lit("Check sequence failed. expected sequence >= %1. got sequence %2")
+            .arg(m_sequencedRequests[id].sequence).arg(sequence));
         return false;
+    }
 
     m_sequencedRequests[id] = SequenceInfo(sequence);
     return true;
@@ -164,7 +170,11 @@ int QnPtzRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* processor)
 {
-    NX_LOG(lit("QnPtzRestHandler: received request %1").arg(path), cl_logDEBUG1);
+    QString paramStr;
+    for (auto itr = params.begin(); itr != params.end(); ++itr)
+        paramStr += lit("%1=%2;").arg(itr.key()).arg(itr.value());
+
+    NX_LOG(lit("QnPtzRestHandler: received request %1 %2").arg(path).arg(paramStr), cl_logDEBUG1);
 
     QString sequenceId;
     int sequenceNumber = -1;
