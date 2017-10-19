@@ -255,18 +255,6 @@
       <translation>Győződjön meg róla, hogy a %1 port elérhető (pl. át van irányítva).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az eszköz menüjében.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat a kamera menüjében.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az I/O modul menüjében.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Ha ez nem segít, állítsa vissza a gyári alapbeállításokat az eszköz web-felületén.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Kamera archívból helyreállítva. Törölje a kamerát, és adja hozzá újra az élő videó megtekintéséhez.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az eszköz menüjében (hiba &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat a kamera menüjében (hiba &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az I/O modul menüjében (hiba &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

@@ -255,18 +255,6 @@
       <translation>ทำให้พอร์ต %1 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>กล้องถูกเรียกคืนจากที่จัดเก็บ ลบกล้องและเพิ่มอีกครั้งเพื่อดูวิดีโอสด</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
