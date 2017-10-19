@@ -9,7 +9,7 @@
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <utils/crypt/symmetrical.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((PasswordData), (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((PasswordData)(CameraPasswordData), (json), _Fields)
 
 PasswordData::PasswordData()
 {

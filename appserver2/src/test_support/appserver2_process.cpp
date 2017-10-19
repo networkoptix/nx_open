@@ -42,6 +42,7 @@
 #include <transaction/message_bus_adapter.h>
 #include <rest/helper/ping_rest_helper.h>
 #include <rest/helper/p2p_statistics.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 static int registerQtResources()
 {
@@ -195,6 +196,23 @@ public:
     }
 
 protected:
+    virtual bool canRemoveResource(const QnUuid& id) override
+    {
+        return id != commonModule()->moduleGUID();
+    }
+
+    virtual void removeResourceIgnored(const QnUuid& resourceId) override
+    {
+        if (resourceId != commonModule()->moduleGUID())
+            return;
+        QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
+
+        ec2::ApiMediaServerData apiServer;
+        ec2::fromResourceToApi(mServer, apiServer);
+        auto connection = commonModule()->ec2Connection();
+        connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
+    }
+
     virtual void onResourceStatusChanged(
         const QnResourcePtr& /*resource*/,
         Qn::ResourceStatus /*status*/,
@@ -216,7 +234,6 @@ protected:
         {
             if (!server->getApiUrl().host().isEmpty())
             {
-                QString gg4 = server->getApiUrl().toString();
                 commonModule()->ec2Connection()->messageBus()->
                     addOutgoingConnectionToPeer(server->getId(), server->getApiUrl());
             }

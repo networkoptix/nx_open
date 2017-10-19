@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} web interfész"
+  },
+  "common":{
+    "systemOffline":"A rendszer offline",
+    "cameraLinks":{
+      "copyToClipboard":"másolás vágólapra",
+      "highStream":"Elsődleges stream",
+      "copyDefaultText":"másolás",
+      "unknown":"Ismeretlen",
+      "lowStream":"Másodlagos stream",
+      "transcoding":"Transzkódolás",
+      "copyActiveText":"vágólapra másolva"
+    },
+    "searchCamPlaceholder":"keresés",
+    "cameraStates":{
+      "noFormat":"Ez a böngésző vagy eszköz nem támogatja erről a kameráról történő videofájl lejátszást.",
+      "ieWin10":"Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
+      "iosVideoTooLarge":"Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+      "unauthorized":"Hitelesítés szükséges",
+      "ubuntuNX":"Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt.",
+      "ieNoWebm":"Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+      "flashOrWebmRequired":"Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
+      "noArmSupport":"Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
+      "error":"Hiba",
+      "offline":"Offline",
+      "noData":"Nincs adat",
+      "flashRequired":"Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videó ARM-alapú szerverről történő lejátszásához."
+    }
   }
 }

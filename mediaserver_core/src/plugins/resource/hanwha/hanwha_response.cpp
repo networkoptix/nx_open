@@ -56,7 +56,16 @@ int HanwhaResponse::errorCode() const
 
 QString HanwhaResponse::errorString() const
 {
-    return m_errorString;
+    if (!m_errorString.isEmpty())
+        return m_errorString;
+    if (!nx_http::StatusCode::isSuccessCode(m_statusCode))
+    {
+        if (m_statusCode == kHanwhaBlockedHttpCode)
+            return "Temporary unauthorized";
+        else
+            return nx_http::StatusCode::toString(m_statusCode);
+    }
+    return m_errorCode == HanwhaError::kNoError ? QString() : "Unknown error";
 }
 
 std::map<QString, QString> HanwhaResponse::response() const
@@ -81,7 +90,7 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer, bool isListMode)
     bool isError = false;
     bool gotErrorDetails = false;
     QString currentGroupPrefix;
-    
+
     for (const auto& line: lines)
     {
         const auto trimmed = line.trimmed();
@@ -187,7 +196,7 @@ void HanwhaResponse::parseBuffer(const nx::Buffer& rawBuffer, bool isListMode)
 
 boost::optional<QString> HanwhaResponse::findParameter(const QString& parameterName, int channel) const
 {
-    auto itr = m_response.find(channel == kNoChannel 
+    auto itr = m_response.find(channel == kNoChannel
         ? parameterName : lit("Channel.%1.%2").arg(channel).arg(parameterName));
     if (itr == m_response.cend())
         return boost::none;

@@ -71,8 +71,6 @@ public:
 
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
-    QnSemaphore* requestSemaphore();
-
     bool isVideoSourceActive();
 
     int maxProfileCount() const;
@@ -110,6 +108,7 @@ public:
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
 
+    virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 

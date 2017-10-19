@@ -1149,33 +1149,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>ซูมเข้า</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>ซูมออก</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>ปรับโฟกัลระยะไกล</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>ปรับโฟกัสระยะใกล้</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>ปรับโฟกัสอัตโนมัติ</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>เปลี่ยนโหมด Dewarping</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -2021,7 +1994,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
       <translation>
-        <numerusform>ไม่สามารถเปลี่ยนชื่ออุปกรณ์</numerusform>
+        <numerusform>ไม่สามารถย้าย %n อุปกรณ์</numerusform>
       </translation>
     </message>
     <message>
@@ -2830,7 +2803,7 @@ to %1</source>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
+      <translation>โปรดปิด %1 และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>

@@ -19,6 +19,7 @@
 
         <qt.libs>core network gui</qt.libs>
         <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lmediaserver_core</global.libs>
+        <rdep.packages>ffmpeg</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

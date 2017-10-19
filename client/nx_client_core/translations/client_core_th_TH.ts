@@ -70,7 +70,7 @@
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก กรุณาติดต่อฝ่ายสนับสนุน.</translation>
+      <translation>ข้อผิดพลาดภายใน %1 โปรดติดต่อทีมสนับสนุน</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
