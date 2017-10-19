@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} interfaz web"
+  },
+  "common":{
+    "systemOffline":"Sistema está desconectado",
+    "cameraLinks":{
+      "copyToClipboard":"copiar al portapapeles",
+      "highStream":"Corriente de alta",
+      "copyDefaultText":"copiar",
+      "unknown":"Uesconocido",
+      "lowStream":"Corriente de baja",
+      "transcoding":"Transcodificación",
+      "copyActiveText":"copiado al portapapeles"
+    },
+    "searchCamPlaceholder":"búsqueda",
+    "cameraStates":{
+      "noFormat":"Este navegador o dispositivo no admite la reproducción de vídeo desde esta cámara.",
+      "ieWin10":"Utilice navegadores Microsoft Edge o Google Chrome.",
+      "iosVideoTooLarge":"iOS no soporta video más grande que el fullHD (2MP: 1920 x 1080).",
+      "unauthorized":"Autenticación necesaria",
+      "ubuntuNX":"Este navegador no admite vídeo de servidores basados ​​en ARM. Por favor, utilice el navegador Chromium en su lugar.",
+      "ieNoWebm":"Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para Internet Explorer.",
+      "flashOrWebmRequired":"<a href='https://get.adobe.com/flashplayer/' target='_blank'>instale Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> para reproducir vídeo en Internet Explorer.",
+      "noArmSupport":"Este navegador o dispositivo no admite la reproducción de vídeo desde servidores basados ​​en ARM.",
+      "error":"Error",
+      "offline":"Desconectado",
+      "noData":"No hay datos",
+      "flashRequired":"Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'> Instale Adobe Flash</a> para reproducir el video de servidores basados en ARM."
+    }
   }
 }
