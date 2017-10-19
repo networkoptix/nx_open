@@ -506,15 +506,15 @@
     <message numerus="yes">
         <source>Activate %n more %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Activate %n more %1.</numerusform>
+            <numerusform>Activate %n more %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n more %1 will be used.</numerusform>
+            <numerusform>%n more %1 will be used.</numerusform>
         </translation>
     </message>
 </context>
@@ -1462,15 +1462,15 @@
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n User</numerusform>
+            <numerusform>%n Users</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Roles</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n Role</numerusform>
+            <numerusform>%n Roles</numerusform>
         </translation>
     </message>
     <message>
