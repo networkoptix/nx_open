@@ -743,6 +743,11 @@ table.webclient-window>tbody>tr>td{
   opacity:0.5;
 }
 
+.blur-preview{
+  opacity: 0.3 !important;
+  filter:blur(5px);
+}
+
 /* Special hack for loading invisible flash objects */
 .invisible{
   height: 0 !important;

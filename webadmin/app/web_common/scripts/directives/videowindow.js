@@ -147,6 +147,7 @@ angular.module('nxCommon')
                                 else{
                                     scope.videoFlags.ieWin10 = true;
                                 }
+                                return false;
                             }
                             break;
 
@@ -175,8 +176,12 @@ angular.module('nxCommon')
                             }
                     }
 
-                    scope.videoFlags.flashRequired = true;
-                    scope.videoFlags.noFormat = true;
+                    if(weHaveHls){
+                        scope.videoFlags.flashRequired = true;
+                    }
+                    else{
+                        scope.videoFlags.noFormat = true;
+                    }
                     return false; // IE9 - No supported formats
                 }
 
@@ -215,7 +220,6 @@ angular.module('nxCommon')
 
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                    scope.loading = false; // Video is playing - disable loading
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
 
@@ -226,9 +230,12 @@ angular.module('nxCommon')
                                     scope.playing = true;
                                 });
 
+                                scope.vgApi.addEventListener("playing", function(event){
+                                    scope.loading = false; // Video is playing - disable loading
+                                });
+
                                 scope.vgApi.addEventListener("ended",function(event){
                                     scope.vgUpdateTime({$currentTime: null, $duration: null});
-
                                 });
                             }
 
