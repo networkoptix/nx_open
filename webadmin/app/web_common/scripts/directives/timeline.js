@@ -501,6 +501,7 @@ angular.module('nxCommon')
                     });
                 }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
+                    scope.emptyArchive = true;
                     if(scope.recordsProvider) {
                         scope.loading = true;
                         initRecordsProvider();

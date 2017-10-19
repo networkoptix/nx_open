@@ -240,9 +240,7 @@ angular.module('nxCommon')
                             }
 
                             scope.vgPlayerReady({$API: scope.vgApi});
-                        }, function(error){
-                            playerErrorHandler(error);
-                        });
+                        }, playerErrorHandler);
                     });
                 }
 
@@ -277,9 +275,9 @@ angular.module('nxCommon')
                                     scope.vgApi.load(getFormatSrc('hls'));
                                 }
                                 scope.vgPlayerReady({$API: api});
-                            }, function(error){
-                                    playerErrorHandler(error);
-                            }, function (position, duration) {
+                            },
+                            playerErrorHandler,
+                            function (position, duration) {
                                 scope.loading = false; // Video is playing - disable loading
                                 scope.vgUpdateTime({$currentTime: position, $duration: duration});
                             });
@@ -318,9 +316,7 @@ angular.module('nxCommon')
                                     });
                                 }
                                 scope.vgPlayerReady({$API:api});
-                            }, function(error){
-                                playerErrorHandler(error);
-                            });
+                            }, playerErrorHandler);
                     });
                 }
 
@@ -333,6 +329,9 @@ angular.module('nxCommon')
                         if( crashCount < Config.webclient.maxCrashCount ){
                             crashCount += 1;
                             srcChanged();
+                        }
+                        else{
+                            crashCount = 0;
                         }
                     });
                     resetPlayer();
