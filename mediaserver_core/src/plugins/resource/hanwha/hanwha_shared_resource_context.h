@@ -8,7 +8,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/semaphore.h>
 #include <nx/mediaserver/resource/abstract_shared_resource_context.h>
-#include <nx/mediaserver/server_module_aware.h>
 
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
@@ -56,7 +55,6 @@ class HanwhaSharedResourceContext:
 
 public:
     HanwhaSharedResourceContext(
-        QnMediaServerModule* serverModule,
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
@@ -97,6 +95,8 @@ private:
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
+
+    mutable QnMutex m_servicesMutex;
 };
 
 } // namespace plugins

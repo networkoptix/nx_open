@@ -24,7 +24,7 @@ HanwhaMetadataManager::HanwhaMetadataManager(HanwhaMetadataPlugin* plugin):
 HanwhaMetadataManager::~HanwhaMetadataManager()
 {
     stopFetchingMetadata();
-    m_plugin->managerStoppedToUseMonitor(m_sharedId);
+    m_plugin->managerIsAboutToBeDestroyed(m_sharedId);
 }
 
 void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -81,14 +81,15 @@ Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* hand
             m_handler->handleMetadata(Error::noError, packet);
         };
 
+    NX_ASSERT(m_plugin);
+    m_monitor = m_plugin->monitor(m_sharedId, m_url, m_auth);
+    if (!m_monitor)
+        return Error::unknownError;
+
     m_handler = handler;
 
-    NX_ASSERT(m_monitor);
-    if (m_monitor)
-    {
-        m_monitor->addHandler(m_uniqueId, monitorHandler);
-        m_monitor->startMonitoring();
-    }
+    m_monitor->addHandler(m_uniqueId, monitorHandler);
+    m_monitor->startMonitoring();
 
     return Error::noError;
 }
@@ -101,6 +102,9 @@ Error HanwhaMetadataManager::stopFetchingMetadata()
     NX_ASSERT(m_plugin);
     if (m_plugin)
         m_plugin->managerStoppedToUseMonitor(m_sharedId);
+
+    m_monitor = nullptr;
+    m_handler = nullptr;
 
     return Error::noError;
 }

@@ -68,7 +68,7 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
 {
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
-    
+
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
         return HanwhaResponse(statusCode, url.toString());

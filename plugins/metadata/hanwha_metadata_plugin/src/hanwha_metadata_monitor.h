@@ -28,7 +28,7 @@ public:
 
     HanwhaMetadataMonitor(
         const Hanwha::DriverManifest& manifest,
-        const QUrl& resourceUrl, 
+        const QUrl& resourceUrl,
         const QAuthenticator& auth);
     virtual ~HanwhaMetadataMonitor();
 

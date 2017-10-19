@@ -34,7 +34,19 @@ const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+using namespace nx::mediaserver_core::plugins;
 
+HanwhaMetadataPlugin::SharedResources::SharedResources(
+    const QString& sharedId,
+    const Hanwha::DriverManifest& driverManifest,
+    const QUrl& url,
+    const QAuthenticator& auth)
+    :
+    monitor(std::make_unique<HanwhaMetadataMonitor>(driverManifest, url, auth)),
+    sharedContext(std::make_shared<HanwhaSharedResourceContext>(sharedId))
+{
+    sharedContext->setRecourceAccess(url, auth);
+}
 
 HanwhaMetadataPlugin::HanwhaMetadataPlugin()
 {
@@ -109,42 +121,20 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto url = QUrl(QString(resourceInfo.url));
+    auto sharedRes = sharedResources(resourceInfo);
+    ++sharedRes->managerCounter;
 
-    QAuthenticator auth;
-    auth.setUser(resourceInfo.login);
-    auth.setPassword(resourceInfo.password);
-
-    auto supportedEvents = fetchSupportedEvents(url, auth, resourceInfo.channel);
+    auto supportedEvents = fetchSupportedEvents(resourceInfo);
     if (!supportedEvents)
         return nullptr;
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
     deviceManifest.supportedEventTypes = *supportedEvents;
 
-    const QString sharedId(resourceInfo.sharedId);
-    HanwhaMetadataManager* manager;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        auto monitorItr = m_monitors.find(sharedId);
-        if (monitorItr == m_monitors.cend())
-        {
-            monitorItr = m_monitors.insert(
-                sharedId,
-                std::make_shared<MonitorCounter>(
-                    std::make_unique<HanwhaMetadataMonitor>(driverManifest(), url, auth)));
-        }
-
-        auto monitorCounter = monitorItr.value();
-        ++monitorCounter->counter;
-
-        manager = new HanwhaMetadataManager(this);
-        manager->setResourceInfo(resourceInfo);
-        manager->setDeviceManifest(QJson::serialized(deviceManifest));
-        manager->setDriverManifest(driverManifest());
-        manager->setMonitor(monitorCounter->monitor.get());
-    }
+    auto manager = new HanwhaMetadataManager(this);
+    manager->setResourceInfo(resourceInfo);
+    manager->setDeviceManifest(QJson::serialized(deviceManifest));
+    manager->setDriverManifest(driverManifest());
 
     return manager;
 }
@@ -164,13 +154,13 @@ const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
-    const QUrl& url,
-    const QAuthenticator& auth,
-    int channel)
+    const ResourceInfo& resourceInfo)
 {
     using namespace nx::mediaserver_core::plugins;
 
-    HanwhaRequestHelper helper(auth, url.toString());
+    auto sharedRes = sharedResources(resourceInfo);
+
+    HanwhaRequestHelper helper(sharedRes->sharedContext);
     const auto parameters = helper.fetchCgiParameters(lit("cgis"));
 
     if (!parameters.isValid())
@@ -181,7 +171,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
     if (!eventStatuses.isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(parameters, eventStatuses, channel);
+    return eventsFromParameters(parameters, eventStatuses, resourceInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
@@ -302,17 +292,82 @@ const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const
     return m_driverManifest;
 }
 
+HanwhaMetadataMonitor* HanwhaMetadataPlugin::monitor(
+    const QString& sharedId,
+    const QUrl& url,
+    const QAuthenticator& auth)
+{
+    std::shared_ptr<SharedResources> monitorCounter;
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto sharedResourcesItr = m_sharedResources.find(sharedId);
+        if (sharedResourcesItr == m_sharedResources.cend())
+        {
+            sharedResourcesItr = m_sharedResources.insert(
+                sharedId,
+                std::make_shared<SharedResources>(
+                    sharedId,
+                    driverManifest(),
+                    url,
+                    auth));
+        }
+
+        monitorCounter = sharedResourcesItr.value();
+        ++monitorCounter->monitorUsageCounter;
+    }
+
+    return monitorCounter->monitor.get();
+}
+
 void HanwhaMetadataPlugin::managerStoppedToUseMonitor(const QString& sharedId)
 {
     QnMutexLocker lock(&m_mutex);
-    auto monitorCounter = m_monitors.value(sharedId);
-    if (!monitorCounter)
+    auto sharedResources = m_sharedResources.value(sharedId);
+    if (!sharedResources)
         return;
 
-    --monitorCounter->counter;
-    NX_ASSERT(monitorCounter->counter >= 0);
-    if (monitorCounter->counter <= 0)
-        m_monitors.remove(sharedId);
+    --sharedResources->monitorUsageCounter;
+    NX_ASSERT(sharedResources->monitorUsageCounter >= 0);
+    if (sharedResources->monitorUsageCounter <= 0)
+        m_sharedResources[sharedId]->monitor->stopMonitoring();
+}
+
+void HanwhaMetadataPlugin::managerIsAboutToBeDestroyed(const QString& sharedId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto sharedResources = m_sharedResources.value(sharedId);
+    if (!sharedResources)
+        return;
+
+    --sharedResources->managerCounter;
+    NX_ASSERT(sharedResources->managerCounter >= 0);
+    if (sharedResources->managerCounter <= 0)
+        m_sharedResources.remove(sharedId);
+}
+
+std::shared_ptr<HanwhaMetadataPlugin::SharedResources> HanwhaMetadataPlugin::sharedResources(
+    const nx::sdk::ResourceInfo& resourceInfo)
+{
+    const QUrl url(resourceInfo.url);
+
+    QAuthenticator auth;
+    auth.setUser(resourceInfo.login);
+    auth.setPassword(resourceInfo.password);
+
+    QnMutexLocker lock(&m_mutex);
+    auto sharedResourcesItr = m_sharedResources.find(resourceInfo.sharedId);
+    if (sharedResourcesItr == m_sharedResources.cend())
+    {
+        sharedResourcesItr = m_sharedResources.insert(
+            resourceInfo.sharedId,
+            std::make_shared<SharedResources>(
+                resourceInfo.sharedId,
+                driverManifest(),
+                url,
+                auth));
+    }
+
+    return sharedResourcesItr.value();
 }
 
 } // namespace plugins

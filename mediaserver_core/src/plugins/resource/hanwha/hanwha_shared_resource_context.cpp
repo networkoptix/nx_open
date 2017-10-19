@@ -33,20 +33,11 @@ static const QUrl cleanUrl(QUrl url)
 using namespace nx::mediaserver::resource;
 
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
-    QnMediaServerModule* serverModule,
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
-    AbstractSharedResourceContext(serverModule, sharedId),
     m_sharedId(sharedId),
-    m_requestSemaphore(kMaxConcurrentRequestNumber),
-    m_chunkLoader(new HanwhaChunkLoader()),
-    m_timeSynchronizer(new HanwhaTimeSyncronizer())
+    m_requestSemaphore(kMaxConcurrentRequestNumber)
 {
-    m_timeSynchronizer->setTimeZoneShiftHandler(
-        [this](std::chrono::seconds timeZoneShift)
-        {
-            m_chunkLoader->setTimeZoneShift(timeZoneShift);
-        });
 }
 
 void HanwhaSharedResourceContext::setRecourceAccess(
@@ -207,6 +198,17 @@ HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation()
 
 void HanwhaSharedResourceContext::startServices()
 {
+    {
+        QnMutexLocker lock(&m_servicesMutex);
+        m_chunkLoader = std::make_shared<HanwhaChunkLoader>();
+        m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
+        m_timeSynchronizer->setTimeZoneShiftHandler(
+            [this](std::chrono::seconds timeZoneShift)
+            {
+                m_chunkLoader->setTimeZoneShift(timeZoneShift);
+            });
+    }
+
     NX_VERBOSE(this, "Starting services...");
     m_chunkLoader->start(this);
     m_timeSynchronizer->start(this);
@@ -222,18 +224,6 @@ QString HanwhaSharedResourceContext::sessionKey(
     QnMutexLocker lock(&m_sessionMutex);
     if (!m_sessionKeys.contains(sessionType))
     {
-        auto resourcePool = serverModule()
-            ->commonModule()
-            ->resourcePool();
-
-        const auto resources = resourcePool->getResourcesBySharedId(m_sharedId);
-        if (resources.isEmpty())
-            return QString();
-
-        auto hanwhaResource = resources.front().dynamicCast<HanwhaResource>();
-        if (!hanwhaResource)
-            return QString();
-
         HanwhaRequestHelper helper(shared_from_this());
         helper.setIgnoreMutexAnalyzer(true);
         const auto response = helper.view(lit("media/sessionkey"));

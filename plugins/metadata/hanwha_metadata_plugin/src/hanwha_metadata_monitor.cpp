@@ -17,12 +17,12 @@ namespace {
     const int kDefaultHttpPort = 80;
 
     const std::chrono::minutes kKeepAliveTimeout(7);
-} // namespace 
+} // namespace
 
 
 HanwhaMetadataMonitor::HanwhaMetadataMonitor(
     const Hanwha::DriverManifest& manifest,
-    const QUrl& url, 
+    const QUrl& url,
     const QAuthenticator& auth)
     :
     m_manifest(manifest),
@@ -59,7 +59,7 @@ void HanwhaMetadataMonitor::stopMonitoring()
     }
 
     if (httpClient)
-        httpClient->pleaseStopSync();
+        httpClient->pleaseStopSync(false);
 }
 
 void HanwhaMetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -112,7 +112,7 @@ void HanwhaMetadataMonitor::initMonitorUnsafe()
     httpClient->setMessageBodyReadTimeoutMs(
         std::chrono::duration_cast<std::chrono::milliseconds>(kKeepAliveTimeout).count());
 
-    auto handler = 
+    auto handler =
         [this](const HanwhaEventList& events)
         {
             QnMutexLocker lock(&m_mutex);

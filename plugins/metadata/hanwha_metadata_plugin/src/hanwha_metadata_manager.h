@@ -55,8 +55,8 @@ private:
     QString m_sharedId;
     int m_channel;
 
-    HanwhaMetadataPlugin* m_plugin;
-    HanwhaMetadataMonitor* m_monitor;
+    HanwhaMetadataPlugin* m_plugin = nullptr;
+    HanwhaMetadataMonitor* m_monitor = nullptr;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
 };
 
