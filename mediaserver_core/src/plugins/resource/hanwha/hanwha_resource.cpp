@@ -545,17 +545,18 @@ QString HanwhaResource::sessionKey(
 
 bool HanwhaResource::isVideoSourceActive()
 {
-    auto info = sharedContext()->loadInformation();
-    if (!info.isValid())
+    auto videoSources = sharedContext()->videoSources();
+    auto eventStatuses = sharedContext()->eventStatuses();
+    if (!videoSources || !eventStatuses)
         return false;
 
-    const auto state = info.videoSources.parameter<QString>(
+    const auto state = videoSources->parameter<QString>(
         lit("Channel.%1.State").arg(getChannel()));
 
     if (!state.is_initialized())
         return false;
 
-    const auto videoLossParameter = info.eventStatuses.parameter<bool>(
+    const auto videoLossParameter = eventStatuses->parameter<bool>(
         lit("Channel.%1.Videoloss").arg(getChannel()));
 
     const bool videoLoss = videoLossParameter.is_initialized()
@@ -684,31 +685,36 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal()
 
 CameraDiagnostics::Result HanwhaResource::initSystem()
 {
-    auto info = sharedContext()->loadInformation();
-    if (!info.isValid())
+    auto info = sharedContext()->information();
+    if (!info)
         return info.diagnostics;
 
     m_isNvr = false;
-    if (info.deviceType == kHanwhaNvrDeviceType)
+    if (info->deviceType == kHanwhaNvrDeviceType)
     {
         m_isNvr = true;
         //setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
         setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
     }
 
-    if (!info.firmware.isEmpty())
-        setFirmware(info.firmware);
+    if (!info->firmware.isEmpty())
+        setFirmware(info->firmware);
 
-    m_attributes = std::move(info.attributes);
-    m_cgiParameters = std::move(info.cgiParamiters);
+    m_attributes = std::move(info->attributes);
+
+    if (auto paramiters = sharedContext()->cgiParamiters())
+        m_cgiParameters = std::move(paramiters.value);
+    else
+        return paramiters.diagnostics;
+
     return CameraDiagnostics::NoErrorResult();
 }
 
 CameraDiagnostics::Result HanwhaResource::initMedia()
 {
-    auto info = sharedContext()->loadInformation();
-    if (!info.isValid())
-        return info.diagnostics;
+    auto videoProfiles = sharedContext()->videoProfiles();
+    if (!videoProfiles)
+        return videoProfiles.diagnostics;
 
     bool hasDualStreaming = false;
     const auto channel = getChannel();
@@ -723,7 +729,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         int fixedProfileCount = 0;
 
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
-        for (const auto& entry: info.videoProfiles.response())
+        for (const auto& entry: videoProfiles->response())
         {
             const bool isFixedProfile = entry.first.startsWith(channelPrefix)
                 && entry.first.endsWith(kHanwhaIsFixedProfileProperty)

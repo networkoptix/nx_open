@@ -30,7 +30,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-HanwhaDeviceInfo HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url)
+HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url)
 {
     // This is not the same context as for resources, bc we do not have MAC address before hand.
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
@@ -39,7 +39,7 @@ HanwhaDeviceInfo HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& 
 
     context->setRecourceAccess(url, auth);
     m_sharedContext[sharedId] = context;
-    return context->loadInformation();
+    return context->information();
 }
 
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
@@ -95,21 +95,21 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     resource->setUrl(urlCopy.toString());
     resource->setDefaultAuth(auth);
 
-    HanwhaDeviceInfo info = cachedDeviceInfo(auth, urlCopy);
-    if (info.macAddress.isEmpty())
+    const auto info = cachedDeviceInfo(auth, urlCopy);
+    if (!info || info->macAddress.isEmpty())
         return QList<QnResourcePtr>();
 
-    resource->setMAC(QnMacAddress(info.macAddress));
-    resource->setModel(info.model);
-    resource->setName(info.model);
-    resource->setFirmware(info.firmware);
+    resource->setMAC(QnMacAddress(info->macAddress));
+    resource->setModel(info->model);
+    resource->setName(info->model);
+    resource->setFirmware(info->firmware);
     resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
     result << resource;
     const int channel = resource->getChannel();
     if (isSearchAction)
         addMultichannelResources(result, auth);
-    else if (channel > 0 || info.channelCount > 1)
+    else if (channel > 0 || info->channelCount > 1)
         resource->updateToChannel(channel);
     return result;
 }
@@ -233,7 +233,11 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 {
     HanwhaResourcePtr firstResource = result.first().template dynamicCast<HanwhaResource>();
 
-    const auto channels = cachedDeviceInfo(auth, firstResource->getUrl()).channelCount;
+    const auto info = cachedDeviceInfo(auth, firstResource->getUrl());
+    if (!info)
+        return;
+
+    const auto channels = info->channelCount;
     if (channels > 1)
     {
         firstResource->updateToChannel(0);
