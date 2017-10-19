@@ -1684,7 +1684,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
       <translation>
-        <numerusform> %n 的 %1 I/O模块</numerusform>
+        <numerusform>%n 的 %1 I/O模块</numerusform>
       </translation>
     </message>
     <message>
@@ -2322,7 +2322,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Recording or motion detection is disabled for %1</source>
       <translation>
-        <numerusform> %1 录像或移动侦测功能已禁用</numerusform>
+        <numerusform>%1 录像或移动侦测功能已禁用</numerusform>
       </translation>
     </message>
   </context>
