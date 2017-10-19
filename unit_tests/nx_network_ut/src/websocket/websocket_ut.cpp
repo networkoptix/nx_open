@@ -64,6 +64,8 @@ public:
 class WebSocket : public ::testing::Test
 {
 protected:
+    WebSocket() : kFrameBuffer("hello") {}
+
     virtual void SetUp() override
     {
         m_acceptor = SocketFactory::createStreamServerSocket();
@@ -377,10 +379,9 @@ protected:
     bool m_tearDownInProgress = false;
 
     const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
-    static const nx::Buffer kFrameBuffer;
+    const nx::Buffer kFrameBuffer;
 };
 
-const nx::Buffer WebSocket::kFrameBuffer("hello");
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
 {
