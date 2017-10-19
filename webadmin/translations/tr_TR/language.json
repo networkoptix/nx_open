@@ -13,9 +13,9 @@
   "passwordRequirements":{
     "minLengthMessage":"Parola en az 8 karakterden oluşmalıdır",
     "requiredMessage":"Sadece latin harfler, sayılar ve klavye simgeler izin verilir",
-    "weakMessage":"Parola farklı simgeler içermelidir.",
+    "weakMessage":"Parola farklı simgeler içermelidir",
     "strongMessage":"Güçlü parola!",
-    "commonMessage":"Bu parola sık kullanılanlar listesinde ve tahmin edilebilir."
+    "commonMessage":"Bu parola sık kullanılanlar listesinde ve tahmin edilebilir"
   },
   "settings":{
     "tabs":{

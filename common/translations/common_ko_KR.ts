@@ -1294,7 +1294,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 번, 첫 번째: %2 &lt; b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 번, 첫 번째: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>

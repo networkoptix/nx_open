@@ -1110,7 +1110,7 @@
     </message>
     <message>
       <source>Storage Failure</source>
-      <translation>Falha de Armazenamento </translation>
+      <translation>Falha de Armazenamento</translation>
     </message>
     <message>
       <source>Network Issue</source>
