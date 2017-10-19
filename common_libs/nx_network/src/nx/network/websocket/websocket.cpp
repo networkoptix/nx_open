@@ -309,6 +309,7 @@ void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoComplet
 void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
     m_socket->cancelIOSync(eventType);
+    m_socket->pleaseStopSync(true);
     m_pingTimer->cancelSync();
     m_aliveTimer->cancelSync();
     m_readQueue.clear();
