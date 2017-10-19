@@ -1,5 +1,5 @@
 {
-  "language_name":"简体中文",
+  "language_name":"LANGUAGE_NAME",
   "dialogs":{
     "okButton":"确定",
     "openLink":"访问此链接",
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} 网页界面"
+  },
+  "common":{
+    "systemOffline":"系统处于离线状态",
+    "cameraLinks":{
+      "copyToClipboard":"复制到剪贴板",
+      "highStream":"高流",
+      "copyDefaultText":"复制",
+      "unknown":"未知的",
+      "lowStream":"低流",
+      "transcoding":"转码",
+      "copyActiveText":"已复制到剪贴板"
+    },
+    "searchCamPlaceholder":"搜索",
+    "cameraStates":{
+      "noFormat":"此浏览器或设备不支持本相机的视频播放。",
+      "ieWin10":"请使用Microsoft Edge或Google Chrome浏览器。",
+      "iosVideoTooLarge":"iOS不支持大于fullHD (2MP：1920x1080) 的视频。",
+      "unauthorized":"需要身份验证",
+      "ubuntuNX":"此浏览器不支持从基于 ARM 服务器的视频。请改为使用 Chromium 浏览器。",
+      "ieNoWebm":"请为 Ie 安装 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a>。",
+      "flashOrWebmRequired":"请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 或 <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM 编解码器</a> 以在 Ie 中播放视频。",
+      "noArmSupport":"此浏览器或设备不支持基于ARM的服务器的视频播放。",
+      "error":"错误",
+      "offline":"离线",
+      "noData":"无数据",
+      "flashRequired":"请 <a href=\"https://get.adobe.com/flashplayer/\" target=\"_blank\">安装 Adobe Flash</a> 播放视频从基于 ARM 的服务器。"
+    }
   }
 }
