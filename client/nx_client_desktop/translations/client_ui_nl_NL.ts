@@ -211,7 +211,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>Audit Trail</translation>
+      <translation>Systeemrapportage</translation>
     </message>
     <message>
       <location/>
@@ -1609,7 +1609,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>Toon het IP adres achter het apparaat</translation>
+      <translation>Toon extra informatie in de boom</translation>
     </message>
     <message>
       <location/>
@@ -2764,7 +2764,7 @@
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation>Audit trail inschakelen</translation>
+      <translation>Systeemrapportage inschakelen</translation>
     </message>
     <message>
       <location/>

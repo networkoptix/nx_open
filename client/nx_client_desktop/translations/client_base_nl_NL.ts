@@ -1150,33 +1150,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Inzoomen</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Uitzoomen</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Focus veraf</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Focus dichtbij</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Autofocus</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Dewarping modus wijzigen</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -1412,7 +1385,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>Audit trail afspelen</translation>
+      <translation>Systeemrapportage afspelen</translation>
     </message>
   </context>
   <context>

@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} web arayüzü"
+  },
+  "common":{
+    "systemOffline":"Sistem çevrimdışı",
+    "cameraLinks":{
+      "copyToClipboard":"panoya yapıştır",
+      "highStream":"Yüksek akış",
+      "copyDefaultText":"kopyala",
+      "unknown":"Belirtilmemiş",
+      "lowStream":"Düşük akış",
+      "transcoding":"Dönüştürme",
+      "copyActiveText":"panoya kopyalandı"
+    },
+    "searchCamPlaceholder":"arama",
+    "cameraStates":{
+      "noFormat":"Bu tarayıcı veya cihaz bu kameradan video oynatmayı desteklemez.",
+      "ieWin10":"Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+      "iosVideoTooLarge":"iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+      "unauthorized":"Kimlik doğrulaması gerekli",
+      "ubuntuNX":"Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın.",
+      "ieNoWebm":"Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+      "flashOrWebmRequired":"Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
+      "noArmSupport":"Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
+      "error":"Hata",
+      "offline":"Çevrimdışı",
+      "noData":"Veri bulunamadı",
+      "flashRequired":"ARM tabanlı sunuculardan video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a>'i yükleyin."
+    }
   }
 }

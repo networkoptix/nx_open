@@ -1149,33 +1149,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Phóng to</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Thu nhỏ</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Tập trung xa</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Tập trung gần</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Tự động lấy nét</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Thay đổi chế độ dewarping</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -3886,7 +3859,7 @@ to %1</source>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
       <translation>
-        <numerusform>Cấp bản quyền lỗi</numerusform>
+        <numerusform>%n Cấp bản quyền lỗi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3920,7 +3893,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
       <translation>
-        <numerusform>Bản quyền ngừng hoạt động</numerusform>
+        <numerusform>%n Bản quyền ngừng hoạt động</numerusform>
       </translation>
     </message>
     <message>
@@ -3969,7 +3942,7 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1</translation>
+      <translation>Bản quyền này đã được kích hoạt trên một máy khác %1 vào %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4932,7 +4905,7 @@ to %1</source>
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
       <translation>
-        <numerusform>Chọn các role không có quyền truy cập %1</numerusform>
+        <numerusform>%n trong số %1 chọn các role không có quyền truy cập %2</numerusform>
       </translation>
     </message>
     <message>
@@ -4949,7 +4922,7 @@ to %1</source>
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation>
-        <numerusform>Chọn người dùng không có quyền truy cập %1</numerusform>
+        <numerusform>%n trong số %1 chọn người dùng không có quyền truy cập %2</numerusform>
       </translation>
     </message>
   </context>
