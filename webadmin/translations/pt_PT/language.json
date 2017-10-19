@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} web interface"
+  },
+  "common":{
+    "systemOffline":"System Offline",
+    "cameraLinks":{
+      "copyToClipboard":"copy to clipboard",
+      "highStream":"High stream",
+      "copyDefaultText":"copy",
+      "unknown":"Desconhecido",
+      "lowStream":"Low stream",
+      "transcoding":"Transcoding",
+      "copyActiveText":"copied to clipboard"
+    },
+    "searchCamPlaceholder":"search",
+    "cameraStates":{
+      "noFormat":"This browser or device does not support video playback from  this camera.",
+      "ieWin10":"Please, use Microsoft Edge or Google Chrome browsers.",
+      "iosVideoTooLarge":"iOS does not support video larger than fullHD (2MP: 1920x1080).",
+      "unauthorized":"Authentication required",
+      "ubuntuNX":"This browser does not support video from ARM-based servers. Please, use Chromium browser instead.",
+      "ieNoWebm":"Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+      "flashOrWebmRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
+      "noArmSupport":"This browser or device does not support video playback from ARM-based servers.",
+      "error":"Erro",
+      "offline":"Offline",
+      "noData":"No data",
+      "flashRequired":"Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers."
+    }
   }
 }

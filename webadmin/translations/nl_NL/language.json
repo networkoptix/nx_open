@@ -47,7 +47,7 @@
     "disconnectedFromSystemSuccess":"Server is succesvol losgemaakt van het systeem",
     "connectedSuccess":"Verbinding maken met het systeem is mislukt",
     "createLocalOwnerTitle":"Maak een lokaal administrator account aan",
-    "confirmChangePassword":"Verander het administrator wachtwoord",
+    "confirmChangePassword":"Wijzig admin wachtwoord",
     "confirmChangePasswordTitle":"Systeemwachtwoord veranderen? Het zal gevolgen hebben voor gebruiker 'admin' en het root-wachtwoord voor sommige servers",
     "confirmChangePasswordAction":"Nieuw wachtwoord opslaan",
     "nx1ControlHint":"Client applicatie is gestart. Gebruik een toetsenbord en muis of de mobiele applicatie om deze te beheren."
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} web interface"
+  },
+  "common":{
+    "systemOffline":"Systeem Offline",
+    "cameraLinks":{
+      "copyToClipboard":"kopieer naar klembord",
+      "highStream":"Hoge stroom",
+      "copyDefaultText":"kopiëren",
+      "unknown":"Unknown",
+      "lowStream":"Lage stroom",
+      "transcoding":"Transcoding",
+      "copyActiveText":"gekopieerd naar het klembord"
+    },
+    "searchCamPlaceholder":"zoeken",
+    "cameraStates":{
+      "noFormat":"Deze browser of apparaat ondersteunt geen videoweergave van deze camera.",
+      "ieWin10":"Gebruik Microsoft Edge of Google Chrome als browser.",
+      "iosVideoTooLarge":"iOS ondersteunt geen video groter dan fullHD (2MP: 1920x1080).",
+      "unauthorized":"Authentication required",
+      "ubuntuNX":"Deze browser ondersteunt geen video van ARM-gebaseerde servers. Gebruik alsjeblieft de Chromium-browser.",
+      "ieNoWebm":"Installeer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
+      "flashOrWebmRequired":"<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> of<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor het afspelen van video in Internet Explorer.",
+      "noArmSupport":"Deze browser of apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
+      "error":"Error",
+      "offline":"Offline",
+      "noData":"Geen data",
+      "flashRequired":"<a href='https://get.adobe.com/flashplayer/' target='_blank'>installeer Adobe Flash</a> om video af te spelen van ARM-based servers."
+    }
   }
 }

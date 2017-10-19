@@ -11,8 +11,11 @@ namespace test {
 class LogMainTest: public ::testing::Test
 {
 public:
-    LogMainTest()
+    LogMainTest():
+        initialLevel(mainLogger()->defaultLevel())
     {
+        mainLogger()->setDefaultLevel(Level::none);
+
         logger = addLogger({lit("SomeTag"), lit("nx::utils::log::test")});
         EXPECT_EQ(Level::none, maxLevel());
         logger->setDefaultLevel(levelFromString("INFO"));
@@ -25,6 +28,7 @@ public:
     ~LogMainTest()
     {
         removeLoggers({lit("SomeTag"), lit("nx::utils::log::test")});
+        mainLogger()->setDefaultLevel(initialLevel);
     }
 
     void expectMessages(const std::vector<const char*>& patterns)
@@ -37,13 +41,14 @@ public:
                  Qt::CaseSensitive, QRegExp::Wildcard);
 
              EXPECT_TRUE(regExp.exactMatch(messages[i]))
-                 << "Line: " << messages[i].toStdString() << std::endl
-                 << "Does not match pattern: " << patterns[i];
+                 << "Line [" << messages[i].toStdString() << "]" << std::endl
+                 << "    does not match pattern [" << patterns[i] << "]";
         }
     }
 
     std::shared_ptr<Logger> logger;
     Buffer* buffer;
+    const Level initialLevel;
 };
 
 TEST_F(LogMainTest, ExplicitTag)
@@ -59,8 +64,9 @@ TEST_F(LogMainTest, ExplicitTag)
         "* ALWAYS SomeTag: Always",
         "* ERROR SomeTag: Error",
         "* WARNING SomeTag: Warning",
-        "* INFO SomeTag: Info"});const int kSeven = 7;
+        "* INFO SomeTag: Info"});
 
+    const int kSeven = 7;
     NX_ALWAYS(testTag) "Always" << kSeven;
     NX_INFO(testTag) "Info" << kSeven;
     NX_VERBOSE(testTag) "Verbose" << kSeven;

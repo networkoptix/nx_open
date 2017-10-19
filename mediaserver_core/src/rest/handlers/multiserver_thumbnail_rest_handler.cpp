@@ -20,6 +20,7 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <utils/media/frame_info.h>
+#include <nx/utils/log/log_main.h>
 
 namespace
 {
@@ -133,6 +134,11 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
 
     if (result.isEmpty())
     {
+        NX_WARNING(this, lm("Can't encode image to '%1' format. Image size: %2x%3")
+            .arg(QString::fromUtf8(imageFormat))
+            .arg(outFrame->width)
+            .arg(outFrame->height));
+
         return makeError(
             nx_http::StatusCode::badRequest
             , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
