@@ -67,30 +67,50 @@ int QnMergeSystemsRestHandler::execute(
         data,
         result);
     if (resultCode != nx_http::StatusCode::ok)
+    {
+        NX_DEBUG(this, lm("Merge with %1 failed with result %2")
+            .args(data.url, nx_http::StatusCode::toString(resultCode)));
         return resultCode;
+    }
 
+    updateLocalServerAuthKeyInConfig(owner->commonModule());
+
+    initiateConnectionToRemoteServer(
+        owner->commonModule(),
+        QUrl(data.url),
+        systemMergeProcessor.remoteModuleInformation());
+
+    qnAuditManager->addAuditRecord(
+        qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge));
+
+    return nx_http::StatusCode::ok;
+}
+
+void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
+    QnCommonModule* commonModule)
+{
     QnMediaServerResourcePtr server =
-        owner->commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(
-            owner->commonModule()->moduleGUID());
+        commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+            commonModule->moduleGUID());
     NX_ASSERT(server);
     // TODO: #ak Following call better be made on event "current server data changed".
     nx::ServerSetting::setAuthKey(server->getAuthKey().toUtf8());
+}
 
+void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(
+    QnCommonModule* commonModule,
+    const QUrl& remoteModuleUrl,
+    const QnModuleInformationWithAddresses& remoteModuleInformation)
+{
     nx::vms::discovery::ModuleEndpoint module(
-        systemMergeProcessor.remoteModuleInformation(),
-        {QUrl(data.url).host(), (uint16_t) systemMergeProcessor.remoteModuleInformation().port});
-    owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(module.endpoint, module.id);
+        remoteModuleInformation,
+        { remoteModuleUrl.host(), (uint16_t)remoteModuleInformation.port });
+    commonModule->moduleDiscoveryManager()->checkEndpoint(module.endpoint, module.id);
 
-    const auto connectionResult = 
-        QnConnectionValidator::validateConnection(
-            systemMergeProcessor.remoteModuleInformation());
+    const auto connectionResult =
+        QnConnectionValidator::validateConnection(remoteModuleInformation);
 
     /* Connect to server if it is compatible */
     if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())
         QnServerConnector::instance()->addConnection(module);
-
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge);
-    qnAuditManager->addAuditRecord(auditRecord);
-
-    return nx_http::StatusCode::ok;
 }

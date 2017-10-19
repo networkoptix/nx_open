@@ -11,6 +11,8 @@ namespace ec2 {
     class AbstractTransactionMessageBus;
 }
 
+class QnCommonModule;
+
 class QnMergeSystemsRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
@@ -37,4 +39,12 @@ private:
 
 private:
     ec2::AbstractTransactionMessageBus* m_messageBus;
+
+    void updateLocalServerAuthKeyInConfig(
+        QnCommonModule* commonModule);
+
+    void initiateConnectionToRemoteServer(
+        QnCommonModule* commonModule,
+        const QUrl& remoteModuleUrl,
+        const QnModuleInformationWithAddresses& remoteModuleInformation);
 };
