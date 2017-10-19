@@ -1757,11 +1757,11 @@ QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
 void QnStorageManager::deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime)
 {
     int idx = catalog->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
-    if (idx != -1) {
-        QVector<DeviceFileCatalog::Chunk> deletedChunks = catalog->deleteRecordsBefore(idx);
-        for(const DeviceFileCatalog::Chunk& chunk: deletedChunks)
-            clearDbByChunk(catalog, chunk);
-    }
+    if (idx == -1)
+        idx = std::numeric_limits<int>::max();
+    QVector<DeviceFileCatalog::Chunk> deletedChunks = catalog->deleteRecordsBefore(idx);
+    for(const DeviceFileCatalog::Chunk& chunk: deletedChunks)
+        clearDbByChunk(catalog, chunk);
 }
 
 void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk)

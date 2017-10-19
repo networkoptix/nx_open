@@ -698,7 +698,8 @@ QVector<DeviceFileCatalog::Chunk> DeviceFileCatalog::deleteRecordsBefore(int idx
 {
     int count = idx;
     QVector<Chunk> result;
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < count && !m_chunks.empty(); ++i)
+    {
         Chunk deletedChunk = deleteFirstRecord();
         if (deletedChunk.startTimeMs)
             result << deletedChunk;
