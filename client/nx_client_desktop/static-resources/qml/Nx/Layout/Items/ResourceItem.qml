@@ -8,7 +8,7 @@ Item
 {
     id: resourceItem
 
-    property var modelData
+    property var layoutItemData
 
     property var rotationAllowed: contentItem.item && contentItem.item.rotationAllowed
 
@@ -57,6 +57,11 @@ Item
         enabled: rotationAllowed
 
         onStarted: contentGeometryAnimation.complete()
+
+        onFinished:
+        {
+            layoutItemData.rotation = contentItem.rotation
+        }
     }
 
     ResizeInstrument
@@ -115,16 +120,16 @@ Item
 
         sourceComponent:
         {
-            if (!modelData.resource)
+            if (!layoutItemData.resource)
                 return
 
-            if (modelData.resource.flags & NxGlobals.MediaResourceFlag)
+            if (layoutItemData.resource.flags & NxGlobals.MediaResourceFlag)
                 return mediaItemComponent
 
-            if (modelData.resource.flags & NxGlobals.ServerResourceFlag)
+            if (layoutItemData.resource.flags & NxGlobals.ServerResourceFlag)
                 return serverItemComponent
 
-            if (modelData.resource.flags & NxGlobals.WebPageResourceFlag)
+            if (layoutItemData.resource.flags & NxGlobals.WebPageResourceFlag)
                 return webPageItemComponent
         }
 
@@ -164,6 +169,13 @@ Item
             property: "height"
             value: contentItem.enclosedGeometry.height
             when: contentItem.enableGeometryBindings
+        }
+        Binding
+        {
+            target: contentItem
+            property: "rotation"
+            value: layoutItemData.rotation
+            when: !rotationInstrument.rotating
         }
 
         ParallelAnimation
@@ -212,7 +224,7 @@ Item
         id: mediaItemComponent
         MediaItemDelegate
         {
-            modelData: resourceItem.modelData
+            layoutItemData: resourceItem.layoutItemData
         }
     }
     Component
@@ -220,7 +232,7 @@ Item
         id: serverItemComponent
         ServerItemDelegate
         {
-            modelData: resourceItem.modelData
+            layoutItemData: resourceItem.layoutItemData
         }
     }
     Component
@@ -228,7 +240,7 @@ Item
         id: webPageItemComponent
         WebPageItemDelegate
         {
-            modelData: resourceItem.modelData
+            layoutItemData: resourceItem.layoutItemData
         }
     }
 }

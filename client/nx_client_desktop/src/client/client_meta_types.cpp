@@ -167,7 +167,7 @@ void QnClientMetaTypes::initialize() {
 void QnClientMetaTypes::registerQmlTypes()
 {
     qmlRegisterType<ColorTheme>("Nx", 1, 0, "ColorThemeBase");
-    qmlRegisterType<ui::scene::models::LayoutModel>("Nx.Models", 1, 0, "LayoutModel");
+    LayoutModel::registerQmlType();
 
     qmlRegisterUncreatableType<QnWorkbench>("Nx.Workbench", 1, 0, "Workbench",
         lit("Cannot create instance of Workbench."));

@@ -3,8 +3,8 @@ import QtQuick.Layouts 1.3
 import Qt.labs.templates 1.0
 import Nx 1.0
 import Nx.Utils 1.0
-import Nx.Models 1.0
 import Nx.Positioners 1.0 as Positioners
+import nx.client.desktop 1.0
 
 import "Items"
 
@@ -159,14 +159,16 @@ Control
 
                 delegate: Item
                 {
-                    Positioners.Grid.geometry: model.geometry
+                    Positioners.Grid.geometry: model.itemData.geometry
+
+                    Positioners.Grid.onGeometryChanged: console.log(model.itemData.resource.name, Positioners.Grid.geometry)
 
                     ResourceItem
                     {
                         anchors.centerIn: parent
                         width: parent.width * (1 - gridLayout.cellSpacingFactor)
                         height: parent.height * (1 - gridLayout.cellSpacingFactor)
-                        modelData: model
+                        layoutItemData: model.itemData
                     }
                 }
             }

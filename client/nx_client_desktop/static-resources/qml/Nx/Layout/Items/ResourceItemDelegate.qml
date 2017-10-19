@@ -3,7 +3,7 @@ import Nx 1.0
 
 Item
 {
-    property var modelData
+    property var layoutItemData
 
     property bool rotationAllowed: false
 
@@ -31,7 +31,7 @@ Item
         TitleBar
         {
             id: titleBar
-            titleText: modelData.resource ? modelData.resource.name : ""
+            titleText: layoutItemData.resource ? layoutItemData.resource.name : ""
         }
     }
 }

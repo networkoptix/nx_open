@@ -8,9 +8,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
-namespace scene {
-namespace models {
 
 class LayoutModel: public QAbstractListModel
 {
@@ -24,9 +21,7 @@ public:
     enum class Roles
     {
         itemId = Qt::UserRole + 1,
-        resource,
-        name,
-        geometry,
+        itemData,
     };
 
     explicit LayoutModel(QObject* parent = nullptr);
@@ -41,6 +36,8 @@ public:
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    static void registerQmlType();
+
 signals:
     void layoutIdChanged();
     void gridBoundingRectChanged();
@@ -50,9 +47,6 @@ private:
     QScopedPointer<Private> const d;
 };
 
-} // namespace models
-} // namespace scene
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

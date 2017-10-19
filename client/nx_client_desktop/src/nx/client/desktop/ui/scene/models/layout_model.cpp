@@ -1,17 +1,20 @@
 #include "layout_model.h"
 
+#include <QtQml/QtQml>
+
 #include <client_core/connection_context_aware.h>
 
 #include <utils/common/connective.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include "layout_item_adaptor.h"
+
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
-namespace scene {
-namespace models {
+
+using ItemAdaptorPtr = QSharedPointer<LayoutItemAdaptor>;
 
 class LayoutModel::Private: public Connective<QObject>, public QnConnectionContextAware
 {
@@ -37,6 +40,7 @@ public:
     QnUuid layoutId;
     QnLayoutResourcePtr layout;
     QList<QnUuid> itemIds;
+    QHash<QnUuid, ItemAdaptorPtr> adaptorById;
     QRect gridBoundingRect;
 };
 
@@ -128,6 +132,8 @@ void LayoutModel::Private::at_itemRemoved(
     itemIds.removeAt(row);
     q->endRemoveRows();
 
+    adaptorById.remove(item.uuid);
+
     updateGridBoundingRect();
 }
 
@@ -195,9 +201,7 @@ QHash<int, QByteArray> LayoutModel::roleNames() const
 {
     static QHash<int, QByteArray> kRoleNames{
         { static_cast<int>(Roles::itemId), "itemId" },
-        { static_cast<int>(Roles::resource), "resource" },
-        { static_cast<int>(Roles::name), "name" },
-        { static_cast<int>(Roles::geometry), "geometry" },
+        { static_cast<int>(Roles::itemData), "itemData" },
     };
 
     return kRoleNames;
@@ -209,25 +213,25 @@ QVariant LayoutModel::data(const QModelIndex& index, int role) const
         return QVariant();
 
     const auto& itemId = d->itemIds[index.row()];
-    const auto& item = d->layout->getItem(itemId);
 
     switch (static_cast<Roles>(role))
     {
         case Roles::itemId:
             return QVariant::fromValue(itemId);
 
-        case Roles::resource:
-            return QVariant::fromValue(
-                d->layout->resourcePool()->getResourceById(item.resource.id).data());
-
-        case Roles::name:
+        case Roles::itemData:
         {
-            const auto& resource = d->resourcePool()->getResourceById(item.resource.id);
-            return resource ? resource->getName() : QString();
-        }
+            if (!d->layout)
+                return QVariant();
 
-        case Roles::geometry:
-            return item.combinedGeometry.toRect();
+            auto adaptor = d->adaptorById.value(itemId);
+            if (!adaptor)
+            {
+                adaptor = ItemAdaptorPtr(new LayoutItemAdaptor(d->layout, itemId));
+                d->adaptorById.insert(itemId, adaptor);
+            }
+            return QVariant::fromValue(adaptor.data());
+        }
     }
 
     return QVariant();
@@ -241,9 +245,13 @@ int LayoutModel::rowCount(const QModelIndex& parent) const
     return d->itemIds.size();
 }
 
-} // namespace models
-} // namespace scene
-} // namespace ui
+void LayoutModel::registerQmlType()
+{
+    qmlRegisterType<LayoutModel>("nx.client.desktop", 1, 0, "LayoutModel");
+    qmlRegisterUncreatableType<LayoutItemAdaptor>("nx.client.desktop", 1, 0, "LayoutItemAdaptor",
+        lit("Cannot create instance of LayoutItemAdaptor."));
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
