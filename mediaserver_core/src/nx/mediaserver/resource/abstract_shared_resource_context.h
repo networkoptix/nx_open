@@ -10,7 +10,6 @@ public:
     using SharedId = QString;
 
 public:
-    AbstractSharedResourceContext() = default;
     virtual ~AbstractSharedResourceContext() = default;
 };
 
