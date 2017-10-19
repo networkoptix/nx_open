@@ -161,8 +161,6 @@ Control
                 {
                     Positioners.Grid.geometry: model.itemData.geometry
 
-                    Positioners.Grid.onGeometryChanged: console.log(model.itemData.resource.name, Positioners.Grid.geometry)
-
                     ResourceItem
                     {
                         anchors.centerIn: parent
