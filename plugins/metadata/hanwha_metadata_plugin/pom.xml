@@ -17,8 +17,9 @@
         <guid>${hanwha_metadata_plugin.guid}</guid>
         <product.title>${hanwha_metadata_plugin.name}</product.title>
 
-        <qt.libs>core network gui</qt.libs>
+        <qt.libs>core network gui sql</qt.libs>
         <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lmediaserver_core</global.libs>
+        <windows.oslibs>-lws2_32</windows.oslibs>
         <rdep.packages>ffmpeg</rdep.packages>
     </properties>
     <dependencies>
