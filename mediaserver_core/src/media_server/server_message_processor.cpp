@@ -63,7 +63,10 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
             if (ownData != newData && source == ec2::NotificationSource::Remote)
             {
                 // if remote peer send update for our server then ignore it and resend our own data
-                commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
+                commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->save(
+                    ownData,
+                    ec2::DummyHandler::instance(),
+                    &ec2::DummyHandler::onRequestDone);
                 return;
             }
         }

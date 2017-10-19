@@ -12,7 +12,6 @@
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/p2p/p2p_connection.h>
-#include <ini.h>
 #include <nx/p2p/p2p_serialization.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx/utils/argument_parser.h>
@@ -29,7 +28,6 @@ class P2pSpecialTransactionTest : public P2pMessageBusTestBase
 public:
     void testMain()
     {
-        const_cast<bool&>(ec2::ini().isP2pMode) = true;
         startServers(2);
         for (const auto& server: m_servers)
             createData(server, 0, 0);

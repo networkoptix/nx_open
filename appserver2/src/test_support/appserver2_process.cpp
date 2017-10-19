@@ -43,6 +43,7 @@
 #include <rest/helper/ping_rest_helper.h>
 #include <rest/helper/p2p_statistics.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/dummy_handler.h>
 
 static int registerQtResources()
 {
@@ -210,7 +211,10 @@ protected:
         ec2::ApiMediaServerData apiServer;
         ec2::fromResourceToApi(mServer, apiServer);
         auto connection = commonModule()->ec2Connection();
-        connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
+        connection->getMediaServerManager(Qn::kSystemAccess)->save(
+            apiServer,
+            ec2::DummyHandler::instance(),
+            &ec2::DummyHandler::onRequestDone);
     }
 
     virtual void onResourceStatusChanged(
