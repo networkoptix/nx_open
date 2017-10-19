@@ -13,6 +13,8 @@ public:
 
     bool hasExpired(std::chrono::milliseconds value) const;
     void restart();
+    void invalidate();
+
 private:
     QElapsedTimer m_timer;
 };

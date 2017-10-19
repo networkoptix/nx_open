@@ -26,12 +26,14 @@ struct HanwhaDeviceInfo
     CameraDiagnostics::Result diagnostics;
     QString deviceType;
     QString firmware;
-    HanwhaAttributes attributes;
-    HanwhaCgiParameters cgiParamiters;
-    int channelCount = 0;
-
     QString macAddress;
     QString model;
+    int channelCount = 0;
+
+    // TODO: Split into separate sructure here.
+
+    HanwhaAttributes attributes;
+    HanwhaCgiParameters cgiParamiters;
 
     HanwhaResponse eventStatuses;
     HanwhaResponse videoSources;
@@ -48,7 +50,8 @@ struct HanwhaDeviceInfo
 };
 
 class HanwhaSharedResourceContext:
-    public nx::mediaserver::resource::AbstractSharedResourceContext
+    public nx::mediaserver::resource::AbstractSharedResourceContext,
+    public std::enable_shared_from_this<HanwhaSharedResourceContext>
 {
 
 public:
@@ -56,25 +59,37 @@ public:
         QnMediaServerModule* serverModule,
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
-    HanwhaDeviceInfo loadInformation(const QAuthenticator& auth, const QUrl& url);
-    void start(const QAuthenticator& auth, const QUrl& url);
+    // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
+    void setRecourceAccess(const QUrl& url, const QAuthenticator& authenticator);
+    void setLastSucessfulUrl(const QUrl& value);
+
+    QUrl url() const;
+    QAuthenticator authenticator() const;
+    QnSemaphore* requestSemaphore();
+
+    HanwhaDeviceInfo loadInformation();
+    void startServices();
 
     QString sessionKey(
         HanwhaSessionType sessionType,
         bool generateNewOne = false);
 
-    QnSemaphore* requestSemaphore();
     std::shared_ptr<HanwhaChunkLoader> chunkLoader() const;
 
 private:
-    mutable QnMutex m_channelCountMutex;
+    HanwhaDeviceInfo requestAndLoadInformation();
 
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
+    mutable QnMutex m_dataMutex;
+    QUrl m_resourceUrl;
+    QAuthenticator m_resourceAuthenticator;
+    QUrl m_lastSuccessfulUrl;
+    nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
+
     mutable QnMutex m_informationMutex;
-    QAuthenticator m_lastAuth;
-    QUrl m_lastUrl;
     HanwhaDeviceInfo m_cachedInformation;
+    nx::utils::ElapsedTimer m_cachedInformationTimer;
 
     mutable QnMutex m_sessionMutex;
     QMap<HanwhaSessionType, QString> m_sessionKeys;
@@ -82,7 +97,6 @@ private:
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
-    nx::utils::ElapsedTimer m_cacheUpdateTimer;
 };
 
 } // namespace plugins

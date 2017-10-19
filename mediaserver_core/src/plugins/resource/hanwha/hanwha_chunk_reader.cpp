@@ -2,12 +2,14 @@
 
 #include <QtCore/QDateTime>
 
-#include "hanwha_chunk_reader.h"
-#include "utils/common/synctime.h"
-#include "core/resource/network_resource.h"
 #include <nx/utils/log/log_main.h>
-#include "hanwha_request_helper.h"
 #include <nx/utils/timer_manager.h>
+#include <utils/common/synctime.h>
+#include <core/resource/network_resource.h>
+
+#include "hanwha_chunk_reader.h"
+#include "hanwha_request_helper.h"
+#include "hanwha_shared_resource_context.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -46,19 +48,19 @@ HanwhaChunkLoader::~HanwhaChunkLoader()
     m_httpClient->pleaseStopSync();
 }
 
-void HanwhaChunkLoader::start(const QAuthenticator& auth, const QUrl& cameraUrl, int maxChannels)
+void HanwhaChunkLoader::start(HanwhaSharedResourceContext* resourceContext)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        m_auth = auth;
-        m_cameraUrl = cameraUrl;
         if (m_state != State::Initial)
             return; //< Already started
 
+        m_resourceContext = resourceContext;
+        m_maxChannels = m_resourceContext->loadInformation().channelCount;
         m_state = State::updateTimeRange;
+        NX_DEBUG(this, lm("Started for %1 channels on %2").args(m_maxChannels, resourceContext->url()));
     }
 
-    m_maxChannels = maxChannels;
     sendRequest();
 }
 
@@ -85,15 +87,16 @@ void HanwhaChunkLoader::sendRequest()
 
 void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
 {
-    QUrl loadChunksUrl;
     {
+        const auto authenticator = m_resourceContext->authenticator();
         QnMutexLocker lock(&m_mutex);
-        m_httpClient->setUserName(m_auth.user());
-        m_httpClient->setUserPassword(m_auth.password());
-        loadChunksUrl = m_cameraUrl;
+        m_httpClient->setUserName(authenticator.user());
+        m_httpClient->setUserPassword(authenticator.password());
     }
 
+    auto loadChunksUrl = m_resourceContext->url();
     loadChunksUrl.setPath("/stw-cgi/recording.cgi");
+
     QUrlQuery query;
     query.addQueryItem("msubmenu", "searchrecordingperiod");
     query.addQueryItem("action", "view");
@@ -104,6 +107,7 @@ void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
         std::bind(&HanwhaChunkLoader::onHttpClientDone, this));
     m_httpClient->setOnSomeMessageBodyAvailable(nullptr);
 
+    // TODO: Use m_resourceConext->requestSemaphore().
     m_httpClient->doGet(loadChunksUrl);
 }
 
@@ -124,15 +128,16 @@ qint64 HanwhaChunkLoader::latestChunkTimeMs() const
 
 void HanwhaChunkLoader::sendLoadChunksRequest()
 {
-    QUrl loadChunksUrl;
     {
+        const auto authenticator = m_resourceContext->authenticator();
         QnMutexLocker lock(&m_mutex);
-        m_httpClient->setUserName(m_auth.user());
-        m_httpClient->setUserPassword(m_auth.password());
-        loadChunksUrl = m_cameraUrl;
+        m_httpClient->setUserName(authenticator.user());
+        m_httpClient->setUserPassword(authenticator.password());
     }
 
+    auto loadChunksUrl = m_resourceContext->url();
     loadChunksUrl.setPath("/stw-cgi/recording.cgi");
+
     QUrlQuery query;
     query.addQueryItem("msubmenu", "timeline");
     query.addQueryItem("action", "view");
@@ -153,6 +158,7 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     m_httpClient->setOnDone(
         std::bind(&HanwhaChunkLoader::onHttpClientDone, this));
 
+    // TODO: Use m_resourceConext->requestSemaphore().
     m_httpClient->doGet(loadChunksUrl);
 }
 
@@ -162,8 +168,7 @@ void HanwhaChunkLoader::onHttpClientDone()
     if (state == nx_http::AsyncClient::sFailed)
     {
         NX_WARNING(this, lm("Http request %1 failed with error %2")
-            .arg(m_httpClient->url().toString())
-            .arg(m_httpClient->lastSysErrorCode()));
+            .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
         startTimerForNextRequest(kResendRequestIfFail);
         return;
     }
@@ -171,12 +176,13 @@ void HanwhaChunkLoader::onHttpClientDone()
     if (statusCode != nx_http::StatusCode::ok)
     {
         NX_WARNING(this, lm("Http request %1 failed with status code %2")
-            .arg(m_httpClient->url().toString())
-            .arg(statusCode));
+            .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
         startTimerForNextRequest(kResendRequestIfFail);
         return;
     }
 
+    NX_VERBOSE(this, lm("Http request %1 succeeded with status code %2")
+        .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
     if (m_state == State::LoadingChunks)
     {
         m_state = State::updateTimeRange;
@@ -246,6 +252,8 @@ void HanwhaChunkLoader::onGotChunkData()
     buffer.truncate(index);
 
     QList<QByteArray> lines = buffer.split('\n');
+    NX_VERBOSE(this, lm("%1 got %2 lines of chunk data")
+        .args(m_httpClient->contentLocationUrl(), lines.size()));
 
     QnMutexLocker lock(&m_mutex);
     for (const auto& line : lines)

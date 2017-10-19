@@ -10,6 +10,7 @@
 
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/http_client.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -27,18 +28,10 @@ const QString kAction = lit("action");
 
 } // namespace
 
-HanwhaRequestHelper::HanwhaRequestHelper(const HanwhaResourcePtr& resource, bool bypass):
-    m_auth(resource->getAuth()),
-    m_url(resource->getUrl()),
-    m_channel(QString::number(resource->getChannel())),
-    m_requestSemaphore(resource->requestSemaphore()),
-    m_bypass(bypass)
-{
-}
-
-HanwhaRequestHelper::HanwhaRequestHelper(const QAuthenticator& auth, const QString& url):
-    m_auth(auth),
-    m_url(url)
+HanwhaRequestHelper::HanwhaRequestHelper(
+    const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext)
+:
+    m_resourceContext(resourceContext)
 {
 }
 
@@ -48,7 +41,7 @@ HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesP
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(attributesPath);
 
-    if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
+    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
         return HanwhaAttributes(statusCode);
 
     return HanwhaAttributes(buffer, statusCode);
@@ -60,7 +53,7 @@ HanwhaCgiParameters HanwhaRequestHelper::fetchCgiParameters(const QString& cgiPa
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(cgiParametersPath);
 
-    if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
+    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
         return HanwhaCgiParameters(statusCode);
 
     return HanwhaCgiParameters(buffer, statusCode);
@@ -75,9 +68,9 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
 {
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
-
+    
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
-    if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
+    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
         return HanwhaResponse(statusCode, url.toString());
 
     return HanwhaResponse(buffer, statusCode, url.toString(), groupBy);
@@ -152,16 +145,14 @@ QUrl HanwhaRequestHelper::buildRequestUrl(
     const QString& action,
     std::map<QString, QString> parameters) const
 {
-    return buildRequestUrl(m_url, cgi, submenu, action, std::move(parameters));
+    return buildRequestUrl(m_resourceContext->url(), cgi, submenu, action, std::move(parameters));
 }
 
 QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const
 {
-    QUrl url(m_url);
+    QUrl url(m_resourceContext->url());
     url.setQuery(QUrlQuery());
-
     url.setPath(kAttributesPathTemplate.arg(attributesPath));
-
     return url;
 }
 
@@ -188,15 +179,19 @@ bool HanwhaRequestHelper::doRequestInternal(
         ? makeBypassUrl(url)
         : url;
 
-    QnSemaphoreLocker lock(m_requestSemaphore);
+    QnSemaphoreLocker lock(m_resourceContext->requestSemaphore());
     if (!httpClient.doGet(realUrl))
+    {
+        NX_VERBOSE(m_resourceContext, lm("%1 has failed").args(realUrl));
         return false;
+    }
 
+    m_resourceContext->setLastSucessfulUrl(httpClient.contentLocationUrl());
     while (!httpClient.eof())
         outBuffer->append(httpClient.fetchMessageBodyBuffer());
 
-    *outStatusCode = (nx_http::StatusCode::Value)httpClient.response()->statusLine.statusCode;
-
+    *outStatusCode = (nx_http::StatusCode::Value) httpClient.response()->statusLine.statusCode;
+    NX_VERBOSE(m_resourceContext, lm("%1 result %2").args(url, httpClient.response()->statusLine.statusCode));
     return true;
 }
 

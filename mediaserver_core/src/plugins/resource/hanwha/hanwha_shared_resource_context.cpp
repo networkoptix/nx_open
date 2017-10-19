@@ -8,6 +8,7 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -16,7 +17,16 @@ namespace plugins {
 namespace {
 
 static const int kMaxConcurrentRequestNumber = 5;
+static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::minutes kCacheDataTimeout(1);
+
+static const QUrl cleanUrl(QUrl url)
+{
+    url.setPath(QString());
+    url.setQuery(QString());
+    url.setFragment(QString());
+    return url;
+}
 
 } // namespace
 
@@ -39,10 +49,60 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
         });
 }
 
-static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, const QUrl& url)
+void HanwhaSharedResourceContext::setRecourceAccess(
+    const QUrl& url, const QAuthenticator& authenticator)
+{
+    {
+        QUrl sharedUrl = cleanUrl(url);
+        QnMutexLocker lock(&m_dataMutex);
+        if (m_resourceUrl == sharedUrl && m_resourceAuthenticator == authenticator)
+            return;
+
+        NX_DEBUG(this, lm("Update resource access (%1:%2) %3").args(
+            authenticator.user(), authenticator.password(), sharedUrl));
+
+        m_resourceUrl = sharedUrl;
+        m_resourceAuthenticator = authenticator;
+        m_lastSuccessfulUrlTimer.invalidate();
+    }
+
+    {
+        QnMutexLocker lock(&m_informationMutex);
+        m_cachedInformationTimer.invalidate();
+    }
+}
+
+void HanwhaSharedResourceContext::setLastSucessfulUrl(const QUrl& value)
+{
+    QnMutexLocker lock(&m_dataMutex);
+    m_lastSuccessfulUrl = cleanUrl(value);
+    m_lastSuccessfulUrlTimer.restart();
+}
+
+QUrl HanwhaSharedResourceContext::url() const
+{
+    QnMutexLocker lock(&m_dataMutex);
+    if (!m_lastSuccessfulUrlTimer.hasExpired(kCacheUrlTimeout))
+        return m_lastSuccessfulUrl;
+    else
+        return m_resourceUrl;
+}
+
+QAuthenticator HanwhaSharedResourceContext::authenticator() const
+{
+    QnMutexLocker lock(&m_dataMutex);
+    return m_resourceAuthenticator;
+}
+
+QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
+{
+    return &m_requestSemaphore;
+}
+
+HanwhaDeviceInfo HanwhaSharedResourceContext::requestAndLoadInformation()
 {
     HanwhaDeviceInfo info{CameraDiagnostics::NoErrorResult()};
-    HanwhaRequestHelper helper(auth, url.toString());
+    HanwhaRequestHelper helper(shared_from_this());
     helper.setIgnoreMutexAnalyzer(true);
 
     const auto deviceinfo = helper.view(lit("system/deviceinfo"));
@@ -130,27 +190,26 @@ static HanwhaDeviceInfo requestAndLoadInformation(const QAuthenticator& auth, co
     return info;
 }
 
-HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation(const QAuthenticator& auth, const QUrl& srcUrl)
+HanwhaDeviceInfo HanwhaSharedResourceContext::loadInformation()
 {
-    bool isExpired = m_cacheUpdateTimer.hasExpired(kCacheDataTimeout);
-    QUrl url(srcUrl);
-
     QnMutexLocker lock(&m_informationMutex);
-    if (m_lastAuth != auth || m_lastUrl != url || isExpired || !m_cachedInformation.diagnostics)
+    if (!m_cachedInformationTimer.hasExpired(kCacheDataTimeout)
+        // TODO: Remove second condition and replace with different timeout in case of failure.
+        && m_cachedInformation.diagnostics.errorCode == CameraDiagnostics::ErrorCode::noError)
     {
-        m_lastAuth = auth;
-        m_lastUrl = url;
-        m_cacheUpdateTimer.restart();
-        m_cachedInformation = requestAndLoadInformation(auth, url);
+        return m_cachedInformation;
     }
 
+    m_cachedInformation = requestAndLoadInformation();
+    m_cachedInformationTimer.restart();
     return m_cachedInformation;
 }
 
-void HanwhaSharedResourceContext::start(const QAuthenticator& auth, const QUrl& url)
+void HanwhaSharedResourceContext::startServices()
 {
-    m_chunkLoader->start(auth, url, m_cachedInformation.channelCount);
-    m_timeSynchronizer->start(auth, url);
+    NX_VERBOSE(this, "Starting services...");
+    m_chunkLoader->start(this);
+    m_timeSynchronizer->start(this);
 }
 
 QString HanwhaSharedResourceContext::sessionKey(
@@ -175,7 +234,7 @@ QString HanwhaSharedResourceContext::sessionKey(
         if (!hanwhaResource)
             return QString();
 
-        HanwhaRequestHelper helper(hanwhaResource);
+        HanwhaRequestHelper helper(shared_from_this());
         helper.setIgnoreMutexAnalyzer(true);
         const auto response = helper.view(lit("media/sessionkey"));
         if (!response.isSuccessful())
@@ -188,11 +247,6 @@ QString HanwhaSharedResourceContext::sessionKey(
         m_sessionKeys[sessionType] = *sessionKey;
     }
     return m_sessionKeys.value(sessionType);
-}
-
-QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
-{
-    return &m_requestSemaphore;
 }
 
 std::shared_ptr<HanwhaChunkLoader> HanwhaSharedResourceContext::chunkLoader() const

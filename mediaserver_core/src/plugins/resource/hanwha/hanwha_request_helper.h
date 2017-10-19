@@ -16,13 +16,14 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+class HanwhaSharedResourceContext;
+
 class HanwhaRequestHelper
 {
 public:
     using Parameters = std::map<QString, QString>;
 
-    HanwhaRequestHelper(const HanwhaResourcePtr& resource, bool bypass = false);
-    HanwhaRequestHelper(const QAuthenticator& auth, const QString& url);
+    HanwhaRequestHelper(const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
 
@@ -97,11 +98,9 @@ private:
     QUrl makeBypassUrl(const QUrl& url) const;
 
 private:
-    const QAuthenticator m_auth;
-    const QString m_url;
+    const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
     const QString m_channel;
     bool m_ignoreMutexAnalyzer = false;
-    QnSemaphore* m_requestSemaphore = nullptr;
     bool m_bypass = false;
 };
 

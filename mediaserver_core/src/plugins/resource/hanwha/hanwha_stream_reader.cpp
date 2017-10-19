@@ -152,7 +152,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
             lit("Update profile: invalid profile number is given"));
     }
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
     const auto profileParameters = makeProfileParameters(profileNumber, parameters);
 
@@ -174,7 +174,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
 QSet<int> HanwhaStreamReader::availableProfiles(int channel) const
 {
     QSet<int> result;
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(
         lit("media/videoprofilepolicy"),
@@ -195,7 +195,7 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 {
     const auto channel = m_hanwhaResource->getChannel();
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(
         lit("media/videoprofile"),
@@ -274,7 +274,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
     if (profileNumber != kHanwhaInvalidProfile)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/streamuri"), params);
 
