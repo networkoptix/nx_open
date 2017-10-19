@@ -212,6 +212,15 @@ def save_json_artifact(artifact_factory, api_method, side_name, server, value):
     log.debug('results from %s from server %s %s is stored to %s', api_method, server.title, server, file_path)
 
 
+def make_dumps_and_fail(servers, merge_timeout, api_method, api_call_start_time):
+    message = 'Servers did not merge in %s: currently waiting for method %r for %s' % (
+        merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time)
+    log.info(message)
+    log.info('killing servers for core dumps')
+    for server in servers:
+        server.make_core_dump()
+    pytest.fail(message)
+
 def wait_for_method_matched(artifact_factory, servers, method, api_object, api_method, start_time, merge_timeout):
     growing_delay = GrowingSleep()
     api_call_start_time = utils.datetime_utc_now()
@@ -219,8 +228,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
         expected_result_dirty = get_response(servers[0], method, api_object, api_method)
         if expected_result_dirty is None:
             if utils.datetime_utc_now() - start_time >= merge_timeout:
-                pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
-                    merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
+                make_dumps_and_fail(servers, merge_timeout, api_method, api_call_start_time)
             continue
         expected_result = clean_json(api_method, expected_result_dirty)
 
@@ -242,8 +250,7 @@ def wait_for_method_matched(artifact_factory, servers, method, api_object, api_m
             log_diffs(expected_result, unmatched_result)
             save_json_artifact(artifact_factory, api_method, 'x', servers[0], expected_result)
             save_json_artifact(artifact_factory, api_method, 'y', first_unsynced_server, unmatched_result)
-            pytest.fail('Servers did not merge in %s: currently waiting for method %r for %s' % (
-                merge_timeout, api_method, utils.datetime_utc_now() - api_call_start_time))
+            make_dumps_and_fail(servers, merge_timeout, api_method, api_call_start_time)
         growing_delay.sleep()
 
 
@@ -297,5 +304,6 @@ def test_scalability(artifact_factory, metrics_saver, config, lightweight_server
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, servers, lightweight_servers)
     finally:
-        servers[0].load_system_settings(log_settings=True)  # log final settings
+        if servers[0].is_started():
+            servers[0].load_system_settings(log_settings=True)  # log final settings
     assert utils.str_to_bool(servers[0].settings['autoDiscoveryEnabled']) == False
