@@ -43,6 +43,11 @@ protected:
         int camerasCount,
         int propertiesPerCamera,
         int userCount = 0);
+
+    bool waitForCondition(std::function<bool()> condition, std::chrono::milliseconds timeout);
+    bool waitForConditionOnAllServers(
+        std::function<bool(const Appserver2Ptr&)> condition,
+        std::chrono::milliseconds timeout);
 protected:
     QnStaticCommonModule staticCommon;
     std::vector<Appserver2Ptr> m_servers;
