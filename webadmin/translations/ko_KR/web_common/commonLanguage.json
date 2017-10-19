@@ -14,7 +14,7 @@
     "error":"오류",
     "unauthorized":"인증이 필요합니다",
     "noData":"데이터 없음",
-    "iosVideoTooLarge":"iOS는 fullHD (2MP : 1920x1080)보다 큰 비디오를 지원하지 않습니다.",
+    "iosVideoTooLarge":"iOS는 fullHD (2MP: 1920x1080) 보다 큰 비디오를 지원하지 않습니다.",
     "flashRequired":"ARM 기반 서버에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a>을 설치하십시오.",
     "flashOrWebmRequired":"Internet Explorer에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> 또는 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>을 설치하십시오.",
     "noArmSupport":"이 브라우저 또는 장치는 ARM 기반 서버의 비디오 재생을 지원하지 않습니다.",

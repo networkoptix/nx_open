@@ -38,9 +38,18 @@ namespace detail {
 class NX_UTILS_API Helper
 {
 public:
-    Helper(Level level, const QString& tag);
-    void log(const QString& message);
-    explicit operator bool() const;
+    Helper(): m_level(Level::none) {} //< Constructing a helper which does not log anything.
+
+    Helper(Level level, const QString& tag): m_level(level), m_tag(tag)
+    {
+        m_logger = getLogger(m_tag);
+        if (!m_logger->isToBeLogged(m_level, m_tag))
+            m_logger.reset();
+    }
+
+    void log(const QString& message) { m_logger->logForced(m_level, m_tag, message); };
+
+    explicit operator bool() const { return m_logger != nullptr; }
 
 protected:
    const Level m_level;
@@ -58,11 +67,22 @@ Helper makeHelper(Level level, const Tag& tag)
 class NX_UTILS_API Stream: public Helper
 {
 public:
-    Stream(Level level, const QString& tag);
-    ~Stream();
+    Stream(): Helper() {} //< Constructing a stream which does not log anything.
+    Stream(Level level, const QString& tag): Helper(level, tag) {}
 
-    /** Oprator logic is reversed to support tricky syntax: if (stream) {} else stream << */
-    explicit operator bool() const;
+    ~Stream()
+    {
+        if (m_logger)
+            log(m_strings.join(QLatin1Char(' ')));
+    }
+
+    Stream(const Stream&) = delete;
+    Stream(Stream&&) = default;
+    Stream& operator=(const Stream&) = delete;
+    Stream& operator=(Stream&&) = default;
+
+    /** Oprator logic is reversed to support tricky syntax: if (stream) {} else stream << ... */
+    explicit operator bool() const { return m_logger == nullptr; }
 
     template<typename Value>
     Stream& operator<<(const Value& value)
@@ -79,6 +99,9 @@ private:
 template<typename Tag>
 Stream makeStream(Level level, const Tag& tag)
 {
+    if (level > maxLevel())
+        return Stream();
+
     using ::toString;
     return Stream(level, toString(tag));
 }
@@ -95,7 +118,7 @@ Stream makeStream(Level level, const Tag& tag)
 } while (0)
 
 #define NX_UTILS_LOG_STREAM(LEVEL, TAG) \
-    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} else stream <<
+    if (auto stream = nx::utils::log::detail::makeStream((LEVEL), (TAG))) {} else stream << /*...*/
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG(__VA_ARGS__, \
