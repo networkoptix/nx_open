@@ -664,6 +664,7 @@ void QnCameraScheduleWidget::updateFromResources()
         setFps(currentMaxFps);
     else if (!m_cameras.isEmpty())
         setFps(m_cameras.first()->getMaxFps() / 2);
+    syncBitrateWithFps();
 
     updateScheduleEnabled();
     updateMinDays();
