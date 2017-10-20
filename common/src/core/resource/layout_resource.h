@@ -55,7 +55,7 @@ public:
 
     void removeItem(const QnLayoutItemData &item);
 
-    void removeItem(const QnUuid &itemUuid);
+    Q_INVOKABLE void removeItem(const QnUuid &itemUuid);
 
     /**
      * @note Resource replacement is not supported for item.

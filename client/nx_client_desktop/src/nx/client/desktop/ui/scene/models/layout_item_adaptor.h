@@ -17,9 +17,10 @@ class LayoutModel;
 class LayoutItemAdaptor: public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QnLayoutResource* layout READ layoutPlainPointer CONSTANT)
     Q_PROPERTY(QnUuid itemId READ itemId CONSTANT)
     Q_PROPERTY(QnUuid resourceId READ resourceId CONSTANT)
-    Q_PROPERTY(QnResource* resource READ resource CONSTANT)
+    Q_PROPERTY(QnResource* resource READ resourcePlainPointer CONSTANT)
     Q_PROPERTY(int flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QRect geometry READ geometry WRITE setGeometry NOTIFY geometryChanged)
     Q_PROPERTY(QnUuid zoomTargetId
@@ -32,10 +33,14 @@ public:
     LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const QnUuid& itemId);
     virtual ~LayoutItemAdaptor() override;
 
+    QnLayoutResourcePtr layout() const;
+    QnLayoutResource* layoutPlainPointer() const;
+
     QnUuid itemId() const;
 
     QnUuid resourceId() const;
-    QnResource* resource() const;
+    QnResourcePtr resource() const;
+    QnResource* resourcePlainPointer() const;
 
     int flags() const;
     void setFlags(int flags);

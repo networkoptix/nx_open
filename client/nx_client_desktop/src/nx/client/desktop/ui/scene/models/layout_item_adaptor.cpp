@@ -73,6 +73,16 @@ LayoutItemAdaptor::~LayoutItemAdaptor()
 {
 }
 
+QnLayoutResourcePtr LayoutItemAdaptor::layout() const
+{
+    return d->layout;
+}
+
+QnLayoutResource* LayoutItemAdaptor::layoutPlainPointer() const
+{
+    return d->layout.data();
+}
+
 QnUuid LayoutItemAdaptor::itemId() const
 {
     return d->itemData.uuid;
@@ -83,9 +93,14 @@ QnUuid LayoutItemAdaptor::resourceId() const
     return d->itemData.resource.id;
 }
 
-QnResource* LayoutItemAdaptor::resource() const
+QnResourcePtr LayoutItemAdaptor::resource() const
 {
-    return d->layout->resourcePool()->getResourceById(d->itemData.resource.id).data();
+    return d->layout->resourcePool()->getResourceById(d->itemData.resource.id);
+}
+
+QnResource* LayoutItemAdaptor::resourcePlainPointer() const
+{
+    return resource().data();
 }
 
 int LayoutItemAdaptor::flags() const
