@@ -33,6 +33,8 @@ int eventHelpId(vms::event::EventType type)
             return Qn::EventsActions_LicenseIssue_Help;
         case vms::event::backupFinishedEvent:
             return Qn::EventsActions_BackupFinished_Help;
+        case vms::event::softwareTriggerEvent:
+            return Qn::EventActions_SoftTrigger_Help;
         default:
             return type >= vms::event::userDefinedEvent
                 ? Qn::EventsActions_Generic_Help
