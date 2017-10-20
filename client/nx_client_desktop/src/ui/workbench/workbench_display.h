@@ -65,6 +65,31 @@ class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextA
     using base_type = Connective<QObject>;
 
 public:
+
+    /**
+    * Layer of a graphics item on the scene.
+    *
+    * Workbench display presents convenience functions for moving items between layers
+    * and guarantees that items from the layers with higher numbers are always
+    * displayed on top of those from the layers with lower numbers.
+    */
+    enum ItemLayer
+    {
+        InvisibleLayer = -1,        //< Layer for invisible items.
+        EMappingLayer = 0,          /**< Layer for E-Mapping background. */
+        BackLayer,                  /**< Back layer. */
+        PinnedLayer,                /**< Layer for pinned items. */
+        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
+        UnpinnedLayer,              /**< Layer for unpinned items. */
+        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
+        ZoomedLayer,                /**< Layer for zoomed items. */
+        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
+        EffectsLayer,               /**< Layer for top-level effects. */
+        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
+        MessageBoxLayer,            /**< Layer for graphics text messages. */
+        LayerCount
+    };
+
     /**
      * Constructor.
      *
@@ -249,14 +274,10 @@ public:
 
     void bringToFront(QnWorkbenchItem *item);
 
-
-    Qn::ItemLayer layer(QGraphicsItem *item) const;
-
-    void setLayer(QGraphicsItem *item, Qn::ItemLayer layer);
-
-    void setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer);
-
-    qreal layerZValue(Qn::ItemLayer layer) const;
+    ItemLayer layer(QGraphicsItem *item) const;
+    void setLayer(QGraphicsItem *item, ItemLayer layer);
+    void setLayer(const QList<QGraphicsItem *> &items, ItemLayer layer);
+    qreal layerZValue(ItemLayer layer) const;
 
     void synchronize(QnWorkbenchItem *item, bool animate);
 
@@ -323,9 +344,9 @@ protected:
     Q_SLOT void adjustGeometry(QnWorkbenchItem *item, bool animate);
     Q_SIGNAL void geometryAdjustmentRequested(QnWorkbenchItem *item, bool animate);
 
-    qreal layerFrontZValue(Qn::ItemLayer layer) const;
-    Qn::ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
-    Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
+    qreal layerFrontZValue(ItemLayer layer) const;
+    ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
+    ItemLayer shadowLayer(ItemLayer itemLayer) const;
 
     bool addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);

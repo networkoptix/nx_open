@@ -79,6 +79,8 @@ public:
 
         AnalyticsModeMaster         = 0x80000,   /**< item is an analytics mode master. */
         AnalyticsModeSlave          = 0x100000,  /**< item is an analytics mode slave. */
+
+        InvisibleWidgetOption       = 0x200000,  //< Do not show this widget on the scene.
     };
     Q_DECLARE_FLAGS(Options, Option)
 
