@@ -68,15 +68,12 @@ namespace nx
 }
 
 
-void resetTransactionTransportConnections();
-
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,
     PasswordData data,
     QnOptionalBool isEnabled,
     const QnUserResourcePtr& userRes,
     QString* errString = nullptr);
-bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 
 bool isLocalAppServer(const QString &host);

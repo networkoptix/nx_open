@@ -260,8 +260,8 @@ void AsyncClient::doRequest(
     nx_http::Method::ValueType method,
     const QUrl& url)
 {
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
+    //NX_ASSERT(!url.host().isEmpty());
+    //NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;

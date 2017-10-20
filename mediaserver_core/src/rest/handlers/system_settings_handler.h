@@ -1,23 +1,34 @@
-/**********************************************************
-* Dec 11, 2015
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef NX_MS_SYSTEM_SETTINGS_HANDLER_H
-#define NX_MS_SYSTEM_SETTINGS_HANDLER_H
+#include <nx/vms/utils/system_settings_processor.h>
 
 #include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
 
-class QnCommonModule;
+class SystemSettingsProcessor:
+    public nx::vms::utils::SystemSettingsProcessor
+{
+    using base_type = nx::vms::utils::SystemSettingsProcessor;
+
+public:
+    SystemSettingsProcessor(
+        QnCommonModule* commonModule,
+        const QnAuthSession& authSession);
+
+private:
+    const QnAuthSession m_authSession;
+
+    void systemNameChanged(
+        const QString& oldValue,
+        const QString& newValue);
+};
 
 /*!
     If no parameters are specified then just returns list of settings.
     If setting(s) to set is specified, then new values are returned
 */
-class QnSystemSettingsHandler
-:
+class QnSystemSettingsHandler:
     public QnJsonRestHandler
 {
     Q_OBJECT
@@ -35,11 +46,10 @@ public:
         QnJsonRestResult& result,
         const Qn::UserAccessData& accessRights,
         const QnAuthSession& authSession);
+
 private:
     void systemNameChanged(
         const QnAuthSession& authSession,
         const QString& oldValue,
         const QString& newValue);
 };
-
-#endif  //NX_MS_SYSTEM_SETTINGS_HANDLER_H

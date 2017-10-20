@@ -1,43 +1,44 @@
-/**********************************************************
-* Aug 25, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "appserver2_process.h"
 
 #include <chrono>
 #include <thread>
 
-#include <api/app_server_connection.h>
-#include <api/common_message_processor.h>
-#include <api/runtime_info_manager.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/core/access/access_types.h>
-#include <llutil/hardware_id.h>
-#include <network/tcp_connection_priv.h>
-#include <nx1/info.h>
-#include <nx_ec/ec2_lib.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/settings.h>
 #include <nx/utils/timer_manager.h>
+
+#include <nx/core/access/access_types.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/initial_data_loader.h>
+#include <nx/vms/utils/server_merge_processor.h>
+#include <nx/vms/utils/setup_system_processor.h>
+#include <nx/vms/utils/system_settings_processor.h>
+
+#include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
+#include <api/runtime_info_manager.h>
+#include <api/model/getnonce_reply.h>
+#include <api/model/configure_reply.h>
+#include <api/model/setup_local_system_data.h>
+#include <api/global_settings.h>
+#include <api/model/ping_reply.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <llutil/hardware_id.h>
+#include <network/tcp_connection_priv.h>
+#include <nx1/info.h>
+#include <nx_ec/ec2_lib.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 
 #include "ec2_connection_processor.h"
 #include <test_support/resource/test_resource_factory.h>
-#include <api/model/getnonce_reply.h>
-#include <nx/network/http/custom_headers.h>
-#include <api/model/configure_reply.h>
-#include <api/model/configure_system_data.h>
 #include <common/common_module.h>
-#include <api/global_settings.h>
-#include <api/model/ping_reply.h>
 #include <core/resource/media_server_resource.h>
 #include <transaction/message_bus_adapter.h>
 #include <rest/helper/ping_rest_helper.h>
@@ -108,7 +109,9 @@ private:
     bool m_showHelp;
 };
 
-}   // namespace conf
+} // namespace conf
+
+//-------------------------------------------------------------------------------------------------
 
 using ProcessorHandler = std::function<
     void(const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)>;
@@ -137,6 +140,8 @@ public:
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
     }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 QnSimpleHttpConnectionListener::QnSimpleHttpConnectionListener(
     QnCommonModule* commonModule,
@@ -179,10 +184,8 @@ void QnSimpleHttpConnectionListener::disableAuthForPath(const QString& path)
     m_disableAuthPrefixes.insert(path);
 }
 
-
-////////////////////////////////////////////////////////////
-//// class Appserver2Process
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class Appserver2MessageProcessor
 
 class Appserver2MessageProcessor:
     public QnCommonMessageProcessor
@@ -227,8 +230,10 @@ protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;
 };
 
-Appserver2Process::Appserver2Process(int argc, char** argv)
-:
+//-------------------------------------------------------------------------------------------------
+// class Appserver2Process
+
+Appserver2Process::Appserver2Process(int argc, char** argv):
     m_argc(argc),
     m_argv(argv),
     m_terminated(false),
@@ -243,7 +248,6 @@ Appserver2Process::~Appserver2Process()
 
 void Appserver2Process::pleaseStop()
 {
-    //m_processTerminationEvent.set_value();
     QnMutexLocker lk(&m_mutex);
     m_terminated = true;
     m_eventLoop.quit();
@@ -268,12 +272,11 @@ int Appserver2Process::exec()
     registerQtResources();
 
     conf::Settings settings;
-    //parsing command line arguments
+    // Parsing command line arguments.
     settings.load(m_argc, m_argv);
     if (settings.showHelp())
     {
-        //settings.printCmdLineArgsHelp();
-        //TODO
+        // TODO: settings.printCmdLineArgsHelp();
         return 0;
     }
 
@@ -286,26 +289,10 @@ int Appserver2Process::exec()
     // Starting receiving notifications.
     m_commonModule->createMessageProcessor<Appserver2MessageProcessor>();
 
-    ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = m_commonModule->moduleGUID();
-    runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_Server;
-    runtimeData.box = QnAppInfo::armBox();
-    runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.platform = QnAppInfo::applicationPlatform();
-
-    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-    {
-        runtimeData.nx1mac = Nx1::getMac();
-        runtimeData.nx1serial = Nx1::getSerial();
-    }
-
-    runtimeData.hardwareIds << QnUuid::createUuid().toString();
-    m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
+    updateRuntimeData();
 
     qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
-    //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
         ec2ConnectionFactory(getConnectionFactory(
             Qn::PT_Server,
@@ -319,14 +306,12 @@ int Appserver2Process::exec()
     const QUrl dbUrl = QUrl::fromLocalFile(settings.dbFilePath());
 
     ec2::AbstractECConnectionPtr ec2Connection;
-    //QnConnectionInfo connectInfo;
     while (!m_terminated)
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
             dbUrl, ec2::ApiClientInfoData(), &ec2Connection);
         if (errorCode == ec2::ErrorCode::ok)
         {
-            //connectInfo = ec2Connection->connectionInfo();
             NX_LOG(lit("Connected to local EC2"), cl_logDEBUG1);
             break;
         }
@@ -335,12 +320,12 @@ int Appserver2Process::exec()
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
-    //QnAppServerConnectionFactory appServerConnectionFactory;
-    //appServerConnectionFactory.setUrl(dbUrl);
-    //appServerConnectionFactory.setEC2ConnectionFactory(ec2ConnectionFactory.get());
-
-    //Must call messageProcessor->init(ec2Connection)
-    //commonModule->setEc2Connection(ec2Connection);
+    nx::vms::utils::loadResourcesFromEcs(
+        m_commonModule.get(),
+        ec2Connection,
+        m_commonModule->messageProcessor(),
+        QnMediaServerResourcePtr(),
+        []() { return false; });
 
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
@@ -349,93 +334,23 @@ int Appserver2Process::exec()
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
 
-    if (settings.isAuthDisabled())
-        tcpListener.disableAuth();
-
-    ec2ConnectionFactory->registerRestHandlers(tcpListener.processorPool());
-
-    if (!tcpListener.bindToLocalAddress())
-    {
-        //Must call messageProcessor->init(ec2Connection)
-        //commonModule->setEc2Connection(nullptr);
-        //appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
-        return 1;
-    }
-
-    auto selfInformation = m_commonModule->moduleInformation();
-    selfInformation.sslAllowed = true;
-    selfInformation.port = tcpListener.getPort();
-    commonModule()->setModuleInformation(selfInformation);
-
     {
         QnMutexLocker lk(&m_mutex);
         m_tcpListener = &tcpListener;
     }
 
-    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformation",
-        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
-        {
-            result->setReply(owner->commonModule()->moduleInformation());
-        });
+    if (settings.isAuthDisabled())
+        tcpListener.disableAuth();
 
-    auto getNonce = [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult* result)
-    {
-        QnGetNonceReply reply;
-        reply.nonce = QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 16);
-        reply.realm = nx::network::AppInfo::realm();
-        result->setReply(reply);
-    };
-    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/getNonce", getNonce);
-    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "web/api/getNonce", getNonce);
+    registerHttpHandlers(ec2ConnectionFactory.get());
 
-    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/ping",
-        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
-        {
-            result->setReply(rest::helper::PingRestHelper::data(owner->commonModule()));
-        });
-
-    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", rest::helper::P2pStatistics::kUrlPath,
-        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
-        {
-            result->setReply(rest::helper::P2pStatistics::data(owner->commonModule()));
-        });
-
-    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/backupDatabase",
-        [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult*)
-        {
-        });
-
-    tcpListener.addHandler<JsonConnectionProcessor>("HTTP", "api/configure",
-        [](const nx_http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
-        {
-            QnConfigureReply reply;
-            reply.restartNeeded = false;
-            result->setReply(reply);
-            ConfigureSystemData data = QJson::deserialized<ConfigureSystemData>(request.messageBody);
-
-            if (data.localSystemId != owner->globalSettings()->localSystemId())
-            {
-                result->setError(QnJsonRestResult::CantProcessRequest, lit("UNSUPPORTED"));
-                return;
-            }
-            if (data.rewriteLocalSettings)
-            {
-                owner->commonModule()->ec2Connection()->setTransactionLogTime(data.tranLogTime);
-                owner->globalSettings()->resynchronizeNowSync();
-            }
-        });
-
-    tcpListener.disableAuthForPath("/api/getNonce");
-    tcpListener.disableAuthForPath("/api/moduleInformation");
-
-    tcpListener.addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
-    ec2ConnectionFactory->registerTransactionListener(&tcpListener);
+    if (!tcpListener.bindToLocalAddress())
+        return 1;
 
     tcpListener.start();
 
     m_commonModule->messageProcessor()->init(ec2Connection);
     m_ecConnection = ec2Connection.get();
-    //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
@@ -447,7 +362,7 @@ int Appserver2Process::exec()
 
     m_commonModule->moduleDiscoveryManager()->stop();
     ec2Connection->stopReceivingNotifications();
-    //Must call messageProcessor->init(ec2Connection)
+    // Must call messageProcessor->init(ec2Connection).
     m_commonModule->messageProcessor()->init(nullptr);
     ec2Connection.reset();
     m_ecConnection = nullptr;
@@ -474,12 +389,149 @@ SocketAddress Appserver2Process::endpoint() const
     return endpoint;
 }
 
-////////////////////////////////////////////////////////////
-//// class Appserver2ProcessPublic
-////////////////////////////////////////////////////////////
+void Appserver2Process::updateRuntimeData()
+{
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = m_commonModule->moduleGUID();
+    runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
+    runtimeData.peer.peerType = Qn::PT_Server;
+    runtimeData.box = QnAppInfo::armBox();
+    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.platform = QnAppInfo::applicationPlatform();
 
-Appserver2ProcessPublic::Appserver2ProcessPublic(int argc, char **argv)
-    :
+    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    {
+        runtimeData.nx1mac = Nx1::getMac();
+        runtimeData.nx1serial = Nx1::getSerial();
+    }
+
+    runtimeData.hardwareIds << QnUuid::createUuid().toString();
+    m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
+}
+
+void Appserver2Process::registerHttpHandlers(
+    ec2::AbstractECConnectionFactory* ec2ConnectionFactory)
+{
+    ec2ConnectionFactory->registerRestHandlers(m_tcpListener->processorPool());
+
+    auto selfInformation = m_commonModule->moduleInformation();
+    selfInformation.sslAllowed = true;
+    selfInformation.port = m_tcpListener->getPort();
+    commonModule()->setModuleInformation(selfInformation);
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformation",
+        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        {
+            result->setReply(owner->commonModule()->moduleInformation());
+        });
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformationAuthenticated",
+        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        {
+            result->setReply(owner->commonModule()->moduleInformation());
+        });
+
+    auto getNonce = [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult* result)
+    {
+        QnGetNonceReply reply;
+        reply.nonce = QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 16);
+        reply.realm = nx::network::AppInfo::realm();
+        result->setReply(reply);
+    };
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/getNonce", getNonce);
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "web/api/getNonce", getNonce);
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/ping",
+        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        {
+            result->setReply(rest::helper::PingRestHelper::data(owner->commonModule()));
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", rest::helper::P2pStatistics::kUrlPath,
+        [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        {
+            result->setReply(rest::helper::P2pStatistics::data(owner->commonModule()));
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/backupDatabase",
+        [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult*)
+        {
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/configure",
+        [](const nx_http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
+        {
+            QnConfigureReply reply;
+            reply.restartNeeded = false;
+            result->setReply(reply);
+            ConfigureSystemData data = QJson::deserialized<ConfigureSystemData>(request.messageBody);
+
+            if (data.localSystemId != owner->globalSettings()->localSystemId())
+            {
+                result->setError(QnJsonRestResult::CantProcessRequest, lit("UNSUPPORTED"));
+                return;
+            }
+            if (data.rewriteLocalSettings)
+            {
+                owner->commonModule()->ec2Connection()->setTransactionLogTime(data.tranLogTime);
+                owner->globalSettings()->resynchronizeNowSync();
+            }
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/mergeSystems",
+        [this](
+            const nx_http::Request& request,
+            QnHttpConnectionListener* owner,
+            QnJsonRestResult* result)
+        {
+            MergeSystemData data = QJson::deserialized<MergeSystemData>(request.messageBody);
+            nx::vms::utils::SystemMergeProcessor systemMergeProcessor(m_commonModule.get());
+            return systemMergeProcessor.merge(
+                Qn::kSystemAccess,
+                QnAuthSession(),
+                std::move(data),
+                result);
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/mergeSystems",
+        [this](
+            const nx_http::Request& request,
+            QnHttpConnectionListener* owner,
+            QnJsonRestResult* result)
+        {
+            MergeSystemData data = QJson::deserialized<MergeSystemData>(request.messageBody);
+            nx::vms::utils::SystemMergeProcessor systemMergeProcessor(m_commonModule.get());
+            return systemMergeProcessor.merge(
+                Qn::kSystemAccess,
+                QnAuthSession(),
+                std::move(data),
+                result);
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupLocalSystem",
+        [this](
+            const nx_http::Request& request,
+            QnHttpConnectionListener* owner,
+            QnJsonRestResult* result)
+        {
+            auto data = QJson::deserialized<SetupLocalSystemData>(request.messageBody);
+            nx::vms::utils::SetupSystemProcessor setupSystemProcessor(m_commonModule.get());
+            return setupSystemProcessor.setupLocalSystem(
+                QnAuthSession(),
+                std::move(data),
+                result);
+        });
+
+    m_tcpListener->disableAuthForPath("/api/getNonce");
+    m_tcpListener->disableAuthForPath("/api/moduleInformation");
+
+    m_tcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
+    ec2ConnectionFactory->registerTransactionListener(m_tcpListener);
+}
+
+//-------------------------------------------------------------------------------------------------
+// class Appserver2ProcessPublic
+
+Appserver2ProcessPublic::Appserver2ProcessPublic(int argc, char **argv):
     m_impl(new Appserver2Process(argc, argv))
 {
 }

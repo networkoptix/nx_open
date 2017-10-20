@@ -411,9 +411,12 @@ bool SystemMergeProcessor::applyRemoteSettings(
     if (!QJson::deserialize(pingRestResult.reply, &pingReply))
         return false;
 
-    QnJsonRestResult backupDBRestResult;
-    if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
-        return false;
+    if (m_dbBackupEnabled)
+    {
+        QnJsonRestResult backupDBRestResult;
+        if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
+            return false;
+    }
 
 
     // 1. update settings in remove database to ensure they have priority while merge

@@ -19,6 +19,7 @@
 namespace ec2 {
 
 class AbstractECConnection;
+class AbstractECConnectionFactory;
 class QnSimpleHttpConnectionListener;
 
 class Appserver2Process:
@@ -38,6 +39,7 @@ public:
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
+
 private:
     int m_argc;
     char** m_argv;
@@ -49,6 +51,9 @@ private:
     QnSimpleHttpConnectionListener* m_tcpListener;
     mutable QnMutex m_mutex;
     QEventLoop m_eventLoop;
+
+    void updateRuntimeData();
+    void registerHttpHandlers(ec2::AbstractECConnectionFactory* ec2ConnectionFactory);
 };
 
 

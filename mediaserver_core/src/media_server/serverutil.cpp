@@ -104,90 +104,22 @@ bool updateUserCredentials(
     const QnUserResourcePtr& userRes,
     QString* errString)
 {
-    if (!userRes)
+    QnUserResourcePtr updatedUser;
+    if (!nx::vms::utils::updateUserCredentials(
+            connection,
+            std::move(data),
+            isEnabled,
+            userRes,
+            errString,
+            &updatedUser))
     {
-        if (errString)
-            *errString = lit("Temporary unavailable. Please try later.");
         return false;
     }
 
-    ec2::ApiUserData apiOldUser;
-    fromResourceToApi(userRes, apiOldUser);
-
-    //generating cryptSha512Hash
-    if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
-        data.cryptSha512Hash = linuxCryptSha512(data.password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH));
-
-    //making copy of admin user to be able to rollback local changed on DB update failure
-    QnUserResourcePtr updatedUser = QnUserResourcePtr(new QnUserResource(*userRes));
-
-    if (data.password.isEmpty() &&
-        updatedUser->getHash() == data.passwordHash &&
-        updatedUser->getDigest() == data.passwordDigest &&
-        updatedUser->getCryptSha512Hash() == data.cryptSha512Hash &&
-        (!isEnabled.isDefined() || updatedUser->isEnabled() == isEnabled.value()))
-    {
-        //no need to update anything
-        return true;
-    }
-
-    if (isEnabled.isDefined())
-        updatedUser->setEnabled(isEnabled.value());
-
-    if (!data.password.isEmpty())
-    {
-        /* set new password */
-        updatedUser->setPasswordAndGenerateHash(data.password);
-    }
-    else if (!data.passwordHash.isEmpty())
-    {
-        updatedUser->setRealm(data.realm);
-        updatedUser->setHash(data.passwordHash);
-        updatedUser->setDigest(data.passwordDigest);
-        if (!data.cryptSha512Hash.isEmpty())
-            updatedUser->setCryptSha512Hash(data.cryptSha512Hash);
-    }
-
-    ec2::ApiUserData apiUser;
-    fromResourceToApi(updatedUser, apiUser);
-
-    if (apiOldUser == apiUser)
-        return true; //< Nothing to update.
-
-    auto errCode = connection->getUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
-    NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if (errCode != ec2::ErrorCode::ok)
-    {
-        if (errString)
-            *errString = lit("Internal server database error: %1").arg(toString(errCode));
-        return false;
-    }
-    updatedUser->resetPassword();
-
+    // TODO: #ak Test user for being owner or local admin?
     HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedUser);
     return true;
 }
-
-bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
-{
-    if (errStr)
-        errStr->clear();
-
-    if (!(passwordData.passwordHash.isEmpty() == passwordData.realm.isEmpty() &&
-        passwordData.passwordDigest.isEmpty() == passwordData.realm.isEmpty() &&
-        passwordData.cryptSha512Hash.isEmpty() == passwordData.realm.isEmpty()))
-    {
-        //these values MUST be all filled or all NOT filled
-        NX_LOG(lit("All password hashes MUST be supplied all together along with realm"), cl_logDEBUG2);
-
-        if (errStr)
-            *errStr = lit("All password hashes MUST be supplied all together along with realm");
-        return false;
-    }
-
-    return true;
-}
-
 
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 {

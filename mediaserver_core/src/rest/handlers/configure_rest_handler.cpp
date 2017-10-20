@@ -1,5 +1,7 @@
 #include "configure_rest_handler.h"
 
+#include <nx/vms/utils/vms_utils.h>
+
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
 #include <nx_ec/data/api_user_data.h>
@@ -87,7 +89,7 @@ int QnConfigureRestHandler::execute(
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;
-    if (!validatePasswordData(data, &errStr))
+    if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
         NX_LOG(lit("QnConfigureRestHandler: invalid password provided"), cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
