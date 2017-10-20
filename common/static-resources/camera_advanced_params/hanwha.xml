@@ -884,6 +884,12 @@
                         writeCmd="control"
                         description="Fits the focus automatically"
                         aux="support=Image/Support/SimpleFocus"/>
+            <param id="image/focus/Mode=Reset"
+                        name="Reset Focus"
+                        dataType="Button"
+                        writeCmd="control"
+                        description="Restores the focus adjustment to the default flange back position"
+                        aux="support=Image/Support/ResetFocus"/>            
             <param id="system/factoryreset/ExcludeSettings=Network"
                         name="Soft Reset"
                         dataType="Button"

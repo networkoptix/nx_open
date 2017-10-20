@@ -160,18 +160,15 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
 
     auto sharedRes = sharedResources(resourceInfo);
 
-    HanwhaRequestHelper helper(sharedRes->sharedContext);
-    const auto parameters = helper.fetchCgiParameters(lit("cgis"));
-
-    if (!parameters.isValid())
+    const auto cgiParameters = sharedRes->sharedContext->cgiParamiters();
+    if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
         return boost::none;
 
-    const auto eventStatuses = helper.check(lit("eventstatus/eventstatus"));
-
-    if (!eventStatuses.isSuccessful())
+    const auto eventStatuses = sharedRes->sharedContext->eventStatuses();
+    if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(parameters, eventStatuses, resourceInfo.channel);
+    return eventsFromParameters(cgiParameters.value, eventStatuses.value, resourceInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
@@ -199,83 +196,21 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
         if (!guid.isNull())
             result.push_back(guid);
 
-        if (eventName == kVideoAnalytics)
+        if (eventName == kVideoAnalytics || eventName == kAudioAnalytics)
         {
-            auto supportedAreaAnalyticsParameter = parameters.parameter(
-                "eventsources/videoanalysis/set/DefinedArea.#.Mode");
-
-            gotValidParameter = supportedAreaAnalyticsParameter.is_initialized()
-                && supportedAreaAnalyticsParameter->isValid();
-
-            if (gotValidParameter)
+            const auto parameters = eventStatuses.response();
+            for (const auto& entry : parameters)
             {
-                auto supportedAreaAnalytics =
-                    supportedAreaAnalyticsParameter->possibleValues();
+                const auto& fullEventName = entry.first;
+                const bool isAnalyticsEvent = fullEventName.startsWith(
+                    lit("Channel.%1.%2.")
+                        .arg(channel)
+                        .arg(eventName));
 
-                for (const auto& videoAnalytics: supportedAreaAnalytics)
+                if (isAnalyticsEvent)
                 {
                     guid = m_driverManifest.eventTypeByInternalName(
-                        lit("%1.%2")
-                            .arg(kVideoAnalytics)
-                            .arg(videoAnalytics));
-
-                    if (!guid.isNull())
-                        result.push_back(guid);
-                }
-            }
-            else
-            {
-                const auto parameters = eventStatuses.response();
-                for (const auto& entry: parameters)
-                {
-                    const auto& eventName = entry.first;
-                    if (eventName.startsWith(lit("Channel.%1.VideoAnalytics.").arg(channel)))
-                    {
-                        guid = m_driverManifest.eventTypeByInternalName(
-                            lit("VideoAnalytics.") + eventName.split(L'.').last());
-
-                        if (!guid.isNull())
-                            result.push_back(guid);
-                    }
-                }
-            }
-
-            auto supportedLineAnalyticsParameter = parameters.parameter(
-                "eventsources/videoanalysis/set/Line.#.Mode");
-
-            gotValidParameter = supportedLineAnalyticsParameter.is_initialized()
-                && supportedLineAnalyticsParameter->isValid();
-
-            if (gotValidParameter)
-            {
-                guid = m_driverManifest.eventTypeByInternalName(
-                    lit("%1.%2")
-                    .arg(kVideoAnalytics)
-                    .arg(lit("Passing")));
-
-                if (!guid.isNull())
-                    result.push_back(guid);
-            }
-
-        }
-
-        if (eventName == kAudioAnalytics)
-        {
-            auto supportedAudioTypesParameter = parameters.parameter(
-                "eventsources/audioanalysis/set/SoundType");
-
-            gotValidParameter = supportedAudioTypesParameter.is_initialized()
-                && supportedAudioTypesParameter->isValid();
-
-            if (gotValidParameter)
-            {
-                auto supportedAudioTypes = supportedAudioTypesParameter->possibleValues();
-                for (const auto& audioAnalytics : supportedAudioTypes)
-                {
-                    guid = m_driverManifest.eventTypeByInternalName(
-                        lit("%1.%2")
-                            .arg(kAudioAnalytics)
-                            .arg(audioAnalytics));
+                        eventName + (".") + fullEventName.split(L'.').last());
 
                     if (!guid.isNull())
                         result.push_back(guid);
@@ -326,8 +261,9 @@ void HanwhaMetadataPlugin::managerStoppedToUseMonitor(const QString& sharedId)
     if (!sharedResources)
         return;
 
-    --sharedResources->monitorUsageCounter;
-    NX_ASSERT(sharedResources->monitorUsageCounter >= 0);
+    if (sharedResources->monitorUsageCounter)
+        --sharedResources->monitorUsageCounter;
+
     if (sharedResources->monitorUsageCounter <= 0)
         m_sharedResources[sharedId]->monitor->stopMonitoring();
 }
