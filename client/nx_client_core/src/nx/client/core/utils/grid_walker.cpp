@@ -36,7 +36,7 @@ bool GridWalker::next()
 
         case Policy::Snake:
         {
-            const bool goingRight = ((y & 1) == 0); //< Odd row.
+            const bool goingRight = (((grid.top() + y) & 1) == 0); //< Odd row.
             if (goingRight)
             {
                 if (x == grid.right())
@@ -56,21 +56,23 @@ bool GridWalker::next()
 
         case Policy::Round:
         {
-            const int xR = grid.width() - x - 1; //< X coordinate, counting from right.
-            const int yB = grid.height() - y - 1; //< Y coordinate, counting from bottom.
+            const int xL = x - grid.left(); //< X coordinate, counting from left.
+            const int yT = y - grid.top(); //< Y coordinate, counting from top.
+            const int xR = grid.right() - x; //< X coordinate, counting from right.
+            const int yB = grid.bottom() - y; //< Y coordinate, counting from bottom.
             const QPoint mid((grid.width() + 1) / 2, (grid.height() + 1) / 2);
 
-            // Top sector of crossing of the lines (x + 1 == y) and (xR == y) above the center.
-            const bool goingRight = (x + 1 >= y) && (xR > y) && (y < mid.y());
+            // Top sector of crossing of the lines (xL + 1 == yT) and (xR == yT) above the center.
+            const bool goingRight = (xL + 1 >= yT) && (xR > yT) && (yT < mid.y());
 
-            // Right sector of crossing of the lines (xR == y) and (xR == yB) right of center.
-            const bool goingDown = (y >= xR) && (yB > xR) && (x >= mid.x());
+            // Right sector of crossing of the lines (xR == yT) and (xR == yB) right of center.
+            const bool goingDown = (yT >= xR) && (yB > xR) && (xL >= mid.x());
 
-            // Bottom sector of crossing of the lines (xR == yB) and (x == yB) below the center
-            const bool goingLeft = (x > yB) && (xR >= yB) && (y >= mid.y());
+            // Bottom sector of crossing of the lines (xR == yB) and (xL == yB) below the center
+            const bool goingLeft = (xL > yB) && (xR >= yB) && (yT >= mid.y());
 
-            // Left sector of crossing of the lines (x + 1 == y) and (x == yB) left of center.
-            const bool goingUp = (x <= yB) && (y > x + 1) && (x < mid.x());
+            // Left sector of crossing of the lines (xL + 1 == yT) and (xL == yB) left of center.
+            const bool goingUp = (xL <= yB) && (yT > xL + 1) && (xL < mid.x());
 
             if (goingRight)
             {
