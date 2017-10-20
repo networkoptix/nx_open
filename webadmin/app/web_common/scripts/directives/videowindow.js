@@ -202,7 +202,6 @@ angular.module('nxCommon')
                     $timeout(function(){
                         nativePlayer.init(element.find(".videoplayer"), function (api) {
                             makingPlayer = false;
-                            crashCount = 0;
                             scope.vgApi = api;
 
                             if (scope.vgSrc) {
@@ -232,6 +231,7 @@ angular.module('nxCommon')
 
                                 scope.vgApi.addEventListener("playing", function(event){
                                     scope.loading = false; // Video is playing - disable loading
+                                    crashCount = 0;
                                 });
 
                                 scope.vgApi.addEventListener("ended",function(event){
@@ -269,7 +269,6 @@ angular.module('nxCommon')
                         $timeout(function () {// Force DOM to refresh here
                             flashlsAPI.init(playerId, function (api) {
                                 makingPlayer = false;
-                                crashCount = 0;
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
                                     scope.vgApi.load(getFormatSrc('hls'));
