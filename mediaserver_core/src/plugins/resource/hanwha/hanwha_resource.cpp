@@ -2408,7 +2408,7 @@ std::shared_ptr<HanwhaSharedResourceContext> HanwhaResource::sharedContext() con
 QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
-        return new HanwhaNvrArchiveDelegate(toSharedPointer());
+        return new HanwhaArchiveDelegate(toSharedPointer());
     return nullptr;
 }
 
