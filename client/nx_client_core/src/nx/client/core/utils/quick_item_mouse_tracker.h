@@ -2,7 +2,11 @@
 
 #include <QtQuick/QQuickItem>
 
-class QnQuickItemMouseTracker : public QQuickItem
+namespace nx {
+namespace client {
+namespace core {
+
+class QuickItemMouseTracker: public QQuickItem
 {
     Q_OBJECT
 
@@ -15,8 +19,8 @@ class QnQuickItemMouseTracker : public QQuickItem
         NOTIFY hoverEventsEnabledChanged)
 
 public:
-    QnQuickItemMouseTracker(QQuickItem* parent = nullptr);
-    ~QnQuickItemMouseTracker();
+    QuickItemMouseTracker(QQuickItem* parent = nullptr);
+    virtual ~QuickItemMouseTracker() override;
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
@@ -29,9 +33,9 @@ public:
     void setHoverEventsEnabled(bool enabled);
 
     QQuickItem* item() const;
-
-public slots:
     void setItem(QQuickItem* item);
+
+    static void registerQmlType();
 
 signals:
     void mouseXChanged();
@@ -51,3 +55,7 @@ private:
     bool m_containsMouse = false;
     bool m_originalHoverEventsEnabled = false;
 };
+
+} // namespace core
+} // namespace client
+} // namespace nx

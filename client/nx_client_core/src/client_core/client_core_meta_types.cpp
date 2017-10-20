@@ -21,6 +21,13 @@
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
+#include <nx/client/core/utils/quick_item_mouse_tracker.h>
+
+namespace nx {
+namespace client {
+namespace core {
+
+namespace {
 
 static QObject* createNxGlobals(QQmlEngine*, QJSEngine*)
 {
@@ -32,7 +39,9 @@ static QObject* createAppInfo(QQmlEngine*, QJSEngine*)
     return new QnAppInfo();
 }
 
-void QnClientCoreMetaTypes::initialize()
+} // namespace
+
+void initializeMetaTypes()
 {
     qRegisterMetaType<QnStringSet>();
     qRegisterMetaTypeStreamOperators<QnStringSet>();
@@ -47,15 +56,14 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterType<QnOrderedSystemsModel>("Nx.Models", 1, 0, "OrderedSystemsModel");
     qmlRegisterType<nx::client::ModelDataAccessor>("Nx.Models", 1, 0, "ModelDataAccessor");
 
-    qmlRegisterType<nx::client::core::ui::positioners::Grid>("Nx.Positioners", 1, 0, "Grid");
+    qmlRegisterType<ui::positioners::Grid>("Nx.Positioners", 1, 0, "Grid");
 
-    qmlRegisterType<nx::client::core::animation::KineticAnimation>(
+    qmlRegisterType<animation::KineticAnimation>(
         "Nx.Animations", 1, 0, "KineticAnimation");
 
     qmlRegisterSingletonType<QnAppInfo>("Nx", 1, 0, "AppInfo", &createAppInfo);
 
-    qmlRegisterSingletonType<nx::client::core::NxGlobalsObject>(
-        "Nx", 1, 0, "NxGlobals", &createNxGlobals);
+    qmlRegisterSingletonType<NxGlobalsObject>("Nx", 1, 0, "NxGlobals", &createNxGlobals);
     qmlRegisterUncreatableType<QnUuid>(
         "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
     qRegisterMetaType<QnUrlHelper>();
@@ -64,8 +72,9 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterUncreatableType<QnSoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
 
-    nx::client::core::FrameSection::registedQmlType();
-    nx::client::core::Geometry::registerQmlType();
+    FrameSection::registedQmlType();
+    Geometry::registerQmlType();
+    QuickItemMouseTracker::registerQmlType();
 
     qmlRegisterUncreatableType<QnMediaDewarpingParams>("Nx.Media", 1, 0, "MediaDewarpingParams",
         QLatin1String("Cannot create an instance of QnMediaDewarpingParams."));
@@ -79,3 +88,7 @@ void QnClientCoreMetaTypes::initialize()
     qmlRegisterUncreatableType<QnLayoutResource>("Nx.Common", 1, 0, "LayoutResource",
         QLatin1String("Cannot create an instance of LayoutResource."));
 }
+
+} // namespace core
+} // namespace client
+} // namespace nx

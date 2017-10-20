@@ -1,17 +1,21 @@
 #include "quick_item_mouse_tracker.h"
 
-QnQuickItemMouseTracker::QnQuickItemMouseTracker(QQuickItem* parent) :
+namespace nx {
+namespace client {
+namespace core {
+
+QuickItemMouseTracker::QuickItemMouseTracker(QQuickItem* parent) :
     QQuickItem(parent)
 {
 }
 
-QnQuickItemMouseTracker::~QnQuickItemMouseTracker()
+QuickItemMouseTracker::~QuickItemMouseTracker()
 {
     if (m_item)
         m_item->removeEventFilter(this);
 }
 
-bool QnQuickItemMouseTracker::eventFilter(QObject* object, QEvent* event)
+bool QuickItemMouseTracker::eventFilter(QObject* object, QEvent* event)
 {
     if (object != m_item)
         return false;
@@ -42,27 +46,27 @@ bool QnQuickItemMouseTracker::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-qreal QnQuickItemMouseTracker::mouseX() const
+qreal QuickItemMouseTracker::mouseX() const
 {
     return m_mousePosition.x();
 }
 
-qreal QnQuickItemMouseTracker::mouseY() const
+qreal QuickItemMouseTracker::mouseY() const
 {
     return m_mousePosition.y();
 }
 
-bool QnQuickItemMouseTracker::containsMouse() const
+bool QuickItemMouseTracker::containsMouse() const
 {
     return m_containsMouse;
 }
 
-bool QnQuickItemMouseTracker::hoverEventsEnabled() const
+bool QuickItemMouseTracker::hoverEventsEnabled() const
 {
     return m_item && m_item->acceptHoverEvents();
 }
 
-void QnQuickItemMouseTracker::setHoverEventsEnabled(bool enabled)
+void QuickItemMouseTracker::setHoverEventsEnabled(bool enabled)
 {
     if (!m_item)
     {
@@ -82,12 +86,12 @@ void QnQuickItemMouseTracker::setHoverEventsEnabled(bool enabled)
     emit hoverEventsEnabledChanged();
 }
 
-QQuickItem* QnQuickItemMouseTracker::item() const
+QQuickItem* QuickItemMouseTracker::item() const
 {
     return m_item;
 }
 
-void QnQuickItemMouseTracker::setItem(QQuickItem* item)
+void QuickItemMouseTracker::setItem(QQuickItem* item)
 {
     if (m_item == item)
         return;
@@ -115,7 +119,7 @@ void QnQuickItemMouseTracker::setItem(QQuickItem* item)
     emit itemChanged();
 }
 
-void QnQuickItemMouseTracker::setMousePosition(const QPointF &pos)
+void QuickItemMouseTracker::setMousePosition(const QPointF &pos)
 {
     if (m_mousePosition == pos)
         return;
@@ -126,7 +130,7 @@ void QnQuickItemMouseTracker::setMousePosition(const QPointF &pos)
     emit mousePositionChanged();
 }
 
-void QnQuickItemMouseTracker::setContainsMouse(bool containsMouse)
+void QuickItemMouseTracker::setContainsMouse(bool containsMouse)
 {
     if (m_containsMouse == containsMouse)
         return;
@@ -134,3 +138,12 @@ void QnQuickItemMouseTracker::setContainsMouse(bool containsMouse)
     m_containsMouse = containsMouse;
     emit containsMouseChanged();
 }
+
+void QuickItemMouseTracker::registerQmlType()
+{
+    qmlRegisterType<QuickItemMouseTracker>("nx.client.core", 1, 0, "MouseTracker");
+}
+
+} // namespace core
+} // namespace client
+} // namespace nx

@@ -58,7 +58,7 @@ void QnClientMetaTypes::initialize() {
         return;
 
     QnCommonMetaTypes::initialize();
-    QnClientCoreMetaTypes::initialize();
+    nx::client::core::initializeMetaTypes();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QnUuid> >();
