@@ -9,6 +9,7 @@
 #include "hanwha_resource_searcher.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
+#include "hanwha_chunk_reader.h"
 
 #include <QtCore/QMap>
 
@@ -29,8 +30,9 @@
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/camera_advanced_param.h>
 
+#include <api/global_settings.h>
+
 #include <media_server/media_server_module.h>
-#include "hanwha_chunk_reader.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -1064,6 +1066,24 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
 
     if (!result)
         return result;
+
+    if (!qnGlobalSettings->hanwhaDeleteProfilesOnInitIfNeeded())
+    {
+        int amountOfProfilesNeeded = 0;
+        if (nxPrimaryProfileNumber == kHanwhaInvalidProfile)
+            ++amountOfProfilesNeeded;
+
+        if (nxSecondaryProfileNumber == kHanwhaInvalidProfile)
+            ++amountOfProfilesNeeded;
+
+        if (amountOfProfilesNeeded > 0)
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lit("- can not create profiles. Please delete %1 profiles%2 on the camera web page.")
+                    .arg(amountOfProfilesNeeded)
+                    .arg(amountOfProfilesNeeded > 1 ? lit("s") : QString()));
+        }
+    }
 
     if (nxPrimaryProfileNumber == kHanwhaInvalidProfile)
     {

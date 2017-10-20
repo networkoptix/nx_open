@@ -75,6 +75,9 @@ namespace
 
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
     const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
+
+    const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
+    const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
 }
 
 using namespace nx::settings_names;
@@ -394,6 +397,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kCloudConnectRelayingEnabledDefault,
         this);
 
+    m_hanwhaDeleteProfilesOnInitIfNeeded = new QnLexicalResourcePropertyAdaptor<bool>(
+        kHanwhaDeleteProfilesOnInitIfNeeded,
+        kHanwhaDeleteProfilesOnInitIfNeededDefault,
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -447,6 +455,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_rtpFrameTimeoutMs
         << m_cloudConnectUdpHolePunchingEnabledAdaptor
         << m_cloudConnectRelayingEnabledAdaptor
+        << m_hanwhaDeleteProfilesOnInitIfNeeded
         ;
 
     return result;
@@ -1018,6 +1027,16 @@ int QnGlobalSettings::maxRecorderQueueSizeBytes() const
 int QnGlobalSettings::maxRecorderQueueSizePackets() const
 {
     return m_maxRecorderQueueSizePackets->value();
+}
+
+bool QnGlobalSettings::hanwhaDeleteProfilesOnInitIfNeeded() const
+{
+    return m_hanwhaDeleteProfilesOnInitIfNeeded->value();
+}
+
+void QnGlobalSettings::setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles)
+{
+    m_hanwhaDeleteProfilesOnInitIfNeeded->setValue(deleteProfiles);
 }
 
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const
