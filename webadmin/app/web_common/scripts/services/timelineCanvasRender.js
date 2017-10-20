@@ -851,21 +851,20 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var marginBottom = timelineConfig.scrollButtonMarginBottom * self.pixelAspectRatio;
         context.fillRect(startCoordinate, self.canvas.height - height - marginBottom, scrollButtonsWidth, height);
 
-        context.lineWidth = timelineConfig.scrollButtonsArrowLineWidth;
+        context.lineWidth = timelineConfig.scrollButtonsArrowLineWidth * self.pixelAspectRatio;
         context.strokeStyle =  active? blurColor(timelineConfig.scrollButtonsArrowActiveColor,1):blurColor(timelineConfig.scrollButtonsArrowColor,1);
 
         var leftCoordinate = startCoordinate + ( scrollButtonsWidth - scrollButtonsArrowWidth)/2;
-        var rightCoordinate = leftCoordinate + scrollButtonsArrowWidth;
+        var rightCoordinate = leftCoordinate + scrollButtonsArrowWidth - self.pixelAspectRatio;
+        leftCoordinate += self.pixelAspectRatio;
 
-        var topCoordinate = self.canvas.height - (height + scrollButtonsArrowHeight) / 2;
+        var topCoordinate = self.canvas.height - (height + scrollButtonsArrowHeight) / 2 + self.pixelAspectRatio;
         var bottomCoordinate = topCoordinate + scrollButtonsArrowHeight;
 
-
         context.beginPath();
-        context.moveTo(left?rightCoordinate:leftCoordinate, topCoordinate - marginBottom + 2);
+        context.moveTo(left?rightCoordinate:leftCoordinate, topCoordinate - marginBottom);
         context.lineTo(left?leftCoordinate:rightCoordinate, (topCoordinate + bottomCoordinate)/2 - marginBottom);
-        context.lineTo(left?rightCoordinate:leftCoordinate,
-                       bottomCoordinate - marginBottom - timelineConfig.scrollBarTopPadding * self.canvas.height);
+        context.lineTo(left?rightCoordinate:leftCoordinate, bottomCoordinate - marginBottom);
         context.stroke();
 
     }
