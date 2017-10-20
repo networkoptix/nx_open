@@ -9,6 +9,8 @@
 
 #include <boost/algorithm/cxx11/all_of.hpp>
 
+#include <ini.h>
+
 #include <api/app_server_connection.h>
 #include <api/server_rest_connection.h>
 
@@ -110,6 +112,10 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <nx/client/desktop/analytics/drivers/local_metadata_analytics_driver.h>
+#include <core/resource_management/resource_pool.h>
 
 using namespace nx;
 using namespace client::desktop::ui;
@@ -269,6 +275,25 @@ bool tourIsRunning(QnWorkbenchContext* context)
     return context->action(action::ToggleLayoutTourModeAction)->isChecked();
 }
 
+QRectF adjustZoomRect(const QRectF& value)
+{
+    if (value.isEmpty())
+        return value;
+
+    static const QRectF kFullRect(0, 0, 1, 1);
+
+    QRectF result(value);
+    result = result.intersected(kFullRect);
+    if (result.isEmpty())
+        return result;
+
+    // Zoom rects are stored in relative coordinates, so aspect ratio must be 1.0
+    if (!nx::client::desktop::ini().allowCustomArZoomWindows)
+        result = QnGeometry::expanded(1.0, result, Qt::KeepAspectRatioByExpanding);
+    result = QnGeometry::movedInto(result, kFullRect);
+    return result;
+}
+
 } // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
@@ -304,7 +329,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     // We shouldn't be using OpenGL context in class constructor.
     QGraphicsView *view = QnWorkbenchContextAware::display()->view();
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
-    m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
+    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
     connect(base_type::resource(), &QnResource::propertyChanged, this,
@@ -1394,6 +1419,35 @@ void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &ima
 // -------------------------------------------------------------------------- //
 void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    const auto& ini = nx::client::desktop::ini();
+    if (ini.enableAnalytics && ini.externalMetadata && options().testFlag(AnalyticsModeSlave))
+    {
+        const auto regionId = qnResourceRuntimeDataManager->layoutItemData(item()->uuid(),
+            Qn::ItemAnalyticsModeRegionIdRole).value<QnUuid>();
+
+        if (!m_localMetadataDriver)
+        {
+            auto metadataResource = base_type::resource();
+            if (ini.enableEntropixEnhancer && metadataResource->getUrl().contains(lit(".enhanced")))
+            {
+                const auto baseResourceUrl = metadataResource->getUrl().replace(lit(".enhanced"), QString());
+                metadataResource = resourcePool()->getResourceByUrl(baseResourceUrl);
+            }
+
+            if (client::desktop::LocalMetadataAnalyticsDriver::supportsAnalytics(metadataResource))
+            {
+                m_localMetadataDriver.reset(new client::desktop::LocalMetadataAnalyticsDriver());
+                m_localMetadataDriver->loadTrack(metadataResource);
+            }
+        }
+
+        if (m_localMetadataDriver)
+        {
+            qint64 timestampUs = m_renderer->getTimestampOfNextFrameToRender(0);
+            setZoomRect(adjustZoomRect(m_localMetadataDriver->zoomRectFor(regionId, timestampUs)));
+        }
+    }
+
     base_type::paint(painter, option, widget);
 
     updateRendererEnabled();

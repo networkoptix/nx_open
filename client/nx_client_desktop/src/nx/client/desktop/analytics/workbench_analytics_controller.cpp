@@ -126,7 +126,7 @@ void WorkbenchAnalyticsController::addOrChangeRegion(const QnUuid& id, const QRe
             }
 
             result->regionId = id;
-            updateZoomRect(result->itemId, region);
+            updateZoomRect(result->itemId, result->regionId, region);
         };
 
     addOrUpdateRegionInternal(m_main);
@@ -157,7 +157,7 @@ void WorkbenchAnalyticsController::removeRegion(const QnUuid& id)
             else
             {
                 iter->regionId = QnUuid();
-                updateZoomRect(iter->itemId, QRectF());
+                updateZoomRect(iter->itemId, QnUuid(), QRectF());
             }
         };
 
@@ -283,7 +283,9 @@ void WorkbenchAnalyticsController::constructLayout()
     }
 }
 
-void WorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect)
+void WorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId,
+    const QnUuid& regionId,
+    const QRectF& zoomRect)
 {
     NX_ASSERT(!itemId.isNull());
     if (itemId.isNull())
@@ -297,6 +299,15 @@ void WorkbenchAnalyticsController::updateZoomRect(const QnUuid& itemId, const QR
     qnResourceRuntimeDataManager->setLayoutItemData(item.uuid,
         Qn::ItemAnalyticsModeSourceRegionRole,
         zoomRect);
+    qnResourceRuntimeDataManager->setLayoutItemData(item.uuid,
+        Qn::ItemAnalyticsModeRegionIdRole,
+        regionId);
+
+    // Enhanced videos load their metadata themselves.
+    const bool hasEnhanced = ini().enableEntropixEnhancer && !m_enhanced.source.uuid.isNull();
+    if (hasEnhanced)
+        return;
+
     item.zoomRect = adjustZoomRect(zoomRect);
     m_layout->updateItem(item);
 }

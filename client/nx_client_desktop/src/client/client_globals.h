@@ -162,6 +162,7 @@ namespace Qn
         ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
 
         ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
+        ItemAnalyticsModeRegionIdRole,              /**< Role for source region id in the analytics mode. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */

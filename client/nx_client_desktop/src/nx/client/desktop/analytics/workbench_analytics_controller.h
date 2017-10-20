@@ -50,7 +50,7 @@ private:
     };
 
     void constructLayout();
-    void updateZoomRect(const QnUuid& itemId, const QRectF& zoomRect);
+    void updateZoomRect(const QnUuid& itemId, const QnUuid& regionId, const QRectF& zoomRect);
 
     /** Adjust rect to source aspect ratio and limit its size. */
     QRectF adjustZoomRect(const QRectF& value) const;
