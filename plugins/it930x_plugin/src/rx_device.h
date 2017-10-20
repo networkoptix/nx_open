@@ -177,7 +177,6 @@ namespace ite
         IteDriverInfo m_rxInfo;
 
         CameraManager *m_cam;
-        int m_minStrength = 70;
         // locked Tx device
 
         bool isLocked_u() const { return m_it930x.get() && m_it930x->hasStream(); }
