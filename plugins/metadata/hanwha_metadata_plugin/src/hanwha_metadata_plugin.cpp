@@ -165,7 +165,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
         return boost::none;
 
     const auto eventStatuses = sharedRes->sharedContext->eventStatuses();
-    if (!eventStatuses.diagnostics || !eventStatuses.value.isSuccessful())
+    if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
     return eventsFromParameters(cgiParameters.value, eventStatuses.value, resourceInfo.channel);
@@ -261,8 +261,9 @@ void HanwhaMetadataPlugin::managerStoppedToUseMonitor(const QString& sharedId)
     if (!sharedResources)
         return;
 
-    --sharedResources->monitorUsageCounter;
-    NX_ASSERT(sharedResources->monitorUsageCounter >= 0);
+    if (sharedResources->monitorUsageCounter)
+        --sharedResources->monitorUsageCounter;
+
     if (sharedResources->monitorUsageCounter <= 0)
         m_sharedResources[sharedId]->monitor->stopMonitoring();
 }
