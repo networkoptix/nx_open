@@ -446,12 +446,14 @@ void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& la
     const int gridSize = std::min((int)items.size(), qnRuntime->maxSceneItems());
 
     const auto grid = createItemGrid(gridSize);
-    GridWalker walker(grid);
+    core::GridWalker walker(grid);
 
     for (const auto& item: items)
     {
+        const bool hasPosition = walker.next();
+        NX_EXPECT(hasPosition);
+
         addItemToReviewLayout(layout, item, walker.pos(), true);
-        walker.next();
     }
     updateButtons(layout);
 }
