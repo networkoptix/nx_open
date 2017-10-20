@@ -46,6 +46,11 @@ bool QuickItemMouseTracker::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
+QPointF QuickItemMouseTracker::position() const
+{
+    return m_mousePosition;
+}
+
 qreal QuickItemMouseTracker::mouseX() const
 {
     return m_mousePosition.x();
@@ -127,7 +132,7 @@ void QuickItemMouseTracker::setMousePosition(const QPointF &pos)
     m_mousePosition = pos;
     emit mouseXChanged();
     emit mouseYChanged();
-    emit mousePositionChanged();
+    emit positionChanged();
 }
 
 void QuickItemMouseTracker::setContainsMouse(bool containsMouse)

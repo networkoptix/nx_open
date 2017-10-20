@@ -10,6 +10,7 @@ class QuickItemMouseTracker: public QQuickItem
 {
     Q_OBJECT
 
+    Q_PROPERTY(QPointF position READ position NOTIFY positionChanged)
     Q_PROPERTY(qreal mouseX READ mouseX NOTIFY mouseXChanged)
     Q_PROPERTY(qreal mouseY READ mouseY NOTIFY mouseYChanged)
     Q_PROPERTY(QQuickItem* item READ item WRITE setItem NOTIFY itemChanged)
@@ -24,6 +25,7 @@ public:
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
+    QPointF position() const;
     qreal mouseX() const;
     qreal mouseY() const;
 
@@ -38,9 +40,9 @@ public:
     static void registerQmlType();
 
 signals:
+    void positionChanged();
     void mouseXChanged();
     void mouseYChanged();
-    void mousePositionChanged();
     void containsMouseChanged();
     void hoverEventsEnabledChanged();
     void itemChanged();
