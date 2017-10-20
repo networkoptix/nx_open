@@ -10,8 +10,16 @@ Item
     property alias leftContentOpacity: leftContent.opacity
     property alias rightContentOpacity: rightContent.opacity
 
-    implicitWidth: parent ? parent.width : 120
+    readonly property alias leftContent: leftContent
+    readonly property alias rightContent: rightContent
+
+    width: parent ? parent.width : 120
+    height: implicitHeight * sizeScale
+
+    implicitWidth: leftContent.implicitWidth + title.implicitWidth + rightContent.implicitWidth
     implicitHeight: 26
+
+    readonly property real sizeScale: Math.min(width / implicitWidth, 1)
 
     Rectangle
     {
@@ -23,18 +31,22 @@ Item
     Row
     {
         id: leftContent
-        height: parent.height
+
+        height: parent.implicitHeight
+        anchors.verticalCenter: parent.verticalCenter
+        transformOrigin: Item.Left
+        scale: sizeScale
     }
 
     Text
     {
         id: title
 
-        anchors.left: leftContent.right
-        anchors.right: rightContent.left
-        height: parent.height
+        x: leftContent.width * sizeScale
+        anchors.verticalCenter: parent.verticalCenter
+        transformOrigin: Item.Left
+        scale: sizeScale
 
-        verticalAlignment: Text.AlignVCenter
         leftPadding: 3
         rightPadding: 3
 
@@ -47,7 +59,11 @@ Item
     Row
     {
         id: rightContent
-        height: parent.height
+
+        height: parent.implicitHeight
         anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        transformOrigin: Item.Right
+        scale: sizeScale
     }
 }
