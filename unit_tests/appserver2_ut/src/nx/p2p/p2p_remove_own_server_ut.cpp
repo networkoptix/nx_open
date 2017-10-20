@@ -26,11 +26,17 @@ static const std::chrono::seconds kMaxSyncTimeout(15 * 1000);
 class P2pSpecialTransactionTest : public P2pMessageBusTestBase
 {
 public:
-    void testMain()
+
+    void givenTwoServers()
     {
         startServers(2);
-        for (const auto& server: m_servers)
+        for (const auto& server : m_servers)
             createData(server, 0, 0);
+    }
+
+    void givenTwoSynchronizedServers()
+    {
+        givenTwoServers();
         sequenceConnect(m_servers);
 
         QnUuid server1Id = m_servers[1]->moduleInstance()->commonModule()->moduleGUID();
@@ -46,38 +52,61 @@ public:
                 return servers.size() == m_servers.size() && distance == 1;
             }, kMaxSyncTimeout);
         ASSERT_TRUE(result);
+    }
 
-        // Drop connections
+    void whenDisconnectServers()
+    {
         m_servers[0]->moduleInstance()->ecConnection()->messageBus()->dropConnections();
         waitForCondition(
             [&]()
         {
+            QnUuid server1Id = m_servers[1]->moduleInstance()->commonModule()->moduleGUID();
+            const auto connection0 = m_servers[0]->moduleInstance()->ecConnection();
+            auto bus0 = connection0->messageBus()->dynamicCast<MessageBus*>();
             auto distance = bus0->distanceToPeer(server1Id);
             return distance > 1;
         }, kMaxSyncTimeout);
+    }
 
-        // Remove server 1
+    void whenOneServerForgetsAnother()
+    {
         auto connection = m_servers[0]->moduleInstance()->ecConnection();
         auto manager = connection->getMediaServerManager(Qn::kSystemAccess);
         manager->removeSync(m_servers[1]->moduleInstance()->commonModule()->moduleGUID());
+    }
 
-        // Restore connection and wait both servers are online again
+    void whenConnectServers()
+    {
         sequenceConnect(m_servers);
-        result = waitForConditionOnAllServers(
+    }
+
+    void thenServersAreSynchronizedWithEachOther()
+    {
+        const auto& resPool0 = m_servers[0]->moduleInstance()->commonModule()->resourcePool();
+        QnUuid server1Id = m_servers[1]->moduleInstance()->commonModule()->moduleGUID();
+        bool result = waitForConditionOnAllServers(
             [&](const Appserver2Ptr& server)
         {
+            const auto connection0 = m_servers[0]->moduleInstance()->ecConnection();
+            auto bus0 = connection0->messageBus()->dynamicCast<MessageBus*>();
             auto servers = resPool0->getAllServers(Qn::AnyStatus);
             auto distance = bus0->distanceToPeer(server1Id);
             return servers.size() == m_servers.size() && distance == 1;
         }, kMaxSyncTimeout);
         ASSERT_TRUE(result);
-
     }
 };
 
-TEST_F(P2pSpecialTransactionTest, main)
+
+TEST_F(P2pSpecialTransactionTest, two_servers_still_abel_to_reconnect_when_one_server_forgets_another_while_offline)
 {
-    testMain();
+    givenTwoSynchronizedServers();
+
+    whenDisconnectServers();
+    whenOneServerForgetsAnother();
+    whenConnectServers();
+
+    thenServersAreSynchronizedWithEachOther();
 }
 
 } // namespace test
