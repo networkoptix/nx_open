@@ -127,7 +127,7 @@ var TimelineConfig = {
         size:20,
         width:10
     },
-    scrollButtonMarginBottom: 5,
+    scrollButtonMarginBottom: 4,
     scrollSpeed: 1, // Relative to screen - one click on scrollbar
     scrollButtonSpeed: 0.25, // One click on scrollbutton
     slowScrollSpeed: 0.25,

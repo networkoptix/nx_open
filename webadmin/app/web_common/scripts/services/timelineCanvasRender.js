@@ -858,7 +858,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var rightCoordinate = leftCoordinate + scrollButtonsArrowWidth - self.pixelAspectRatio;
         leftCoordinate += self.pixelAspectRatio;
 
-        var topCoordinate = self.canvas.height - (height + scrollButtonsArrowHeight) / 2 + self.pixelAspectRatio;
+        var topCoordinate = self.canvas.height - (height + scrollButtonsArrowHeight) / 2;
         var bottomCoordinate = topCoordinate + scrollButtonsArrowHeight;
 
         context.beginPath();
