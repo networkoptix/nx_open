@@ -301,12 +301,12 @@ angular.module('nxCommon')
                                     scope.vgApi.load(getFormatSrc('hls'));
 
                                     scope.vgApi.addEventListener("playing", function(){
+                                        scope.loading = false;  // Video is ready - disable loading
                                         crashCount = 0;
                                     });
 
                                     scope.vgApi.addEventListener("timeupdate", function (event) {
                                         var video = event.srcElement || event.originalTarget;
-                                        scope.loading = false;  // Video is ready - disable loading
                                         scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                     });
 

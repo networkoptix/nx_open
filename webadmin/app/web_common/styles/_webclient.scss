@@ -481,7 +481,6 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
-    z-index: 110;
 
     & table{
       font-size: 12px;
@@ -605,7 +604,7 @@ table.webclient-window>tbody>tr>td{
     height: 48px;
     top:0;
     left: 0;
-    z-index: 110;
+    z-index: 3;
   }
 
   .stick-to-bottom{
@@ -845,7 +844,7 @@ table.webclient-window>tbody>tr>td{
   }
 
   .cameras-panel-wrapper{
-    z-index: 200;
+    z-index: 4;
     position: absolute;
     width: 100% !important;
   }
