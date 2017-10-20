@@ -156,7 +156,7 @@
     "mySystemSearch":"IMeMyMine",
     "unavailable":"המערכת אינה זמינה",
     "offline":"השרת אינו זמין",
-    "openClient":"פתח ב- {{VMS_NAME}}",
+    "openClient":"פתח ב {{VMS_NAME}}",
     "confirmRenameTitle":"שם מערכת",
     "confirmRenameAction":"שמור",
     "successRename":"שם המערכת נשמר",

@@ -222,7 +222,7 @@
   },
   "activeActions":{
     "sendConfirm":"Aktivasyon linki gönder",
-    "resetPassword":"Parolayı sıfırla -",
+    "resetPassword":"Parolayı sıfırla",
     "setNewPassword":"Parolayı kaydet",
     "setNewPasswordLabel":"Yeni Parola"
   },
