@@ -35,7 +35,6 @@ namespace ite
             NOT_A_CHANNEL = 16 // TxDevice::CHANNELS_NUM
         };
 
-        static constexpr unsigned MIN_STRENGTH() { return 70; }
         static constexpr unsigned MIN_QUALITY() { return 60; }
 
         static constexpr unsigned RC_DELAY_MS() { return 250; }
@@ -94,7 +93,7 @@ namespace ite
         uint8_t strength() const { return m_signalStrength; }
         uint8_t quality() const { return m_signalQuality; }
         bool present() const { return m_signalPresent; }
-        bool good() const { return present() && strength() > MIN_STRENGTH() /*&& quality() > MIN_QUALITY()*/; }
+        bool good() const;
 
         static unsigned dev2id(const std::string& devName);
         static unsigned str2id(const std::string& devName);
@@ -178,6 +177,7 @@ namespace ite
         IteDriverInfo m_rxInfo;
 
         CameraManager *m_cam;
+        int m_minStrength = 70;
         // locked Tx device
 
         bool isLocked_u() const { return m_it930x.get() && m_it930x->hasStream(); }

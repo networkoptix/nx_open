@@ -114,274 +114,375 @@ RxHintManager::HintInfoVector RxHintManager::getHintsByRx(int rxId) const
         return rxHintsIt->second;
     }
 }
+} // namespace ite
+
+namespace ite {
+
+Settings settings;
+
+namespace aux {
+
+// ConfigParser ------------------------------------------------------------------------------------
+class ConfigParser
+{
+public:
+    ConfigParser(const std::string& fileName);
+    int parseCount() const;
+    bool hasFile() const;
+private:
+    static const std::string kMinStrengthKey;
+    static const std::string kMaxFramesPerSecKey;
+
+    int m_parsedCount = 0;
+    bool m_hasFile = false;
+
+    void parseIntVal(const std::string& valueString, int* value);
+};
+
+const std::string ConfigParser::kMinStrengthKey = "minStrength";
+const std::string ConfigParser::kMaxFramesPerSecKey = "maxFramesPerSecond";
+
+
+int ConfigParser::parseCount() const
+{
+    return m_parsedCount;
 }
 
-namespace ite
+bool ConfigParser::hasFile() const
 {
-    //
-    const int RESCAN_TIMEOUT = 300 * 1000; // ms
+    return m_hasFile;
+}
 
-    DiscoveryManager * DiscoveryManager::Instance;
+ConfigParser::ConfigParser(const std::string &fileName)
+{
+    std::ifstream ifs(fileName);
+    if (!ifs.is_open())
+        return;
 
-    DiscoveryManager::DiscoveryManager()
-    :   m_needScan(true),
-        m_blockAutoScan(false)
+    m_hasFile = true;
+    std::string line;
+    while (!ifs.eof() && !ifs.fail())
     {
-        Instance = this;
-        m_rescanTimer.restart();
-    }
+        std::getline(ifs, line);
+        auto delimeterPos = line.find('=');
+        if (delimeterPos == std::string::npos || delimeterPos == line.size() - 1)
+            continue;
 
-    DiscoveryManager::~DiscoveryManager()
-    {
-        ITE_LOG() << FMT("~DiscoveryManager() called");
+        auto key = line.substr(0, delimeterPos);
+        auto value = line.substr(delimeterPos + 1);
+
+        if (strcasecmp(kMinStrengthKey.c_str(), key.c_str()) == 0)
         {
-            std::lock_guard<std::mutex> lk(m_mutex);
-            for (auto it = m_rxDevices.begin(); it != m_rxDevices.end(); ++it) {
-                it->second->pleaseStop();
-            }
+            parseIntVal(value, &settings.minStrength);
+            std::cout << "INFO. successfully parsed minStrength value: " << settings.minStrength
+                      << std::endl;
         }
-        // release CameraManagers before DeviceMapper
-        for (auto it = m_cameras.begin(); it != m_cameras.end(); ++it)
-            (*it)->releaseRef();
-
-        Instance = nullptr;
+        else if (strcasecmp(kMaxFramesPerSecKey.c_str(), key.c_str()) == 0)
+        {
+            parseIntVal(value, &settings.maxFramesPerSecond);
+            std::cout << "INFO. successfully parsed maxFramesPerSecond value: "
+                      << settings.maxFramesPerSecond << std::endl;
+        }
     }
+}
 
-    void * DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
+void ConfigParser::parseIntVal(const std::string &valueString, int *value)
+{
+    try
     {
+        *value = std::stoi(valueString);
+        ++m_parsedCount;
+    }
+    catch (...)
+    {
+        std::cout << "ERROR. Failed to parse config value: " << valueString << std::endl;
+    }
+}
+// -------------------------------------------------------------------------------------------------
+
+// aux free functions ------------------------------------------------------------------------------
+static void parseConfigFile()
+{
+    ConfigParser parser("it930.conf");
+    if (!parser.hasFile())
+        return;
+
+    if (parser.parseCount() != 0)
+        return;
+
+    std::cout << "WARNING. No config settings have been parsed" << std::endl;
+}
+// -------------------------------------------------------------------------------------------------
+
+} // namespace aux
+
+
+// DiscoveryManager --------------------------------------------------------------------------------
+
+const int RESCAN_TIMEOUT = 300 * 1000; // ms
+
+DiscoveryManager * DiscoveryManager::Instance;
+
+DiscoveryManager::DiscoveryManager()
+:   m_needScan(true),
+    m_blockAutoScan(false)
+{
+    Instance = this;
+    aux::parseConfigFile();
+    m_rescanTimer.restart();
+}
+
+DiscoveryManager::~DiscoveryManager()
+{
+    ITE_LOG() << FMT("~DiscoveryManager() called");
+    {
+        std::lock_guard<std::mutex> lk(m_mutex);
+        for (auto it = m_rxDevices.begin(); it != m_rxDevices.end(); ++it) {
+            it->second->pleaseStop();
+        }
+    }
+    // release CameraManagers before DeviceMapper
+    for (auto it = m_cameras.begin(); it != m_cameras.end(); ++it)
+        (*it)->releaseRef();
+
+    Instance = nullptr;
+}
+
+void * DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
+{
 //        if (interfaceID == nxcip::IID_CameraDiscoveryManager2)
 //        {
 //            addRef();
 //            return this;
 //        }
-        if (interfaceID == nxcip::IID_CameraDiscoveryManager)
+    if (interfaceID == nxcip::IID_CameraDiscoveryManager)
+    {
+        addRef();
+        return this;
+    }
+    else if (interfaceID == nxpl::IID_PluginInterface)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+
+    return nullptr;
+}
+
+void DiscoveryManager::getVendorName( char* buf ) const
+{
+    static const char * VENDOR_NAME = "it930x";
+    strcpy( buf, VENDOR_NAME );
+}
+
+int DiscoveryManager::fromMDNSData(
+    const char* /*discoveredAddress*/,
+    const unsigned char* /*mdnsResponsePacket*/,
+    int /*mdnsResponsePacketSize*/,
+    nxcip::CameraInfo* /*cameraInfo*/ )
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* /*count*/ )
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+static const char * internal = "HACK";
+
+int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* /*address*/, const char* /*login*/, const char* /*password*/ )
+{
+    return findCameras(cameras, internal);
+}
+
+int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * opt)
+{
+    static const uint64_t kRescanTimeoutMs = 1000 * 120;
+    if (m_needScan || m_rescanTimer.elapsedMS() > kRescanTimeoutMs)
+    {
+        m_needScan = false;
+        scan_2();
+        m_rescanTimer.restart();
+    }
+
+    int cameraCount = 0;
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+    for (auto it = m_rxDevices.begin(); it != m_rxDevices.end(); ++it)
+    {
+        debug_printf("[DiscoveryManager::findCameras] trying RX %d\n", (*it)->rxID());
+        if (it->second->deviceReady())
         {
-            addRef();
-            return this;
-        }
-        else if (interfaceID == nxpl::IID_PluginInterface)
-        {
-            addRef();
-            return static_cast<nxpl::PluginInterface*>(this);
-        }
-
-        return nullptr;
-    }
-
-    void DiscoveryManager::getVendorName( char* buf ) const
-    {
-        static const char * VENDOR_NAME = "it930x";
-        strcpy( buf, VENDOR_NAME );
-    }
-
-    int DiscoveryManager::fromMDNSData(
-        const char* /*discoveredAddress*/,
-        const unsigned char* /*mdnsResponsePacket*/,
-        int /*mdnsResponsePacketSize*/,
-        nxcip::CameraInfo* /*cameraInfo*/ )
-    {
-        return nxcip::NX_NOT_IMPLEMENTED;
-    }
-
-    int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
-    {
-        return nxcip::NX_NOT_IMPLEMENTED;
-    }
-
-    int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* /*count*/ )
-    {
-        return nxcip::NX_NOT_IMPLEMENTED;
-    }
-
-    static const char * internal = "HACK";
-
-    int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* /*address*/, const char* /*login*/, const char* /*password*/ )
-    {
-        return findCameras(cameras, internal);
-    }
-
-    int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * opt)
-    {
-        static const uint64_t kRescanTimeoutMs = 1000 * 120;
-        if (m_needScan || m_rescanTimer.elapsedMS() > kRescanTimeoutMs)
-        {
-            m_needScan = false;
-            scan_2();
-            m_rescanTimer.restart();
-        }
-
-        int cameraCount = 0;
-
-        std::lock_guard<std::mutex> lock(m_mutex);
-        for (auto it = m_rxDevices.begin(); it != m_rxDevices.end(); ++it)
-        {
-            debug_printf("[DiscoveryManager::findCameras] trying RX %d\n", (*it)->rxID());
-            if (it->second->deviceReady())
-            {
-                debug_printf("[DiscoveryManager::findCameras] RX %d is good!\n", (*it)->rxID());
-                nxcip::CameraInfo info = it->second->getCameraInfo();
-                debug_printf(
-                    "[DiscoveryManager::findCameras] Rx: %d; cam uid: %s cam url: %s\n",
-                    (*it)->rxID(),
-                    info.uid,
-                    info.url
-                );
-
-                cameras[cameraCount++] = info;
-            }
-            else
-            {
-                debug_printf("[DiscoveryManager::findCameras] cam %d is not good!\n", (*it)->rxID());
-            }
-        }
-        return cameraCount;
-        // <refactor
-    }
-
-    void DiscoveryManager::findAndSwapCamerasRx(CameraPtr cam1, CameraPtr cam2)
-    {
-        std::lock(cam1->get_mutex(), cam2->get_mutex());
-        std::lock_guard<std::mutex> lk1(cam1->get_mutex(), std::adopt_lock);
-        std::lock_guard<std::mutex> lk2(cam2->get_mutex(), std::adopt_lock);
-
-        cam1->rxDeviceRef().swap(cam2->rxDeviceRef());
-    }
-
-    void DiscoveryManager::makeHint(const nxcip::CameraInfo &info)
-    {	// We can find camera by (rxId, txId, channel) unique key.
-        // This information is stored in CameraInfo::auxillary data string.
-        // Format is 'rxId,txId,chan'.
-        std::stringstream ss(info.auxiliaryData);
-        auto extractInt = [&ss]() {
-            int tmp;
-            try {
-                while (1) {
-                    int c = ss.get();
-                    if (std::isdigit(c)) {
-                        ss.unget();
-                        break;
-                    } else if (ss.fail()) {
-                        return -1;
-                    }
-                }
-                ss >> tmp;
-            } catch (const std::exception &) {
-                return -1;
-            }
-            if (ss.fail())
-                return -1;
-            return tmp;
-        };
-
-        int rxId = extractInt();
-        int txId = extractInt();
-        int freq = extractInt();
-
-        if (rxId == -1 || txId == -1 || freq == -1)
-        {	// Bailing out if any of the key data is absent
+            debug_printf("[DiscoveryManager::findCameras] RX %d is good!\n", (*it)->rxID());
+            nxcip::CameraInfo info = it->second->getCameraInfo();
             debug_printf(
-                "[DiscoveryManager::findCameraByInfo] failed to extract auxillary camera data, original string is %s\n",
-                info.auxiliaryData
+                "[DiscoveryManager::findCameras] Rx: %d; cam uid: %s cam url: %s\n",
+                (*it)->rxID(),
+                info.uid,
+                info.url
             );
-            return;
-        }
-        rxHintManager.addHint(rxId, txId, TxDevice::chan4freq(freq));
 
-        auto rxIt = m_rxDevices.find(rxId);
-        if (rxIt == m_rxDevices.end())
+            cameras[cameraCount++] = info;
+        }
+        else
         {
-            RxDevicePtr newRxDevice(new RxDevice(rxId));
-            newRxDevice->startWatchDog();
-            m_rxDevices.emplace(rxId, newRxDevice);
+            debug_printf("[DiscoveryManager::findCameras] cam %d is not good!\n", (*it)->rxID());
         }
+    }
+    return cameraCount;
+    // <refactor
+}
 
+void DiscoveryManager::findAndSwapCamerasRx(CameraPtr cam1, CameraPtr cam2)
+{
+    std::lock(cam1->get_mutex(), cam2->get_mutex());
+    std::lock_guard<std::mutex> lk1(cam1->get_mutex(), std::adopt_lock);
+    std::lock_guard<std::mutex> lk2(cam2->get_mutex(), std::adopt_lock);
+
+    cam1->rxDeviceRef().swap(cam2->rxDeviceRef());
+}
+
+void DiscoveryManager::makeHint(const nxcip::CameraInfo &info)
+{	// We can find camera by (rxId, txId, channel) unique key.
+    // This information is stored in CameraInfo::auxillary data string.
+    // Format is 'rxId,txId,chan'.
+    std::stringstream ss(info.auxiliaryData);
+    auto extractInt = [&ss]() {
+        int tmp;
+        try {
+            while (1) {
+                int c = ss.get();
+                if (std::isdigit(c)) {
+                    ss.unget();
+                    break;
+                } else if (ss.fail()) {
+                    return -1;
+                }
+            }
+            ss >> tmp;
+        } catch (const std::exception &) {
+            return -1;
+        }
+        if (ss.fail())
+            return -1;
+        return tmp;
+    };
+
+    int rxId = extractInt();
+    int txId = extractInt();
+    int freq = extractInt();
+
+    if (rxId == -1 || txId == -1 || freq == -1)
+    {	// Bailing out if any of the key data is absent
+        debug_printf(
+            "[DiscoveryManager::findCameraByInfo] failed to extract auxillary camera data, original string is %s\n",
+            info.auxiliaryData
+        );
         return;
     }
+    rxHintManager.addHint(rxId, txId, TxDevice::chan4freq(freq));
 
-    nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
+    auto rxIt = m_rxDevices.find(rxId);
+    if (rxIt == m_rxDevices.end())
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        RxDevicePtr newRxDevice(new RxDevice(rxId));
+        newRxDevice->startWatchDog();
+        m_rxDevices.emplace(rxId, newRxDevice);
+    }
 
-        unsigned short txID = RxDevice::str2id(info.uid);
-        CameraManager * cam = nullptr;
+    return;
+}
+
+nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    unsigned short txID = RxDevice::str2id(info.uid);
+    CameraManager * cam = nullptr;
 //        ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] trying to get cam %d\n", txID);
 
-        // First lets find out if there are any rxDev which is locked on this tx right now
-        // and if there are any CameraManager objects that operates with this tx.
-        auto cameraIt = std::find_if(m_cameras.begin(), m_cameras.end(), [txID](CameraPtr c) { return c->cameraId() == txID; });
+    // First lets find out if there are any rxDev which is locked on this tx right now
+    // and if there are any CameraManager objects that operates with this tx.
+    auto cameraIt = std::find_if(m_cameras.begin(), m_cameras.end(), [txID](CameraPtr c) { return c->cameraId() == txID; });
 
-        auto rxIt = std::find_if(m_rxDevices.begin(), m_rxDevices.end(),
-            [txID](const std::pair<int, RxDevicePtr> &p)
-            {
-                return p.second->getTxDevice() && p.second->getTxDevice()->txID() == txID;
-            }
-        );
-
-        // Second let's deal with Rx
-        RxDevicePtr foundRxDev;
-
-        if (rxIt == m_rxDevices.end())
-        { 	// No camera found in already present cameras. But we have one option left.
-            // Let's make a hint for rx watchdogs with caminfo. Maybe we've already
-            // dicovered this camera earlier (on the previous mediaserver run).
-            makeHint(info);
-//            ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] no camera found\n");
-            if (cameraIt != m_cameras.end() && (*cameraIt)->rxDeviceRef())
-            {	// Notify camera that its rx device is no longer operational
-//                ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
-                std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
-                (*cameraIt)->rxDeviceRef().reset();
-            }
-            return nullptr;
-        }
-        else
+    auto rxIt = std::find_if(m_rxDevices.begin(), m_rxDevices.end(),
+        [txID](const std::pair<int, RxDevicePtr> &p)
         {
-            foundRxDev = rxIt->second;
+            return p.second->getTxDevice() && p.second->getTxDevice()->txID() == txID;
         }
+    );
 
-        // Now we know if rx is operational. Let's deal with related cameraManager.
-        if (cameraIt != m_cameras.end())
-        {	// related camera found
-            if ((*cameraIt)->rxDeviceRef())
-            {	// camera has ref to some rx device
-                if ((*cameraIt)->rxDeviceRef() == foundRxDev)
-                {	// Good! Camera's rx and found from the pool match
+    // Second let's deal with Rx
+    RxDevicePtr foundRxDev;
+
+    if (rxIt == m_rxDevices.end())
+    { 	// No camera found in already present cameras. But we have one option left.
+        // Let's make a hint for rx watchdogs with caminfo. Maybe we've already
+        // dicovered this camera earlier (on the previous mediaserver run).
+        makeHint(info);
+//            ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] no camera found\n");
+        if (cameraIt != m_cameras.end() && (*cameraIt)->rxDeviceRef())
+        {	// Notify camera that its rx device is no longer operational
+//                ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
+            std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
+            (*cameraIt)->rxDeviceRef().reset();
+        }
+        return nullptr;
+    }
+    else
+    {
+        foundRxDev = rxIt->second;
+    }
+
+    // Now we know if rx is operational. Let's deal with related cameraManager.
+    if (cameraIt != m_cameras.end())
+    {	// related camera found
+        if ((*cameraIt)->rxDeviceRef())
+        {	// camera has ref to some rx device
+            if ((*cameraIt)->rxDeviceRef() == foundRxDev)
+            {	// Good! Camera's rx and found from the pool match
 //                    ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] camera rxDevice already correct. Camera found!\n");
-                }
-                else
-                {	// Camera has reference to some other rx device. This may be the case if cameras have been
-                    // physically replugged. Not critical though, we can just replace rxs.
-//                    ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] camera rxDevice is not correct, replacing. Camera found!\n");
-                    std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
-                    (*cameraIt)->rxDeviceRef().reset();
-                    (*cameraIt)->rxDeviceRef() = foundRxDev;
-                    (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt));
-                }
-                cam = *cameraIt;
-                cam->addRef();
             }
             else
-            {	// This can be if camera's been unplugged and then replugged to the same port
-//                ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] No rxDevice for camera. Setting one and returning. Camera found!\n");
+            {	// Camera has reference to some other rx device. This may be the case if cameras have been
+                // physically replugged. Not critical though, we can just replace rxs.
+//                    ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] camera rxDevice is not correct, replacing. Camera found!\n");
                 std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
+                (*cameraIt)->rxDeviceRef().reset();
                 (*cameraIt)->rxDeviceRef() = foundRxDev;
                 (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt));
-
-                cam = *cameraIt;
-                cam->addRef();
             }
-        }
-        else
-        {	// This should occur once after launch. Creating brand new CameraManager.
-//            ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] creating new camera with rx device %d. Camera found!\n", (foundRxDev)->rxID());
-            CameraPtr newCam(new CameraManager(foundRxDev));
-            m_cameras.push_back(newCam);
-            cam = newCam;
+            cam = *cameraIt;
             cam->addRef();
         }
+        else
+        {	// This can be if camera's been unplugged and then replugged to the same port
+//                ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] No rxDevice for camera. Setting one and returning. Camera found!\n");
+            std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
+            (*cameraIt)->rxDeviceRef() = foundRxDev;
+            (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt));
 
-        return cam;
+            cam = *cameraIt;
+            cam->addRef();
+        }
     }
+    else
+    {	// This should occur once after launch. Creating brand new CameraManager.
+//            ITE_LOG() << FMT("[DiscoveryManager::createCameraManager] creating new camera with rx device %d. Camera found!\n", (foundRxDev)->rxID());
+        CameraPtr newCam(new CameraManager(foundRxDev));
+        m_cameras.push_back(newCam);
+        cam = newCam;
+        cam->addRef();
+    }
+
+    return cam;
+}
 
 //    int DiscoveryManager::notify(uint32_t event, uint32_t value, void * )
 //    {
@@ -406,59 +507,61 @@ namespace ite
 //        return nxcip::NX_NO_ERROR;
 //    }
 
-    void getRxDevNames(std::vector<std::string>& devs)
-    {
-        devs.clear();
-        DIR * dir = ::opendir( "/dev" );
+void getRxDevNames(std::vector<std::string>& devs)
+{
+    devs.clear();
+    DIR * dir = ::opendir( "/dev" );
 
-        if (dir != NULL)
+    if (dir != NULL)
+    {
+        struct dirent * ent;
+        while ((ent = ::readdir( dir )) != NULL)
         {
-            struct dirent * ent;
-            while ((ent = ::readdir( dir )) != NULL)
-            {
-                std::string file( ent->d_name );
-                if (file.find( RxDevice::DEVICE_PATTERN ) != std::string::npos)
-                    devs.push_back(file);
-            }
-            ::closedir( dir );
+            std::string file( ent->d_name );
+            if (file.find( RxDevice::DEVICE_PATTERN ) != std::string::npos)
+                devs.push_back(file);
         }
+        ::closedir( dir );
     }
+}
 
-    void DiscoveryManager::scan_2()
+void DiscoveryManager::scan_2()
+{
+    debug_printf("[scan_2] started\n");
+
+    // Getting available Rx devices
+    // This is done once since they should not
+    // be altered while server is up.
+    std::vector<std::string> names;
+    getRxDevNames(names);
+
+    for (size_t i = 0; i < names.size(); ++i)
     {
-        debug_printf("[scan_2] started\n");
+        unsigned rxID = RxDevice::dev2id(names[i]);
+        std::lock_guard<std::mutex> lk(m_mutex);
 
-        // Getting available Rx devices
-        // This is done once since they should not
-        // be altered while server is up.
-        std::vector<std::string> names;
-        getRxDevNames(names);
-
-        for (size_t i = 0; i < names.size(); ++i) 
+        auto rxIt = m_rxDevices.find(rxID);
+        if (rxIt == m_rxDevices.end())
         {
-            unsigned rxID = RxDevice::dev2id(names[i]);
-            std::lock_guard<std::mutex> lk(m_mutex);
+            RxDevicePtr newRxDevice(new RxDevice(rxID));
+            ITE_LOG() << FMT("Rx %d starting watchdog", rxID);
 
-            auto rxIt = m_rxDevices.find(rxID);
-            if (rxIt == m_rxDevices.end())
-            {
-                RxDevicePtr newRxDevice(new RxDevice(rxID));
-                ITE_LOG() << FMT("Rx %d starting watchdog", rxID);
+            newRxDevice->startWatchDog();
 
-                newRxDevice->startWatchDog();
-
-                ITE_LOG() << FMT("Rx %d watchdog started", rxID);
-                m_rxDevices.emplace(rxID, newRxDevice);
-            }
-            else
-            {    
-                RxDevicePtr rx = rxIt->second;
-                if (!rx->running() && !rx->needStop())
-                {   // Rx open failed at the last attempt. Retrying.
-                    ITE_LOG() << FMT("Retrying open Rx %d", rxID);
-                    rx->startWatchDog();
-                }
+            ITE_LOG() << FMT("Rx %d watchdog started", rxID);
+            m_rxDevices.emplace(rxID, newRxDevice);
+        }
+        else
+        {
+            RxDevicePtr rx = rxIt->second;
+            if (!rx->running() && !rx->needStop())
+            {   // Rx open failed at the last attempt. Retrying.
+                ITE_LOG() << FMT("Retrying open Rx %d", rxID);
+                rx->startWatchDog();
             }
         }
     }
 }
+// -------------------------------------------------------------------------------------------------
+
+} // namespace ite

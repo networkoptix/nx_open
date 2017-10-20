@@ -6,40 +6,46 @@
 
 #include "ref_counter.h"
 
-namespace ite
+namespace ite {
+class CameraManager;
+class ContentPacket;
+
+
+namespace aux {
+class FramesFrequencyWatcher;
+}
+//!
+class StreamReader : public DefaultRefCounter<nxcip::StreamReader>
 {
-    class CameraManager;
-    class ContentPacket;
+public:
+    StreamReader(CameraManager * cameraManager, int encoderNumber);
+    virtual ~StreamReader();
 
-    //!
-    class StreamReader : public DefaultRefCounter<nxcip::StreamReader>
-    {
-    public:
-        StreamReader(CameraManager * cameraManager, int encoderNumber);
-        virtual ~StreamReader();
+    // nxcip::PluginInterface
 
-        // nxcip::PluginInterface
+    virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
-        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
+    // nxcip::StreamReader
 
-        // nxcip::StreamReader
+    virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
+    virtual void interrupt() override;
 
-        virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
-        virtual void interrupt() override;
+    //
 
-        //
-
-    private:
-        CameraManager * m_cameraManager;
-        int m_encoderNumber;
-        bool m_interrupted;
+private:
+    CameraManager * m_cameraManager;
+    int m_encoderNumber;
+    bool m_interrupted;
 
 #if 1
-        int64_t m_ts = 0;
+    int64_t m_ts = 0;
 #endif
+    std::unique_ptr<aux::FramesFrequencyWatcher> m_freqWatcher;
 
-        std::shared_ptr<ContentPacket> nextPacket();
-    };
-}
+    std::shared_ptr<ContentPacket> nextPacket();
+    bool framesTooOften() const;
+};
+
+} // namespace ite
 
 #endif // ITE_STREAM_READER_H
