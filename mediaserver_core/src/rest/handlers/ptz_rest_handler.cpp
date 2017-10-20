@@ -163,7 +163,9 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     {
         m_workers[sequence].inProgress = true;
         NX_VERBOSE("QnPtzRestHandler", lm("Start executing async PTZ command. Sequence %1").arg(sequence));
-        QtConcurrent::run(std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
+        QtConcurrent::run(
+            qnPtzPool->commandThreadPool(),
+            std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
     }
     return CODE_OK;
 }
