@@ -180,7 +180,7 @@ QN_HELP_TOPIC(EventsActions_MediaServerConflict_Help,			"media_servers_conflict.
 QN_HELP_TOPIC(EventsActions_MediaServerStarted_Help,			"media_server_started.htm")
 QN_HELP_TOPIC(EventsActions_LicenseIssue_Help,			        "license_issue.htm")
 QN_HELP_TOPIC(EventsActions_BackupFinished_Help,                "archive_backup_finished.htm")
-QN_HELP_TOPIC(EventActions_SoftTrigger_Help,)                   "soft_triggers.htm")
+QN_HELP_TOPIC(EventActions_SoftTrigger_Help,                    "soft_triggers.htm")
 QN_HELP_TOPIC(EventsActions_Generic_Help,                       "generic_event.htm")
 
 QN_HELP_TOPIC(LayoutSettings_Locking_Help,						"locking_layouts.htm")
