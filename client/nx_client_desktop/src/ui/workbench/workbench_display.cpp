@@ -594,13 +594,13 @@ void QnWorkbenchDisplay::initSceneView()
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
-    setLayer(m_curtainItem.data(), Qn::BackLayer);
+    setLayer(m_curtainItem.data(), QnWorkbenchDisplay::BackLayer);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
     m_gridItem = new QnGridItem();
     m_scene->addItem(m_gridItem.data());
-    setLayer(m_gridItem.data(), Qn::BackLayer);
+    setLayer(m_gridItem.data(), QnWorkbenchDisplay::BackLayer);
     opacityAnimator(m_gridItem.data())->setTimeLimit(300);
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
@@ -610,7 +610,7 @@ void QnWorkbenchDisplay::initSceneView()
         //
         m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
         m_scene->addItem(gridBackgroundItem());
-        setLayer(gridBackgroundItem(), Qn::EMappingLayer);
+        setLayer(gridBackgroundItem(), QnWorkbenchDisplay::EMappingLayer);
         gridBackgroundItem()->setOpacity(0.0);
         gridBackgroundItem()->setMapper(workbench()->mapper());
     }
@@ -664,14 +664,14 @@ QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
 // -------------------------------------------------------------------------- //
-Qn::ItemLayer QnWorkbenchDisplay::layer(QGraphicsItem *item) const
+QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::layer(QGraphicsItem *item) const
 {
     bool ok;
-    Qn::ItemLayer layer = static_cast<Qn::ItemLayer>(item->data(ITEM_LAYER_KEY).toInt(&ok));
-    return ok ? layer : Qn::BackLayer;
+    ItemLayer layer = static_cast<ItemLayer>(item->data(ITEM_LAYER_KEY).toInt(&ok));
+    return ok ? layer : BackLayer;
 }
 
-void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer)
+void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, QnWorkbenchDisplay::ItemLayer layer)
 {
     if (item == NULL)
     {
@@ -685,7 +685,7 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer)
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
 }
 
-void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer)
+void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, QnWorkbenchDisplay::ItemLayer layer)
 {
     foreach(QGraphicsItem *item, items)
         setLayer(item, layer);
@@ -1401,59 +1401,51 @@ void QnWorkbenchDisplay::updateCurrentMarginFlags()
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: calculators
 // -------------------------------------------------------------------------- //
-qreal QnWorkbenchDisplay::layerFrontZValue(Qn::ItemLayer layer) const
+qreal QnWorkbenchDisplay::layerFrontZValue(ItemLayer layer) const
 {
     return layerZValue(layer) + m_frontZ;
 }
 
-qreal QnWorkbenchDisplay::layerZValue(Qn::ItemLayer layer) const
+qreal QnWorkbenchDisplay::layerZValue(ItemLayer layer) const
 {
     return layer * layerZSize;
 }
 
-Qn::ItemLayer QnWorkbenchDisplay::shadowLayer(Qn::ItemLayer itemLayer) const
+QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::shadowLayer(ItemLayer itemLayer) const
 {
     switch (itemLayer)
     {
-        case Qn::PinnedRaisedLayer:
-            return Qn::PinnedLayer;
-        case Qn::UnpinnedRaisedLayer:
-            return Qn::UnpinnedLayer;
+        case PinnedRaisedLayer:
+            return PinnedLayer;
+        case UnpinnedRaisedLayer:
+            return UnpinnedLayer;
         default:
             return itemLayer;
     }
 }
 
-Qn::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWidget *widget) const
+QnWorkbenchDisplay::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWidget *widget) const
 {
-    NX_ASSERT(widget != NULL);
+    NX_ASSERT(widget);
+
+    if (widget->options().testFlag(QnResourceWidget::InvisibleWidgetOption))
+        return InvisibleLayer;
 
     if (widget == m_widgetByRole[Qn::ZoomedRole])
-    {
-        return Qn::ZoomedLayer;
-    }
-    else if (widget->item()->isPinned())
-    {
-        if (widget == m_widgetByRole[Qn::RaisedRole])
-        {
-            return Qn::PinnedRaisedLayer;
-        }
-        else
-        {
-            return Qn::PinnedLayer;
-        }
-    }
-    else
+        return ZoomedLayer;
+
+    if (widget->item()->isPinned())
     {
         if (widget == m_widgetByRole[Qn::RaisedRole])
-        {
-            return Qn::UnpinnedRaisedLayer;
-        }
-        else
-        {
-            return Qn::UnpinnedLayer;
-        }
+            return PinnedRaisedLayer;
+
+        return PinnedLayer;
     }
+
+    if (widget == m_widgetByRole[Qn::RaisedRole])
+        return UnpinnedRaisedLayer;
+
+    return UnpinnedLayer;
 }
 
 QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const
@@ -2441,7 +2433,7 @@ void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, con
         splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
         scene()->addItem(splashItem);
-        setLayer(splashItem, Qn::EffectsLayer);
+        setLayer(splashItem, QnWorkbenchDisplay::EffectsLayer);
     }
 }
 

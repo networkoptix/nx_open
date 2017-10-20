@@ -333,7 +333,7 @@ void LayoutTourReviewController::updatePlaceholders()
 
             QSharedPointer<LayoutTourDropPlaceholder> result(new LayoutTourDropPlaceholder());
             result->setRect(geometry);
-            display()->setLayer(result.data(), Qn::BackLayer);
+            display()->setLayer(result.data(), QnWorkbenchDisplay::BackLayer);
             display()->scene()->addItem(result.data());
             return result;
         };
