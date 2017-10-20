@@ -100,13 +100,17 @@ void HanwhaSharedResourceContext::startServices()
 {
     {
         QnMutexLocker lock(&m_servicesMutex);
-        m_chunkLoader = std::make_shared<HanwhaChunkLoader>();
-        m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
-        m_timeSynchronizer->setTimeZoneShiftHandler(
-            [this](std::chrono::seconds timeZoneShift)
-            {
-                m_chunkLoader->setTimeZoneShift(timeZoneShift);
-            });
+        if (!m_chunkLoader)
+        {
+            NX_CRITICAL(!m_timeSynchronizer);
+            m_chunkLoader = std::make_shared<HanwhaChunkLoader>();
+            m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
+            m_timeSynchronizer->setTimeZoneShiftHandler(
+                [this](std::chrono::seconds timeZoneShift)
+                {
+                    m_chunkLoader->setTimeZoneShift(timeZoneShift);
+                });
+        }
     }
 
     NX_VERBOSE(this, "Starting services...");
