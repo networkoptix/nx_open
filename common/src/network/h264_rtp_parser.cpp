@@ -10,6 +10,7 @@
 
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
+static const int kMinIdrCountToDetectIFrameByIdr = 2;
 
 CLH264RtpParser::CLH264RtpParser():
         QnRtpVideoStreamParser(),
@@ -20,7 +21,7 @@ CLH264RtpParser::CLH264RtpParser():
         m_builtinSpsFound(false),
         m_builtinPpsFound(false),
         m_keyDataExists(false),
-        m_idrFound(false),
+        m_idrCounter(0),
         m_frameExists(false),
         m_firstSeqNum(0),
         m_packetPerNal(0),
@@ -335,11 +336,17 @@ void CLH264RtpParser::updateNalFlags(const quint8* data, int dataLen)
         else if (isSliceNal(nalUnitType))
         {
             m_frameExists = true;
-            if (nalUnitType == nuSliceIDR) {
+            if (nalUnitType == nuSliceIDR)
+            {
                 m_keyDataExists = true;
-                m_idrFound = true;
+                if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr)
+                {
+                    if (isFirstSliceNal(nalUnitType, data, dataLen))
+                        ++m_idrCounter;
+                }
             }
-            else if (!m_idrFound && isIFrame(data, dataLen)) {
+            else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && isIFrame(data, dataLen))
+            {
                 m_keyDataExists = true;
             }
             break; //< optimization
