@@ -48,6 +48,7 @@ ResourceItemDelegate
             onPressed: resourceItem.rotationInstrument.start(mousePosition, this)
             onMousePositionChanged: resourceItem.rotationInstrument.move(mousePosition, this)
             onReleased: resourceItem.rotationInstrument.stop()
+            onCanceled: resourceItem.rotationInstrument.stop()
         },
 
         TitleBarButton
