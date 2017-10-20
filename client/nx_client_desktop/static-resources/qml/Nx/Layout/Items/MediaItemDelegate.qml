@@ -44,6 +44,10 @@ ResourceItemDelegate
         TitleBarButton
         {
             icon: "qrc:/skin/item/rotate.png"
+
+            onPressed: resourceItem.rotationInstrument.start(mousePosition, this)
+            onMousePositionChanged: resourceItem.rotationInstrument.move(mousePosition, this)
+            onReleased: resourceItem.rotationInstrument.stop()
         },
 
         TitleBarButton

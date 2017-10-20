@@ -14,6 +14,8 @@ Button
     property color pressedColor: ColorTheme.darker(ColorTheme.colors.brand_core, 3)
     property color checkedColor: ColorTheme.darker(ColorTheme.colors.brand_core, 1)
 
+    readonly property alias mousePosition: mouseTracker.position
+
     leftPadding: 1
     rightPadding: 1
     topPadding: 1

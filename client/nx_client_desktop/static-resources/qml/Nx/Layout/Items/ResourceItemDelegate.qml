@@ -4,6 +4,7 @@ import Nx 1.0
 Item
 {
     property var layoutItemData
+    property var resourceItem: null
 
     property bool rotationAllowed: false
 

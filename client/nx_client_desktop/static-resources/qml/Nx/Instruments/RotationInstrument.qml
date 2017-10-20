@@ -61,10 +61,13 @@ Instrument
             finished()
     }
 
-    function start(position)
+    function start(position, caller)
     {
         if (!target)
             return
+
+        if (caller)
+            position = caller.mapToItem(item, position.x, position.y)
 
         _startAngle = calculateAngle(position)
         _startRotation = target.rotation
@@ -73,16 +76,19 @@ Instrument
 
     function stop()
     {
-        if (!target)
+        if (!target || !_started)
             return
 
         _started = false
     }
 
-    function move(position)
+    function move(position, caller)
     {
-        if (!target)
+        if (!target || !_started)
             return
+
+        if (caller)
+            position = caller.mapToItem(item, position.x, position.y)
 
         var rotation = normalizedAngle(_startRotation + calculateAngle(position) - _startAngle)
         var roundedRotation = Math.round(rotation / roundingAngle) * roundingAngle

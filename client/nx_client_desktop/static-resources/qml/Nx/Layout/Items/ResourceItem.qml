@@ -6,7 +6,7 @@ import nx.client.desktop 1.0
 
 Item
 {
-    id: resourceItem
+    id: resourceItemControl
 
     property var layoutItemData
 
@@ -31,14 +31,14 @@ Item
 
         onDoubleClicked:
         {
-            if (flickableView.zoomedItem !== resourceItem)
+            if (flickableView.zoomedItem !== resourceItemControl)
             {
-                flickableView.zoomedItem = resourceItem
+                flickableView.zoomedItem = resourceItemControl
             }
             else if (
-                Math.abs(resourceItem.width - flickableView.width)
+                Math.abs(resourceItemControl.width - flickableView.width)
                     < gridLayout.unzoomThreshold
-                || Math.abs(resourceItem.height - flickableView.height)
+                || Math.abs(resourceItemControl.height - flickableView.height)
                     < gridLayout.unzoomThreshold)
             {
                 flickableView.zoomedItem = null
@@ -63,6 +63,7 @@ Item
             layoutItemData.rotation = contentItem.rotation
         }
     }
+    readonly property alias rotationInstrument: rotationInstrument
 
     ResizeInstrument
     {
@@ -72,14 +73,14 @@ Item
         target: contentItem
         cursorManager: cursorManager
 
-        frameWidth: 4 / contentItem.width * resourceItem.width
+        frameWidth: 4 / contentItem.width * resourceItemControl.width
         minWidth: gridLayout.cellSize.width / 2
         minHeight: gridLayout.cellSize.height / 3
 
         onStarted:
         {
             contentGeometryAnimation.complete()
-            resourceItem.parent.z = 1
+            resourceItemControl.parent.z = 1
         }
 
         onFinished: contentGeometryAnimation.start()
@@ -95,7 +96,7 @@ Item
         onStarted:
         {
             contentGeometryAnimation.stop()
-            resourceItem.parent.z = 1
+            resourceItemControl.parent.z = 1
         }
 
         onFinished: contentGeometryAnimation.start()
@@ -148,14 +149,14 @@ Item
         {
             target: contentItem
             property: "x"
-            value: (resourceItem.width - contentItem.enclosedGeometry.width) / 2
+            value: (resourceItemControl.width - contentItem.enclosedGeometry.width) / 2
             when: contentItem.enableGeometryBindings
         }
         Binding
         {
             target: contentItem
             property: "y"
-            value: (resourceItem.height - contentItem.enclosedGeometry.height) / 2
+            value: (resourceItemControl.height - contentItem.enclosedGeometry.height) / 2
             when: contentItem.enableGeometryBindings
         }
         Binding
@@ -188,7 +189,7 @@ Item
             {
                 target: contentItem
                 property: "x"
-                to: (resourceItem.width - contentItem.enclosedGeometry.width) / 2
+                to: (resourceItemControl.width - contentItem.enclosedGeometry.width) / 2
                 duration: d.kReturnToBoundsAnimationDuration
                 easing.type: d.kReturnToBoundsAnimationEasing
             }
@@ -196,7 +197,7 @@ Item
             {
                 target: contentItem
                 property: "y"
-                to: (resourceItem.height - contentItem.enclosedGeometry.height) / 2
+                to: (resourceItemControl.height - contentItem.enclosedGeometry.height) / 2
                 duration: d.kReturnToBoundsAnimationDuration
                 easing.type: d.kReturnToBoundsAnimationEasing
             }
@@ -217,7 +218,7 @@ Item
                 easing.type: d.kReturnToBoundsAnimationEasing
             }
 
-            onStopped: resourceItem.parent.z = 0
+            onStopped: resourceItemControl.parent.z = 0
         }
 
         Behavior on rotation
@@ -232,7 +233,8 @@ Item
         id: mediaItemComponent
         MediaItemDelegate
         {
-            layoutItemData: resourceItem.layoutItemData
+            resourceItem: resourceItemControl
+            layoutItemData: resourceItemControl.layoutItemData
         }
     }
     Component
@@ -240,7 +242,8 @@ Item
         id: serverItemComponent
         ServerItemDelegate
         {
-            layoutItemData: resourceItem.layoutItemData
+            resourceItem: resourceItemControl
+            layoutItemData: resourceItemControl.layoutItemData
         }
     }
     Component
@@ -248,7 +251,8 @@ Item
         id: webPageItemComponent
         WebPageItemDelegate
         {
-            layoutItemData: resourceItem.layoutItemData
+            resourceItem: resourceItemControl
+            layoutItemData: resourceItemControl.layoutItemData
         }
     }
 }
