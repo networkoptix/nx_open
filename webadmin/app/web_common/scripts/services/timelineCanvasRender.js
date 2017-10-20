@@ -591,7 +591,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     function drawOrCheckScrollBar(context, mouseX, mouseY, catchScrollBarSlider){
         mouseY *= self.pixelAspectRatio;
         mouseX *= self.pixelAspectRatio;
-        var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height -1; // top border where scrollbar belongs
+        var top = self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height - self.pixelAspectRatio; // top border where scrollbar belongs
 
         var scrollSlider = self.scaleManager.scrollSlider();
         var startCoordinate = scrollSlider.start * self.pixelAspectRatio;

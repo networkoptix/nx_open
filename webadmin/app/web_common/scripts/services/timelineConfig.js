@@ -82,7 +82,7 @@ var TimelineConfig = {
 
     //Scroll bar marks
     scrollBarMarksColor : [105,135,150],  //$light16
-    scrollBarMarksHeightOffset : 3,
+    scrollBarMarksHeightOffset : 4,
     scrollBarMarksSpacing : 4,
 
     timeMarkerColor: [43,56,63, 0.9], // Timemarker color //$dark9
