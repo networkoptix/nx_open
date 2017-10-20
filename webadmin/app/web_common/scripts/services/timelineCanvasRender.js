@@ -744,7 +744,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.font = formatFont(timelineConfig.markerTimeFont);
         dateString = dateFormat(date, timelineConfig.timeFormat);
         dateWidth = context.measureText(dateString).width;
-        textStart = height/2 + textStart - 6 * self.pixelAspectRatio;
+        textStart = height/2 + textStart - timelineConfig.markerTimeOffset * self.pixelAspectRatio;
         context.fillText(dateString,coordinate - dateWidth/2, textStart);
 
     }
