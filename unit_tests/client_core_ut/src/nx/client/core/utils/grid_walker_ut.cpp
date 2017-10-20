@@ -66,6 +66,16 @@ TEST(GridWalkerTest, square3x3Snake)
         {0,2}, {1,2}, {2,2}});
 }
 
+TEST(GridWalkerTest, negative3x3Snake)
+{
+    const QRect r(-1, -1, 3, 3);
+    GridWalker w(r, GridWalker::Policy::Snake);
+    checkSequence(w, {
+        {-1,-1}, {0,-1}, {1,-1},
+        {1,0}, {0,0}, {-1,0},
+        {-1,1}, {0,1}, {1,1}});
+}
+
 TEST(GridWalkerTest, square2x2Round)
 {
     const QRect r(0, 0, 2, 2);
@@ -83,6 +93,16 @@ TEST(GridWalkerTest, square3x3Round)
         {0,0}, {1,0}, {2,0},
         {2,1}, {2,2}, {1,2},
         {0,2}, {0,1}, {1,1}});
+}
+
+TEST(GridWalkerTest, negative3x3Round)
+{
+    const QRect r(-1, -1, 3, 3);
+    GridWalker w(r, GridWalker::Policy::Round);
+    checkSequence(w, {
+        {-1,-1}, {0,-1}, {1,-1},
+        {1,0}, {1,1}, {0,1},
+        {-1,1}, {-1,0}, {0,0}});
 }
 
 TEST(GridWalkerTest, rect4x3Round)
