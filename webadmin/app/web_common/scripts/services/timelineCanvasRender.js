@@ -855,8 +855,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.strokeStyle =  active? blurColor(timelineConfig.scrollButtonsArrowActiveColor,1):blurColor(timelineConfig.scrollButtonsArrowColor,1);
 
         var leftCoordinate = startCoordinate + ( scrollButtonsWidth - scrollButtonsArrowWidth)/2;
-        var rightCoordinate = leftCoordinate + scrollButtonsArrowWidth - self.pixelAspectRatio;
-        leftCoordinate += self.pixelAspectRatio;
+        var rightCoordinate = leftCoordinate + scrollButtonsArrowWidth;
 
         var topCoordinate = self.canvas.height - (height + scrollButtonsArrowHeight) / 2;
         var bottomCoordinate = topCoordinate + scrollButtonsArrowHeight;

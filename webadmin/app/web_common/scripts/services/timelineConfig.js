@@ -124,8 +124,8 @@ var TimelineConfig = {
     scrollButtonsArrowColor:[255,255,255,0.8],  //$light1
     scrollButtonsArrowActiveColor:[255,255,255,1],  //$light1
     scrollButtonsArrow:{
-        size:20,
-        width:10
+        size:16,
+        width:8
     },
     scrollButtonMarginBottom: 4,
     scrollSpeed: 1, // Relative to screen - one click on scrollbar
