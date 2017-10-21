@@ -174,13 +174,13 @@ ConfigParser::ConfigParser(const std::string &fileName)
         if (strcasecmp(kMinStrengthKey.c_str(), key.c_str()) == 0)
         {
             parseIntVal(value, &settings.minStrength);
-            std::cout << "INFO. successfully parsed minStrength value: " << settings.minStrength
+            std::cout << "ITE930_INFO: successfully parsed minStrength value: " << settings.minStrength
                       << std::endl;
         }
         else if (strcasecmp(kMaxFramesPerSecKey.c_str(), key.c_str()) == 0)
         {
             parseIntVal(value, &settings.maxFramesPerSecond);
-            std::cout << "INFO. successfully parsed maxFramesPerSecond value: "
+            std::cout << "ITE930_INFO: successfully parsed maxFramesPerSecond value: "
                       << settings.maxFramesPerSecond << std::endl;
         }
     }
@@ -195,14 +195,66 @@ void ConfigParser::parseIntVal(const std::string &valueString, int *value)
     }
     catch (...)
     {
-        std::cout << "ERROR. Failed to parse config value: " << valueString << std::endl;
+        std::cout << "ITE930_ERROR: Failed to parse config value: " << valueString << std::endl;
     }
 }
 // -------------------------------------------------------------------------------------------------
 
 // aux free functions ------------------------------------------------------------------------------
+static const char* getPath(const char* fullName, char* buf, int size)
+{
+    int len = strlen(fullName);
+    int i;
+    int newSize = 0;
+
+    for (i = len - 1; i >= 0; --i) {
+        if (fullName[i] == '/') {
+            newSize = i;
+            break;
+        }
+    }
+
+    for (i = 0; i < newSize && i < size; ++i) {
+        buf[i] = fullName[i];
+    }
+
+    if (i < size - 1) {
+        buf[i + 1] = '\0';
+    }
+
+    return buf;
+}
+
+static const char* exeName(char* buf, int size)
+{
+    if (readlink("/proc/self/exe", buf, size) < 0) {
+        return NULL;
+    }
+
+    return buf;
+}
+
 static void parseConfigFile()
 {
+    const int kBufSize = 512;
+    char buf[kBufSize];
+
+    memset(buf, '\0', kBufSize);
+    if (exeName(buf, kBufSize) == nullptr)
+    {
+        std::cout << "ITE930_WARNING: Failed to get exe path" << std::endl;
+        return;
+    }
+
+    if (getPath(buf, buf, kBufSize) == nullptr)
+    {
+        std::cout << "ITE930_WARNING: Failed to extract path compononet from exe path" << std::endl;
+        return;
+    }
+
+    strcat(buf, "it930.conf");
+    std::cout << "ITE930_INFO: trying to use config file: " << buf << std::endl;
+
     ConfigParser parser("it930.conf");
     if (!parser.hasFile())
         return;
@@ -210,7 +262,7 @@ static void parseConfigFile()
     if (parser.parseCount() != 0)
         return;
 
-    std::cout << "WARNING. No config settings have been parsed" << std::endl;
+    std::cout << "ITE930_WARNING: No config settings have been parsed" << std::endl;
 }
 // -------------------------------------------------------------------------------------------------
 

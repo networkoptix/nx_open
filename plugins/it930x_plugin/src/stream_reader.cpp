@@ -54,7 +54,7 @@ void FramesFrequencyWatcher::gotFrame()
     auto framesPerSec = (m_frameCount * 1000) / timeSinceLastFrame.count();
     if (framesPerSec > m_maxFramesPerSecond)
     {
-        std::cout << "WARNING. Frames per second overflow detected: "  << framesPerSec << std::endl;
+        std::cout << "ITE930_WARNING: Frames per second overflow detected: "  << framesPerSec << std::endl;
         m_overflow = true;
     }
 
