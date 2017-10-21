@@ -209,10 +209,14 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                                              (short_name, structure.name)))
                         continue
 
+                    replace_str = '(.*?)' if structure.type != structure.DATA_TYPES.html else '([.\s\S]*)'
                     # create regex using this line
                     template_line = re.escape(template_line)
                     escape_name = re.escape(structure.name)
-                    template_line = template_line.replace(escape_name, '(.*?)')
+                    template_line = template_line.replace(escape_name, replace_str)
+
+                    if structure.type != structure.DATA_TYPES.html:
+                        template_line += "$"
 
                     # try to parse file_content with regex
                     result = re.search(template_line, file_content)
@@ -222,7 +226,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                         continue
 
                     # if there is a value - compare it with latest draft
-                    value = result.group(1) if template_line != '(.*?)' else file_content
+                    value = result.group(1)
                     current_value = structure.find_actual_value(customization)
                     if value == current_value:
                         log_messages.append(('warning', 'value %s not changed %s for data structure %s' %
