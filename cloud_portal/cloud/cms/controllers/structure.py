@@ -188,6 +188,8 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                         ('warning', 'Ignored %s (customization %s not found)' % (name, customization_name)))
                     continue
 
+                customization = customization.first()
+
                 # try to parse datastructures from the file using template
                 if not context.template:  # no template - nothing we can do
                     log_messages.append(('error', 'Ignored: %s (context has to template)' % name))
@@ -209,19 +211,22 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
                     # create regex using this line
                     template_line = re.escape(template_line)
-                    template_line = template_line.replace(structure.name, '(*+?)')
+                    escape_name = re.escape(structure.name)
+                    template_line = template_line.replace(escape_name, '(.*?)')
 
                     # try to parse file_content with regex
-                    match = re.match(template_line, file_content)
-                    if not match:
+                    result = re.search(template_line, file_content)
+                    if not result:
                         log_messages.append(('warning', 'No line in file %s for data structure %s' %
                                              (name, structure.name)))
                         continue
 
                     # if there is a value - compare it with latest draft
-                    value = match.group(1)
+                    value = result.group(1) if template_line != '(.*?)' else file_content
                     current_value = structure.find_actual_value(customization)
                     if value == current_value:
+                        log_messages.append(('warning', 'value %s not changed %s for data structure %s' %
+                                             (value, name, structure.name)))
                         continue
 
                     # save if needed

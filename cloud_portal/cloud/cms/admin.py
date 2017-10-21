@@ -96,10 +96,10 @@ admin.site.register(Customization, CustomizationAdmin)
 
 
 class DataRecordAdmin(CMSAdmin):
-    list_display = ('customization', 'language',
+    list_display = ('customization', 'language', 'context',
                     'data_structure', 'short_description', 'version')
-    list_filter = ('data_structure', 'customization', 'language')
-    search_fields = ('data_structure__name', 'customization__name',
+    list_filter = ('data_structure__context', 'data_structure', 'customization', 'language')
+    search_fields = ('data_structure__context__name', 'data_structure__name', 'customization__name',
                      'data_structure__description', 'value', 'language__code')
 
 admin.site.register(DataRecord, DataRecordAdmin)
