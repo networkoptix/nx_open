@@ -59,7 +59,7 @@ angular.module('cloudApp')
 
         return {
             checkResponseHasError:function(data){
-                if(data && data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
+                if(data && data.data && data.data.resultCode && data.data.resultCode != 'ok'){
                     return data;
                 }
                 return false;
