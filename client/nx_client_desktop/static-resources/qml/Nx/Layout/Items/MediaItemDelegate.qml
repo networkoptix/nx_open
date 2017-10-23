@@ -1,8 +1,18 @@
 import QtQuick 2.6
+import Nx.Items 1.0
 
 ResourceItemDelegate
 {
     rotationAllowed: true
+
+    titleBar.leftContent.children:
+    [
+        RecordingStatusIndicator
+        {
+            anchors.verticalCenter: parent.verticalCenter
+            cameraId: layoutItemData.resource.id
+        }
+    ]
 
     titleBar.rightContent.children:
     [
