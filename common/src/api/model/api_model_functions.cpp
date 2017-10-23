@@ -6,6 +6,7 @@
 #include "storage_space_reply.h"
 #include "storage_status_reply.h"
 #include "time_reply.h"
+#include "hardware_ids_reply.h"
 #include "statistics_reply.h"
 #include "connection_info.h"
 #include "test_email_settings_reply.h"
@@ -36,6 +37,7 @@
     (QnStatisticsReply)\
     (QnTimeReply)\
     (ApiServerDateTimeData)\
+    (ApiServerHardwareIdsData)\
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\

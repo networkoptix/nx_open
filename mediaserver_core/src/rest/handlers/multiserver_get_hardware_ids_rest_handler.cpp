@@ -1,4 +1,4 @@
-#include "multiserver_time_rest_handler.h"
+#include "multiserver_get_hardware_ids_rest_handler.h"
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -9,19 +9,21 @@
 #include <rest/server/rest_connection_processor.h>
 #include <rest/helpers/request_context.h>
 #include <rest/helpers/request_helpers.h>
-#include <api/model/time_reply.h>
+#include <api/model/hardware_ids_reply.h>
 #include <network/tcp_listener.h>
+
+#include <nx/kit/debug.h>
 
 namespace {
 
 using DummyType = int;
-typedef QnMultiserverRequestContext<DummyType> QnTimeRequestContext;
+typedef QnMultiserverRequestContext<DummyType> QnGetHardwareIdsRequestContext;
 
 static void loadRemoteDataAsync(
     QnCommonModule* commonModule,
-    ApiMultiserverServerDateTimeDataList& outputData,
+    ApiServerHardwareIdsDataList& outputData,
     const QnMediaServerResourcePtr& server,
-    QnTimeRequestContext* context,
+    QnGetHardwareIdsRequestContext* context,
     const QString& urlPath)
 {
     auto requestCompletionFunc =
@@ -29,20 +31,18 @@ static void loadRemoteDataAsync(
         (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
         {
             bool success = false;
-            ApiServerDateTimeData remoteData;
-            QnTimeReply timeData;
+            ApiServerHardwareIdsData remoteData;
+            QStringList serverData;
             if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
             {
                 QnJsonRestResult jsonReply;
                 success = QJson::deserialize(msgBody, &jsonReply)
-                    && QJson::deserialize(jsonReply.reply, &timeData);
+                    && QJson::deserialize(jsonReply.reply, &serverData);
             }
             if (success)
             {
                 remoteData.serverId = server->getId();
-                remoteData.timeSinseEpochMs = timeData.utcTime;
-                remoteData.timeZoneOffsetMs = timeData.timeZoneOffset;
-                remoteData.timeZoneId = timeData.timezoneId;
+                remoteData.hardwareIds = serverData;
             }
             context->executeGuarded(
                 [context, success, &remoteData, &outputData]()
@@ -55,7 +55,6 @@ static void loadRemoteDataAsync(
 
     QUrl apiUrl(server->getApiUrl());
     apiUrl.setPath(urlPath);
-    apiUrl.setQuery("local"); //< Use device (OS) time.
 
     auto router = commonModule->router();
     runMultiserverDownloadRequest(router, apiUrl, server, requestCompletionFunc, context);
@@ -63,28 +62,30 @@ static void loadRemoteDataAsync(
 
 } // namespace
 
-QnMultiserverTimeRestHandler::QnMultiserverTimeRestHandler(const QString& getTimeApiMethodPath):
+QnMultiserverGetHardwareIdsRestHandler::QnMultiserverGetHardwareIdsRestHandler(
+    const QString& getHardwareIdsApiMethodPath)
+    :
     QnFusionRestHandler(),
-    m_getTimeApiMethodPath(getTimeApiMethodPath)
+    m_getHardwareIdsApiMethodPath(getHardwareIdsApiMethodPath)
 {
 }
 
-int QnMultiserverTimeRestHandler::executeGet(
+int QnMultiserverGetHardwareIdsRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParamList& params,
     QByteArray& result,
     QByteArray& contentType,
     const QnRestConnectionProcessor* owner)
 {
-    ApiMultiserverServerDateTimeDataList outputData;
+    ApiServerHardwareIdsDataList outputData;
     const auto ownerPort = owner->owner()->getPort();
-    QnTimeRequestContext context(DummyType(), ownerPort);
+    QnGetHardwareIdsRequestContext context(DummyType(), ownerPort);
 
     auto onlineServers = owner->commonModule()->resourcePool()->getAllServers(Qn::Online);
     for (const auto& server: onlineServers)
     {
         loadRemoteDataAsync(
-            owner->commonModule(), outputData, server, &context, m_getTimeApiMethodPath);
+            owner->commonModule(), outputData, server, &context, m_getHardwareIdsApiMethodPath);
     }
 
     context.waitForDone();
