@@ -162,7 +162,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
             ? new QnWorkbenchWelcomeScreen(qnClientCoreModule->mainQmlEngine(), this)
             : nullptr),
     m_currentPageHolder(new QStackedWidget(this)),
-    m_titleBar(new QnMainWindowTitleBarWidget(this)),
+    m_titleBar(new QnMainWindowTitleBarWidget(this, context)),
     m_titleVisible(true),
     m_drawCustomFrame(false),
     m_inFullscreenTransition(false)

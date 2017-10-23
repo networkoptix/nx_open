@@ -38,8 +38,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     m_updating(false)
 {
     ui->setupUi(this);
-    ui->licensingWidget->initializeContext(this);
-    ui->cameraScheduleWidget->initializeContext(this);
+    ui->licensingWidget->initializeContext();
+    ui->cameraScheduleWidget->initializeContext();
 
     CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 

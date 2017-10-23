@@ -35,6 +35,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class RecordingStatusHelper;
 class EntropixImageEnhancer;
 
 namespace ui {
@@ -380,6 +381,8 @@ private:
     mutable bool m_motionLabelPositionsValid;
 
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
+
+    nx::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
 
     QnPtzControllerPtr m_ptzController;
     QnFisheyeHomePtzController *m_homePtzController;

@@ -57,8 +57,8 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/client/core/utils/geometry.h>
-#include <ui/common/recording_status_helper.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
@@ -110,6 +110,7 @@
 #include <plugins/resource/avi/avi_resource.h>
 
 using namespace nx;
+using namespace nx::client::desktop;
 using namespace client::desktop::ui;
 
 using nx::client::core::Geometry;
@@ -287,6 +288,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_motionSelectionCacheValid(false),
     m_motionLabelPositionsValid(false),
     m_sensStaticText(),
+    m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_ptzController(nullptr),
     m_homePtzController(nullptr),
     m_dewarpingParams(),
@@ -397,15 +399,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     if (m_camera)
     {
-        QTimer *timer = new QTimer(this);
-
-        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateIconButton);
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(),
-            &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera, &QnResource::statusChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-
         if (m_camera->hasFlags(Qn::io_module))
         {
             connect(m_camera, &QnResource::statusChanged, this,
@@ -414,11 +407,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                     updateIoModuleVisibility(animationAllowed());
                 });
         }
-
-        connect(m_camera, &QnSecurityCamResource::scheduleTasksChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-        timer->start(1000 * 60); /* Update icon button every minute. */
-
         const auto controller = statusOverlayController();
         connect(controller, &QnStatusOverlayController::buttonClicked, this,
             [this](Qn::ResourceOverlayButton button)
@@ -454,6 +442,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     // Update buttons for single layout tour start/stop
     connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
         &QnMediaResourceWidget::updateButtonsVisibility);
+
+    m_recordingStatusHelper->setCamera(m_camera);
+
+    connect(m_recordingStatusHelper, &RecordingStatusHelper::recordingModeChanged,
+        this, &QnMediaResourceWidget::updateIconButton);
 
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
@@ -1335,10 +1328,11 @@ void QnMediaResourceWidget::updateDisplay()
 
 void QnMediaResourceWidget::updateIconButton()
 {
-    auto buttonsBar = titleBar()->leftButtonsBar();
+    const auto buttonsBar = titleBar()->leftButtonsBar();
+
     if (isZoomWindow())
     {
-        auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
+        const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
         iconButton->setToolTip(tr("Zoom Window"));
 
@@ -1352,14 +1346,13 @@ void QnMediaResourceWidget::updateIconButton()
         return;
     }
 
-    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(m_camera);
-    QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
+    const auto icon = m_recordingStatusHelper->icon();
 
-    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !recIcon.isNull());
+    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !icon.isNull());
 
-    auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
-    iconButton->setIcon(recIcon);
-    iconButton->setToolTip(QnRecordingStatusHelper::tooltip(recordingMode));
+    const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
+    iconButton->setIcon(icon);
+    iconButton->setToolTip(m_recordingStatusHelper->tooltip());
 }
 
 void QnMediaResourceWidget::updateRendererEnabled()

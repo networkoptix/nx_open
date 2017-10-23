@@ -185,7 +185,7 @@ public:
 
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchContext* context):
     base_type(parent),
-    QnWorkbenchContextAware(nullptr, context),
+    QnWorkbenchContextAware(context),
     d_ptr(new QnGridBackgroundItemPrivate()),
     m_panelColor(Qt::black)
 {

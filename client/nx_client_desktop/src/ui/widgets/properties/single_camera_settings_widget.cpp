@@ -77,8 +77,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
-    ui->licensingWidget->initializeContext(this);
-    ui->cameraScheduleWidget->initializeContext(this);
+    ui->licensingWidget->initializeContext();
+    ui->cameraScheduleWidget->initializeContext();
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
 

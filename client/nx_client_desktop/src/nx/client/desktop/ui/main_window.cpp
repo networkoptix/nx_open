@@ -8,6 +8,7 @@
 
 #include <nx/utils/log/log.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx {
 namespace client {
@@ -41,6 +42,8 @@ MainWindow::MainWindow(QQmlEngine* engine, QnWorkbenchContext* context, QWidget*
     d->sceneWidget = new QQuickWidget(engine, this);
 
     d->sceneWidget->rootContext()->setContextProperty(lit("workbench"), workbench());
+    d->sceneWidget->rootContext()->setContextProperty(
+        QnWorkbenchContextAware::kQmlContextPropertyName, context);
 
     d->sceneWidget->setSource(lit("main.qml"));
     d->sceneWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);

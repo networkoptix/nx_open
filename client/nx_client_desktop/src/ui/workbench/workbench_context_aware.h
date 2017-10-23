@@ -28,76 +28,87 @@ class MainWindow;
 /**
  * This class simplifies access to workbench context.
  *
- * If some class needs access to workbench context,
- * it can simply derive from <tt>QnWorkbenchContextAware</tt> and
- * pass its context-aware parent into constructor.
+ * If some class needs access to workbench context, it can simply derive from
+ * QnWorkbenchContextAware and pass its context-aware parent into constructor.
  */
 class QnWorkbenchContextAware: public QnConnectionContextAware
 {
 public:
+    static QString kQmlContextPropertyName;
+
+    enum class InitializationMode
+    {
+        instant, /**< Initialize context from parent in constructor. */
+        lazy, /**< Initialize context from parent when context() is called first time. */
+        manual, /**< Initialize context later with manual call initializeContext(). */
+        qmlContext, /**< Initialize context later using QML context property. */
+    };
+
     /**
      * Constructor.
      *
-     * \param parent                    Parent for this object. Must itself be
-     *                                  a child of some context-aware object,
-     *                                  or of a context. Must not be NULL.
+     * @param parent Parent for this object. Must itself be a child of some context-aware object,
+     *     or of a context. Must not be null. If lazyInitialization is true this can also be an
+     *     object itself. In this case context initialization will be berformed when the first
+     *     getter is called. The context will be found in QML context property.
      */
-    QnWorkbenchContextAware(QObject *parent, bool lazyInitialization = false);
+    QnWorkbenchContextAware(
+        QObject* parent,
+        InitializationMode initMode = InitializationMode::instant);
 
-    QnWorkbenchContextAware(QnWorkbenchContext *context);
-
-    QnWorkbenchContextAware(QObject *parent, QnWorkbenchContext *context);
+    QnWorkbenchContextAware(QnWorkbenchContext* context);
 
     /**
      * Virtual destructor.
      *
-     * We do <tt>dynamic_cast</tt>s to <tt>QnWorkbenchContextAware</tt>, so this
-     * class better have a vtable.
+     * We do dynamic_casts to QnWorkbenchContextAware, so this class better have a vtable.
      */
-    virtual ~QnWorkbenchContextAware() {}
+    virtual ~QnWorkbenchContextAware();
 
     /**
-     * \returns                         Context associated with this context-aware object.
+     * @returns Context associated with this context-aware object.
      */
-    QnWorkbenchContext *context() const {
-        return m_context;
-    }
+    QnWorkbenchContext* context() const;
 
-    /** Delayed initialization call. */
-    void initializeContext(QObject *parent);
+    /** Check if context is initialized. */
+    bool isContextInitialized() const;
 
-    /** Delayed initialization call. */
-    void initializeContext(QnWorkbenchContext *context);
+    /** Initialize context manually. */
+    void initializeContext();
 
 protected:
     virtual void afterContextInitialized();
 
-    QAction *action(const nx::client::desktop::ui::action::IDType id) const;
+    QAction* action(const nx::client::desktop::ui::action::IDType id) const;
 
     nx::client::desktop::ui::action::Manager* menu() const;
 
-    QnWorkbench *workbench() const;
+    QnWorkbench* workbench() const;
 
-    QnWorkbenchLayoutSnapshotManager *snapshotManager() const;
+    QnWorkbenchLayoutSnapshotManager* snapshotManager() const;
 
-    QnWorkbenchAccessController *accessController() const;
+    QnWorkbenchAccessController* accessController() const;
 
-    QnWorkbenchDisplay *display() const;
+    QnWorkbenchDisplay* display() const;
 
-    QnWorkbenchNavigator *navigator() const;
+    QnWorkbenchNavigator* navigator() const;
 
     nx::client::desktop::ui::MainWindow* mainWindow() const;
 
-    /** @return The same as mainWindow() but casted to QWidget*, so caller don't need to include
+    /**
+     * @return The same as mainWindow() but casted to QWidget*, so caller don't need to include
      * MainWindow header.
      */
     QWidget* mainWindowWidget() const;
 
 private:
-    void init(QObject *parent, bool lazyInitialization = false);
-    void init(QnWorkbenchContext *context);
+    void init(QObject* parent);
+    void init(QnWorkbenchContext* context);
+    void initFromQmlContext();
 
 private:
-    QnWorkbenchContext *m_context;
-    bool m_initialized;
+    QObject* m_parent = nullptr;
+    InitializationMode m_initializationMode = InitializationMode::instant;
+    QnWorkbenchContext* m_context = nullptr;
 };
+

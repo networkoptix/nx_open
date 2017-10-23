@@ -206,7 +206,7 @@ static const int kRecordedDaysDontChange = std::numeric_limits<int>::max();
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::manual),
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),

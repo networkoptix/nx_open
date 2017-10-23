@@ -139,7 +139,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     QnWorkbenchContext* context)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(context),
     d_ptr(new QnMainWindowTitleBarWidgetPrivate(this))
 {
     Q_D(QnMainWindowTitleBarWidget);
