@@ -245,7 +245,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
         auto resPool = commonModule()->resourcePool();
         if (auto user = resPool->getResourceById<QnUserResource>(d->accessRights.userId))
             originalUserName = user->getName().toUtf8();
-        if (userName.isEmpty())
+        if (originalUserName.isEmpty())
             originalUserName = originalAuthHeader.digest->userid;
 
         nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalUserName);
