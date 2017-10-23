@@ -4,6 +4,7 @@
 
 #include <QtCore/QDir>
 
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
@@ -12,9 +13,45 @@
 
 #include <api/mediaserver_client.h>
 #include <test_support/appserver2_process.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 namespace test {
+
+namespace {
+
+class MediaServerClientEx:
+    public MediaServerClient
+{
+    using base_type = MediaServerClient;
+
+public:
+    MediaServerClientEx(const QUrl& baseRequestUrl):
+        base_type(baseRequestUrl)
+    {
+    }
+
+    void ec2GetTransactionLog(
+        std::function<void(ec2::ErrorCode, ec2::ApiTransactionDataList)> completionHandler)
+    {
+        performAsyncEc2Call("ec2/getTransactionLog", std::move(completionHandler));
+    }
+
+    ec2::ErrorCode ec2GetTransactionLog(ec2::ApiTransactionDataList* result)
+    {
+        using Ec2GetTransactionLogAsyncFuncPointer =
+            void(MediaServerClientEx::*)(
+                std::function<void(ec2::ErrorCode, ec2::ApiTransactionDataList)>);
+
+        return syncCallWrapper(
+            this,
+            static_cast<Ec2GetTransactionLogAsyncFuncPointer>(
+                &MediaServerClientEx::ec2GetTransactionLog),
+            result);
+    }
+};
+
+} // namespace
 
 class PeerHelper
 {
@@ -53,19 +90,61 @@ public:
         return true;
     }
 
+    QnRestResult::Error mergeTo(const PeerHelper& remotePeer)
+    {
+        MergeSystemData mergeSystemData;
+        mergeSystemData.takeRemoteSettings = true;
+        mergeSystemData.mergeOneServer = false;
+        mergeSystemData.ignoreIncompatible = false;
+        const auto nonce = nx::utils::generateRandomName(7);
+        mergeSystemData.getKey = buildAuthKey("/api/mergeSystems", m_ownerCredentials, nonce);
+        mergeSystemData.postKey = buildAuthKey("/api/mergeSystems", m_ownerCredentials, nonce);
+        mergeSystemData.url = nx::network::url::Builder()
+            .setScheme(nx_http::kUrlSchemeName)
+            .setEndpoint(remotePeer.endpoint()).toString();
+
+        auto mediaServerClient = prepareMediaServerClient();
+        return mediaServerClient->mergeSystems(mergeSystemData).error;
+    }
+
+    ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result)
+    {
+        auto mediaServerClient = prepareMediaServerClient();
+        return mediaServerClient->ec2GetTransactionLog(result);
+    }
+
+    SocketAddress endpoint() const
+    {
+        return m_process.moduleInstance()->endpoint();
+    }
+
 private:
     QString m_dataDir;
     nx::utils::test::ModuleLauncher<Appserver2ProcessPublic> m_process;
     QString m_systemName;
     nx_http::Credentials m_ownerCredentials;
 
-    std::unique_ptr<MediaServerClient> prepareMediaServerClient()
+    std::unique_ptr<MediaServerClientEx> prepareMediaServerClient()
     {
-        auto mediaServerClient = std::make_unique<MediaServerClient>(
+        auto mediaServerClient = std::make_unique<MediaServerClientEx>(
             nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setEndpoint(m_process.moduleInstance()->endpoint()));
         mediaServerClient->setUserCredentials(m_ownerCredentials);
         return mediaServerClient;
+    }
+
+    QString buildAuthKey(
+        const nx::String& url,
+        const nx_http::Credentials& credentials,
+        const nx::String& nonce)
+    {
+        const auto ha1 = nx_http::calcHa1(
+            credentials.username,
+            nx::network::AppInfo::realm(),
+            credentials.authToken.value);
+        const auto ha2 = nx_http::calcHa2(nx_http::Method::get, url);
+        const auto response = nx_http::calcResponse(ha1, nonce, ha2);
+        return lm("%1:%2:%3").args(credentials.username, nonce, response).toUtf8().toBase64();
     }
 };
 
@@ -115,17 +194,44 @@ protected:
 
     void whenMergeSystems()
     {
-        // TODO
+        m_prevResult = m_servers.back().peer->mergeTo(*m_servers.front().peer);
     }
 
     void thenMergeSucceeded()
     {
-        // TODO
+        ASSERT_EQ(QnRestResult::Error::NoError, m_prevResult);
     }
     
     void thenAllServersSynchronizedData()
     {
-        // TODO
+        for (;;)
+        {
+            std::vector<::ec2::ApiTransactionDataList> transactionLogs;
+            for (auto& server: m_servers)
+            {
+                ::ec2::ApiTransactionDataList transactionLog;
+                ASSERT_EQ(::ec2::ErrorCode::ok, server.peer->getTransactionLog(&transactionLog));
+                transactionLogs.push_back(std::move(transactionLog));
+            }
+
+            const ::ec2::ApiTransactionDataList* prevTransactionLog = nullptr;
+            bool allLogsAreEqual = true;
+            for (const auto& transactionLog: transactionLogs)
+            {
+                if (prevTransactionLog)
+                {
+                    if (*prevTransactionLog != transactionLog)
+                        allLogsAreEqual = false;
+                }
+
+                prevTransactionLog = &transactionLog;
+            }
+
+            if (allLogsAreEqual)
+                break;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
 
 private:
@@ -136,6 +242,7 @@ private:
 
     QString m_tmpDir;
     std::vector<ServerContext> m_servers;
+    QnRestResult::Error m_prevResult = QnRestResult::Error::NoError;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 };

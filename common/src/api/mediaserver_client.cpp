@@ -1,9 +1,7 @@
 #include "mediaserver_client.h"
 
-#include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/sync_call.h>
 #include <nx/utils/type_utils.h>
 
 MediaServerClient::MediaServerClient(const QUrl& baseRequestUrl):
@@ -41,6 +39,7 @@ QnJsonRestResult MediaServerClient::saveCloudSystemCredentials(
             const CloudCredentialsData&, std::function<void(QnJsonRestResult)>);
 
     return syncCallWrapper(
+        this,
         static_cast<SaveCloudSystemCredentialsAsyncFuncPointer>(
             &MediaServerClient::saveCloudSystemCredentials),
         request);
@@ -58,6 +57,7 @@ QnJsonRestResult MediaServerClient::getModuleInformation(QnModuleInformation* mo
         void(MediaServerClient::*)(std::function<void(QnJsonRestResult, QnModuleInformation)>);
 
     return syncCallWrapper(
+        this,
         static_cast<GetModuleInformationAsyncFuncPointer>(
             &MediaServerClient::getModuleInformation),
         moduleInformation);
@@ -77,6 +77,7 @@ QnJsonRestResult MediaServerClient::setupLocalSystem(const SetupLocalSystemData&
             const SetupLocalSystemData&, std::function<void(QnJsonRestResult)>);
 
     return syncCallWrapper(
+        this,
         static_cast<SetupLocalSystemAsyncFuncPointer>(&MediaServerClient::setupLocalSystem),
         request);
 }
@@ -96,6 +97,7 @@ QnJsonRestResult MediaServerClient::setupCloudSystem(
             const SetupCloudSystemData&, std::function<void(QnJsonRestResult)>);
 
     return syncCallWrapper(
+        this,
         static_cast<SetupCloudSystemAsyncFuncPointer>(&MediaServerClient::setupCloudSystem),
         request);
 }
@@ -114,6 +116,7 @@ QnJsonRestResult MediaServerClient::detachFromCloud(const DetachFromCloudData& r
             const DetachFromCloudData&, std::function<void(QnJsonRestResult)>);
 
     return syncCallWrapper(
+        this,
         static_cast<DetachFromCloudAsyncFuncPointer>(
             &MediaServerClient::detachFromCloud),
         request);
@@ -133,6 +136,7 @@ QnJsonRestResult MediaServerClient::mergeSystems(const MergeSystemData& request)
             const MergeSystemData&, std::function<void(QnJsonRestResult)>);
 
     return syncCallWrapper(
+        this,
         static_cast<AsyncFuncPointer>(&MediaServerClient::mergeSystems),
         request);
 }
@@ -153,6 +157,7 @@ ec2::ErrorCode MediaServerClient::ec2GetUsers(ec2::ApiUserDataList* result)
             std::function<void(ec2::ErrorCode, ec2::ApiUserDataList)>);
 
     return syncCallWrapper(
+        this,
         static_cast<Ec2GetUsersAsyncFuncPointer>(&MediaServerClient::ec2GetUsers),
         result);
 }
@@ -172,6 +177,7 @@ ec2::ErrorCode MediaServerClient::ec2SaveUser(const ec2::ApiUserData& request)
             std::function<void(ec2::ErrorCode)>);
 
     return syncCallWrapper(
+        this,
         static_cast<Ec2SaveUserAsyncFuncPointer>(&MediaServerClient::ec2SaveUser),
         request);
 }
@@ -189,6 +195,7 @@ ec2::ErrorCode MediaServerClient::ec2GetSettings(ec2::ApiResourceParamDataList* 
             std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
 
     return syncCallWrapper(
+        this,
         static_cast<Ec2GetSettingsAsyncFuncPointer>(&MediaServerClient::ec2GetSettings),
         result);
 }
@@ -209,6 +216,7 @@ ec2::ErrorCode MediaServerClient::ec2SetResourceParams(
             std::function<void(ec2::ErrorCode)>);
 
     return syncCallWrapper(
+        this,
         static_cast<Ec2SetResourceParamsAsyncFuncPointer>(
             &MediaServerClient::ec2SetResourceParams),
         request);
@@ -234,6 +242,7 @@ ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
             std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
 
     return syncCallWrapper(
+        this,
         static_cast<Ec2GetResourceParamsAsyncFuncPointer>(
             &MediaServerClient::ec2GetResourceParams),
         resourceId,
@@ -252,230 +261,6 @@ void MediaServerClient::stopWhileInAioThread()
 
 //-------------------------------------------------------------------------------------------------
 // Utilities
-
-template<typename Input, typename ... Output>
-void MediaServerClient::performGetRequest(
-    const std::string& requestPath,
-    const Input& inputData,
-    std::function<void(
-        SystemError::ErrorCode,
-        nx_http::StatusCode::Value statusCode,
-        Output...)> completionHandler)
-{
-    using ActualOutputType =
-        typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
-
-    performGetRequest(
-        [&inputData](const QUrl& url, nx_http::AuthInfo authInfo)
-        {
-            return std::make_unique<nx_http::FusionDataHttpClient<Input, ActualOutputType>>(
-                url, std::move(authInfo), inputData);
-        },
-        requestPath,
-        std::move(completionHandler));
-}
-
-template<typename ... Output>
-void MediaServerClient::performGetRequest(
-    const std::string& requestPath,
-    std::function<void(
-        SystemError::ErrorCode,
-        nx_http::StatusCode::Value statusCode,
-        Output...)> completionHandler)
-{
-    using ActualOutputType =
-        typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
-
-    performGetRequest(
-        [](const QUrl& url, nx_http::AuthInfo authInfo)
-        {
-            return std::make_unique<nx_http::FusionDataHttpClient<void, ActualOutputType>>(
-                url, std::move(authInfo));
-        },
-        requestPath,
-        std::move(completionHandler));
-}
-
-template<typename CreateHttpClientFunc, typename ... Output>
-void MediaServerClient::performGetRequest(
-    CreateHttpClientFunc createHttpClientFunc,
-    const std::string& requestPath,
-    std::function<void(
-        SystemError::ErrorCode,
-        nx_http::StatusCode::Value statusCode,
-        Output...)> completionHandler)
-{
-    using ActualOutputType =
-        typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
-
-    QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
-        .appendPath(QLatin1String("/"))
-        .appendPath(QString::fromStdString(requestPath)).toUrl();
-    nx_http::AuthInfo authInfo;
-    authInfo.user = m_userCredentials;
-
-    auto fusionClient = createHttpClientFunc(requestUrl, std::move(authInfo));
-
-    post(
-        [this,
-            fusionClient = std::move(fusionClient),
-            completionHandler = std::move(completionHandler)]() mutable
-        {
-            fusionClient->bindToAioThread(getAioThread());
-            auto fusionClientPtr = fusionClient.get();
-            m_activeClients.emplace(fusionClientPtr, std::move(fusionClient));
-            fusionClientPtr->execute(
-                [this, fusionClientPtr, completionHandler = std::move(completionHandler)](
-                    SystemError::ErrorCode errorCode,
-                    const nx_http::Response* response,
-                    Output... outData)
-                {
-                    auto clientIter = m_activeClients.find(fusionClientPtr);
-                    NX_ASSERT(clientIter != m_activeClients.end());
-                    auto client = std::move(clientIter->second);
-                    m_activeClients.erase(clientIter);
-
-                    m_prevResponseHttpStatusCode = 
-                        response
-                        ? (nx_http::StatusCode::Value)response->statusLine.statusCode
-                        : nx_http::StatusCode::undefined;
-
-                    return completionHandler(
-                        errorCode,
-                        m_prevResponseHttpStatusCode,
-                        std::move(outData)...);
-                });
-        });
-}
-
-template<typename ResultCode, typename Output>
-ResultCode MediaServerClient::syncCallWrapper(
-    void(MediaServerClient::*asyncFunc)(std::function<void(ResultCode, Output)>),
-    Output* output)
-{
-    ResultCode resultCode;
-    std::tie(resultCode, *output) =
-        makeSyncCall<ResultCode, Output>(std::bind(asyncFunc, this, std::placeholders::_1));
-    return resultCode;
-}
-
-template<typename ResultCode, typename Input>
-ResultCode MediaServerClient::syncCallWrapper(
-    void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode)>),
-    const Input& input)
-{
-    using namespace std::placeholders;
-
-    ResultCode resultCode;
-    std::tie(resultCode) = makeSyncCall<ResultCode>(std::bind(asyncFunc, this, input, _1));
-    return resultCode;
-}
-
-template<typename ResultCode, typename Input, typename Output>
-ResultCode MediaServerClient::syncCallWrapper(
-    void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode, Output)>),
-    const Input& input,
-    Output* output)
-{
-    using namespace std::placeholders;
-
-    ResultCode resultCode;
-    std::tie(resultCode, *output) =
-        makeSyncCall<ResultCode, Output>(std::bind(asyncFunc, this, input, _1));
-    return resultCode;
-}
-
-template<typename Input>
-void MediaServerClient::performApiRequest(
-    const std::string& requestName,
-    const Input& input,
-    std::function<void(QnJsonRestResult)> completionHandler)
-{
-    performGetRequest<Input, QnJsonRestResult>(
-        requestName,
-        input,
-        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, QnJsonRestResult)>(
-            [this, completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode,
-                nx_http::StatusCode::Value statusCode,
-                QnJsonRestResult result)
-            {
-                result.error = toApiErrorCode(sysErrorCode, statusCode);
-                completionHandler(std::move(result));
-            }));
-}
-
-template<typename Output>
-void MediaServerClient::performApiRequest(
-    const std::string& requestName,
-    std::function<void(QnJsonRestResult, Output)> completionHandler)
-{
-    performGetRequest<QnJsonRestResult>(
-        requestName,
-        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, QnJsonRestResult)>(
-            [this, completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode,
-                nx_http::StatusCode::Value statusCode,
-                QnJsonRestResult result)
-            {
-                Output output;
-                result.error = toApiErrorCode(sysErrorCode, statusCode);
-                if (result.error == QnRestResult::NoError)
-                    output = result.deserialized<Output>();
-                completionHandler(std::move(result), std::move(output));
-            }));
-}
-
-QnRestResult::Error MediaServerClient::toApiErrorCode(
-    SystemError::ErrorCode sysErrorCode,
-    nx_http::StatusCode::Value statusCode)
-{
-    if (sysErrorCode != SystemError::noError)
-        return QnRestResult::CantProcessRequest;
-    if (!nx_http::StatusCode::isSuccessCode(statusCode))
-        return QnRestResult::CantProcessRequest;
-    return QnRestResult::NoError;
-}
-
-template<typename Input, typename ... Output>
-void MediaServerClient::performAsyncEc2Call(
-    const std::string& requestName,
-    const Input& request,
-    std::function<void(ec2::ErrorCode, Output...)> completionHandler)
-{
-    performGetRequest<Output...>(
-        requestName,
-        request,
-        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value)>(
-            [this, completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode,
-                nx_http::StatusCode::Value statusCode,
-                Output... output)
-            {
-                completionHandler(
-                    toEc2ErrorCode(sysErrorCode, statusCode),
-                    std::move(output)...);
-            }));
-}
-
-template<typename ... Output>
-void MediaServerClient::performAsyncEc2Call(
-    const std::string& requestName,
-    std::function<void(ec2::ErrorCode, Output...)> completionHandler)
-{
-    performGetRequest<Output...>(
-        requestName,
-        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, Output...)>(
-            [this, completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode,
-                nx_http::StatusCode::Value statusCode,
-                Output... result)
-            {
-                completionHandler(
-                    toEc2ErrorCode(sysErrorCode, statusCode),
-                    std::move(result)...);
-            }));
-}
 
 ec2::ErrorCode MediaServerClient::toEc2ErrorCode(
     SystemError::ErrorCode systemErrorCode,

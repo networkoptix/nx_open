@@ -49,13 +49,12 @@ private:
         ::utils::MergeSystemsStatus::Value mergeStatus);
 
     bool applyCurrentSettings(
-        const QUrl &remoteUrl,
-        const QString& getKey,
+        const QUrl& remoteUrl,
         const QString& postKey,
         bool oneServer);
 
     bool applyRemoteSettings(
-        const QUrl &remoteUrl,
+        const QUrl& remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,

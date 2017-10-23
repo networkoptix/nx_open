@@ -31,6 +31,7 @@
 #include <llutil/hardware_id.h>
 #include <network/tcp_connection_priv.h>
 #include <nx1/info.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/ec2_lib.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
@@ -114,7 +115,10 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 using ProcessorHandler = std::function<
-    void(const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)>;
+    nx_http::StatusCode::Value(
+        const nx_http::Request&,
+        QnHttpConnectionListener* owner,
+        QnJsonRestResult* result)>;
 class JsonConnectionProcessor: public QnTCPConnectionProcessor
 {
 private:
@@ -134,10 +138,9 @@ public:
     {
         QnJsonRestResult result;
         auto owner = static_cast<QnHttpConnectionListener*>(d_ptr->owner);
-        m_handler(d_ptr->request, owner, &result);
+        const auto httpStatusCode = m_handler(d_ptr->request, owner, &result);
         d_ptr->response.messageBody = QJson::serialized(result);
-        sendResponse(nx_http::StatusCode::ok,
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+        sendResponse(httpStatusCode, Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
     }
 };
 
@@ -320,13 +323,15 @@ int Appserver2Process::exec()
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
+    addSelfServerResource(ec2Connection);
+
     nx::vms::utils::loadResourcesFromEcs(
         m_commonModule.get(),
         ec2Connection,
         m_commonModule->messageProcessor(),
         QnMediaServerResourcePtr(),
         []() { return false; });
-
+    
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
         QHostAddress::Any,
@@ -423,11 +428,13 @@ void Appserver2Process::registerHttpHandlers(
         [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(owner->commonModule()->moduleInformation());
+            return nx_http::StatusCode::ok;
         });
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformationAuthenticated",
         [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(owner->commonModule()->moduleInformation());
+            return nx_http::StatusCode::ok;
         });
 
     auto getNonce = [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult* result)
@@ -436,6 +443,7 @@ void Appserver2Process::registerHttpHandlers(
         reply.nonce = QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 16);
         reply.realm = nx::network::AppInfo::realm();
         result->setReply(reply);
+        return nx_http::StatusCode::ok;
     };
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/getNonce", getNonce);
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "web/api/getNonce", getNonce);
@@ -444,17 +452,20 @@ void Appserver2Process::registerHttpHandlers(
         [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(rest::helper::PingRestHelper::data(owner->commonModule()));
+            return nx_http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", rest::helper::P2pStatistics::kUrlPath,
         [](const nx_http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
         {
             result->setReply(rest::helper::P2pStatistics::data(owner->commonModule()));
+            return nx_http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/backupDatabase",
         [](const nx_http::Request&, QnHttpConnectionListener*, QnJsonRestResult*)
         {
+            return nx_http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/configure",
@@ -465,16 +476,18 @@ void Appserver2Process::registerHttpHandlers(
             result->setReply(reply);
             ConfigureSystemData data = QJson::deserialized<ConfigureSystemData>(request.messageBody);
 
-            if (data.localSystemId != owner->globalSettings()->localSystemId())
+            if (!data.localSystemId.isNull() &&
+                data.localSystemId != owner->globalSettings()->localSystemId())
             {
                 result->setError(QnJsonRestResult::CantProcessRequest, lit("UNSUPPORTED"));
-                return;
+                return nx_http::StatusCode::badRequest;
             }
             if (data.rewriteLocalSettings)
             {
                 owner->commonModule()->ec2Connection()->setTransactionLogTime(data.tranLogTime);
                 owner->globalSettings()->resynchronizeNowSync();
             }
+            return nx_http::StatusCode::ok;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/mergeSystems",
@@ -483,28 +496,21 @@ void Appserver2Process::registerHttpHandlers(
             QnHttpConnectionListener* owner,
             QnJsonRestResult* result)
         {
-            MergeSystemData data = QJson::deserialized<MergeSystemData>(request.messageBody);
+            const auto data = QJson::deserialized<MergeSystemData>(request.messageBody);
             nx::vms::utils::SystemMergeProcessor systemMergeProcessor(m_commonModule.get());
-            return systemMergeProcessor.merge(
+            const auto statusCode = systemMergeProcessor.merge(
                 Qn::kSystemAccess,
                 QnAuthSession(),
-                std::move(data),
+                data,
                 result);
-        });
+            if (nx_http::StatusCode::isSuccessCode(statusCode))
+            {
+                m_ecConnection.load()->addRemotePeer(
+                    systemMergeProcessor.remoteModuleInformation().id,
+                    data.url);
+            }
 
-    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/mergeSystems",
-        [this](
-            const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
-            QnJsonRestResult* result)
-        {
-            MergeSystemData data = QJson::deserialized<MergeSystemData>(request.messageBody);
-            nx::vms::utils::SystemMergeProcessor systemMergeProcessor(m_commonModule.get());
-            return systemMergeProcessor.merge(
-                Qn::kSystemAccess,
-                QnAuthSession(),
-                std::move(data),
-                result);
+            return statusCode;
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupLocalSystem",
@@ -526,6 +532,25 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     ec2ConnectionFactory->registerTransactionListener(m_tcpListener);
+}
+
+void Appserver2Process::addSelfServerResource(
+    ec2::AbstractECConnectionPtr ec2Connection)
+{
+    auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
+    server->setId(commonModule()->moduleGUID());
+    m_commonModule->resourcePool()->addResource(server);
+    server->setStatus(Qn::Online);
+
+    m_commonModule->bindModuleinformation(server);
+
+    ::ec2::ApiMediaServerData apiServer;
+    apiServer.id = commonModule()->moduleGUID();
+    ::ec2::fromResourceToApi(server, apiServer);
+    if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
+        != ec2::ErrorCode::ok)
+    {
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

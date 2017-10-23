@@ -244,7 +244,6 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     {
         if (!applyCurrentSettings(
                 data.url,
-                data.getKey,
                 data.postKey,
                 data.mergeOneServer))
         {
@@ -289,8 +288,7 @@ void SystemMergeProcessor::setMergeError(
 }
 
 bool SystemMergeProcessor::applyCurrentSettings(
-    const QUrl &remoteUrl,
-    const QString& /*getKey*/,
+    const QUrl& remoteUrl,
     const QString& postKey,
     bool oneServer)
 {
@@ -346,7 +344,7 @@ bool SystemMergeProcessor::applyCurrentSettings(
 
 bool SystemMergeProcessor::executeRemoteConfigure(
     const ConfigureSystemData& data,
-    const QUrl &remoteUrl,
+    const QUrl& remoteUrl,
     const QString& postKey)
 {
     QByteArray serializedData = QJson::serialized(data);
@@ -519,7 +517,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::getClientResponse(
 
 template <class ResultDataType>
 bool SystemMergeProcessor::executeRequest(
-    const QUrl &remoteUrl,
+    const QUrl& remoteUrl,
     const QString& getKey,
     ResultDataType& result,
     const QString& path)
