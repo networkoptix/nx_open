@@ -1,38 +1,30 @@
 #include "configure_rest_handler.h"
 
+#include <QtCore/QSettings>
+
+#include <nx/network/http/http_types.h>
+#include <nx/utils/log/log.h>
+
 #include <nx/vms/utils/vms_utils.h>
 
-#include "nx_ec/ec_api.h"
-#include "nx_ec/dummy_handler.h"
-#include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/managers/abstract_user_manager.h>
-#include <nx_ec/managers/abstract_server_manager.h>
-
-#include "transaction/transaction_message_bus_base.h"
-#include "api/app_server_connection.h"
-#include "common/common_module.h"
-#include "media_server/settings.h"
-#include "media_server/serverutil.h"
-#include "media_server/server_connector.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "network/tcp_connection_priv.h"
-#include "nx/vms/discovery/manager.h"
-#include "api/model/configure_reply.h"
-#include "rest/server/rest_connection_processor.h"
-#include "network/tcp_listener.h"
-#include "server/host_system_password_synchronizer.h"
-#include "audit/audit_manager.h"
-#include "settings.h"
-#include <media_server/serverutil.h>
-
-#include <rest/helpers/permissions_helper.h>
 #include <api/global_settings.h>
-#include <api/resource_property_adaptor.h>
-#include <media_server/media_server_module.h>
-#include <nx/utils/log/log.h>
+#include <api/model/configure_reply.h>
+#include <api/model/configure_system_data.h>
+#include <audit/audit_manager.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <network/tcp_listener.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/dummy_handler.h>
+#include <nx_ec/ec_api.h>
+#include <rest/helpers/permissions_helper.h>
+#include <rest/server/rest_connection_processor.h>
+
+#include "media_server/media_server_module.h"
+#include "media_server/serverutil.h"
+#include "media_server/settings.h"
 
 namespace
 {
@@ -93,7 +85,7 @@ int QnConfigureRestHandler::execute(
     {
         NX_LOG(lit("QnConfigureRestHandler: invalid password provided"), cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        return CODE_OK;
+        return nx_http::StatusCode::ok;
     }
 
     // Configure request must support systemName changes to maintain compatibility with NxTool
@@ -111,14 +103,14 @@ int QnConfigureRestHandler::execute(
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: database backup error"), cl_logWARNING);
-            return CODE_OK;
+            return nx_http::StatusCode::ok;
         }
 
         if (!configureLocalSystem(data, m_messageBus))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: can't change local system Id"), cl_logWARNING);
-            return CODE_OK;
+            return nx_http::StatusCode::ok;
         }
         if (data.wholeSystem)
         {
@@ -152,10 +144,10 @@ int QnConfigureRestHandler::execute(
     if (data.hasPassword())
     {
         if (!updateUserCredentials(
-            owner->commonModule()->ec2Connection(),
-            data,
-            QnOptionalBool(),
-            owner->resourcePool()->getAdministrator()))
+                owner->commonModule()->ec2Connection(),
+                data,
+                QnOptionalBool(),
+                owner->resourcePool()->getAdministrator()))
         {
             NX_LOG(lit("QnConfigureRestHandler: can't update administrator credentials"), cl_logWARNING);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
@@ -182,7 +174,7 @@ int QnConfigureRestHandler::execute(
         owner->owner()->waitForPortUpdated();
     }
 
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }
 
 int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, int port)
