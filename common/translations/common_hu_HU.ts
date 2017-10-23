@@ -431,7 +431,7 @@
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>Edge licencek</translation>
+      <translation>edge licenc</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
@@ -704,12 +704,12 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Legalacsonyabb</translation>
+      <translation>La</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Alacsony</translation>
+      <translation>A</translation>
     </message>
     <message>
       <source>Me</source>
@@ -719,7 +719,7 @@
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Magas</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>Bst</source>
@@ -1286,7 +1286,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
@@ -1304,7 +1304,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

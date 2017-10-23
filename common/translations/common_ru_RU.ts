@@ -475,7 +475,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Возобновляемые лицензии</translation>
     </message>
   </context>
   <context>
@@ -678,7 +678,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Возобновляемая лицензия</translation>
     </message>
   </context>
   <context>
@@ -1266,11 +1266,11 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
+      <translation>Проблема с лицензией на сервере &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
+      <translation>Сервер &quot;%1&quot; завершил резервное копирование архива</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1404,7 +1404,7 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Диск %1 переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
+      <translation>Диск &quot;%1&quot; переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Все администраторы</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1508,15 +1508,15 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Программный триггер</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Программный триггер %1 на %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Программный триггер %1 активирован несколько раз</translation>
     </message>
     <message>
       <source>Send email</source>
@@ -1524,7 +1524,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Подтвердить</translation>
     </message>
   </context>
   <context>

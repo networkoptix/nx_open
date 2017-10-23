@@ -104,7 +104,7 @@
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Apagar Ligações</translation>
+      <translation>Apagar Ligações?</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>

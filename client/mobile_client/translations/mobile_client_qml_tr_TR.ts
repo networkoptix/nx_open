@@ -96,7 +96,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>Giriş &quot;%1&quot; silinsin mi?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Görüntü rotasyonu tam ekran modunda desteklenmiyor</translation>
     </message>
   </context>
   <context>
@@ -287,11 +287,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Kameranızı konumlandırmak için görüntüye dokunun</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>İptal</translation>
     </message>
   </context>
   <context>
@@ -319,14 +319,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>ÖN AYAR</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ ön tanımlı pozisyon</translation>
     </message>
   </context>
   <context>
@@ -394,11 +394,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Kamera seçin</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Ctrl + ok tuşlarına basın veya fare tekerleğini kullanın</translation>
     </message>
   </context>
   <context>
@@ -447,11 +447,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>ULAŞILAMAZ</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Kurmak için web tarayıcısından veya masaüstü istemcisinden bu sunucuya bağlanın</translation>
     </message>
   </context>
   <context>
@@ -466,7 +466,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Ağ bağlantısını kontrol edin veya daha önce bağlanılan bir sunucu için &quot;%1&quot; e basın.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -486,7 +486,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>Sisteme bağlanılamıyor &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Yeni Sunucu</translation>
     </message>
   </context>
   <context>
@@ -586,15 +586,15 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Görüntü rotasyonu tam ekran modunda desteklenmiyor</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Durumumu şu şekilde göster</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>Boşluk</translation>
     </message>
   </context>
   <context>
@@ -624,15 +624,15 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Çevrimdışı</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Yetkisiz</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Herhangi bir video akışı oynatılamıyor</translation>
     </message>
   </context>
   <context>

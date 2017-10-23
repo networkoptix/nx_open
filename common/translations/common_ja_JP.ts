@@ -475,7 +475,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>タイムライセンス</translation>
     </message>
   </context>
   <context>
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>タイムライセンス</translation>
     </message>
   </context>
   <context>
@@ -1174,7 +1174,7 @@
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 切断</translation>
+      <translation>I/Oモジュール %1 切断</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -1279,7 +1279,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
