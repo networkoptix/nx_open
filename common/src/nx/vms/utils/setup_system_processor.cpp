@@ -1,6 +1,7 @@
 #include "setup_system_processor.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <api/global_settings.h>
 #include <api/model/setup_local_system_data.h>
