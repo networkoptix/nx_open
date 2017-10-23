@@ -5941,7 +5941,7 @@ to %1</source>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>Lịch trìnhh sao lưu dự kiến kế tiếp &lt; b &gt;%1 &lt;/b &gt;</translation>
+      <translation>Lịch trìnhh sao lưu dự kiến kế tiếp &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>

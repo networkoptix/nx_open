@@ -1110,7 +1110,7 @@
     </message>
     <message>
       <source>Storage Failure</source>
-      <translation>Falha de Armazenamento </translation>
+      <translation>Falha de Armazenamento</translation>
     </message>
     <message>
       <source>Network Issue</source>
@@ -1295,7 +1295,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>

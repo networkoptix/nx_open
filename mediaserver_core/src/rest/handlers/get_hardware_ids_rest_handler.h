@@ -2,7 +2,7 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnRuntimeInfoRestHandler: public QnJsonRestHandler
+class QnGetHardwareIdsRestHandler: public QnJsonRestHandler
 {
 public:
     virtual int executeGet(

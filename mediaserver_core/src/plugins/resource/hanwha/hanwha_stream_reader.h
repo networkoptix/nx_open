@@ -27,7 +27,7 @@ protected:
         bool isCameraControlRequired,
         const QnLiveStreamParams& params) override;
     
-    friend class HanwhaNvrArchiveDelegate;
+    friend class HanwhaArchiveDelegate;
 private:
     HanwhaProfileParameters makeProfileParameters(
         int profileNumber,

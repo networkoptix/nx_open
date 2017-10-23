@@ -12,11 +12,11 @@ namespace plugins {
 
 class HanwhaStreamReader;
 
-class HanwhaNvrArchiveDelegate: public QnAbstractArchiveDelegate
+class HanwhaArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    HanwhaNvrArchiveDelegate(const QnResourcePtr& res);
-    virtual ~HanwhaNvrArchiveDelegate();
+    HanwhaArchiveDelegate(const QnResourcePtr& res);
+    virtual ~HanwhaArchiveDelegate();
 
     virtual bool open(const QnResourcePtr &resource) override;
     virtual void close() override;

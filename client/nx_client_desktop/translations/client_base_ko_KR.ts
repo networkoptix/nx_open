@@ -4822,7 +4822,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;Cameras from other servers and removed cameras></translation>
+      <translation>Cameras from other servers and removed cameras</translation>
     </message>
     <message>
       <source>%1 TB</source>

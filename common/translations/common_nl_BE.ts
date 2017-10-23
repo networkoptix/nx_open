@@ -550,7 +550,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
+      <translation>Server met bijpassende Hardware-Id niet gevonden</translation>
     </message>
   </context>
   <context>
@@ -673,7 +673,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>Hardware ID</translation>
+      <translation>Hardware Id: %1</translation>
     </message>
     <message>
       <source>Time License</source>

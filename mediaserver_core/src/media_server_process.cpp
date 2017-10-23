@@ -184,6 +184,8 @@
 #include <rest/handlers/start_lite_client_rest_handler.h>
 #include <rest/handlers/runtime_info_rest_handler.h>
 #include <rest/handlers/downloads_rest_handler.h>
+#include <rest/handlers/get_hardware_ids_rest_handler.h>
+#include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -483,13 +485,15 @@ QnStorageResourcePtr createStorage(
     storage->setParentId(serverId);
     storage->setUrl(path);
 
-    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const QnPlatformMonitor::PartitionSpace& part)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
-    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    const auto storageType = (it != partitions.end())
+        ? it->type
+        : QnPlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
 
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
@@ -1787,7 +1791,7 @@ void MediaServerProcess::registerRestHandlers(
     QnUniversalTcpListener* tcpListener,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
-	auto processorPool = tcpListener->processorPool();
+    auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
     processorPool->registerRedirectRule(lit(""), welcomePage);
     processorPool->registerRedirectRule(lit("/"), welcomePage);
@@ -1862,7 +1866,8 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(
+        &cloudManagerGroup->connectionManager), kAdmin);
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
@@ -1879,7 +1884,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
 
     // TODO: Introduce constants for API methods registered here, also use them in
-    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors.
+    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
+    // except when it is the path of some other api method.
 
     reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler()); //< deprecated
     reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods")); //< new version
@@ -1903,6 +1909,10 @@ void MediaServerProcess::registerRestHandlers(
     #endif
 
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+
+    static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
+    reg(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
+    reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>

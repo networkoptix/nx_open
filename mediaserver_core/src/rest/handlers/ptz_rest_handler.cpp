@@ -31,6 +31,13 @@ static const QStringList kCameraIdParams{kCameraIdParam, kDeprecatedResourceIdPa
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
 static const nx::utils::log::Tag kLogTag(lit("QnPtzRestHandler"));
+QString toString(const QnRequestParams& params)
+{
+    QString result;
+    for (auto itr = params.begin(); itr != params.end(); ++itr)
+        result += lit("%1=%2;").arg(itr.key()).arg(itr.value());
+    return result;
+}
 
 bool checkUserAccess(
     const Qn::UserAccessData& accessRights,
@@ -124,19 +131,19 @@ bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
 
 void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function)
 {
+    NX_VERBOSE(kLogTag, lm("Before execute PTZ command sync. Sequence %1").arg(sequence));
     function();
+    NX_VERBOSE(kLogTag, lm("After execute PTZ command sync. Sequence %1").arg(sequence));
 
     m_asyncExecMutex.lock();
 
     while (AsyncFunc nextFunction = m_workers[sequence].nextCommand)
     {
-        NX_VERBOSE(kLogTag,
-            lm("Before execute PTZ command sync. Sequence %1").arg(sequence));
+        NX_VERBOSE(kLogTag, lm("Before execute postponed PTZ command sync. Sequence %1").arg(sequence));
         m_workers[sequence].nextCommand = AsyncFunc();
-        NX_VERBOSE(kLogTag,
-            lm("After execute PTZ command sync. Sequence %1").arg(sequence));
         m_asyncExecMutex.unlock();
         nextFunction();
+        NX_VERBOSE(kLogTag, lm("After execute postponed PTZ command sync. Sequence %1").arg(sequence));
         m_asyncExecMutex.lock();
     }
 
@@ -157,9 +164,10 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     else
     {
         m_workers[sequence].inProgress = true;
-        NX_VERBOSE(kLogTag,
-            lm("Start executing async PTZ command. Sequence %1").arg(sequence));
-        QtConcurrent::run(std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
+        NX_VERBOSE(kLogTag, lm("Start executing async PTZ command. Sequence %1").arg(sequence));
+        QtConcurrent::run(
+            qnPtzPool->commandThreadPool(),
+            std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
     }
     return CODE_OK;
 }
@@ -176,11 +184,7 @@ int QnPtzRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* processor)
 {
-    QString paramStr;
-    for (auto itr = params.begin(); itr != params.end(); ++itr)
-        paramStr += lit("%1=%2;").arg(itr.key()).arg(itr.value());
-
-    NX_LOG(lit("QnPtzRestHandler: received request %1 %2").arg(path).arg(paramStr), cl_logDEBUG1);
+    NX_LOG(lit("QnPtzRestHandler: received request %1 %2").arg(path).arg(toString(params)), cl_logDEBUG1);
 
     QString sequenceId;
     int sequenceNumber = -1;
@@ -267,6 +271,9 @@ int QnPtzRestHandler::executePost(
 
 int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result)
 {
+    NX_VERBOSE(this, lit("Start execute ContinuousMove. params=%1").arg(toString(params)));
+
+
     qreal xSpeed, ySpeed, zSpeed;
     if (
         !requireParameter(params, lit("xSpeed"), result, &xSpeed) ||
@@ -274,13 +281,18 @@ int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller
         !requireParameter(params, lit("zSpeed"), result, &zSpeed)
         )
     {
+        NX_VERBOSE(this, lit("Finish execute ContinuousMove because of invalid params."));
         return CODE_INVALID_PARAMETER;
     }
 
     QVector3D speed(xSpeed, ySpeed, zSpeed);
     if (!controller->continuousMove(speed))
+    {
+        NX_VERBOSE(this, lit("Finish execute ContinuousMove: FAILED"));
         return CODE_INTERNAL_ERROR;
+    }
 
+    NX_VERBOSE(this, lit("Finish execute ContinuousMove: SUCCESS"));
     return CODE_OK;
 }
 

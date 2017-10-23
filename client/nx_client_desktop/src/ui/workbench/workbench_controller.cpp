@@ -199,8 +199,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_motionSelectionInstrument->setPen(subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
-    m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
-    m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
+    m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(QnWorkbenchDisplay::EffectsLayer));
+    m_rotationInstrument->setRotationItemZValue(display()->layerZValue(QnWorkbenchDisplay::EffectsLayer));
     m_resizingInstrument->setInnerEffectRadius(4);
     m_resizingInstrument->setOuterEffectRadius(8);
 
@@ -264,7 +264,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_zoomWindowInstrument);
     m_manager->installInstrument(ptzInstrument);
 
-    display()->setLayer(m_dropInstrument->surface(), Qn::BackLayer);
+    display()->setLayer(m_dropInstrument->surface(), QnWorkbenchDisplay::BackLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(pressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftPressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -841,7 +841,7 @@ void QnWorkbenchController::at_moveStarted(QGraphicsView *, const QList<QGraphic
 
     /* Bring to front preserving relative order. */
     display()->bringToFront(items);
-    display()->setLayer(items, Qn::FrontLayer);
+    display()->setLayer(items, QnWorkbenchDisplay::FrontLayer);
 
     /* Show grid. */
     opacityAnimator(display()->gridItem())->animateTo(1.0);
