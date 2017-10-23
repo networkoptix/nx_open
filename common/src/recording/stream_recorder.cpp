@@ -21,13 +21,6 @@
 
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
-#include "transcoding/filters/contrast_image_filter.h"
-#include "transcoding/filters/time_image_filter.h"
-#include "transcoding/filters/fisheye_image_filter.h"
-#include "transcoding/filters/rotate_image_filter.h"
-#include "transcoding/filters/crop_image_filter.h"
-#include "transcoding/filters/tiled_image_filter.h"
-#include "transcoding/filters/scale_image_filter.h"
 
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "export/sign_helper.h"
@@ -313,16 +306,22 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 
 bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
+    #define VERBOSE(S) NX_VERBOSE(this, lm("%1 %2").args(__func__, (S)))
+
     if (m_needReopen)
     {
         m_needReopen = false;
+        VERBOSE("EXIT: Reopening");
         close();
     }
 
-    QnConstAbstractMediaDataPtr md = std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
+    QnConstAbstractMediaDataPtr md =
+        std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
     if (!md)
+    {
+        VERBOSE("EXIT: Unknown data");
         return true; // skip unknown data
-
+    }
     if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp > m_EofDateTime)
     {
         if (!m_endOfData)
@@ -339,6 +338,11 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
             m_recordingFinished = true;
             m_endOfData = true;
+            VERBOSE(lm("END: Stopping; m_endOfData: false; error: %1").arg(isOk ? "true" : "false"));
+        }
+        else
+        {
+            VERBOSE("END: Stopping; m_endOfData: true");
         }
 
         pleaseStop();
@@ -347,6 +351,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
     if (md->dataType == QnAbstractMediaData::META_V1)
     {
+        VERBOSE("META_V1");
         if (needSaveData(md))
             saveData(md);
     }
@@ -355,6 +360,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         m_prebuffer.push(md);
         if (m_prebufferingUsec == 0)
         {
+            VERBOSE("no pre-buffering");
             m_nextIFrameTime = AV_NOPTS_VALUE;
             while (!m_prebuffer.isEmpty())
             {
@@ -368,12 +374,20 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         }
         else
         {
-            bool isKeyFrame = md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY);
-            if (m_nextIFrameTime == (qint64)AV_NOPTS_VALUE && isKeyFrame)
+            bool isKeyFrame = md->dataType == QnAbstractMediaData::VIDEO
+                && (md->flags & AV_PKT_FLAG_KEY);
+            if (m_nextIFrameTime == (qint64) AV_NOPTS_VALUE && isKeyFrame)
                 m_nextIFrameTime = md->timestamp;
+            VERBOSE(lm("isKeyFrame: %1 "
+                "(dataType == VIDEO: %2; flags & VA_PKT_FLAG_KEY: %3)").args(
+                    isKeyFrame ? "true" : "false",
+                    md->dataType == QnAbstractMediaData::VIDEO ? "true" : "false",
+                    md->flags & AV_PKT_FLAG_KEY ? "true" : "false"));
 
-            if (m_nextIFrameTime != (qint64)AV_NOPTS_VALUE && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
+            if (m_nextIFrameTime != (qint64) AV_NOPTS_VALUE
+                && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
             {
+                VERBOSE("find next I-Frame");
                 while (!m_prebuffer.isEmpty() && m_prebuffer.front()->timestamp < m_nextIFrameTime)
                 {
                     QnConstAbstractMediaDataPtr d;
@@ -392,21 +406,27 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 
     if (m_waitEOF && m_dataQueue.size() == 0)
     {
+        VERBOSE("closing");
         close();
         m_waitEOF = false;
     }
 
     if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && m_EofDateTime > m_startDateTime)
     {
-        int progress = ((md->timestamp - m_startDateTime) * 100ll) / (m_EofDateTime - m_startDateTime);
+        const int progress =
+            ((md->timestamp - m_startDateTime) * 100LL) / (m_EofDateTime - m_startDateTime);
         if (progress != m_lastProgress)
         {
+            VERBOSE("progress");
             emit recordingProgress(progress);
             m_lastProgress = progress;
         }
     }
 
+    VERBOSE("END");
     return true;
+
+    #undef VERBOSE
 }
 
 void QnStreamRecorder::cleanFfmpegContexts()
@@ -425,12 +445,19 @@ void QnStreamRecorder::cleanFfmpegContexts()
 bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
-        return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
-
-    if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION * 2 * 1000ll && m_truncateInterval > 0)
     {
-        // if multifile recording allowed, recreate file if recording hole is detected
-        qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime) / 1000 << "ms";
+        NX_VERBOSE(this, "saveData(): META_V1");
+        return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
+    }
+
+    if (m_endDateTime != qint64(AV_NOPTS_VALUE)
+        && md->timestamp - m_endDateTime > MAX_FRAME_DURATION * 2 * 1000LL
+        && m_truncateInterval > 0)
+    {
+        // If multifile recording is allowed, recreate the file if a recording hole is detected.
+        NX_DEBUG(this, lm("Data hole detected for camera %1. Diff between packets: %2 ms")
+            .arg(m_device->getUniqueId())
+            .arg((md->timestamp - m_endDateTime) / 1000));
         close();
     }
     else if (m_startDateTime != qint64(AV_NOPTS_VALUE))
@@ -438,18 +465,22 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         if (md->timestamp - m_startDateTime > m_truncateInterval * 3 && m_truncateInterval > 0)
         {
             // if multifile recording allowed, recreate file if recording hole is detected
-            qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime) / 1000000 << "sec. Close file";
+            NX_DEBUG(this, lm(
+                "Too long time when no I-frame detected (file length exceed %1 sec. Close file")
+                .arg((md->timestamp - m_startDateTime) / 1000000));
             close();
         }
-        else if (md->timestamp < m_startDateTime - 1000ll * 1000)
+        else if (md->timestamp < m_startDateTime - 1000LL * 1000)
         {
-            qDebug() << "Time translated into the past for " << (md->timestamp - m_startDateTime) / 1000000 << "sec. Close file";
+            NX_DEBUG(this, lm("Time translated into the past for %1 s. Close file")
+                .arg((md->timestamp - m_startDateTime) / 1000000));
             close();
         }
     }
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
     {
+        NX_VERBOSE(this, "saveData(): AUDIO");
         // TODO: m_firstTime should not be used to guard comparison with m_prevAudioFormat.
         QnCodecAudioFormat audioFormat(md->context);
         if (!m_prevAudioFormat.is_initialized())
@@ -463,13 +494,19 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     //    return true; // ignore audio data
 
     if (vd && !m_gotKeyFrame[vd->channelNumber] && !(vd->flags & AV_PKT_FLAG_KEY))
+    {
+        NX_VERBOSE(this, "saveData(): VIDEO; skip data");
         return true; // skip data
+    }
 
     const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
     if (m_firstTime)
     {
         if (vd == 0 && mediaDev->hasVideo(md->dataProvider))
+        {
+            NX_VERBOSE(this, "saveData(): AUDIO; skip audio packets before first video packet");
             return true; // skip audio packets before first video packet
+        }
         if (!initFfmpegContainer(md))
         {
             if (!m_recordingContextVector.empty())
@@ -479,9 +516,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
             cleanFfmpegContexts();
 
             m_needStop = true;
+            NX_VERBOSE(this, "saveData(): first time; initFfmpegContainer() failed");
             return false;
         }
 
+        NX_VERBOSE(this, "saveData(): first time; recording started");
         m_firstTime = false;
         emit recordingStarted();
     }
@@ -492,7 +531,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         m_gotKeyFrame[channel] = true;
     if ((md->flags & AV_PKT_FLAG_KEY) || !mediaDev->hasVideo(m_mediaProvider))
     {
-        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > (m_truncateInterval + m_truncateIntervalEps))
+        if (m_truncateInterval > 0
+            && md->timestamp - m_startDateTime > (m_truncateInterval + m_truncateIntervalEps))
         {
             m_endDateTime = md->timestamp;
             close();
@@ -506,8 +546,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
         streamIndex = 0;
 
-    if ((uint)streamIndex >= m_recordingContextVector[0].formatCtx->nb_streams)
+    if ((uint) streamIndex >= m_recordingContextVector[0].formatCtx->nb_streams)
+    {
+        NX_VERBOSE(this, "saveData(): skip packet");
         return true; // skip packet
+    }
 
     m_endDateTime = md->timestamp;
 
@@ -517,7 +560,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         bool inputDataDepleted = false;
         do
         {
-            m_audioTranscoder->transcodePacket(inputDataDepleted ? QnConstAbstractMediaDataPtr() : md, &result);
+            m_audioTranscoder->transcodePacket(
+                inputDataDepleted ? QnConstAbstractMediaDataPtr() : md, &result);
             if (result && result->dataSize() > 0)
                 writeData(result, streamIndex);
             inputDataDepleted = true;
@@ -704,8 +748,11 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
         // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-        const bool isTranscode = m_transcodeFilters.isTranscodingRequired(mediaDev)
-            || (m_dstVideoCodec != AV_CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType);
+        const bool isTranscode =
+            (m_transcodeFilters.is_initialized()
+                && m_transcodeFilters->isTranscodingRequired(mediaDev))
+            || (m_dstVideoCodec != AV_CODEC_ID_NONE
+                && m_dstVideoCodec != mediaData->compressionType);
 
         const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
 
@@ -786,8 +833,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     m_videoTranscoder->setMTMode(true);
 
                     m_videoTranscoder->open(videoData);
-                    m_transcodeFilters.prepare(mediaDev, m_videoTranscoder->getResolution());
-                    m_videoTranscoder->setFilterList(m_transcodeFilters);
+
+                    m_transcodeFilters->prepare(mediaDev, m_videoTranscoder->getResolution());
+                    m_videoTranscoder->setFilterList(*m_transcodeFilters);
                     m_videoTranscoder->setQuality(Qn::QualityHighest);
                     m_videoTranscoder->open(videoData); // reopen again for new size
 

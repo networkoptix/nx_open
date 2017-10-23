@@ -134,12 +134,12 @@ QnConstResourceAudioLayoutPtr ThirdPartyArchiveDelegate::getAudioLayout()
     return audioLayout;
 }
 
-void ThirdPartyArchiveDelegate::onReverseMode( qint64 displayTime, bool value )
+void ThirdPartyArchiveDelegate::setSpeed( qint64 displayTime, double value )
 {
     nxcip::UsecUTCTimestamp actualSelectedTimestamp = nxcip::INVALID_TIMESTAMP_VALUE;
     m_archiveReader->setReverseMode(
         ++m_cSeq,
-        value,
+        value < 0,
         (displayTime == 0 || displayTime == (qint64)AV_NOPTS_VALUE)
             ? nxcip::INVALID_TIMESTAMP_VALUE
             : displayTime,

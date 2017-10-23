@@ -22,7 +22,6 @@ HanwhaArchiveDelegate::HanwhaArchiveDelegate(const QnResourcePtr& resource)
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
     auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.setAdditionAttribute("Rate-Control", "no");
 
     m_flags |= Flag_CanOfflineRange;
     m_flags |= Flag_CanProcessNegativeSpeed;
@@ -51,31 +50,36 @@ void HanwhaArchiveDelegate::close()
 qint64 HanwhaArchiveDelegate::startTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    return qnServerModule->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
-        ->chunkLoader()->startTimeUsec(hanwhaRes->getChannel());
+    return hanwhaRes->sharedContext()->chunkLoader()->startTimeUsec(hanwhaRes->getChannel());
 }
 
 qint64 HanwhaArchiveDelegate::endTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    return qnServerModule->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
-        ->chunkLoader()->endTimeUsec(hanwhaRes->getChannel());
+    return hanwhaRes->sharedContext()->chunkLoader()->endTimeUsec(hanwhaRes->getChannel());
 }
 
 QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 {
     if (!m_streamReader)
         return QnAbstractMediaDataPtr();
-    if (!m_streamReader->isStreamOpened() && !open(m_streamReader->m_resource))
-        return QnAbstractMediaDataPtr();
+    if (!m_streamReader->isStreamOpened())
+    {
+        if (m_currentPositionUsec != AV_NOPTS_VALUE)
+            m_streamReader->setPositionUsec(m_currentPositionUsec);
+        if (!open(m_streamReader->m_resource))
+            return QnAbstractMediaDataPtr();
+    }
 
     auto result = m_streamReader->getNextData();
-    if (result && !isForwardDirection())
+    if (result)
     {
-        result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
-        result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+        m_currentPositionUsec = result->timestamp;
+        if (!isForwardDirection())
+        {
+            result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+            result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+        }
     }
 
     if (result && m_endTimeUsec != AV_NOPTS_VALUE && result->timestamp > m_endTimeUsec)
@@ -96,9 +100,7 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    const auto chunks = qnServerModule->sharedContextPool()
-        ->sharedContext<HanwhaSharedResourceContext>(hanwhaRes)
-        ->chunkLoader()->chunks(hanwhaRes->getChannel());
+    const auto chunks = hanwhaRes->sharedContext()->chunkLoader()->chunks(hanwhaRes->getChannel());
     const qint64 timeMs = timeUsec / 1000;
     auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection());
     if (itr == chunks.cend())
@@ -106,10 +108,10 @@ qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
     else if (!itr->contains(timeMs))
         timeUsec = isForwardDirection() ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
 
-    if (m_previewMode && m_lastSeekTime == timeUsec)
-        return timeUsec;
+    if (m_playbackMode == PlaybackMode::ThumbNails && m_currentPositionUsec == timeUsec)
+        return timeUsec; //< Ignore two thumbnails in the row from the same position.
 
-    m_lastSeekTime = timeUsec;
+    m_currentPositionUsec = timeUsec;
     m_streamReader->setPositionUsec(timeUsec);
     return timeUsec;
 }
@@ -131,27 +133,42 @@ void HanwhaArchiveDelegate::beforeClose()
     m_streamReader->pleaseStop();
 }
 
-void HanwhaArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void HanwhaArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
     auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.setScale(value ? -1 : 1);
-    seek(displayTime, true /*findIFrame*/);
-    close();
-    open(m_streamReader->m_resource);
+    rtspClient.setScale(value);
+    if (displayTime != AV_NOPTS_VALUE)
+        seek(displayTime, true /*findIFrame*/);
+    else if (rtspClient.isOpened())
+        rtspClient.sendPlay(AV_NOPTS_VALUE /*startTime*/, AV_NOPTS_VALUE /*endTime */, value);
+
+    if (!m_streamReader->isStreamOpened())
+        open(m_streamReader->m_resource);
 }
 
 void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
 {
     m_endTimeUsec = endTimeUsec;
-    m_previewMode = frameStepUsec > 1;
-    if (m_previewMode)
-    {
-        auto& rtspClient = m_streamReader->rtspClient();
-        rtspClient.setAdditionAttribute("Frames", "Intra");
-    }
-    m_streamReader->setSessionType(
-        m_previewMode ? HanwhaSessionType::preview : HanwhaSessionType::archive);
     seek(startTimeUsec, true /*findIFrame*/);
+}
+
+void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
+{
+    m_playbackMode = mode;
+    auto& rtspClient = m_streamReader->rtspClient();
+    switch (mode)
+    {
+        case PlaybackMode::ThumbNails:
+            rtspClient.setAdditionAttribute("Frames", "Intra");
+            m_streamReader->setSessionType(HanwhaSessionType::preview);
+            break;
+        case PlaybackMode::Export:
+            rtspClient.setAdditionAttribute("Rate-Control", "no");
+            m_streamReader->setSessionType(HanwhaSessionType::fileExport);
+            break;
+        default:
+            break;
+    }
 }
 
 void HanwhaArchiveDelegate::beforeSeek(qint64 time)

@@ -28,7 +28,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout();
     virtual QnConstResourceAudioLayoutPtr getAudioLayout();
     virtual bool isRealTimeSource() const;
-    virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
+    virtual void setSpeed(qint64 displayTime, double value);
     virtual void setSingleshotMode(bool value);
 
     virtual AVCodecContext* setAudioChannel(int num);
@@ -36,7 +36,7 @@ public:
     //virtual void setMotionRegion(const QRegion& region);
     //virtual void setSendMotion(bool value);
     virtual void beforeSeek(qint64 time);
-    virtual void beforeChangeReverseMode(bool reverseMode);
+    virtual void beforeChangeSpeed(double value);
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& size) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
     virtual void setSendMotion(bool value) override;

@@ -266,6 +266,7 @@
 #include <recorder/remote_archive_synchronizer.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
+#include <rest/handlers/change_camera_password_rest_handler.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1833,6 +1834,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     reg("api/pingSystem", new QnPingSystemRestHandler());
+    reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
     reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated, still used in the client

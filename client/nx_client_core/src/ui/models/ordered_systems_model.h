@@ -3,7 +3,6 @@
 #include <ui/models/sort_filter_list_model.h>
 #include <client/system_weights_manager.h>
 
-class QnSystemsModel;
 class QnOrderedSystemsModel: public QnSortFilterListModel
 {
     Q_OBJECT
@@ -27,20 +26,12 @@ private: // overrides
         const QModelIndex& left,
         const QModelIndex& right) const override;
 
-    bool filterAcceptsRow(
-        int sourceRow,
-        const QModelIndex& sourceParent) const override;
-
 private:
     void handleWeightsChanged();
 
     qreal getWeight(const QModelIndex& modelIndex) const;
 
-    bool getWeightFromData(const QModelIndex& modelIndex,
-        qreal& weight) const;
-
 private:
-    QnSystemsModel * const m_source;
     QnWeightsDataHash m_weights;
     qreal m_unknownSystemsWeight;
 };

@@ -40,6 +40,7 @@ private:
         int profileNumber,
         const QnLiveStreamParams& parameters);
 
+    QSet<int> availableProfiles(int channel) const;
     int chooseNvrChannelProfile(Qn::ConnectionRole role) const;
     bool isCorrectProfile(int profileNumber) const;
 

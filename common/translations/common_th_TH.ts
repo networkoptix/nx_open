@@ -255,18 +255,6 @@
       <translation>ทำให้พอร์ต %1 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>หากไม่สามารถแก้ปัญหาได้ให้เรียกคืนค่าเริ่มต้นจากโรงงานบนหน้าเว็บของอุปกรณ์</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>กล้องถูกเรียกคืนจากที่จัดเก็บ ลบกล้องและเพิ่มอีกครั้งเพื่อดูวิดีโอสด</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -452,7 +452,7 @@
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>ใบอนุญาตวีดีโอวอร์ วีดีโอ </translation>
+      <translation>ใบอนุญาตวีดีโอวอร์ วีดีโอ</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
@@ -546,7 +546,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>ไม่พบเซิร์ฟเวอร์ที่มี ID ฮาร์ดแวร์ที่ตรงกัน</translation>
+      <translation>ไม่พบเซิร์ฟเวอร์ที่มี Id ฮาร์ดแวร์ที่ตรงกัน</translation>
     </message>
   </context>
   <context>
@@ -655,11 +655,11 @@
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>ได้รับอนุญาตให้ %s</translation>
+      <translation>ได้รับอนุญาตให้ %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>ลายน้ำ</translation>
+      <translation>ลายน้ำ: %1</translation>
     </message>
     <message>
       <source>Hardware Id: %1</source>
@@ -703,7 +703,7 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>LST</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -713,7 +713,7 @@
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>ME</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
@@ -830,7 +830,7 @@
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>W</translation>
+      <translation>w</translation>
     </message>
     <message>
       <source>M</source>
@@ -943,7 +943,7 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation>เปิดการแปลงรหัส CL ไม่ได้ดำเนินการ.</translation>
+      <translation>การแปลงรหัส OpenCL ไม่ได้ดำเนินการ.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
@@ -951,11 +951,11 @@
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>เปิด CL แปลงไม่ได้ดำเนินการ.</translation>
+      <translation>OpenCL แปลงไม่ได้ดำเนินการ.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>ไม่รู้จัก การแปลง </translation>
+      <translation>ไม่รู้จัก การแปลง</translation>
     </message>
   </context>
   <context>
@@ -1171,7 +1171,7 @@
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน  %1</translation>
+      <translation>เหตุการณ์ที่ไม่ได้กำหนดที่เกิดขึ้นใน %1</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
@@ -1270,7 +1270,7 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>

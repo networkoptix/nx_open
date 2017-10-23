@@ -13,19 +13,19 @@
     </message>
     <message>
       <source>Cannot add new devices while backup process is running.</source>
-      <translation>백업중에는 새 장치 추가 불가</translation>
+      <translation>백업 진행중에는 새로운 장치 추가가 불가합니다.</translation>
     </message>
     <message>
       <source>Cannot add new cameras while backup process is running.</source>
-      <translation>백업중에는 신규 카메라 추가 불가</translation>
+      <translation>백업 진행중는 신규 카메라 추가 불가합니다.</translation>
     </message>
     <message>
       <source>Cannot add new devices because they store archive on external storage.</source>
-      <translation>외부저장장차에 앱업중이므로 새 장치 추가 불가</translation>
+      <translation>상기시스템은 외부저장장치를 통하여 기록하기에 신규장치 추가가 불가합니다.</translation>
     </message>
     <message>
       <source>Cannot add new cameras because they store archive on external storage.</source>
-      <translation>외부저정 장치에 백업중이므로 새 카메라 추가 불가</translation>
+      <translation>상기시스템은 외부저장장치를 통하여 기록하기에 신규카메라 추가가 불가합니다.</translation>
     </message>
   </context>
   <context>
@@ -34,11 +34,11 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation>더 많은 북마크를 보려면 타임 라인을 확대/축소</translation>
+      <translation>더 많은 북마크를 보려면 타임 라인을 확대 또는 축소 하세요.</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation>처음부터 북마크를 재생</translation>
+      <translation>북마크 재생</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
@@ -53,14 +53,14 @@ to view more bookmarks</source>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation>%1 서버를 접속할 수 없습니다.</translation>
+      <translation>%1 서버에 연결 할수 없습니다.</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation>설치된 버젼 %1</translation>
+      <translation>설치중인 버젼 %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
@@ -83,11 +83,11 @@ to view more bookmarks</source>
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation>필터...</translation>
+      <translation>검색조건...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation>시스템에 연결</translation>
+      <translation>시스템 연결</translation>
     </message>
     <message>
       <source>Help</source>
@@ -95,23 +95,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>이벤트 로그...</translation>
+      <translation>이벤트정보...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
-      <translation>백업할 카메라</translation>
+      <translation>카메라 백업</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation>비디오 월 조정</translation>
+      <translation>비디오월 조정</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>화면 적용</translation>
+      <translation>현재 화면 전송</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation>시간 서버 선택</translation>
+      <translation>시간 서버 설정</translation>
     </message>
     <message>
       <source>Fit in View</source>
@@ -131,11 +131,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>로컬 파일 찾아보기</translation>
+      <translation>현재 파일 찾아보기</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation>시작 화면을 표시</translation>
+      <translation>시작화면 표시하기</translation>
     </message>
     <message>
       <source>New...</source>
@@ -151,11 +151,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Window</source>
-      <translation>윈도우</translation>
+      <translation>창</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation>신규 윈도우</translation>
+      <translation>신규창</translation>
     </message>
     <message>
       <source>User...</source>
@@ -167,11 +167,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation>비디오 월...</translation>
+      <translation>비디오월...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>새로운 비디오 월...</translation>
+      <translation>신규 비디오월...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -179,7 +179,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation>웹 페이지...</translation>
+      <translation>신규 웹페이지...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -187,7 +187,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>레이아웃열기...</translation>
+      <translation>레이아웃 열기...</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -203,7 +203,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>웹클라이언트</translation>
+      <translation>웹 클라이언트</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
@@ -219,19 +219,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>비디어 월 화면 저장</translation>
+      <translation>비디어월 화면 저장</translation>
     </message>
     <message>
       <source>Drop Resources</source>
-      <translation>리스소 이동</translation>
+      <translation>리스소 삭제</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation>화면 저장 시작</translation>
+      <translation>화면녹화 시작</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation>화면 저장 멈춤</translation>
+      <translation>화면녹화 멈춤</translation>
     </message>
     <message>
       <source>Stop current action</source>
@@ -854,15 +854,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>북마크 로그 ...</translation>
+      <translation>북마크 로그...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation>Showreel ...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation>새 Showreel ...</translation>
+      <translation>새 Showreel...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
@@ -1052,7 +1052,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>파일 이름 &quot;%1&quot;은 운영 체제에 지정되어 있습니다. 다른 이름을 사용해보십시오.</translation>
+      <translation>파일 이름 &quot;%1&quot; 은 운영 체제에 지정되어 있습니다. 다른 이름을 사용해보십시오.</translation>
     </message>
   </context>
   <context>
@@ -1133,7 +1133,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>카메라  &quot;%1&quot;의 현재 위치를 설정할 수 없습니다. </translation>
+      <translation>카메라 &quot;%1&quot; 의 현재 위치를 설정할 수 없습니다.</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1146,33 +1146,6 @@ to view more bookmarks</source>
     <message>
       <source>These tours will become invalid.</source>
       <translation>이 튜어 설정은 유효하지 않습니다.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>줌 인</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>줌 아웃</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>원거리 초첨</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>근거리 초점</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>자동 초점</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>디와핑 모드 변경</translation>
     </message>
   </context>
   <context>
@@ -2092,11 +2065,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O 모듈 ID</translation>
+      <translation>I/O 모듈 Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>카메라 ID</translation>
+      <translation>카메라 Id</translation>
     </message>
   </context>
   <context>
@@ -3026,7 +2999,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation>오디오 장치 &quot;%1&quot;를 초기화할 수 없습니다.</translation>
+      <translation>오디오 장치 &quot;%1&quot; 를 초기화할 수 없습니다.</translation>
     </message>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
@@ -3485,7 +3458,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3699,7 +3672,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>하드웨어 ID에 잠김</translation>
+      <translation>하드웨어 Id에 잠김</translation>
     </message>
   </context>
   <context>
@@ -3965,7 +3938,7 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>이 라이센스는 이미 활성화되어 있으며 하드웨어 ID %1에 연결되어 있습니다.</translation>
+      <translation>이 라이센스는 이미 활성화되어 있으며 하드웨어 Id %1에 연결되어 있습니다.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
@@ -4000,11 +3973,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 이메일로 보내주십시오.</translation>
+      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 Id를 이메일로 보내주십시오.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 보내주십시오.</translation>
+      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 Id를 보내주십시오.</translation>
     </message>
   </context>
   <context>
@@ -4264,7 +4237,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>트리거 %1 (%2)을 호출하지 못했습니다.</translation>
+      <translation>트리거 %1 (%2) 을 호출하지 못했습니다.</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -4273,7 +4246,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>일정에 따라 중지됨</translation>
     </message>
   </context>
   <context>
@@ -4521,7 +4494,7 @@ to %1</source>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
-      <translation>이 컴퓨터의 성능은 설정 모드만 실행 수 있습니다.</translation>
+      <translation>%1: 이 컴퓨터의 성능은 설정 모드만 실행 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -4692,7 +4665,7 @@ to %1</source>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation>프리셋 &quot;%1&quot;에서 사용하는 단축키</translation>
+      <translation>프리셋 &quot;%1&quot; 에서 사용하는 단축키</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
@@ -7178,11 +7151,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>암호를 입력하세요</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>관리자 암호</translation>
     </message>
   </context>
   <context>
@@ -7808,7 +7781,7 @@ to %1</source>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation>서버 &quot;%1&quot;이 (가) 응답하지 않습니다.</translation>
+      <translation>서버 &quot;%1&quot; 이 (가) 응답하지 않습니다.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>

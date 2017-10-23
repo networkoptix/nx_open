@@ -22,8 +22,12 @@ struct QnPoint2D
 {
     QnPoint2D() {};
     QnPoint2D(double xC, double yC): x(xC), y(yC) {};
+    QnPoint2D(const QPointF& point);
+
     double x = 0;
     double y = 0;
+
+    QPointF toPointF() const;
 };
 QN_FUSION_DECLARE_FUNCTIONS(QnPoint2D, (json)(ubjson)(metatype));
 #define QnPoint2D_Fields (x)(y)
@@ -32,9 +36,12 @@ struct QnRect
 {
     QnRect() {}
     QnRect(QnPoint2D tl, QnPoint2D br): topLeft(tl), bottomRight(br) {}
+    QnRect(const QRectF& rect);
 
     QnPoint2D topLeft;
     QnPoint2D bottomRight;
+
+    QRectF toRectF() const;
 };
 QN_FUSION_DECLARE_FUNCTIONS(QnRect, (json)(ubjson)(metatype));
 #define QnRect_Fields (topLeft)(bottomRight)
@@ -58,6 +65,23 @@ struct QnObjectDetectionMetadata: public QnAbstractMetadata
 QN_FUSION_DECLARE_FUNCTIONS(QnObjectDetectionMetadata, (json)(ubjson)(metatype));
 #define QnObjectDetectionMetadata_Fields (detectedObjects)
 
-#define QN_OBJECT_DETECTION_TYPES (QnPoint2D)(QnRect)(QnObjectFeature)(QnObjectDetectionInfo)(QnObjectDetectionMetadata)
+struct QnObjectDetectionMetadataTrack
+{
+    qint64 timestampMs = 0;
+    std::vector<QnObjectDetectionInfo> objects;
+};
+QN_FUSION_DECLARE_FUNCTIONS(QnObjectDetectionMetadataTrack, (json)(ubjson)(metatype));
+#define QnObjectDetectionMetadataTrack_Fields (timestampMs)(objects)
+
+#define QN_OBJECT_DETECTION_TYPES (QnPoint2D)(QnRect)\
+    (QnObjectFeature)\
+    (QnObjectDetectionInfo)\
+    (QnObjectDetectionMetadata)\
+    (QnObjectDetectionMetadataTrack)
 
 using QnObjectDetectionMetadataPtr = std::shared_ptr<QnObjectDetectionMetadata>;
+
+bool operator<(const QnObjectDetectionMetadataTrack& first,
+    const QnObjectDetectionMetadataTrack& second);
+bool operator<(qint64 first, const QnObjectDetectionMetadataTrack& second);
+bool operator<(const QnObjectDetectionMetadataTrack& first, qint64 second);

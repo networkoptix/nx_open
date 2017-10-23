@@ -47,7 +47,8 @@ enum class HanwhaSessionType
     undefined,
     live,
     archive,
-    preview
+    preview,
+    fileExport
 };
 
 //TODO: #dmishin consider using Fusion instead of custom methods.
@@ -180,6 +181,8 @@ static const QString kHanwhaFormatAttribute = lit("format");
 static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
+
+static const QString kHanwhaNvrDeviceType = lit("NVR");
 
 } // namespace plugins
 } // namespace mediaserver_core

@@ -1022,7 +1022,7 @@ to view more bookmarks</source>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>התחל סרטון</translation>
+      <translation>התחל סיור</translation>
     </message>
   </context>
   <context>
@@ -1149,33 +1149,6 @@ to view more bookmarks</source>
     <message>
       <source>These tours will become invalid.</source>
       <translation>סיורים אלו יהפכו ללא תקינים.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>התקרב</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>התרחק</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>התמקד ברחוק</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>התמקד בקרוב</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>מיקוד אוטומטי</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>שינוי מצב פריסה</translation>
     </message>
   </context>
   <context>
@@ -4421,7 +4394,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>מושבת לפי לוח זמנים</translation>
     </message>
   </context>
   <context>
@@ -7398,11 +7371,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>הכנס סיסמא...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>סיסמת מנהל</translation>
     </message>
   </context>
   <context>
@@ -7993,11 +7966,11 @@ to %1</source>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
       <source>Stop Showreel</source>
-      <translation>עצור סרטון</translation>
+      <translation>עצור סיור</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>התחל סרטון</translation>
+      <translation>התחל סיור</translation>
     </message>
     <message>
       <source>Stop Tour</source>

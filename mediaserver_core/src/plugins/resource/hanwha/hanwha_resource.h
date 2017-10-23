@@ -4,14 +4,15 @@
 
 #include <core/ptz/ptz_limits.h>
 
-#include <plugins/resource/onvif/onvif_resource.h>
-#include <plugins/resource/hanwha/hanwha_attributes.h>
-#include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/hanwha/hanwha_advanced_parameter_info.h>
+#include <plugins/resource/hanwha/hanwha_attributes.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
+#include <plugins/resource/hanwha/hanwha_stream_limits.h>
 #include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
 #include <plugins/resource/hanwha/hanwha_archive_delegate.h>
+#include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
 #include <nx/utils/timer_holder.h>
@@ -25,8 +26,6 @@ extern "C" {
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
-
-class HanwhaChunkLoader;
 
 class HanwhaResource: public QnPlOnvifResource
 {
@@ -76,10 +75,6 @@ public:
 
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
-    QnSemaphore* requestSemaphore();
-
-    std::shared_ptr<HanwhaChunkLoader> chunkLoader();
-
     QnAbstractArchiveDelegate* remoteArchiveDelegate();
 
     bool isVideoSourceActive();
@@ -114,6 +109,12 @@ public:
 
     QString nxProfileName(Qn::ConnectionRole role) const;
 
+    static const QString kNormalizedSpeedPtzTrait;
+    static const QString kHas3AxisPtz;
+
+    std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
+
+    virtual bool setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString = nullptr) override;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -123,7 +124,6 @@ protected:
 private:
     CameraDiagnostics::Result init();
     CameraDiagnostics::Result initSystem();
-    CameraDiagnostics::Result initAttributes();
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
@@ -280,6 +280,7 @@ private:
     std::atomic<bool> m_areInputPortsMonitored{false};
 
     nx::utils::TimerHolder m_timerHolder;
+    std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
     std::unique_ptr<HanwhaRemoteArchiveManager> m_remoteArchiveManager;
     std::unique_ptr<HanwhaArchiveDelegate> m_remoteArchiveDelegate;
 };

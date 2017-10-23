@@ -65,14 +65,6 @@ public:
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
-class AnalyticsModeActionFactory: public Factory
-{
-    Q_OBJECT
-public:
-    AnalyticsModeActionFactory(QObject *parent = NULL): Factory(parent) {}
-    virtual QList<QAction *> newActions(const Parameters &parameters, QObject *parent) override;
-};
-
 } // namespace action
 } // namespace ui
 } // namespace desktop

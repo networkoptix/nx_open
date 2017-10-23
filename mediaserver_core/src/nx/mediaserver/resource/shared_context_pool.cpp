@@ -4,7 +4,8 @@ namespace nx {
 namespace mediaserver {
 namespace resource {
 
-SharedContextPool::SharedContextPool(QnMediaServerModule* serverModule):
+SharedContextPool::SharedContextPool(QnMediaServerModule* serverModule, QObject* parent):
+    QObject(parent),
     ServerModuleAware(serverModule)
 {
 }

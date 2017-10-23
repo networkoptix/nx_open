@@ -1151,33 +1151,6 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Zoom be</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Zoom ki</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Fókusz távoli</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Fókusz közeli</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Autófókusz</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Dewarping mód változtatása</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6447,17 +6420,17 @@ to %1</source>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>ó ap</translation>
+      <translation>h ap</translation>
     </message>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation>nn</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>HHHH</translation>
+      <translation>MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>

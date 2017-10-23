@@ -1149,33 +1149,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>ズームイン</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>ズームアウト</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>フォーカス遠</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>フォーカス近</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>オートフォーカス</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>歪み補正モード</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -4248,7 +4221,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1（ツアー&quot;%2&quot; が有効）</translation>
+      <translation>%1(ツアー&quot;%2&quot; が有効)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4264,7 +4237,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>トリガ%1（%2）の呼び出しに失敗しました</translation>
+      <translation>トリガ%1(%2)の呼び出しに失敗しました</translation>
     </message>
     <message>
       <source>press and hold</source>
@@ -4273,7 +4246,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>スケジュールで無効</translation>
     </message>
   </context>
   <context>

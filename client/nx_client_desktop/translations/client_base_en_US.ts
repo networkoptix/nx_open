@@ -1047,8 +1047,10 @@ to view more bookmarks</source>
         <source>Filename should not contain the following reserved characters:
 %1</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Filename should not contain the following reserved character:
+%1</numerusform>
+            <numerusform>Filename should not contain the following reserved characters:
+%1</numerusform>
         </translation>
     </message>
     <message>
@@ -1150,33 +1152,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -1260,8 +1235,8 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>...and %n more</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>...and %n more</numerusform>
+            <numerusform>...and %n more</numerusform>
         </translation>
     </message>
 </context>
@@ -2669,7 +2644,7 @@ to %1</source>
     </message>
     <message>
         <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Account is not activated. Please check your email and follow provided instructions</translation>
     </message>
 </context>
 <context>
@@ -3239,8 +3214,8 @@ to %1</source>
     <message numerus="yes">
         <source>%n Removed subjects</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n Removed subject</numerusform>
+            <numerusform>%n Removed subjects</numerusform>
         </translation>
     </message>
     <message>
@@ -3914,8 +3889,8 @@ to %1</source>
     <message numerus="yes">
         <source>Deactivate licenses?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Deactivate license?</numerusform>
+            <numerusform>Deactivate licenses?</numerusform>
         </translation>
     </message>
     <message>
@@ -3925,22 +3900,22 @@ to %1</source>
     <message numerus="yes">
         <source>Failed to deactivate %n licenses</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Failed to deactivate license</numerusform>
+            <numerusform>Failed to deactivate %n licenses</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n licenses cannot be deactivated</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+            <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cannot deactivate licenses</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Cannot deactivate license</numerusform>
+            <numerusform>Cannot deactivate licenses</numerusform>
         </translation>
     </message>
     <message>
@@ -3962,8 +3937,8 @@ to %1</source>
     <message numerus="yes">
         <source>%n licenses deactivated</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n license deactivated</numerusform>
+            <numerusform>%n licenses deactivated</numerusform>
         </translation>
     </message>
     <message>
@@ -3977,8 +3952,8 @@ to %1</source>
     <message numerus="yes">
         <source>%n channels.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n channel.</numerusform>
+            <numerusform>%n channels.</numerusform>
         </translation>
     </message>
     <message>
@@ -3988,8 +3963,8 @@ to %1</source>
     <message numerus="yes">
         <source>Deactivate %n Other</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Deactivate %n Other</numerusform>
+            <numerusform>Deactivate %n Other</numerusform>
         </translation>
     </message>
     <message>
@@ -4988,8 +4963,8 @@ to %1</source>
         <source>%n of %1 selected roles have no %2 permission</source>
         <comment>%1 is number of selected roles, %2 is permission name</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n of %1 selected roles has no %2 permission</numerusform>
+            <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
         </translation>
     </message>
     <message>
@@ -5006,8 +4981,8 @@ to %1</source>
         <source>%n of %1 selected users have no %2 permission</source>
         <comment>%1 is number of selected users, %2 is permission name</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n of %1 selected users has no %2 permission</numerusform>
+            <numerusform>%n of %1 selected users have no %2 permission</numerusform>
         </translation>
     </message>
 </context>
@@ -5306,8 +5281,8 @@ to %1</source>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n of %1 users has invalid email address</numerusform>
+            <numerusform>%n of %1 users have invalid email address</numerusform>
         </translation>
     </message>
     <message>
@@ -5317,8 +5292,8 @@ to %1</source>
     <message numerus="yes">
         <source>%n of %1 additional email addresses are invalid</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n of %1 additional email addresses is invalid</numerusform>
+            <numerusform>%n of %1 additional email addresses are invalid</numerusform>
         </translation>
     </message>
     <message>
@@ -6741,8 +6716,8 @@ to %1</source>
     <message numerus="yes">
         <source>Please select an action to perform on %n users with this role</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Please select an action to perform on %n user with this role</numerusform>
+            <numerusform>Please select an action to perform on %n users with this role</numerusform>
         </translation>
     </message>
 </context>
@@ -6936,8 +6911,8 @@ to %1</source>
         <source>PC %1 - Displays %2</source>
         <comment>%2 will be substituted by _list_ of displays</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>PC %1 - Display %2</numerusform>
+            <numerusform>PC %1 - Displays %2</numerusform>
         </translation>
     </message>
 </context>
@@ -7682,8 +7657,8 @@ to %1</source>
     <message numerus="yes">
         <source>Remove %n items from showreel?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Remove item from showreel?</numerusform>
+            <numerusform>Remove %n items from showreel?</numerusform>
         </translation>
     </message>
 </context>
@@ -7911,22 +7886,22 @@ to %1</source>
     <message numerus="yes">
         <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Server &quot;%1&quot; cannot access the device. Move it anyway?</numerusform>
+            <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Server &quot;%1&quot; cannot access the camera. Move it anyway?</numerusform>
+            <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Server &quot;%1&quot; cannot access the I/O module. Move it anyway?</numerusform>
+            <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
         </translation>
     </message>
     <message>

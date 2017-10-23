@@ -1,6 +1,7 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
 import Nx.Models 1.0;
+
 import com.networkoptix.qml 1.0;
 
 import "."
@@ -43,20 +44,16 @@ Rectangle
                 : Image.PreserveAspectFit);
         }
 
-
         NxSearchEdit
         {
             id: searchEdit;
 
-            readonly property bool itemsOverflow:
-                grid.model.sourceRowsCount > pageSwitcher.kMaxPagesCount * grid.itemsPerPage
-            visible: grid.count > grid.itemsPerPage || itemsOverflow
+            visible: grid.totalCount > grid.itemsPerPage
 
             anchors.bottom: gridHolder.top
             anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
             z: (grid.watcher.isSomeoneActive ? 0 : 1000);
-
         }
 
         Item
@@ -81,6 +78,7 @@ Rectangle
                 readonly property int tileHeight: 96;
                 readonly property int tileWidth: 280;
                 readonly property int tileSpacing: 16;
+                property int totalCount: model ? model.sourceRowsCount : 0
 
                 readonly property int maxColsCount:
                 {
@@ -350,7 +348,7 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: (!grid.model || (grid.model.sourceRowsCount == 0));
+            visible: (!grid.model || (grid.totalCount == 0));
         }
 
         Item

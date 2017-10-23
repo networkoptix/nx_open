@@ -1151,33 +1151,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Przybliż</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Oddalenie</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Ostrość dalej</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Ostrość bliżej</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Auto ostrość</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Zmień tryb przekształcania</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -1227,7 +1200,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Customer Support</source>
-      <translation>Wsparcie klienta</translation>
+      <translation>Wsparcie klienta   support@nxpolska.pl   </translation>
     </message>
     <message>
       <source>Client is not connected to any System</source>
@@ -4090,11 +4063,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie wiadomości e-mail z kluczem licencyjnym oraz ID sprzętu do %1.</translation>
+      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie wiadomości e-mail z kluczem licencyjnym oraz ID sprzętu do support@nxpolska.pl.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie klucza licencyjnego oraz ID sprzętu do %1.</translation>
+      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie klucza licencyjnego oraz ID sprzętu do support@nxpolska.pl.</translation>
     </message>
   </context>
   <context>

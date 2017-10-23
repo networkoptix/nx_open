@@ -255,18 +255,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If it does not help, restore factory defaults on the device web-page.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -312,6 +300,18 @@
     </message>
     <message>
         <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -506,15 +506,15 @@
     <message numerus="yes">
         <source>Activate %n more %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Activate %n more %1.</numerusform>
+            <numerusform>Activate %n more %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n more %1 will be used.</numerusform>
+            <numerusform>%n more %1 will be used.</numerusform>
         </translation>
     </message>
 </context>
@@ -1462,15 +1462,15 @@
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n User</numerusform>
+            <numerusform>%n Users</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Roles</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n Role</numerusform>
+            <numerusform>%n Roles</numerusform>
         </translation>
     </message>
     <message>

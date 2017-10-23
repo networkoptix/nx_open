@@ -404,10 +404,43 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period)
     }
 }
 
-void QnTimePeriodList::excludeTimePeriodList(const QnTimePeriodList& timePeriodList)
+void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
 {
-    for (const auto& timePeriod: timePeriodList)
-        excludeTimePeriod(timePeriod);
+    if (empty() || periodList.isEmpty())
+        return;
+
+    const_iterator srcItr = begin();
+    const_iterator dstItr = periodList.begin();
+    QnTimePeriodList result;
+    QnTimePeriod subtractPeriod = *dstItr;
+
+    while (srcItr != end())
+    {
+        while (srcItr != end() && srcItr->startTimeMs < subtractPeriod.startTimeMs)
+            result << *srcItr++;
+        if (!result.isEmpty())
+            result.last().truncate(subtractPeriod.startTimeMs);
+
+        while (srcItr != end() && srcItr->endTimeMs() <= subtractPeriod.endTimeMs())
+            srcItr++;
+        if (srcItr != end())
+        {
+            result << *srcItr++;
+            result.last().truncateFront(subtractPeriod.endTimeMs());
+        }
+
+        if (dstItr != periodList.end() - 1)
+        {
+            subtractPeriod = *(++dstItr);
+            if (!result.isEmpty())
+            {
+                result.last().truncate(subtractPeriod.startTimeMs);
+                if (result.last().isEmpty())
+                    result.pop_back();
+            }
+        }
+    }
+    *this = result;
 }
 
 void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint)

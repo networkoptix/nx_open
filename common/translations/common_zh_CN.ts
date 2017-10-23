@@ -255,18 +255,6 @@
       <translation>请确认端口 %1可用(如转发).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在设备设置。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先，尝试打开记录 （如果它是关闭的） 和降低 fps 的相机设置。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置。</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>如果它没有帮助，恢复出厂默认设置设备 web 页上的。</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>摄像机是从归档中恢复。删除摄像机并重新添加以观看直播视频。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在设备设置 (错误&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>首先，尝试打开记录 （如果它是关闭的） 和降低 fps 的相机设置 (错误&quot;%1&quot;).。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置 (错误&quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1288,7 +1288,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

@@ -7,8 +7,8 @@
         <tr ng-if="debugMode"><td>再生中</td><td class="camera-links-info">{{transport}} - {{player}} と {{currentResolution}}</td></tr>
         <tr><td>名前</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
-            <td>カメラID</td>
-            <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace ('}','')}}<br>
+            <td>CameraID</td>
+            <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
                 <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>
         </tr>

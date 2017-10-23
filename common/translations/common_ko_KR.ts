@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>서버 %1 : &quot;%2&quot;에서 잘못된 응답을 받았습니다.</translation>
+      <translation>서버 %1: &quot;%2&quot; 에서 잘못된 응답을 받았습니다.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -180,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>기기 요청 &quot;%1&quot;이 &quot;%2&quot; 오류로 실패했습니다.</translation>
+      <translation>기기 요청 &quot;%1&quot; 이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>카메라 요청 &quot;%1&quot;이 &quot;%2&quot; 오류로 실패했습니다.</translation>
+      <translation>카메라 요청 &quot;%1&quot; 이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>I / O 모듈 요청 &quot;%1&quot;이 &quot;%2&quot;  오류로 실패했습니다.</translation>
+      <translation>I / O 모듈 요청 &quot;%1&quot; 이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -253,18 +253,6 @@
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
       <translation>%1포트가 접속가능한지 확인하세요.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>카메라 아카이브에서 복원 되었습니다. 라이브 비디오를 보려면 카메라를 삭제 한후 다시 추가하십시요.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>우선, 장치 설정에서 녹화모드를 켜고 FPS를 줄이세요 (오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -546,7 +546,7 @@
     </message>
     <message>
       <source>Server with matching Hardware Id not found</source>
-      <translation>HWID와 일치하는 서버를  찾지 못했습니다</translation>
+      <translation>HWID와 일치하는 서버를 찾지 못했습니다</translation>
     </message>
   </context>
   <context>
@@ -663,7 +663,7 @@
     </message>
     <message>
       <source>Hardware Id: %1</source>
-      <translation>하드웨어 ID: %1</translation>
+      <translation>하드웨어 Id: %1</translation>
     </message>
     <message>
       <source>Time License</source>
@@ -1225,11 +1225,11 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>서버 &quot;%1&quot;에 라이센스 문제가 있습니다.</translation>
+      <translation>서버 &quot;%1&quot; 에 라이센스 문제가 있습니다.</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>서버 &quot;%1&quot;가 아카이브 백업을 완료했습니다.</translation>
+      <translation>서버 &quot;%1&quot; 가 아카이브 백업을 완료했습니다.</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1294,7 +1294,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 번, 첫 번째 : %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 번, 첫 번째: %2 &lt; b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1361,7 +1361,7 @@
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>시스템 디스크 &quot;%1&quot;가 거의 찼습니다.</translation>
+      <translation>시스템 디스크 &quot;%1&quot; 가 거의 찼습니다.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>

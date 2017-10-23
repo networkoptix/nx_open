@@ -1152,33 +1152,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Приблизить</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Отдалить</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Отдалить фокус</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Приблизить фокус</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Автофокусировка</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Изменить режим развёртки</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -3936,7 +3909,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
         <numerusform>Требуется по крайней мере %n %1</numerusform>
@@ -7091,7 +7064,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n закладку?</numerusform>
         <numerusform>Удалить %n закладки?</numerusform>
         <numerusform>Удалить %n закладок?</numerusform>
@@ -7340,7 +7313,7 @@ to %1</source>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n элемент не сохранен:</numerusform>
         <numerusform>%n элемента не сохранено:</numerusform>
         <numerusform>%n элементов не сохранено:</numerusform>
@@ -7356,7 +7329,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n элемент не удален:</numerusform>
         <numerusform>%n элемента не удалено:</numerusform>
         <numerusform>%n элементов не удалено:</numerusform>
@@ -7527,7 +7500,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемента?</numerusform>
         <numerusform>Удалить %n элементов?</numerusform>
@@ -7547,7 +7520,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Удалить %n матрицу?</numerusform>
         <numerusform>Удалить %n матрицы?</numerusform>
         <numerusform>Удалить %n матриц?</numerusform>

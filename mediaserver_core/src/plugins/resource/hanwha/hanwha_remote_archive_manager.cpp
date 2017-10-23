@@ -27,13 +27,13 @@ bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
     int64_t /*startTimeMs*/,
     int64_t /*endTimeMs*/)
 {
-    auto loader = m_resource->chunkLoader();
+    auto loader = m_resource->sharedContext()->chunkLoader();
     if (!loader)
         return false;
 
     // TODO: #dmishin Fix channel if needed
     const auto chunks = loader->chunksSync(m_resource->getChannel());
-    
+
     for (const auto& chunk: chunks)
     {
         outArchiveEntries->emplace_back(
@@ -66,7 +66,7 @@ RemoteArchiveCapabilities HanwhaRemoteArchiveManager::capabilities() const
 QnAbstractArchiveDelegate* HanwhaRemoteArchiveManager::archiveDelegate()
 {
     return m_resource->remoteArchiveDelegate();
-    
+
 }
 
 void HanwhaRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(

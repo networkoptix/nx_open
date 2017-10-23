@@ -29,10 +29,12 @@ public:
 
     virtual void beforeClose() override;
 
-    virtual void onReverseMode(qint64 displayTime, bool value);
+    virtual void setSpeed(qint64 displayTime, double value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
     virtual void beforeSeek(qint64 time) override;
+
+    virtual void setPlaybackMode(PlaybackMode value) override;    
 
     void setRateControlEnabled(bool enabled);
 private:
@@ -42,8 +44,8 @@ private:
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
     int m_rateControlEnabled = true;
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
-    qint64 m_lastSeekTime = AV_NOPTS_VALUE;
-    bool m_previewMode = false;
+    qint64 m_currentPositionUsec = AV_NOPTS_VALUE;
+    PlaybackMode m_playbackMode = PlaybackMode::Archive;
 };
 
 } // namespace plugins

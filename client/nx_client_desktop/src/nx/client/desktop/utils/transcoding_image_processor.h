@@ -2,11 +2,11 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <core/resource/resource_fwd.h>
+
 #include <nx/client/desktop/utils/abstract_image_processor.h>
 
 namespace nx { namespace core { namespace transcoding {struct Settings; } } }
-
-struct QnMediaDewarpingParams;
 
 namespace nx {
 namespace client {
@@ -23,7 +23,7 @@ public:
 
    void setTranscodingSettings(
        const nx::core::transcoding::Settings& settings,
-       const QnMediaDewarpingParams& mediaDewarpingParams);
+       const QnMediaResourcePtr& resource);
 
    virtual QSize process(const QSize& sourceSize) const override;
    virtual QImage process(const QImage& sourceImage) const override;

@@ -22,5 +22,12 @@ struct PasswordData
 
 #define PasswordData_Fields (password)(realm)(passwordHash)(passwordDigest)(cryptSha512Hash)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (PasswordData), (json));
+struct CameraPasswordData
+{
+    QString cameraId;
+    QString user;
+    QString password;
+};
+#define CameraPasswordData_Fields (cameraId)(user)(password)
 
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (PasswordData)(CameraPasswordData), (json));

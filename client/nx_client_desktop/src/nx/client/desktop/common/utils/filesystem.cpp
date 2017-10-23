@@ -6,93 +6,82 @@
 #include <utils/common/app_info.h>
 
 #include <nx/utils/log/assert.h>
-#include "nx/utils/app_info.h"
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-
-class FilesystemStrings
+QString FileSystemStrings::suffix(FileExtension ext)
 {
-    Q_DECLARE_TR_FUNCTIONS(FilesystemStrings)
-public:
-    static QString suffix(FileExtension ext)
+    switch (ext)
     {
-        switch (ext)
-        {
-            case FileExtension::avi:
-                return lit("avi");
-            case FileExtension::mkv:
-                return lit("mkv");
-            case FileExtension::mp4:
-                return lit("mp4");
-            case FileExtension::nov:
-                return lit("nov");
-            case FileExtension::exe64:
-            case FileExtension::exe86:
-                return lit("exe");
-            default:
-                NX_ASSERT(false, "Should never get here");
-                return QString();
-        }
+        case FileExtension::avi:
+            return lit("avi");
+        case FileExtension::mkv:
+            return lit("mkv");
+        case FileExtension::mp4:
+            return lit("mp4");
+        case FileExtension::nov:
+            return lit("nov");
+        case FileExtension::exe64:
+        case FileExtension::exe86:
+            return lit("exe");
+        default:
+            NX_ASSERT(false, "Should never get here");
+            return QString();
+    }
+}
+
+FileExtension FileSystemStrings::extension(const QString& suffix, FileExtension defaultValue)
+{
+    if (suffix == lit("exe"))
+    {
+        if (utils::AppInfo::isWin64())
+            return FileExtension::exe64;
+        return FileExtension::exe86;
     }
 
-    static FileExtension extension(const QString& suffix)
+    if (suffix == lit("avi"))
+        return FileExtension::avi;
+
+    if (suffix == lit("mp4"))
+        return FileExtension::mp4;
+
+    if (suffix == lit("nov"))
+        return FileExtension::nov;
+
+    return defaultValue;
+}
+
+QString FileSystemStrings::description(FileExtension extension)
+{
+    switch (extension)
     {
-        if (suffix == lit("exe"))
-        {
-            if (utils::AppInfo::isWin64())
-                return FileExtension::exe64;
-            return FileExtension::exe86;
-        }
+        case FileExtension::avi:
+            return tr("Audio Video Interleave");
+        case FileExtension::mkv:
+            return tr("Matroska");
+        case FileExtension::mp4:
+            return tr("MPEG-4 Part 14");
+        case FileExtension::nov:
+            return tr("%1 Media File").arg(QnAppInfo::organizationName());
+        case FileExtension::exe64:
+            return tr("Executable %1 Media File (x64)").arg(QnAppInfo::organizationName());
+        case FileExtension::exe86:
+            return tr("Executable %1 Media File (x86)").arg(QnAppInfo::organizationName());
 
-        if (suffix == lit("avi"))
-            return FileExtension::avi;
-
-        if (suffix == lit("mp4"))
-            return FileExtension::mp4;
-
-        if (suffix == lit("nov"))
-            return FileExtension::nov;
-
-        // Default value.
-        return FileExtension::mkv;
+        default:
+            NX_ASSERT(false, "Should never get here");
+            return QString();
     }
+}
 
-    static QString description(FileExtension ext)
-    {
-        const QString formatTemplate(lit("%1 (*.%2)"));
-        return formatTemplate.arg(descriptionInternal(ext)).arg(suffix(ext));
-    }
-
-private:
-    static QString descriptionInternal(FileExtension extension)
-    {
-        switch (extension)
-        {
-            case FileExtension::avi:
-                return tr("Audio Video Interleave");
-            case FileExtension::mkv:
-                return tr("Matroska");
-            case FileExtension::mp4:
-                return tr("MPEG-4 Part 14");
-            case FileExtension::nov:
-                return tr("%1 Media File").arg(QnAppInfo::organizationName());
-            case FileExtension::exe64:
-                return tr("Executable %1 Media File (x64)").arg(QnAppInfo::organizationName());
-            case FileExtension::exe86:
-                return tr("Executable %1 Media File (x86)").arg(QnAppInfo::organizationName());
-
-            default:
-                NX_ASSERT(false, "Should never get here");
-                return QString();
-        }
-    }
-};
-
-} // namespace
+QString FileSystemStrings::filterDescription(FileExtension ext)
+{
+    const QString formatTemplate(lit("%1 (*.%2)"));
+    return formatTemplate.arg(description(ext)).arg(suffix(ext));
+}
 
 bool FileExtensionUtils::isExecutable(FileExtension extension)
 {
@@ -120,7 +109,7 @@ void FileExtensionModel::setExtensions(const FileExtensionList& extensions)
     endResetModel();
 }
 
-int FileExtensionModel::rowCount(const QModelIndex& parent) const
+int FileExtensionModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return m_data.size();
 }
@@ -143,9 +132,9 @@ QVariant FileExtensionModel::data(const QModelIndex& index, int role) const
         case Qt::StatusTipRole:
         case Qt::WhatsThisRole:
         case Qt::AccessibleDescriptionRole:
-            return FilesystemStrings::description(extension);
+            return FileSystemStrings::filterDescription(extension);
         case Qn::ShortTextRole:
-            return lit(".%1").arg(FilesystemStrings::suffix(extension));
+            return lit(".%1").arg(FileSystemStrings::suffix(extension));
         case ExtensionRole:
             return qVariantFromValue(extension);
         default:
@@ -161,13 +150,13 @@ Filename Filename::parse(const QString& filename)
     Filename result;
     result.path = info.absolutePath();
     result.name = info.completeBaseName();
-    result.extension = FilesystemStrings::extension(info.suffix());
+    result.extension = FileSystemStrings::extension(info.suffix());
     return result;
 }
 
 QString Filename::completeFileName() const
 {
-    const auto ext = L'.' + FilesystemStrings::suffix(extension);
+    const auto ext = L'.' + FileSystemStrings::suffix(extension);
     const auto fullName = name.endsWith(ext)
         ? name
         : name + ext;

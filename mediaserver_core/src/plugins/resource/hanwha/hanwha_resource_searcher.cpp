@@ -13,6 +13,8 @@
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_common.h"
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
 
 namespace {
 
@@ -27,6 +29,18 @@ static const QString kHanwhaDefaultPassword = lit("4321");
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url)
+{
+    // This is not the same context as for resources, bc we do not have MAC address before hand.
+    auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
+    const auto context = qnServerModule->sharedContextPool()
+        ->sharedContext<HanwhaSharedResourceContext>(sharedId);
+
+    context->setRecourceAccess(url, auth);
+    m_sharedContext[sharedId] = context;
+    return context->information();
+}
 
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule),
@@ -77,34 +91,25 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
     HanwhaResourcePtr resource(new HanwhaResource());
     QUrl urlCopy(url);
     urlCopy.setScheme("http");
-    QString urlStr = urlCopy.toString();
 
     resource->setUrl(urlCopy.toString());
     resource->setDefaultAuth(auth);
 
-    HanwhaRequestHelper helper(resource);
-    HanwhaResponse systemInfo = helper.view("system/deviceinfo");
-    if (!systemInfo.isSuccessful())
+    const auto info = cachedDeviceInfo(auth, urlCopy);
+    if (!info || info->macAddress.isEmpty())
         return QList<QnResourcePtr>();
 
-    auto macAddr = systemInfo.parameter<QString>("ConnectedMACAddress");
-    auto model = systemInfo.parameter<QString>("Model");
-    if (!macAddr || !model)
-        return QList<QnResourcePtr>();
-    auto firmware = systemInfo.parameter<QString>("FirmwareVersion");
-    
-    resource->setMAC(QnMacAddress(*macAddr));
-    resource->setModel(*model);
-    resource->setName(*model);
-    if (firmware)
-        resource->setFirmware(*firmware);
+    resource->setMAC(QnMacAddress(info->macAddress));
+    resource->setModel(info->model);
+    resource->setName(info->model);
+    resource->setFirmware(info->firmware);
     resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
     result << resource;
     const int channel = resource->getChannel();
     if (isSearchAction)
         addMultichannelResources(result, auth);
-    else if (channel > 0 || getChannels(resource, auth) > 1)
+    else if (channel > 0 || info->channelCount > 1)
         resource->updateToChannel(channel);
     return result;
 }
@@ -144,12 +149,21 @@ bool HanwhaResourceSearcher::processPacket(
     const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/)
 {
+    if (discoveryMode() == DiscoveryMode::disabled)
+        return false;
+
     if (!isHanwhaCamera(devInfo))
         return false;
 
     QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
         cameraMac = QnMacAddress(devInfo.serialNumber);
+    if (cameraMac.isNull())
+    {
+        NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
+            .arg(devInfo.udn).arg(devInfo.serialNumber));
+        return false;
+    }
 
     QString model(devInfo.modelName);
 
@@ -214,30 +228,16 @@ void HanwhaResourceSearcher::createResource(
     addMultichannelResources(result, rpRes ? rpRes->getAuth() : auth);
 }
 
-int HanwhaResourceSearcher::getChannels(
-    const HanwhaResourcePtr& resource,
-    const QAuthenticator& auth)
-{
-    auto result = m_channelsByCamera.value(resource->getUniqueId());
-    if (result > 0)
-        return result;
-    
-    HanwhaRequestHelper helper(auth, resource->getUrl());
-    auto attributes = helper.fetchAttributes(lit("attributes/System"));
-
-    const auto maxChannels = attributes.attribute<int>(lit("System/MaxChannel"));
-    result = maxChannels ? *maxChannels : 1;
-    if (attributes.isValid())
-        m_channelsByCamera.insert(resource->getUniqueId(), result);
-    return result;
-}
-
 template <typename T>
 void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QAuthenticator& auth)
 {
     HanwhaResourcePtr firstResource = result.first().template dynamicCast<HanwhaResource>();
 
-    const auto channels = getChannels(firstResource, auth);
+    const auto info = cachedDeviceInfo(auth, firstResource->getUrl());
+    if (!info)
+        return;
+
+    const auto channels = info->channelCount;
     if (channels > 1)
     {
         firstResource->updateToChannel(0);

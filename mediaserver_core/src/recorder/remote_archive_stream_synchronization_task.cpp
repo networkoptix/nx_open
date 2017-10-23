@@ -95,7 +95,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
             kDetailLevelMs,
             false,
             std::numeric_limits<int>::max());
-    
+
     // TODO: calculate difference somehow
     for (const auto& chunk: deviceChunks)
         writeEntryToArchive(chunk);
@@ -105,7 +105,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
 
 bool RemoteArchiveStreamSynchronizationTask::writeEntryToArchive(const RemoteArchiveEntry& entry)
 {
-    auto reader = archiveReader();
+    auto reader = archiveReader(entry.startTimeMs, entry.startTimeMs + entry.durationMs);
     reader->setPlaybackRange(QnTimePeriod(entry.startTimeMs, entry.durationMs));
 
     auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };

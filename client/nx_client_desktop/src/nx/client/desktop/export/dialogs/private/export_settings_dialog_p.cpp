@@ -19,7 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/file_system.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/client/desktop/utils/layout_thumbnail_loader.h>
 #include <nx/client/desktop/utils/proxy_image_provider.h>
 #include <nx/client/desktop/utils/transcoding_image_processor.h>
@@ -75,6 +75,22 @@ ExportSettingsDialog::Private::~Private()
 {
 }
 
+void ExportSettingsDialog::Private::updateOverlaysVisibility(bool transcodingIsAllowed)
+{
+    if (transcodingIsAllowed)
+    {
+        for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
+            overlay(overlayType)->setHidden(false);
+    }
+    else
+    {
+        for (const auto overlayWidget: m_overlays)
+            overlayWidget->setHidden(true);
+    }
+
+    updateMediaImageProcessor();
+}
+
 void ExportSettingsDialog::Private::loadSettings()
 {
     m_exportMediaPersistentSettings = m_bookmarkName.isEmpty()
@@ -89,8 +105,15 @@ void ExportSettingsDialog::Private::loadSettings()
     if (lastExportDir.isEmpty())
         lastExportDir = QDir::homePath();
 
+    setMode(QnLexical::deserialized<Mode>(qnSettings->lastExportMode(), Mode::Media));
+
     m_exportMediaSettings.fileName.path = lastExportDir;
+    m_exportMediaSettings.fileName.extension = FileSystemStrings::extension(
+        m_exportMediaPersistentSettings.fileFormat, FileExtension::mkv);
+
     m_exportLayoutSettings.filename.path = lastExportDir;
+    m_exportLayoutSettings.filename.extension = FileSystemStrings::extension(
+        m_exportLayoutPersistentSettings.fileFormat, FileExtension::nov);
 
     auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
     if (!imageOverlay.name.trimmed().isEmpty())
@@ -109,10 +132,13 @@ void ExportSettingsDialog::Private::loadSettings()
         selectOverlay(type);
 
     updateTranscodingSettings();
+    updateOverlaysVisibility(isTranscodingAllowed());
 }
 
 void ExportSettingsDialog::Private::saveSettings()
 {
+    qnSettings->setLastExportMode(QnLexical::serialized(m_mode));
+
     switch (m_mode)
     {
         case Mode::Media:
@@ -216,6 +242,7 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
         setLocalFile(media);
 
     validateSettings(Mode::Media);
+    updateMediaImageProcessor();
 
     if (!m_mediaImageProvider) //< Just in case.
         return;
@@ -227,19 +254,6 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
 void ExportSettingsDialog::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
     setFrameSize(QnCameraThumbnailManager::sizeHintForCamera(camera, QSize()));
-
-    const QPair<qreal, qreal> coefficients(
-        qreal(m_previewSize.width()) / m_fullFrameSize.width(),
-        qreal(m_previewSize.height()) / m_fullFrameSize.height());
-
-    m_overlayScale = std::min({ coefficients.first, coefficients.second, 1.0 });
-
-    for (size_t i = 0; i != overlayCount; ++i)
-        m_overlays[i]->setScale(m_overlayScale);
-
-    const auto thumbnailSizeLimit = coefficients.first >= coefficients.second
-        ? QSize(m_previewSize.width(), 0)
-        : QSize(0, m_previewSize.height());
 
     m_mediaImageProvider.reset(new ProxyImageProvider());
 
@@ -310,11 +324,17 @@ void ExportSettingsDialog::Private::setFrameSize(const QSize& size)
 
     m_fullFrameSize = size;
 
+    if (m_fullFrameSize.isValid())
+    {
+        const auto newDimension = std::min(m_fullFrameSize.width(), m_fullFrameSize.height());
+        m_exportMediaPersistentSettings.setDimension(newDimension);
+    }
+
     const QPair<qreal, qreal> coefficients(
         qreal(m_previewSize.width()) / m_fullFrameSize.width(),
         qreal(m_previewSize.height()) / m_fullFrameSize.height());
 
-    m_overlayScale = qMin(coefficients.first, coefficients.second);
+    m_overlayScale = std::min({coefficients.first, coefficients.second, 1.0});
 
     QScopedValueRollback<bool> updatingRollback(m_positionUpdating, true);
 
@@ -351,13 +371,20 @@ void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period)
 
 void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
 {
+    const auto transcodingWasAllowed = isTranscodingAllowed();
     m_exportMediaSettings.fileName = filename;
+    m_exportMediaPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Media);
+
+    const bool transcodingIsAllowed = isTranscodingAllowed();
+    if (transcodingIsAllowed != transcodingWasAllowed)
+        emit transcodingAllowedChanged(transcodingIsAllowed);
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
     m_exportLayoutSettings.filename = filename;
+    m_exportLayoutPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Layout);
 }
 
@@ -391,6 +418,11 @@ void ExportSettingsDialog::Private::setMode(Mode mode)
 
     m_mode = mode;
     validateSettings(m_mode);
+}
+
+bool ExportSettingsDialog::Private::isTranscodingAllowed() const
+{
+    return !FileExtensionUtils::isExecutable(m_exportMediaSettings.fileName.extension);
 }
 
 FileExtensionList ExportSettingsDialog::Private::allowedFileExtensions(Mode mode)
@@ -708,6 +740,8 @@ void ExportSettingsDialog::Private::createOverlays(QWidget* overlayContainer)
                     overlayPositionChanged(type);
             });
     }
+
+    connect(this, &Private::transcodingAllowedChanged, this, &Private::updateOverlaysVisibility);
 }
 
 void ExportSettingsDialog::Private::updateBookmarkText()
@@ -742,12 +776,11 @@ void ExportSettingsDialog::Private::updateTimestampText()
 
 void ExportSettingsDialog::Private::updateMediaImageProcessor()
 {
-    const auto& settings = m_exportMediaSettings.transcodingSettings;
-    const auto dewarpingParams = m_exportMediaSettings.mediaResource
-        ? m_exportMediaSettings.mediaResource->getDewarpingParams()
-        : QnMediaDewarpingParams();
+    const auto& settings = isTranscodingAllowed()
+        ? m_exportMediaSettings.transcodingSettings
+        : nx::core::transcoding::Settings();
 
-    m_mediaImageProcessor->setTranscodingSettings(settings, dewarpingParams);
+    m_mediaImageProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)

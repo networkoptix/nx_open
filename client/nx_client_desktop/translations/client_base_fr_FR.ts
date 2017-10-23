@@ -1151,33 +1151,6 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Zoom Avant</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Zoom Arrière</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Focus Loin</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Focus Près</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Auto Focus</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Changer Mode Dérouler</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -4327,7 +4300,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Désactivé selon l'horaire</translation>
     </message>
   </context>
   <context>
@@ -7256,11 +7229,11 @@ to %1</source>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Entrer mot de passe...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Mot de passe Administrateur</translation>
     </message>
   </context>
   <context>

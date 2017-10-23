@@ -384,7 +384,7 @@ void QnCloudStatusWatcher::updateSystems()
                     }
             };
 
-            executeDelayed(handler, 0, thread());
+            executeDelayed(handler, 0, guard->thread());
         }
     );
 }

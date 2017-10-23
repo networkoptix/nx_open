@@ -221,10 +221,12 @@ QnConstResourceAudioLayoutPtr QnVMax480ArchiveDelegate::getAudioLayout()
     return audioLayout;
 }
 
-void QnVMax480ArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnVMax480ArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
-    if (m_reverseMode != value) {
-        m_reverseMode = value;
+    bool reverseMode = value < 0;
+    if (m_reverseMode != reverseMode) 
+    {
+        m_reverseMode = reverseMode;
         m_ignoreNextSeek = false;
         seek(displayTime, true);
     }

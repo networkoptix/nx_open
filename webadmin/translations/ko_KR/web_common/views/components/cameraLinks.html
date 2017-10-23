@@ -4,10 +4,10 @@
     </div>
     <div class='camera-links-title'>카메라 세부 정보</div>
     <table>
-        <tr ng-if="debugMode"><td>재생 중</td><td class="camera-links-info">{{transport}}-{{player}} 와 {{currentResolution}}</td></tr>
+        <tr ng-if="debugMode"><td>재생 중</td><td class="camera-links-info">{{transport}} - {{currentResolution}} with {{player}}</td></tr>
         <tr><td>이름</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
-            <td>카메라 Id</td>
+            <td>CameraID</td>
             <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace ('}','')}}<br>
                 <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>

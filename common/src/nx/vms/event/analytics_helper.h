@@ -29,7 +29,7 @@ public:
     AnalyticsHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     /** Get list of all supported analytics events in the system. */
-    QList<EventDescriptor> systemSupportedAnaliticEvents() const;
+    QList<EventDescriptor> systemSupportedAnalyticsEvents() const;
 
     /** Get list of all supported analytics events for the given cameras. */
     static QList<EventDescriptor> supportedAnalyticsEvents(

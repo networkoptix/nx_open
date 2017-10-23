@@ -47,7 +47,7 @@
     "disconnectedFromSystemSuccess":"サーバーがシステムから正常に切離されました",
     "connectedSuccess":"システムが正常に接続されています",
     "createLocalOwnerTitle":"ローカルの管理者を登録",
-    "confirmChangePassword":"adminパスワードの変更",
+    "confirmChangePassword":"Adminパスワードの変更",
     "confirmChangePasswordTitle":"システム パスワードを変更しますか? 一部のサーバー ユーザー 'admin' と root のパスワードに影響します",
     "confirmChangePasswordAction":"新しいパスワードを保存",
     "nx1ControlHint":"クライアント アプリケーションが開始されました　キーボード/マウス、またはモバイル アプリケーションを使用して制御します"
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} web インターフェイス"
+  },
+  "common":{
+    "systemOffline":"システムはオフライン",
+    "cameraLinks":{
+      "copyToClipboard":"クリップボードにコピー",
+      "highStream":"高解像度ストリーム",
+      "copyDefaultText":"コピー",
+      "unknown":"未知の値",
+      "lowStream":"低解像度ストリーム",
+      "transcoding":"トランスコーディング",
+      "copyActiveText":"クリップボードにコピーしました"
+    },
+    "searchCamPlaceholder":"検索",
+    "cameraStates":{
+      "noFormat":"このブラウザまたはデバイスは、このカメラからのビデオ再生をサポートしていません",
+      "ieWin10":"Microsoft EdgeまたはGoogle Chromeブラウザを使用してください",
+      "iosVideoTooLarge":"iOSはfullHD(2MP：1920x1080)より大きいビデオをサポートしていません",
+      "unauthorized":"認証が必要",
+      "ubuntuNX":"このブラウザは、ARMベースのサーバーのビデオをサポートしていません。代わりにChromiumブラウザを使用してください",
+      "ieNoWebm":"ビデオを再生することはできません<br>\nIeに <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM codec</a>をインストールして下さい",
+      "flashOrWebmRequired":"ビデオを再生することはできません<br>\nIeで再生するには<a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
+      "noArmSupport":"このブラウザまたはデバイスは、ARMベースのサーバーからのビデオ再生をサポートしていません",
+      "error":"エラー",
+      "offline":"オフライン",
+      "noData":"データがありません",
+      "flashRequired":"ARMベースのサーバーからビデオを再生するには、<a href='https://get.adobe.com/flashplayer/' target='_blank'> Adob​​e Flash</a>をインストールしてください"
+    }
   }
 }

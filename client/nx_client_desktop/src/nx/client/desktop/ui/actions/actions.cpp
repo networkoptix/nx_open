@@ -1,13 +1,15 @@
 #include "actions.h"
-#include "config.h"
 
 #include <core/resource/device_dependent_strings.h>
+
+#include <ini.h>
 
 #include <client/client_runtime_settings.h>
 
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/analytics/analytics_action_factory.h>
 #include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -21,8 +23,6 @@
 #include <nx/network/app_info.h>
 
 #include <nx/utils/app_info.h>
-
-#include <ini.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ui::action, IDType)
 
@@ -359,14 +359,11 @@ void initialize(Manager* manager, Action* root)
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
-    if (ini().enableAnalytics)
-    {
-        factory(StartAnalyticsAction)
-            .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-            .text(ContextMenu::tr("Start Analytics..."))
-            .childFactory(new AnalyticsModeActionFactory(manager))
-            .condition(condition::hasFlags(Qn::server_live_cam, MatchMode::All));
-    }
+    factory(StartAnalyticsAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Start Analytics..."))
+        .childFactory(new AnalyticsActionFactory(manager))
+        .condition(AnalyticsActionFactory::condition());
 
     factory()
         .flags(TitleBar)
@@ -750,7 +747,7 @@ void initialize(Manager* manager, Action* root)
         .separator();
 
     factory(ExportVideoAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Video..."))
         .conditionalText(ContextMenu::tr("Export Bookmark..."),
             condition::hasArgument(Qn::CameraBookmarkRole))
@@ -763,7 +760,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
         .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(ConditionWrapper(new ExportCondition(true))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportLayoutAction)
@@ -777,7 +775,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
         .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(ConditionWrapper(new ExportCondition(true))
+        .condition((ConditionWrapper(new ExportCondition(true))
+            || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ThumbnailsSearchAction)

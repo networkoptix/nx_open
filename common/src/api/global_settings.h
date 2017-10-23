@@ -265,6 +265,9 @@ public:
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
+    bool hanwhaDeleteProfilesOnInitIfNeeded() const;
+    void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
+
 signals:
     void initialized();
 
@@ -383,6 +386,8 @@ private:
 
     QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor;
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor;
+
+    QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded;
 
     AdaptorList m_allAdaptors;
 

@@ -255,18 +255,6 @@
       <translation>וודא שפורט %1 נגישץ (כלומר שהוא מופנה).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות המכשיר.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות המצלמה.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין fps בהגדרות מודלות קלט/פלט.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>אם זה לא עוזר, שחזר את הגדרות ברירות המחדל של היצרן בדף האינטרנט של ההתקן.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>המצלמה שוחזרה מארכיון. מחק את המצלמה והוסף אותה שוב לתצוגת וידאו חי.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המכשיר (שגיאה &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות המצלמה (שגיאה &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות התקן הקלט/פלט (שגיאה &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1363,7 +1363,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

@@ -767,24 +767,25 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     return result;
 }
 
-void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
+    if (value == 0.0)
+        return;
+
+    m_position = displayTime;
+    m_rtspSession->setScale(value);
+
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = value < 0;
+
+    bool needSendRequest = !m_opened || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
+    if (!needSendRequest)
+        return;
+    
+    bool fromLive = newReverseMode && m_position == DATETIME_NOW;
     m_blockReopening = false;
-    int sign = value ? -1 : 1;
-    bool fromLive = value && m_position == DATETIME_NOW;
-    close();
 
-    if (!m_opened && m_camera) {
-        m_rtspSession->setScale(qAbs(m_rtspSession->getScale()) * sign);
-        m_position = displayTime;
-        openInternal();
-    }
-    else {
-        m_rtspSession->sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession->getScale()) * sign);
-    }
-    m_sendedCSec = m_rtspSession->lastSendedCSeq();
-    //m_waitBOF = true;
-
+    seek(displayTime, /* findIFrame */ true);
     if (fromLive)
         m_position = AV_NOPTS_VALUE;
 }
@@ -871,11 +872,15 @@ void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
     }
 }
 
-void QnRtspClientArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
+void QnRtspClientArchiveDelegate::beforeChangeSpeed(double speed)
 {
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = speed < 0;
+
     // Reconnect If camera is offline and it is switch from live to archive
-    if (m_position == DATETIME_NOW) {
-        if (reverseMode)
+    if (oldReverseMode != newReverseMode && m_position == DATETIME_NOW)
+    {
+        if (newReverseMode)
             beforeSeek(AV_NOPTS_VALUE);
         else
             m_blockReopening = false;

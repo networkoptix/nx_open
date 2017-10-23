@@ -42,7 +42,6 @@ private:
 
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
-    bool m_previousPacketHasMarkerBit;
     std::vector<quint8> m_nextFrameChunksBuffer;
     quint32 m_lastRtpTime;
 private:

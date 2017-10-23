@@ -22,7 +22,7 @@ namespace {
             QtMsgType type,
             const QString& description,
             const QUrl& identifier,
-            const QSourceLocation& sourceLocation ) override { 
+            const QSourceLocation& sourceLocation ) override {
                 if( type >= QtCriticalMsg ) {
                     NX_LOG( lit("Camera parameters XML validation error. Identifier: %1. Description: %2. Location: %3:%4").
                         arg(identifier.toString()).arg(description).arg(sourceLocation.line()).arg(sourceLocation.column()), cl_logDEBUG1 );
@@ -153,6 +153,7 @@ namespace QnXmlTag {
     const QString paramDataType         = lit("dataType");
     const QString paramName             = lit("name");
     const QString paramDescription      = lit("description");
+    const QString paramConfirmation     = lit("confirmation");
     const QString paramRange            = lit("range");
     const QString paramInternalRange    = lit("internalRange");
     const QString paramTag              = lit("tag");
@@ -206,15 +207,15 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
     result.version      = root.attribute(QnXmlTag::pluginVersion);
     result.unique_id    = root.attribute(QnXmlTag::pluginUniqueId);
     result.packet_mode  = parseBooleanXmlValue(root.attribute(QnXmlTag::pluginPacketMode, lit("true")));
-	
+
 	return parsePluginXml(root, result);
 }
 
 bool QnCameraAdvacedParamsXmlParser::parsePluginXml(const QDomElement& pluginXml, QnCameraAdvancedParams &params) {
     for (QDomNode node = pluginXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		if (node.nodeName() != QnXmlTag::parameters) 
+		if (node.nodeName() != QnXmlTag::parameters)
 			continue;
-	
+
         for (QDomNode groupNode = node.toElement().firstChild(); !groupNode.isNull(); groupNode = groupNode.nextSibling()) {
 		    QnCameraAdvancedParamGroup group;
             if (!parseGroupXml(groupNode.toElement(), group))
@@ -247,22 +248,25 @@ bool QnCameraAdvacedParamsXmlParser::parseGroupXml(const QDomElement &groupXml, 
 	return true;
 }
 
-bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementXml, QnCameraAdvancedParameter &param) {
-    param.id            = elementXml.attribute(QnXmlTag::paramId);
-    param.dataType      = QnCameraAdvancedParameter::stringToDataType(elementXml.attribute(QnXmlTag::paramDataType));
-	param.name          = elementXml.attribute(QnXmlTag::paramName);
-	param.description   = elementXml.attribute(QnXmlTag::paramDescription);
-	param.range         = elementXml.attribute(QnXmlTag::paramRange);
+bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement& elementXml,
+    QnCameraAdvancedParameter& param)
+{
+    param.id = elementXml.attribute(QnXmlTag::paramId);
+    param.dataType = QnCameraAdvancedParameter::stringToDataType(elementXml.attribute(QnXmlTag::paramDataType));
+    param.name = elementXml.attribute(QnXmlTag::paramName);
+    param.description = elementXml.attribute(QnXmlTag::paramDescription);
+    param.confirmation = elementXml.attribute(QnXmlTag::paramConfirmation);
+    param.range = elementXml.attribute(QnXmlTag::paramRange);
     param.internalRange = elementXml.attribute(QnXmlTag::paramInternalRange);
-	param.tag           = elementXml.attribute(QnXmlTag::paramTag);
-	param.readOnly      = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramReadOnly));
-    param.readCmd       = elementXml.attribute(QnXmlTag::paramReadCmd);
-    param.writeCmd      = elementXml.attribute(QnXmlTag::paramWriteCmd);
-    param.aux           = elementXml.attribute(QnXmlTag::paramAux);
-    param.showRange     = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramShowRange));
-    param.notes         = elementXml.attribute(QnXmlTag::paramNotes);
-    param.unit          = elementXml.attribute(QnXmlTag::paramUnit);
-    param.resync        = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
+    param.tag = elementXml.attribute(QnXmlTag::paramTag);
+    param.readOnly = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramReadOnly));
+    param.readCmd = elementXml.attribute(QnXmlTag::paramReadCmd);
+    param.writeCmd = elementXml.attribute(QnXmlTag::paramWriteCmd);
+    param.aux = elementXml.attribute(QnXmlTag::paramAux);
+    param.showRange = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramShowRange));
+    param.notes = elementXml.attribute(QnXmlTag::paramNotes);
+    param.unit = elementXml.attribute(QnXmlTag::paramUnit);
+    param.resync = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramResync));
 
     auto childNodes = elementXml.childNodes();
 

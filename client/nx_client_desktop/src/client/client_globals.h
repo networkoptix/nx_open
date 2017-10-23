@@ -90,29 +90,6 @@ namespace Qn
     Q_DECLARE_OPERATORS_FOR_FLAGS(ItemFlags)
 
     /**
-     * Layer of a graphics item on the scene.
-     *
-     * Workbench display presents convenience functions for moving items between layers
-     * and guarantees that items from the layers with higher numbers are always
-     * displayed on top of those from the layers with lower numbers.
-     */
-    enum ItemLayer
-    {
-        EMappingLayer,              /**< Layer for E-Mapping background. */
-        BackLayer,                  /**< Back layer. */
-        PinnedLayer,                /**< Layer for pinned items. */
-        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
-        UnpinnedLayer,              /**< Layer for unpinned items. */
-        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        ZoomedLayer,                /**< Layer for zoomed items. */
-        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
-        EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
-        MessageBoxLayer,            /**< Layer for graphics text messages. */
-        LayerCount
-    };
-
-    /**
     * Generic enumeration holding different data roles used in Qn classes.
     */
     enum ItemDataRole

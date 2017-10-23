@@ -24,7 +24,7 @@ HanwhaMappedPresetManager::HanwhaMappedPresetManager(const QnResourcePtr& resour
 
 bool HanwhaMappedPresetManager::createNativePreset(const QnPtzPreset& nxPreset, QString *outNativePresetId)
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto presetNumber = freePresetNumber();
     if (presetNumber.isEmpty())
         return false;
@@ -54,7 +54,7 @@ bool HanwhaMappedPresetManager::removeNativePreset(const QString nativePresetId)
 
     const auto presetName = presetNameFromId(nativePresetId);
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.remove(
         lit("ptzconfig/preset"),
         {
@@ -72,7 +72,7 @@ bool HanwhaMappedPresetManager::nativePresets(QnPtzPresetList* outNativePresets)
     if (!outNativePresets)
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.view(
         lit("ptzconfig/preset"),
         {{kHanwhaChannelProperty, channel()}});
@@ -103,10 +103,13 @@ bool HanwhaMappedPresetManager::activateNativePreset(const QString& nativePreset
     if (number.isEmpty())
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.control(
         lit("ptzcontrol/preset"),
-        {{kHanwhaPresetNumberProperty, number}});
+        {
+            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+            {kHanwhaPresetNumberProperty, number}
+        });
 
     return response.isSuccessful();
 }
@@ -123,7 +126,7 @@ bool HanwhaMappedPresetManager::normalizeNativePreset(
     if (newPresetName.isEmpty())
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.update(
         lit("ptzconfig/preset"),
         {

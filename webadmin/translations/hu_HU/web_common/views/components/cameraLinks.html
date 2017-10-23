@@ -4,11 +4,11 @@
     </div>
     <div class='camera-links-title'>Kamera részletek</div>
     <table>
-        <tr ng-if="debugMode"><td>Lejátszás</td><td class="camera-links-info">{{transport}} - {{currentResolution}} {{player}} lejátszóval</td></tr>
+        <tr ng-if="debugMode"><td>Lejátszás</td><td class="camera-links-info">{{transport}} - {{currentResolution}} a következővel: {{player}}</td></tr>
         <tr><td>Név</td><td class="camera-links-info">{{activeCamera.name}}</td></tr>
         <tr>
-            <td>KameraID</td>
-            <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace ("}','')}}<br>
+            <td>CameraID</td>
+            <td class="camera-links-info buffer">{{activeCamera.id.replace('{','').replace('}','')}}<br>
                 <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
             </td>
         </tr>

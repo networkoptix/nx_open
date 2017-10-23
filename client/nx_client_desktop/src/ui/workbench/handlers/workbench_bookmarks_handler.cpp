@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QAction>
 
+#include <ini.h>
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
@@ -118,9 +119,12 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(bookmarksViewer, &QnBookmarksViewer::exportBookmarkClicked, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
+            const auto actionId = nx::client::desktop::ini().universalExportDialog
+                ? action::ExportVideoAction
+                : action::ExportTimeSelectionAction;
+
             context()->statisticsModule()->registerClick(lit("bookmark_tooltip_export"));
-            menu()->triggerIfPossible(action::ExportVideoAction,
-                getActionParamsFunc(bookmark));
+            menu()->triggerIfPossible(actionId, getActionParamsFunc(bookmark));
         });
 
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,

@@ -86,10 +86,14 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
 
-rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread /*= 0*/)
+rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
+    const QnUuid& cameraId,
+    bool start,
+    GetCallback callback,
+    QThread* targetThread /*= 0*/)
 {
     QnRequestParamList params;
-    params.insert(lit("clientId"),      commonModule()->moduleGUID().toString());
+    params.insert(lit("clientId"), sourceId);
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
@@ -431,6 +435,24 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::changeCameraPassword(
+    const QnUuid& id,
+    const QAuthenticator& auth,
+    Result<QnRestResult>::type callback,
+    QThread* targetThread)
+{
+    CameraPasswordData data;
+    data.cameraId = id.toString();
+    data.user = auth.user();
+    data.password = auth.password();
+    return executePost(
+        lit("/api/changeCameraPassword"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
+}
 
 // --------------------------- private implementation -------------------------------------
 

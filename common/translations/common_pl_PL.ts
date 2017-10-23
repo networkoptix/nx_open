@@ -255,18 +255,6 @@
       <translation>Upewnij się, że port %1 jest dostępny (np. jest przekierowany).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach urządzenia.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach kamery.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach modułu I/O.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Jeśli to nie pomoże, przywróć urządzeniu fabryczne ustawienia domyślne przeglądarką WWW.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Kamera została przywrócona z archiwum. Usuń kamerę i dodaj ją ponownie, aby wyświetlić podgląd na żywo.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach urządzenia (błąd &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach kamery (błąd &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach modułu I/O (błąd &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
@@ -1338,7 +1338,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

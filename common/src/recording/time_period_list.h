@@ -158,11 +158,23 @@ public:
      * \param[in] period                A period to be excluded.
      *
      * The function excludes the given period from the list.
-     * If the period overlaps the other periods, intersected pieces or whole periods will be romoved.
+     * If the period overlaps the other periods, intersected pieces or whole periods will be removed.
      * If the period list is unsorted or contains overlapping periods
      * the result is undefined.
      */
-    void excludeTimePeriod(const QnTimePeriod &period);
+    void excludeTimePeriod(const QnTimePeriod& period);
+
+    /**
+     * Exclude a periods. This functions is the same as operator-.
+     *
+     * \param[in] periodList    A period list to be excluded.
+     *
+     * The function excludes the given period list from the source list.
+     * If the period list overlaps the other periods, intersected pieces or whole periods will be removed.
+     * If the source or destination period list is unsorted or contains overlapping periods
+     * the result is undefined.
+     */
+    void excludeTimePeriods(const QnTimePeriodList& periodList);
 
     void excludeTimePeriodList(const QnTimePeriodList& timePeriodList);
 

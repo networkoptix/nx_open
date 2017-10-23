@@ -18,15 +18,17 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+class HanwhaSharedResourceContext;
+
 class HanwhaChunkLoader: public QObject
 {
     Q_OBJECT
 
     enum class State
     {
-        initial,
+        Initial,
         updateTimeRange,
-        loadingChunks
+        LoadingChunks
     };
 
 public:
@@ -35,7 +37,7 @@ public:
 
     void setIsCameraLoader(bool isCameraLoader);
 
-    void start(const QAuthenticator& auth, const QUrl& url, int channelCount);
+    void start(HanwhaSharedResourceContext* resourceContext);
     bool isStarted() const;
 
     qint64 startTimeUsec(int channelNumber) const;
@@ -43,6 +45,7 @@ public:
     QnTimePeriodList chunks(int channelNumber) const;
     QnTimePeriodList chunksSync(int channelNumber) const;
 
+    void setTimeZoneShift(std::chrono::seconds timeZoneShift);
 signals:
     void gotChunks();
 
@@ -60,10 +63,10 @@ private:
     void startTimerForNextRequest(const std::chrono::milliseconds& delay);
     void sendRequest();
     void parseTimeRangeData(const QByteArray& data);
-    qint64 latestChunkTime() const;
+    qint64 latestChunkTimeMs() const;
 private:
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
-    State m_state = State::initial;
+    State m_state = State::Initial;
     QByteArray m_unfinishedLine;
     std::vector<QnTimePeriodList> m_chunks;
     qint64 m_nextRequestTimerId = 0;
@@ -73,11 +76,12 @@ private:
     qint64 m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
 
     int m_maxChannels = 0;
-    QAuthenticator m_auth;
-    QUrl m_cameraUrl;
+    HanwhaSharedResourceContext* m_resourceContext = nullptr;
     mutable QnMutex m_mutex;
 
-    //< Is this loader for camera or for NVR
+    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};
+    std::atomic<bool> m_terminated{false};
+
     bool m_isCameraLoader = false;
     std::atomic<bool> m_chunksLoadedAtLeastOnce{false};
     std::atomic<bool> m_timeRangeLoadedAtLeastOnce{false};

@@ -392,7 +392,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         });
 
 
-        systemAPI.getTime().then(function(result){
+        systemAPI.getTime(true).then(function(result){
             var serverUtcTime = parseInt(result.data.reply.utcTime);
             var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
             timeManager.init(Config.webclient.useServerTime, serverUtcTime, timeZoneOffset);

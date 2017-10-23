@@ -136,6 +136,31 @@ public:
                 messageBox->show();
             });
 
+        addButton(lit("RandomizePtz"), [this]
+            {
+                QList<Ptz::Capabilities> presets;
+                presets.push_back(Ptz::NoPtzCapabilities);
+                presets.push_back(Ptz::ContinuousZoomCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability);
+                presets.push_back(Ptz::ContinuousPanTiltCapabilities);
+                presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability | Ptz::PresetsPtzCapability);
+
+                for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                {
+                    int idx = presets.indexOf(camera->getPtzCapabilities());
+                    if (idx < 0)
+                        idx = 0;
+                    else
+                        idx = (idx + 1) % presets.size();
+
+                    camera->setPtzCapabilities(presets[idx]);
+                }
+
+            });
+
         addButton(lit("Resource Pool"), [this]
             {
                 auto messageBox = new QnMessageBox(mainWindow());

@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>เครื่องมือสำหรับนักพัฒนา</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            มีแนวคิดในการปรับปรุงเครื่องมือสำหรับนักพัฒนาซอฟต์แวร์ของเราหรือเพียงต้องการเริ่มต้นการสนทนา
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">ส่งข้อเสนอแนะทางอีเมล</a></p>
     </div>
@@ -11,30 +11,25 @@
     <div>
         <h3>กิจกรรมทั่วไป</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System,
-            which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
+            เหตุการณ์ทั่วไปคือวิธีการส่งกิจกรรมจากระบบของบุคคลที่สามไปยังระบบซึ่งสามารถใช้เพื่อเรียกใช้การทำงานของระบบในเครื่องมือเหตุการณ์และกฎ
+            Generator Event Generator เป็นเครื่องมือที่ช่วยสร้าง HTTP Generic Event calls
         </p>
         <p><a href="#/developers/events">กิจกรรมทั่วไป</a></p>
     </div>
     <div>
         <h3>เซิร์ฟเวอร์ API</h3>
         <p>
-            API ของเซิร์ฟเวอร์มีชุด API API มาตรฐานสำหรับระบบอื่นๆ ช่วยให้นักพัฒนาสามารถเข้าถึงคุณลักษณะของระบบได้เกือบทุกอย่างที่มีอยู่ในไคลเอ็นต์ปกติ: ค้นหา / จัดการทรัพยากรระบบ (เซิร์ฟเวอร์กล้องผู้ใช้สิทธิ์) ดึงวิดีโอสดหรือบันทึกจากระบบสร้างเหตุการณ์สร้างกฎควบคุมกล้อง PTZ , และอื่น ๆ.
+            API ของเซิร์ฟเวอร์มีชุด API API มาตรฐานสำหรับระบบอื่นๆ ช่วยให้นักพัฒนาสามารถเข้าถึงคุณลักษณะของระบบได้เกือบทุกอย่างที่มีอยู่ในไคลเอ็นต์ปกติ: ค้นหา / จัดการทรัพยากรระบบ (เซิร์ฟเวอร์กล้องผู้ใช้สิทธิ์) ดึงวิดีโอสดหรือบันทึกจากระบบสร้างเหตุการณ์สร้างกฎควบคุมกล้อง PTZ, และอื่น ๆ.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            <a href="#/developers/api"><b> เครื่องมือทดสอบ API (ใหม่) </b></a> - เอกสารแบบโต้ตอบกับเครื่องมือสำหรับการทดสอบ API การโทร <br> <a href="#/developers/changelog"> การเปลี่ยนแปลง API </a> - รายการการเปลี่ยนแปลงใน API <br> <a id="api-doc" href="api.xml" target="_blank"> ในเอกสาร API </a>
         </p>
 
     </div>
     <div>
         <h3>รายละเอียดกล้อง</h3>
         <p>
-            Displays additional developer-friendly information for cameras in the Web Admin interface:
+            แสดงข้อมูลผู้พัฒนามิตรเพิ่มเติมสำหรับกล้องในอินเทอร์เฟซเว็บ Admin:
         </p>
         <ul>
             <li>รหัสกล้อง</li>
@@ -42,15 +37,14 @@
             <li>ส่งออกวิดีโอโดยตรงจากเบราเซอร์</li>
         </ul>
         <p>
-            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
-            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+            การเปิดแผงปุ่มรายละเอียดกล้อง - ไปยังอินเทอร์เฟซสำหรับผู้ดูแลระบบเว็บ เลือก<a href="#/view">มุมมอง</a> เลือกกล้องเป้าหมาย คลิกที่ไอคอนการตั้งค่า (รูปเฟือง), จาก นั้นเลือกกล้องรายละเอียด"
         </p>
         <p><a href="#/view/?cameraLinks">รายละเอียดกล้อง</a></p>
     </div>
     <div>
         <h3>SDK การรวมแหล่งที่มาของวิดีโอ</h3>
         <p>
-            ซอร์สโค้ด SDK ของวิดีโอนำเสนอความสามารถในการรวมแหล่งวิดีโอสดหรือที่บันทึกไว้ (กล้อง IP, NVRs, DVRs ฯลฯ ) เข้ากับระบบ SDK ช่วยในการสร้างวิธีการในการค้นหาแสดงการวิเคราะห์และบันทึกวิดีโอ นอกจากนี้ยังช่วยให้สามารถรวมพอร์ต I / O อุปกรณ์และข้อมูลการตรวจจับการเคลื่อนไหว
+            ซอร์สโค้ด SDK ของวิดีโอ นำเสนอความสามารถในการรวมแหล่งวิดีโอสดหรือที่บันทึกไว้ (กล้อง IP, NVRs, DVRs ฯลฯ) เข้ากับระบบ SDK ช่วยในการสร้างวิธีการในการค้นหาแสดงการวิเคราะห์และบันทึกวิดีโอ นอกจากนี้ยังช่วยให้สามารถรวมพอร์ต I / O อุปกรณ์และข้อมูลการตรวจจับการเคลื่อนไหว
         </p>
         <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >รับ SDK</a></p>
     </div>

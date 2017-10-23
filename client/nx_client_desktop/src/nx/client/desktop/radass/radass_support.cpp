@@ -11,6 +11,11 @@
 
 #include <nx/client/desktop/condition/generic_condition.h>
 
+
+namespace nx {
+namespace client {
+namespace desktop {
+
 namespace {
 
 bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemData& item)
@@ -28,16 +33,11 @@ bool isRadassSupportedInternal(QnResourcePool* resourcePool, const QnLayoutItemD
         resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     }
 
-    const auto camera = resourcePool->getResourceByDescriptor(item.resource)
-        .dynamicCast<QnVirtualCameraResource>();
-    return camera && camera->hasDualStreaming2();
+    return isRadassSupported(resourcePool->getResourceByDescriptor(item.resource)
+        .dynamicCast<QnVirtualCameraResource>());
 }
 
 } // namespace
-
-namespace nx {
-namespace client {
-namespace desktop {
 
 bool isRadassSupported(const QnLayoutResourcePtr& layout, MatchMode match)
 {
@@ -70,6 +70,20 @@ bool isRadassSupported(const QnLayoutItemIndex& item)
 
     const auto layoutItem = item.layout()->getItem(item.uuid());
     return isRadassSupportedInternal(item.layout()->resourcePool(), layoutItem);
+}
+
+bool isRadassSupported(const QnVirtualCameraResourcePtr& camera)
+{
+    return camera && camera->hasDualStreaming2();
+}
+
+bool isRadassSupported(const QnVirtualCameraResourceList& cameras, MatchMode match)
+{
+    return GenericCondition::check<QnVirtualCameraResourcePtr>(cameras, match,
+        [](const QnVirtualCameraResourcePtr& camera)
+        {
+            return isRadassSupported(camera);
+        });
 }
 
 bool isRadassSupported(const QnLayoutItemIndexList& items, MatchMode match)
