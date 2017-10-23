@@ -18,6 +18,9 @@ files:
     source: '/cloud_portal/cloud/notifications/static/templates/*.json'
     translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
   -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.template'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
+  -
     source: '/cloud_portal/cloud/notifications/static/templates/*.html'
     translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
   -
