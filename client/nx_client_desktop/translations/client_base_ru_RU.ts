@@ -3388,7 +3388,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>Открыть  закладки</translation>
+      <translation>Открыть закладки</translation>
     </message>
     <message>
       <source>Event Rules</source>
