@@ -19,8 +19,8 @@ namespace ite {
 
 struct Settings
 {
-    int minStrength;
-    int maxFramesPerSecond;
+    int minStrength = 70;
+    int maxFramesPerSecond = 100;
 };
 
 extern Settings settings;

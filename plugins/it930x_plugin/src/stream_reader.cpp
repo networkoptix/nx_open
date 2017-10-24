@@ -64,9 +64,7 @@ void FramesFrequencyWatcher::gotFrame()
 
 bool FramesFrequencyWatcher::isOverflow() const
 {
-    bool oldVal = m_overflow;
-    m_overflow = false;
-    return oldVal;
+    return m_overflow;
 }
 // -------------------------------------------------------------------------------------------------
 
@@ -169,7 +167,6 @@ void StreamReader::interrupt()
 }
 
 //
-
 bool StreamReader::framesTooOften() const
 {
     if (!m_freqWatcher)
@@ -200,7 +197,11 @@ ContentPacketPtr StreamReader::nextPacket()
             break;
 
         if (pkt && framesTooOften())
-            return nullptr;
+        {
+            m_interrupted = true;
+            m_cameraManager->rxDeviceRef()->shutdown();
+            break;
+        }
 
         if (pkt)
             return pkt;

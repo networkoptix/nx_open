@@ -241,7 +241,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
     if (returnIframeBeforeTime)
         --itr; // prefer frame before defined time if no exact match
 
-    return *itr;
+    return QnConstCompressedVideoDataPtr((*itr)->clone());
 }
 
 QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTime(
