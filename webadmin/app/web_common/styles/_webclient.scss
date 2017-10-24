@@ -481,6 +481,7 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
+    z-index: 1; /*keeps camera details panel above video*/
 
     & table{
       font-size: 12px;
