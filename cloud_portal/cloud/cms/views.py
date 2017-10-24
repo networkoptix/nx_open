@@ -26,6 +26,26 @@ class MyAdminSite(AdminSite):
 mysite = MyAdminSite()
 
 
+def get_context_and_language(request, context_id, language_code, customization):
+    context = Context.objects.get(id=context_id) if context_id else None
+    language = Language.objects.get(code=language_code) if language_code else None
+
+    if request.method == "POST":
+        if not context and 'context' in request.POST and request.POST['context']:
+            context = Context.objects.get(id=request.POST['context'])
+
+        if not language and 'language' in request.POST and request.POST['language']:
+            language = Language.objects.get(code=request.POST['language'])
+
+    if not language:
+        if 'language' in request.session:
+            language = Language.objects.get(code=request.session['language'])
+        else:
+            language = customization.default_language
+
+    return context, language
+
+
 def initialize_context_editor(request, context_id, language_code):
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     context, language = get_context_and_language(request, context_id, language_code, customization)
@@ -244,7 +264,7 @@ def product_settings(request, product_id):
                     'success': messages.SUCCESS,
                     'warning': messages.WARNING,
                 }[item[0]]
-            messages.add_message(request, log_type, item[1])
+                messages.add_message(request, log_type, item[1])
     else:
         form = ProductSettingsForm()
 

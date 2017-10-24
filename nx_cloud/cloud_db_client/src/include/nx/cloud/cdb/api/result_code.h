@@ -36,6 +36,7 @@ enum class ResultCode
     serviceUnavailable,
     notAllowedInCurrentState,
     mergedSystemIsOffline,
+    vmsRequestFailure,
 
     /** Credentials used for authentication are no longer valid. */
     credentialsRemovedPermanently,

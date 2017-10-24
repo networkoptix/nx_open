@@ -51,12 +51,12 @@
                        ng-disabled="linkSettings.useAuth">&nbsp;Gebruik inloggegevens</label></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
-            <td><label class="camera-links-label" for="useLogin">Login</label></td>
+            <td><label class="camera-links-label" for="useLogin">Gebruikersnaam</label></td>
             <td><input id="useLogin" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.useLogin"></td>
         </tr>
         <tr ng-if="!linkSettings.useAuth && linkSettings.useCredentials">
-            <td><label class="camera-links-label" for="usePassword">Wachtwoord</label></td>
+            <td><label class="camera-links-label" for="usePassword">Password</label></td>
             <td><input id="usePassword" type="text" class="input-sm camera-links-info"
                        ng-model="linkSettings.usePassword"></td>
         </tr>
@@ -66,7 +66,7 @@
                        ng-model="linkSettings.duration"></td>
         </tr>
         <tr>
-            <td><label class="camera-links-label" for="resolution">Resolutie</label></td>
+            <td><label class="camera-links-label" for="resolution">Resolution</label></td>
             <td><input id="resolution" type="text" class="input-sm camera-links-info" 
                        ng-model="linkSettings.resolution"></td>
         </tr>

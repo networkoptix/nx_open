@@ -41,10 +41,6 @@ protected:
 
 private:
     conf::RunTimeOptions m_runTimeOptions;
-
-    int m_argc;
-    char** m_argv;
-    int m_timerID;
     std::vector<SocketAddress> m_httpEndpoints;
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
 

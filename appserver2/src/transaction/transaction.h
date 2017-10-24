@@ -1623,6 +1623,13 @@ APPLY(10101, getMiscParam, ApiMiscData, \
         ApiTransactionData& operator=(const ApiTransactionData&) = default;
         ApiTransactionData(ApiTransactionData&&) = default;
         ApiTransactionData& operator=(ApiTransactionData&&) = default;
+
+        bool operator==(const ApiTransactionData& right) const
+        {
+            return tranGuid == right.tranGuid
+                && tran == right.tran
+                && dataSize == right.dataSize;
+        }
     };
 #define ApiTransactionData_Fields (tranGuid)(tran)(dataSize)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))

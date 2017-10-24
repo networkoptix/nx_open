@@ -299,6 +299,26 @@ void AsyncHttpClient::setAuth(const AuthInfo& auth)
     m_delegate.setAuth(auth);
 }
 
+void AsyncHttpClient::setUserAuthToken(const AuthToken& userToken)
+{
+    m_delegate.setUserAuthToken(userToken);
+}
+
+void AsyncHttpClient::setUserCredentials(const Credentials& userCredentials)
+{
+    m_delegate.setUserCredentials(userCredentials);
+}
+
+void AsyncHttpClient::setProxyUserAuthToken(const AuthToken& userToken)
+{
+    m_delegate.setProxyUserAuthToken(userToken);
+}
+
+void AsyncHttpClient::setProxyUserCredentials(const Credentials& userCredentials)
+{
+    m_delegate.setProxyUserCredentials(userCredentials);
+}
+
 void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
 {
     m_delegate.setProxyVia(proxyEndpoint);

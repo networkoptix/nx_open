@@ -100,16 +100,16 @@ public:
         const AbstractResourceReader& in,
         AbstractResourceWriter* const out) const override
     {
-#ifdef NX_STREE_ENABLE_DEBUG_LOGGING
-        NX_LOG(lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResId), cl_logDEBUG2);
-#endif
+        #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
+            NX_LOG(lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResId), cl_logDEBUG2);
+        #endif
 
         QVariant value;
         if (!in.get(m_matchResId, &value))
         {
-#ifdef NX_STREE_ENABLE_DEBUG_LOGGING
-            NX_LOG(lit("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResId), cl_logDEBUG2);
-#endif
+            #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
+                NX_LOG(lit("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResId), cl_logDEBUG2);
+            #endif
             return;
         }
 
@@ -118,16 +118,16 @@ public:
         typename Container::const_iterator it = m_children.find(typedValue);
         if (it == m_children.end())
         {
-#ifdef NX_STREE_ENABLE_DEBUG_LOGGING
-            NX_LOG(lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2);
-#endif
+            #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
+                NX_LOG(lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2);
+            #endif
             return;
         }
 
-#ifdef NX_STREE_ENABLE_DEBUG_LOGGING
-        NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
-            .arg(it->first).arg(value.toString()), cl_logDEBUG2);
-#endif
+        #if defined(NX_STREE_ENABLE_DEBUG_LOGGING)
+            NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
+                .arg(it->first).arg(value.toString()), cl_logDEBUG2);
+        #endif
         it->second->get(in, out);
     }
 

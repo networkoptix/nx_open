@@ -10,7 +10,7 @@ namespace stree {
 
 /**
  * Associative dictionary. Element key interpreted as wildcard mask. 
- * Find methods look up for the first element that satisfies supplied string.
+ * Find methods look up the first element that satisfies supplied string.
  * NOTE: Performs validation to mask by sequentially checking all elements. 
  * So do not use it when high performance is needed.
  */

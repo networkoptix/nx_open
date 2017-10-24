@@ -8,8 +8,9 @@ namespace cloud {
 namespace gateway {
 
 namespace conf {
+
 class Settings;
-class RunTimeOptions;
+
 } // namespace conf
 
 class ConnectHandler:
@@ -20,9 +21,7 @@ class ConnectHandler:
         network::server::StreamConnectionHolder<nx_http::deprecated::AsyncMessagePipeline>;
 
 public:
-    ConnectHandler(
-        const conf::Settings& settings,
-        const conf::RunTimeOptions& runTimeOptions);
+    ConnectHandler(const conf::Settings& settings);
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
@@ -42,7 +41,6 @@ private:
     void stream(Socket* source, Socket* target, Buffer* buffer);
 
     const conf::Settings& m_settings;
-    const conf::RunTimeOptions& m_runTimeOptions;
 
     nx_http::Request m_request;
     nx_http::HttpServerConnection* m_connection;

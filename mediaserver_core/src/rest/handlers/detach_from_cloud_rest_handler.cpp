@@ -4,6 +4,8 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 
+#include <nx/vms/utils/vms_utils.h>
+
 #include <api/global_settings.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/model/detach_from_cloud_data.h>
@@ -71,7 +73,7 @@ int QnDetachFromCloudRestHandler::execute(
     }
 
     QString errStr;
-    if (!validatePasswordData(data, &errStr))
+    if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
         NX_LOGX(lm("Cannot detach from cloud. Password check failed. cloudSystemId %1")
             .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);

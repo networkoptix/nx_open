@@ -6,6 +6,7 @@
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/test_support/utils.h>
@@ -85,7 +86,7 @@ bool MediaServerCloudIntegrationTest::saveCloudCredentialsToMediaServer()
     cloudData.cloudAuthKey = QString::fromStdString(m_cloudSystem.authKey);
     cloudData.cloudAccountName = QString::fromStdString(m_ownerAccount.email);
     return
-        mserverClient.saveCloudSystemCredentials(std::move(cloudData)).error ==
+        mserverClient->saveCloudSystemCredentials(std::move(cloudData)).error ==
         QnJsonRestResult::NoError;
 }
 
@@ -104,27 +105,36 @@ MediaServerLauncher& MediaServerCloudIntegrationTest::mediaServer()
     return m_mediaServerLauncher;
 }
 
-MediaServerClient MediaServerCloudIntegrationTest::prepareMediaServerClient()
+std::unique_ptr<MediaServerClient> MediaServerCloudIntegrationTest::prepareMediaServerClient()
 {
-    MediaServerClient mediaServerClient(mediaServerEndpoint());
+    auto mediaServerClient = std::make_unique<MediaServerClient>(
+        nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            .setEndpoint(mediaServerEndpoint()));
     if (!m_ownerCredentials.first.isEmpty())
     {
-        mediaServerClient.setUserName(m_ownerCredentials.first);
-        mediaServerClient.setPassword(m_ownerCredentials.second);
+        mediaServerClient->setUserCredentials(nx_http::Credentials(
+            m_ownerCredentials.first,
+            nx_http::PasswordAuthToken(m_ownerCredentials.second)));
     }
     else
     {
-        mediaServerClient.setUserName(m_defaultOwnerCredentials.first);
-        mediaServerClient.setPassword(m_defaultOwnerCredentials.second);
+        mediaServerClient->setUserCredentials(nx_http::Credentials(
+            m_defaultOwnerCredentials.first,
+            nx_http::PasswordAuthToken(m_defaultOwnerCredentials.second)));
     }
     return mediaServerClient;
 }
 
-MediaServerClient MediaServerCloudIntegrationTest::prepareMediaServerClientFromCloudOwner()
+std::unique_ptr<MediaServerClient> 
+    MediaServerCloudIntegrationTest::prepareMediaServerClientFromCloudOwner()
 {
-    MediaServerClient mediaServerClient(mediaServerEndpoint());
-    mediaServerClient.setUserName(m_ownerAccount.email.c_str());
-    mediaServerClient.setPassword(m_ownerAccount.password.c_str());
+    auto mediaServerClient = std::make_unique<MediaServerClient>(
+        nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
+            .setEndpoint(mediaServerEndpoint()));
+
+    mediaServerClient->setUserCredentials(nx_http::Credentials(
+        m_ownerAccount.email.c_str(),
+        nx_http::PasswordAuthToken(m_ownerAccount.password.c_str())));
     return mediaServerClient;
 }
 
@@ -138,7 +148,7 @@ void MediaServerCloudIntegrationTest::configureSystemAsLocal()
     request.systemName = nx::utils::generateRandomName(7);
     request.password = password;
 
-    QnJsonRestResult resultCode = mediaServerClient.setupLocalSystem(std::move(request));
+    QnJsonRestResult resultCode = mediaServerClient->setupLocalSystem(std::move(request));
     ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
     if (m_ownerCredentials.first.isEmpty())
@@ -199,7 +209,7 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     for (;;)
     {
         ::ec2::ApiUserDataList users;
-        ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+        ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         const auto userIter = std::find_if(
             users.begin(), users.end(),
             [&newAccount](const ::ec2::ApiUserData& elem)
@@ -230,7 +240,7 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
     userData.permissions = Qn::GlobalLiveViewerPermissionSet;
 
     auto mediaServerClient = prepareMediaServerClient();
-    NX_GTEST_ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient.ec2SaveUser(userData));
+    NX_GTEST_ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2SaveUser(userData));
 
     return userData;
 }

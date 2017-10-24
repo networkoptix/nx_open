@@ -311,8 +311,6 @@ void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
     m_socket->cancelIOSync(eventType);
     m_pingTimer->cancelSync();
     m_aliveTimer->cancelSync();
-    m_readQueue.clear();
-    m_writeQueue.clear();
 }
 
 bool WebSocket::isDataFrame() const
