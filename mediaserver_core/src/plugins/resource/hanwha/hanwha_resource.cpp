@@ -607,6 +607,9 @@ CameraDiagnostics::Result HanwhaResource::initInternal()
 
 CameraDiagnostics::Result HanwhaResource::init()
 {
+    setCameraCapability(Qn::SetUserPasswordCapability, true);
+    saveParams();
+
     const auto sharedContext = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
     {
@@ -640,7 +643,6 @@ CameraDiagnostics::Result HanwhaResource::init()
         return result;
 
     initMediaStreamCapabilities();
-    setCameraCapability(Qn::SetUserPasswordCapability, true);
     saveParams();
 
     sharedContext->startServices();
