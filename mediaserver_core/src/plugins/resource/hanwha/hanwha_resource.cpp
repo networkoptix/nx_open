@@ -607,6 +607,9 @@ CameraDiagnostics::Result HanwhaResource::initInternal()
 
 CameraDiagnostics::Result HanwhaResource::init()
 {
+    setCameraCapability(Qn::SetUserPasswordCapability, true);
+    saveParams();
+
     const auto sharedContext = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
     {
@@ -640,7 +643,6 @@ CameraDiagnostics::Result HanwhaResource::init()
         return result;
 
     initMediaStreamCapabilities();
-    setCameraCapability(Qn::SetUserPasswordCapability, true);
     saveParams();
 
     sharedContext->startServices();
@@ -1103,7 +1105,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
         if (nxSecondaryProfileNumber == kHanwhaInvalidProfile)
             ++amountOfProfilesNeeded;
 
-        if (amountOfProfilesNeeded > 0)
+        if (amountOfProfilesNeeded + totalProfileNumber > m_maxProfileCount)
         {
             return CameraDiagnostics::CameraInvalidParams(
                 lit("- can not create profiles. Please delete %1 profiles%2 on the camera web page.")
