@@ -44,11 +44,14 @@ def main() {
 
 def unsafe_main() {
 	def action = params?.action ?: 'update_parameters'
-	def dry_run = params?.dry_run ?: true
+	def dry_run = params?.dry_run
 	def clean_build = params?.clean_build ?: false
 	def clean_only = params?.clean_only ?: false
 	def slave_runner
 	def requested_platform_names
+
+	if (dry_run == null)
+		dry_run = true
 
 	echo "Action: $action"
 
