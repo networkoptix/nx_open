@@ -44,7 +44,9 @@ def main() {
 
 def unsafe_main() {
 	def action = params?.action ?: 'update_parameters'
-	def must_clean_workspace = params?.clean ?: false
+	def dry_run = params?.dry_run ?: true
+	def clean_build = params?.clean_build ?: false
+	def clean_only = params?.clean_only ?: false
 	def slave_runner
 	def requested_platform_names
 
@@ -80,7 +82,9 @@ def unsafe_main() {
 			configuration: config.ci.configuration,
 			customization: config.ci.customization,
 			cloud_group: config.ci.cloud_group,
-			must_clean_workspace: must_clean_workspace,
+			dry_run: dry_run,
+			clean_build: clean_build,
+			clean_only: clean_only,
 		]
 		slave_runner.run_slaves_stage(run_params)
 		echo "revision_info: $slave_runner.revision_info"
@@ -91,13 +95,17 @@ def unsafe_main() {
 def update_job_parameters(config) {
 	def job_params = [
 		choice(name: 'action', choices: ['build', 'update_parameters'].join('\n'), description: 'Action to run'),
-		booleanParam(name: 'clean', defaultValue: false, description: 'Do clean build')
+		booleanParam(name: 'dry_run', defaultValue: false,
+			description: 'Do dry run: do not build nor test anything, just test this Jenkinsfile'),
+		booleanParam(name: 'clean_build', defaultValue: false, description: 'Do clean build (clean workspaces before builds)'),
+		booleanParam(name: 'clean_only', defaultValue: false, description: 'Clean workspaces only, do not do anything else'),
 	]
 	def platform_params = config.platforms.collect {
 		booleanParam(name: it.key, defaultValue: it.key in config.ci.default_platforms, description: "Build $it.key platform")
 	}
 	properties([
 		parameters(job_params + platform_params),
+		disableConcurrentBuilds(),
 		buildDiscarder(logRotator(daysToKeepStr: config.ci.days_to_keep_old_build.toString())),
 	])
 }
