@@ -399,9 +399,11 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
 
             // User server time offset of current server (server camera belongs to)
-            var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
-            if(serverOffset){
-                timeManager.setOffset(serverOffset);
+            if($scope.activeCamera){
+                var serverOffset = $scope.camerasProvider.getServerTimeOffset($scope.activeCamera.parentId);
+                if(serverOffset){
+                    timeManager.setOffset(serverOffset);
+                }
             }
 
             $scope.showCameraPanel = !$scope.activeCamera;

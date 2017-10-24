@@ -27,7 +27,7 @@ namespace MatchType
     };
 
     NX_UTILS_API Value fromString(const QString& str);
-}; // namespace MatchType
+} // namespace MatchType
 
 class NX_UTILS_API SaxHandler:
     public QXmlDefaultHandler
@@ -52,11 +52,11 @@ public:
     virtual bool fatalError(const QXmlParseException& exception);
 
     /**
-     * @return root of tree, created during parsing xml.
+     * @return Root of tree, created during parsing xml.
      */
     const std::unique_ptr<AbstractNode>& root() const;
     /**
-     * Releases ownership of tree, created during parsing.
+     * Releases ownership of the tree, created during parsing.
      */
     std::unique_ptr<AbstractNode> releaseTree();
 

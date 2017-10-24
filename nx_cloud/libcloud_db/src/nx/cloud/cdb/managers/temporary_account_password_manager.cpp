@@ -28,10 +28,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
-    const conf::Settings& settings,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
 :
-    m_settings(settings),
     m_dbManager(dbManager)
 {
     if (fillCache() != nx::utils::db::DBResult::ok)

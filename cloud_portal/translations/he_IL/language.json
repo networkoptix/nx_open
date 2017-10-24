@@ -174,6 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"החשבון שלך נשמר בהצלחה",
+    "activationLinkSent":"Activation Link Sent",
     "passwordChangedSuccess":"החשבון שלך נשמר בהצלחה",
     "changePassword":"שנה סיסמה",
     "newPasswordLabel":"סיסמה חדשה",
@@ -220,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"שלח",
+    "sendConfirm":"Resend activation link",
     "resetPassword":"איפוס סיסמה",
     "setNewPassword":"שמור סיסמה",
     "setNewPasswordLabel":"סיסמה חדשה"

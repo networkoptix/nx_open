@@ -57,7 +57,7 @@ public:
      * @param queryFunc throws nx::utils::db::Exception.
      * @throws nx::utils::db::Exception.
      */
-    template<typename QueryFunc, typename... OutputData>
+    template<typename QueryFunc>
     void executeUpdateQuerySync(QueryFunc queryFunc)
     {
         nx::utils::promise<nx::utils::db::DBResult> queryDonePromise;
@@ -69,8 +69,7 @@ public:
             },
             [&queryDonePromise](
                 nx::utils::db::QueryContext*,
-                nx::utils::db::DBResult dbResult,
-                OutputData... outputData)
+                nx::utils::db::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });

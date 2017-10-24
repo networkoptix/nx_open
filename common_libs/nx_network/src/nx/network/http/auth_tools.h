@@ -11,14 +11,58 @@
 
 namespace nx_http {
 
+enum class AuthTokenType
+{
+    none,
+    password,
+    ha1,
+};
+
+class NX_NETWORK_API AuthToken
+{
+public:
+    QString value;
+    AuthTokenType type = AuthTokenType::none;
+
+    void setPassword(const QString& password);
+    void setHa1(const QString& ha1);
+    bool empty() const;
+};
+
+class NX_NETWORK_API PasswordAuthToken:
+    public AuthToken
+{
+public:
+    PasswordAuthToken(const QString& password);
+};
+
+class NX_NETWORK_API Ha1AuthToken:
+    public AuthToken
+{
+public:
+    Ha1AuthToken(const QString& ha1);
+};
+
+class NX_NETWORK_API Credentials
+{
+public:
+    QString username;
+    AuthToken authToken;
+
+    Credentials() = default;
+    Credentials(
+        const QString& username,
+        const AuthToken& authToken);
+};
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Generates Authorization header and adds it to the request.
  */
 bool NX_NETWORK_API addAuthorization(
     Request* const request,
-    const StringType& userName,
-    const boost::optional<StringType>& userPassword,
-    const boost::optional<BufferType>& predefinedHA1,
+    const Credentials& credentials,
     const header::WWWAuthenticate& wwwAuthenticateHeader);
 
 BufferType NX_NETWORK_API calcHa1(
@@ -65,6 +109,12 @@ bool NX_NETWORK_API calcDigestResponse(
     const StringType& userName,
     const boost::optional<StringType>& userPassword,
     const boost::optional<BufferType>& predefinedHA1,
+    const StringType& uri,
+    const header::WWWAuthenticate& wwwAuthenticateHeader,
+    header::DigestAuthorization* const digestAuthorizationHeader);
+bool NX_NETWORK_API calcDigestResponse(
+    const StringType& method,
+    const Credentials& credentials,
     const StringType& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
     header::DigestAuthorization* const digestAuthorizationHeader);

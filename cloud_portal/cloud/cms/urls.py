@@ -2,8 +2,8 @@ from django.conf.urls import include, url
 from .views import *
 
 urlpatterns = [
-    url(r'page_editor/(?P<context_id>.+?)/(?P<language_code>.+?)/', page_editor, name="page_editor"),
-    url(r'page_editor/(?P<context_id>.+?)/', page_editor, name="page_editor"),
+    url(r'edit/(?P<context_id>.+?)/(?P<language_code>.+?)/', page_editor, name="page_editor"),
+    url(r'edit/(?P<context_id>.+?)/', page_editor, name="page_editor"),
 
     url(r'download/(?P<path>.*)$', download_file, name="download_file"),
 
@@ -14,5 +14,5 @@ urlpatterns = [
 
     url(r'version_action/(?P<version_id>.+?)/', version_action, name="version_action"),
 
-    url(r'version/(?P<version_id>.+?)/', version, name="version"),
+    url(r'^version/(?P<version_id>.+?)/', version, name="version"),
 ]

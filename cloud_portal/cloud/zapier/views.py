@@ -12,16 +12,12 @@ from rest_hooks.signals import raw_hook_event
 
 from models import *
 from cloud import settings
-
+import urllib
 from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
-#Hacked URLs
-CLOUD_DB_URL_HACK = 'http://beta.nxvms.com:80/cdb'
-CLOUD_INSTANCE_URL_HACK = 'http://beta.nxvms.com'
-
 #Correct urls
-#CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
+CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
 
 
@@ -34,12 +30,6 @@ def authenticate(request):
             email, password = base64.b64decode(credentials[1]).split(':', 1)
             user = django.contrib.auth.authenticate(username=email, password=password)
 
-            #start auth hacks
-            request = CLOUD_INSTANCE_URL_HACK + "/api/account/login/"
-            r = requests.post(request, json={'email': email, 'password': password})
-            if r.status_code != 200:
-                raise APINotAuthorisedException('Username or password are invalid')
-            #end auth hacks
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
@@ -139,7 +129,7 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
     else:
         return
 
-    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL_HACK, system_id)
+    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL, system_id)
 
     r = requests.post(url, json=data, auth=HTTPDigestAuth(email, password))
     if r.status_code != 200:
@@ -181,7 +171,7 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
 @handle_exceptions
 def get_systems(request):
     user, email, password = authenticate(request)
-    request = CLOUD_DB_URL_HACK + "/system/get"
+    request = CLOUD_DB_URL + "/system/get"
     r = requests.get(request, params={"customization": settings.CUSTOMIZATION}, auth=HTTPDigestAuth(email, password))
 
     if r.status_code != 200:
@@ -215,10 +205,10 @@ def zapier_send_generic_event(request):
     make_or_increment_rule('Generic Event', email, system_id, caption,
                            password=password, description=description, source=source)
 
-    url = "{}/gateway/{}/api/createEvent"\
-        .format(CLOUD_INSTANCE_URL_HACK, system_id)
+    url = "{}/gateway/{}/api/createEvent?{}"\
+        .format(CLOUD_INSTANCE_URL, system_id, urllib.urlencode(query_params).replace('+', '%20'))
 
-    r = requests.get(url, data=None, params=query_params, auth=HTTPDigestAuth(email, password))
+    r = requests.get(url, data=None, auth=HTTPDigestAuth(email, password))
 
     if r.status_code != 200:
         Response({'message': "Error sending generic event to system"}, status=r.status_code)
@@ -237,7 +227,7 @@ def nx_http_action(request):
 
     if hooks_event.exists():
         for hook in hooks_event:
-            raw_hook_event.send(sender=None, event_name=event, payload={'data': {'caption': caption}}, user=hook.user)
+            hook.deliver_hook(None, {'caption': caption})
             make_or_increment_rule('Hook Fired', hook.user.email, system_id, caption)
 
         return Response({'message': "Webhook fired for " + caption}, status=200)

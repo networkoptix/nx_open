@@ -122,9 +122,6 @@ public slots:
     void stopSync();
 
 private slots:
-    void loadResourcesFromECS(
-        ec2::AbstractECConnectionPtr ec2Connection,
-        QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);

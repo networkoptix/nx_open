@@ -4,6 +4,8 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 
+#include <nx/vms/utils/vms_utils.h>
+
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -65,7 +67,7 @@ int QnDetachFromSystemRestHandler::execute(
     }
 
     QString errStr;
-    if (!validatePasswordData(data, &errStr))
+    if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
         NX_LOGX(lm("Cannot detach from system. Password check failed.")
             , cl_logDEBUG1);

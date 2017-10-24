@@ -4,9 +4,12 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/test_http_server.h>
 
 #include <nx/cloud/cdb/managers/system_health_info_provider.h>
+
+#include <rest/server/json_rest_result.h>
 
 #include "test_setup.h"
 
@@ -73,7 +76,7 @@ protected:
         base_type::SetUp();
 
         m_vmsGatewayEmulator.registerRequestProcessorFunc(
-            "/gateway/{systemId}/",
+            "/gateway/{systemId}/api/mergeSystems",
             std::bind(&SystemMerge::vmsApiRequestStub, this, _1, _2, _3, _4, _5));
         ASSERT_TRUE(m_vmsGatewayEmulator.bindAndListen());
 
@@ -83,6 +86,11 @@ protected:
         ASSERT_TRUE(startAndWaitUntilStarted());
 
         m_ownerAccount = addActivatedAccount2();
+
+        m_vmsGatewayEmulator.setAuthenticationEnabled(true);
+        m_vmsGatewayEmulator.registerUserCredentials(
+            m_ownerAccount.email.c_str(),
+            m_ownerAccount.password.c_str());
     }
 
     void givenTwoSystemsWithSameOwner()
@@ -112,6 +120,11 @@ protected:
     void whenMergeSystems()
     {
         m_prevResultCode = mergeSystems(m_ownerAccount, m_masterSystem.id, m_slaveSystem.id);
+    }
+
+    void whenSlaveSystemFailsEveryRequest()
+    {
+        m_vmsApiResult = nx_http::StatusCode::internalServerError;
     }
 
     void thenResultCodeIs(api::ResultCode resultCode)
@@ -146,6 +159,17 @@ protected:
         requestPathItems.pop_front();
     }
 
+    void thenVmsRequestIsAuthenticatedWithOwnerCredentials()
+    {
+        m_prevVmsApiRequest = m_vmsApiRequests.pop();
+        const auto authorizationHeaderStr = nx_http::getHeaderValue(
+            m_prevVmsApiRequest->headers, nx_http::header::Authorization::NAME);
+        ASSERT_FALSE(authorizationHeaderStr.isEmpty());
+        nx_http::header::Authorization authorization;
+        ASSERT_TRUE(authorization.parse(authorizationHeaderStr));
+        ASSERT_EQ(m_ownerAccount.email, authorization.userid().toStdString());
+    }
+
     void assertAnyOfPermissionsIsNotEnoughToMergeSystems(
         std::vector<api::SystemAccessRole> accessRolesToCheck)
     {
@@ -171,6 +195,7 @@ private:
     TestHttpServer m_vmsGatewayEmulator;
     nx::utils::SyncQueue<nx_http::Request> m_vmsApiRequests;
     boost::optional<nx_http::Request> m_prevVmsApiRequest;
+    boost::optional<nx_http::StatusCode::Value> m_vmsApiResult;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         ec2::ConnectionManager*,
@@ -189,7 +214,17 @@ private:
         nx_http::RequestProcessedHandler completionHandler)
     {
         m_vmsApiRequests.push(std::move(request));
-        completionHandler(nx_http::StatusCode::ok);
+        
+        QnJsonRestResult response;
+        response.error = QnRestResult::Error::NoError;
+
+        nx_http::RequestResult requestResult(
+            m_vmsApiResult ? *m_vmsApiResult : nx_http::StatusCode::ok);
+        requestResult.dataSource = std::make_unique<nx_http::BufferSource>(
+            "application/json",
+            QJson::serialized(response));
+
+        completionHandler(std::move(requestResult));
     }
 };
 
@@ -211,6 +246,16 @@ TEST_F(SystemMerge, fails_if_either_system_is_offline)
 }
 
 // TEST_F(SystemMerge, fails_if_either_system_is_older_than_3_2)
+
+TEST_F(SystemMerge, vms_merge_request_is_authenticated_using_same_credentials_as_cloud_merge)
+{
+    givenTwoOnlineSystemsWithSameOwner();
+
+    whenMergeSystems();
+
+    thenMergeSucceeded();
+    thenVmsRequestIsAuthenticatedWithOwnerCredentials();
+}
 
 TEST_F(SystemMerge, fails_if_systems_have_different_owners)
 {
@@ -242,7 +287,15 @@ TEST_F(SystemMerge, merge_request_invokes_merge_request_to_slave_system)
     thenVmsApiMergeRequestHasBeenIssuedToSlaveSystem();
 }
 
-// TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
+TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
+{
+    givenTwoOnlineSystemsWithSameOwner();
+    
+    whenSlaveSystemFailsEveryRequest();
+    whenMergeSystems();
+
+    thenResultCodeIs(api::ResultCode::vmsRequestFailure);
+}
 
 } // namespace test
 } // namespace cdb

@@ -98,11 +98,7 @@
         padding-left:15px;
 
         &.active{
-          background-color: $brand_core !important;
           color:$light1;
-        }
-        &:hover{
-          background-color: $light16;
         }
       }
     }
@@ -180,12 +176,12 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.cameras-panel-wrapper{
+.cameras-panel-toggle{
   width: 320px;
 
-  @include transition-property(width);
-  @include transition-duration(.35s);
-  @include transition-timing-function(ease);
+  transition-timing-function: ease-in-out;
+  -webkit-transition-duration: 1s;
+  transition-duration: 1s;
 }
 
 .cameras-panel{
@@ -253,10 +249,6 @@ table.webclient-window>tbody>tr>td{
       float: right;
       width: 44px;
       height: 44px;
-      &.active{
-        color: $blue10 !important;  
-      }
-      
       &:hover, &.active:hover{
         background-color: $additional_light3 !important;  
       }
@@ -480,7 +472,7 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
-    z-index: 112;
+    z-index: 110;
 
     & table{
       font-size: 12px;
@@ -736,11 +728,6 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.blur-preview{
-  -webkit-filter: blur(5px);
-  filter: blur(5px);
-}
-
 .video-preview{
   background-color: $dark1;
   max-width: 100%;
@@ -844,7 +831,7 @@ table.webclient-window>tbody>tr>td{
   }
 
   .cameras-panel-wrapper{
-    z-index: 2000;
+    z-index: 200;
     position: absolute;
     width: 100% !important;
   }
@@ -877,7 +864,6 @@ table.webclient-window>tbody>tr>td{
 
   .stick-to-top{
     height: 60px !important;
-    margin-top: 4px;
   }
 }
 
@@ -921,20 +907,4 @@ table.webclient-window>tbody>tr>td{
   height: 44px;
   width: 40px;
   display: block;
-}
-
-.collapse-box{
-    /*
-        Trick to fix WEB-561 - when collapsing we are making content for collapsing box move up while height is decreasing
-    */
-
-    overflow:hidden;
-
-    .collapsing.closing{ /* Additional animation for collapsing */
-        margin-top:-100px;
-        transform: translate3d(0, 0, 0); /* Enable hardware acceleration */
-        @include transition-property(height,visibility,margin-top);
-        @include transition-duration(.35s);
-        @include transition-timing-function(ease);
-    }
 }
