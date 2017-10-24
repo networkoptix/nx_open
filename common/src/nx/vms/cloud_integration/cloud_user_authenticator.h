@@ -6,15 +6,20 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx/cloud/cdb/api/auth_provider.h>
-#include <nx/cloud/cdb/api/connection.h>
-#include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/subscription.h>
 
-#include "abstract_user_data_provider.h"
+#include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/cloud/cdb/api/connection.h>
+#include <nx/vms/auth/abstract_user_data_provider.h>
+
+#include <core/resource/resource_fwd.h>
+
+namespace nx {
+namespace vms {
+namespace cloud_integration {
 
 class CloudConnectionManager;
 class CdbNonceFetcher;
@@ -24,7 +29,7 @@ class CloudUserInfoPool;
  * Adds support for authentication using cloud account credentials.
  */
 class CloudUserAuthenticator:
-    public AbstractUserDataProvider,
+    public auth::AbstractUserDataProvider,
     public Qn::EnableSafeDirectConnection
 {
 public:
@@ -33,7 +38,7 @@ public:
      */
     CloudUserAuthenticator(
         CloudConnectionManager* const cloudConnectionManager,
-        std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
+        std::unique_ptr<auth::AbstractUserDataProvider> defaultAuthenticator,
         const CdbNonceFetcher& cdbNonceFetcher,
         const CloudUserInfoPool& cloudUserInfoPool);
     ~CloudUserAuthenticator();
@@ -60,7 +65,7 @@ private:
     };
 
     CloudConnectionManager* const m_cloudConnectionManager;
-    std::unique_ptr<AbstractUserDataProvider> m_defaultAuthenticator;
+    std::unique_ptr<auth::AbstractUserDataProvider> m_defaultAuthenticator;
     const CdbNonceFetcher& m_cdbNonceFetcher;
     const CloudUserInfoPool& m_cloudUserInfoPool;
     mutable QnMutex m_mutex;
@@ -91,3 +96,7 @@ private:
 
     void cloudBindingStatusChanged(bool boundToCloud);
 };
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

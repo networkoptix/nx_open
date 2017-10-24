@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include "cloud_manager_group.h"
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 class CloudIntegrationManager:
     public QObject
@@ -10,11 +10,11 @@ class CloudIntegrationManager:
     Q_OBJECT
 
 public:
-    CloudManagerGroup cloudManagerGroup;
+    nx::vms::cloud_integration::CloudManagerGroup cloudManagerGroup;
 
     CloudIntegrationManager(
         QnCommonModule* commonModule,
-        AbstractNonceProvider* defaultNonceFetcher);
+        nx::vms::auth::AbstractNonceProvider* defaultNonceFetcher);
 
 private slots:
     void onCloudBindingStatusChanged(bool isBound);

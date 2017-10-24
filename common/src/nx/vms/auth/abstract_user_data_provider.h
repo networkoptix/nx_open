@@ -9,6 +9,10 @@
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
 
+namespace nx {
+namespace vms {
+namespace auth {
+
 class AbstractUserDataProvider
 {
 public:
@@ -37,3 +41,7 @@ public:
         const nx_http::header::Authorization& authorizationHeader,
         nx_http::HttpHeaders* const responseHeaders) = 0;
 };
+
+} // namespace auth
+} // namespace vms
+} // namespace nx

@@ -18,6 +18,10 @@ constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(
 
 } // namespace
 
+namespace nx {
+namespace vms {
+namespace cloud_integration {
+
 CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
@@ -247,3 +251,7 @@ void CloudConnectionManager::cloudSettingsChanged()
         qnGlobalSettings->cloudSystemId(),
         qnGlobalSettings->cloudAuthKey());
 }
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

@@ -25,6 +25,10 @@ class AuthInfo;
 
 class QnResourcePool;
 
+namespace nx {
+namespace vms {
+namespace cloud_integration {
+
 namespace detail {
 
 struct CloudUserInfoRecord
@@ -137,3 +141,7 @@ protected:
     nx::Buffer m_nonce;
     mutable QnMutex m_mutex;
 };
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

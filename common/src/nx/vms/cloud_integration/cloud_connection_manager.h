@@ -13,6 +13,10 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
+namespace nx {
+namespace vms {
+namespace cloud_integration {
+
 class AbstractCloudConnectionManager:
     public QObject,
     public nx::hpm::api::AbstractCloudSystemCredentialsProvider
@@ -89,3 +93,7 @@ private:
 private slots:
     void cloudSettingsChanged();
 };
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

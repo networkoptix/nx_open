@@ -4,7 +4,7 @@
 #include <core/resource_access/user_access_data.h>
 
 struct PasswordData;
-class CloudConnectionManager;
+namespace nx { namespace vms { namespace cloud_integration { class CloudConnectionManager; } } }
 namespace ec2 {
     class AbstractTransactionMessageBus;
 }
@@ -15,7 +15,7 @@ class QnDetachFromSystemRestHandler: public QnJsonRestHandler
 
 public:
     QnDetachFromSystemRestHandler(
-        CloudConnectionManager* const cloudConnectionManager,
+        nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager,
         ec2::AbstractTransactionMessageBus* messageBus);
 
     virtual int executeGet(
@@ -32,6 +32,6 @@ private:
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult& result);
 private:
-    CloudConnectionManager* const m_cloudConnectionManager;
+    nx::vms::cloud_integration::CloudConnectionManager* const m_cloudConnectionManager;
     ec2::AbstractTransactionMessageBus* m_messageBus;
 };

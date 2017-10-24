@@ -14,12 +14,12 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <api/app_server_connection.h>
 #include <rest/helpers/permissions_helper.h>
-#include <cloud/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
 #include "system_settings_handler.h"
 
 
 QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
-    CloudManagerGroup* cloudManagerGroup)
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
     :
     m_cloudManagerGroup(cloudManagerGroup)
 {

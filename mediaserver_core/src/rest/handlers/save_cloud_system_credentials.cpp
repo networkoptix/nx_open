@@ -18,14 +18,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
-#include <cloud/cloud_connection_manager.h>
-#include <cloud/cloud_manager_group.h>
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
 QnSaveCloudSystemCredentialsHandler::QnSaveCloudSystemCredentialsHandler(
-    CloudManagerGroup* cloudManagerGroup)
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
 :
     m_cloudManagerGroup(cloudManagerGroup)
 {

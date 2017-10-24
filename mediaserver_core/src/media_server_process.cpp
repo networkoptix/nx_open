@@ -1510,7 +1510,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 void MediaServerProcess::registerRestHandlers(
-    CloudManagerGroup* cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
@@ -1643,7 +1643,7 @@ void MediaServerProcess::regTcp(
 }
 
 bool MediaServerProcess::initTcpListener(
-    CloudManagerGroup* const cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
@@ -1874,7 +1874,8 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
-void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
+void MediaServerProcess::resetSystemState(
+    nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
 {
     for (;;)
     {

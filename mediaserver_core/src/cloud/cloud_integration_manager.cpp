@@ -4,13 +4,17 @@
 
 #include "media_server/media_server_module.h"
 #include "media_server/settings.h"
+#include "network/auth/generic_user_data_provider.h"
 #include "server/server_globals.h"
 
 CloudIntegrationManager::CloudIntegrationManager(
     QnCommonModule* commonModule,
-    AbstractNonceProvider* defaultNonceFetcher)
+    nx::vms::auth::AbstractNonceProvider* defaultNonceFetcher)
     :
-    cloudManagerGroup(commonModule, defaultNonceFetcher)
+    cloudManagerGroup(
+        commonModule,
+        defaultNonceFetcher,
+        std::make_unique<GenericUserDataProvider>(commonModule))
 {
     const auto cdbEndpoint = qnServerModule->roSettings()->value(
         nx_ms_conf::CDB_ENDPOINT,
@@ -24,7 +28,7 @@ CloudIntegrationManager::CloudIntegrationManager(
 
     connect(
         &cloudManagerGroup.connectionManager,
-        &AbstractCloudConnectionManager::cloudBindingStatusChanged,
+        &nx::vms::cloud_integration::AbstractCloudConnectionManager::cloudBindingStatusChanged,
         this,
         &CloudIntegrationManager::onCloudBindingStatusChanged);
 }

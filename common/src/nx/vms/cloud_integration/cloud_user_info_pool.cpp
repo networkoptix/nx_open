@@ -1,17 +1,26 @@
+#include "cloud_user_info_pool.h"
+
 #include <algorithm>
+
+#include <nx/fusion/serialization/json.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/utils/log/log.h>
+
+#include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
+
+#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
-#include <nx/utils/log/log.h>
-#include <nx/network/http/auth_tools.h>
-#include <nx/cloud/cdb/api/auth_provider.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/cloud/cdb/client/data/auth_data.h>
-#include "cloud_user_info_pool.h"
+
 #include "cdb_nonce_fetcher.h"
 
+namespace nx {
+namespace vms {
+namespace cloud_integration {
 
-static const QString kCloudAuthInfoKey = nx::cdb::api::kVmsUserAuthInfoAttributeName;
+static const QString kCloudAuthInfoKey = 
+    QLatin1String(nx::cdb::api::kVmsUserAuthInfoAttributeName);
 
 // CloudUserInfoPoolSupplier
 CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnResourcePool* resourcePool):
@@ -307,3 +316,7 @@ void CloudUserInfoPool::clear()
     m_nonce.clear();
     m_cloudUserInfoRecordList.clear();
 }
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

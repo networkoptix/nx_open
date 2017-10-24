@@ -4,14 +4,15 @@
 #include <core/resource_access/user_access_data.h>
 
 struct DetachFromCloudData;
-class CloudConnectionManager;
+namespace nx { namespace vms { namespace cloud_integration { class CloudConnectionManager; } } }
 
 class QnDetachFromCloudRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 
 public:
-    QnDetachFromCloudRestHandler(CloudConnectionManager* const cloudConnectionManager);
+    QnDetachFromCloudRestHandler(
+        nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager);
 
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
@@ -28,5 +29,5 @@ private:
         QnJsonRestResult& result);
 
 private:
-    CloudConnectionManager* const m_cloudConnectionManager;
+    nx::vms::cloud_integration::CloudConnectionManager* const m_cloudConnectionManager;
 };

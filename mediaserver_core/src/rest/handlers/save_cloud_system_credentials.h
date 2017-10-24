@@ -3,7 +3,7 @@
 #include "rest/server/json_rest_handler.h"
 
 struct CloudCredentialsData;
-struct CloudManagerGroup;
+namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 class QnCommonModule;
 
 class QnSaveCloudSystemCredentialsHandler:
@@ -12,7 +12,8 @@ class QnSaveCloudSystemCredentialsHandler:
     Q_OBJECT
 
 public:
-    QnSaveCloudSystemCredentialsHandler(CloudManagerGroup* cloudManagerGroup);
+    QnSaveCloudSystemCredentialsHandler(
+        nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup);
 
     virtual int executePost(
         const QString& path,
@@ -27,7 +28,7 @@ public:
         const QnRestConnectionProcessor* owner);
 
 private:
-    CloudManagerGroup* m_cloudManagerGroup;
+    nx::vms::cloud_integration::CloudManagerGroup* m_cloudManagerGroup;
 
     bool authorize(
         const QnRestConnectionProcessor* owner,

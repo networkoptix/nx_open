@@ -18,12 +18,12 @@
 #include <nx/utils/sync_call.h>
 
 #include <media_server/serverutil.h>
-#include <cloud/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
 #include <utils/common/app_info.h>
 #include <api/model/detach_from_cloud_reply.h>
 
 QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
-    CloudConnectionManager* const cloudConnectionManager)
+    nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager)
     :
     QnJsonRestHandler(),
     m_cloudConnectionManager(cloudConnectionManager)

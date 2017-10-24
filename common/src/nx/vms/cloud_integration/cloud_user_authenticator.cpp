@@ -2,28 +2,32 @@
 
 #include <chrono>
 
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/sync_call.h>
+
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-#include <nx/network/http/custom_headers.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/app_info.h>
-#include <nx/utils/sync_call.h>
-
-#include <nx/network/http/auth_tools.h>
-#include <nx/utils/log/log.h>
 
 #include "cdb_nonce_fetcher.h"
-#include "cloud/cloud_connection_manager.h"
-#include <api/global_settings.h>
-#include <common/common_module.h>
+#include "cloud_connection_manager.h"
+
+namespace nx {
+namespace vms {
+namespace cloud_integration {
 
 static const std::chrono::minutes kUnsuccessfulAuthorizationResultCachePeriod(1);
 
 CloudUserAuthenticator::CloudUserAuthenticator(
     CloudConnectionManager* const cloudConnectionManager,
-    std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
+    std::unique_ptr<auth::AbstractUserDataProvider> defaultAuthenticator,
     const CdbNonceFetcher& cdbNonceFetcher,
     const CloudUserInfoPool& cloudUserInfoPool)
 :
@@ -435,3 +439,7 @@ void CloudUserAuthenticator::cloudBindingStatusChanged(bool boundToCloud)
     if (!boundToCloud)
         clear();
 }
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx
