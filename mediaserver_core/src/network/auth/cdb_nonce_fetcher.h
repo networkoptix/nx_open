@@ -71,7 +71,7 @@ private:
     mutable QnMutex m_mutex;
     AbstractCloudConnectionManager* const m_cloudConnectionManager;
     AbstractNonceProvider* m_defaultGenerator;
-    //map<cdb_nonce, valid_time>
+    /** map<cdb_nonce, valid_time>. */
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;

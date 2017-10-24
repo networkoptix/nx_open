@@ -1,8 +1,3 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cloud_user_authenticator.h"
 
 #include <chrono>
@@ -24,7 +19,7 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 
-static const std::chrono::minutes UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD(1);
+static const std::chrono::minutes kUnsuccessfulAuthorizationResultCachePeriod(1);
 
 CloudUserAuthenticator::CloudUserAuthenticator(
     CloudConnectionManager* const cloudConnectionManager,
@@ -52,8 +47,8 @@ CloudUserAuthenticator::~CloudUserAuthenticator()
 
 QnResourcePtr CloudUserAuthenticator::findResByName(const QByteArray& nxUserName) const
 {
-    //NOTE this method returns NULL for cloud login.
-    //  This is OK, since NULL from this method does not signal authentication failure
+    // NOTE: This method returns NULL for cloud login.
+    //  This is OK, since NULL from this method does not signal authentication failure.
     return m_defaultAuthenticator->findResByName(nxUserName);
 }
 
@@ -103,7 +98,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
 
     if (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest)
     {
-        //supporting only digest authentication for cloud-based authentication
+        // Supporting only digest authentication for cloud-based authentication.
 
         if (isCloudUser)
         {
@@ -154,7 +149,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         }
     }
 
-    if (!isCloudUser || !isCloudNonce)    //nonce must be valid cloud nonce
+    if (!isCloudUser || !isCloudNonce)    //< Nonce must be valid cloud nonce.
     {
         NX_LOGX(lm("Passing digest authentication of user %1 to the default authenticator. Nonce %2")
             .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
@@ -193,7 +188,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
             responseHeaders);
     }
 
-    //checking authorization cache
+    // Checking authorization cache.
     const auto cacheKey = std::make_pair(authorizationHeader.userid(), cloudNonce);
 
     QnMutexLocker lk(&m_mutex);
@@ -206,7 +201,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
             NX_LOGX(lm("Waiting for running cloud get_auth request. username %1, cloudNonce %2")
                 .arg(authorizationHeader.userid()).arg(cloudNonce), cl_logDEBUG2);
 
-            //if request for required cacheKey is in progress, waiting for its completion
+            // If request for required cacheKey is in progress, waiting for its completion.
             while (m_requestInProgress.find(cacheKey) != m_requestInProgress.end())
                 m_cond.wait(lk.mutex());
 
@@ -281,7 +276,7 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
 {
     const auto userNameQString = QString::fromUtf8(userName);
     const auto& commonModule = m_cloudConnectionManager->commonModule();
-    //if there is user with same name in system, resolving to that user
+    // If there is user with same name in system, resolving to that user.
     const auto res = commonModule->resourcePool()->getResource(
         [&userNameQString](const QnResourcePtr& res) {
             return (res.dynamicCast<QnUserResource>() != nullptr) &&
@@ -291,7 +286,7 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
     if (res)
         return res.staticCast<QnUserResource>();
 
-    //cloud user is created by cloud portal during sharing process
+    // Cloud user is created by cloud portal during sharing process.
     return QnUserResourcePtr();
 }
 
@@ -308,7 +303,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     authRequest.realm = nx::network::AppInfo::realm().toStdString();
     authRequest.username = std::string(userid.data(), userid.size());
 
-    //marking that request is in progress
+    // Marking that request is in progress.
     const auto requestIter = m_requestInProgress.emplace(userid, cloudNonce).first;
 
     lk->unlock();
@@ -364,13 +359,13 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
         if (resultCode != nx::cdb::api::ResultCode::networkError &&
             resultCode != nx::cdb::api::ResultCode::unknownError)
         {
-            //caching invalid authorization result
+            // Caching invalid authorization result.
             CloudAuthenticationData authData;
             authData.authorized = false;
             authData.expirationTime =
                 m_monotonicClock.elapsed() +
                 std::chrono::duration_cast<std::chrono::milliseconds>(
-                    UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD).count();
+                    kUnsuccessfulAuthorizationResultCachePeriod).count();
             m_authorizationCache.emplace(
                 std::make_pair(userid, cloudNonce),
                 std::move(authData)).first;
@@ -401,7 +396,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
         return std::make_tuple(Qn::Auth_WrongLogin, QnResourcePtr());
     }
 
-    //translating cloud account to local user
+    // Translating cloud account to local user.
     auto localUser = getMappedLocalUserForCloudCredentials(
         cacheItem.data.authenticatedAccountData.accountEmail.c_str());
     if (!localUser)
@@ -418,7 +413,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
         ha2);
     if (authorizationHeader.digest->params["response"] == calculatedResponse)
     {
-        //returning resolved user to HTTP client
+        // Returning resolved user to HTTP client.
         responseHeaders->emplace(
             Qn::EFFECTIVE_USER_NAME_HEADER_NAME,
             localUser->getName().toUtf8());

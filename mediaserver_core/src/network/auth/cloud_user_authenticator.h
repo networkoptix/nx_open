@@ -1,8 +1,3 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <map>
@@ -25,9 +20,10 @@ class CloudConnectionManager;
 class CdbNonceFetcher;
 class CloudUserInfoPool;
 
-/** Add support for authentication using cloud account credentials. */
-class CloudUserAuthenticator
-:
+/**
+ * Adds support for authentication using cloud account credentials.
+ */
+class CloudUserAuthenticator:
     public AbstractUserDataProvider,
     public Qn::EnableSafeDirectConnection
 {
@@ -58,17 +54,9 @@ public:
 private:
     struct CloudAuthenticationData
     {
-    public:
-        bool authorized;
+        bool authorized = false;
         nx::cdb::api::AuthResponse data;
-        qint64 expirationTime;
-
-        CloudAuthenticationData()
-        :
-            authorized(false),
-            expirationTime(0)
-        {
-        }
+        qint64 expirationTime = 0;
     };
 
     CloudConnectionManager* const m_cloudConnectionManager;
@@ -77,12 +65,12 @@ private:
     const CloudUserInfoPool& m_cloudUserInfoPool;
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_cond;
-    /** map<pair<username, nonce>, auth_data> */
+    /** map<pair<username, nonce>, auth_data>. */
     std::map<
         std::pair<nx_http::StringType, nx_http::BufferType>,
         CloudAuthenticationData> m_authorizationCache;
     QElapsedTimer m_monotonicClock;
-    /** set<pair<username, nonce>, auth_data> */
+    /** set<pair<username, nonce>, auth_data>. */
     std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
 
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
