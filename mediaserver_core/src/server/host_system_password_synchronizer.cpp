@@ -92,7 +92,7 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
             qWarning() << "Failed to set root password on current system";
         }
     }
-else
+#else
     Q_UNUSED( user );
 #endif
 }
