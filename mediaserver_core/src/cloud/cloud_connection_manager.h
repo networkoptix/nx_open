@@ -62,6 +62,8 @@ public:
 
     virtual void processCloudErrorCode(nx::cdb::api::ResultCode resultCode) override;
 
+    void setCloudDbUrl(const QUrl& url);
+
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
     void setProxyVia(const SocketAddress& proxyEndpoint);

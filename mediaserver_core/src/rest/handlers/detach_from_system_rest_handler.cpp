@@ -77,7 +77,7 @@ int QnDetachFromSystemRestHandler::execute(
 
     dropConnectionsToRemotePeers(m_messageBus);
 
-    if (resetSystemToStateNew(owner->commonModule()))
+    if (nx::vms::utils::resetSystemToStateNew(owner->commonModule()))
     {
         if (!m_cloudConnectionManager->detachSystemFromCloud())
         {

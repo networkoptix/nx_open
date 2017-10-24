@@ -89,7 +89,7 @@ int QnDetachFromCloudRestHandler::execute(
     if (shouldResetSystemToNewState)
     {
         NX_VERBOSE(this, lm("Resetting system to the \"new\" state"));
-        if (!resetSystemToStateNew(owner->commonModule()))
+        if (!nx::vms::utils::resetSystemToStateNew(owner->commonModule()))
         {
             NX_LOGX(lm("Cannot detach from cloud. Failed to reset system to state new. cloudSystemId %1")
                 .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);

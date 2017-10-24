@@ -3,6 +3,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_global.h>
+#include <nx/vms/utils/vms_utils.h>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -11,25 +12,16 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include "media_server/media_server_module.h"
-#include "media_server/settings.h"
-#include "media_server/serverutil.h"
-#include "server/server_globals.h"
-
 namespace {
+
 constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
-}
+
+} // namespace
 
 CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
-    const auto cdbEndpoint = qnServerModule->roSettings()->value(
-        nx_ms_conf::CDB_ENDPOINT,
-        "").toString();
-    if (!cdbEndpoint.isEmpty())
-        m_cdbConnectionFactory->setCloudUrl(lm("http://%1").arg(cdbEndpoint).toStdString());
-
     Qn::directConnect(
         globalSettings(), &QnGlobalSettings::initialized,
         this, &CloudConnectionManager::cloudSettingsChanged);
@@ -37,6 +29,11 @@ CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
     Qn::directConnect(
         globalSettings(), &QnGlobalSettings::cloudCredentialsChanged,
         this, &CloudConnectionManager::cloudSettingsChanged);
+}
+
+void CloudConnectionManager::setCloudDbUrl(const QUrl& url)
+{
+    m_cdbConnectionFactory->setCloudUrl(url.toString().toStdString());
 }
 
 CloudConnectionManager::~CloudConnectionManager()
@@ -157,7 +154,8 @@ bool CloudConnectionManager::detachSystemFromCloud()
         return false;
     }
 
-    qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
+    emit cloudBindingStatusChanged(false);
+    emit disconnectedFromCloud();
 
     return true;
 }
@@ -183,14 +181,11 @@ void CloudConnectionManager::setCloudCredentials(
 
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(std::move(credentials));
-
-        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
-        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
         makeSystemLocal();
     }
 
@@ -208,7 +203,7 @@ bool CloudConnectionManager::makeSystemLocal()
     auto adminUser = resourcePool()->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
     {
-        if (!resetSystemToStateNew(commonModule()))
+        if (!nx::vms::utils::resetSystemToStateNew(commonModule()))
         {
             NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
             return false;
