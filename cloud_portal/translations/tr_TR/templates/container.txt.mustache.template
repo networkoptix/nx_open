@@ -1,0 +1,8 @@
+{{#systemName}}
+Sistem: {{systemName}} {{systemSignature}}
+{{/systemName}}
+
+{{>body}}
+
+{{companyUrl}}
+Destek: {{supportLink}}
