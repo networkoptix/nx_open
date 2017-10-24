@@ -84,6 +84,18 @@
   }
 }
 
+.glyphicon-close-fullscreen{
+  @include kill-glyphicon;
+  background-position: -26px -99px;
+
+  &:hover{
+    background-position: -26px -123px;
+  }
+  &:active{
+    background-position: -26px -147px;
+  }
+}
+
 .glyphicon-server-online,
 .glyphicon-server-active,
 .glyphicon-server-offline

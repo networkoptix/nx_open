@@ -648,6 +648,67 @@ table.webclient-window>tbody>tr>td{
   cursor: pointer;
 }
 
+.fullscreen-notification{
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+
+  padding: 0 16px;
+  height: 40px;
+  line-height: 40px;
+  background-color: $dark7;
+  opacity: 0.9;
+
+  font-weight: 600;
+  color: $light4;
+  z-index: 1; /*used to bring the notification above the player*/
+
+  -webkit-animation-delay: 2s;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+
+  animation-delay: 2s;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+@keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+.fade-out {
+  -webkit-animation-name: fadeOut;
+  animation-name: fadeOut;
+}
+
+.fullscreen-hoverarea{
+  &{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 10%;
+    width: 10%;
+    z-index: 1;  /*used to bring the close-fullscreen button above the player*/
+    margin: 10px;
+  }
+  &:hover .close-fullscreen-icon {
+    display: block;
+  }
+}
+
+.close-fullscreen-icon{
+  position: absolute;
+  right: 0;
+  display: none;
+}
+
 .video-settings{
   &{
     right: -35px;
