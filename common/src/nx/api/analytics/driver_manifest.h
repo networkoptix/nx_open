@@ -12,8 +12,8 @@ namespace nx {
 namespace api {
 
 /**
-* Description of the analytics driver, which can generate different events.
-*/
+ * Description of the analytics driver, which can generate different events.
+ */
 
 struct AnalyticsDriverManifestBase
 {

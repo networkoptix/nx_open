@@ -12,6 +12,12 @@ namespace metadata {
  */
 struct Rect
 {
+    Rect() {}
+    Rect(float x, float y, float width, float height):
+        x(x), y(y), width(width), height(height)
+    {
+    }
+
     /**
      * @brief x coordinate of top left corner by x axis.
      * MUST be in the range [0..1].
@@ -55,32 +61,32 @@ public:
      * @brief id of detected object. If the object (e.g. particular person)
      * is detected on multiple frames this parameter SHOULD be the same every time.
      */
-    virtual nxpl::NX_GUID id() = 0;
+    virtual nxpl::NX_GUID id() const = 0;
 
     /**
      * @brief (e.g. vehicle type: truck,  car, etc)
      */
-    virtual NX_ASCII const char* objectSubType() = 0;
+    virtual NX_ASCII const char* objectSubType() const = 0;
 
     /**
      * @brief attributes array of object attributes (e.g. age, color).
      */
-    virtual NX_LOCALE_DEPENDENT Attribute* attributes() = 0;
+    virtual NX_LOCALE_DEPENDENT const Attribute* attributes() const = 0;
 
     /**
      * @brief attributeCount count of attributes
      */
-    virtual int attributeCount() = 0;
+    virtual int attributeCount() const = 0;
 
     /**
      * @brief auxilaryData user side data in json format. Null terminated UTF-8 string.
      */
-    virtual const char* auxilaryData() = 0;
+    virtual const char* auxilaryData() const = 0;
 
     /**
      * @brief boundingBox bounding box of detected object.
      */
-    virtual Rect boundingBox() = 0;
+    virtual Rect boundingBox() const = 0;
 };
 
 /**

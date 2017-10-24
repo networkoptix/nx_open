@@ -4,12 +4,12 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
-void* CommonEventMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* CommonMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_EventMetadataPacket)
     {
         addRef();
-        return static_cast<AbstractEventMetadataPacket*>(this);
+        return static_cast<AbstractIterableMetadataPacket*>(this);
     }
 
     if (interfaceId == nxpl::IID_PluginInterface)
@@ -20,17 +20,17 @@ void* CommonEventMetadataPacket::queryInterface(const nxpl::NX_GUID& interfaceId
     return nullptr;
 }
 
-int64_t CommonEventMetadataPacket::timestampUsec() const
+int64_t CommonMetadataPacket::timestampUsec() const
 {
     return m_timestampUsec;
 }
 
-int64_t CommonEventMetadataPacket::durationUsec() const
+int64_t CommonMetadataPacket::durationUsec() const
 {
     return m_durationUsec;
 }
 
-AbstractDetectedEvent* CommonEventMetadataPacket::nextItem()
+AbstractMetadataItem* CommonMetadataPacket::nextItem()
 {
     if (m_currentEventIndex < m_events.size())
         return m_events[m_currentEventIndex++];
@@ -38,30 +38,29 @@ AbstractDetectedEvent* CommonEventMetadataPacket::nextItem()
     return nullptr;
 }
 
-void CommonEventMetadataPacket::setTimestampUsec(int64_t timestampUsec)
+void CommonMetadataPacket::setTimestampUsec(int64_t timestampUsec)
 {
     m_timestampUsec = timestampUsec;
 }
 
-void CommonEventMetadataPacket::setDurationUsec(int64_t durationUsec)
+void CommonMetadataPacket::setDurationUsec(int64_t durationUsec)
 {
     m_durationUsec = durationUsec;
 }
 
-void CommonEventMetadataPacket::addEvent(AbstractDetectedEvent* event)
+void CommonMetadataPacket::addEvent(AbstractMetadataItem* event)
 {
     m_events.push_back(event);
 }
 
-void CommonEventMetadataPacket::resetEvents()
+void CommonMetadataPacket::resetEvents()
 {
     m_events.clear();
     m_currentEventIndex = 0;
 }
 
-CommonEventMetadataPacket::~CommonEventMetadataPacket()
+CommonMetadataPacket::~CommonMetadataPacket()
 {
-    qDebug() << "####### Destroying packet!!!!!";
 }
 
 } // namespace metadata

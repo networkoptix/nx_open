@@ -10,10 +10,10 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
-class CommonEventMetadataPacket: public nxpt::CommonRefCounter<AbstractEventMetadataPacket>
+class CommonMetadataPacket: public nxpt::CommonRefCounter<AbstractIterableMetadataPacket>
 {
 public:
-    virtual ~CommonEventMetadataPacket();
+    virtual ~CommonMetadataPacket();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -21,13 +21,13 @@ public:
 
     virtual int64_t durationUsec() const override;
 
-    virtual AbstractDetectedEvent* nextItem() override;
+    virtual AbstractMetadataItem* nextItem() override;
 
     void setTimestampUsec(int64_t timestampUsec);
 
     void setDurationUsec(int64_t durationUsec);
 
-    void addEvent(AbstractDetectedEvent* event);
+    void addEvent(AbstractMetadataItem* event);
 
     void resetEvents();
 
@@ -35,9 +35,9 @@ private:
     int64_t m_timestampUsec = -1;
     int64_t m_durationUsec = -1;
 
-    std::vector<AbstractDetectedEvent*> m_events;
+    std::vector<AbstractMetadataItem*> m_events;
     int m_currentEventIndex = 0;
-    
+
 };
 
 } // namespace metadata

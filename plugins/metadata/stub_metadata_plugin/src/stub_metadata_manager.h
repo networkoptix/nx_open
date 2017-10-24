@@ -13,7 +13,7 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-class StubMetadataManager: 
+class StubMetadataManager:
     public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
 {
 public:
@@ -34,6 +34,7 @@ public:
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();
     nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
+    nx::sdk::metadata::AbstractMetadataPacket* cookSomeObjects();
 
     int64_t usSinceEpoch() const;
 
@@ -44,6 +45,7 @@ private:
     nx::sdk::metadata::AbstractMetadataHandler* m_handler;
     int m_counter = 0;
     nxpl::NX_GUID m_eventTypeId;
+    nxpl::NX_GUID m_objectTypeId;
 };
 
 } // namespace plugins

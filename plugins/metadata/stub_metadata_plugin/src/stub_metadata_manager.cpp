@@ -6,6 +6,7 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
 #include <nx/sdk/metadata/common_detected_event.h>
+#include <nx/sdk/metadata/common_detected_object.h>
 
 namespace nx {
 namespace mediaserver {
@@ -19,7 +20,7 @@ static const nxpl::NX_GUID kLineCrossingEventGuid
 static const nxpl::NX_GUID kObjectInTheAreaEventGuid
     = {{0xB0, 0xE6, 0x40, 0x44, 0xFF, 0xA3, 0x4B, 0x7F, 0x80, 0x7A, 0x06, 0x0C, 0x1F, 0xE5, 0xA0, 0x4C}};
 
-} // namespace 
+} // namespace
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
@@ -49,7 +50,7 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 Error StubMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    
+
     stopFetchingMetadataUnsafe();
     m_handler = handler;
 
@@ -57,8 +58,8 @@ Error StubMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handle
         {
             while (!m_stopping)
             {
-                auto eventPacket = cookSomeEvents();
-                m_handler->handleMetadata(Error::noError, eventPacket);
+                m_handler->handleMetadata(Error::noError, cookSomeEvents());
+                m_handler->handleMetadata(Error::noError, cookSomeObjects());
                 std::this_thread::sleep_for(std::chrono::milliseconds(3000));
             }
         };
@@ -128,16 +129,22 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     detectedEvent->setIsActive(m_counter == 1);
     detectedEvent->setEventTypeId(m_eventTypeId);
 
-    std::cout << "#### Firing event!!!! " 
-        << "Type: " << (m_eventTypeId == kLineCrossingEventGuid ? "Line crossing" :  "Object detection") << " "
-        << "Is active: " << (m_counter == 1) << " "
-        << m_counter 
-        << std::endl; 
-
-
-    auto eventPacket = new CommonEventMetadataPacket();
+    auto eventPacket = new CommonMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
     eventPacket->addEvent(detectedEvent);
+    return eventPacket;
+}
+
+AbstractMetadataPacket* StubMetadataManager::cookSomeObjects()
+{
+    auto detectedObject = new CommonDetectedObject();
+    detectedObject->setAuxilaryData(R"json({"auxilaryData": "someJson2"})json");
+    detectedObject->setEventTypeId(m_objectTypeId);
+    detectedObject->setBoundingBox(Rect(0.25, 0.25, 0.25, 0.25));
+
+    auto eventPacket = new CommonMetadataPacket();
+    eventPacket->setTimestampUsec(usSinceEpoch());
+    eventPacket->addEvent(detectedObject);
     return eventPacket;
 }
 
