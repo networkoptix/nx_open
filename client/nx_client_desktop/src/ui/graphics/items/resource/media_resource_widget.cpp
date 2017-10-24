@@ -2352,8 +2352,7 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
     result.isDefaultPassword =
         [camera = resource.dynamicCast<QnSecurityCamResource>()]()
         {
-            return camera && camera->isDefaultAuth()
-                && camera->hasCameraCapabilities(Qn::SetUserPasswordCapability);
+            return camera && camera->needsToChangeDefaultPassword();
         }();
 
     return result;

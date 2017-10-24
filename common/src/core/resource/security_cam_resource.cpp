@@ -113,6 +113,19 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         this, &QnSecurityCamResource::at_motionRegionChanged,
         Qt::DirectConnection);
 
+    connect(this, &QnNetworkResource::statusChanged,
+        this, &QnSecurityCamResource::needsToChangeDefaultPasswordChanged);
+    connect(this, &QnNetworkResource::propertyChanged, this,
+        [this](const QnResourcePtr& /*resource*/, const QString& key)
+        {
+            if (key == Qn::CAMERA_CREDENTIALS_PARAM_NAME
+                || key == Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME)
+            {
+                return;
+            }
+            emit needsToChangeDefaultPasswordChanged();
+        });
+
     QnMediaResource::initMediaResource();
 }
 
@@ -143,6 +156,19 @@ bool QnSecurityCamResource::removeProperty(const QString& key)
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(Qn::kGroupPlayParamName);
+}
+
+bool QnSecurityCamResource::needsToChangeDefaultPassword() const
+{
+    static const auto cameraIsOnline =
+        [](Qn::ResourceStatus status)
+        {
+            return status == Qn::Online || status == Qn::Recording;
+        };
+
+    return isDefaultAuth()
+        && hasCameraCapabilities(Qn::SetUserPasswordCapability)
+        && cameraIsOnline(getStatus());
 }
 
 const QnResource* QnSecurityCamResource::toResource() const {

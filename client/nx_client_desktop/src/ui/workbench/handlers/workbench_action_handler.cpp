@@ -659,8 +659,7 @@ void ActionHandler::at_changeDefaultCameraPassword_triggered()
             const auto result = cameras.filtered(
                 [](const QnSecurityCamResourcePtr& camera)
                 {
-                    return camera->isDefaultAuth() && camera->hasCameraCapabilities(
-                        Qn::SetUserPasswordCapability);
+                    return camera && camera->needsToChangeDefaultPassword();
                 });
             return result;
         }();
