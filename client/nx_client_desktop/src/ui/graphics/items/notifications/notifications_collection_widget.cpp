@@ -51,6 +51,9 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
+#include <nx/client/desktop/ui/actions/action.h>
+
 #include <health/system_health_helper.h>
 
 #include <utils/common/delayed.h>
@@ -154,6 +157,27 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                 return;
             at_notificationCache_fileDownloaded(filename);
         });
+
+    const auto defaultPasswordWatcher = context->instance<DefaultPasswordCamerasWatcher>();
+    const auto updateDefaultCameraPasswordNotification =
+        [this, defaultPasswordWatcher]()
+        {
+            if (defaultPasswordWatcher->notificationIsVisible())
+            {
+                NX_EXPECT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
+                m_currentDefaultPasswordChangeWidget =
+                    addCustomPopup(action::ChangeDefaultCameraPasswordAction,
+                        QnNotificationLevel::Value::ImportantNotification, false);
+            }
+            else
+            {
+                cleanUpItem(m_currentDefaultPasswordChangeWidget);
+            }
+        };
+
+    updateDefaultCameraPasswordNotification();
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::notificationIsVisibleChanged,
+        this, updateDefaultCameraPasswordNotification);
 }
 
 QnNotificationsCollectionWidget::~QnNotificationsCollectionWidget()
@@ -289,6 +313,37 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
         });
 
     m_customPopupItems.insert(action->getParams().actionId, widget);
+}
+
+QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
+    action::IDType actionId,
+    QnNotificationLevel::Value notificationLevel,
+    bool closeable)
+{
+    if (m_list->itemCount() >= kMaxNotificationItems)
+        return nullptr;
+
+    const auto action = menu()->action(actionId);
+    if (!action)
+        return nullptr;
+
+    QnNotificationWidget* item = new QnNotificationWidget(m_list);
+    item->setText(action->text());
+    item->setTooltipText(action->toolTip());
+    item->setNotificationLevel(notificationLevel);
+    item->setCloseButtonAvailable(closeable);
+    item->addTextButton(action->icon(), tr("Set Passwords"),
+        [this, actionId]()
+        {
+            // Action will trigger additional event loop, which will cause problems here.
+            executeDelayedParented( [this, actionId] { menu()->trigger(actionId); },
+                kDefaultDelay, this);
+        });
+
+    item->addActionButton(qnSkin->icon("events/sound.png"), actionId);
+
+    m_list->addItem(item, !closeable);
+    return item;
 }
 
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
