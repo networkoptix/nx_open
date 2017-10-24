@@ -106,6 +106,8 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
+#include <ui/widgets/properties/camera_settings_tab.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -270,6 +272,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
     connect(action(action::ReviewLayoutTourInNewWindowAction), &QAction::triggered, this,
         &ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered);
+
+    connect(action(action::ChangeDefaultCameraPasswordAction), &QAction::triggered,
+        this, &ActionHandler::at_changeDefaultCameraPassword_triggered);
 
     connect(action(action::MediaFileSettingsAction), &QAction::triggered, this, &ActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
@@ -642,6 +647,36 @@ void ActionHandler::at_previousLayoutAction_triggered()
 
     const auto total = workbench()->layouts().size();
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + total) % total);
+}
+
+void ActionHandler::at_changeDefaultCameraPassword_triggered()
+{
+    const auto camerasWithDefaultPassword =
+        [this]()
+        {
+            const auto resourcePool = commonModule()->resourcePool();
+            const auto cameras = resourcePool->getResources<QnSecurityCamResource>();
+            const auto result = cameras.filtered(
+                [](const QnSecurityCamResourcePtr& camera)
+                {
+                    return camera->isDefaultAuth() && camera->hasCameraCapabilities(
+                        Qn::SetUserPasswordCapability);
+                });
+            return result;
+        }();
+
+    if (camerasWithDefaultPassword.isEmpty())
+        return;
+
+    if (true)
+    {
+        const auto parameters = action::Parameters(camerasWithDefaultPassword.first())
+            .withArgument(Qn::FocusTabRole, static_cast<int>(Qn::AdvancedCameraSettingsTab));
+        menu()->trigger(action::CameraSettingsAction, parameters);
+        return;
+    }
+
+    // Show multiple cameras password change dialog
 }
 
 void ActionHandler::at_openInLayoutAction_triggered()

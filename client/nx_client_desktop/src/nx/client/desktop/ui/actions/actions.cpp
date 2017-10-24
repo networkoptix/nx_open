@@ -599,6 +599,9 @@ void initialize(Manager* manager, Action* root)
     factory(HideCloudPromoAction)
         .flags(NoTarget);
 
+    factory(ChangeDefaultCameraPasswordAction)
+        .flags(NoTarget);
+
     factory(OpenCloudRegisterUrl)
         .flags(NoTarget)
         .text(ContextMenu::tr("Create Account..."));

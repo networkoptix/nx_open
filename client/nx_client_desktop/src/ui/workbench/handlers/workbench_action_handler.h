@@ -195,6 +195,9 @@ protected slots:
     void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
 
     void at_convertCameraToEntropix_triggered();
+
+    void at_changeDefaultCameraPassword_triggered();
+
 private:
     void notifyAboutUpdate();
 

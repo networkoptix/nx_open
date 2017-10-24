@@ -331,6 +331,7 @@ private:
         bool isOffline;         /// Shows if resource is offline. Not-real-time resource is alwasy online
         bool isUnauthorized;    /// Shows if resource is unauthorized. Not-real-time resource is alwasy online
         bool hasVideo;          /// Shows if resource has video
+        bool isDefaultPassword; /// Shows if password at the device is default
     };
 
     /// @brief Return resource states

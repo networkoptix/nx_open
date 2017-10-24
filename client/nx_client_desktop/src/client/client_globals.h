@@ -337,6 +337,7 @@ namespace Qn
         ServerOfflineOverlay,
         ServerUnauthorizedOverlay,
         IoModuleDisabledOverlay,
+        PasswordRequiredOverlay,
 
         OverlayCount
     };
@@ -348,6 +349,7 @@ namespace Qn
         IoEnable,
         MoreLicenses,
         Settings,
+        SetPassword
     };
 
     /**

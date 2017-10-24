@@ -437,6 +437,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                     case Qn::ResourceOverlayButton::MoreLicenses:
                         processMoreLicensesRequest();
                         break;
+                    case Qn::ResourceOverlayButton::SetPassword:
+                        menu()->trigger(action::ChangeDefaultCameraPasswordAction);
                     default:
                         break;
                 }
@@ -1979,6 +1981,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (states.isOffline)
             return Qn::OfflineOverlay;
 
+        if (states.isDefaultPassword)
+            return Qn::PasswordRequiredOverlay;
+
         if (states.isUnauthorized)
             return Qn::UnauthorizedOverlay;
     }
@@ -2064,6 +2069,9 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
 {
     if (!m_camera || !m_camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
+
+    if (statusOverlay == Qn::PasswordRequiredOverlay)
+        return Qn::ResourceOverlayButton::SetPassword;
 
     const bool canChangeSettings = accessController()->hasPermissions(m_camera,
         Qn::SavePermission | Qn::WritePermission);
@@ -2340,6 +2348,13 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
     result.isOffline = (result.isRealTimeSource && (!resource || (resource->getStatus() == Qn::Offline)));
     result.isUnauthorized = (result.isRealTimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
     result.hasVideo = hasVideo();
+
+    result.isDefaultPassword =
+        [camera = resource.dynamicCast<QnSecurityCamResource>()]()
+        {
+            return camera && camera->isDefaultAuth()
+                && camera->hasCameraCapabilities(Qn::SetUserPasswordCapability);
+        }();
 
     return result;
 }

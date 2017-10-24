@@ -236,6 +236,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
             result[toInt(Qn::ServerOfflineOverlay)] = tr("SERVER UNAVAILABLE");
             result[toInt(Qn::ServerUnauthorizedOverlay)] = tr("NO ACCESS");
             result[toInt(Qn::IoModuleDisabledOverlay)] = tr("DEVICE DISABLED");
+            result[toInt(Qn::PasswordRequiredOverlay)] = tr("PASSWORD REQUIRED");
             return result;
         }();
 
@@ -264,6 +265,7 @@ QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)
             result[toInt(Qn::IoModuleDisabledOverlay)] = lit("item_placeholders/disabled.png");
             result[toInt(Qn::NoVideoDataOverlay)] = lit("legacy/io_speaker.png");
             result[toInt(Qn::PausedOverlay)] = lit("item_placeholders/pause.png");
+            result[toInt(Qn::PasswordRequiredOverlay)] = lit("item_placeholders/alert.png");
             return result;
         }();
 
@@ -287,6 +289,8 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
     result.insert(toInt(Qn::ResourceOverlayButton::IoEnable), tr("Enable"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
+    result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set Password"));
+
     if (resource)
     {
         result.insert(toInt(Qn::ResourceOverlayButton::Settings),
