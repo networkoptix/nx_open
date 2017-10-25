@@ -15,7 +15,7 @@ EventPanel::EventPanel(QWidget* parent): EventPanel(nullptr, parent)
 }
 
 EventPanel::EventPanel(QnWorkbenchContext* context, QWidget* parent):
-    base_type(parent, Qt::FramelessWindowHint),
+    base_type(parent),
     QnWorkbenchContextAware(parent, context),
     d(new Private(this))
 {
@@ -36,6 +36,11 @@ EventPanel::EventPanel(QnWorkbenchContext* context, QWidget* parent):
 
 EventPanel::~EventPanel()
 {
+}
+
+void EventPanel::paintEvent(QPaintEvent* /*event*/)
+{
+    d->paintBackground();
 }
 
 } // namespace

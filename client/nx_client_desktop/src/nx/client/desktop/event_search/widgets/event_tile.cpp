@@ -32,10 +32,11 @@ static constexpr int kDescriptionFontWeight = QFont::Normal;
 
 } // namespace
 
-EventTile::EventTile(QWidget* parent) :
+EventTile::EventTile(const QnUuid& id, QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
     ui(new Ui::EventTile()),
-    m_closeButton(new QPushButton(this))
+    m_closeButton(new QPushButton(this)),
+    m_id(id)
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
@@ -44,11 +45,13 @@ EventTile::EventTile(QWidget* parent) :
     m_closeButton->setIconSize(QnSkin::maximumSize(m_closeButton->icon()));
     m_closeButton->setFixedSize(m_closeButton->iconSize());
     m_closeButton->setFlat(true);
+    m_closeButton->setHidden(true);
+    auto anchor = new QnWidgetAnchor(m_closeButton);
+    anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
+
     auto sizePolicy = ui->timestampLabel->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
     ui->timestampLabel->setSizePolicy(sizePolicy);
-    auto anchor = new QnWidgetAnchor(m_closeButton);
-    anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
 
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
@@ -80,13 +83,14 @@ EventTile::EventTile(QWidget* parent) :
 }
 
 EventTile::EventTile(
+    const QnUuid& id,
     const QString& title,
     const QPixmap& icon,
     const QString& timestamp,
     const QString& description,
     QWidget* parent)
     :
-    EventTile(parent)
+    EventTile(id, parent)
 {
     setTitle(title);
     setIcon(icon);
@@ -96,6 +100,11 @@ EventTile::EventTile(
 
 EventTile::~EventTile()
 {
+}
+
+QnUuid EventTile::id() const
+{
+    return m_id;
 }
 
 QString EventTile::title() const
@@ -195,6 +204,7 @@ EventTile* EventTile::createFrom(const QModelIndex& index, QWidget* parent)
     NX_ASSERT(index.isValid());
 
     auto tile = new EventTile(
+        index.data(Qn::UuidRole).value<QnUuid>(),
         index.data(Qt::DisplayRole).toString(),
         index.data(Qt::DecorationRole).value<QPixmap>(),
         index.data(Qn::TimestampTextRole).toString(),

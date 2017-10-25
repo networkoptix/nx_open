@@ -84,6 +84,11 @@ bool EventListModel::removeEvent(const QnUuid& id)
     return d->removeEvent(id);
 }
 
+QModelIndex EventListModel::indexOf(const QnUuid& id) const
+{
+    return index(d->indexOf(id));
+}
+
 void EventListModel::clear()
 {
     d->clear();

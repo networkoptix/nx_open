@@ -19,14 +19,14 @@ EventRibbon::~EventRibbon()
 {
 }
 
-void EventRibbon::insertTile(int index, EventTile* tile)
+QAbstractItemModel* EventRibbon::model() const
 {
-    d->insertTile(index, tile);
+    return d->model();
 }
 
-void EventRibbon::removeTiles(int first, int count)
+void EventRibbon::setModel(QAbstractItemModel* model)
 {
-    d->removeTiles(first, count);
+    d->setModel(model);
 }
 
 QSize EventRibbon::sizeHint() const

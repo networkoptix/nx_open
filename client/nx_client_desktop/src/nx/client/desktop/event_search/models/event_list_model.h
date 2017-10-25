@@ -31,6 +31,8 @@ public:
 
     virtual bool removeEvent(const QnUuid& id);
 
+    QModelIndex indexOf(const QnUuid& id) const;
+
 protected:
     struct EventData
     {

@@ -6,8 +6,10 @@
 
 #include <ui/customization/customized.h>
 #include <nx/utils/disconnect_helper.h>
+#include <nx/utils/uuid.h>
 
 class QModelIndex;
+class QPushButton;
 
 namespace Ui { class EventTile; }
 
@@ -18,6 +20,7 @@ namespace desktop {
 class EventTile: public Customized<QWidget>
 {
     Q_OBJECT
+    Q_PROPERTY(QnUuid id READ id)
     Q_PROPERTY(QString title READ title WRITE setTitle)
     Q_PROPERTY(QColor titleColor READ titleColor WRITE setTitleColor)
     Q_PROPERTY(QString description READ description WRITE setDescription)
@@ -28,8 +31,9 @@ class EventTile: public Customized<QWidget>
     using base_type = Customized<QWidget>;
 
 public:
-    explicit EventTile(QWidget* parent = nullptr);
+    explicit EventTile(const QnUuid& id, QWidget* parent = nullptr);
     explicit EventTile(
+        const QnUuid& id,
         const QString& title,
         const QPixmap& icon,
         const QString& timestamp = QString(),
@@ -37,6 +41,8 @@ public:
         QWidget* parent = nullptr);
 
     virtual ~EventTile() override;
+
+    QnUuid id() const;
 
     QString title() const;
     void setTitle(const QString& value);
@@ -82,6 +88,7 @@ protected:
 private:
     QScopedPointer<Ui::EventTile> ui;
     QPushButton* const m_closeButton = nullptr;
+    QnUuid m_id;
 };
 
 } // namespace

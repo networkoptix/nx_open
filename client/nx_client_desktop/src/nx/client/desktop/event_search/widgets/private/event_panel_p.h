@@ -22,6 +22,8 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    void paintBackground();
+
 private:
     EventPanel* q = nullptr;
     QTabWidget* m_tabs = nullptr;

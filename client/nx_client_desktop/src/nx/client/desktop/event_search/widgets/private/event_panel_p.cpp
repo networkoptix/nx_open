@@ -1,5 +1,6 @@
 #include "event_panel_p.h"
 
+#include <QtGui/QPainter>
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
@@ -29,6 +30,8 @@ EventPanel::Private::Private(EventPanel* q):
 
     q->setAutoFillBackground(false);
     q->setAttribute(Qt::WA_TranslucentBackground);
+
+    m_cameraTab->setHidden(true);
 }
 
 EventPanel::Private::~Private()
@@ -60,6 +63,15 @@ void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
         if (index >= 0)
             m_tabs->removeTab(index);
     }
+}
+
+void EventPanel::Private::paintBackground()
+{
+    if (m_tabs->currentWidget() != m_cameraTab)
+        return;
+
+    QPainter painter(q);
+    painter.fillRect(q->rect(), q->palette().background());
 }
 
 } // namespace

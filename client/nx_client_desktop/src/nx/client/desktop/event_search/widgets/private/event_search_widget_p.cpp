@@ -3,6 +3,8 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QVBoxLayout>
 
+#include <ui/style/helper.h>
+#include <ui/widgets/common/search_line_edit.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 
@@ -25,8 +27,20 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     layout->addWidget(m_headerWidget);
     layout->addWidget(line);
     layout->addWidget(m_eventRibbon);
+    layout->setSpacing(0);
 
     m_eventRibbon->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+    auto headerLayout = new QVBoxLayout(m_headerWidget);
+    auto searchLineEdit = new QnSearchLineEdit(m_headerWidget);
+    headerLayout->addWidget(searchLineEdit);
+    headerLayout->setContentsMargins(
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding,
+        style::Metrics::kStandardPadding);
+
+    m_eventRibbon->setModel(m_model); // TODO: #vkutin Use filter proxy model.
 }
 
 EventSearchWidget::Private::~Private()

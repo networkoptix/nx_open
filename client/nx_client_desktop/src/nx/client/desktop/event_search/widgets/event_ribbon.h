@@ -5,6 +5,8 @@
 
 #include <nx/utils/uuid.h>
 
+class QAbstractItemModel;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -20,10 +22,15 @@ public:
     EventRibbon(QWidget* parent = nullptr);
     virtual ~EventRibbon() override;
 
-    void insertTile(int index, EventTile* tile);
-    void removeTiles(int first, int count);
+    QAbstractItemModel* model() const;
+    void setModel(QAbstractItemModel* model);
 
     virtual QSize sizeHint() const override;
+
+signals:
+    void closeRequested(const QnUuid& id);
+    void linkActivated(const QnUuid& id, const QString& link);
+    void clicked(const QnUuid& id);
 
 protected:
     virtual bool event(QEvent* event) override;

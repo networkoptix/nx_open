@@ -2,7 +2,11 @@
 
 #include "../event_ribbon.h"
 
+#include <QtCore/QModelIndex>
+#include <QtCore/QScopedPointer>
+
 #include <nx/utils/integer_range.h>
+#include <nx/utils/disconnect_helper.h>
 
 class QScrollBar;
 
@@ -20,8 +24,8 @@ public:
     Private(EventRibbon* q);
     virtual ~Private() override;
 
-    void insertTile(int index, EventTile* tileWidget);
-    void removeTiles(int first, int count);
+    QAbstractItemModel* model() const;
+    void setModel(QAbstractItemModel* model);
 
     int totalHeight() const;
 
@@ -43,8 +47,22 @@ private:
 
     int calculateHeight(QWidget* widget) const;
 
+    void insertTile(int index, EventTile* tileWidget);
+    void insertNewTiles(int first, int count);
+    void removeTiles(int first, int count);
+    void clear();
+
+    EventTile* createTile(const QModelIndex& index);
+
 private:
-    EventRibbon* q = nullptr;
+    EventRibbon* const q = nullptr;
+    QAbstractItemModel* m_model = nullptr;
+    QScopedPointer<QnDisconnectHelper> m_modelConnections;
+
+    // These fields are constant for now.
+    // If required in the future they can be made changeable from public interface.
+    QModelIndex m_rootIndex;
+    int m_modelColumn = 0;
 
     QScrollBar* const m_scrollBar = nullptr;
     QWidget* const m_viewport = nullptr;

@@ -29,7 +29,6 @@ public:
     virtual ~Private() override;
 
 private:
-    EventTile* newEventTile(const QModelIndex& index) const;
     QToolButton* newActionButton(ui::action::IDType actionId, int helpTopicId);
 
 private:

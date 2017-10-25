@@ -60,62 +60,37 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     m_systemHealth->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_notifications->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // TODO: #vkutin In the future I might replace EventRibbon::addTile/removeTile with
-    // EventRibbon::setModel(EventListModel*) if every custom action can be described in EventData
-
-    const auto connectToModel =
+    const auto handleSpecials =
         [this](EventRibbon* ribbon, EventListModel* model)
         {
-            connect(model, &QAbstractListModel::rowsInserted, this,
-                [this, ribbon, model](const QModelIndex& /*parent*/, int first, int last)
+            connect(ribbon, &EventRibbon::closeRequested, this,
+                [model](const QnUuid& id) { model->removeEvent(id); });
+
+            connect(ribbon, &EventRibbon::clicked, this,
+                [this, model](const QnUuid& id)
                 {
-                    for (int i = first; i <= last; ++i)
+                    const auto index = model->indexOf(id);
+                    const QVariant actionIdData = index.data(Qn::ActionIdRole);
+                    if (actionIdData.canConvert<ui::action::IDType>())
                     {
-                        const auto index = model->index(i);
-                        const auto uuid = index.data(Qn::UuidRole).value<QnUuid>();
+                        const auto actionId = actionIdData.value<ui::action::IDType>();
+                        const auto actionParameters = index.data(Qn::ActionParametersRole)
+                            .value<ui::action::Parameters>();
 
-                        auto tile = newEventTile(index);
-                        ribbon->insertTile(i, tile);
-
-                        connect(tile, &EventTile::closeRequested, this,
-                            [model, uuid]() { model->removeEvent(uuid); });
+                        menu()->triggerIfPossible(actionId, actionParameters);
                     }
-                });
-
-            connect(model, &QAbstractListModel::rowsAboutToBeRemoved, this,
-                [this, ribbon, model](const QModelIndex& /*parent*/, int first, int last)
-                {
-                    ribbon->removeTiles(first, last - first + 1);
                 });
         };
 
-    connectToModel(m_systemHealth, m_systemHealthModel);
-    connectToModel(m_notifications, m_notificationsModel);
+    m_systemHealth->setModel(m_systemHealthModel);
+    m_notifications->setModel(m_notificationsModel);
+
+    handleSpecials(m_systemHealth, m_systemHealthModel);
+    handleSpecials(m_notifications, m_notificationsModel);
 }
 
 NotificationListWidget::Private::~Private()
 {
-}
-
-EventTile* NotificationListWidget::Private::newEventTile(const QModelIndex& index) const
-{
-    auto tile = EventTile::createFrom(index);
-
-    const QVariant actionIdData = index.data(Qn::ActionIdRole);
-    if (actionIdData.canConvert<ui::action::IDType>())
-    {
-        const auto actionId = actionIdData.value<ui::action::IDType>();
-        const auto actionParameters = index.data(Qn::ActionParametersRole)
-            .value<ui::action::Parameters>();
-
-        connect(tile, &EventTile::clicked, this,
-            [this, actionId, actionParameters]()
-            {
-                menu()->triggerIfPossible(actionId, actionParameters);
-            });
-    }
-
-    return tile;
 }
 
 QToolButton* NotificationListWidget::Private::newActionButton(

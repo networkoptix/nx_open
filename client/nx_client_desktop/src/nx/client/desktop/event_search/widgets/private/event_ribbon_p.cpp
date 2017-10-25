@@ -3,10 +3,12 @@
 #include <algorithm>
 
 #include <QtCore/QPointer>
+#include <QtCore/QAbstractItemModel>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
+#include <client/client_globals.h>
 #include <utils/common/event_processors.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
@@ -81,6 +83,99 @@ EventRibbon::Private::Private(EventRibbon* q):
 
 EventRibbon::Private::~Private()
 {
+    m_modelConnections.reset();
+}
+
+QAbstractItemModel* EventRibbon::Private::model() const
+{
+    return m_model;
+}
+
+void EventRibbon::Private::setModel(QAbstractItemModel* model)
+{
+    if (m_model == model)
+        return;
+
+    m_modelConnections.reset();
+    clear();
+
+    m_model = model;
+
+    if (!m_model)
+        return;
+
+    insertNewTiles(0, m_model->rowCount(m_rootIndex));
+
+    m_modelConnections.reset(new QnDisconnectHelper());
+
+    *m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
+        [this]() { insertNewTiles(0, m_model->rowCount(m_rootIndex)); });
+
+    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
+        [this](const QModelIndex& parent, int first, int last)
+        {
+            if (m_rootIndex.isValid() != parent.isValid())
+                return;
+
+            if (m_rootIndex.isValid() && m_rootIndex != parent)
+                return;
+
+            insertNewTiles(first, last - first + 1);
+        });
+
+    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
+        [this](const QModelIndex& parent, int first, int last)
+        {
+            if (m_rootIndex.isValid() != parent.isValid())
+                return;
+
+            if (m_rootIndex.isValid() && m_rootIndex != parent)
+                return;
+
+            removeTiles(first, last - first + 1);
+        });
+}
+
+void EventRibbon::Private::insertNewTiles(int first, int count)
+{
+    if (!m_model)
+        return;
+
+    for (int i = first; i < count; ++i)
+    {
+        const auto index = m_model->index(i, m_modelColumn, m_rootIndex);
+        auto tile = createTile(index);
+        NX_EXPECT(tile);
+        if (tile)
+            insertTile(i, tile);
+    }
+}
+
+EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
+{
+    auto tile = EventTile::createFrom(index);
+    if (!tile)
+        return nullptr;
+
+    connect(tile, &EventTile::closeRequested, this,
+        [this]()
+        {
+            emit q->closeRequested(static_cast<EventTile*>(sender())->id());
+        });
+
+    connect(tile, &EventTile::linkActivated, this,
+        [this](const QString& link)
+        {
+            emit q->linkActivated(static_cast<EventTile*>(sender())->id(), link);
+        });
+
+    connect(tile, &EventTile::clicked, this,
+        [this]()
+        {
+            emit q->clicked(static_cast<EventTile*>(sender())->id());
+        });
+
+    return tile;
 }
 
 void EventRibbon::Private::insertTile(int index, EventTile* tileWidget)
@@ -161,6 +256,19 @@ void EventRibbon::Private::removeTiles(int first, int count)
     updateScrollRange();
 
     updateView();
+    q->updateGeometry();
+}
+
+void EventRibbon::Private::clear()
+{
+    for (auto& tile: m_tiles)
+        tile.widget->deleteLater();
+
+    m_tiles.clear();
+    m_totalHeight = 0;
+    m_visible = nx::utils::IntegerRange();
+
+    updateScrollRange();
     q->updateGeometry();
 }
 
