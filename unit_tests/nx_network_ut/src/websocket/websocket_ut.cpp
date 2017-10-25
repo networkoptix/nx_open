@@ -660,7 +660,11 @@ protected:
             beforeWaitAction();
 
         readyFuture.wait();
-        //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+
+    void startAndWaitForDestroyed()
+    {
+        start();
         waitForClientSocketDestroyed();
         waitForServerSocketDestroyed();
     }
@@ -675,6 +679,8 @@ protected:
             }).detach();
 
         start();
+        clientWebSocket->pleaseStopSync();
+        waitForServerSocketDestroyed();
     }
 
     void thenItsBeenKeptAliveByThePings()
@@ -695,7 +701,7 @@ protected:
 TEST_F(WebSocket_PingPong, PingPong_noPingsBecauseOfData)
 {
     givenServerClientWebSockets();
-    start();
+    startAndWaitForDestroyed();
     ASSERT_FALSE(isTimeoutError);
 }
 
@@ -720,8 +726,7 @@ TEST_F(WebSocket_PingPong, Close)
         clientWebSocket->sendCloseAsync();
     };
 
-    start();
-
+    startAndWaitForDestroyed();
     ASSERT_FALSE(clientWebSocket);
     ASSERT_FALSE(serverWebSocket);
 }
@@ -952,7 +957,7 @@ TEST_F(WebSocket_PingPong, UnexpectedClose_deleteFromCb_send)
         clientWebSocket->socket()->terminate();
     };
 
-    start();
+    startAndWaitForDestroyed();
 
     ASSERT_FALSE(clientWebSocket);
     ASSERT_FALSE(serverWebSocket);
@@ -968,7 +973,7 @@ TEST_F(WebSocket_PingPong, UnexpectedClose_deleteFromCb_receive)
         serverWebSocket->socket()->terminate();
     };
 
-    start();
+    startAndWaitForDestroyed();
 
     ASSERT_FALSE(clientWebSocket);
     ASSERT_FALSE(serverWebSocket);
