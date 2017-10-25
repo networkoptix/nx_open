@@ -662,11 +662,11 @@ table.webclient-window>tbody>tr>td{
   color: $light4;
   z-index: 1; /* Used to bring the notification above the player. */
 
-  -webkit-animation-delay: 2s;
+  -webkit-animation-delay: 5s;
   -webkit-animation-duration: 1s;
   -webkit-animation-fill-mode: both;
 
-  animation-delay: 2s;
+  animation-delay: 5s;
   animation-duration: 1s;
   animation-fill-mode: both;
 }
