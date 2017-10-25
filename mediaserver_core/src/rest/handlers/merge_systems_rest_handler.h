@@ -11,6 +11,8 @@ namespace ec2 {
     class AbstractTransactionMessageBus;
 }
 
+class QnCommonModule;
+
 class QnMergeSystemsRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
@@ -35,30 +37,14 @@ private:
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult &result);
 
-    bool applyCurrentSettings(
-        const nx::utils::Url &remoteUrl,
-        const QString& getKey,
-        const QString& postKey,
-        bool oneServer,
-        const QnRestConnectionProcessor* owner);
-
-    bool applyRemoteSettings(
-        const nx::utils::Url &remoteUrl,
-        const QnUuid& systemId,
-        const QString& systemName,
-        const QString& getKey,
-        const QString& postKey,
-        const QnRestConnectionProcessor* owner);
-
-    void setMergeError(
-        QnJsonRestResult& result,
-        utils::MergeSystemsStatus::Value mergeStatus);
-
-    bool executeRemoteConfigure(
-        const ConfigureSystemData& data,
-        const nx::utils::Url &remoteUrl,
-        const QString& postKey,
-        const QnRestConnectionProcessor* owner);
 private:
     ec2::AbstractTransactionMessageBus* m_messageBus;
+
+    void updateLocalServerAuthKeyInConfig(
+        QnCommonModule* commonModule);
+
+    void initiateConnectionToRemoteServer(
+        QnCommonModule* commonModule,
+        const QUrl& remoteModuleUrl,
+        const QnModuleInformationWithAddresses& remoteModuleInformation);
 };

@@ -1,15 +1,16 @@
 #include <gtest/gtest.h>
 
+#include <nx/core/access/access_types.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
+
 #include <api/global_settings.h>
 #include <api/model/cloud_credentials_data.h>
 #include <common/common_module.h>
-#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <network/auth/generic_user_data_provider.h>
 #include <network/auth/time_based_nonce_provider.h>
-
-#include <cloud/cloud_manager_group.h>
 #include <media_server/settings.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
 #include <settings.h>
@@ -61,7 +62,10 @@ class QnSaveCloudSystemCredentialsHandler:
 {
 public:
     QnSaveCloudSystemCredentialsHandler():
-        m_cloudManagerGroup(&m_commonModule, &m_timeBasedNonceProvider),
+        m_cloudManagerGroup(
+            &m_commonModule,
+            &m_timeBasedNonceProvider,
+            std::make_unique<GenericUserDataProvider>(&m_commonModule)),
         m_restHandler(&m_cloudManagerGroup)
     {
     }
@@ -96,7 +100,7 @@ protected:
 
 private:
     TimeBasedNonceProvider m_timeBasedNonceProvider;
-    CloudManagerGroup m_cloudManagerGroup;
+    nx::vms::cloud_integration::CloudManagerGroup m_cloudManagerGroup;
     ::QnSaveCloudSystemCredentialsHandler m_restHandler;
 };
 

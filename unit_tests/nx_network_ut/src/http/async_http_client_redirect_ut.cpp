@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <QUrlQuery>
+
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -26,19 +28,8 @@ public:
 protected:
     void givenTwoHttpServersWithRedirection()
     {
-        using namespace std::placeholders;
-
         givenResourceServer();
-        ASSERT_TRUE(m_resourceServer->registerStaticProcessor(
-            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
-            kTestMessageBody,
-            "text/plain",
-            nx_http::Method::get));
-
-        ASSERT_TRUE(m_resourceServer->registerRequestProcessorFunc(
-            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
-            std::bind(&AsyncHttpClientRedirect::savePostedResource, this, _1, _2, _3, _4, _5),
-            nx_http::Method::post));
+        registerContentHandlers();
 
         givenRedirectServer();
     }
@@ -55,12 +46,29 @@ protected:
     void givenHttpResourceWithAuthentication()
     {
         givenResourceServer();
-        ASSERT_TRUE(m_resourceServer->registerStaticProcessor(
-            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
-            kTestMessageBody,
-            "text/plain"));
+        registerContentHandlers();
 
-        // Enabling authentication.
+        enableAuthenticationOnContentServer();
+    }
+
+    void givenResourceServer()
+    {
+        ASSERT_TRUE(m_resourceServer->bindAndListen());
+        m_actualUrl = nx::utils::Url(lm("http://localhost:%1%2")
+            .arg(m_resourceServer->serverAddress().port)
+            .arg(nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath)));
+    }
+
+    void givenRedirectServer()
+    {
+        ASSERT_TRUE(m_redirector->bindAndListen());
+        m_redirectUrl = nx::utils::Url(lm("http://127.0.0.1:%1%2")
+            .arg(m_redirector->serverAddress().port).arg(kTestPath));
+        ASSERT_TRUE(m_redirector->registerRedirectHandler(kTestPath, m_actualUrl));
+    }
+
+    void enableAuthenticationOnContentServer()
+    {
         const QString userName = nx::utils::generateRandomName(7);
         const QString password = nx::utils::generateRandomName(7);
         m_httpClient.setUserName(userName);
@@ -70,30 +78,22 @@ protected:
         m_resourceServer->registerUserCredentials(userName.toUtf8(), password.toUtf8());
     }
 
-    void givenResourceServer()
-    {
-        ASSERT_TRUE(m_resourceServer->bindAndListen());
-        m_actualUrl = nx::utils::Url(lm("http://%1%2")
-            .arg(m_resourceServer->serverAddress().toString())
-            .arg(nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath)));
-    }
-
-    void givenRedirectServer()
-    {
-        ASSERT_TRUE(m_redirector->bindAndListen());
-        m_redirectUrl = nx::utils::Url(lm("http://%1%2")
-            .arg(m_redirector->serverAddress().toString()).arg(kTestPath));
-        ASSERT_TRUE(m_redirector->registerRedirectHandler(kTestPath, m_actualUrl));
-    }
-
     void whenRequestingRedirectedResource()
     {
         ASSERT_TRUE(m_httpClient.doGet(m_redirectUrl));
     }
 
-    void whenPostingResourceToRedirectionServer()
+    void whenPostingResourceToRedirectionServer(std::map<QString, QString> params = {})
     {
-        m_httpClient.doPost(m_redirectUrl, "text/plain", kTestMessageBody);
+        QUrlQuery query;
+        for (const auto& param: params)
+            query.addQueryItem(param.first, param.second);
+
+        auto url = m_redirectUrl;
+        url.setQuery(query.query());
+
+        m_httpClient.addAdditionalHeader("Nx-Additional-Header", "value");
+        m_httpClient.doPost(url, "text/plain", kTestMessageBody);
     }
 
     void thenClientShouldFetchResourceFromActualLocation()
@@ -125,13 +125,41 @@ protected:
         ASSERT_EQ(kTestMessageBody, m_postResourceRequests.pop().messageBody);
     }
 
-    void thenRequestToContentServerDoesNotContainDuplicateHeaders()
+    void thenPostRequestIsReceived()
     {
-        auto request = m_postResourceRequests.pop();
-        for (const auto& header: request.headers)
+        m_prevReceivedPostRequest = m_postResourceRequests.pop();
+    }
+
+    void andPostRequestToContentServerDoesNotContainDuplicateHeaders()
+    {
+        for (const auto& header: m_prevReceivedPostRequest->headers)
         {
-            ASSERT_EQ(1U, request.headers.count(header.first));
+            ASSERT_EQ(1U, m_prevReceivedPostRequest->headers.count(header.first))
+                << header.first.data();
         }
+    }
+
+    void andHostHeaderHoldsCorrectValue()
+    {
+        const auto hostHeader = m_prevReceivedPostRequest->headers.find("Host");
+        ASSERT_NE(hostHeader, m_prevReceivedPostRequest->headers.end());
+        ASSERT_EQ(hostHeader->second, lm("%1:%2").args(m_actualUrl.host(),m_actualUrl.port()));
+    }
+
+    void andDigestUrlIsCorrectAndFullyEncoded()
+    {
+        const auto authHeader = 
+            m_prevReceivedPostRequest->headers.find(nx_http::header::Authorization::NAME);
+        ASSERT_NE(authHeader, m_prevReceivedPostRequest->headers.end());
+        nx_http::header::Authorization auth(nx_http::header::AuthScheme::digest);
+        ASSERT_TRUE(auth.parse(authHeader->second));
+        ASSERT_EQ(auth.digest->params["uri"],
+            m_prevReceivedPostRequest->requestLine.url.toString(QUrl::FullyEncoded).toUtf8());
+    }
+
+    void registerAdditionalRequestHeader(const nx::String& name, const nx::String& value)
+    {
+        m_httpClient.addAdditionalHeader(name, value);
     }
 
 private:
@@ -141,6 +169,7 @@ private:
     nx::utils::Url m_redirectUrl;
     nx::utils::Url m_actualUrl;
     nx::utils::SyncQueue<nx_http::Request> m_postResourceRequests;
+    boost::optional<nx_http::Request> m_prevReceivedPostRequest;
 
     void savePostedResource(
         nx_http::HttpServerConnection* const /*connection*/,
@@ -151,6 +180,22 @@ private:
     {
         m_postResourceRequests.push(std::move(request));
         completionHandler(nx_http::StatusCode::ok);
+    }
+
+    void registerContentHandlers()
+    {
+        using namespace std::placeholders;
+
+        ASSERT_TRUE(m_resourceServer->registerStaticProcessor(
+            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            kTestMessageBody,
+            "text/plain",
+            nx_http::Method::get));
+
+        ASSERT_TRUE(m_resourceServer->registerRequestProcessorFunc(
+            nx::network::url::normalizePath(kContentServerPathPrefix + kTestPath),
+            std::bind(&AsyncHttpClientRedirect::savePostedResource, this, _1, _2, _3, _4, _5),
+            nx_http::Method::post));
     }
 };
 
@@ -185,9 +230,25 @@ TEST_F(AsyncHttpClientRedirect, message_body_is_redirected)
 
 TEST_F(AsyncHttpClientRedirect, no_duplicate_headers_in_redirected_request)
 {
+    registerAdditionalRequestHeader("TestHeader", "Value");
+
     givenTwoHttpServersWithRedirection();
     whenPostingResourceToRedirectionServer();
-    thenRequestToContentServerDoesNotContainDuplicateHeaders();
+
+    thenPostRequestIsReceived();
+    andPostRequestToContentServerDoesNotContainDuplicateHeaders();
+}
+
+TEST_F(AsyncHttpClientRedirect, digest_url_is_correct)
+{
+    givenTwoHttpServersWithRedirection();
+    enableAuthenticationOnContentServer();
+
+    whenPostingResourceToRedirectionServer({{"param", "value"}});
+
+    thenPostRequestIsReceived();
+    andHostHeaderHoldsCorrectValue();
+    andDigestUrlIsCorrectAndFullyEncoded();
 }
 
 } // namespace test

@@ -1,17 +1,18 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/http/http_client.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
+#include <nx/utils/sync_call.h>
+
+#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/vms/cloud_integration/cdb_nonce_fetcher.h>
 
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>
-#include <nx/utils/sync_call.h>
-#include <nx/utils/std/future.h>
-#include <nx/cloud/cdb/api/cloud_nonce.h>
-#include <network/auth/cdb_nonce_fetcher.h>
 #include <network/auth/time_based_nonce_provider.h>
-#include <nx/network/http/http_client.h>
-
 #include <test_support/mediaserver_launcher.h>
+
 #include "mediaserver_cloud_integration_test_setup.h"
 
 namespace {
@@ -224,7 +225,7 @@ private:
         nx::Buffer nonceWithoutTrailer;
         nx::Buffer trailer;
 
-        auto parseResult = CdbNonceFetcher::parseCloudNonce(
+        auto parseResult = nx::vms::cloud_integration::CdbNonceFetcher::parseCloudNonce(
             nonceString,
             &nonceWithoutTrailer,
             &trailer);

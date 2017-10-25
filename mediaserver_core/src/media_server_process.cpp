@@ -39,6 +39,7 @@
 
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/events/reasoned_event.h>
+#include <nx/vms/utils/vms_utils.h>
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/mediaserver/event/rule_processor.h>
 #include <nx/mediaserver/event/extended_rule_processor.h>
@@ -191,6 +192,7 @@
 #include <rtsp/rtsp_connection.h>
 
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/initial_data_loader.h>
 #include <network/multicodec_rtp_reader.h>
 #include <network/router.h>
 
@@ -249,7 +251,7 @@
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
-#include "cloud/cloud_manager_group.h"
+#include "cloud/cloud_integration_manager.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
@@ -1301,280 +1303,6 @@ void MediaServerProcess::updateAddressesList()
             serverAddresses.end()));
 }
 
-void MediaServerProcess::loadResourcesFromECS(
-    ec2::AbstractECConnectionPtr ec2Connection,
-    QnCommonMessageProcessor* messageProcessor)
-{
-    ec2::ErrorCode rez;
-    {
-        //reading servers list
-        ec2::ApiMediaServerDataList mediaServerList;
-        while( ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok )
-        {
-            NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        ec2::ApiDiscoveryDataList discoveryDataList;
-        while( ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok )
-        {
-            NX_LOG( lit("QnMain::run(). Can't get discovery data."), cl_logERROR );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        QMultiHash<QnUuid, nx::utils::Url> additionalAddressesById;
-        QMultiHash<QnUuid, nx::utils::Url> ignoredAddressesById;
-        for (const ec2::ApiDiscoveryData &data: discoveryDataList)
-        {
-            additionalAddressesById.insert(data.id, data.url);
-            if (data.ignore)
-                ignoredAddressesById.insert(data.id, data.url);
-        }
-
-        for(const auto &mediaServer: mediaServerList)
-        {
-            const auto defaultPort = QUrl(mediaServer.url).port();
-            QList<SocketAddress> addresses;
-            ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses, defaultPort);
-
-            QList<nx::utils::Url> additionalAddresses = additionalAddressesById.values(mediaServer.id);
-            for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
-                const SocketAddress addr(it->host(), it->port(defaultPort));
-                if (addresses.contains(addr))
-                    it = additionalAddresses.erase(it);
-                else
-                    ++it;
-            }
-            const auto dictionary = commonModule()->serverAdditionalAddressesDictionary();
-            dictionary->setAdditionalUrls(mediaServer.id, additionalAddresses);
-            dictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
-            messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
-        }
-        do {
-            if (needToStop())
-                return;
-        } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
-
-
-        // read resource status
-        ec2::ApiResourceStatusDataList statusList;
-        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetStatusList( statusList );
-
-        //reading server attributes
-        ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
-
-    }
-
-
-    {
-        // read camera list
-        ec2::ApiCameraDataList cameras;
-        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        //reading camera attributes
-        ec2::ApiCameraAttributesDataList cameraUserAttributesList;
-        while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetCameraUserAttributesList(cameraUserAttributesList);
-
-        // read properties dictionary
-        ec2::ApiResourceParamWithRefDataList kvPairs;
-        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
-        {
-            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetPropertyList(kvPairs);
-
-        /* Properties and attributes must be read before processing cameras because of getAuth() method */
-        QnManualCameraInfoMap manualCameras;
-        for (const auto &camera : cameras)
-        {
-            messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
-            if (camera.manuallyAdded)
-            {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
-                if (resType)
-                {
-                    const auto auth = QnNetworkResource::getResourceAuth(commonModule(), camera.id, camera.typeId);
-                    manualCameras.insert(camera.url,
-                        QnManualCameraInfo(nx::utils::Url(camera.url), auth, resType->getName()));
-                }
-                else
-                {
-                    NX_ASSERT(false, lm("No resourse type in the pool %1").arg(camera.typeId));
-                }
-            }
-        }
-        commonModule()->resourceDiscoveryManager()->registerManualCameras(manualCameras);
-    }
-
-    {
-        ec2::ApiServerFootageDataList serverFootageData;
-        while (( rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        commonModule()->cameraHistoryPool()->resetServerFootageData(serverFootageData);
-        commonModule()->cameraHistoryPool()->setHistoryCheckDelay(1000);
-    }
-
-    {
-        //loading users
-        ec2::ApiUserDataList users;
-        while(( rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users))  != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for(const auto &user: users)
-            messageProcessor->updateResource(user, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading videowalls
-        ec2::ApiVideowallDataList videowalls;
-        while(( rez = ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for (const ec2::ApiVideowallData& videowall: videowalls)
-            messageProcessor->updateResource(videowall, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading layouts
-        ec2::ApiLayoutDataList layouts;
-        while(( rez = ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for(const auto &layout: layouts)
-            messageProcessor->updateResource(layout, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading webpages
-        ec2::ApiWebPageDataList webpages;
-        while ((rez = ec2Connection->getWebPageManager(Qn::kSystemAccess)->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get webpages. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for (const auto &webpage : webpages)
-            messageProcessor->updateResource(webpage, ec2::NotificationSource::Local);
-    }
-
-    {
-        //loading accessible resources
-        ec2::ApiAccessRightsDataList accessRights;
-        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetAccessRights(accessRights);
-    }
-
-    {
-        //loading user roles
-        ec2::ApiUserRoleDataList userRoles;
-        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-        messageProcessor->resetUserRoles(userRoles);
-    }
-
-    {
-        //loading business rules
-        vms::event::RuleList rules;
-        while( (rez = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
-        {
-            qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for (const auto& rule: rules)
-            messageProcessor->on_businessEventAddedOrUpdated(rule);
-    }
-
-    {
-        // load licenses
-        QnLicenseList licenses;
-        while( (rez = ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses)) != ec2::ErrorCode::ok )
-        {
-            qDebug() << "QnMain::run(): Can't get license list. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for(const QnLicensePtr &license: licenses)
-            messageProcessor->on_licenseChanged(license);
-    }
-
-    // Start receiving local notifications
-    auto processor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
-    processor->startReceivingLocalNotifications(ec2Connection);
-}
-
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
 {
     const auto hwInfo = HardwareInformation::instance();
@@ -1792,7 +1520,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 void MediaServerProcess::registerRestHandlers(
-    CloudManagerGroup* cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
@@ -1870,7 +1598,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudManagerGroup), kAdmin);
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
@@ -1925,7 +1653,7 @@ void MediaServerProcess::regTcp(
 }
 
 bool MediaServerProcess::initTcpListener(
-    CloudManagerGroup* const cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
@@ -2156,7 +1884,8 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
-void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
+void MediaServerProcess::resetSystemState(
+    nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
 {
     for (;;)
     {
@@ -2167,7 +1896,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
             continue;
         }
 
-        if (!resetSystemToStateNew(commonModule()))
+        if (!nx::vms::utils::resetSystemToStateNew(commonModule()))
         {
             qWarning() << "Error while resetting system to state \"new \". Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -2461,11 +2190,13 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
 
     TimeBasedNonceProvider timeBasedNonceProvider;
-    CloudManagerGroup cloudManagerGroup(commonModule(), &timeBasedNonceProvider);
+    CloudIntegrationManager cloudIntegrationManager(
+        commonModule(),
+        &timeBasedNonceProvider);
     auto authHelper = std::make_unique<QnAuthHelper>(
         commonModule(),
         &timeBasedNonceProvider,
-        &cloudManagerGroup);
+        &cloudIntegrationManager.cloudManagerGroup);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
@@ -2724,7 +2455,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
+    if (!initTcpListener(&cloudIntegrationManager.cloudManagerGroup, ec2ConnectionFactory->messageBus()))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2788,7 +2519,7 @@ void MediaServerProcess::run()
         server->setPrimaryAddress(
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
-        cloudManagerGroup.connectionManager.setProxyVia(
+        cloudIntegrationManager.cloudManagerGroup.connectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
@@ -2923,7 +2654,20 @@ void MediaServerProcess::run()
 
     commonModule()->resourceAccessManager()->beginUpdate();
     commonModule()->resourceAccessProvider()->beginUpdate();
-    loadResourcesFromECS(ec2Connection, commonModule()->messageProcessor());
+
+    nx::vms::utils::loadResourcesFromEcs(
+        commonModule(),
+        ec2Connection,
+        commonModule()->messageProcessor(),
+        m_mediaServer,
+        [this]() { return needToStop(); });
+
+    // Start receiving local notifications
+    auto serverMessageProcessor = dynamic_cast<QnServerMessageProcessor*> (commonModule()->messageProcessor());
+    serverMessageProcessor->startReceivingLocalNotifications(ec2Connection);
+
+
+
     qnServerModule->metadataManagerPool()->init();
     at_runtimeInfoChanged(runtimeManager->localInfo());
 
@@ -2965,7 +2709,7 @@ void MediaServerProcess::run()
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
                     "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
 
-            resetSystemState(cloudManagerGroup.connectionManager);
+            resetSystemState(cloudIntegrationManager.cloudManagerGroup.connectionManager);
         }
         if (settingsProxy->isCloudInstanceChanged())
         {
@@ -3029,10 +2773,10 @@ void MediaServerProcess::run()
         m_universalTcpListener,
         &QnTcpListener::portChanged,
         this,
-        [this, &cloudManagerGroup]()
+        [this, &cloudIntegrationManager]()
         {
             updateAddressesList();
-            cloudManagerGroup.connectionManager.setProxyVia(
+            cloudIntegrationManager.cloudManagerGroup.connectionManager.setProxyVia(
                 SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 

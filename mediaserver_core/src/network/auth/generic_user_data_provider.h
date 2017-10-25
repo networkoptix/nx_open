@@ -1,23 +1,17 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_AUTH_GENERIC_USER_DATA_PROVIDER_H
-#define NX_AUTH_GENERIC_USER_DATA_PROVIDER_H
+#pragma once
 
 #include <QtCore/QObject>
 
-#include "abstract_user_data_provider.h"
 #include <nx/utils/safe_direct_connection.h>
+
+#include <nx/vms/auth/abstract_user_data_provider.h>
+
 #include <common/common_module_aware.h>
 
-
-class GenericUserDataProvider
-:
+class GenericUserDataProvider:
     public QObject,
     public QnCommonModuleAware,
-    public AbstractUserDataProvider,
+    public nx::vms::auth::AbstractUserDataProvider,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
@@ -46,5 +40,3 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr& res);
     void at_resourcePool_resourceRemoved(const QnResourcePtr& res);
 };
-
-#endif  //NX_AUTH_GENERIC_USER_DATA_PROVIDER_H

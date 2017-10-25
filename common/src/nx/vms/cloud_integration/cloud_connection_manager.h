@@ -9,9 +9,14 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/subscription.h>
+#include <nx/utils/url.h>
 
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
+
+namespace nx {
+namespace vms {
+namespace cloud_integration {
 
 class AbstractCloudConnectionManager:
     public QObject,
@@ -62,6 +67,8 @@ public:
 
     virtual void processCloudErrorCode(nx::cdb::api::ResultCode resultCode) override;
 
+    void setCloudDbUrl(const nx::utils::Url &url);
+
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
@@ -87,3 +94,7 @@ private:
 private slots:
     void cloudSettingsChanged();
 };
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

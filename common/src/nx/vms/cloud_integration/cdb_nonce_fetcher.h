@@ -11,14 +11,19 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
-#include <nx/cloud/cdb/api/connection.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/safe_direct_connection.h>
 
-#include "abstract_nonce_provider.h"
+#include <nx/cloud/cdb/api/connection.h>
+#include <nx/vms/auth/abstract_nonce_provider.h>
+
 #include "cloud_user_info_pool.h"
+
+namespace nx {
+namespace vms {
+namespace cloud_integration {
 
 class AbstractCloudConnectionManager;
 class AbstractCloudUserInfoPool;
@@ -28,7 +33,7 @@ class AbstractCloudUserInfoPool;
  * Otherwise, standard nonce generation/validation logic is used.
  */
 class CdbNonceFetcher:
-    public AbstractNonceProvider,
+    public auth::AbstractNonceProvider,
     public QObject,
     public Qn::EnableSafeDirectConnection
 {
@@ -40,7 +45,7 @@ public:
         nx::utils::StandaloneTimerManager* timerManager,
         AbstractCloudConnectionManager* const cloudConnectionManager,
         AbstractCloudUserInfoPool* cloudUserInfoPool,
-        AbstractNonceProvider* defaultGenerator);
+        auth::AbstractNonceProvider* defaultGenerator);
     ~CdbNonceFetcher();
 
     virtual QByteArray generateNonce() override;
@@ -70,8 +75,8 @@ private:
 
     mutable QnMutex m_mutex;
     AbstractCloudConnectionManager* const m_cloudConnectionManager;
-    AbstractNonceProvider* m_defaultGenerator;
-    //map<cdb_nonce, valid_time>
+    auth::AbstractNonceProvider* m_defaultGenerator;
+    /** map<cdb_nonce, valid_time>. */
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;
@@ -91,3 +96,7 @@ private:
     void cloudBindingStatusChanged(bool boundToCloud);
     nx::Buffer generateNonceTrailer();
 };
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

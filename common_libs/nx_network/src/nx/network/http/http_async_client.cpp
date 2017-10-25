@@ -260,8 +260,8 @@ void AsyncClient::doRequest(
     nx_http::Method::ValueType method,
     const nx::utils::Url& url)
 {
-    NX_ASSERT(!url.host().isEmpty());
-    NX_ASSERT(url.isValid());
+    //NX_ASSERT(!url.host().isEmpty());
+    //NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
     m_requestUrl = url;
@@ -1164,6 +1164,10 @@ void AsyncClient::prepareRequestHeaders(bool useHttp11, const nx_http::StringTyp
         }
     }
 
+    // It is not correct just to replace headers because there 
+    // could be multiple headers with same name in m_additionalHeaders.
+    for (const auto& header: m_additionalHeaders)
+        m_request.headers.erase(header.first);
     m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
 
     addAppropriateAuthenticationInformation();

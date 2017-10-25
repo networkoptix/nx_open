@@ -8,17 +8,19 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <nx/utils/thread/stoppable.h>
 #include <common/static_common_module.h>
 #include <common/common_module.h>
 #include <network/http_connection_listener.h>
+#include <nx_ec/ec_api.h>
 
 //namespace nx {
 namespace ec2 {
 
 class AbstractECConnection;
+class AbstractECConnectionFactory;
 class QnSimpleHttpConnectionListener;
 
 class Appserver2Process:
@@ -38,6 +40,7 @@ public:
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
+
 private:
     int m_argc;
     char** m_argv;
@@ -49,6 +52,10 @@ private:
     QnSimpleHttpConnectionListener* m_tcpListener;
     mutable QnMutex m_mutex;
     QEventLoop m_eventLoop;
+
+    void updateRuntimeData();
+    void registerHttpHandlers(ec2::AbstractECConnectionFactory* ec2ConnectionFactory);
+    void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
 };
 
 

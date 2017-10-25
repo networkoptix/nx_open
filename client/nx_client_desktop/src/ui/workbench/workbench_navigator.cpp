@@ -683,6 +683,11 @@ bool QnWorkbenchNavigator::isRecording() const
     return m_isRecording;
 }
 
+bool QnWorkbenchNavigator::syncIsForced() const
+{
+    return m_syncIsForced;
+}
+
 void QnWorkbenchNavigator::updateFootageState()
 {
     updateHasArchive();
@@ -796,6 +801,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
         updateSyncedPeriods();
     updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnSecurityCamResource>());
     updateLines();
+    updateSyncIsForced();
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
@@ -838,6 +844,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     if (workbench() && !workbench()->isInLayoutChangeProcess())
         updateSyncedPeriods(); /* Full rebuild on widget removing. */
     updateLines();
+    updateSyncIsForced();
 }
 
 QnResourceWidget *QnWorkbenchNavigator::currentWidget() const
@@ -1912,6 +1919,34 @@ void QnWorkbenchNavigator::updateTimelineRelevancy()
 
     if (!m_timelineRelevant && !qFuzzyIsNull(speed()))
         setLive(true);
+}
+
+void QnWorkbenchNavigator::updateSyncIsForced()
+{
+    // Force sync if there more than 1 channel of recorders on the scene.
+    const auto widgets = m_syncedWidgets;
+    const auto syncIsForced = std::count_if(widgets.cbegin(), widgets.cend(),
+        [](QnMediaResourceWidget* w)
+        {
+            const auto camera = w->resource().dynamicCast<QnSecurityCamResource>();
+            return camera && camera->isDtsBased();
+        }) > 1;
+
+    if (m_syncIsForced == syncIsForced)
+        return;
+
+    m_syncIsForced = syncIsForced;
+
+    const auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    if (syncIsForced && !streamSynchronizer->isRunning())
+    {
+        if (m_currentWidgetFlags.testFlag(WidgetSupportsSync))
+            streamSynchronizer->setState(m_currentWidget);
+        else
+            streamSynchronizer->start(DATETIME_NOW, 1.0);
+    }
+
+    emit syncIsForcedChanged();
 }
 
 void QnWorkbenchNavigator::updateThumbnailsLoader()

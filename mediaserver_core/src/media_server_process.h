@@ -38,7 +38,7 @@ class QnLdapManager;
 struct BeforeRestoreDbData;
 namespace ec2 { class CrashReporter; }
 
-struct CloudManagerGroup;
+namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
 void restartServer(int restartTimeout);
 
@@ -122,9 +122,6 @@ public slots:
     void stopSync();
 
 private slots:
-    void loadResourcesFromECS(
-        ec2::AbstractECConnectionPtr ec2Connection,
-        QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -153,7 +150,7 @@ private:
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
     void registerRestHandlers(
-        CloudManagerGroup* const cloudManagerGroup,
+        nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
 
@@ -161,7 +158,7 @@ private:
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
-        CloudManagerGroup* const cloudManagerGroup,
+        nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
         ec2::TransactionMessageBusAdapter* messageBus);
     void initializeCloudConnect();
 
@@ -173,7 +170,7 @@ private:
         ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
     bool isStopping() const;
-    void resetSystemState(CloudConnectionManager& cloudConnectionManager);
+    void resetSystemState(nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
