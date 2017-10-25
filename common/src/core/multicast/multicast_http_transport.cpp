@@ -175,7 +175,7 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     result.offset      = fields[7].toInt();
     result.payloadData = fields[8];
 
-    if (result.offset + result.payloadData.size() > result.messageSize)
+    if (result.offset < 0 || result.offset + result.payloadData.size() > result.messageSize)
         return result; // error
 
     *ok = true;
