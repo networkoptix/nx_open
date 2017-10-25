@@ -18,7 +18,8 @@ enum class PlaybackMode
     Live,
     Archive,
     ThumbNails,
-    Export
+    Export,
+    Edge
 };
 
 class QnAbstractArchiveDelegate: public QObject

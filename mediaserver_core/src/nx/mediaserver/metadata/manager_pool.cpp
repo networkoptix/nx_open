@@ -235,7 +235,9 @@ bool ManagerPool::canFetchMetadataFromResource(const QnSecurityCamResourcePtr& c
         return false;
 
     const auto status = camera->getStatus();
-    return !camera->hasFlags(Qn::foreigner | Qn::desktop_camera)
+    const auto cameraFlags = camera->flags();
+    return !cameraFlags.testFlag(Qn::foreigner)
+        && !cameraFlags.testFlag(Qn::desktop_camera)
         && (status == Qn::Online || status == Qn::Recording);
 }
 
