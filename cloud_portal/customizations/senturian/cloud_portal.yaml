@@ -16,7 +16,7 @@ cloud_portal:
     url: 'https://$CLOUD_PORTAL_HOST'
 
 cloud_gateway:
-    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
+    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT/gateway'
 
 mail_from: 'admin@senturiansolutions.com'
 

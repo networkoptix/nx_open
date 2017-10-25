@@ -125,7 +125,7 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
     else:
         return
 
-    cloud_gateway.post('gateway/' + system_id, "ec2/saveEventRule", data, email, password)
+    cloud_gateway.post(system_id, "ec2/saveEventRule", data, email, password)
 
 
 def make_or_increment_rule(action, email, system_id, caption, password=None,
@@ -191,7 +191,7 @@ def zapier_send_generic_event(request):
                            password=password, description=description, source=source)
 
     url = "api/createEvent?{}".format(urllib.urlencode(query_params).replace('+', "%20"))
-    return cloud_gateway.get('gateway/' + system_id, url, email, password)
+    return cloud_gateway.get(system_id, url, email, password)
 
 
 @api_view(['GET'])
