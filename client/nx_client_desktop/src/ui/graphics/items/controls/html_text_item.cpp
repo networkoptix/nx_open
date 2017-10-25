@@ -1,5 +1,6 @@
 #include "html_text_item.h"
 
+#include <QtCore/QPointer>
 #include <QtGui/QAbstractTextDocumentLayout>
 #include <QtGui/QTextDocument>
 #include <QtGui/QPainter>
@@ -57,7 +58,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHtmlTextItemOptions, (eq), QnHtmlTextItemOpti
 
 ///
 
-class QnHtmlTextItemPrivate
+class QnHtmlTextItemPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(QnHtmlTextItem)
     QnHtmlTextItem *q_ptr;
@@ -82,10 +83,10 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
     , pixmap()
 {
     installEventHandler(parent, QEvent::PaletteChange, parent,
-        [this]()
+        [guard = QPointer<QnHtmlTextItemPrivate>(this)]()
         {
-            if (!this->options.backgroundColor.isValid())
-                updatePixmap();
+            if (guard && !guard->options.backgroundColor.isValid())
+                guard->updatePixmap();
         });
 }
 
