@@ -229,7 +229,6 @@ table.webclient-window>tbody>tr>td{
     float: right;
     display: inline-block;
     position: relative;
-    z-index: 1;
     cursor: pointer;
 
     .clear-button{
@@ -366,7 +365,6 @@ table.webclient-window>tbody>tr>td{
 
   &-preview .camera-status{
     position: absolute;
-    z-index: 1;
     top: 4px;
     left: 4px;
     width: 8px;
@@ -481,7 +479,7 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
-    z-index: 1; /*keeps camera details panel above video*/
+    z-index: 2; /* Keeps camera details panel above video and preloader */
 
     & table{
       font-size: 12px;
@@ -605,7 +603,7 @@ table.webclient-window>tbody>tr>td{
     height: 48px;
     top:0;
     left: 0;
-    z-index: 3;
+    z-index: 2; /* Keeps the video title and settings above video and preloader */
   }
 
   .stick-to-bottom{
@@ -662,7 +660,7 @@ table.webclient-window>tbody>tr>td{
 
   font-weight: 600;
   color: $light4;
-  z-index: 1; /*used to bring the notification above the player*/
+  z-index: 1; /* Used to bring the notification above the player. */
 
   -webkit-animation-delay: 2s;
   -webkit-animation-duration: 1s;
@@ -695,7 +693,7 @@ table.webclient-window>tbody>tr>td{
     right: 0;
     height: 10%;
     width: 10%;
-    z-index: 1;  /*used to bring the close-fullscreen button above the player*/
+    z-index: 1;  /* Used to bring the close-fullscreen button above the player. */
     margin: 10px;
   }
   &:hover .close-fullscreen-icon {
@@ -834,7 +832,7 @@ table.webclient-window>tbody>tr>td{
 
 .drop-back{
   position: absolute !important;
-  z-index: -1;
+  z-index: -1; /* Used for loading the flash player. */
 }
 
 .rotate90 {
@@ -906,7 +904,7 @@ table.webclient-window>tbody>tr>td{
   }
 
   .cameras-panel-wrapper{
-    z-index: 4;
+    z-index: 3; /* Keeps the cameras-panel above the video player and preloads for mobile. */
     position: absolute;
     width: 100% !important;
   }
