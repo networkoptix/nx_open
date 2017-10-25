@@ -1122,6 +1122,7 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     bool enabled = !ui->noRecordButton->isChecked();
     ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
+    ui->advancedSettingsWidget->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
     if (!(m_readOnly && pickedFromGrid))
