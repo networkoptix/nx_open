@@ -171,23 +171,6 @@ bool configureLocalSystem(
     return true;
 }
 
-bool resetSystemToStateNew(QnCommonModule* commonModule)
-{
-    NX_LOG(lit("Resetting system to the \"new\" state"), cl_logINFO);
-
-    commonModule->globalSettings()->setLocalSystemId(QnUuid());   //< Marking system as a "new".
-    if (!commonModule->globalSettings()->synchronizeNowSync())
-    {
-        NX_LOG(lit("Error saving changes to global settings"), cl_logINFO);
-        return false;
-    }
-
-    auto adminUserResource = commonModule->resourcePool()->getAdministrator();
-    PasswordData data;
-    data.password = helpers::kFactorySystemPassword;
-    return updateUserCredentials(commonModule->ec2Connection(), data, QnOptionalBool(true), adminUserResource, nullptr);
-}
-
 // -------------- nx::ServerSetting -----------------------
 
 qint64 nx::ServerSetting::getSysIdTime()

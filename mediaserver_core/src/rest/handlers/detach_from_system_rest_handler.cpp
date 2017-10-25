@@ -14,11 +14,11 @@
 #include <rest/helpers/permissions_helper.h>
 
 #include <media_server/serverutil.h>
-#include <cloud/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
 #include <utils/common/app_info.h>
 
 QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
-    CloudConnectionManager* const cloudConnectionManager,
+    nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager,
     ec2::AbstractTransactionMessageBus* messageBus)
     :
     QnJsonRestHandler(),
@@ -77,7 +77,7 @@ int QnDetachFromSystemRestHandler::execute(
 
     dropConnectionsToRemotePeers(m_messageBus);
 
-    if (resetSystemToStateNew(owner->commonModule()))
+    if (nx::vms::utils::resetSystemToStateNew(owner->commonModule()))
     {
         if (!m_cloudConnectionManager->detachSystemFromCloud())
         {

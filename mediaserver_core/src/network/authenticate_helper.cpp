@@ -25,8 +25,6 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include "network/auth/time_based_nonce_provider.h"
 #include "network/auth/generic_user_data_provider.h"
-#include "network/auth/cdb_nonce_fetcher.h"
-#include "network/auth/cloud_user_authenticator.h"
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_user_manager.h>
@@ -36,7 +34,9 @@
 
 #include <nx/kit/ini_config.h>
 
-#include "cloud/cloud_manager_group.h"
+#include <nx/vms/cloud_integration/cdb_nonce_fetcher.h>
+#include <nx/vms/cloud_integration/cloud_user_authenticator.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
@@ -65,7 +65,7 @@ const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 *
 QnAuthHelper::QnAuthHelper(
     QnCommonModule* commonModule,
     TimeBasedNonceProvider* timeBasedNonceProvider,
-    CloudManagerGroup* cloudManagerGroup)
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
 :
     QnCommonModuleAware(commonModule),
     m_timeBasedNonceProvider(timeBasedNonceProvider),

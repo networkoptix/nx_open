@@ -31,6 +31,8 @@ bool updateUserCredentials(
     QString* errString = nullptr,
     QnUserResourcePtr* updatedUser = nullptr);
 
+bool resetSystemToStateNew(QnCommonModule* commonModule);
+
 } // namespace utils
 } // namespace vms
 } // namespace nx

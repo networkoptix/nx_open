@@ -39,6 +39,7 @@
 
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/events/reasoned_event.h>
+#include <nx/vms/utils/vms_utils.h>
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/mediaserver/event/rule_processor.h>
 #include <nx/mediaserver/event/extended_rule_processor.h>
@@ -250,7 +251,7 @@
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
-#include "cloud/cloud_manager_group.h"
+#include "cloud/cloud_integration_manager.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
@@ -1509,7 +1510,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 void MediaServerProcess::registerRestHandlers(
-    CloudManagerGroup* cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
@@ -1587,7 +1588,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloudManagerGroup), kAdmin);
     reg("api/detachFromSystem", new QnDetachFromSystemRestHandler(
         &cloudManagerGroup->connectionManager, messageBus), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
@@ -1642,7 +1643,7 @@ void MediaServerProcess::regTcp(
 }
 
 bool MediaServerProcess::initTcpListener(
-    CloudManagerGroup* const cloudManagerGroup,
+    nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
@@ -1873,7 +1874,8 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
-void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
+void MediaServerProcess::resetSystemState(
+    nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
 {
     for (;;)
     {
@@ -1884,7 +1886,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
             continue;
         }
 
-        if (!resetSystemToStateNew(commonModule()))
+        if (!nx::vms::utils::resetSystemToStateNew(commonModule()))
         {
             qWarning() << "Error while resetting system to state \"new \". Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -2178,11 +2180,13 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
 
     TimeBasedNonceProvider timeBasedNonceProvider;
-    CloudManagerGroup cloudManagerGroup(commonModule(), &timeBasedNonceProvider);
+    CloudIntegrationManager cloudIntegrationManager(
+        commonModule(),
+        &timeBasedNonceProvider);
     auto authHelper = std::make_unique<QnAuthHelper>(
         commonModule(),
         &timeBasedNonceProvider,
-        &cloudManagerGroup);
+        &cloudIntegrationManager.cloudManagerGroup);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
@@ -2441,7 +2445,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
+    if (!initTcpListener(&cloudIntegrationManager.cloudManagerGroup, ec2ConnectionFactory->messageBus()))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2505,7 +2509,7 @@ void MediaServerProcess::run()
         server->setPrimaryAddress(
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
-        cloudManagerGroup.connectionManager.setProxyVia(
+        cloudIntegrationManager.cloudManagerGroup.connectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
@@ -2695,7 +2699,7 @@ void MediaServerProcess::run()
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
                     "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
 
-            resetSystemState(cloudManagerGroup.connectionManager);
+            resetSystemState(cloudIntegrationManager.cloudManagerGroup.connectionManager);
         }
         if (settingsProxy->isCloudInstanceChanged())
         {
@@ -2759,10 +2763,10 @@ void MediaServerProcess::run()
         m_universalTcpListener,
         &QnTcpListener::portChanged,
         this,
-        [this, &cloudManagerGroup]()
+        [this, &cloudIntegrationManager]()
         {
             updateAddressesList();
-            cloudManagerGroup.connectionManager.setProxyVia(
+            cloudIntegrationManager.cloudManagerGroup.connectionManager.setProxyVia(
                 SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 
