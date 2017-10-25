@@ -18,9 +18,6 @@ public:
     NotificationListWidget(QWidget* parent = nullptr);
     virtual ~NotificationListWidget() override;
 
-    EventListModel* model() const;
-    void setModel(EventListModel* model);
-
 private:
     class Private;
     QScopedPointer<Private> d;

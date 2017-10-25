@@ -4,15 +4,16 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
+#include <ui/widgets/common/panel.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class EventSearchWidget: public QWidget
+class EventSearchWidget: public QnPanel
 {
     Q_OBJECT
-    using base_type = QWidget;
+    using base_type = QnPanel;
 
 public:
     EventSearchWidget(QWidget* parent = nullptr);

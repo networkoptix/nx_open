@@ -4,11 +4,18 @@
 
 #include <QtWidgets/QTabWidget>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
 
-class EventSearchWidget::Private: public QObject
+class EventRibbon;
+class UnifiedSearchListModel;
+
+class EventSearchWidget::Private:
+    public QObject,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -21,6 +28,10 @@ public:
 
 private:
     EventSearchWidget* q = nullptr;
+    UnifiedSearchListModel* const m_model = nullptr;
+    QWidget* const m_headerWidget = nullptr;
+    EventRibbon* const m_eventRibbon = nullptr;
+
     QnVirtualCameraResourcePtr m_camera;
 };
 

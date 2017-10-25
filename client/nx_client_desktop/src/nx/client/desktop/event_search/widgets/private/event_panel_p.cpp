@@ -7,8 +7,6 @@
 
 #include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/client/desktop/event_search/widgets/event_search_widget.h>
-#include <nx/client/desktop/event_search/models/event_list_model.h>
-#include <nx/client/desktop/event_search/models/notification_list_model.h>
 
 namespace nx {
 namespace client {
@@ -19,9 +17,7 @@ EventPanel::Private::Private(EventPanel* q):
     q(q),
     m_tabs(new QTabWidget(q)),
     m_systemTab(new NotificationListWidget(m_tabs)),
-    m_cameraTab(new EventSearchWidget(m_tabs)),
-    m_notificationsModel(new NotificationListModel(q)),
-    m_eventSearchModel(new EventListModel(q))
+    m_cameraTab(new EventSearchWidget(m_tabs))
 {
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());

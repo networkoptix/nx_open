@@ -10,7 +10,6 @@ namespace desktop {
 
 class NotificationListWidget;
 class EventSearchWidget;
-class EventListModel;
 
 class EventPanel::Private: public QObject
 {
@@ -29,9 +28,6 @@ private:
 
     NotificationListWidget* m_systemTab = nullptr;
     EventSearchWidget* m_cameraTab = nullptr;
-
-    EventListModel* m_notificationsModel = nullptr;
-    EventListModel* m_eventSearchModel = nullptr;
 
     enum class Tab
     {

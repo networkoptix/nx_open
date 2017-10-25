@@ -23,9 +23,6 @@ public:
 
     virtual ~EventPanel() override;
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
-
 private:
     class Private;
     QScopedPointer<Private> d;

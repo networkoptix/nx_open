@@ -6,7 +6,7 @@ namespace client {
 namespace desktop {
 
 EventSearchWidget::EventSearchWidget(QWidget* parent):
-    QWidget(parent),
+    base_type(parent),
     d(new Private(this))
 {
 }
