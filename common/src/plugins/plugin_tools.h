@@ -38,6 +38,12 @@ namespace nxpt
                 m_ptr->addRef();
         }
 
+        ScopedRef(ScopedRef<T>&& data)
+        {
+            m_ptr = data.m_ptr;
+            data.m_ptr = 0;
+        }
+
         ~ScopedRef()
         {
             reset();
@@ -255,7 +261,7 @@ namespace nxpt
         CommonRefManager* m_refCountingDelegate;
     };
 
-    
+
     template <typename T>
     class CommonRefCounter: public T
     {
@@ -365,7 +371,7 @@ namespace nxpt
         }
     };
 
-    
+
 
 } // namespace nxpt
 
@@ -389,7 +395,7 @@ struct hash<nxpl::NX_GUID>
 
         for (auto i = 0; i < sizeof(guid.bytes); ++i)
             h = (h + (324723947 + guid.bytes[i])) ^ 93485734985;
-        
+
         return h;
     }
 };

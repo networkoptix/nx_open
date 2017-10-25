@@ -371,6 +371,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
             continue;
 
         ++endpointsInProgress;
+        NX_ASSERT(!endpoint.toString().isEmpty());
         connectToEndpoint(endpoint, endpointsGroup);
     }
 

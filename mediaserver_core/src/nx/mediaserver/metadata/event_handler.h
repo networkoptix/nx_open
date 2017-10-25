@@ -5,6 +5,10 @@
 #include <core/resource/resource.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
 #include <nx/vms/event/event_fwd.h>
+#include <plugins/plugin_tools.h>
+
+#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
+#include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
 
 namespace nx {
 namespace mediaserver {
@@ -24,7 +28,12 @@ public:
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
-
+    void handleMetadataEvent(
+        nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedEvent> eventData,
+        qint64 timestampUsec);
+    void handleMetadataObject(
+        nxpt::ScopedRef<nx::sdk::metadata::AbstarctDetectedObject> eventData,
+        qint64 timestampUsec);
 private:
     QnSecurityCamResourcePtr m_resource;
     QnUuid m_pluginId;

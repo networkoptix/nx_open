@@ -3,8 +3,6 @@
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_internal_tools.h>
 
-#include <nx/sdk/metadata/abstract_event_metadata_packet.h>
-#include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
 
@@ -26,50 +24,73 @@ void EventHandler::handleMetadata(
     if (error != Error::noError)
         return;
 
-    nxpt::ScopedRef<AbstractEventMetadataPacket> eventPacket(
+    nxpt::ScopedRef<AbstractEventMetadataPacket> packet(
         (AbstractEventMetadataPacket*)
         metadata->queryInterface(IID_EventMetadataPacket), false);
 
-    if (!eventPacket)
+    if (!packet)
         return;
 
-    while(true)
+    while (true)
     {
-        nxpt::ScopedRef<AbstractDetectedEvent> eventData(
-            eventPacket->nextItem(), false);
+        nxpt::ScopedRef<AbstractMetadataItem> item(
+            packet->nextItem(), false);
 
-        if (!eventData)
+        if (!item)
             return;
 
-        const auto eventState = eventData->isActive()
-            ? nx::vms::event::EventState::active
-            : nx::vms::event::EventState::inactive;
+        nxpt::ScopedRef<AbstractDetectedEvent> eventData =
+            (AbstractDetectedEvent*) item->queryInterface(IID_DetectedEvent);
+        nxpt::ScopedRef<AbstarctDetectedObject> objectData =
+            (AbstarctDetectedObject*) item->queryInterface(IID_DetectedObject);
 
-        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
-
-        const bool dublicate = eventState == nx::vms::event::EventState::inactive
-            && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
-
-        if (dublicate)
-            continue;
-
-        setLastEventState(eventTypeId, eventState);
-
-        auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
-            m_resource,
-            m_pluginId,
-            eventTypeId,
-            eventState,
-            eventData->caption(),
-            eventData->description(),
-            eventData->auxilaryData(),
-            eventPacket->timestampUsec());
-
-        if (m_resource->captureEvent(sdkEvent))
-            continue;
-
-        qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
+        auto timestampUsec = packet->timestampUsec();
+        if (eventData)
+            handleMetadataEvent(std::move(eventData), timestampUsec);
+        else if (objectData)
+            handleMetadataObject(std::move(objectData), timestampUsec);
     }
+}
+
+void EventHandler::handleMetadataObject(
+    nxpt::ScopedRef<nx::sdk::metadata::AbstarctDetectedObject> eventData,
+    qint64 timestampUsec)
+{
+
+}
+
+void EventHandler::handleMetadataEvent(
+    nxpt::ScopedRef<AbstractDetectedEvent> eventData,
+    qint64 timestampUsec)
+{
+    const auto eventState = eventData->isActive()
+        ? nx::vms::event::EventState::active
+        : nx::vms::event::EventState::inactive;
+
+    const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->eventTypeId());
+
+    const bool dublicate = eventState == nx::vms::event::EventState::inactive
+        && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
+
+    if (dublicate)
+        return;
+
+    setLastEventState(eventTypeId, eventState);
+
+    auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
+        m_resource,
+        m_pluginId,
+        eventTypeId,
+        eventState,
+        eventData->caption(),
+        eventData->description(),
+        eventData->auxilaryData(),
+        timestampUsec);
+
+    if (m_resource->captureEvent(sdkEvent))
+        return;
+
+    qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
 }
 
 void EventHandler::setResource(const QnSecurityCamResourcePtr& resource)
