@@ -84,7 +84,7 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
     installEventHandler(parent, QEvent::PaletteChange, this,
         [this]()
         {
-            if (this->options.backgroundColor.isValid())
+            if (!this->options.backgroundColor.isValid())
                 updatePixmap();
         });
 }
