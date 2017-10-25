@@ -13,6 +13,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+struct LayoutTemplate;
+
 class WorkbenchAnalyticsController:
     public Connective<QObject>,
     public QnConnectionContextAware
@@ -26,47 +28,26 @@ public:
         const QnResourcePtr& resource,
         const AbstractAnalyticsDriverPtr& driver,
         QObject* parent = nullptr);
+
+    WorkbenchAnalyticsController(
+        const LayoutTemplate& layoutTemplate,
+        const QnResourcePtr& resource,
+        const AbstractAnalyticsDriverPtr& driver,
+        QObject* parent = nullptr);
+
     virtual ~WorkbenchAnalyticsController() override;
 
     int matrixSize() const;
     QnResourcePtr resource() const;
     QnLayoutResourcePtr layout() const;
+    const LayoutTemplate& layoutTemplate() const;
 
     void addOrChangeRegion(const QnUuid& id, const QRectF& region);
     void removeRegion(const QnUuid& id);
 
 private:
-    struct ElementData
-    {
-        QnUuid itemId;
-        QnUuid regionId;
-    };
-
-    struct ElementMapping
-    {
-        QList<ElementData> mapping;
-        QnLayoutItemData source;
-        int nextColorIdx = 0;
-    };
-
-    void constructLayout();
-    void updateZoomRect(const QnUuid& itemId, const QnUuid& regionId, const QRectF& zoomRect);
-
-    /** Adjust rect to source aspect ratio and limit its size. */
-    QRectF adjustZoomRect(const QRectF& value) const;
-
-    bool isDynamic() const;
-
-    QnUuid addSlaveItem(ElementMapping& source, const QPoint& position);
-
-private:
-    const int m_matrixSize;
-    QnResourcePtr m_resource;
-    QnLayoutResourcePtr m_layout;
-    AbstractAnalyticsDriverPtr m_driver;
-
-    ElementMapping m_main;
-    ElementMapping m_enhanced;
+    class Private;
+    QScopedPointer<Private> const d;
 };
 
 } // namespace desktop
