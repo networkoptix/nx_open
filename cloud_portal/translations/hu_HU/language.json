@@ -156,7 +156,7 @@
     "mySystemSearch":"IMeMyMine",
     "unavailable":"Rendszer nem elérhető",
     "offline":"A rendszer offline",
-    "openClient":"Megnyitás {{VMS_NAME}} alkalmazással",
+    "openClient":"Megnyitás {{VMS_NAME}}",
     "confirmRenameTitle":"Rendszer neve",
     "confirmRenameAction":"Mentés",
     "successRename":"Rendszer neve mentve",

@@ -61,13 +61,13 @@
                                 <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
                             </td>
                             <td class="left-border right-border">
-                                <b>Website</b><br>
+                                <b>Witryna internetowa</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
                         {{/system}}
                         {{^system}}
                             <td class="right-border">
-                                <b>Website</b><br>
+                                <b>Witryna internetowa</b><br>
                                 <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
                         {{/system}}
