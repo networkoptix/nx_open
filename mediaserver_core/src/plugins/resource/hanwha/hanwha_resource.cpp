@@ -2071,19 +2071,18 @@ void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
     if (!camera)
         return;
 
+    static const auto reopen =
+        [](const QnLiveStreamProviderPtr& stream)
+        {
+            if (stream && stream->isRunning())
+                stream->pleaseReopenStream();
+        };
+
     if (reopenPrimary)
-    {
-        auto providerHi = camera->getPrimaryReader();
-        if (providerHi && providerHi->isRunning())
-            providerHi->pleaseReopenStream();
-    }
+        reopen(camera->getPrimaryReader());
 
     if (reopenSecondary)
-    {
-        auto providerLow = camera->getSecondaryReader();
-        if (providerLow && providerLow->isRunning())
-            providerLow->pleaseReopenStream();
-    }
+        reopen(camera->getSecondaryReader());
 }
 
 int HanwhaResource::suggestBitrate(
