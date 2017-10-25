@@ -308,9 +308,19 @@ void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoComplet
 
 void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
-    m_pingTimer->cancelSync();
-    m_aliveTimer->cancelSync();
-    m_socket->cancelIOSync(eventType);
+    nx::utils::promise<void> p;
+    auto f = p.get_future();
+
+    dispatch(
+        [this, eventType, p = std::move(p)] ()
+        {
+            m_pingTimer->cancelSync();
+            m_aliveTimer->cancelSync();
+            m_socket->cancelIOSync(eventType);
+
+        });
+
+    f.wait();
 }
 
 bool WebSocket::isDataFrame() const
