@@ -1,26 +1,32 @@
 #pragma once
 
-#include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
+#include <rest/server/json_rest_handler.h>
 
 struct DetachFromCloudData;
-namespace nx { namespace vms { namespace cloud_integration { class CloudConnectionManager; } } }
+namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
-class QnDetachFromCloudRestHandler: public QnJsonRestHandler
+class QnDetachFromCloudRestHandler:
+    public QnJsonRestHandler
 {
     Q_OBJECT
 
 public:
     QnDetachFromCloudRestHandler(
-        nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager);
+        nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup);
 
     virtual int executeGet(
-        const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
+        const QString& path,
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner) override;
 
     virtual int executePost(
-        const QString& path, const QnRequestParams& params, const QByteArray& body,
-        QnJsonRestResult& result, const QnRestConnectionProcessor* owner) override;
+        const QString& path,
+        const QnRequestParams& params,
+        const QByteArray& body,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner) override;
 
 private:
     int execute(
@@ -29,5 +35,5 @@ private:
         QnJsonRestResult& result);
 
 private:
-    nx::vms::cloud_integration::CloudConnectionManager* const m_cloudConnectionManager;
+    nx::vms::cloud_integration::CloudManagerGroup* m_cloudManagerGroup;
 };
