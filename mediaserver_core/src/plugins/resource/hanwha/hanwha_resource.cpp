@@ -429,8 +429,6 @@ bool HanwhaResource::setParamsPhysical(
             *info,
             value.value);
     }
-    if (reopenPrimaryStream || reopenSecondaryStream)
-        initMediaStreamCapabilities();
     saveParams();
 
     bool success = true;
@@ -465,7 +463,12 @@ bool HanwhaResource::setParamsPhysical(
     if (success)
         result = values;
 
-    reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+    if (reopenPrimaryStream || reopenSecondaryStream)
+    {
+        initMediaStreamCapabilities();
+        saveParams();
+        reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+    }
 
     return success;
 }
@@ -2068,14 +2071,19 @@ void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
     if (!camera)
         return;
 
-    auto providerHi = camera->getPrimaryReader();
-    auto providerLow = camera->getSecondaryReader();
+    if (reopenPrimary)
+    {
+        auto providerHi = camera->getPrimaryReader();
+        if (providerHi && providerHi->isRunning())
+            providerHi->pleaseReopenStream();
+    }
 
-    if (providerHi && providerHi->isRunning())
-        providerHi->pleaseReopenStream();
-
-    if (providerLow && providerLow->isRunning())
-        providerLow->pleaseReopenStream();
+    if (reopenSecondary)
+    {
+        auto providerLow = camera->getSecondaryReader();
+        if (providerLow && providerLow->isRunning())
+            providerLow->pleaseReopenStream();
+    }
 }
 
 int HanwhaResource::suggestBitrate(
