@@ -85,7 +85,7 @@ bool HanwhaMappedPresetManager::nativePresets(QnPtzPresetList* outNativePresets)
         const auto split = presetEntry.first.split(L'.');
         if (split.size() != 5)
             continue;
-        
+
         const auto& presetId = makePresetId(
             split[3] /*prestNumber*/,
             presetEntry.second /*presetName*/);
@@ -193,7 +193,7 @@ QString HanwhaMappedPresetManager::freePresetNumber() const
     QSet<int> presetNumbers;
     for (const auto& preset: presets)
         presetNumbers.insert(presetNumberFromId(preset.id).toInt());
-    
+
     const int limit = m_maxPresetNumber > 0
         ? m_maxPresetNumber
         : kHanwhaDefaultMaxPresetNumber;
