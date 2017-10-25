@@ -8,7 +8,7 @@
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
 
-#include "cloud/cloud_connection_manager.h"
+#include "cloud_connection_manager.h"
 
 namespace {
 
@@ -19,11 +19,15 @@ constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::minute
 
 } // namespace
 
+namespace nx {
+namespace vms {
+namespace cloud_integration {
+
 CdbNonceFetcher::CdbNonceFetcher(
     nx::utils::StandaloneTimerManager* timerManager,
     AbstractCloudConnectionManager* const cloudConnectionManager,
     AbstractCloudUserInfoPool* cloudUserInfoPool,
-    AbstractNonceProvider* defaultGenerator)
+    auth::AbstractNonceProvider* defaultGenerator)
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(defaultGenerator),
@@ -335,3 +339,7 @@ void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
         m_cloudUserInfoPool->clear(); //< TODO: #ak Remove it from here!
     cloudBindingStatusChangedUnsafe(lock, boundToCloud);
 }
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

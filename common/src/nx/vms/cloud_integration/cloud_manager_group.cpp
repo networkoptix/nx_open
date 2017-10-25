@@ -1,16 +1,20 @@
 #include "cloud_manager_group.h"
 
+#include <memory>
+
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
 
 #include <common/common_module.h>
 
-#include "network/auth/cloud_user_info_pool.h"
-#include "network/auth/generic_user_data_provider.h"
+namespace nx {
+namespace vms {
+namespace cloud_integration {
 
 CloudManagerGroup::CloudManagerGroup(
     QnCommonModule* commonModule,
-    AbstractNonceProvider* defaultNonceFetcher)
+    auth::AbstractNonceProvider* defaultNonceFetcher,
+    std::unique_ptr<auth::AbstractUserDataProvider> defaultAuthenticator)
 :
     connectionManager(commonModule),
     cloudUserInfoPool(
@@ -22,8 +26,12 @@ CloudManagerGroup::CloudManagerGroup(
         defaultNonceFetcher),
     userAuthenticator(
         &connectionManager,
-        std::make_unique<GenericUserDataProvider>(commonModule),
+        std::move(defaultAuthenticator),
         authenticationNonceFetcher,
         cloudUserInfoPool)
 {
 }
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx

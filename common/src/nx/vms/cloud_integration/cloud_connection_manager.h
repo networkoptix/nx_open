@@ -13,6 +13,10 @@
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
+namespace nx {
+namespace vms {
+namespace cloud_integration {
+
 class AbstractCloudConnectionManager:
     public QObject,
     public nx::hpm::api::AbstractCloudSystemCredentialsProvider
@@ -62,6 +66,8 @@ public:
 
     virtual void processCloudErrorCode(nx::cdb::api::ResultCode resultCode) override;
 
+    void setCloudDbUrl(const QUrl& url);
+
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
@@ -87,3 +93,7 @@ private:
 private slots:
     void cloudSettingsChanged();
 };
+
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx
