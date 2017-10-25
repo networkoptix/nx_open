@@ -225,9 +225,7 @@ protected:
     void assertInvitedUserIsAuthenticatedSuccessfully()
     {
         while (!userRequestIsAuthorizedByServer(m_inivitedUserEmail, m_inivitedUserPassword))
-        {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
 private:

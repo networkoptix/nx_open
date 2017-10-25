@@ -40,7 +40,7 @@ public:
         QnJsonRestResult* result);
 
     nx_http::StatusCode::Value detachFromCloud(
-        const DetachFromCloudData& passwordData,
+        const DetachFromCloudData& data,
         DetachFromCloudReply* result);
 
     QString errorDescription() const;
