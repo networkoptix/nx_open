@@ -5,6 +5,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <rest/server/json_rest_result.h>
+#include <rest/helpers/request_helpers.h>
 #include <media_server/media_server_module.h>
 
 using nx::vms::common::p2p::downloader::Downloader;
@@ -395,6 +396,13 @@ int QnDownloadsRestHandler::executeGet(
         return nx_http::StatusCode::badRequest;
 
     Helper helper(this, params, result, resultContentType);
+    if (!verifyRelativePath(request.fileName))
+    {
+        return helper.makeError(
+            nx_http::StatusCode::badRequest,
+            QnRestResult::InvalidParameter,
+            "File name in not a valid relative path.");
+    }
 
     if (!helper.hasDownloader())
     {
@@ -431,6 +439,13 @@ int QnDownloadsRestHandler::executePost(
         return nx_http::StatusCode::badRequest;
 
     Helper helper(this, params, result, resultContentType);
+    if (!verifyRelativePath(request.fileName))
+    {
+        return helper.makeError(
+            nx_http::StatusCode::badRequest,
+            QnRestResult::InvalidParameter,
+            "File name in not a valid relative path.");
+    }
 
     if (!helper.hasDownloader())
     {
@@ -478,6 +493,13 @@ int QnDownloadsRestHandler::executeDelete(
         return nx_http::StatusCode::badRequest;
 
     Helper helper(this, params, result, resultContentType);
+    if (!verifyRelativePath(request.fileName))
+    {
+        return helper.makeError(
+            nx_http::StatusCode::badRequest,
+            QnRestResult::InvalidParameter,
+            "File name in not a valid relative path.");
+    }
 
     if (!helper.hasDownloader())
     {
