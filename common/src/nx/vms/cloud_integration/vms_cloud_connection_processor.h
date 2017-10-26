@@ -30,7 +30,7 @@ public:
     void setSystemSettingsProcessor(
         nx::vms::utils::SystemSettingsProcessor* systemSettingsProcessor);
 
-    nx_http::StatusCode::Value saveCloudSystemCredentials(
+    nx_http::StatusCode::Value bindSystemToCloud(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);
 

@@ -27,10 +27,7 @@ void Settings::load(int argc, char** argv)
 
     m_settings.parseArgs(argc, (const char**)argv);
 
-    m_cloudIntegration.delayBeforeSettingMasterFlag =
-        nx::utils::parseTimerDuration(
-            m_settings.value("cloudIntegration/delayBeforeSettingMasterFlag").toString(),
-            kDefaultDelayBeforeSettingMasterFlag);
+    loadCloudIntegration();
 }
 
 bool Settings::showHelp()
@@ -71,6 +68,20 @@ bool Settings::isAuthDisabled() const
 const CloudIntegration& Settings::cloudIntegration() const
 {
     return m_cloudIntegration;
+}
+
+void Settings::loadCloudIntegration()
+{
+    m_cloudIntegration.delayBeforeSettingMasterFlag =
+        nx::utils::parseTimerDuration(
+            m_settings.value("cloudIntegration/delayBeforeSettingMasterFlag").toString(),
+            kDefaultDelayBeforeSettingMasterFlag);
+
+    if (m_settings.contains("cloudIntegration/cloudDbUrl"))
+    {
+        m_cloudIntegration.cloudDbUrl = 
+            m_settings.value("cloudIntegration/cloudDbUrl").toString();
+    }
 }
 
 } // namespace conf

@@ -1,6 +1,9 @@
 #pragma once
 
+#include <chrono>
 #include <map>
+
+#include <boost/optional.hpp>
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/auth_tools.h>
@@ -41,6 +44,7 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
     void setUserCredentials(const nx_http::Credentials& userCredentials);
+    void setRequestTimeout(std::chrono::milliseconds timeout);
 
     //---------------------------------------------------------------------------------------------
     // /api/ requests
@@ -183,6 +187,8 @@ protected:
         authInfo.user = m_userCredentials;
 
         auto fusionClient = createHttpClientFunc(requestUrl, std::move(authInfo));
+        if (m_requestTimeout)
+            fusionClient->setRequestTimeout(*m_requestTimeout);
 
         post(
             [this,
@@ -363,4 +369,7 @@ protected:
     ec2::ErrorCode toEc2ErrorCode(
         SystemError::ErrorCode systemErrorCode,
         nx_http::StatusCode::Value statusCode);
+
+private:
+    boost::optional<std::chrono::milliseconds> m_requestTimeout;
 };

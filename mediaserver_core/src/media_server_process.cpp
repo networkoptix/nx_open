@@ -2585,7 +2585,7 @@ void MediaServerProcess::run()
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
     commonModule()->setModuleInformation(selfInformation);
-    commonModule()->bindModuleinformation(m_mediaServer);
+    commonModule()->bindModuleInformation(m_mediaServer);
 
     // show our cloud host value in registry in case of installer will check it
     const auto& globalSettings = commonModule()->globalSettings();

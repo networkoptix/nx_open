@@ -12,6 +12,7 @@ namespace conf {
 struct CloudIntegration
 {
     std::chrono::milliseconds delayBeforeSettingMasterFlag;
+    QUrl cloudDbUrl;
 
     CloudIntegration();
 };
@@ -37,6 +38,8 @@ private:
     QnSettings m_settings;
     bool m_showHelp;
     CloudIntegration m_cloudIntegration;
+
+    void loadCloudIntegration();
 };
 
 } // namespace conf

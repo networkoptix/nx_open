@@ -53,7 +53,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         owner->commonModule(),
         m_cloudManagerGroup);
 
-    return vmsCloudConnectionProcessor.saveCloudSystemCredentials(data, &result);
+    return vmsCloudConnectionProcessor.bindSystemToCloud(data, &result);
 }
 
 bool QnSaveCloudSystemCredentialsHandler::authorize(

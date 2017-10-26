@@ -170,6 +170,9 @@ int Appserver2Process::exec()
         nullptr,
         settings.cloudIntegration().delayBeforeSettingMasterFlag);
     m_cloudManagerGroup = &cloudManagerGroup;
+
+    if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
+        cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
     
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
@@ -372,7 +375,7 @@ void Appserver2Process::registerHttpHandlers(
             QnHttpConnectionListener* owner,
             QnJsonRestResult* result)
         {
-            auto data = QJson::deserialized<SetupCloudSystemData>(request.messageBody);
+            const auto data = QJson::deserialized<SetupCloudSystemData>(request.messageBody);
             nx::vms::cloud_integration::VmsCloudConnectionProcessor vmsCloudConnectionProcessor(
                 m_commonModule.get(),
                 m_cloudManagerGroup);
@@ -380,6 +383,19 @@ void Appserver2Process::registerHttpHandlers(
                 QnAuthSession(),
                 data,
                 result);
+    });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/saveCloudSystemCredentials",
+        [this](
+            const nx_http::Request& request,
+            QnHttpConnectionListener* owner,
+            QnJsonRestResult* result)
+        {
+            const auto data = QJson::deserialized<CloudCredentialsData>(request.messageBody);
+            nx::vms::cloud_integration::VmsCloudConnectionProcessor vmsCloudConnectionProcessor(
+                m_commonModule.get(),
+                m_cloudManagerGroup);
+            return vmsCloudConnectionProcessor.bindSystemToCloud(data, result);
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/detachFromCloud",
@@ -414,8 +430,9 @@ void Appserver2Process::addSelfServerResource(
     server->setId(commonModule()->moduleGUID());
     m_commonModule->resourcePool()->addResource(server);
     server->setStatus(Qn::Online);
+    server->setServerFlags(Qn::SF_HasPublicIP);
 
-    m_commonModule->bindModuleinformation(server);
+    m_commonModule->bindModuleInformation(server);
 
     ::ec2::ApiMediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();
