@@ -248,6 +248,7 @@ linux*:!android {
         QMAKE_CXXFLAGS += -msse4.1
     }
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
+    QMAKE_CXXFLAGS += -fstack-protector-all
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
