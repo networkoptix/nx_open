@@ -335,7 +335,7 @@ void Appserver2Process::registerHttpHandlers(
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/mergeSystems",
         [this](
             const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
+            QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
             const auto data = QJson::deserialized<MergeSystemData>(request.messageBody);
@@ -358,7 +358,7 @@ void Appserver2Process::registerHttpHandlers(
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupLocalSystem",
         [this](
             const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
+            QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
             auto data = QJson::deserialized<SetupLocalSystemData>(request.messageBody);
@@ -372,7 +372,7 @@ void Appserver2Process::registerHttpHandlers(
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupCloudSystem",
         [this](
             const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
+            QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
             const auto data = QJson::deserialized<SetupCloudSystemData>(request.messageBody);
@@ -388,7 +388,7 @@ void Appserver2Process::registerHttpHandlers(
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/saveCloudSystemCredentials",
         [this](
             const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
+            QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
             const auto data = QJson::deserialized<CloudCredentialsData>(request.messageBody);
@@ -401,7 +401,7 @@ void Appserver2Process::registerHttpHandlers(
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/detachFromCloud",
         [this](
             const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
+            QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
             auto data = QJson::deserialized<DetachFromCloudData>(request.messageBody);
