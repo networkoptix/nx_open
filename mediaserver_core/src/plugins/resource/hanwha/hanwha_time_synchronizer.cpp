@@ -82,7 +82,13 @@ void HanwhaTimeSyncronizer::start(HanwhaSharedResourceContext* resourceConext)
 
 void HanwhaTimeSyncronizer::setTimeZoneShiftHandler(TimeZoneShiftHandler handler)
 {
-    m_timer.post([this, h = std::move(handler)]() mutable { m_timeZoneHandler = std::move(h); });
+    m_timer.post(
+        [this, handler = std::move(handler)]() mutable
+        {
+            m_timeZoneHandler = std::move(handler);
+            if (m_timeZoneHandler)
+                m_timeZoneHandler(m_timeZoneShift);
+        });
 }
 
 static QDateTime toUtcDateTime(const QString& value)

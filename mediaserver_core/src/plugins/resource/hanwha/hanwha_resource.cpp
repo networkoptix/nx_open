@@ -648,7 +648,8 @@ CameraDiagnostics::Result HanwhaResource::init()
     initMediaStreamCapabilities();
     saveParams();
 
-    sharedContext->startServices();
+    const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
+    sharedContext->startServices(hasVideoArchive);
     return result;
 }
 
@@ -2453,7 +2454,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    return sharedContext()->chunkLoader()->chunks(getChannel());
+    return sharedContext()->chunks(getChannel());
 }
 
 bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString)
