@@ -78,8 +78,8 @@ void AnalyticsActionHandler::startAnalytics()
     }
 
     const ControllerPtr controller(layoutTemplate.isValid()
-        ? new WorkbenchAnalyticsController(layoutTemplate, resource, driver)
-        : new WorkbenchAnalyticsController(size, resource, driver));
+        ? new WorkbenchAnalyticsController(layoutTemplate, resource, driver, this)
+        : new WorkbenchAnalyticsController(size, resource, driver, this));
 
     m_controllers.append(controller);
     menu()->trigger(ui::action::OpenInNewTabAction, controller->layout());
