@@ -49,6 +49,7 @@
 #include <rest/helper/p2p_statistics.h>
 #include <transaction/message_bus_adapter.h>
 
+#include "appserver2_audit_manager.h"
 #include "appserver2_process_settings.h"
 #include "cloud_integration/cloud_connector.h"
 #include "ec2_connection_processor.h"
@@ -124,6 +125,8 @@ int Appserver2Process::exec()
     updateRuntimeData();
 
     qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
+
+    AuditManager auditManager(m_commonModule.get());
 
     std::unique_ptr<ec2::AbstractECConnectionFactory>
         ec2ConnectionFactory(getConnectionFactory(
