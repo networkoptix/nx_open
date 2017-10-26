@@ -56,7 +56,7 @@ void AnalyticsActionHandler::startAnalytics()
     int size = parameters.argument(Qn::IntRole).toInt();
 
     auto existing = std::find_if(m_controllers.cbegin(), m_controllers.cend(),
-        [resource, size, &templateName = layoutTemplate.name](const ControllerPtr& controller)
+        [resource, size, templateName = layoutTemplate.name](const ControllerPtr& controller)
         {
             if (controller->resource() != resource)
                 return false;
