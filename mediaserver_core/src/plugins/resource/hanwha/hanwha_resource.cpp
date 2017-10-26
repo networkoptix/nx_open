@@ -1111,7 +1111,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
         if (amountOfProfilesNeeded + totalProfileNumber > m_maxProfileCount)
         {
             return CameraDiagnostics::CameraInvalidParams(
-                lit("- can not create profiles. Please delete %1 profiles%2 on the camera web page.")
+                lit("- can not create profiles. Please delete %1 profile%2 on the camera web page")
                     .arg(amountOfProfilesNeeded)
                     .arg(amountOfProfilesNeeded > 1 ? lit("s") : QString()));
         }
