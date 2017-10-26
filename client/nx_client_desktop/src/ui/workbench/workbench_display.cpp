@@ -1149,6 +1149,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (widgetsForResource.size() == 1)
         emit resourceAdded(widget->resource());
 
+    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    if (options)
+        widget->setOptions(widget->options() | options);
+
     synchronize(widget, false);
     bringToFront(widget);
 
@@ -1161,10 +1165,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if (frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
-
-    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
-    if (options)
-        widget->setOptions(widget->options() | options);
 
     emit widgetAdded(widget);
 

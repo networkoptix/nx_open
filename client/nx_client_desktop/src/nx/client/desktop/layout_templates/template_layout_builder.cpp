@@ -92,7 +92,10 @@ QnLayoutItemData TemplateLayoutBuilder::Private::createItemData(
     itemData.resource = resource;
 
     if (!itemTemplate.visible)
-        options |= QnResourceWidget::InvisibleWidgetOption;
+    {
+        options |= QnResourceWidget::InvisibleWidgetOption
+            | QnResourceWidget::InfoOverlaysForbidden;
+    }
 
     if (options)
     {
