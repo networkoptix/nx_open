@@ -182,33 +182,41 @@ protected:
             fusionClient->setRequestTimeout(*m_requestTimeout);
 
         post(
-            [this,
-                fusionClient = std::move(fusionClient),
+            [this, fusionClient = std::move(fusionClient),
                 completionHandler = std::move(completionHandler)]() mutable
             {
-                fusionClient->bindToAioThread(getAioThread());
-                auto fusionClientPtr = fusionClient.get();
-                m_activeClients.push_back(std::move(fusionClient));
-                fusionClientPtr->execute(
-                    [fusionClientIter = --m_activeClients.end(),
-                        completionHandler = std::move(completionHandler)](
-                            SystemError::ErrorCode errorCode,
-                            const nx_http::Response* response,
-                            Output... outData) mutable
-                    {
-                        auto client = std::move(*fusionClientIter);
-                        m_activeClients.erase(fusionClientIter);
+                executeRequest<decltype(fusionClient), decltype(completionHandler), Output...>(
+                    std::move(fusionClient), std::move(completionHandler));
+            });
+    }
 
-                        m_prevResponseHttpStatusCode = 
-                            response
-                            ? (nx_http::StatusCode::Value)response->statusLine.statusCode
-                            : nx_http::StatusCode::undefined;
+    template<typename HttpClient, typename CompletionHandler, typename ... Output>
+    void executeRequest(
+        HttpClient httpClient,
+        CompletionHandler completionHandler)
+    {
+        httpClient->bindToAioThread(getAioThread());
+        auto httpClientPtr = httpClient.get();
+        m_activeClients.push_back(std::move(httpClient));
+        httpClientPtr->execute(
+            [this, fusionClientIter = --m_activeClients.end(),
+                completionHandler = std::move(completionHandler)](
+                    SystemError::ErrorCode errorCode,
+                    const nx_http::Response* response,
+                    Output... outData) mutable
+            {
+                auto client = std::move(*fusionClientIter);
+                m_activeClients.erase(fusionClientIter);
 
-                        return completionHandler(
-                            errorCode,
-                            m_prevResponseHttpStatusCode,
-                            std::move(outData)...);
-                    });
+                m_prevResponseHttpStatusCode = 
+                    response
+                    ? (nx_http::StatusCode::Value)response->statusLine.statusCode
+                    : nx_http::StatusCode::undefined;
+
+                return completionHandler(
+                    errorCode,
+                    m_prevResponseHttpStatusCode,
+                    std::move(outData)...);
             });
     }
 
