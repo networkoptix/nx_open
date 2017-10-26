@@ -110,6 +110,7 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
+#include <core/resource_management/resource_runtime_data.h>
 
 using namespace nx;
 using namespace client::desktop::ui;
@@ -293,7 +294,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_ioModuleOverlayWidget(nullptr),
     m_ioCouldBeShown(false),
     m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
-    m_posUtcMs(DATETIME_INVALID)
+    m_posUtcMs(DATETIME_INVALID),
+    m_itemId(item->uuid())
 {
     NX_ASSERT(m_resource, "Media resource widget was created with a non-media resource.");
 
@@ -479,6 +481,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::clearEntropixEnhancedImage);
     connect(this, &QnMediaResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::clearEntropixEnhancedImage);
+
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this, &QnMediaResourceWidget::handleItemDataChanged);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -493,6 +498,49 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     for (auto* data : m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+}
+
+void QnMediaResourceWidget::handleItemDataChanged(
+    const QnUuid& id,
+    Qn::ItemDataRole role,
+    const QVariant& data)
+{
+    if (id != m_itemId)
+        return;
+
+    switch(role)
+    {
+        case Qn::ItemPausedRole:
+        {
+            const bool shouldPause = data.toBool();
+            if (shouldPause == display()->isPaused())
+                return;
+
+            if (shouldPause)
+                display()->pause();
+            else
+                display()->play();
+            break;
+        }
+        case Qn::ItemTimeRole:
+        {
+            if (const auto reader = display()->archiveReader())
+            {
+                const auto timestampUSec = data.toLongLong();
+                const auto timestampMs = timestampUSec == DATETIME_NOW
+                    ? DATETIME_NOW
+                    : timestampUSec * 1000;
+
+                reader->jumpTo(timestampMs, 0);
+            }
+            break;
+        }
+        case Qn::ItemSpeedRole:
+                display()->archiveReader()->setSpeed(data.toDouble());
+            break;
+        default:
+            break;
+    }
 }
 
 void QnMediaResourceWidget::initSoftwareTriggers()

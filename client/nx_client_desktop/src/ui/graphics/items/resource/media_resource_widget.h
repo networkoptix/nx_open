@@ -252,6 +252,8 @@ private slots:
     void clearEntropixEnhancedImage();
 
 private:
+    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
     void createPtzController();
@@ -408,6 +410,7 @@ private:
     QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
     QImage m_entropixEnhancedImage;
     int m_entropixProgress = -1;
+    QnUuid m_itemId;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)
