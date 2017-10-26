@@ -574,13 +574,19 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     if (m_cameras == cameras)
         return;
 
-    for (const auto& camera : m_cameras)
-        disconnect(camera, &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons);
+    for (const auto& camera: m_cameras)
+    {
+        disconnect(camera, &QnSecurityCamResource::resourceChanged,
+            this, &QnCameraScheduleWidget::cameraResourceChanged);
+    }
 
     m_cameras = cameras;
 
-    for (const auto& camera : m_cameras)
-        connect(camera, &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons, Qt::QueuedConnection);
+    for (const auto& camera: m_cameras)
+    {
+        connect(camera, &QnSecurityCamResource::resourceChanged,
+            this, &QnCameraScheduleWidget::cameraResourceChanged, Qt::QueuedConnection);
+    }
 }
 
 void QnCameraScheduleWidget::updateFromResources()
@@ -1221,6 +1227,12 @@ void QnCameraScheduleWidget::updateRecordSpinboxes()
 {
     ui->recordBeforeSpinBox->setEnabled(m_motionAvailable);
     ui->recordAfterSpinBox->setEnabled(m_motionAvailable);
+}
+
+void QnCameraScheduleWidget::cameraResourceChanged()
+{
+    updateMaxFPS();
+    updateMotionButtons();
 }
 
 void QnCameraScheduleWidget::updateMotionButtons()
