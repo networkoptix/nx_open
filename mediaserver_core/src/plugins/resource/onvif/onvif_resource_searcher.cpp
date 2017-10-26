@@ -12,7 +12,7 @@
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
-#include "core/dataprovider/live_stream_provider.h"
+#include <providers/live_stream_provider.h>
 
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"

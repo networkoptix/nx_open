@@ -12,8 +12,6 @@
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
 
-// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-#include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -938,7 +936,7 @@ void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
 {
     QUrl url(urlString);
 
-    const bool removeCredentials = m_camera 
+    const bool removeCredentials = m_camera
         && !m_camera->getProperty(kRemoveCredentialsFromWebPageUrl).isEmpty();
 
     if (!m_readOnly && !removeCredentials)

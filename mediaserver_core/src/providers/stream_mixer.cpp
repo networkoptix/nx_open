@@ -1,6 +1,6 @@
 #include "stream_mixer.h"
 
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include "spush_media_stream_provider.h"
 #include <utils/common/sleep.h>
 #include <nx/utils/log/log.h>
 
@@ -43,14 +43,14 @@ void QnStreamMixer::addDataSource(QnAbstractStreamDataProviderPtr& source)
         lock.unlock();
         source->addDataProcessor(this);
     }
-    
+
 }
 
 void QnStreamMixer::removeDataSource(QnAbstractStreamDataProvider* source)
 {
     QnMutexLocker lock(&m_mutex);
     auto sourceId = (uintptr_t) source;
-    
+
     if (m_sourceMap.contains(sourceId))
     {
         m_sourceMap.remove(sourceId);

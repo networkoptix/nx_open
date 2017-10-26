@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_TEST_CAMERA
 
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/spush_media_stream_provider.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/network/socket.h>
 #include <nx/streaming/rtsp_client.h>

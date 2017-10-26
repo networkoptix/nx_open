@@ -7,11 +7,10 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
-#include <core/dataprovider/live_stream_provider.h>
-
-
-class QnAbstractAudioTransmitter : public QnAbstractDataConsumer
+class QnAbstractAudioTransmitter: public QnAbstractDataConsumer
 {
     Q_OBJECT
 public:

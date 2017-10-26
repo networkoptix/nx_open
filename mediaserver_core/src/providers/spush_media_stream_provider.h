@@ -7,8 +7,8 @@
 
 #include <nx/utils/thread/wait_condition.h>
 
-#include "abstract_media_stream_provider.h"
-#include "core/dataprovider/live_stream_provider.h"
+#include <core/dataprovider/abstract_media_stream_provider.h>
+#include "live_stream_provider.h"
 
 
 struct QnAbstractMediaData;

@@ -104,7 +104,6 @@
 #include "health/system_health.h"
 #include <utils/common/credentials.h>
 #include <utils/common/encoded_credentials.h>
-#include <core/dataprovider/stream_mixer.h>
 #include <core/resource/resource_data_structures.h>
 
 #include <core/resource/camera_advanced_param.h>
@@ -280,10 +279,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnLdapUser>();
     qRegisterMetaType<QnLdapUsers>();
-    qRegisterMetaType<QnChannelMapping>();
-    qRegisterMetaType<QList<QnChannelMapping>>();
-    qRegisterMetaType<QnResourceChannelMapping>();
-    qRegisterMetaType<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<Qn::ConnectionResult>();
 
@@ -371,8 +366,6 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<nx::common::utils::Credentials>();
     QnJsonSerializer::registerSerializer<QList<nx::common::utils::Credentials>>();
     QnJsonSerializer::registerSerializer<QnEncodedCredentials>();
-    QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
-    QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
     QnJsonSerializer::registerSerializer<QnBitrateList>();
     QnJsonSerializer::registerSerializer<TwoWayAudioParams>();

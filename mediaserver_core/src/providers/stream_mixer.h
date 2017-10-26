@@ -2,7 +2,7 @@
 
 #include <set>
 #include <nx/fusion/model_functions.h>
-#include "abstract_media_stream_provider.h"
+#include <core/dataprovider/abstract_media_stream_provider.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/data_packet_queue.h>

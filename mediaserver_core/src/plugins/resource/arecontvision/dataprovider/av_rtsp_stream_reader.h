@@ -8,7 +8,7 @@
 
 #ifdef ENABLE_ARECONT
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 

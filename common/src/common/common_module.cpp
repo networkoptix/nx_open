@@ -49,9 +49,6 @@
 #include <api/session_manager.h>
 #include <network/router.h>
 
-#include <analytics/plugins/detection/detection_plugin_factory.h>
-#include <analytics/common/metadata_plugin_factory.h>
-
 using namespace nx;
 
 namespace {
@@ -149,8 +146,6 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
     m_eventRuleManager = new nx::vms::event::RuleManager(this); //< Depends on nothing.
-    m_detectionPluginFactory = new nx::analytics::DetectionPluginFactory(this); //< Depends on nothing.
-    m_metadataPluginFactory = new nx::analytics::MetadataPluginFactory(this); //< Depends on nothing.    
     m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on nothing.
 
     // Depends on resource pool.

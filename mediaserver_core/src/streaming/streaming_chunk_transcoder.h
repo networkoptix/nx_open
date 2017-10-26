@@ -8,7 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 
-#include <core/dataprovider/abstract_ondemand_data_provider.h>
+#include <providers/abstract_ondemand_data_provider.h>
 #include <streaming/ondemand_media_data_provider.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/timer_manager.h>
@@ -42,14 +42,14 @@ public:
         /** Transcoding can be stopped only just before GOP. */
         fStopTranscodingAtGOPBoundary = 0x01,
         /**
-         * Try to include begin of range in resulting chunk, i.e., 
+         * Try to include begin of range in resulting chunk, i.e.,
          * start transcoding with GOP, including supplyed start timestamp.
          * Otherwise, transcoding is started with first GOP following start timestamp.
          */
         fBeginOfRangeInclusive = 0x02,
         /**
          * Actual only with fStopTranscodingAtGOPBoundary specified.
-         * If specified, transcoding stops just before GOP, following specified ending timestamp. 
+         * If specified, transcoding stops just before GOP, following specified ending timestamp.
          * Otherwise, transcoding stops at GOP that includes end timestamp
          */
         fEndOfRangeInclusive = 0x04
@@ -66,7 +66,7 @@ public:
 
     /**
      * Starts transcoding of resource transcodeParams.srcResourceUniqueID.
-     * Requested data (transcodeParams.startTimestamp()) may be in future. 
+     * Requested data (transcodeParams.startTimestamp()) may be in future.
      *   In this case transcoding will start as soon as source data is available.
      * @param chunk Transcoded stream is passed to chunk->appendData.
      * @return False, if transcoding could not be started by any reason. True, otherwise.

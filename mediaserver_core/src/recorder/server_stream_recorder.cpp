@@ -9,7 +9,7 @@
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include "core/dataprovider/live_stream_provider.h"
+#include "providers/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include <core/resource/server_backup_schedule.h>
@@ -18,7 +18,7 @@
 #include "utils/math/math.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include "providers/spush_media_stream_provider.h"
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/vms/event/events/reasoned_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
@@ -316,7 +316,7 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (m_catalog == QnServer::HiQualityCatalog) 
+        if (m_catalog == QnServer::HiQualityCatalog)
         {
             QnLiveStreamParams params;
             if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled())

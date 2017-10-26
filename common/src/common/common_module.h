@@ -39,15 +39,6 @@ namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
 
-namespace nx {
-namespace analytics {
-
-class DetectionPluginFactory;
-class MetadataPluginFactory;
-
-} // namespace analytics
-} // namespace nx
-
 struct BeforeRestoreDbData
 {
     void saveToSettings(QSettings* settings);
@@ -177,16 +168,6 @@ public:
     nx::vms::event::RuleManager* eventRuleManager() const
     {
         return m_eventRuleManager;
-    }
-
-    nx::analytics::DetectionPluginFactory* detectionPluginFactory() const
-    {
-        return m_detectionPluginFactory;
-    }
-
-    nx::analytics::MetadataPluginFactory* metadataPluginFactory() const
-    {
-        return m_metadataPluginFactory;
     }
 
     QnLicensePool* licensePool() const;
@@ -327,8 +308,5 @@ private:
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
 
     // TODO: #dmishin move these factories to server module
-    nx::analytics::DetectionPluginFactory* m_detectionPluginFactory = nullptr;
-    nx::analytics::MetadataPluginFactory* m_metadataPluginFactory = nullptr;
-
     QnUuid m_videowallGuid;
 };

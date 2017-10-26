@@ -36,7 +36,7 @@ extern "C"
 #include <utils/common/util.h>
 #include <rtsp/rtsp_data_consumer.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
 #include <plugins/resource/avi/thumbnails_stream_reader.h>
@@ -1384,7 +1384,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->setLiveQuality(d->quality);
         d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
     }
-    else if ((d->playbackMode == PlaybackMode::Archive || d->playbackMode == PlaybackMode::Export) 
+    else if ((d->playbackMode == PlaybackMode::Archive || d->playbackMode == PlaybackMode::Export)
               && d->archiveDP)
     {
         d->archiveDP->addDataProcessor(d->dataProcessor);

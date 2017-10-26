@@ -14,8 +14,8 @@
 #include <nx/streaming/config.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
-#include <core/dataprovider/cpull_media_stream_provider.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/cpull_media_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 
 #include <api/global_settings.h>

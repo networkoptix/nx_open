@@ -5,7 +5,7 @@
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <utils/common/adaptive_sleep.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include "live_stream_provider.h"
 
 struct QnAbstractMediaData;
 
