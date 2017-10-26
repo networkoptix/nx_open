@@ -147,6 +147,7 @@ if(LINUX)
     add_compile_options(
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers
+        -fstack-protector-all #< TODO: Use -fstask-protector-strong when supported.
     )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)

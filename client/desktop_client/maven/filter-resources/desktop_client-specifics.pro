@@ -11,7 +11,7 @@ mac {
 }
 
 unix: !mac {
-    QT += x11extras  
+    QT += x11extras
 }
 
 mac {
@@ -19,7 +19,7 @@ mac {
 }
 
 unix:!mac {
-    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/ -pie"
 }
 
 IS_DYNAMIC_CUSTOMIZATION_ENABLED=${dynamic.customization}
