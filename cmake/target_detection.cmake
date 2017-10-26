@@ -60,7 +60,7 @@ function(detect_target)
             set(detected_modification "")
         elseif(targetDevice MATCHES "ios")
             set(detected_arch "arm")
-            set(detected_platform "ios")                                            ..
+            set(detected_platform "ios")
             set(detected_modification "")
             set(detected_rdep_target "ios")
         elseif(targetDevice MATCHES "tx1")
