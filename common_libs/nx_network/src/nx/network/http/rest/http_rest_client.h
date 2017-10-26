@@ -2,24 +2,14 @@
 
 #include <initializer_list>
 
+#include <nx/network/buffer.h>
+
 #include "../http_types.h"
 
 namespace nx_http {
 namespace rest {
 
 namespace detail {
-
-template<typename Arg>
-void replace(QByteArray* where, int pos, int count, const Arg& withWhat)
-{
-    where->replace(pos, count, withWhat);
-}
-
-template<>
-inline void replace(QByteArray* where, int pos, int count, const std::string& withWhat)
-{
-    where->replace(pos, count, withWhat.c_str());
-}
 
 template<typename ArgumentType>
 bool substituteNextParameter(
@@ -36,7 +26,7 @@ bool substituteNextParameter(
         return false;
     }
 
-    replace(
+    nx::replace(
         path,
         openingBracketPos,
         closingBracketPos - openingBracketPos + 1,

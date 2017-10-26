@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <map>
+#include <list>
 
 #include <boost/optional.hpp>
 
@@ -110,20 +111,10 @@ public:
      * NOTE: Can only be called within request completion handler. 
      *   Otherwise, result is not defined.
      */
-    nx_http::StatusCode::Value prevResponseHttpStatusCode() const;
+    nx_http::StatusCode::Value lastResponseHttpStatusCode() const;
 
 protected:
     virtual void stopWhileInAioThread() override;
-
-//private:
-    const QUrl m_baseRequestUrl;
-    nx_http::Credentials m_userCredentials;
-    // TODO: #ak Replace with std::set in c++17.
-    std::map<
-        nx::network::aio::BasicPollable*,
-        std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
-    nx_http::StatusCode::Value m_prevResponseHttpStatusCode = 
-        nx_http::StatusCode::undefined;
 
     template<typename Input, typename ... Output>
     void performGetRequest(
@@ -197,17 +188,16 @@ protected:
             {
                 fusionClient->bindToAioThread(getAioThread());
                 auto fusionClientPtr = fusionClient.get();
-                m_activeClients.emplace(fusionClientPtr, std::move(fusionClient));
+                m_activeClients.push_back(std::move(fusionClient));
                 fusionClientPtr->execute(
-                    [this, fusionClientPtr, completionHandler = std::move(completionHandler)](
-                        SystemError::ErrorCode errorCode,
-                        const nx_http::Response* response,
-                        Output... outData)
+                    [fusionClientIter = --m_activeClients.end(),
+                        completionHandler = std::move(completionHandler)](
+                            SystemError::ErrorCode errorCode,
+                            const nx_http::Response* response,
+                            Output... outData) mutable
                     {
-                        auto clientIter = m_activeClients.find(fusionClientPtr);
-                        NX_ASSERT(clientIter != m_activeClients.end());
-                        auto client = std::move(clientIter->second);
-                        m_activeClients.erase(clientIter);
+                        auto client = std::move(*fusionClientIter);
+                        m_activeClients.erase(fusionClientIter);
 
                         m_prevResponseHttpStatusCode = 
                             response
@@ -372,4 +362,9 @@ protected:
 
 private:
     boost::optional<std::chrono::milliseconds> m_requestTimeout;
+    const QUrl m_baseRequestUrl;
+    nx_http::Credentials m_userCredentials;
+    std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
+    nx_http::StatusCode::Value m_prevResponseHttpStatusCode =
+        nx_http::StatusCode::undefined;
 };
