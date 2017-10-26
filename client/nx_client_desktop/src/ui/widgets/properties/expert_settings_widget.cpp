@@ -276,7 +276,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     if (m_hasDualStreaming)
     {
-        ui->secondStreamQualityComboBox->setVisible(m_qualityEditable);
+        ui->secondStreamQualityWidget->setVisible(m_qualityEditable);
 
         CheckboxUtils::setupTristateCheckbox(
             ui->secondStreamDisableCheckBox,
