@@ -122,7 +122,7 @@ protected:
     }
 
     void thenSystemDataIsSynchronizedToCloud(
-        const nx::hpm::api::SystemCredentials& cloudCredentials)
+        const nx::hpm::api::SystemCredentials& /*cloudCredentials*/)
     {
         // TODO
     }
