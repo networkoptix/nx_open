@@ -382,20 +382,11 @@ bool Helper::hasDownloader() const
     return downloader != nullptr;
 }
 
-} // namespace
-
-int QnDownloadsRestHandler::executeGet(
-    const QString& path,
-    const QnRequestParamList& params,
-    QByteArray& result,
-    QByteArray& resultContentType,
-    const QnRestConnectionProcessor* /*processor*/)
+boost::optional<int> hasError(const Request& request, Helper& helper)
 {
-    Request request(path);
     if (!request.isValid())
         return nx_http::StatusCode::badRequest;
 
-    Helper helper(this, params, result, resultContentType);
     if (!verifyRelativePath(request.fileName))
     {
         return helper.makeError(
@@ -411,6 +402,24 @@ int QnDownloadsRestHandler::executeGet(
             QnRestResult::CantProcessRequest,
             "DistributedFileDownloader is not initialized.");
     }
+
+    return boost::none;
+}
+
+} // namespace
+
+
+int QnDownloadsRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& resultContentType,
+    const QnRestConnectionProcessor* /*processor*/)
+{
+    Request request(path);
+    Helper helper(this, params, result, resultContentType);
+    if (const auto returnCode = hasError(request, helper))
+        return *returnCode;
 
     switch (request.subject)
     {
@@ -435,25 +444,9 @@ int QnDownloadsRestHandler::executePost(
     const QnRestConnectionProcessor* /*processor*/)
 {
     Request request(path);
-    if (!request.isValid())
-        return nx_http::StatusCode::badRequest;
-
     Helper helper(this, params, result, resultContentType);
-    if (!verifyRelativePath(request.fileName))
-    {
-        return helper.makeError(
-            nx_http::StatusCode::badRequest,
-            QnRestResult::InvalidParameter,
-            "File name in not a valid relative path.");
-    }
-
-    if (!helper.hasDownloader())
-    {
-        return helper.makeError(
-            nx_http::StatusCode::internalServerError,
-            QnRestResult::CantProcessRequest,
-            "DistributedFileDownloader is not initialized.");
-    }
+    if (const auto returnCode = hasError(request, helper))
+        return *returnCode;
 
     switch (request.subject)
     {
@@ -489,25 +482,9 @@ int QnDownloadsRestHandler::executeDelete(
     const QnRestConnectionProcessor* /*processor*/)
 {
     Request request(path);
-    if (!request.isValid() || request.subject != Request::Subject::file)
-        return nx_http::StatusCode::badRequest;
-
     Helper helper(this, params, result, resultContentType);
-    if (!verifyRelativePath(request.fileName))
-    {
-        return helper.makeError(
-            nx_http::StatusCode::badRequest,
-            QnRestResult::InvalidParameter,
-            "File name in not a valid relative path.");
-    }
-
-    if (!helper.hasDownloader())
-    {
-        return helper.makeError(
-            nx_http::StatusCode::internalServerError,
-            QnRestResult::CantProcessRequest,
-            "DistributedFileDownloader is not initialized.");
-    }
+    if (const auto returnCode = hasError(request, helper))
+        return *returnCode;
 
     return helper.handleRemoveDownload(request.fileName);
 }
