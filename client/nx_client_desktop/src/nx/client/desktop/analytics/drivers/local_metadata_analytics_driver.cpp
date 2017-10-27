@@ -32,7 +32,7 @@ LocalMetadataAnalyticsDriver::LocalMetadataAnalyticsDriver(const QnResourcePtr& 
 {
     QFile metadata(metadataFileName(resource->getUrl()));
     metadata.open(QIODevice::ReadOnly);
-    m_track = QJson::deserialized<std::vector<QnObjectDetectionMetadataTrack>>(metadata.readAll());
+    m_track = QJson::deserialized<std::vector<nx::common::metadata::DetectionMetadataPacket>>(metadata.readAll());
     metadata.close();
 
     if (m_track.empty())
@@ -49,19 +49,19 @@ LocalMetadataAnalyticsDriver::LocalMetadataAnalyticsDriver(const QnResourcePtr& 
             const auto timestampMs = timestampUs / 1000;
 
             m_currentFrame = std::lower_bound(m_track.cbegin(), m_track.cend(), timestampMs);
-            if (m_currentFrame == m_track.cbegin() && timestampMs < *m_currentFrame)
+            if (m_currentFrame == m_track.cbegin() && timestampUs < m_currentFrame->timestampUsec)
             {
                 qnMetadataAnalyticsController->gotMetadata(resource, {});
                 return;
             }
 
-            if (m_currentFrame != m_track.cbegin() && timestampMs < *m_currentFrame)
+            if (m_currentFrame != m_track.cbegin() && timestampUs < m_currentFrame->timestampUsec)
                 --m_currentFrame;
 
-            NX_EXPECT(m_currentFrame->timestampMs <= timestampMs);
+            NX_EXPECT(m_currentFrame->timestampUsec <= timestampUs);
 
-            QnObjectDetectionMetadata metadata;
-            metadata.detectedObjects = m_currentFrame->objects;
+            nx::common::metadata::DetectionMetadataPacket metadata;
+            metadata.objects = m_currentFrame->objects;
             qnMetadataAnalyticsController->gotMetadata(resource, std::move(metadata));
         });
 }

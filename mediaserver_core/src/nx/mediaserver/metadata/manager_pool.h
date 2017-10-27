@@ -64,8 +64,8 @@ public:
     QnAbstractDataReceptorPtr registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
     void removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
 
-    bool registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
-    void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
+    bool registerDataReceptor(const QnResourcePtr& resource, QnAbstractDataReceptor* dataReceptor);
+    void removeDataReceptor(const QnResourcePtr& resource, QnAbstractDataReceptor* dataReceptor);
 
 public slots:
     void initExistingResources();

@@ -201,7 +201,11 @@ struct QnCompressedMetadata: public QnAbstractCompressedMetadata
         QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
     virtual const char* data() const override;
     virtual size_t dataSize() const override;
-    virtual bool setData(const char* data, std::size_t dataSize);
+
+    bool setData(const char* data, std::size_t dataSize);
+    bool setData(const QByteArray& data);
+    void setDurationUsec(qint64 value) { m_duration = value;  }
+    void setTimestampUsec(qint64 value) { timestamp = value; }
 };
 
 /**

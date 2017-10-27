@@ -396,25 +396,34 @@ void ManagerPool::removeDataProvider(QnAbstractMediaStreamDataProvider* dataProv
     context.dataReceptor.clear();
 }
 
-bool ManagerPool::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)
+bool ManagerPool::registerDataReceptor(
+    const QnResourcePtr& resource,
+    QnAbstractDataReceptor* dataReceptor)
 {
-    const auto& id = dataProvider->getResource()->getId();
+    const auto& id = resource->getId();
     auto itr = m_contexts.find(id);
     if (itr == m_contexts.end())
         return false;
-    auto& context = itr->second;
-    context.handler->registerDataReceptor(dataReceptor);
-    return true;
+
+    if (auto handler = dynamic_cast<EventHandler*> (itr->second.handler.get()))
+    {
+        handler->registerDataReceptor(dataReceptor);
+        return true;
+    }
+    return false;
 }
 
-void ManagerPool::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
+void ManagerPool::removeDataReceptor(
+    const QnResourcePtr& resource,
+    QnAbstractDataReceptor* dataReceptor)
 {
-    const auto& id = dataProvider->getResource()->getId();
+    const auto& id = resource->getId();
     auto itr = m_contexts.find(id);
     if (itr == m_contexts.end())
         return;
     auto& context = itr->second;
-    context.handler->removeDataReceptor(dataReceptor);
+    if (auto handler = dynamic_cast<EventHandler*> (itr->second.handler.get()))
+        handler->removeDataReceptor(dataReceptor);
 }
 
 } // namespace metadata

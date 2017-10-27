@@ -32,6 +32,11 @@ public:
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
+    void handleEventsPacket(
+        nxpt::ScopedRef<nx::sdk::metadata::AbstractEventMetadataPacket> packet);
+    void handleMetadataPacket(
+        nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectionMetadataPacket> packet);
+
     void handleMetadataEvent(
         nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedEvent> eventData,
         qint64 timestampUsec);

@@ -29,6 +29,29 @@ static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
 static const int SAVE_BITRATE_FRAME = 300; // value TBD
 
+class MetadataDataReceptor: public QnAbstractDataReceptor
+{
+public:
+    MetadataDataReceptor(QnLiveStreamProvider* owner): m_owner(owner)
+    {
+    }
+
+    virtual bool canAcceptData() const override
+    {
+        return true;
+    }
+
+    virtual void putData(const QnAbstractDataPacketPtr& data) override
+    {
+        const QnAbstractCompressedMetadataPtr& metadata =
+            std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
+        if (metadata)
+            m_owner->addMetadata(metadata);
+    }
+private:
+    QnLiveStreamProvider* m_owner;
+};
+
 QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
     m_livemutex(QnMutex::Recursive),
@@ -40,6 +63,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_videoChannels(1),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1)
 {
+    m_metadataReceptor.reset(new MetadataDataReceptor(this));
+
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         m_motionMaskBinData[i] =
@@ -68,13 +93,13 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     auto pool = qnServerModule->metadataManagerPool();
     m_videoMetadataPlugin = pool->registerDataProvider(this);
     if (m_videoMetadataPlugin)
-        pool->registerDataReceptor(this);
+        pool->registerDataReceptor(getResource(), m_metadataReceptor.data());
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
     qnServerModule->metadataManagerPool()->removeDataProvider(this);
-    qnServerModule->metadataManagerPool()->removeDataReceptor(this);
+    qnServerModule->metadataManagerPool()->removeDataReceptor(getResource(), m_metadataReceptor.data());
 
     directDisconnectAll();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -232,7 +257,7 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needMetaData()
 {
     // I assume this function is called once per video frame
-    if (!m_metadataQueue.empty())
+    if (!m_metadataQueue.isEmpty())
         return true;
 
     bool needHardwareMotion = getRole() == Qn::CR_LiveVideo
@@ -415,6 +440,13 @@ QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
 
 QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetaData()
 {
+    if (!m_metadataQueue.isEmpty())
+    {
+        QnAbstractCompressedMetadataPtr metadata;
+        m_metadataQueue.pop(metadata);
+        return metadata;
+    }
+
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
@@ -603,6 +635,11 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
         NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
                 .arg(info.encoderIndex), cl_logINFO);
     }
+}
+
+void QnLiveStreamProvider::addMetadata(const QnAbstractCompressedMetadataPtr& metadata)
+{
+    m_metadataQueue.push(metadata);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

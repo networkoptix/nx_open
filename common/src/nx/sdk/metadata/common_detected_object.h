@@ -21,14 +21,13 @@ public:
     virtual float confidence() const override;
     virtual nxpl::NX_GUID id() const override;
     virtual NX_ASCII const char* objectSubType() const override;
-    virtual NX_LOCALE_DEPENDENT const Attribute* attributes() const override;
+    virtual NX_LOCALE_DEPENDENT const Attribute* attribute(int index) const override;
     virtual int attributeCount() const override;
     virtual const char* auxilaryData() const override;
     virtual Rect boundingBox() const override;
 
-    virtual void setEventTypeId(const nxpl::NX_GUID& eventTypeId);
-    virtual void setConfidence(float confidence);
-
+    void setEventTypeId(const nxpl::NX_GUID& eventTypeId);
+    void setConfidence(float confidence);
     void setId(const nxpl::NX_GUID& value);
     void setObjectSubType(const std::string& value);
     void seAttributes(const std::vector<NX_LOCALE_DEPENDENT Attribute>& value);

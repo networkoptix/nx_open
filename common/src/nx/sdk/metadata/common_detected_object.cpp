@@ -45,9 +45,9 @@ NX_ASCII const char* CommonDetectedObject::objectSubType() const
     return m_objectSubType.data();
 }
 
-NX_LOCALE_DEPENDENT const Attribute* CommonDetectedObject::attributes() const
+NX_LOCALE_DEPENDENT const Attribute* CommonDetectedObject::attribute(int index) const
 {
-    return &m_attributes[0];
+    return index < m_attributes.size() ? &m_attributes[index] : nullptr;
 }
 
 int CommonDetectedObject::attributeCount() const

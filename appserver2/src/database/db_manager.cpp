@@ -2059,7 +2059,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
-    }   
+    }
 
     return ErrorCode::ok;
 }

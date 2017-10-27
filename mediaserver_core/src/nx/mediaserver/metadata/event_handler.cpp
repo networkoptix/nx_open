@@ -8,6 +8,8 @@
 
 #include <core/resource/security_cam_resource.h>
 #include <nx/mediaserver/event/event_connector.h>
+#include <analytics/common/object_detection_metadata.h>
+#include <nx/fusion/serialization/ubjson.h>
 
 namespace nx {
 namespace mediaserver {
@@ -24,44 +26,67 @@ void EventHandler::handleMetadata(
     if (error != Error::noError)
         return;
 
-    nxpt::ScopedRef<AbstractEventMetadataPacket> packet(
+    nxpt::ScopedRef<AbstractEventMetadataPacket> eventsPacket(
         (AbstractEventMetadataPacket*)
         metadata->queryInterface(IID_EventMetadataPacket), false);
+    if (eventsPacket)
+        handleEventsPacket(std::move(eventsPacket));
 
-    if (!packet)
-        return;
+    nxpt::ScopedRef<AbstractDetectionMetadataPacket> objectsPacket(
+        (AbstractDetectionMetadataPacket*)
+        metadata->queryInterface(IID_DetectionMetadataPacket), false);
+    if (objectsPacket)
+        handleMetadataPacket(std::move(objectsPacket));
+}
 
+void EventHandler::handleEventsPacket(nxpt::ScopedRef<AbstractEventMetadataPacket> packet)
+{
     while (true)
     {
-        nxpt::ScopedRef<AbstractMetadataItem> item(
-            packet->nextItem(), false);
-
+        nxpt::ScopedRef<AbstractMetadataItem> item(packet->nextItem(), false);
         if (!item)
             return;
 
         nxpt::ScopedRef<AbstractDetectedEvent> eventData =
-            (AbstractDetectedEvent*) item->queryInterface(IID_DetectedEvent);
-        nxpt::ScopedRef<AbstarctDetectedObject> objectData =
-            (AbstarctDetectedObject*) item->queryInterface(IID_DetectedObject);
+            (AbstractDetectedEvent*)item->queryInterface(IID_DetectedEvent);
 
         auto timestampUsec = packet->timestampUsec();
         if (eventData)
             handleMetadataEvent(std::move(eventData), timestampUsec);
-        else if (objectData)
-            handleMetadataObject(std::move(objectData), timestampUsec);
     }
 }
 
-void EventHandler::handleMetadataObject(
-    nxpt::ScopedRef<nx::sdk::metadata::AbstarctDetectedObject> eventData,
-    qint64 timestampUsec)
+void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractDetectionMetadataPacket> packet)
 {
-    QnAbstractMediaDataPtr metadata(new QnCompressedMetadata(MetadataType::ObjectDetection));
-    //metadata->m_duration = ? ;
-    //metadata->m_data = ? ;
+    nx::common::metadata::DetectionMetadataPacket data;
+    while (true)
+    {
+        nxpt::ScopedRef<AbstarctDetectedObject> item(packet->nextItem(), false);
+        if (!item)
+            return;
+        nx::common::metadata::DetectedObject object;
+        object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
+        const auto box = item->boundingBox();
+        object.boundingBox = QRect(box.x, box.y, box.width, box.height);
+        for (int i = 0; i < item->attributeCount(); ++i)
+        {
+            nx::common::metadata::Attribute attribute;
+            attribute.name = QString::fromStdString(item->attribute(i)->name);
+            attribute.value = QString::fromStdString(item->attribute(i)->value);
+            object.labels.push_back(attribute);
+        }
+        data.objects.push_back(std::move(object));
+    }
+    data.timestampUsec = packet->timestampUsec();
+    data.durationUsec = packet->durationUsec();
+
+    QnCompressedMetadataPtr serializedData(new QnCompressedMetadata(MetadataType::ObjectDetection));
+    serializedData->setTimestampUsec(packet->timestampUsec());
+    serializedData->setDurationUsec(packet->durationUsec());
+    serializedData->setData(QnUbjson::serialized(data));
 
     if (m_dataReceptor)
-        m_dataReceptor->putData(metadata);
+        m_dataReceptor->putData(serializedData);
 }
 
 void EventHandler::handleMetadataEvent(

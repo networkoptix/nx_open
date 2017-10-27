@@ -20,8 +20,8 @@ public:
 
 private:
     const QnResourcePtr m_resource;
-    std::vector<QnObjectDetectionMetadataTrack> m_track;
-    std::vector<QnObjectDetectionMetadataTrack>::const_iterator m_currentFrame;
+    std::vector<nx::common::metadata::DetectionMetadataPacket> m_track;
+    std::vector<nx::common::metadata::DetectionMetadataPacket>::const_iterator m_currentFrame;
 };
 
 } // namespace desktop

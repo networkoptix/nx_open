@@ -21,6 +21,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <utils/common/threadqueue.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -35,10 +36,11 @@ class NaiveDetectionSmoother;
 } // namespace nx
 
 class QnLiveStreamProvider;
+class MetadataDataReceptor;
+using MetadataDataReceptorPtr = QSharedPointer<MetadataDataReceptor>;
 
 class QnLiveStreamProvider:
-    public QnAbstractMediaStreamDataProvider,
-    public QnAbstractDataReceptor
+    public QnAbstractMediaStreamDataProvider
 {
 public:
     QnLiveStreamProvider(const QnResourcePtr& res);
@@ -87,6 +89,7 @@ public:
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
 
+    void addMetadata(const QnAbstractCompressedMetadataPtr& metadata);
 protected:
     QnAbstractCompressedMetadataPtr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -140,8 +143,9 @@ private:
     QElapsedTimer m_resolutionCheckTimer;
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
-    std::queue<QnAbstractCompressedMetadataPtr> m_metadataQueue;
+    QnSafeQueue<QnAbstractCompressedMetadataPtr> m_metadataQueue;
     QnAbstractDataReceptorPtr m_videoMetadataPlugin;
+    MetadataDataReceptorPtr m_metadataReceptor;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

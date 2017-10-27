@@ -52,15 +52,15 @@ DemoAnalyticsDriver::~DemoAnalyticsDriver()
 
 void DemoAnalyticsDriver::tick()
 {
-    QnObjectDetectionMetadataTrack track;
-    track.timestampMs = m_elapsed.elapsed();
+    nx::common::metadata::DetectionMetadataPacket track;
+    track.timestampUsec = m_elapsed.elapsed() * 1000;
 
     for (auto region = m_regions.begin(); region != m_regions.end(); )
     {
         region->tick();
         if (region->isValid())
         {
-            QnObjectDetectionInfo info;
+            nx::common::metadata::DetectedObject info;
             info.objectId = region->id;
             info.boundingBox = region->geometry;
             track.objects.push_back(info);
