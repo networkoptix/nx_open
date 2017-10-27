@@ -1151,33 +1151,6 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Zoom be</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Zoom ki</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Fókusz távoli</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Fókusz közeli</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Autófókusz</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Dewarping mód változtatása</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -6033,7 +6006,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>Archív biztonsági mentés befejeződött &lt;/b&gt;%1&lt;/b&gt;-ig</translation>
+      <translation>Archív biztonsági mentés befejeződött &lt;b&gt;%1&lt;/b&gt;-ig</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>

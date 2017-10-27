@@ -850,6 +850,9 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     QnGlNativePainting::begin(m_renderer->glContext(), painter);
 
     qreal opacity = effectiveOpacity();
+    if (options().testFlag(InvisibleWidgetOption))
+        opacity = 0.0;
+
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
     if (!opaque || (base_type::resource()->flags() & Qn::still_image))
@@ -859,7 +862,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintVideoTexture(
     }
 
     m_renderer->setBlurFactor(m_statusOverlay->opacity());
-    const auto result = m_renderer->paint(channel, sourceSubRect, targetRect, effectiveOpacity());
+    const auto result = m_renderer->paint(channel, sourceSubRect, targetRect, opacity);
     m_paintedChannels[channel] = true;
 
     /* There is no need to restore blending state before invoking endNativePainting. */
@@ -1444,6 +1447,9 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect)
 {
+    if (options().testFlag(InvisibleWidgetOption))
+        return;
+
     if (options() & DisplayMotion)
     {
         ensureMotionSelectionCache();
@@ -2023,7 +2029,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::UnauthorizedOverlay;
 
     if (m_camera && m_camera->isDtsBased() && !m_camera->isLicenseUsed())
-        return Qn::AnalogWithoutLicenseOverlay;
+    {
+        bool isLive = m_display->camDisplay()->isRealTimeSource();
+        bool canViewWithoutLicense = m_camera->licenseType() == Qn::LC_Bridge && isLive;
+        if (!canViewWithoutLicense)
+            return Qn::AnalogWithoutLicenseOverlay;
+    }
 
     if (options().testFlag(DisplayActivity) && m_display->isPaused())
     {

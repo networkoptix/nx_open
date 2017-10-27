@@ -1151,33 +1151,6 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Zoom Avant</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Zoom Arrière</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Focus Loin</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Focus Près</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Auto Focus</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Changer Mode Dérouler</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -3165,7 +3138,7 @@ to %1</source>
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
         <numerusform>Journal d'événement pour %1 - %n événement trouvé</numerusform>
-        <numerusform>Journal d'événement pour %1  - %n événements trouvés</numerusform>
+        <numerusform>Journal d'événement pour %1 - %n événements trouvés</numerusform>
       </translation>
     </message>
     <message>

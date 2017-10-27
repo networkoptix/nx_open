@@ -84,6 +84,10 @@ protected:
 
     virtual QnResourceFactory* getResourceFactory() const override;
 
+    virtual bool canRemoveResource(const QnUuid& id) override;
+    
+    virtual void removeResourceIgnored(const QnUuid& resourceId) override;
+
     virtual void updateResource(
         const QnResourcePtr& resource,
         ec2::NotificationSource /*source*/) override;

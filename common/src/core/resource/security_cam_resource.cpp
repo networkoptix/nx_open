@@ -1319,3 +1319,10 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
     return (int)result;
 }
 
+bool QnSecurityCamResource::setCameraCredentialsSync(
+    const QAuthenticator& auth, QString* outErrorString)
+{
+    if (outErrorString)
+        *outErrorString = tr("Operation is not permitted.");
+    return false;
+}

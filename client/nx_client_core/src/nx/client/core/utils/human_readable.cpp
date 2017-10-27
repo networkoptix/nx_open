@@ -315,7 +315,7 @@ QString HumanReadable::digitalSizeUnit(DigitalSizeUnit unit, SuffixFormat suffix
         {
             return (suffixFormat == SuffixFormat::Full)
                 ? tr("Kilobytes", "Full suffix for displaying kilobytes", count)
-                : tr("kB", "Suffix for displaying kilobytes", count);
+                : tr("KB", "Suffix for displaying kilobytes", count);
         }
         case Mega:
         {

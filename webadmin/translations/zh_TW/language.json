@@ -47,7 +47,7 @@
     "disconnectedFromSystemSuccess":"伺服器已成功地從系統脫離",
     "connectedSuccess":"系統已成功連接",
     "createLocalOwnerTitle":"新建本地管理員",
-    "confirmChangePassword":"變更管理員密碼",
+    "confirmChangePassword":"變更管理員密碼 (注意! 這裡將變更您的最高權限管理員密碼!)",
     "confirmChangePasswordTitle":"變更系統密碼? 這將影響某些伺服器上 admin 及 root 的密碼",
     "confirmChangePasswordAction":"儲存新密碼",
     "nx1ControlHint":"用戶端應用程式已啟動. 使用鍵盤/滑鼠或行動應用程式來控制它."
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} web 介面"
+  },
+  "common":{
+    "systemOffline":"系統處於離線狀態",
+    "cameraLinks":{
+      "copyToClipboard":"複製到剪貼簿",
+      "highStream":"高解析串流",
+      "copyDefaultText":"複製",
+      "unknown":"未知",
+      "lowStream":"低解析串流",
+      "transcoding":"轉碼",
+      "copyActiveText":"已複製到剪貼簿"
+    },
+    "searchCamPlaceholder":"搜尋",
+    "cameraStates":{
+      "noFormat":"此瀏覽器或設備不支援從此攝影機回放影像。",
+      "ieWin10":"請使用Microsoft Edge或Google Chrome瀏覽器。",
+      "iosVideoTooLarge":"iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
+      "unauthorized":"需要身份驗證",
+      "ubuntuNX":"此瀏覽器不支援從 ARM 伺服器播放影像。請改用 Chromium 瀏覽器。",
+      "ieNoWebm":"請安裝 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> 以支援 Internet Explorer.",
+      "flashOrWebmRequired":"要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
+      "noArmSupport":"此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
+      "error":"錯誤",
+      "offline":"離線",
+      "noData":"無資料",
+      "flashRequired":"要在 ARM 伺服器上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a>."
+    }
   }
 }

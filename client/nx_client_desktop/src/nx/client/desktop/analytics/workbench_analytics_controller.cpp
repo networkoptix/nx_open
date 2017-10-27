@@ -12,6 +12,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 
+#include <nx/client/core/utils/grid_walker.h>
+
 #include <nx/client/desktop/analytics/drivers/abstract_analytics_driver.h>
 
 #include <ui/common/geometry.h>
@@ -211,15 +213,25 @@ void WorkbenchAnalyticsController::constructLayout()
             m_resource->addFlags(Qn::sync);
             enhanced->addFlags(Qn::sync);
 
+            auto enhancedItemOptions = kMasterItemOptions;
+            int positionX = centralItemPosition + enhancedOffset;
+            if (ini().hideEnhancedVideo)
+            {
+                enhancedItemOptions |= QnResourceWidget::InvisibleWidgetOption
+                   | QnResourceWidget::InfoOverlaysForbidden;
+                positionX = centralItemPosition; //< Hide below the main item;
+            }
+
             m_enhanced.source.flags = Qn::Pinned;
             m_enhanced.source.uuid = QnUuid::createUuid();
-            m_enhanced.source.combinedGeometry = QRect(centralItemPosition + enhancedOffset,
-                centralItemPosition, centralItemSize, centralItemSize);
             m_enhanced.source.resource.id = enhanced->getId();
             m_enhanced.source.resource.uniqueId = enhanced->getUniqueId();
+            m_enhanced.source.combinedGeometry = QRect(positionX,
+                centralItemPosition, centralItemSize, centralItemSize);
+
             qnResourceRuntimeDataManager->setLayoutItemData(m_enhanced.source.uuid,
                 Qn::ItemWidgetOptions,
-                kMasterItemOptions);
+                enhancedItemOptions);
 
             m_layout->addItem(m_enhanced.source);
         }
@@ -230,20 +242,40 @@ void WorkbenchAnalyticsController::constructLayout()
         const bool hasEnhanced = ini().enableEntropixEnhancer && !m_enhanced.source.uuid.isNull();
 
         // Add zoom windows.
-        for (int x = 0; x < m_matrixSize; ++x)
+
+        if (hasEnhanced && ini().hideEnhancedVideo)
         {
-            for (int y = 0; y < m_matrixSize; ++y)
+            core::GridWalker w(QRect(-1, -1, m_matrixSize + 1, m_matrixSize + 1),
+                core::GridWalker::Policy::Round);
+
+            bool addEnhanced = false;
+            while (w.next())
             {
-                if (centralItemRect.contains(x, y))
+                if (centralItemRect.contains(w.pos()))
+                    continue;
+
+                auto& mapping = addEnhanced ? m_enhanced : m_main;
+                ElementData element;
+                element.itemId = addSlaveItem(mapping, w.pos());
+                mapping.mapping.push_back(element);
+                addEnhanced = !addEnhanced;
+            }
+        }
+        else
+        {
+            core::GridWalker w(QRect(0, 0, m_matrixSize, m_matrixSize));
+            while (w.next())
+            {
+                if (centralItemRect.contains(w.pos()))
                     continue;
 
                 ElementData element;
-                element.itemId = addSlaveItem(m_main, QPoint(x, y));
+                element.itemId = addSlaveItem(m_main, w.pos());
                 m_main.mapping.push_back(element);
 
                 if (hasEnhanced)
                 {
-                    element.itemId = addSlaveItem(m_enhanced, QPoint(enhancedOffset + x, y));
+                    element.itemId = addSlaveItem(m_enhanced, w.pos() + QPoint(enhancedOffset, 0));
                     m_enhanced.mapping.push_back(element);
                 }
             }

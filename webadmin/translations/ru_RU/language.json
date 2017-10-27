@@ -47,7 +47,7 @@
     "disconnectedFromSystemSuccess":"Сервер был успешно отсоединет от системы",
     "connectedSuccess":"Система успешно подключена",
     "createLocalOwnerTitle":"Создать локального администратора",
-    "confirmChangePassword":"Изменение пароля администратора",
+    "confirmChangePassword":"Изменить пароль администратора",
     "confirmChangePasswordTitle":"Вы уверены, что хотите изменить системный пароль? Это повлияет на пользователя admin и изменит пароль пользователя root для некоторых серверов",
     "confirmChangePasswordAction":"Сохранить новый пароль",
     "nx1ControlHint":"Клиентское приложение запущено. Им можно управлять с помощью клавиатуры/мыши или мобильного приложения."
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} web-интерфейс"
+  },
+  "common":{
+    "systemOffline":"Система не в сети",
+    "cameraLinks":{
+      "copyToClipboard":"скопировать в буфер обмена",
+      "highStream":"Выс. кач-во",
+      "copyDefaultText":"копировать",
+      "unknown":"Неизвестный",
+      "lowStream":"Низ. кач-во",
+      "transcoding":"Перекодирование",
+      "copyActiveText":"скопировано в буфер обмена"
+    },
+    "searchCamPlaceholder":"поиск",
+    "cameraStates":{
+      "noFormat":"Этот браузер или устройство не поддерживает воспроизведение видео с этой камеры.",
+      "ieWin10":"Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+      "iosVideoTooLarge":"iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+      "unauthorized":"Требуется аутентификация",
+      "ubuntuNX":"Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium.",
+      "ieNoWebm":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+      "flashOrWebmRequired":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
+      "noArmSupport":"Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
+      "error":"Ошибка",
+      "offline":"Не в сети",
+      "noData":"Нет данных",
+      "flashRequired":"Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> для воспроизведения видео с серверов на базе ARM."
+    }
   }
 }

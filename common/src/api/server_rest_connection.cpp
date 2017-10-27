@@ -433,6 +433,24 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::changeCameraPassword(
+    const QnUuid& id,
+    const QAuthenticator& auth,
+    Result<QnRestResult>::type callback,
+    QThread* targetThread)
+{
+    CameraPasswordData data;
+    data.cameraId = id.toString();
+    data.user = auth.user();
+    data.password = auth.password();
+    return executePost(
+        lit("/api/changeCameraPassword"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
+}
 
 // --------------------------- private implementation -------------------------------------
 

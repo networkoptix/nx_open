@@ -4,7 +4,6 @@
 #include <chrono>
 #include <deque>
 #include <memory>
-#include <random>
 
 #include <boost/optional.hpp>
 
@@ -59,8 +58,7 @@ public:
         nx_http::BufferType* const cloudNonce,
         nx_http::BufferType* const nonceTrailer);
 
-protected:
-    static nx::Buffer generateNonceTrailer(std::function<short()> genFunc);
+    static nx::Buffer generateNonceTrailer();
 
 private:
     struct NonceCtx
@@ -81,9 +79,6 @@ private:
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;
     nx::utils::TimerManager::TimerGuard m_timerID;
-    std::random_device m_rd;
-    std::default_random_engine m_randomEngine;
-    std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;
     nx::utils::StandaloneTimerManager* m_timerManager;
     AbstractCloudUserInfoPool* m_cloudUserInfoPool;
 
@@ -94,7 +89,6 @@ private:
 
     void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);
     void cloudBindingStatusChanged(bool boundToCloud);
-    nx::Buffer generateNonceTrailer();
 };
 
 } // namespace cloud_integration

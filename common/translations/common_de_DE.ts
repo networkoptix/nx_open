@@ -255,18 +255,6 @@
       <translation>Stellen Sie sicher, dass Port %1 erreichbar ist (Portweiterleitung).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Geräteeinstellungen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Kameraeinstellungen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Wenn das nicht hilft, stellen Sie das Gerät über die Webseite auf Werkseinstellungen.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Die Kamera wurde aus dem Archiv wiederhergestellt. Löschen Sie die Kamera und fügen Sie sie erneut hinzu, um das Live-Video anzuzeigen.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Geräteeinstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Kameraeinstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen (Fehler &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>

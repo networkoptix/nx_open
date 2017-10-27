@@ -61,24 +61,20 @@ HanwhaTimeSyncronizer::~HanwhaTimeSyncronizer()
     promise.get_future().wait();
 }
 
-void HanwhaTimeSyncronizer::start(const QAuthenticator& auth, const QUrl& url)
+void HanwhaTimeSyncronizer::start(HanwhaSharedResourceContext* resourceConext)
 {
     utils::promise<void> promise;
     m_timer.post(
-        [this, auth, url, &promise]() mutable
+        [this, resourceConext, &promise]() mutable
         {
-            if (m_auth != auth || m_url != url)
-            {
-                m_auth = auth;
-                m_url = url;
-                m_timer.cancelSync();
-                m_startPromises.push_back(&promise);
-                verifyDateTime();
-            }
-            else
-            {
-                promise.set_value();
-            }
+            if (m_resourceConext)
+                return promise.set_value(); // Already started.
+
+            m_resourceConext = resourceConext;
+            NX_DEBUG(this, lm("Started by %1").args(resourceConext));
+
+            m_startPromises.push_back(&promise);
+            verifyDateTime();
         });
 
     promise.get_future().wait();
@@ -132,7 +128,8 @@ void HanwhaTimeSyncronizer::verifyDateTime()
                 //     return setDateTime(now);
                 // }
 
-                NX_VERBOSE(this, lm("Current time diff is %1 which is ok").arg(timeDiffSecs));
+                NX_VERBOSE(this, lm("Current time diff is %1 which is ok").arg(
+                    std::chrono::seconds(timeDiffSecs)));
                 retryVerificationIn(kResyncInterval);
             }
             catch (const std::runtime_error& exception)
@@ -176,7 +173,7 @@ void HanwhaTimeSyncronizer::setDateTime(const QDateTime& dateTime)
 
 void HanwhaTimeSyncronizer::retryVerificationIn(std::chrono::milliseconds timeout)
 {
-    if (m_url.isEmpty())
+    if (!m_resourceConext)
         return;
 
     const auto verify = [this](){ verifyDateTime(); };
@@ -206,12 +203,14 @@ void HanwhaTimeSyncronizer::doRequest(
     const QString& action, std::map<QString, QString> params,
     bool isList, utils::MoveOnlyFunc<void(HanwhaResponse)> handler)
 {
+    // TODO: Use m_resourceConext->requestSemaphore().
+    const auto authenticator = m_resourceConext->authenticator();
     const auto url = HanwhaRequestHelper::buildRequestUrl(
-        m_url, lit("system"), lit("date"), action, params);
+        m_resourceConext->url(), lit("system"), lit("date"), action, params);
 
     m_httpClient.pleaseStopSync();
-    m_httpClient.setUserName(m_auth.user());
-    m_httpClient.setUserPassword(m_auth.password());
+    m_httpClient.setUserName(authenticator.user());
+    m_httpClient.setUserPassword(authenticator.password());
     m_httpClient.doGet(url,
         [this, url, isList, handler = std::move(handler)]()
         {

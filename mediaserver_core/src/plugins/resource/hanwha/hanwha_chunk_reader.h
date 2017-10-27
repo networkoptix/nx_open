@@ -18,6 +18,8 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+class HanwhaSharedResourceContext;
+
 class HanwhaChunkLoader: public QObject
 {
     Q_OBJECT
@@ -33,7 +35,7 @@ public:
     HanwhaChunkLoader();
     virtual ~HanwhaChunkLoader();
 
-    void start(const QAuthenticator& auth, const QUrl& url, int channelCount);
+    void start(HanwhaSharedResourceContext* resourceContext);
     bool isStarted() const;
 
     qint64 startTimeUsec(int channelNumber) const;
@@ -65,8 +67,7 @@ private:
     qint64 m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
 
     int m_maxChannels = 0;
-    QAuthenticator m_auth;
-    QUrl m_cameraUrl;
+    HanwhaSharedResourceContext* m_resourceContext = nullptr;
     mutable QnMutex m_mutex;
 
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};

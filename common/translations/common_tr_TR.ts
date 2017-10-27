@@ -255,18 +255,6 @@
       <translation>Port %1 in erişilebilir olduğuna emin olun (e.g. forwarded).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve cihazın Fps değerlerini düşürün.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve kameranın Fps değerlerini düşürün.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve I/O modülünün Fps değerlerini düşürün.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Eğer sorun çözülmez ise, Cihaz web sayfasından fabrika ayarlarına dönün.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Kamera arşivden geri yüklendi. Canlı video izlemek için kamerayı silin ve tekrar ekleyin.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve cihazın Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve kameranın Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve I/O modülünün Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
