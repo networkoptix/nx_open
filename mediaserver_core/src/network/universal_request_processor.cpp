@@ -22,15 +22,6 @@ namespace {
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
 
-bool isDigestAuth(const nx_http::Response& response)
-{
-    const auto header = response.headers.find(nx_http::header::WWWAuthenticate::NAME);
-    if (header == response.headers.end())
-        return false;
-    nx_http::header::WWWAuthenticate wwwAuthenticate;
-    wwwAuthenticate.parse(header->second);
-    return wwwAuthenticate.authScheme == nx_http::header::AuthScheme::digest;
-}
 
 } // namespace
 
@@ -101,7 +92,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                 nx_http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
 
             int retryThreshold = 0;
-            if (isDigestAuth(d->response))
+            if (usedMethod == nx_http::AuthMethod::httpDigest)
                 retryThreshold = MAX_AUTH_RETRY_COUNT;
             else if (d->authenticatedOnce)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
