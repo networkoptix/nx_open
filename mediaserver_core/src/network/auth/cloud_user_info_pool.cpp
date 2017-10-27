@@ -128,7 +128,7 @@ Qn::AuthResult CloudUserInfoPool::authenticate(
         NX_LOGX(lm("parseCloudNonce() failed. User: %1, nonce: %2")
             .arg(userName)
             .arg(nonce), cl_logERROR);
-        return Qn::Auth_WrongDigestOrNonce;
+        return Qn::Auth_WrongDigest;
     }
 
     const auto intermediateResponse = intermediateResponseByUserNonce(userName, cloudNonce);

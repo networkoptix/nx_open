@@ -212,7 +212,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
             NX_VERBOSE(this, lm("Authenticating %1. Authorization header not found")
                 .arg(request.requestLine));
 
-            Qn::AuthResult authResult = Qn::Auth_WrongDigestOrNonce;
+            Qn::AuthResult authResult = Qn::Auth_WrongDigest;
             if (usedAuthMethod)
                 *usedAuthMethod = nx_http::AuthMethod::httpDigest;
             QnUserResourcePtr userResource;
@@ -292,7 +292,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
             auto authResult = m_ldap->authenticate(userResource->getName(), password);
 
             if ((authResult == Qn::Auth_WrongPassword ||
-                authResult == Qn::Auth_WrongDigestOrNonce ||
+                authResult == Qn::Auth_WrongDigest ||
                 authResult == Qn::Auth_WrongLogin) &&
                 authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
             {
@@ -423,10 +423,10 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     const QByteArray uri = authorization.digest->params["uri"];
 
     if (nonce.isEmpty() || userName.isEmpty() || realm.isEmpty())
-        return Qn::Auth_WrongDigestOrNonce;
+        return Qn::Auth_WrongDigest;
 
     QnUserResourcePtr userResource;
-    Qn::AuthResult errCode = Qn::Auth_WrongDigestOrNonce;
+    Qn::AuthResult errCode = Qn::Auth_WrongDigest;
     if (m_nonceProvider->isNonceValid(nonce))
     {
         errCode = Qn::Auth_WrongLogin;
@@ -579,7 +579,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     auto authRecord = QByteArray::fromBase64(authRecordBase64);
     auto authFields = authRecord.split(':');
     if (authFields.size() != 3)
-        return Qn::Auth_WrongDigestOrNonce;
+        return Qn::Auth_WrongDigest;
 
     nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
     authorization.digest->userid = authFields[0];
@@ -589,7 +589,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     //digestAuthParams.params["uri"];   uri is empty
 
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))
-        return Qn::Auth_WrongDigestOrNonce;
+        return Qn::Auth_WrongDigest;
 
     QnResourcePtr res;
     Qn::AuthResult errCode = Qn::Auth_WrongLogin;

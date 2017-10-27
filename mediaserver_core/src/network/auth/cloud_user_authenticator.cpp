@@ -149,7 +149,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
             NX_LOGX(lm("Refusing digest authentication of user %1 due to non-cloud nonce %2")
                 .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
             return std::make_tuple<Qn::AuthResult, QnResourcePtr>(
-                Qn::Auth_WrongDigestOrNonce,
+                Qn::Auth_CloudConnectError,
                 cloudUsers.first());
         }
     }

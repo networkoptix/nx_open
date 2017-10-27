@@ -532,7 +532,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_OK,            // OK
         Auth_WrongLogin,    // invalid login
         Auth_WrongInternalLogin, // invalid login used for internal auth scheme
-        Auth_WrongDigestOrNonce,   // invalid/empty digest or invalid nonce
+        Auth_WrongDigest,   // invalid or empty digest
         Auth_WrongPassword, // invalid password
         Auth_Forbidden,     // no auth method found or custom auth scheme without login/password is failed
         Auth_PasswordExpired, // Password is expired

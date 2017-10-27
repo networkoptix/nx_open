@@ -22,7 +22,7 @@ Qn::AuthResult QnClientAuthHelper::authenticate(
     {
         nx_http::header::WWWAuthenticate authenticationHeader;
         if (!authenticationHeader.parse(authHeaderBuf))
-            return Qn::Auth_WrongDigestOrNonce;
+            return Qn::Auth_WrongDigest;
         authenticationCtx->setAuthenticationHeader(authenticationHeader);
     }
     authenticationCtx->setResponseStatusCode(
