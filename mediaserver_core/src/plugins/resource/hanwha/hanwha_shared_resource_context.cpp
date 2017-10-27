@@ -160,7 +160,7 @@ qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
 
 qint64 HanwhaSharedResourceContext::chunksEndUsec(int channelNumber) const
 {
-    return m_chunkLoader->startTimeUsec(channelNumber);
+    return m_chunkLoader->endTimeUsec(channelNumber);
 }
 
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
