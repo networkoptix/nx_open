@@ -1,3 +1,5 @@
+#include <array>
+#include <nx/utils/scope_guard.h>
 #include "file_system.h"
 
 #if defined(Q_OS_UNIX)
@@ -209,7 +211,96 @@ QString applicationFileNameInternal(const QString& /*defaultFileName*/)
 
 namespace {
 
-static HANDLE driveHandleByString(const QString& driveString)
+class WinDrivesInfoFetcher
+{
+public:
+    WinDriveInfoList getInfoList();
+    static bool mediaIsInserted(HANDLE driveHandle);
+    static HANDLE driveHandleByString(const QString& driveString);
+
+private:
+    WinDriveInfoList m_infoList;
+    std::array<TCHAR, 512> m_driveNamesBuf;
+    const TCHAR* m_bufPtr = nullptr;
+
+    bool fillDriveNamesBuf();
+    bool getNextDriveString(QString* driveString);
+    void processDrive(const QString& driveName);
+    void addRemovableDrive(HANDLE driveHandle, WinDriveInfo* driveInfo);
+};
+
+WinDriveInfoList WinDrivesInfoFetcher::getInfoList()
+{
+    m_infoList.clear();
+    if (!fillDriveNamesBuf())
+        return m_infoList;
+
+    QString driveString;
+    while (getNextDriveString(&driveString))
+        processDrive(driveString);
+
+    return m_infoList;
+}
+
+bool WinDrivesInfoFetcher::fillDriveNamesBuf()
+{
+    if (!GetLogicalDriveStrings(m_driveNamesBuf.size(), m_driveNamesBuf.data()))
+        return false;
+
+    m_bufPtr = m_driveNamesBuf.data();
+    return true;
+}
+
+bool WinDrivesInfoFetcher::getNextDriveString(QString* driveString)
+{
+    if (*m_bufPtr == L'\0')
+        return false;
+
+    *driveString = QString::fromUtf16((const ushort*)m_bufPtr);
+    m_bufPtr += driveString->length() + 1;
+
+    return true;
+}
+
+void WinDrivesInfoFetcher::processDrive(const QString& driveName)
+{
+    WinDriveInfo driveInfo;
+    driveInfo.path = driveName;
+    auto driveHandle = driveHandleByString(driveName);
+    if (driveHandle == INVALID_HANDLE_VALUE)
+        return;
+
+    auto fileHandleGuard = makeScopeGuard([driveHandle]() { CloseHandle(driveHandle); });
+
+    driveInfo.type = GetDriveType((LPCWSTR)driveInfo.path.data());
+    if (driveInfo.type == DRIVE_REMOVABLE)
+        return addRemovableDrive(driveHandle, &driveInfo);
+
+    driveInfo.access |= WinDriveInfo::Readable;
+    driveInfo.access |= WinDriveInfo::Writable;
+    m_infoList.append(driveInfo);
+}
+
+void WinDrivesInfoFetcher::addRemovableDrive(HANDLE driveHandle, WinDriveInfo* driveInfo)
+{
+    if (!mediaIsInserted(driveHandle))
+        return;
+
+    driveInfo->access |= WinDriveInfo::Readable;
+    DWORD bytesReturned;
+    BOOL isWritable = DeviceIoControl(
+        driveHandle,
+        IOCTL_DISK_IS_WRITABLE,
+        NULL, 0,
+        NULL, 0,
+        &bytesReturned,
+        NULL);
+
+    driveInfo->access |= isWritable ? WinDriveInfo::Writable : 0;
+    m_infoList.append(*driveInfo);
+}
+
+HANDLE WinDrivesInfoFetcher::driveHandleByString(const QString& driveString)
 {
     QString driveSysString = QString(lit("\\\\.\\%1:")).arg(driveString[0]);
 
@@ -223,7 +314,7 @@ static HANDLE driveHandleByString(const QString& driveString)
         NULL);
 }
 
-static bool mediaIsInserted(HANDLE driveHandle)
+bool WinDrivesInfoFetcher::mediaIsInserted(HANDLE driveHandle)
 {
     DWORD bytesReturned;
     return DeviceIoControl(
@@ -239,11 +330,11 @@ static bool mediaIsInserted(HANDLE driveHandle)
 
 bool mediaIsInserted(const QString& driveString)
 {
-    auto handle = driveHandleByString(driveString);
+    auto handle = WinDrivesInfoFetcher::driveHandleByString(driveString);
     if (handle == INVALID_HANDLE_VALUE)
         return false;
 
-    auto result = mediaIsInserted(handle);
+    auto result = WinDrivesInfoFetcher::mediaIsInserted(handle);
     CloseHandle(handle);
 
     return result;
@@ -251,49 +342,7 @@ bool mediaIsInserted(const QString& driveString)
 
 WinDriveInfoList getWinDrivesInfo()
 {
-    WinDriveInfoList result;
-    const DWORD drivesBufLen = 512;
-    TCHAR drivesBuf[drivesBufLen];
-
-    if (!GetLogicalDriveStrings(drivesBufLen, drivesBuf))
-        return result;
-
-    LPTSTR pdrivesBuf = drivesBuf;
-    while (*pdrivesBuf != L'\0')
-    {
-        QString drive = QString::fromUtf16((ushort*)pdrivesBuf);
-        pdrivesBuf += drive.length() + 1;
-
-        WinDriveInfo driveInfo;
-        driveInfo.path = drive;
-
-        auto driveHandle = driveHandleByString(drive);
-        if (driveHandle == INVALID_HANDLE_VALUE)
-            continue;
-
-        if (!mediaIsInserted(driveHandle))
-        {
-            CloseHandle(driveHandle);
-            continue;
-        }
-
-        driveInfo.access |= WinDriveInfo::Readable;
-        DWORD bytesReturned;
-        BOOL isWritable = DeviceIoControl(
-            driveHandle,
-            IOCTL_DISK_IS_WRITABLE,
-            NULL, 0,
-            NULL, 0,
-            &bytesReturned,
-            NULL);
-        driveInfo.access |= isWritable ? WinDriveInfo::Writable : 0;
-        driveInfo.type = GetDriveType((LPCWSTR)driveInfo.path.data());
-
-        CloseHandle(driveHandle);
-        result.append(driveInfo);
-    }
-
-    return result;
+    return WinDrivesInfoFetcher().getInfoList();
 }
 
 #endif // #ifdef Q_OS_WIN
