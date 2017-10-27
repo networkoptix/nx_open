@@ -89,7 +89,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                 nx_http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
 
             int retryThreshold = 0;
-            if (authResult == Qn::Auth_WrongDigest)
+            if (authResult == Qn::Auth_WrongDigestOrNonce)
                 retryThreshold = MAX_AUTH_RETRY_COUNT;
             else if (d->authenticatedOnce)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)
