@@ -1,4 +1,4 @@
-#include "server_merge_processor.h"
+#include "system_merge_processor.h"
 
 #include <chrono>
 
@@ -8,6 +8,7 @@
 #include <nx/utils/log/log.h>
 
 #include <api/global_settings.h>
+#include <api/mediaserver_client.h>
 #include <api/model/ping_reply.h>
 #include <api/resource_property_adaptor.h>
 #include <common/common_module.h>
@@ -92,43 +93,15 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
         return nx_http::StatusCode::internalServerError;
     }
 
-    QByteArray moduleInformationData;
+    const auto statusCode = fetchModuleInformation(url, data.getKey, &m_remoteModuleInformation);
+    if (!nx_http::StatusCode::isSuccessCode(statusCode))
     {
-        nx_http::HttpClient client;
-        client.setResponseReadTimeoutMs(kRequestTimeout.count());
-        client.setSendTimeoutMs(kRequestTimeout.count());
-        client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
-
-        QUrlQuery query;
-        query.addQueryItem(lit("checkOwnerPermissions"), lit("true"));
-        query.addQueryItem(lit("showAddresses"), lit("true"));
-
-        QUrl requestUrl(url);
-        requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
-        requestUrl.setQuery(query);
-        addAuthToRequest(requestUrl, data.getKey);
-
-        if (!client.doGet(requestUrl) || !isResponseOK(client))
-        {
-            auto status = getClientResponse(client);
-            NX_LOG(lit("SystemMergeProcessor. Error requesting url %1: %2")
-                .arg(data.url).arg(QLatin1String(nx_http::StatusCode::toString(status))),
-                cl_logDEBUG1);
-            if (status == nx_http::StatusCode::unauthorized)
-                setMergeError(result, MergeStatus::unauthorized);
-            else if (status == nx_http::StatusCode::unauthorized)
-                setMergeError(result, MergeStatus::forbidden);
-            else
-                setMergeError(result, MergeStatus::notFound);
-            return nx_http::StatusCode::serviceUnavailable;
-        }
-        /* if we've got it successfully we know system name and admin password */
-        while (!client.eof())
-            moduleInformationData.append(client.fetchMessageBodyBuffer());
+        if (statusCode == nx_http::StatusCode::unauthorized)
+            setMergeError(result, MergeStatus::unauthorized);
+        else
+            setMergeError(result, MergeStatus::notFound);
+        return nx_http::StatusCode::serviceUnavailable;
     }
-
-    const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
-    m_remoteModuleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
     result->setReply(m_remoteModuleInformation);
 
@@ -144,16 +117,45 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     bool isRemoteInCloud = !m_remoteModuleInformation.cloudSystemId.isEmpty();
     if (isLocalInCloud && isRemoteInCloud)
     {
-        NX_LOG(lit("SystemMergeProcessor (%1). Cannot merge because both systems are bound to the cloud")
-            .arg(data.url), cl_logDEBUG1);
-        setMergeError(result, MergeStatus::bothSystemBoundToCloud);
-        return nx_http::StatusCode::badRequest;
+        MediaServerClient remoteMediaServerClient(url);
+        remoteMediaServerClient.setAuthenticationKey(data.getKey);
+        ::ec2::ApiResourceParamDataList remoteSettings;
+        const auto resultCode = remoteMediaServerClient.ec2GetSettings(&remoteSettings);
+        if (resultCode != ::ec2::ErrorCode::ok)
+        {
+            NX_DEBUG(this, lm("Error fetching remote system settings. %1")
+                .arg(::ec2::toString(resultCode)));
+            setMergeError(result, MergeStatus::notFound);
+            return nx_http::StatusCode::serviceUnavailable;
+        }
+
+        QString remoteSystemCloudOwner;
+        for (const auto& remoteSetting: remoteSettings)
+        {
+            if (remoteSetting.name == nx::settings_names::kNameCloudAccountName)
+                remoteSystemCloudOwner = remoteSetting.value;
+        }
+
+        if (remoteSystemCloudOwner != m_commonModule->globalSettings()->cloudAccountName())
+        {
+            NX_DEBUG(this, lm("Cannot merge two cloud systems with different owners: %1 vs %2")
+                .args(m_commonModule->globalSettings()->cloudAccountName(), remoteSystemCloudOwner));
+            setMergeError(result, MergeStatus::bothSystemBoundToCloud);
+            return nx_http::StatusCode::badRequest;
+        }
+        else
+        {
+            NX_DEBUG(this, lm("Merge two cloud systems with same owner %1")
+                .args(m_commonModule->globalSettings()->cloudAccountName()));
+        }
     }
 
     bool canMerge = true;
     if (m_remoteModuleInformation.cloudSystemId != m_commonModule->globalSettings()->cloudSystemId())
     {
-        if (data.takeRemoteSettings && isLocalInCloud)
+        if (isLocalInCloud && isRemoteInCloud)
+            canMerge = true;
+        else if (data.takeRemoteSettings && isLocalInCloud)
             canMerge = false;
         else if (!data.takeRemoteSettings && isRemoteInCloud)
             canMerge = false;
@@ -551,6 +553,47 @@ void SystemMergeProcessor::addAuthToRequest(QUrl& request, const QString& remote
     QUrlQuery query(request.query());
     query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
     request.setQuery(query);
+}
+
+nx_http::StatusCode::Value SystemMergeProcessor::fetchModuleInformation(
+    const QUrl& url,
+    const QString& authenticationKey,
+    QnModuleInformationWithAddresses* moduleInformation)
+{
+    QByteArray moduleInformationData;
+    {
+        nx_http::HttpClient client;
+        client.setResponseReadTimeoutMs(kRequestTimeout.count());
+        client.setSendTimeoutMs(kRequestTimeout.count());
+        client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+
+        QUrlQuery query;
+        query.addQueryItem(lit("checkOwnerPermissions"), lit("true"));
+        query.addQueryItem(lit("showAddresses"), lit("true"));
+
+        QUrl requestUrl(url);
+        requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
+        requestUrl.setQuery(query);
+        addAuthToRequest(requestUrl, authenticationKey);
+
+        if (!client.doGet(requestUrl) || !isResponseOK(client))
+        {
+            auto status = getClientResponse(client);
+            NX_LOG(lm("SystemMergeProcessor. Error requesting url %1: %2")
+                .args(url, nx_http::StatusCode::toString(status)), cl_logDEBUG1);
+            return status == nx_http::StatusCode::undefined
+                ? nx_http::StatusCode::serviceUnavailable
+                : status;
+        }
+        /* if we've got it successfully we know system name and admin password */
+        while (!client.eof())
+            moduleInformationData.append(client.fetchMessageBodyBuffer());
+    }
+
+    const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
+    *moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
+
+    return nx_http::StatusCode::ok;
 }
 
 } // namespace utils

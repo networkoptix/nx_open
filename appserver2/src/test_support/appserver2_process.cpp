@@ -16,7 +16,7 @@
 #include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/initial_data_loader.h>
-#include <nx/vms/utils/server_merge_processor.h>
+#include <nx/vms/utils/system_merge_processor.h>
 #include <nx/vms/utils/setup_system_processor.h>
 #include <nx/vms/utils/system_settings_processor.h>
 

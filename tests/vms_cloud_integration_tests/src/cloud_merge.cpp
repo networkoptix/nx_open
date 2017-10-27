@@ -40,7 +40,24 @@ protected:
        
         for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
         {
-            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i)));
+            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[0]));
+            m_systemCloudCredentials.push_back(
+                m_systemMergeFixture.peer(i).getCloudCredentials());
+        }
+    }
+
+    void givenTwoCloudSystemsWithDifferentOwners()
+    {
+        const int numberOfSystemsToCreate = 2;
+
+        ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(numberOfSystemsToCreate));
+
+        while (m_cloudAccounts.size() < numberOfSystemsToCreate)
+            m_cloudAccounts.push_back(m_cdb.addActivatedAccount2());
+
+        for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
+        {
+            ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[i]));
             m_systemCloudCredentials.push_back(
                 m_systemMergeFixture.peer(i).getCloudCredentials());
         }
@@ -82,9 +99,9 @@ protected:
 
         const auto cloudSystemCredentials = 
             m_systemMergeFixture.peer(0).getCloudCredentials();
-        thenCloudCredentialsAreValid(cloudSystemCredentials);
-        thenAllCloudCredentialsAreNotValidExcept(cloudSystemCredentials);
         thenSystemDataIsSynchronizedToCloud(cloudSystemCredentials);
+        thenAllCloudCredentialsAreNotValidExcept(cloudSystemCredentials);
+        thenCloudCredentialsAreValid(cloudSystemCredentials);
     }
 
     void thenCloudCredentialsAreValid(
@@ -122,15 +139,54 @@ protected:
     }
 
     void thenSystemDataIsSynchronizedToCloud(
-        const nx::hpm::api::SystemCredentials& /*cloudCredentials*/)
+        const nx::hpm::api::SystemCredentials& cloudCredentials)
     {
-        // TODO
+        auto mediaServerClient = m_systemMergeFixture.peer(0).mediaServerClient();
+        ::ec2::ApiUserDataList vmsUsers;
+        ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&vmsUsers));
+
+        // Waiting until cloud has all that users vms has.
+        for (;;)
+        {
+            std::vector<nx::cdb::api::SystemSharingEx> cloudUsers;
+            ASSERT_EQ(
+                nx::cdb::api::ResultCode::ok,
+                m_cdb.getSystemSharings(
+                    cloudCredentials.systemId.toStdString(),
+                    cloudCredentials.key.toStdString(),
+                    &cloudUsers));
+
+            int usersFound = 0;
+            for (const auto& vmsUser: vmsUsers)
+            {
+                if (!vmsUser.isCloud)
+                    continue;
+                for (const auto& cloudUser: cloudUsers)
+                {
+                    if (cloudUser.accountEmail == vmsUser.name.toStdString())
+                    {
+                        ++usersFound;
+                        break;
+                    }
+                }
+            }
+
+            if (usersFound == (int) cloudUsers.size())
+                break;
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
+    void thenMergeFails()
+    {
+        ASSERT_NE(QnRestResult::Error::NoError, m_systemMergeFixture.prevMergeResult());
     }
 
 private:
     nx::cdb::CdbLauncher m_cdb;
     ::ec2::test::SystemMergeFixture m_systemMergeFixture;
-    nx::cdb::AccountWithPassword m_ownerAccount;
+    std::vector<nx::cdb::AccountWithPassword> m_cloudAccounts;
     std::vector<nx::hpm::api::SystemCredentials> m_systemCloudCredentials;
 
     static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
@@ -139,7 +195,7 @@ private:
     {
         ASSERT_TRUE(m_cdb.startAndWaitUntilStarted());
 
-        m_ownerAccount = m_cdb.addActivatedAccount2();
+        m_cloudAccounts.push_back(m_cdb.addActivatedAccount2());
 
         m_systemMergeFixture.addSetting(
             "-cloudIntegration/cloudDbUrl",
@@ -151,19 +207,21 @@ private:
             "100ms");
     }
 
-    bool connectToCloud(::ec2::test::PeerWrapper& peerWrapper)
+    bool connectToCloud(
+        ::ec2::test::PeerWrapper& peerWrapper,
+        const nx::cdb::AccountWithPassword& ownerAccount)
     {
-        const auto system = m_cdb.addRandomSystemToAccount(m_ownerAccount);
+        const auto system = m_cdb.addRandomSystemToAccount(ownerAccount);
         return peerWrapper.saveCloudSystemCredentials(
             system.id,
             system.authKey,
-            m_ownerAccount.email);
+            ownerAccount.email);
     }
 };
 
 std::unique_ptr<QnStaticCommonModule> CloudMerge::s_staticCommonModule;
 
-TEST_F(CloudMerge, DISABLED_cloud_systems_with_the_same_owner_can_be_merged)
+TEST_F(CloudMerge, cloud_systems_with_the_same_owner_can_be_merged)
 {
     givenTwoCloudSystemsWithTheSameOwner();
     addRandomCloudUserToEachSystem();
@@ -171,6 +229,13 @@ TEST_F(CloudMerge, DISABLED_cloud_systems_with_the_same_owner_can_be_merged)
     whenMergeSystems();
 
     thenSystemsMerged();
+}
+
+TEST_F(CloudMerge, cloud_systems_with_different_owners_cannot_be_merged)
+{
+    givenTwoCloudSystemsWithDifferentOwners();
+    whenMergeSystems();
+    thenMergeFails();
 }
 
 } // namespace test

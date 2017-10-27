@@ -77,6 +77,11 @@ private:
         const QString& path);
 
     void addAuthToRequest(QUrl& request, const QString& remoteAuthKey);
+
+    nx_http::StatusCode::Value fetchModuleInformation(
+        const QUrl& url,
+        const QString& authenticationKey,
+        QnModuleInformationWithAddresses* moduleInformation);
 };
 
 } // namespace utils

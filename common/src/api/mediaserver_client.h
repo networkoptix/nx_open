@@ -6,8 +6,12 @@
 
 #include <boost/optional.hpp>
 
+#include <QtCore/QString>
+#include <QtCore/QUrlQuery>
+
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>
@@ -45,6 +49,10 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
     void setUserCredentials(const nx_http::Credentials& userCredentials);
+    /**
+     * Authentication through query param.
+     */
+    void setAuthenticationKey(const QString& key);
     void setRequestTimeout(std::chrono::milliseconds timeout);
 
     //---------------------------------------------------------------------------------------------
@@ -174,8 +182,15 @@ protected:
         QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
             .appendPath(QLatin1String("/"))
             .appendPath(QString::fromStdString(requestPath)).toUrl();
+        if (!m_authenticationKey.isEmpty())
+        {
+            QUrlQuery query(requestUrl.query());
+            query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), m_authenticationKey);
+            requestUrl.setQuery(query);
+        }
         nx_http::AuthInfo authInfo;
-        authInfo.user = m_userCredentials;
+        if (m_userCredentials)
+            authInfo.user = *m_userCredentials;
 
         auto fusionClient = createHttpClientFunc(requestUrl, std::move(authInfo));
         if (m_requestTimeout)
@@ -371,8 +386,9 @@ protected:
 private:
     boost::optional<std::chrono::milliseconds> m_requestTimeout;
     const QUrl m_baseRequestUrl;
-    nx_http::Credentials m_userCredentials;
+    boost::optional<nx_http::Credentials> m_userCredentials;
     std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
     nx_http::StatusCode::Value m_prevResponseHttpStatusCode =
         nx_http::StatusCode::undefined;
+    QString m_authenticationKey;
 };

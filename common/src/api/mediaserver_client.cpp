@@ -21,6 +21,11 @@ void MediaServerClient::setUserCredentials(const nx_http::Credentials& userCrede
     m_userCredentials = userCredentials;
 }
 
+void MediaServerClient::setAuthenticationKey(const QString& key)
+{
+    m_authenticationKey = key;
+}
+
 void MediaServerClient::setRequestTimeout(std::chrono::milliseconds timeout)
 {
     m_requestTimeout = timeout;
