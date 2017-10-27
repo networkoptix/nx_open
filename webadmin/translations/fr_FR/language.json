@@ -7,8 +7,8 @@
   },
   "setup":{
     "createAccount":"créer compte",
-    "errorNoHDD":"Ce périphérique sert à travailler avec le disque dur installé. <br>S.V.P éteindre l’appareil et installer un disque dur.",
-    "errorNoNetwork":"Cet appareil a besoin de connexion réseau pour fonctionner. <br>S.V.P connecter au réseau local ou Internet"
+    "errorNoHDD":"Ce périphérique sert à travailler avec le disque dur installé.<br>S.V.P éteindre l’appareil et installer un disque dur.",
+    "errorNoNetwork":"Cet appareil a besoin de connexion réseau pour fonctionner.<br>S.V.P connecter au réseau local ou Internet"
   },
   "passwordRequirements":{
     "minLengthMessage":"Mot de passe doit avoir au moins 8 caractères",
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} interface web"
+  },
+  "common":{
+    "systemOffline":"System Hors ligne",
+    "cameraLinks":{
+      "copyToClipboard":"copier vers presse-papier",
+      "highStream":"Flux Haut",
+      "copyDefaultText":"copier",
+      "unknown":"Inconnu",
+      "lowStream":"Flux Bas",
+      "transcoding":"Transcodage",
+      "copyActiveText":"copié dvers presse-papiers"
+    },
+    "searchCamPlaceholder":"recherche",
+    "cameraStates":{
+      "noFormat":"Ce navigateur ou le périphérique ne prend pas de lecture vidéo de cette caméra.",
+      "ieWin10":"S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
+      "iosVideoTooLarge":"iOS ne supporte pas une vidéo supérieure à fullHD (2MP : 1920 x 1080).",
+      "unauthorized":"Authentification requise",
+      "ubuntuNX":"Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utilisez un navigateur Chromium.",
+      "ieNoWebm":"Veuillez installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> pour Internet Explorer.",
+      "flashOrWebmRequired":"S.V.P. <a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> ou le <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> codec WebM</a> pour la lecture vidéo dans Internet Explorer.",
+      "noArmSupport":"Ce navigateur ou ce périphérique ne supporte pas la lecture vidéo à partir de serveurs basés sur ARM.",
+      "error":"Erreur",
+      "offline":"Hors ligne",
+      "noData":"Aucune donnée",
+      "flashRequired":"S.V.P.<a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> pour la lecture vidéo à partir de serveurs ARM."
+    }
   }
 }

@@ -6,7 +6,7 @@
     "openLinkWithTitle":"Besuchen Sie diesen Link für {{title}}"
   },
   "setup":{
-    "createAccount":"Account erstellen",
+    "createAccount":"account erstellen",
     "errorNoHDD":"Dieses Gerät ist dafür gedacht mit einem installierten Festplattenlaufwerk zu arbeiten.<br>Schalten Sie das Gerät bitte ab und installieren Sie ein Festplattenlaufwerk.",
     "errorNoNetwork":"Dieses Gerät benötigt eine Netzwerkverbindung um zu funktionieren.<br>Bitte verbinden Sie es mit dem lokalen Netzwerk zum Internet"
   },
@@ -78,8 +78,8 @@
     "mergeSucceed":"Zusammenführung erfolgreich abgeschlossen.",
     "newSystemDisplayName":"Neues System",
     "incompatibleProtocol":"inkompatible Version",
-    "incompatibleCloudHost":"Cloudkonflikt",
-    "incompatibleCloudState":"Cloud verbunden"
+    "incompatibleCloudHost":"cloudkonflikt",
+    "incompatibleCloudState":"cloud verbunden"
   },
   "login":{
     "incorrectPassword":"Login oder Passwort falsch"
@@ -88,12 +88,12 @@
     "cannotGetUser":"Serverfehler: kann die aktuellen Benutzerdaten nicht abrufen"
   },
   "offlineDialog":{
-    "serverOffline":"Server ist offline"
+    "serverOffline":"server ist offline"
   },
   "restartDialog":{
-    "serverStarting":"Server wird gestartet",
-    "serverRestarting":"Server startet neu",
-    "serverOffline":"Server ist offline"
+    "serverStarting":"server wird gestartet",
+    "serverRestarting":"server startet neu",
+    "serverOffline":"server ist offline"
   },
   "fileUpload":{
     "started":"Update wurde erfolgreich gestartet. Es kann einige Minuten dauern",
@@ -112,5 +112,32 @@
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} Benutzeroberfläche"
+  },
+  "common":{
+    "systemOffline":"System offline",
+    "cameraLinks":{
+      "copyToClipboard":"in zwischenablage kopieren",
+      "highStream":"Hoher Stream",
+      "copyDefaultText":"kopieren",
+      "unknown":"Unbekannt",
+      "lowStream":"Niedriger Stream",
+      "transcoding":"Umkodierung",
+      "copyActiveText":"in die zwischenablage kopiert"
+    },
+    "searchCamPlaceholder":"suche",
+    "cameraStates":{
+      "noFormat":"Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von dieser Kamera.",
+      "ieWin10":"Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
+      "iosVideoTooLarge":"iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
+      "unauthorized":"Authentifizierung erforderlich",
+      "ubuntuNX":"Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium.",
+      "ieNoWebm":"Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
+      "flashOrWebmRequired":"Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
+      "noArmSupport":"Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
+      "error":"Fehler",
+      "offline":"Offline",
+      "noData":"Keine Daten",
+      "flashRequired":"Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos von ARM-basierten Servern abzuspielen."
+    }
   }
 }

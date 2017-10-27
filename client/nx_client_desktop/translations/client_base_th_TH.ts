@@ -1149,33 +1149,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>ซูมเข้า</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>ซูมออก</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>ปรับโฟกัลระยะไกล</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>ปรับโฟกัสระยะใกล้</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>ปรับโฟกัสอัตโนมัติ</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>เปลี่ยนโหมด Dewarping</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -2021,7 +1994,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
       <translation>
-        <numerusform>ไม่สามารถเปลี่ยนชื่ออุปกรณ์</numerusform>
+        <numerusform>ไม่สามารถย้าย %n อุปกรณ์</numerusform>
       </translation>
     </message>
     <message>
@@ -2657,7 +2630,7 @@ to %1</source>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>เชื่อมต่อกับกล้องไม่ได้</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
     </message>
   </context>
   <context>
@@ -2830,7 +2803,7 @@ to %1</source>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation>กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
+      <translation>โปรดปิด %1 และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
@@ -5964,7 +5937,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>สำรองข้อมูลเก็บถาวรเสร็จถึง%1 &lt; b &gt; &lt;/b &gt;</translation>
+      <translation>สำรองข้อมูลเก็บถาวรเสร็จถึง &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>

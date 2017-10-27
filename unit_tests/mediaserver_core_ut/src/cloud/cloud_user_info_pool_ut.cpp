@@ -14,17 +14,6 @@ static const nx::Buffer kWrongPassword = "wrong_password";
 static const nx::Buffer kTestUri = "/uri";
 static const nx::Buffer kTestMethod = "GET";
 
-
-class TestCdbNonceFetcher:
-    public nx::vms::cloud_integration::CdbNonceFetcher
-{
-public:
-    static nx::Buffer generateNonceTrailer()
-    {
-        return CdbNonceFetcher::generateNonceTrailer([]() { return 1; });
-    }
-};
-
 class TestCloudUserInfoPool:
     public nx::vms::cloud_integration::CloudUserInfoPool
 {
@@ -70,7 +59,7 @@ protected:
     {
         nx_http::header::WWWAuthenticate authServerHeader;
         authServerHeader.authScheme = nx_http::header::AuthScheme::digest;
-        authServerHeader.params["nonce"] = cloudNonce + TestCdbNonceFetcher::generateNonceTrailer();
+        authServerHeader.params["nonce"] = cloudNonce + nx::vms::cloud_integration::CdbNonceFetcher::generateNonceTrailer();
         authServerHeader.params["realm"] = kTestRealm;
         authServerHeader.params["algorithm"] = kTestAlgorithm;
 

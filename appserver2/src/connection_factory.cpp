@@ -894,9 +894,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[opt] id Event rule unique id. If omitted, return data for all event rules.
      * %return List of event rule objects in the requested format.
      *     %param id Event rule unique id.
-     *     %param eventType One of the fixed values, or an integer starting from 1000 which denote
-     *         a user-defined event, or an integer in range 500..599 which denote a system health
-     *         event.
+     *     %param eventType One of the fixed values.
      *         %value undefinedEvent Event type is not defined.
      *         %value cameraMotionEvent Motion has occurred on a camera.
      *         %value cameraInputEvent Camera input signal is received.
@@ -910,62 +908,62 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value licenseIssueEvent Not enough licenses.
      *         %value backupFinishedEvent Archive backup done.
      *         %value softwareTriggerEvent Software triggers.
-     *         %value systemHealthEvent Equals 500. First system health message.
-     *         %value maxSystemHealthEvent Equals 599. Last possible system health message.
-     *         %value anyCameraEvent Event group.
-     *         %value anyServerEvent Event group.
-     *         %value anyEvent Event group.
-     *         %value userDefinedEvent Equals 1000. First user-defined event.
+     *         %value[proprietary] systemHealthEvent Equals 500. First system health message.
+     *         %value[proprietary] maxSystemHealthEvent Equals 599. Last possible system health
+     *             message.
+     *         %value[proprietary] anyCameraEvent Event group.
+     *         %value[proprietary] anyServerEvent Event group.
+     *         %value[proprietary] anyEvent Event group.
+     *         %value userDefinedEvent Custom event defined by the user.
      *     %param eventResourceIds List of event resource ids.
      *     %param eventCondition String containing a JSON object, some fields of which depend on
-     *         eventType. Defines the filter for an event to make the rule applicable.
-     *         <ul>
-     *         <li>eventType (string) - Event type. "undefinedEvent" means any.</li>
-     *         <li>eventTimestampUsec (integer) - Event timestamp (in milliseconds); 0 means
-     *             any.</li>
-     *         <li>eventResourceId (string) - Event source - id of a camera or a server.
-     *             "{00000000-0000-0000-0000-000000000000}" means any.</li>
-     *         <li>resourceName (string) - Name of the resource which caused the event. Empty
-     *             string means any.</li>
-     *        <li>sourceServerId (string) - Id of a server that generated the event.
-     *            "{00000000-0000-0000-0000-000000000000}" means any.</li>
-     *        <li>reasonCode (string, fixed values) - Used in certain event types. "none" means
-     *            any. Has one of the following values:
-     *            <ul>
-     *            <li>none</li>
-     *            <li>networkNoFrame</li>
-     *            <li>networkConnectionClosed</li>
-     *            <li>networkRtpPacketLoss</li>
-     *            <li>serverTerminated</li>
-     *            <li>serverStarted</li>
-     *            <li>storageIoError</li>
-     *            <li>storageTooSlow</li>
-     *            <li>storageFull</li>
-     *            <li>systemStorageFull</li>
-     *            <li>licenseRemoved</li>
-     *            <li>backupFailedNoBackupStorageError</li>
-     *            <li>backupFailedSourceStorageError</li>
-     *            <li>backupFailedSourceFileError</li>
-     *            <li>backupFailedTargetFileError</li>
-     *            <li>backupFailedChunkError</li>
-     *            <li>backupEndOfPeriod</li>
-     *            <li>backupDone</li>
-     *            <li>backupCancelled</li>
-     *            <li>networkNoResponseFromDevice</li>
-     *            </ul>
-     *            </li>
-     *         <li>inputPortId (string) - Used for input events only. Empty string means
-     *             "any".</li>
-     *         <li>caption (string) - Short event description. Empty string means any.</li>
-     *         <li>description (string) - Long event description. Empty string means any.</li>
-     *         <li>metadata (object) - Imposes filtering based on the event metadata fields.
-     *             The object contains the following fields:
-     *             <ul>
-     *             <li>cameraRefs (list of strings) - Camera ids. Empty means any.</li>
-     *             </ul>
-     *             In the future, more fields can be added.
-     *             </li>
-     *         </ul>
+     *         eventType. Defines the filter for an event to make the rule applicable. NOTE: Other
+     *         fields than the described below can be stored in this object, but they are not used
+     *         for event matching.
+     *         %// ATTENTION: Commented-out params are present in the struct but are not used in
+     *             eventCondition. Also, params which are not commented-out may have descriptions
+     *             applicable only to the current usage of the struct.
+     *         %//param eventCondition.eventType (string) Event type. Default: "undefinedEvent".
+     *         %//param eventCondition.eventTimestampUsec (integer) Event timestamp (in
+     *             milliseconds). Default: 0.
+     *         %//param eventCondition.eventResourceId (string) Event source - id of a camera or a
+     *             server. Default: "{00000000-0000-0000-0000-000000000000}".
+     *         %param eventCondition.resourceName Substring to be found in the name of the resource
+     *             (e.g. a camera) which caused the event. Empty string matches any value.
+     *         %//param eventCondition.sourceServerId (string) Id of a server that generated the
+     *             event. Default: "{00000000-0000-0000-0000-000000000000}".
+     *         %//param eventCondition.reasonCode (string, fixed values) Used in certain event
+     *             types. Default: "none".
+     *             %value none
+     *             %value networkNoFrame
+     *             %value networkConnectionClosed
+     *             %value networkRtpPacketLoss
+     *             %value serverTerminated
+     *             %value serverStarted
+     *             %value storageIoError
+     *             %value storageTooSlow
+     *             %value storageFull
+     *             %value systemStorageFull
+     *             %value licenseRemoved
+     *             %value backupFailedNoBackupStorageError
+     *             %value backupFailedSourceStorageError
+     *             %value backupFailedSourceFileError
+     *             %value backupFailedTargetFileError
+     *             %value backupFailedChunkError
+     *             %value backupEndOfPeriod
+     *             %value backupDone
+     *             %value backupCancelled
+     *             %value networkNoResponseFromDevice
+     *         %param eventCondition.inputPortId (string) Used for input events only. Empty string
+     *             matches any value.
+     *         %param eventCondition.caption Substring to be found in the short event description.
+     *             Empty string matches any value.
+     *         %param eventCondition.description Substring to be found in the long event
+     *             description. Empty string matches any value.
+     *         %//param eventCondition.metadata (object) Imposes filtering based on the event
+     *             metadata fields. The object contains the following fields:
+     *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
+     *                 ids. Empty means any.
      *     %param eventState One of the fixed values.
      *         %value inactive
      *         %value active
@@ -1015,7 +1013,8 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             - text - HTTP message body for POST method.
      *         %value acknowledgeAction
      *     %param actionResourceIds List of action resource ids.
-     *     %param actionParams String containing a JSON object which fields depend on actionType.
+     *     %param actionParams String containing a JSON object which fields depend on actionType
+     *         and thus are described next to the respective actionType values.
      *     %param aggregationPeriod Period (in seconds) during which the consecutive similar events
      *         are aggregated into a single event.
      *     %param disabled Whether the rule is disabled.

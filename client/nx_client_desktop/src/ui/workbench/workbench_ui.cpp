@@ -610,7 +610,7 @@ void QnWorkbenchUi::initGraphicsMessageBoxHolder()
     auto overlayWidget = new QnUiElementsWidget();
     overlayWidget->setAcceptedMouseButtons(0);
     display()->scene()->addItem(overlayWidget);
-    display()->setLayer(overlayWidget, Qn::MessageBoxLayer);
+    display()->setLayer(overlayWidget, QnWorkbenchDisplay::MessageBoxLayer);
 
     QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);
     messageBoxVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -844,7 +844,7 @@ void QnWorkbenchUi::createControlsWidget()
     m_controlsWidget = new QnUiElementsWidget();
     m_controlsWidget->setAcceptedMouseButtons(0);
     display()->scene()->addItem(m_controlsWidget);
-    display()->setLayer(m_controlsWidget, Qn::UiLayer);
+    display()->setLayer(m_controlsWidget, QnWorkbenchDisplay::UiLayer);
 
     installEventHandler(m_controlsWidget, QEvent::WindowDeactivate, this,
         [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
@@ -1458,7 +1458,7 @@ void QnWorkbenchUi::createFpsWidget()
     updateFpsGeometry();
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
-    display()->setLayer(m_fpsItem, Qn::MessageBoxLayer);
+    display()->setLayer(m_fpsItem, QnWorkbenchDisplay::MessageBoxLayer);
 
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);

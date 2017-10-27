@@ -1149,33 +1149,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>줌 인</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>줌 아웃</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>원거리 초첨</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>근거리 초점</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>자동 초점</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>디와핑 모드 변경</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -4849,7 +4822,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;Cameras from other servers and removed cameras></translation>
+      <translation>Cameras from other servers and removed cameras</translation>
     </message>
     <message>
       <source>%1 TB</source>

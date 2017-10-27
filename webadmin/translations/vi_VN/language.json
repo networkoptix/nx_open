@@ -19,14 +19,14 @@
   },
   "settings":{
     "tabs":{
-      "server":"máy chủ",
+      "server":"Máy chủ",
       "system":"Hệ thống",
-      "device":"thiết bị"
+      "device":"Thiết bị"
     },
     "confirmRestart":"Khởi động lại máy chủ?",
     "couldntCheckInternet":"Không thể kiểm tra kết nối đám mây",
     "confirmRestoreDefault":"Xóa cơ sở dữ liệu và cài đặt? Quá trình này sẽ mất một thời gian và máy chủ sẽ được khởi động lại sau đó.",
-    "confirmRestoreDefaultTitle":"Khôi phục mặc định của nha sản xuât",
+    "confirmRestoreDefaultTitle":"Khôi phục mặc định của nhà sản xuât",
     "unexpectedError":"Không thành công: đã xảy ra lỗi không mong muốn",
     "connnetionError":"Lôi kêt nôi",
     "wrongPassword":"Sai mật khẩu.",
@@ -73,7 +73,7 @@
     "cloudHostConflict":"Không thể hợp nhất các hệ thống vì các máy chủ được kết với các máy chủ đám mây khác",
     "licenceError":"Cảnh báo! Bạn sắp hợp hệ thống với bản quyền đăng ký. Chỉ cho phép một bản quyền Starter cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa. Hợp nhất bằng mọi cách?",
     "connectionFailed":"Kết nối thất bại: ",
-    "unknownError":"lỗi không xác định",
+    "unknownError":"Lỗi không xác định",
     "mergeFailed":"Hợp nhất không thành công: ",
     "mergeSucceed":"Hợp nhất thành công.",
     "newSystemDisplayName":"Hệ thống mới",
@@ -105,12 +105,39 @@
     "selectFiles":"Chọn tập tin"
   },
   "advanced":{
-    "free":"Trống",
+    "free":"Còn trống",
     "total":"Tổng cộng",
     "occupied":"Sử dụng",
     "reserved":"Dự trữ"
   },
   "pageTitles":{
     "default":"{{PRODUCT_NAME}} giao diện web"
+  },
+  "common":{
+    "systemOffline":"Hệ thống offline",
+    "cameraLinks":{
+      "copyToClipboard":"chép vào bảng nháp",
+      "highStream":"Luồng tốc độ cao",
+      "copyDefaultText":"sao chép",
+      "unknown":"Không biết",
+      "lowStream":"Luồng tốc độ thấp",
+      "transcoding":"Đang chuyển mã",
+      "copyActiveText":"sao chép vào clipboard"
+    },
+    "searchCamPlaceholder":"tìm kiếm",
+    "cameraStates":{
+      "noFormat":"Trình duyệt hoặc thiết bị này không hỗ trợ phát lại video từ camera này.",
+      "ieWin10":"Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
+      "iosVideoTooLarge":"ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
+      "unauthorized":"Yêu cầu xác thực",
+      "ubuntuNX":"Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế.",
+      "ieNoWebm":"Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
+      "flashOrWebmRequired":"Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
+      "noArmSupport":"Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
+      "error":"Lỗi",
+      "offline":"Ẩn",
+      "noData":"Không có dữ liệu",
+      "flashRequired":"Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video từ máy chủ ARM."
+    }
   }
 }

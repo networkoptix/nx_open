@@ -405,8 +405,10 @@ protected:
     Role serverRole = Role::undefined;
 
     const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
+    static const nx::Buffer kFrameBuffer;
 };
 
+const nx::Buffer WebSocket::kFrameBuffer("hello");
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
 {

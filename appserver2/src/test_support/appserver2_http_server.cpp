@@ -6,6 +6,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <network/tcp_connection_priv.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/dummy_handler.h>
 
 #include "ec2_connection_processor.h"
 #include "transaction/message_bus_adapter.h"
@@ -94,6 +96,26 @@ void Appserver2MessageProcessor::onResourceStatusChanged(
 QnResourceFactory* Appserver2MessageProcessor::getResourceFactory() const
 {
     return nx::TestResourceFactory::instance();
+}
+
+bool Appserver2MessageProcessor::canRemoveResource(const QnUuid& id)
+{
+    return id != commonModule()->moduleGUID();
+}
+
+void Appserver2MessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
+{
+    if (resourceId != commonModule()->moduleGUID())
+        return;
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
+
+    ec2::ApiMediaServerData apiServer;
+    ec2::fromResourceToApi(mServer, apiServer);
+    auto connection = commonModule()->ec2Connection();
+    connection->getMediaServerManager(Qn::kSystemAccess)->save(
+        apiServer,
+        ec2::DummyHandler::instance(),
+        &ec2::DummyHandler::onRequestDone);
 }
 
 void Appserver2MessageProcessor::updateResource(

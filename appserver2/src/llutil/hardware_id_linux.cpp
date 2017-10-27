@@ -125,7 +125,7 @@ void findMacAddresses(QnMacAndDeviceClassList& devices) {
             continue;
 
         QString mac = QString(addressFile.readAll()).trimmed().toUpper();
-        if (mac.isEmpty())
+        if (mac.isEmpty() || mac == lit("00:00:00:00:00:00"))
             continue;
 
         QFileInfo subsystemFileInfo(interfacesDir, interface + "/device/subsystem");
