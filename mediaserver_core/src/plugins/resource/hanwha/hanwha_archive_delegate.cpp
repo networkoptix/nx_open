@@ -48,24 +48,30 @@ void HanwhaArchiveDelegate::close()
 
 qint64 HanwhaArchiveDelegate::startTime() const
 {
-    const auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    if (hanwhaRes->getStatus() != Qn::Online)
-        return AV_NOPTS_VALUE;
-
-    if (const auto context = hanwhaRes->sharedContext())
-        return context->chunksStartUsec(hanwhaRes->getChannel());
+    // TODO: This copy-paste should probably be moved into helper function, but it is not easy
+    // because with current interface we need to get both channel number and shared context.
+    if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
+    {
+        if (resource->getStatus() >= Qn::Online)
+        {
+            if (const auto context = resource->sharedContext())
+                return context->chunksStartUsec(resource->getChannel());
+        }
+    }
 
     return AV_NOPTS_VALUE;
 }
 
 qint64 HanwhaArchiveDelegate::endTime() const
 {
-    const auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    if (hanwhaRes->getStatus() != Qn::Online)
-        return AV_NOPTS_VALUE;
-
-    if (const auto context = hanwhaRes->sharedContext())
-        return context->chunksEndUsec(hanwhaRes->getChannel());
+    if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
+    {
+        if (resource->getStatus() >= Qn::Online)
+        {
+            if (const auto context = resource->sharedContext())
+                return context->chunksEndUsec(resource->getChannel());
+        }
+    }
 
     return AV_NOPTS_VALUE;
 }
@@ -110,12 +116,14 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
-    const auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
     QnTimePeriodList chunks;
-    if (hanwhaRes->getStatus() == Qn::Online)
+    if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
     {
-        if (const auto context = hanwhaRes->sharedContext())
-            chunks = context->chunks(hanwhaRes->getChannel());
+        if (resource->getStatus() >= Qn::Online)
+        {
+            if (const auto context = resource->sharedContext())
+                chunks = context->chunks(resource->getChannel());
+        }
     }
 
     const qint64 timeMs = timeUsec / 1000;
