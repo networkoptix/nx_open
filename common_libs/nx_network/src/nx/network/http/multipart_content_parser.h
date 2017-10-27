@@ -16,19 +16,23 @@ public:
     MultipartContentParser();
     virtual ~MultipartContentParser();
 
-    virtual bool processData( const QnByteArrayConstRef& data ) override;
+    virtual bool processData(const QnByteArrayConstRef& data) override;
     virtual size_t flush() override;
 
     /**
-        \return \a false, if \a contentType does not specify multipart content
-        \note After this method has been called, no \a MultipartContentParser::setBoundary call is needed
+     * @return false, if contentType does not specify multipart content.
+     * NOTE: After this method has been called, no MultipartContentParser::setBoundary call is needed.
     */
-    bool setContentType( const StringType& contentType );
-    void setBoundary( const StringType& boundary );
+    bool setContentType(const StringType& contentType);
+    void setBoundary(const StringType& boundary);
     void setForceParseAsBinary(bool force);
-    /** Returns headers of last read frame */
+    /**
+     * @return Headers of last read frame.
+     */
     const nx_http::HttpHeaders& prevFrameHeaders() const;
-    /** Returns \a true if epilogue has been received */
+    /**
+     * @return true if epilogue has been received.
+     */
     bool eof() const;
 
 private:
@@ -38,13 +42,13 @@ private:
         waitingBoundary,
         readingHeaders,
         readingTextData,
-        /** reading trailing CR of LF before binary data */
+        /** Reading trailing CR of LF before binary data. */
         depleteLineFeedBeforeBinaryData,
-        /** reading data with Content-Length known */
+        /** Reading data with Content-Length known. */
         readingSizedBinaryData,
-        /** reading data with Content-Length not known: searching for boundary */
+        /** Reading data with Content-Length not known: searching for boundary. */
         readingUnsizedBinaryData,
-        /** epilogue has been received */
+        /** Epilogue has been received. */
         eofReached
     };
 
@@ -73,7 +77,7 @@ private:
     bool processLine(const ConstBufferRefType& lineBuffer);
     bool readUnsizedBinaryData(
         QnByteArrayConstRef data,
-        size_t* const offset );
+        size_t* const offset);
 };
 
 } // namespace nx_http

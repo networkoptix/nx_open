@@ -10,10 +10,6 @@ LineSplitter::LineSplitter():
 {
 }
 
-LineSplitter::~LineSplitter()
-{
-}
-
 bool LineSplitter::parseByLines(
     const ConstBufferRefType& data,
     QnByteArrayConstRef* const lineBuffer,

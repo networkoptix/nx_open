@@ -1,10 +1,4 @@
-/**********************************************************
-* 22 may 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_COMPAT_POLL_H
-#define NX_COMPAT_POLL_H
+#pragma once
 
 #ifdef _WIN32
 
@@ -35,7 +29,7 @@ typedef nx_pollfd pollfd;
 
 #endif
 
-typedef int (WINAPI *PollFuncType)( pollfd /*fdarray*/[], ULONG /*nfds*/, INT /*timeout*/ );
+typedef int (WINAPI *PollFuncType)(pollfd /*fdarray*/[], ULONG /*nfds*/, INT /*timeout*/);
 PollFuncType NX_NETWORK_API getPollFuncAddress();
 
 #define poll getPollFuncAddress()
@@ -44,6 +38,4 @@ PollFuncType NX_NETWORK_API getPollFuncAddress();
 
 #  include <poll.h>
 
-#endif
-
-#endif  //NX_COMPAT_POLL_H
+#endif // _WIN32
