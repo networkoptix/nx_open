@@ -1604,6 +1604,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate)
     synchronizeZoomRect(widget);
     synchronizeGeometry(widget, animate);
     synchronizeLayer(widget);
+    synchronizePlaceholder(widget);
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate)
@@ -1695,6 +1696,11 @@ void QnWorkbenchDisplay::synchronizeLayer(QnWorkbenchItem *item)
 void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget)
 {
     setLayer(widget, synchronizedLayer(widget));
+}
+
+void QnWorkbenchDisplay::synchronizePlaceholder(QnResourceWidget* widget)
+{
+    widget->setPlaceholderPixmap(widget->item()->data(Qn::ItemPlaceholderRole).value<QPixmap>());
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBounds()
@@ -2179,8 +2185,21 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
 
 void QnWorkbenchDisplay::at_item_dataChanged(Qn::ItemDataRole role)
 {
-    if (role == Qn::ItemFlipRole)
-        synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), false);
+    const auto item = static_cast<QnWorkbenchItem*>(sender());
+
+    switch (role)
+    {
+        case Qn::ItemFlipRole:
+            synchronizeGeometry(item, false);
+            break;
+
+        case Qn::ItemPlaceholderRole:
+            synchronizePlaceholder(widget(item));
+            break;
+
+        default:
+            break;
+    }
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged()

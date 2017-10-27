@@ -35,10 +35,12 @@ struct LayoutTemplateItem
     int width = 1;
     int height = 1;
     QColor frameColor;
+    QString placeholder;
     // TODO: #dklychkov Use QVariantMap.
     QJsonObject properties;
 };
-#define LayoutTemplateItem_Fields (type)(source)(visible)(x)(y)(width)(height)(frameColor)(properties)
+#define LayoutTemplateItem_Fields \
+    (type)(source)(visible)(x)(y)(width)(height)(frameColor)(placeholder)(properties)
 
 struct LayoutTemplateBlock
 {

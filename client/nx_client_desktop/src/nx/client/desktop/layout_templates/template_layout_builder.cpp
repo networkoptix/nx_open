@@ -4,12 +4,14 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <common/common_module.h>
 #include <client/client_globals.h>
 #include <client_core/connection_context_aware.h>
 #include <plugins/resource/avi/filetypesupport.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
 
 namespace nx {
 namespace client {
@@ -107,6 +109,17 @@ QnLayoutItemData TemplateLayoutBuilder::Private::createItemData(
     {
         qnResourceRuntimeDataManager->setLayoutItemData(
             itemData.uuid, Qn::ItemFrameDistinctionColorRole, itemTemplate.frameColor);
+    }
+
+    if (!itemTemplate.placeholder.isEmpty())
+    {
+        const auto cache = commonModule()->instance<ResourceWidgetPixmapCache>();
+        const auto pixmap = cache->pixmap(itemTemplate.placeholder);
+        if (!pixmap.isNull())
+        {
+            qnResourceRuntimeDataManager->setLayoutItemData(
+                itemData.uuid, Qn::ItemPlaceholderRole, pixmap);
+        }
     }
 
     return itemData;

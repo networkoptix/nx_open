@@ -749,6 +749,9 @@ void QnMediaResourceWidget::createPtzController()
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 {
+    if (!placeholderPixmap().isNull() && zoomTargetWidget() && !zoomRect().isValid())
+        return QnGeometry::aspectRatio(placeholderPixmap().size());
+
     const auto aviResource = m_resource.dynamicCast<QnAviResource>();
     if (aviResource && aviResource->flags().testFlag(Qn::still_image))
     {
@@ -1483,6 +1486,20 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
             m_entropixEnhancedImage,
             m_entropixEnhancedImage.rect());
         result = Qn::NewFrameRendered;
+    }
+    else if (!placeholderPixmap().isNull() && zoomTargetWidget() && !zoomRect().isValid())
+    {
+        const PainterTransformScaleStripper scaleStripper(painter);
+
+        const auto result = m_renderer->discardFrame(channel);
+        m_paintedChannels[channel] = true;
+
+        painter->drawPixmap(
+            scaleStripper.mapRect(paintRect),
+            placeholderPixmap(),
+            placeholderPixmap().rect());
+
+        return result;
     }
     else
     {
