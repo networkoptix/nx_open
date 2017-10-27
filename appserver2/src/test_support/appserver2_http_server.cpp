@@ -6,6 +6,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <network/tcp_connection_priv.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/dummy_handler.h>
 
 #include "ec2_connection_processor.h"
 #include "transaction/message_bus_adapter.h"
