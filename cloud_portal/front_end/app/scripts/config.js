@@ -213,7 +213,7 @@ var Config = {
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
         staticResources: "static/web_common/",
         maxCrashCount: 2,
-        nativeTimeout: 15 * 1000 //15s
+        nativeTimeout: 60 * 1000 //60s
     },
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',

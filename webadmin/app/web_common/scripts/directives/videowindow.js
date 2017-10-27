@@ -191,7 +191,6 @@ angular.module('nxCommon')
 
                 var makingPlayer = false;
                 var crashCount = 0;
-                var autoShow = null;
                 var nativePlayerLoadError = null;
 
                 //For the native player. Handles webm's long loading times
@@ -222,15 +221,6 @@ angular.module('nxCommon')
                             scope.vgApi = api;
 
                             if (scope.vgSrc) {
-                                if(scope.player == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hack for android bug. remove it later
-                                    if(autoshow){
-                                        $timeout.cancel(autoshow);
-                                    }
-                                    autoshow = $timeout(function () {
-                                        scope.loading = false; // Automatically disable loading state after timeout (20 seconds)
-                                        autoshow = null;
-                                    },20000);
-                                }
                                 scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
@@ -404,9 +394,8 @@ angular.module('nxCommon')
                 function srcChanged(){
                     scope.loading = true; // source changed - start loading
                     scope.videoFlags.errorLoading = false;
-                    scope.preview = getFormatSrc('jpeg');
-
                     if(scope.vgSrc ) {
+                        scope.preview = getFormatSrc('jpeg');
                         scope.player = detectBestFormat();
                         resetPlayer();
 
