@@ -1,31 +1,12 @@
 #pragma once
 
 #include <set>
-#include <nx/fusion/model_functions.h>
 #include <core/dataprovider/abstract_media_stream_provider.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/data_packet_queue.h>
 #include "live_stream_provider.h"
-struct QnChannelMapping
-{
-    quint32 originalChannel;
-    QList<quint32> mappedChannels;
-};
-
-struct QnResourceChannelMapping
-{
-    quint32 resourceChannel;
-    QList<QnChannelMapping> channelMap;
-};
-
-Q_DECLARE_METATYPE(QnChannelMapping)
-Q_DECLARE_METATYPE(QList<QnChannelMapping>)
-Q_DECLARE_METATYPE(QnResourceChannelMapping)
-Q_DECLARE_METATYPE(QList<QnResourceChannelMapping>)
-
-QN_FUSION_DECLARE_FUNCTIONS(QnChannelMapping, (json))
-QN_FUSION_DECLARE_FUNCTIONS(QnResourceChannelMapping, (json))
+#include <core/dataprovider/stream_mixer_data.h>
 
 #ifdef ENABLE_DATA_PROVIDERS
 

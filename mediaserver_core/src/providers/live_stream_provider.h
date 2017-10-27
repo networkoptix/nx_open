@@ -20,6 +20,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/dataprovider/live_stream_params.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -35,7 +36,9 @@ class NaiveDetectionSmoother;
 
 class QnLiveStreamProvider;
 
-class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
+class QnLiveStreamProvider:
+    public QnAbstractMediaStreamDataProvider,
+    public QnAbstractDataReceptor
 {
 public:
     QnLiveStreamProvider(const QnResourcePtr& res);
@@ -138,6 +141,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
     std::queue<QnAbstractCompressedMetadataPtr> m_metadataQueue;
+    QnAbstractDataReceptorPtr m_videoMetadataPlugin;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <plugins/plugin_api.h>
-#include <plugins/metadata/abstract_data_packet.h>
-#include <plugins/metadata/abstract_media_context.h>
+#include "abstract_data_packet.h"
+#include "abstract_media_context.h"
 
 namespace nx {
 namespace sdk {
@@ -21,6 +21,7 @@ static const nxpl::NX_GUID IID_CompressedMediaPacket
  */
 class AbstractCompressedMediaPacket: public AbstractDataPacket
 {
+    using base_type = AbstractDataPacket;
 public:
     /**
      * @return Null terminated ASCII string containig
@@ -42,6 +43,7 @@ public:
      * @return pointer to the codec context.
      */
     virtual const AbstractMediaContext* context() const = 0;
+
 };
 
 } // namespace metadata

@@ -56,7 +56,12 @@ void EventHandler::handleMetadataObject(
     nxpt::ScopedRef<nx::sdk::metadata::AbstarctDetectedObject> eventData,
     qint64 timestampUsec)
 {
+    QnAbstractMediaDataPtr metadata(new QnCompressedMetadata(MetadataType::ObjectDetection));
+    //metadata->m_duration = ? ;
+    //metadata->m_data = ? ;
 
+    if (m_dataReceptor)
+        m_dataReceptor->putData(metadata);
 }
 
 void EventHandler::handleMetadataEvent(
@@ -101,6 +106,16 @@ void EventHandler::setResource(const QnSecurityCamResourcePtr& resource)
 void EventHandler::setPluginId(const QnUuid& pluginId)
 {
     m_pluginId = pluginId;
+}
+
+void EventHandler::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)
+{
+    m_dataReceptor = dataReceptor;
+}
+
+void EventHandler::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
+{
+    m_dataReceptor = nullptr;
 }
 
 nx::vms::event::EventState EventHandler::lastEventState(const QnUuid& eventId) const

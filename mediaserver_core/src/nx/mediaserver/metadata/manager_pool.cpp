@@ -17,7 +17,10 @@
 
 #include <nx/api/analytics/supported_events.h>
 #include <nx/api/analytics/device_manifest.h>
-
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
+#include "media_data_receptor.h"
 
 namespace nx {
 namespace mediaserver {
@@ -368,6 +371,50 @@ bool ManagerPool::resourceInfoFromResource(
     outResourceInfo->channel = camera->getChannel();
 
     return true;
+}
+
+QnAbstractDataReceptorPtr ManagerPool::registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    const auto& id = dataProvider->getResource()->getId();
+    auto itr = m_contexts.find(id);
+    if (itr == m_contexts.end())
+        return QnAbstractDataReceptorPtr();
+    auto& context = itr->second;
+    context.dataProvider = dataProvider;
+    context.dataReceptor = QnAbstractDataReceptorPtr(new DataReceptor(&context));
+    return context.dataReceptor;
+}
+
+void ManagerPool::removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    const auto& id = dataProvider->getResource()->getId();
+    auto itr = m_contexts.find(id);
+    if (itr == m_contexts.end())
+        return;
+    auto& context = itr->second;
+    context.dataProvider = nullptr;
+    context.dataReceptor.clear();
+}
+
+bool ManagerPool::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)
+{
+    const auto& id = dataProvider->getResource()->getId();
+    auto itr = m_contexts.find(id);
+    if (itr == m_contexts.end())
+        return false;
+    auto& context = itr->second;
+    context.handler->registerDataReceptor(dataReceptor);
+    return true;
+}
+
+void ManagerPool::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
+{
+    const auto& id = dataProvider->getResource()->getId();
+    auto itr = m_contexts.find(id);
+    if (itr == m_contexts.end())
+        return;
+    auto& context = itr->second;
+    context.handler->removeDataReceptor(dataReceptor);
 }
 
 } // namespace metadata

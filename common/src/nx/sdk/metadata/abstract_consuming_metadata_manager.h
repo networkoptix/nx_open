@@ -1,7 +1,7 @@
 #pragma once
 
-#include <plugins/metadata/abstract_metadata_manager.h>
-#include <plugins/metadata/abstract_data_packet.h>
+#include "abstract_data_packet.h"
+#include "abstract_metadata_manager.h"
 
 namespace nx {
 namespace sdk {
@@ -27,7 +27,7 @@ public:
      * @param dataPacket packet of data.
      * @return noError in case of success, other value in case of failure.
      */
-    virtual Error pushData(const AbstractDataPacket* dataPacket) = 0;
+    virtual Error putData(const AbstractDataPacket* dataPacket) = 0;
 };
 
 } // namespace metadata

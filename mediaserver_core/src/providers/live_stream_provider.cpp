@@ -22,6 +22,8 @@
 #include <utils/common/synctime.h>
 #include <camera/video_camera.h>
 #include <analytics/plugins/detection/config.h>
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/metadata/manager_pool.h>
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
@@ -63,6 +65,20 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
         updateSoftwareMotion();
     });
 
+    auto pool = qnServerModule->metadataManagerPool();
+    m_videoMetadataPlugin = pool->registerDataProvider(this);
+    if (m_videoMetadataPlugin)
+        pool->registerDataReceptor(this);
+}
+
+QnLiveStreamProvider::~QnLiveStreamProvider()
+{
+    qnServerModule->metadataManagerPool()->removeDataProvider(this);
+    qnServerModule->metadataManagerPool()->removeDataReceptor(this);
+
+    directDisconnectAll();
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        qFreeAligned(m_motionMaskBinData[i]);
 }
 
 void QnLiveStreamProvider::setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner)
@@ -73,13 +89,6 @@ void QnLiveStreamProvider::setOwner(QnSharedResourcePointer<QnAbstractVideoCamer
 QnSharedResourcePointer<QnAbstractVideoCamera> QnLiveStreamProvider::getOwner() const
 {
     return m_owner.toStrongRef();
-}
-
-QnLiveStreamProvider::~QnLiveStreamProvider()
-{
-    directDisconnectAll();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        qFreeAligned(m_motionMaskBinData[i]);
 }
 
 void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
@@ -295,18 +304,31 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (needAnalyzeStream(getRole()))
     {
         auto channel = videoData->channelNumber;
-        if (nx::analytics::ini().enableMotionDetection)
+        bool needAnalyzeFrame = !nx::analytics::ini().useKeyFramesOnly
+            || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
+
+        if (needAnalyzeFrame && nx::analytics::ini().enableMotionDetection)
         {
             static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
                 * SECONDARY_STREAM_MAX_RESOLUTION.height();
 
-            if (m_motionEstimation[channel].analizeFrame(videoData))
+            needAnalyzeFrame &= !m_forcedMotionStream.isEmpty()
+                || videoData->width * videoData->height <= maxSquare;
+
+            if (needAnalyzeFrame && m_motionEstimation[channel].analizeFrame(videoData))
             {
                 updateStreamResolution(
                     channel,
                     m_motionEstimation[channel].videoResolution());
             }
         }
+
+        if (nx::analytics::ini().enableDetectionPlugin && m_videoMetadataPlugin)
+        {
+            if (m_videoMetadataPlugin->canAcceptData())
+                m_videoMetadataPlugin->putData(videoData);
+        }
+
     }
     else if (updateResolutionFromPrimaryStream)
     {

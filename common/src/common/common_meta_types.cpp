@@ -107,6 +107,7 @@
 #include <core/resource/resource_data_structures.h>
 
 #include <core/resource/camera_advanced_param.h>
+#include <core/dataprovider/stream_mixer_data.h>
 
 namespace {
     bool qn_commonMetaTypes_initialized = false;
@@ -373,6 +374,14 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
+
+    qRegisterMetaType<QnChannelMapping>();
+    qRegisterMetaType<QList<QnChannelMapping>>();
+    qRegisterMetaType<QnResourceChannelMapping>();
+    qRegisterMetaType<QList<QnResourceChannelMapping>>();
+
+    QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
+    QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qn_commonMetaTypes_initialized = true;
 }

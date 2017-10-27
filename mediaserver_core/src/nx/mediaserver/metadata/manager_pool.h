@@ -18,8 +18,10 @@
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 class QnMediaServerModule;
+class QnAbstractMediaStreamDataProvider;
 
 namespace nx {
 namespace mediaserver {
@@ -33,18 +35,21 @@ public:
     ResourceMetadataContext(
         nx::sdk::metadata::AbstractMetadataManager*,
         nx::sdk::metadata::AbstractMetadataHandler*);
-    
+
     std::unique_ptr<
         nx::sdk::metadata::AbstractMetadataManager,
         ManagerDeleter> manager;
 
     std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
+
+    QnAbstractMediaStreamDataProvider* dataProvider;
+    QnAbstractDataReceptorPtr dataReceptor;
 };
 
-class ManagerPool final: 
+class ManagerPool final:
     public Connective<QObject>
 {
-    using ResourceMetadataContextMap = std::multimap<QnUuid, ResourceMetadataContext>;
+    using ResourceMetadataContextMap = std::map<QnUuid, ResourceMetadataContext>;
     using PluginList = QList<nx::sdk::metadata::AbstractMetadataPlugin*>;
 
     Q_OBJECT
@@ -55,6 +60,12 @@ public:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
+
+    QnAbstractDataReceptorPtr registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
+    void removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
+
+    bool registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
+    void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
 
 public slots:
     void initExistingResources();

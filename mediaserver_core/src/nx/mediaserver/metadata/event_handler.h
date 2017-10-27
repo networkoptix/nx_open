@@ -10,6 +10,8 @@
 #include <nx/sdk/metadata/abstract_event_metadata_packet.h>
 #include <nx/sdk/metadata/abstract_detection_metadata_packet.h>
 
+class QnAbstractDataReceptor;
+
 namespace nx {
 namespace mediaserver {
 namespace metadata {
@@ -25,6 +27,8 @@ public:
 
     void setPluginId(const QnUuid& pluginId);
 
+    void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
+    void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
 private:
     nx::vms::event::EventState lastEventState(const QnUuid& eventId) const;
     void setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState);
@@ -38,6 +42,7 @@ private:
     QnSecurityCamResourcePtr m_resource;
     QnUuid m_pluginId;
     QMap<QnUuid, nx::vms::event::EventState> m_eventStateMap;
+    QnAbstractDataReceptor* m_dataReceptor;
 
 };
 

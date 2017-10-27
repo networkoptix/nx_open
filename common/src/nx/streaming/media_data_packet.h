@@ -192,7 +192,6 @@ public:
     QnByteArray m_data;
 };
 
-
 struct QnCompressedMetadata: public QnAbstractCompressedMetadata
 {
     QnCompressedMetadata(MetadataType type);
