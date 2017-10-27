@@ -49,12 +49,18 @@ void HanwhaArchiveDelegate::close()
 qint64 HanwhaArchiveDelegate::startTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
+    if (hanwhaRes->getStatus() != Qn::Online)
+        return AV_NOPTS_VALUE;
+
     return hanwhaRes->sharedContext()->chunksStartUsec(hanwhaRes->getChannel());
 }
 
 qint64 HanwhaArchiveDelegate::endTime() const
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
+    if (hanwhaRes->getStatus() != Qn::Online)
+        return AV_NOPTS_VALUE;
+
     return hanwhaRes->sharedContext()->chunksEndUsec(hanwhaRes->getChannel());
 }
 
@@ -99,7 +105,10 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
     auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    const auto chunks = hanwhaRes->sharedContext()->chunks(hanwhaRes->getChannel());
+    QnTimePeriodList chunks;
+    if (hanwhaRes->getStatus() == Qn::Online)
+        chunks = hanwhaRes->sharedContext()->chunks(hanwhaRes->getChannel());
+
     const qint64 timeMs = timeUsec / 1000;
     auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection());
     if (itr == chunks.cend())
