@@ -16,7 +16,7 @@ set(uri.protocol "nx-vms")
 
 # Default settings
 set(backgroundImage
-    "{\"enabled\": true, \"name\": \":/skin/background_dw.png\", \"mode\": \"Fit\"}")
+    "{\"enabled\": true, \"name\": \":/skin/background.png\", \"mode\": \"Crop\"}")
 set(defaultWebPages
     "{\"Home Page\": \"http://networkoptix.com\", \"Support\": \"http://support.networkoptix.com\"}")
 
