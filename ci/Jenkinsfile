@@ -8,7 +8,7 @@ import org.nx.jenkins.CiRunner
 
 def main() {
 	def runner = new CiRunner(this, env, params, currentBuild)
-	runner.main()
+	runner.main(build_tool: 'maven', should_run_fun_tests: true)
 }
 
 main()
