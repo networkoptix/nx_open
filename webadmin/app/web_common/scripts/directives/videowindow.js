@@ -191,6 +191,23 @@ angular.module('nxCommon')
 
                 var makingPlayer = false;
                 var crashCount = 0;
+                var autoShow = null;
+                var nativePlayerLoadError = null;
+
+                //For the native player. Handles webm's long loading times
+                function loadingTimeout(){
+                    scope.videoFlags.errorLoading = true;
+                    scope.loading = false;
+                    nativePlayerLoadError = null;
+                    resetPlayer();
+                }
+
+                function resetTimeout(event){
+                    if(nativePlayerLoadError){
+                        $timeout.cancel(nativePlayerLoadError);
+                        nativePlayerLoadError = $timeout(loadingTimeout, Config.webclient.nativeTimeout);
+                    }
+                }
 
                 function initNativePlayer(nativeFormat) {
 
@@ -198,8 +215,8 @@ angular.module('nxCommon')
                     scope.flashls = false;
                     scope.jsHls = false;
 
-                    var autoshow = null;
                     $timeout(function(){
+                        var nativePlayer = new NativePlayer();
                         nativePlayer.init(element.find(".videoplayer"), function (api) {
                             makingPlayer = false;
                             scope.vgApi = api;
@@ -214,7 +231,6 @@ angular.module('nxCommon')
                                         autoshow = null;
                                     },20000);
                                 }
-
                                 scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
 
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
@@ -222,25 +238,35 @@ angular.module('nxCommon')
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
 
-                                scope.vgApi.addEventListener("pause", function(event){
-                                    scope.playing = false;
-                                });
-                                scope.vgApi.addEventListener("play", function(event){
-                                    scope.playing = true;
-                                });
-
                                 scope.vgApi.addEventListener("playing", function(event){
                                     scope.loading = false; // Video is playing - disable loading
                                     crashCount = 0;
+                                    if(nativePlayerLoadError){
+                                        $timeout.cancel(nativePlayerLoadError);
+                                        nativePlayerLoadError = null;
+                                    }
                                 });
 
                                 scope.vgApi.addEventListener("ended",function(event){
                                     scope.vgUpdateTime({$currentTime: null, $duration: null});
                                 });
+
+                                scope.vgApi.addEventListener("loadstart", function (event){
+                                    if(nativePlayerLoadError){
+                                        $timeout.cancel(nativePlayerLoadError);
+                                    }
+                                    nativePlayerLoadError = $timeout(loadingTimeout, Config.webclient.nativeTimeout);
+                                });
+
+                                //If we are still downloading the video reset the timer
+                                scope.vgApi.addEventListener("progress", resetTimeout);
+
+                                //If the player stalls give it a chance to recover
+                                scope.vgApi.addEventListener("stalled", resetTimeout);
                             }
 
                             scope.vgPlayerReady({$API: scope.vgApi});
-                        }, playerErrorHandler);
+                        });
                     });
                 }
 
@@ -366,9 +392,9 @@ angular.module('nxCommon')
                     if(scope.vgApi){
                         scope.vgApi.kill();
                         makingPlayer = false;
+                        scope.vgApi = null;
                     }
                     scope.vgPlayerReady({$API: null});
-
                     //Turn off all players to reset ng-class for rotation
                     scope.native = false;
                     scope.flashls = false;
