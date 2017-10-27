@@ -5,7 +5,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/vms/utils/vms_utils.h>
 
-#include <api/app_server_connection.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -226,7 +225,7 @@ bool CloudConnectionManager::removeCloudUsers()
         });
     for (const auto& user: usersToRemove)
     {
-        auto errCode = QnAppServerConnectionFactory::ec2Connection()
+        const auto errCode = commonModule()->ec2Connection()
             ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
         NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)

@@ -22,6 +22,7 @@ class QnAuditManager:
     public Singleton<QnAuditManager>
 {
     Q_OBJECT
+
 public:
 
     static const int MIN_PLAYBACK_TIME_TO_LOG = 1000 * 5;
@@ -31,6 +32,8 @@ public:
     QnAuditManager(QObject* parent);
 
 public:
+    virtual ~QnAuditManager() = default;
+
     static QnAuditRecord prepareRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType);
 
     /* notify new playback was started from position timestamp
@@ -45,16 +48,21 @@ public:
     int updateAuditRecord(int internalId, const QnAuditRecord& record);
     bool enabled() const;
     QnTimePeriod playbackRange(const AuditHandle& handle) const;
+
 public slots:
     void at_connectionOpened(const QnAuthSession &session);
     void at_connectionClosed(const QnAuthSession &session);
+
 private slots:
     void setEnabled(bool value);
+
 protected:
     virtual int addAuditRecordInternal(const QnAuditRecord& record) = 0;
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) = 0;
+
 private slots:
     void at_timer();
+
 private:
     int registerNewConnection(const QnAuthSession &data, bool explicitCall);
     bool hasSimilarRecentlyRecord(const QnAuditRecord& data) const;
@@ -107,12 +115,14 @@ private:
     std::atomic<bool> m_enabled;
     QElapsedTimer m_sessionCleanupTimer;
     std::deque<QnAuditRecord> m_recentlyAddedRecords;
+
 private:
     bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
     void cleanupExpiredSessions();
     template <class T>
     void processDelayedRecords(QVector<T>& recordsToAggregate); // group and write to DB playback records
 };
+
 #define qnAuditManager QnAuditManager::instance()
 
 #endif // __AUDIT_MANAGER_H__

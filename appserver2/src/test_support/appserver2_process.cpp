@@ -12,6 +12,8 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/core/access/access_types.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
+#include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx/vms/utils/initial_data_loader.h>
 #include <nx/vms/utils/server_merge_processor.h>
@@ -20,12 +22,17 @@
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
-#include <api/runtime_info_manager.h>
-#include <api/model/getnonce_reply.h>
-#include <api/model/configure_reply.h>
-#include <api/model/setup_local_system_data.h>
 #include <api/global_settings.h>
+#include <api/model/configure_reply.h>
+#include <api/model/detach_from_cloud_data.h>
+#include <api/model/detach_from_cloud_reply.h>
+#include <api/model/getnonce_reply.h>
 #include <api/model/ping_reply.h>
+#include <api/model/setup_cloud_system_data.h>
+#include <api/model/setup_local_system_data.h>
+#include <api/runtime_info_manager.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <llutil/hardware_id.h>
@@ -37,15 +44,15 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 
-#include "ec2_connection_processor.h"
 #include <test_support/resource/test_resource_factory.h>
-#include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
-#include <transaction/message_bus_adapter.h>
 #include <rest/helper/ping_rest_helper.h>
 #include <rest/helper/p2p_statistics.h>
-#include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/dummy_handler.h>
+#include <transaction/message_bus_adapter.h>
+
+#include "appserver2_audit_manager.h"
+#include "appserver2_process_settings.h"
+#include "cloud_integration/cloud_connector.h"
+#include "ec2_connection_processor.h"
 
 static int registerQtResources()
 {
@@ -55,204 +62,6 @@ static int registerQtResources()
 
 //namespace nx {
 namespace ec2 {
-
-namespace conf {
-
-class Settings
-{
-public:
-    Settings():
-        m_settings(QnAppInfo::organizationNameForSettings(), "Nx Appserver2", "appserver2"),
-        m_showHelp(false)
-    {
-    }
-
-    void load(int argc, char** argv)
-    {
-        m_settings.parseArgs(argc, (const char**)argv);
-    }
-
-    bool showHelp()
-    {
-        return m_settings.value("help", "not present").toString() != "not present";
-    }
-
-    QString dbFilePath() const
-    {
-        return m_settings.value("dbFile", "ecs.sqlite").toString();
-    }
-
-    bool isP2pMode() const
-    {
-        return m_settings.value("p2pMode", false).toBool();
-    }
-
-    int moduleInstance() const
-    {
-        return m_settings.value("moduleInstance").toInt();
-    }
-
-    SocketAddress endpoint() const
-    {
-        return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
-    }
-
-    QnUuid moduleGuid() const
-    {
-        return QnUuid(m_settings.value("moduleGuid").toString());
-    }
-
-    bool isAuthDisabled() const
-    {
-        return m_settings.contains("disableAuth");
-    }
-
-private:
-    QnSettings m_settings;
-    bool m_showHelp;
-};
-
-} // namespace conf
-
-//-------------------------------------------------------------------------------------------------
-
-using ProcessorHandler = std::function<
-    nx_http::StatusCode::Value(
-        const nx_http::Request&,
-        QnHttpConnectionListener* owner,
-        QnJsonRestResult* result)>;
-class JsonConnectionProcessor: public QnTCPConnectionProcessor
-{
-private:
-    ProcessorHandler m_handler;
-public:
-    JsonConnectionProcessor(
-        ProcessorHandler handler,
-        QSharedPointer<AbstractStreamSocket> socket,
-        QnHttpConnectionListener* owner)
-        :
-        QnTCPConnectionProcessor(socket, owner),
-        m_handler(handler)
-    {
-    }
-
-    virtual void run() override
-    {
-        QnJsonRestResult result;
-        auto owner = static_cast<QnHttpConnectionListener*>(d_ptr->owner);
-        const auto httpStatusCode = m_handler(d_ptr->request, owner, &result);
-        d_ptr->response.messageBody = QJson::serialized(result);
-        sendResponse(httpStatusCode, Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
-
-QnSimpleHttpConnectionListener::QnSimpleHttpConnectionListener(
-    QnCommonModule* commonModule,
-    const QHostAddress& address,
-    int port,
-    int maxConnections,
-    bool useSsl)
-:
-    QnHttpConnectionListener(commonModule, address, port, maxConnections, useSsl)
-{
-}
-
-QnSimpleHttpConnectionListener::~QnSimpleHttpConnectionListener()
-{
-    stop();
-}
-
-QnTCPConnectionProcessor* QnSimpleHttpConnectionListener::createRequestProcessor(
-    QSharedPointer<AbstractStreamSocket> clientSocket)
-{
-    return new Ec2ConnectionProcessor(clientSocket, this);
-}
-
-bool QnSimpleHttpConnectionListener::needAuth(const nx_http::Request& request) const
-{
-    auto path = request.requestLine.url.path();
-    for (const auto& value: m_disableAuthPrefixes)
-    {
-        if (path.contains(value))
-            return false;
-    }
-    QUrlQuery query(request.requestLine.url.query());
-    if (query.hasQueryItem(Qn::URL_QUERY_AUTH_KEY_NAME))
-        return false; //< Authenticated by url query
-    return QnHttpConnectionListener::needAuth();
-}
-
-void QnSimpleHttpConnectionListener::disableAuthForPath(const QString& path)
-{
-    m_disableAuthPrefixes.insert(path);
-}
-
-//-------------------------------------------------------------------------------------------------
-// class Appserver2MessageProcessor
-
-class Appserver2MessageProcessor:
-    public QnCommonMessageProcessor
-{
-public:
-    Appserver2MessageProcessor(QObject* parent):
-        QnCommonMessageProcessor(parent),
-        m_factory(new nx::TestResourceFactory())
-    {
-    }
-
-protected:
-    virtual bool canRemoveResource(const QnUuid& id) override
-    {
-        return id != commonModule()->moduleGUID();
-    }
-
-    virtual void removeResourceIgnored(const QnUuid& resourceId) override
-    {
-        if (resourceId != commonModule()->moduleGUID())
-            return;
-        QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
-
-        ec2::ApiMediaServerData apiServer;
-        ec2::fromResourceToApi(mServer, apiServer);
-        auto connection = commonModule()->ec2Connection();
-        connection->getMediaServerManager(Qn::kSystemAccess)->save(
-            apiServer,
-            ec2::DummyHandler::instance(),
-            &ec2::DummyHandler::onRequestDone);
-    }
-
-    virtual void onResourceStatusChanged(
-        const QnResourcePtr& /*resource*/,
-        Qn::ResourceStatus /*status*/,
-        ec2::NotificationSource /*source*/) override
-    {
-    }
-
-    virtual QnResourceFactory* getResourceFactory() const override
-    {
-        return nx::TestResourceFactory::instance();
-    }
-
-    virtual void updateResource(
-        const QnResourcePtr& resource,
-        ec2::NotificationSource /*source*/) override
-    {
-        commonModule()->resourcePool()->addResource(resource);
-        if (auto server = resource.dynamicCast<QnMediaServerResource>())
-        {
-            if (!server->getApiUrl().host().isEmpty())
-            {
-                commonModule()->ec2Connection()->messageBus()->
-                    addOutgoingConnectionToPeer(server->getId(), server->getApiUrl());
-            }
-        }
-    }
-
-protected:
-    std::unique_ptr<nx::TestResourceFactory> m_factory;
-};
 
 //-------------------------------------------------------------------------------------------------
 // class Appserver2Process
@@ -317,6 +126,8 @@ int Appserver2Process::exec()
 
     qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
+    AuditManager auditManager(m_commonModule.get());
+
     std::unique_ptr<ec2::AbstractECConnectionFactory>
         ec2ConnectionFactory(getConnectionFactory(
             Qn::PT_Server,
@@ -352,6 +163,19 @@ int Appserver2Process::exec()
         m_commonModule->messageProcessor(),
         QnMediaServerResourcePtr(),
         []() { return false; });
+
+    ::ec2::CloudConnector cloudConnector(ec2ConnectionFactory->messageBus());
+
+    nx::vms::cloud_integration::CloudManagerGroup cloudManagerGroup(
+        m_commonModule.get(),
+        nullptr,
+        &cloudConnector,
+        nullptr,
+        settings.cloudIntegration().delayBeforeSettingMasterFlag);
+    m_cloudManagerGroup = &cloudManagerGroup;
+
+    if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
+        cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
     
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
@@ -514,7 +338,7 @@ void Appserver2Process::registerHttpHandlers(
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/mergeSystems",
         [this](
             const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
+            QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
             const auto data = QJson::deserialized<MergeSystemData>(request.messageBody);
@@ -537,7 +361,7 @@ void Appserver2Process::registerHttpHandlers(
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupLocalSystem",
         [this](
             const nx_http::Request& request,
-            QnHttpConnectionListener* owner,
+            QnHttpConnectionListener* /*owner*/,
             QnJsonRestResult* result)
         {
             auto data = QJson::deserialized<SetupLocalSystemData>(request.messageBody);
@@ -546,6 +370,53 @@ void Appserver2Process::registerHttpHandlers(
                 QnAuthSession(),
                 std::move(data),
                 result);
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/setupCloudSystem",
+        [this](
+            const nx_http::Request& request,
+            QnHttpConnectionListener* /*owner*/,
+            QnJsonRestResult* result)
+        {
+            const auto data = QJson::deserialized<SetupCloudSystemData>(request.messageBody);
+            nx::vms::cloud_integration::VmsCloudConnectionProcessor vmsCloudConnectionProcessor(
+                m_commonModule.get(),
+                m_cloudManagerGroup);
+            return vmsCloudConnectionProcessor.setupCloudSystem(
+                QnAuthSession(),
+                data,
+                result);
+    });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/saveCloudSystemCredentials",
+        [this](
+            const nx_http::Request& request,
+            QnHttpConnectionListener* /*owner*/,
+            QnJsonRestResult* result)
+        {
+            const auto data = QJson::deserialized<CloudCredentialsData>(request.messageBody);
+            nx::vms::cloud_integration::VmsCloudConnectionProcessor vmsCloudConnectionProcessor(
+                m_commonModule.get(),
+                m_cloudManagerGroup);
+            return vmsCloudConnectionProcessor.bindSystemToCloud(data, result);
+        });
+
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/detachFromCloud",
+        [this](
+            const nx_http::Request& request,
+            QnHttpConnectionListener* /*owner*/,
+            QnJsonRestResult* result)
+        {
+            auto data = QJson::deserialized<DetachFromCloudData>(request.messageBody);
+            nx::vms::cloud_integration::VmsCloudConnectionProcessor vmsCloudConnectionProcessor(
+                m_commonModule.get(),
+                m_cloudManagerGroup);
+            DetachFromCloudReply reply;
+            const auto resultCode = vmsCloudConnectionProcessor.detachFromCloud(data, &reply);
+            result->setReply(reply);
+            if (resultCode != nx_http::StatusCode::ok)
+                result->setError(QnRestResult::CantProcessRequest);
+            return resultCode;
         });
 
     m_tcpListener->disableAuthForPath("/api/getNonce");
@@ -562,8 +433,9 @@ void Appserver2Process::addSelfServerResource(
     server->setId(commonModule()->moduleGUID());
     m_commonModule->resourcePool()->addResource(server);
     server->setStatus(Qn::Online);
+    server->setServerFlags(Qn::SF_HasPublicIP);
 
-    m_commonModule->bindModuleinformation(server);
+    m_commonModule->bindModuleInformation(server);
 
     ::ec2::ApiMediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();

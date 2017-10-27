@@ -55,6 +55,18 @@ namespace nx
     String NX_NETWORK_API bufferToString( const Buffer& buffer );
 
     std::string NX_NETWORK_API toStdString(const String& str);
+
+    template<typename Arg>
+    void replace(QByteArray* where, int pos, int count, const Arg& withWhat)
+    {
+        where->replace(pos, count, withWhat);
+    }
+
+    template<>
+    inline void replace(QByteArray* where, int pos, int count, const std::string& withWhat)
+    {
+        where->replace(pos, count, withWhat.c_str());
+    }
 }
 
 namespace std

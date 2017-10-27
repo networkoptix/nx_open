@@ -23,7 +23,6 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include "master_server_status_watcher.h"
 #include "settings.h"
 
 #include <utils/common/delayed.h>
@@ -119,9 +118,6 @@ QnMediaServerModule::QnMediaServerModule(
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
-    store(new QnMasterServerStatusWatcher(
-        commonModule(),
-        m_settings->delayBeforeSettingMasterFlag()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
     m_licenseWatcher = store(new nx::mediaserver::LicenseWatcher(commonModule()));
 
