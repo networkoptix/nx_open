@@ -12,13 +12,18 @@ MediaServerClient::MediaServerClient(const QUrl& baseRequestUrl):
 void MediaServerClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
-    for (auto& val: m_activeClients)
-        val.first->bindToAioThread(aioThread);
+    for (auto& client: m_activeClients)
+        client->bindToAioThread(aioThread);
 }
 
 void MediaServerClient::setUserCredentials(const nx_http::Credentials& userCredentials)
 {
     m_userCredentials = userCredentials;
+}
+
+void MediaServerClient::setRequestTimeout(std::chrono::milliseconds timeout)
+{
+    m_requestTimeout = timeout;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -249,7 +254,7 @@ ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
         result);
 }
 
-nx_http::StatusCode::Value MediaServerClient::prevResponseHttpStatusCode() const
+nx_http::StatusCode::Value MediaServerClient::lastResponseHttpStatusCode() const
 {
     return m_prevResponseHttpStatusCode;
 }

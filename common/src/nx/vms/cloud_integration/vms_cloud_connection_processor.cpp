@@ -40,7 +40,7 @@ void VmsCloudConnectionProcessor::setSystemSettingsProcessor(
     m_systemSettingsProcessor = systemSettingsProcessor;
 }
 
-nx_http::StatusCode::Value VmsCloudConnectionProcessor::saveCloudSystemCredentials(
+nx_http::StatusCode::Value VmsCloudConnectionProcessor::bindSystemToCloud(
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
@@ -113,7 +113,7 @@ nx_http::StatusCode::Value VmsCloudConnectionProcessor::setupCloudSystem(
         return nx_http::StatusCode::internalServerError;
     }
     
-    const nx_http::StatusCode::Value httpResult = saveCloudSystemCredentials(data, result);
+    const nx_http::StatusCode::Value httpResult = bindSystemToCloud(data, result);
     if (!nx_http::StatusCode::isSuccessCode(httpResult))
     {
         // Changing system name back.

@@ -16,6 +16,10 @@
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_api.h>
 
+#include "appserver2_http_server.h"
+
+namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+
 //namespace nx {
 namespace ec2 {
 
@@ -52,6 +56,7 @@ private:
     QnSimpleHttpConnectionListener* m_tcpListener;
     mutable QnMutex m_mutex;
     QEventLoop m_eventLoop;
+    nx::vms::cloud_integration::CloudManagerGroup* m_cloudManagerGroup = nullptr;
 
     void updateRuntimeData();
     void registerHttpHandlers(ec2::AbstractECConnectionFactory* ec2ConnectionFactory);
@@ -79,28 +84,6 @@ public:
 private:
     Appserver2Process* m_impl;
 };
-
-class QnSimpleHttpConnectionListener: public QnHttpConnectionListener
-{
-public:
-    QnSimpleHttpConnectionListener(
-        QnCommonModule* commonModule,
-        const QHostAddress& address,
-        int port,
-        int maxConnections,
-        bool useSsl);
-
-    ~QnSimpleHttpConnectionListener();
-
-    bool needAuth(const nx_http::Request& request) const;
-    void disableAuthForPath(const QString& path);
-protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> clientSocket) override;
-private:
-    QSet<QString> m_disableAuthPrefixes;
-};
-
 
 }   // namespace ec2
 //}   // namespace nx

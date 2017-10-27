@@ -9,28 +9,37 @@
 
 CloudIntegrationManager::CloudIntegrationManager(
     QnCommonModule* commonModule,
+    ::ec2::AbstractTransactionMessageBus* transactionMessageBus,
     nx::vms::auth::AbstractNonceProvider* defaultNonceFetcher)
     :
-    cloudManagerGroup(
+    m_cloudConnector(transactionMessageBus),
+    m_cloudManagerGroup(
         commonModule,
         defaultNonceFetcher,
-        std::make_unique<GenericUserDataProvider>(commonModule))
+        &m_cloudConnector,
+        std::make_unique<GenericUserDataProvider>(commonModule),
+        qnServerModule->settings()->delayBeforeSettingMasterFlag())
 {
     const auto cdbEndpoint = qnServerModule->roSettings()->value(
         nx_ms_conf::CDB_ENDPOINT,
         "").toString();
     if (!cdbEndpoint.isEmpty())
     {
-        cloudManagerGroup.connectionManager.setCloudDbUrl(
+        m_cloudManagerGroup.setCloudDbUrl(
             nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
                 .setEndpoint(SocketAddress(cdbEndpoint)));
     }
 
     connect(
-        &cloudManagerGroup.connectionManager,
+        &m_cloudManagerGroup.connectionManager,
         &nx::vms::cloud_integration::AbstractCloudConnectionManager::cloudBindingStatusChanged,
         this,
         &CloudIntegrationManager::onCloudBindingStatusChanged);
+}
+
+nx::vms::cloud_integration::CloudManagerGroup& CloudIntegrationManager::cloudManagerGroup()
+{
+    return m_cloudManagerGroup;
 }
 
 void CloudIntegrationManager::onCloudBindingStatusChanged(bool isBound)

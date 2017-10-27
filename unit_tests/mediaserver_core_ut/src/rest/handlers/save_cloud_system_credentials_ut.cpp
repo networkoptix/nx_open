@@ -11,9 +11,11 @@
 #include <core/resource/user_resource.h>
 #include <network/auth/generic_user_data_provider.h>
 #include <network/auth/time_based_nonce_provider.h>
-#include <media_server/settings.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
 #include <settings.h>
+
+#include <media_server/settings.h>
+#include <cloud/cloud_integration_manager.h>
 
 namespace test {
 
@@ -32,8 +34,10 @@ public:
     ~MediaServerRestHandlerTestBase()
     {
     }
+
 protected:
     QnCommonModule m_commonModule;
+
 private:
     ec2::Settings m_ec2Settings;
 
@@ -62,11 +66,11 @@ class QnSaveCloudSystemCredentialsHandler:
 {
 public:
     QnSaveCloudSystemCredentialsHandler():
-        m_cloudManagerGroup(
+        m_cloudIntegrationManager(
             &m_commonModule,
-            &m_timeBasedNonceProvider,
-            std::make_unique<GenericUserDataProvider>(&m_commonModule)),
-        m_restHandler(&m_cloudManagerGroup)
+            nullptr,
+            &m_timeBasedNonceProvider),
+        m_restHandler(&m_cloudIntegrationManager.cloudManagerGroup())
     {
     }
 
@@ -100,7 +104,7 @@ protected:
 
 private:
     TimeBasedNonceProvider m_timeBasedNonceProvider;
-    nx::vms::cloud_integration::CloudManagerGroup m_cloudManagerGroup;
+    CloudIntegrationManager m_cloudIntegrationManager;
     ::QnSaveCloudSystemCredentialsHandler m_restHandler;
 };
 

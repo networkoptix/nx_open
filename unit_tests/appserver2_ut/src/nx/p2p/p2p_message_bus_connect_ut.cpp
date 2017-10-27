@@ -269,7 +269,7 @@ protected:
             auto flags = serverRes->getServerFlags();
             flags |= Qn::SF_P2pSyncDone;
             serverRes->setServerFlags(flags);
-            commonModule->bindModuleinformation(serverRes);
+            commonModule->bindModuleInformation(serverRes);
         }
 
         while (args.get(kStandaloneModeParamName))
