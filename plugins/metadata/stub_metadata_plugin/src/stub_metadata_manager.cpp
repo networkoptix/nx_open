@@ -39,6 +39,12 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
         return static_cast<AbstractMetadataManager*>(this);
     }
 
+    if (interfaceId == IID_ConsumingMetadataManager)
+    {
+        addRef();
+        return static_cast<AbstractConsumingMetadataManager*>(this);
+    }
+
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();

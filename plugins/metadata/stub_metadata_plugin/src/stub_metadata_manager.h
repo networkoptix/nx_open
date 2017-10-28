@@ -41,8 +41,8 @@ private:
 private:
     mutable std::mutex m_mutex;
     std::unique_ptr<std::thread> m_thread;
-    std::atomic<bool> m_stopping;
-    nx::sdk::metadata::AbstractMetadataHandler* m_handler;
+    std::atomic<bool> m_stopping{false};
+    nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
     int m_counter = 0;
     nxpl::NX_GUID m_eventTypeId;
     nxpl::NX_GUID m_objectTypeId;

@@ -88,13 +88,13 @@ public slots:
 private:
     PluginList availablePlugins() const;
 
-    void createMetadataManagersForResource(const QnSecurityCamResourcePtr& camera);
+    void createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
 
     nx::sdk::metadata::AbstractMetadataManager* createMetadataManager(
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::metadata::AbstractMetadataPlugin* plugin) const;
 
-    void releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& camera);
+    void releaseResourceMetadataManagersUnsafe(const QnSecurityCamResourcePtr& camera);
 
     EventHandler* createMetadataHandler(
         const QnResourcePtr& resource,
