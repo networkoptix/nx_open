@@ -10,9 +10,6 @@ namespace
     const quint32 kFramesBeforeReopen = 100;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnChannelMapping, (json), (originalChannel)(mappedChannels))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnResourceChannelMapping, (json), (resourceChannel)(channelMap))
-
 #ifdef ENABLE_DATA_PROVIDERS
 
 QnStreamMixer::QnStreamMixer() :

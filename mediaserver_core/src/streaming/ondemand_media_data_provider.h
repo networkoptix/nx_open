@@ -22,7 +22,7 @@ class QnAbstractStreamDataProvider;
 class OnDemandMediaDataProvider
 :
     public AbstractOnDemandDataProvider,
-    public QnAbstractDataReceptor
+    public QnAbstractMediaDataReceptor
 {
 public:
     OnDemandMediaDataProvider( const QSharedPointer<QnAbstractStreamDataProvider>& dataProvider ) throw();
@@ -35,12 +35,12 @@ public:
     //!Implementation of AbstractOnDemandDataProvider::put
     virtual void put(QnAbstractDataPacketPtr packet) override;
 
-    //!Implementation of QnAbstractDataReceptor::canAcceptData
+    //!Implementation of QnAbstractMediaDataReceptor::canAcceptData
     /*!
         \return false if internal buffer is full. true, otherwise
     */
     virtual bool canAcceptData() const override;
-    //!Implementation of QnAbstractDataReceptor::putData
+    //!Implementation of QnAbstractMediaDataReceptor::putData
     /*!
         Stores \a data in internal buffer, which is read out by \a tryRead
     */

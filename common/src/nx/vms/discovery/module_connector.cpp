@@ -372,6 +372,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 
         ++endpointsInProgress;
         NX_ASSERT(!endpoint.toString().isEmpty());
+        QString gg4 = endpoint.toString();
         connectToEndpoint(endpoint, endpointsGroup);
     }
 

@@ -10,7 +10,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-class QnStreamMixer: public QnAbstractDataReceptor
+class QnStreamMixer: public QnAbstractMediaDataReceptor
 {
 
     typedef std::shared_ptr<QnAbstractMediaStreamProvider> QnAbstractMediaStreamProviderPtr;
