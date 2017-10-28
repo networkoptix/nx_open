@@ -397,7 +397,7 @@ void QnLiveStreamProvider::onPrimaryParamsChanged(const QnLiveStreamParams& prim
 
     if (secondaryResolutionIsLarge())
     {
-        newSecondaryStreamFps = MIN_SECOND_STREAM_FPS;
+        newSecondaryStreamFps = QnLiveStreamParams::MIN_SECOND_STREAM_FPS;
     }
     else if (sharingMethod == Qn::PixelsFpsSharing)
     {
@@ -410,7 +410,7 @@ void QnLiveStreamProvider::onPrimaryParamsChanged(const QnLiveStreamParams& prim
         {
             newSecondaryStreamFps = qMax(
                 m_cameraRes->desiredSecondStreamFps() / 2,
-                MIN_SECOND_STREAM_FPS);
+                QnLiveStreamParams::MIN_SECOND_STREAM_FPS);
         }
     }
     else if (sharingMethod == Qn::BasicFpsSharing)
