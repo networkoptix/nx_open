@@ -109,7 +109,7 @@ def update_from_object(cms_structure):
                 data_structure.translatable = "{{language}}" in name
 
                 # this is used to convert source images into b64 strings
-                file_path = os.path.join('static', 'default', 'source', name)
+                file_path = os.path.join('static', '_source', 'blue', name)
                 file_path = file_path.replace("{{language}}", default_language)
                 try:
                     with open(file_path, 'r') as file:
@@ -129,7 +129,7 @@ def read_structure_json(filename):
 
 
 def process_zip(file_descriptor, user, update_structure, update_content):
-    log_messages = ()
+    log_messages = []
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
     root = None
@@ -145,6 +145,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             log_messages.append(('warning', 'Not found structure.json file'))
 
     for name in zip_file.namelist():
+        # log_messages.append(('info', 'Processing %s' % name))
         if name.startswith('__') or name.endswith('structure.json'):  # Ignore trash in archive from MACs or **structure.json files
             log_messages.append(('info', 'Ignored: %s' % name))
             continue
@@ -158,7 +159,8 @@ def process_zip(file_descriptor, user, update_structure, update_content):
         short_name = name.replace(root, '')
 
         if short_name.startswith('help/'):  # Ignore help
-            log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
+            if short_name == 'help/':
+                log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
             continue
 
         # now we have name
@@ -179,12 +181,14 @@ def process_zip(file_descriptor, user, update_structure, update_content):
         # try to find relevant data structure and update its default (maybe)
         structure = DataStructure.objects.filter(name=short_name)
         if not structure.exists():
+            log_messages.append(('warning', 'Ignored: %s (data structure %s does not exist)' % (name, short_name)))
             continue
         structure = structure.first()
 
         # if data structure is not FILE or IMAGE - print to log and ignore
         if structure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            log_messages.append(('warning', 'Ignored: %s (data structure is not a file)' % name))
+            log_messages.append(('warning', 'Ignored: %s (data structure type is %s, not a %s or %s)' %
+                                 (name, structure.type, DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file)))
             continue
 
         data = zip_file.read(name)
@@ -218,4 +222,5 @@ def process_zip(file_descriptor, user, update_structure, update_content):
             )
             record.save()
             log_messages.append(('success', 'Updated value for data structure %s using %s' % (structure.label, name)))
+    log_messages.append(('success', 'Finished'))
     return log_messages

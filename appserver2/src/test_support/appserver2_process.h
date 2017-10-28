@@ -8,17 +8,23 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <nx/utils/thread/stoppable.h>
 #include <common/static_common_module.h>
 #include <common/common_module.h>
 #include <network/http_connection_listener.h>
+#include <nx_ec/ec_api.h>
+
+#include "appserver2_http_server.h"
+
+namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
 //namespace nx {
 namespace ec2 {
 
 class AbstractECConnection;
+class AbstractECConnectionFactory;
 class QnSimpleHttpConnectionListener;
 
 class Appserver2Process:
@@ -38,6 +44,7 @@ public:
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
+
 private:
     int m_argc;
     char** m_argv;
@@ -49,6 +56,11 @@ private:
     QnSimpleHttpConnectionListener* m_tcpListener;
     mutable QnMutex m_mutex;
     QEventLoop m_eventLoop;
+    nx::vms::cloud_integration::CloudManagerGroup* m_cloudManagerGroup = nullptr;
+
+    void updateRuntimeData();
+    void registerHttpHandlers(ec2::AbstractECConnectionFactory* ec2ConnectionFactory);
+    void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
 };
 
 
@@ -72,28 +84,6 @@ public:
 private:
     Appserver2Process* m_impl;
 };
-
-class QnSimpleHttpConnectionListener: public QnHttpConnectionListener
-{
-public:
-    QnSimpleHttpConnectionListener(
-        QnCommonModule* commonModule,
-        const QHostAddress& address,
-        int port,
-        int maxConnections,
-        bool useSsl);
-
-    ~QnSimpleHttpConnectionListener();
-
-    bool needAuth(const nx_http::Request& request) const;
-    void disableAuthForPath(const QString& path);
-protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> clientSocket) override;
-private:
-    QSet<QString> m_disableAuthPrefixes;
-};
-
 
 }   // namespace ec2
 //}   // namespace nx

@@ -160,11 +160,17 @@ public:
     void setSubsequentReconnectTries(int reconnectTries);
     void setTotalReconnectTries(int reconnectTries);
     void setUserAgent(const QString& userAgent);
+
     void setUserName(const QString& userName);
     void setUserPassword(const QString& userPassword);
+    void setUserAuthToken(const AuthToken& userToken);
+    void setUserCredentials(const Credentials& userCredentials);
     void setProxyUserName(const QString& userName);
     void setProxyUserPassword(const QString& userPassword);
+    void setProxyUserAuthToken(const AuthToken& proxyUserToken);
+    void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
+
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     /** If set to \a true client will not try to add Authorization header to the first request. false by default. */

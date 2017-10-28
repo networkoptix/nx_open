@@ -205,8 +205,8 @@ nx_http::AsyncHttpClientPtr FcResourceSearcher::createHttpClient() const
 {
     nx_http::AuthInfo authInfo;
 
-    authInfo.username = kFlirDefaultUsername;
-    authInfo.password = kFlirDefaultPassword;
+    authInfo.user.username = kFlirDefaultUsername;
+    authInfo.user.authToken.setPassword(kFlirDefaultPassword);
 
     auto httpClientPtr = nx_http::AsyncHttpClient::create();
     httpClientPtr->setSendTimeoutMs(kDeviceInfoRequestTimeout.count());

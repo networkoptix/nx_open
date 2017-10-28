@@ -1,6 +1,7 @@
 <div class="container auth-hidden">
     <div class="jumbotron">
         <ng-include src="$root.C.viewsDir + 'static/landing.html'"></ng-include>
-        <p><a class="btn btn-lg btn-primary auth-hidden" href="/register" role="button">Hesap oluştur</a></p>
+        <p ng-if='!userEmail'><a class="btn btn-lg btn-primary auth-hidden" href="/register" role="button">Hesap oluştur</a></p>
+        <p ng-if='userEmail'><a class="btn btn-lg btn-primary auth-hidden" href="/login" ng-click="login();$event.preventDefault();" role="button">Giriş</a></p>
     </div>
 </div>

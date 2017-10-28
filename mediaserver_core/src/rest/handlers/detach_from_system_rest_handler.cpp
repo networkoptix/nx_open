@@ -4,6 +4,8 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 
+#include <nx/vms/utils/vms_utils.h>
+
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -12,11 +14,11 @@
 #include <rest/helpers/permissions_helper.h>
 
 #include <media_server/serverutil.h>
-#include <cloud/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
 #include <utils/common/app_info.h>
 
 QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
-    CloudConnectionManager* const cloudConnectionManager,
+    nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager,
     ec2::AbstractTransactionMessageBus* messageBus)
     :
     QnJsonRestHandler(),
@@ -65,7 +67,7 @@ int QnDetachFromSystemRestHandler::execute(
     }
 
     QString errStr;
-    if (!validatePasswordData(data, &errStr))
+    if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
         NX_LOGX(lm("Cannot detach from system. Password check failed.")
             , cl_logDEBUG1);
@@ -75,7 +77,7 @@ int QnDetachFromSystemRestHandler::execute(
 
     dropConnectionsToRemotePeers(m_messageBus);
 
-    if (resetSystemToStateNew(owner->commonModule()))
+    if (nx::vms::utils::resetSystemToStateNew(owner->commonModule()))
     {
         if (!m_cloudConnectionManager->detachSystemFromCloud())
         {

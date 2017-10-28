@@ -9,5 +9,6 @@
         <div ng-if="!preloader && title" class="placeholder-title" ng-bind-html="title"></div>
         <div ng-if="!preloader && message" class="placeholder-message" ng-bind-html="message"></div>
     </div>
-    <img ng-if="preview" class="video-preview" ng-src="{{preview}}" ng-class="{'blur-preview': condition}"preview-image>
+    <img ng-if="preview" class="video-preview" ng-src="{{preview}}" ng-class="{'blur-preview': condition}"
+         error-loading="errorLoadingPreview" preview-image>
 </div>

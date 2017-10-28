@@ -25,14 +25,14 @@ public:
      */
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
-        std::unique_ptr<CommonSocketImpl> impl = std::unique_ptr<CommonSocketImpl>() );
+        std::unique_ptr<CommonSocketImpl> impl = std::unique_ptr<CommonSocketImpl>());
 
     Pollable(const Pollable&) = delete;
     Pollable& operator=(const Pollable&) = delete;
     Pollable(Pollable&&) = delete;
     Pollable& operator=(Pollable&&) = delete;
 
-    virtual ~Pollable() {}
+    virtual ~Pollable() = default;
 
     AbstractSocket::SOCKET_HANDLE handle() const;
     /**
@@ -44,16 +44,16 @@ public:
     /**
      * NOTE: Zero timeout means infinite timeout.
      */
-    bool getRecvTimeout( unsigned int* millis ) const;
+    bool getRecvTimeout(unsigned int* millis) const;
     /**
      * NOTE: Zero timeout means infinite timeout.
      */
-    bool getSendTimeout( unsigned int* millis ) const;
+    bool getSendTimeout(unsigned int* millis) const;
 
     CommonSocketImpl* impl();
     const CommonSocketImpl* impl() const;
 
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) const;
 
     nx::network::aio::AbstractAioThread* getAioThread() const;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);

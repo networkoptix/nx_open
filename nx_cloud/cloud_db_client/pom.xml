@@ -30,11 +30,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>nx_fusion</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
         </dependency>
 
         <dependency>

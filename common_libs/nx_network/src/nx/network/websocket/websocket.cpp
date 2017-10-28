@@ -69,9 +69,9 @@ void WebSocket::restartTimers()
 
 void WebSocket::stopWhileInAioThread()
 {
-    m_socket.reset();
     m_pingTimer.reset();
     m_aliveTimer.reset();
+    m_socket.reset();
 }
 
 void WebSocket::setIsLastFrame()
@@ -308,11 +308,19 @@ void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoComplet
 
 void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
-    m_socket->cancelIOSync(eventType);
-    m_pingTimer->cancelSync();
-    m_aliveTimer->cancelSync();
-    m_readQueue.clear();
-    m_writeQueue.clear();
+    nx::utils::promise<void> p;
+    auto f = p.get_future();
+
+    dispatch(
+        [this, eventType, p = std::move(p)] ()
+        {
+            m_pingTimer->cancelSync();
+            m_aliveTimer->cancelSync();
+            m_socket->cancelIOSync(eventType);
+
+        });
+
+    f.wait();
 }
 
 bool WebSocket::isDataFrame() const

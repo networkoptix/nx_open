@@ -41,7 +41,7 @@ def process_context_structure(customization, context, content,
         # replace marker with value
         if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
             content = content.replace(datastructure.name, content_value)
-        elif content_value:
+        elif content_value or datastructure.optional:
             image_storage = os.path.join('static', customization.name)
             if preview:
                 image_storage = os.path.join(image_storage, 'preview')
@@ -305,11 +305,10 @@ def get_zip_package(customization_name, product_name,
 
 
 def save_b64_to_file(value, filename, storage_location):
-    if not value:
-        return
     file_name = os.path.join(storage_location, filename)
     make_dir(file_name)
-    image_png = base64.b64decode(value)
+
+    image_png = base64.b64decode(value) if value else ''
 
     with open(file_name, 'wb') as f:
         f.write(image_png)

@@ -1,8 +1,3 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #include "generic_user_data_provider.h"
 
 #include <QtCore/QCryptographicHash>
@@ -14,7 +9,6 @@
 
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
-
 
 GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)

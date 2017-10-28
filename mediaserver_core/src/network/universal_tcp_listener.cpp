@@ -1,7 +1,5 @@
-
 #include "universal_tcp_listener.h"
 
-#include <common/common_module.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/retry_timer.h>
@@ -12,13 +10,16 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
 
-#include "cloud/cloud_connection_manager.h"
+#include <nx/vms/cloud_integration/cloud_connection_manager.h>
+
+#include <common/common_module.h>
+
 #include "proxy_sender_connection_processor.h"
 #include "universal_request_processor.h"
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
-    const CloudConnectionManager& cloudConnectionManager,
+    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -36,7 +37,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
     Qn::directConnect(
-        &cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
+        &cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
         this,
         [this, &cloudConnectionManager](bool /*boundToCloud*/)
         {

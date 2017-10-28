@@ -48,6 +48,7 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
 
         case ResultCode::serviceUnavailable:
         case ResultCode::retryLater:
+        case ResultCode::vmsRequestFailure:
             return nx_http::StatusCode::serviceUnavailable;
     }
 
@@ -152,6 +153,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, ResultCode,
     (nx::cdb::api::ResultCode::serviceUnavailable, "serviceUnavailable")
     (nx::cdb::api::ResultCode::notAllowedInCurrentState, "notAllowedInCurrentState")
     (nx::cdb::api::ResultCode::mergedSystemIsOffline, "mergedSystemIsOffline")
+    (nx::cdb::api::ResultCode::vmsRequestFailure, "vmsRequestFailure")
     (nx::cdb::api::ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
     (nx::cdb::api::ResultCode::invalidFormat, "invalidFormat")
     (nx::cdb::api::ResultCode::retryLater, "retryLater")

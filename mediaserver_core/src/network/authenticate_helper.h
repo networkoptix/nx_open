@@ -9,9 +9,6 @@
 #include <QElapsedTimer>
 #include <QCache>
 
-#include <core/resource/resource_fwd.h>
-
-#include "utils/common/id.h"
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
@@ -19,18 +16,21 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_restriction_list.h>
 
-#include "ldap/ldap_manager.h"
-#include "network/auth/abstract_nonce_provider.h"
-#include "network/auth/abstract_user_data_provider.h"
-#include <core/resource_access/user_access_data.h>
+#include <nx/vms/auth/abstract_nonce_provider.h>
+#include <nx/vms/auth/abstract_user_data_provider.h>
+
 #include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource_access/user_access_data.h>
+#include <utils/common/id.h>
+
+#include "ldap/ldap_manager.h"
 
 struct QnLdapDigestAuthContext;
 class TimeBasedNonceProvider;
-struct CloudManagerGroup;
+namespace nx { namespace vms { namespace cloud_integration {  struct CloudManagerGroup; } } }
 
-class QnAuthHelper
-:
+class QnAuthHelper:
     public QObject,
     public QnCommonModuleAware,
     public Singleton<QnAuthHelper>
@@ -43,7 +43,7 @@ public:
     QnAuthHelper(
         QnCommonModule* commonModule,
         TimeBasedNonceProvider* timeBasedNonceProvider,
-        CloudManagerGroup* cloudManagerGroup);
+        nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup);
     virtual ~QnAuthHelper();
 
     //!Authenticates request on server side
@@ -153,9 +153,9 @@ private:
     mutable QnMutex m_mutex;
     nx_http::AuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
-    AbstractNonceProvider* m_timeBasedNonceProvider;
-    AbstractNonceProvider* m_nonceProvider;
-    AbstractUserDataProvider* m_userDataProvider;
+    nx::vms::auth::AbstractNonceProvider* m_timeBasedNonceProvider;
+    nx::vms::auth::AbstractNonceProvider* m_nonceProvider;
+    nx::vms::auth::AbstractUserDataProvider* m_userDataProvider;
     std::unique_ptr<QnLdapManager> m_ldap;
 
     void authenticationExpired( const QString& path, quint64 timerID );
