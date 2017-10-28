@@ -35,11 +35,88 @@ ResourceMetadataContext::ResourceMetadataContext()
 
 ResourceMetadataContext::~ResourceMetadataContext()
 {
-    if (manager)
+    if (m_videoFrameDataReceptor)
+        m_videoFrameDataReceptor->detachFromContext();
+    m_videoFrameDataReceptor.clear();
+    if (m_manager)
     {
-        manager->stopFetchingMetadata();
-        manager->releaseRef();
+        m_manager->stopFetchingMetadata();
+        m_manager->releaseRef();
     }
+}
+
+bool ResourceMetadataContext::canAcceptData() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_metadataReceptor != nullptr;
+}
+
+void ResourceMetadataContext::putData(const QnAbstractDataPacketPtr& data)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_metadataReceptor)
+        m_metadataReceptor->putData(data);
+}
+
+void ResourceMetadataContext::setManager(nx::sdk::metadata::AbstractMetadataManager* manager)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_manager.reset(manager);
+}
+
+void ResourceMetadataContext::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_handler.reset(handler);
+}
+
+
+void ResourceMetadataContext::setDataProvider(const QnAbstractMediaStreamDataProvider* provider)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_dataProvider = provider;
+}
+
+void ResourceMetadataContext::setVideoFrameDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_videoFrameDataReceptor = receptor;
+}
+
+void ResourceMetadataContext::setMetadataDataReceptor(QnAbstractDataReceptor* receptor)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_metadataReceptor = receptor;
+}
+
+nx::sdk::metadata::AbstractMetadataManager* ResourceMetadataContext::manager() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_manager.get();
+}
+
+nx::sdk::metadata::AbstractMetadataHandler* ResourceMetadataContext::handler() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_handler.get();
+}
+
+const QnAbstractMediaStreamDataProvider* ResourceMetadataContext::dataProvider() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_dataProvider;
+}
+
+QSharedPointer<VideoDataReceptor> ResourceMetadataContext::videoFrameDataReceptor() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_videoFrameDataReceptor;
+}
+
+QnAbstractDataReceptor* ResourceMetadataContext::metadataDataReceptor() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_metadataReceptor;
 }
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
@@ -168,8 +245,11 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
 
         {
             QnMutexLocker lock(&m_contextMutex);
-            m_contexts[camera->getId()].manager.reset(manager);
-            m_contexts[camera->getId()].handler.reset(handler);
+            auto& context = m_contexts[camera->getId()];
+            context.setManager(manager);
+            context.setHandler(handler);
+            handler->registerDataReceptor(&context);
+
         }
 
 
@@ -193,11 +273,10 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
 void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& resource)
 {
     QnMutexLocker lock(&m_contextMutex);
-    auto id = resource->getId();
-    auto range  = m_contexts.erase(id);
+    m_contexts.erase(resource->getId());
 }
 
-AbstractMetadataHandler* ManagerPool::createMetadataHandler(
+EventHandler* ManagerPool::createMetadataHandler(
     const QnResourcePtr& resource,
     const QnUuid& pluginId)
 {
@@ -251,14 +330,14 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
     if (context == m_contexts.cend())
         return false;
 
-    auto& manager = context->second.manager;
-    auto& handler = context->second.handler;
+    auto manager = context->second.manager();
+    auto handler = context->second.handler();
     Error result = Error::unknownError;
 
     if (eventTypeIds.empty())
         result = manager->stopFetchingMetadata();
     else
-        result = manager->startFetchingMetadata(handler.get()); //< TODO: #dmishin pass event types.
+        result = manager->startFetchingMetadata(handler); //< TODO: #dmishin pass event types.
 
     return result == Error::noError;
 }
@@ -376,15 +455,16 @@ bool ManagerPool::resourceInfoFromResource(
     return true;
 }
 
-QnAbstractDataReceptorPtr ManagerPool::registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
+QWeakPointer<QnAbstractDataReceptor> ManagerPool::registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
 {
     QnMutexLocker lock(&m_contextMutex);
     auto id = dataProvider->getResource()->getId();
         return QnAbstractDataReceptorPtr();
     auto& context = m_contexts[id];
-    context.dataProvider = dataProvider;
-    context.dataReceptor = QnAbstractDataReceptorPtr(new DataReceptor(&context));
-    return context.dataReceptor;
+    context.setDataProvider(dataProvider);
+    auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(&context));
+    context.setVideoFrameDataReceptor(dataReceptor);
+    return dataReceptor.toWeakRef();
 }
 
 void ManagerPool::removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
@@ -395,11 +475,11 @@ void ManagerPool::removeDataProvider(QnAbstractMediaStreamDataProvider* dataProv
     if (itr == m_contexts.end())
         return;
     auto& context = itr->second;
-    context.dataProvider = nullptr;
-    context.dataReceptor.clear();
+    context.setDataProvider(nullptr);
+    context.setVideoFrameDataReceptor(VideoDataReceptorPtr());
 }
 
-bool ManagerPool::registerDataReceptor(
+void ManagerPool::registerDataReceptor(
     const QnResourcePtr& resource,
     QnAbstractDataReceptor* dataReceptor)
 {
@@ -407,12 +487,7 @@ bool ManagerPool::registerDataReceptor(
     const auto& id = resource->getId();
 
     auto& context = m_contexts[id];
-    if (auto handler = dynamic_cast<EventHandler*> (context.handler.get()))
-    {
-        handler->registerDataReceptor(dataReceptor);
-        return true;
-    }
-    return false;
+    context.setMetadataDataReceptor(dataReceptor);
 }
 
 void ManagerPool::removeDataReceptor(
@@ -420,9 +495,11 @@ void ManagerPool::removeDataReceptor(
     QnAbstractDataReceptor* dataReceptor)
 {
     QnMutexLocker lock(&m_contextMutex);
-    auto& context = m_contexts[resource->getId()];
-    if (auto handler = dynamic_cast<EventHandler*> (context.handler.get()))
-        handler->removeDataReceptor(dataReceptor);
+    auto itr = m_contexts.find(resource->getId());
+    if (itr == m_contexts.end())
+        return;
+    auto& context = itr->second;
+    context.setMetadataDataReceptor(nullptr);
 }
 
 } // namespace metadata

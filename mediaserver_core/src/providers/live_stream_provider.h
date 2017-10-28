@@ -143,7 +143,8 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
     QnSafeQueue<QnAbstractCompressedMetadataPtr> m_metadataQueue;
-    QnAbstractDataReceptorPtr m_videoMetadataPlugin;
+
+    QWeakPointer<QnAbstractDataReceptor> m_videoDataReceptor;
     MetadataDataReceptorPtr m_metadataReceptor;
 };
 

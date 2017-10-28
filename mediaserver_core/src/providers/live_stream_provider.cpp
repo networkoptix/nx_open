@@ -91,9 +91,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     });
 
     auto pool = qnServerModule->metadataManagerPool();
-    m_videoMetadataPlugin = pool->registerDataProvider(this);
-    if (m_videoMetadataPlugin)
-        pool->registerDataReceptor(getResource(), m_metadataReceptor.data());
+    m_videoDataReceptor = pool->registerDataProvider(this);
+    pool->registerDataReceptor(getResource(), m_metadataReceptor.data());
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -348,10 +347,11 @@ void QnLiveStreamProvider::onGotVideoFrame(
             }
         }
 
-        if (nx::analytics::ini().enableDetectionPlugin && m_videoMetadataPlugin)
+        auto receptor = m_videoDataReceptor.toStrongRef();
+        if (nx::analytics::ini().enableDetectionPlugin &&
+            receptor && receptor->canAcceptData())
         {
-            if (m_videoMetadataPlugin->canAcceptData())
-                m_videoMetadataPlugin->putData(videoData);
+            receptor->putData(videoData);
         }
 
     }

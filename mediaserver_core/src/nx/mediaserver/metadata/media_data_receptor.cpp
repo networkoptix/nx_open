@@ -9,17 +9,26 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-DataReceptor::DataReceptor(const ResourceMetadataContext* context):
+VideoDataReceptor::VideoDataReceptor(const ResourceMetadataContext* context):
     m_context(context)
 {
 }
 
-void DataReceptor::putData(const QnAbstractDataPacketPtr& data)
+void VideoDataReceptor::detachFromContext()
 {
+    QnMutexLocker lock(&m_mutex);
+    m_context = nullptr;
+}
+
+void VideoDataReceptor::putData(const QnAbstractDataPacketPtr& data)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_context)
+        return;
     using namespace nx::sdk::metadata;
     nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
         (AbstractConsumingMetadataManager*)
-        m_context->manager->queryInterface(IID_ConsumingMetadataManager), false);
+        m_context->manager()->queryInterface(IID_ConsumingMetadataManager), false);
     if (!manager)
         return;
     auto video = dynamic_cast<QnCompressedVideoData*> (data.get());

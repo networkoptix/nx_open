@@ -8,16 +8,20 @@ namespace metadata {
 
 class ResourceMetadataContext;
 
-struct DataReceptor: public QnAbstractDataReceptor
+struct VideoDataReceptor: public QnAbstractDataReceptor
 {
 public:
-    DataReceptor(const ResourceMetadataContext* context);
+    VideoDataReceptor(const ResourceMetadataContext* context);
 
     virtual bool canAcceptData() const override { return true;  }
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
+
+    void detachFromContext();
 private:
     const ResourceMetadataContext* m_context;
+    mutable QnMutex m_mutex;
 };
+using VideoDataReceptorPtr = QSharedPointer<VideoDataReceptor>;
 
 } // namespace metadata
 } // namespace mediaserver

@@ -27,17 +27,38 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-struct ResourceMetadataContext
+class EventHandler;
+class VideoDataReceptor;
+
+struct ResourceMetadataContext: public QnAbstractDataReceptor
 {
 public:
     ResourceMetadataContext();
     ~ResourceMetadataContext();
 
-    std::unique_ptr<nx::sdk::metadata::AbstractMetadataManager> manager;
-    std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
+    void setManager(nx::sdk::metadata::AbstractMetadataManager* manager);
+    void setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler);
+    void setDataProvider(const QnAbstractMediaStreamDataProvider* provider);
+    void setVideoFrameDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor);
+    void setMetadataDataReceptor(QnAbstractDataReceptor* receptor);
 
-    QnAbstractMediaStreamDataProvider* dataProvider;
-    QnAbstractDataReceptorPtr dataReceptor;
+    nx::sdk::metadata::AbstractMetadataManager* manager() const;
+    nx::sdk::metadata::AbstractMetadataHandler* handler() const;
+    const QnAbstractMediaStreamDataProvider* dataProvider() const;
+    QSharedPointer<VideoDataReceptor> videoFrameDataReceptor() const;
+    QnAbstractDataReceptor* metadataDataReceptor() const;
+protected:
+    virtual bool canAcceptData() const override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
+
+private:
+    mutable QnMutex m_mutex;
+    std::unique_ptr<nx::sdk::metadata::AbstractMetadataManager> m_manager;
+    std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> m_handler;
+
+    const QnAbstractMediaStreamDataProvider* m_dataProvider;
+    QSharedPointer<VideoDataReceptor> m_videoFrameDataReceptor;
+    QnAbstractDataReceptor* m_metadataReceptor;
 };
 
 class ManagerPool final:
@@ -55,10 +76,10 @@ public:
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
-    QnAbstractDataReceptorPtr registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
+    QWeakPointer<QnAbstractDataReceptor> registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
     void removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
 
-    bool registerDataReceptor(const QnResourcePtr& resource, QnAbstractDataReceptor* dataReceptor);
+    void registerDataReceptor(const QnResourcePtr& resource, QnAbstractDataReceptor* dataReceptor);
     void removeDataReceptor(const QnResourcePtr& resource, QnAbstractDataReceptor* dataReceptor);
 
 public slots:
@@ -75,7 +96,7 @@ private:
 
     void releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& camera);
 
-    nx::sdk::metadata::AbstractMetadataHandler* createMetadataHandler(
+    EventHandler* createMetadataHandler(
         const QnResourcePtr& resource,
         const QnUuid& pluginId);
 
