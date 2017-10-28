@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/settings.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
 
 #include <nx/core/access/access_types.h>
@@ -60,7 +61,6 @@ static int registerQtResources()
     return 0;
 }
 
-//namespace nx {
 namespace ec2 {
 
 //-------------------------------------------------------------------------------------------------
@@ -72,10 +72,6 @@ Appserver2Process::Appserver2Process(int argc, char** argv):
     m_terminated(false),
     m_ecConnection(nullptr),
     m_tcpListener(nullptr)
-{
-}
-
-Appserver2Process::~Appserver2Process()
 {
 }
 
@@ -113,7 +109,7 @@ int Appserver2Process::exec()
         return 0;
     }
 
-    m_commonModule.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
+    m_commonModule = std::make_unique<QnCommonModule>(false, nx::core::access::Mode::direct);
     const auto moduleGuid = settings.moduleGuid();
     m_commonModule->setModuleGUID(
         moduleGuid.isNull() ? QnUuid::createUuid() : moduleGuid);
@@ -450,14 +446,8 @@ void Appserver2Process::addSelfServerResource(
 // class Appserver2ProcessPublic
 
 Appserver2ProcessPublic::Appserver2ProcessPublic(int argc, char **argv):
-    m_impl(new Appserver2Process(argc, argv))
+    m_impl(std::make_unique<Appserver2Process>(argc, argv))
 {
-}
-
-Appserver2ProcessPublic::~Appserver2ProcessPublic()
-{
-    delete m_impl;
-    m_impl = nullptr;
 }
 
 void Appserver2ProcessPublic::pleaseStop()
@@ -478,7 +468,7 @@ int Appserver2ProcessPublic::exec()
 
 const Appserver2Process* Appserver2ProcessPublic::impl() const
 {
-    return m_impl;
+    return m_impl.get();
 }
 
 ec2::AbstractECConnection* Appserver2ProcessPublic::ecConnection()
@@ -497,4 +487,3 @@ QnCommonModule* Appserver2ProcessPublic::commonModule() const
 }
 
 }   // namespace ec2
-//}   // namespace nx

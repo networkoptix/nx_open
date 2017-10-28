@@ -92,17 +92,34 @@ protected:
         m_systemMergeFixture.whenMergeSystems();
     }
 
-    void thenSystemsMerged()
+    void whenGoneOffline()
+    {
+        m_cdb.stop();
+    }
+
+    void thenMergeSucceded()
     {
         ASSERT_EQ(QnRestResult::Error::NoError, m_systemMergeFixture.prevMergeResult());
-        m_systemMergeFixture.thenAllServersSynchronizedData();
-
-        const auto cloudSystemCredentials = 
-            m_systemMergeFixture.peer(0).getCloudCredentials();
-        thenSystemDataIsSynchronizedToCloud(cloudSystemCredentials);
-        thenAllCloudCredentialsAreNotValidExcept(cloudSystemCredentials);
-        thenCloudCredentialsAreValid(cloudSystemCredentials);
     }
+    
+    void andAllServersAreInterconnected()
+    {
+        m_systemMergeFixture.thenAllServersAreInterconnected();
+    }
+    
+    void andAllServersSynchronizedData()
+    {
+        m_systemMergeFixture.thenAllServersSynchronizedData();
+    }
+
+    //void thenSystemsMerged()
+    //{
+    //    const auto cloudSystemCredentials = 
+    //        m_systemMergeFixture.peer(0).getCloudCredentials();
+    //    thenSystemDataIsSynchronizedToCloud(cloudSystemCredentials);
+    //    waitUntilAllCloudCredentialsAreNotValidExcept(cloudSystemCredentials);
+    //    thenCloudCredentialsAreValid(cloudSystemCredentials);
+    //}
 
     void thenCloudCredentialsAreValid(
         const nx::hpm::api::SystemCredentials& cloudCredentials)
@@ -126,16 +143,31 @@ protected:
                 cloudCredentials.systemId.toStdString(), &systemData));
     }
 
-    void thenAllCloudCredentialsAreNotValidExcept(
+    bool areAllCloudCredentialsNotValidExcept(
         const nx::hpm::api::SystemCredentials& cloudCredentialsException)
     {
         for (const auto& cloudCredentials: m_systemCloudCredentials)
         {
             if (cloudCredentials.systemId == cloudCredentialsException.systemId)
-                thenCloudCredentialsAreValid(cloudCredentials);
-            else
-                thenCloudCredentialsAreNotValid(cloudCredentials);
+                continue;
+
+            nx::cdb::api::SystemDataEx systemData;
+            const auto resultCode = m_cdb.getSystem(
+                cloudCredentials.systemId.toStdString(), cloudCredentials.key.toStdString(),
+                cloudCredentials.systemId.toStdString(), &systemData);
+
+            if (resultCode == nx::cdb::api::ResultCode::ok)
+                return false;
         }
+
+        return true;
+    }
+
+    void waitUntilAllCloudCredentialsAreNotValidExcept(
+        const nx::hpm::api::SystemCredentials& cloudCredentialsException)
+    {
+        while (!areAllCloudCredentialsNotValidExcept(cloudCredentialsException))
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     void thenSystemDataIsSynchronizedToCloud(
@@ -228,7 +260,9 @@ TEST_F(CloudMerge, cloud_systems_with_the_same_owner_can_be_merged)
 
     whenMergeSystems();
 
-    thenSystemsMerged();
+    thenMergeSucceded();
+    andAllServersAreInterconnected();
+    andAllServersSynchronizedData();
 }
 
 TEST_F(CloudMerge, cloud_systems_with_different_owners_cannot_be_merged)

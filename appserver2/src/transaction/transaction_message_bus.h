@@ -124,7 +124,9 @@ public:
     AlivePeersMap aliveClientPeers() const;
 
     virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
+    virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
     virtual void dropConnections() override;
+
 signals:
     void gotLockRequest(ApiLockData);
     //void gotUnlockRequest(ApiLockData);

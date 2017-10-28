@@ -73,6 +73,11 @@ QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedClientPeers() const
     return m_bus->directlyConnectedClientPeers();
 }
 
+QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedServerPeers() const
+{
+    return m_bus->directlyConnectedServerPeers();
+}
+
 QnUuid TransactionMessageBusAdapter::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
 {
     return m_bus->routeToPeerVia(dstPeer, distance);
