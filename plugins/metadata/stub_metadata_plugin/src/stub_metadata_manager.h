@@ -6,15 +6,14 @@
 #include <mutex>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/abstract_metadata_manager.h>
-
+#include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
 
 namespace nx {
 namespace mediaserver {
 namespace plugins {
 
 class StubMetadataManager:
-    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractMetadataManager>
+    public nxpt::CommonRefCounter<nx::sdk::metadata::AbstractConsumingMetadataManager>
 {
 public:
     StubMetadataManager();
@@ -31,6 +30,7 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
+    virtual nx::sdk::Error putData(const nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();
     nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();

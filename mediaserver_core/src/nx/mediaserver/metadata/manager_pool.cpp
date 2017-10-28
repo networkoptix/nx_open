@@ -29,20 +29,17 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-ResourceMetadataContext::ResourceMetadataContext(
-    AbstractMetadataManager* metadataManager,
-    AbstractMetadataHandler* metadataHandler)
-:
-    manager(
-        metadataManager,
-        ManagerDeleter(
-            [](AbstractMetadataManager* metadataManager)
-            {
-                metadataManager->stopFetchingMetadata();
-                metadataManager->releaseRef();
-            })),
-    handler(metadataHandler)
+ResourceMetadataContext::ResourceMetadataContext()
 {
+}
+
+ResourceMetadataContext::~ResourceMetadataContext()
+{
+    if (manager)
+    {
+        manager->stopFetchingMetadata();
+        manager->releaseRef();
+    }
 }
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
@@ -169,9 +166,12 @@ void ManagerPool::createMetadataManagersForResource(const QnSecurityCamResourceP
         if (!handler)
             continue;
 
-        m_contexts.emplace(
-            camera->getId(),
-            ResourceMetadataContext(manager, handler));
+        {
+            QnMutexLocker lock(&m_contextMutex);
+            m_contexts[camera->getId()].manager.reset(manager);
+            m_contexts[camera->getId()].handler.reset(handler);
+        }
+
 
         managerGuard.release();
     }
@@ -192,6 +192,7 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
 
 void ManagerPool::releaseResourceMetadataManagers(const QnSecurityCamResourcePtr& resource)
 {
+    QnMutexLocker lock(&m_contextMutex);
     auto id = resource->getId();
     auto range  = m_contexts.erase(id);
 }
@@ -224,6 +225,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 
     if (canFetchMetadataFromResource(camera))
     {
+        QnMutexLocker lock(&m_contextMutex);
         auto context = m_contexts.find(resourceId);
         if (context == m_contexts.cend())
             createMetadataManagersForResource(camera);
@@ -244,6 +246,7 @@ bool ManagerPool::canFetchMetadataFromResource(const QnSecurityCamResourcePtr& c
 
 bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid>& eventTypeIds)
 {
+    QnMutexLocker lock(&m_contextMutex);
     auto context = m_contexts.find(resourceId);
     if (context == m_contexts.cend())
         return false;
@@ -375,11 +378,10 @@ bool ManagerPool::resourceInfoFromResource(
 
 QnAbstractDataReceptorPtr ManagerPool::registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
 {
-    const auto& id = dataProvider->getResource()->getId();
-    auto itr = m_contexts.find(id);
-    if (itr == m_contexts.end())
+    QnMutexLocker lock(&m_contextMutex);
+    auto id = dataProvider->getResource()->getId();
         return QnAbstractDataReceptorPtr();
-    auto& context = itr->second;
+    auto& context = m_contexts[id];
     context.dataProvider = dataProvider;
     context.dataReceptor = QnAbstractDataReceptorPtr(new DataReceptor(&context));
     return context.dataReceptor;
@@ -387,6 +389,7 @@ QnAbstractDataReceptorPtr ManagerPool::registerDataProvider(QnAbstractMediaStrea
 
 void ManagerPool::removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
 {
+    QnMutexLocker lock(&m_contextMutex);
     const auto& id = dataProvider->getResource()->getId();
     auto itr = m_contexts.find(id);
     if (itr == m_contexts.end())
@@ -400,12 +403,11 @@ bool ManagerPool::registerDataReceptor(
     const QnResourcePtr& resource,
     QnAbstractDataReceptor* dataReceptor)
 {
+    QnMutexLocker lock(&m_contextMutex);
     const auto& id = resource->getId();
-    auto itr = m_contexts.find(id);
-    if (itr == m_contexts.end())
-        return false;
 
-    if (auto handler = dynamic_cast<EventHandler*> (itr->second.handler.get()))
+    auto& context = m_contexts[id];
+    if (auto handler = dynamic_cast<EventHandler*> (context.handler.get()))
     {
         handler->registerDataReceptor(dataReceptor);
         return true;
@@ -417,12 +419,9 @@ void ManagerPool::removeDataReceptor(
     const QnResourcePtr& resource,
     QnAbstractDataReceptor* dataReceptor)
 {
-    const auto& id = resource->getId();
-    auto itr = m_contexts.find(id);
-    if (itr == m_contexts.end())
-        return;
-    auto& context = itr->second;
-    if (auto handler = dynamic_cast<EventHandler*> (itr->second.handler.get()))
+    QnMutexLocker lock(&m_contextMutex);
+    auto& context = m_contexts[resource->getId()];
+    if (auto handler = dynamic_cast<EventHandler*> (context.handler.get()))
         handler->removeDataReceptor(dataReceptor);
 }
 

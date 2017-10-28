@@ -59,13 +59,18 @@ Error StubMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handle
             while (!m_stopping)
             {
                 m_handler->handleMetadata(Error::noError, cookSomeEvents());
-                m_handler->handleMetadata(Error::noError, cookSomeObjects());
                 std::this_thread::sleep_for(std::chrono::milliseconds(3000));
             }
         };
 
     m_thread.reset(new std::thread(metadataDigger));
 
+    return Error::noError;
+}
+
+nx::sdk::Error StubMetadataManager::putData(const nx::sdk::metadata::AbstractDataPacket* dataPacket)
+{
+    m_handler->handleMetadata(Error::noError, cookSomeObjects());
     return Error::noError;
 }
 

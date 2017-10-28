@@ -30,16 +30,10 @@ namespace metadata {
 struct ResourceMetadataContext
 {
 public:
-    using ManagerDeleter = std::function<void(nx::sdk::metadata::AbstractMetadataManager*)>;
+    ResourceMetadataContext();
+    ~ResourceMetadataContext();
 
-    ResourceMetadataContext(
-        nx::sdk::metadata::AbstractMetadataManager*,
-        nx::sdk::metadata::AbstractMetadataHandler*);
-
-    std::unique_ptr<
-        nx::sdk::metadata::AbstractMetadataManager,
-        ManagerDeleter> manager;
-
+    std::unique_ptr<nx::sdk::metadata::AbstractMetadataManager> manager;
     std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> handler;
 
     QnAbstractMediaStreamDataProvider* dataProvider;
@@ -120,6 +114,7 @@ private:
 private:
     ResourceMetadataContextMap m_contexts;
     QnMediaServerModule* m_serverModule;
+    QnMutex m_contextMutex;
 };
 
 } // namespace metadata
