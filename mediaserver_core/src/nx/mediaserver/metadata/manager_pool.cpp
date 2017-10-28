@@ -243,6 +243,7 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         auto handler = createMetadataHandler(camera, pluginManifest->driverId);
         if (!handler)
             continue;
+        manager->setHandler(handler);
 
         auto& context = m_contexts[camera->getId()];
         context.setManager(manager);
@@ -334,7 +335,7 @@ bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid
     if (eventTypeIds.empty())
         result = manager->stopFetchingMetadata();
     else
-        result = manager->startFetchingMetadata(handler); //< TODO: #dmishin pass event types.
+        result = manager->startFetchingMetadata(); //< TODO: #dmishin pass event types.
 
     return result == Error::noError;
 }

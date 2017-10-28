@@ -53,12 +53,18 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error StubMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
+Error StubMetadataManager::setHandler(AbstractMetadataHandler* handler)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_handler = handler;
+    return Error::noError;
+}
+
+Error StubMetadataManager::startFetchingMetadata()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     stopFetchingMetadataUnsafe();
-    m_handler = handler;
 
     auto metadataDigger = [this]()
         {
