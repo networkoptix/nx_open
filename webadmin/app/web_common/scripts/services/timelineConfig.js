@@ -107,6 +107,7 @@ var TimelineConfig = {
     markerTriangleHeight: 3/100,
     markerLineHeightOffset: 4,
     markerTimeOffset: 6,
+    markerSideBuffer: 10,
 
     dateFormat: 'd mmmm yyyy', // Timemarker format for date
     timeFormat: 'HH:MM:ss', // Timemarker format for time

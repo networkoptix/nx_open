@@ -686,10 +686,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     function drawMarker(context, date, markerColor, markWidth, textColor){
         var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
 
-        if(coordinate < 0 || coordinate > self.canvas.width ) {
-            return;
-        }
-
         date = new Date(date);
 
         var height = timelineConfig.markerHeight * self.canvas.height;
@@ -712,11 +708,22 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.stroke();
 
         var startCoord = coordinate - width/2;
+        var markerSideBuffer = timelineConfig.markerSideBuffer * self.pixelAspectRatio;
+
+        var triangleLeft = false;
+        var triangleRight = false;
+
         if(startCoord < 0){
-            startCoord = 0;
+            startCoord = markerSideBuffer;
+            if (coordinate < startCoord/2 + triangleHeight * self.canvas.height){
+                triangleLeft = true;
+            }
         }
         if(startCoord > self.canvas.width - width){
-            startCoord = self.canvas.width - width;
+            startCoord = self.canvas.width - width - markerSideBuffer;
+            if (coordinate > self.canvas.width - markerSideBuffer/2 - triangleHeight * self.canvas.height){
+                triangleRight = true;
+            }
         }
 
         // Bubble
@@ -724,9 +731,23 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         // Triangle
         context.beginPath();
-        context.moveTo(0.5 + coordinate + triangleHeight * self.canvas.height, height + offset);
-        context.lineTo(0.5 + coordinate, height + offset + triangleHeight * self.canvas.height);
-        context.lineTo(0.5 + coordinate - triangleHeight * self.canvas.height, height + offset);
+        if(!triangleLeft && !triangleRight){
+            context.moveTo(0.5 + coordinate + triangleHeight * self.canvas.height, height + offset);
+            context.lineTo(0.5 + coordinate, height + offset + triangleHeight * self.canvas.height);
+            context.lineTo(0.5 + coordinate - triangleHeight * self.canvas.height, height + offset);
+        }
+        else if (triangleLeft){
+            context.moveTo(startCoord, height/2 + offset);
+            context.lineTo(startCoord, (height/2 + offset) + triangleHeight * self.canvas.height);
+            context.lineTo(startCoord - triangleHeight * self.canvas.height, height/2 + offset);
+            context.lineTo(startCoord, (height/2 + offset) - triangleHeight * self.canvas.height);
+        }
+        else{
+            context.moveTo(startCoord + width, height/2 + offset);
+            context.lineTo(startCoord + width, (height/2 + offset) + triangleHeight * self.canvas.height);
+            context.lineTo(startCoord + width + triangleHeight * self.canvas.height, height/2 + offset);
+            context.lineTo(startCoord + width, (height/2 + offset) - triangleHeight * self.canvas.height);
+        }
         context.closePath();
         context.fill();
 
