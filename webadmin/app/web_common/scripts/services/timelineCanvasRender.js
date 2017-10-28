@@ -812,7 +812,11 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
             if (canScrollRight) {
                 if(ableToScrollRight || true) {
-                    drawScrollButton(context, false, mouseOverRightScrollButton, mouseInRightButton);
+                    var sliderBar = self.scaleManager.scrollSlider();
+                    var scrollbarEnd = (sliderBar.start + sliderBar.width) * self.pixelAspectRatio;
+                    if(scrollbarEnd < self.canvas.width - self.pixelAspectRatio){
+                        drawScrollButton(context, false, mouseOverRightScrollButton, mouseInRightButton);
+                    }
                 }else{
                     if(!scrollRightEnablingTimer) {
                         scrollRightEnablingTimer = setTimeout(function () {
