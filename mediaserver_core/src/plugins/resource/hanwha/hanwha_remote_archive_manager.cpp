@@ -59,14 +59,12 @@ bool HanwhaRemoteArchiveManager::removeArchiveEntries(const std::vector<QString>
 
 RemoteArchiveCapabilities HanwhaRemoteArchiveManager::capabilities() const
 {
-    return RemoteArchiveCapability::RandomChunkPositionAccessCapability
-        | RemoteArchiveCapability::StreamChunkCapability;
+    return RemoteArchiveCapability::RandomAccessChunkCapability;
 }
 
 QnAbstractArchiveDelegate* HanwhaRemoteArchiveManager::archiveDelegate()
 {
     return m_resource->remoteArchiveDelegate();
-
 }
 
 void HanwhaRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(

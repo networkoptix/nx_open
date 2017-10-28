@@ -44,6 +44,10 @@ static int SOCKET_READ_BUFFER_SIZE = 512*1024;
 static const int MAX_MEDIA_SOCKET_COUNT = 5;
 static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 
+static const int64_t kNtpEpochTimeDiff =
+    QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
+        .secsTo(QDateTime::fromString(lit("1970-01-01"), Qt::ISODate));
+
 } // namespace
 
 namespace RtpTransport {
@@ -143,7 +147,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 {
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
-    
+
     const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
     if (position != AV_NOPTS_VALUE)
     {
@@ -242,7 +246,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
                 result->channelNumber = m_tracks[i].parser->logicalChannelNum();
                 if (result->dataType == QnAbstractMediaData::VIDEO)
                 {
-                    result->channelNumber = 
+                    result->channelNumber =
                         std::min(result->channelNumber, (quint32) m_numberOfVideoChannels - 1);
                 }
                 return result;
@@ -287,7 +291,17 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         if (format == QnRtspClient::TT_VIDEO || format == QnRtspClient::TT_AUDIO)
         {
-            if (!parser->processData((quint8*)m_demuxedData[rtpChannelNum]->data(), rtpBufferOffset+4, readed-4, ioDevice->getStatistic(), m_gotData))
+            const auto offset = rtpBufferOffset+4;
+            const auto length = readed - 4;
+
+            const auto rtcpStaticstics = rtspStatistics(offset, length, rtpChannelNum);
+
+            if (!parser->processData(
+                (quint8*)m_demuxedData[rtpChannelNum]->data(),
+                offset,
+                length,
+                rtcpStaticstics,
+                m_gotData))
             {
                 clearKeyData(parser->logicalChannelNum());
                 m_demuxedData[rtpChannelNum]->clear();
@@ -372,12 +386,23 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
             while (!gotData)
             {
                 quint8* rtpBuffer = QnRtspClient::prepareDemuxedData(m_demuxedData, rtpChannelNum, MAX_RTP_PACKET_SIZE); // todo: update here
-                int readed = track.ioDevice->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
-                if (readed < 1)
+                int bytesRead = track.ioDevice->read( (char*) rtpBuffer, MAX_RTP_PACKET_SIZE);
+                if (bytesRead < 1)
                     break;
-                m_demuxedData[rtpChannelNum]->finishWriting(readed);
+                m_demuxedData[rtpChannelNum]->finishWriting(bytesRead);
                 quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
-                if (!track.parser->processData(bufferBase, rtpBuffer-bufferBase, readed, track.ioDevice->getStatistic(), gotData))
+
+                const auto statistics = rtspStatistics(
+                    rtpBuffer - bufferBase,
+                    bytesRead,
+                    rtpChannelNum);
+
+                if (!track.parser->processData(
+                        bufferBase,
+                        rtpBuffer-bufferBase,
+                        bytesRead,
+                        statistics,
+                        gotData))
                 {
                     clearKeyData(track.parser->logicalChannelNum());
                     m_demuxedData[rtpChannelNum]->clear();
@@ -600,7 +625,7 @@ void QnMulticodecRtpReader::createTrackParsers()
         if (trackType == QnRtspClient::TT_VIDEO || trackType == QnRtspClient::TT_AUDIO)
         {
             m_tracks[i].parser.reset(createParser(trackInfo[i]->codecName.toUpper()));
-            if (m_tracks[i].parser) 
+            if (m_tracks[i].parser)
             {
                 m_tracks[i].parser->setTimeHelper(&m_timeHelper);
                 m_tracks[i].parser->setSDPInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
@@ -754,6 +779,11 @@ void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
     m_timeHelper.setTimePolicy(TimePolicy::ForceCameraTime);
 }
 
+void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
+{
+    m_timeHelper.setTimePolicy(timePolicy);
+}
+
 void QnMulticodecRtpReader::addRequestHeader(
     const QString& requestName,
     const nx_http::HttpHeader& header)
@@ -764,6 +794,61 @@ void QnMulticodecRtpReader::addRequestHeader(
 QnRtspClient& QnMulticodecRtpReader::rtspClient()
 {
     return m_RtpSession;
+}
+
+boost::optional<uint64_t> QnMulticodecRtpReader::parseOnvifNtpExtension(
+    quint8* bufferStart,
+    int length) const
+{
+    if (length < RtpHeader::RTP_HEADER_SIZE)
+        return boost::none;
+
+    const auto rtpHeader = (RtpHeader*) bufferStart;
+    if (!rtpHeader->extension)
+        return boost::none;
+
+    if (length < RtpHeader::RTP_HEADER_SIZE + 4)
+        return boost::none;
+
+    quint8* ptr = bufferStart + RtpHeader::RTP_HEADER_SIZE;
+    const auto extensionType = htons(*(uint16_t*)ptr);
+
+    if (extensionType != 0xabac && extensionType != 0xabad)
+        return boost::none;
+
+    const int extWords = ((int(ptr[2]) << 8) + ptr[3]);
+    if (extWords != 3)
+        return boost::none;
+
+    ptr += 4;
+    const auto seconds = htonl(*(uint32_t*)ptr);
+    const auto fractions = htonl(*(uint32_t*)(ptr + 4));
+
+    return (uint64_t)((seconds
+        - kNtpEpochTimeDiff
+        + (double) fractions / std::numeric_limits<uint32_t>::max())
+        * 1'000'000);
+}
+
+QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
+    int rtpBufferOffset,
+    int rtpPacketSize,
+    int channel)
+{
+    auto ioDevice = m_tracks[channel].ioDevice;
+    auto rtcpStaticstics = ioDevice->getStatistic();
+    const auto extensionNtpTime = parseOnvifNtpExtension(
+        (quint8*)m_demuxedData[channel]->data() + rtpBufferOffset,
+        rtpPacketSize);
+
+    rtcpStaticstics.ntpOnvifExtensionTime = extensionNtpTime
+        ? extensionNtpTime
+        : m_lastOnvifNtpExtensionTime;
+
+    if (extensionNtpTime)
+        m_lastOnvifNtpExtensionTime = extensionNtpTime;
+
+    return rtcpStaticstics;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

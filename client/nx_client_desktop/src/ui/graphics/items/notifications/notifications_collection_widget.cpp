@@ -649,8 +649,24 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         return;
 
     const QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
-    const QString messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
+    QString messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
     NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    if (messageText.isEmpty())
+        return;
+
+    bool isRemoteArchiveSynchronizationEvent =
+        message == QnSystemHealth::RemoteArchiveSyncStarted
+        || message == QnSystemHealth::RemoteArchiveSyncFinished
+        || message == QnSystemHealth::RemoteArchiveSyncError
+        || message == QnSystemHealth::RemoteArchiveSyncProgress;
+
+    if (action && isRemoteArchiveSynchronizationEvent)
+    {
+        auto description = action->getRuntimeParams().description;
+        if (!description.isEmpty())
+            messageText = description;
+    }
+
     if (messageText.isEmpty())
         return;
 

@@ -10,7 +10,7 @@
 
 extern "C"
 {
-    // For const AV_NOPTS_VALUE.
+// For const AV_NOPTS_VALUE.
 #include <libavutil/avutil.h>
 }
 
@@ -35,8 +35,6 @@ public:
     HanwhaChunkLoader();
     virtual ~HanwhaChunkLoader();
 
-    void setIsCameraLoader(bool isCameraLoader);
-
     void start(HanwhaSharedResourceContext* resourceContext);
     bool isStarted() const;
 
@@ -46,6 +44,8 @@ public:
     QnTimePeriodList chunksSync(int channelNumber) const;
 
     void setTimeZoneShift(std::chrono::seconds timeZoneShift);
+    std::chrono::seconds timeZoneShift() const;
+
 signals:
     void gotChunks();
 
@@ -82,7 +82,6 @@ private:
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};
     std::atomic<bool> m_terminated{false};
 
-    bool m_isCameraLoader = false;
     std::atomic<bool> m_chunksLoadedAtLeastOnce{false};
     std::atomic<bool> m_timeRangeLoadedAtLeastOnce{false};
     mutable std::atomic<bool> m_errorOccured{false};

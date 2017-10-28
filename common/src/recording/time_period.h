@@ -84,6 +84,10 @@ public:
      */
     void truncateFront(qint64 timeMs);
 
+    QnTimePeriod truncated(qint64 timeMs) const;
+
+    QnTimePeriod truncatedFront(qint64 timeMs) const;
+
     QByteArray serialize() const;
     QnTimePeriod& deserialize(const QByteArray& data);
 

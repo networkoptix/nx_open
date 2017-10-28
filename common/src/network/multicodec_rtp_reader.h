@@ -97,6 +97,8 @@ public:
      */
     void setTrustToCameraTime(bool value);
 
+    void setTimePolicy(TimePolicy timePolicy);
+
     void addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header);
 signals:
     void networkIssue(
@@ -127,6 +129,11 @@ private:
     QnRtspClient::TransportType getRtpTransport() const;
 
     void calcStreamUrl();
+
+    boost::optional<uint64_t> parseOnvifNtpExtension(quint8* bufferStart, int length) const;
+
+    QnRtspStatistic rtspStatistics(int rtpBufferOffset, int rtpPacketSize, int channel);
+
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr& res, const QString& key);
@@ -159,6 +166,7 @@ private:
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
+    boost::optional<uint64_t> m_lastOnvifNtpExtensionTime;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

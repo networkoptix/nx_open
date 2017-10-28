@@ -315,6 +315,21 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
+    if (m_startRecordingBoundUs.is_initialized())
+    {
+        if (nonConstData->timestamp < *m_startRecordingBoundUs)
+            nonConstData->timestamp = *m_startRecordingBoundUs;
+    }
+
+    if (m_endRecordingBoundUs.is_initialized())
+    {
+        if (nonConstData->timestamp > *m_endRecordingBoundUs)
+        {
+            close();
+            return true;
+        }
+    }
+
     QnConstAbstractMediaDataPtr md =
         std::dynamic_pointer_cast<const QnAbstractMediaData>(nonConstData);
     if (!md)
@@ -1223,6 +1238,12 @@ void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
 void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
 {
     m_transcodeFilters = filters;
+}
+
+void QnStreamRecorder::setRecordingBounds(int64_t startTimeUs, int64_t endTimeUs)
+{
+    m_startRecordingBoundUs = startTimeUs;
+    m_endRecordingBoundUs = endTimeUs;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

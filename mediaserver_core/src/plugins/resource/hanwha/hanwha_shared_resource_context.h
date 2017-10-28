@@ -107,6 +107,7 @@ public:
     std::shared_ptr<HanwhaChunkLoader> chunkLoader() const;
 
     // NOTE: function objects return HanwhaResult<T>.
+    HanwhaCachedData<int> currentOverlappedId;
     HanwhaCachedData<HanwhaInformation> information;
     HanwhaCachedData<HanwhaCgiParameters> cgiParamiters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
@@ -114,6 +115,7 @@ public:
     HanwhaCachedData<HanwhaResponse> videoProfiles;
 
 private:
+    HanwhaResult<int> loadOverlappedId();
     HanwhaResult<HanwhaInformation> loadInformation();
     HanwhaResult<HanwhaCgiParameters> loadCgiParamiters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();

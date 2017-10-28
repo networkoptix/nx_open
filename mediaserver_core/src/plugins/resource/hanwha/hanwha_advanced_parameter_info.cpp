@@ -83,12 +83,6 @@ QString HanwhaAdavancedParameterInfo::rangeParameter() const
     if (!m_rangeParameter.isEmpty())
         return m_rangeParameter;
 
-    qDebug() << "Range parameter: " << lit("%1/%2/%3/%4")
-        .arg(m_cgi)
-        .arg(m_submenu)
-        .arg(m_updateAction)
-        .arg(m_parameterName);
-
     return lit("%1/%2/%3/%4")
         .arg(m_cgi)
         .arg(m_submenu)

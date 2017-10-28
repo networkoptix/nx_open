@@ -126,6 +126,8 @@ public:
 
     int64_t lastFileSize() const;
 
+    void setRecordingBounds(int64_t startTimeUs, int64_t endTimeUs);
+
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -240,6 +242,9 @@ private:
     bool m_disableRegisterFile;
     MotionHandler m_motionHandler;
     int64_t m_lastFileSize = 0;
+
+    boost::optional<int64_t> m_startRecordingBoundUs;
+    boost::optional<int64_t> m_endRecordingBoundUs;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

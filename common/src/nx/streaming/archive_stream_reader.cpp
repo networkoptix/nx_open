@@ -1035,7 +1035,7 @@ void QnArchiveStreamReader::setSpeedInternal(double value, qint64 currentTimeHin
 {
     if (value == m_speed)
         return;
-    
+
     bool oldReverseMode = m_speed;
     bool newReverseMode = value;
     m_speed = value;
@@ -1071,6 +1071,21 @@ void QnArchiveStreamReader::pleaseStop()
         m_delegate->beforeClose();
     m_singleShowWaitCond.wakeAll();
     m_stopWaitCond.wakeAll();
+}
+
+void QnArchiveStreamReader::setEndOfPlaybackHandler(std::function<void()> handler)
+{
+    m_endOfPlaybackHandler = handler;
+    if (m_delegate)
+        m_delegate->setEndOfPlaybackHandler(handler);
+}
+
+void QnArchiveStreamReader::setErrorHandler(
+    std::function<void(const QString& errorString)> handler)
+{
+    m_errorHandler = handler;
+    if (m_delegate)
+        m_delegate->setErrorHandler(handler);
 }
 
 void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast)
@@ -1280,6 +1295,11 @@ void QnArchiveStreamReader::unlock()
 void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
 {
     m_delegate = contextDelegate;
+    if (m_endOfPlaybackHandler)
+        m_delegate->setEndOfPlaybackHandler(m_endOfPlaybackHandler);
+
+    if (m_errorHandler)
+        m_delegate->setErrorHandler(m_errorHandler);
 }
 
 void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
@@ -1354,12 +1374,12 @@ void QnArchiveStreamReader::setGroupId(const QByteArray& guid)
 
 bool QnArchiveStreamReader::isPaused() const
 {
-    if (getResource()->hasParam(Qn::kGroupPlayParamName)) 
+    if (getResource()->hasParam(Qn::kGroupPlayParamName))
     {
         QnMutexLocker lock(&m_stopMutex);
         return m_stopCond;
     }
-    else 
+    else
     {
         return QnAbstractArchiveStreamReader::isPaused();
     }
@@ -1367,13 +1387,13 @@ bool QnArchiveStreamReader::isPaused() const
 
 void QnArchiveStreamReader::pause()
 {
-    if (getResource()->hasParam(Qn::kGroupPlayParamName)) 
+    if (getResource()->hasParam(Qn::kGroupPlayParamName))
     {
         QnMutexLocker lock( &m_stopMutex );
         m_delegate->beforeClose();
         m_stopCond = true; // for VMAX
     }
-    else 
+    else
     {
         QnAbstractArchiveStreamReader::pause();
     }

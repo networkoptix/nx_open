@@ -34,9 +34,12 @@ public:
 
     virtual void beforeSeek(qint64 time) override;
 
-    virtual void setPlaybackMode(PlaybackMode value) override;    
+    virtual void setPlaybackMode(PlaybackMode value) override;
 
     void setRateControlEnabled(bool enabled);
+    void setOverlappedId(int overlappedId);
+
+
 private:
     bool isForwardDirection() const;
 private:

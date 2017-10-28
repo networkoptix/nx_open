@@ -68,7 +68,7 @@ boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str)
 {
     if (!str.is_initialized())
         return boost::none;
-    
+
     return fromHanwhaString<AVCodecID>(*str);
 }
 
@@ -484,6 +484,18 @@ bool ratioComparator(const QString& lhs, const QString& rhs)
     }
 
     return ((double) num1 / den1) > ((double) num2 / den2);
+}
+
+qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift)
+{
+    auto dateTime = QDateTime::fromString(value, kHanwhaDateFormat);
+    dateTime.setOffsetFromUtc(timeZoneShift.count());
+    return std::max(0LL, dateTime.toMSecsSinceEpoch());
+}
+
+QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift)
+{
+    return QDateTime::fromMSecsSinceEpoch(valueMs, Qt::OffsetFromUTC, timeZoneShift.count());
 }
 
 } // namespace plugins

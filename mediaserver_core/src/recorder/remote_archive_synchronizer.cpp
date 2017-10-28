@@ -1,25 +1,17 @@
 #include "remote_archive_synchronizer.h"
 
-#include <recorder/storage_manager.h>
 #include <recorder/remote_archive_synchronization_task.h>
 #include <recorder/remote_archive_stream_synchronization_task.h>
-#include <recording/stream_recorder.h>
 #include <nx/mediaserver/event/event_connector.h>
-#include <transcoding/transcoding_utils.h>
 #include <utils/common/util.h>
-#include <motion/motion_helper.h>
-#include <database/server_db.h>
+
 #include <common/common_module.h>
 #include <common/static_common_module.h>
+#include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/dummy_resource.h>
-
-#include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/utils/avi_motion_archive_delegate.h>
-#include <plugins/storage/memory/ext_iodevice_storage.h>
-#include <plugins/utils/avi_motion_archive_delegate.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
@@ -37,6 +29,15 @@ RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QObject* parent):
     m_terminated(false)
 {
     NX_LOGX(lit("Creating remote archive synchronizer."), cl_logDEBUG1);
+
+    auto threadCount = maxSynchronizationThreads();
+    NX_LOGX(
+        lit("Setting maximum number of archive synchronization threads to %1")
+        .arg(threadCount),
+        cl_logDEBUG1);
+
+    m_threadPool.setMaxThreadCount(threadCount);
+
     connect(
         commonModule()->resourcePool(),
         &QnResourcePool::resourceAdded,
@@ -133,6 +134,19 @@ void RemoteArchiveSynchronizer::at_resourceParentIdChanged(const QnResourcePtr& 
     cancelTaskForResource(resource->getId());
 }
 
+int RemoteArchiveSynchronizer::maxSynchronizationThreads() const
+{
+    auto maxThreads = qnGlobalSettings->maxRemoteArchiveSynchronizationThreads();
+    if (maxThreads > 0)
+        return maxThreads;
+
+    maxThreads = QThread::idealThreadCount() / 2;
+    if (maxThreads > 0)
+        return maxThreads;
+
+    return 1;
+}
+
 void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResourcePtr& resource)
 {
     if (m_terminated)
@@ -147,11 +161,11 @@ void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResource
     const auto capabilities = manager->capabilities();
     std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> task;
 
-    if (capabilities.testFlag(RemoteArchiveCapability::StreamChunkCapability))
+    if (capabilities.testFlag(RemoteArchiveCapability::RandomAccessChunkCapability))
         task = std::make_shared<RemoteArchiveStreamSynchronizationTask>(commonModule());
     else
         task = std::make_shared<RemoteArchiveSynchronizationTask>(commonModule());
-    
+
     if (!task)
         return;
 
@@ -160,7 +174,10 @@ void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResource
 
     SynchronizationTaskContext context;
     context.task = task;
-    context.result = nx::utils::concurrent::run([task]() { task->execute(); });
+    context.result = nx::utils::concurrent::run(
+        &m_threadPool,
+        [task]() { task->execute(); });
+
     m_syncTasks[id] = context;
 }
 

@@ -406,40 +406,106 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period)
 
 void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
 {
-    if (empty() || periodList.isEmpty())
-        return;
-
-    const_iterator srcItr = begin();
-    const_iterator dstItr = periodList.begin();
+    auto srcItr = cbegin();
+    auto subtrahendItr = periodList.cbegin();
     QnTimePeriodList result;
-    QnTimePeriod subtractPeriod = *dstItr;
+
+    auto leftIntersection =
+        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
+        {
+            return subtrahend.startTimeMs <= src.startTimeMs
+                && subtrahend.endTimeMs() > src.startTimeMs
+                && subtrahend.endTimeMs() < src.endTimeMs();
+        };
+
+    auto rightIntersection =
+        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
+        {
+            return subtrahend.startTimeMs > src.startTimeMs
+                && subtrahend.startTimeMs < src.endTimeMs()
+                && subtrahend.endTimeMs() >= src.endTimeMs();
+        };
+
+    auto contains =
+        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
+        {
+            return subtrahend.startTimeMs > src.startTimeMs
+                && subtrahend.startTimeMs < src.endTimeMs()
+                && subtrahend.endTimeMs() > src.startTimeMs
+                && subtrahend.endTimeMs() < src.endTimeMs();
+        };
+
+    auto contained =
+        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
+        {
+            return subtrahend.startTimeMs <= src.startTimeMs
+                && subtrahend.endTimeMs() >= src.endTimeMs();
+        };
 
     while (srcItr != end())
     {
-        while (srcItr != end() && srcItr->startTimeMs < subtractPeriod.startTimeMs)
-            result << *srcItr++;
-        if (!result.isEmpty())
-            result.last().truncate(subtractPeriod.startTimeMs);
-
-        while (srcItr != end() && srcItr->endTimeMs() <= subtractPeriod.endTimeMs())
-            srcItr++;
-        if (srcItr != end())
+        if (contained(*srcItr, *subtrahendItr))
         {
-            result << *srcItr++;
-            result.last().truncateFront(subtractPeriod.endTimeMs());
+            ++srcItr;
+            continue;
         }
 
-        if (dstItr != periodList.end() - 1)
+        if (subtrahendItr != periodList.cend()
+            && subtrahendItr->endTimeMs() <= srcItr->startTimeMs)
         {
-            subtractPeriod = *(++dstItr);
-            if (!result.isEmpty())
+            ++subtrahendItr;
+            continue;
+        }
+
+        if (subtrahendItr == periodList.cend() && srcItr != end())
+            result << *srcItr;
+
+        auto current = *srcItr;
+        while (subtrahendItr != periodList.cend())
+        {
+            if (leftIntersection(current, *subtrahendItr))
             {
-                result.last().truncate(subtractPeriod.startTimeMs);
-                if (result.last().isEmpty())
-                    result.pop_back();
+                current = current.truncatedFront(subtrahendItr->endTimeMs());
+                ++subtrahendItr;
+
+                if (subtrahendItr == periodList.cend())
+                    result << current;
+
+                continue;
             }
+
+            if (rightIntersection(current, *subtrahendItr))
+            {
+                result << current.truncated(subtrahendItr->startTimeMs);
+                break;
+            }
+
+            if (contains(current, *subtrahendItr))
+            {
+                result << QnTimePeriod::fromInterval(
+                    current.startTimeMs,
+                    subtrahendItr->startTimeMs);
+
+                current = QnTimePeriod::fromInterval(
+                    subtrahendItr->endTimeMs(),
+                    current.endTimeMs());
+
+                ++subtrahendItr;
+
+                if (subtrahendItr == periodList.cend())
+                    result << current;
+
+                continue;
+            }
+
+            result << current;
+            break;
         }
+
+        // We should be here only if current source chunk is fully processed.
+        ++srcItr;
     }
+
     *this = result;
 }
 

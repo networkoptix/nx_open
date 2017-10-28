@@ -270,7 +270,15 @@ void ModuleConnector::Module::connectToEndpoint(
     const auto client = nx_http::AsyncHttpClient::create();
     m_httpClients.insert(client);
     client->bindToAioThread(m_reconnectTimer.getAioThread());
-    client->doGet(kUrl.arg(endpoint.toString()),
+
+    const QUrl url(kUrl.arg(endpoint.toString()));
+    if (url.host().isEmpty())
+    {
+        NX_DEBUG(this, lm("Can not connect to endopoint %1").arg(endpoint));
+        return;
+    }
+
+    client->doGet(url.toString(),
         [this, endpoint, endpointsGroup](nx_http::AsyncHttpClientPtr client) mutable
         {
             m_httpClients.erase(client);

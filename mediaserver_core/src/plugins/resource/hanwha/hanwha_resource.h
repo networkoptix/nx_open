@@ -162,8 +162,8 @@ private:
     QString defaultValue(const QString& parameter, Qn::ConnectionRole role) const;
 
     QString suggestCodecProfile(
-        AVCodecID codec, 
-        Qn::ConnectionRole role, 
+        AVCodecID codec,
+        Qn::ConnectionRole role,
         const QString& desiredProfile) const;
 
     QSize bestSecondaryResolution(
@@ -187,7 +187,7 @@ private:
         QnCameraAdvancedParameter* inOutParameter,
         const HanwhaAdavancedParameterInfo& info) const;
 
-    using CreateDependencyFunc = 
+    using CreateDependencyFunc =
         std::function<QnCameraAdvancedParameterDependency(
             const HanwhaCodecLimits& codecLimits,
             AVCodecID codec,

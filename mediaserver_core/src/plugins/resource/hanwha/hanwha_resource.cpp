@@ -553,6 +553,15 @@ QString HanwhaResource::sessionKey(
     return QString();
 }
 
+QnAbstractArchiveDelegate* HanwhaResource::remoteArchiveDelegate()
+{
+    auto delegate = new HanwhaArchiveDelegate(toSharedPointer(this));
+    const auto overlappedId = sharedContext()->currentOverlappedId();
+    delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
+
+    return delegate;
+}
+
 bool HanwhaResource::isVideoSourceActive()
 {
     auto videoSources = sharedContext()->videoSources();
@@ -2423,6 +2432,7 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
         return new HanwhaArchiveDelegate(toSharedPointer());
+
     return nullptr;
 }
 

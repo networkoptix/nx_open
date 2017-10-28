@@ -112,8 +112,8 @@ LicenseTypeInfo::LicenseTypeInfo() :
 {}
 
 LicenseTypeInfo::LicenseTypeInfo(
-    Qn::LicenseType licenseType, 
-    const QnLatin1Array& className, 
+    Qn::LicenseType licenseType,
+    const QnLatin1Array& className,
     bool allowedForARM,
     bool allowedToShareChannel)
     :
@@ -135,7 +135,7 @@ QnLicense::QnLicense(const QByteArray& licenseBlock):
 }
 
 QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
-{ 
+{
     QList<QByteArray> params;
     params << QByteArray("NAME=").append(value.name);
     params << QByteArray("SERIAL=").append(value.key);
@@ -451,8 +451,6 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
 int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType,
     QnLicenseValidator* validator) const
 {
-    return 200;
-
     if (licenseType == Qn::LC_Free)
         return std::numeric_limits<int>::max();
 

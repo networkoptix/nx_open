@@ -32,7 +32,7 @@ static const QString kDeleteOkResponse("del OK");
 static const QString kDateTimeFormat("yyyyMMddhhmmss");
 static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
 
-} // namespace 
+} // namespace
 
 using namespace nx::core::resource;
 
@@ -48,7 +48,7 @@ LilinRemoteArchiveManager::~LilinRemoteArchiveManager()
 }
 
 bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
-    std::vector<RemoteArchiveEntry>* outArchiveEntries, 
+    std::vector<RemoteArchiveEntry>* outArchiveEntries,
     int64_t startTimeMs,
     int64_t endTimeMs)
 {
@@ -220,7 +220,7 @@ bool LilinRemoteArchiveManager::fetchFileList(const QString& directory, std::vec
 
         // Filter files that are being recorded at the moment
         auto entryExtension = QString::fromLatin1(split[1]);
-        if (entryExtension.endsWith("_ing")) 
+        if (entryExtension.endsWith("_ing"))
             continue;
 
         outFileLists->push_back(QString::fromLatin1(split[0]));
@@ -241,8 +241,7 @@ boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dat
 
 RemoteArchiveCapabilities LilinRemoteArchiveManager::capabilities() const
 {
-    return RemoteArchiveCapability::RemoveChunkCapability
-        | RemoteArchiveCapability::FullChunkCapability;
+    return RemoteArchiveCapability::RemoveChunkCapability;
 }
 
 QnAbstractArchiveDelegate* LilinRemoteArchiveManager::archiveDelegate()

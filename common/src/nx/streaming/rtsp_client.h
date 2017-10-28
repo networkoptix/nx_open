@@ -36,11 +36,19 @@ static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadata
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
+
+// Class name is quite misleading.
+// Actually it is RTCP statistics + NTP time from Onvif extension.
 class QnRtspStatistic
 {
 public:
     QnRtspStatistic(): timestamp(0), ntpTime(0), localTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
-    bool isEmpty() const { return timestamp == 0 && ntpTime == 0; }
+    bool isEmpty() const
+    {
+        return timestamp == 0
+            && ntpTime == 0
+            && !ntpOnvifExtensionTime.is_initialized();
+    }
 
     quint32 timestamp;
     double ntpTime;
@@ -48,6 +56,7 @@ public:
     qint64 receivedPackets;
     qint64 receivedOctets;
     quint32 ssrc;
+    boost::optional<uint64_t> ntpOnvifExtensionTime;
 };
 
 enum class TimePolicy
@@ -55,7 +64,8 @@ enum class TimePolicy
     BindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
     IgnoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
     ForceLocalTime, //< Use local time only.
-    ForceCameraTime //< Use camera NPT time only.
+    ForceCameraTime, //< Use camera NPT time only.
+    OnvifExtension //< Use timestamps from Onvif streaming spec extension.
 };
 
 class QnRtspTimeHelper
@@ -72,6 +82,7 @@ public:
     QString getResID() const { return m_resourceId; }
 
     void setTimePolicy(TimePolicy policy);
+
 private:
     double cameraTimeToLocalTime(double cameraSecondsSinceEpoch, double currentSecondsSinceEpoch);
     bool isLocalTimeChanged();
@@ -322,7 +333,7 @@ public:
 
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
-    
+
     void setTrackInfo(const TrackMap& tracks);
 
     AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete

@@ -33,13 +33,18 @@ HanwhaArchiveDelegate::HanwhaArchiveDelegate(const QnResourcePtr& resource)
 
 HanwhaArchiveDelegate::~HanwhaArchiveDelegate()
 {
+    qDebug() << "!!!!!!!!!!!!! HANWHA ARCHIVE DELEGATE DTOR !!!!!!!!!!!!!!!!!!";
     m_streamReader.reset();
 }
 
 bool HanwhaArchiveDelegate::open(const QnResourcePtr &resource)
 {
     m_streamReader->setRateControlEnabled(m_rateControlEnabled);
-    return (bool) m_streamReader->openStreamInternal(false, QnLiveStreamParams());
+    const auto result = (bool) m_streamReader->openStreamInternal(false, QnLiveStreamParams());
+    if (!result && m_errorHandler)
+        m_errorHandler(lit("Can not open stream"));
+
+    return result;
 }
 
 void HanwhaArchiveDelegate::close()
@@ -68,26 +73,39 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
         if (m_currentPositionUsec != AV_NOPTS_VALUE)
             m_streamReader->setPositionUsec(m_currentPositionUsec);
         if (!open(m_streamReader->m_resource))
-            return QnAbstractMediaDataPtr();
-    }
-
-    auto result = m_streamReader->getNextData();
-    if (result)
-    {
-        m_currentPositionUsec = result->timestamp;
-        if (!isForwardDirection())
         {
-            result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
-            result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+            if (m_errorHandler)
+                m_errorHandler(lit("Can not open stream."));
+            return QnAbstractMediaDataPtr();
         }
     }
 
-    if (result && m_endTimeUsec != AV_NOPTS_VALUE && result->timestamp > m_endTimeUsec)
+    auto result = m_streamReader->getNextData();
+    if (!result)
+    {
+        if (m_errorHandler)
+            m_errorHandler(lit("Can not fetch data from stream"));
+
+        return result;
+    }
+
+    m_currentPositionUsec = result->timestamp;
+    if (!isForwardDirection())
+    {
+        result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
+        result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+    }
+
+    if (m_endTimeUsec != AV_NOPTS_VALUE && result->timestamp > m_endTimeUsec)
     {
         QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
         rez->timestamp = isForwardDirection() ? DATETIME_NOW : 0;
+        if (m_endOfPlaybackHandler)
+            m_endOfPlaybackHandler();
+
         return rez;
     }
+
     return result;
 }
 
@@ -148,6 +166,9 @@ void HanwhaArchiveDelegate::setSpeed(qint64 displayTime, double value)
 
 void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 frameStepUsec)
 {
+    if (m_streamReader)
+        m_streamReader->setPlaybackRange(startTimeUsec, endTimeUsec);
+
     m_endTimeUsec = endTimeUsec;
     seek(startTimeUsec, true /*findIFrame*/);
 }
@@ -163,6 +184,7 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
             m_streamReader->setSessionType(HanwhaSessionType::preview);
             break;
         case PlaybackMode::Export:
+        case PlaybackMode::Edge:
             rtspClient.setAdditionAttribute("Rate-Control", "no");
             m_streamReader->setSessionType(HanwhaSessionType::fileExport);
             break;
@@ -179,6 +201,11 @@ void HanwhaArchiveDelegate::beforeSeek(qint64 time)
 void HanwhaArchiveDelegate::setRateControlEnabled(bool enabled)
 {
     m_rateControlEnabled = enabled;
+}
+
+void HanwhaArchiveDelegate::setOverlappedId(int overlappedId)
+{
+    m_streamReader->setOverlappedId(overlappedId);
 }
 
 } // namespace plugins

@@ -160,6 +160,11 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     }
 }
 
+void QnServerStreamRecorder::setLastMediaTime(qint64 lastMediaTime)
+{
+    m_lastMediaTime = lastMediaTime;
+}
+
 void QnServerStreamRecorder::updateRebuildState()
 {
     QnMutexLocker lock( &m_queueSizeMutex );
@@ -316,7 +321,7 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (m_catalog == QnServer::HiQualityCatalog) 
+        if (m_catalog == QnServer::HiQualityCatalog)
         {
             QnLiveStreamParams params;
             if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled())
@@ -348,7 +353,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 
 void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
 {
-    m_lastMediaTime = media->timestamp;
+    setLastMediaTime(media->timestamp);
 
     NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
     QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);

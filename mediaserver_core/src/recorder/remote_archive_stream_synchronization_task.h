@@ -2,8 +2,9 @@
 
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <recorder/abstract_remote_archive_synchronization_task.h>
+#include <recorder/server_edge_stream_recorder.h>
 #include <nx/streaming/archive_stream_reader.h>
-
+#include <nx/streaming/abstract_archive_delegate.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -13,7 +14,7 @@ class RemoteArchiveStreamSynchronizationTask:
     public AbstractRemoteArchiveSynchronizationTask
 {
     using AbstractRemoteArchiveManager = nx::core::resource::AbstractRemoteArchiveManager;
-    using RemoteArchiveEntry = nx::core::resource::RemoteArchiveChunk;
+    using RemoteArchiveChunk = nx::core::resource::RemoteArchiveChunk;
     using BufferType = QByteArray;
 
 public:
@@ -26,17 +27,28 @@ public:
 
 private:
     bool synchronizeArchive();
-    bool writeEntryToArchive(const RemoteArchiveEntry& entry);
-    QnAbstractArchiveStreamReader* archiveReader(int64_t startTimeMs, int64_t endTimeMs);
+    bool writeTimePeriodToArchive(const QnTimePeriod& timePeriod);
+    void resetArchiveReaderUnsafe(int64_t startTimeMs, int64_t endTimeMs);
+    void resetRecorderUnsafe(int64_t startTimeMs, int64_t endTimeMs);
 
-    QString chunkFileName(const RemoteArchiveEntry& entry) const;
+    QnTimePeriodList toTimePeriodList(
+        const std::vector<RemoteArchiveChunk>& entries) const;
+
+    std::chrono::milliseconds totalDuration(const QnTimePeriodList& deviceChunks);
+
+    bool needToFireProgress() const;
 
 private:
+    mutable QnMutex m_mutex;
     QnCommonModule* m_commonModule;
     QnSecurityCamResourcePtr m_resource;
-    std::atomic<bool> m_canceled;
+    std::atomic<bool> m_canceled{false};
     std::function<void()> m_doneHandler;
-    std::unique_ptr<QnArchiveStreamReader> m_reader;
+    std::chrono::milliseconds m_totalDuration{0};
+    std::chrono::milliseconds m_importedDuration{0};
+
+    std::unique_ptr<QnAbstractArchiveStreamReader> m_archiveReader;
+    std::unique_ptr<QnServerEdgeStreamRecorder> m_recorder;
 };
 
 } // namespace recorder

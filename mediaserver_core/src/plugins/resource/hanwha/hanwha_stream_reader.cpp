@@ -2,11 +2,14 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <chrono>
+
 #include "hanwha_stream_reader.h"
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
+#include "hanwha_chunk_reader.h"
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
@@ -30,6 +33,7 @@ HanwhaStreamReader::HanwhaStreamReader(const HanwhaResourcePtr& res):
 
 HanwhaStreamReader::~HanwhaStreamReader()
 {
+    qDebug() << "???????? HANWHA STREAM READER DESTRUCTOR ???????????";
 }
 
 CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
@@ -59,7 +63,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         if (!result)
             return result;
     }
-    
+
     auto result = streamUri(profileToOpen, &streamUrlString);
     if (!result)
         return result;
@@ -72,7 +76,14 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
     m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
     m_rtpReader.setRole(role);
-    m_rtpReader.setTrustToCameraTime(m_hanwhaResource->isNvr());
+
+    if (m_hanwhaResource->isNvr())
+        m_rtpReader.setTimePolicy(TimePolicy::ForceCameraTime);
+    else if (role == Qn::ConnectionRole::CR_Archive)
+        m_rtpReader.setTimePolicy(TimePolicy::OnvifExtension);
+    else
+        m_rtpReader.setTimePolicy(TimePolicy::IgnoreCameraTimeIfBigJitter);
+
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx_http::HttpHeader("Rate-Control", "no"));
 
@@ -95,16 +106,16 @@ HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
     const auto bitrateControl = m_hanwhaResource->streamBitrateControl(role); //< cbr/vbr
     const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters);
 
-    const auto govLengthParameterName = 
+    const auto govLengthParameterName =
         lit("%1.GOVLength").arg(toHanwhaString(codec));
-    
+
     const auto bitrateControlParameterName =
         lit("%1.BitrateControlType").arg(toHanwhaString(codec));
 
     const bool isH26x = codec == AVCodecID::AV_CODEC_ID_H264
         || codec == AVCodecID::AV_CODEC_ID_HEVC;
 
-    HanwhaProfileParameters result = 
+    HanwhaProfileParameters result =
     {
         {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
         {kHanwhaProfileNumberProperty, QString::number(profileNumber)},
@@ -145,8 +156,8 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
     if (m_hanwhaResource->isNvr())
     {
         // TODO: #dmishin implement profile configuration for NVR if needed.
-        return CameraDiagnostics::NoErrorResult(); 
-    }   
+        return CameraDiagnostics::NoErrorResult();
+    }
 
     if (profileNumber == kHanwhaInvalidProfile)
     {
@@ -180,7 +191,7 @@ QSet<int> HanwhaStreamReader::availableProfiles(int channel) const
     helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(
         lit("media/videoprofilepolicy"),
-        { { kHanwhaChannelProperty, QString::number(channel) } });
+        {{ kHanwhaChannelProperty, QString::number(channel) }});
 
     if (!response.isSuccessful())
         return result;
@@ -202,14 +213,14 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
     const auto response = helper.view(
         lit("media/videoprofile"),
         {{kHanwhaChannelProperty, QString::number(channel)}});
-    
+
     if (!response.isSuccessful())
         return kHanwhaInvalidProfile;
 
     const auto profiles = parseProfiles(response);
     if (profiles.empty())
         return kHanwhaInvalidProfile;
-    
+
     if (profiles.find(channel) == profiles.cend())
         return kHanwhaInvalidProfile;
 
@@ -250,16 +261,13 @@ int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
 
 bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
 {
-    return profileNumber != kHanwhaInvalidProfile || m_hanwhaResource->isNvr();
+    return profileNumber != kHanwhaInvalidProfile
+        || m_hanwhaResource->isNvr()
+        || getRole() == Qn::CR_Archive;
 }
 
 CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)
 {
-    if (getRole() == Qn::CR_Archive && !m_hanwhaResource->isNvr())
-    {
-        QUrl url(m_hanwhaResource->getUrl());
-    }
-
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
@@ -269,15 +277,31 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         {kHanwhaTransportProtocolProperty, rtpTransport()},
         {kHanwhaRtspOverHttpProperty, kHanwhaFalse}
     };
-    
-    if (getRole() == Qn::CR_Archive)
-        params.emplace(kHanwhaMediaTypeProperty, kHanwhaSearchMediaType);
+
+    const auto role = getRole();
+    if (role == Qn::CR_Archive)
+    {
+        const auto mediaType = m_hanwhaResource->isNvr()
+            ? kHanwhaSearchMediaType
+            : kHanwhaBackupMediaType;
+
+        params.emplace(kHanwhaMediaTypeProperty, mediaType);
+    }
     else
+    {
         params.emplace(kHanwhaMediaTypeProperty, kHanwhaLiveMediaType);
+    }
 
     if (m_hanwhaResource->isNvr())
         params.emplace(kHanwhaClientTypeProperty, "PC");
-    
+
+    if (profileNumber == kHanwhaInvalidProfile
+        && !m_hanwhaResource->isNvr()
+        && role == Qn::ConnectionRole::CR_Archive)
+    {
+        profileNumber = 2; //< The actual number doesn't matter.
+    }
+
     if (profileNumber != kHanwhaInvalidProfile)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
@@ -296,6 +320,23 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
 
     auto rtspUri = response.response()[kHanwhaUriProperty];
     *outUrl = m_hanwhaResource->fromOnvifDiscoveredUrl(rtspUri.toStdString(), false);
+
+    if (getRole() == Qn::CR_Archive && !m_hanwhaResource->isNvr())
+    {
+        QUrl url(*outUrl);
+
+        // This path is not documented, but Samsung SmartViewer uses it.
+        // May not work with some cameras.
+        url.setPath(lit("/recording/%1-%2/OverlappedID=%3/play.smp")
+            .arg(toHanwhaPlaybackTime(m_startTimeUsec))
+            .arg(toHanwhaPlaybackTime(m_endTimeUsec))
+            .arg(m_overlappedId));
+
+        *outUrl = url.toString();
+
+        qDebug() << "============ GOT PLAYBACK URL!!! (EDGE RECORDING)" << *outUrl;
+    }
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -322,15 +363,31 @@ void HanwhaStreamReader::setRateControlEnabled(bool enabled)
     m_rateControlEnabled = enabled;
 }
 
-void HanwhaStreamReader::setPlaybackRange(int64_t startTimeMs, int64_t endtimeMs)
+void HanwhaStreamReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec)
 {
-    m_startTimeMs = startTimeMs;
-    m_endTimeMs = endtimeMs;
+    m_startTimeUsec = startTimeUsec;
+    m_endTimeUsec = endTimeUsec;
+}
+
+void HanwhaStreamReader::setOverlappedId(int overlappedId)
+{
+    m_overlappedId = overlappedId;
 }
 
 QnRtspClient& HanwhaStreamReader::rtspClient()
 {
     return m_rtpReader.rtspClient();
+}
+
+QString HanwhaStreamReader::toHanwhaPlaybackTime(int64_t timestampUsec) const
+{
+    const auto timezoneShift = m_hanwhaResource
+        ->sharedContext()
+        ->chunkLoader()
+        ->timeZoneShift();
+
+    return toHanwhaDateTime(timestampUsec / 1000, timezoneShift)
+        .toString(lit("yyyyMMddhhmmss"));
 }
 
 void HanwhaStreamReader::setSessionType(HanwhaSessionType value)

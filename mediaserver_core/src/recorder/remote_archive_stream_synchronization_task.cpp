@@ -2,11 +2,11 @@
 
 #include <core/resource/security_cam_resource.h>
 
-#include <recording/stream_recorder.h>
-
 #include <recorder/storage_manager.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/mediaserver/event/event_connector.h>
 
 #include <utils/common/util.h>
 
@@ -16,7 +16,7 @@ namespace recorder {
 
 namespace {
 
-static const int kDetailLevelMs = 1000;
+static const int kDetailLevelMs = 1;
 
 } // namespace
 
@@ -38,7 +38,14 @@ void RemoteArchiveStreamSynchronizationTask::setDoneHandler(std::function<void()
 
 void RemoteArchiveStreamSynchronizationTask::cancel()
 {
+    QnMutexLocker lock(&m_mutex);
     m_canceled = true;
+
+    if (m_archiveReader)
+        m_archiveReader->pleaseStop();
+
+    if (m_recorder)
+        m_recorder->pleaseStop();
 }
 
 bool RemoteArchiveStreamSynchronizationTask::execute()
@@ -48,33 +55,33 @@ bool RemoteArchiveStreamSynchronizationTask::execute()
 
 bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
 {
-    NX_LOGX(
+    NX_INFO(
+        this,
         lm("Starting archive synchronization. Resource: %1 %2")
             .arg(m_resource->getName())
-            .arg(m_resource->getUniqueId()),
-        cl_logINFO);
+            .arg(m_resource->getUniqueId()));
 
     auto manager = m_resource->remoteArchiveManager();
     if (!manager)
     {
-        NX_LOGX(
+        NX_ERROR(
+            this,
             lm("Resource %1 %2 has no remote archive manager")
                 .arg(m_resource->getName())
-                .arg(m_resource->getUniqueId()),
-            cl_logWARNING);
+                .arg(m_resource->getUniqueId()));
 
         return false;
     }
 
-    std::vector<RemoteArchiveEntry> deviceChunks;
+    std::vector<RemoteArchiveChunk> deviceChunks;
     auto result = manager->listAvailableArchiveEntries(&deviceChunks);
     if (!result)
     {
-        NX_LOGX(
+        NX_ERROR(
+            this,
             lm("Can not fetch chunks from camera %1 %2")
                 .arg(m_resource->getName())
-                .arg(m_resource->getUniqueId()),
-            cl_logWARNING);
+                .arg(m_resource->getUniqueId()));
 
         return false;
     }
@@ -87,7 +94,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
     const auto endTimeMs = deviceChunks[lastDeviceChunkIndex].startTimeMs
         + deviceChunks[lastDeviceChunkIndex].durationMs;
 
-    auto serverChunks = qnNormalStorageMan
+    auto serverTimePeriods = qnNormalStorageMan
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,
@@ -96,88 +103,192 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
             false,
             std::numeric_limits<int>::max());
 
-    // TODO: calculate difference somehow
-    for (const auto& chunk: deviceChunks)
-        writeEntryToArchive(chunk);
+    auto deviceTimePeriods = toTimePeriodList(deviceChunks);
+    NX_VERBOSE(this, lm("Device time periods: %1.").arg(deviceTimePeriods));
+    NX_VERBOSE(this, lm("Server time periods: %1").arg(serverTimePeriods));
+
+    deviceTimePeriods.excludeTimePeriods(serverTimePeriods);
+    NX_VERBOSE(this, lm("Periods to import from device: %1").arg(deviceTimePeriods));
+
+    if (deviceTimePeriods.isEmpty())
+        return true;
+
+    m_totalDuration = totalDuration(deviceTimePeriods);
+
+    qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
+    for (const auto& timePeriod: deviceTimePeriods)
+    {
+        qDebug() << deviceTimePeriods[5];
+        if (m_canceled)
+            break;
+
+        if (timePeriod.durationMs >= 1000)
+        {
+            qDebug() << "";
+            qDebug() << "";
+            qDebug() << "Writing chunk:"
+                << QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs)
+                << QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs + timePeriod.durationMs);
+            writeTimePeriodToArchive(timePeriod);
+        }
+    }
+
+    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
+    return true;
+}
+
+bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
+    const QnTimePeriod& timePeriod)
+{
+    if (timePeriod.isInfinite())
+        return false;
+
+    const auto startTimeMs = timePeriod.startTimeMs;
+    const auto endTimeMs = timePeriod.isInfinite() || timePeriod.durationMs > 10000
+        ? timePeriod.startTimeMs + 10000
+        : timePeriod.endTimeMs();//entry.endTimeMs();
+
+    if (endTimeMs <= startTimeMs)
+        return true;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        resetRecorderUnsafe(startTimeMs, endTimeMs);
+        resetArchiveReaderUnsafe(startTimeMs, endTimeMs);
+    }
+
+    m_recorder->start();
+    m_archiveReader->start();
+
+    m_recorder->wait();
+    m_archiveReader->wait();
+
+    m_importedDuration += std::chrono::milliseconds(timePeriod.durationMs);
+
+    qDebug() << "======> Entry has been written:" << startTimeMs << endTimeMs;
+    qDebug() << "";
+    qDebug() << "";
 
     return true;
 }
 
-bool RemoteArchiveStreamSynchronizationTask::writeEntryToArchive(const RemoteArchiveEntry& entry)
-{
-    auto reader = archiveReader(entry.startTimeMs, entry.startTimeMs + entry.durationMs);
-    reader->setPlaybackRange(QnTimePeriod(entry.startTimeMs, entry.durationMs));
-
-    auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
-    const auto fileName = chunkFileName(entry);
-    QFileInfo info(fileName);
-    QDir dir = info.dir();
-    if (!dir.exists() && !dir.mkpath("."))
-        return false;
-
-    QnStreamRecorder recorder(m_resource);
-    recorder.clearUnprocessedData();
-    recorder.addRecordingContext(
-        fileName,
-        qnNormalStorageMan->getOptimalStorageRoot());
-
-    recorder.setContainer(kArchiveContainer);
-    recorder.disableRegisterFile(true);
-    recorder.setSaveMotionHandler(saveMotionHandler);
-
-    qnNormalStorageMan->fileStarted(
-        entry.startTimeMs,
-        currentTimeZone() / 60,
-        fileName,
-        nullptr);
-
-    reader->addDataProcessor(&recorder);
-    reader->start();
-    reader->wait();
-
-    recorder.close(); //< Do we need it?
-
-    return qnNormalStorageMan->fileFinished(
-        recorder.duration() / 1000,
-        fileName,
-        nullptr,
-        recorder.lastFileSize());
-}
-
-QnAbstractArchiveStreamReader* RemoteArchiveStreamSynchronizationTask::archiveReader(
+void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
     int64_t startTimeMs,
     int64_t endTimeMs)
 {
-    if (!m_reader)
-    {
-        auto delegate = m_resource
-            ->remoteArchiveManager()
-            ->archiveDelegate();
+    NX_ASSERT(endTimeMs > startTimeMs);
 
-        if (!delegate)
-            return nullptr;
+    auto archiveDelegate = m_resource
+        ->remoteArchiveManager()
+        ->archiveDelegate();
 
-        m_reader = std::make_unique<QnArchiveStreamReader>(m_resource);
-        m_reader->setArchiveDelegate(delegate);
-    }
+    if (!archiveDelegate)
+        return;
 
-    auto delegate = m_reader->getArchiveDelegate();
-    delegate->setRange(startTimeMs, endTimeMs, /*frameStep*/1);
+    archiveDelegate->setPlaybackMode(PlaybackMode::Edge);
+    archiveDelegate->setRange(startTimeMs * 1000, endTimeMs * 1000, /*frameStep*/ 1);
 
-    return m_reader.get();
+    m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
+    m_archiveReader->setArchiveDelegate(archiveDelegate);
+    m_archiveReader->setPlaybackRange(QnTimePeriod(startTimeMs, endTimeMs - startTimeMs));
+    m_archiveReader->setRole(Qn::CR_Archive);
+
+    m_archiveReader->addDataProcessor(m_recorder.get());
+    m_archiveReader->setEndOfPlaybackHandler(
+        [this]()
+        {
+            NX_ASSERT(m_archiveReader && m_recorder);
+            qDebug() << "========> STOPPING recorder and reader";
+            if (m_archiveReader)
+                m_archiveReader->pleaseStop();
+
+            if (m_recorder)
+                m_recorder->pleaseStop();
+        });
+
+    m_archiveReader->setErrorHandler(
+        [this, startTimeMs, endTimeMs](const QString& errorString)
+        {
+            NX_ASSERT(m_archiveReader && m_recorder);
+            NX_DEBUG(
+                this,
+                lm("Can not synchronize time period: %1-%2, error: %3")
+                    .arg(startTimeMs)
+                    .arg(endTimeMs)
+                    .arg(errorString));
+
+            qnEventRuleConnector->at_remoteArchiveSyncError(
+                m_resource,
+                errorString);
+
+            qDebug() << "========> GOT ERROR, stopping recorder and reader" << errorString;
+            if (m_archiveReader)
+                m_archiveReader->pleaseStop();
+
+            if (m_recorder)
+                m_recorder->pleaseStop();
+        });
 }
 
-QString RemoteArchiveStreamSynchronizationTask::chunkFileName(
-    const RemoteArchiveEntry& entry) const
+void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(int64_t startTimeMs, int64_t endTimeMs)
 {
-    auto filename = qnNormalStorageMan->getFileName(
-        entry.startTimeMs,
-        currentTimeZone() / 60,
-        m_resource,
-        DeviceFileCatalog::prefixByCatalog(QnServer::ChunksCatalog::HiQualityCatalog),
-        qnNormalStorageMan->getOptimalStorageRoot());
+    auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
 
-    return filename + kArchiveContainerExtension;
+    m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
+        m_resource,
+        QnServer::ChunksCatalog::HiQualityCatalog,
+        m_archiveReader.get());
+
+    m_recorder->setSaveMotionHandler(saveMotionHandler);
+    m_recorder->setRecordingBounds(startTimeMs * 1000, endTimeMs * 1000);
+    m_recorder->setOnFileWrittenHandler(
+        [this](int64_t /*startTimeMs*/, int64_t durationMs)
+        {
+            m_importedDuration += std::chrono::milliseconds(durationMs);
+            if (needToFireProgress())
+            {
+                qnEventRuleConnector->at_remoteArchiveSyncProgress(
+                    m_resource,
+                    (double)m_importedDuration.count() / m_totalDuration.count());
+            }
+        });
+}
+
+QnTimePeriodList RemoteArchiveStreamSynchronizationTask::toTimePeriodList(
+    const std::vector<RemoteArchiveChunk>& entries) const
+{
+    QnTimePeriodList result;
+    for (const auto& entry: entries)
+    {
+        if (entry.durationMs > 0)
+            result << QnTimePeriod(entry.startTimeMs, entry.durationMs);
+    }
+
+    return result;
+}
+
+std::chrono::milliseconds RemoteArchiveStreamSynchronizationTask::totalDuration(
+    const QnTimePeriodList& deviceChunks)
+{
+    int64_t result = 0;
+    for (const auto& chunk: deviceChunks)
+    {
+        NX_ASSERT(!chunk.isInfinite());
+        if (chunk.isInfinite())
+            continue;
+
+        if (chunk.durationMs < 1000)
+            continue;
+
+        result += chunk.durationMs;
+    }
+
+    return std::chrono::milliseconds(result);
+}
+
+bool RemoteArchiveStreamSynchronizationTask::needToFireProgress() const
+{
+    return true;
 }
 
 } // namespace recorder

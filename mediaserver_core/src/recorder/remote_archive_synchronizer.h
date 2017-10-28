@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
+#include <QtCore/QThreadPool>
 
 #include <set>
 #include <map>
@@ -27,7 +28,7 @@ struct SynchronizationTaskContext
 };
 
 
-class RemoteArchiveSynchronizer: 
+class RemoteArchiveSynchronizer:
     public QObject,
     public QnCommonModuleAware
 {
@@ -43,6 +44,7 @@ public slots:
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
 
 private:
+    int maxSynchronizationThreads() const;
     void makeAndRunTaskUnsafe(const QnSecurityCamResourcePtr& resoource);
 
     void removeTaskFromAwaited(const QnUuid& resource);
@@ -53,6 +55,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
+    QThreadPool m_threadPool;
     std::set<QnUuid> m_delayedTasks;
     std::map<QnUuid, SynchronizationTaskContext> m_syncTasks;
     std::atomic<bool> m_terminated;

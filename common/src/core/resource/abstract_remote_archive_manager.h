@@ -18,20 +18,17 @@ using BufferType = QByteArray;
 enum RemoteArchiveCapability
 {
     NoCapabilities = 0x000,
-    RandomChunkPositionAccessCapability = 0x001,
     RemoveChunkCapability = 0x002,
-    StreamChunkCapability = 0x004,
-    FullChunkCapability = 0x008
+    RandomAccessChunkCapability = 0x004,
 };
 
 Q_DECLARE_FLAGS(RemoteArchiveCapabilities, RemoteArchiveCapability)
 Q_DECLARE_OPERATORS_FOR_FLAGS(RemoteArchiveCapabilities)
 
-
 /**
  * Represents chunk in remote device archive.
  */
-struct RemoteArchiveChunk 
+struct RemoteArchiveChunk
 {
     QString id;
     int64_t startTimeMs = 0;
@@ -90,7 +87,7 @@ public:
 
     /**
      * Removes the specified entry from the device.
-     * @return True if entry has been successfully deleted from the device, false otherwise. 
+     * @return True if entry has been successfully deleted from the device, false otherwise.
      */
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) = 0;
 

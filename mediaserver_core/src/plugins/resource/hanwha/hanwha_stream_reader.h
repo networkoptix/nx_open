@@ -15,21 +15,22 @@ namespace plugins {
 
 class HanwhaStreamReader: public QnRtpStreamReader
 {
-    
+
 public:
     HanwhaStreamReader(const HanwhaResourcePtr& res);
 
     void setPositionUsec(qint64 value);
     void setSessionType(HanwhaSessionType value);
     void setRateControlEnabled(bool enabled);
-    void setPlaybackRange(int64_t startTimeMs, int64_t endtimeMs);
+    void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec);
+    void setOverlappedId(int overlappedId);
 
     virtual ~HanwhaStreamReader() override;
-protected: 
+protected:
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
         const QnLiveStreamParams& params) override;
-    
+
     friend class HanwhaArchiveDelegate;
 private:
     HanwhaProfileParameters makeProfileParameters(
@@ -48,12 +49,16 @@ private:
 
     QString rtpTransport() const;
     QnRtspClient& rtspClient();
+
+    QString toHanwhaPlaybackTime(int64_t timestamp) const;
+
 private:
     HanwhaResourcePtr m_hanwhaResource;
     bool m_rateControlEnabled = true;
     HanwhaSessionType m_sessionType = HanwhaSessionType::live;
-    int64_t m_startTimeMs = 0;
-    int64_t m_endTimeMs = 0;
+    int64_t m_startTimeUsec = 0;
+    int64_t m_endTimeUsec = 0;
+    int m_overlappedId = 0;
 };
 
 } // namespace plugins

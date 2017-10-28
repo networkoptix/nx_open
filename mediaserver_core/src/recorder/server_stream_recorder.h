@@ -60,7 +60,7 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media) override;
-    void beforeProcessData(const QnConstAbstractMediaDataPtr& media);
+    virtual void beforeProcessData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& motion) override;
 
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
@@ -68,6 +68,7 @@ protected:
     virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    virtual void setLastMediaTime(qint64 lastMediaTime);
 
     virtual void beforeRun() override;
     virtual void endOfRun() override;
