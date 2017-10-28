@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <nx/fusion/fusion/fusion.h>
+#include <nx/fusion/serialization/ubjson.h>
 
 namespace nx {
 namespace client {
@@ -35,7 +36,7 @@ void MetadataAnalyticsController::gotMetadata(const QnResourcePtr& resource,
 {
     std::map<QnUuid, QRectF> rectangles;
     auto& prevRectangles = m_rectMap[resource->getId()];
-    auto detectedObjects = metadata.detectedObjects;
+    auto detectedObjects = metadata.objects;
 
     for (const auto& obj: detectedObjects)
         rectangles[obj.objectId] = QRectF(obj.boundingBox);

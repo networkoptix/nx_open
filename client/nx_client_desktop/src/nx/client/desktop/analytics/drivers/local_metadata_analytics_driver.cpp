@@ -46,9 +46,7 @@ LocalMetadataAnalyticsDriver::LocalMetadataAnalyticsDriver(const QnResourcePtr& 
             if (resource != m_resource)
                 return;
 
-            const auto timestampMs = timestampUs / 1000;
-
-            m_currentFrame = std::lower_bound(m_track.cbegin(), m_track.cend(), timestampMs);
+            m_currentFrame = std::lower_bound(m_track.cbegin(), m_track.cend(), std::chrono::microseconds(timestampUs));
             if (m_currentFrame == m_track.cbegin() && timestampUs < m_currentFrame->timestampUsec)
             {
                 qnMetadataAnalyticsController->gotMetadata(resource, {});

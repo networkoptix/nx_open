@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <chrono>
 
 #include <analytics/common/abstract_metadata.h>
 
@@ -19,6 +20,8 @@ struct Attribute
 };
 QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson)(metatype));
 #define Attribute_Fields (name)(value)
+
+bool operator< (const Attribute& f, const Attribute& s);
 
 struct DetectedObject
 {
@@ -44,6 +47,12 @@ QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson)(metatype));
     (DetectionMetadataPacket)
 
 using DetectionMetadataPacketPtr = std::shared_ptr<DetectionMetadataPacket>;
+using DetectionMetadataTrack = DetectionMetadataPacket;
+
+bool operator<(const DetectionMetadataPacket& first,
+    const DetectionMetadataPacket& second);
+bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second);
+bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second);
 
 
 } // namespace metadata
