@@ -44,6 +44,19 @@ private:
     QnModuleInformationWithAddresses m_remoteModuleInformation;
     bool m_dbBackupEnabled = false;
 
+    bool validateInputData(
+        const MergeSystemData& data,
+        QnJsonRestResult* result);
+
+    nx_http::StatusCode::Value checkWhetherMergeIsPossible(
+        const MergeSystemData& data,
+        QnJsonRestResult* result);
+
+    nx_http::StatusCode::Value mergeSystems(
+        Qn::UserAccessData accessRights,
+        MergeSystemData data,
+        QnJsonRestResult* result);
+
     void setMergeError(
         QnJsonRestResult* result,
         ::utils::MergeSystemsStatus::Value mergeStatus);
