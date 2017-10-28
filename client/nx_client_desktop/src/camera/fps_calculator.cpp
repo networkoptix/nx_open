@@ -1,10 +1,8 @@
 #include "fps_calculator.h"
 
-// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-#include <core/dataprovider/live_stream_provider.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/dataprovider/live_stream_params.h>
 
 namespace Qn {
 
@@ -27,13 +25,13 @@ void calculateMaxFps(
         {
             case Qn::MT_HardwareGrid:
                 if (shareFps)
-                    cameraDualStreamingFps -= MIN_SECOND_STREAM_FPS;
+                    cameraDualStreamingFps -= QnLiveStreamParams::MIN_SECOND_STREAM_FPS;
                 break;
             case Qn::MT_SoftwareGrid:
                 if (shareFps)
                 {
-                    cameraFps -= MIN_SECOND_STREAM_FPS;
-                    cameraDualStreamingFps -= MIN_SECOND_STREAM_FPS;
+                    cameraFps -= QnLiveStreamParams::MIN_SECOND_STREAM_FPS;
+                    cameraDualStreamingFps -= QnLiveStreamParams::MIN_SECOND_STREAM_FPS;
                 }
                 break;
             default:
