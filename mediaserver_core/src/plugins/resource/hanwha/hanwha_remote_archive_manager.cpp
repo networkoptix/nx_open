@@ -14,12 +14,10 @@ using namespace nx::core::resource;
 HanwhaRemoteArchiveManager::HanwhaRemoteArchiveManager(HanwhaResource* resource):
     m_resource(resource)
 {
-
 }
 
 HanwhaRemoteArchiveManager::~HanwhaRemoteArchiveManager()
 {
-
 }
 
 bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(

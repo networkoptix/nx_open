@@ -13,7 +13,7 @@ class HanwhaResource;
 class HanwhaRemoteArchiveManager: public
     nx::core::resource::AbstractRemoteArchiveManager
 {
-    using EntriesUpdatedCallback = 
+    using EntriesUpdatedCallback =
         std::function<void(const std::vector<nx::core::resource::RemoteArchiveChunk>&)>;
 public:
     HanwhaRemoteArchiveManager(HanwhaResource* resource);

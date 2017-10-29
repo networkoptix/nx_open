@@ -324,10 +324,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
     if (m_endRecordingBoundUs.is_initialized())
     {
         if (nonConstData->timestamp > *m_endRecordingBoundUs)
-        {
-            close();
             return true;
-        }
     }
 
     QnConstAbstractMediaDataPtr md =

@@ -33,7 +33,6 @@ HanwhaStreamReader::HanwhaStreamReader(const HanwhaResourcePtr& res):
 
 HanwhaStreamReader::~HanwhaStreamReader()
 {
-    qDebug() << "???????? HANWHA STREAM READER DESTRUCTOR ???????????";
 }
 
 CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(

@@ -33,7 +33,6 @@ HanwhaArchiveDelegate::HanwhaArchiveDelegate(const QnResourcePtr& resource)
 
 HanwhaArchiveDelegate::~HanwhaArchiveDelegate()
 {
-    qDebug() << "!!!!!!!!!!!!! HANWHA ARCHIVE DELEGATE DTOR !!!!!!!!!!!!!!!!!!";
     m_streamReader.reset();
 }
 

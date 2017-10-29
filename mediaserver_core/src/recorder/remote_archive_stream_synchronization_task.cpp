@@ -118,19 +118,11 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
     qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
     for (const auto& timePeriod: deviceTimePeriods)
     {
-        qDebug() << deviceTimePeriods[5];
         if (m_canceled)
             break;
 
         if (timePeriod.durationMs >= 1000)
-        {
-            qDebug() << "";
-            qDebug() << "";
-            qDebug() << "Writing chunk:"
-                << QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs)
-                << QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs + timePeriod.durationMs);
             writeTimePeriodToArchive(timePeriod);
-        }
     }
 
     qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
@@ -165,10 +157,6 @@ bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
 
     m_importedDuration += std::chrono::milliseconds(timePeriod.durationMs);
 
-    qDebug() << "======> Entry has been written:" << startTimeMs << endTimeMs;
-    qDebug() << "";
-    qDebug() << "";
-
     return true;
 }
 
@@ -198,7 +186,6 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
         [this]()
         {
             NX_ASSERT(m_archiveReader && m_recorder);
-            qDebug() << "========> STOPPING recorder and reader";
             if (m_archiveReader)
                 m_archiveReader->pleaseStop();
 
@@ -221,7 +208,6 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
                 m_resource,
                 errorString);
 
-            qDebug() << "========> GOT ERROR, stopping recorder and reader" << errorString;
             if (m_archiveReader)
                 m_archiveReader->pleaseStop();
 
