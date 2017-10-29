@@ -28,6 +28,9 @@ RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QObject* parent):
     QnCommonModuleAware(parent),
     m_terminated(false)
 {
+    if (!qnGlobalSettings->isEdgeRecordingEnabled())
+        return;
+
     NX_LOGX(lit("Creating remote archive synchronizer."), cl_logDEBUG1);
 
     auto threadCount = maxSynchronizationThreads();
