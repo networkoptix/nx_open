@@ -104,16 +104,20 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
             std::numeric_limits<int>::max());
 
     auto deviceTimePeriods = toTimePeriodList(deviceChunks);
-    NX_VERBOSE(this, lm("Device time periods: %1.").arg(deviceTimePeriods));
-    NX_VERBOSE(this, lm("Server time periods: %1").arg(serverTimePeriods));
+    NX_DEBUG(this, lm("Device time periods: %1.").arg(deviceTimePeriods));
+    NX_DEBUG(this, lm("Server time periods: %1").arg(serverTimePeriods));
 
     deviceTimePeriods.excludeTimePeriods(serverTimePeriods);
-    NX_VERBOSE(this, lm("Periods to import from device: %1").arg(deviceTimePeriods));
+    NX_DEBUG(this, lm("Periods to import from device: %1").arg(deviceTimePeriods));
 
     if (deviceTimePeriods.isEmpty())
         return true;
 
     m_totalDuration = totalDuration(deviceTimePeriods);
+    NX_DEBUG(
+        this,
+        lm("Total remote archive length to synchronize: %1")
+            .arg(m_totalDuration.count()));
 
     qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
     for (const auto& timePeriod: deviceTimePeriods)
@@ -136,9 +140,7 @@ bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
         return false;
 
     const auto startTimeMs = timePeriod.startTimeMs;
-    const auto endTimeMs = timePeriod.isInfinite() || timePeriod.durationMs > 10000
-        ? timePeriod.startTimeMs + 10000
-        : timePeriod.endTimeMs();//entry.endTimeMs();
+    const auto endTimeMs = timePeriod.endTimeMs();
 
     if (endTimeMs <= startTimeMs)
         return true;
@@ -148,6 +150,10 @@ bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
         resetRecorderUnsafe(startTimeMs, endTimeMs);
         resetArchiveReaderUnsafe(startTimeMs, endTimeMs);
     }
+
+    NX_ASSERT(m_recorder && m_archiveReader);
+    if (!m_recorder || !m_archiveReader)
+        return false;
 
     m_recorder->start();
     m_archiveReader->start();
@@ -165,6 +171,8 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
     int64_t endTimeMs)
 {
     NX_ASSERT(endTimeMs > startTimeMs);
+    if (endTimeMs <= startTimeMs)
+        return;
 
     auto archiveDelegate = m_resource
         ->remoteArchiveManager()
@@ -233,6 +241,17 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(int64_t startTi
             m_importedDuration += std::chrono::milliseconds(durationMs);
             if (needToFireProgress())
             {
+                auto progress = (double)m_importedDuration.count() / m_totalDuration.count();
+                if (progress > 1.0)
+                {
+                    progress = 1.0;
+                    NX_DEBUG(
+                        this,
+                        lm("Wrong progress! Imported: %1, Total: %1")
+                            .arg(m_importedDuration.count())
+                            .arg(m_totalDuration.count()));
+                }
+
                 qnEventRuleConnector->at_remoteArchiveSyncProgress(
                     m_resource,
                     (double)m_importedDuration.count() / m_totalDuration.count());
@@ -274,7 +293,7 @@ std::chrono::milliseconds RemoteArchiveStreamSynchronizationTask::totalDuration(
 
 bool RemoteArchiveStreamSynchronizationTask::needToFireProgress() const
 {
-    return true;
+    return true; //< For now let's report progress for each recorded file.
 }
 
 } // namespace recorder

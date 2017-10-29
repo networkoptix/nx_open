@@ -1,7 +1,5 @@
 #include "multiserver_chunks_rest_handler.h"
 
-#include <chrono>
-
 #include <api/helpers/chunks_request_data.h>
 
 #include <common/common_module.h>
@@ -24,8 +22,6 @@
 #include <rest/helpers/chunks_request_helper.h>
 #include <rest/helpers/request_context.h>
 #include <rest/helpers/request_helpers.h>
-
-#include <utils/common/synctime.h>
 
 namespace {
 
@@ -111,8 +107,6 @@ static void loadLocalData(
 }
 
 static std::atomic<int> staticRequestNum;
-
-static std::chrono::milliseconds kMaxInfinitePeriodDuration(100000);
 
 } // namespace
 
