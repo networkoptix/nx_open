@@ -784,12 +784,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.stroke();
     }
 
-    var scrollLeftEnablingTimer = null;
-    var ableToScrollLeft = false;
-
-    var scrollRightEnablingTimer = null;
-    var ableToScrollRight = false;
-
 
     function drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling){
 
@@ -813,45 +807,14 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         
         if(context) {
             if (canScrollLeft) {
-                if(ableToScrollLeft || true) {
-                    drawScrollButton(context, true, mouseOverLeftScrollButton, mouseInLeftButton);
-                }else{
-                    if(!scrollLeftEnablingTimer) {
-                        scrollLeftEnablingTimer = setTimeout(function () {
-                            scrollLeftEnablingTimer = null;
-                            //ableToScrollLeft = true;
-                        }, timelineConfig.animationDuration);
-                    }
-                }
-            }else{
-                ableToScrollLeft = false;
-                if(scrollLeftEnablingTimer){
-                    clearTimeout(scrollLeftEnablingTimer);
-                    scrollLeftEnablingTimer = null;
-                }
+                drawScrollButton(context, true, mouseOverLeftScrollButton, mouseInLeftButton);
             }
-
             if (canScrollRight) {
-                if(ableToScrollRight || true) {
-                    var sliderBar = self.scaleManager.scrollSlider();
-                    var scrollbarEnd = (sliderBar.start + sliderBar.width) * self.pixelAspectRatio;
-                    if(scrollbarEnd < self.canvas.width - self.pixelAspectRatio){
-                        drawScrollButton(context, false, mouseOverRightScrollButton, mouseInRightButton);
-                    }
-                }else{
-                    if(!scrollRightEnablingTimer) {
-                        scrollRightEnablingTimer = setTimeout(function () {
-                            scrollRightEnablingTimer = null;
-                            //ableToScrollRight = true;
-                        }, timelineConfig.animationDuration);
-                    }
+                var sliderBar = self.scaleManager.scrollSlider();
+                var scrollbarEnd = (sliderBar.start + sliderBar.width) * self.pixelAspectRatio;
+                if(scrollbarEnd < self.canvas.width - self.pixelAspectRatio){
+                    drawScrollButton(context, false, mouseOverRightScrollButton, mouseInRightButton);
                 }
-            }else{
-                ableToScrollRight = false;
-                if(scrollRightEnablingTimer){
-                    clearTimeout(scrollRightEnablingTimer);
-                }
-                scrollRightEnablingTimer = null;
             }
         }
         return {
