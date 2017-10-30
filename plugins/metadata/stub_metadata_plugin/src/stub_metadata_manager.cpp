@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include <plugins/plugin_tools.h>
-#include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_detected_object.h>
 
@@ -146,9 +146,9 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     detectedEvent->setIsActive(m_counter == 1);
     detectedEvent->setEventTypeId(m_eventTypeId);
 
-    auto eventPacket = new CommonMetadataPacket();
+    auto eventPacket = new CommonEventsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
-    eventPacket->addEvent(detectedEvent);
+    eventPacket->addItem(detectedEvent);
     return eventPacket;
 }
 
@@ -159,9 +159,9 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeObjects()
     detectedObject->setEventTypeId(m_objectTypeId);
     detectedObject->setBoundingBox(Rect(0.25, 0.25, 0.25, 0.25));
 
-    auto eventPacket = new CommonMetadataPacket();
+    auto eventPacket = new CommonObjectsMetadataPacket();
     eventPacket->setTimestampUsec(usSinceEpoch());
-    eventPacket->addEvent(detectedObject);
+    eventPacket->addItem(detectedObject);
     return eventPacket;
 }
 

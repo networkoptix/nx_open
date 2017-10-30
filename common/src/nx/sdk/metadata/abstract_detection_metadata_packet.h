@@ -90,17 +90,17 @@ public:
 };
 
 /**
- * Each class that implements AbstractDetectionMetadataPacket interface
+ * Each class that implements AbstractObjectsMetadataPacket interface
  * should properly handle this GUID in its queryInterface method
  */
 static const nxpl::NX_GUID IID_DetectionMetadataPacket
     = {{0x89, 0x89, 0xa1, 0x84, 0x72, 0x09, 0x4c, 0xde, 0xbb, 0x46, 0x09, 0xc1, 0x23, 0x2e, 0x31, 0x85}};
 
 /**
- * @brief The AbstractDetectionMetadataPacket class is an interface for metadata packet
+ * @brief The AbstractObjectsMetadataPacket class is an interface for metadata packet
  * that contains the data about detected on the scene objects.
  */
-class AbstractDetectionMetadataPacket: public AbstractIterableMetadataPacket
+class AbstractObjectsMetadataPacket: public AbstractIterableMetadataPacket
 {
 public:
 

@@ -32,8 +32,8 @@ void EventHandler::handleMetadata(
     if (eventsPacket)
         handleEventsPacket(std::move(eventsPacket));
 
-    nxpt::ScopedRef<AbstractDetectionMetadataPacket> objectsPacket(
-        (AbstractDetectionMetadataPacket*)
+    nxpt::ScopedRef<AbstractObjectsMetadataPacket> objectsPacket(
+        (AbstractObjectsMetadataPacket*)
         metadata->queryInterface(IID_DetectionMetadataPacket), false);
     if (objectsPacket)
         handleMetadataPacket(std::move(objectsPacket));
@@ -45,7 +45,7 @@ void EventHandler::handleEventsPacket(nxpt::ScopedRef<AbstractEventMetadataPacke
     {
         nxpt::ScopedRef<AbstractMetadataItem> item(packet->nextItem(), false);
         if (!item)
-            return;
+            break;
 
         nxpt::ScopedRef<AbstractDetectedEvent> eventData =
             (AbstractDetectedEvent*)item->queryInterface(IID_DetectedEvent);
@@ -56,14 +56,14 @@ void EventHandler::handleEventsPacket(nxpt::ScopedRef<AbstractEventMetadataPacke
     }
 }
 
-void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractDetectionMetadataPacket> packet)
+void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataPacket> packet)
 {
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
         nxpt::ScopedRef<AbstarctDetectedObject> item(packet->nextItem(), false);
         if (!item)
-            return;
+            break;
         nx::common::metadata::DetectedObject object;
         object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();

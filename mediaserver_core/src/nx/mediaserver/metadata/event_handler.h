@@ -35,7 +35,7 @@ private:
     void handleEventsPacket(
         nxpt::ScopedRef<nx::sdk::metadata::AbstractEventMetadataPacket> packet);
     void handleMetadataPacket(
-        nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectionMetadataPacket> packet);
+        nxpt::ScopedRef<nx::sdk::metadata::AbstractObjectsMetadataPacket> packet);
 
     void handleMetadataEvent(
         nxpt::ScopedRef<nx::sdk::metadata::AbstractDetectedEvent> eventData,
