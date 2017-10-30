@@ -32,12 +32,12 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    virtual nx::sdk::Error putData(const nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
+    virtual nx::sdk::Error putData(nx::sdk::metadata::AbstractDataPacket* dataPacket) override;
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();
     nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
     nx::sdk::metadata::AbstractMetadataPacket* cookSomeObjects(
-        const nx::sdk::metadata::AbstractDataPacket* mediaPacket);
+        nx::sdk::metadata::AbstractDataPacket* mediaPacket);
 
     int64_t usSinceEpoch() const;
 

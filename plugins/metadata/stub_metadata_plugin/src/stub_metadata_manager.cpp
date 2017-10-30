@@ -81,7 +81,7 @@ Error StubMetadataManager::startFetchingMetadata()
     return Error::noError;
 }
 
-nx::sdk::Error StubMetadataManager::putData(const nx::sdk::metadata::AbstractDataPacket* dataPacket)
+nx::sdk::Error StubMetadataManager::putData(nx::sdk::metadata::AbstractDataPacket* dataPacket)
 {
     m_handler->handleMetadata(Error::noError, cookSomeObjects(dataPacket));
     return Error::noError;
@@ -153,16 +153,10 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     return eventPacket;
 }
 
-AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(const nx::sdk::metadata::AbstractDataPacket* mediaPacket)
+AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(nx::sdk::metadata::AbstractDataPacket* mediaPacket)
 {
-#if 1
-    auto nonConstPacket = const_cast<nx::sdk::metadata::AbstractDataPacket*>(mediaPacket);
     nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
-        (CommonCompressedVideoPacket*) nonConstPacket->queryInterface(IID_CompressedVideoPacket);
-#else
-    nxpt::ScopedRef<const CommonCompressedVideoPacket> videoPacket =
-        (const CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
-#endif
+        (CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
     if (!videoPacket)
         return nullptr;
 

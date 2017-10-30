@@ -27,7 +27,7 @@ public:
      * @param dataPacket packet of data.
      * @return noError in case of success, other value in case of failure.
      */
-    virtual Error putData(const AbstractDataPacket* dataPacket) = 0;
+    virtual Error putData(AbstractDataPacket* dataPacket) = 0;
 };
 
 } // namespace metadata
