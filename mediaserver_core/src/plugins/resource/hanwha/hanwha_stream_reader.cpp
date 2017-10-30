@@ -382,7 +382,6 @@ QString HanwhaStreamReader::toHanwhaPlaybackTime(int64_t timestampUsec) const
 {
     const auto timezoneShift = m_hanwhaResource
         ->sharedContext()
-        ->chunkLoader()
         ->timeZoneShift();
 
     return toHanwhaDateTime(timestampUsec / 1000, timezoneShift)

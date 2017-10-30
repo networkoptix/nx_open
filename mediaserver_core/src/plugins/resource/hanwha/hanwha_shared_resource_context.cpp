@@ -113,6 +113,7 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
                 [this](std::chrono::seconds timeZoneShift)
                 {
                     m_chunkLoader->setTimeZoneShift(timeZoneShift);
+                    m_timeZoneShift = timeZoneShift;
                 });
         }
     }
@@ -148,14 +149,14 @@ QString HanwhaSharedResourceContext::sessionKey(
     return m_sessionKeys.value(sessionType);
 }
 
-std::shared_ptr<HanwhaChunkLoader> HanwhaSharedResourceContext::chunkLoader() const
-{
-    return m_chunkLoader;
-}
-
 QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const
 {
     return m_chunkLoader->chunks(channelNumber);
+}
+
+QnTimePeriodList HanwhaSharedResourceContext::chunksSync(int channelNumber) const
+{
+    return m_chunkLoader->chunksSync(channelNumber);
 }
 
 qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
@@ -316,6 +317,11 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
     }
 
     return {CameraDiagnostics::NoErrorResult(), std::move(videoProfiles)};
+}
+
+std::chrono::seconds HanwhaSharedResourceContext::timeZoneShift() const
+{
+    return m_timeZoneShift;
 }
 
 } // namespace plugins

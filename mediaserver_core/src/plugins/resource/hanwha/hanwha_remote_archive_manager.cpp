@@ -25,12 +25,8 @@ bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
     int64_t /*startTimeMs*/,
     int64_t /*endTimeMs*/)
 {
-    auto loader = m_resource->sharedContext()->chunkLoader();
-    if (!loader)
-        return false;
-
     // TODO: #dmishin Fix channel if needed
-    const auto chunks = loader->chunksSync(m_resource->getChannel());
+    const auto chunks = m_resource->sharedContext()->chunksSync(m_resource->getChannel());
 
     for (const auto& chunk: chunks)
     {

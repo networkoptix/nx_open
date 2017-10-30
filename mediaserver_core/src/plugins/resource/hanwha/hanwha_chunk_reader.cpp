@@ -191,16 +191,18 @@ void HanwhaChunkLoader::onHttpClientDone()
         .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
     if (m_state == State::LoadingChunks)
     {
-        m_state = nextState(m_state);
+        m_errorOccured = false;
         m_chunksLoadedAtLeastOnce = true;
+        m_state = nextState(m_state);
         m_wait.wakeAll();
         startTimerForNextRequest(kUpdateChunksDelay); //< Send next request after delay
     }
     else if (m_state == State::updateTimeRange)
     {
         parseTimeRangeData(m_httpClient->fetchMessageBodyBuffer());
-        m_state = nextState(m_state);
         m_timeRangeLoadedAtLeastOnce = true;
+        m_errorOccured = false;
+        m_state = nextState(m_state);
         m_wait.wakeAll();
         sendRequest(); //< Send next request immediately
     }
@@ -368,9 +370,6 @@ QnTimePeriodList HanwhaChunkLoader::chunksSync(int channelNumber) const
     {
         m_wait.wait(&m_mutex);
     }
-
-    if (m_errorOccured)
-        m_errorOccured = false;
 
     return chunksUnsafe(channelNumber);
 }
