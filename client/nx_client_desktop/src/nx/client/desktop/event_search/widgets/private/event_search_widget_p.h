@@ -31,8 +31,6 @@ private:
     UnifiedSearchListModel* const m_model = nullptr;
     QWidget* const m_headerWidget = nullptr;
     EventRibbon* const m_eventRibbon = nullptr;
-
-    QnVirtualCameraResourcePtr m_camera;
 };
 
 } // namespace

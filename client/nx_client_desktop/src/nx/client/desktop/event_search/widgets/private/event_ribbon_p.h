@@ -52,7 +52,15 @@ private:
     void removeTiles(int first, int count);
     void clear();
 
+    // Creates a tile widget for a data model item using the following roles:
+    //     Qt::UuidRole for unique id
+    //     Qt::DisplayRole for title
+    //     Qt::DecorationRole for icon
+    //     Qn::TimestampTextRole for timestamp
+    //     Qn::DescriptionTextRole for description
+    //     Qt::ForegroundRole for titleColor
     EventTile* createTile(const QModelIndex& index);
+    static void updateTile(EventTile* tile, const QModelIndex& index);
 
 private:
     EventRibbon* const q = nullptr;

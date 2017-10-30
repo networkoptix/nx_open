@@ -65,14 +65,6 @@ public:
     QAction* action() const;
     void setAction(QAction* value);
 
-    // Creates a tile widget for a data model item using the following roles:
-    //     Qt::DisplayRole for title
-    //     Qt::DecorationRole for icon
-    //     Qn::TimestampTextRole for timestamp
-    //     Qn::DescriptionTextRole for description
-    //     Qt::ForegroundRole for titleColor
-    static EventTile* createFrom(const QModelIndex& index, QWidget* parent = nullptr);
-
 signals:
     void clicked();
 

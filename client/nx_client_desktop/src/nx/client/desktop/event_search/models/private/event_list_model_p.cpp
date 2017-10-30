@@ -52,6 +52,20 @@ void EventListModel::Private::clear()
     m_nextSequentialNumber = 0;
 }
 
+bool EventListModel::Private::updateEvent(const EventData& data)
+{
+    const auto i = indexOf(data.id);
+    if (i < 0)
+        return false;
+
+    m_events[i].data = data;
+
+    const auto index = q->index(i);
+    emit q->dataChanged(index, index);
+
+    return true;
+}
+
 const EventListModel::EventData& EventListModel::Private::event(int index) const
 {
     if (index < 0 || index >= m_events.count())

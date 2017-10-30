@@ -11,10 +11,12 @@
 #include <client/client_globals.h>
 #include <utils/common/event_processors.h>
 #include <ui/common/widget_anchor.h>
+#include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
 
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/utils/log/assert.h>
+
 
 namespace nx {
 namespace client {
@@ -109,7 +111,11 @@ void EventRibbon::Private::setModel(QAbstractItemModel* model)
     m_modelConnections.reset(new QnDisconnectHelper());
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::modelReset, this,
-        [this]() { insertNewTiles(0, m_model->rowCount(m_rootIndex)); });
+        [this]()
+        {
+            clear();
+            insertNewTiles(0, m_model->rowCount(m_rootIndex));
+        });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
         [this](const QModelIndex& parent, int first, int last)
@@ -134,6 +140,30 @@ void EventRibbon::Private::setModel(QAbstractItemModel* model)
 
             removeTiles(first, last - first + 1);
         });
+
+    *m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
+        [this](const QModelIndex& first, const QModelIndex& last)
+        {
+            if (first.column() > m_modelColumn || last.column() < m_modelColumn)
+                return;
+
+            if (m_rootIndex.isValid() != first.parent().isValid())
+                return;
+
+            if (m_rootIndex.isValid() && m_rootIndex != first.parent())
+                return;
+
+            for (int i = first.row(); i <= last.row(); ++i)
+                updateTile(m_tiles[i].widget, first.sibling(i, m_modelColumn));
+        });
+
+    *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
+        [this]()
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "EventRibbon doesn't support model rows moving!");
+            clear(); // Handle as full reset.
+            insertNewTiles(0, m_model->rowCount(m_rootIndex));
+        });
 }
 
 void EventRibbon::Private::insertNewTiles(int first, int count)
@@ -141,7 +171,7 @@ void EventRibbon::Private::insertNewTiles(int first, int count)
     if (!m_model)
         return;
 
-    for (int i = first; i < count; ++i)
+    for (int i = first; i < first + count; ++i)
     {
         const auto index = m_model->index(i, m_modelColumn, m_rootIndex);
         auto tile = createTile(index);
@@ -153,9 +183,12 @@ void EventRibbon::Private::insertNewTiles(int first, int count)
 
 EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 {
-    auto tile = EventTile::createFrom(index);
-    if (!tile)
+    const auto id = index.data(Qn::UuidRole).value<QnUuid>();
+    if (id.isNull())
         return nullptr;
+
+    auto tile = new EventTile(id, q);
+    updateTile(tile, index);
 
     connect(tile, &EventTile::closeRequested, this,
         [this]()
@@ -176,6 +209,25 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
         });
 
     return tile;
+}
+
+void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
+{
+    NX_EXPECT(tile && index.isValid());
+
+    tile->setTitle(index.data(Qt::DisplayRole).toString());
+    tile->setIcon(index.data(Qt::DecorationRole).value<QPixmap>());
+    tile->setTimestamp(index.data(Qn::TimestampTextRole).toString());
+    tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
+    tile->setToolTip(index.data(Qt::ToolTipRole).toString());
+
+    setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
+
+    const auto color = index.data(Qt::ForegroundRole).value<QColor>();
+    if (color.isValid())
+        tile->setTitleColor(color);
+
+    // TODO: #vkutin Preview?
 }
 
 void EventRibbon::Private::insertTile(int index, EventTile* tileWidget)

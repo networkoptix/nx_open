@@ -23,17 +23,6 @@ class EventListModel:
     using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
-    explicit EventListModel(QObject* parent = nullptr);
-    virtual ~EventListModel() override;
-
-    virtual int rowCount(const QModelIndex& parent) const override;
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-
-    virtual bool removeEvent(const QnUuid& id);
-
-    QModelIndex indexOf(const QnUuid& id) const;
-
-protected:
     struct EventData
     {
         QnUuid id;
@@ -48,10 +37,21 @@ protected:
         ui::action::Parameters actionParameters;
     };
 
-protected:
+public:
+    explicit EventListModel(QObject* parent = nullptr);
+    virtual ~EventListModel() override;
+
+    virtual int rowCount(const QModelIndex& parent) const override;
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
     virtual bool addEvent(const EventData& event);
+    virtual bool updateEvent(const EventData& event);
+    virtual bool removeEvent(const QnUuid& id);
     virtual void clear();
 
+    QModelIndex indexOf(const QnUuid& id) const;
+
+protected:
     virtual QString timestampText(qint64 timestampMs) const;
 
 private:

@@ -4,15 +4,10 @@
 #include <QtGui/QPainter>
 
 #include <client/client_globals.h>
-#include <ui/help/help_topic_accessor.h>
 #include <ui/common/palette.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-
-#include <nx/client/desktop/ui/actions/action.h>
-#include <nx/client/desktop/ui/actions/action_parameters.h>
-#include <nx/utils/log/assert.h>
 
 namespace nx {
 namespace client {
@@ -162,7 +157,11 @@ QPixmap EventTile::icon() const
 
 void EventTile::setIcon(const QPixmap& value)
 {
-    ui->iconLabel->setPixmap(value);
+    // TODO: #vkutin Do we want to scale them? Now it's a temporary measure for soft triggers.
+    ui->iconLabel->setPixmap(value.scaled(
+        ui->iconLabel->maximumSize() * value.devicePixelRatio(),
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation));
     // Icon label is always visible. It keeps column width fixed.
 }
 
@@ -197,31 +196,6 @@ void EventTile::paintEvent(QPaintEvent* /*event*/)
     painter.setPen(Qt::NoPen);
     painter.setBrush(palette().window());
     painter.drawRoundedRect(rect(), kRoundingRadius, kRoundingRadius);
-}
-
-EventTile* EventTile::createFrom(const QModelIndex& index, QWidget* parent)
-{
-    NX_ASSERT(index.isValid());
-
-    auto tile = new EventTile(
-        index.data(Qn::UuidRole).value<QnUuid>(),
-        index.data(Qt::DisplayRole).toString(),
-        index.data(Qt::DecorationRole).value<QPixmap>(),
-        index.data(Qn::TimestampTextRole).toString(),
-        index.data(Qn::DescriptionTextRole).toString(),
-        parent);
-
-    tile->setToolTip(index.data(Qt::ToolTipRole).toString());
-
-    setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
-
-    const auto color = index.data(Qt::ForegroundRole).value<QColor>();
-    if (color.isValid())
-        tile->setTitleColor(color);
-
-    // TODO: #vkutin Preview?
-
-    return tile;
 }
 
 bool EventTile::event(QEvent* event)

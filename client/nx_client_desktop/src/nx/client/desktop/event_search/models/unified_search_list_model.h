@@ -2,6 +2,8 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <core/resource/resource_fwd.h>
+
 #include <nx/client/desktop/event_search/models/event_list_model.h>
 
 namespace nx {
@@ -16,6 +18,9 @@ class UnifiedSearchListModel: public EventListModel
 public:
     explicit UnifiedSearchListModel(QObject* parent = nullptr);
     virtual ~UnifiedSearchListModel() override;
+
+    QnVirtualCameraResourcePtr camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 private:
     class Private;

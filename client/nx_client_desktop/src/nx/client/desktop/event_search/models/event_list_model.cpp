@@ -69,6 +69,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
                 ? QVariant::fromValue(event.titleColor)
                 : QVariant();
 
+        case Qn::ResourceSearchStringRole:
+            return lit("%1 %2").arg(event.title).arg(event.description);
+
         default:
             return QVariant();
     }
@@ -77,6 +80,11 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
 bool EventListModel::addEvent(const EventData& event)
 {
     return d->addEvent(event);
+}
+
+bool EventListModel::updateEvent(const EventData& event)
+{
+    return d->updateEvent(event);
 }
 
 bool EventListModel::removeEvent(const QnUuid& id)

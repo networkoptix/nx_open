@@ -30,6 +30,8 @@ public:
     // Event index lookup by id. Logarithmic complexity.
     int indexOf(const QnUuid& id) const;
 
+    bool updateEvent(const EventData& data);
+
     const EventData& event(int index) const;
 
     bool isValid(const QModelIndex& index) const;
