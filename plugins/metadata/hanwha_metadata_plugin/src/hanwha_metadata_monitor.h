@@ -35,7 +35,9 @@ public:
     void startMonitoring();
     void stopMonitoring();
 
-    void setHandler(const Handler& handler);
+    void addHandler(const QString& handlerId, const Handler& handler);
+    void removeHandler(const QString& handlerId);
+    void clearHandlers();
 
 private:
     nx::utils::Url buildMonitoringUrl(const nx::utils::Url& url) const;
@@ -53,7 +55,7 @@ private:
     const QAuthenticator m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
-    Handler m_handler;
+    QMap<QString, Handler> m_handlers;
     bool m_started = false;
 };
 

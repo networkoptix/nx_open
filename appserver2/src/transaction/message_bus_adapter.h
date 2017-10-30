@@ -6,8 +6,7 @@
 #include <transaction/transaction_message_bus.h>
 #include <nx/p2p/p2p_message_bus.h>
 
-namespace ec2
-{
+namespace ec2 {
 
     enum class MessageBusType
     {
@@ -16,9 +15,11 @@ namespace ec2
         P2pMode
     };
 
-    class TransactionMessageBusAdapter: public AbstractTransactionMessageBus
+    class TransactionMessageBusAdapter:
+        public AbstractTransactionMessageBus
     {
         Q_OBJECT
+
     public:
         TransactionMessageBusAdapter(
             detail::QnDbManager* db,
@@ -32,12 +33,13 @@ namespace ec2
 
         template <typename T> T dynamicCast() { return dynamic_cast<T> (m_bus.get()); }
 
-        virtual ~TransactionMessageBusAdapter() {}
+        virtual ~TransactionMessageBusAdapter() = default;
 
         virtual void start() override;
         virtual void stop() override;
 
         virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
+        virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
         virtual int distanceToPeer(const QnUuid& dstPeer) const override;
@@ -59,6 +61,7 @@ namespace ec2
         virtual detail::QnDbManager* getDb() const override;
 
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
+
     public:
         template<class T>
         void sendTransaction(
@@ -93,6 +96,7 @@ namespace ec2
             else
                 NX_CRITICAL(false, "Not implemented");
         }
+
     private:
         std::unique_ptr<TransactionMessageBusBase> m_bus;
 
@@ -102,4 +106,5 @@ namespace ec2
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;
         TimeSynchronizationManager* m_timeSyncManager;
     };
-};
+
+} // namespace ec2

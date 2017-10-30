@@ -780,7 +780,8 @@ void socketErrorHandling(
         << SystemError::getLastOSErrorText().toStdString();
     ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 
-    server->listen();
+    ASSERT_EQ(true, server->listen());
+    ASSERT_EQ(SystemError::noError, SystemError::getLastOSErrorCode());
 
     SystemError::setLastErrorCode(SystemError::noError);
     ASSERT_FALSE(client->bind(server->getLocalAddress()));

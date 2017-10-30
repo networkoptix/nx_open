@@ -90,7 +90,7 @@ public:
     using QnInstanceStorage::instance;
     using QnInstanceStorage::store;
 
-    void bindModuleinformation(const QnMediaServerResourcePtr &server);
+    void bindModuleInformation(const QnMediaServerResourcePtr &server);
 
     QnSessionManager* sessionManager() const
     {

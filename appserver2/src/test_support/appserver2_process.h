@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <memory>
 
 #include <QtCore/QCoreApplication>
 
@@ -16,7 +17,10 @@
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_api.h>
 
-//namespace nx {
+#include "appserver2_http_server.h"
+
+namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+
 namespace ec2 {
 
 class AbstractECConnection;
@@ -28,7 +32,7 @@ class Appserver2Process:
 {
 public:
     Appserver2Process(int argc, char **argv);
-    virtual ~Appserver2Process();
+    virtual ~Appserver2Process() = default;
 
     virtual void pleaseStop() override;
 
@@ -52,18 +56,19 @@ private:
     QnSimpleHttpConnectionListener* m_tcpListener;
     mutable QnMutex m_mutex;
     QEventLoop m_eventLoop;
+    nx::vms::cloud_integration::CloudManagerGroup* m_cloudManagerGroup = nullptr;
 
     void updateRuntimeData();
     void registerHttpHandlers(ec2::AbstractECConnectionFactory* ec2ConnectionFactory);
     void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
 };
 
-
-class Appserver2ProcessPublic: public QnStoppable
+class Appserver2ProcessPublic:
+    public QnStoppable
 {
 public:
     Appserver2ProcessPublic(int argc, char **argv);
-    virtual ~Appserver2ProcessPublic();
+    virtual ~Appserver2ProcessPublic() = default;
 
     virtual void pleaseStop() override;
 
@@ -76,31 +81,9 @@ public:
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
     QnCommonModule* commonModule() const;
+
 private:
-    Appserver2Process* m_impl;
+    std::unique_ptr<Appserver2Process> m_impl;
 };
 
-class QnSimpleHttpConnectionListener: public QnHttpConnectionListener
-{
-public:
-    QnSimpleHttpConnectionListener(
-        QnCommonModule* commonModule,
-        const QHostAddress& address,
-        int port,
-        int maxConnections,
-        bool useSsl);
-
-    ~QnSimpleHttpConnectionListener();
-
-    bool needAuth(const nx_http::Request& request) const;
-    void disableAuthForPath(const QString& path);
-protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> clientSocket) override;
-private:
-    QSet<QString> m_disableAuthPrefixes;
-};
-
-
-}   // namespace ec2
-//}   // namespace nx
+} // namespace ec2

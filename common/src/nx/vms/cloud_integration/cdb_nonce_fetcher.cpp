@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 #include <nx/utils/sync_call.h>
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
@@ -30,8 +31,6 @@ CdbNonceFetcher::CdbNonceFetcher(
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(defaultGenerator),
-    m_randomEngine(m_rd()),
-    m_nonceTrailerRandomGenerator('a', 'z'),
     m_timerManager(timerManager),
     m_cloudUserInfoPool(cloudUserInfoPool)
 {
@@ -66,7 +65,7 @@ CdbNonceFetcher::~CdbNonceFetcher()
     timerID.reset();
 }
 
-nx::Buffer CdbNonceFetcher::generateNonceTrailer(std::function<short()> genFunc)
+nx::Buffer CdbNonceFetcher::generateNonceTrailer()
 {
     nx::Buffer nonceTrailer;
     nonceTrailer.resize(kNonceTrailerLength);
@@ -74,15 +73,8 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer(std::function<short()> genFunc)
     std::generate(
         nonceTrailer.data()+sizeof(kMagicBytes),
         nonceTrailer.data()+nonceTrailer.size(),
-        genFunc);
+        []() { return nx::utils::random::number<int>('a', 'z'); });
     return nonceTrailer;
-}
-
-nx::Buffer CdbNonceFetcher::generateNonceTrailer()
-{
-    // TODO: #ak std::default_random_engine can throw. And it really happens!
-    return generateNonceTrailer(
-        [this]() { return m_nonceTrailerRandomGenerator(m_randomEngine); });
 }
 
 QByteArray CdbNonceFetcher::generateNonce()

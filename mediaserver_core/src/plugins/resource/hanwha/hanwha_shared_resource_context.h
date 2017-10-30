@@ -21,54 +21,112 @@ namespace plugins {
 
 class HanwhaChunkLoader;
 
-struct HanwhaDeviceInfo
+struct HanwhaInformation
 {
-    CameraDiagnostics::Result diagnostics;
     QString deviceType;
     QString firmware;
-    HanwhaAttributes attributes;
-    HanwhaCgiParameters cgiParamiters;
-    int channelCount = 0;
-
     QString macAddress;
     QString model;
+    int channelCount = 0;
+    HanwhaAttributes attributes;
+};
 
-    HanwhaResponse videoSources;
-    HanwhaResponse videoProfiles;
+template<typename Value>
+struct HanwhaResult
+{
+    CameraDiagnostics::Result diagnostics;
+    Value value;
 
-    HanwhaDeviceInfo(CameraDiagnostics::Result diagnostics = CameraDiagnostics::NotImplementedResult()):
-        diagnostics(diagnostics) {}
-    bool isValid() const { return (bool) diagnostics; }
+    inline operator bool() const { return diagnostics.errorCode == CameraDiagnostics::ErrorCode::noError; }
+    inline Value* operator->() { return &value; }
+    inline const Value* operator->() const { return &value; }
+};
+
+template<typename Value>
+class HanwhaCachedData
+{
+public:
+    HanwhaCachedData(
+        std::function<HanwhaResult<Value>()> getter,
+        std::chrono::milliseconds timeout)
+    :
+        m_getter(std::move(getter)), m_timeout(timeout)
+    {
+    }
+
+    HanwhaResult<Value> operator()()
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_timer.hasExpired(std::chrono::seconds(10))) //< TODO: Move out timeout.
+        {
+            m_value = m_getter();
+            m_timer.restart();
+        }
+
+        return m_value;
+    }
+
+    void invalidate()
+    {
+        QnMutexLocker locker(&m_mutex);
+        m_timer.invalidate();
+    }
+
+private:
+    const std::function<HanwhaResult<Value>()> m_getter;
+    const std::chrono::milliseconds m_timeout;
+
+    QnMutex m_mutex;
+    nx::utils::ElapsedTimer m_timer;
+    HanwhaResult<Value> m_value;
 };
 
 class HanwhaSharedResourceContext:
-    public nx::mediaserver::resource::AbstractSharedResourceContext
+    public nx::mediaserver::resource::AbstractSharedResourceContext,
+    public std::enable_shared_from_this<HanwhaSharedResourceContext>
 {
 
 public:
     HanwhaSharedResourceContext(
-        QnMediaServerModule* serverModule,
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
-    HanwhaDeviceInfo loadInformation(const QAuthenticator& auth, const nx::utils::Url& url);
-    void start(const QAuthenticator& auth, const nx::utils::Url& url);
+    // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
+    void setRecourceAccess(const nx::utils::Url& url, const QAuthenticator& authenticator);
+    void setLastSucessfulUrl(const nx::utils::Url& value);
+
+    nx::utils::Url url() const;
+    QAuthenticator authenticator() const;
+    QnSemaphore* requestSemaphore();
+
+    void startServices();
 
     QString sessionKey(
         HanwhaSessionType sessionType,
         bool generateNewOne = false);
 
-    QnSemaphore* requestSemaphore();
     std::shared_ptr<HanwhaChunkLoader> chunkLoader() const;
 
+    // NOTE: function objects return HanwhaResult<T>.
+    HanwhaCachedData<HanwhaInformation> information;
+    HanwhaCachedData<HanwhaCgiParameters> cgiParamiters;
+    HanwhaCachedData<HanwhaResponse> eventStatuses;
+    HanwhaCachedData<HanwhaResponse> videoSources;
+    HanwhaCachedData<HanwhaResponse> videoProfiles;
+
 private:
-    mutable QnMutex m_channelCountMutex;
-    
+    HanwhaResult<HanwhaInformation> loadInformation();
+    HanwhaResult<HanwhaCgiParameters> loadCgiParamiters();
+    HanwhaResult<HanwhaResponse> loadEventStatuses();
+    HanwhaResult<HanwhaResponse> loadVideoSources();
+    HanwhaResult<HanwhaResponse> loadVideoProfiles();
+
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
-    mutable QnMutex m_informationMutex;
-    QAuthenticator m_lastAuth;
-    nx::utils::Url m_lastUrl;
-    HanwhaDeviceInfo m_cachedInformation;
+    mutable QnMutex m_dataMutex;
+    nx::utils::Url m_resourceUrl;
+    QAuthenticator m_resourceAuthenticator;
+    nx::utils::Url m_lastSuccessfulUrl;
+    nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
 
     mutable QnMutex m_sessionMutex;
     QMap<HanwhaSessionType, QString> m_sessionKeys;
@@ -76,7 +134,8 @@ private:
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
-    nx::utils::ElapsedTimer m_cacheUpdateTimer;
+
+    mutable QnMutex m_servicesMutex;
 };
 
 } // namespace plugins

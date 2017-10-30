@@ -14,7 +14,9 @@ namespace cloud_integration {
 CloudManagerGroup::CloudManagerGroup(
     QnCommonModule* commonModule,
     auth::AbstractNonceProvider* defaultNonceFetcher,
-    std::unique_ptr<auth::AbstractUserDataProvider> defaultAuthenticator)
+    AbstractEc2CloudConnector* ec2CloudConnector,
+    std::unique_ptr<auth::AbstractUserDataProvider> defaultAuthenticator,
+    std::chrono::milliseconds delayBeforeSettingMasterFlag)
 :
     connectionManager(commonModule),
     cloudUserInfoPool(
@@ -28,8 +30,16 @@ CloudManagerGroup::CloudManagerGroup(
         &connectionManager,
         std::move(defaultAuthenticator),
         authenticationNonceFetcher,
-        cloudUserInfoPool)
+        cloudUserInfoPool),
+    m_masterServerStatusWatcher(commonModule, delayBeforeSettingMasterFlag), // TODO: #ak Take from some settings.
+    m_connectToCloudWatcher(commonModule, ec2CloudConnector)
 {
+}
+
+void CloudManagerGroup::setCloudDbUrl(const nx::utils::Url& cdbUrl)
+{
+    connectionManager.setCloudDbUrl(cdbUrl);
+    m_connectToCloudWatcher.setCloudDbUrl(cdbUrl);
 }
 
 } // namespace cloud_integration

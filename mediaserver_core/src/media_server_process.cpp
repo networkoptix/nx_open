@@ -185,6 +185,8 @@
 #include <rest/handlers/start_lite_client_rest_handler.h>
 #include <rest/handlers/runtime_info_rest_handler.h>
 #include <rest/handlers/downloads_rest_handler.h>
+#include <rest/handlers/get_hardware_ids_rest_handler.h>
+#include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -255,10 +257,8 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
-#include <media_server/master_server_status_watcher.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <nx/mediaserver/license_watcher.h>
-#include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
 #include "media_server_process_aux.h"
@@ -270,6 +270,7 @@
 #include <recorder/remote_archive_synchronizer.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
+#include <rest/handlers/change_camera_password_rest_handler.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -484,13 +485,15 @@ QnStorageResourcePtr createStorage(
     storage->setParentId(serverId);
     storage->setUrl(path);
 
-    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
     const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const QnPlatformMonitor::PartitionSpace& part)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
-    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    const auto storageType = (it != partitions.end())
+        ? it->type
+        : QnPlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
 
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
@@ -1524,7 +1527,7 @@ void MediaServerProcess::registerRestHandlers(
     QnUniversalTcpListener* tcpListener,
     ec2::TransactionMessageBusAdapter* messageBus)
 {
-	auto processorPool = tcpListener->processorPool();
+    auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
     processorPool->registerRedirectRule(lit(""), welcomePage);
     processorPool->registerRedirectRule(lit("/"), welcomePage);
@@ -1575,6 +1578,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/auditLog", new QnAuditLogRestHandler(), kAdmin);
     reg("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     reg("api/pingSystem", new QnPingSystemRestHandler());
+    reg("api/changeCameraPassword", new QnChangeCameraPasswordRestHandler(), kAdmin);
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
     reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated, still used in the client
@@ -1615,7 +1619,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
 
     // TODO: Introduce constants for API methods registered here, also use them in
-    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors.
+    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors,
+    // except when it is the path of some other api method.
 
     reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler()); //< deprecated
     reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods")); //< new version
@@ -1639,6 +1644,10 @@ void MediaServerProcess::registerRestHandlers(
     #endif
 
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+
+    static const char kGetHardwareIdsPath[] = "api/getHardwareIds";
+    reg(kGetHardwareIdsPath, new QnGetHardwareIdsRestHandler());
+    reg("ec2/getHardwareIdsOfServers", new QnMultiserverGetHardwareIdsRestHandler(QLatin1String("/") + kGetHardwareIdsPath));
 }
 
 template<class TcpConnectionProcessor, typename... ExtraParam>
@@ -2189,38 +2198,6 @@ void MediaServerProcess::run()
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
 
-    TimeBasedNonceProvider timeBasedNonceProvider;
-    CloudIntegrationManager cloudIntegrationManager(
-        commonModule(),
-        &timeBasedNonceProvider);
-    auto authHelper = std::make_unique<QnAuthHelper>(
-        commonModule(),
-        &timeBasedNonceProvider,
-        &cloudIntegrationManager.cloudManagerGroup);
-    connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
-
-    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
-    QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), nx_http::AuthMethod::noAuth );
-
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/ping"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/camera_event*"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/showLog*"), nx_http::AuthMethod::urlQueryParam);   //allowed by default for now
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/moduleInformation"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/gettime"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getTimeZones"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getNonce"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), nx_http::AuthMethod::noAuth);
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
-    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
-
-    //by following delegating hls authentication to target server
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth );
-
     std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
         new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
@@ -2304,8 +2281,44 @@ void MediaServerProcess::run()
             commonModule(),
             settings->value(nx_ms_conf::P2P_MODE_FLAG).toBool()));
 
+    TimeBasedNonceProvider timeBasedNonceProvider;
+
+    auto cloudIntegrationManager = std::make_unique<CloudIntegrationManager>(
+        commonModule(),
+        ec2ConnectionFactory->messageBus(),
+        &timeBasedNonceProvider);
+
+    auto authHelper = std::make_unique<QnAuthHelper>(
+        commonModule(),
+        &timeBasedNonceProvider,
+        &cloudIntegrationManager->cloudManagerGroup());
+    connect(
+        authHelper.get(), &QnAuthHelper::emptyDigestDetected,
+        this, &MediaServerProcess::at_emptyDigestDetected);
+
+    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
+    authHelper->restrictionList()->allow(lit("?"), nx_http::AuthMethod::noAuth);
+
+    authHelper->restrictionList()->allow(lit("*/api/ping"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/camera_event*"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/showLog*"), nx_http::AuthMethod::urlQueryParam);   //allowed by default for now
+    authHelper->restrictionList()->allow(lit("*/api/moduleInformation"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/gettime"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/getTimeZones"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/getNonce"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/cookieLogin"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/cookieLogout"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/static/*"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
+    authHelper->restrictionList()->allow(lit("*/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
+    authHelper->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
+
+    //by following delegating hls authentication to target server
+    authHelper->restrictionList()->allow(lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth);
+
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
-    QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));
 
     //passing settings
     std::map<QString, QVariant> confParams;
@@ -2455,7 +2468,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(&cloudIntegrationManager.cloudManagerGroup, ec2ConnectionFactory->messageBus()))
+    if (!initTcpListener(&cloudIntegrationManager->cloudManagerGroup(), ec2ConnectionFactory->messageBus()))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2519,7 +2532,7 @@ void MediaServerProcess::run()
         server->setPrimaryAddress(
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
-        cloudIntegrationManager.cloudManagerGroup.connectionManager.setProxyVia(
+        cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
@@ -2593,7 +2606,7 @@ void MediaServerProcess::run()
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
     commonModule()->setModuleInformation(selfInformation);
-    commonModule()->bindModuleinformation(m_mediaServer);
+    commonModule()->bindModuleInformation(m_mediaServer);
 
     // show our cloud host value in registry in case of installer will check it
     const auto& globalSettings = commonModule()->globalSettings();
@@ -2709,7 +2722,7 @@ void MediaServerProcess::run()
                 qWarning() << "Cloud instance changed from" << globalSettings->cloudHost() <<
                     "to" << nx::network::AppInfo::defaultCloudHost() << ". Server goes to the new state";
 
-            resetSystemState(cloudIntegrationManager.cloudManagerGroup.connectionManager);
+            resetSystemState(cloudIntegrationManager->cloudManagerGroup().connectionManager);
         }
         if (settingsProxy->isCloudInstanceChanged())
         {
@@ -2776,7 +2789,7 @@ void MediaServerProcess::run()
         [this, &cloudIntegrationManager]()
         {
             updateAddressesList();
-            cloudIntegrationManager.cloudManagerGroup.connectionManager.setProxyVia(
+            cloudIntegrationManager->cloudManagerGroup().connectionManager.setProxyVia(
                 SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 
@@ -2841,7 +2854,7 @@ void MediaServerProcess::run()
     emit started();
     exec();
 
-    disconnect(QnAuthHelper::instance(), 0, this, 0);
+    disconnect(authHelper.get(), 0, this, 0);
     disconnect(commonModule()->resourceDiscoveryManager(), 0, this, 0);
     disconnect(qnNormalStorageMan, 0, this, 0);
     disconnect(qnBackupStorageMan, 0, this, 0);
@@ -2924,7 +2937,7 @@ void MediaServerProcess::run()
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();
 
-    connectToCloudWatcher.reset();
+    cloudIntegrationManager.reset();
     ec2Connection.reset();
     ec2ConnectionFactory.reset();
 

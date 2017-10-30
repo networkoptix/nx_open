@@ -7,30 +7,28 @@ HttpModManager::HttpModManager(QObject* parent /*= nullptr*/):
 {
 }
 
-HttpModManager::~HttpModManager()
-{
-}
-
 void HttpModManager::apply(Request* const request)
 {
-    //applying m_urlRewriteExact
-    auto it = m_urlRewriteExact.find( request->requestLine.url.path() );
-    if( it != m_urlRewriteExact.end() )
-        request->requestLine.url.setPath( it->second );
+    // Applying m_urlRewriteExact.
+    auto it = m_urlRewriteExact.find(request->requestLine.url.path());
+    if (it != m_urlRewriteExact.end())
+        request->requestLine.url.setPath(it->second);
 
-    //calling custom filters
-    for( auto& mod: m_requestModifiers )
-        mod( request );
+    // Calling custom filters.
+    for (auto& mod: m_requestModifiers)
+        mod(request);
 }
 
-void HttpModManager::addUrlRewriteExact( const QString& originalPath, const QString& effectivePath )
+void HttpModManager::addUrlRewriteExact(
+    const QString& originalPath,
+    const QString& effectivePath)
 {
-    m_urlRewriteExact.emplace( originalPath, effectivePath );
+    m_urlRewriteExact.emplace(originalPath, effectivePath);
 }
 
-void HttpModManager::addCustomRequestMod( std::function<void( Request* )> requestMod )
+void HttpModManager::addCustomRequestMod(std::function<void(Request*)> requestMod)
 {
-    m_requestModifiers.emplace_back( std::move( requestMod ) );
+    m_requestModifiers.emplace_back(std::move(requestMod));
 }
 
 } // namespace nx_http

@@ -25,7 +25,9 @@ struct AuthInfo
     SocketAddress proxyEndpoint;
 };
 
-//!This cache is to help http clients to authenticate on server without receiving HTTP Unauthorized error first
+/**
+ * This cache is to help http clients to authenticate on server without receiving HTTP Unauthorized error first.
+ */
 class NX_NETWORK_API AuthInfoCache
 {
 public:
@@ -46,7 +48,7 @@ public:
             const Credentials& userCredentials,
             header::WWWAuthenticate wwwAuthenticateHeader,
             header::Authorization authorization)
-        :
+            :
             url(url),
             method(method),
             userCredentials(userCredentials),
@@ -67,48 +69,50 @@ public:
 
     AuthInfoCache() = default;
 
-    //!Save successful authorization information in cache for later use
+    /**
+     * Save successful authorization information in cache for later use.
+     */
     template<typename AuthorizationCacheItemRef>
-    void cacheAuthorization( AuthorizationCacheItemRef&& item )
+    void cacheAuthorization(AuthorizationCacheItemRef&& item)
     {
-        std::lock_guard<std::mutex> lk( m_mutex );
+        std::lock_guard<std::mutex> lk(m_mutex);
 
-        m_cachedAuthorization.reset( new AuthorizationCacheItem(
-            std::forward<AuthorizationCacheItemRef>(item) ) );
+        m_cachedAuthorization.reset(new AuthorizationCacheItem(
+            std::forward<AuthorizationCacheItemRef>(item)));
     }
 
-    //!Adds Authorization header to \a request, if corresponding data can be found in cache
-    /*!
-        \return \a true if necessary information has been found in cache and added to \a request. \a false otherwise
-    */
+    /**
+     * Adds Authorization header to request, if corresponding data can be found in cache.
+     * @return true if necessary information has been found in cache and added to request. false otherwise.
+     */
     bool addAuthorizationHeader(
         const nx::utils::Url& url,
         Request* const request,
-        AuthInfoCache::AuthorizationCacheItem* const authzData );
+        AuthInfoCache::AuthorizationCacheItem* const authzData);
 
-    /*!
-        \param url This argument is required since \a request->requestLine.url can contain only path
-    */
+    /**
+     * @param url This argument is required since request->requestLine.url can contain only path.
+     */
     static bool addAuthorizationHeader(
         const nx::utils::Url& url,
         Request* const request,
-        AuthInfoCache::AuthorizationCacheItem authzData );
+        AuthInfoCache::AuthorizationCacheItem authzData);
     static AuthInfoCache* instance();
 
 private:
-    //!Authorization header, successfully used with \a m_url
-    /*!
-        //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials
-    */
+    // TODO: #ak (2.4) This information should stored globally depending on server endpoint, server path, user credentials.
+    /**
+     * Authorization header, successfully used with m_url.
+     */
     std::unique_ptr<AuthorizationCacheItem> m_cachedAuthorization;
     mutable std::mutex m_mutex;
 
     AuthorizationCacheItem getCachedAuthentication(
         const nx::utils::Url& url,
-        const StringType& method ) const;
+        const StringType& method) const;
 
-    AuthInfoCache( const AuthInfoCache& );
-    AuthInfoCache& operator=( const AuthInfoCache& );
+    AuthInfoCache(const AuthInfoCache&);
+    AuthInfoCache& operator=(const AuthInfoCache&);
 };
 
 } // namespace nx_http

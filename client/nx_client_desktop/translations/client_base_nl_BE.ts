@@ -960,7 +960,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+      <translation>Hardware-Id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
     </message>
   </context>
   <context>
@@ -1147,33 +1147,6 @@ to view more bookmarks</source>
     <message>
       <source>These tours will become invalid.</source>
       <translation>Deze tours worden ongeldig.</translation>
-    </message>
-  </context>
-  <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>Inzoomen</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>Uitzoomen</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>Focus veraf</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>Focus dichtbij</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>Autofocus</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>Dewarping modus wijzigen</translation>
     </message>
   </context>
   <context>
@@ -3734,7 +3707,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware ID</translation>
+      <translation>Gelieerd aan Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -4010,11 +3983,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware ID %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4045,7 +4018,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>

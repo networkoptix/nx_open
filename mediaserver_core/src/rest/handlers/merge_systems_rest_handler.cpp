@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/vms/utils/vms_utils.h>
-#include <nx/vms/utils/server_merge_processor.h>
+#include <nx/vms/utils/system_merge_processor.h>
 
 #include <audit/audit_manager.h>
 #include <common/common_module.h>

@@ -214,7 +214,7 @@ QnCommonModule::~QnCommonModule()
     clear();
 }
 
-void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server)
+void QnCommonModule::bindModuleInformation(const QnMediaServerResourcePtr &server)
 {
     /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::resetCachedValue);

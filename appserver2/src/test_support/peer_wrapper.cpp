@@ -1,5 +1,7 @@
 #include "peer_wrapper.h"
 
+#include <transaction/message_bus_adapter.h>
+
 namespace ec2 {
 namespace test {
 
@@ -49,6 +51,11 @@ PeerWrapper::PeerWrapper(const QString& dataDir):
     m_ownerCredentials.authToken = nx_http::PasswordAuthToken("admin");
 }
 
+void PeerWrapper::addSetting(const std::string& name, const std::string& value)
+{
+    m_process.addArg(name.c_str(), value.c_str());
+}
+
 bool PeerWrapper::startAndWaitUntilStarted()
 {
     const QString dbFileArg = lm("--dbFile=%1/db.sqlite").args(m_dataDir);
@@ -76,6 +83,30 @@ bool PeerWrapper::configureAsLocalSystem()
     return true;
 }
 
+bool PeerWrapper::saveCloudSystemCredentials(
+    const std::string& systemId,
+    const std::string& authKey,
+    const std::string& ownerAccountEmail)
+{
+    auto mserverClient = prepareMediaServerClient();
+
+    CloudCredentialsData cloudData;
+    cloudData.cloudSystemID = QString::fromStdString(systemId);
+    cloudData.cloudAuthKey = QString::fromStdString(authKey);
+    cloudData.cloudAccountName = QString::fromStdString(ownerAccountEmail);
+    if (mserverClient->saveCloudSystemCredentials(std::move(cloudData)).error !=
+            QnJsonRestResult::NoError)
+    {
+        return false;
+    }
+
+    m_cloudCredentials.systemId = systemId.c_str();
+    m_cloudCredentials.key = authKey.c_str();
+    m_cloudCredentials.serverId = id().toSimpleByteArray();
+
+    return true;
+}
+
 QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
 {
     MergeSystemData mergeSystemData;
@@ -99,16 +130,31 @@ ec2::ErrorCode PeerWrapper::getTransactionLog(ec2::ApiTransactionDataList* resul
     return mediaServerClient->ec2GetTransactionLog(result);
 }
 
+QnUuid PeerWrapper::id() const
+{
+    return m_process.moduleInstance()->impl()->commonModule()->moduleGUID();
+}
+
 SocketAddress PeerWrapper::endpoint() const
 {
     return m_process.moduleInstance()->endpoint();
+}
+
+nx::hpm::api::SystemCredentials PeerWrapper::getCloudCredentials() const
+{
+    return m_cloudCredentials;
+}
+
+std::unique_ptr<MediaServerClient> PeerWrapper::mediaServerClient() const
+{
+    return prepareMediaServerClient();
 }
 
 bool PeerWrapper::areAllPeersHaveSameTransactionLog(
     const std::vector<std::unique_ptr<PeerWrapper>>& peers)
 {
     std::vector<::ec2::ApiTransactionDataList> transactionLogs;
-    for (const auto& server : peers)
+    for (const auto& server: peers)
     {
         ::ec2::ApiTransactionDataList transactionLog;
         const auto ec2ErrorCode = server->getTransactionLog(&transactionLog);
@@ -123,8 +169,12 @@ bool PeerWrapper::areAllPeersHaveSameTransactionLog(
 
     const ::ec2::ApiTransactionDataList* prevTransactionLog = nullptr;
     bool allLogsAreEqual = true;
-    for (const auto& transactionLog : transactionLogs)
+    for (const auto& transactionLog: transactionLogs)
     {
+        //std::cout << "=========================\n";
+        //std::cout << QJson::serialized(transactionLog).toStdString() << "\n";
+        //std::cout << "=========================\n";
+
         if (prevTransactionLog)
         {
             if (*prevTransactionLog != transactionLog)
@@ -137,12 +187,43 @@ bool PeerWrapper::areAllPeersHaveSameTransactionLog(
     return allLogsAreEqual;
 }
 
+bool PeerWrapper::arePeersInterconnected(
+    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+{
+    // For now just checking that each peer is connected to every other.
+    
+    std::vector<QnUuid> peerIds;
+    for (const auto& peer: peers)
+        peerIds.push_back(peer->id());
+
+    for (const auto& peer: peers)
+    {
+        const auto connectedPeers = 
+            peer->m_process.moduleInstance()->impl()->commonModule()->
+                ec2Connection()->messageBus()->directlyConnectedServerPeers();
+
+        for (const auto& peerId: peerIds)
+        {
+            if (peerId == peer->id())
+                continue;
+            if (std::find(connectedPeers.begin(), connectedPeers.end(), peerId) == 
+                    connectedPeers.end())
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 std::unique_ptr<MediaServerClientEx> PeerWrapper::prepareMediaServerClient() const
 {
     auto mediaServerClient = std::make_unique<MediaServerClientEx>(
         nx::network::url::Builder().setScheme(nx_http::kUrlSchemeName)
         .setEndpoint(m_process.moduleInstance()->endpoint()));
     mediaServerClient->setUserCredentials(m_ownerCredentials);
+    mediaServerClient->setRequestTimeout(std::chrono::minutes(1));
     return mediaServerClient;
 }
 

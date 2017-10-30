@@ -188,7 +188,7 @@ VmsRequestResult VmsGateway::convertVmsResultToResultCode(
 
     if (vmsResult.error == QnRestResult::Error::CantProcessRequest)
     {
-        switch (clientPtr->prevResponseHttpStatusCode())
+        switch (clientPtr->lastResponseHttpStatusCode())
         {
             case nx_http::StatusCode::serviceUnavailable:
             case nx_http::StatusCode::notFound:

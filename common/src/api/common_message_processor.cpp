@@ -55,6 +55,7 @@
 #include <utils/common/app_info.h>
 
 #include <nx/utils/log/log.h>
+#include <nx_ec/dummy_handler.h>
 
 using namespace nx;
 
@@ -326,9 +327,11 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
         {
             if (auto connection = commonModule()->ec2Connection())
             {
-                connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(
+                connection->getResourceManager(Qn::kSystemAccess)->setResourceStatus(
                     resourceId,
-                    res->getStatus());
+                    res->getStatus(),
+                    ec2::DummyHandler::instance(),
+                    &ec2::DummyHandler::onRequestDone);
             }
         }
     }

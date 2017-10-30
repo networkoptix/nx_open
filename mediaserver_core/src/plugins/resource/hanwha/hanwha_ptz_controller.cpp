@@ -82,7 +82,7 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
         addIfNeed(kHanwhaZoomProperty, hanwhaSpeed.z());
     }
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.control(
         command,
         params);
@@ -92,7 +92,7 @@ bool HanwhaPtzController::continuousMove(const QVector3D& speed)
 
 bool HanwhaPtzController::continuousFocus(qreal speed)
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
 
     const auto response = helper.control(
         lit("ptzcontrol/continuous"),
@@ -109,7 +109,7 @@ bool HanwhaPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
     if (space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto hanwhaPosition = toHanwhaPosition(position);
 
     const auto response = helper.control(
@@ -126,7 +126,7 @@ bool HanwhaPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
 
 bool HanwhaPtzController::viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed)
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.control(
         lit("ptzcontrol/areazoom"),
         makeViewPortParameters(aspectRatio, viewport));
@@ -139,7 +139,7 @@ bool HanwhaPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* p
     if (space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     helper.setIgnoreMutexAnalyzer(true);
 
     const auto response = helper.view(
@@ -184,7 +184,7 @@ bool HanwhaPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* l
 
 bool HanwhaPtzController::getFlip(Qt::Orientations* flip) const
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.view(lit("image/flip"));
 
     if (!response.isSuccessful())
@@ -245,7 +245,7 @@ bool HanwhaPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, co
 
     if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
     {
-        HanwhaRequestHelper helper(m_hanwhaResource);
+        HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
         auto response = helper.control(
             lit("image/focus"),
             {{lit("Mode"), lit("AutoFocus")}});

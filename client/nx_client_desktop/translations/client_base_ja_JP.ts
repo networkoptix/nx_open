@@ -1149,33 +1149,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-      <source>Zoom In</source>
-      <translation>ズームイン</translation>
-    </message>
-    <message>
-      <source>Zoom Out</source>
-      <translation>ズームアウト</translation>
-    </message>
-    <message>
-      <source>Focus Far</source>
-      <translation>フォーカス遠</translation>
-    </message>
-    <message>
-      <source>Focus Near</source>
-      <translation>フォーカス近</translation>
-    </message>
-    <message>
-      <source>Auto Focus</source>
-      <translation>オートフォーカス</translation>
-    </message>
-    <message>
-      <source>Change Dewarping Mode</source>
-      <translation>歪み補正モード</translation>
-    </message>
-  </context>
-  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -3738,7 +3711,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;サーバーが見つかりません></translation>
+      <translation>サーバーが見つかりません</translation>
     </message>
     <message>
       <source>Expires</source>

@@ -1646,7 +1646,7 @@ void QnTransactionMessageBus::reconnectAllPeers(QnMutexLockerBase* const /*lock*
         NX_LOGX(lm("Disconnected from peer %1").arg(transport->remoteAddr()), cl_logWARNING);
         transport->setState(QnTransactionTransport::Error);
     }
-    for (auto transport : m_connectingConnections)
+    for (auto transport: m_connectingConnections)
         transport->setState(ec2::QnTransactionTransport::Error);
 }
 
@@ -1708,6 +1708,12 @@ QSet<QnUuid> QnTransactionMessageBus::directlyConnectedClientPeers() const
     }
 
     return result;
+}
+
+QSet<QnUuid> QnTransactionMessageBus::directlyConnectedServerPeers() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return connectedServerPeers();
 }
 
 ec2::ApiPeerData QnTransactionMessageBus::localPeer() const
