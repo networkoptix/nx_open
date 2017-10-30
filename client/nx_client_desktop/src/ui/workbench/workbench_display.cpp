@@ -611,7 +611,6 @@ void QnWorkbenchDisplay::initSceneView()
         m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
         m_scene->addItem(gridBackgroundItem());
         setLayer(gridBackgroundItem(), QnWorkbenchDisplay::EMappingLayer);
-        gridBackgroundItem()->setOpacity(0.0);
         gridBackgroundItem()->setMapper(workbench()->mapper());
     }
 

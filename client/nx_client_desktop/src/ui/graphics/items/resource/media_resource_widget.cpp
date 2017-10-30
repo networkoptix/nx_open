@@ -2100,7 +2100,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::UnauthorizedOverlay;
 
     if (m_camera && m_camera->isDtsBased() && !m_camera->isLicenseUsed())
-        return Qn::AnalogWithoutLicenseOverlay;
+    {
+        bool isLive = m_display->camDisplay()->isRealTimeSource();
+        bool canViewWithoutLicense = m_camera->licenseType() == Qn::LC_Bridge && isLive;
+        if (!canViewWithoutLicense)
+            return Qn::AnalogWithoutLicenseOverlay;
+    }
 
     if (options().testFlag(DisplayActivity) && m_display->isPaused())
     {

@@ -16,7 +16,9 @@ namespace plugins {
 
 namespace {
 
-static const int kMaxConcurrentRequestNumber = 5;
+// Limited by NPM-9080VQ, it can only be opening 3 stream at the same time, while it has 4.
+static const int kMaxConcurrentRequestNumber = 3;
+
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::minutes kCacheDataTimeout(1);
 
@@ -96,22 +98,28 @@ QnSemaphore* HanwhaSharedResourceContext::requestSemaphore()
     return &m_requestSemaphore;
 }
 
-void HanwhaSharedResourceContext::startServices()
+void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
 {
     {
         QnMutexLocker lock(&m_servicesMutex);
-        m_chunkLoader = std::make_shared<HanwhaChunkLoader>();
-        m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
-        m_timeSynchronizer->setTimeZoneShiftHandler(
-            [this](std::chrono::seconds timeZoneShift)
-            {
-                m_chunkLoader->setTimeZoneShift(timeZoneShift);
-            });
+        if (!m_timeSynchronizer)
+            m_timeSynchronizer = std::make_unique<HanwhaTimeSyncronizer>();
+
+        if (hasVideoArchive && !m_chunkLoader)
+        {
+            m_chunkLoader = std::make_shared<HanwhaChunkLoader>();
+            m_timeSynchronizer->setTimeZoneShiftHandler(
+                [this](std::chrono::seconds timeZoneShift)
+                {
+                    m_chunkLoader->setTimeZoneShift(timeZoneShift);
+                });
+        }
     }
 
-    NX_VERBOSE(this, "Starting services...");
-    m_chunkLoader->start(this);
+    NX_VERBOSE(this, lm("Starting services (has video archive: %1)...").arg(hasVideoArchive));
     m_timeSynchronizer->start(this);
+    if (hasVideoArchive)
+        m_chunkLoader->start(this);
 }
 
 QString HanwhaSharedResourceContext::sessionKey(
@@ -139,9 +147,20 @@ QString HanwhaSharedResourceContext::sessionKey(
     return m_sessionKeys.value(sessionType);
 }
 
-std::shared_ptr<HanwhaChunkLoader> HanwhaSharedResourceContext::chunkLoader() const
+
+QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const
 {
-    return m_chunkLoader;
+    return m_chunkLoader->chunks(channelNumber);
+}
+
+qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
+{
+    return m_chunkLoader->startTimeUsec(channelNumber);
+}
+
+qint64 HanwhaSharedResourceContext::chunksEndUsec(int channelNumber) const
+{
+    return m_chunkLoader->endTimeUsec(channelNumber);
 }
 
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()

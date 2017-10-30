@@ -71,9 +71,9 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
 
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
-        return HanwhaResponse(statusCode, url.toString());
+        return HanwhaResponse(statusCode, url.toString(QUrl::RemoveUserInfo));
 
-    return HanwhaResponse(buffer, statusCode, url.toString(), groupBy);
+    return HanwhaResponse(buffer, statusCode, url.toString(QUrl::RemoveUserInfo), groupBy);
 }
 
 HanwhaResponse HanwhaRequestHelper::view(

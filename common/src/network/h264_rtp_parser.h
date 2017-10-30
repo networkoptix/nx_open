@@ -35,7 +35,7 @@ private:
     bool m_builtinSpsFound;
     bool m_builtinPpsFound;
     bool m_keyDataExists;
-    bool m_idrFound;
+    int m_idrCounter;
     bool m_frameExists;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;

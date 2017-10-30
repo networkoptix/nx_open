@@ -1200,7 +1200,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Customer Support</source>
-      <translation>Wsparcie klienta   support@nxpolska.pl   </translation>
+      <translation>Wsparcie klienta</translation>
     </message>
     <message>
       <source>Client is not connected to any System</source>
@@ -2345,7 +2345,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla bieżącej kamery to %1.  Aktualnie wybrano %2.</translation>
+      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla bieżącej kamery to %1. Aktualnie wybrano %2.</translation>
     </message>
     <message>
       <source>Too many motion areas</source>
@@ -2357,7 +2357,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla dowolnego czujnika bieżącej kamery to %1.  Aktualnie wybrano %2.</translation>
+      <translation>Maksymalna liczba ustawień czułości detekcji ruchu dla dowolnego czujnika bieżącej kamery to %1. Aktualnie wybrano %2.</translation>
     </message>
   </context>
   <context>
@@ -4063,11 +4063,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie wiadomości e-mail z kluczem licencyjnym oraz ID sprzętu do support@nxpolska.pl.</translation>
+      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie wiadomości e-mail z kluczem licencyjnym oraz ID sprzętu do %1.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie klucza licencyjnego oraz ID sprzętu do support@nxpolska.pl.</translation>
+      <translation>W celu uzyskania pliku z kluczem aktywacyjnym prosimy o przesłanie klucza licencyjnego oraz ID sprzętu do %1.</translation>
     </message>
   </context>
   <context>
@@ -4718,9 +4718,9 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>około %d minutę temu</numerusform>
-        <numerusform>około %d minuty temu</numerusform>
-        <numerusform>około %d minut temu</numerusform>
+        <numerusform>około %n minutę temu</numerusform>
+        <numerusform>około %n minuty temu</numerusform>
+        <numerusform>około %n minut temu</numerusform>
       </translation>
     </message>
     <message>

@@ -3138,7 +3138,7 @@ to %1</source>
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
         <numerusform>Journal d'événement pour %1 - %n événement trouvé</numerusform>
-        <numerusform>Journal d'événement pour %1  - %n événements trouvés</numerusform>
+        <numerusform>Journal d'événement pour %1 - %n événements trouvés</numerusform>
       </translation>
     </message>
     <message>

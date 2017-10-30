@@ -3,6 +3,7 @@
 #include <media_server/server_update_tool.h>
 #include <api/model/upload_update_reply.h>
 #include <managers/updates_manager.h>
+#include <rest/helpers/request_helpers.h>
 
 int QnUpdateUnauthenticatedRestHandler::executeGet(
     const QString& path,
@@ -23,7 +24,7 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
     const auto updateId = params.value(lit("updateId"));
     const bool delayed = params.value(lit("delayed"), lit("false")) != lit("false");
 
-    if (updateId.isEmpty())
+    if (updateId.isEmpty() || !verifyRelativePath(updateId))
     {
         result.setError(QnJsonRestResult::InvalidParameter, lit("updateId"));
         return nx_http::StatusCode::ok;

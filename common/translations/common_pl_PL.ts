@@ -775,7 +775,7 @@
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Kodek wideo lub audio jest niezgodny z wybranym formatem %1.</translation>
+      <translation>Kodek wideo lub audio jest niezgodny z wybranym formatem.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>

@@ -2,13 +2,10 @@
 
 #include <rest/server/fusion_rest_handler.h>
 
-/**
- * @return Local PC time and time zone for all servers in the system.
- */
-class QnMultiserverTimeRestHandler: public QnFusionRestHandler
+class QnMultiserverGetHardwareIdsRestHandler: public QnFusionRestHandler
 {
 public:
-    QnMultiserverTimeRestHandler(const QString& getTimeApiMethodPath);
+    QnMultiserverGetHardwareIdsRestHandler(const QString& getHardwareIdsApiMethodPath);
 
     virtual int executeGet(
         const QString& path,
@@ -18,5 +15,5 @@ public:
         const QnRestConnectionProcessor *owner) override;
 
 private:
-    QString m_getTimeApiMethodPath;
+    QString m_getHardwareIdsApiMethodPath;
 };

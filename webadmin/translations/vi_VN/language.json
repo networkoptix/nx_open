@@ -73,7 +73,7 @@
     "cloudHostConflict":"Không thể hợp nhất các hệ thống vì các máy chủ được kết với các máy chủ đám mây khác",
     "licenceError":"Cảnh báo! Bạn sắp hợp hệ thống với bản quyền đăng ký. Chỉ cho phép một bản quyền Starter cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa. Hợp nhất bằng mọi cách?",
     "connectionFailed":"Kết nối thất bại: ",
-    "unknownError":"lỗi không xác định",
+    "unknownError":"Lỗi không xác định",
     "mergeFailed":"Hợp nhất không thành công: ",
     "mergeSucceed":"Hợp nhất thành công.",
     "newSystemDisplayName":"Hệ thống mới",
