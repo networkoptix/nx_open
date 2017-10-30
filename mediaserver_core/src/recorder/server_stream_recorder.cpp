@@ -737,7 +737,12 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
     }
 }
 
-void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
+void QnServerStreamRecorder::fileFinished(
+    qint64 durationMs,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    qint64 fileSize,
+    qint64 startTimeMs)
 {
     if (m_truncateInterval != 0)
     {
@@ -745,19 +750,26 @@ void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& file
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
 
         qnBackupStorageMan->fileFinished(
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
     }
 };
 
-void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::fileStarted(
+    qint64 startTimeMs,
+    int timeZone,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    bool sideRecorder)
 {
     if (m_truncateInterval > 0)
     {
@@ -765,14 +777,16 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
 
         qnBackupStorageMan->fileStarted(
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
     }
 }

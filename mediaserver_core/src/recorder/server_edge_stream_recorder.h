@@ -54,13 +54,15 @@ protected:
         qint64 startTimeMs,
         int timeZone,
         const QString& fileName,
-        QnAbstractMediaStreamDataProvider* provider) override;
+        QnAbstractMediaStreamDataProvider* provider,
+        bool sideRecorder = false) override;
 
     virtual void fileFinished(
         qint64 durationMs,
         const QString& fileName,
         QnAbstractMediaStreamDataProvider* provider,
-        qint64 fileSize) override;
+        qint64 fileSize,
+        qint64 startTimeMs = AV_NOPTS_VALUE) override;
 
 private:
     FileStartedInfo m_lastfileStartedInfo;

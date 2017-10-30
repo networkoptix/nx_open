@@ -33,7 +33,8 @@ void QnServerEdgeStreamRecorder::fileStarted(
     qint64 startTimeMs,
     int timeZone,
     const QString& fileName,
-    QnAbstractMediaStreamDataProvider* provider)
+    QnAbstractMediaStreamDataProvider* provider,
+    bool /*sideRecorder*/)
 {
     m_lastfileStartedInfo = FileStartedInfo(
         startTimeMs,
@@ -46,7 +47,8 @@ void QnServerEdgeStreamRecorder::fileFinished(
     qint64 durationMs,
     const QString& fileName,
     QnAbstractMediaStreamDataProvider* provider,
-    qint64 fileSize)
+    qint64 fileSize,
+    qint64 /*startTimeMs*/)
 {
     if (m_lastfileStartedInfo.isValid)
     {
@@ -54,9 +56,15 @@ void QnServerEdgeStreamRecorder::fileFinished(
             m_lastfileStartedInfo.startTimeMs,
             m_lastfileStartedInfo.timeZone,
             m_lastfileStartedInfo.fileName,
-            m_lastfileStartedInfo.provider);
+            m_lastfileStartedInfo.provider,
+            /*sideRecorder*/ true);
 
-        base_type::fileFinished(durationMs, fileName, provider, fileSize);
+        base_type::fileFinished(
+            durationMs,
+            fileName,
+            provider,
+            fileSize,
+            m_lastfileStartedInfo.startTimeMs);
 
         if (m_fileWrittenHandler)
             m_fileWrittenHandler(m_lastfileStartedInfo.startTimeMs, durationMs);

@@ -143,10 +143,22 @@ protected:
 
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
-    virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
+    virtual void fileFinished(
+        qint64 durationMs,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider *provider,
+        qint64 fileSize,
+        qint64 startTimeMs = AV_NOPTS_VALUE)
+    {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
     }
-    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
+    virtual void fileStarted(
+        qint64 startTimeMs,
+        int timeZone,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider *provider,
+        bool sideRecorder = false)
+    {
         Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
     virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider*);
