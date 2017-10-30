@@ -15,6 +15,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include <common/static_common_module.h>
+#include <rest/helpers/request_helpers.h>
 
 int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
 {
@@ -65,6 +66,12 @@ int QnUpdateRestHandler::executePost(
             result.setReply(reply);
             return nx_http::StatusCode::ok;
         }
+    }
+
+    if (!verifyRelativePath(updateId))
+    {
+        result.setError(QnRestResult::InvalidParameter, lit("updateId"));
+        return nx_http::StatusCode::ok;
     }
 
     QnSoftwareVersion version;

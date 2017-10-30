@@ -48,14 +48,32 @@ void HanwhaArchiveDelegate::close()
 
 qint64 HanwhaArchiveDelegate::startTime() const
 {
-    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    return hanwhaRes->sharedContext()->chunkLoader()->startTimeUsec(hanwhaRes->getChannel());
+    // TODO: This copy-paste should probably be moved into helper function, but it is not easy
+    // because with current interface we need to get both channel number and shared context.
+    if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
+    {
+        if (resource->getStatus() >= Qn::Online)
+        {
+            if (const auto context = resource->sharedContext())
+                return context->chunksStartUsec(resource->getChannel());
+        }
+    }
+
+    return AV_NOPTS_VALUE;
 }
 
 qint64 HanwhaArchiveDelegate::endTime() const
 {
-    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    return hanwhaRes->sharedContext()->chunkLoader()->endTimeUsec(hanwhaRes->getChannel());
+    if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
+    {
+        if (resource->getStatus() >= Qn::Online)
+        {
+            if (const auto context = resource->sharedContext())
+                return context->chunksEndUsec(resource->getChannel());
+        }
+    }
+
+    return AV_NOPTS_VALUE;
 }
 
 QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
@@ -98,8 +116,16 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
-    auto hanwhaRes = m_streamReader->getResource().dynamicCast<HanwhaResource>();
-    const auto chunks = hanwhaRes->sharedContext()->chunkLoader()->chunks(hanwhaRes->getChannel());
+    QnTimePeriodList chunks;
+    if (const auto resource = m_streamReader->getResource().dynamicCast<HanwhaResource>())
+    {
+        if (resource->getStatus() >= Qn::Online)
+        {
+            if (const auto context = resource->sharedContext())
+                chunks = context->chunks(resource->getChannel());
+        }
+    }
+
     const qint64 timeMs = timeUsec / 1000;
     auto itr = chunks.findNearestPeriod(timeMs, isForwardDirection());
     if (itr == chunks.cend())

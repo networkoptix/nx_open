@@ -147,7 +147,10 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     query.addQueryItem("action", "view");
     query.addQueryItem("Type", "All");
 
-    auto startDateTime = toHanwhaDateTime(latestChunkTimeMs(), m_timeZoneShift);
+    auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        kUpdateChunksDelay).count();
+
+    auto startDateTime = toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, m_timeZoneShift);
     auto endDateTime = QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1);
     query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateFormat));
     query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateFormat));
@@ -260,11 +263,12 @@ void HanwhaChunkLoader::onGotChunkData()
         .args(m_httpClient->contentLocationUrl(), lines.size()));
 
     QnMutexLocker lock(&m_mutex);
-    for (const auto& line : lines)
-        parseChunkData(line.trimmed());
+    const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+    for (const auto& line: lines)
+        parseChunkData(line.trimmed(), currentTimeMs);
 }
 
-bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
+bool HanwhaChunkLoader::parseChunkData(const QByteArray& line, qint64 currentTimeMs)
 {
     int channelNumberPos = line.indexOf('.') + 1;
     if (channelNumberPos == 0)
@@ -275,9 +279,11 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
 
     if (channelNumber > kMaxAllowedChannelNumber)
     {
-        NX_WARNING(this, lm("Ignore line %1 due to too big channel number %2 provided.").arg(line).arg(channelNumber));
+        NX_WARNING(this, lm("Ignore line %1 due to too big channel number %2 provided")
+            .args(line, channelNumber));
         return false;
     }
+
     if (m_chunks.size() <= channelNumber)
         m_chunks.resize(channelNumber + 1);
 
@@ -294,6 +300,12 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     else if (fieldName == kEndTimeParamName)
     {
         auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
+        if (m_lastParsedStartTimeMs > currentTimeMs)
+        {
+            NX_DEBUG(this, lm("Ignore period [%1, %2] from future on channel %3")
+                .args(m_lastParsedStartTimeMs, endTimeMs, channelNumber));
+            return false;
+        }
 
         QnTimePeriod timePeriod(m_lastParsedStartTimeMs, endTimeMs - m_lastParsedStartTimeMs);
         if (m_startTimeUsec == AV_NOPTS_VALUE || chunks.isEmpty())

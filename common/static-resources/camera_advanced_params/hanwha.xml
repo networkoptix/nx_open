@@ -894,25 +894,25 @@
                         description="Restores the focus adjustment to the default flange back position"
                         aux="support=Image/Support/ResetFocus"/>
             <param id="system/factoryreset/ExcludeSettings=Network"
-                        name="Soft Reset"
+                        name="Reset to Factory Defaults except Network Settings"
                         dataType="Button"
                         writeCmd="control"
                         confirmation="Are you sure you want to reset all settings (except network) to default?"
                         description="Resets all camera parameters to defaults except for network settings"
                         aux="noChannel"/>
             <param id="system/factoryreset/ExcludeSettings=None"
-                        name="Hard Reset"
+                        name="Reset to Factory Defaults"
                         dataType="Button"
                         writeCmd="control"
                         confirmation="Are you sure you want to reset all settings (including network) to default?"
                         description="Resets all camera parameters to defaults"
                         aux="noChannel"/>
             <param id="system/power/Type=Restart"
-                        name="Reboot"
+                        name="Restart"
                         dataType="Button"
                         writeCmd="control"
-                        confirmation="Are you sure you want to reboot the device?"
-                        description="Reboots the device"
+                        confirmation="Are you sure you want to restart the device?"
+                        description="Restarts the device"
                         aux="noChannel"/>
         </group>
     </parameters>
