@@ -33,18 +33,10 @@ NativePlayer.prototype.volume = function(volumeLevel){
 }
 
 NativePlayer.prototype.kill = function(){
-    if(window.jscd.browser){
-        this.video.removeAttribute('playsinline');
-        this.video.removeAttribute('controls');
-    }
     this.video.src = "";
 };
 
 NativePlayer.prototype.load = function(url, type){
-    if(window.jscd.mobile){
-        this.video.setAttribute('playsinline', true);
-        this.video.setAttribute('controls', true);
-    }
     this.video.setAttribute('type', type);
     this.video.src = url;
 };

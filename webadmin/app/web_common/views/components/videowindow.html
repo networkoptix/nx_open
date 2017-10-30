@@ -13,6 +13,7 @@
     										   ng-init="initFlash()" ng-bind-html="flashPlayer">
     </div>
 
-    <video class="videoplayer" ng-if="native || jsHls" ng-class="[loading ? 'invisible' : '', getRotation()]" muted>
+    <video class="videoplayer" ng-if="native || jsHls"
+           ng-class="[loading ? 'invisible' : '', getRotation()]" playsinline muted>
     </video>
 </div>
