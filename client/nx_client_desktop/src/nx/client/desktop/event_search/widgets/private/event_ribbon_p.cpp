@@ -68,10 +68,10 @@ EventRibbon::Private::Private(EventRibbon* q):
     installEventHandler(m_scrollBar, {QEvent::Show, QEvent::Hide}, this, updateViewportMargins);
     updateViewportMargins();
 
-    installEventHandler(m_viewport, QEvent::Resize, this,
-        [this]()
+    installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize}, this,
+        [this](QObject* /*watched*/, QEvent* event)
         {
-            if (m_currentWidth != m_viewport->width())
+            if (m_currentWidth != m_viewport->width() || event->type() == QEvent::Show)
             {
                 m_currentWidth = m_viewport->width();
                 updateAllPositions();
@@ -331,12 +331,12 @@ void EventRibbon::Private::updateAllPositions()
     // only interactively when they're visible in the viewport,
     // or when scroll bar shows/hides - but then there's no need to preserve view
 
-    int position = 0;
+    m_totalHeight = 0;
     for (auto& tile: m_tiles)
     {
         tile.widget->resize(m_currentWidth, calculateHeight(tile.widget));
-        tile.position = position;
-        position += tile.widget->height() + kDefaultTileSpacing;
+        tile.position = m_totalHeight;
+        m_totalHeight += tile.widget->height() + kDefaultTileSpacing;
     }
 }
 
