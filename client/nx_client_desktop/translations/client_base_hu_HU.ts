@@ -6006,7 +6006,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>Archív biztonsági mentés befejeződött &lt;/b&gt;%1&lt;/b&gt;-ig</translation>
+      <translation>Archív biztonsági mentés befejeződött &lt;b&gt;%1&lt;/b&gt;-ig</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>

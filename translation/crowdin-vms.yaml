@@ -37,7 +37,7 @@ files:
     dest: '/Installer/OptixTheme.wxl'
     translation: '/wixsetup/maven/bin-resources/OptixTheme_%locale_with_underscore%.wxl'
   -
-    source: '/webadmin/app/language.json'
+    source: '/webadmin/.tmp/language.json'
     translation: '/webadmin/translations/%locale_with_underscore%/language.json'
   -
     source: '/webadmin/app/views/**/*.*'
@@ -45,9 +45,6 @@ files:
     ignore:
       - /webadmin/app/views/debug.html
       - /webadmin/app/views/viewdebug.html
-  -
-    source: '/webadmin/app/web_common/commonLanguage.json'
-    translation: '/webadmin/translations/%locale_with_underscore%/web_common/commonLanguage.json'
   -
     source: '/webadmin/app/web_common/views/**/*.*'
     translation: '/webadmin/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'

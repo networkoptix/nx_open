@@ -3711,7 +3711,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;サーバーが見つかりません></translation>
+      <translation>サーバーが見つかりません</translation>
     </message>
     <message>
       <source>Expires</source>

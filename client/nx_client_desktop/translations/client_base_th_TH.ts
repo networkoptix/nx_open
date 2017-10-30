@@ -2630,7 +2630,7 @@ to %1</source>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>เชื่อมต่อกับกล้องไม่ได้</translation>
+      <translation>ไม่สามารถเชื่อมต่อกับ %1</translation>
     </message>
   </context>
   <context>
@@ -5937,7 +5937,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>สำรองข้อมูลเก็บถาวรเสร็จถึง%1 &lt; b &gt; &lt;/b &gt;</translation>
+      <translation>สำรองข้อมูลเก็บถาวรเสร็จถึง &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>

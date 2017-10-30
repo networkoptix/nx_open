@@ -1,14 +1,14 @@
 #pragma once
 
-#include <network/router.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/http/asynchttpclient.h>
-#include <nx/utils/system_error.h>
-#include <core/resource/resource_fwd.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/user_resource.h>
+#include <network/router.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/utils/system_error.h>
 
 template<typename Context, typename RequestFunc>
 void runMultiserverRequest(
@@ -87,4 +87,10 @@ void runMultiserverUploadRequest(
     };
 
     runMultiserverRequest(router, url, downloadRequest, server, context);
+}
+
+inline
+bool verifyRelativePath(const QString& path)
+{
+    return !path.contains("..");
 }

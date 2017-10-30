@@ -76,7 +76,7 @@ angular.module('webadminApp')
                                     }
                                 }
                             });
-                            if(param.optional == 'true' && (func.method == 'GET' || func.method == 'POST')){
+                            if(param.optional && (func.method == 'GET' || func.method == 'POST')){
                                 param.values.unshift({label:'', name:null});
                             }
                         }
@@ -87,7 +87,7 @@ angular.module('webadminApp')
                     });
 
                     if(func.url == activeApiMethod){ // Check if we should select this method (checking url parameter)
-                        if(func.proprietary == 'true' && !$scope.allowProprietary){
+                        if(func.proprietary && !$scope.allowProprietary){
                             return; // proprietary methods are forbidden
                         }
                         $scope.setActiveFunction(group, func);
