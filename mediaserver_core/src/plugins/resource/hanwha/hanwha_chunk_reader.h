@@ -56,7 +56,7 @@ private:
 
     void onHttpClientDone();
     void onGotChunkData();
-    bool parseChunkData(const QByteArray& data);
+    bool parseChunkData(const QByteArray& data, qint64 currentTimeMs);
 
     void sendLoadChunksRequest();
     void sendUpdateTimeRangeRequest();

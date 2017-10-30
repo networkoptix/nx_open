@@ -669,7 +669,8 @@ CameraDiagnostics::Result HanwhaResource::init()
     initMediaStreamCapabilities();
     saveParams();
 
-    sharedContext->startServices();
+    const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
+    sharedContext->startServices(hasVideoArchive);
     return result;
 }
 
@@ -1138,7 +1139,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
         if (amountOfProfilesNeeded + totalProfileNumber > m_maxProfileCount)
         {
             return CameraDiagnostics::CameraInvalidParams(
-                lit("- can not create profiles. Please delete %1 profiles%2 on the camera web page.")
+                lit("- can not create profiles. Please delete %1 profile%2 on the camera web page")
                     .arg(amountOfProfilesNeeded)
                     .arg(amountOfProfilesNeeded > 1 ? lit("s") : QString()));
         }
@@ -2481,7 +2482,7 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    return sharedContext()->chunkLoader()->chunks(getChannel());
+    return sharedContext()->chunks(getChannel());
 }
 
 bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString)
