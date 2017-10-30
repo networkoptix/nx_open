@@ -136,10 +136,10 @@ boost::optional<in_addr> HostAddress::ipV4() const
     return boost::none;
 }
 
-HostAddress::Addr6WithScope HostAddress::ipV6() const
+HostAddress::IpV6WithScope HostAddress::ipV6() const
 {
     if (m_ipV6)
-        return Addr6WithScope(m_ipV6, m_scopeId);
+        return IpV6WithScope(m_ipV6, m_scopeId);
 
     if (m_ipV4)
         return ipV6from(*m_ipV4);
@@ -151,7 +151,7 @@ HostAddress::Addr6WithScope HostAddress::ipV6() const
     if (const auto ipV4 = ipV4from(*m_string))
         return ipV6from(*ipV4);
 
-    return Addr6WithScope();
+    return IpV6WithScope();
 }
 
 bool HostAddress::isLocal() const
@@ -241,9 +241,9 @@ boost::optional<in_addr> HostAddress::ipV4from(const QString& ip)
     return boost::none;
 }
 
-HostAddress::Addr6WithScope HostAddress::ipV6from(const QString& ip)
+HostAddress::IpV6WithScope HostAddress::ipV6from(const QString& ip)
 {
-    Addr6WithScope result;
+    IpV6WithScope result;
     QString ipString = ip;
     auto scopeIdDelimIndex = ip.indexOf("%");
     uint32_t scopeId = std::numeric_limits<uint32_t>::max();
@@ -307,20 +307,20 @@ boost::optional<in_addr> HostAddress::ipV4from(const in6_addr& v6)
     return v4;
 }
 
-HostAddress::Addr6WithScope HostAddress::ipV6from(const in_addr& v4)
+HostAddress::IpV6WithScope HostAddress::ipV6from(const in_addr& v4)
 {
     // TODO: Remove this hack when IPv6 is properly supported!
     //  Try to map it from IPv4 as v4 format is preferable
     if (v4.s_addr == htonl(INADDR_ANY))
-        return Addr6WithScope(in6addr_any, boost::none);
+        return IpV6WithScope(in6addr_any, boost::none);
     if (v4.s_addr == htonl(INADDR_LOOPBACK))
-        return Addr6WithScope(in6addr_loopback, boost::none);
+        return IpV6WithScope(in6addr_loopback, boost::none);
 
     in6_addr v6;
     std::memcpy(&v6.s6_addr[0], kIpVersionMapPrefix.data(), kIpVersionMapPrefix.size());
     std::memcpy(&v6.s6_addr[kIpVersionMapPrefix.size()], &v4, sizeof(v4));
 
-    return Addr6WithScope(v6, boost::none);
+    return IpV6WithScope(v6, boost::none);
 }
 
 void HostAddress::swap(HostAddress& other)

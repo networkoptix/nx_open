@@ -98,11 +98,11 @@ public:
      */
     boost::optional<in_addr> ipV4() const;
 
-    using Addr6WithScope = std::pair<boost::optional<in6_addr>, boost::optional<uint32_t>>;
+    using IpV6WithScope = std::pair<boost::optional<in6_addr>, boost::optional<uint32_t>>;
     /**
      * IP v6 if address is v6 or v4 converted to v6.
      */
-    Addr6WithScope ipV6() const;
+    IpV6WithScope ipV6() const;
     boost::optional<uint32_t> scopeId() const;
 
     bool isLocal() const;
@@ -118,10 +118,10 @@ public:
         boost::optional<uint32_t> scopeId);
 
     static boost::optional<in_addr> ipV4from(const QString& ip);
-    static Addr6WithScope ipV6from(const QString& ip);
+    static IpV6WithScope ipV6from(const QString& ip);
 
     static boost::optional<in_addr> ipV4from(const in6_addr& addr);
-    static Addr6WithScope ipV6from(const in_addr& addr);
+    static IpV6WithScope ipV6from(const in_addr& addr);
 
     void swap(HostAddress& other);
 
