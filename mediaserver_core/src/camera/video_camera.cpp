@@ -111,6 +111,16 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
+static CyclicAllocator gopKeeperKeyFramesAllocator;
+
+static QnAbstractAllocator* getAllocator(size_t frameSize)
+{
+    const static size_t kMaxFrameSize = 2 * 1024 * 1024;
+    return frameSize < kMaxFrameSize
+            ? static_cast<QnAbstractAllocator*>(&gopKeeperKeyFramesAllocator)
+            : static_cast<QnAbstractAllocator*>(QnSystemAllocator::instance());
+}
+
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnMutexLocker lock( &m_queueMtx );
@@ -129,7 +139,7 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
 
             if (m_lastKeyFrames[ch].empty() || m_lastKeyFrames[ch].back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
-                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(QnSystemAllocator::instance())));
+                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone(getAllocator(video->dataSize()))));
 
             while ((!m_lastKeyFrames[ch].empty() && m_lastKeyFrames[ch].front()->timestamp < removeThreshold) ||
                     (m_lastKeyFrames[ch].size() > KEEP_IFRAMES_INTERVAL/KEEP_IFRAMES_DISTANCE))
@@ -259,7 +269,7 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCameraGopKeeper::getGopTillTime(q
     {
         const QnConstAbstractDataPacketPtr& data = randomAccess.at(i);
         auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
-        if (video && video->timestamp <= time && video->channelNumber == channel)
+        if (video && video->timestamp <= time && video->channelNumber == (quint32) channel)
             frameSequence->push(video);
     }
 

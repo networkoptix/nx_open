@@ -66,7 +66,19 @@ bool FramesFrequencyWatcher::isOverflow() const
 {
     return m_overflow;
 }
-// -------------------------------------------------------------------------------------------------
+
+// free functions ----------------------------------------------------------------------------------
+static bool frameTooLarge(ContentPacketPtr pkt)
+{
+    const static size_t kMaxFrameSize = 2 * 1024 * 1024;
+    if (pkt->size() < kMaxFrameSize)
+        return false;
+
+    std::cout << "ITE930_WARNING: Large frame (" << pkt->size() << ") detected. "
+              << "Rx Device will be reloaded: "  << std::endl;
+    return true;
+}
+
 
 } // namespace aux
 
@@ -196,7 +208,7 @@ ContentPacketPtr StreamReader::nextPacket()
         if (m_interrupted)
             break;
 
-        if (pkt && framesTooOften())
+        if (pkt && (framesTooOften() || aux::frameTooLarge(pkt)))
         {
             m_interrupted = true;
             m_cameraManager->rxDeviceRef()->shutdown();
