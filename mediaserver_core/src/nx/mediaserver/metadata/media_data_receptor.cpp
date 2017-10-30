@@ -35,6 +35,7 @@ void VideoDataReceptor::putData(const QnAbstractDataPacketPtr& data)
     if (video)
     {
         nxpt::ScopedRef<CommonCompressedVideoPacket> packet(new CommonCompressedVideoPacket());
+        packet->setTimestampUsec(data->timestamp);
         packet->setWidth(video->width);
         packet->setHeight(video->height);
         packet->setCodec(toString(video->compressionType).toStdString());

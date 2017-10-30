@@ -36,7 +36,8 @@ public:
 private:
     nx::sdk::Error stopFetchingMetadataUnsafe();
     nx::sdk::metadata::AbstractMetadataPacket* cookSomeEvents();
-    nx::sdk::metadata::AbstractMetadataPacket* cookSomeObjects();
+    nx::sdk::metadata::AbstractMetadataPacket* cookSomeObjects(
+        const nx::sdk::metadata::AbstractDataPacket* mediaPacket);
 
     int64_t usSinceEpoch() const;
 

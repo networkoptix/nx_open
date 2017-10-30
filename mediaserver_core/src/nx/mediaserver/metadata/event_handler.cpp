@@ -67,7 +67,7 @@ void EventHandler::handleMetadataPacket(nxpt::ScopedRef<AbstractObjectsMetadataP
         nx::common::metadata::DetectedObject object;
         object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
-        object.boundingBox = QRect(box.x, box.y, box.width, box.height);
+        object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
         for (int i = 0; i < item->attributeCount(); ++i)
         {
             nx::common::metadata::Attribute attribute;

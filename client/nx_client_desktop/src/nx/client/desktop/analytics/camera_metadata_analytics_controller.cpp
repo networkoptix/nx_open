@@ -25,8 +25,13 @@ void MetadataAnalyticsController::gotMetadataPacket(
     if (!metadataIsOk)
         return;
 
+    bool success = false;
     auto objectDetectionMetadata =
-        QnUbjson::deserialized<nx::common::metadata::DetectionMetadataPacket>(serializedData->data());
+        QnUbjson::deserialized<nx::common::metadata::DetectionMetadataPacket>(
+            QByteArray::fromRawData(serializedData->data(), serializedData->dataSize()),
+            nx::common::metadata::DetectionMetadataPacket(),
+            &success
+            );
 
     gotMetadata(resource, objectDetectionMetadata);
 }

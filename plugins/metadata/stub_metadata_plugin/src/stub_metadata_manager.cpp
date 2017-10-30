@@ -7,6 +7,7 @@
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_detected_event.h>
 #include <nx/sdk/metadata/common_detected_object.h>
+#include <nx/sdk/metadata/common_compressed_video_packet.h>
 
 namespace nx {
 namespace mediaserver {
@@ -82,7 +83,7 @@ Error StubMetadataManager::startFetchingMetadata()
 
 nx::sdk::Error StubMetadataManager::putData(const nx::sdk::metadata::AbstractDataPacket* dataPacket)
 {
-    m_handler->handleMetadata(Error::noError, cookSomeObjects());
+    m_handler->handleMetadata(Error::noError, cookSomeObjects(dataPacket));
     return Error::noError;
 }
 
@@ -152,15 +153,31 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     return eventPacket;
 }
 
-AbstractMetadataPacket* StubMetadataManager::cookSomeObjects()
+AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(const nx::sdk::metadata::AbstractDataPacket* mediaPacket)
 {
+#if 1
+    auto nonConstPacket = const_cast<nx::sdk::metadata::AbstractDataPacket*>(mediaPacket);
+    nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
+        (CommonCompressedVideoPacket*) nonConstPacket->queryInterface(IID_CompressedVideoPacket);
+#else
+    nxpt::ScopedRef<const CommonCompressedVideoPacket> videoPacket =
+        (const CommonCompressedVideoPacket*) mediaPacket->queryInterface(IID_CompressedVideoPacket);
+#endif
+    if (!videoPacket)
+        return nullptr;
+
     auto detectedObject = new CommonDetectedObject();
+    static const nxpl::NX_GUID objectId =
+    { { 0xB5, 0x29, 0x4F, 0x25, 0x4F, 0xE6, 0x46, 0x47, 0xB8, 0xD1, 0xA0, 0x72, 0x9F, 0x70, 0xF2, 0xD1 } };
+
+    detectedObject->setId(objectId);
     detectedObject->setAuxilaryData(R"json({"auxilaryData": "someJson2"})json");
     detectedObject->setEventTypeId(m_objectTypeId);
     detectedObject->setBoundingBox(Rect(0.25, 0.25, 0.25, 0.25));
 
     auto eventPacket = new CommonObjectsMetadataPacket();
-    eventPacket->setTimestampUsec(usSinceEpoch());
+    eventPacket->setTimestampUsec(videoPacket->timestampUsec());
+    eventPacket->setDurationUsec(1000000LL * 10);
     eventPacket->addItem(detectedObject);
     return eventPacket;
 }

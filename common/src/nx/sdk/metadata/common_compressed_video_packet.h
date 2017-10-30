@@ -21,12 +21,13 @@ public:
 
     virtual int width() const override { return m_width;  }
     virtual int height() const override { return m_height; }
+    virtual int64_t timestampUsec() const override { return m_mediaPacket.timestampUsec();  }
 
     void setWidth(int value) { m_width = value; }
     void setHeight(int value) { m_height = value; }
     void setCodec(const std::string& value) { m_mediaPacket.setCodec(value); }
     void setData(std::vector<char> data) { m_mediaPacket.setData(data); }
-
+    void setTimestampUsec(int64_t value) { m_mediaPacket.setTimestampUsec(value);  }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
