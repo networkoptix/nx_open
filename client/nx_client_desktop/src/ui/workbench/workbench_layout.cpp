@@ -16,6 +16,7 @@
 #include <utils/common/warnings.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
@@ -255,8 +256,15 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
         item->layout()->removeItem(item);
     }
 
-    if (item->isPinned() && m_itemMap.isOccupied(item->geometry()))
-        item->setFlag(Qn::Pinned, false);
+    if (item->isPinned())
+    {
+        if (const QnWorkbenchItem* otherItem = m_itemMap.value(item->geometry().topLeft()))
+        {
+            const auto options = otherItem->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
+            if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
+                item->setFlag(Qn::Pinned, false);
+        }
+    }
 
     item->m_layout = this;
     m_items.insert(item);
