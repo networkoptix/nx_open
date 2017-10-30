@@ -25,6 +25,8 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
+#include <ini.h>
 
 #include <client_core/client_core_module.h>
 
@@ -1450,11 +1452,11 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (options().testFlag(InvisibleWidgetOption))
         return;
 
+    const auto metadata = m_renderer->lastFrameMetadata(channel);
     if (options() & DisplayMotion)
     {
         ensureMotionSelectionCache();
 
-        const auto metadata = m_renderer->lastFrameMetadata(channel);
         if (metadata && metadata->dataType == QnAbstractMediaData::DataType::META_V1)
         {
             paintMotionGrid(
@@ -1471,6 +1473,16 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         {
             QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
+        }
+    }
+
+    if (metadata && metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
+    {
+        if (nx::client::desktop::ini().enableAnalytics)
+        {
+            qnMetadataAnalyticsController->gotMetadataPacket(
+                m_resource->toResourcePtr(),
+                std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
         }
     }
 

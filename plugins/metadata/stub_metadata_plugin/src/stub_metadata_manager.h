@@ -47,6 +47,7 @@ private:
     std::atomic<bool> m_stopping{false};
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
     int m_counter = 0;
+    int m_counterObjects = 0;
     nxpl::NX_GUID m_eventTypeId;
     nxpl::NX_GUID m_objectTypeId;
 };

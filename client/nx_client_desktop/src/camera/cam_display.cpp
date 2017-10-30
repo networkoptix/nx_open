@@ -1164,12 +1164,6 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
     if (metadata->containTime(video->timestamp))
     {
         video->motion = metadata;
-        if (ini.enableAnalytics)
-        {
-            qnMetadataAnalyticsController->gotMetadataPacket(
-                m_resource->toResourcePtr(),
-                std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
-        }
     }
     queue.erase(queue.begin(), itr);
 }

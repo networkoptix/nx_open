@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <math.h>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
@@ -167,7 +168,12 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(nx::sdk::metadata::
     detectedObject->setId(objectId);
     detectedObject->setAuxilaryData(R"json({"auxilaryData": "someJson2"})json");
     detectedObject->setEventTypeId(m_objectTypeId);
-    detectedObject->setBoundingBox(Rect(0.25, 0.25, 0.25, 0.25));
+
+    double dt = m_counterObjects++ / 32.0;
+    double intPart;
+    dt = modf(dt, &intPart) * 0.75;
+
+    detectedObject->setBoundingBox(Rect(dt, dt, 0.25, 0.25));
 
     auto eventPacket = new CommonObjectsMetadataPacket();
     eventPacket->setTimestampUsec(videoPacket->timestampUsec());
