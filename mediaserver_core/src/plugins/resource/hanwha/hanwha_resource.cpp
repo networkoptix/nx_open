@@ -65,17 +65,18 @@ struct PtzDescriptor
     PtzOperation operation = PtzOperation::add;
 };
 
-static const std::map<QString, PtzDescriptor> kHanwhaPtzCapabilityAttributes =
+static const std::map<QString, PtzDescriptor> kHanwhaCameraPtzCapabilities =
 {
-    {lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability)},
-    {lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability)},
-    {lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability)},
-    {lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
-    {lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
-    {lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
+    {lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
+    {lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
+    {lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
     {lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability)},
     {lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
-    {lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
+    {lit("AreaZoom"), PtzDescriptor(
+        Ptz::Capability::ViewportPtzCapability |
+        Ptz::Capability::AbsolutePanCapability |
+        Ptz::Capability::AbsoluteTiltCapability |
+        Ptz::Capability::AbsoluteZoomCapability) },
     {lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability)},
     {
         lit("DigitalPTZ"),
@@ -88,6 +89,28 @@ static const std::map<QString, PtzDescriptor> kHanwhaPtzCapabilityAttributes =
     }
 };
 
+static const std::map<QString, PtzDescriptor> kHanwhaNvrPtzCapabilities =
+{
+    { lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability) },
+    { lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability) },
+    { lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability) },
+    { lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability) },
+    { lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability) },
+    { lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability) },
+    { lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability) },
+    { lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
+    { lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
+    { lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability) },
+    {
+        lit("DigitalPTZ"),
+        PtzDescriptor(
+            Ptz::Capability::ContinuousZoomCapability |
+            Ptz::Capability::ContinuousTiltCapability |
+            Ptz::Capability::ContinuousPanCapability,
+            PtzOperation::remove
+        )
+    }
+};
 
 static const QString kAdvancedParametersTemplateFile = lit(":/camera_advanced_params/hanwha.xml");
 
@@ -414,8 +437,6 @@ bool HanwhaResource::setParamsPhysical(
             *info,
             value.value);
     }
-    if (reopenPrimaryStream || reopenSecondaryStream)
-        initMediaStreamCapabilities();
     saveParams();
 
     bool success = true;
@@ -450,7 +471,12 @@ bool HanwhaResource::setParamsPhysical(
     if (success)
         result = values;
 
-    reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+    if (reopenPrimaryStream || reopenSecondaryStream)
+    {
+        initMediaStreamCapabilities();
+        saveParams();
+        reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+    }
 
     return success;
 }
@@ -601,6 +627,9 @@ CameraDiagnostics::Result HanwhaResource::initInternal()
 
 CameraDiagnostics::Result HanwhaResource::init()
 {
+    setCameraCapability(Qn::SetUserPasswordCapability, true);
+    saveParams();
+
     const auto sharedContext = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
     {
@@ -638,7 +667,6 @@ CameraDiagnostics::Result HanwhaResource::init()
         return result;
 
     initMediaStreamCapabilities();
-    setCameraCapability(Qn::SetUserPasswordCapability, true);
     saveParams();
 
     sharedContext->startServices();
@@ -922,7 +950,11 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     removeProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME);
 
     m_ptzCapabilities = Ptz::NoPtzCapabilities;
-    for (const auto& attributeToCheck: kHanwhaPtzCapabilityAttributes)
+
+    const auto& ptzCapabilities = isNvr() ?
+        kHanwhaNvrPtzCapabilities : kHanwhaCameraPtzCapabilities;
+
+    for (const auto& attributeToCheck: ptzCapabilities)
     {
         const auto& name = lit("PTZSupport/%1/%2")
             .arg(attributeToCheck.first)
@@ -1103,7 +1135,7 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
         if (nxSecondaryProfileNumber == kHanwhaInvalidProfile)
             ++amountOfProfilesNeeded;
 
-        if (amountOfProfilesNeeded > 0)
+        if (amountOfProfilesNeeded + totalProfileNumber > m_maxProfileCount)
         {
             return CameraDiagnostics::CameraInvalidParams(
                 lit("- can not create profiles. Please delete %1 profiles%2 on the camera web page.")
@@ -2066,14 +2098,18 @@ void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
     if (!camera)
         return;
 
-    auto providerHi = camera->getPrimaryReader();
-    auto providerLow = camera->getSecondaryReader();
+    static const auto reopen =
+        [](const QnLiveStreamProviderPtr& stream)
+        {
+            if (stream && stream->isRunning())
+                stream->pleaseReopenStream();
+        };
 
-    if (providerHi && providerHi->isRunning())
-        providerHi->pleaseReopenStream();
+    if (reopenPrimary)
+        reopen(camera->getPrimaryReader());
 
-    if (providerLow && providerLow->isRunning())
-        providerLow->pleaseReopenStream();
+    if (reopenSecondary)
+        reopen(camera->getSecondaryReader());
 }
 
 int HanwhaResource::suggestBitrate(

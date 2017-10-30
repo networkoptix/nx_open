@@ -16,7 +16,9 @@ namespace plugins {
 
 namespace {
 
-static const int kMaxConcurrentRequestNumber = 5;
+// Limited by NPM-9080VQ, it can only be opening 3 stream at the same time, while it has 4.
+static const int kMaxConcurrentRequestNumber = 3;
+
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::minutes kCacheDataTimeout(1);
 

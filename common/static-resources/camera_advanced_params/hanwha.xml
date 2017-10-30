@@ -27,9 +27,7 @@
             <param id="media/audioinput/EncodingType"
                     name="Codec"
                     dataType="Enumeration"
-                    range="G.711,G.726"
-                    internalRange="G711,G726"
-                    aux="support=Media/Limit/MaxAudioInput"/>
+                    aux="support=Media/Limit/MaxAudioInput;range=media/audioinput/set/EncodingType"/>
             <param id="media/audioinput/Bitrate"
                     name="Bitrate"
                     dataType="Enumeration"
@@ -40,12 +38,17 @@
                         <conditional-range id="g711Range" range="64000">
                             <condition
                                 watch="media/audioinput/EncodingType"
-                                condition="value=G.711"/>
+                                condition="value=G711"/>
                         </conditional-range>
                         <conditional-range id="g726Range" range="16000,24000,32000,40000,64000">
                             <condition
                                 watch="media/audioinput/EncodingType"
-                                condition="value=G.726"/>
+                                condition="value=G726"/>
+                        </conditional-range>
+                        <conditional-range id="aacRange" range="48000">
+                            <condition
+                                watch="media/audioinput/EncodingType"
+                                condition="value=AAC"/>
                         </conditional-range>
                     </dependencies-ranges>
                 </dependencies>
@@ -889,7 +892,7 @@
                         dataType="Button"
                         writeCmd="control"
                         description="Restores the focus adjustment to the default flange back position"
-                        aux="support=Image/Support/ResetFocus"/>            
+                        aux="support=Image/Support/ResetFocus"/>
             <param id="system/factoryreset/ExcludeSettings=Network"
                         name="Soft Reset"
                         dataType="Button"
