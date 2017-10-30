@@ -82,11 +82,11 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
     , html()
     , pixmap()
 {
-    installEventHandler(parent, QEvent::PaletteChange, parent,
-        [guard = QPointer<QnHtmlTextItemPrivate>(this)]()
+    installEventHandler(parent, QEvent::PaletteChange, this,
+        [this]()
         {
-            if (guard && guard->options.backgroundColor.isValid())
-                guard->updatePixmap();
+            if (!this->options.backgroundColor.isValid())
+                updatePixmap();
         });
 }
 
