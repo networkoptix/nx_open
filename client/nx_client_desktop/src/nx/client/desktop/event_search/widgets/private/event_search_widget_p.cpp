@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QVBoxLayout>
 
 #include <ui/models/sort_filter_list_model.h>
@@ -52,6 +53,14 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     layout->setSpacing(0);
 
     m_eventRibbon->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+    connect(m_eventRibbon->scrollBar(), &QScrollBar::valueChanged, this,
+        [this](int value)
+        {
+            const auto scrollBar = m_eventRibbon->scrollBar();
+            if (scrollBar->isVisible() && value == scrollBar->maximum())
+                m_model->fetchMore();
+        });
 
     auto headerLayout = new QVBoxLayout(m_headerWidget);
     auto searchLineEdit = new QnSearchLineEdit(m_headerWidget);

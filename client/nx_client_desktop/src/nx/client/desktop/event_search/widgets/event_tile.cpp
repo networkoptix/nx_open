@@ -158,7 +158,7 @@ QPixmap EventTile::icon() const
 void EventTile::setIcon(const QPixmap& value)
 {
     // TODO: #vkutin Do we want to scale them? Now it's a temporary measure for soft triggers.
-    ui->iconLabel->setPixmap(value.scaled(
+    ui->iconLabel->setPixmap(value.isNull() ? value : value.scaled(
         ui->iconLabel->maximumSize() * value.devicePixelRatio(),
         Qt::KeepAspectRatio,
         Qt::SmoothTransformation));

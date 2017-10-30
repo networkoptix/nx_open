@@ -51,13 +51,36 @@ UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
     connect(q, &QAbstractItemModel::modelAboutToBeReset, this,
         [this]()
         {
-            m_eventRequestHandles.clear();
+            m_eventRequests.clear();
             m_eventIds.clear();
+            m_oldestTimeMs = std::numeric_limits<qint64>::max();
         });
 }
 
 UnifiedSearchListModel::Private::~Private()
 {
+}
+
+void UnifiedSearchListModel::Private::fetchMore()
+{
+    if (!m_camera)
+        return;
+
+    // TODO: #vkutin This is a temporary implementation of infinite scroll which loads events for
+    // previous 24 hours. Actual implementation will request entire period with result count limit.
+
+    const auto endTimeMs = m_startTimeMs;
+    m_startTimeMs = endTimeMs - std::chrono::milliseconds(kDefaultEventsPeriod).count();
+
+    auto finishHandler = QnRaiiGuard::createDestructible(
+        [guardedThis = QPointer<Private>(this), oldest = m_oldestTimeMs]()
+        {
+            // If nothing was fetched, try more.
+            if (guardedThis && oldest == guardedThis->m_oldestTimeMs)
+                guardedThis->fetchMore();
+        });
+
+    fetchAll(m_startTimeMs, endTimeMs, finishHandler);
 }
 
 void UnifiedSearchListModel::Private::periodicUpdate()
@@ -76,16 +99,32 @@ void UnifiedSearchListModel::Private::periodicUpdate()
     fetchEvents(startTimeMs, endTimeMs);
 }
 
-void UnifiedSearchListModel::Private::fetchEvents(qint64 startTimeMs, qint64 endTimeMs)
+void UnifiedSearchListModel::Private::fetchAll(qint64 startMs, qint64 endMs,
+    QnRaiiGuardPtr handler)
 {
+    NX_EXPECT(m_camera);
+    if (!m_camera)
+        return;
+
+    fetchEvents(startMs, endMs, handler);
+    fetchBookmarks(startMs, endMs, handler);
+    fetchAnalytics(startMs, endMs, handler);
+}
+
+void UnifiedSearchListModel::Private::fetchEvents(qint64 startMs, qint64 endMs,
+    QnRaiiGuardPtr handler)
+{
+    if (!accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission))
+        return;
+
     const auto eventsReceived =
         [this, guard = QPointer<QObject>(this)]
             (bool success, rest::Handle handle, rest::EventLogData data)
             {
-                if (!guard || !m_eventRequestHandles.contains(handle))
+                if (!guard || !m_eventRequests.contains(handle))
                     return;
 
-                m_eventRequestHandles.remove(handle);
+                m_eventRequests.remove(handle);
 
                 if (!success)
                     return;
@@ -96,7 +135,7 @@ void UnifiedSearchListModel::Private::fetchEvents(qint64 startTimeMs, qint64 end
 
     QnEventLogRequestData request;
     request.cameras << m_camera;
-    request.period = QnTimePeriod::fromInterval(startTimeMs, endTimeMs);
+    request.period = QnTimePeriod::fromInterval(startMs, endMs);
 
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const auto& server: onlineServers)
@@ -105,8 +144,9 @@ void UnifiedSearchListModel::Private::fetchEvents(qint64 startTimeMs, qint64 end
         if (handle <= 0)
             continue;
 
-        m_eventRequestHandles.insert(handle);
+        m_eventRequests[handle] = handler;
 
+        // TODO: #vkutin Do we need it? Seems it's required only in case request is cancelled.
         const auto timeoutCallback =
             [this, handle, eventsReceived]
             {
@@ -119,17 +159,18 @@ void UnifiedSearchListModel::Private::fetchEvents(qint64 startTimeMs, qint64 end
     }
 }
 
-void UnifiedSearchListModel::Private::fetchBookmarks(qint64 startTimeMs, qint64 endTimeMs)
+void UnifiedSearchListModel::Private::fetchBookmarks(qint64 startMs, qint64 endMs,
+    QnRaiiGuardPtr handler)
 {
     if (!accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission))
         return;
 
     QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = startTimeMs;
-    filter.endTimeMs = endTimeMs;
+    filter.startTimeMs = startMs;
+    filter.endTimeMs = endMs;
 
     qnCameraBookmarksManager->getBookmarksAsync({m_camera}, filter,
-        [this](bool success, const QnCameraBookmarkList& bookmarks)
+        [this, handler](bool success, const QnCameraBookmarkList& bookmarks)
         {
             if (!success)
                 return;
@@ -139,7 +180,8 @@ void UnifiedSearchListModel::Private::fetchBookmarks(qint64 startTimeMs, qint64 
         });
 }
 
-void UnifiedSearchListModel::Private::fetchAnalytics(qint64 startTimeMs, qint64 endTimeMs)
+void UnifiedSearchListModel::Private::fetchAnalytics(qint64 startMs, qint64 endMs,
+    QnRaiiGuardPtr handler)
 {
     // TODO: FIXME: IMPLEMENTME: #vkutin
 }
@@ -179,6 +221,8 @@ void UnifiedSearchListModel::Private::addOrUpdateBookmark(const QnCameraBookmark
     //data.actionId =
     //data.actionParameters =
 
+    m_oldestTimeMs = qMin(m_oldestTimeMs, bookmark.startTimeMs);
+
     if (!q->updateEvent(data))
         q->addEvent(data);
 }
@@ -208,6 +252,8 @@ void UnifiedSearchListModel::Private::addCameraEvent(const nx::vms::event::Actio
     //data.helpId = Qn::Bookmarks_Usage_Help;
     //data.actionId =
     //data.actionParameters =
+
+    m_oldestTimeMs = qMin(m_oldestTimeMs, eventTimeMs);
 
     q->addEvent(data);
 }

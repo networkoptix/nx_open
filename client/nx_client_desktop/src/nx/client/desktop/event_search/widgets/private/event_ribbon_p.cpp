@@ -260,6 +260,7 @@ void EventRibbon::Private::insertTile(int index, EventTile* tileWidget)
     m_totalHeight += delta;
     updateScrollRange();
 
+    // TODO: #vkutin This won't work if entire ribbon is invisible at the moment. Think about it.
     if (position + delta < m_scrollBar->value())
         m_scrollBar->setValue(m_scrollBar->value() + delta);
 

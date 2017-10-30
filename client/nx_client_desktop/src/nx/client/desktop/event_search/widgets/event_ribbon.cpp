@@ -24,6 +24,11 @@ QAbstractItemModel* EventRibbon::model() const
     return d->model();
 }
 
+QScrollBar* EventRibbon::scrollBar() const
+{
+    return d->scrollBar();
+}
+
 void EventRibbon::setModel(QAbstractItemModel* model)
 {
     d->setModel(model);

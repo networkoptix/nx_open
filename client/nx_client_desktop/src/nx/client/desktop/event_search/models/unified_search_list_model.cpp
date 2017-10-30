@@ -25,6 +25,11 @@ void UnifiedSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camera)
     d->setCamera(camera);
 }
 
+void UnifiedSearchListModel::fetchMore()
+{
+    d->fetchMore();
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

@@ -2,11 +2,15 @@
 
 #include "../unified_search_list_model.h"
 
+#include <limits>
+
 #include <QtCore/QTimer>
+#include <QtCore/QHash>
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
+#include <nx/utils/raii_guard.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {
@@ -29,10 +33,13 @@ public:
 
     void clear();
 
+    void fetchMore();
+
 private:
-    void fetchEvents(qint64 startTimeMs, qint64 endTimeMs);
-    void fetchBookmarks(qint64 startTimeMs, qint64 endTimeMs);
-    void fetchAnalytics(qint64 startTimeMs, qint64 endTimeMs);
+    void fetchAll(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
+    void fetchEvents(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
+    void fetchBookmarks(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
+    void fetchAnalytics(qint64 startMs, qint64 endMs, QnRaiiGuardPtr handler = QnRaiiGuardPtr());
 
     void periodicUpdate();
     void watchBookmarkChanges();
@@ -48,10 +55,11 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     QScopedPointer<QTimer> m_updateTimer;
     QScopedPointer<vms::event::StringsHelper> m_helper;
-    QSet<rest::Handle> m_eventRequestHandles;
+    QHash<rest::Handle, QnRaiiGuardPtr> m_eventRequests;
     QHash<QPair<QnUuid, qint64>, QnUuid> m_eventIds;
     qint64 m_startTimeMs = 0;
     qint64 m_endTimeMs = -1;
+    qint64 m_oldestTimeMs = std::numeric_limits<qint64>::max();
 };
 
 } // namespace

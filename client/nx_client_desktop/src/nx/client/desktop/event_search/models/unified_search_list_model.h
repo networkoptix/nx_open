@@ -22,6 +22,8 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
+    void fetchMore();
+
 private:
     class Private;
     QScopedPointer<Private> d;

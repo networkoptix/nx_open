@@ -6,6 +6,7 @@
 #include <nx/utils/uuid.h>
 
 class QAbstractItemModel;
+class QScrollBar;
 
 namespace nx {
 namespace client {
@@ -26,6 +27,8 @@ public:
     void setModel(QAbstractItemModel* model);
 
     virtual QSize sizeHint() const override;
+
+    QScrollBar* scrollBar() const;
 
 signals:
     void closeRequested(const QnUuid& id);
