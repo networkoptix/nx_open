@@ -1160,10 +1160,19 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
     if (itr != queue.begin())
         --itr;
 
-    const QnAbstractCompressedMetadataPtr& metadata = itr->second;
-    if (metadata->containTime(video->timestamp))
+    auto& metadataList = itr->second;
+    for (auto itrMetadata = metadataList.begin(); itrMetadata != metadataList.end();)
     {
-        video->motion = metadata;
+        auto& metadata = *itrMetadata;
+        if (metadata->containTime(video->timestamp))
+        {
+            video->metadata << metadata;
+            itrMetadata = metadataList.erase(itrMetadata);
+        }
+        else
+        {
+            ++itrMetadata;
+        }
     }
     queue.erase(queue.begin(), itr);
 }
@@ -1178,9 +1187,10 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     QnAbstractCompressedMetadataPtr metadata =
         std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
 
-    if (metadata) {
+    if (metadata)
+    {
         int ch = metadata->channelNumber;
-        m_lastMetadata[ch][metadata->timestamp] = metadata;
+        m_lastMetadata[ch][metadata->timestamp] << metadata;
         if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
             m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
         return true;

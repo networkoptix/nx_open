@@ -316,3 +316,5 @@ protected:
 private:
     qint64 m_firstTimestamp;
 };
+
+using FrameMetadata = QVector<QnAbstractCompressedMetadataPtr>;

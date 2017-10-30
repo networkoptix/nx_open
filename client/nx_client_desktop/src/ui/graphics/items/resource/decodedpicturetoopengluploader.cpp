@@ -570,7 +570,7 @@ quint64 DecodedPictureToOpenGLUploader::UploadedPicture::pts() const
     return m_pts;
 }
 
-QnAbstractCompressedMetadataPtr DecodedPictureToOpenGLUploader::UploadedPicture::metadata() const
+FrameMetadata DecodedPictureToOpenGLUploader::UploadedPicture::metadata() const
 {
     return m_metadata;
 }

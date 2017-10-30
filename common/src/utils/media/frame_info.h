@@ -154,11 +154,11 @@ private:
 
 
 //!Decoded frame, ready to be rendered
+
 class CLVideoDecoderOutput: public AVFrame
 {
 public:
     //!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
-    QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
     CLVideoDecoderOutput(QImage image);
@@ -168,13 +168,12 @@ public:
 
     static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
     static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
+    static bool isPixelFormatSupported(AVPixelFormat format);
+
     void saveToFile(const char* filename);
     void clean();
-    static bool isPixelFormatSupported(AVPixelFormat format);
     void setUseExternalData(bool value);
     bool isExternalData() const { return m_useExternalData; }
-    //void setDisplaying(bool value) {m_displaying = value; }
-    //bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(const QSize& size, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
@@ -192,24 +191,23 @@ public:
     void fillRightEdge();
 
 public:
-    QnAbstractMediaData::MediaFlags flags;
+    QSharedPointer<QnAbstractPictureDataRef> picData;
+
+    QnAbstractMediaData::MediaFlags flags = QnAbstractMediaData::MediaFlags_None;
 
     /** Pixel width to pixel height ratio. Some videos have non-square pixels, we support that. */
-    double sample_aspect_ratio;
+    double sample_aspect_ratio = 0.0;
 
     /** Number of the video channel in video layout. */
-    int channel;
+    int channel = 0;
 
-    QnAbstractCompressedMetadataPtr metadata; // addition data associated with video frame
-
+    FrameMetadata metadata; // addition data associated with video frame
+private:
+    bool m_useExternalData = false; // pointers only copied to this frame
 private:
     bool invalidScaleParameters(const QSize& size) const;
     static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
     static bool equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, int stride1, int stride2, int height, int max_diff);
-
-private:
-    bool m_useExternalData; // pointers only copied to this frame
-    //bool m_displaying;
 
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
