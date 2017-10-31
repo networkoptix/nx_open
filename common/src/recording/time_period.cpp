@@ -247,22 +247,26 @@ void QnTimePeriod::truncateFront(qint64 timeMs)
 
 QnTimePeriod QnTimePeriod::truncated(qint64 timeMs) const
 {
-    if (timeMs <= startTimeMs)
-        return QnTimePeriod();
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        return QnTimePeriod::fromInterval(
+            startTimeMs,
+            timeMs > endTimeMs() ? endTimeMs() : timeMs);
+    }
 
-    return QnTimePeriod::fromInterval(
-        startTimeMs,
-        timeMs > endTimeMs() ? endTimeMs() : timeMs);
+    return *this;
 }
 
 QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
 {
-    if (timeMs >= endTimeMs())
-        return QnTimePeriod();
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        return QnTimePeriod::fromInterval(
+            timeMs < startTimeMs ?
+            startTimeMs : timeMs, endTimeMs());
+    }
 
-    return QnTimePeriod::fromInterval(
-        timeMs < startTimeMs ?
-        startTimeMs : timeMs,  endTimeMs());
+    return *this;
 }
 
 bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)
