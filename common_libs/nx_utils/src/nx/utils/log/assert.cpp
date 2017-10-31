@@ -36,7 +36,7 @@ AssertTimer::TimeInfo::TimeInfo(const TimeInfo& other)
 {
 }
 
-AssertTimer::TimeInfo& AssertTimer::TimeInfo::operator =(const TimeInfo& other)
+AssertTimer::TimeInfo& AssertTimer::TimeInfo::operator=(const TimeInfo& other)
 {
     m_count = other.m_count.load();
     m_time = other.m_time.load();
@@ -44,7 +44,7 @@ AssertTimer::TimeInfo& AssertTimer::TimeInfo::operator =(const TimeInfo& other)
 }
 
 /** Edit to change output sort order */
-bool AssertTimer::TimeInfo::operator <(const TimeInfo& other) const
+bool AssertTimer::TimeInfo::operator<(const TimeInfo& other) const
 {
     return m_time > other.m_time;
 }
