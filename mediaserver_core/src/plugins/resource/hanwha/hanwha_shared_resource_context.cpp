@@ -22,6 +22,9 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::minutes kCacheDataTimeout(1);
 
+static const QString kMinOverlappedDateTime = lit("1970-01-01 00:00:00");
+static const QString kMaxOverlappedDateTime = lit("2038-01-01 00:00:00");
+
 static const QUrl cleanUrl(QUrl url)
 {
     url.setPath(QString());
@@ -176,8 +179,8 @@ HanwhaResult<int> HanwhaSharedResourceContext::loadOverlappedId()
     const auto response = helper.view(
         lit("recording/overlapped"),
         {
-            {lit("FromDate"), lit("1970-01-01 00:00:00")},
-            {lit("ToDate"), lit("2038-01-01 00:00:00")}
+            {lit("FromDate"), kMinOverlappedDateTime},
+            {lit("ToDate"), kMaxOverlappedDateTime}
         }); //< TODO: #dmishin it looks pretty hardcoded. Get actual time range from the camera.
 
     if (!response.isSuccessful())

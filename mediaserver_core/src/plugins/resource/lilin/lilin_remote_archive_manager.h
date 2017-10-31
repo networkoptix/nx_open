@@ -29,9 +29,9 @@ class LilinRemoteArchiveManager:
 public:
 
     explicit LilinRemoteArchiveManager(LilinResource* resource);
-    virtual ~LilinRemoteArchiveManager() override;
+    virtual ~LilinRemoteArchiveManager() = default;
 
-    // Implementation of AbstractRemoteArchiveManager::listAvailableArchiveEntries 
+    // Implementation of AbstractRemoteArchiveManager::listAvailableArchiveEntries
     virtual bool listAvailableArchiveEntries(
         std::vector<RemoteArchiveEntry>* outArchiveEntries,
         int64_t startTimeMs = 0,

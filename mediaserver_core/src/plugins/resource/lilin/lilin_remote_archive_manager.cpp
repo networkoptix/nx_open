@@ -39,12 +39,6 @@ using namespace nx::core::resource;
 LilinRemoteArchiveManager::LilinRemoteArchiveManager(LilinResource* resource):
     m_resource(resource)
 {
-
-}
-
-LilinRemoteArchiveManager::~LilinRemoteArchiveManager()
-{
-
 }
 
 bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
@@ -92,7 +86,7 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
 }
 
 void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
-    std::function<void(const std::vector<RemoteArchiveEntry>&)> callback)
+    std::function<void(const std::vector<RemoteArchiveEntry>&)> /*callback*/)
 {
     // Do nothing.
 }

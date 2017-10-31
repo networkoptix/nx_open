@@ -16,10 +16,6 @@ HanwhaRemoteArchiveManager::HanwhaRemoteArchiveManager(HanwhaResource* resource)
 {
 }
 
-HanwhaRemoteArchiveManager::~HanwhaRemoteArchiveManager()
-{
-}
-
 bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
     std::vector<RemoteArchiveChunk>* outArchiveEntries,
     int64_t /*startTimeMs*/,

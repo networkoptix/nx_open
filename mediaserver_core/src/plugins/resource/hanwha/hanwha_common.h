@@ -66,7 +66,7 @@ static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaDefaultMaxPresetNumber = 1000;
 static const int kHanwhaProfileNameMaxLength = 12;
 
-static const QString kHanwhaDateFormat("yyyy-MM-dd hh:mm:ss");
+static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 
 const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
 const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");

@@ -33,7 +33,8 @@ class QnServerEdgeStreamRecorder: public QnServerStreamRecorder
 
 public:
     using FileWrittenHandler = std::function<void(
-        int64_t startTimeMs, int64_t durationMs)>;
+        std::chrono::milliseconds startTime,
+        std::chrono::milliseconds duration)>;
 
 
 public:

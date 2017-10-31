@@ -288,6 +288,8 @@ void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
 {
     const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
 
     vms::event::SystemHealthActionPtr action(
         new vms::event::SystemHealthAction(QnSystemHealth::MessageType::RemoteArchiveSyncStarted,
@@ -306,6 +308,8 @@ void EventConnector::at_remoteArchiveSyncFinished(const QnResourcePtr &resource)
 {
     const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
 
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncFinished,
@@ -326,6 +330,8 @@ void EventConnector::at_remoteArchiveSyncError(
 {
     const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
 
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncError,
@@ -349,6 +355,8 @@ void EventConnector::at_remoteArchiveSyncProgress(
 
     const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(secRes, lit("Resource is not a descendant of QnSecurityCamResource"));
+    if (!secRes)
+        return;
 
     vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::MessageType::RemoteArchiveSyncProgress,

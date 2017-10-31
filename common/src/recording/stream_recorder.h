@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <random>
+#include <chrono>
 
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
@@ -126,7 +127,9 @@ public:
 
     int64_t lastFileSize() const;
 
-    void setRecordingBounds(int64_t startTimeUs, int64_t endTimeUs);
+    void setRecordingBounds(
+        const std::chrono::microseconds& startTime,
+        const std::chrono::microseconds& endTime);
 
 signals:
     void recordingStarted();
@@ -255,8 +258,8 @@ private:
     MotionHandler m_motionHandler;
     int64_t m_lastFileSize = 0;
 
-    boost::optional<int64_t> m_startRecordingBoundUs;
-    boost::optional<int64_t> m_endRecordingBoundUs;
+    boost::optional<std::chrono::microseconds> m_startRecordingBound;
+    boost::optional<std::chrono::microseconds> m_endRecordingBound;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

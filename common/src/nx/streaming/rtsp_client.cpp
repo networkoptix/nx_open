@@ -382,7 +382,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
             .arg(currentUs)
             .arg("got time from Onvif NTP extension"));
 
-        return statistics.ntpOnvifExtensionTime.get();
+        return statistics.ntpOnvifExtensionTime->count();
     }
 
     const double currentSeconds = currentMs / 1000.0;

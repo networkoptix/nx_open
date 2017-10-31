@@ -94,8 +94,8 @@ public:
 
     bool isEnabled() const { return m_enabled; }
     void setEnabled(bool value) { m_enabled = value; }
-    virtual void setEndOfPlaybackHandler(std::function<void()> handler) {}
-    virtual void setErrorHandler(std::function<void(const QString& errorString)> handler) {}
+    virtual void setEndOfPlaybackHandler(std::function<void()> /*handler*/) {}
+    virtual void setErrorHandler(std::function<void(const QString& errorString)> /*handler*/) {}
 
 protected:
 

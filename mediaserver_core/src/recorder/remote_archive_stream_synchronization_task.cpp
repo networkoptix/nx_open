@@ -125,7 +125,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
         if (m_canceled)
             break;
 
-        if (timePeriod.durationMs >= 1000)
+        if (timePeriod.durationMs >= std::milli::den)
             writeTimePeriodToArchive(timePeriod);
     }
 
@@ -139,16 +139,16 @@ bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
     if (timePeriod.isInfinite())
         return false;
 
-    const auto startTimeMs = timePeriod.startTimeMs;
-    const auto endTimeMs = timePeriod.endTimeMs();
+    const std::chrono::milliseconds startTime(timePeriod.startTimeMs);
+    const std::chrono::milliseconds endTime(timePeriod.endTimeMs());
 
-    if (endTimeMs <= startTimeMs)
+    if (endTime <= startTime)
         return true;
 
     {
         QnMutexLocker lock(&m_mutex);
-        resetRecorderUnsafe(startTimeMs, endTimeMs);
-        resetArchiveReaderUnsafe(startTimeMs, endTimeMs);
+        resetRecorderUnsafe(startTime, endTime);
+        resetArchiveReaderUnsafe(startTime, endTime);
     }
 
     NX_ASSERT(m_recorder && m_archiveReader);
@@ -167,11 +167,13 @@ bool RemoteArchiveStreamSynchronizationTask::writeTimePeriodToArchive(
 }
 
 void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
-    int64_t startTimeMs,
-    int64_t endTimeMs)
+    const std::chrono::milliseconds& startTime,
+    const std::chrono::milliseconds& endTime)
 {
-    NX_ASSERT(endTimeMs > startTimeMs);
-    if (endTimeMs <= startTimeMs)
+    using namespace std::chrono;
+
+    NX_ASSERT(endTime > startTime);
+    if (endTime <= startTime)
         return;
 
     auto archiveDelegate = m_resource
@@ -182,11 +184,14 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
         return;
 
     archiveDelegate->setPlaybackMode(PlaybackMode::Edge);
-    archiveDelegate->setRange(startTimeMs * 1000, endTimeMs * 1000, /*frameStep*/ 1);
+    archiveDelegate->setRange(
+        duration_cast<microseconds>(startTime).count(),
+        duration_cast<microseconds>(endTime).count(),
+        /*frameStep*/ 1);
 
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
     m_archiveReader->setArchiveDelegate(archiveDelegate);
-    m_archiveReader->setPlaybackRange(QnTimePeriod(startTimeMs, endTimeMs - startTimeMs));
+    m_archiveReader->setPlaybackRange(QnTimePeriod(startTime, endTime - startTime));
     m_archiveReader->setRole(Qn::CR_Archive);
 
     m_archiveReader->addDataProcessor(m_recorder.get());
@@ -202,15 +207,13 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
         });
 
     m_archiveReader->setErrorHandler(
-        [this, startTimeMs, endTimeMs](const QString& errorString)
+        [this, startTime, endTime](const QString& errorString)
         {
             NX_ASSERT(m_archiveReader && m_recorder);
             NX_DEBUG(
                 this,
                 lm("Can not synchronize time period: %1-%2, error: %3")
-                    .arg(startTimeMs)
-                    .arg(endTimeMs)
-                    .arg(errorString));
+                    .args(startTime, endTime, errorString));
 
             qnEventRuleConnector->at_remoteArchiveSyncError(
                 m_resource,
@@ -224,8 +227,12 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
         });
 }
 
-void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(int64_t startTimeMs, int64_t endTimeMs)
+void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
+    const std::chrono::milliseconds& startTime,
+    const std::chrono::milliseconds& endTime)
 {
+    using namespace std::chrono;
+
     auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
 
     m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
@@ -234,11 +241,16 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(int64_t startTi
         m_archiveReader.get());
 
     m_recorder->setSaveMotionHandler(saveMotionHandler);
-    m_recorder->setRecordingBounds(startTimeMs * 1000, endTimeMs * 1000);
+    m_recorder->setRecordingBounds(
+        duration_cast<microseconds>(startTime),
+        duration_cast<microseconds>(endTime));
+
     m_recorder->setOnFileWrittenHandler(
-        [this](int64_t /*startTimeMs*/, int64_t durationMs)
+        [this](
+            std::chrono::milliseconds /*startTime*/,
+            std::chrono::milliseconds duration)
         {
-            m_importedDuration += std::chrono::milliseconds(durationMs);
+            m_importedDuration += duration;
             if (needToFireProgress())
             {
                 auto progress = (double)m_importedDuration.count() / m_totalDuration.count();
@@ -254,19 +266,19 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(int64_t startTi
 
                 qnEventRuleConnector->at_remoteArchiveSyncProgress(
                     m_resource,
-                    (double)m_importedDuration.count() / m_totalDuration.count());
+                    progress);
             }
         });
 }
 
 QnTimePeriodList RemoteArchiveStreamSynchronizationTask::toTimePeriodList(
-    const std::vector<RemoteArchiveChunk>& entries) const
+    const std::vector<RemoteArchiveChunk>& chunks) const
 {
     QnTimePeriodList result;
-    for (const auto& entry: entries)
+    for (const auto& chunk: chunks)
     {
-        if (entry.durationMs > 0)
-            result << QnTimePeriod(entry.startTimeMs, entry.durationMs);
+        if (chunk.durationMs > 0)
+            result << QnTimePeriod(chunk.startTimeMs, chunk.durationMs);
     }
 
     return result;
@@ -282,7 +294,7 @@ std::chrono::milliseconds RemoteArchiveStreamSynchronizationTask::totalDuration(
         if (chunk.isInfinite())
             continue;
 
-        if (chunk.durationMs < 1000)
+        if (chunk.durationMs < std::milli::den)
             continue;
 
         result += chunk.durationMs;

@@ -56,7 +56,7 @@ public:
     qint64 receivedPackets;
     qint64 receivedOctets;
     quint32 ssrc;
-    boost::optional<uint64_t> ntpOnvifExtensionTime;
+    boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
 };
 
 enum class TimePolicy

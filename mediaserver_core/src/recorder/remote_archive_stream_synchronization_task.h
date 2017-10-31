@@ -28,8 +28,13 @@ public:
 private:
     bool synchronizeArchive();
     bool writeTimePeriodToArchive(const QnTimePeriod& timePeriod);
-    void resetArchiveReaderUnsafe(int64_t startTimeMs, int64_t endTimeMs);
-    void resetRecorderUnsafe(int64_t startTimeMs, int64_t endTimeMs);
+    void resetArchiveReaderUnsafe(
+        const std::chrono::milliseconds& startTime,
+        const std::chrono::milliseconds& endTime);
+
+    void resetRecorderUnsafe(
+        const std::chrono::milliseconds& startTime,
+        const std::chrono::milliseconds& endTime);
 
     QnTimePeriodList toTimePeriodList(
         const std::vector<RemoteArchiveChunk>& entries) const;

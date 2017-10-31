@@ -315,15 +315,16 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
-    if (m_startRecordingBoundUs.is_initialized())
+    if (m_startRecordingBound.is_initialized())
     {
-        if (nonConstData->timestamp < *m_startRecordingBoundUs)
-            nonConstData->timestamp = *m_startRecordingBoundUs;
+        nonConstData->timestamp = std::max(
+            nonConstData->timestamp,
+            m_startRecordingBound->count());
     }
 
-    if (m_endRecordingBoundUs.is_initialized())
+    if (m_endRecordingBound.is_initialized())
     {
-        if (nonConstData->timestamp > *m_endRecordingBoundUs)
+        if (nonConstData->timestamp > m_endRecordingBound->count())
             return true;
     }
 
@@ -1237,10 +1238,12 @@ void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterCh
     m_transcodeFilters = filters;
 }
 
-void QnStreamRecorder::setRecordingBounds(int64_t startTimeUs, int64_t endTimeUs)
+void QnStreamRecorder::setRecordingBounds(
+    const std::chrono::microseconds& startTime,
+    const std::chrono::microseconds& endTime)
 {
-    m_startRecordingBoundUs = startTimeUs;
-    m_endRecordingBoundUs = endTimeUs;
+    m_startRecordingBound = startTime;
+    m_endRecordingBound = endTime;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

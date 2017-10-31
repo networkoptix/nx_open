@@ -67,7 +67,12 @@ void QnServerEdgeStreamRecorder::fileFinished(
             m_lastfileStartedInfo.startTimeMs);
 
         if (m_fileWrittenHandler)
-            m_fileWrittenHandler(m_lastfileStartedInfo.startTimeMs, durationMs);
+        {
+            m_fileWrittenHandler(
+                std::chrono::milliseconds(
+                    m_lastfileStartedInfo.startTimeMs),
+                std::chrono::milliseconds(durationMs));
+        }
     }
 
     m_lastfileStartedInfo = FileStartedInfo();

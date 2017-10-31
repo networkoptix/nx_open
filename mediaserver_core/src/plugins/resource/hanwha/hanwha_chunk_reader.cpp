@@ -45,9 +45,14 @@ void HanwhaChunkLoader::start(HanwhaSharedResourceContext* resourceContext)
             return; //< Already started
 
         if (auto information = resourceContext->information())
+        {
             m_maxChannels = information->channelCount;
+        }
         else
+        {
+            NX_DEBUG(this, lit("Unable to fetch channel number"));
             return; //< Unable to start without channel number.
+        }
 
         m_resourceContext = resourceContext;
         m_state = nextState(m_state);
@@ -141,8 +146,8 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
 
     auto startDateTime = toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, m_timeZoneShift);
     auto endDateTime = QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1);
-    query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateFormat));
-    query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateFormat));
+    query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateTimeFormat));
+    query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateTimeFormat));
 
     QStringList channelsParam;
     for (int i = 0; i < m_maxChannels; ++i)
@@ -400,9 +405,6 @@ HanwhaChunkLoader::State HanwhaChunkLoader::nextState(State currentState) const
 {
     if (m_resourceContext->information()->deviceType != kHanwhaNvrDeviceType)
         return State::LoadingChunks;
-
-    if (currentState == State::LoadingChunks)
-        return State::updateTimeRange;
 
     if (currentState == State::updateTimeRange)
         return State::LoadingChunks;

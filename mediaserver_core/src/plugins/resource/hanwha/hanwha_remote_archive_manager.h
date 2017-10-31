@@ -17,7 +17,7 @@ class HanwhaRemoteArchiveManager: public
         std::function<void(const std::vector<nx::core::resource::RemoteArchiveChunk>&)>;
 public:
     HanwhaRemoteArchiveManager(HanwhaResource* resource);
-    virtual ~HanwhaRemoteArchiveManager();
+    virtual ~HanwhaRemoteArchiveManager() = default;
 
     // Implemantation of AbstractRemoteArchiveManager::listAvailableArchiveEntries
     virtual bool listAvailableArchiveEntries(

@@ -44,9 +44,15 @@ static int SOCKET_READ_BUFFER_SIZE = 512*1024;
 static const int MAX_MEDIA_SOCKET_COUNT = 5;
 static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 
-static const int64_t kNtpEpochTimeDiff =
+static const std::chrono::seconds kNtpEpochTimeDiff(
     QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
-        .secsTo(QDateTime::fromString(lit("1970-01-01"), Qt::ISODate));
+        .secsTo(QDateTime::fromString(lit("1970-01-01"), Qt::ISODate)));
+
+// prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
+static const int kInterleavedRtpOverTcpPrefixLength = 4;
+static const int kOnvifNtpExtensionId = 0xabac;
+static const int kOnvifNtpExtensionAltId = 0xabad;
+static const int kOnvifNtpExtensionWordsNumber = 3;
 
 } // namespace
 
@@ -291,8 +297,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         if (format == QnRtspClient::TT_VIDEO || format == QnRtspClient::TT_AUDIO)
         {
-            const auto offset = rtpBufferOffset+4;
-            const auto length = readed - 4;
+            const auto offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
+            const auto length = readed - kInterleavedRtpOverTcpPrefixLength;
 
             const auto rtcpStaticstics = rtspStatistics(offset, length, rtpChannelNum);
 
@@ -796,7 +802,7 @@ QnRtspClient& QnMulticodecRtpReader::rtspClient()
     return m_RtpSession;
 }
 
-boost::optional<uint64_t> QnMulticodecRtpReader::parseOnvifNtpExtension(
+boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpExtensionTime(
     quint8* bufferStart,
     int length) const
 {
@@ -807,27 +813,28 @@ boost::optional<uint64_t> QnMulticodecRtpReader::parseOnvifNtpExtension(
     if (!rtpHeader->extension)
         return boost::none;
 
-    if (length < RtpHeader::RTP_HEADER_SIZE + 4)
+    if (length < RtpHeader::RTP_HEADER_SIZE + RtpHeaderExtension::kRtpExtensionHeaderLength)
         return boost::none;
 
     quint8* ptr = bufferStart + RtpHeader::RTP_HEADER_SIZE;
-    const auto extensionType = htons(*(uint16_t*)ptr);
+    const auto extensionId = htons(*(uint16_t*)ptr);
 
-    if (extensionType != 0xabac && extensionType != 0xabad)
+    if (isOnvifNtpExtensionId(extensionId))
         return boost::none;
 
     const int extWords = ((int(ptr[2]) << 8) + ptr[3]);
-    if (extWords != 3)
+    if (extWords != kOnvifNtpExtensionWordsNumber)
         return boost::none;
 
-    ptr += 4;
+    ptr += RtpHeaderExtension::kRtpExtensionHeaderLength;
     const auto seconds = htonl(*(uint32_t*)ptr);
-    const auto fractions = htonl(*(uint32_t*)(ptr + 4));
+    const double fractions = htonl(*(uint32_t*)(ptr + 4));
 
-    return (uint64_t)((seconds
-        - kNtpEpochTimeDiff
-        + (double) fractions / std::numeric_limits<uint32_t>::max())
-        * 1'000'000);
+    return std::chrono::microseconds(seconds * std::micro::den)
+        + std::chrono::microseconds(
+            (uint64_t)(fractions / std::numeric_limits<uint32_t>::max()
+            * std::micro::den))
+        - kNtpEpochTimeDiff;
 }
 
 QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
@@ -837,18 +844,22 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
 {
     auto ioDevice = m_tracks[channel].ioDevice;
     auto rtcpStaticstics = ioDevice->getStatistic();
-    const auto extensionNtpTime = parseOnvifNtpExtension(
+    const auto extensionNtpTime = parseOnvifNtpExtensionTime(
         (quint8*)m_demuxedData[channel]->data() + rtpBufferOffset,
         rtpPacketSize);
 
-    rtcpStaticstics.ntpOnvifExtensionTime = extensionNtpTime
-        ? extensionNtpTime
-        : m_lastOnvifNtpExtensionTime;
-
-    if (extensionNtpTime)
+    if (extensionNtpTime.is_initialized())
         m_lastOnvifNtpExtensionTime = extensionNtpTime;
 
+    rtcpStaticstics.ntpOnvifExtensionTime = m_lastOnvifNtpExtensionTime;
+
     return rtcpStaticstics;
+}
+
+bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
+{
+    return id == kOnvifNtpExtensionId
+        || id == kOnvifNtpExtensionAltId;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

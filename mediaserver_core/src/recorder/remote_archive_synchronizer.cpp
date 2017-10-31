@@ -143,6 +143,8 @@ int RemoteArchiveSynchronizer::maxSynchronizationThreads() const
     if (maxThreads > 0)
         return maxThreads;
 
+    // Ideal thread count is divided by 2 to not fully load
+    // CPU in case of motion detection analysis.
     maxThreads = QThread::idealThreadCount() / 2;
     if (maxThreads > 0)
         return maxThreads;

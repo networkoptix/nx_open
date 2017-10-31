@@ -410,41 +410,9 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
     auto subtrahendItr = periodList.cbegin();
     QnTimePeriodList result;
 
-    auto leftIntersection =
-        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
-        {
-            return subtrahend.startTimeMs <= src.startTimeMs
-                && subtrahend.endTimeMs() > src.startTimeMs
-                && subtrahend.endTimeMs() < src.endTimeMs();
-        };
-
-    auto rightIntersection =
-        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
-        {
-            return subtrahend.startTimeMs > src.startTimeMs
-                && subtrahend.startTimeMs < src.endTimeMs()
-                && subtrahend.endTimeMs() >= src.endTimeMs();
-        };
-
-    auto contains =
-        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
-        {
-            return subtrahend.startTimeMs > src.startTimeMs
-                && subtrahend.startTimeMs < src.endTimeMs()
-                && subtrahend.endTimeMs() > src.startTimeMs
-                && subtrahend.endTimeMs() < src.endTimeMs();
-        };
-
-    auto contained =
-        [](const QnTimePeriod& src, const QnTimePeriod& subtrahend)
-        {
-            return subtrahend.startTimeMs <= src.startTimeMs
-                && subtrahend.endTimeMs() >= src.endTimeMs();
-        };
-
     while (srcItr != end())
     {
-        if (contained(*srcItr, *subtrahendItr))
+        if (srcItr->isContainedIn(*subtrahendItr))
         {
             ++srcItr;
             continue;
@@ -463,7 +431,7 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
         auto current = *srcItr;
         while (subtrahendItr != periodList.cend())
         {
-            if (leftIntersection(current, *subtrahendItr))
+            if (current.isLeftIntersection(*subtrahendItr))
             {
                 current = current.truncatedFront(subtrahendItr->endTimeMs());
                 ++subtrahendItr;
@@ -474,13 +442,13 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
                 continue;
             }
 
-            if (rightIntersection(current, *subtrahendItr))
+            if (current.isRightIntersection(*subtrahendItr))
             {
                 result << current.truncated(subtrahendItr->startTimeMs);
                 break;
             }
 
-            if (contains(current, *subtrahendItr))
+            if (current.contains(*subtrahendItr))
             {
                 result << QnTimePeriod::fromInterval(
                     current.startTimeMs,
