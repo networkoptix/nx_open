@@ -60,33 +60,19 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     m_systemHealth->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_notifications->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    const auto handleSpecials =
+    const auto handleActions =
         [this](EventRibbon* ribbon, EventListModel* model)
         {
-            connect(ribbon, &EventRibbon::closeRequested, this,
-                [model](const QnUuid& id) { model->removeEvent(id); });
-
-            connect(ribbon, &EventRibbon::clicked, this,
-                [this, model](const QnUuid& id)
-                {
-                    const auto index = model->indexOf(id);
-                    const QVariant actionIdData = index.data(Qn::ActionIdRole);
-                    if (actionIdData.canConvert<ui::action::IDType>())
-                    {
-                        const auto actionId = actionIdData.value<ui::action::IDType>();
-                        const auto actionParameters = index.data(Qn::ActionParametersRole)
-                            .value<ui::action::Parameters>();
-
-                        menu()->triggerIfPossible(actionId, actionParameters);
-                    }
-                });
+            connect(ribbon, &EventRibbon::clicked, model, &EventListModel::defaultAction);
+            connect(ribbon, &EventRibbon::closeRequested, model, &EventListModel::closeAction);
+            connect(ribbon, &EventRibbon::linkActivated, model, &EventListModel::linkAction);
         };
 
     m_systemHealth->setModel(m_systemHealthModel);
     m_notifications->setModel(m_notificationsModel);
 
-    handleSpecials(m_systemHealth, m_systemHealthModel);
-    handleSpecials(m_notifications, m_notificationsModel);
+    handleActions(m_systemHealth, m_systemHealthModel);
+    handleActions(m_notifications, m_notificationsModel);
 }
 
 NotificationListWidget::Private::~Private()

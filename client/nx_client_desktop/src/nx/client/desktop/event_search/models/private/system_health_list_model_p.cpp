@@ -1,5 +1,7 @@
 #include "system_health_list_model_p.h"
 
+#include <chrono>
+
 #include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -11,6 +13,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <utils/common/delayed.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -20,6 +23,12 @@
 namespace nx {
 namespace client {
 namespace desktop {
+
+namespace {
+
+const auto kDisplayTimeout = std::chrono::milliseconds(12500);
+
+} // namespace
 
 using namespace ui;
 
@@ -35,6 +44,8 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
         this, &Private::addSystemHealthEvent);
     connect(handler, &QnWorkbenchNotificationsHandler::systemHealthEventRemoved,
         this, &Private::removeSystemHealthEvent);
+
+    connect(q, &EventListModel::modelReset, this, [this]() { m_uuidHash.clear(); });
 }
 
 SystemHealthListModel::Private::~Private()
@@ -78,6 +89,7 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
     eventData.toolTip = QnSystemHealthStringsHelper::messageTooltip(message, resourceName);
     eventData.helpId = QnBusiness::healthHelpId(message);
     eventData.removable = true;
+    eventData.extraData = static_cast<int>(message);
 
     eventData.titleColor = QnNotificationLevel::notificationColor(
         QnNotificationLevel::valueOf(message));
@@ -133,26 +145,6 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
         {
             eventData.icon = qnSkin->pixmap("cloud/cloud_20.png");
             eventData.actionId = action::PreferencesCloudTabAction;
-            // TODO: FIXME: #vkutin Restore functionality.
-            /*
-            const auto hideCloudPromoNextRun =
-                [this]
-                {
-                    menu()->trigger(action::HideCloudPromoAction);
-                };
-
-            connect(item, &QnNotificationWidget::actionTriggered, this, hideCloudPromoNextRun);
-            connect(item, &QnNotificationWidget::closeTriggered, this, hideCloudPromoNextRun);
-
-            connect(item, &QnNotificationWidget::linkActivated, this,
-                [item](const QString& link)
-                {
-                    if (link.contains(lit("://")))
-                        QDesktopServices::openUrl(link);
-                    else
-                        item->triggerDefaultAction();
-                });
-                */
             break;
         }
 
@@ -167,11 +159,16 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
             break;
     }
 
-    // TODO: #vkutin Restore functionality.
-    // QnSystemHealth::isMessageLocked(message)
+    if (!q->addEvent(eventData))
+        return;
 
     m_uuidHash[uuidKey] = eventData.id;
-    q->addEvent(eventData);
+
+    if (!QnSystemHealth::isMessageLocked(message))
+    {
+        executeDelayedParented([this, id = eventData.id]() { q->removeEvent(id); },
+            std::chrono::milliseconds(kDisplayTimeout).count(), this);
+    }
 }
 
 void SystemHealthListModel::Private::removeSystemHealthEvent(

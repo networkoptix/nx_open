@@ -36,6 +36,7 @@ public:
         int helpId = -1;
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;
+        QVariant extraData;
     };
 
 public:
@@ -45,15 +46,23 @@ public:
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    virtual bool addEvent(const EventData& event);
-    virtual bool updateEvent(const EventData& event);
-    virtual bool removeEvent(const QnUuid& id);
-    virtual void clear();
+    bool addEvent(const EventData& event);
+    bool updateEvent(const EventData& event);
+    bool removeEvent(const QnUuid& id);
+    void clear();
 
     QModelIndex indexOf(const QnUuid& id) const;
 
+    void defaultAction(const QnUuid& id);
+    void closeAction(const QnUuid& id);
+    void linkAction(const QnUuid& id, const QString& link);
+
 protected:
     virtual QString timestampText(qint64 timestampMs) const;
+
+    virtual void triggerDefaultAction(const EventData& event);
+    virtual void triggerCloseAction(const EventData& event);
+    virtual void triggerLinkAction(const EventData& event, const QString& link);
 
 private:
     class Private;

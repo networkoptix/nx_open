@@ -1,5 +1,7 @@
 #include "event_list_model_p.h"
 
+#include <QtGui/QDesktopServices>
+
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -100,6 +102,36 @@ bool EventListModel::Private::isValid(const QModelIndex& index) const
 {
     return index.model() == q && !index.parent().isValid() && index.column() == 0
         && index.row() >= 0 && index.row() < count();
+}
+
+void EventListModel::Private::defaultAction(const QnUuid& id)
+{
+    const auto index = indexOf(id);
+    NX_ASSERT(index >= 0, Q_FUNC_INFO, "Unknown event id");
+    if (index < 0)
+        return;
+
+    q->triggerDefaultAction(m_events[index].data);
+}
+
+void EventListModel::Private::closeAction(const QnUuid& id)
+{
+    const auto index = indexOf(id);
+    NX_ASSERT(index >= 0, Q_FUNC_INFO, "Unknown event id");
+    if (index < 0)
+        return;
+
+    q->triggerCloseAction(m_events[index].data);
+}
+
+void EventListModel::Private::linkAction(const QnUuid& id, const QString& link)
+{
+    const auto index = indexOf(id);
+    NX_ASSERT(index >= 0, Q_FUNC_INFO, "Unknown event id");
+    if (index < 0)
+        return;
+
+    q->triggerLinkAction(m_events[index].data, link);
 }
 
 } // namespace

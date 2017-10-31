@@ -1,7 +1,10 @@
 #include "event_tile.h"
 #include "ui_event_tile.h"
 
+#include <QtCore/QUrl>
+
 #include <QtGui/QPainter>
+#include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
 #include <ui/common/palette.h>
@@ -61,6 +64,7 @@ EventTile::EventTile(const QnUuid& id, QWidget* parent):
     font.setPixelSize(kTitleFontPixelSize);
     ui->nameLabel->setFont(font);
     ui->nameLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->nameLabel->setOpenExternalLinks(false);
 
     font.setWeight(kTimestampFontWeight);
     font.setPixelSize(kTimestampFontPixelSize);
@@ -71,10 +75,21 @@ EventTile::EventTile(const QnUuid& id, QWidget* parent):
     font.setPixelSize(kDescriptionFontPixelSize);
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->descriptionLabel->setOpenExternalLinks(false);
 
     connect(m_closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
-    connect(ui->descriptionLabel, &QLabel::linkActivated, this, &EventTile::linkActivated);
+    const auto activateLink =
+        [this](const QString& link)
+        {
+            if (link.contains(lit("://")))
+                QDesktopServices::openUrl(link);
+            else
+                emit linkActivated(link);
+        };
+
+    connect(ui->nameLabel, &QLabel::linkActivated, this, activateLink);
+    connect(ui->descriptionLabel, &QLabel::linkActivated, this, activateLink);
 }
 
 EventTile::EventTile(

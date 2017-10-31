@@ -17,6 +17,10 @@ public:
     explicit SystemHealthListModel(QObject* parent = nullptr);
     virtual ~SystemHealthListModel() override;
 
+protected:
+    virtual void triggerDefaultAction(const EventData& event) override;
+    virtual void triggerCloseAction(const EventData& event) override;
+
 private:
     class Private;
     QScopedPointer<Private> d;

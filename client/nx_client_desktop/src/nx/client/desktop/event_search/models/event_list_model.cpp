@@ -5,6 +5,8 @@
 
 #include <utils/common/synctime.h>
 
+#include <nx/client/desktop/ui/actions/action_manager.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -115,6 +117,39 @@ QString EventListModel::timestampText(qint64 timestampMs) const
         return dateTime.date().toString(Qt::DefaultLocaleShortDate);
 
     return dateTime.time().toString(Qt::DefaultLocaleShortDate);
+}
+
+void EventListModel::defaultAction(const QnUuid& id)
+{
+    d->defaultAction(id);
+}
+
+void EventListModel::closeAction(const QnUuid& id)
+{
+    d->closeAction(id);
+}
+
+void EventListModel::linkAction(const QnUuid& id, const QString& link)
+{
+    d->linkAction(id, link);
+}
+
+void EventListModel::triggerDefaultAction(const EventData& event)
+{
+    if (event.actionId != ui::action::NoAction)
+        menu()->triggerIfPossible(event.actionId, event.actionParameters);
+}
+
+void EventListModel::triggerCloseAction(const EventData& event)
+{
+    NX_ASSERT(event.removable, Q_FUNC_INFO, "Event is not closeable");
+    if (event.removable)
+        removeEvent(event.id);
+}
+
+void EventListModel::triggerLinkAction(const EventData& event, const QString& link)
+{
+    triggerDefaultAction(event);
 }
 
 } // namespace

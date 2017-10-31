@@ -36,6 +36,10 @@ public:
 
     bool isValid(const QModelIndex& index) const;
 
+    void defaultAction(const QnUuid& id);
+    void closeAction(const QnUuid& id);
+    void linkAction(const QnUuid& id, const QString& link);
+
 private:
     struct EventDescriptor
     {

@@ -81,6 +81,9 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         sortModel, &EventSortFilterModel::setFilterWildcard);
 
     m_eventRibbon->setModel(sortModel);
+
+    connect(m_eventRibbon, &EventRibbon::clicked, m_model, &EventListModel::defaultAction);
+    connect(m_eventRibbon, &EventRibbon::linkActivated, m_model, &EventListModel::linkAction);
 }
 
 EventSearchWidget::Private::~Private()
