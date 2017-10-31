@@ -18,8 +18,8 @@ using BufferType = QByteArray;
 enum RemoteArchiveCapability
 {
     NoCapabilities = 0,
-    RemoveChunkCapability = 1 << 1,
-    RandomAccessChunkCapability = 1 << 2
+    RemoveChunkCapability = 1,
+    RandomAccessChunkCapability = 1 << 1
 };
 
 Q_DECLARE_FLAGS(RemoteArchiveCapabilities, RemoteArchiveCapability)
