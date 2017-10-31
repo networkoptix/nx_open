@@ -127,9 +127,9 @@ public:
 
 private:
     mutable boost::optional<QString> m_string;
-    mutable boost::optional<in_addr> m_ipV4;
-    mutable boost::optional<in6_addr> m_ipV6;
-    mutable boost::optional<uint32_t> m_scopeId;
+    boost::optional<in_addr> m_ipV4;
+    boost::optional<in6_addr> m_ipV6;
+    boost::optional<uint32_t> m_scopeId;
 };
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);

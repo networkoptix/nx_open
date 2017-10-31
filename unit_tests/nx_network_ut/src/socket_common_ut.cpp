@@ -49,9 +49,9 @@ static void testHostAddress(
     boost::optional<in6_addr> ipv6)
 {
     if (string4)
-        testHostAddress(string4, ipv4, ipv6, string4, true);
+        testHostAddress(string4, ipv4, ipv6, string4, false);
 
-    testHostAddress(string6, ipv4, ipv6, string6, true);
+    testHostAddress(string6, ipv4, ipv6, string6, false);
 
     if (ipv4)
     {
@@ -88,13 +88,22 @@ TEST(HostAddress, Base)
 TEST(HostAddress, IpV6FromString)
 {
     HostAddress addr("fd00::9465:d2ff:fe64:2772%1");
-    ASSERT_TRUE(addr.isIpAddress());
+    ASSERT_FALSE(addr.isIpAddress());
     ASSERT_TRUE(addr.isPureIpV6());
 
     in6_addr addr6;
     ASSERT_TRUE(inet_pton(AF_INET6, "fd00::9465:d2ff:fe64:2772", &addr6));
     ASSERT_TRUE(memcmp(&addr6, &addr.ipV6().first.get(), sizeof(in6_addr)) == 0);
     ASSERT_EQ(1, addr.ipV6().second.get());
+}
+
+TEST(HostAddress, MappedIpV4AddressIsNotAPureIpV6)
+{
+    HostAddress addr("::ffff:172.25.4.8");
+    ASSERT_FALSE(addr.isPureIpV6());
+
+    addr = HostAddress("::ffff:c22:384e");
+    ASSERT_FALSE(addr.isPureIpV6());
 }
 
 TEST(HostAddress, IpToStringV6)

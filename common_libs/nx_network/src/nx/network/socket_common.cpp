@@ -180,13 +180,6 @@ bool HostAddress::isIpAddress() const
     if (m_ipV4 || m_ipV6)
         return true;
 
-    if ((bool) (m_ipV4 = ipV4from(*m_string)))
-        return true;
-
-    std::tie(m_ipV6, m_scopeId) = ipV6from(*m_string);
-    if (m_ipV6)
-        return true;
-
     return false;
 }
 

@@ -341,6 +341,21 @@ TEST_F(AddressResolverNat64, IPv4) // NAT64 not in use, IP v4 is just converted 
     ASSERT_EQ(kV4.ipV4()->s_addr, entries.front().host.ipV4()->s_addr);
 }
 
+TEST_F(AddressResolverNat64, IPv6) // NAT64 returns 2 addresses: mapped IP v6 and converted IP v4.
+{
+    const auto entries = SocketGlobals::addressResolver().resolveSync(
+        kV4, NatTraversalSupport::disabled, AF_INET6);
+    ASSERT_EQ(2U, entries.size());
+
+    ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
+    ASSERT_TRUE(entries.front().host.isIpAddress());
+    ASSERT_EQ(0, memcmp(&kV6.ipV6().first.get(), &entries.front().host.ipV6().first.get(), sizeof(in6_addr)));
+
+    ASSERT_EQ(cloud::AddressType::direct, entries.back().type);
+    ASSERT_TRUE(entries.back().host.isIpAddress());
+    ASSERT_EQ(0, memcmp(&kV4.ipV6().first.get(), &entries.back().host.ipV6().first.get(), sizeof(in6_addr)));
+}
+
 } // namespace test
 } // namespace network
 } // namespace nx

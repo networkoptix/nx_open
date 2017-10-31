@@ -114,11 +114,11 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
     bool needToAddIpV4Socket =
-        localAddress.address == HostAddress::anyHost
+        localAddress.address.toString() == HostAddress::anyHost.toString()
         || (bool) localAddress.address.ipV4();
 
     bool needToAddIpV6Socket =
-        localAddress.address == HostAddress::anyHost
+        localAddress.address.toString() == HostAddress::anyHost.toString()
         || (bool)localAddress.address.isPureIpV6();
 
     AbstractStreamServerSocket* ipV4ServerSocket = nullptr;
