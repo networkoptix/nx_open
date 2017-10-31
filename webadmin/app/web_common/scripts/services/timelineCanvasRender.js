@@ -650,30 +650,89 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.stroke();
     }
 
-    // !!! Draw and position for timeMarker
-    function drawTimeMarker(context){
 
-        if(!self.scaleManager.playedPosition ||
+    function timeMarkerOffScreen(date){
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
+        return coordinate < 0 || self.canvas.width < coordinate;
+    }
+
+    function cursorInTimeMarker(date, mouseX, mouseY){
+        //check x-direction
+        var coordinate = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio);
+        var width = timelineConfig.markerWidth * self.pixelAspectRatio;
+        var markerSideBuffer = timelineConfig.markerSideBuffer * self.pixelAspectRatio;
+
+        var isLeft = coordinate < 0 && markerSideBuffer <= mouseX && mouseX <= markerSideBuffer + width;
+        var isRight = coordinate > self.canvas.width && self.canvas.width - markerSideBuffer - width <= mouseX
+                                                     && mouseX <= self.canvas.width - markerSideBuffer;
+
+        //check y-direction
+        var height = timelineConfig.markerHeight * self.canvas.height;
+        var offset = timelineConfig.markerPullDown * self.pixelAspectRatio;
+        var isInY = offset <= mouseY && mouseY <= offset + height;
+
+        return {
+            rightMarker: isRight && isInY,
+            leftMarker: isLeft && isInY
+        };
+
+    }
+    function isLive(){
+        return !self.scaleManager.playedPosition ||
             self.scaleManager.liveMode &&
-            self.scaleManager.end - self.scaleManager.playedPosition < self.scaleManager.stickToLiveMs){
+            self.scaleManager.end - self.scaleManager.playedPosition < self.scaleManager.stickToLiveMs;
+    }
+
+
+    // !!! Draw and position for timeMarker
+    function drawOrCheckTimeMarker(context, mouseX, mouseY){
+        mouseX *= self.pixelAspectRatio;
+        mouseY *= self.pixelAspectRatio;
+
+        if(isLive()){
             return;
         }
 
-        drawMarker( context,
-                    self.scaleManager.playedPosition,
-                    timelineConfig.timeMarkerColor,
-                    timelineConfig.timeMarkerLineWidth,
-                    timelineConfig.timeMarkerTextColor);
+        var cursorIn = {leftMarker: false, rightMarker: false};
+        if(timeMarkerOffScreen(self.scaleManager.playedPosition)){
+            cursorIn = cursorInTimeMarker(self.scaleManager.playedPosition, mouseX, mouseY);
+        }
 
-        drawScrollBarMark(  context,
-                            self.scaleManager.playedPosition,
-                            timelineConfig.timeMarkerColor,
-                            timelineConfig.timeMarkerLineWidth);
+        if(context){
+            var markerColor = cursorIn.leftMarker || cursorIn.rightMarker
+                            ? timelineConfig.timeMarkerActiveColor
+                            : timelineConfig.timeMarkerColor;
+
+            drawMarker( context,
+                        self.scaleManager.playedPosition,
+                        markerColor,
+                        timelineConfig.timeMarkerLineWidth,
+                        timelineConfig.timeMarkerTextColor);
+
+            drawScrollBarMark(  context,
+                                self.scaleManager.playedPosition,
+                                markerColor,
+                                timelineConfig.timeMarkerLineWidth);
+        }
+        else{
+            return cursorIn;
+        }
     }
 
-    function drawPointerMarker(context, mouseX){
+    function drawPointerMarker(context, mouseX, mouseY){
         if(window.jscd.mobile || !mouseX){
             return;
+        }
+
+        var cursorIn = {leftMarker: false, rightMarker: false};
+        if(!isLive() && timeMarkerOffScreen(self.scaleManager.playedPosition)){
+            cursorIn = cursorInTimeMarker(self.scaleManager.playedPosition,
+                                              mouseX * self.pixelAspectRatio,
+                                              mouseY * self.pixelAspectRatio);
+
+            if(cursorIn.leftMarker || cursorIn.rightMarker){
+                return;
+            }
         }
 
         drawMarker( context,
@@ -927,7 +986,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var buttonsState = drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling);
 
 
-        drawTimeMarker(context);
+        drawOrCheckTimeMarker(context, mouseX, mouseY);
 
         var clickedCoordinate =  self.scaleManager.clickedCoordinate();
         if(!mouseOverEvents){ // Mouse left timeline - do not draw timemarker, but forget clickedCoordinate
@@ -952,6 +1011,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             eventsRow: false
         };
 
+        var timeMarker = drawOrCheckTimeMarker(null, mouseX, mouseY);
+        _.extend(result, timeMarker);
+
+        if(result.leftMarker || result.rightMarker){
+            return result;
+        }
+
         var buttons = drawOrCheckScrollButtons(null, mouseX, mouseY);
         _.extend(result, buttons);
         if(result.leftButton || result.rightButton)
@@ -966,10 +1032,11 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
 
         result.eventsRow = drawOrCheckEvents(null, mouseX, mouseY);
-
-        result.timeline = mouseY > 0 && mouseX > 0 &&
-                          mouseX * self.pixelAspectRatio < canvas.width &&
-                          mouseY * self.pixelAspectRatio < canvas.height;
+        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
+        mouseY *= self.pixelAspectRatio;
+        result.timeline = mouseY > top && mouseX > 0 &&
+                          mouseX * self.pixelAspectRatio < self.canvas.width &&
+                          mouseY < self.canvas.height;
 
         return result;
     };

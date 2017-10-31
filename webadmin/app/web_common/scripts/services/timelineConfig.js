@@ -86,6 +86,7 @@ var TimelineConfig = {
     scrollBarMarksSpacing : 4,
 
     timeMarkerColor: [43,56,63, 0.9], // Timemarker color //$dark9
+    timeMarkerActiveColor: [43,56,63],
     timeMarkerTextColor: [255,255,255],  //$light1
     pointerMarkerColor: [205,215,220, 0.9], // Mouse pointer marker color //$light6
     pointerMarkerTextColor: [43,56,63],  //$dark9

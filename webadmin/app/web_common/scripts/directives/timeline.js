@@ -390,6 +390,12 @@ angular.module('nxCommon')
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
                         scrollbarClickOrHold();
+                        return;
+                    }
+
+                    if(mouseOverElements.leftMarker || mouseOverElements.rightMarker){
+                        scope.scaleManager.setAnchorDateAndPoint(scope.scaleManager.playedPosition, 0.5);
+                        timelineActions.delayWatchingPlayingPosition();
                     }
                 }
                 function viewportClick(event){
