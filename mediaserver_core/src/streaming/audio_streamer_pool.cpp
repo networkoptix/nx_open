@@ -4,7 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/camera_pool.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <proxy/2wayaudio/proxy_audio_transmitter.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>

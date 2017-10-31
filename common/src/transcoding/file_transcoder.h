@@ -19,7 +19,7 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <nx/utils/thread/long_runnable.h>
 

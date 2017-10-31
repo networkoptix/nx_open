@@ -4,7 +4,7 @@
 #include <QtCore/QDir>
 
 #include <nx/utils/random.h>
-#include <plugins/resource/avi/filetypesupport.h>
+#include <core/resource/avi/filetypesupport.h>
 #include <recording/time_period_list.h>
 #include <utils/common/util.h>
 #include <utils/fs/file.h>

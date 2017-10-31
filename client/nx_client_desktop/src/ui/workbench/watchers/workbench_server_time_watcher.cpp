@@ -11,7 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <utils/common/synctime.h>
 #include <core/resource/fake_media_server.h>

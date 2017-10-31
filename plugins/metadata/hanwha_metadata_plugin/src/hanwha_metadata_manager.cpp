@@ -7,7 +7,7 @@
 #include <chrono>
 
 #include <nx/sdk/metadata/common_detected_event.h>
-#include <nx/sdk/metadata/common_event_metadata_packet.h>
+#include <nx/sdk/metadata/common_metadata_packet.h>
 
 namespace nx {
 namespace mediaserver {
@@ -43,13 +43,19 @@ void* HanwhaMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* handler)
+nx::sdk::Error HanwhaMetadataManager::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
+{
+    m_handler = handler;
+    return Error::noError;
+}
+
+Error HanwhaMetadataManager::startFetchingMetadata()
 {
     auto monitorHandler =
         [this](const HanwhaEventList& events)
         {
             using namespace std::chrono;
-            auto packet = new CommonEventMetadataPacket();
+            auto packet = new CommonEventsMetadataPacket();
 
             for (const auto& hanwhaEvent : events)
             {
@@ -74,7 +80,7 @@ Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* hand
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
 
                 packet->setDurationUsec(-1);
-                packet->addEvent(event);
+                packet->addItem(event);
             }
 
             std::cout << std::endl << std::endl;
@@ -85,8 +91,6 @@ Error HanwhaMetadataManager::startFetchingMetadata(AbstractMetadataHandler* hand
     m_monitor = m_plugin->monitor(m_sharedId, m_url, m_auth);
     if (!m_monitor)
         return Error::unknownError;
-
-    m_handler = handler;
 
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();

@@ -17,8 +17,8 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 
 #include <nx/fusion/model_functions.h>
 

@@ -5,7 +5,7 @@
 
 #include <nx/network/nettools.h>
 
-#include <plugins/resource/test_camera/testcamera_const.h>
+#include <core/resource/test_camera/testcamera_const.h>
 #include "test_camera_processor.h"
 
 int MEDIA_PORT = 4985;
@@ -77,7 +77,7 @@ protected:
                 m_allowedIpRanges.begin(),
                 m_allowedIpRanges.end(),
                 [v4Addr](const IpRangeV4& range)
-                { 
+                {
                     return range.contains(v4Addr);
                 });
         };

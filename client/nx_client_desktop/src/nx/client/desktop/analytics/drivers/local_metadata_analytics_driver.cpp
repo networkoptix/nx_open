@@ -2,7 +2,7 @@
 
 #include <QtCore/QFileInfo>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 

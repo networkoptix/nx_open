@@ -16,9 +16,9 @@
 #include <nx/utils/log/log.h>
 #include <utils/math/math.h>
 #include "recorder/file_deletor.h"
-#include "plugins/resource/avi/avi_archive_delegate.h"
+#include "core/resource/avi/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
-#include "plugins/resource/avi/avi_resource.h"
+#include "core/resource/avi/avi_resource.h"
 #include "nx/streaming/archive_stream_reader.h"
 #include <QtCore/QDebug>
 #include "recording_manager.h"

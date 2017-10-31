@@ -14,18 +14,33 @@ namespace api {
 /**
  * Description of the analytics driver, which can generate different events.
  */
-
 struct AnalyticsDriverManifestBase
 {
+    Q_GADGET
+    Q_ENUMS(Capability)
+    Q_FLAGS(Capabilities)
+
+public:
+    enum Capability
+    {
+        noCapabilities = 0,
+        needDeepCopyForMediaFrame = 0x1
+    };
+    Q_DECLARE_FLAGS(Capabilities, Capability)
+
     QnUuid driverId;
     TranslatableString driverName;
     QStringList acceptedDataTypes;
     QStringList supportedCodecs;
     QStringList supportedHandleTypes;
     QStringList supportedPixelFormats;
+    Capabilities capabilities;
 };
+Q_DECLARE_OPERATORS_FOR_FLAGS(AnalyticsDriverManifestBase::Capabilities)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
+
 #define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)(supportedCodecs)\
-    (supportedHandleTypes)(supportedPixelFormats)
+    (supportedHandleTypes)(supportedPixelFormats)(capabilities)
 
 struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
@@ -37,4 +52,3 @@ QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 
 } // namespace api
 } // namespace nx
-

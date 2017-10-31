@@ -39,7 +39,7 @@ extern "C"
 #include <providers/live_stream_provider.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
-#include <plugins/resource/avi/thumbnails_stream_reader.h>
+#include <core/resource/avi/thumbnails_stream_reader.h>
 #include <rtsp/rtsp_encoder.h>
 #include <rtsp/rtsp_h264_encoder.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
@@ -58,7 +58,7 @@ extern "C"
 #include <nx/utils/random.h>
 #include <nx/fusion/serialization/lexical_enum.h>
 #include <media_server/media_server_module.h>
-#include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <core/resource/avi/thumbnails_archive_delegate.h>
 
 class QnTcpListener;
 

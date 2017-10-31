@@ -13,7 +13,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include <nx/streaming/abstract_data_packet.h>
-#include <plugins/storage/memory/ext_iodevice_storage.h>
+#include <core/storage/memory/ext_iodevice_storage.h>
 #include <utils/common/adaptive_sleep.h>
 #include <nx/utils/thread/long_runnable.h>
 

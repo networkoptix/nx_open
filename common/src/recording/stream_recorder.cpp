@@ -16,7 +16,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/config.h>
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <nx/streaming/archive_stream_reader.h>
 
 #include "transcoding/ffmpeg_audio_transcoder.h"

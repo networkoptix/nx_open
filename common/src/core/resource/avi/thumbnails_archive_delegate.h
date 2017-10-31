@@ -1,7 +1,6 @@
-#ifndef __THUMBNAILS_ARCHIVE_DELEGATE_H
-#define __THUMBNAILS_ARCHIVE_DELEGATE_H
+#pragma once
 
-#include "avi_archive_delegate.h"
+#include <core/resource/avi/avi_archive_delegate.h>
 
 class QnThumbnailsArchiveDelegate: public QnAbstractArchiveDelegate
 {
@@ -35,5 +34,3 @@ private:
 };
 
 typedef QSharedPointer<QnThumbnailsArchiveDelegate> QnThumbnailsArchiveDelegatePtr;
-
-#endif

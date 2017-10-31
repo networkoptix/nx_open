@@ -1,6 +1,6 @@
 #include "nov_archive_delegate.h"
 
-#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include <core/storage/file_storage/layout_storage_resource.h>
 #include <utils/common/util.h>
 
 QnNovArchiveDelegate::QnNovArchiveDelegate():
@@ -43,7 +43,7 @@ qint64 QnNovArchiveDelegate::seek(qint64 time, bool findIFrame)
 
 QnAbstractMediaDataPtr QnNovArchiveDelegate::getNextData()
 {
-    while (1) 
+    while (1)
     {
         QnAbstractMediaDataPtr data = QnAviArchiveDelegate::getNextData();
 

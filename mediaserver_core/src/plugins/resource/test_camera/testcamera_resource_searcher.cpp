@@ -5,7 +5,7 @@
 #include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include <plugins/resource/test_camera/testcamera_const.h>
+#include <core/resource/test_camera/testcamera_const.h>
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 

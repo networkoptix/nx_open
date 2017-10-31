@@ -113,7 +113,8 @@ const char* StubMetadataPlugin::capabilitiesManifest(Error* error) const
                     }
                 }
             }
-        ]
+        ],
+        "options": "needDeepCopyForMediaFrame"
     }
     )manifest";
 }

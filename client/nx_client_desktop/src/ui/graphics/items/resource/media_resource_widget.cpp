@@ -111,7 +111,7 @@
 #include <api/common_message_processor.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <utils/media/sse_helper.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 using namespace nx;
 using namespace client::desktop::ui;

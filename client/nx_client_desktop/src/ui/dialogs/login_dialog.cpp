@@ -37,9 +37,9 @@
 #include <utils/common/util.h>
 #include <utils/connection_diagnostics_helper.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
-#include <plugins/resource/avi/filetypesupport.h>
+#include <core/resource/avi/filetypesupport.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/connection_name_dialog.h>

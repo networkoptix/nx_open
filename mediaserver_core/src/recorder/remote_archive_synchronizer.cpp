@@ -14,9 +14,9 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/dummy_resource.h>
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <plugins/utils/avi_motion_archive_delegate.h>
-#include <plugins/storage/memory/ext_iodevice_storage.h>
+#include <core/storage/memory/ext_iodevice_storage.h>
 #include <plugins/utils/avi_motion_archive_delegate.h>
 
 #include <nx/utils/log/log.h>

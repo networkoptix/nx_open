@@ -25,8 +25,8 @@ extern "C"
 #include <nx/streaming/config.h>
 #include <core/ptz/media_dewarping_params.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <motion/light_motion_archive_connection.h>
 #include <export/sign_helper.h>

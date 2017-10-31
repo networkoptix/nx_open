@@ -10,7 +10,7 @@
 #include <QtCore/QBuffer>
 
 #include <core/resource/resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 #include <nx_speech_synthesizer/text_to_wav.h>
 #include <camera/audio_stream_display.h>

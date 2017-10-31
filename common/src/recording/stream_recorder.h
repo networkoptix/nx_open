@@ -33,7 +33,7 @@ extern "C"
 #include <recording/stream_recorder_data.h>
 
 #include <common/common_module_aware.h>
-#include <plugins/resource/avi/avi_archive_metadata.h>
+#include <core/resource/avi/avi_archive_metadata.h>
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;

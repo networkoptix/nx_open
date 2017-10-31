@@ -2,7 +2,7 @@
 
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <recording/time_period_list.h>
-#include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <core/resource/avi/thumbnails_archive_delegate.h>
 
 #if defined(ENABLE_HANWHA)
 

@@ -66,8 +66,8 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
-#include <plugins/storage/file_storage/qtfile_storage_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/qtfile_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
