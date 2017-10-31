@@ -394,8 +394,11 @@ angular.module('nxCommon')
                     }
 
                     if(mouseOverElements.leftMarker || mouseOverElements.rightMarker){
-                        scope.scaleManager.setAnchorDateAndPoint(scope.scaleManager.playedPosition, 0.5);
-                        timelineActions.delayWatchingPlayingPosition();
+                        var sM = scope.scaleManager;
+                        var date = sM.playedPosition;
+                        var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart)/2;
+                        var relativeSizeOfTimeLine = (sM.end - sM.visibleEnd) - (sM.start - sM.visibleStart);
+                        timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, true);
                     }
                 }
                 function viewportClick(event){

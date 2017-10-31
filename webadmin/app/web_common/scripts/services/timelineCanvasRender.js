@@ -844,11 +844,11 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         var bottom = Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height) -
                      timelineConfig.scrollBarTopPadding * self.canvas.height;
-        var scrollCooridnate = (date - self.scaleManager.start)/(self.scaleManager.end - self.scaleManager.start) * self.canvas.width;
+        var scrollCoordinate = (date - self.scaleManager.start)/(self.scaleManager.end - self.scaleManager.start) * self.canvas.width;
 
         context.beginPath();
-        context.moveTo(0.5 + scrollCooridnate, bottom);
-        context.lineTo(0.5 + scrollCooridnate, self.canvas.height);
+        context.moveTo(0.5 + scrollCoordinate, bottom);
+        context.lineTo(0.5 + scrollCoordinate, self.canvas.height);
         context.stroke();
     }
 
