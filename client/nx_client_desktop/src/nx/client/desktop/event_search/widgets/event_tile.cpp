@@ -102,6 +102,20 @@ QnUuid EventTile::id() const
     return m_id;
 }
 
+bool EventTile::closeable() const
+{
+    return m_closeable;
+}
+
+void EventTile::setCloseable(bool value)
+{
+    if (m_closeable == value)
+        return;
+
+    m_closeable = value;
+    handleHoverChanged(m_closeable && underMouse());
+}
+
 QString EventTile::title() const
 {
     return ui->nameLabel->text();
@@ -204,17 +218,15 @@ bool EventTile::event(QEvent* event)
     {
         case QEvent::Enter:
         case QEvent::HoverEnter:
-            ui->timestampLabel->setHidden(true);
-            m_closeButton->setHidden(false);
+            handleHoverChanged(true);
             break;
 
         case QEvent::Leave:
         case QEvent::HoverLeave:
-            ui->timestampLabel->setHidden(false);
-            m_closeButton->setHidden(true);
+            handleHoverChanged(false);
             break;
 
-        case QEvent::MouseButtonPress:base_type::event(event);
+        case QEvent::MouseButtonPress:
             base_type::event(event);
             event->accept();
             return true;
@@ -228,6 +240,13 @@ bool EventTile::event(QEvent* event)
     }
 
     return base_type::event(event);
+}
+
+void EventTile::handleHoverChanged(bool hovered)
+{
+    const auto showCloseButton = hovered & m_closeable;
+    ui->timestampLabel->setHidden(showCloseButton);
+    m_closeButton->setVisible(showCloseButton);
 }
 
 } // namespace

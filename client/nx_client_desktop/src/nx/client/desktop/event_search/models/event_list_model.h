@@ -32,6 +32,7 @@ public:
         qint64 timestamp = 0;
         QPixmap icon;
         QColor titleColor;
+        bool removable = false;
         int helpId = -1;
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;

@@ -292,6 +292,7 @@ namespace Qn
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
         DescriptionTextRole,                        /**< Role for generic description text (QString). */
         ActionParametersRole,                       /**< Role for action parameters (ui::action::Parameters). */
+        RemovableRole,                              /**< An item is removable (bool). */
 
         RoleCount
     };

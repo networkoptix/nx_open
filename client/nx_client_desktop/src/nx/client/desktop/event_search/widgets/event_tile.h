@@ -21,6 +21,7 @@ class EventTile: public Customized<QWidget>
 {
     Q_OBJECT
     Q_PROPERTY(QnUuid id READ id)
+    Q_PROPERTY(bool closeable READ closeable WRITE setCloseable)
     Q_PROPERTY(QString title READ title WRITE setTitle)
     Q_PROPERTY(QColor titleColor READ titleColor WRITE setTitleColor)
     Q_PROPERTY(QString description READ description WRITE setDescription)
@@ -43,6 +44,9 @@ public:
     virtual ~EventTile() override;
 
     QnUuid id() const;
+
+    bool closeable() const;
+    void setCloseable(bool value);
 
     QString title() const;
     void setTitle(const QString& value);
@@ -78,9 +82,13 @@ protected:
     virtual bool event(QEvent* event) override;
 
 private:
+    void handleHoverChanged(bool hovered);
+
+private:
     QScopedPointer<Ui::EventTile> ui;
     QPushButton* const m_closeButton = nullptr;
     QnUuid m_id;
+    bool m_closeable = false;
 };
 
 } // namespace

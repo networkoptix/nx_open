@@ -220,6 +220,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setTimestamp(index.data(Qn::TimestampTextRole).toString());
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
     tile->setToolTip(index.data(Qt::ToolTipRole).toString());
+    tile->setCloseable(index.data(Qn::RemovableRole).toBool());
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
 

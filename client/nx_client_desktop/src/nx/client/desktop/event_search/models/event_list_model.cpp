@@ -72,6 +72,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::ResourceSearchStringRole:
             return lit("%1 %2").arg(event.title).arg(event.description);
 
+        case Qn::RemovableRole:
+            return event.removable;
+
         default:
             return QVariant();
     }

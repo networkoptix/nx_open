@@ -77,6 +77,7 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
     eventData.title = messageText;
     eventData.toolTip = QnSystemHealthStringsHelper::messageTooltip(message, resourceName);
     eventData.helpId = QnBusiness::healthHelpId(message);
+    eventData.removable = true;
 
     eventData.titleColor = QnNotificationLevel::notificationColor(
         QnNotificationLevel::valueOf(message));
@@ -132,7 +133,7 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
         {
             eventData.icon = qnSkin->pixmap("cloud/cloud_20.png");
             eventData.actionId = action::PreferencesCloudTabAction;
-            // TODO: #vkutin Restore functionality.
+            // TODO: FIXME: #vkutin Restore functionality.
             /*
             const auto hideCloudPromoNextRun =
                 [this]
