@@ -253,6 +253,7 @@ private slots:
 
 private:
     void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleDewarpingParamsChanged();
 
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
@@ -310,7 +311,11 @@ private:
         QnUuid overlayItemId;
     };
 
+    void initRenderer();
     void initSoftwareTriggers();
+    void initIoModuleOverlay();
+    void initIconButton();
+    void initStatusOverlayController();
 
     SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
@@ -349,7 +354,7 @@ private:
     QnResourceDisplayPtr m_display;
 
     /** Associated renderer. */
-    QnResourceWidgetRenderer *m_renderer;
+    QnResourceWidgetRenderer* m_renderer = nullptr;
 
     /** Selected region for search-by-motion, in parrots. */
     QList<QRegion> m_motionSelection;
@@ -363,36 +368,35 @@ private:
     mutable QList<QnMotionRegion> m_motionSensitivity;
 
     /** Whether the motion sensitivity is valid. */
-    mutable bool m_motionSensitivityValid;
+    mutable bool m_motionSensitivityValid = false;
 
     /** Binary mask for the current motion region. */
     mutable QList<simd128i *> m_binaryMotionMask;
 
     /** Whether motion mask binary data is valid. */
-    mutable bool m_binaryMotionMaskValid;
+    mutable bool m_binaryMotionMaskValid = false;
 
     /** Whether motion selection cached paths are valid. */
-    mutable bool m_motionSelectionCacheValid;
+    mutable bool m_motionSelectionCacheValid = false;
 
     /** Position for text labels for all motion sensitivity regions. */
     /*   m_motionLabelPositions[channel][sensitivity][polygonIndex]  */
     mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>> m_motionLabelPositions;
 
     /** Whether motion label positions data is valid. */
-    mutable bool m_motionLabelPositionsValid;
+    mutable bool m_motionLabelPositionsValid = false;
 
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
     QnPtzControllerPtr m_ptzController;
-    QnFisheyeHomePtzController *m_homePtzController;
+    QnFisheyeHomePtzController* m_homePtzController = nullptr;
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
-    bool m_ioCouldBeShown;
+    QnIoModuleOverlayWidget* m_ioModuleOverlayWidget = nullptr;
+    bool m_ioCouldBeShown = false;
 
-    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
-    QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+    QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseStatusHelper;
 
     qint64 m_posUtcMs;
 

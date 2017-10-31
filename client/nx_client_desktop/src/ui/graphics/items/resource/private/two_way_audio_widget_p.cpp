@@ -266,7 +266,7 @@ void QnTwoWayAudioWidgetPrivate::updateCamera(const QnVirtualCameraResourcePtr& 
 
     /* If the given camera is I/O Module, then the license is required. */
     if (camera && m_camera->isIOModule())
-        m_licenseHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
+        m_licenseHelper.reset(new QnSingleCamLicenseStatusHelper(m_camera));
     else
         m_licenseHelper.reset();
 
@@ -285,7 +285,10 @@ void QnTwoWayAudioWidgetPrivate::updateCamera(const QnVirtualCameraResourcePtr& 
     if (camera)
         connect(camera, &QnResource::statusChanged, this, updateState);
     if (m_licenseHelper)
-        connect(m_licenseHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this, updateState);
+    {
+        connect(m_licenseHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged, this,
+            updateState);
+    }
 
     updateState();
 }
@@ -301,7 +304,7 @@ bool QnTwoWayAudioWidgetPrivate::isAllowed() const
 
     /* Check if we are require licenses for two-way audio. */
     if (m_licenseHelper)
-        return m_licenseHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed;
+        return m_licenseHelper->status() == QnSingleCamLicenseStatusHelper::LicenseStatus::used;
 
     return true;
 }
