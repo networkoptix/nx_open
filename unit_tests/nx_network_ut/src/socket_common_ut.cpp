@@ -1,5 +1,6 @@
 #ifdef _WIN32
 #include <Winsock2.h>
+#include <Ws2tcpip.h>
 typedef ULONG in_addr_t;
 #endif
 

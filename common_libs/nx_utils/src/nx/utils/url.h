@@ -10,7 +10,7 @@ namespace nx {
 namespace utils {
 
 
-class Url
+class NX_UTILS_API Url
 {
 public:
     Url();
@@ -18,7 +18,7 @@ public:
     Url& operator=(const QString& url);
 
     Url(const Url& /*other*/) = default;
-    Url& operator=(const Url& /*other*/) = default;    
+    Url& operator=(const Url& /*other*/) = default;
 
     Url(Url&& /*other*/) = default;
     Url& operator=(Url&& /*other*/) = default;
@@ -43,8 +43,8 @@ public:
     static Url fromEncoded(const QByteArray &url, QUrl::ParsingMode mode = QUrl::TolerantMode);
     static Url fromUserInput(const QString &userInput);
     static Url fromUserInput(
-        const QString &userInput, 
-        const QString &workingDirectory, 
+        const QString &userInput,
+        const QString &workingDirectory,
         QUrl::UserInputResolutionOptions options = QUrl::DefaultResolution);
 
     bool isValid() const;
