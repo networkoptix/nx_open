@@ -178,33 +178,32 @@ private:
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
 
-class QnSingleCamLicenceStatusHelper: public Connective<QObject>
+class QnSingleCamLicenseStatusHelper: public Connective<QObject>
 {
     Q_OBJECT
+    using base_type = Connective<QObject>;
 
 public:
-    enum CameraLicenseStatus
+    enum class LicenseStatus
     {
-        InvalidSource
-        , LicenseNotUsed
-        , LicenseOverflow
-        , LicenseUsed
+        invalid,
+        notUsed,
+        overflow,
+        used
     };
 
-    QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera);
+    explicit QnSingleCamLicenseStatusHelper(const QnVirtualCameraResourcePtr &camera,
+        QObject* parent = nullptr);
+    virtual ~QnSingleCamLicenseStatusHelper();
 
-    virtual ~QnSingleCamLicenceStatusHelper();
-
-    CameraLicenseStatus status();
+    LicenseStatus status() const;
 
 signals:
-    void licenceStatusChanged();
+    void licenseStatusChanged();
 
 private:
-    typedef QScopedPointer<QnCamLicenseUsageHelper> QnCamLicenseUsageHelperPtr;
-
     const QnVirtualCameraResourcePtr m_camera;
-    QnCamLicenseUsageHelperPtr m_helper;
+    QScopedPointer<QnCamLicenseUsageHelper> m_helper;
 };
 
 class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher

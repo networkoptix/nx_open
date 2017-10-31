@@ -276,60 +276,49 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     base_type(context, item, parent),
     m_resource(base_type::resource().dynamicCast<QnMediaResource>()),
     m_camera(base_type::resource().dynamicCast<QnVirtualCameraResource>()),
-    m_display(nullptr),
-    m_renderer(nullptr),
-    m_motionSelection(),
-    m_motionSelectionPathCache(),
-    m_paintedChannels(),
-    m_motionSensitivity(),
-    m_motionSensitivityValid(false),
-    m_binaryMotionMask(),
-    m_binaryMotionMaskValid(false),
-    m_motionSelectionCacheValid(false),
-    m_motionLabelPositionsValid(false),
-    m_sensStaticText(),
-    m_ptzController(nullptr),
-    m_homePtzController(nullptr),
-    m_dewarpingParams(),
-    m_ioModuleOverlayWidget(nullptr),
-    m_ioCouldBeShown(false),
-    m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
     m_posUtcMs(DATETIME_INVALID),
     m_itemId(item->uuid())
 {
     NX_ASSERT(m_resource, "Media resource widget was created with a non-media resource.");
 
     setupHud();
+    initRenderer();
 
-    // TODO: #Elric
-    // Strictly speaking, this is a hack.
-    // We shouldn't be using OpenGL context in class constructor.
-    QGraphicsView *view = QnWorkbenchContextAware::display()->view();
-    const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
-    m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
-    connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
-        &QnMediaResourceWidget::updateAspectRatio);
     connect(base_type::resource(), &QnResource::propertyChanged, this,
         &QnMediaResourceWidget::at_resource_propertyChanged);
     connect(base_type::resource(), &QnResource::mediaDewarpingParamsChanged, this,
-        &QnMediaResourceWidget::updateDewarpingParams);
+        &QnMediaResourceWidget::handleDewarpingParamsChanged);
+    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
+        &QnMediaResourceWidget::handleDewarpingParamsChanged);
+
     connect(this, &QnResourceWidget::zoomTargetWidgetChanged, this,
         &QnMediaResourceWidget::updateDisplay);
-    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
-        &QnMediaResourceWidget::updateFisheye);
-    connect(item, &QnWorkbenchItem::dewarpingParamsChanged, this,
-        &QnMediaResourceWidget::dewarpingParamsChanged);
+
     connect(item, &QnWorkbenchItem::imageEnhancementChanged, this,
         &QnMediaResourceWidget::at_item_imageEnhancementChanged);
-    connect(this, &QnMediaResourceWidget::dewarpingParamsChanged, this,
-        &QnMediaResourceWidget::updateFisheye);
+
     connect(this, &QnResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::updateFisheye);
-    connect(this, &QnMediaResourceWidget::dewarpingParamsChanged, this,
-        &QnMediaResourceWidget::updateButtonsVisibility);
+
     if (m_camera)
+    {
         connect(m_camera, &QnVirtualCameraResource::motionRegionChanged, this,
             &QnMediaResourceWidget::invalidateMotionSensitivity);
+
+        m_licenseStatusHelper.reset(new QnSingleCamLicenseStatusHelper(m_camera));
+
+        connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
+            this,
+            [this]
+            {
+                const bool animate = animationAllowed();
+                updateIoModuleVisibility(animate);
+                updateStatusOverlay(animate);
+                updateOverlayButton();
+                updateButtonsVisibility();
+            });
+    }
+
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
@@ -366,84 +355,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
     /* Set up overlays */
-    if (m_camera && m_camera->hasFlags(Qn::io_module))
-    {
-        // TODO: #vkutin #gdm #common Make a style metric that holds this value.
-        auto topMargin = titleBar()
-            ? titleBar()->leftButtonsBar()->uniformButtonSize().height()
-            : 0.0;
-
-        m_ioLicenceStatusHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
-        m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
-        m_ioModuleOverlayWidget->setIOModule(m_camera);
-        m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
-        m_ioModuleOverlayWidget->setUserInputEnabled(accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
-        m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
-        addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
-
-        connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged,
-            this,
-            [this]
-            {
-                updateIoModuleVisibility(animationAllowed());
-            });
-
-        updateButtonsVisibility();
-        updateIoModuleVisibility(false);
-    }
-
+    initIoModuleOverlay();
     ensureTwoWayAudioWidget();
 
     /* Set up buttons. */
     createButtons();
-
-    if (m_camera)
-    {
-        QTimer *timer = new QTimer(this);
-
-        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateIconButton);
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(),
-            &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera, &QnResource::statusChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-
-        if (m_camera->hasFlags(Qn::io_module))
-        {
-            connect(m_camera, &QnResource::statusChanged, this,
-                [this]
-                {
-                    updateIoModuleVisibility(animationAllowed());
-                });
-        }
-
-        connect(m_camera, &QnSecurityCamResource::scheduleTasksChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-        timer->start(1000 * 60); /* Update icon button every minute. */
-
-        const auto controller = statusOverlayController();
-        connect(controller, &QnStatusOverlayController::buttonClicked, this,
-            [this](Qn::ResourceOverlayButton button)
-            {
-                switch (button)
-                {
-                    case Qn::ResourceOverlayButton::Diagnostics:
-                        processDiagnosticsRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::IoEnable:
-                        processIoEnableRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::Settings:
-                        processSettingsRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::MoreLicenses:
-                        processMoreLicensesRequest();
-                        break;
-                    default:
-                        break;
-                }
-            });
-    }
+    initIconButton();
+    initStatusOverlayController();
 
     connect(base_type::resource(), &QnResource::resourceChanged, this,
         &QnMediaResourceWidget::updateButtonsVisibility); // TODO: #GDM #Common get rid of resourceChanged
@@ -543,6 +461,25 @@ void QnMediaResourceWidget::handleItemDataChanged(
     }
 }
 
+void QnMediaResourceWidget::handleDewarpingParamsChanged()
+{
+    updateFisheye();
+    updateButtonsVisibility();
+    emit dewarpingParamsChanged();
+}
+
+void QnMediaResourceWidget::initRenderer()
+{
+    // TODO: #Elric
+    // Strictly speaking, this is a hack.
+    // We shouldn't be using OpenGL context in class constructor.
+    QGraphicsView *view = QnWorkbenchContextAware::display()->view();
+    const auto viewport = qobject_cast<const QGLWidget*>(view ? view->viewport() : nullptr);
+    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
+    connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
+        &QnMediaResourceWidget::updateAspectRatio);
+}
+
 void QnMediaResourceWidget::initSoftwareTriggers()
 {
     if (!display()->camDisplay()->isRealTimeSource())
@@ -570,6 +507,82 @@ void QnMediaResourceWidget::initSoftwareTriggers()
 
     connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
+}
+
+void QnMediaResourceWidget::initIoModuleOverlay()
+{
+    if (m_camera && m_camera->hasFlags(Qn::io_module))
+    {
+        // TODO: #vkutin #gdm #common Make a style metric that holds this value.
+        const auto topMargin = titleBar()
+            ? titleBar()->leftButtonsBar()->uniformButtonSize().height()
+            : 0.0;
+
+        m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
+        m_ioModuleOverlayWidget->setIOModule(m_camera);
+        m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+        m_ioModuleOverlayWidget->setUserInputEnabled(
+            accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
+        m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
+        addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
+
+        updateButtonsVisibility();
+        updateIoModuleVisibility(false);
+
+        connect(m_camera, &QnResource::statusChanged, this,
+            [this]
+            {
+                updateIoModuleVisibility(animationAllowed());
+            });
+    }
+}
+
+void QnMediaResourceWidget::initIconButton()
+{
+    if (m_camera)
+    {
+        auto timer = new QTimer(this);
+
+        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateIconButton);
+        connect(context()->instance<QnWorkbenchServerTimeWatcher>(),
+            &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
+            &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera, &QnResource::statusChanged, this,
+            &QnMediaResourceWidget::updateIconButton);
+
+        connect(m_camera, &QnSecurityCamResource::scheduleTasksChanged, this,
+            &QnMediaResourceWidget::updateIconButton);
+        timer->start(1000 * 60); /* Update icon button every minute. */
+    }
+}
+
+void QnMediaResourceWidget::initStatusOverlayController()
+{
+    if (m_camera)
+    {
+        const auto controller = statusOverlayController();
+        connect(controller, &QnStatusOverlayController::buttonClicked, this,
+            [this](Qn::ResourceOverlayButton button)
+            {
+                switch (button)
+                {
+                    case Qn::ResourceOverlayButton::Diagnostics:
+                        processDiagnosticsRequest();
+                        break;
+                    case Qn::ResourceOverlayButton::IoEnable:
+                        processIoEnableRequest();
+                        break;
+                    case Qn::ResourceOverlayButton::Settings:
+                        processSettingsRequest();
+                        break;
+                    case Qn::ResourceOverlayButton::MoreLicenses:
+                        processMoreLicensesRequest();
+                        break;
+                    default:
+                        break;
+                }
+            });
+    }
 }
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
@@ -1706,8 +1719,7 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     if (m_dewarpingParams == params)
         return;
     m_dewarpingParams = params;
-
-    emit dewarpingParamsChanged();
+    handleDewarpingParamsChanged();
 }
 
 // -------------------------------------------------------------------------- //
@@ -2046,7 +2058,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
 
-        if (m_ioLicenceStatusHelper->status() != QnSingleCamLicenceStatusHelper::LicenseUsed)
+        if (m_licenseStatusHelper->status() != QnSingleCamLicenseStatusHelper::LicenseStatus::used)
             return Qn::IoModuleDisabledOverlay;
     }
 
@@ -2073,11 +2085,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (states.isUnauthorized)
         return Qn::UnauthorizedOverlay;
 
-    if (m_camera && m_camera->isDtsBased() && !m_camera->isLicenseUsed())
+    // Footage browsing is forbidden for NVRs without license. Live video is forbidden for VMAX.
+    if (m_camera
+        && m_camera->isDtsBased()
+        && m_licenseStatusHelper->status() != QnSingleCamLicenseStatusHelper::LicenseStatus::used)
     {
-        bool isLive = m_display->camDisplay()->isRealTimeSource();
-        bool canViewWithoutLicense = m_camera->licenseType() == Qn::LC_Bridge && isLive;
-        if (!canViewWithoutLicense)
+        if (!states.isRealTimeSource || m_camera->licenseType() != Qn::LC_Bridge)
             return Qn::AnalogWithoutLicenseOverlay;
     }
 
@@ -2121,18 +2134,18 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     switch (statusOverlay)
     {
         case Qn::IoModuleDisabledOverlay:
+        case Qn::AnalogWithoutLicenseOverlay:
         {
-            NX_ASSERT(m_ioLicenceStatusHelper, Q_FUNC_INFO,
-                "Query I/O status overlay for resource widget which is not containing I/O module");
+            NX_ASSERT(m_licenseStatusHelper, Q_FUNC_INFO, "Invalid local video status");
 
-            if (m_ioLicenceStatusHelper && canChangeSettings)
+            if (m_licenseStatusHelper && canChangeSettings)
             {
-                switch (m_ioLicenceStatusHelper->status())
+                switch (m_licenseStatusHelper->status())
                 {
-                    case QnSingleCamLicenceStatusHelper::LicenseNotUsed:
+                    case QnSingleCamLicenseStatusHelper::LicenseStatus::notUsed:
                         return Qn::ResourceOverlayButton::IoEnable;
 
-                    case QnSingleCamLicenceStatusHelper::LicenseOverflow:
+                    case QnSingleCamLicenseStatusHelper::LicenseStatus::overflow:
                         return Qn::ResourceOverlayButton::MoreLicenses;
                     default:
                         break;
@@ -2396,20 +2409,18 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
 {
-    NX_ASSERT(m_camera && m_camera->hasFlags(Qn::io_module) && m_ioLicenceStatusHelper,
-        Q_FUNC_INFO, "updateIoModuleVisibility should be called only for I/O modules");
-
-    if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
+    if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_licenseStatusHelper)
         return;
 
     const QnImageButtonWidget * const button = titleBar()->rightButtonsBar()->button(Qn::IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = !hasVideo();
-    const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
+    const bool correctLicenseStatus =
+        (m_licenseStatusHelper->status() == QnSingleCamLicenseStatusHelper::LicenseStatus::used);
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
 
-    m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenceStatus);
+    m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenseStatus);
     const ResourceStates states = getResourceStates();
     const bool correctState = (!states.isOffline && !states.isUnauthorized && states.isRealTimeSource);
     const OverlayVisibility visibility = (m_ioCouldBeShown && correctState ? Visible : Invisible);
@@ -2432,14 +2443,14 @@ void QnMediaResourceWidget::processIoEnableRequest()
 {
     context()->statisticsModule()->registerClick(lit("resource_status_overlay_io_enable"));
 
-    NX_ASSERT(m_ioLicenceStatusHelper, Q_FUNC_INFO,
+    NX_ASSERT(m_licenseStatusHelper, Q_FUNC_INFO,
         "at_statusOverlayWidget_ioEnableRequested could not be processed for non-I/O modules");
 
-    if (!m_ioLicenceStatusHelper)
+    if (!m_licenseStatusHelper)
         return;
 
-    const auto licenceStatus = m_ioLicenceStatusHelper->status();
-    if (licenceStatus != QnSingleCamLicenceStatusHelper::LicenseNotUsed)
+    const auto licenseStatus = m_licenseStatusHelper->status();
+    if (licenseStatus != QnSingleCamLicenseStatusHelper::LicenseStatus::notUsed)
         return;
 
     qnResourcesChangesManager->saveCamera(m_camera,
