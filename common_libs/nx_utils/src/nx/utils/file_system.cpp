@@ -1,5 +1,6 @@
 #include <array>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
 #include "file_system.h"
 
 #if defined(Q_OS_UNIX)
@@ -211,7 +212,7 @@ QString applicationFileNameInternal(const QString& /*defaultFileName*/)
 
 namespace {
 
-class WinDrivesInfoFetcher
+class WindowsDrivesInfoFetcher
 {
 public:
     WinDriveInfoList getInfoList();
@@ -220,8 +221,8 @@ public:
 
 private:
     WinDriveInfoList m_infoList;
-    std::array<TCHAR, 512> m_driveNamesBuf;
-    const TCHAR* m_bufPtr = nullptr;
+    std::array<WCHAR, 512> m_driveNamesBuf;
+    const WCHAR* m_bufPtr = nullptr;
 
     bool fillDriveNamesBuf();
     bool getNextDriveString(QString* driveString);
@@ -229,7 +230,7 @@ private:
     void addRemovableDrive(HANDLE driveHandle, WinDriveInfo* driveInfo);
 };
 
-WinDriveInfoList WinDrivesInfoFetcher::getInfoList()
+WinDriveInfoList WindowsDrivesInfoFetcher::getInfoList()
 {
     m_infoList.clear();
     if (!fillDriveNamesBuf())
@@ -242,16 +243,19 @@ WinDriveInfoList WinDrivesInfoFetcher::getInfoList()
     return m_infoList;
 }
 
-bool WinDrivesInfoFetcher::fillDriveNamesBuf()
+bool WindowsDrivesInfoFetcher::fillDriveNamesBuf()
 {
-    if (!GetLogicalDriveStrings(m_driveNamesBuf.size(), m_driveNamesBuf.data()))
+    if (!GetLogicalDriveStringsW(m_driveNamesBuf.size(), m_driveNamesBuf.data()))
+    {
+        NX_ERROR(this, "GetLogicalDriveStringsW failed");
         return false;
+    }
 
     m_bufPtr = m_driveNamesBuf.data();
     return true;
 }
 
-bool WinDrivesInfoFetcher::getNextDriveString(QString* driveString)
+bool WindowsDrivesInfoFetcher::getNextDriveString(QString* driveString)
 {
     if (*m_bufPtr == L'\0')
         return false;
@@ -262,13 +266,16 @@ bool WinDrivesInfoFetcher::getNextDriveString(QString* driveString)
     return true;
 }
 
-void WinDrivesInfoFetcher::processDrive(const QString& driveName)
+void WindowsDrivesInfoFetcher::processDrive(const QString& driveName)
 {
     WinDriveInfo driveInfo;
     driveInfo.path = driveName;
     auto driveHandle = driveHandleByString(driveName);
     if (driveHandle == INVALID_HANDLE_VALUE)
+    {
+        NX_ERROR(this, lm("Failed to get handle for the drive %1").args(driveName));
         return;
+    }
 
     auto fileHandleGuard = makeScopeGuard([driveHandle]() { CloseHandle(driveHandle); });
 
@@ -281,7 +288,7 @@ void WinDrivesInfoFetcher::processDrive(const QString& driveName)
     m_infoList.append(driveInfo);
 }
 
-void WinDrivesInfoFetcher::addRemovableDrive(HANDLE driveHandle, WinDriveInfo* driveInfo)
+void WindowsDrivesInfoFetcher::addRemovableDrive(HANDLE driveHandle, WinDriveInfo* driveInfo)
 {
     if (!mediaIsInserted(driveHandle))
         return;
@@ -300,7 +307,7 @@ void WinDrivesInfoFetcher::addRemovableDrive(HANDLE driveHandle, WinDriveInfo* d
     m_infoList.append(*driveInfo);
 }
 
-HANDLE WinDrivesInfoFetcher::driveHandleByString(const QString& driveString)
+HANDLE WindowsDrivesInfoFetcher::driveHandleByString(const QString& driveString)
 {
     QString driveSysString = QString(lit("\\\\.\\%1:")).arg(driveString[0]);
 
@@ -314,7 +321,7 @@ HANDLE WinDrivesInfoFetcher::driveHandleByString(const QString& driveString)
         NULL);
 }
 
-bool WinDrivesInfoFetcher::mediaIsInserted(HANDLE driveHandle)
+bool WindowsDrivesInfoFetcher::mediaIsInserted(HANDLE driveHandle)
 {
     DWORD bytesReturned;
     return DeviceIoControl(
@@ -330,11 +337,11 @@ bool WinDrivesInfoFetcher::mediaIsInserted(HANDLE driveHandle)
 
 bool mediaIsInserted(const QString& driveString)
 {
-    auto handle = WinDrivesInfoFetcher::driveHandleByString(driveString);
+    auto handle = WindowsDrivesInfoFetcher::driveHandleByString(driveString);
     if (handle == INVALID_HANDLE_VALUE)
         return false;
 
-    auto result = WinDrivesInfoFetcher::mediaIsInserted(handle);
+    auto result = WindowsDrivesInfoFetcher::mediaIsInserted(handle);
     CloseHandle(handle);
 
     return result;
@@ -342,7 +349,7 @@ bool mediaIsInserted(const QString& driveString)
 
 WinDriveInfoList getWinDrivesInfo()
 {
-    return WinDrivesInfoFetcher().getInfoList();
+    return WindowsDrivesInfoFetcher().getInfoList();
 }
 
 #endif // #ifdef Q_OS_WIN
