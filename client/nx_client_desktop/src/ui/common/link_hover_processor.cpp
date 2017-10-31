@@ -28,10 +28,15 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
 
     updateColors(UpdateTime::Now);
 
-    installEventHandler(m_label, { QEvent::UpdateRequest, QEvent::Show, QEvent::HoverLeave }, this,
-        [this](QObject* object, QEvent* event)
+    const auto handledEvents = {
+        QEvent::UpdateRequest,
+        QEvent::Show,
+        QEvent::HoverLeave,
+        QEvent::MouseButtonRelease };
+
+    installEventHandler(m_label, handledEvents, this,
+        [this](QObject* /*object*/, QEvent* event)
         {
-            Q_UNUSED(object);
             switch (event->type())
             {
                 case QEvent::UpdateRequest:
@@ -44,16 +49,23 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
 
                 case QEvent::HoverLeave:
                 {
-                    /*
-                    * QLabel and underlying QWidgetTextControl handle only MouseMove event.
-                    * So if the mouse leaves control, they don't emit linkHovered(L"").
-                    * Worse, they still consider last hovered link hovered, so if the mouse
-                    * enters control and hovers the link again, they don't emit linkHovered(link)
-                    * To fix that we send fake MouseMove upon leaving the control:
-                    */
+                    // QLabel and underlying QWidgetTextControl handle only MouseMove event.
+                    // So if the mouse leaves control, they don't emit linkHovered(L"").
+                    // Worse, they still consider last hovered link hovered, so if the mouse
+                    // enters control and hovers the link again, they don't emit linkHovered(link)
+                    // To fix that we send fake MouseMove upon leaving the control:
                     const int kFarFarAway = -1.0e8;
                     QMouseEvent kFakeMouseMove(QEvent::MouseMove, QPointF(kFarFarAway, kFarFarAway), Qt::NoButton, 0, 0);
                     QApplication::sendEvent(m_label, &kFakeMouseMove);
+                    break;
+                }
+
+                case QEvent::MouseButtonRelease:
+                {
+                    // QLabel ignores MouseButtonPress events, but keeps MouseButtonRelease events
+                    // accepted if it contains hypertext links. To fix that (parent receiving
+                    // presses but not releases) we need to accept events only if link is hovered.
+                    event->setAccepted(!m_hoveredLink.isEmpty());
                     break;
                 }
 
