@@ -83,7 +83,7 @@ public:
     /*
      * @return Archive delegate. Delegate is used only if StreamChunkCapability is present.
      */
-    virtual QnAbstractArchiveDelegate* archiveDelegate() = 0;
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate() = 0;
 
     /**
      * Removes the specified entry from the device.

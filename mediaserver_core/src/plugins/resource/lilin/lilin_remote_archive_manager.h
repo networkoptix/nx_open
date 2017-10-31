@@ -39,7 +39,7 @@ public:
     virtual void setOnAvailabaleEntriesUpdatedCallback(
         std::function<void(const std::vector<RemoteArchiveEntry>&)> callback) override;
 
-    virtual QnAbstractArchiveDelegate* archiveDelegate() override;
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate() override;
 
     virtual bool fetchArchiveEntry(const QString& entryId, BufferType* outBuffer) override;
 

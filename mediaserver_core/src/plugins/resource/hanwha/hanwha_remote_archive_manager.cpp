@@ -52,7 +52,7 @@ RemoteArchiveCapabilities HanwhaRemoteArchiveManager::capabilities() const
     return RemoteArchiveCapability::RandomAccessChunkCapability;
 }
 
-QnAbstractArchiveDelegate* HanwhaRemoteArchiveManager::archiveDelegate()
+std::unique_ptr<QnAbstractArchiveDelegate> HanwhaRemoteArchiveManager::archiveDelegate()
 {
     return m_resource->remoteArchiveDelegate();
 }

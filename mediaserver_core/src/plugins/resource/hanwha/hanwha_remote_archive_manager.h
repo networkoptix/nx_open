@@ -30,7 +30,7 @@ public:
         const QString& entryId,
         nx::core::resource::BufferType* outBuffer) override;
 
-    virtual QnAbstractArchiveDelegate* archiveDelegate() override;
+    virtual std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate() override;
 
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) override;
 

@@ -23,7 +23,6 @@ static const int kDetailLevelMs = 1;
 RemoteArchiveStreamSynchronizationTask::RemoteArchiveStreamSynchronizationTask(
     QnCommonModule* commonModule)
 {
-
 }
 
 void RemoteArchiveStreamSynchronizationTask::setResource(const QnSecurityCamResourcePtr& resource)
@@ -190,7 +189,7 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
         /*frameStep*/ 1);
 
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(m_resource);
-    m_archiveReader->setArchiveDelegate(archiveDelegate);
+    m_archiveReader->setArchiveDelegate(archiveDelegate.release());
     m_archiveReader->setPlaybackRange(QnTimePeriod(startTime, endTime - startTime));
     m_archiveReader->setRole(Qn::CR_Archive);
 

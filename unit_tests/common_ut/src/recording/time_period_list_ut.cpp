@@ -530,4 +530,26 @@ TEST(QnTimePeriodsListTest, excludePeriodList)
         sourceList2.excludeTimePeriods(excludeList);
         ASSERT_EQ(sourceList2, resultList);
     }
+
+    {
+        QnTimePeriodList sourceList;
+        QnTimePeriodList resultList;
+        QnTimePeriodList excludeList;
+        for (int i = 0; i < 200; i += 10)
+        {
+            if (i < 100)
+            {
+                sourceList << QnTimePeriod(i, 8);
+                excludeList << QnTimePeriod(i + 1, 8);
+                resultList << QnTimePeriod(i, 1);
+            }
+            else
+            {
+                excludeList << QnTimePeriod(i, 8);
+            }
+        }
+
+        sourceList.excludeTimePeriods(excludeList);
+        ASSERT_EQ(sourceList, resultList);
+    }
 }

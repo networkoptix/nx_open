@@ -238,7 +238,7 @@ RemoteArchiveCapabilities LilinRemoteArchiveManager::capabilities() const
     return RemoteArchiveCapability::RemoveChunkCapability;
 }
 
-QnAbstractArchiveDelegate* LilinRemoteArchiveManager::archiveDelegate()
+std::unique_ptr<QnAbstractArchiveDelegate> LilinRemoteArchiveManager::archiveDelegate()
 {
     return nullptr;
 }

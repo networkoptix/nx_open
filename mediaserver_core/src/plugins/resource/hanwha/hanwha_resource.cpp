@@ -25,6 +25,7 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
@@ -579,13 +580,13 @@ QString HanwhaResource::sessionKey(
     return QString();
 }
 
-QnAbstractArchiveDelegate* HanwhaResource::remoteArchiveDelegate()
+std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
 {
-    auto delegate = new HanwhaArchiveDelegate(toSharedPointer(this));
+    auto delegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
     const auto overlappedId = sharedContext()->currentOverlappedId();
     delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
 
-    return delegate;
+    return std::move(delegate);
 }
 
 bool HanwhaResource::isVideoSourceActive()

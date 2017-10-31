@@ -75,7 +75,7 @@ public:
 
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
-    QnAbstractArchiveDelegate* remoteArchiveDelegate();
+    std::unique_ptr<QnAbstractArchiveDelegate> remoteArchiveDelegate();
 
     bool isVideoSourceActive();
 
