@@ -101,6 +101,8 @@ void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
     auto loadChunksUrl = m_resourceContext->url();
     loadChunksUrl.setPath("/stw-cgi/recording.cgi");
 
+    // TODO: Check for 'attributes/Recording/Support/SearchPeriod' and use only if it's supported,
+    // otherwise we have to load all periods constantly and clean them up by timeout.
     QUrlQuery query;
     query.addQueryItem("msubmenu", "searchrecordingperiod");
     query.addQueryItem("action", "view");
