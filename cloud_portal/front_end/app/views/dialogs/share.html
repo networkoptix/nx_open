@@ -16,7 +16,7 @@
                 <label for="role">Permissions</label>
 
                 <select class="form-control" name="role" id="role" ng-model="user.role"
-                        ng-options="option as $root.L.accessRoles[option.name].label for option in accessRoles"></select>
+                        ng-options="option as option.name for option in accessRoles"></select>
 
                 <span class="help-block">
                     {{getRoleDescription()}}
