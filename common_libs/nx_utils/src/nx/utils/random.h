@@ -104,6 +104,12 @@ Type number(
     return distribution(qtDevice());
 }
 
+template<typename Type>
+bool number(typename std::enable_if<std::is_same<Type, bool>::value>::type* = 0)
+{
+    return qtDevice()() > (QtDevice::min() + ((QtDevice::max() - QtDevice::min()) >> 1));
+}
+
 /**
  * Generates uniform_real_distribution random real in [min, max)
  */
