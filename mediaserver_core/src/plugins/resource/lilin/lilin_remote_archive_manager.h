@@ -31,26 +31,20 @@ public:
     explicit LilinRemoteArchiveManager(LilinResource* resource);
     virtual ~LilinRemoteArchiveManager() = default;
 
-    // Implementation of AbstractRemoteArchiveManager::listAvailableArchiveEntries
     virtual bool listAvailableArchiveEntries(
         std::vector<RemoteArchiveEntry>* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
 
-    // Implemantation of AbstractRemoteArchiveManager::setOnAvailableEntriesCallback
     virtual void setOnAvailabaleEntriesUpdatedCallback(
         std::function<void(const std::vector<RemoteArchiveEntry>&)> callback) override;
 
-    // Implemantation of AbstractRemoteArchiveManager::archiveDelegate
     virtual QnAbstractArchiveDelegate* archiveDelegate() override;
 
-    // Implementation of AbstractRemoteArchiveManager::fetchArchiveEntries
     virtual bool fetchArchiveEntry(const QString& entryId, BufferType* outBuffer) override;
 
-    // Implementation of AbstractRemoteArchiveManager::removeArchiveEntry
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) override;
 
-    // Implementation of AbstractRemoteArchiveManager::capabilities
     virtual nx::core::resource::RemoteArchiveCapabilities capabilities() const override;
 
 private:

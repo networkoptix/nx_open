@@ -19,27 +19,21 @@ public:
     HanwhaRemoteArchiveManager(HanwhaResource* resource);
     virtual ~HanwhaRemoteArchiveManager() = default;
 
-    // Implemantation of AbstractRemoteArchiveManager::listAvailableArchiveEntries
     virtual bool listAvailableArchiveEntries(
         std::vector<nx::core::resource::RemoteArchiveChunk>* outArchiveEntries,
         int64_t startTimeMs = 0,
         int64_t endTimeMs = std::numeric_limits<int64_t>::max()) override;
 
-    // Implemantation of AbstractRemoteArchiveManager::setOnAvailableEntriesCallback
     virtual void setOnAvailabaleEntriesUpdatedCallback(EntriesUpdatedCallback callback) override;
 
-    // Implemantation of AbstractRemoteArchiveManager::fetchArchiveEntry
     virtual bool fetchArchiveEntry(
         const QString& entryId,
         nx::core::resource::BufferType* outBuffer) override;
 
-    // Implemantation of AbstractRemoteArchiveManager::archiveDelegate
     virtual QnAbstractArchiveDelegate* archiveDelegate() override;
 
-    // Implemantation of AbstractRemoteArchiveManager::removeArchiveEntries
     virtual bool removeArchiveEntries(const std::vector<QString>& entryIds) override;
 
-    // Implemantation of AbstractRemoteArchiveManager::capabilities
     virtual nx::core::resource::RemoteArchiveCapabilities capabilities() const override;
 
 private:

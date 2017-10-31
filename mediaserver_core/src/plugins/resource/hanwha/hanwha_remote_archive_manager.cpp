@@ -36,13 +36,13 @@ bool HanwhaRemoteArchiveManager::listAvailableArchiveEntries(
 }
 
 bool HanwhaRemoteArchiveManager::fetchArchiveEntry(
-    const QString& entryId,
-    nx::core::resource::BufferType* outBuffer)
+    const QString& /*entryId*/,
+    nx::core::resource::BufferType* /*outBuffer*/)
 {
     return false;
 }
 
-bool HanwhaRemoteArchiveManager::removeArchiveEntries(const std::vector<QString>& entryIds)
+bool HanwhaRemoteArchiveManager::removeArchiveEntries(const std::vector<QString>& /*entryIds*/)
 {
     return false;
 }

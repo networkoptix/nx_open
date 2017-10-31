@@ -9,6 +9,10 @@ namespace nx {
 namespace mediaserver_core {
 namespace recorder {
 
+/*
+ * Synchronization task for resources that are able to provide
+ * fixed archive chunks only.
+ */
 class RemoteArchiveSynchronizationTask:
     public AbstractRemoteArchiveSynchronizationTask
 {
