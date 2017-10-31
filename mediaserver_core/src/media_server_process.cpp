@@ -2474,28 +2474,27 @@ void MediaServerProcess::run()
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     const auto restrictions = QnAuthHelper::instance()->restrictionList();
+    restrictions->allow(lit("."), nx_http::AuthMethod::noAuth); //< For "OPTIONS * RTSP/1.0"
 
-    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
-    restrictions->allow(lit( "." ), nx_http::AuthMethod::noAuth);
-
-    restrictions->allow(lit("(/web)?/api/ping"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/camera_event.+"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/showLog.+"), nx_http::AuthMethod::urlQueryParam);
-    restrictions->allow(lit("(/web)?/api/moduleInformation"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/gettime"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/getTimeZones"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/getNonce"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/cookieLogin"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/cookieLogout"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/static/.+"), nx_http::AuthMethod::noAuth);
+    const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
+    restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/camera_event.+"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/showLog.+"), nx_http::AuthMethod::urlQueryParam);
+    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/gettime"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getNonce"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/static/.+"), nx_http::AuthMethod::noAuth);
     restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("(/web)?/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
 
     // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
     // authentication is implemented.
     // WARNING: This is severe vulnerability introduced in 3.0.
-    restrictions->allow(lit("(/web)?/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth );
