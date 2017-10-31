@@ -412,21 +412,24 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
 
     while (srcItr != end())
     {
+        if (subtrahendItr == periodList.cend())
+        {
+            result << *srcItr;
+            ++srcItr;
+            continue;
+        }
+
         if (srcItr->isContainedIn(*subtrahendItr))
         {
             ++srcItr;
             continue;
         }
 
-        if (subtrahendItr != periodList.cend()
-            && subtrahendItr->endTimeMs() <= srcItr->startTimeMs)
+        if (subtrahendItr->endTimeMs() <= srcItr->startTimeMs)
         {
             ++subtrahendItr;
             continue;
         }
-
-        if (subtrahendItr == periodList.cend() && srcItr != end())
-            result << *srcItr;
 
         auto current = *srcItr;
         while (subtrahendItr != periodList.cend())

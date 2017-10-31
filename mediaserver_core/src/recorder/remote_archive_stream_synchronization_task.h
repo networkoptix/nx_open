@@ -10,6 +10,10 @@ namespace nx {
 namespace mediaserver_core {
 namespace recorder {
 
+/*
+ * Synchronization task for resources that are able to provide
+ * archive stream with random access.
+ */
 class RemoteArchiveStreamSynchronizationTask:
     public AbstractRemoteArchiveSynchronizationTask
 {
