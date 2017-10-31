@@ -819,7 +819,7 @@ boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpE
     quint8* ptr = bufferStart + RtpHeader::RTP_HEADER_SIZE;
     const auto extensionId = htons(*(uint16_t*)ptr);
 
-    if (isOnvifNtpExtensionId(extensionId))
+    if (!isOnvifNtpExtensionId(extensionId))
         return boost::none;
 
     const int extWords = ((int(ptr[2]) << 8) + ptr[3]);
