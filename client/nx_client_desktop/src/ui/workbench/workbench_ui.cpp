@@ -748,7 +748,10 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             if (!alreadyZoomed)
                 m_unzoomedOpenedPanels = openedPanels();
-            setOpenedPanels(NoPanel, true);
+            const auto panels = newWidget->options().testFlag(QnResourceWidget::DisplayMotion)
+                ? TimelinePanel
+                : NoPanel;
+            setOpenedPanels(panels, true);
         }
         else
         {

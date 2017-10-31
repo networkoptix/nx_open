@@ -112,6 +112,8 @@ QString QnStreamRecorder::errorString(StreamRecorderError errCode)
             return tr("File write error. Not enough free space.");
         case StreamRecorderError::invalidResourceType:
             return tr("Invalid resource type for data export.");
+        case StreamRecorderError::dataNotFound:
+            return tr("No data was exported.");
         default:
             return QString();
     }

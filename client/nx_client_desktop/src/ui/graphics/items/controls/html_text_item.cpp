@@ -57,7 +57,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHtmlTextItemOptions, (eq), QnHtmlTextItemOpti
 
 ///
 
-class QnHtmlTextItemPrivate
+class QnHtmlTextItemPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(QnHtmlTextItem)
     QnHtmlTextItem *q_ptr;
@@ -81,7 +81,7 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
     , html()
     , pixmap()
 {
-    installEventHandler(parent, QEvent::PaletteChange, parent,
+    installEventHandler(parent, QEvent::PaletteChange, this,
         [this]()
         {
             if (!this->options.backgroundColor.isValid())
