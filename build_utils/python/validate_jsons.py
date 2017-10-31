@@ -20,6 +20,7 @@ def main():
                 p = subprocess.Popen('jsonlint -v %s' % os.path.join(path, name), shell=True, stdout=PIPE)
                 out, err = p.communicate()
                 print out
+                print err
                 p.wait()
                 if p.returncode:
                     print "failed with code: %s" % str(p.returncode)
