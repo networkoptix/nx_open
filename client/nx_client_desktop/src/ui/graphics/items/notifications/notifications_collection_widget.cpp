@@ -654,13 +654,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     if (messageText.isEmpty())
         return;
 
-    bool isRemoteArchiveSynchronizationEvent =
-        message == QnSystemHealth::RemoteArchiveSyncStarted
-        || message == QnSystemHealth::RemoteArchiveSyncFinished
-        || message == QnSystemHealth::RemoteArchiveSyncError
-        || message == QnSystemHealth::RemoteArchiveSyncProgress;
-
-    if (action && isRemoteArchiveSynchronizationEvent)
+    if (action && isRemoteArchiveMessage(message))
     {
         auto description = action->getRuntimeParams().description;
         if (!description.isEmpty())
