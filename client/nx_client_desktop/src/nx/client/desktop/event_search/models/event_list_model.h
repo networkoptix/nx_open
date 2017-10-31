@@ -64,6 +64,8 @@ protected:
     virtual void triggerCloseAction(const EventData& event);
     virtual void triggerLinkAction(const EventData& event, const QString& link);
 
+    virtual void beforeRemove(const EventData& event);
+
 private:
     class Private;
     QScopedPointer<Private> d;

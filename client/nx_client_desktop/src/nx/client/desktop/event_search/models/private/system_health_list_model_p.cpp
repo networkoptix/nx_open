@@ -36,7 +36,8 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     base_type(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule())),
+    m_uuidHashes()
 {
     const auto handler = context()->instance<QnWorkbenchNotificationsHandler>();
     connect(handler, &QnWorkbenchNotificationsHandler::cleared, q, &EventListModel::clear);
@@ -45,11 +46,29 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     connect(handler, &QnWorkbenchNotificationsHandler::systemHealthEventRemoved,
         this, &Private::removeSystemHealthEvent);
 
-    connect(q, &EventListModel::modelReset, this, [this]() { m_uuidHash.clear(); });
+    connect(q, &EventListModel::modelReset, this,
+        [this]()
+        {
+            for (auto& hash: m_uuidHashes)
+                hash.clear();
+        });
 }
 
 SystemHealthListModel::Private::~Private()
 {
+}
+
+SystemHealthListModel::Private::ExtraData SystemHealthListModel::Private::extraData(
+    const EventData& event)
+{
+    NX_ASSERT(event.extraData.canConvert<ExtraData>(), Q_FUNC_INFO);
+    return event.extraData.value<ExtraData>();
+}
+
+void SystemHealthListModel::Private::beforeRemove(const EventData& event)
+{
+    const auto extraData = Private::extraData(event);
+    m_uuidHashes[extraData.first].remove(extraData.second);
 }
 
 void SystemHealthListModel::Private::addSystemHealthEvent(
@@ -72,9 +91,7 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
     }
 
     // TODO: #vkutin We may want multiple resource aggregation as one event.
-
-    const auto uuidKey = qMakePair(message, resource.data());
-    if (m_uuidHash.contains(uuidKey))
+    if (m_uuidHashes[message].contains(resource))
         return;
 
     const auto resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
@@ -89,7 +106,7 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
     eventData.toolTip = QnSystemHealthStringsHelper::messageTooltip(message, resourceName);
     eventData.helpId = QnBusiness::healthHelpId(message);
     eventData.removable = true;
-    eventData.extraData = static_cast<int>(message);
+    eventData.extraData = qVariantFromValue(ExtraData(message, resource));
 
     eventData.titleColor = QnNotificationLevel::notificationColor(
         QnNotificationLevel::valueOf(message));
@@ -162,7 +179,7 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
     if (!q->addEvent(eventData))
         return;
 
-    m_uuidHash[uuidKey] = eventData.id;
+    m_uuidHashes[message][resource] = eventData.id;
 
     if (!QnSystemHealth::isMessageLocked(message))
     {
@@ -175,6 +192,22 @@ void SystemHealthListModel::Private::removeSystemHealthEvent(
     QnSystemHealth::MessageType message,
     const QVariant& params)
 {
+    QnResourcePtr resource;
+    if (params.canConvert<QnResourcePtr>())
+        resource = params.value<QnResourcePtr>();
+
+    const auto& uuidHash = m_uuidHashes[message];
+
+    if (resource)
+    {
+        if (uuidHash.contains(resource))
+            q->removeEvent(uuidHash.value(resource));
+    }
+    else
+    {
+        for (const auto& id: uuidHash.values()) //< Must iterate a copy of the list.
+            q->removeEvent(id);
+    }
 }
 
 } // namespace

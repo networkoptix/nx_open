@@ -41,6 +41,8 @@ bool EventListModel::Private::removeEvent(const QnUuid& id)
     if (index < 0)
         return false;
 
+    q->beforeRemove(m_events[index].data);
+
     ScopedRemoveRows removeRows(q, QModelIndex(), index, index);
     m_sequentialNumberById.remove(m_events[index].data.id);
     m_events.removeAt(index);
@@ -68,7 +70,7 @@ bool EventListModel::Private::updateEvent(const EventData& data)
     return true;
 }
 
-const EventListModel::EventData& EventListModel::Private::event(int index) const
+const EventListModel::EventData& EventListModel::Private::getEvent(int index) const
 {
     if (index < 0 || index >= m_events.count())
     {

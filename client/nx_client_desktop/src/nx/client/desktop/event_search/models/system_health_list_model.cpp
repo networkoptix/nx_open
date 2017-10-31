@@ -21,16 +21,22 @@ void SystemHealthListModel::triggerDefaultAction(const EventData& event)
 {
     base_type::triggerDefaultAction(event);
 
-    if (event.extraData.toInt() == QnSystemHealth::CloudPromo)
+    if (Private::extraData(event).first == QnSystemHealth::CloudPromo)
         menu()->trigger(ui::action::HideCloudPromoAction);
 }
 
 void SystemHealthListModel::triggerCloseAction(const EventData& event)
 {
-    base_type::triggerCloseAction(event);
-
-    if (event.extraData.toInt() == QnSystemHealth::CloudPromo)
+    if (Private::extraData(event).first == QnSystemHealth::CloudPromo)
         menu()->trigger(ui::action::HideCloudPromoAction);
+
+    base_type::triggerCloseAction(event);
+}
+
+void SystemHealthListModel::beforeRemove(const EventData& event)
+{
+    base_type::beforeRemove(event);
+    d->beforeRemove(event);
 }
 
 } // namespace

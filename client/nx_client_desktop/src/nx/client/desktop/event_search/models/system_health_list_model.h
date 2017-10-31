@@ -21,6 +21,8 @@ protected:
     virtual void triggerDefaultAction(const EventData& event) override;
     virtual void triggerCloseAction(const EventData& event) override;
 
+    virtual void beforeRemove(const EventData& event) override;
+
 private:
     class Private;
     QScopedPointer<Private> d;

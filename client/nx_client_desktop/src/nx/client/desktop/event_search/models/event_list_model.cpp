@@ -32,7 +32,7 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
     if (!d->isValid(index))
         return QVariant();
 
-    const auto& event = d->event(index.row());
+    const auto& event = d->getEvent(index.row());
     switch (role)
     {
         case Qt::DisplayRole:
@@ -150,6 +150,10 @@ void EventListModel::triggerCloseAction(const EventData& event)
 void EventListModel::triggerLinkAction(const EventData& event, const QString& link)
 {
     triggerDefaultAction(event);
+}
+
+void EventListModel::beforeRemove(const EventData& /*event*/)
+{
 }
 
 } // namespace

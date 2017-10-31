@@ -32,7 +32,7 @@ public:
 
     bool updateEvent(const EventData& data);
 
-    const EventData& event(int index) const;
+    const EventData& getEvent(int index) const;
 
     bool isValid(const QModelIndex& index) const;
 
