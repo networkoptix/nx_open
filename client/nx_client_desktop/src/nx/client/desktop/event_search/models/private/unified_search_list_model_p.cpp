@@ -330,7 +330,8 @@ QPixmap UnifiedSearchListModel::Private::eventPixmap(const nx::vms::event::Event
             return QPixmap();
 
         case nx::vms::event::EventType::softwareTriggerEvent:
-            return QnSoftwareTriggerPixmaps::pixmapByName(event.description);
+            return QnSoftwareTriggerPixmaps::colorizedPixmap(
+                event.description, QPalette().light().color());
 
         case nx::vms::event::EventType::analyticsSdkEvent:
             return QPixmap();

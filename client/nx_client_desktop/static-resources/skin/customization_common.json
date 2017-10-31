@@ -900,7 +900,14 @@
             "emailSettings": "#cbcbcb",
             "chartColor": "brand_d3"
         }
-    }
+    },
 
+    "nx::client::desktop::EventPanel": {
+        "palette": {
+            "default": {
+                "window": "dark6"
+            }
+        }
+    }
 }
 

@@ -55,7 +55,7 @@ EventTile::EventTile(const QnUuid& id, QWidget* parent):
     ui->timestampLabel->setHidden(true);
     ui->previewLabel->setHidden(true);
 
-    ui->nameLabel->setForegroundRole(QPalette::Text);
+    ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
 
@@ -145,13 +145,13 @@ void EventTile::setTitle(const QString& value)
 QColor EventTile::titleColor() const
 {
     ui->nameLabel->ensurePolished();
-    return ui->nameLabel->palette().color(QPalette::Text);
+    return ui->nameLabel->palette().color(ui->nameLabel->foregroundRole());
 }
 
 void EventTile::setTitleColor(const QColor& value)
 {
     ui->nameLabel->ensurePolished();
-    setPaletteColor(ui->nameLabel, QPalette::Text, value);
+    setPaletteColor(ui->nameLabel, ui->nameLabel->foregroundRole(), value);
 }
 
 QString EventTile::description() const
