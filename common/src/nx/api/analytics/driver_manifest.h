@@ -52,3 +52,9 @@ QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 
 } // namespace api
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (nx::api::AnalyticsDriverManifestBase::Capability)
+    (nx::api::AnalyticsDriverManifestBase::Capabilities),
+    (metatype)(numeric)(lexical)
+)
