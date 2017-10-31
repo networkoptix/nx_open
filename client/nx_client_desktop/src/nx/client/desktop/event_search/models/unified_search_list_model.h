@@ -24,6 +24,9 @@ public:
 
     void fetchMore();
 
+signals:
+    void fetchMoreFinished();
+
 private:
     class Private;
     QScopedPointer<Private> d;

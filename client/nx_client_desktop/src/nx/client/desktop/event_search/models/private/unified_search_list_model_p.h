@@ -2,16 +2,17 @@
 
 #include "../unified_search_list_model.h"
 
-#include <limits>
-
-#include <QtCore/QTimer>
 #include <QtCore/QHash>
+#include <QtCore/QTimer>
+#include <QtCore/QWeakPointer>
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
 #include <nx/utils/raii_guard.h>
 #include <nx/vms/event/event_fwd.h>
+
+class QnRaiiGuard;
 
 namespace nx {
 namespace client {
@@ -59,7 +60,7 @@ private:
     QHash<QPair<QnUuid, qint64>, QnUuid> m_eventIds;
     qint64 m_startTimeMs = 0;
     qint64 m_endTimeMs = -1;
-    qint64 m_oldestTimeMs = std::numeric_limits<qint64>::max();
+    QWeakPointer<QnRaiiGuard> m_fetchInProgress;
 };
 
 } // namespace

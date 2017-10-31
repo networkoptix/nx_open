@@ -27,6 +27,9 @@ public:
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
 private:
+    void maybeFetchMore();
+
+private:
     EventSearchWidget* q = nullptr;
     UnifiedSearchListModel* const m_model = nullptr;
     QWidget* const m_headerWidget = nullptr;

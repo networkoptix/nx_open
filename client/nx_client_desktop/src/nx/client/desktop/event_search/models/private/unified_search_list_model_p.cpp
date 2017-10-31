@@ -53,7 +53,6 @@ UnifiedSearchListModel::Private::Private(UnifiedSearchListModel* q):
         {
             m_eventRequests.clear();
             m_eventIds.clear();
-            m_oldestTimeMs = std::numeric_limits<qint64>::max();
         });
 }
 
@@ -63,7 +62,7 @@ UnifiedSearchListModel::Private::~Private()
 
 void UnifiedSearchListModel::Private::fetchMore()
 {
-    if (!m_camera)
+    if (!m_camera || !m_fetchInProgress.isNull())
         return;
 
     // TODO: #vkutin This is a temporary implementation of infinite scroll which loads events for
@@ -73,13 +72,17 @@ void UnifiedSearchListModel::Private::fetchMore()
     m_startTimeMs = endTimeMs - std::chrono::milliseconds(kDefaultEventsPeriod).count();
 
     auto finishHandler = QnRaiiGuard::createDestructible(
-        [guardedThis = QPointer<Private>(this), oldest = m_oldestTimeMs]()
+        [guardedThis = QPointer<Private>(this)]()
         {
-            // If nothing was fetched, try more.
-            if (guardedThis && oldest == guardedThis->m_oldestTimeMs)
-                guardedThis->fetchMore();
+            executeDelayed(
+                [guardedThis]()
+                {
+                    if (guardedThis)
+                        emit guardedThis->q->fetchMoreFinished();
+                });
         });
 
+    m_fetchInProgress = finishHandler;
     fetchAll(m_startTimeMs, endTimeMs, finishHandler);
 }
 
@@ -221,8 +224,6 @@ void UnifiedSearchListModel::Private::addOrUpdateBookmark(const QnCameraBookmark
     //data.actionId =
     //data.actionParameters =
 
-    m_oldestTimeMs = qMin(m_oldestTimeMs, bookmark.startTimeMs);
-
     if (!q->updateEvent(data))
         q->addEvent(data);
 }
@@ -253,8 +254,6 @@ void UnifiedSearchListModel::Private::addCameraEvent(const nx::vms::event::Actio
     //data.actionId =
     //data.actionParameters =
 
-    m_oldestTimeMs = qMin(m_oldestTimeMs, eventTimeMs);
-
     q->addEvent(data);
 }
 
@@ -281,13 +280,9 @@ void UnifiedSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr
     // TODO: #vkutin #gdm #common Think of some means to prevent overwhelming server
     // with queries if current camera is quickly switched many times.
 
-    const auto endTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-    m_startTimeMs = endTimeMs - std::chrono::milliseconds(kDefaultEventsPeriod).count();
+    m_startTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     m_endTimeMs = -1; //< Reset to live.
-
-    fetchEvents(m_startTimeMs, endTimeMs);
-    fetchBookmarks(m_startTimeMs, endTimeMs);
-    fetchAnalytics(m_startTimeMs, endTimeMs);
+    fetchMore();
 
     m_updateTimer->start();
 }

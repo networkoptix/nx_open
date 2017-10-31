@@ -9,6 +9,7 @@
 #include <ui/models/sort_filter_list_model.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/search_line_edit.h>
+#include <utils/common/event_processors.h>
 
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
@@ -54,14 +55,6 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     m_eventRibbon->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 
-    connect(m_eventRibbon->scrollBar(), &QScrollBar::valueChanged, this,
-        [this](int value)
-        {
-            const auto scrollBar = m_eventRibbon->scrollBar();
-            if (scrollBar->isVisible() && value == scrollBar->maximum())
-                m_model->fetchMore();
-        });
-
     auto headerLayout = new QVBoxLayout(m_headerWidget);
     auto searchLineEdit = new QnSearchLineEdit(m_headerWidget);
     searchLineEdit->setTextChangedSignalFilterMs(std::chrono::milliseconds(kFilterDelay).count());
@@ -84,10 +77,31 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     connect(m_eventRibbon, &EventRibbon::clicked, m_model, &EventListModel::defaultAction);
     connect(m_eventRibbon, &EventRibbon::linkActivated, m_model, &EventListModel::linkAction);
+
+    // Fetch-on-demand logic.
+
+    connect(sortModel, &QAbstractItemModel::rowsRemoved,
+        this, &Private::maybeFetchMore, Qt::QueuedConnection);
+
+    connect(m_eventRibbon->scrollBar(), &QScrollBar::valueChanged, this, &Private::maybeFetchMore);
+    connect(m_model, &UnifiedSearchListModel::fetchMoreFinished, this, &Private::maybeFetchMore);
+    installEventHandler(q, QEvent::Show, this, &Private::maybeFetchMore);
 }
 
 EventSearchWidget::Private::~Private()
 {
+}
+
+void EventSearchWidget::Private::maybeFetchMore()
+{
+    if (!q->isVisible())
+        return;
+
+    const auto scrollBar = m_eventRibbon->scrollBar();
+    if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
+        return;
+
+    m_model->fetchMore();
 }
 
 QnVirtualCameraResourcePtr EventSearchWidget::Private::camera() const
