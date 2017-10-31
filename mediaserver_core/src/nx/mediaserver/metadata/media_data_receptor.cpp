@@ -39,9 +39,17 @@ void VideoDataReceptor::putData(const QnAbstractDataPacketPtr& data)
         packet->setWidth(video->width);
         packet->setHeight(video->height);
         packet->setCodec(toString(video->compressionType).toStdString());
-        std::vector<char> buffer(video->dataSize());
-        memcpy(&buffer[0], video->data(), video->dataSize());
-        packet->setData(std::move(buffer));
+        if (m_context->pluginManifest().capabilities.testFlag(
+            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame))
+        {
+            std::vector<char> buffer(video->dataSize());
+            memcpy(&buffer[0], video->data(), video->dataSize());
+            packet->setData(std::move(buffer));
+        }
+        else
+        {
+            packet->setData(video->data(), video->dataSize());
+        }
 
         manager->putData(packet.get());
     }
