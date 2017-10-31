@@ -107,6 +107,50 @@ void setupButton(QPushButton& button)
     button.setStyleSheet(kStyleSheet);
 }
 
+void setupCustomButton(QPushButton& button)
+{
+    static const auto kDefaultButtonHeight = 28.0;
+
+    button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    button.setFixedHeight(kDefaultButtonHeight);
+
+    static const auto kButtonName = lit("itemStateExtraActionButton");
+    button.setObjectName(kButtonName);
+
+    static const auto kStyleSheetTemplate = lit(
+        "QPushButton#%1"
+        "{"
+        "    color: %2;"
+        "    background-color: \"transparent\";"
+        "    border-style: solid;"
+        "    border-radius: 2px;"
+        "    font: 500 13px;"
+        "    padding-left: 16px;"
+        "    padding-right: 16px;"
+        "    min-height: 32px;"
+        "    max-height: 32px;"
+        "}"
+        "QPushButton#%1:hover"
+        "{"
+        "    color: %3;"
+        "}"
+        "QPushButton#%1:pressed"
+        "{"
+        "    color: %2;"
+        "}"
+        );
+
+    static const auto kBaseColor = QColor(qnNxStyle->mainColor(
+        QnNxStyle::Colors::kContrast).darker(4));
+
+    static const auto kTextColor = toTransparent(kBaseColor, 0.6).name(QColor::HexArgb);
+    static const auto kHoveredTextColor = kBaseColor.name(QColor::HexArgb);
+
+    const auto kStyleSheet = kStyleSheetTemplate.arg(kButtonName, kTextColor, kHoveredTextColor);
+
+    button.setStyleSheet(kStyleSheet);
+}
+
 enum LabelStyleFlag
 {
     kNormalStyle = 0x0,
@@ -176,13 +220,16 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     m_caption(new QLabel()),
     m_description(new QLabel()),
 
-    m_button(new QPushButton())
+    m_button(new QPushButton()),
+    m_customButton(new QPushButton())
+
 {
     makeTransparentForMouse(this);
 
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
     connect(this, &GraphicsWidget::scaleChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
     connect(m_button, &QPushButton::clicked, this, &QnStatusOverlayWidget::actionButtonClicked);
+    connect(m_customButton, &QPushButton::clicked, this, &QnStatusOverlayWidget::extraButtonClicked);
 
     setupPreloader();
     setupCentralControls();
@@ -210,14 +257,17 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
     const bool descriptionVisible = controls.testFlag(Control::kDescription);
     const bool centralVisible = (iconVisible || captionVisible || descriptionVisible);
 
-    const bool extrasVisible = controls.testFlag(Control::kButton);
+    const bool buttonVisible = controls.testFlag(Control::kButton);
+    const bool customButtonVisible = controls.testFlag(Control::kCustomButton);
+    const bool extrasVisible = buttonVisible || customButtonVisible;
 
     m_imageItem.setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
     m_preloaderHolder->setVisible(preloaderVisible);
     m_imageItem.setVisible(!preloaderVisible && imageOverlayVisible);
     m_centralHolder->setVisible(!preloaderVisible && !imageOverlayVisible && centralVisible);
     m_extrasHolder->setVisible(!preloaderVisible && !imageOverlayVisible && extrasVisible);
-
+    m_button->setVisible(buttonVisible);
+    m_customButton->setVisible(customButtonVisible);
     m_centralAreaImage->setVisible(iconVisible);
     m_caption->setVisible(captionVisible);
     m_description->setVisible(descriptionVisible);
@@ -267,6 +317,12 @@ void QnStatusOverlayWidget::setCaption(const QString& caption)
 void QnStatusOverlayWidget::setButtonText(const QString& text)
 {
     m_button->setText(text);
+    updateAreasSizes();
+}
+
+void QnStatusOverlayWidget::setCustomButtonText(const QString& text)
+{
+    m_customButton->setText(text);
     updateAreasSizes();
 }
 
@@ -331,6 +387,7 @@ void QnStatusOverlayWidget::setupCentralControls()
 void QnStatusOverlayWidget::setupExtrasControls()
 {
     setupButton(*m_button);
+    setupCustomButton(*m_customButton);
 
     /* Even though there's only one button in the extras holder,
      * a container widget with a layout must be created, otherwise
@@ -339,9 +396,12 @@ void QnStatusOverlayWidget::setupExtrasControls()
     m_extrasContainer->setAttribute(Qt::WA_TranslucentBackground);
     m_extrasContainer->setObjectName(lit("extrasContainer"));
 
-    const auto layout = new QHBoxLayout(m_extrasContainer);
+    const auto layout = new QVBoxLayout(m_extrasContainer);
     layout->setContentsMargins(QMargins());
     layout->addWidget(m_button);
+    layout->addWidget(m_customButton);
+    layout->setAlignment(m_button, Qt::AlignHCenter);
+    layout->setAlignment(m_customButton, Qt::AlignHCenter);
 
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     horizontalLayout->addStretch(1);
@@ -395,16 +455,20 @@ void QnStatusOverlayWidget::updateAreasSizes()
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());
 
     // TODO: #vkutin #ynikitenkov Localize visibility matters in ONE place!
-    bool showExtras = m_visibleControls.testFlag(Control::kButton);
+    const int visibleExtrasButtonsCount =
+        (m_visibleControls.testFlag(Control::kButton) ? 1 : 0)
+        + (m_visibleControls.testFlag(Control::kCustomButton) ? 1 : 0);
 
-    const qreal minHeight = 95 * scale; // TODO: #ynikitenkov Change for description
+    bool showExtras = visibleExtrasButtonsCount > 0;
+
+    const qreal minHeight = 95 * scale * visibleExtrasButtonsCount;
     showExtras = showExtras && (rect.height() > minHeight); // Do not show extras on too small items
 
     qreal extrasHeight = 0.0;
     if (showExtras)
     {
-        const qreal maxExtrasHeight = scale * 80;    // TODO: #ynikitnekov Change for description
-        const qreal minExtrasHeight = scale * 24;
+        const qreal maxExtrasHeight = scale * 80 * visibleExtrasButtonsCount;
+        const qreal minExtrasHeight = scale * 24 * visibleExtrasButtonsCount;
 
         if (quater > maxExtrasHeight)
             extrasHeight = maxExtrasHeight;
@@ -415,7 +479,6 @@ void QnStatusOverlayWidget::updateAreasSizes()
     }
 
     m_preloaderHolder->setFixedSize(rect.size());
-
     m_centralHolder->setFixedSize(QSizeF(rect.width(), height - extrasHeight));
 
     const bool showCentralArea = (!m_visibleControls.testFlag(Control::kPreloader)

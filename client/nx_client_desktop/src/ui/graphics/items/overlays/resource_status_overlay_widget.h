@@ -24,7 +24,8 @@ public:
         kIcon           = 0x04,
         kCaption        = 0x08,
         kButton         = 0x10,
-        kDescription    = 0x20
+        kCustomButton    = 0x20,
+        kDescription    = 0x40
     };
     Q_DECLARE_FLAGS(Controls, Control);
 
@@ -41,9 +42,11 @@ public:
     void setCaption(const QString& caption);
     void setDescription(const QString& description);
     void setButtonText(const QString& text);
+    void setCustomButtonText(const QString& text);
 
 signals:
     void actionButtonClicked();
+    void extraButtonClicked();
 
 private:
     void setupPreloader();
@@ -81,4 +84,5 @@ private:
 
     // Extras
     QPushButton* const m_button;
+    QPushButton* const m_customButton;
 };

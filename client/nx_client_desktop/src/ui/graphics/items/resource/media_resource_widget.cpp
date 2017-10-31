@@ -97,7 +97,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include "ui/workbench/workbench_item.h"
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -112,7 +113,8 @@
 #include <plugins/resource/avi/avi_resource.h>
 
 using namespace nx;
-using namespace client::desktop::ui;
+using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -481,6 +483,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::clearEntropixEnhancedImage);
     connect(this, &QnMediaResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::clearEntropixEnhancedImage);
+
+    const auto passwordWatcher = context->instance<DefaultPasswordCamerasWatcher>();
+    connect(passwordWatcher, &DefaultPasswordCamerasWatcher::camerasWithDefaultPasswordCountChanged,
+        this, &QnMediaResourceWidget::updateCustomOverlayButton);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -2119,6 +2125,19 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     }
 
     return base_type::calculateOverlayButton(statusOverlay);
+}
+
+QString QnMediaResourceWidget::overlayCustomButtonText(
+    Qn::ResourceStatusOverlay statusOverlay) const
+{
+    if (statusOverlay != Qn::PasswordRequiredOverlay)
+        return QString();
+
+    const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto camerasCount = watcher ? watcher->camerasWithDefaultPasswordCount() : 0;
+    return  camerasCount > 1
+        ? tr("Set For All %n Cameras", nullptr, camerasCount)
+        : QString();
 }
 
 void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key)

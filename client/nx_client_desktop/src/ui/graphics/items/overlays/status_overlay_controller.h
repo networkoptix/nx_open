@@ -26,6 +26,9 @@ public:
     Qn::ResourceOverlayButton currentButton() const;
     void setCurrentButton(Qn::ResourceOverlayButton button);
 
+    QString customButtonText() const;
+    void setCustomButtonText(const QString& text);
+
     bool isErrorOverlay() const;
 
     QnStatusOverlayWidget::Controls visibleItems() const;
@@ -41,6 +44,8 @@ signals:
     void statusOverlayChanged(bool animated);
 
     void currentButtonChanged();
+
+    void customButtonTextChanged();
 
     void isErrorOverlayChanged();
 
@@ -70,5 +75,7 @@ private:
     QnStatusOverlayWidget::Controls m_visibleItems;
     Qn::ResourceStatusOverlay m_statusOverlay;
     Qn::ResourceOverlayButton m_currentButton;
+    QString m_customButtonText;
+
     bool m_isErrorOverlay;
 };

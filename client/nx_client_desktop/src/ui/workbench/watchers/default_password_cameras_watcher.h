@@ -21,8 +21,11 @@ public:
 
     bool notificationIsVisible() const;
 
+    int camerasWithDefaultPasswordCount() const;
+
 signals:
     void notificationIsVisibleChanged();
+    void camerasWithDefaultPasswordCountChanged();
 
 private:
     bool m_notificationIsVisible = false;

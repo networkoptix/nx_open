@@ -26,10 +26,11 @@ DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
         [this, setNotificationVisible](const QnResourcePtr& resource)
         {
             const auto resourceId = resource->getId().toQUuid();
-            if (m_camerasWithDefaultPassword.remove(resourceId)
-                && m_camerasWithDefaultPassword.isEmpty())
+            if (m_camerasWithDefaultPassword.remove(resourceId))
             {
-                setNotificationVisible(false);
+                if (m_camerasWithDefaultPassword.isEmpty())
+                    setNotificationVisible(false);
+                emit camerasWithDefaultPasswordCountChanged();
             }
         };
 
@@ -52,6 +53,7 @@ DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
 
             m_camerasWithDefaultPassword.insert(resourceId);
             setNotificationVisible(true);
+            emit camerasWithDefaultPasswordCountChanged();
         };
 
     const auto resourceAddedHandler =
@@ -76,6 +78,11 @@ DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
 bool DefaultPasswordCamerasWatcher::notificationIsVisible() const
 {
     return m_notificationIsVisible;
+}
+
+int DefaultPasswordCamerasWatcher::camerasWithDefaultPasswordCount() const
+{
+    return m_camerasWithDefaultPassword.size();
 }
 
 } // namespace desktop
