@@ -3,6 +3,17 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <ui/common/aligner.h>
+
+namespace {
+
+void setupPasswordField(QnInputField& field)
+{
+    field.setPasswordIndicatorEnabled(true);
+    field.setEchoMode(QLineEdit::Password);
+}
+
+} // namespace
 
 QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     const QnVirtualCameraResourceList& cameras,
@@ -17,7 +28,21 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     else
         ui->resourcesPanel->setVisible(false);
 
+    ui->passwordEdit->setTitle(tr("New Password"));
+    ui->confirmPasswordEdit->setTitle(tr("Repeat Password"));
+
     setResizeToContentsMode(Qt::Vertical);
+
+    setupPasswordField(*ui->passwordEdit);
+    setupPasswordField(*ui->confirmPasswordEdit);
+    ui->passwordEdit->setValidator(Qn::defaultPasswordValidator(false));
+    ui->passwordEdit->reset();
+    ui->confirmPasswordEdit->setValidator(Qn::defaultConfirmationValidator(
+        [this](){ return ui->passwordEdit->text(); }, tr("Passwords do not match.")));
+
+    QnAligner* aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    aligner->addWidgets({ ui->passwordEdit, ui->confirmPasswordEdit });
 }
 
 QnCameraPasswordChangeDialog::~QnCameraPasswordChangeDialog()
