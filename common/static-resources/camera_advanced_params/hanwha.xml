@@ -888,7 +888,7 @@
                         description="Fits the focus automatically"
                         aux="support=Image/Support/SimpleFocus"/>
             <param id="image/focus/Mode=Reset"
-                        name="Reset Focus"
+                        name="Initialize Focus"
                         dataType="Button"
                         writeCmd="control"
                         description="Restores the focus adjustment to the default flange back position"
