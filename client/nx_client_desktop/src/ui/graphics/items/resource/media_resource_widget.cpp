@@ -308,9 +308,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         connect(d->camera, &QnVirtualCameraResource::motionRegionChanged, this,
             &QnMediaResourceWidget::invalidateMotionSensitivity);
 
-        m_licenseStatusHelper.reset(new QnSingleCamLicenseStatusHelper(d->camera));
-
-        connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
+        connect(d, &QnMediaResourceWidgetPrivate::licenseStatusChanged,
             this,
             [this]
             {
@@ -318,6 +316,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 updateIoModuleVisibility(animate);
                 updateStatusOverlay(animate);
                 updateOverlayButton();
+
+                emit licenseStatusChanged();
             });
     }
 
@@ -2029,7 +2029,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
 
-        if (m_licenseStatusHelper->status() != QnSingleCamLicenseStatusHelper::LicenseStatus::used)
+        if (d->licenseStatus() != QnLicenseUsageStatus::used)
             return Qn::IoModuleDisabledOverlay;
     }
 
@@ -2093,16 +2093,14 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         case Qn::IoModuleDisabledOverlay:
         case Qn::AnalogWithoutLicenseOverlay:
         {
-            NX_ASSERT(m_licenseStatusHelper, Q_FUNC_INFO, "Invalid local video status");
-
-            if (m_licenseStatusHelper && canChangeSettings)
+            if (canChangeSettings)
             {
-                switch (m_licenseStatusHelper->status())
+                switch (d->licenseStatus())
                 {
-                    case QnSingleCamLicenseStatusHelper::LicenseStatus::notUsed:
+                    case QnLicenseUsageStatus::notUsed:
                         return Qn::ResourceOverlayButton::EnableLicense;
 
-                    case QnSingleCamLicenseStatusHelper::LicenseStatus::overflow:
+                    case QnLicenseUsageStatus::overflow:
                         return Qn::ResourceOverlayButton::MoreLicenses;
                     default:
                         break;
@@ -2357,8 +2355,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     const QnImageButtonWidget* const button = titleBar()->rightButtonsBar()->button(Qn::IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = !d->hasVideo;
-    const bool correctLicenseStatus =
-        (m_licenseStatusHelper->status() == QnSingleCamLicenseStatusHelper::LicenseStatus::used);
+    const bool correctLicenseStatus = isLicenseUsed();
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
 
@@ -2386,13 +2383,8 @@ void QnMediaResourceWidget::processEnableLicenseRequest()
 {
     context()->statisticsModule()->registerClick(lit("resource_status_overlay_enable_license"));
 
-    NX_ASSERT(m_licenseStatusHelper, Q_FUNC_INFO, "License are not actual for local files");
-
-    if (!m_licenseStatusHelper)
-        return;
-
-    const auto licenseStatus = m_licenseStatusHelper->status();
-    if (licenseStatus != QnSingleCamLicenseStatusHelper::LicenseStatus::notUsed)
+    const auto licenseStatus = d->licenseStatus();
+    if (licenseStatus != QnLicenseUsageStatus::notUsed)
         return;
 
     qnResourcesChangesManager->saveCamera(d->camera,
@@ -2563,6 +2555,11 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 {
     static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
     return kAvailableSpeedRange;
+}
+
+bool QnMediaResourceWidget::isLicenseUsed() const
+{
+    return d->licenseStatus() == QnLicenseUsageStatus::used;
 }
 
 /*

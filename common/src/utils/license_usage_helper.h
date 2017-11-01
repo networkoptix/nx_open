@@ -14,6 +14,14 @@ static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlic
 
 struct LicenseCompatibility;
 
+enum class QnLicenseUsageStatus
+{
+    invalid,
+    notUsed,
+    overflow,
+    used
+};
+
 class QnLicenseUsageWatcher: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
@@ -184,19 +192,11 @@ class QnSingleCamLicenseStatusHelper: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    enum class LicenseStatus
-    {
-        invalid,
-        notUsed,
-        overflow,
-        used
-    };
-
     explicit QnSingleCamLicenseStatusHelper(const QnVirtualCameraResourcePtr &camera,
         QObject* parent = nullptr);
     virtual ~QnSingleCamLicenseStatusHelper();
 
-    LicenseStatus status() const;
+    QnLicenseUsageStatus status() const;
 
 signals:
     void licenseStatusChanged();

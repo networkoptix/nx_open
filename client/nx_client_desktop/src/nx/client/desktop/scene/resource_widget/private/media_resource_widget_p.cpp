@@ -35,6 +35,8 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& reso
         m_licenseStatusHelper.reset(new QnSingleCamLicenseStatusHelper(camera));
         connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
             this, &MediaResourceWidgetPrivate::updateNvrWithoutLicense);
+        connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
+            this, &MediaResourceWidgetPrivate::licenseStatusChanged);
 
         updateNvrWithoutLicense();
     }
@@ -79,6 +81,11 @@ bool MediaResourceWidgetPrivate::isUnauthorized() const
 bool MediaResourceWidgetPrivate::nvrWithoutLicense() const
 {
     return m_nvrWithoutLicense;
+}
+
+QnLicenseUsageStatus MediaResourceWidgetPrivate::licenseStatus() const
+{
+    return m_licenseStatusHelper->status();
 }
 
 void MediaResourceWidgetPrivate::updateIsPlayingLive()
@@ -136,7 +143,7 @@ void MediaResourceWidgetPrivate::updateNvrWithoutLicense()
     // Footage browsing is forbidden for NVRs without license. Live video is forbidden for VMAX.
     setNvrWithoutLicense(camera
         && camera->isDtsBased()
-        && m_licenseStatusHelper->status() != QnSingleCamLicenseStatusHelper::LicenseStatus::used
+        && !camera->isLicenseUsed()
         && (!m_isPlayingLive || camera->licenseType() != Qn::LC_Bridge));
 }
 

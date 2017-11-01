@@ -304,7 +304,7 @@ bool QnTwoWayAudioWidgetPrivate::isAllowed() const
 
     /* Check if we are require licenses for two-way audio. */
     if (m_licenseHelper)
-        return m_licenseHelper->status() == QnSingleCamLicenseStatusHelper::LicenseStatus::used;
+        return m_licenseHelper->status() == QnLicenseUsageStatus::used;
 
     return true;
 }

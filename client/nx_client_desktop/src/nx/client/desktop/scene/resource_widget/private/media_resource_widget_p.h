@@ -2,6 +2,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <licensing/license_fwd.h>
+
 #include <nx/client/desktop/camera/camera_fwd.h>
 
 #include <utils/common/connective.h>
@@ -15,12 +17,13 @@ namespace desktop {
 class MediaResourceWidgetPrivate: public Connective<QObject>
 {
     Q_OBJECT
-    Q_PROPERTY(bool hasVideo MEMBER hasVideo CONSTANT);
-    Q_PROPERTY(bool isIoModule MEMBER isIoModule CONSTANT);
-    Q_PROPERTY(bool isPlayingLive READ isPlayingLive WRITE setIsPlayingLive NOTIFY stateChanged);
-    Q_PROPERTY(bool isOffline READ isOffline WRITE setIsOffline NOTIFY stateChanged);
-    Q_PROPERTY(bool isUnauthorized READ isUnauthorized WRITE setIsUnauthorized NOTIFY stateChanged);
-    Q_PROPERTY(bool nvrWithoutLicense READ nvrWithoutLicense WRITE setNvrWithoutLicense NOTIFY stateChanged);
+    Q_PROPERTY(bool hasVideo MEMBER hasVideo CONSTANT)
+    Q_PROPERTY(bool isIoModule MEMBER isIoModule CONSTANT)
+    Q_PROPERTY(bool isPlayingLive READ isPlayingLive WRITE setIsPlayingLive NOTIFY stateChanged)
+    Q_PROPERTY(bool isOffline READ isOffline WRITE setIsOffline NOTIFY stateChanged)
+    Q_PROPERTY(bool isUnauthorized READ isUnauthorized WRITE setIsUnauthorized NOTIFY stateChanged)
+    Q_PROPERTY(bool nvrWithoutLicense READ nvrWithoutLicense WRITE setNvrWithoutLicense NOTIFY stateChanged)
+    Q_PROPERTY(QnLicenseUsageStatus licenseStatus READ licenseStatus NOTIFY licenseStatusChanged)
 
     using base_type = Connective<QObject>;
 
@@ -42,8 +45,11 @@ public:
     bool isUnauthorized() const;
     bool nvrWithoutLicense() const;
 
+    QnLicenseUsageStatus licenseStatus() const;
+
 signals:
     void stateChanged();
+    void licenseStatusChanged();
 
 private:
     void updateIsPlayingLive();

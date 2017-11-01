@@ -24,12 +24,13 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
-#include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <nx/client/desktop/camera/camera_fwd.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
-#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
+
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace client {
@@ -162,6 +163,8 @@ public:
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
 
+    bool isLicenseUsed() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -171,6 +174,7 @@ signals:
     void positionChanged(qint64 positionUtcMs);
     void motionSearchModeEnabled(bool enabled);
     void zoomWindowCreationModeEnabled(bool enabled);
+    void licenseStatusChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -379,8 +383,6 @@ private:
 
     QnIoModuleOverlayWidget* m_ioModuleOverlayWidget = nullptr;
     bool m_ioCouldBeShown = false;
-
-    QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseStatusHelper;
 
     qint64 m_posUtcMs;
 

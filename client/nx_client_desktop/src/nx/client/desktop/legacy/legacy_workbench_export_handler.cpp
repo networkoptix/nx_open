@@ -14,7 +14,7 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <camera/client_video_camera.h>
-
+#include <camera/resource_display.h>
 #include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
