@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>Preferências…</translation>
+      <translation>Preferências...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -511,7 +511,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation>Mostrar</translation>
+      <translation>Mostrar </translation>
     </message>
     <message>
       <source>&amp;Rename</source>

@@ -14,7 +14,7 @@ Config.helpLinks.push({
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness",
+            url: "https://play.google.com/store/apps/details?id=com.ubiquitysmart.vmsdtv",
             class:'googleplay',
             button: "Android Client"
         }
