@@ -1,7 +1,6 @@
 #include "workbench_analytics_controller.h"
 
 #include <QtCore/QFileInfo>
-#include <QtCore/QTimer>
 
 #include <ini.h>
 
@@ -22,14 +21,10 @@
 #include <ui/common/geometry.h>
 #include <ui/graphics/items/resource/resource_widget.h> //TODO: #GDM move enum to client globals
 #include <ui/style/skin.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_layout.h>
 
 namespace {
 
 static constexpr auto kDefaultCellSpacing = 0.05;
-static constexpr auto kLoopCheckInterval = 200;
 
 static const QList<QColor> kFrameColors{
     Qt::red,
@@ -88,8 +83,6 @@ public:
     ElementMapping mainMapping;
     ElementMapping enhancedMapping;
 
-    QTimer* loopTimer = nullptr;
-
 public:
     Private(WorkbenchAnalyticsController* parent);
     virtual ~Private() override;
@@ -109,22 +102,11 @@ public:
     QnUuid addSlaveItem(ElementMapping& source, const QPoint& position);
 
     void connectToDriver();
-
-private:
-    void at_currentLayoutChanged();
-    void at_loopTimerTimeout();
 };
 
 WorkbenchAnalyticsController::Private::Private(WorkbenchAnalyticsController* parent):
-    q(parent),
-    loopTimer(new QTimer(this))
+    q(parent)
 {
-    connect(q->workbench(), &QnWorkbench::currentLayoutChanged, this,
-        &Private::at_currentLayoutChanged);
-
-    loopTimer->setInterval(kLoopCheckInterval);
-
-    connect(loopTimer, &QTimer::timeout, this, &Private::at_loopTimerTimeout);
 }
 
 WorkbenchAnalyticsController::Private::~Private()
@@ -406,26 +388,7 @@ void WorkbenchAnalyticsController::Private::connectToDriver()
     connect(driver, &AbstractAnalyticsDriver::regionAddedOrChanged, q,
         &WorkbenchAnalyticsController::addOrChangeRegion);
     connect(driver, &AbstractAnalyticsDriver::regionRemoved, q,
-            &WorkbenchAnalyticsController::removeRegion);
-}
-
-void WorkbenchAnalyticsController::Private::at_currentLayoutChanged()
-{
-    if (q->workbench()->currentLayout()->resource() != layout)
-    {
-        loopTimer->stop();
-        return;
-    }
-
-    loopTimer->start();
-}
-
-void WorkbenchAnalyticsController::Private::at_loopTimerTimeout()
-{
-    const auto navigator = q->navigator();
-
-    if (navigator->positionUsec() == DATETIME_NOW)
-        navigator->setPosition(0);
+        &WorkbenchAnalyticsController::removeRegion);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -437,7 +400,6 @@ WorkbenchAnalyticsController::WorkbenchAnalyticsController(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
     d->matrixSize = matrixSize;
@@ -455,7 +417,6 @@ WorkbenchAnalyticsController::WorkbenchAnalyticsController(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     d(new Private(this))
 {
     d->layoutTemplate = layoutTemplate;

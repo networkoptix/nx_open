@@ -3,7 +3,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_data.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <client_core/connection_context_aware.h>
 
 #include <nx/client/desktop/analytics/analytics_fwd.h>
 
@@ -17,7 +17,7 @@ struct LayoutTemplate;
 
 class WorkbenchAnalyticsController:
     public Connective<QObject>,
-    public QnWorkbenchContextAware
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
