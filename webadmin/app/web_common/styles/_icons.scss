@@ -112,7 +112,7 @@
   background-position: -50px -26px;
 }
 
-.glyphicon-info-sign{
+/*.glyphicon-info-sign{
   @include kill-glyphicon;
   &{
     background-position: -74px -26px;
@@ -120,7 +120,7 @@
   &.active{
     background-position: -98px -26px;
   }
-}
+}*/
 /* Check CLOUD-1197 - this style affected some other remove buttons, so we limit its effect to cameras-panel only */
 .cameras-panel .glyphicon-remove{
   @include kill-glyphicon;

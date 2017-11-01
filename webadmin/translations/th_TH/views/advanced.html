@@ -1,12 +1,12 @@
 <div class="container">
-    <h1>Advanced server settings</h1>
+    <h1>การตั้งค่าเซิร์ฟเวอร์ขั้นสูง</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> คำเตือน! </b> การเปลี่ยนแปลงใด ๆ ในหน้านี้อาจทำให้เซิร์ฟเวอร์ทำงานไม่ถูกต้อง
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>พื้นที่จัดเก็บ</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -16,7 +16,7 @@
                         URL
                     </th>
                     <th width="200">
-                        Free Space
+                        พื้นที่ว่าง:
                     </th>
                     <th width="150">
                         เนื้อที่ที่สำรองไว้
@@ -40,7 +40,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} จาก {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -67,15 +67,15 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+ placeholder="เนื้อที่ที่สำรองไว้"/>
+                            <div class="input-group-addon">กิกะไบต์</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
-                            <div class="input-group-addon">GB</div>
+ placeholder="เนื้อที่ที่สำรองไว้"/>
+                            <div class="input-group-addon">กิกะไบต์</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -86,7 +86,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Use for writing"/>
+                                   placeholder="ใช้สำหรับเขียน"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -103,12 +103,12 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            No main storage drive was selected for writing - video will not be recorded on this server.
+            ไม่ได้เลือกไดรฟ์เก็บข้อมูลหลักสำหรับการเขียน - วิดีโอจะไม่ถูกบันทึกลงในเซิร์ฟเวอร์นี้
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            จำนวนพื้นที่ที่จองมากกว่าพื้นที่ว่างที่เหลือ วิดีโอวิดีโอปัจจุบันอาจถูกนำออกเพื่อเพิ่มพื้นที่ว่าง
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">แก้ไขการตั้งค่าที่ไฮไลต์ทั้งหมดเพื่อบันทึก</div>
 
         <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >บันทึก</button>
         <button class="btn btn-warning" ng-click="cancel()">ยกเลิก</button>
@@ -121,13 +121,13 @@
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                    <option value="NONE">ไม่มี: ล็อกถูกปิดใช้งาน</option>
+                    <option value="ALWAYS">เสมอ: บันทึกข้อผิดพลาดคำเตือนและข้อความที่สำคัญที่สุด</option>
+                    <option value="ERROR">ข้อผิดพลาด: บันทึกข้อผิดพลาดเท่านั้น</option>
+                    <option value="WARNING">คำเตือน: บันทึกคำเตือนและข้อผิดพลาด</option>
+                    <option value="INFO">ข้อมูล: บันทึกข้อผิดพลาดคำเตือนและข้อความทั้งหมด</option>
+                    <option value="DEBUG">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
+                    <option value="DEBUG2">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
                 </select>
             </div>
         </div>
@@ -135,13 +135,13 @@
             <label class="col-sm-4">ระดับล็อกธุรกรรม</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
-                    <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
-                    <option value="ERROR">Error: Log errors only.</option>
-                    <option value="WARNING">Warning: Log warnings and errors.</option>
-                    <option value="INFO">Info: Log errors, warnings and all messages.</option>
-                    <option value="DEBUG">Debug: Log every system message and debug information.</option>
-                    <option value="DEBUG2">Debug2: Log every system message and extended debug information.</option>
+                    <option value="NONE">ไม่มี: ล็อกถูกปิดใช้งาน</option>
+                    <option value="ALWAYS">เสมอ: บันทึกข้อผิดพลาดคำเตือนและข้อความที่สำคัญที่สุด</option>
+                    <option value="ERROR">ข้อผิดพลาด: บันทึกข้อผิดพลาดเท่านั้น</option>
+                    <option value="WARNING">คำเตือน: บันทึกคำเตือนและข้อผิดพลาด</option>
+                    <option value="INFO">ข้อมูล: บันทึกข้อผิดพลาดคำเตือนและข้อความทั้งหมด</option>
+                    <option value="DEBUG">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
+                    <option value="DEBUG2">ดีบัก: เข้าสู่ระบบทุกข้อความของระบบและข้อมูลดีบั๊ก</option>
                 </select>
             </div>
         </div>
@@ -151,20 +151,20 @@
         </div>
     </form>
 
-    <h2>Manual update</h2>
+    <h2>อัปเดตด้วยตนเอง</h2>
     <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
         <div class="form-group">
-            <label class="col-sm-4">Upload installer</label>
+            <label class="col-sm-4">อัปโหลดโปรแกรมติดตั้ง</label>
             <div class="col-sm-8">
                 <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Please ensure the configuration is correct.</p>
+                <p class="help-block">โปรดตรวจสอบว่าการกำหนดค่าถูกต้อง</p>
             </div>
         </div>
     </form>
 
     <h1>การตั้งค่าระบบขั้นสูง</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> คำเตือน! </b> การเปลี่ยนแปลงใด ๆ ในหน้านี้อาจทำให้เซิร์ฟเวอร์ทำงานไม่ถูกต้อง
     </div>
 
     <form class="form row" role="form" name="systemSettings" novalidate>
@@ -191,7 +191,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] || 'ว่างเปล่า'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -208,9 +208,9 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>คำเตือน!</b> การเปลี่ยนแปลงบางอย่างต้องเริ่มระบบใหม่ <b>ทั้งหมด</b> เซิร์ฟเวอร์ในระบบ<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >รีสตาร์ทเซิร์ฟเวอร์ปัจจุบัน</button>
         </div>
     </div>
 </div>
