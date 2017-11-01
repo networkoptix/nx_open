@@ -94,7 +94,7 @@ template<typename Type = int>
 Type number(
     Type min = 0,
     Type max = std::numeric_limits<Type>::max(),
-    typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
+    typename std::enable_if<std::is_integral<Type>::value && !std::is_same<Type, bool>::value>::type* = 0)
 {
     #ifdef NX_UTILS_USE_OWN_INT_DISTRIBUTION
         UniformIntDistribution<Type> distribution(min, max);
