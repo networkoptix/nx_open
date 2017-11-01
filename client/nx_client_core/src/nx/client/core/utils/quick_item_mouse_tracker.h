@@ -1,12 +1,15 @@
 #pragma once
 
-#include <QtQuick/QQuickItem>
+#include <QtCore/QObject>
+#include <QtCore/QPoint>
+
+class QQuickItem;
 
 namespace nx {
 namespace client {
 namespace core {
 
-class QuickItemMouseTracker: public QQuickItem
+class QuickItemMouseTracker: public QObject
 {
     Q_OBJECT
 
@@ -19,8 +22,10 @@ class QuickItemMouseTracker: public QQuickItem
         READ hoverEventsEnabled WRITE setHoverEventsEnabled
         NOTIFY hoverEventsEnabledChanged)
 
+    using base_type = QObject;
+
 public:
-    QuickItemMouseTracker(QQuickItem* parent = nullptr);
+    QuickItemMouseTracker(QObject* parent = nullptr);
     virtual ~QuickItemMouseTracker() override;
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;

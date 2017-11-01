@@ -1,11 +1,13 @@
 #include "quick_item_mouse_tracker.h"
 
+#include <QtQuick/QQuickItem>
+
 namespace nx {
 namespace client {
 namespace core {
 
-QuickItemMouseTracker::QuickItemMouseTracker(QQuickItem* parent) :
-    QQuickItem(parent)
+QuickItemMouseTracker::QuickItemMouseTracker(QObject* parent) :
+    base_type(parent)
 {
 }
 
