@@ -4315,7 +4315,7 @@ to %1</source>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>NA ŻYWO</translation>
+      <translation>LIVE</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
