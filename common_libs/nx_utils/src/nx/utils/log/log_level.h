@@ -19,11 +19,9 @@ enum class Level
     info,
     debug,
     verbose,
-
-    notConfigured = 0xFF,
+    notConfigured = 0xFF
 };
 
-//bool NX_UTILS_API operator<=(Level left, Level right);
 Level NX_UTILS_API levelFromString(const QString& levelString);
 QString NX_UTILS_API toString(Level level);
 
