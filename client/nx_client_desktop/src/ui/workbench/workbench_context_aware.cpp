@@ -126,7 +126,7 @@ void QnWorkbenchContextAware::initFromQmlContext()
         return;
 
     const auto workbenchContext =
-        qmlContext->contextProperty(lit("workbenchContext")).value<QnWorkbenchContext*>();
+        qmlContext->contextProperty(kQmlContextPropertyName).value<QnWorkbenchContext*>();
 
     if (workbenchContext)
         init(workbenchContext);
