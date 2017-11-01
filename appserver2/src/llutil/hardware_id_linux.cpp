@@ -10,15 +10,15 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
-#ifdef __arm__
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <unistd.h>
+#if defined(__arm__) || defined(__aarch64__)
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <sys/ioctl.h>
+    #include <arpa/inet.h>
+    #include <net/if.h>
+    #include <unistd.h>
 
-#include <QtCore/QCryptographicHash>
+    #include <QtCore/QCryptographicHash>
 #endif
 
 #include "util.h"
@@ -195,7 +195,7 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
     }
 }
 
-#elif defined(__arm__)
+#elif defined(__arm__) || defined(__aarch64__)
 
 // TODO: Use getMacFromPrimaryIF instead
 void mac_eth0(char  MAC_str[13], char** host)

@@ -149,6 +149,7 @@ namespace Qn
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
         ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
+        ItemPlaceholderRole,                        /**< Role for item's placeholder pixmap. Value of type QPixmap. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
@@ -162,6 +163,7 @@ namespace Qn
         ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
 
         ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
+        ItemAnalyticsModeRegionIdRole,              /**< Role for source region id in the analytics mode. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -203,7 +205,9 @@ namespace Qn
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
-        StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
+        LayoutTemplateRole,                         /**< Role for layout template. Used in StartAnalyticsAction. */
+
+        StoreSessionRole,                           /**< Role for flag that shows if session on successful connection should be stored.
                                                          Used in action::ConnectAction. */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                         Used in action::ConnectAction. */
