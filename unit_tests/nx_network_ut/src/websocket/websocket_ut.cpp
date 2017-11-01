@@ -819,11 +819,10 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
                 frameCount = 0;
                 sentMessageCount++;
             }
+
             if (sentMessageCount >= kTotalMessageCount)
-            {
-                readyPromise.set_value();
                 return;
-            }
+
             clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
         };
 
@@ -834,6 +833,13 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
                 return;
             ASSERT_EQ(serverReadBuf.size(), clientSendBuf.size());
             receivedFrameCount++;
+
+            if (receivedFrameCount >= kTotalMessageCount*kMessageFrameCount)
+            {
+                readyPromise.set_value();
+                return;
+            }
+
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
