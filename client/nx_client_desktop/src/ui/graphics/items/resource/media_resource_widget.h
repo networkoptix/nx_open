@@ -254,6 +254,7 @@ private slots:
     void clearEntropixEnhancedImage();
 
 private:
+    void setupStatusOverlayHandlers();
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
     void createPtzController();

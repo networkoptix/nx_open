@@ -63,10 +63,9 @@ QnStatusOverlayController::QnStatusOverlayController(
         this, &QnStatusOverlayController::updateVisibleItems);
 
     connect(m_widget, &QnStatusOverlayWidget::actionButtonClicked, this,
-        [this]
-        {
-            emit buttonClicked(m_currentButton);
-        });
+        [this] { emit buttonClicked(m_currentButton); });
+    connect(m_widget, &QnStatusOverlayWidget::customButtonClicked,
+        this, &QnStatusOverlayController::customButtonClicked);
 
     connect(this, &QnStatusOverlayController::isErrorOverlayChanged, this,
         [this]() { m_widget->setErrorStyle(isErrorOverlay()); });

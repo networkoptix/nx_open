@@ -51,6 +51,8 @@ signals:
 
     void buttonClicked(Qn::ResourceOverlayButton button);
 
+    void customButtonClicked();
+
     void visibleItemsChanged();
 
 private:

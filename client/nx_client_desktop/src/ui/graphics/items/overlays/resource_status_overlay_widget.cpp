@@ -229,7 +229,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
     connect(this, &GraphicsWidget::scaleChanged, this, &QnStatusOverlayWidget::updateAreasSizes);
     connect(m_button, &QPushButton::clicked, this, &QnStatusOverlayWidget::actionButtonClicked);
-    connect(m_customButton, &QPushButton::clicked, this, &QnStatusOverlayWidget::extraButtonClicked);
+    connect(m_customButton, &QPushButton::clicked, this, &QnStatusOverlayWidget::customButtonClicked);
 
     setupPreloader();
     setupCentralControls();

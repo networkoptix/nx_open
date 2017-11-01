@@ -46,7 +46,7 @@ public:
 
 signals:
     void actionButtonClicked();
-    void extraButtonClicked();
+    void customButtonClicked();
 
 private:
     void setupPreloader();

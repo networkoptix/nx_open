@@ -98,6 +98,7 @@
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
+#include <ui/dialogs/camera_password_change_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -652,30 +653,14 @@ void ActionHandler::at_previousLayoutAction_triggered()
 void ActionHandler::at_changeDefaultCameraPassword_triggered()
 {
     const auto camerasWithDefaultPassword =
-        [this]()
-        {
-            const auto resourcePool = commonModule()->resourcePool();
-            const auto cameras = resourcePool->getResources<QnSecurityCamResource>();
-            const auto result = cameras.filtered(
-                [](const QnSecurityCamResourcePtr& camera)
-                {
-                    return camera && camera->needsToChangeDefaultPassword();
-                });
-            return result;
-        }();
+        menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
 
     if (camerasWithDefaultPassword.isEmpty())
         return;
 
-    if (true)
-    {
-        const auto parameters = action::Parameters(camerasWithDefaultPassword.first())
-            .withArgument(Qn::FocusTabRole, static_cast<int>(Qn::AdvancedCameraSettingsTab));
-        menu()->trigger(action::CameraSettingsAction, parameters);
+    QnCameraPasswordChangeDialog dialog(camerasWithDefaultPassword, context()->mainWindow());
+    if (!dialog.exec())
         return;
-    }
-
-    // Show multiple cameras password change dialog
 }
 
 void ActionHandler::at_openInLayoutAction_triggered()

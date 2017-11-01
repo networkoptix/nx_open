@@ -165,13 +165,21 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
             if (defaultPasswordWatcher->notificationIsVisible())
             {
                 NX_EXPECT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
+                const auto parametersGetter =
+                    [defaultPasswordWatcher]()
+                    {
+                        return action::Parameters(
+                            defaultPasswordWatcher->camerasWithDefaultPassword());
+                    };
+
                 m_currentDefaultPasswordChangeWidget =
-                    addCustomPopup(action::ChangeDefaultCameraPasswordAction,
+                    addCustomPopup(action::ChangeDefaultCameraPasswordAction, parametersGetter,
                         QnNotificationLevel::Value::ImportantNotification, false);
             }
             else
             {
                 cleanUpItem(m_currentDefaultPasswordChangeWidget);
+                m_currentDefaultPasswordChangeWidget = nullptr;
             }
         };
 
@@ -317,6 +325,7 @@ void QnNotificationsCollectionWidget::addAcknoledgeButtonIfNeeded(
 
 QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
     action::IDType actionId,
+    const ParametersGetter& parametersGetter,
     QnNotificationLevel::Value notificationLevel,
     bool closeable)
 {
@@ -333,11 +342,17 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
     item->setNotificationLevel(notificationLevel);
     item->setCloseButtonAvailable(closeable);
     item->addTextButton(action->icon(), tr("Set Passwords"),
-        [this, actionId]()
+        [this, parametersGetter, actionId]()
         {
+            const auto triggerAction =
+                [this, actionId, parametersGetter]
+                {
+                    const auto parameters = parametersGetter();
+                    menu()->trigger(actionId, parameters);
+                };
+
             // Action will trigger additional event loop, which will cause problems here.
-            executeDelayedParented( [this, actionId] { menu()->trigger(actionId); },
-                kDefaultDelay, this);
+            executeDelayedParented(triggerAction, kDefaultDelay, this);
         });
 
     item->addActionButton(qnSkin->icon("events/sound.png"), actionId);

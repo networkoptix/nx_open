@@ -65,8 +65,10 @@ private:
         const QnVirtualCameraResourcePtr& camera,
         const nx::vms::event::AbstractActionPtr& action);
 
+    using ParametersGetter = std::function<nx::client::desktop::ui::action::Parameters ()>;
     QnNotificationWidget* addCustomPopup(
         nx::client::desktop::ui::action::IDType actionId,
+        const ParametersGetter& parametersGetter,
         QnNotificationLevel::Value notificationLevel,
         bool closeable);
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);

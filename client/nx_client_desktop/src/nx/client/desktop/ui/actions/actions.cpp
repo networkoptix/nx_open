@@ -600,7 +600,7 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget);
 
     factory(ChangeDefaultCameraPasswordAction)
-        .flags(NoTarget)
+        .flags(SingleTarget | MultiTarget | ResourceTarget)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Some cameras require passwords to be set"));

@@ -4,6 +4,7 @@
 
 #include <QtCore/QUuid>
 
+#include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 #include <common/common_module_aware.h>
 
@@ -21,15 +22,15 @@ public:
 
     bool notificationIsVisible() const;
 
-    int camerasWithDefaultPasswordCount() const;
+    QnVirtualCameraResourceList camerasWithDefaultPassword() const;
 
 signals:
     void notificationIsVisibleChanged();
-    void camerasWithDefaultPasswordCountChanged();
+    void camerasWithDefaultPasswordChanged();
 
 private:
     bool m_notificationIsVisible = false;
-    QSet<QUuid> m_camerasWithDefaultPassword;
+    QHash<QUuid, QnVirtualCameraResourcePtr> m_camerasWithDefaultPassword;
 };
 
 } // namespace desktop
