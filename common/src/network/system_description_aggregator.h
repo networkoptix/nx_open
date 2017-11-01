@@ -53,7 +53,7 @@ public: // overrides
 
     QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QUrl getServerHost(const QnUuid& serverId) const override;
+    nx::utils::Url getServerHost(const QnUuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 

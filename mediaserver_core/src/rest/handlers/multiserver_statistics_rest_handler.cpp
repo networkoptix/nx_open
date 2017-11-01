@@ -236,7 +236,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnCommonMo
             ec2::Ec2StaticticsReporter::DEFAULT_SERVER_API + lit("/config/client_stats_v2.json");
 
         const auto localSettingsUrl = commonModule->globalSettings()->clientStatisticsSettingsUrl();
-        return QUrl::fromUserInput(localSettingsUrl.trimmed().isEmpty()
+        return nx::utils::Url::fromUserInput(localSettingsUrl.trimmed().isEmpty()
             ? kSettingsUrl
             : localSettingsUrl);
     }();

@@ -10,6 +10,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/url.h>
 
 #include "auth_tools.h"
 #include "http_types.h"
@@ -33,7 +34,7 @@ public:
     class AuthorizationCacheItem
     {
     public:
-        QUrl url;
+        nx::utils::Url url;
         StringType method;
         Credentials userCredentials;
         std::shared_ptr<header::WWWAuthenticate> wwwAuthenticateHeader;
@@ -42,7 +43,7 @@ public:
         AuthorizationCacheItem() = default;
 
         AuthorizationCacheItem(
-            const QUrl& url,
+            const nx::utils::Url& url,
             const StringType& method,
             const Credentials& userCredentials,
             header::WWWAuthenticate wwwAuthenticateHeader,
@@ -85,7 +86,7 @@ public:
      * @return true if necessary information has been found in cache and added to request. false otherwise.
      */
     bool addAuthorizationHeader(
-        const QUrl& url,
+        const nx::utils::Url& url,
         Request* const request,
         AuthInfoCache::AuthorizationCacheItem* const authzData);
 
@@ -93,7 +94,7 @@ public:
      * @param url This argument is required since request->requestLine.url can contain only path.
      */
     static bool addAuthorizationHeader(
-        const QUrl& url,
+        const nx::utils::Url& url,
         Request* const request,
         AuthInfoCache::AuthorizationCacheItem authzData);
     static AuthInfoCache* instance();
@@ -107,7 +108,7 @@ private:
     mutable std::mutex m_mutex;
 
     AuthorizationCacheItem getCachedAuthentication(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const StringType& method) const;
 
     AuthInfoCache(const AuthInfoCache&);

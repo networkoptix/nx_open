@@ -729,7 +729,7 @@ void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactio
     if (!transport->isIncoming())
     {
         //we can connect to the peer
-        const QUrl remoteAddr = transport->remoteAddr();
+        const nx::utils::Url remoteAddr = transport->remoteAddr();
         //saving credentials has been used to establish connection
         startSynchronizingTimeWithPeer( //starting sending time sync info to peer
             transport->remotePeer().id,
@@ -810,7 +810,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
     NX_LOG(lm("TimeSynchronizationManager. About to report sync_time to peer %1 (%2)")
         .arg(peerID).arg(peerIter->second.peerAddress.toString()), cl_logDEBUG2);
 
-    QUrl targetUrl;
+    nx::utils::Url targetUrl;
     targetUrl.setScheme( lit("http") );
     targetUrl.setHost( peerIter->second.peerAddress.address.toString() );
     targetUrl.setPort( peerIter->second.peerAddress.port );

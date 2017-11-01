@@ -53,7 +53,7 @@ public:
 
     HanwhaMetadataMonitor* monitor(
         const QString& sharedId,
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth);
 
     void managerStoppedToUseMonitor(const QString& sharedId);
@@ -71,7 +71,7 @@ private:
         SharedResources(
             const QString& sharedId,
             const Hanwha::DriverManifest& driverManifest,
-            const QUrl& url,
+            const nx::utils::Url &url,
             const QAuthenticator& auth);
     };
 

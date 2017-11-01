@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 class QTimer;
@@ -24,7 +25,7 @@ public:
     struct Connection
     {
         QnUuid serverId;
-        QUrl url;
+        nx::utils::Url url;
     };
 
     explicit KnownServerConnections(QnCommonModule* commonModule, QObject* parent = nullptr);

@@ -15,7 +15,7 @@ bool operator==(const BasicInstanceInformation& left, const BasicInstanceInforma
 
 //-------------------------------------------------------------------------------------------------
 
-ModuleFinder::ModuleFinder(const QUrl& baseUrl):
+ModuleFinder::ModuleFinder(const utils::Url &baseUrl):
     m_baseUrl(baseUrl)
 {
 }

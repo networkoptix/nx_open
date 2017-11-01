@@ -150,7 +150,7 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
 rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
     const QnUuid& peerId,
     const QString& fileName,
-    const QUrl& url,
+    const nx::utils::Url& url,
     int chunkIndex,
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)

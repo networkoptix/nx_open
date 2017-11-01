@@ -48,7 +48,7 @@ QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread
 
     if (targetThread)
     {
-        NX_EXPECT(qnHasEventLoop(targetThread));
+        //NX_EXPECT(qnHasEventLoop(targetThread));
         timer->moveToThread(targetThread);
         functor->moveToThread(targetThread);
     }

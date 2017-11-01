@@ -135,7 +135,7 @@ public:
     std::chrono::milliseconds connectionKeepAliveTimeout() const;
     int keepAliveProbeCount() const;
 
-    void doOutgoingConnect(const QUrl& remotePeerUrl);
+    void doOutgoingConnect(const nx::utils::Url &remotePeerUrl);
 
     // these getters/setters are using from a single thread
     qint64 lastConnectTime() { return m_lastConnectTime; }
@@ -158,7 +158,7 @@ public:
 
     virtual const ec2::ApiPeerData& localPeer() const override;
     virtual const ec2::ApiPeerData& remotePeer() const override;
-    virtual QUrl remoteAddr() const override;
+    virtual nx::utils::Url remoteAddr() const override;
     SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
 
@@ -217,7 +217,7 @@ signals:
         const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
     void remotePeerUnauthorized(const QnUuid& id);
-    void peerIdDiscovered(const QUrl& url, const QnUuid& id);
+    void peerIdDiscovered(const nx::utils::Url& url, const QnUuid& id);
     void onSomeDataReceivedFromRemotePeer();
 
 protected:
@@ -269,7 +269,7 @@ private:
     nx::Buffer m_readBuffer;
     //!Holds raw data. It is serialized to http chunk just before sending to socket
     std::deque<DataToSend> m_dataToSend;
-    QUrl m_remoteAddr;
+    nx::utils::Url m_remoteAddr;
     bool m_connected;
 
     std::map<int, HttpChunkExtensonHandler> m_httpChunkExtensonHandlers;
@@ -295,7 +295,7 @@ private:
     std::unique_ptr<ConnectionLockGuard> m_connectionLockGuard;
     nx_http::AsyncHttpClientPtr m_outgoingTranClient;
     bool m_authOutgoingConnectionByServerKey;
-    QUrl m_postTranBaseUrl;
+    nx::utils::Url m_postTranBaseUrl;
     nx::Buffer m_dummyReadBuffer;
     bool m_base64EncodeOutgoingTransactions;
     std::vector<nx_http::HttpHeader> m_outgoingClientHeaders;
@@ -345,7 +345,7 @@ private:
     void outgoingConnectionEstablished( SystemError::ErrorCode errorCode );
     void startSendKeepAliveTimerNonSafe();
     void onMonitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
-    QUrl generatePostTranUrl();
+    nx::utils::Url generatePostTranUrl();
     void aggregateOutgoingTransactionsNonSafe();
 
     /** Destructor will block until unlock is called */

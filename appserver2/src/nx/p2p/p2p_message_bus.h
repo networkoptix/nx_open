@@ -65,7 +65,7 @@ public:
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
 
-    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
     QMap<QnUuid, P2pConnectionPtr> connections() const;
@@ -403,10 +403,10 @@ private:
     struct RemoteConnection
     {
         RemoteConnection() {}
-        RemoteConnection(const QnUuid& peerId, const QUrl& url) : peerId(peerId), url(url) {}
+        RemoteConnection(const QnUuid& peerId, const nx::utils::Url& url) : peerId(peerId), url(url) {}
 
         QnUuid peerId;
-        QUrl url;
+        nx::utils::Url url;
     };
 
     std::vector<RemoteConnection> m_remoteUrls;

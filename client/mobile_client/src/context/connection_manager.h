@@ -9,6 +9,7 @@
 #include <utils/common/software_version.h>
 #include <common/common_globals.h>
 #include <client/client_connection_status.h>
+#include <nx/utils/url.h>
 
 class QnConnectionManagerPrivate;
 class QnConnectionManager: public QObject, public QnConnectionContextAware
@@ -19,7 +20,7 @@ class QnConnectionManager: public QObject, public QnConnectionContextAware
     Q_PROPERTY(State connectionState READ connectionState NOTIFY connectionStateChanged)
     Q_PROPERTY(bool online READ isOnline NOTIFY isOnlineChanged)
     Q_PROPERTY(ConnectionType connectionType READ connectionType NOTIFY connectionTypeChanged)
-    Q_PROPERTY(QUrl currentUrl READ currentUrl NOTIFY currentUrlChanged)
+    Q_PROPERTY(nx::utils::Url currentUrl READ currentUrl NOTIFY currentUrlChanged)
     Q_PROPERTY(QString currentHost READ currentHost NOTIFY currentHostChanged)
     Q_PROPERTY(QString currentLogin READ currentLogin NOTIFY currentLoginChanged)
     Q_PROPERTY(QString currentPassword READ currentPassword NOTIFY currentPasswordChanged)
@@ -57,7 +58,7 @@ public:
 
     Q_INVOKABLE int defaultServerPort() const;
 
-    QUrl currentUrl() const;
+    nx::utils::Url currentUrl() const;
     QString currentHost() const;
     QString currentLogin() const;
     QString currentPassword() const;
@@ -79,8 +80,8 @@ signals:
     void connectionVersionChanged();
 
 public slots:
-    bool connectToServer(const QUrl &url);
-    bool connectToServer(const QUrl &url, const QString& userName, const QString& password);
+    bool connectToServer(const nx::utils::Url &url);
+    bool connectToServer(const nx::utils::Url &url, const QString& userName, const QString& password);
     bool connectByUserInput(
         const QString& address, const QString& userName, const QString& password);
     void disconnectFromServer();

@@ -10,6 +10,7 @@
 
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/url.h>
 #include <nx/network/nettools.h>
 
 #include <api/model/manual_camera_seach_reply.h>
@@ -43,10 +44,10 @@ class QnAbstractDTSSearcher;
 
 struct QnManualCameraInfo
 {
-    QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType);
+    QnManualCameraInfo(const nx::utils::Url& url, const QAuthenticator& auth, const QString& resType);
     QList<QnResourcePtr> checkHostAddr() const;
 
-    QUrl url;
+    nx::utils::Url url;
     QnResourceTypePtr resType;
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;

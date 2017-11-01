@@ -5,7 +5,7 @@
 namespace nx_http {
 
 bool AuthInfoCache::addAuthorizationHeader(
-    const QUrl& url,
+    const nx::utils::Url& url,
     Request* const request,
     AuthInfoCache::AuthorizationCacheItem* const authzData)
 {
@@ -21,7 +21,7 @@ bool AuthInfoCache::addAuthorizationHeader(
 }
 
 bool AuthInfoCache::addAuthorizationHeader(
-    const QUrl& url,
+    const nx::utils::Url& url,
     Request* const request,
     AuthInfoCache::AuthorizationCacheItem authzData)
 {
@@ -65,7 +65,7 @@ AuthInfoCache* AuthInfoCache::instance()
 }
 
 AuthInfoCache::AuthorizationCacheItem AuthInfoCache::getCachedAuthentication(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const StringType& method) const
 {
     std::lock_guard<std::mutex> lk(m_mutex);

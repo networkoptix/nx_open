@@ -15,7 +15,7 @@ class MediaServerClientEx:
     using base_type = MediaServerClient;
 
 public:
-    MediaServerClientEx(const QUrl& baseRequestUrl):
+    MediaServerClientEx(const nx::utils::Url& baseRequestUrl):
         base_type(baseRequestUrl)
     {
     }

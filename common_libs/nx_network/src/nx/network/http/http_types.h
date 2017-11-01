@@ -19,6 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 
 /**
  * Holds http-implementation suitable for async/sync i/o.
@@ -247,7 +248,7 @@ class NX_NETWORK_API RequestLine
 {
 public:
     StringType method;
-    QUrl url;
+    nx::utils::Url url;
     MimeProtoVersion version;
 
     RequestLine() = default;

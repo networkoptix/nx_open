@@ -24,7 +24,7 @@ public:
 
     virtual bool bind(const SocketAddress&) = 0;
     virtual bool listen() = 0;
-    virtual QUrl getServerUrl() const = 0;
+    virtual nx::utils::Url getServerUrl() const = 0;
     virtual void sendIndicationThroughEveryConnection(nx::stun::Message) = 0;
     virtual nx::stun::MessageDispatcher& dispatcher() = 0;
     virtual std::size_t connectionCount() const = 0;
@@ -238,7 +238,7 @@ private:
     typename AsyncClientTestTypes::ClientType m_client;
     std::unique_ptr<typename AsyncClientTestTypes::ServerType> m_server;
     SocketAddress m_serverEndpoint = SocketAddress::anyPrivateAddress;
-    QUrl m_serverUrl;
+    nx::utils::Url m_serverUrl;
     nx::utils::SyncQueue<int /*dummy*/> m_reconnectEvents;
     nx::utils::SyncQueue<RequestResult> m_requestResult;
     nx::utils::SyncQueue<nx::stun::Message> m_indicationsReceived;

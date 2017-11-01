@@ -44,7 +44,7 @@ void CloudMediaServerEndpointVerificator::verifyHost(
     }
 
     m_httpClient->doGet(
-        QUrl(lit("http://%1/api/moduleInformation").arg(m_endpointToVerify.toString())),
+        nx::utils::Url(lit("http://%1/api/moduleInformation").arg(m_endpointToVerify.toString())),
         std::bind(&CloudMediaServerEndpointVerificator::onHttpRequestDone, this));
 }
 

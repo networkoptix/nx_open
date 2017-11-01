@@ -168,7 +168,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     }
 
     QAuthenticator auth = getAuth();
-    QUrl requestUrl;
+    nx::utils::Url requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_HTTP_PORT) );
 

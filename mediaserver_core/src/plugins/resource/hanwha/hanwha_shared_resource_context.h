@@ -91,10 +91,10 @@ public:
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
-    void setRecourceAccess(const QUrl& url, const QAuthenticator& authenticator);
-    void setLastSucessfulUrl(const QUrl& value);
+    void setRecourceAccess(const nx::utils::Url& url, const QAuthenticator& authenticator);
+    void setLastSucessfulUrl(const nx::utils::Url& value);
 
-    QUrl url() const;
+    nx::utils::Url url() const;
     QAuthenticator authenticator() const;
     QnSemaphore* requestSemaphore();
 
@@ -123,9 +123,9 @@ private:
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
     mutable QnMutex m_dataMutex;
-    QUrl m_resourceUrl;
+    nx::utils::Url m_resourceUrl;
     QAuthenticator m_resourceAuthenticator;
-    QUrl m_lastSuccessfulUrl;
+    nx::utils::Url m_lastSuccessfulUrl;
     nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
 
     mutable QnMutex m_sessionMutex;

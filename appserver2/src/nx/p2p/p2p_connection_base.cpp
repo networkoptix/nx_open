@@ -41,7 +41,7 @@ QString toString(ConnectionBase::State value)
 ConnectionBase::ConnectionBase(
     const QnUuid& remoteId,
     const ApiPeerDataEx& localPeer,
-    const QUrl& _remotePeerUrl,
+    const nx::utils::Url& _remotePeerUrl,
     const std::chrono::seconds& keepAliveTimeout,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
@@ -110,18 +110,18 @@ ConnectionBase::~ConnectionBase()
     }
 }
 
-QUrl ConnectionBase::remoteAddr() const
+nx::utils::Url ConnectionBase::remoteAddr() const
 {
     if (m_direction == Direction::outgoing)
         return m_remotePeerUrl;
     if (m_webSocket)
     {
         auto address = m_webSocket->socket()->getForeignAddress();
-        return QUrl(lit("http://%1:%2")
+        return nx::utils::Url(lit("http://%1:%2")
             .arg(address.address.toString())
             .arg(address.port));
     }
-    return QUrl();
+    return nx::utils::Url();
 }
 
 void ConnectionBase::cancelConnecting(State newState, const QString& reason)

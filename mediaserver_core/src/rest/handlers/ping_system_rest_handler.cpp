@@ -29,7 +29,7 @@ int QnPingSystemRestHandler::executeGet(
 {
     Q_UNUSED(path)
 
-    QUrl url = params.value(lit("url"));
+    nx::utils::Url url = params.value(lit("url"));
     QString getKey = params.value(lit("getKey"));
 
     if (url.isEmpty())
@@ -114,7 +114,7 @@ int QnPingSystemRestHandler::executeGet(
 }
 
 QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
-        const QUrl &url,
+        const nx::utils::Url &url,
         const QString& getKey,
         int &status)
 {

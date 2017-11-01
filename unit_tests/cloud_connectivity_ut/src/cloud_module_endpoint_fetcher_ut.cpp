@@ -44,15 +44,15 @@ public:
 protected:
     cloud::CloudDbUrlFetcher m_fetcher;
 
-    QUrl fetchModuleUrl(const char* moduleName)
+    nx::utils::Url fetchModuleUrl(const char* moduleName)
     {
         auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(moduleName);
         auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher->pleaseStopSync(); });
         fetcher->setModulesXmlUrl(m_modulesUrl);
 
-        nx::utils::promise<QUrl> urlFoundPromise;
+        nx::utils::promise<nx::utils::Url> urlFoundPromise;
         fetcher->get(
-            [&urlFoundPromise](nx_http::StatusCode::Value statusCode, QUrl url)
+            [&urlFoundPromise](nx_http::StatusCode::Value statusCode, nx::utils::Url url)
             {
                 if (statusCode != nx_http::StatusCode::ok)
                 {
@@ -75,7 +75,7 @@ protected:
         return m_server;
     }
 
-    void setModulesUrl(QUrl modulesUrl)
+    void setModulesUrl(nx::utils::Url modulesUrl)
     {
         m_modulesUrl = modulesUrl;
         m_fetcher.setModulesXmlUrl(m_modulesUrl);
@@ -84,7 +84,7 @@ protected:
 private:
     TestHttpServer m_server;
     const QByteArray m_modulesXmlBody;
-    QUrl m_modulesUrl;
+    nx::utils::Url m_modulesUrl;
 
     void init()
     {
@@ -96,15 +96,15 @@ private:
         ASSERT_TRUE(m_server.bindAndListen()) << SystemError::getLastOSErrorText().toStdString();
 
         setModulesUrl(
-            QUrl(lit("http://%1%2").arg(m_server.serverAddress().toString()).arg(testPath)));
+            nx::utils::Url(lit("http://%1%2").arg(m_server.serverAddress().toString()).arg(testPath)));
     }
 };
 
 TEST_F(CloudModuleUrlFetcher, common)
 {
-    ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
-    ASSERT_EQ(QUrl("stuns://52.55.171.51:3345"), fetchModuleUrl("hpm"));
-    ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
+    ASSERT_EQ(nx::utils::Url("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
+    ASSERT_EQ(nx::utils::Url("stuns://52.55.171.51:3345"), fetchModuleUrl("hpm"));
+    ASSERT_EQ(nx::utils::Url("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -129,9 +129,9 @@ public:
 
 TEST_F(CloudModuleUrlFetcherCompatibility, correctly_parses_endpoints)
 {
-    ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("cdb"));
-    ASSERT_EQ(QUrl("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
-    ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
+    ASSERT_EQ(nx::utils::Url("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("cdb"));
+    ASSERT_EQ(nx::utils::Url("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
+    ASSERT_EQ(nx::utils::Url("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -156,9 +156,9 @@ public:
 
 TEST_F(CloudModuleUrlFetcherCompatibilityAutoSchemeSelection, https)
 {
-    ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
-    ASSERT_EQ(QUrl("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
-    ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("notification_module"));
+    ASSERT_EQ(nx::utils::Url("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
+    ASSERT_EQ(nx::utils::Url("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
+    ASSERT_EQ(nx::utils::Url("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("notification_module"));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -222,7 +222,7 @@ protected:
         httpServer().registerRequestProcessor<
             CustomMessageBodyProvider<HanglingMsgBodySource>>("/cloud_modules.xml");
         setModulesUrl(
-            QUrl(lit("http://%1/cloud_modules.xml").arg(httpServer().serverAddress().toString())));
+            nx::utils::Url(lit("http://%1/cloud_modules.xml").arg(httpServer().serverAddress().toString())));
     }
     
     void assertUrlFetcherReportsError()
@@ -256,7 +256,7 @@ TEST_F(FtCloudModuleUrlFetcher, cancellation)
             operation.get(
                 [&s](
                     nx_http::StatusCode::Value /*resCode*/,
-                    QUrl endpoint)
+                    nx::utils::Url endpoint)
                 {
                     //if called after destruction, will get segfault here
                     s = endpoint.toString().toStdString();
@@ -330,7 +330,7 @@ protected:
         nx::utils::promise<void> done;
         m_urlFetcher.get(
             [this, &done](
-                nx_http::StatusCode::Value statusCode, QUrl tcpUrl, QUrl udpUrl)
+                nx_http::StatusCode::Value statusCode, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
             {
                 m_actualResult.statusCode = statusCode;
                 m_actualResult.tcpUrl = tcpUrl;
@@ -351,8 +351,8 @@ private:
     struct Result
     {
         nx_http::StatusCode::Value statusCode;
-        QUrl tcpUrl;
-        QUrl udpUrl;
+        nx::utils::Url tcpUrl;
+        nx::utils::Url udpUrl;
     };
 
     Result m_expectedResult;

@@ -43,9 +43,9 @@ bool QnAxisAudioTransmitter::isReadyForTransmission(
     return isRetryAfterUnauthorizedResponse || m_noAuth;
 }
 
-QUrl QnAxisAudioTransmitter::transmissionUrl() const
+nx::utils::Url QnAxisAudioTransmitter::transmissionUrl() const
 {
-    QUrl url(m_resource->getUrl());
+    nx::utils::Url url(m_resource->getUrl());
 
     url.setScheme(lit("http"));
     if (url.host().isEmpty())

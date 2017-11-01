@@ -196,6 +196,65 @@ void AddressResolver::resolveDomain(
         });
 }
 
+namespace {
+
+// InPlaceResolver ---------------------------------------------------------------------------------
+using ResolveHandler = AddressResolver::ResolveHandler;
+
+class InPlaceResolver
+{
+public:
+    InPlaceResolver(int ipVersion, const HostAddress& hostname);
+    bool resolve(ResolveHandler* handler);
+private:
+    int m_ipVersion;
+    HostAddress m_hostname;
+
+    bool callHandler(HostAddress hostAddress, ResolveHandler* handler);
+};
+
+InPlaceResolver::InPlaceResolver(int ipVersion, const HostAddress& hostname):
+    m_ipVersion(ipVersion),
+    m_hostname(hostname)
+{
+    NX_ASSERT(m_ipVersion == AF_INET || m_ipVersion == AF_INET6);
+    if (m_ipVersion != AF_INET && m_ipVersion != AF_INET6)
+        NX_ERROR(this, "Unknown ip version");
+}
+
+bool InPlaceResolver::resolve(ResolveHandler* handler)
+{
+    if (m_hostname.isIpAddress())
+        return callHandler(std::move(m_hostname), handler);
+
+    if (m_ipVersion == AF_INET && m_hostname.ipV4())
+        return callHandler(*m_hostname.ipV4(), handler);
+
+    HostAddress::IpV6WithScope ipV6WithScope = m_hostname.ipV6();
+    if (!ipV6WithScope.first || !m_hostname.isPureIpV6())
+        return false;
+
+    return callHandler(HostAddress(*ipV6WithScope.first, ipV6WithScope.second), handler);
+}
+
+bool InPlaceResolver::callHandler(HostAddress hostAddress, ResolveHandler* handler)
+{
+    NX_VERBOSE(this, lm("IP %1 resolved in place").arg(m_hostname));
+    AddressEntry entry(AddressType::direct, std::move(hostAddress));
+    (*handler)(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
+
+    return true;
+}
+
+static bool inPlaceResolve(int ipVersion, const HostAddress& hostAddress, ResolveHandler* handler)
+{
+    InPlaceResolver resolver(ipVersion, hostAddress);
+    return resolver.resolve(handler);
+}
+// -------------------------------------------------------------------------------------------------
+
+} // namespace
+
 void AddressResolver::resolveAsync(
     const HostAddress& hostName,
     ResolveHandler handler,
@@ -203,27 +262,8 @@ void AddressResolver::resolveAsync(
     int ipVersion,
     void* requestId)
 {
-    if (hostName.isIpAddress())
-    {
-        NX_VERBOSE(this, lm("IP %1 is already resolved").arg(hostName));
-        AddressEntry entry(AddressType::direct, hostName);
-        return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
-    }
-
-    // Checking if hostName is fixed address, to speed up resolution when IPv6 is disabled.
-    if (ipVersion == AF_INET)
-    {
-        const auto hostStr = hostName.toString().toStdString();
-        struct in_addr resolvedAddress;
-        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
-        if (inet_pton(AF_INET, hostStr.c_str(), &resolvedAddress) > 0)
-        {
-            // Resolved.
-            NX_VERBOSE(this, lm("Hostname %1 is IP v4 address").arg(hostStr));
-            AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
-            return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
-        }
-    }
+    if (inPlaceResolve(ipVersion, hostName, &handler))
+        return;
 
     if (SocketGlobals::ini().isHostDisabled(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());

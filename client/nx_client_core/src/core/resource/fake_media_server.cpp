@@ -76,7 +76,7 @@ Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
     return m_serverData.status;
 }
 
-QUrl QnFakeMediaServerResource::getApiUrl() const
+nx::utils::Url QnFakeMediaServerResource::getApiUrl() const
 {
     auto url = base_type::getApiUrl();
     url.setUserName(m_authenticator.user());

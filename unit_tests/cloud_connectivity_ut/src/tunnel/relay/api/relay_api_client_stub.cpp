@@ -107,9 +107,9 @@ void ClientImpl::openConnectionToTheTargetHost(
         });
 }
 
-QUrl ClientImpl::url() const
+utils::Url ClientImpl::url() const
 {
-    return QUrl();
+    return nx::utils::Url();
 }
 
 SystemError::ErrorCode ClientImpl::prevRequestSysErrorCode() const

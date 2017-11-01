@@ -408,10 +408,13 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
         return false;
     }
 
-    if (m_ipVersion == AF_INET6)
+    int on = 1;
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
+        return false;
+
+    if (m_ipVersion == AF_INET6
+        && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)))
     {
-        int off = 0;
-        if (::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&off, sizeof(off)))
             return false;
     }
 
@@ -811,7 +814,8 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
     if (connectResult != 0)
     {
-        if (SystemError::getLastOSErrorCode() != SystemError::inProgress)
+        auto errorCode = SystemError::getLastOSErrorCode();
+        if (errorCode != SystemError::inProgress)
             return false;
         if (isNonBlockingModeBak)
             return true;        //async connect started
@@ -1131,9 +1135,9 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
         return true;
 
 #if defined( Q_OS_LINUX )
-    const int inactivityPeriodBeforeFirstProbe = 
+    const int inactivityPeriodBeforeFirstProbe =
         intDuration<seconds>(info->inactivityPeriodBeforeFirstProbe);
-    if (setsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, 
+    if (setsockopt(handle(), SOL_TCP, TCP_KEEPIDLE,
             &inactivityPeriodBeforeFirstProbe, sizeof(inactivityPeriodBeforeFirstProbe)) < 0)
     {
         return false;
@@ -1150,9 +1154,9 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
     if (setsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count)) < 0)
         return false;
 #elif defined( Q_OS_MACX )
-    const int inactivityPeriodBeforeFirstProbe = 
+    const int inactivityPeriodBeforeFirstProbe =
         intDuration<seconds>(info->inactivityPeriodBeforeFirstProbe);
-    if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE, 
+    if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE,
             &inactivityPeriodBeforeFirstProbe, sizeof(inactivityPeriodBeforeFirstProbe)) < 0)
     {
         return false;
@@ -1185,7 +1189,7 @@ bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
     *result = KeepAliveOptions();
 #if defined(Q_OS_LINUX)
     int inactivityPeriodBeforeFirstProbe = 0;
-    if (getsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, 
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPIDLE,
             &inactivityPeriodBeforeFirstProbe, &length) < 0)
     {
         return false;

@@ -6,8 +6,6 @@
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QUrl>
-
 #include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
@@ -33,7 +31,7 @@ struct General
 struct CloudDb
 {
     bool runWithCloud;
-    boost::optional<QUrl> url;
+    boost::optional<nx::utils::Url> url;
     QString user;
     QString password;
     std::chrono::seconds updateInterval{0};

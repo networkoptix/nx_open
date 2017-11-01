@@ -79,7 +79,7 @@ private:
     };
 
     std::unique_ptr<nx::network::cloud::relay::ConnectionAcceptor> m_relayConnectionAcceptor;
-    QUrl m_baseUrl;
+    nx::utils::Url m_baseUrl;
     nx::String m_peerName;
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_serverConnection;

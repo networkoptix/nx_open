@@ -39,7 +39,7 @@ class MediaServerClient:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    MediaServerClient(const QUrl& baseRequestUrl);
+    MediaServerClient(const nx::utils::Url &baseRequestUrl);
     
     MediaServerClient(const MediaServerClient&) = delete;
     MediaServerClient& operator=(const MediaServerClient&) = delete;
@@ -137,7 +137,7 @@ protected:
             typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
         performGetRequest(
-            [&inputData](const QUrl& url, nx_http::AuthInfo authInfo)
+            [&inputData](const nx::utils::Url& url, nx_http::AuthInfo authInfo)
             {
                 return std::make_unique<nx_http::FusionDataHttpClient<Input, ActualOutputType>>(
                     url, std::move(authInfo), inputData);
@@ -158,7 +158,7 @@ protected:
             typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
         performGetRequest(
-            [](const QUrl& url, nx_http::AuthInfo authInfo)
+            [](const nx::utils::Url& url, nx_http::AuthInfo authInfo)
             {
                 return std::make_unique<nx_http::FusionDataHttpClient<void, ActualOutputType>>(
                     url, std::move(authInfo));
@@ -176,10 +176,10 @@ protected:
             nx_http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
-        using ActualOutputType =
-            typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
+//        using ActualOutputType =
+//            typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
 
-        QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
+        nx::utils::Url requestUrl = nx::network::url::Builder(m_baseRequestUrl)
             .appendPath(QLatin1String("/"))
             .appendPath(QString::fromStdString(requestPath)).toUrl();
         if (!m_authenticationKey.isEmpty())
@@ -385,7 +385,7 @@ protected:
 
 private:
     boost::optional<std::chrono::milliseconds> m_requestTimeout;
-    const QUrl m_baseRequestUrl;
+    const nx::utils::Url m_baseRequestUrl;
     boost::optional<nx_http::Credentials> m_userCredentials;
     std::list<std::unique_ptr<nx::network::aio::BasicPollable>> m_activeClients;
     nx_http::StatusCode::Value m_prevResponseHttpStatusCode =

@@ -9,7 +9,7 @@ CloudConnector::CloudConnector(AbstractTransactionMessageBus* messageBus):
 {
 }
 
-void CloudConnector::startDataSynchronization(const QUrl& cloudUrl)
+void CloudConnector::startDataSynchronization(const nx::utils::Url &cloudUrl)
 {
     m_messageBus->addOutgoingConnectionToPeer(::ec2::kCloudPeerId, cloudUrl);
 }

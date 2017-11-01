@@ -4,7 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/type_utils.h>
 
-MediaServerClient::MediaServerClient(const QUrl& baseRequestUrl):
+MediaServerClient::MediaServerClient(const nx::utils::Url& baseRequestUrl):
     m_baseRequestUrl(baseRequestUrl)
 {
 }

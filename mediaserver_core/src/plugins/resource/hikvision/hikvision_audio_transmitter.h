@@ -26,7 +26,7 @@ protected:
         nx_http::AsyncHttpClientPtr httpClient,
         bool isRetryAfterUnauthorizedResponse) const override;
 
-    virtual QUrl transmissionUrl() const override;
+    virtual nx::utils::Url transmissionUrl() const override;
     virtual std::chrono::milliseconds transmissionTimeout() const override;
     virtual nx_http::StringType contentType() const override;
 

@@ -14,7 +14,7 @@ bool isCloudServer(const QnMediaServerResourcePtr& server)
     if (!server)
         return false;
 
-    QUrl url = server->getApiUrl();
+    nx::utils::Url url = server->getApiUrl();
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
         return true;
 

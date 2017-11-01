@@ -238,7 +238,7 @@ int syncDir(const QString& localDir, QString remoteUrl)
     remoteUrl = lit("http://") + remoteUrl;
 
     RDirSyncher::EventReceiver dummyEventReceiver;
-    auto syncher = std::make_shared<RDirSyncher>(QUrl(remoteUrl), localDir, &dummyEventReceiver);
+    auto syncher = std::make_shared<RDirSyncher>(nx::utils::Url(remoteUrl), localDir, &dummyEventReceiver);
     if (!syncher->startAsync())
     {
         std::cerr << "Error: Failed to start synchronization" << std::endl;
@@ -335,7 +335,7 @@ int doInstallation(
 
 int downloadFile(const QString& url, const QString& destFilePath)
 {
-    QUrl sourceUrl(url);
+    nx::utils::Url sourceUrl(url);
 
     std::string destFile = destFilePath.isEmpty()
         ? QFileInfo(sourceUrl.path()).fileName().toStdString()

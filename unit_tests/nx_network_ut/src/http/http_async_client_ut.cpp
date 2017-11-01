@@ -162,7 +162,7 @@ private:
         completionHandler(nx_http::StatusCode::switchingProtocols);
     }
 
-    QUrl prepareUrl()
+    nx::utils::Url prepareUrl()
     {
         const auto serverAddress = m_synchronousServer
             ? m_synchronousServer->endpoint()

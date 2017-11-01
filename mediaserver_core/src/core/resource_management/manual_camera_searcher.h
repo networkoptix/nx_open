@@ -42,11 +42,11 @@ public:
 
     void doSearch();
 
-    QUrl url();
+    nx::utils::Url url();
     QString toString();
 
 private:
-    QUrl m_url;
+    nx::utils::Url m_url;
     QAuthenticator m_auth;
 
     /**

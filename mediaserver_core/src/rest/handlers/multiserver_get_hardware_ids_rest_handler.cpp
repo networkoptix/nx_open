@@ -53,7 +53,7 @@ static void loadRemoteDataAsync(
                 });
         };
 
-    QUrl apiUrl(server->getApiUrl());
+    nx::utils::Url apiUrl(server->getApiUrl());
     apiUrl.setPath(urlPath);
 
     auto router = commonModule->router();

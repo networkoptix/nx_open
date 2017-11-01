@@ -170,52 +170,52 @@ void AsyncClient::setRequestBody(std::unique_ptr<AbstractMsgBodySource> body)
     m_requestBody->bindToAioThread(getAioThread());
 }
 
-void AsyncClient::doGet(const QUrl& url)
+void AsyncClient::doGet(const nx::utils::Url& url)
 {
     doRequest(nx_http::Method::get, url);
 }
 
 void AsyncClient::doGet(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doGet(url);
 }
 
-void AsyncClient::doPost(const QUrl& url)
+void AsyncClient::doPost(const nx::utils::Url& url)
 {
     doRequest(nx_http::Method::post, url);
 }
 
 void AsyncClient::doPost(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPost(url);
 }
 
-void AsyncClient::doPut(const QUrl& url)
+void AsyncClient::doPut(const nx::utils::Url& url)
 {
     doRequest(nx_http::Method::put, url);
 }
 
 void AsyncClient::doPut(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
     doPut(url);
 }
 
-void AsyncClient::doDelete(const QUrl& url)
+void AsyncClient::doDelete(const nx::utils::Url& url)
 {
     doRequest(nx_http::Method::delete_, url);
 }
 
 void AsyncClient::doDelete(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -223,7 +223,7 @@ void AsyncClient::doDelete(
 }
 
 void AsyncClient::doUpgrade(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -235,7 +235,7 @@ void AsyncClient::doUpgrade(
 }
 
 void AsyncClient::doUpgrade(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx_http::Method::ValueType method,
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -258,7 +258,7 @@ void AsyncClient::doUpgrade(
 
 void AsyncClient::doRequest(
     nx_http::Method::ValueType method,
-    const QUrl& url)
+    const nx::utils::Url& url)
 {
     //NX_ASSERT(!url.host().isEmpty());
     //NX_ASSERT(url.isValid());
@@ -275,7 +275,7 @@ void AsyncClient::doRequest(
 
 void AsyncClient::doRequest(
     nx_http::Method::ValueType method,
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -324,12 +324,12 @@ BufferType AsyncClient::fetchMessageBodyBuffer()
     return buffer;
 }
 
-const QUrl& AsyncClient::url() const
+const nx::utils::Url& AsyncClient::url() const
 {
     return m_requestUrl;
 }
 
-const QUrl& AsyncClient::contentLocationUrl() const
+const nx::utils::Url& AsyncClient::contentLocationUrl() const
 {
     return m_contentLocationUrl;
 }
@@ -455,7 +455,7 @@ void AsyncClient::stopWhileInAioThread()
 void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 {
     NX_LOGX(lm("Opened connection to url %1. Result code %2")
-        .arg(m_contentLocationUrl).arg(errorCode), cl_logDEBUG2);
+        .args(m_contentLocationUrl, errorCode), cl_logDEBUG2);
 
     if (m_terminated)
         return;
@@ -692,7 +692,16 @@ void AsyncClient::initiateTcpConnection()
 
     m_state = State::sInit;
 
-    m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lm("https"));
+    int ipVersion = AF_INET;
+    if ((bool) HostAddress(m_contentLocationUrl.host()).isPureIpV6())
+    {
+        ipVersion = AF_INET6;
+    }
+
+    m_socket = SocketFactory::createStreamSocket(
+        m_contentLocationUrl.scheme() == lm("https"),
+        nx::network::NatTraversalSupport::enabled,
+        ipVersion);
 
     NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
         .arg(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
@@ -1042,7 +1051,7 @@ bool AsyncClient::sendRequestToNewLocation(const Response& response)
     m_authorizationTried = false;
     m_ha1RecalcTried = false;
 
-    m_contentLocationUrl = QUrl(QLatin1String(locationIter->second));
+    m_contentLocationUrl = nx::utils::Url(QLatin1String(locationIter->second));
 
     const auto method = m_request.requestLine.method;
     composeRequest(method);
@@ -1282,7 +1291,7 @@ bool AsyncClient::reconnectIfAppropriate()
     return false;
 }
 
-QString AsyncClient::endpointWithProtocol(const QUrl& url)
+QString AsyncClient::endpointWithProtocol(const nx::utils::Url& url)
 {
     return lm("%1://%2:%3")
         .arg(url.scheme())

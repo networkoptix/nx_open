@@ -20,7 +20,7 @@ public:
 
     nx_http::AsyncHttpClientPtr asyncHttpClient() const;
     bool isFailed() const;
-    QUrl url() const;
+    nx::utils::Url url() const;
     QByteArray contentType();
     QByteArray data();
     nx_http::Response response();
@@ -37,7 +37,7 @@ private:
     nx_http::AsyncHttpClientPtr m_client;
 
     bool m_failed;
-    QUrl m_url;
+    nx::utils::Url m_url;
     nx_http::BufferType m_contentType;
     nx_http::BufferType m_data;
     nx_http::Response m_response;

@@ -42,7 +42,7 @@ protected:
 
 private:
     void setMaxFps(int f);
-    CameraDiagnostics::Result doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody );
+    CameraDiagnostics::Result doISDApiRequest( const nx::utils::Url& apiRequestUrl, QByteArray* const msgBody );
 };
 
 #endif // #ifdef ENABLE_ISD

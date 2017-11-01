@@ -48,7 +48,7 @@ public:
     void execute(QnMutex& mutex);
     virtual void pleaseStop();
     QSharedPointer<AbstractStreamSocket> socket() const;
-    QUrl getDecodedUrl() const;
+    nx::utils::Url getDecodedUrl() const;
 
     bool sendBuffer(const QnByteArray& sendBuffer);
     bool sendBuffer(const QByteArray& sendBuffer);

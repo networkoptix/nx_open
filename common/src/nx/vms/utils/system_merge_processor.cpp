@@ -62,7 +62,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::merge(
     if (!validateInputData(data, result))
         return nx_http::StatusCode::badRequest;
 
-    const QUrl url(data.url);
+    const nx::utils::Url url(data.url);
 
     // Get module information to get system name.
     auto statusCode = fetchModuleInformation(url, data.getKey, &m_remoteModuleInformation);
@@ -101,7 +101,7 @@ bool SystemMergeProcessor::validateInputData(
         return false;
     }
 
-    const QUrl url(data.url);
+    const nx::utils::Url url(data.url);
     if (!url.isValid())
     {
         NX_LOG(lit("SystemMergeProcessor. Received invalid parameter url %1")
@@ -126,7 +126,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPossible(
     const MergeSystemData& data,
     QnJsonRestResult* result)
 {
-    const QUrl url(data.url);
+    const nx::utils::Url url(data.url);
 
     QnUserResourcePtr adminUser = m_commonModule->resourcePool()->getAdministrator();
     if (!adminUser)
@@ -298,7 +298,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::mergeSystems(
     const QUrl url(data.url);
     if (!m_remoteModuleInformation.remoteAddresses.contains(url.host()))
     {
-        QUrl simpleUrl;
+        nx::utils::Url simpleUrl;
         simpleUrl.setScheme(lit("http"));
         simpleUrl.setHost(url.host());
         if (url.port() != m_remoteModuleInformation.port)
@@ -324,7 +324,7 @@ void SystemMergeProcessor::setMergeError(
 }
 
 bool SystemMergeProcessor::applyCurrentSettings(
-    const QUrl& remoteUrl,
+    const nx::utils::Url& remoteUrl,
     const QString& postKey,
     bool oneServer)
 {
@@ -380,7 +380,7 @@ bool SystemMergeProcessor::applyCurrentSettings(
 
 bool SystemMergeProcessor::executeRemoteConfigure(
     const ConfigureSystemData& data,
-    const QUrl& remoteUrl,
+    const nx::utils::Url& remoteUrl,
     const QString& postKey)
 {
     QByteArray serializedData = QJson::serialized(data);
@@ -391,7 +391,7 @@ bool SystemMergeProcessor::executeRemoteConfigure(
     client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, m_authSession.toByteArray());
 
-    QUrl requestUrl(remoteUrl);
+    nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(lit("/api/configure"));
     addAuthToRequest(requestUrl, postKey);
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
@@ -424,7 +424,7 @@ bool SystemMergeProcessor::executeRemoteConfigure(
 }
 
 bool SystemMergeProcessor::applyRemoteSettings(
-    const QUrl& remoteUrl,
+    const nx::utils::Url& remoteUrl,
     const QnUuid& systemId,
     const QString& systemName,
     const QString& getKey,
@@ -512,7 +512,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
             m_authSession.toByteArray());
 
         QByteArray serializedData = QJson::serialized(currentServer);
-        QUrl requestUrl(remoteUrl);
+        nx::utils::Url requestUrl(remoteUrl);
         addAuthToRequest(requestUrl, postKey);
         requestUrl.setPath(lit("/ec2/saveMediaServer"));
         if (!client.doPost(requestUrl, "application/json", serializedData) ||
@@ -553,7 +553,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::getClientResponse(
 
 template <class ResultDataType>
 bool SystemMergeProcessor::executeRequest(
-    const QUrl& remoteUrl,
+    const nx::utils::Url& remoteUrl,
     const QString& getKey,
     ResultDataType& result,
     const QString& path)
@@ -563,7 +563,7 @@ bool SystemMergeProcessor::executeRequest(
     client.setSendTimeoutMs(kRequestTimeout.count());
     client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
 
-    QUrl requestUrl(remoteUrl);
+    nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(path);
     addAuthToRequest(requestUrl, getKey);
     if (!client.doGet(requestUrl) || !isResponseOK(client))
@@ -582,7 +582,7 @@ bool SystemMergeProcessor::executeRequest(
     return QJson::deserialize(response, &result);
 }
 
-void SystemMergeProcessor::addAuthToRequest(QUrl& request, const QString& remoteAuthKey)
+void SystemMergeProcessor::addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey)
 {
     QUrlQuery query(request.query());
     query.addQueryItem(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME), remoteAuthKey);
@@ -590,7 +590,7 @@ void SystemMergeProcessor::addAuthToRequest(QUrl& request, const QString& remote
 }
 
 nx_http::StatusCode::Value SystemMergeProcessor::fetchModuleInformation(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QString& authenticationKey,
     QnModuleInformationWithAddresses* moduleInformation)
 {
@@ -605,7 +605,7 @@ nx_http::StatusCode::Value SystemMergeProcessor::fetchModuleInformation(
         query.addQueryItem(lit("checkOwnerPermissions"), lit("true"));
         query.addQueryItem(lit("showAddresses"), lit("true"));
 
-        QUrl requestUrl(url);
+        nx::utils::Url requestUrl(url);
         requestUrl.setPath(lit("/api/moduleInformationAuthenticated"));
         requestUrl.setQuery(query);
         addAuthToRequest(requestUrl, authenticationKey);

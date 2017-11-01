@@ -28,7 +28,7 @@ void AsyncClientWithHttpTunneling::bindToAioThread(
         m_httpClient->bindToAioThread(aioThread);
 }
 
-void AsyncClientWithHttpTunneling::connect(const QUrl& url, ConnectHandler handler)
+void AsyncClientWithHttpTunneling::connect(const utils::Url &url, ConnectHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -297,7 +297,7 @@ void AsyncClientWithHttpTunneling::dispatchIndication(
 
 void AsyncClientWithHttpTunneling::openHttpTunnel(
     const QnMutexLockerBase&,
-    const QUrl& url,
+    const nx::utils::Url& url,
     ConnectHandler handler)
 {
     m_connectHandler = std::move(handler);

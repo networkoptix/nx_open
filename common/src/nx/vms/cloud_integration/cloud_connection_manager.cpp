@@ -34,7 +34,7 @@ CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
         this, &CloudConnectionManager::cloudSettingsChanged);
 }
 
-void CloudConnectionManager::setCloudDbUrl(const QUrl& url)
+void CloudConnectionManager::setCloudDbUrl(const nx::utils::Url& url)
 {
     m_cdbConnectionFactory->setCloudUrl(url.toString().toStdString());
 }

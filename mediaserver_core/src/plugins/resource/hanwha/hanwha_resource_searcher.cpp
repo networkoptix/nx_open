@@ -30,7 +30,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url)
+HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url)
 {
     // This is not the same context as for resources, bc we do not have MAC address before hand.
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
@@ -48,6 +48,7 @@ HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
 {
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);
 }
+
 
 QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnUuid &resourceTypeId,
@@ -75,8 +76,7 @@ QString HanwhaResourceSearcher::manufacture() const
     return kHanwhaManufacturerName;
 }
 
-QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
-    const QUrl& url,
+QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url,
     const QAuthenticator& auth,
     bool isSearchAction)
 {
@@ -89,7 +89,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(
 
     QnResourceList result;
     HanwhaResourcePtr resource(new HanwhaResource());
-    QUrl urlCopy(url);
+    utils::Url urlCopy(url);
     urlCopy.setScheme("http");
 
     resource->setUrl(urlCopy.toString());
