@@ -2,7 +2,6 @@
 #include <QtCore/QRegExp>
 #include <cctype>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/assert.h>
 #include "url.h"
 
