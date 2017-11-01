@@ -5,28 +5,13 @@
 #include <type_traits>
 #include <QByteArray>
 
+#include "qt_random_device.h"
+
 // #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
 
 namespace nx {
 namespace utils {
 namespace random {
-
-/**
- * Exception free, qrand based random device.
- * @note Should be used on platforms where std::random_device does not work as expected.
- */
-class NX_UTILS_API QtDevice
-{
-public:
-    typedef uint result_type;
-    QtDevice();
-
-    result_type operator()();
-    double entropy() const;
-
-    static constexpr result_type min() { return std::random_device::min(); }
-    static constexpr result_type max() { return std::random_device::max(); }
-};
 
 /**
  * Simple implementaion of std::uniform_int_distribution.
@@ -90,10 +75,12 @@ NX_UTILS_API QByteArray generate(std::size_t count);
 /**
  * Generates uniform_int_distribution random integer in [min, max]
  */
-template<typename Type = int>
+template<typename RandomDevice, typename Type = int>
 Type number(
+    RandomDevice& randomDevice,
     Type min = 0,
     Type max = std::numeric_limits<Type>::max(),
+    typename std::enable_if<std::is_class<RandomDevice>::value>::type* = 0,
     typename std::enable_if<
         std::is_integral<Type>::value &&
         !std::is_same<Type, bool>::value>::type* = 0)
@@ -103,13 +90,46 @@ Type number(
     #else
         std::uniform_int_distribution<Type> distribution(min, max);
     #endif
-    return distribution(qtDevice());
+    return distribution(randomDevice);
+}
+
+template<typename Type = int>
+Type number(
+    Type min = 0,
+    Type max = std::numeric_limits<Type>::max(),
+    typename std::enable_if<
+        std::is_integral<Type>::value &&
+        !std::is_same<Type, bool>::value>::type* = 0)
+{
+    return number<QtDevice, Type>(qtDevice(), min, max);
+}
+
+template<typename RandomDevice, typename Type>
+bool number(
+    RandomDevice& randomDevice,
+    typename std::enable_if<std::is_class<RandomDevice>::value>::type* = 0,
+    typename std::enable_if<std::is_same<Type, bool>::value>::type* = 0)
+{
+    return randomDevice() >
+        (RandomDevice::min() + ((RandomDevice::max() - RandomDevice::min()) / 2));
 }
 
 template<typename Type>
 bool number(typename std::enable_if<std::is_same<Type, bool>::value>::type* = 0)
 {
-    return qtDevice()() > (QtDevice::min() + ((QtDevice::max() - QtDevice::min()) / 2));
+    return number<QtDevice, Type>(qtDevice());
+}
+
+template<typename RandomDevice, typename Type>
+Type number(
+    RandomDevice& randomDevice,
+    Type min = 0,
+    Type max = std::numeric_limits<Type>::max(),
+    typename std::enable_if<std::is_class<RandomDevice>::value>::type* = 0,
+    typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
+{
+    std::uniform_real_distribution<Type> distribution(min, max);
+    return distribution(randomDevice);
 }
 
 /**
@@ -121,9 +141,35 @@ Type number(
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
 {
-    std::uniform_real_distribution<Type> distribution(min, max);
-    return distribution(qtDevice());
+    return number<QtDevice, Type>(qtDevice(), min, max);
 }
+
+template<typename RandomDevice>
+QByteArray generateName(RandomDevice& randomDevice, int length)
+{
+    static const char kAlphaAndDigits[] = 
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    static const size_t kDigitsCount = 10;
+    static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
+
+    if (!length)
+        return QByteArray();
+
+    QByteArray str;
+    str.resize(length);
+    str[0] = kAlphaAndDigits[
+        nx::utils::random::number(randomDevice) % 
+            (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
+    for (int i = 1; i < length; ++i)
+    {
+        str[i] = kAlphaAndDigits[nx::utils::random::number(randomDevice) % 
+            (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
+    }
+
+    return str;
+}
+
+NX_UTILS_API QByteArray generateName(int length);
 
 /**
  * Generates uniform random number in [base - delta, base + delta]

@@ -7,10 +7,9 @@
 #include <boost/multi_index/ordered_index.hpp>
 
 #include <nx/utils/counter.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/stree/resourcecontainer.h>
-
 #include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "managers_types.h"
 #include "../access_control/abstract_authentication_data_provider.h"
