@@ -45,7 +45,7 @@ void Manager::start()
     loadDrivers();
 
     bool loaded = loadMappings();
-    Q_ASSERT(loaded);
+    NX_ASSERT(loaded);
     if (!loaded)
         return;
 

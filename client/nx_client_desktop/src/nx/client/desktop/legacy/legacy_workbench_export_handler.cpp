@@ -285,7 +285,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
         if (!periods.isEmpty())
             durationMs = periods.duration();
-        Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
+        NX_ASSERT(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
 
@@ -935,7 +935,7 @@ void WorkbenchExportHandler::at_exportRapidReviewAction_triggered()
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
         if (!periods.isEmpty())
             durationMs = periods.duration();
-        Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
+        NX_ASSERT(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
     if (durationMs < ui::dialogs::ExportRapidReview::kMinimalSourcePeriodLength)

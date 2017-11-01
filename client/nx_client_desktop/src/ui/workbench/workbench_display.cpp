@@ -2400,7 +2400,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     }
     else
     {
-        Q_ASSERT_X(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
+        NX_ASSERT(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
             Q_FUNC_INFO, "Invalid action type");
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
