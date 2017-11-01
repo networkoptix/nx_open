@@ -116,7 +116,7 @@ protected:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
 private:
-    CameraDiagnostics::Result init();
+    CameraDiagnostics::Result initDevice();
     CameraDiagnostics::Result initSystem();
     CameraDiagnostics::Result initMedia();
     CameraDiagnostics::Result initIo();
