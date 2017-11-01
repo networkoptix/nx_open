@@ -1014,7 +1014,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Только видео с камер</translation>
+      <translation>Только видео в реальном времени</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1034,7 +1034,7 @@
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>Может смотреть живое видео со всех камер.</translation>
+      <translation>Может смотреть видео в реальном времени со всех камер.</translation>
     </message>
     <message>
       <source>Custom user role.</source>

@@ -535,7 +535,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Rotate to...</source>
-      <translation>Rodar a ...</translation>
+      <translation>Rodar a...</translation>
     </message>
     <message>
       <source>0 degrees</source>
@@ -1464,8 +1464,8 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n Acção</numerusform>
-        <numerusform>%n Acções</numerusform>
+        <numerusform>%n acção</numerusform>
+        <numerusform>%n acções</numerusform>
       </translation>
     </message>
     <message>
@@ -2295,7 +2295,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -3863,7 +3863,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Erro de rede.</translation>
+      <translation>Erro de rede</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -4134,7 +4134,7 @@ to %1</translation>
     </message>
     <message>
       <source>Auto-Discovered Servers</source>
-      <translation>Servidor Descobertos Autom.</translation>
+      <translation>Servidor Descobertos Autom</translation>
     </message>
     <message>
       <source>* Last used connection *</source>
@@ -4150,7 +4150,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Apagar Ligações</translation>
+      <translation>Apagar Ligações?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4414,7 +4414,7 @@ to %1</translation>
     <name>QnNavigationItem</name>
     <message>
       <source>Speed Down</source>
-      <translation>Diminuir Vel.</translation>
+      <translation>Diminuir Vel</translation>
     </message>
     <message>
       <source>Previous Frame</source>
@@ -4422,7 +4422,7 @@ to %1</translation>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation>Aumentar Vel.</translation>
+      <translation>Aumentar Vel</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -5826,7 +5826,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Erro de rede.</translation>
+      <translation>Erro de rede</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -5994,7 +5994,7 @@ to %1</translation>
     </message>
     <message>
       <source>%1 before now</source>
-      <translation>(%1 antes de agora)</translation>
+      <translation>%1 antes de agora</translation>
     </message>
     <message>
       <source>Realtime backup is active...</source>
@@ -6501,7 +6501,7 @@ to %1</translation>
     </message>
     <message>
       <source>Input device is not selected</source>
-      <translation>O dispositivo de entrada não está seleccionado.</translation>
+      <translation>O dispositivo de entrada não está seleccionado</translation>
     </message>
     <message>
       <source>Streaming is not ready yet</source>
@@ -6509,7 +6509,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Erro de rede.</translation>
+      <translation>Erro de rede</translation>
     </message>
   </context>
   <context>
@@ -6869,7 +6869,7 @@ to %1</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Email inválido</translation>
+      <translation>Email inválido.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -6956,7 +6956,7 @@ to %1</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Página da Web:</translation>
+      <translation>Página da Web</translation>
     </message>
   </context>
   <context>
@@ -7441,7 +7441,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>pausa</translation>
+      <translation>Pausa</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
