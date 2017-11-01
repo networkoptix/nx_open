@@ -345,7 +345,7 @@ namespace Qn
     {
         Empty,
         Diagnostics,
-        IoEnable,
+        EnableLicense,
         MoreLicenses,
         Settings,
     };

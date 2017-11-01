@@ -36,6 +36,7 @@ namespace client {
 namespace desktop {
 
 class EntropixImageEnhancer;
+class MediaResourceWidgetPrivate;
 
 namespace ui {
 namespace graphics {
@@ -50,6 +51,7 @@ class SoftwareTriggerButton;
 
 // TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
 using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
+using QnMediaResourceWidgetPrivate = nx::client::desktop::MediaResourceWidgetPrivate;
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -234,7 +236,7 @@ private slots:
     void at_camDisplay_liveChanged();
     void processSettingsRequest();
     void processDiagnosticsRequest();
-    void processIoEnableRequest();
+    void processEnableLicenseRequest();
     void processMoreLicensesRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
@@ -261,7 +263,6 @@ private:
 
     qreal calculateVideoAspectRatio() const;
 
-    Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
@@ -312,6 +313,7 @@ private:
     };
 
     void initRenderer();
+    void initDisplay();
     void initSoftwareTriggers();
     void initIoModuleOverlay();
     void initIconButton();
@@ -330,28 +332,10 @@ private:
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+    void getResourceStates();
 
 private:
-    struct ResourceStates
-    {
-        bool isRealTimeSource;  /// Shows if resource is real-time source
-        bool isOffline;         /// Shows if resource is offline. Not-real-time resource is alwasy online
-        bool isUnauthorized;    /// Shows if resource is unauthorized. Not-real-time resource is alwasy online
-        bool hasVideo;          /// Shows if resource has video
-    };
-
-    /// @brief Return resource states
-    ResourceStates getResourceStates() const;
-
-private:
-    /** Media resource. */
-    QnMediaResourcePtr m_resource;
-
-    /** Camera resource. */
-    QnVirtualCameraResourcePtr m_camera;
-
-    /** Display. */
-    QnResourceDisplayPtr m_display;
+    QScopedPointer<QnMediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
     QnResourceWidgetRenderer* m_renderer = nullptr;
