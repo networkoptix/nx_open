@@ -168,9 +168,6 @@ protected:
             nx_http::StatusCode::Value statusCode,
             Output...)> completionHandler)
     {
-        using ActualOutputType =
-            typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
-
         QUrl requestUrl = nx::network::url::Builder(m_baseRequestUrl)
             .appendPath(QLatin1String("/"))
             .appendPath(QString::fromStdString(requestPath)).toUrl();
