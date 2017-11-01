@@ -285,7 +285,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
         : QnVirtualCameraResourcePtr());
     IntStringHash result;
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
-    result.insert(toInt(Qn::ResourceOverlayButton::IoEnable), tr("Enable"));
+    result.insert(toInt(Qn::ResourceOverlayButton::EnableLicense), tr("Enable"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
     if (resource)
     {

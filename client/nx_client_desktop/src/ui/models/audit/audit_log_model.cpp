@@ -125,7 +125,22 @@ public:
 
     static bool lessThanEndTimestamp(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        return d1->rangeEndSec < d2->rangeEndSec;
+        const bool leftIsUncompleteLoginSession =
+            d1->rangeEndSec == 0 && d1->eventType == Qn::AR_Login;
+        const bool rightIsUncompleteLoginSession =
+            d2->rangeEndSec == 0 && d2->eventType == Qn::AR_Login;
+
+        if (leftIsUncompleteLoginSession)
+        {
+            if (leftIsUncompleteLoginSession == rightIsUncompleteLoginSession)
+                return d1->createdTimeSec < d2->createdTimeSec; // Both sessions are uncompleted.
+            else
+                return true; // Uncompleted session is always "less" then completed
+        }
+
+        return rightIsUncompleteLoginSession
+            ? false
+            : d1->rangeEndSec < d2->rangeEndSec;
     }
 
     static bool lessThanDuration(const QnAuditRecord *d1, const QnAuditRecord *d2)
