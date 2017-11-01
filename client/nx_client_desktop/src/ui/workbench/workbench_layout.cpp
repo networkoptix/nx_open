@@ -256,23 +256,20 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
         item->layout()->removeItem(item);
     }
 
-    if (item->isPinned())
-    {
-        if (const QnWorkbenchItem* otherItem = m_itemMap.value(item->geometry().topLeft()))
-        {
-            const auto options = otherItem->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
-            if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
-                item->setFlag(Qn::Pinned, false);
-        }
-    }
+    if (item->isPinned() && m_itemMap.isOccupied(item->geometry()))
+        item->setFlag(Qn::Pinned, false);
 
     item->m_layout = this;
     m_items.insert(item);
 
     if (item->isPinned())
     {
-        m_itemMap.fill(item->geometry(), item);
-        NX_DEBUG(kItemMapTag, lm("Add item to cell %1").arg(item->geometry()));
+        const auto options = item->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
+        if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
+        {
+            m_itemMap.fill(item->geometry(), item);
+            NX_DEBUG(kItemMapTag, lm("Add item to cell %1").arg(item->geometry()));
+        }
     }
     m_rectSet.insert(item->geometry());
     m_itemsByResource[item->resource()].insert(item);
@@ -297,8 +294,12 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
     /* Update internal data structures. */
     if (item->isPinned())
     {
-        m_itemMap.clear(item->geometry());
-        NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
+        const auto options = item->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
+        if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
+        {
+            m_itemMap.clear(item->geometry());
+            NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
+        }
     }
     m_rectSet.remove(item->geometry());
     m_itemsByResource[item->resource()].remove(item);
