@@ -37,6 +37,7 @@ Item
             titleOpacity: resourceItem.hovered || layoutItemData.displayInfo ? 1.0 : 0.0
             leftContentOpacity: titleOpacity
             rightContentOpacity: resourceItem.hovered ? 1.0 : 0.0
+            backgroundOpacity: Math.max(titleOpacity, leftContentOpacity, rightContentOpacity)
 
             Behavior on titleOpacity { NumberAnimation { duration: 150 } }
             Behavior on rightContentOpacity { NumberAnimation { duration: 150 } }
