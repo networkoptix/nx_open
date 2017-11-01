@@ -6,7 +6,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 // Proxy model that can be used to add/remove/rearrange columns in the source model.
 // Data for added columns must be handled in subclasses (override flags(), data(), setData()).
@@ -45,7 +44,6 @@ private:
     QVector<int> m_sourceToProxy;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

@@ -3,7 +3,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 void CustomizableSortFilterProxyModel::setCustomLessThan(LessPredicate lessThan)
 {
@@ -64,7 +63,6 @@ bool CustomizableSortFilterProxyModel::baseFilterAcceptsColumn(int sourceColumn,
     return base_type::filterAcceptsColumn(sourceColumn, sourceParent);
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx
