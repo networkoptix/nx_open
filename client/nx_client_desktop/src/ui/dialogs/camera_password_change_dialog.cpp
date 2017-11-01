@@ -14,6 +14,28 @@ void setupPasswordField(QnInputField& field)
     field.setEchoMode(QLineEdit::Password);
 }
 
+Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraResourceList& cameras)
+{
+    const auto userNames =
+        [cameras]()
+        {
+            QSet<QString> result;
+            for (const auto& camera: cameras)
+                result.insert(camera->getDefaultAuth().user());
+            return result;
+        }();
+
+    return
+        [userNames](const QString& text)
+        {
+            static const auto kErrorMessage = QnCameraPasswordChangeDialog::tr(
+                "Password shouldn't be equal to camera's user name");
+            return userNames.contains(text)
+                ? Qn::ValidationResult(QValidator::Invalid, kErrorMessage)
+                : Qn::kValidResult;
+        };
+}
+
 } // namespace
 
 QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
@@ -36,7 +58,8 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
 
     setupPasswordField(*ui->passwordEdit);
     setupPasswordField(*ui->confirmPasswordEdit);
-    ui->passwordEdit->setValidator(Qn::defaultPasswordValidator(false));
+    ui->passwordEdit->setValidator(Qn::validatorsConcatenator(
+        { Qn::defaultPasswordValidator(false), makeNonCameraUserNameValidator(cameras) }));
     ui->passwordEdit->reset();
     ui->confirmPasswordEdit->setValidator(Qn::defaultConfirmationValidator(
         [this](){ return ui->passwordEdit->text(); }, tr("Passwords do not match.")));
