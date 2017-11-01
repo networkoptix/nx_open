@@ -44,6 +44,8 @@ struct QnCameraAdvancedParameterCondition
         Equal,
         InRange,
         NotInRange,
+        Present,
+        NotPresent,
         Default,
         Unknown
     };
