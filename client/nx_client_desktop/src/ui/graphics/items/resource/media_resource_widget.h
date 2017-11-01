@@ -36,7 +36,6 @@ namespace client {
 namespace desktop {
 
 class EntropixImageEnhancer;
-class LocalMetadataAnalyticsDriver;
 
 namespace ui {
 namespace graphics {
@@ -409,8 +408,6 @@ private:
     QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
     QImage m_entropixEnhancedImage;
     int m_entropixProgress = -1;
-
-    QScopedPointer<nx::client::desktop::LocalMetadataAnalyticsDriver> m_localMetadataDriver;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)
