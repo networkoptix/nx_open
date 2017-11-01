@@ -23,7 +23,7 @@ void VideoDataReceptor::detachFromContext()
 void VideoDataReceptor::putData(const QnAbstractDataPacketPtr& data)
 {
     QnMutexLocker lock(&m_mutex);
-    if (!m_context)
+    if (!m_context || !m_context->manager())
         return;
     using namespace nx::sdk::metadata;
     nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
