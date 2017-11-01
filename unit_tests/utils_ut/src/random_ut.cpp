@@ -1,6 +1,10 @@
+#include <array>
+
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
+#include <nx/utils/qt_random_device.h>
+#include <nx/utils/cryptographic_random_device.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {
@@ -8,35 +12,47 @@ namespace utils {
 namespace random {
 namespace test {
 
-template<typename Type>
-void testContainer(const std::map<Type, size_t>& container)
+template<typename RandomDevice>
+class Random:
+    public ::testing::Test
 {
-    static_cast<void>(container);
-}
+protected:
+    template<typename Type>
+    void testContainer(const std::map<Type, size_t>& container)
+    {
+        static_cast<void>(container);
+    }
 
-template<typename Type, typename Expect, typename ... Expects>
-void testContainer(const std::map<Type, size_t>& container, Expect expect, Expects ... args)
-{
-    const auto it = std::find_if(
-        container.begin(), container.end(),
-        [&](const std::pair<Type, size_t>& kv) { return expect(kv.first); });
+    template<typename Type, typename Expect, typename ... Expects>
+    void testContainer(
+        const std::map<Type, size_t>& container, Expect expect, Expects ... args)
+    {
+        const auto it = std::find_if(
+            container.begin(), container.end(),
+            [&](const std::pair<Type, size_t>& kv) { return expect(kv.first); });
 
-    ASSERT_TRUE(it != container.end());
-    testContainer(container, std::forward<Expects>(args) ...);
-}
+        ASSERT_TRUE(it != container.end());
+        testContainer(container, std::forward<Expects>(args) ...);
+    }
 
-template<typename Type, typename ... Expects>
-void testNumberGeneration(
-    Type min, Type max, size_t count, Expects ... expects)
-{
-    std::map<Type, size_t> container;
-    while (count--)
-        ++container[number(min, max)];
+    template<typename Type, typename ... Expects>
+    void testNumberGeneration(
+        Type min, Type max, size_t count, Expects ... expects)
+    {
+        std::map<Type, size_t> container;
+        while (count--)
+            ++container[number(m_randomDevice, min, max)];
 
-    testContainer(container, std::forward<Expects>(expects) ...);
-}
+        testContainer(container, std::forward<Expects>(expects) ...);
+    }
 
-TEST(Random, Numbers)
+private:
+    RandomDevice m_randomDevice;
+};
+
+TYPED_TEST_CASE_P(Random);
+
+TYPED_TEST_P(Random, Numbers)
 {
     testNumberGeneration<int>(
         0, 1, 100,
@@ -69,6 +85,14 @@ TEST(Random, Numbers)
         [](uint64_t a) { return a > (std::numeric_limits<uint64_t>::max() / 10) * 8; },
         [](uint64_t a) { return a < (std::numeric_limits<uint64_t>::max() / 10) * 2; });
 }
+
+REGISTER_TYPED_TEST_CASE_P(Random, Numbers);
+
+INSTANTIATE_TYPED_TEST_CASE_P(QtDevice, Random, nx::utils::random::QtDevice);
+INSTANTIATE_TYPED_TEST_CASE_P(
+    CryptographicRandomDevice,
+    Random,
+    nx::utils::random::CryptographicRandomDevice);
 
 } // namespace test
 } // namespace random
