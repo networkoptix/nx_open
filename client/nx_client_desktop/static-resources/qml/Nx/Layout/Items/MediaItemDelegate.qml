@@ -63,8 +63,19 @@ ResourceItemDelegate
 
         TitleBarButton
         {
+            id: infoButton
+
             icon: "qrc:/skin/item/info.png"
             checkable: true
+
+            Binding
+            {
+                target: infoButton
+                property: "checked"
+                value: layoutItemData.displayInfo
+            }
+            // Use Action from Qt 5.10
+            onCheckedChanged: layoutItemData.displayInfo = checked
         },
 
         TitleBarButton

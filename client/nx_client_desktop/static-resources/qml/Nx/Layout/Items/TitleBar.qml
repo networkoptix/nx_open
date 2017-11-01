@@ -9,6 +9,7 @@ Item
     property alias backgroundOpacity: background.opacity
     property alias leftContentOpacity: leftContent.opacity
     property alias rightContentOpacity: rightContent.opacity
+    property alias titleOpacity: title.opacity
 
     readonly property alias leftContent: leftContent
     readonly property alias rightContent: rightContent

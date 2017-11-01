@@ -33,6 +33,13 @@ Item
         {
             id: titleBar
             titleText: layoutItemData.resource ? layoutItemData.resource.name : ""
+
+            titleOpacity: resourceItem.hovered || layoutItemData.displayInfo ? 1.0 : 0.0
+            leftContentOpacity: titleOpacity
+            rightContentOpacity: resourceItem.hovered ? 1.0 : 0.0
+
+            Behavior on titleOpacity { NumberAnimation { duration: 150 } }
+            Behavior on rightContentOpacity { NumberAnimation { duration: 150 } }
         }
     }
 }
