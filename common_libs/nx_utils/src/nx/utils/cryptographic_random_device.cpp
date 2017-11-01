@@ -2,6 +2,8 @@
 
 #if defined(__linux__) && !defined(ANDROID)
     #include <linux/random.h>
+    #include <syscall.h>
+    #include <unistd.h>
 #elif defined(_WIN32)
     #define _CRT_RAND_S
     #include <stdlib.h> 
@@ -23,8 +25,8 @@ namespace {
 
     bool generateSystemDependentRandom(CryptographicRandomDevice::result_type* result)
     {
-        const int bytesGenerated = getrandom(result, sizeof(*result), GRND_NONBLOCK);
-        return bytesGenerated == sizeof(*result));
+        const int bytesGenerated = syscall(SYS_getrandom, result, sizeof(*result), GRND_NONBLOCK);
+        return bytesGenerated == sizeof(*result);
     }
 
 #elif defined(_WIN32)
