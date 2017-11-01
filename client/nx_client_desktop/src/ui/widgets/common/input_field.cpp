@@ -49,8 +49,6 @@ public:
     }
 
     QnInputField* parent;
-    QLabel* title;
-    QnWordWrappedLabel* hint;
 
     QnPasswordStrengthIndicator* passwordIndicator;
     bool hidePasswordIndicatorWhenEmpty;
