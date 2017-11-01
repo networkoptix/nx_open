@@ -25,8 +25,13 @@ namespace {
 
     bool generateSystemDependentRandom(CryptographicRandomDevice::result_type* result)
     {
-        const int bytesGenerated = syscall(SYS_getrandom, result, sizeof(*result), GRND_NONBLOCK);
-        return bytesGenerated == sizeof(*result);
+        // getrandom supported starting with kernel 3.17. E.g., ubuntu 14.04 uses kernel 3.16.
+        #if defined(SYS_getrandom)
+            const int bytesGenerated = syscall(SYS_getrandom, result, sizeof(*result), GRND_NONBLOCK);
+            return bytesGenerated == sizeof(*result);
+        #else
+            return false;
+        #endif
     }
 
 #elif defined(_WIN32)
