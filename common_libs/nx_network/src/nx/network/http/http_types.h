@@ -19,6 +19,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qnbytearrayref.h>
 #include <nx/utils/software_version.h>
+#include <nx/utils/url.h>
 
 /**
  * Holds http-implementation suitable for async/sync i/o.
@@ -101,6 +102,15 @@ bool NX_NETWORK_API readHeader(
  */
 HttpHeaders::iterator NX_NETWORK_API insertOrReplaceHeader(
     HttpHeaders* const headers, const HttpHeader& newHeader);
+
+template<typename HeaderType>
+HttpHeaders::iterator insertOrReplaceHeader(
+    HttpHeaders* const headers, const HeaderType& header)
+{
+    return insertOrReplaceHeader(
+        headers,
+        HttpHeader(HeaderType::NAME, header.toString()));
+}
 
 HttpHeaders::iterator NX_NETWORK_API insertHeader(
     HttpHeaders* const headers, const HttpHeader& newHeader);
@@ -238,7 +248,7 @@ class NX_NETWORK_API RequestLine
 {
 public:
     StringType method;
-    QUrl url;
+    nx::utils::Url url;
     MimeProtoVersion version;
 
     RequestLine() = default;
@@ -646,6 +656,20 @@ private:
     void readProductName(Product* product, QnByteArrayConstRef* inputStr);
     void readProductVersion(Product* product, QnByteArrayConstRef* inputStr);
     void readProductComment(Product* product, QnByteArrayConstRef* inputStr);
+};
+
+class NX_NETWORK_API StrictTransportSecurity
+{
+public:
+    static const StringType NAME;
+
+    std::chrono::seconds maxAge = std::chrono::seconds::zero();
+    bool includeSubDomains = false;
+    bool preload = false;
+
+    bool operator==(const StrictTransportSecurity&) const;
+    bool parse(const nx_http::StringType& strValue);
+    StringType toString() const;
 };
 
 } // namespace header

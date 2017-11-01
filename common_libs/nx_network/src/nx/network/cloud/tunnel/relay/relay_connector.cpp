@@ -12,7 +12,7 @@ namespace cloud {
 namespace relay {
 
 Connector::Connector(
-    QUrl relayUrl,
+    nx::utils::Url relayUrl,
     AddressEntry targetHostAddress,
     nx::String connectSessionId)
     :
@@ -105,7 +105,7 @@ void Connector::onStartRelaySessionResponse(
     m_connectSessionId = response.sessionId.c_str();
 
     auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
-        QUrl(response.actualRelayUrl.c_str()),
+        nx::utils::Url(response.actualRelayUrl.c_str()),
         m_connectSessionId,
         std::move(m_relayClient));
     handler(

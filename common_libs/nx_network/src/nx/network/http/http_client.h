@@ -7,6 +7,7 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 #include "asynchttpclient.h"
 
@@ -32,19 +33,19 @@ public:
     /**
      * @return true if response has been received.
      */
-    bool doGet(const QUrl& url);
+    bool doGet(const nx::utils::Url& url);
     /**
      * @return true if response has been received.
      */
     bool doUpgrade(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const StringType& protocolToUpgradeTo);
 
     /**
      * @return true if response has been received.
      */
     bool doPost(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
 
@@ -52,14 +53,14 @@ public:
      * @return true if response has been received.
      */
     bool doPut(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
 
     /**
      * @return true if response has been received.
      */
-    bool doDelete(const QUrl& url);
+    bool doDelete(const nx::utils::Url& url);
 
     const Response* response() const;
     SystemError::ErrorCode lastSysErrorCode() const;
@@ -74,8 +75,8 @@ public:
     BufferType fetchMessageBodyBuffer();
 
     void addAdditionalHeader(const StringType& key, const StringType& value);
-    const QUrl& url() const;
-    const QUrl& contentLocationUrl() const;
+    const nx::utils::Url& url() const;
+    const nx::utils::Url& contentLocationUrl() const;
     StringType contentType() const;
 
     /** See AsyncHttpClient::setSubsequentReconnectTries */
@@ -89,10 +90,10 @@ public:
 
     /** See AsyncHttpClient::setResponseReadTimeoutMs */
     void setResponseReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
-    
+
     /** See AsyncHttpClient::setMessageBodyReadTimeoutMs */
     void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
-    
+
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
@@ -107,7 +108,7 @@ public:
     /** @return Socket in blocking mode. */
     std::unique_ptr<AbstractStreamSocket> takeSocket();
 
-    static bool fetchResource(const QUrl& url, BufferType* msgBody, StringType* contentType);
+    static bool fetchResource(const nx::utils::Url& url, BufferType* msgBody, StringType* contentType);
 
 private:
     nx_http::AsyncHttpClientPtr m_asyncHttpClient;

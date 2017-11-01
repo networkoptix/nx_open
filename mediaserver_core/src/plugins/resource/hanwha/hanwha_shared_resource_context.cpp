@@ -22,7 +22,7 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::minutes kCacheDataTimeout(1);
 
-static const QUrl cleanUrl(QUrl url)
+static const nx::utils::Url cleanUrl(nx::utils::Url url)
 {
     url.setPath(QString());
     url.setQuery(QString());
@@ -48,10 +48,10 @@ HanwhaSharedResourceContext::HanwhaSharedResourceContext(
 }
 
 void HanwhaSharedResourceContext::setRecourceAccess(
-    const QUrl& url, const QAuthenticator& authenticator)
+    const nx::utils::Url& url, const QAuthenticator& authenticator)
 {
     {
-        QUrl sharedUrl = cleanUrl(url);
+        nx::utils::Url sharedUrl = cleanUrl(url);
         QnMutexLocker lock(&m_dataMutex);
         if (m_resourceUrl == sharedUrl && m_resourceAuthenticator == authenticator)
             return;
@@ -71,14 +71,14 @@ void HanwhaSharedResourceContext::setRecourceAccess(
     videoProfiles.invalidate();
 }
 
-void HanwhaSharedResourceContext::setLastSucessfulUrl(const QUrl& value)
+void HanwhaSharedResourceContext::setLastSucessfulUrl(const nx::utils::Url& value)
 {
     QnMutexLocker lock(&m_dataMutex);
     m_lastSuccessfulUrl = cleanUrl(value);
     m_lastSuccessfulUrlTimer.restart();
 }
 
-QUrl HanwhaSharedResourceContext::url() const
+nx::utils::Url HanwhaSharedResourceContext::url() const
 {
     QnMutexLocker lock(&m_dataMutex);
     if (!m_lastSuccessfulUrlTimer.hasExpired(kCacheUrlTimeout))

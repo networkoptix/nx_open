@@ -13,7 +13,7 @@
 template<typename Context, typename RequestFunc>
 void runMultiserverRequest(
     QnRouter* router,
-    QUrl url,
+    nx::utils::Url url,
     const RequestFunc &request,
     const QnMediaServerResourcePtr &server,
     Context *context)
@@ -44,13 +44,13 @@ void runMultiserverRequest(
 template<typename Context, typename CompletionFunc>
 void runMultiserverDownloadRequest(
     QnRouter* router,
-    QUrl url,
+    nx::utils::Url url,
     const QnMediaServerResourcePtr &server,
     const CompletionFunc &requestCompletionFunc,
     Context *context)
 {
     const auto downloadRequest = [requestCompletionFunc]
-        (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
+        (const nx::utils::Url &url, const nx_http::HttpHeaders &headers, Context *context)
     {
         context->executeGuarded([url, requestCompletionFunc, headers, context]()
         {
@@ -65,7 +65,7 @@ void runMultiserverDownloadRequest(
 template<typename Context, typename CompletionFunc>
 void runMultiserverUploadRequest(
     QnRouter* router,
-    QUrl url,
+    nx::utils::Url url,
     const QByteArray &data,
     const QByteArray &contentType,
     const QString &user,
@@ -75,7 +75,7 @@ void runMultiserverUploadRequest(
     Context *context)
 {
     const auto downloadRequest = [completionFunc, data, contentType, user, password]
-        (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
+        (const nx::utils::Url &url, const nx_http::HttpHeaders &headers, Context *context)
     {
         context->executeGuarded([url, data, completionFunc, headers
             , contentType, context, user, password]()

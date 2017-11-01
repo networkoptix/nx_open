@@ -6,7 +6,7 @@ QnConnectionData::QnConnectionData():
     localId()
 {}
 
-QnConnectionData::QnConnectionData(const QString &name, const QUrl &url,
+QnConnectionData::QnConnectionData(const QString &name, const nx::utils::Url &url,
     const QnUuid& localId):
     name(name),
     url(url),

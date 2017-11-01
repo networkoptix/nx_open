@@ -37,7 +37,7 @@ protected:
 private:
     nx_http::AsyncHttpClientPtr m_checkInputPortsRequest;
     mutable QnMutex m_ioPortMutex;
-    QUrl m_checkInputUrl;
+    nx::utils::Url m_checkInputUrl;
     bool m_inputMonitored;
     qint64 m_checkInputPortStatusTimerID;
     //!true - closed, falswe - opened

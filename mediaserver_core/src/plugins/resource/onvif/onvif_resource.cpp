@@ -4275,8 +4275,8 @@ bool QnPlOnvifResource::initializeTwoWayAudio()
     audioTransmitter->setContentType(params.contentType.toUtf8());
     audioTransmitter->setNoAuth(params.noAuth);
 
-    QUrl srcUrl(getUrl());
-    QUrl url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
+    nx::utils::Url srcUrl(getUrl());
+    nx::utils::Url url(lit("http://%1:%2%3").arg(srcUrl.host()).arg(srcUrl.port()).arg(params.urlPath));
     audioTransmitter->setTransmissionUrl(url);
 
     return true;

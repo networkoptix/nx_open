@@ -250,12 +250,22 @@ void HttpServerConnection::addResponseHeaders(
     nx_http::Response* response,
     nx_http::AbstractMsgBodySource* responseMsgBody)
 {
+    static const auto kYear = std::chrono::hours(24) * 365;
+
     nx_http::insertOrReplaceHeader(
         &response->headers,
         nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
     nx_http::insertOrReplaceHeader(
         &response->headers,
         nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
+
+    const auto sslSocket = dynamic_cast<AbstractEncryptedStreamSocket*>(socket().get());
+    if (sslSocket && sslSocket->isEncryptionEnabled())
+    {
+        nx_http::header::StrictTransportSecurity strictTransportSecurity;
+        strictTransportSecurity.maxAge = kYear;
+        nx_http::insertOrReplaceHeader(&response->headers, strictTransportSecurity);
+    }
 
     addMessageBodyHeaders(response, responseMsgBody);
 
@@ -347,7 +357,8 @@ void HttpServerConnection::someMsgBodyRead(
     }
 
     // TODO: #ak read and send message body async.
-    //    Move async reading/writing to some separate class (async pipe) to enable reusage.
+    //  Move async reading/writing to some separate class (async pipe) to enable reusage.
+    //  AsyncChannelUnidirectionalBridge can serve that purpose.
 
     sendData(
         std::move(buf),

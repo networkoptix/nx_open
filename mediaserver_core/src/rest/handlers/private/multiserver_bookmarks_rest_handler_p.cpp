@@ -36,8 +36,8 @@ namespace
         "delete",
     };
 
-    QUrl getApiUrl(const QnMediaServerResourcePtr &server, QnBookmarkOperation operation) {
-        QUrl apiUrl(server->getApiUrl());
+    nx::utils::Url getApiUrl(const QnMediaServerResourcePtr &server, QnBookmarkOperation operation) {
+        nx::utils::Url apiUrl(server->getApiUrl());
         apiUrl.setPath(L'/' + QnMultiserverBookmarksRestHandlerPrivate::urlPath + L'/' + operations[static_cast<int>(operation)]);
         return apiUrl;
     }
@@ -46,7 +46,7 @@ namespace
     void sendAsyncRequest(
         QnCommonModule* commonModule,
         const QnMediaServerResourcePtr &server,
-        QUrl url,
+        nx::utils::Url url,
         Context *ctx)
     {
         auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
@@ -83,7 +83,7 @@ namespace
             });
         };
 
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Get));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::Get));
 
         QnGetBookmarksRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();
@@ -129,7 +129,7 @@ namespace
             });
         };
 
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::GetTags));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::GetTags));
 
         QnGetBookmarkTagsRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();
@@ -154,7 +154,7 @@ namespace
         const QnMediaServerResourcePtr &server,
         QnUpdateBookmarkRequestContext* ctx)
     {
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Update));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::Update));
 
         QnUpdateBookmarkRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();
@@ -168,7 +168,7 @@ namespace
         const QnMediaServerResourcePtr &server,
         QnDeleteBookmarkRequestContext* ctx)
     {
-        QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Delete));
+        nx::utils::Url apiUrl(getApiUrl(server, QnBookmarkOperation::Delete));
 
         QnDeleteBookmarkRequestData modifiedRequest = ctx->request();
         modifiedRequest.makeLocal();

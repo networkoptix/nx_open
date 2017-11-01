@@ -37,7 +37,7 @@ public:
     void closeAllConnections();
     void useAnotherSystem();
 
-    QUrl cdbSynchronizationUrl() const;
+    utils::Url cdbSynchronizationUrl() const;
 
     OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
     OnConnectionFailureSubscription& onConnectionFailureSubscription();

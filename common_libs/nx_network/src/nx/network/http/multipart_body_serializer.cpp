@@ -14,10 +14,6 @@ MultipartBodySerializer::MultipartBodySerializer(
 {
 }
 
-MultipartBodySerializer::~MultipartBodySerializer()
-{
-}
-
 StringType MultipartBodySerializer::contentType() const
 {
     return "multipart/x-mixed-replace;boundary="+m_boundary;
@@ -76,7 +72,7 @@ void MultipartBodySerializer::startBodyPartInternal(
     m_bodyPartStarted = true;
 
     BufferType serializedData;
-    //TODO #ak it makes sense to make a rough estimation of required serializedData size and reserve
+    // TODO: #ak It makes sense to make a rough estimation of required serializedData size and reserve.
 
     serializedData +=
         m_delimiter +

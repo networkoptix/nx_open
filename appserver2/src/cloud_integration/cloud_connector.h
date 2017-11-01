@@ -12,7 +12,7 @@ class CloudConnector:
 public:
     CloudConnector(AbstractTransactionMessageBus* messageBus);
 
-    virtual void startDataSynchronization(const QUrl& cloudUrl) override;
+    virtual void startDataSynchronization(const nx::utils::Url& cloudUrl) override;
     virtual void stopDataSynchronization() override;
 
 private:

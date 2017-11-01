@@ -188,7 +188,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
 TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverHTTP )
 {
     nx_http::HttpClient client;
-    ASSERT_TRUE( client.doGet( QUrl("http://192.168.0.1/valgrind-arm-linaro-multilib-2013.09.tar.gz") ) );
+    ASSERT_TRUE( client.doGet( nx::utils::Url("http://192.168.0.1/valgrind-arm-linaro-multilib-2013.09.tar.gz") ) );
     qint64 totalBytesRead = 0;
     size_t readsCount = 0;
     while( !client.eof() && (static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ) )

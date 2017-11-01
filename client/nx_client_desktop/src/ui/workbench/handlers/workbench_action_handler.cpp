@@ -2118,7 +2118,7 @@ void ActionHandler::at_browseUrlAction_triggered() {
     if (url.isEmpty())
         return;
 
-    QDesktopServices::openUrl(QUrl::fromUserInput(url));
+    QDesktopServices::openUrl(nx::utils::Url::fromUserInput(url).toQUrl());
 }
 
 void ActionHandler::at_versionMismatchMessageAction_triggered()
@@ -2301,14 +2301,14 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     if (nx::network::isCloudServer(server))
         return;
 
-    QUrl url(server->getApiUrl());
+    nx::utils::Url url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
     url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
     url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(url.toQUrl());
 }
 
 void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
@@ -2318,10 +2318,10 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
         return;
     // path may contains path + url query params
     // TODO: #akolesnikov #3.1 VMS-2806
-    QUrl serverUrl(server->getApiUrl().toString() + path);
+    nx::utils::Url serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
-    QUrl proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
+    nx::utils::Url proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
@@ -2368,20 +2368,20 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
             appserverUrl.userName(), appserverUrl.password(),
             auth.realm, nx_http::Method::get, auth.nonce.toUtf8());
 
-        QUrl targetUrl(request.url);
-        QUrlQuery urlQuery(targetUrl);
+        nx::utils::Url targetUrl(request.url);
+        QUrlQuery urlQuery(targetUrl.toQUrl());
         urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
         targetUrl.setQuery(urlQuery);
 
         targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-        targetUrl = QUrl(lit("http://%1/%2:%3:%4%5?%6")
+        targetUrl = nx::utils::Url(lit("http://%1/%2:%3:%4%5?%6")
             .arg(gateway->endpoint().toString()).arg(targetUrl.scheme())
             .arg(targetUrl.host()).arg(targetUrl.port())
             .arg(targetUrl.path()).arg(targetUrl.query()));
 
-        QDesktopServices::openUrl(targetUrl);
+        QDesktopServices::openUrl(targetUrl.toQUrl());
     }
 }
 

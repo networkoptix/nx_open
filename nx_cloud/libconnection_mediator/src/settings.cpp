@@ -246,7 +246,7 @@ void Settings::loadSettings()
     const auto cdbUrlStr = settings().value(kCdbUrl, kDefaultCdbUrl).toString();
     if (!cdbUrlStr.isEmpty())
     {
-        m_cloudDB.url = QUrl(cdbUrlStr);
+        m_cloudDB.url = nx::utils::Url(cdbUrlStr);
     }
     else
     {
@@ -255,7 +255,7 @@ void Settings::loadSettings()
         if (!endpointString.isEmpty())
         {
             // Supporting both url and host:port here.
-            m_cloudDB.url = QUrl(endpointString);
+            m_cloudDB.url = nx::utils::Url(endpointString);
             if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
             {
                 const SocketAddress endpoint(endpointString);

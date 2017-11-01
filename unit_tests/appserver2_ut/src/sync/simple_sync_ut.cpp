@@ -69,7 +69,7 @@ static void createData(const Appserver2Ptr& server)
 
         auto addr = server->moduleInstance()->endpoint();
 
-        QUrl url(lit("http://%1:%2/ec2/saveCamera").arg(addr.address.toString()).arg(addr.port));
+        nx::utils::Url url(lit("http://%1:%2/ec2/saveCamera").arg(addr.address.toString()).arg(addr.port));
         if (!httpClient.doPost(url, "application/json", content))
         {
             break;
@@ -115,7 +115,7 @@ TEST(SympleSyncTest, main)
     {
         const auto addr = servers[i]->moduleInstance()->endpoint();
         const auto id = servers[i]->moduleInstance()->commonModule()->moduleGUID();
-        QUrl url = lit("http://%1:%2/ec2/events").arg(addr.address.toString()).arg(addr.port);
+        nx::utils::Url url = lit("http://%1:%2/ec2/events").arg(addr.address.toString()).arg(addr.port);
         servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addOutgoingConnectionToPeer(id, url);
     }
 

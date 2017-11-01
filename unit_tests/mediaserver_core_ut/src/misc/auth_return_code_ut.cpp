@@ -120,7 +120,7 @@ public:
             QnAuthHelper::instance()->generateNonce());
 
         auto msgBody = QJson::serialized(cookieLogin);
-        QUrl url = mediaServerLauncher->apiUrl();
+        nx::utils::Url url = mediaServerLauncher->apiUrl();
         url.setPath("/api/cookieLogin");
         nx_http::HttpClient httpClient;
         httpClient.doPost(url, "application/json", msgBody);
@@ -163,7 +163,7 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
             }
-            QUrl url = mediaServerLauncher->apiUrl();
+            nx::utils::Url url = mediaServerLauncher->apiUrl();
             url.setPath("/ec2/getUsers");
             if (httpClient.doGet(url))
                 break;  //< Server is alive

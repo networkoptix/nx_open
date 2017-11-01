@@ -23,7 +23,9 @@ static std::deque<HostAddress> convertAddrInfo(addrinfo* addressInfo)
                 break;
 
             case AF_INET6:
-                newAddress = HostAddress(((sockaddr_in6*)(info->ai_addr))->sin6_addr);
+                newAddress = HostAddress(
+                    ((sockaddr_in6*)(info->ai_addr))->sin6_addr,
+                    ((sockaddr_in6*)(info->ai_addr))->sin6_scope_id);
                 break;
 
             default:

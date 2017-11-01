@@ -61,7 +61,7 @@ namespace QnXmlDetail {
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (bool)(char)(signed char)(unsigned char)(short)(unsigned short)
         (int)(unsigned int)(long)(unsigned long)(long long)(unsigned long long)
-        (float)(double)(QString)(QnUuid)(QUrl)(QnLatin1Array)(QByteArray),
+        (float)(double)(QString)(QnUuid)(QUrl)(nx::utils::Url)(QnLatin1Array)(QByteArray),
     (xml_lexical),
     inline
 )

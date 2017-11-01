@@ -23,7 +23,9 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
     return SystemError::noError;
 }
 
-void PredefinedHostResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)
+void PredefinedHostResolver::addEtcHost(
+    const QString& name,
+    std::vector<HostAddress> addresses)
 {
     QnMutexLocker lock(&m_mutex);
     m_etcHosts[name] = std::move(addresses);

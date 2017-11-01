@@ -4,6 +4,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <client_core/connection_context_aware.h>
+#include <nx/utils/url.h>
 
 class QnConnectionManager;
 class QnMobileAppInfo;
@@ -93,10 +94,10 @@ public:
 
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;
-    Q_INVOKABLE QUrl getLastUsedUrl() const;
-    Q_INVOKABLE QUrl getInitialUrl() const;
+    Q_INVOKABLE nx::utils::Url getLastUsedUrl() const;
+    Q_INVOKABLE nx::utils::Url getInitialUrl() const;
 
-    Q_INVOKABLE QUrl getWebSocketUrl() const;
+    Q_INVOKABLE nx::utils::Url getWebSocketUrl() const;
 
     Q_INVOKABLE void setCloudCredentials(const QString& login, const QString& password);
 

@@ -51,8 +51,8 @@ private:
     struct Result
     {
         nx_http::StatusCode::Value resultCode = nx_http::StatusCode::ok;
-        QUrl tcpUrl;
-        QUrl udpUrl;
+        nx::utils::Url tcpUrl;
+        nx::utils::Url udpUrl;
     };
 
     nx::network::cloud::ConnectionMediatorUrlFetcher m_urlFetcher;
@@ -61,8 +61,8 @@ private:
 
     void saveMediatorUrls(
         nx_http::StatusCode::Value resultCode,
-        QUrl tcpUrl,
-        QUrl udpUrl)
+        nx::utils::Url tcpUrl,
+        nx::utils::Url udpUrl)
     {
         Result result;
         result.resultCode = resultCode;

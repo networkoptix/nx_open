@@ -83,7 +83,7 @@ bool QnIOModuleMonitor::open()
         return false;
 
     m_httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    QUrl requestUrl(server->getApiUrl());
+    nx::utils::Url requestUrl(server->getApiUrl());
     requestUrl.setPath(lit("/api/iomonitor"));
     QUrlQuery query;
     query.addQueryItem(QString::fromLatin1(Qn::PHYSICAL_ID_URL_QUERY_ITEM), m_camera->getUniqueId());

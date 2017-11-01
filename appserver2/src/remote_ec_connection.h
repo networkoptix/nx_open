@@ -32,7 +32,7 @@ namespace ec2
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
-        virtual void updateConnectionUrl(const QUrl& url) override;
+        virtual void updateConnectionUrl(const nx::utils::Url& url) override;
 
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;

@@ -3,8 +3,8 @@
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
-#include <model/remote_relay_peer_pool.h>
-#include <model/../settings.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relay/settings.h>
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/cf/wrappers.h>
@@ -22,7 +22,7 @@ class TestRelayPool: public RemoteRelayPeerPool
 {
 public:
     using RemoteRelayPeerPool::RemoteRelayPeerPool;
-    cassandra::AsyncConnection* getConnection()
+    cassandra::AbstractAsyncConnection* getConnection()
     {
         return nx::cloud::relay::model::RemoteRelayPeerPool::getConnection();
     }

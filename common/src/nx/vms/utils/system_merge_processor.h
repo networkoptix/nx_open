@@ -44,17 +44,30 @@ private:
     QnModuleInformationWithAddresses m_remoteModuleInformation;
     bool m_dbBackupEnabled = false;
 
+    bool validateInputData(
+        const MergeSystemData& data,
+        QnJsonRestResult* result);
+
+    nx_http::StatusCode::Value checkWhetherMergeIsPossible(
+        const MergeSystemData& data,
+        QnJsonRestResult* result);
+
+    nx_http::StatusCode::Value mergeSystems(
+        Qn::UserAccessData accessRights,
+        MergeSystemData data,
+        QnJsonRestResult* result);
+
     void setMergeError(
         QnJsonRestResult* result,
         ::utils::MergeSystemsStatus::Value mergeStatus);
 
     bool applyCurrentSettings(
-        const QUrl& remoteUrl,
+        const nx::utils::Url& remoteUrl,
         const QString& postKey,
         bool oneServer);
 
     bool applyRemoteSettings(
-        const QUrl& remoteUrl,
+        const nx::utils::Url& remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,
@@ -62,7 +75,7 @@ private:
 
     bool executeRemoteConfigure(
         const ConfigureSystemData& data,
-        const QUrl &remoteUrl,
+        const nx::utils::Url &remoteUrl,
         const QString& postKey);
 
     bool isResponseOK(const nx_http::HttpClient& client);
@@ -71,12 +84,17 @@ private:
 
     template <class ResultDataType>
     bool executeRequest(
-        const QUrl &remoteUrl,
+        const nx::utils::Url &remoteUrl,
         const QString& getKey,
         ResultDataType& result,
         const QString& path);
 
-    void addAuthToRequest(QUrl& request, const QString& remoteAuthKey);
+    void addAuthToRequest(nx::utils::Url& request, const QString& remoteAuthKey);
+
+    nx_http::StatusCode::Value fetchModuleInformation(
+        const nx::utils::Url &url,
+        const QString& authenticationKey,
+        QnModuleInformationWithAddresses* moduleInformation);
 };
 
 } // namespace utils

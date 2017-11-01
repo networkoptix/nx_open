@@ -236,21 +236,21 @@ QString QnContext::getLastUsedSystemName() const
     return qnSettings->lastUsedConnection().systemName;
 }
 
-QUrl QnContext::getLastUsedUrl() const
+nx::utils::Url QnContext::getLastUsedUrl() const
 {
     return qnSettings->lastUsedConnection().urlWithCredentials();
 }
 
-QUrl QnContext::getInitialUrl() const
+nx::utils::Url QnContext::getInitialUrl() const
 {
     return qnSettings->startupParameters().url;
 }
 
-QUrl QnContext::getWebSocketUrl() const
+nx::utils::Url QnContext::getWebSocketUrl() const
 {
     const auto port = qnSettings->webSocketPort();
     if (port == 0)
-        return QUrl();
+        return nx::utils::Url();
 
     return nx::network::url::Builder()
         .setScheme(lit("ws"))

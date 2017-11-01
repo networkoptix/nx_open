@@ -24,7 +24,7 @@ public:
         stun::AbstractAsyncClient::bindToAioThread(aioThread);
     }
 
-    virtual void connect(const QUrl& /*url*/, ConnectHandler handler = nullptr) override
+    virtual void connect(const nx::utils::Url& /*url*/, ConnectHandler handler = nullptr) override
     {
         if (handler)
             post([handler = std::move(handler)]() { handler(SystemError::noError); });

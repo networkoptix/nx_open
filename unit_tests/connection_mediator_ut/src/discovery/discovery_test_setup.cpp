@@ -49,7 +49,7 @@ void DiscoveryTestSetup::onWebSocketAccepted(
     m_acceptedConnections.push(std::move(connection));
 }
 
-QUrl DiscoveryTestSetup::getUrl() const
+nx::utils::Url DiscoveryTestSetup::getUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(nx_http::kUrlSchemeName)

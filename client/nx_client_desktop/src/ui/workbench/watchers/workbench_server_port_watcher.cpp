@@ -46,7 +46,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
                     if (!currentServer)
                         return;
 
-                    QUrl url = commonModule()->currentUrl();
+                    nx::utils::Url url = commonModule()->currentUrl();
                     if (url.isEmpty() || (url.port() == currentServer->getPort()))
                         return;
 

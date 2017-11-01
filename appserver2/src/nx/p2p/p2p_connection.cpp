@@ -10,11 +10,10 @@
 namespace nx {
 namespace p2p {
 
-Connection::Connection(
-    QnCommonModule* commonModule,
+Connection::Connection(QnCommonModule* commonModule,
     const QnUuid& remoteId,
     const ApiPeerDataEx& localPeer,
-    const QUrl& remotePeerUrl,
+    const utils::Url &remotePeerUrl,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
     :
@@ -70,7 +69,7 @@ void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
     }
     else
     {
-        QUrl url;
+        nx::utils::Url url;
         if (const auto& connection = commonModule()->ec2Connection())
             url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());

@@ -32,7 +32,7 @@ public:
     /**
      * @param url http and stun scheme is supported.
      */
-    virtual void connect(const QUrl& url, ConnectHandler handler) override;
+    virtual void connect(const nx::utils::Url& url, ConnectHandler handler) override;
 
     virtual bool setIndicationHandler(
         int method,
@@ -85,7 +85,7 @@ private:
     /** map<stun method, handler> */
     std::map<int, HandlerContext> m_indicationHandlers;
     mutable QnMutex m_mutex;
-    QUrl m_url;
+    nx::utils::Url m_url;
     std::map<void*, ReconnectHandler> m_reconnectHandlers;
     nx::network::RetryTimer m_reconnectTimer;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
@@ -108,7 +108,7 @@ private:
 
     void openHttpTunnel(
         const QnMutexLockerBase&,
-        const QUrl& url,
+        const nx::utils::Url& url,
         ConnectHandler handler);
     void onHttpConnectionUpgradeDone();
 

@@ -35,7 +35,7 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void RemoteEC2Connection::updateConnectionUrl(const QUrl& url)
+    void RemoteEC2Connection::updateConnectionUrl(const nx::utils::Url &url)
     {
         m_connectionInfo.ecUrl = url;
     }
@@ -48,10 +48,10 @@ namespace ec2
 
         base_type::startReceivingNotifications();
 
-        QUrl url(m_queryProcessor->getUrl());
+        nx::utils::Url url(m_queryProcessor->getUrl());
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         //url.setPath("ec2/events");
-        url = QUrl( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
+        url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
         QUrlQuery q;
         url.setQuery(q);
         m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(m_remotePeerId, url);

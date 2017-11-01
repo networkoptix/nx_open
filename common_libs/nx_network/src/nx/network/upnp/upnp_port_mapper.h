@@ -81,7 +81,7 @@ protected: // for testing only
 
     struct Device
     {
-        QUrl url;
+        nx::utils::Url url;
         HostAddress internalIp;
         HostAddress externalIp;
 
@@ -101,8 +101,9 @@ protected: // for testing only
     virtual void onTimer( const quint64& timerID ) override;
 
 private:
-    void addNewDevice( const HostAddress& localAddress,
-                       const QUrl& url, const QString& serial );
+    void addNewDevice(
+        const HostAddress& localAddress,
+        const nx::utils::Url &url, const QString& serial );
 
     void removeMapping( PortId portId );
     void updateExternalIp( Device& device );

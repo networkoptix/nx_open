@@ -76,7 +76,7 @@ static void loadRemoteDataAsync(
                 });
         };
 
-    QUrl apiUrl(server->getApiUrl());
+    nx::utils::Url apiUrl(server->getApiUrl());
     apiUrl.setPath(lit("/%1/").arg(urlPath));
 
     QnChunksRequestData modifiedRequest = ctx->request();

@@ -60,7 +60,7 @@ protected:
 
     void givenHappyRelay()
     {
-        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
+        m_relayUrl = nx::utils::Url(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
             m_relayUrl,
@@ -70,7 +70,7 @@ protected:
 
     void givenUnhappyRelay()
     {
-        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
+        m_relayUrl = nx::utils::Url(lm("http://127.0.0.1:12345"));
         m_connector = std::make_unique<relay::Connector>(
             m_relayUrl,
             AddressEntry(AddressType::cloud, "any_name"),
@@ -80,7 +80,7 @@ protected:
 
     void givenSilentRelay()
     {
-        m_relayUrl = QUrl(lm("http://127.0.0.1:12345"));
+        m_relayUrl = nx::utils::Url(lm("http://127.0.0.1:12345"));
 
         m_connector = std::make_unique<relay::Connector>(
             m_relayUrl,
@@ -153,7 +153,7 @@ protected:
     }
 
     void createRelayConnector(
-        QUrl relayUrl,
+        nx::utils::Url relayUrl,
         nx::String targetHostAddress,
         nx::String connectSessionId)
     {
@@ -172,7 +172,7 @@ protected:
 private:
     std::unique_ptr<relay::Connector> m_connector;
     nx::utils::promise<Result> m_connectFinished;
-    QUrl m_relayUrl;
+    nx::utils::Url m_relayUrl;
     std::atomic<nx::cloud::relay::api::test::ClientImpl*>
         m_prevClientToRelayConnectionInstanciated;
     boost::optional<Result> m_prevConnectorResult;

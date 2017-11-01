@@ -74,9 +74,9 @@ bool HikvisionAudioTransmitter::isReadyForTransmission(
     return true;
 }
 
-QUrl HikvisionAudioTransmitter::transmissionUrl() const
+utils::Url HikvisionAudioTransmitter::transmissionUrl() const
 {
-    QUrl url(m_resource->getUrl());
+    nx::utils::Url url(m_resource->getUrl());
     url.setPath(kTwoWayAudioPrefix + kTransmitTwoWayAudioUrlTemplate.arg(m_channelId));
 
     return url;
@@ -98,7 +98,7 @@ bool HikvisionAudioTransmitter::openChannelIfNeeded()
 
     auto httpHelper = createHttpHelper();
 
-    QUrl url(m_resource->getUrl());
+    nx::utils::Url url(m_resource->getUrl());
     auto channelStatusPath = kTwoWayAudioPrefix + kChannelStatusUrlTemplate.arg(m_channelId);
     auto channelOpenPath = kTwoWayAudioPrefix + kOpenTwoWayAudioUrlTemplate.arg(m_channelId);
 
@@ -155,7 +155,7 @@ bool HikvisionAudioTransmitter::closeChannel()
 
     auto httpHelper = createHttpHelper();
 
-    QUrl url(m_resource->getUrl());
+    nx::utils::Url url(m_resource->getUrl());
     url.setPath(kTwoWayAudioPrefix + kCloseTwoWayAudioUrlTemplate.arg(m_channelId));
 
     auto result = httpHelper->doPut(

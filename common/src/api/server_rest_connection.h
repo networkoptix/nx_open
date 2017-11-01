@@ -168,9 +168,8 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle downloadFileChunkFromInternet(
-        const QString& fileName,
-        const QUrl& url,
+    Handle downloadFileChunkFromInternet(const QString& fileName,
+        const nx::utils::Url &url,
         int chunkIndex,
         int chunkSize,
         Result<QByteArray>::type callback,

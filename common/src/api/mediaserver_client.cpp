@@ -4,7 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/type_utils.h>
 
-MediaServerClient::MediaServerClient(const QUrl& baseRequestUrl):
+MediaServerClient::MediaServerClient(const nx::utils::Url& baseRequestUrl):
     m_baseRequestUrl(baseRequestUrl)
 {
 }
@@ -19,6 +19,11 @@ void MediaServerClient::bindToAioThread(nx::network::aio::AbstractAioThread* aio
 void MediaServerClient::setUserCredentials(const nx_http::Credentials& userCredentials)
 {
     m_userCredentials = userCredentials;
+}
+
+void MediaServerClient::setAuthenticationKey(const QString& key)
+{
+    m_authenticationKey = key;
 }
 
 void MediaServerClient::setRequestTimeout(std::chrono::milliseconds timeout)

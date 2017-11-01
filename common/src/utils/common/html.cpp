@@ -142,7 +142,7 @@ QString htmlFormattedParagraph(const QString &text, int pixelSize, bool isBold /
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
 
-QString makeHref(const QString& text, const QUrl& url)
+QString makeHref(const QString& text, const nx::utils::Url& url)
 {
     return makeHref(text, url.toString());
 }

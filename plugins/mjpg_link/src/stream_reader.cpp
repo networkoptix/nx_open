@@ -261,7 +261,7 @@ int StreamReader::doRequest( nx_http::HttpClient* const httpClient )
 {
     httpClient->setUserName( QLatin1String(m_cameraInfo.defaultLogin) );
     httpClient->setUserPassword( QLatin1String(m_cameraInfo.defaultPassword) );
-    if( !httpClient->doGet( QUrl(QLatin1String(m_cameraInfo.url)) ) ||
+    if( !httpClient->doGet( nx::utils::Url(QLatin1String(m_cameraInfo.url)) ) ||
         !httpClient->response() )
     {
         NX_LOG( QString::fromLatin1("Failed to request %1").arg(QLatin1String(m_cameraInfo.url)), cl_logDEBUG1 );

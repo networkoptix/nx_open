@@ -39,7 +39,7 @@ using namespace nx::mediaserver_core::plugins;
 HanwhaMetadataPlugin::SharedResources::SharedResources(
     const QString& sharedId,
     const Hanwha::DriverManifest& driverManifest,
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth)
     :
     monitor(std::make_unique<HanwhaMetadataMonitor>(driverManifest, url, auth)),
@@ -229,7 +229,7 @@ const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const
 
 HanwhaMetadataMonitor* HanwhaMetadataPlugin::monitor(
     const QString& sharedId,
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth)
 {
     std::shared_ptr<SharedResources> monitorCounter;
@@ -284,7 +284,7 @@ void HanwhaMetadataPlugin::managerIsAboutToBeDestroyed(const QString& sharedId)
 std::shared_ptr<HanwhaMetadataPlugin::SharedResources> HanwhaMetadataPlugin::sharedResources(
     const nx::sdk::ResourceInfo& resourceInfo)
 {
-    const QUrl url(resourceInfo.url);
+    const nx::utils::Url url(resourceInfo.url);
 
     QAuthenticator auth;
     auth.setUser(resourceInfo.login);

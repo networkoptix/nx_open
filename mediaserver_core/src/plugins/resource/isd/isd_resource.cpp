@@ -39,7 +39,7 @@ QnPlIsdResource::QnPlIsdResource()
 
 void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
@@ -90,7 +90,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));
 
 
-    QUrl apiRequestUrl;
+    nx::utils::Url apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
 
     QAuthenticator auth = getAuth();
@@ -272,7 +272,7 @@ void QnPlIsdResource::setMaxFps(int f)
     setProperty(MAX_FPS_PARAM_NAME, f);
 }
 
-CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody )
+CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const nx::utils::Url& apiRequestUrl, QByteArray* const msgBody )
 {
     int statusCode = nx_http::StatusCode::ok;
 

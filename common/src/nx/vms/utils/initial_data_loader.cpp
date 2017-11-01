@@ -50,8 +50,8 @@ void loadResourcesFromEcs(
                 return;
         }
 
-        QMultiHash<QnUuid, QUrl> additionalAddressesById;
-        QMultiHash<QnUuid, QUrl> ignoredAddressesById;
+        QMultiHash<QnUuid, nx::utils::Url> additionalAddressesById;
+        QMultiHash<QnUuid, nx::utils::Url> ignoredAddressesById;
         for (const ec2::ApiDiscoveryData &data : discoveryDataList)
         {
             additionalAddressesById.insert(data.id, data.url);
@@ -61,11 +61,11 @@ void loadResourcesFromEcs(
 
         for (const auto &mediaServer : mediaServerList)
         {
-            const auto defaultPort = QUrl(mediaServer.url).port();
+            const auto defaultPort = nx::utils::Url(mediaServer.url).port();
             QList<SocketAddress> addresses;
             ec2::deserializeNetAddrList(mediaServer.networkAddresses, addresses, defaultPort);
 
-            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer.id);
+            QList<nx::utils::Url> additionalAddresses = additionalAddressesById.values(mediaServer.id);
             for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */)
             {
                 const SocketAddress addr(it->host(), it->port(defaultPort));
@@ -161,7 +161,7 @@ void loadResourcesFromEcs(
                     {
                         const auto auth = QnNetworkResource::getResourceAuth(commonModule, camera.id, camera.typeId);
                         manualCameras.insert(camera.url,
-                            QnManualCameraInfo(QUrl(camera.url), auth, resType->getName()));
+                            QnManualCameraInfo(nx::utils::Url(camera.url), auth, resType->getName()));
                     }
                     else
                     {

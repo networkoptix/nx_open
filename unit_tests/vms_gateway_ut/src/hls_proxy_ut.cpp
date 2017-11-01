@@ -81,11 +81,11 @@ protected:
 
     void thenPlaylistItemIsAvailableThroughProxy()
     {
-        QUrl chunkUrl;
+        nx::utils::Url chunkUrl;
         for (const auto& entry: m_receivedPlaylist.entries)
         {
             if (entry.type == network::m3u::EntryType::location)
-                chunkUrl = QUrl(entry.value);
+                chunkUrl = nx::utils::Url(entry.value);
         }
 
         if (chunkUrl.host().isEmpty())
@@ -110,7 +110,7 @@ protected:
         {
             if (entry.type != network::m3u::EntryType::location)
                 continue;
-            QString chunkProxyPath = QUrl(entry.value).path();
+            QString chunkProxyPath = nx::utils::Url(entry.value).path();
             const auto pathParts = chunkProxyPath.split('/', QString::SkipEmptyParts);
             const auto targetHostName = pathParts[1];
             ASSERT_EQ(m_hlsServerFullCloudName, targetHostName);
@@ -171,9 +171,9 @@ private:
             nx_http::kAudioMpegUrlMimeType);
     }
 
-    QUrl playlistProxyUrl() const
+    nx::utils::Url playlistProxyUrl() const
     {
-        return QUrl(lm("http://%1/%2%3")
+        return nx::utils::Url(lm("http://%1/%2%3")
             .arg(moduleInstance()->impl()->httpEndpoints()[0])
             .arg(m_cloudSystemId).arg(kHlsPlaylistPath));
     }

@@ -96,15 +96,15 @@ private:
         return std::make_unique<nx_http::BufferSource>("video/mp2t", m_fixedResource);
     }
 
-    QUrl streamUrl() const
+    nx::utils::Url streamUrl() const
     {
-        return QUrl(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
+        return nx::utils::Url(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
             .arg(m_httpServer.serverAddress()).arg(kStreamPath));
     }
 
-    QUrl fixedResourceUrl() const
+    nx::utils::Url fixedResourceUrl() const
     {
-        return QUrl(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
+        return nx::utils::Url(lm("http://%1/%2%3").arg(moduleInstance()->impl()->httpEndpoints()[0])
             .arg(m_httpServer.serverAddress()).arg(kFixedResourcePath));
     }
 };

@@ -198,7 +198,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
     QnManualCameraInfoMap infoMap;
     for (const auto& camera: data.cameras)
     {
-        QUrl url(camera.url);
+        nx::utils::Url url(camera.url);
         if (url.host().isEmpty() && !url.path().isEmpty())
         {
             // camera.url is just an IP address or a hostname; QUrl parsed it as path, fixing it.

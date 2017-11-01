@@ -99,7 +99,7 @@ namespace detail
         QnDbManager(QnCommonModule* commonModule);
         virtual ~QnDbManager();
 
-        bool init(const QUrl& dbUrl);
+        bool init(const nx::utils::Url& dbUrl);
         bool isInitialized() const;
 
         template <class T>
