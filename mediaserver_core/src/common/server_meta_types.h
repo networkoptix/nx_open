@@ -1,10 +1,16 @@
 #pragma once
 
+namespace nx {
+namespace server {
+
 /**
- * Convenience class for uniform initialization of metatypes in common module.
+ * Convenience class for uniform initialization of metatypes in server module.
  */
-class QnServerMetaTypes
+class MetaTypes
 {
 public:
     static void initialize();
 };
+
+} // namespace server
+} // namespace nx

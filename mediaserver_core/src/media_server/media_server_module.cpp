@@ -83,7 +83,7 @@ QnMediaServerModule::QnMediaServerModule(
 {
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
-    QnServerMetaTypes::initialize();
+    nx::server::MetaTypes::initialize();
 
     store(new QnStaticCommonModule(
         Qn::PT_Server,

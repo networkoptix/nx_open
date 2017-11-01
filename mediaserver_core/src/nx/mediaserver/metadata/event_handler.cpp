@@ -9,7 +9,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <nx/mediaserver/event/event_connector.h>
 #include <analytics/common/object_detection_metadata.h>
-#include <nx/fusion/serialization/ubjson.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace mediaserver {

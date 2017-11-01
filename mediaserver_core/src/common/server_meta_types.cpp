@@ -1,8 +1,11 @@
 #include "server_meta_types.h"
 
-#include <providers/stream_mixer.h>
-#include <core/dataprovider/stream_mixer_data.h>
+namespace nx {
+namespace server {
 
-void QnServerMetaTypes::initialize()
+void MetaTypes::initialize()
 {
 }
+
+} // namespace server
+} // namespace nx
