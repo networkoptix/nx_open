@@ -418,15 +418,6 @@ void WorkbenchAnalyticsController::Private::at_currentLayoutChanged()
     }
 
     loopTimer->start();
-
-    // Ugly hach to make video play sync after activating layout.
-    // Sometimes the timeout is not enough to load video. The hack fails in such cases.
-    QTimer::singleShot(200, this,
-        [this]()
-        {
-            const auto navigator = q->navigator();
-            navigator->setPosition(navigator->positionUsec() + 1);
-        });
 }
 
 void WorkbenchAnalyticsController::Private::at_loopTimerTimeout()
