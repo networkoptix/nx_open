@@ -121,7 +121,11 @@ bool QnInputField::passwordIndicatorEnabled() const
     return passwordIndicator() != nullptr;
 }
 
-void QnInputField::setPasswordIndicatorEnabled(bool enabled, bool hideForEmptyInput, bool showImmediately)
+void QnInputField::setPasswordIndicatorEnabled(
+    bool enabled,
+    bool hideForEmptyInput,
+    bool showImmediately,
+    QnPasswordInformation::AnalyzeFunction analyzeFunction)
 {
     Q_D(QnInputField);
 
@@ -132,7 +136,8 @@ void QnInputField::setPasswordIndicatorEnabled(bool enabled, bool hideForEmptyIn
     {
         if (!d->passwordIndicator)
         {
-            d->passwordIndicator = new QnPasswordStrengthIndicator(toLineEdit(input()));
+            d->passwordIndicator = new QnPasswordStrengthIndicator(
+                toLineEdit(input()), analyzeFunction);
             d->passwordIndicator->setVisible(false);
         }
 

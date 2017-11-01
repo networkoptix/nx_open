@@ -4,12 +4,13 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <ui/common/aligner.h>
+#include <nx/utils/password_analyzer.h>
 
 namespace {
 
 void setupPasswordField(QnInputField& field)
 {
-    field.setPasswordIndicatorEnabled(true);
+    field.setPasswordIndicatorEnabled(true, true, false, nx::utils::cameraPasswordStrength);
     field.setEchoMode(QLineEdit::Password);
 }
 
