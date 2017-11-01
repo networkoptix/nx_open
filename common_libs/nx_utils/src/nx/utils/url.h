@@ -4,7 +4,6 @@
 #include <QtCore/QJsonValue>
 #include <QtXml/QtXml>
 #include <boost/optional.hpp>
-#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace utils {
@@ -158,6 +157,8 @@ inline bool addressesEqual(const nx::utils::Url& lhs, const nx::utils::Url& rhs)
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::utils::Url)
+
+class QnJsonContext;
 
 inline void serialize(QnJsonContext* /*ctx*/, const nx::utils::Url& url, QJsonValue* target)
 {
