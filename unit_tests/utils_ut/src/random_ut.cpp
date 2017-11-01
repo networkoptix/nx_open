@@ -54,33 +54,33 @@ TYPED_TEST_CASE_P(Random);
 
 TYPED_TEST_P(Random, Numbers)
 {
-    testNumberGeneration<int>(
+    this->template testNumberGeneration<int>(
         0, 1, 100,
         [](int a) { return a == 0; },
         [](int a) { return a == 1; });
 
-    testNumberGeneration<size_t>(
+    this->template testNumberGeneration<size_t>(
         0, 100, 10000,
         [](size_t a) { return a < 80; },
         [](size_t a) { return a > 40 && a < 60; },
         [](size_t a) { return a > 80; });
 
-    testNumberGeneration<int>(
+    this->template testNumberGeneration<int>(
         -10, 10, 1000,
         [](int a) { return a > 5; },
         [](int a) { return a < -5; });
 
-    testNumberGeneration<float>(
+    this->template testNumberGeneration<float>(
         -1, 1, 1000,
         [](float a) { return a > 0.9; },
         [](float a) { return a < -0.9; });
 
-    testNumberGeneration<double>(
+    this->template testNumberGeneration<double>(
         0, 1, 100,
         [](double a) { return a > 0.8; },
         [](double a) { return a < 0.2; });
 
-    testNumberGeneration<uint64_t>(
+    this->template testNumberGeneration<uint64_t>(
         0, std::numeric_limits<uint64_t>::max(), 100,
         [](uint64_t a) { return a > (std::numeric_limits<uint64_t>::max() / 10) * 8; },
         [](uint64_t a) { return a < (std::numeric_limits<uint64_t>::max() / 10) * 2; });
