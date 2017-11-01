@@ -8,6 +8,12 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
+void ManagerDeletor(nx::sdk::metadata::AbstractMetadataManager* manager)
+{
+    manager->stopFetchingMetadata();
+    manager->releaseRef();
+}
+
 ResourceMetadataContext::ResourceMetadataContext()
 {
 }
@@ -17,11 +23,6 @@ ResourceMetadataContext::~ResourceMetadataContext()
     if (m_videoFrameDataReceptor)
         m_videoFrameDataReceptor->detachFromContext();
     m_videoFrameDataReceptor.clear();
-    if (m_manager)
-    {
-        m_manager->stopFetchingMetadata();
-        m_manager->releaseRef();
-    }
 }
 
 bool ResourceMetadataContext::canAcceptData() const
@@ -37,26 +38,23 @@ void ResourceMetadataContext::putData(const QnAbstractDataPacketPtr& data)
         m_metadataReceptor->putData(data);
 }
 
-void ResourceMetadataContext::setManager(nx::sdk::metadata::AbstractMetadataManager* manager)
+void ResourceMetadataContext::clearManagers()
 {
     QnMutexLocker lock(&m_mutex);
-    m_manager.reset(manager);
+    m_managers.clear();
 }
 
-void ResourceMetadataContext::setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler)
+void ResourceMetadataContext::addManager(
+    nx::sdk::metadata::AbstractMetadataManager* manager,
+    nx::sdk::metadata::AbstractMetadataHandler* handler,
+    const nx::api::AnalyticsDriverManifest& manifest)
 {
     QnMutexLocker lock(&m_mutex);
-    m_handler.reset(handler);
-}
-
-void ResourceMetadataContext::setPluginManifest(const nx::api::AnalyticsDriverManifest& manifest)
-{
-    m_pluginManifest = manifest;
-}
-
-nx::api::AnalyticsDriverManifest ResourceMetadataContext::pluginManifest() const
-{
-    return m_pluginManifest;
+    ManagerContext context;
+    context.manager = ManagerPtr(manager, ManagerDeletor);
+    context.handler.reset(handler);
+    context.manifest = manifest;
+    m_managers.push_back(std::move(context));
 }
 
 void ResourceMetadataContext::setDataProvider(const QnAbstractMediaStreamDataProvider* provider)
@@ -77,16 +75,10 @@ void ResourceMetadataContext::setMetadataDataReceptor(QnAbstractDataReceptor* re
     m_metadataReceptor = receptor;
 }
 
-nx::sdk::metadata::AbstractMetadataManager* ResourceMetadataContext::manager() const
+const ManagerList& ResourceMetadataContext::managers() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_manager.get();
-}
-
-nx::sdk::metadata::AbstractMetadataHandler* ResourceMetadataContext::handler() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_handler.get();
+    return m_managers;
 }
 
 const QnAbstractMediaStreamDataProvider* ResourceMetadataContext::dataProvider() const
@@ -105,6 +97,18 @@ QnAbstractDataReceptor* ResourceMetadataContext::metadataDataReceptor() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_metadataReceptor;
+}
+
+void ResourceMetadataContext::setManagersInitialized(bool value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_isManagerInitialized = value;
+}
+
+bool ResourceMetadataContext::isManagerInitialized() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_isManagerInitialized;
 }
 
 } // namespace metadata

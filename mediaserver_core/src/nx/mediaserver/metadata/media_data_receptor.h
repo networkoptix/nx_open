@@ -8,7 +8,7 @@ namespace metadata {
 
 class ResourceMetadataContext;
 
-struct VideoDataReceptor: public QnAbstractDataReceptor
+class VideoDataReceptor: public QnAbstractDataReceptor
 {
 public:
     VideoDataReceptor(const ResourceMetadataContext* context);

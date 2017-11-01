@@ -23,35 +23,39 @@ void VideoDataReceptor::detachFromContext()
 void VideoDataReceptor::putData(const QnAbstractDataPacketPtr& data)
 {
     QnMutexLocker lock(&m_mutex);
-    if (!m_context || !m_context->manager())
+    if (!m_context)
         return;
     using namespace nx::sdk::metadata;
-    nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
-        (AbstractConsumingMetadataManager*)
-        m_context->manager()->queryInterface(IID_ConsumingMetadataManager), false);
-    if (!manager)
-        return;
-    auto video = dynamic_cast<QnCompressedVideoData*> (data.get());
-    if (video)
-    {
-        nxpt::ScopedRef<CommonCompressedVideoPacket> packet(new CommonCompressedVideoPacket());
-        packet->setTimestampUsec(data->timestamp);
-        packet->setWidth(video->width);
-        packet->setHeight(video->height);
-        packet->setCodec(toString(video->compressionType).toStdString());
-        if (m_context->pluginManifest().capabilities.testFlag(
-            nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame))
-        {
-            std::vector<char> buffer(video->dataSize());
-            memcpy(&buffer[0], video->data(), video->dataSize());
-            packet->setData(std::move(buffer));
-        }
-        else
-        {
-            packet->setData(video->data(), video->dataSize());
-        }
 
-        manager->putData(packet.get());
+    for (auto& contextData: m_context->managers())
+    {
+        nxpt::ScopedRef<AbstractConsumingMetadataManager> manager(
+            (AbstractConsumingMetadataManager*)
+            contextData.manager->queryInterface(IID_ConsumingMetadataManager), false);
+        if (!manager)
+            return;
+        auto video = dynamic_cast<QnCompressedVideoData*> (data.get());
+        if (video)
+        {
+            nxpt::ScopedRef<CommonCompressedVideoPacket> packet(new CommonCompressedVideoPacket());
+            packet->setTimestampUsec(data->timestamp);
+            packet->setWidth(video->width);
+            packet->setHeight(video->height);
+            packet->setCodec(toString(video->compressionType).toStdString());
+            if (contextData.manifest.capabilities.testFlag(
+                nx::api::AnalyticsDriverManifestBase::needDeepCopyForMediaFrame))
+            {
+                std::vector<char> buffer(video->dataSize());
+                memcpy(&buffer[0], video->data(), video->dataSize());
+                packet->setData(std::move(buffer));
+            }
+            else
+            {
+                packet->setData(video->data(), video->dataSize());
+            }
+
+            manager->putData(packet.get());
+        }
     }
 }
 

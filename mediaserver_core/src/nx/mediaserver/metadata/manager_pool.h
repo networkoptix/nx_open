@@ -70,9 +70,9 @@ private:
 
     void handleResourceChanges(const QnResourcePtr& resource);
 
-    bool canFetchMetadataFromResource(const QnSecurityCamResourcePtr& camera) const;
+    bool isCameraAlive(const QnSecurityCamResourcePtr& camera) const;
 
-    bool fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid>& eventTypeIds);
+    void fetchMetadataForResourceUnsafe(ResourceMetadataContext& context, QSet<QnUuid>& eventTypeIds);
 
     template<typename T>
     boost::optional<T> deserializeManifest(const char* manifestString) const
@@ -99,7 +99,6 @@ private:
     bool resourceInfoFromResource(
         const QnSecurityCamResourcePtr& camera,
         nx::sdk::ResourceInfo* outResourceInfo) const;
-
 private:
     ResourceMetadataContextMap m_contexts;
     QnMediaServerModule* m_serverModule;

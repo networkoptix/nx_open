@@ -28,39 +28,57 @@ namespace mediaserver {
 namespace metadata {
 
 class VideoDataReceptor;
+using ManagerPtr = std::unique_ptr<
+    nx::sdk::metadata::AbstractMetadataManager,
+    std::function<void(nx::sdk::metadata::AbstractMetadataManager*)>>;
+using HandlerPtr = std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler>;
+struct ManagerContext
+{
+    ManagerPtr manager;
+    HandlerPtr handler;
+    nx::api::AnalyticsDriverManifest manifest;
+};
 
-struct ResourceMetadataContext: public QnAbstractDataReceptor
+using ManagerList = std::vector<ManagerContext>;
+
+class ResourceMetadataContext: public QnAbstractDataReceptor
 {
 public:
     ResourceMetadataContext();
     ~ResourceMetadataContext();
 
-    void setManager(nx::sdk::metadata::AbstractMetadataManager* manager);
-    void setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler);
-    void setPluginManifest(const nx::api::AnalyticsDriverManifest& manifest);
+    /**
+     * Register plugin manager. This function takes ownership for the manager and handler
+     */
+    void addManager(
+        nx::sdk::metadata::AbstractMetadataManager* manager,
+        nx::sdk::metadata::AbstractMetadataHandler* handler,
+        const nx::api::AnalyticsDriverManifest& manifest);
+    void clearManagers();
     void setDataProvider(const QnAbstractMediaStreamDataProvider* provider);
     void setVideoFrameDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor);
     void setMetadataDataReceptor(QnAbstractDataReceptor* receptor);
 
-    nx::sdk::metadata::AbstractMetadataManager* manager() const;
-    nx::sdk::metadata::AbstractMetadataHandler* handler() const;
+    const ManagerList& managers() const;
     const QnAbstractMediaStreamDataProvider* dataProvider() const;
     QSharedPointer<VideoDataReceptor> videoFrameDataReceptor() const;
     QnAbstractDataReceptor* metadataDataReceptor() const;
-    nx::api::AnalyticsDriverManifest pluginManifest() const;
+
+    void setManagersInitialized(bool value);
+    bool isManagerInitialized() const;
 protected:
     virtual bool canAcceptData() const override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
 private:
     mutable QnMutex m_mutex;
-    std::unique_ptr<nx::sdk::metadata::AbstractMetadataManager> m_manager;
-    std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler> m_handler;
+    ManagerList m_managers;
 
     const QnAbstractMediaStreamDataProvider* m_dataProvider = nullptr;
     QSharedPointer<VideoDataReceptor> m_videoFrameDataReceptor;
     QnAbstractDataReceptor* m_metadataReceptor = nullptr;
     nx::api::AnalyticsDriverManifest m_pluginManifest;
+    bool m_isManagerInitialized = false;
 };
 
 } // namespace metadata

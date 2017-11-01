@@ -21,6 +21,7 @@
 #include <nx/sdk/metadata/abstract_consuming_metadata_manager.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include "media_data_receptor.h"
+#include <nx/utils/log/log_main.h>
 
 namespace nx {
 namespace mediaserver {
@@ -93,7 +94,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
         return;
 
     QnMutexLocker lock(&m_contextMutex);
-    releaseResourceMetadataManagersUnsafe(camera);
+    m_contexts.erase(resource->getId());
 }
 
 void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
@@ -122,19 +123,7 @@ nx::mediaserver::metadata::ManagerPool::PluginList ManagerPool::availablePlugins
 
 void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
 {
-    NX_ASSERT(camera);
-    if (!camera)
-        return;
-
-    auto cameraId = camera->getId();
-    if (!canFetchMetadataFromResource(camera))
-        return;
-
-    releaseResourceMetadataManagersUnsafe(camera);
-
-    auto plugins = availablePlugins();
-
-    for (auto& plugin: plugins)
+    for (auto& plugin: availablePlugins())
     {
         auto manager = createMetadataManager(camera, plugin);
         if (!manager)
@@ -150,16 +139,12 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
         if (!deviceManifest)
             continue;
 
-        auto handler = createMetadataHandler(camera, pluginManifest->driverId);
-        if (!handler)
-            continue;
-        manager->setHandler(handler);
-
         auto& context = m_contexts[camera->getId()];
-        context.setManager(manager);
-        context.setHandler(handler);
-        context.setPluginManifest(*pluginManifest);
-        handler->registerDataReceptor(&context);
+        auto handler = createMetadataHandler(camera, pluginManifest->driverId);
+        manager->setHandler(handler);
+        context.addManager(manager, handler, *pluginManifest);
+        if (manager->queryInterface(IID_ConsumingMetadataManager))
+            handler->registerDataReceptor(&context);
 
         managerGuard.release();
     }
@@ -178,9 +163,11 @@ AbstractMetadataManager* ManagerPool::createMetadataManager(
     return plugin->managerForResource(resourceInfo, &error);
 }
 
-void ManagerPool::releaseResourceMetadataManagersUnsafe(const QnSecurityCamResourcePtr& resource)
+void ManagerPool::releaseResourceMetadataManagersUnsafe(const QnSecurityCamResourcePtr& camera)
 {
-    m_contexts.erase(resource->getId());
+    auto& context = m_contexts[camera->getId()];
+    context.clearManagers();
+    context.setManagersInitialized(false);
 }
 
 EventHandler* ManagerPool::createMetadataHandler(
@@ -205,50 +192,48 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
         return;
 
     auto resourceId = camera->getId();
-    auto events = qnServerModule
-        ->metadataRuleWatcher()
-        ->watchedEventsForResource(resourceId);
-
-    if (canFetchMetadataFromResource(camera))
+    QnMutexLocker lock(&m_contextMutex);
+    auto& context = m_contexts[resourceId];
+    if (isCameraAlive(camera))
     {
-        QnMutexLocker lock(&m_contextMutex);
-        auto context = m_contexts.find(resourceId);
-        if (context == m_contexts.cend())
+        if (!context.isManagerInitialized())
             createMetadataManagersForResourceUnsafe(camera);
+        auto events = qnServerModule->metadataRuleWatcher()->watchedEventsForResource(resourceId);
+        fetchMetadataForResourceUnsafe(context, events);
     }
-
-    fetchMetadataForResource(resourceId, events);
+    else
+    {
+        releaseResourceMetadataManagersUnsafe(camera);
+    }
 }
 
-bool ManagerPool::canFetchMetadataFromResource(const QnSecurityCamResourcePtr& camera) const
+bool ManagerPool::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
 {
     if (!camera)
         return false;
 
-    const auto status = camera->getStatus();
-    return !camera->hasFlags(Qn::foreigner | Qn::desktop_camera)
-        && (status == Qn::Online || status == Qn::Recording);
+    if (camera->hasFlags(Qn::foreigner | Qn::desktop_camera))
+        return false;
+    return camera->getStatus() >= Qn::Online;
 }
 
-bool ManagerPool::fetchMetadataForResource(const QnUuid& resourceId, QSet<QnUuid>& eventTypeIds)
+void ManagerPool::fetchMetadataForResourceUnsafe(ResourceMetadataContext& context, QSet<QnUuid>& eventTypeIds)
 {
-    QnMutexLocker lock(&m_contextMutex);
-    auto context = m_contexts.find(resourceId);
-    if (context == m_contexts.cend())
-        return false;
-
-    auto manager = context->second.manager();
-    auto handler = context->second.handler();
-    Error result = Error::unknownError;
-    if (!manager)
-        return false;
-
-    if (eventTypeIds.empty())
-        result = manager->stopFetchingMetadata();
-    else
-        result = manager->startFetchingMetadata(); //< TODO: #dmishin pass event types.
-
-    return result == Error::noError;
+    for (auto& data: context.managers())
+    {
+        if (eventTypeIds.empty())
+        {
+            auto result = data.manager->stopFetchingMetadata();
+            if (result != Error::noError)
+                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
+        }
+        else
+        {
+            auto result = data.manager->startFetchingMetadata(); //< TODO: #dmishin pass event types.
+            if (result != Error::noError)
+                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
+        }
+    }
 }
 
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::addManifestToServer(
