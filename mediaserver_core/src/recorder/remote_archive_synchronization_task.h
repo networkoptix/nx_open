@@ -21,9 +21,10 @@ class RemoteArchiveSynchronizationTask:
     using BufferType = QByteArray;
 
 public:
-    RemoteArchiveSynchronizationTask(QnCommonModule* commonModule);
+    RemoteArchiveSynchronizationTask(
+        QnMediaServerModule* serverModule,
+        const QnSecurityCamResourcePtr& resource);
 
-    virtual void setResource(const QnSecurityCamResourcePtr& resource) override;
     virtual void setDoneHandler(std::function<void()> handler) override;
     virtual void cancel() override;
     virtual bool execute() override;
@@ -61,7 +62,6 @@ private:
         QnServer::ChunksCatalog catalog) const;
 
 private:
-    QnCommonModule* m_commonModule;
     QnSecurityCamResourcePtr m_resource;
     std::atomic<bool> m_canceled;
     std::function<void()> m_doneHandler;

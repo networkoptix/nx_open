@@ -22,9 +22,10 @@ class RemoteArchiveStreamSynchronizationTask:
     using BufferType = QByteArray;
 
 public:
-    RemoteArchiveStreamSynchronizationTask(QnCommonModule* commonModule);
+    RemoteArchiveStreamSynchronizationTask(
+        QnMediaServerModule* serverModule,
+        const QnSecurityCamResourcePtr& resource);
 
-    virtual void setResource(const QnSecurityCamResourcePtr& resource) override;
     virtual void setDoneHandler(std::function<void()> handler) override;
     virtual void cancel() override;
     virtual bool execute() override;
@@ -40,10 +41,10 @@ private:
         const std::chrono::milliseconds& startTime,
         const std::chrono::milliseconds& endTime);
 
-    QnTimePeriodList toTimePeriodList(
-        const std::vector<RemoteArchiveChunk>& entries) const;
+    static QnTimePeriodList toTimePeriodList(
+        const std::vector<RemoteArchiveChunk>& chunks);
 
-    std::chrono::milliseconds totalDuration(const QnTimePeriodList& deviceChunks);
+    static std::chrono::milliseconds totalDuration(const QnTimePeriodList& deviceChunks);
 
     bool needToFireProgress() const;
 

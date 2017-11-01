@@ -3,8 +3,7 @@
 #include <QtCore/QSize>
 
 #include <core/resource/resource_fwd.h>
-
-class QnCommonModule;
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -14,12 +13,16 @@ static const QSize kMaxLowStreamResolution(1024, 768);
 static const QString kArchiveContainer("matroska");
 static const QString kArchiveContainerExtension(".mkv");
 
-class AbstractRemoteArchiveSynchronizationTask
+class AbstractRemoteArchiveSynchronizationTask:
+    public nx::mediaserver::ServerModuleAware
 {
 public:
-    virtual ~AbstractRemoteArchiveSynchronizationTask() {};
+    AbstractRemoteArchiveSynchronizationTask(QnMediaServerModule* serverModule):
+        nx::mediaserver::ServerModuleAware(serverModule)
+    {
+    }
 
-    virtual void setResource(const QnSecurityCamResourcePtr& resource) = 0;
+    virtual ~AbstractRemoteArchiveSynchronizationTask() {};
     virtual void setDoneHandler(std::function<void()> handler) = 0;
     virtual void cancel() = 0;
     virtual bool execute() = 0;

@@ -24,8 +24,8 @@ namespace recorder {
 
 using namespace nx::core::resource;
 
-RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QObject* parent):
-    QnCommonModuleAware(parent),
+RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_terminated(false)
 {
     if (!qnGlobalSettings->isEdgeRecordingEnabled())
@@ -167,14 +167,21 @@ void RemoteArchiveSynchronizer::makeAndRunTaskUnsafe(const QnSecurityCamResource
     std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> task;
 
     if (capabilities.testFlag(RemoteArchiveCapability::RandomAccessChunkCapability))
-        task = std::make_shared<RemoteArchiveStreamSynchronizationTask>(commonModule());
+    {
+        task = std::make_shared<RemoteArchiveStreamSynchronizationTask>(
+            serverModule(),
+            resource);
+    }
     else
-        task = std::make_shared<RemoteArchiveSynchronizationTask>(commonModule());
+    {
+        task = std::make_shared<RemoteArchiveSynchronizationTask>(
+            serverModule(),
+            resource);
+    }
 
     if (!task)
         return;
 
-    task->setResource(resource);
     task->setDoneHandler([this, id]() { removeTaskFromAwaited(id); });
 
     SynchronizationTaskContext context;

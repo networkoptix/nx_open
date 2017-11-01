@@ -9,13 +9,14 @@
 #include <vector>
 #include <atomic>
 
-#include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <recorder/abstract_remote_archive_synchronization_task.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/resource_media_layout.h>
 #include <server/server_globals.h>
 #include <nx/utils/concurrent.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -30,12 +31,12 @@ struct SynchronizationTaskContext
 
 class RemoteArchiveSynchronizer:
     public QObject,
-    public QnCommonModuleAware
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    RemoteArchiveSynchronizer(QObject* parent);
+    RemoteArchiveSynchronizer(QnMediaServerModule* serverModule);
     virtual ~RemoteArchiveSynchronizer();
 
 public slots:

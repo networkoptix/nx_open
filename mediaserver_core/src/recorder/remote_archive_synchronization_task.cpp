@@ -30,17 +30,16 @@ namespace recorder {
 
 using namespace nx::core::resource;
 
-RemoteArchiveSynchronizationTask::RemoteArchiveSynchronizationTask(QnCommonModule* commonModule):
-    m_commonModule(commonModule),
+RemoteArchiveSynchronizationTask::RemoteArchiveSynchronizationTask(
+    QnMediaServerModule* serverModule,
+    const QnSecurityCamResourcePtr& resource)
+    :
+    AbstractRemoteArchiveSynchronizationTask(serverModule),
+    m_resource(resource),
     m_canceled(false),
     m_totalChunksToSynchronize(0),
     m_currentNumberOfSynchronizedChunks(0)
 {
-}
-
-void RemoteArchiveSynchronizationTask::setResource(const QnSecurityCamResourcePtr& resource)
-{
-    m_resource = resource;
 }
 
 void RemoteArchiveSynchronizationTask::setDoneHandler(std::function<void()> handler)
@@ -367,7 +366,7 @@ bool RemoteArchiveSynchronizationTask::convertAndWriteBuffer(
     QnResourcePtr storageResource(new DummyResource());
     storageResource->setUrl(temporaryFilePath);
 
-    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(m_commonModule));
+    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
     storage->registerResourceData(temporaryFilePath, ioDevice);
 
     using namespace nx::mediaserver_core::plugins;
@@ -431,7 +430,7 @@ bool RemoteArchiveSynchronizationTask::convertAndWriteBuffer(
 QnServer::ChunksCatalog RemoteArchiveSynchronizationTask::chunksCatalogByResolution(
     const QSize& resolution) const
 {
-    const auto maxLowStreamArea = 
+    const auto maxLowStreamArea =
         kMaxLowStreamResolution.width() * kMaxLowStreamResolution.height();
     const auto area = resolution.width() * resolution.height();
 
