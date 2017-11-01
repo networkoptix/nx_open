@@ -55,8 +55,6 @@ bool hasRepeatingSymbols(const QString& password, int maxCount = 4)
 
 bool hasConsecutiveSequance(const QString& password, int maxCount = 4)
 {
-//    static const CharCategoryLookup categoryLookup(kAllowedSymbols);
-
     const auto count = password.count();
     if (!maxCount || count < maxCount || count <= 1)
         return false;
