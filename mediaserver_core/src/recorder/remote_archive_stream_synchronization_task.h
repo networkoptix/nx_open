@@ -19,7 +19,6 @@ class RemoteArchiveStreamSynchronizationTask:
 {
     using AbstractRemoteArchiveManager = nx::core::resource::AbstractRemoteArchiveManager;
     using RemoteArchiveChunk = nx::core::resource::RemoteArchiveChunk;
-    using BufferType = QByteArray;
 
 public:
     RemoteArchiveStreamSynchronizationTask(
@@ -46,11 +45,10 @@ private:
 
     static std::chrono::milliseconds totalDuration(const QnTimePeriodList& deviceChunks);
 
-    bool needToFireProgress() const;
+    bool needToReportProgress() const;
 
 private:
     mutable QnMutex m_mutex;
-    QnCommonModule* m_commonModule;
     QnSecurityCamResourcePtr m_resource;
     std::atomic<bool> m_canceled{false};
     std::function<void()> m_doneHandler;

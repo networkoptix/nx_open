@@ -100,7 +100,7 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
             std::numeric_limits<int>::max());
 
     auto deviceTimePeriods = toTimePeriodList(deviceChunks);
-    NX_DEBUG(this, lm("Device time periods: %1.").arg(deviceTimePeriods));
+    NX_DEBUG(this, lm("Device time periods: %1").arg(deviceTimePeriods));
     NX_DEBUG(this, lm("Server time periods: %1").arg(serverTimePeriods));
 
     deviceTimePeriods.excludeTimePeriods(serverTimePeriods);
@@ -245,7 +245,7 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
             std::chrono::milliseconds duration)
         {
             m_importedDuration += duration;
-            if (needToFireProgress())
+            if (needToReportProgress())
             {
                 auto progress = (double)m_importedDuration.count() / m_totalDuration.count();
                 if (progress > 1.0)
@@ -296,7 +296,7 @@ std::chrono::milliseconds RemoteArchiveStreamSynchronizationTask::totalDuration(
     return std::chrono::milliseconds(result);
 }
 
-bool RemoteArchiveStreamSynchronizationTask::needToFireProgress() const
+bool RemoteArchiveStreamSynchronizationTask::needToReportProgress() const
 {
     return true; //< For now let's report progress for each recorded file.
 }
