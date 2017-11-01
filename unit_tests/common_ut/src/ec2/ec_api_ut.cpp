@@ -23,12 +23,12 @@ public:
     {
     }
 
-    void addGetRequest( const QUrl& url )
+    void addGetRequest( const nx::utils::Url& url )
     {
         m_getRequestUrls.push_back( url );
     }
 
-    void addUpdateRequest( const QUrl& url, const QByteArray& msgBody )
+    void addUpdateRequest( const nx::utils::Url& url, const QByteArray& msgBody )
     {
         m_updateRequests.push_back( std::make_pair( url, msgBody ) );
     }
@@ -103,12 +103,12 @@ private:
         static const int UPDATE_REQUEST = 2;
 
         int requestType;
-        QUrl url;
+        nx::utils::Url url;
         //!for update requests
         QByteArray body;
 
         //!create get requests
-        Request( const QUrl& _url )
+        Request( const nx::utils::Url& _url )
         :
             requestType( GET_REQUEST ),
             url( _url )
@@ -116,7 +116,7 @@ private:
         }
 
         //!create update requests
-        Request( const QUrl& _url, const QByteArray& _body )
+        Request( const nx::utils::Url& _url, const QByteArray& _body )
         :
             requestType( UPDATE_REQUEST ),
             url( _url ),
@@ -125,8 +125,8 @@ private:
         }
     };
 
-    std::vector<QUrl> m_getRequestUrls;
-    std::vector<std::pair<QUrl, QByteArray>> m_updateRequests;
+    std::vector<nx::utils::Url> m_getRequestUrls;
+    std::vector<std::pair<nx::utils::Url, QByteArray>> m_updateRequests;
     int m_requestsStarted;
     int m_requestsCompleted;
     int m_maxSimultaneousRequestsCount;

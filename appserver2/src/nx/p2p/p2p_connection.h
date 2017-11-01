@@ -12,7 +12,7 @@ public:
         QnCommonModule* commonModule,
         const QnUuid& remoteId,
         const ApiPeerDataEx& localPeer,
-        const QUrl& remotePeerUrl,
+        const nx::utils::Url& remotePeerUrl,
         std::unique_ptr<QObject> opaqueObject,
         ConnectionLockGuard connectionLockGuard);
     Connection(

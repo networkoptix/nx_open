@@ -14,7 +14,7 @@ class NxGlobalsObject: public QObject
 public:
     NxGlobalsObject(QObject* parent = nullptr);
 
-    Q_INVOKABLE QnUrlHelper url(const QUrl& url) const;
+    Q_INVOKABLE QnUrlHelper url(const nx::utils::Url &url) const;
     Q_INVOKABLE QnSoftwareVersion softwareVersion(const QString& version) const;
 
     Q_INVOKABLE void ensureFlickableChildVisible(QQuickItem* item);

@@ -90,7 +90,7 @@ QnActiResource::~QnActiResource()
 
 void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
@@ -739,7 +739,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
     m_inputMonitored = false;
 
     QAuthenticator auth = getAuth();
-    QUrl url = getUrl();
+    nx::utils::Url url = getUrl();
     url.setPath(lit("/cgi-bin/%1").arg(lit("encoder")));
     url.setQuery(lit("USER=%1&PWD=%2&%3").arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr));
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();

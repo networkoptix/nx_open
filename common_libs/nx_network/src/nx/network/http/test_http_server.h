@@ -136,7 +136,7 @@ public:
 
     bool registerRedirectHandler(
         const QString& resourcePath,
-        const QUrl& location,
+        const nx::utils::Url& location,
         nx_http::StringType method = nx_http::kAnyMethod);
 
     // used for test purpose

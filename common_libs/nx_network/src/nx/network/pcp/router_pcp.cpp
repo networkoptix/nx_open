@@ -59,8 +59,8 @@ QByteArray Router::makeMapRequest(Mapping& mapping)
     header.opcode = Opcode::MAP;
     header.lifeTime = LIFETIME;
     header.clientIp = QByteArray(
-        reinterpret_cast<const char*>(mapping.internal.address.ipV6().get_ptr()),
-        sizeof(*mapping.internal.address.ipV6()));
+        reinterpret_cast<const char*>(mapping.internal.address.ipV6().first.get_ptr()),
+        sizeof(*mapping.internal.address.ipV6().first));
 
     MapMessage message;
     message.nonce = mapping.nonce;

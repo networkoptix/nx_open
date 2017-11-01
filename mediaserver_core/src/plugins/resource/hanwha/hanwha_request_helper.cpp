@@ -119,8 +119,8 @@ void HanwhaRequestHelper::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
     m_ignoreMutexAnalyzer = ignoreMutexAnalyzer;
 }
 
-QUrl HanwhaRequestHelper::buildRequestUrl(
-    QUrl deviceUrl,
+utils::Url HanwhaRequestHelper::buildRequestUrl(
+    nx::utils::Url deviceUrl,
     const QString& cgi,
     const QString& submenu,
     const QString& action,
@@ -139,7 +139,7 @@ QUrl HanwhaRequestHelper::buildRequestUrl(
     return deviceUrl;
 }
 
-QUrl HanwhaRequestHelper::buildRequestUrl(
+nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
@@ -148,16 +148,16 @@ QUrl HanwhaRequestHelper::buildRequestUrl(
     return buildRequestUrl(m_resourceContext->url(), cgi, submenu, action, std::move(parameters));
 }
 
-QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const
+nx::utils::Url HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const
 {
-    QUrl url(m_resourceContext->url());
+    nx::utils::Url url(m_resourceContext->url());
     url.setQuery(QUrlQuery());
     url.setPath(kAttributesPathTemplate.arg(attributesPath));
     return url;
 }
 
 bool HanwhaRequestHelper::doRequestInternal(
-    const QUrl& url,
+    const utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
     nx_http::StatusCode::Value* outStatusCode)
@@ -221,9 +221,9 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     return doRequest(split[0], split[1], action, parameters, groupBy);
 }
 
-QUrl HanwhaRequestHelper::makeBypassUrl(const QUrl& url) const
+nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) const
 {
-    QUrl bypassUrl(url);
+    nx::utils::Url bypassUrl(url);
     bypassUrl.setPath(lit("/stw-cgi/bypass.cgi"));
 
     QUrlQuery bypassQuery;

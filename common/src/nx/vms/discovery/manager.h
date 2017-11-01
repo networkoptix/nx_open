@@ -3,6 +3,7 @@
 #include "deprecated_multicast_finder.h"
 #include "module_connector.h"
 #include "udp_multicast_finder.h"
+#include <nx/utils/url.h>
 
 class QnMediaServerResource;
 
@@ -55,7 +56,7 @@ public:
      *     pinged just once.
      */
     void checkEndpoint(SocketAddress endpoint, QnUuid expectedId = QnUuid());
-    void checkEndpoint(const QUrl& url, QnUuid expectedId = QnUuid());
+    void checkEndpoint(const nx::utils::Url &url, QnUuid expectedId = QnUuid());
 
     template<typename Ptr, typename Found, typename Changed, typename Lost>
     void onSignals(Ptr ptr, Found foundSlot, Changed changedSlot, Lost lostSlot)

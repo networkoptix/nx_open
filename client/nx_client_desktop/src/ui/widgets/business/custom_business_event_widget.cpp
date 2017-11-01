@@ -42,10 +42,10 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
             if (!server)
                 return;
 
-            QUrl targetUrl(server->getApiUrl());
+            nx::utils::Url targetUrl(server->getApiUrl());
             targetUrl.setPath(kApiDocPath);
             targetUrl.setFragment(kApiDocFragment);
-            QDesktopServices::openUrl(targetUrl);
+            QDesktopServices::openUrl(targetUrl.toQUrl());
         });
 }
 

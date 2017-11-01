@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QtCore/QUrl>
+#include <nx/utils/url.h>
 
 /** RAII helper to consistently open/close html tags on the given string. */
 class QnHtmlTag
@@ -32,7 +32,7 @@ QString htmlFormattedParagraph(const QString &text
     , bool isBold = false
     , bool isItalic = false);
 
-QString makeHref(const QString& text, const QUrl& url);
+QString makeHref(const QString& text, const nx::utils::Url &url);
 QString makeHref(const QString& text, const QString& link);
 
 QString escapeHtml(const QString& input);

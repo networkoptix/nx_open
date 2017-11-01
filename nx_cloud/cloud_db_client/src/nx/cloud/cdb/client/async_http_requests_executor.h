@@ -70,7 +70,7 @@ public:
             auth,
             [this, auth, httpMethod, path, input, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
-                QUrl cdbUrl) mutable
+                nx::utils::Url cdbUrl) mutable
             {
                 if (resCode != nx_http::StatusCode::ok)
                     return errHandler(api::httpStatusCodeToResultCode(resCode));
@@ -117,7 +117,7 @@ public:
             auth,
             [this, auth, httpMethod, path, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
-                QUrl cdbUrl) mutable
+                nx::utils::Url cdbUrl) mutable
             {
                 if (resCode != nx_http::StatusCode::ok)
                     return errHandler(api::httpStatusCodeToResultCode(resCode));
@@ -159,7 +159,7 @@ private:
     template<typename InputData, typename OutputData>
     void execute(
         nx_http::Method::ValueType httpMethod,
-        QUrl url,
+        nx::utils::Url url,
         nx_http::AuthInfo auth,
         const InputData& input,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
@@ -174,7 +174,7 @@ private:
     template<typename InputData>
     void execute(
         nx_http::Method::ValueType httpMethod,
-        QUrl url,
+        nx::utils::Url url,
         nx_http::AuthInfo auth,
         const InputData& input,
         std::function<void(api::ResultCode)> completionHandler)
@@ -189,7 +189,7 @@ private:
     template<typename OutputData>
     void execute(
         nx_http::Method::ValueType httpMethod,
-        QUrl url,
+        nx::utils::Url url,
         nx_http::AuthInfo auth,
         std::function<void(api::ResultCode, OutputData)> completionHandler)
     {
@@ -202,7 +202,7 @@ private:
 
     void execute(
         nx_http::Method::ValueType httpMethod,
-        QUrl url,
+        nx::utils::Url url,
         nx_http::AuthInfo auth,
         std::function<void(api::ResultCode)> completionHandler)
     {

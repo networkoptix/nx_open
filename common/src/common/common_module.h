@@ -219,7 +219,7 @@ public:
     QnUuid remoteGUID() const;
 
     /** Url we are currently connected to. */
-    QUrl currentUrl() const;
+    nx::utils::Url currentUrl() const;
 
     /** Server we are currently connected to. */
     QnMediaServerResourcePtr currentServer() const;

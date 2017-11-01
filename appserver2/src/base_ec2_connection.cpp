@@ -371,9 +371,9 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const QUrl& _url)
+void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const nx::utils::Url &_url)
 {
-    QUrl url(_url);
+    nx::utils::Url url(_url);
     QUrlQuery q;
     url.setQuery(q);
     m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(id, url);

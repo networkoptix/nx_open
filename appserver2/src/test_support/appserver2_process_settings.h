@@ -5,6 +5,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/settings.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 namespace ec2 {
 namespace conf {
@@ -12,7 +13,7 @@ namespace conf {
 struct CloudIntegration
 {
     std::chrono::milliseconds delayBeforeSettingMasterFlag;
-    QUrl cloudDbUrl;
+    nx::utils::Url cloudDbUrl;
 
     CloudIntegration();
 };

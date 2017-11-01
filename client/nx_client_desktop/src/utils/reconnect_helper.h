@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 class QnReconnectHelper: public QObject, public QnConnectionContextAware
 {
@@ -15,7 +16,7 @@ public:
     QnMediaServerResourceList servers() const;
 
     QnMediaServerResourcePtr currentServer() const;
-    QUrl currentUrl() const;
+    nx::utils::Url currentUrl() const;
 
     void markServerAsInvalid(const QnMediaServerResourcePtr &server);
 

@@ -78,27 +78,32 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
     return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
 }
 
-bool QnUniversalTcpListener::addServerSocketToMultipleSocket(const SocketAddress& localAddress,
-    nx::network::MultipleServerSocket* multipleServerSocket, int ipVersion)
+AbstractStreamServerSocket* QnUniversalTcpListener::addServerSocketToMultipleSocket(
+    const SocketAddress& localAddress,
+    nx::network::MultipleServerSocket* multipleServerSocket,
+    int ipVersion)
 {
-    auto tcpServerSocket = SocketFactory::createStreamServerSocket(false,
-        nx::network::NatTraversalSupport::enabled, ipVersion);
+    auto tcpServerSocket = SocketFactory::createStreamServerSocket(
+        false,
+        nx::network::NatTraversalSupport::enabled,
+        ipVersion);
 
     if (!tcpServerSocket->setReuseAddrFlag(true) ||
         !tcpServerSocket->bind(localAddress) ||
         !tcpServerSocket->listen())
     {
         setLastError(SystemError::getLastOSErrorCode());
-        return false;
+        return nullptr;
     }
 
+    auto result = tcpServerSocket.get();
     if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
     {
         setLastError(SystemError::getLastOSErrorCode());
-        return false;
+        return nullptr;
     }
 
-    return true;
+    return result;
 }
 
 AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
@@ -108,16 +113,23 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     QnMutexLocker lk(&m_mutex);
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
-    bool needToAddIpV4Socket = localAddress.address == HostAddress::anyHost
+    bool needToAddIpV4Socket =
+        localAddress.address.toString() == HostAddress::anyHost.toString()
         || (bool) localAddress.address.ipV4();
 
-    bool needToAddIpV6Socket = false;
-    // localAddress.address == HostAddress::anyHost
-    //     || (bool)localAddress.address.ipV6();
+    bool needToAddIpV6Socket =
+        localAddress.address.toString() == HostAddress::anyHost.toString()
+        || (bool)localAddress.address.isPureIpV6();
 
+    AbstractStreamServerSocket* ipV4ServerSocket = nullptr;
     if (needToAddIpV4Socket)
     {
-        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET))
+        ipV4ServerSocket = addServerSocketToMultipleSocket(
+            localAddress,
+            multipleServerSocket.get(),
+            AF_INET);
+
+        if (ipV4ServerSocket == nullptr)
             return nullptr;
         ++m_totalListeningSockets;
         ++m_cloudSocketIndex;
@@ -125,8 +137,17 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 
     if (needToAddIpV6Socket)
     {
-        if (!addServerSocketToMultipleSocket(localAddress, multipleServerSocket.get(), AF_INET6))
+        SocketAddress ipV6SocketAddress = localAddress;
+        if (ipV4ServerSocket != nullptr)
+            ipV6SocketAddress.port = ipV4ServerSocket->getLocalAddress().port;
+
+        if (!addServerSocketToMultipleSocket(
+                ipV6SocketAddress,
+                multipleServerSocket.get(),
+                AF_INET6))
+        {
             return nullptr;
+        }
         ++m_totalListeningSockets;
         ++m_cloudSocketIndex;
     }
@@ -153,7 +174,8 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
         if (sslNeeded)
         {
             m_serverSocket = std::make_unique<nx::network::deprecated::SslServerSocket>(
-                std::move(m_serverSocket), true);
+                std::move(m_serverSocket),
+                true);
         }
     #endif
 
@@ -249,7 +271,7 @@ bool QnUniversalTcpListener::isAuthentificationRequired(nx_http::Request& reques
     if (QnUuid(targetHeader->second) == commonModule()->moduleGUID())
         return true; //< Self proxy is not a proxy.
 
-    if (!QUrlQuery(request.requestLine.url).hasQueryItem(lit("authKey")))
+    if (!QUrlQuery(request.requestLine.url.toQUrl()).hasQueryItem(lit("authKey")))
         return true; //< Temporary authorization is required.
 
     const auto requestPath = request.requestLine.url.path();

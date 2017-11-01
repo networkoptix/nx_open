@@ -84,7 +84,7 @@ QString QnPlISDResourceSearcher::manufacture() const
 }
 
 QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& authOriginal,
     bool isSearchAction)
 {
@@ -153,7 +153,7 @@ QnResourceList QnPlISDResourceSearcher::findResources(void)
 
 
 QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
-    const QUrl &url,
+    const nx::utils::Url &url,
     const QAuthenticator &authOriginal)
 {
 
@@ -377,7 +377,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     resource->setModel(name);
     resource->setMAC(QnMacAddress(smac));
 
-    QUrl url;
+    nx::utils::Url url;
     url.setScheme(lit("http"));
     url.setHost(mdnsRemoteAddress);
     url.setPort(port);
@@ -403,7 +403,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
         for (const auto& creds: possibleCreds)
         {
             QAuthenticator auth = creds.toAuthenticator();
-            QUrl url(lit("//") + mdnsRemoteAddress);
+            nx::utils::Url url(lit("//") + mdnsRemoteAddress);
             url.setPort(port);
             if (testCredentials(url, auth))
             {
@@ -454,7 +454,7 @@ bool QnPlISDResourceSearcher::processPacket(
         for (const auto& creds: possibleCreds)
         {
             QAuthenticator auth = creds.toAuthenticator();
-            QUrl url(lit("//") + deviceEndpoint.address.toString());
+            nx::utils::Url url(lit("//") + deviceEndpoint.address.toString());
             if (testCredentials(url, auth))
             {
                 cameraAuth = auth;
@@ -526,7 +526,7 @@ void QnPlISDResourceSearcher::createResource(
     result << resource;
 }
 
-bool QnPlISDResourceSearcher::testCredentials(const QUrl &url, const QAuthenticator &auth)
+bool QnPlISDResourceSearcher::testCredentials(const nx::utils::Url &url, const QAuthenticator &auth)
 {
 
     const auto host = url.host();

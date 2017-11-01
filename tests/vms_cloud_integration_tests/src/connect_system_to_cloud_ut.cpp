@@ -203,7 +203,7 @@ private:
     {
         auto endpoint = mediaServerEndpoint();
 
-        QUrl url("http://somehost/ec2/getUsers");
+        nx::utils::Url url("http://somehost/ec2/getUsers");
         url.setHost(endpoint.address.toString());
         url.setPort(endpoint.port);
 

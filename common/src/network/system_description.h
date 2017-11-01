@@ -5,6 +5,7 @@
 #include <network/module_information.h>
 #include <network/base_system_description.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 class QnSystemDescription: public QnBaseSystemDescription
 {
@@ -36,7 +37,7 @@ public: // overrides
 
     QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    QUrl getServerHost(const QnUuid& serverId) const override;
+    nx::utils::Url getServerHost(const QnUuid& serverId) const override;
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
@@ -57,7 +58,7 @@ public:
 
     void removeServer(const QnUuid& serverId);
 
-    void setServerHost(const QnUuid& serverId, const QUrl& host);
+    void setServerHost(const QnUuid& serverId, const nx::utils::Url& host);
 
     void setName(const QString& value);
 
@@ -76,7 +77,7 @@ protected:
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
-    typedef QHash<QnUuid, QUrl> HostsHash;
+    typedef QHash<QnUuid, nx::utils::Url> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
     typedef QSet<QnUuid> IdsSet;
 

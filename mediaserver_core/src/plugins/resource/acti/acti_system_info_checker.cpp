@@ -15,7 +15,7 @@ const std::chrono::milliseconds kActiSystemInfoResponseReceiveTimeout(4000);
 } // namespace
 
 
-QnActiSystemInfoChecker::QnActiSystemInfoChecker(const QUrl& url):
+QnActiSystemInfoChecker::QnActiSystemInfoChecker(const nx::utils::Url& url):
     m_baseUrl(url),
     m_systemInfo(boost::none),
     m_lastSuccessfulAuth(boost::none),
@@ -62,7 +62,7 @@ bool QnActiSystemInfoChecker::isFailed()
     return m_failed;
 }
 
-void QnActiSystemInfoChecker::setUrl(const QUrl& url)
+void QnActiSystemInfoChecker::setUrl(const nx::utils::Url& url)
 {
     QnMutexLocker lock(&m_mutex);
     m_baseUrl = url;
@@ -127,7 +127,7 @@ void QnActiSystemInfoChecker::tryToGetSystemInfoWithGivenAuthUnsafe(const QAuthe
 {
     initHttpClientIfNeededUnsafe();
 
-    QUrl requestUrl = m_baseUrl;
+    nx::utils::Url requestUrl = m_baseUrl;
     requestUrl.setPath(lit("/cgi-bin/system"));
 
     QUrlQuery query;

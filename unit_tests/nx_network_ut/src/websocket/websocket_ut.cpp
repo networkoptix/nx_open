@@ -405,10 +405,7 @@ protected:
     Role serverRole = Role::undefined;
 
     const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
-    static const nx::Buffer kFrameBuffer;
 };
-
-const nx::Buffer WebSocket::kFrameBuffer("hello");
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
 {
@@ -822,11 +819,10 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
                 frameCount = 0;
                 sentMessageCount++;
             }
+
             if (sentMessageCount >= kTotalMessageCount)
-            {
-                readyPromise.set_value();
                 return;
-            }
+
             clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
         };
 
@@ -837,6 +833,13 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
                 return;
             ASSERT_EQ(serverReadBuf.size(), clientSendBuf.size());
             receivedFrameCount++;
+
+            if (receivedFrameCount >= kTotalMessageCount*kMessageFrameCount)
+            {
+                readyPromise.set_value();
+                return;
+            }
+
             serverReadBuf.clear();
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };

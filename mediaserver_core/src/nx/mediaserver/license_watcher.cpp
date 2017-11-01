@@ -20,7 +20,7 @@
 namespace nx {
 namespace mediaserver {
 
-static const QUrl kLicenseServerUrl("http://licensing.networkoptix.com/nxlicensed/api/v1/validate/");
+static const nx::utils::Url kLicenseServerUrl("http://licensing.networkoptix.com/nxlicensed/api/v1/validate/");
 static const std::chrono::milliseconds kCheckInterval = std::chrono::hours(24);
 
 struct ServerInfo

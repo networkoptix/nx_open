@@ -52,7 +52,7 @@ private:
         QString* outName,
         QString* outValue) const;
 
-    bool doVivotekRequest(const QUrl& url, QString* outParameterName, QString* outParameterValue) const;
+    bool doVivotekRequest(const nx::utils::Url& url, QString* outParameterName, QString* outParameterValue) const;
     boost::optional<QString> getVivotekParameter(const QString& param) const;
     bool setVivotekParameter(const QString& parameterName, const QString& parameterValue) const;
 

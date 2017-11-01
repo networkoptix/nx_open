@@ -1113,8 +1113,9 @@ bool QnRtspClient::sendSetup()
 #else
 
         nx_http::Request request;
-        auto setupUrl = trackInfo->setupURL == "*" ?
-            QUrl() : QUrl(QString::fromLatin1(trackInfo->setupURL));
+        auto setupUrl = trackInfo->setupURL == "*"
+                ? nx::utils::Url()
+                : nx::utils::Url(QString::fromLatin1(trackInfo->setupURL));
 
         request.requestLine.method = "SETUP";
         if( setupUrl.isRelative() )
@@ -1867,7 +1868,7 @@ QAuthenticator QnRtspClient::getAuth() const
     return m_auth;
 }
 
-QUrl QnRtspClient::getUrl() const
+nx::utils::Url QnRtspClient::getUrl() const
 {
     return m_url;
 }

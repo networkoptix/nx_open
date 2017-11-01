@@ -367,7 +367,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return Qn::IncompatibleVersionConnectionResult;
 
-        QUrl serverUrl = connectionInfo.ecUrl;
+        nx::utils::Url serverUrl = connectionInfo.ecUrl;
         if (serverUrl.scheme().isEmpty())
         {
             serverUrl.setScheme(connectionInfo.allowSslConnections

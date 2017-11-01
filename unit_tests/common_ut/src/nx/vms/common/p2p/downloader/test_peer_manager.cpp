@@ -86,7 +86,7 @@ void TestPeerManager::setPeerGroups(const QnUuid& peerId, const QStringList& gro
         m_peersByGroup.insert(group, peerId);
 }
 
-void TestPeerManager::addInternetFile(const QUrl& url, const QString& fileName)
+void TestPeerManager::addInternetFile(const nx::utils::Url& url, const QString& fileName)
 {
     m_fileByUrl[url] = fileName;
 }
@@ -191,10 +191,9 @@ rest::Handle TestPeerManager::downloadChunk(
         });
 }
 
-rest::Handle TestPeerManager::downloadChunkFromInternet(
-    const QnUuid& peerId,
+rest::Handle TestPeerManager::downloadChunkFromInternet(const QnUuid& peerId,
     const QString& fileName,
-    const QUrl& url,
+    const utils::Url &url,
     int chunkIndex,
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)
@@ -458,7 +457,7 @@ rest::Handle ProxyTestPeerManager::downloadChunk(
 }
 
 rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(const QnUuid& peerId, const QString& fileName,
-    const QUrl& url,
+    const utils::Url &url,
     int chunkIndex,
     int chunkSize,
     AbstractPeerManager::ChunkCallback callback)

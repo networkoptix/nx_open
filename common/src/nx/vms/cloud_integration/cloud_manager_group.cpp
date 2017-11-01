@@ -36,7 +36,7 @@ CloudManagerGroup::CloudManagerGroup(
 {
 }
 
-void CloudManagerGroup::setCloudDbUrl(const QUrl& cdbUrl)
+void CloudManagerGroup::setCloudDbUrl(const nx::utils::Url& cdbUrl)
 {
     connectionManager.setCloudDbUrl(cdbUrl);
     m_connectToCloudWatcher.setCloudDbUrl(cdbUrl);

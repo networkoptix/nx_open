@@ -27,8 +27,8 @@ QnNetworkProxyFactory::~QnNetworkProxyFactory()
 {
 }
 
-QUrl QnNetworkProxyFactory::urlToResource(
-    const QUrl &baseUrl,
+nx::utils::Url QnNetworkProxyFactory::urlToResource(
+    const nx::utils::Url &baseUrl,
     const QnResourcePtr &resource,
     const QString &proxyQueryParameterName) const
 {
@@ -39,7 +39,7 @@ QUrl QnNetworkProxyFactory::urlToResource(
     case QNetworkProxy::NoProxy:
         break;
     case QNetworkProxy::HttpProxy: {
-        QUrl url(baseUrl);
+        nx::utils::Url url(baseUrl);
         QUrlQuery query(url.query());
         if (proxyQueryParameterName.isEmpty())
             url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString()).arg(url.path()));
@@ -52,7 +52,7 @@ QUrl QnNetworkProxyFactory::urlToResource(
 
         if (!proxy.user().isEmpty()) {
             NX_ASSERT( via );
-            QUrlQuery urlQuery(url);
+            QUrlQuery urlQuery(url.toQUrl());
             auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
             urlQuery.addQueryItem(
                 lit("proxy_auth"),

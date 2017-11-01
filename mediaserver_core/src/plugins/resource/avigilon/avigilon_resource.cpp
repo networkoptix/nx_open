@@ -66,7 +66,7 @@ bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)
         return false;
     }
 
-    m_checkInputUrl = QUrl(getUrl());
+    m_checkInputUrl = nx::utils::Url(getUrl());
     m_checkInputUrl.setScheme( lit("http") );
     m_checkInputUrl.setPath( lit("/cgi-x/get-digitalio") );
 

@@ -69,6 +69,8 @@ private:
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
     void updateCloudConnectState(QnMutexLockerBase* const lk);
 
-    bool addServerSocketToMultipleSocket(const SocketAddress& localAddress,
-        nx::network::MultipleServerSocket* multipleServerSocket, int ipVersion);
+    AbstractStreamServerSocket* addServerSocketToMultipleSocket(
+        const SocketAddress& localAddress,
+        nx::network::MultipleServerSocket* multipleServerSocket,
+        int ipVersion);
 };

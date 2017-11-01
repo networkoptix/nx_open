@@ -28,7 +28,7 @@ bool StunOverHttpServer::listen()
     return true;
 }
 
-QUrl StunOverHttpServer::getServerUrl() const
+nx::utils::Url StunOverHttpServer::getServerUrl() const
 {
     return nx::network::url::Builder()
         .setScheme(nx_http::kUrlSchemeName)
@@ -74,7 +74,7 @@ nx::stun::MessageDispatcher& StunOverHttpServerFixture::dispatcher()
     return m_server.dispatcher();
 }
 
-QUrl StunOverHttpServerFixture::tunnelUrl() const
+nx::utils::Url StunOverHttpServerFixture::tunnelUrl() const
 {
     return m_server.getServerUrl();
 }

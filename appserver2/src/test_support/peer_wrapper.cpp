@@ -1,5 +1,7 @@
 #include "peer_wrapper.h"
 
+#include <transaction/message_bus_adapter.h>
+
 namespace ec2 {
 namespace test {
 
@@ -13,7 +15,7 @@ class MediaServerClientEx:
     using base_type = MediaServerClient;
 
 public:
-    MediaServerClientEx(const QUrl& baseRequestUrl):
+    MediaServerClientEx(const nx::utils::Url& baseRequestUrl):
         base_type(baseRequestUrl)
     {
     }
@@ -100,7 +102,7 @@ bool PeerWrapper::saveCloudSystemCredentials(
 
     m_cloudCredentials.systemId = systemId.c_str();
     m_cloudCredentials.key = authKey.c_str();
-    //m_cloudCredentials.serverId = ;
+    m_cloudCredentials.serverId = id().toSimpleByteArray();
 
     return true;
 }
@@ -126,6 +128,11 @@ ec2::ErrorCode PeerWrapper::getTransactionLog(ec2::ApiTransactionDataList* resul
 {
     auto mediaServerClient = prepareMediaServerClient();
     return mediaServerClient->ec2GetTransactionLog(result);
+}
+
+QnUuid PeerWrapper::id() const
+{
+    return m_process.moduleInstance()->impl()->commonModule()->moduleGUID();
 }
 
 SocketAddress PeerWrapper::endpoint() const
@@ -164,6 +171,10 @@ bool PeerWrapper::areAllPeersHaveSameTransactionLog(
     bool allLogsAreEqual = true;
     for (const auto& transactionLog: transactionLogs)
     {
+        //std::cout << "=========================\n";
+        //std::cout << QJson::serialized(transactionLog).toStdString() << "\n";
+        //std::cout << "=========================\n";
+
         if (prevTransactionLog)
         {
             if (*prevTransactionLog != transactionLog)
@@ -174,6 +185,36 @@ bool PeerWrapper::areAllPeersHaveSameTransactionLog(
     }
 
     return allLogsAreEqual;
+}
+
+bool PeerWrapper::arePeersInterconnected(
+    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+{
+    // For now just checking that each peer is connected to every other.
+    
+    std::vector<QnUuid> peerIds;
+    for (const auto& peer: peers)
+        peerIds.push_back(peer->id());
+
+    for (const auto& peer: peers)
+    {
+        const auto connectedPeers = 
+            peer->m_process.moduleInstance()->impl()->commonModule()->
+                ec2Connection()->messageBus()->directlyConnectedServerPeers();
+
+        for (const auto& peerId: peerIds)
+        {
+            if (peerId == peer->id())
+                continue;
+            if (std::find(connectedPeers.begin(), connectedPeers.end(), peerId) == 
+                    connectedPeers.end())
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 std::unique_ptr<MediaServerClientEx> PeerWrapper::prepareMediaServerClient() const

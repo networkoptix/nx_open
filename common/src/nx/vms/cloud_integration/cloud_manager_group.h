@@ -8,6 +8,7 @@
 #include "cloud_user_info_pool.h"
 #include "master_server_status_watcher.h"
 #include "connect_to_cloud_watcher.h"
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace vms {
@@ -27,7 +28,7 @@ struct CloudManagerGroup
         std::unique_ptr<auth::AbstractUserDataProvider> defaultAuthenticator,
         std::chrono::milliseconds delayBeforeSettingMasterFlag);
 
-    void setCloudDbUrl(const QUrl& cdbUrl);
+    void setCloudDbUrl(const nx::utils::Url &cdbUrl);
 
 private:
     QnMasterServerStatusWatcher m_masterServerStatusWatcher;

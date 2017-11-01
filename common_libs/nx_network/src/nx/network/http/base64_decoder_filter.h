@@ -11,9 +11,6 @@ class NX_NETWORK_API Base64DecoderFilter:
     public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
-    Base64DecoderFilter();
-    virtual ~Base64DecoderFilter();
-
-    virtual bool processData( const QnByteArrayConstRef& data ) override;
+    virtual bool processData(const QnByteArrayConstRef& data) override;
     virtual size_t flush() override;
 };

@@ -157,7 +157,7 @@ bool TestHttpServer::registerContentProvider(
 
 bool TestHttpServer::registerRedirectHandler(
     const QString& resourcePath,
-    const QUrl& location,
+    const nx::utils::Url& location,
     nx_http::StringType method)
 {
     return registerRequestProcessor<nx_http::server::handler::Redirect>(

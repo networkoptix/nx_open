@@ -55,7 +55,7 @@ void QnRecentLocalSystemsFinder::updateSystems()
         const auto connection = it.value();
 
         const bool hasOnlyCloudUrls = std::all_of(connection.urls.cbegin(), connection.urls.cend(),
-            [](const QUrl& url)
+            [](const nx::utils::Url& url)
             {
                 return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
             });

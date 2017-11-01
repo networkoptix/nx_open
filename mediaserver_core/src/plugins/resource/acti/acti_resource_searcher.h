@@ -22,7 +22,7 @@ public:
 
     virtual QString manufacture() const;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
     virtual QnResourceList findResources(void) override;
 
@@ -56,8 +56,8 @@ private:
     QnMutex m_mutex;
 
     nx_upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
-    QByteArray getDeviceXmlAsync(const QUrl& url);
-    nx_upnp::DeviceInfo getDeviceInfoSync(const QUrl& url, bool* outStatus) const;
+    QByteArray getDeviceXmlAsync(const nx::utils::Url &url);
+    nx_upnp::DeviceInfo getDeviceInfoSync(const nx::utils::Url& url, bool* outStatus) const;
 
     bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
 

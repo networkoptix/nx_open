@@ -23,7 +23,7 @@ public:
     virtual QString getName() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
-    virtual QUrl getApiUrl() const override;
+    virtual nx::utils::Url getApiUrl() const override;
 
     void setAuthenticator(const QAuthenticator& authenticator);
 

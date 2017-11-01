@@ -9,10 +9,10 @@ namespace test {
 
 TEST(UrlGetEndpoint, defaultPortCorrespondsToUrlScheme)
 {
-    ASSERT_EQ(80, getEndpoint(QUrl("http://host/path")).port);
-    ASSERT_EQ(443, getEndpoint(QUrl("https://host/path")).port);
-    ASSERT_EQ(554, getEndpoint(QUrl("rtsp://host/path")).port);
-    ASSERT_EQ(0, getEndpoint(QUrl("/host/path")).port);
+    ASSERT_EQ(80, getEndpoint(nx::utils::Url("http://host/path")).port);
+    ASSERT_EQ(443, getEndpoint(nx::utils::Url("https://host/path")).port);
+    ASSERT_EQ(554, getEndpoint(nx::utils::Url("rtsp://host/path")).port);
+    ASSERT_EQ(0, getEndpoint(nx::utils::Url("/host/path")).port);
 }
 
 } // namespace test

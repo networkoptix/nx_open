@@ -77,7 +77,7 @@ protected:
 private:
     std::unique_ptr<TestHttpServer> m_httpServer;
     std::unique_ptr<ClientImpl> m_client;
-    QUrl m_baseUrl;
+    nx::utils::Url m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
     boost::optional<QAuthenticator> m_authenticator;
 
@@ -101,7 +101,7 @@ private:
             "application/json");
 
         ASSERT_TRUE(m_httpServer->bindAndListen());
-        m_baseUrl = QUrl(lm("http://%1/%2").arg(m_httpServer->serverAddress()).arg(baseUrlPath));
+        m_baseUrl = nx::utils::Url(lm("http://%1/%2").arg(m_httpServer->serverAddress()).arg(baseUrlPath));
 
         if (m_authenticator)
         {

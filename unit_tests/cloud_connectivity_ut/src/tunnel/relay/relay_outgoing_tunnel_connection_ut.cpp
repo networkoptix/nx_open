@@ -245,7 +245,7 @@ private:
         using namespace std::placeholders;
         using namespace nx::cloud::relay;
 
-        const auto relayUrl = QUrl("http://127.0.0.1:12345");
+        const auto relayUrl = nx::utils::Url("http://127.0.0.1:12345");
 
         auto clientToRelayConnection = api::ClientFactory::create(relayUrl);
 

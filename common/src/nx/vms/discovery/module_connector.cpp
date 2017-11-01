@@ -291,7 +291,7 @@ ModuleConnector::Module::Priority
     if (host.isLocal())
         return kLocalNetwork;
 
-    if (host.ipV4() || host.ipV6())
+    if (host.ipV4() || (bool) host.ipV6().first)
         return kIp; //< TODO: Consider to check if we have such interface.
 
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
