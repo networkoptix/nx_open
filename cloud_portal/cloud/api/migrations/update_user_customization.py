@@ -3,16 +3,20 @@ from __future__ import unicode_literals
 from django.db import connection, migrations
 
 
-def update_customizations_from_clouddb(apps, schema_editor):
-    with connection.cursor() as cursor:
-        cursor.execute('UPDATE cloudportal.api_account db1 JOIN clouddb.account db2 ON db1.email=db2.email SET db1.customization=db2.customization')
+#migratedb shouldn't assume cloud_db database exists at the moment
+#currently not in use do nothing
 
-class Migration(migrations.Migration):
 
-    dependencies = [
-        ('api', '0012_account_customization'),
-    ]
+#def update_customizations_from_clouddb(apps, schema_editor):
+#    with connection.cursor() as cursor:
+#        cursor.execute('UPDATE cloudportal.api_account db1 JOIN clouddb.account db2 ON db1.email=db2.email SET db1.customization=db2.customization')
 
-    operations = [
-        migrations.RunPython(update_customizations_from_clouddb),
-    ]
+#class Migration(migrations.Migration):
+
+#    dependencies = [
+#        ('api', '0012_account_customization'),
+#    ]
+
+#    operations = [
+#        migrations.RunPython(update_customizations_from_clouddb),
+#    ]
