@@ -26,6 +26,9 @@ public:
     Q_INVOKABLE QColor darker(const QColor& color, int offset) const;
     Q_INVOKABLE QColor lighter(const QColor& color, int offset) const;
 
+    Q_INVOKABLE static bool isDark(const QColor& color);
+    Q_INVOKABLE static bool isLight(const QColor& color);
+
 private:
     class Private;
     QScopedPointer<Private> const d;

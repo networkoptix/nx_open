@@ -153,6 +153,16 @@ QColor ColorTheme::lighter(const QColor& color, int offset) const
     return colors[qBound(0, info.index + offset, colors.size() - 1)];
 }
 
+Q_INVOKABLE bool ColorTheme::isDark(const QColor& color)
+{
+    return color.toHsv().value() < 128;
+}
+
+Q_INVOKABLE bool ColorTheme::isLight(const QColor& color)
+{
+    return !isDark(color);
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
