@@ -10,6 +10,8 @@
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 #include <plugins/resource/hanwha/hanwha_stream_limits.h>
+#include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
+#include <plugins/resource/hanwha/hanwha_archive_delegate.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
@@ -34,6 +36,8 @@ public:
     virtual ~HanwhaResource() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+
+    virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager() override;
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
 
@@ -70,6 +74,8 @@ public:
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
+
+    std::unique_ptr<QnAbstractArchiveDelegate> remoteArchiveDelegate();
 
     bool isVideoSourceActive();
 
@@ -156,8 +162,8 @@ private:
     QString defaultValue(const QString& parameter, Qn::ConnectionRole role) const;
 
     QString suggestCodecProfile(
-        AVCodecID codec, 
-        Qn::ConnectionRole role, 
+        AVCodecID codec,
+        Qn::ConnectionRole role,
         const QString& desiredProfile) const;
 
     QSize bestSecondaryResolution(
@@ -181,7 +187,7 @@ private:
         QnCameraAdvancedParameter* inOutParameter,
         const HanwhaAdavancedParameterInfo& info) const;
 
-    using CreateDependencyFunc = 
+    using CreateDependencyFunc =
         std::function<QnCameraAdvancedParameterDependency(
             const HanwhaCodecLimits& codecLimits,
             AVCodecID codec,
@@ -275,6 +281,8 @@ private:
 
     nx::utils::TimerHolder m_timerHolder;
     std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
+    std::unique_ptr<HanwhaRemoteArchiveManager> m_remoteArchiveManager;
+    std::unique_ptr<HanwhaArchiveDelegate> m_remoteArchiveDelegate;
 };
 
 } // namespace plugins

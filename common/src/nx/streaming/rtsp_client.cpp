@@ -369,9 +369,20 @@ qint64 QnRtspTimeHelper::getUsecTime(
             .arg(m_resourceId)
             .arg(currentUs)
             .arg(m_timePolicy == TimePolicy::ForceLocalTime
-                ? "ignoreCameraTime=true" 
+                ? "ignoreCameraTime=true"
                 : "empty statistics"));
         return currentUs;
+    }
+
+    if (m_timePolicy == TimePolicy::OnvifExtension
+        && statistics.ntpOnvifExtensionTime.is_initialized())
+    {
+        VERBOSE(lm("-> %2 (%3), resourceId: %1")
+            .arg(m_resourceId)
+            .arg(currentUs)
+            .arg("got time from Onvif NTP extension"));
+
+        return statistics.ntpOnvifExtensionTime->count();
     }
 
     const double currentSeconds = currentMs / 1000.0;
@@ -409,7 +420,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
         printTime(jitter);
     #endif
 
-    if (jitterSeconds > IGNORE_CAMERA_TIME_THRESHOLD_S 
+    if (jitterSeconds > IGNORE_CAMERA_TIME_THRESHOLD_S
         && m_timePolicy == TimePolicy::IgnoreCameraTimeIfBigJitter)
     {
         m_timePolicy = TimePolicy::ForceLocalTime;
@@ -649,7 +660,7 @@ void QnRtspClient::parseSDP()
             isBackChannel = true;
         }
     }
-    if (mapNum >= 0) 
+    if (mapNum >= 0)
     {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
@@ -915,6 +926,14 @@ void QnRtspClient::addCommonHeaders(nx_http::HttpHeaders& headers)
 {
     headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     headers.insert( nx_http::HttpHeader("User-Agent", m_userAgent ));
+}
+
+void QnRtspClient::addAdditionalHeaders(
+    const QString& requestName,
+    nx_http::HttpHeaders* outHeaders)
+{
+    for (const auto& header: m_additionalHeaders[requestName])
+        nx_http::insertOrReplaceHeader(outHeaders, header);
 }
 
 nx_http::Request QnRtspClient::createDescribeRequest()
@@ -1324,8 +1343,8 @@ nx_http::Request QnRtspClient::createPlayRequest( qint64 startPos, qint64 endPos
     addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
-    if (m_scaleHeaderEnabled)
-        request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
+    addAdditionalHeaders(lit("PLAY"), &request.headers);
+    request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale)) );
     if( m_numOfPredefinedChannels )
     {
         nx_http::insertOrReplaceHeader(
@@ -1379,7 +1398,7 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
         m_keepAliveTime.restart();
         return true;
     }
-    
+
     return false;
 
 }
@@ -2082,7 +2101,7 @@ void QnRtspClient::setDateTimeFormat(const DateTimeFormat& format)
     m_dateTimeFormat = format;
 }
 
-void QnRtspClient::setScaleHeaderEnabled(bool value)
+void QnRtspClient::addRequestHeader(const QString& requestName, const nx_http::HttpHeader& header)
 {
-    m_scaleHeaderEnabled = value;
+    nx_http::insertOrReplaceHeader(&m_additionalHeaders[requestName], header);
 }

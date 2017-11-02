@@ -18,7 +18,8 @@ enum class PlaybackMode
     Live,
     Archive,
     ThumbNails,
-    Export
+    Export,
+    Edge
 };
 
 class QnAbstractArchiveDelegate: public QObject
@@ -116,8 +117,21 @@ public:
     virtual int getSequence() const { return 0;  }
 
     virtual void setPlaybackMode(PlaybackMode value) {}
+
+    virtual void setEndOfPlaybackHandler(std::function<void()> handler)
+    {
+        m_endOfPlaybackHandler = handler;
+    };
+
+    virtual void setErrorHandler(std::function<void(const QString& errorString)> handler)
+    {
+        m_errorHandler = handler;
+    };
+
 protected:
     Flags m_flags;
+    std::function<void()> m_endOfPlaybackHandler;
+    std::function<void(const QString& errorString)> m_errorHandler;
 };
 
 typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;

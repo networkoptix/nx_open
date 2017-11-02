@@ -12,7 +12,7 @@
     </message>
     <message>
       <source>{{VMS_NAME}}</source>
-      <translation>WAVE</translation>
+      <translation>Wisenet WAVE</translation>
     </message>
     <message>
       <source>{{downloadLink}}</source>
@@ -32,15 +32,15 @@
     </message>
     <message>
       <source>{{iOSappID}}</source>
-      <translation>none</translation>
+      <translation>Q5VL4R39XK.com.hanwhasecurity.wavemobile</translation>
     </message>
     <message>
       <source>{{IOS_APP_LINK}}</source>
-      <translation>disabled</translation>
+      <translation>https://itunes.apple.com/eg/app/hd-witness/id1050899754?mt=8</translation>
     </message>
     <message>
       <source>{{ANDROID_APP_LINK}}</source>
-      <translation>disabled</translation>
+      <translation>https://play.google.com/store/apps/details?id=com.hanwhasecurity.wavemobile</translation>
     </message>
     <message>
       <source>{{COMPANY_NAME}}</source>

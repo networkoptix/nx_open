@@ -44,6 +44,7 @@ struct RtpHeader
 #pragma pack(push, 1)
 struct RtpHeaderExtension
 {
+    static const int kRtpExtensionHeaderLength = 4;
     uint16_t definedByProfile;
     uint16_t length;
 };
@@ -55,7 +56,7 @@ class QnRtpStreamParser: public QObject
 public:
     QnRtpStreamParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
-    
+
     virtual ~QnRtpStreamParser();
 
     // used for sync audio/video streams
@@ -96,10 +97,10 @@ protected:
     struct Chunk
     {
         Chunk(): bufferStart(nullptr), bufferOffset(0), len(0), nalStart(false) {}
-        Chunk(int _bufferOffset, quint16 _len, quint8 _nalStart = false): 
+        Chunk(int _bufferOffset, quint16 _len, quint8 _nalStart = false):
             bufferStart(nullptr),
-            bufferOffset(_bufferOffset), 
-            len(_len), 
+            bufferOffset(_bufferOffset),
+            len(_len),
             nalStart(_nalStart) {}
 
         quint8* bufferStart;

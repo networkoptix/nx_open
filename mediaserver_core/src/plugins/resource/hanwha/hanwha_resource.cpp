@@ -25,6 +25,7 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
@@ -245,6 +246,14 @@ HanwhaResource::~HanwhaResource()
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 {
     return new HanwhaStreamReader(toSharedPointer(this));
+}
+
+nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveManager()
+{
+    if (!m_remoteArchiveManager)
+        m_remoteArchiveManager = std::make_unique<HanwhaRemoteArchiveManager>(this);
+
+    return m_remoteArchiveManager.get();
 }
 
 bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
@@ -571,6 +580,15 @@ QString HanwhaResource::sessionKey(
     return QString();
 }
 
+std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
+{
+    auto delegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
+    const auto overlappedId = sharedContext()->currentOverlappedId();
+    delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
+
+    return std::move(delegate);
+}
+
 bool HanwhaResource::isVideoSourceActive()
 {
     auto videoSources = sharedContext()->videoSources();
@@ -645,6 +663,10 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         return result;
 
     result = initTwoWayAudio();
+    if (!result)
+        return result;
+
+    result = initRemoteArchive();
     if (!result)
         return result;
 
@@ -1084,7 +1106,13 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    setCameraCapability(Qn::RemoteArchiveCapability, false);
+    bool hasRemoteArchive = !isNvr();
+    const auto eventStatuses = sharedContext()->eventStatuses();
+    const auto isSdCardInserted = eventStatuses.value.parameter<bool>(lit("SystemEvent.SDInsert"));
+
+    hasRemoteArchive &= (isSdCardInserted.is_initialized() && isSdCardInserted.get());
+    setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2507,6 +2535,7 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
         return new HanwhaArchiveDelegate(toSharedPointer());
+
     return nullptr;
 }
 

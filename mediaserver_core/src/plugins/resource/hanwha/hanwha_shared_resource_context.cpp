@@ -22,6 +22,9 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::minutes kCacheDataTimeout(1);
 
+static const QString kMinOverlappedDateTime = lit("1970-01-01 00:00:00");
+static const QString kMaxOverlappedDateTime = lit("2038-01-01 00:00:00");
+
 static const QUrl cleanUrl(QUrl url)
 {
     url.setPath(QString());
@@ -37,6 +40,7 @@ using namespace nx::mediaserver::resource;
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)
     :
+    currentOverlappedId([this](){ return loadOverlappedId(); }, kCacheDataTimeout),
     information([this](){ return loadInformation(); }, kCacheDataTimeout),
     cgiParamiters([this](){ return loadCgiParamiters(); }, kCacheDataTimeout),
     eventStatuses([this](){ return loadEventStatuses(); }, kCacheDataTimeout),
@@ -112,6 +116,7 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
                 [this](std::chrono::seconds timeZoneShift)
                 {
                     m_chunkLoader->setTimeZoneShift(timeZoneShift);
+                    m_timeZoneShift = timeZoneShift;
                 });
         }
     }
@@ -147,10 +152,14 @@ QString HanwhaSharedResourceContext::sessionKey(
     return m_sessionKeys.value(sessionType);
 }
 
-
 QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const
 {
     return m_chunkLoader->chunks(channelNumber);
+}
+
+QnTimePeriodList HanwhaSharedResourceContext::chunksSync(int channelNumber) const
+{
+    return m_chunkLoader->chunksSync(channelNumber);
 }
 
 qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
@@ -161,6 +170,40 @@ qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
 qint64 HanwhaSharedResourceContext::chunksEndUsec(int channelNumber) const
 {
     return m_chunkLoader->endTimeUsec(channelNumber);
+}
+
+HanwhaResult<int> HanwhaSharedResourceContext::loadOverlappedId()
+{
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+    const auto response = helper.view(
+        lit("recording/overlapped"),
+        {
+            {lit("FromDate"), kMinOverlappedDateTime},
+            {lit("ToDate"), kMaxOverlappedDateTime}
+        }); //< TODO: #dmishin it looks pretty hardcoded. Get actual time range from the camera.
+
+    if (!response.isSuccessful())
+    {
+        return {error(
+            response,
+            CameraDiagnostics::RequestFailedResult(
+                response.requestUrl(),
+                response.errorString()))};
+    }
+
+    const auto overlappedIdListString = response.parameter<QString>(lit("OverlappedIDList"));
+    if (!overlappedIdListString.is_initialized())
+        return {CameraDiagnostics::CameraInvalidParams(lit("Can not fetch overlapped id list"))};
+
+    const auto overlappedIds = overlappedIdListString->split(L',');
+    if (overlappedIds.isEmpty())
+        return {CameraDiagnostics::CameraInvalidParams(lit("Overlapped id list is empty"))};
+
+    return {
+        CameraDiagnostics::NoErrorResult(),
+        overlappedIds.first().toInt() //< Check if it the first or the greatest value in the list
+    };
 }
 
 HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
@@ -277,6 +320,11 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
     }
 
     return {CameraDiagnostics::NoErrorResult(), std::move(videoProfiles)};
+}
+
+std::chrono::seconds HanwhaSharedResourceContext::timeZoneShift() const
+{
+    return m_timeZoneShift;
 }
 
 } // namespace plugins
