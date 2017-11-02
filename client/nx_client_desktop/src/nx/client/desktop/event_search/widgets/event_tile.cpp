@@ -210,12 +210,13 @@ void EventTile::setImage(const QPixmap& value)
 
 CommandActionPtr EventTile::action() const
 {
-    return ui->actionButton->action();
+    return m_action;
 }
 
 void EventTile::setAction(const CommandActionPtr& value)
 {
-    ui->actionButton->setAction(value);
+    m_action = value;
+    ui->actionButton->setAction(m_action.data());
 }
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)

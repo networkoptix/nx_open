@@ -91,6 +91,7 @@ private:
     QPushButton* const m_closeButton = nullptr;
     QnUuid m_id;
     bool m_closeable = false;
+    CommandActionPtr m_action; //< Button action.
 };
 
 } // namespace

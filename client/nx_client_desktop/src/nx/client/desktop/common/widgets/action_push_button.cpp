@@ -9,7 +9,7 @@ ActionPushButton::ActionPushButton(QWidget* parent): base_type(parent)
     setHidden(true);
 }
 
-ActionPushButton::ActionPushButton(const CommandActionPtr& action, QWidget* parent):
+ActionPushButton::ActionPushButton(QAction* action, QWidget* parent):
     base_type(parent)
 {
     setAction(action);
@@ -19,12 +19,12 @@ ActionPushButton::~ActionPushButton()
 {
 }
 
-CommandActionPtr ActionPushButton::action() const
+QAction* ActionPushButton::action() const
 {
     return m_action;
 }
 
-void ActionPushButton::setAction(const CommandActionPtr& value)
+void ActionPushButton::setAction(QAction* value)
 {
     if (m_action == value)
         return;
