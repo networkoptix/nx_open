@@ -64,7 +64,7 @@ function(detect_package_versions)
         set(_openssl_version "1.0.1f")
         set(_quazip_version "0.7.2")
     endif()
-    
+
     if(box STREQUAL "tx1")
         set(_festival_version "2.1x")
         set(_openssl_version "1.0.0j")
@@ -136,6 +136,10 @@ function(get_dependencies)
         nx_rdep_add_package(cifs-utils)
     endif()
 
+    if(box STREQUAL "tx1")
+        nx_rdep_add_package(sysroot)
+    endif()
+
     if(haveTests)
         nx_rdep_add_package(gtest)
         nx_rdep_add_package(gmock)
@@ -203,7 +207,7 @@ function(get_dependencies)
             endif()
         endif()
 
-        if(LINUX AND arch MATCHES "arm|aarch64")
+        if(LINUX AND arch MATCHES "arm")
             nx_rdep_add_package(openldap)
             nx_rdep_add_package(sasl2)
         endif()

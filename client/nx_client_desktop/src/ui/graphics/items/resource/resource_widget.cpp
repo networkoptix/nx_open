@@ -554,6 +554,17 @@ QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
     return m_selectionState;
 }
 
+QPixmap QnResourceWidget::placeholderPixmap() const
+{
+    return m_placeholderPixmap;
+}
+
+void QnResourceWidget::setPlaceholderPixmap(const QPixmap& pixmap)
+{
+    m_placeholderPixmap = pixmap;
+    emit placeholderPixmapChanged();
+}
+
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     QSizeF result;

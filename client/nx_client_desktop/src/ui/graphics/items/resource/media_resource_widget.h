@@ -24,18 +24,20 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
-#include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <nx/client/desktop/camera/camera_fwd.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
-#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
+
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 class EntropixImageEnhancer;
+class MediaResourceWidgetPrivate;
 
 namespace ui {
 namespace graphics {
@@ -50,6 +52,7 @@ class SoftwareTriggerButton;
 
 // TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
 using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
+using QnMediaResourceWidgetPrivate = nx::client::desktop::MediaResourceWidgetPrivate;
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -160,6 +163,8 @@ public:
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
 
+    bool isLicenseUsed() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -169,6 +174,7 @@ signals:
     void positionChanged(qint64 positionUtcMs);
     void motionSearchModeEnabled(bool enabled);
     void zoomWindowCreationModeEnabled(bool enabled);
+    void licenseStatusChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -234,7 +240,7 @@ private slots:
     void at_camDisplay_liveChanged();
     void processSettingsRequest();
     void processDiagnosticsRequest();
-    void processIoEnableRequest();
+    void processEnableLicenseRequest();
     void processMoreLicensesRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
@@ -253,6 +259,7 @@ private slots:
 
 private:
     void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleDewarpingParamsChanged();
 
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
@@ -260,7 +267,6 @@ private:
 
     qreal calculateVideoAspectRatio() const;
 
-    Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
@@ -310,7 +316,12 @@ private:
         QnUuid overlayItemId;
     };
 
+    void initRenderer();
+    void initDisplay();
     void initSoftwareTriggers();
+    void initIoModuleOverlay();
+    void initIconButton();
+    void initStatusOverlayController();
 
     SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
@@ -325,31 +336,13 @@ private:
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+    void getResourceStates();
 
 private:
-    struct ResourceStates
-    {
-        bool isRealTimeSource;  /// Shows if resource is real-time source
-        bool isOffline;         /// Shows if resource is offline. Not-real-time resource is alwasy online
-        bool isUnauthorized;    /// Shows if resource is unauthorized. Not-real-time resource is alwasy online
-        bool hasVideo;          /// Shows if resource has video
-    };
-
-    /// @brief Return resource states
-    ResourceStates getResourceStates() const;
-
-private:
-    /** Media resource. */
-    QnMediaResourcePtr m_resource;
-
-    /** Camera resource. */
-    QnVirtualCameraResourcePtr m_camera;
-
-    /** Display. */
-    QnResourceDisplayPtr m_display;
+    QScopedPointer<QnMediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
-    QnResourceWidgetRenderer *m_renderer;
+    QnResourceWidgetRenderer* m_renderer = nullptr;
 
     /** Selected region for search-by-motion, in parrots. */
     QList<QRegion> m_motionSelection;
@@ -363,36 +356,33 @@ private:
     mutable QList<QnMotionRegion> m_motionSensitivity;
 
     /** Whether the motion sensitivity is valid. */
-    mutable bool m_motionSensitivityValid;
+    mutable bool m_motionSensitivityValid = false;
 
     /** Binary mask for the current motion region. */
     mutable QList<simd128i *> m_binaryMotionMask;
 
     /** Whether motion mask binary data is valid. */
-    mutable bool m_binaryMotionMaskValid;
+    mutable bool m_binaryMotionMaskValid = false;
 
     /** Whether motion selection cached paths are valid. */
-    mutable bool m_motionSelectionCacheValid;
+    mutable bool m_motionSelectionCacheValid = false;
 
     /** Position for text labels for all motion sensitivity regions. */
     /*   m_motionLabelPositions[channel][sensitivity][polygonIndex]  */
     mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>> m_motionLabelPositions;
 
     /** Whether motion label positions data is valid. */
-    mutable bool m_motionLabelPositionsValid;
+    mutable bool m_motionLabelPositionsValid = false;
 
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
     QnPtzControllerPtr m_ptzController;
-    QnFisheyeHomePtzController *m_homePtzController;
+    QnFisheyeHomePtzController* m_homePtzController = nullptr;
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
-    bool m_ioCouldBeShown;
-
-    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
-    QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+    QnIoModuleOverlayWidget* m_ioModuleOverlayWidget = nullptr;
+    bool m_ioCouldBeShown = false;
 
     qint64 m_posUtcMs;
 
