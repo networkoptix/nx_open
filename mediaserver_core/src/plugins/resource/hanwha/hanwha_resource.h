@@ -233,6 +233,9 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
+    bool executeCommandInternal(
+        const HanwhaAdavancedParameterInfo& info,
+        const HanwhaRequestHelper::Parameters& parameters);
 
     void initMediaStreamCapabilities();
 

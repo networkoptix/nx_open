@@ -1825,29 +1825,29 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (!cgiParameter)
             continue;
 
-        bool supported = true;
+        bool isSupported = true;
         auto supportAttribute = info->supportAttribute();
 
         if (!supportAttribute.isEmpty())
         {
-            supported = false;
+            isSupported = false;
             if (!info->isChannelIndependent())
                 supportAttribute += lit("/%1").arg(getChannel());
 
-            const auto boolAttr = m_attributes.attribute<bool>(supportAttribute);
-            if (boolAttr.is_initialized())
+            const auto boolAttribute = m_attributes.attribute<bool>(supportAttribute);
+            if (boolAttribute != boost::none)
             {
-                supported = boolAttr.get();
+                isSupported = boolAttribute.get();
             }
             else
             {
-                const auto intAttr = m_attributes.attribute<int>(supportAttribute);
-                if (intAttr.is_initialized())
-                    supported = intAttr.get() > 0;
+                const auto intAttribute = m_attributes.attribute<int>(supportAttribute);
+                if (intAttribute != boost::none)
+                    isSupported = intAttribute.get() > 0;
             }
         }
 
-        if (supported)
+        if (isSupported)
             supportedIds.insert(id);
     }
 
@@ -2364,23 +2364,30 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
     if (!parameterValues.isEmpty())
         requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
 
+    return executeCommandInternal(*info, requestParameters);
+}
+
+bool HanwhaResource::executeCommandInternal(
+    const HanwhaAdavancedParameterInfo& info,
+    const HanwhaRequestHelper::Parameters& parameters)
+{
     auto makeRequest =
         [&info, this](HanwhaRequestHelper::Parameters parameters, int channel)
-        {
-            if (channel != kHanwhaInvalidChannel)
-                parameters[kHanwhaChannelProperty] = QString::number(channel);
+    {
+        if (channel != kHanwhaInvalidChannel)
+            parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-            HanwhaRequestHelper helper(sharedContext());
-            const auto response = helper.doRequest(
-                info->cgi(),
-                info->submenu(),
-                info->updateAction(),
-                parameters);
+        HanwhaRequestHelper helper(sharedContext());
+        const auto response = helper.doRequest(
+            info.cgi(),
+            info.submenu(),
+            info.updateAction(),
+            parameters);
 
-            return response.isSuccessful();
-        };
+        return response.isSuccessful();
+    };
 
-    if (info->shouldAffectAllChannels())
+    if (info.shouldAffectAllChannels())
     {
         const auto& systemInfo = sharedContext()->information();
         if (!systemInfo)
@@ -2390,20 +2397,19 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
         const auto channelCount = systemInfo->channelCount;
         for (auto i = 0; i < channelCount; ++i)
         {
-            result = makeRequest(requestParameters, i);
+            result = makeRequest(parameters, i);
             if (!result)
                 return false;
         }
 
         return result;
     }
-    else if (!info->isChannelIndependent())
+    else if (!info.isChannelIndependent())
     {
-        return makeRequest(requestParameters, getChannel());
+        return makeRequest(parameters, getChannel());
     }
 
-
-    return makeRequest(requestParameters, kHanwhaInvalidChannel);
+    return makeRequest(parameters, kHanwhaInvalidChannel);
 }
 
 bool HanwhaResource::executeServiceCommand(

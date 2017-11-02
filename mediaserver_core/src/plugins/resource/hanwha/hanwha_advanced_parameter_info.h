@@ -70,6 +70,9 @@ private:
     QString m_submenu;
     QString m_parameterName;
     QString m_parameterValue;
+
+    const std::map<QString, QString*> m_stringAuxes;
+    const std::map<QString, bool*> m_boolAuxes;
 };
 
 } // namespace plugins
