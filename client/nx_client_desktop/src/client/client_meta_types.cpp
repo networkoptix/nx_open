@@ -35,6 +35,7 @@
 
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/client/desktop/ui/common/recording_status_helper.h>
+#include <nx/client/desktop/ui/common/focus_frame_item.h>
 #include <nx/client/desktop/ui/scene/models/layout_model.h>
 #include <nx/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/client/desktop/utils/cursor_manager.h>
@@ -181,5 +182,6 @@ void QnClientMetaTypes::registerQmlTypes()
     ui::scene::Instrument::registerQmlType();
     CursorManager::registerQmlType();
     RecordingStatusHelper::registerQmlType();
+    FocusFrameItem::registerQmlType();
 }
 
