@@ -170,18 +170,20 @@ QSGNode* FocusFrameItem::updatePaintNode(
             data[3].set(x + w, y + h, twx + ts, thy);
         };
 
+    // Rectangles are shifted by kDotSize to avoid painting corner dots multiple times.
+    // This is important when the color is semi-transparent.
     setRectToData(
         leftNode->geometry()->vertexDataAsTexturedPoint2D(),
         QRectF(0, 0, kDotSize, height()));
     setRectToData(
         rightNode->geometry()->vertexDataAsTexturedPoint2D(),
-        QRectF(width() - kDotSize, 0, kDotSize, height()));
+        QRectF(width() - kDotSize, kDotSize, kDotSize, height() - kDotSize));
     setRectToData(
         topNode->geometry()->vertexDataAsTexturedPoint2D(),
-        QRectF(0, 0, width(), kDotSize));
+        QRectF(kDotSize, 0, width() - kDotSize, kDotSize));
     setRectToData(
         bottomNode->geometry()->vertexDataAsTexturedPoint2D(),
-        QRectF(0, height() - kDotSize, width(), kDotSize));
+        QRectF(kDotSize, height() - kDotSize, width() - 2 * kDotSize, kDotSize));
 
     setNodesDirtyState(QSGNode::DirtyGeometry);
 
