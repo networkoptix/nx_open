@@ -4,7 +4,15 @@
 
 class QnGetNonceRestHandler: public QnJsonRestHandler
 {
-    Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+    QnGetNonceRestHandler(bool isUrlSupported = false);
+
+    virtual int executeGet(
+        const QString &path,
+        const QnRequestParams &params,
+        QnJsonRestResult &result,
+        const QnRestConnectionProcessor*) override;
+
+private:
+    bool m_isUrlSupported = false;
 };
