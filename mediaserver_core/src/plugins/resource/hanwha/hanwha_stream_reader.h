@@ -18,6 +18,7 @@ class HanwhaStreamReader: public QnRtpStreamReader
 
 public:
     HanwhaStreamReader(const HanwhaResourcePtr& res);
+    virtual ~HanwhaStreamReader() override;
 
     void setPositionUsec(qint64 value);
     void setSessionType(HanwhaSessionType value);
@@ -25,7 +26,6 @@ public:
     void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec);
     void setOverlappedId(int overlappedId);
 
-    virtual ~HanwhaStreamReader() override;
 protected:
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,

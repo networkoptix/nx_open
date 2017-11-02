@@ -2553,6 +2553,24 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     return sharedContext()->chunks(getChannel());
 }
 
+QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
+    const QnAbstractStreamDataProvider* dataProvider) const
+{
+    auto defaultLayout = QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    if (!isAudioEnabled())
+        return defaultLayout;
+
+    const auto reader = dynamic_cast<const HanwhaStreamReader*>(dataProvider);
+    if (!reader)
+        return defaultLayout;
+
+    const auto layout = reader->getDPAudioLayout();
+    if (layout)
+        return layout;
+
+    return defaultLayout;
+}
+
 bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString)
 {
     HanwhaRequestHelper helper(sharedContext());
