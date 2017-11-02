@@ -333,7 +333,7 @@ void QnResourceAccessManager::updatePermissionsBySubject(const QnResourceAccessS
 
 void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 {
-    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    if (const auto& layout = resource.dynamicCast<QnLayoutResource>())
     {
         /* If layout become shared AND user is admin - he will not receive access notification
          * (because he already had access) but permissions must be recalculated. */
@@ -341,6 +341,15 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
              &QnResourceAccessManager::updatePermissionsToResource);
         connect(layout, &QnLayoutResource::lockedChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
+    }
+
+    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        if (camera->isDtsBased())
+        {
+            connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+                &QnResourceAccessManager::updatePermissionsToResource);
+        }
     }
 
     if (isUpdating())
@@ -353,7 +362,7 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 
 void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    disconnect(resource, nullptr, this, nullptr);
+    resource->disconnect(this);
 
     if (isUpdating())
         return;
@@ -466,7 +475,39 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return result;
 
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
-    if (hasGlobalPermission(subject, Qn::GlobalExportPermission))
+
+    bool liveAllowed = true;
+    bool footageAllowed = hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
+    bool exportAllowed = hasGlobalPermission(subject, Qn::GlobalExportPermission);
+
+    if (!camera->isLicenseUsed())
+    {
+        switch (camera->licenseType())
+        {
+            case Qn::LC_Bridge:
+            {
+                footageAllowed = false;
+                exportAllowed = false;
+                break;
+            }
+            case Qn::LC_VMAX:
+            {
+                liveAllowed = false;
+                footageAllowed = false;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    if (liveAllowed)
+        result |= Qn::ViewLivePermission;
+
+    if (footageAllowed)
+        result |= Qn::ViewFootagePermission;
+
+    if (exportAllowed)
         result |= Qn::ExportPermission;
 
     if (hasGlobalPermission(subject, Qn::GlobalUserInputPermission))
