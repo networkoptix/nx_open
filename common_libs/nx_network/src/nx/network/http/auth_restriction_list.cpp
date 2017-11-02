@@ -2,13 +2,15 @@
 
 namespace nx_http {
 
+const unsigned int AuthMethodRestrictionList::kDefaults =
+    AuthMethod::cookie | AuthMethod::http |
+    AuthMethod::videowall | AuthMethod::urlQueryParam;
+
 unsigned int AuthMethodRestrictionList::getAllowedAuthMethods(
     const nx_http::Request& request) const
 {
     QString path = request.requestLine.url.path();
-    unsigned int allowed =
-        AuthMethod::cookie | AuthMethod::http | 
-        AuthMethod::videowall | AuthMethod::urlQueryParam;
+    unsigned int allowed = kDefaults;
 
     QnMutexLocker lock(&m_mutex);
     for (const auto& rule: m_allowed)
