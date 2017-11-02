@@ -180,7 +180,7 @@ angular.module('webadminApp')
                 }
                 return $q.reject();
             },
-            getNonce:function(login, url){
+            getNonce:function(login, url, remote){
                 var params = {
                     userName:login
                 };
@@ -190,8 +190,8 @@ angular.module('webadminApp')
                     }
                     params.url = url;
                 }
-
-                return $http.get(proxy + '/web/api/getNonce?' + $.param(params));
+                var nonceType = remote ? 'getRemoteNonce' : 'getNonce';
+                return $http.get(proxy + '/web/api/' + nonceType + '?' + $.param(params));
             },
             logout:function(){
                 $localStorage.$reset();
@@ -381,7 +381,7 @@ angular.module('webadminApp')
             mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
                 // 1. get remote nonce
                 var self = this;
-                return self.getNonce(remoteLogin, url).then(function(data){
+                return self.getNonce(remoteLogin, url, true).then(function(data){
                     if(data.data.error && data.data.error!="0"){
                         return $q.reject(data);
                     }
@@ -405,7 +405,7 @@ angular.module('webadminApp')
             },
             pingSystem: function(url, remoteLogin, remotePassword){
                 var self = this;
-                return self.getNonce(remoteLogin, url).then(function(data) {
+                return self.getNonce(remoteLogin, url, true).then(function(data) {
 
                     if(data.data.error && data.data.error!="0"){
                         return $q.reject(data);
