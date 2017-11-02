@@ -479,9 +479,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
 
-    bool liveAllowed = true;
-    bool footageAllowed = hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
-    bool exportAllowed = hasGlobalPermission(subject, Qn::GlobalExportPermission);
+    bool isLiveAllowed = true;
+    bool isFootageAllowed = hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
+    bool isExportAllowed = hasGlobalPermission(subject, Qn::GlobalExportPermission);
 
     if (!camera->isLicenseUsed())
     {
@@ -489,15 +489,15 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         {
             case Qn::LC_Bridge:
             {
-                footageAllowed = false;
-                exportAllowed = false;
+                isFootageAllowed = false;
+                isExportAllowed = false;
                 break;
             }
 
             // TODO: Forbid all for VMAX when discussed with management
             case Qn::LC_VMAX:
             {
-                //liveAllowed = false;
+                //isLiveAllowed = false;
                 //footageAllowed = false;
                 break;
             }
@@ -506,15 +506,15 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         }
     }
 
-    if (liveAllowed)
+    if (isLiveAllowed)
         result |= Qn::ViewLivePermission;
 
-    if (footageAllowed)
+    if (isFootageAllowed)
         result |= Qn::ViewFootagePermission;
 
-    if (exportAllowed)
+    if (isExportAllowed)
     {
-        NX_EXPECT(footageAllowed, "Server API cannot allow export without footage access.");
+        NX_EXPECT(isFootageAllowed, "Server API cannot allow export without footage access.");
         result |= Qn::ExportPermission;
     }
 
