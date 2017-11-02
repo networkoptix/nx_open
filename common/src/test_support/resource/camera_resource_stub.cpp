@@ -14,7 +14,7 @@ QString CameraResourceStub::getDriverName() const
     return lit("CameraResourceStub");
 }
 
-QnAbstractStreamDataProvider * CameraResourceStub::createLiveDataProvider()
+QnAbstractStreamDataProvider* CameraResourceStub::createLiveDataProvider()
 {
     NX_ASSERT(false);
     return nullptr;
@@ -42,6 +42,18 @@ void CameraResourceStub::setHasDualStreaming(bool value)
 {
     m_hasDualStreaming = value;
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1); //< to reset cached values;
+}
+
+void CameraResourceStub::markCameraAsNvr()
+{
+    m_licenseType = Qn::LC_Bridge;
+    setProperty(Qn::DTS_PARAM_NAME, 1); //< to reset cached values;
+}
+
+void CameraResourceStub::markCameraAsVMax()
+{
+    m_licenseType = Qn::LC_VMAX;
+    setProperty(Qn::DTS_PARAM_NAME, 1); //< to reset cached values;
 }
 
 } // namespace nx

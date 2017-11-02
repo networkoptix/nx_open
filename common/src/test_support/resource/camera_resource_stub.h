@@ -19,6 +19,9 @@ public:
     virtual bool hasDualStreaming() const override;
     void setHasDualStreaming(bool value);
 
+    void markCameraAsNvr();
+    void markCameraAsVMax();
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 
@@ -28,5 +31,7 @@ private:
     Qn::LicenseType m_licenseType;
     boost::optional<bool> m_hasDualStreaming;
 };
+
+using CameraResourceStubPtr = QnSharedResourcePointer<CameraResourceStub>;
 
 } // namespace nx
