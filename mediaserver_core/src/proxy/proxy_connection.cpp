@@ -452,6 +452,9 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
         return false;
     }
 
+    if (dstRoute.id.isNull() && d->accessRights.userId.isNull())
+        return false; //< Do not allow direct IP connect for unauthorized users.
+
     d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
     if (d->lastConnectedUrl.isEmpty())
         return false; // invalid dst address
