@@ -152,11 +152,16 @@ static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
     if (scopeIdDelimPos == 0 || scopeIdDelimPos == ipv6AddrString.length() - 1)
         return QString();
 
-    NX_ASSERT(ifaceName == ipv6AddrString.mid(scopeIdDelimPos + 1));
-    if (ifaceName != ipv6AddrString.mid(scopeIdDelimPos + 1))
+    QString scopeIdTail = ipv6AddrString.mid(scopeIdDelimPos + 1);
+    QString scopeIdFromIndex = QString::number(ifaceIndex);
+    if (scopeIdTail == scopeIdFromIndex)
+        return ipv6AddrString;
+
+    NX_ASSERT(ifaceName == scopeIdTail);
+    if (ifaceName != scopeIdTail)
         return QString();
 
-    return ipv6AddrString.left(scopeIdDelimPos + 1) + QString::number(ifaceIndex);
+    return ipv6AddrString.left(scopeIdDelimPos + 1) + scopeIdFromIndex;
 }
 
 } // namespace
