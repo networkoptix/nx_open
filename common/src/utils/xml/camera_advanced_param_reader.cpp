@@ -330,11 +330,11 @@ bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
 
         if (depNode.nodeName() == QnXmlTag::conditionalShow)
         {
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Show;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::show;
         }
         else if (depNode.nodeName() == QnXmlTag::conditionalRange)
         {
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = depNode.attribute(QnXmlTag::paramRange);
             dependency.internalRange = depNode.attribute(QnXmlTag::paramInternalRange);
         }
@@ -397,7 +397,7 @@ bool QnCameraAdvacedParamsXmlParser::parseConditionString(
 
     condition.type = QnCameraAdvancedParameterCondition::fromStringToConditionType(condTypeStr);
 
-    if (condition.type == QnCameraAdvancedParameterCondition::ConditionType::Unknown)
+    if (condition.type == QnCameraAdvancedParameterCondition::ConditionType::unknown)
         return false;
 
     condition.value = condValueStr;

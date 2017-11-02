@@ -1941,7 +1941,7 @@ bool HanwhaResource::addBitrateRanges(
 
             QnCameraAdvancedParameterDependency dependency;
             dependency.id = QnUuid::createUuid().toString();
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("%1,%2").arg(minLimit).arg(maxLimit);
             return dependency;
         };
@@ -1961,7 +1961,7 @@ bool HanwhaResource::addFrameRateRanges(
         {
             QnCameraAdvancedParameterDependency dependency;
             dependency.id = QnUuid::createUuid().toString();
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("1,%2").arg(limits.maxFps);
             return dependency;
         };
@@ -1994,7 +1994,7 @@ bool HanwhaResource::addDependencies(
 
             const auto codecString = toHanwhaString(codec);
             QnCameraAdvancedParameterCondition codecCondition;
-            codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+            codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::equal;
             codecCondition.paramId = lit("%1media/videoprofile/EncodingType")
                 .arg(streamPrefix);
             codecCondition.value = codecString;
@@ -2002,7 +2002,7 @@ bool HanwhaResource::addDependencies(
             const auto resolutionString = toHanwhaString(resolution);
             QnCameraAdvancedParameterCondition resolutionCondition;
             resolutionCondition.type =
-                QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                QnCameraAdvancedParameterCondition::ConditionType::equal;
             resolutionCondition.paramId = lit("%1media/videoprofile/Resolution")
                 .arg(streamPrefix);
             resolutionCondition.value = resolutionString;
@@ -2022,7 +2022,7 @@ bool HanwhaResource::addDependencies(
             {
                 QnCameraAdvancedParameterCondition bitrateControlTypeCondition;
                 bitrateControlTypeCondition.type
-                    = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                    = QnCameraAdvancedParameterCondition::ConditionType::equal;
                 bitrateControlTypeCondition.paramId
                     = lit("%1media/videoprofile/%2.BitrateControlType")
                         .arg(streamPrefix)

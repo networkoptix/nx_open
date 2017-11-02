@@ -223,10 +223,10 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(
                             using ConditionType =
                                 QnCameraAdvancedParameterCondition::ConditionType;
 
-                            if (condition.type == ConditionType::Present)
+                            if (condition.type == ConditionType::present)
                                 return m_paramWidgetsById.contains(condition.paramId);
 
-                            if (condition.type == ConditionType::NotPresent)
+                            if (condition.type == ConditionType::notPresent)
                                 return !m_paramWidgetsById.contains(condition.paramId);
 
                             auto widget = m_paramWidgetsById.value(condition.paramId);
@@ -234,14 +234,14 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(
                         });
 
                     // TODO: #dmishin move this somewhere.
-                    if (dependency.type == DependencyType::Show)
+                    if (dependency.type == DependencyType::show)
                     {
                         if (auto label = m_paramLabelsById.value(paramId))
                             label->setHidden(!allConditionsSatisfied);
                         if (auto widget = m_paramWidgetsById.value(paramId))
                             widget->setHidden(!allConditionsSatisfied);
                     }
-                    else if (dependency.type == DependencyType::Range)
+                    else if (dependency.type == DependencyType::range)
                     {
                         if (!allConditionsSatisfied)
                             return false;
