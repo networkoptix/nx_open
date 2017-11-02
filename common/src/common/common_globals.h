@@ -636,56 +636,137 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageInitResult)
 
     /**
-     * Flags describing the actions permitted for the user to do with the
-     * selected resource. Calculated in runtime.
+     * Flags describing the actions permitted for the user/role to do with the selected resource.
+     * Calculated in runtime.
      */
     enum Permission
     {
-        /* Generic permissions. */
-        NoPermissions                   = 0x0000,   /**< No access */
+        /** ------------------------------
+         * Generic permissions.
+         * ------------------------------ */
 
-        ReadPermission                  = 0x0001,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        WritePermission                 = 0x0002,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
-        SavePermission                  = 0x0004,   /**< Generic save access. Entity can be saved to the server. */
-        RemovePermission                = 0x0008,   /**< Generic delete permission. */
-        ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
-        WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
+        // No access.
+        NoPermissions = 0x0000,
 
         /**
-         * Permission to view resource content.
-         * Currently used for server's health monitor access.
-         * Automatically granted for cameras and web pages if user has ReadPermission for them.
+         * Generic read access. Having this permission doesn't necessary mean that all
+         * information is readable.
          */
-        ViewContentPermission           = 0x0020,
+        ReadPermission = 0x0001,
 
-        /** Full set of permissions which can be available for server resource. */
-        FullServerPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ViewContentPermission,
+        /**
+         * Generic write access. Having this permission doesn't necessary mean that all
+         * information is writable.
+         */
+        WritePermission = 0x0002,
 
-        /* Layout-specific permissions. */
-        AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
-        EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
-        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission, /**< Permission to modify without saving. */
-        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ModifyLayoutPermission | EditLayoutSettingsPermission,
+        // Generic save access. Resource can be saved to the server.
+        SavePermission = 0x0004,
 
-        /* User-specific permissions. */
-        WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
-        WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        WriteEmailPermission            = 0x0800,   /**< Permission to edit user's email. */
-        WriteFullNamePermission         = 0x1000,   /**< Permission to edit user's full name. */
-        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission
-                                            | RemovePermission | WritePasswordPermission
-                                            | WriteAccessRightsPermission
-                                            | WriteFullNamePermission | WriteEmailPermission,
+        // Generic delete permission. Resource can be deleted from the server.
+        RemovePermission = 0x0008,
 
-        /* Media-specific permissions. */
-        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
+        ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
 
-        /* Camera-specific permissions. */
-        WritePtzPermission              = 0x4000,   /**< Permission to use camera's PTZ controls. */
+        // Permission to edit resource's name.
+        WriteNamePermission = 0x0010,
 
-        /* Mode-specific permissions. */
-        VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission | WritePtzPermission,
+        // Full set of generic permissions.
+        FullGenericPermissions = ReadWriteSavePermission | RemovePermission | WriteNamePermission,
+
+        /**
+         * Generic permission to view actual resource content. Actually that means we can open
+         * widget with this resource's content on the scene. For servers: health monitor access.
+         */
+        ViewContentPermission = 0x0020,
+
+        /** ------------------------------
+        * Webpage-specific permissions.
+        * ------------------------------ */
+
+        ViewWebPagePermission = ViewContentPermission,
+
+
+        /** ------------------------------
+        * Server-specific permissions.
+        * ------------------------------ */
+
+        ViewHealthMonitorPermission = ViewContentPermission,
+
+        // Full set of permissions which can be available for the server resource.
+        FullServerPermissions = FullGenericPermissions | ViewHealthMonitorPermission,
+
+
+         /** ------------------------------
+         * Layout-specific permissions.
+         * ------------------------------ */
+
+         // Permission to add or remove items from a layout.
+        AddRemoveItemsPermission = 0x0040,
+
+        // Permission to setup layout background or set locked flag.
+        EditLayoutSettingsPermission = 0x0080,
+
+        // Permission set to modify without saving.
+        ModifyLayoutPermission = ReadPermission | WritePermission | AddRemoveItemsPermission,
+
+        // Full set of permissions which can be available for the layout resource.
+        FullLayoutPermissions = FullGenericPermissions
+            | AddRemoveItemsPermission
+            | EditLayoutSettingsPermission,
+
+
+        /** ------------------------------
+        * User-specific permissions.
+        * ------------------------------ */
+
+        // Permission to edit associated password.
+        WritePasswordPermission = 0x0200,
+
+        // Permission to edit access rights.
+        WriteAccessRightsPermission = 0x0400,
+
+        // Permission to edit user's email.
+        WriteEmailPermission = 0x0800,
+
+        // Permission to edit user's full name.
+        WriteFullNamePermission = 0x1000,
+
+        // Full set of permissions which can be available for the user resource.
+        FullUserPermissions = FullGenericPermissions
+            | WritePasswordPermission
+            | WriteAccessRightsPermission
+            | WriteFullNamePermission
+            | WriteEmailPermission,
+
+
+        /** ------------------------------
+        * Media-specific permissions.
+        * ------------------------------ */
+
+        // Permission to view camera's live stream.
+        ViewLivePermission = 0x2000,
+
+        // Permission to view camera's footage.
+        ViewFootagePermission = 0x4000,
+
+        // Permission to export video parts.
+        ExportPermission = 0x8000,
+
+        // Permission to use camera's PTZ controls.
+        WritePtzPermission = 0x10000,
+
+
+        /** ------------------------------
+         * Mode-specific permissions.
+         * ------------------------------ */
+
+        VideoWallLayoutPermissions = ModifyLayoutPermission,
+        VideoWallMediaPermissions = ReadPermission
+            | ViewContentPermission
+            | ViewLivePermission
+            | ViewFootagePermission
+            | WritePtzPermission,
 
         AllPermissions = 0xFFFFFFFF
     };
