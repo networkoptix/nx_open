@@ -137,7 +137,7 @@ QColor ColorTheme::darker(const QColor& color, int offset) const
 
 QColor ColorTheme::lighter(const QColor& color, int offset) const
 {
-    const auto& info = d->colorInfoByColor.value(color);
+    const auto& info = d->colorInfoByColor.value(transparent(color, 1.0));
 
     if (info.group.isEmpty())
     {
@@ -150,7 +150,9 @@ QColor ColorTheme::lighter(const QColor& color, int offset) const
     }
 
     const auto& colors = d->groups.value(info.group);
-    return colors[qBound(0, info.index + offset, colors.size() - 1)];
+    auto result = colors[qBound(0, info.index + offset, colors.size() - 1)];
+    result.setAlpha(color.alpha());
+    return result;
 }
 
 Q_INVOKABLE bool ColorTheme::isDark(const QColor& color)
