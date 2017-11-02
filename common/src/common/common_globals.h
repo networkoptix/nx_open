@@ -641,37 +641,36 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
      */
     enum Permission
     {
-        /** ------------------------------
-         * Generic permissions.
-         * ------------------------------ */
+        //-----------------------------------------------------------------------------------------
+        //  Generic resource permissions.
 
         // No access.
         NoPermissions = 0x0000,
 
-        /**
-         * Generic read access. Having this permission doesn't necessary mean that all
-         * information is readable.
-         */
+        // Generic read access. Having this permission doesn't necessary mean that all
+        // information is readable. See resource-specific permissions below. By default this means
+        // that this resource will be available in server api replies (e.g. FullInfo)
         ReadPermission = 0x0001,
 
-        /**
-         * Generic write access. Having this permission doesn't necessary mean that all
-         * information is writable.
-         */
+        // Generic write access. Having this permission doesn't necessary mean that all
+        // information is writable. See resource-specific permissions below. Actual only on the
+        // client side. By default this means we can modify the resource somehow.
         WritePermission = 0x0002,
 
-        // Generic save access. Resource can be saved to the server.
+        // Generic save access. Resource can be saved to the server database. Actual both on the
+        // client and the server side.
         SavePermission = 0x0004,
 
-        // Generic delete permission. Resource can be deleted from the server.
+        // Generic delete permission. Resource can be deleted from the server database.
         RemovePermission = 0x0008,
-
-        ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
 
         // Permission to edit resource's name.
         WriteNamePermission = 0x0010,
 
-        // Full set of generic permissions.
+        // Alias for common set of generic permissions.
+        ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
+
+        // Alias for full set of generic permissions.
         FullGenericPermissions = ReadWriteSavePermission | RemovePermission | WriteNamePermission,
 
         /**
@@ -680,26 +679,29 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
          */
         ViewContentPermission = 0x0020,
 
-        /** ------------------------------
-        * Webpage-specific permissions.
-        * ------------------------------ */
+        //-----------------------------------------------------------------------------------------
 
+        //-----------------------------------------------------------------------------------------
+        // Webpage-specific permissions.
+
+        // Permission to view web page.
         ViewWebPagePermission = ViewContentPermission,
 
+        //-----------------------------------------------------------------------------------------
 
-        /** ------------------------------
-        * Server-specific permissions.
-        * ------------------------------ */
+        //-----------------------------------------------------------------------------------------
+        // Server-specific permissions.
 
+        // Permission to view health monitoring.
         ViewHealthMonitorPermission = ViewContentPermission,
 
         // Full set of permissions which can be available for the server resource.
         FullServerPermissions = FullGenericPermissions | ViewHealthMonitorPermission,
 
+        //-----------------------------------------------------------------------------------------
 
-         /** ------------------------------
-         * Layout-specific permissions.
-         * ------------------------------ */
+        //-----------------------------------------------------------------------------------------
+        // Layout-specific permissions.
 
          // Permission to add or remove items from a layout.
         AddRemoveItemsPermission = 0x0040,
@@ -715,10 +717,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
             | AddRemoveItemsPermission
             | EditLayoutSettingsPermission,
 
+        //-----------------------------------------------------------------------------------------
 
-        /** ------------------------------
-        * User-specific permissions.
-        * ------------------------------ */
+        //-----------------------------------------------------------------------------------------
+        // User-specific permissions.
 
         // Permission to edit associated password.
         WritePasswordPermission = 0x0200,
@@ -739,10 +741,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
             | WriteFullNamePermission
             | WriteEmailPermission,
 
+        //-----------------------------------------------------------------------------------------
 
-        /** ------------------------------
-        * Media-specific permissions.
-        * ------------------------------ */
+        //-----------------------------------------------------------------------------------------
+        // Media-specific permissions.
 
         // Permission to view camera's live stream.
         ViewLivePermission = 0x2000,
@@ -756,18 +758,25 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         // Permission to use camera's PTZ controls.
         WritePtzPermission = 0x10000,
 
+        //-----------------------------------------------------------------------------------------
 
-        /** ------------------------------
-         * Mode-specific permissions.
-         * ------------------------------ */
+        //-----------------------------------------------------------------------------------------
+        // Mode-specific permissions.
 
+        // Layout access permission for the running videowall instance.
         VideoWallLayoutPermissions = ModifyLayoutPermission,
+
+        // Media access permission for the running videowall instance.
+        // PTZ is intended here - by SpaceX request.
         VideoWallMediaPermissions = ReadPermission
             | ViewContentPermission
             | ViewLivePermission
             | ViewFootagePermission
             | WritePtzPermission,
 
+        //-----------------------------------------------------------------------------------------
+
+        // All eventually possible permissions.
         AllPermissions = 0xFFFFFFFF
     };
 
