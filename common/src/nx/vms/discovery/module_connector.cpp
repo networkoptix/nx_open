@@ -1,16 +1,17 @@
 #include "module_connector.h"
 
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <rest/server/json_rest_result.h>
-#include <nx/network/socket_global.h>
-#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms {
 namespace discovery {
 
-static const auto kUrl =
-    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
+static const QUrl kUrl(lit(
+    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen"));
 
 std::chrono::seconds kDefaultDisconnectTimeout(10);
 static const network::RetryPolicy kDefaultRetryPolicy(
@@ -270,7 +271,7 @@ void ModuleConnector::Module::connectToEndpoint(
     const auto client = nx_http::AsyncHttpClient::create();
     m_httpClients.insert(client);
     client->bindToAioThread(m_reconnectTimer.getAioThread());
-    client->doGet(kUrl.arg(endpoint.toString()),
+    client->doGet(nx::network::url::Builder(kUrl).setEndpoint(endpoint),
         [this, endpoint, endpointsGroup](nx_http::AsyncHttpClientPtr client) mutable
         {
             m_httpClients.erase(client);
