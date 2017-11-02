@@ -40,7 +40,7 @@ private:
     QList<DemoRegion> m_regions;
 
     QElapsedTimer m_elapsed;
-    std::vector<QnObjectDetectionMetadataTrack> m_track;
+    std::vector<nx::common::metadata::DetectionMetadataPacket> m_track;
 };
 
 } // namespace desktop

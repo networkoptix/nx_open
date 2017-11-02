@@ -17,7 +17,7 @@ namespace plugins {
 struct Hanwha
 {
     Q_GADGET
-    Q_ENUMS(EventTypeFlag EventItemType)       
+    Q_ENUMS(EventTypeFlag EventItemType)
     Q_FLAGS(EventTypeFlags)
 
 public:

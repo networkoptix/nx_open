@@ -27,7 +27,7 @@ public:
     //bool keyFrame;
     //int flags;
     //bool ignore;
-    QnAbstractCompressedMetadataPtr motion;
+    FrameMetadata metadata;
     qint64 pts;
 
     QnCompressedVideoData( QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );

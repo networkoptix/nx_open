@@ -4,6 +4,8 @@
 
 #include <core/resource/camera_resource.h>
 #include <analytics/common/object_detection_metadata.h>
+#include <nx/fusion/fusion/fusion.h>
+#include <nx/fusion/serialization/ubjson.h>
 
 namespace nx {
 namespace client {
@@ -11,33 +13,34 @@ namespace desktop {
 
 void MetadataAnalyticsController::gotMetadataPacket(
     const QnResourcePtr& resource,
-    const QnCompressedMetadataPtr& metadata)
+    const QnCompressedMetadataPtr& serializedData)
 {
     if (!resource)
         return;
 
-    const auto metadataIsOk = metadata
-        && metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA
-        && metadata->metadataType == MetadataType::ObjectDetection;
+    const auto metadataIsOk = serializedData
+        && serializedData->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA
+        && serializedData->metadataType == MetadataType::ObjectDetection;
 
     if (!metadataIsOk)
         return;
 
-    QnObjectDetectionMetadata objectDetectionMetadata;
-    objectDetectionMetadata.deserialize(metadata);
+    auto objectDetectionMetadata =
+        QnUbjson::deserialized<nx::common::metadata::DetectionMetadataPacket>(
+            QByteArray::fromRawData(serializedData->data(), serializedData->dataSize()));
 
     gotMetadata(resource, objectDetectionMetadata);
 }
 
 void MetadataAnalyticsController::gotMetadata(const QnResourcePtr& resource,
-    const QnObjectDetectionMetadata& metadata)
+    const nx::common::metadata::DetectionMetadataPacket& metadata)
 {
     std::map<QnUuid, QRectF> rectangles;
     auto& prevRectangles = m_rectMap[resource->getId()];
-    auto detectedObjects = metadata.detectedObjects;
+    auto detectedObjects = metadata.objects;
 
     for (const auto& obj: detectedObjects)
-        rectangles[obj.objectId] = obj.boundingBox.toRectF();
+        rectangles[obj.objectId] = QRectF(obj.boundingBox);
 
     for (const auto& uuid: prevRectangles)
     {

@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DROID
 
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/spush_media_stream_provider.h>
 #include <nx/network/simple_http_client.h>
 #include "droid_resource.h"
 #include <nx/network/socket.h>

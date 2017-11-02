@@ -11,7 +11,7 @@
 
 #include <api/app_server_connection.h>
 #include <nx/mediaserver/event/event_connector.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/abstract_storage_resource.h>

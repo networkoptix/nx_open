@@ -22,8 +22,8 @@
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <plugins/storage/file_storage/layout_storage_resource.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>

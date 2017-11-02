@@ -4,7 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>

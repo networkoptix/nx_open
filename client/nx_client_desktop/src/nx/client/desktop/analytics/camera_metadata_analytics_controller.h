@@ -7,6 +7,7 @@
 #include <analytics/common/abstract_metadata.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/streaming/media_data_packet.h>
 
 namespace nx {
 namespace client {
@@ -19,8 +20,10 @@ class MetadataAnalyticsController:
     Q_OBJECT
 
 public:
-    void gotMetadataPacket(const QnResourcePtr& resource, const QnCompressedMetadataPtr& metadata);
-    void gotMetadata(const QnResourcePtr& resource, const QnObjectDetectionMetadata& metadata);
+    void gotMetadataPacket(
+        const QnResourcePtr& resource, const QnCompressedMetadataPtr& metadata);
+    void gotMetadata(
+        const QnResourcePtr& resource, const nx::common::metadata::DetectionMetadataPacket& metadata);
     void gotFrame(const QnResourcePtr& resource, qint64 timestampUs);
 
 signals:

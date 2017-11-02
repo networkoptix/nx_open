@@ -43,7 +43,7 @@ extern "C"
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/pending_operation.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <server/server_storage_manager.h>
 

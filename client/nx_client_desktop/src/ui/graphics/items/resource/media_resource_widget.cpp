@@ -25,6 +25,8 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
+#include <ini.h>
 
 #include <client_core/client_core_module.h>
 
@@ -109,7 +111,7 @@
 #include <api/common_message_processor.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <utils/media/sse_helper.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 using namespace nx;
 using namespace client::desktop::ui;
@@ -1450,30 +1452,42 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (options().testFlag(InvisibleWidgetOption))
         return;
 
-    if (options() & DisplayMotion)
+    const auto metadataList = m_renderer->lastFrameMetadata(channel);
+    for (const auto& metadata: metadataList)
     {
-        ensureMotionSelectionCache();
-
-        const auto metadata = m_renderer->lastFrameMetadata(channel);
-        if (metadata && metadata->dataType == QnAbstractMediaData::DataType::META_V1)
+        if (options() & DisplayMotion)
         {
-            paintMotionGrid(
-                painter,
-                channel,
-                rect,
-                std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+            ensureMotionSelectionCache();
+
+            if (metadata && metadata->dataType == QnAbstractMediaData::DataType::META_V1)
+            {
+                paintMotionGrid(
+                    painter,
+                    channel,
+                    rect,
+                    std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+            }
+
+            paintMotionSensitivity(painter, channel, rect);
+
+            /* Motion selection. */
+            if (!m_motionSelection[channel].isEmpty())
+            {
+                QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
+                paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
+            }
         }
 
-        paintMotionSensitivity(painter, channel, rect);
-
-        /* Motion selection. */
-        if (!m_motionSelection[channel].isEmpty())
+        if (metadata && metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
         {
-            QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
-            paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
+            if (nx::client::desktop::ini().enableAnalytics)
+            {
+                qnMetadataAnalyticsController->gotMetadataPacket(
+                    m_resource->toResourcePtr(),
+                    std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
+            }
         }
     }
-
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
 }

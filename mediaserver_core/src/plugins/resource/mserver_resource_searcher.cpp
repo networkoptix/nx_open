@@ -2,7 +2,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>

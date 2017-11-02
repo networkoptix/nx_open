@@ -2,7 +2,7 @@
 
 #include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/spush_media_stream_provider.h>
 #include <utils/common/request_param.h>
 #include <common/common_module_aware.h>
 #include <camera/video_camera.h>

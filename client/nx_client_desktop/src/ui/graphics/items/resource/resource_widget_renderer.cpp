@@ -175,15 +175,15 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
     return ctx.renderer ? ctx.renderer->isHardwareDecoderUsed() : 0;
 }
 
-QnAbstractCompressedMetadataPtr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
+FrameMetadata QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 {
     if (m_channelRenderers.size() <= static_cast<size_t>(channel))
-        return QnAbstractCompressedMetadataPtr();
+        return FrameMetadata();
 
     const RenderingTools& ctx = m_channelRenderers[channel];
     return ctx.renderer
         ? ctx.renderer->lastFrameMetadata()
-        : QnAbstractCompressedMetadataPtr();
+        : FrameMetadata();
 }
 
 void QnResourceWidgetRenderer::setBlurFactor(qreal value)

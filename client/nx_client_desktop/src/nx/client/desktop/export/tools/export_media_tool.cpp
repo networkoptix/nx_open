@@ -12,8 +12,8 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/resource/avi/thumbnails_stream_reader.h>
+#include <core/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/thumbnails_stream_reader.h>
 
 namespace nx {
 namespace client {

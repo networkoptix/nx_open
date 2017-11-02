@@ -22,6 +22,7 @@
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/combined_sensors_description.h>
 #include <core/resource/media_stream_capability.h>
+#include <core/dataprovider/live_stream_params.h>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;

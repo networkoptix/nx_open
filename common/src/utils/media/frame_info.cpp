@@ -56,7 +56,7 @@ unsigned int QnOpenGLPictureData::glTexture() const
 /////////////////////////////////////////////////////
 CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
-    memset( this, 0, sizeof(*this) );
+    memset( this, 0, sizeof(AVFrame) );
 }
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
@@ -332,7 +332,7 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {
-    memset( this, 0, sizeof(*this) );
+    memset( this, 0, sizeof(AVFrame) );
 
     reallocate(image.width(), image.height(), AV_PIX_FMT_YUV420P);
     CLVideoDecoderOutput src;

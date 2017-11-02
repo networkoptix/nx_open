@@ -3,7 +3,7 @@
 #include <client/client_app_info.h>
 
 #include "utils/common/util.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include "core/storage/file_storage/layout_storage_resource.h"
 
 namespace {
 

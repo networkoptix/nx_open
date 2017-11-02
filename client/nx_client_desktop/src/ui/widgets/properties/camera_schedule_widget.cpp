@@ -5,9 +5,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QListView>
 
-// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-#include <core/dataprovider/live_stream_provider.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
@@ -1448,11 +1445,11 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
 
         int decreaseAlways = 0;
         if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
-            decreaseAlways = MIN_SECOND_STREAM_FPS;
+            decreaseAlways = QnLiveStreamParams::kMinSecondStreamFps;
 
         int decreaseIfMotionPlusLQ = 0;
         if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-            decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
+            decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamFps;
 
         QnScheduleTaskList tasks;
         for (auto task: scheduleTasks())

@@ -13,8 +13,8 @@
 #include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
 
 #include <recording/time_period.h>
-#include <plugins/resource/avi/thumbnails_stream_reader.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/thumbnails_stream_reader.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :

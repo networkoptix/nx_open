@@ -2,7 +2,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include "plugins/storage/file_storage/qtfile_storage_resource.h"
+#include "core/storage/file_storage/qtfile_storage_resource.h"
 
 #include "common/common_module.h"
 #include <common/static_common_module.h>

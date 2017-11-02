@@ -514,12 +514,13 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
         }
 
-        if (data->motion) {
+        if (!data->metadata.isEmpty())
+        {
             while (m_motionMap.size() > MAX_DECODE_THREAD+1)
                 m_motionMap.remove(0);
 
             m_motionMap
-                << QPair<qint64, QnAbstractCompressedMetadataPtr>(data->timestamp, data->motion);
+                << QPair<qint64, FrameMetadata>(data->timestamp, data->metadata);
         }
 
         // -------------------------
@@ -577,12 +578,15 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     if (got_picture)
     {
         int motionIndex = findMotionInfo(m_frame->pkt_dts);
-        if (motionIndex >= 0) {
+        if (motionIndex >= 0)
+        {
             outFrame->metadata = m_motionMap[motionIndex].second;
             m_motionMap.remove(motionIndex);
         }
         else
-            outFrame->metadata.reset();
+        {
+            outFrame->metadata.clear();
+        }
 
         AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&

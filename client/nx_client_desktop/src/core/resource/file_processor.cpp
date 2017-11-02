@@ -14,8 +14,8 @@
 #include <plugins/resource/avi/avi_dvd_resource.h>
 #include <plugins/resource/avi/avi_bluray_resource.h>
 #include <plugins/resource/avi/avi_dvd_archive_delegate.h>
-#include <plugins/resource/avi/filetypesupport.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/filetypesupport.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/workaround/mac_utils.h>
 

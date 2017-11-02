@@ -33,7 +33,7 @@
 
 #include <network/cloud_url_validator.h>
 
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period.h>
 
