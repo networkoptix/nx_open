@@ -63,11 +63,11 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
             , request.extraFormatting);
     }
 
-    if (!request.isValid())
+    if (const auto error = request.getError())
     {
         return makeError(
             nx_http::StatusCode::badRequest
-            , lit("Invalid request") // TODO: #GDM think about more detailed error
+            , lit("Invalid request: ") + *error
             , &result
             , &contentType
             , request.format
@@ -147,7 +147,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
             .arg(outFrame->height));
 
         return makeError(
-            nx_http::StatusCode::badRequest
+            nx_http::StatusCode::unsupportedMediaType
             , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
             , &result
             , &contentType
@@ -180,32 +180,39 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
     // TODO: #rvasilenko implement raw format here
 
-    auto requestCompletionFunc = [&context, &result] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
-
-        if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
-            result = msgBody;
-        }
-
-        context.executeGuarded([&context]()
+    SystemError::ErrorCode remoteOsStatus = SystemError::notImplemented;
+    nx_http::StatusCode::Value remoteHttpStatus = nx_http::StatusCode::internalServerError;
+    QByteArray remoteResult;
+    auto requestCompletionFunc =
+        [&] (SystemError::ErrorCode osStatus, int httpStatus, nx_http::BufferType body)
         {
-            context.requestProcessed();
-        });
-    };
+            remoteOsStatus = osStatus;
+            remoteHttpStatus = (nx_http::StatusCode::Value) httpStatus;
+            remoteResult = std::move(body);
+            context.executeGuarded([&context]() { context.requestProcessed(); });
+        };
+
     runMultiserverDownloadRequest(server->commonModule()->router(), apiUrl, server, requestCompletionFunc, &context);
     context.waitForDone();
+    NX_DEBUG(this, lm("Request to '%1' finithed (%2) http status %3").args(
+        apiUrl, SystemError::toString(remoteOsStatus), remoteHttpStatus));
 
-    QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();
-    if (result.isEmpty())
+    if (remoteOsStatus != SystemError::noError)
     {
         return makeError(
-            nx_http::StatusCode::badRequest
-            , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
+            nx_http::StatusCode::internalServerError
+            , lit("Internal error: ") + SystemError::toString(remoteOsStatus)
             , &result
             , &contentType
             , request.format
             , request.extraFormatting);
     }
 
-    contentType = QByteArray("image/") + imageFormat;
-    return nx_http::StatusCode::ok;
+    result = std::move(remoteResult);
+    if (remoteHttpStatus == nx_http::StatusCode::ok)
+        contentType = QByteArray("image/") + QnLexical::serialized(request.imageFormat).toUtf8();
+    else
+        contentType = QByteArray("application/json"); //< TODO: Provide content type from response.
+
+    return remoteHttpStatus;
 }

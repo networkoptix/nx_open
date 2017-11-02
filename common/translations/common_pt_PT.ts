@@ -140,7 +140,7 @@
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation>Não é possível ligar ao porto HTTP %1.</translation>
+      <translation>Não é possível ligar ao porto http %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -642,7 +642,7 @@
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>módulos I/O</translation>
+      <translation>Módulos I/O</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -650,7 +650,7 @@
     </message>
     <message>
       <source>I/O module</source>
-      <translation>módulo I/O</translation>
+      <translation>Módulo I/O</translation>
     </message>
   </context>
   <context>
@@ -1204,7 +1204,7 @@
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>A CÂmara %1 foi desligada</translation>
+      <translation>A câmara %1 foi desligada</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
@@ -1300,7 +1300,7 @@
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Servidor %1 em conflito : %2</translation>
+      <translation>Servidor %1 em conflito: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>

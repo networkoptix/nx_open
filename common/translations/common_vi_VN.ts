@@ -304,15 +304,15 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Trước tiên, hãy thử bật ghi (nếu nó tắt) hảy giảm fps trong cài đặt thiết bị (lỗi &quot;%1&quot;).</translation>
+      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của thiết bị (lỗi &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera (lỗi &quot;%1&quot;).</translation>
+      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của camera (lỗi &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Trước tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt mô-đun I/O (lỗi &quot;%1&quot;).</translation>
+      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của module I/O (lỗi &quot;%1&quot;).</translation>
     </message>
   </context>
   <context>
