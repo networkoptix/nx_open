@@ -22,7 +22,6 @@ class MediaResourceWidgetPrivate: public Connective<QObject>
     Q_PROPERTY(bool isPlayingLive READ isPlayingLive WRITE setIsPlayingLive NOTIFY stateChanged)
     Q_PROPERTY(bool isOffline READ isOffline WRITE setIsOffline NOTIFY stateChanged)
     Q_PROPERTY(bool isUnauthorized READ isUnauthorized WRITE setIsUnauthorized NOTIFY stateChanged)
-    Q_PROPERTY(bool nvrWithoutLicense READ nvrWithoutLicense WRITE setNvrWithoutLicense NOTIFY stateChanged)
     Q_PROPERTY(QnLicenseUsageStatus licenseStatus READ licenseStatus NOTIFY licenseStatusChanged)
 
     using base_type = Connective<QObject>;
@@ -43,7 +42,6 @@ public:
     bool isPlayingLive() const;
     bool isOffline() const;
     bool isUnauthorized() const;
-    bool nvrWithoutLicense() const;
 
     QnLicenseUsageStatus licenseStatus() const;
 
@@ -61,9 +59,6 @@ private:
     void updateIsUnauthorized();
     void setIsUnauthorized(bool value);
 
-    void updateNvrWithoutLicense();
-    void setNvrWithoutLicense(bool value);
-
 private:
     QnResourceDisplayPtr m_display;
     QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseStatusHelper;
@@ -71,7 +66,6 @@ private:
     bool m_isPlayingLive = false;
     bool m_isOffline = false;
     bool m_isUnauthorized = false;
-    bool m_nvrWithoutLicense = false;
 };
 
 } // namespace desktop

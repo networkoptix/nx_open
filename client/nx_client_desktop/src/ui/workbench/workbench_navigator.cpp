@@ -1965,7 +1965,7 @@ void QnWorkbenchNavigator::updateThumbnailsLoader()
 
             if (const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
             {
-                if (camera->isDtsBased() && !camera->isLicenseUsed())
+                if (!accessController()->hasPermissions(camera, Qn::ViewFootagePermission))
                     return false;
             }
 

@@ -34,11 +34,9 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& reso
     {
         m_licenseStatusHelper.reset(new QnSingleCamLicenseStatusHelper(camera));
         connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
-            this, &MediaResourceWidgetPrivate::updateNvrWithoutLicense);
-        connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
             this, &MediaResourceWidgetPrivate::licenseStatusChanged);
-
-        updateNvrWithoutLicense();
+        connect(m_licenseStatusHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged,
+            this, &MediaResourceWidgetPrivate::stateChanged);
     }
 }
 
@@ -59,7 +57,6 @@ void MediaResourceWidgetPrivate::setDisplay(const QnResourceDisplayPtr& display)
         updateIsPlayingLive();
         updateIsOffline();
         updateIsUnauthorized();
-        updateNvrWithoutLicense();
     }
 }
 
@@ -76,11 +73,6 @@ bool MediaResourceWidgetPrivate::isOffline() const
 bool MediaResourceWidgetPrivate::isUnauthorized() const
 {
     return m_isUnauthorized;
-}
-
-bool MediaResourceWidgetPrivate::nvrWithoutLicense() const
-{
-    return m_nvrWithoutLicense;
 }
 
 QnLicenseUsageStatus MediaResourceWidgetPrivate::licenseStatus() const
@@ -104,7 +96,6 @@ void MediaResourceWidgetPrivate::setIsPlayingLive(bool value)
         QSignalBlocker blocker(this);
         updateIsOffline();
         updateIsUnauthorized();
-        updateNvrWithoutLicense();
     }
 
     emit stateChanged();
@@ -137,25 +128,6 @@ void MediaResourceWidgetPrivate::setIsUnauthorized(bool value)
     m_isUnauthorized = value;
     emit stateChanged();
 }
-
-void MediaResourceWidgetPrivate::updateNvrWithoutLicense()
-{
-    // Footage browsing is forbidden for NVRs without license. Live video is forbidden for VMAX.
-    setNvrWithoutLicense(camera
-        && camera->isDtsBased()
-        && !camera->isLicenseUsed()
-        && (!m_isPlayingLive || camera->licenseType() != Qn::LC_Bridge));
-}
-
-void MediaResourceWidgetPrivate::setNvrWithoutLicense(bool value)
-{
-    if (m_nvrWithoutLicense == value)
-        return;
-
-    m_nvrWithoutLicense = value;
-    emit stateChanged();
-}
-
 
 } // namespace desktop
 } // namespace client

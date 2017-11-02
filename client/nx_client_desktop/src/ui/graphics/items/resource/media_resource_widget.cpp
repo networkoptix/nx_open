@@ -1920,11 +1920,14 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (qnRuntime->isDevMode())
         result |= Qn::DbgScreenshotButton;
 
-    if (d->hasVideo
-        && !base_type::resource()->hasFlags(Qn::still_image)
-        && !d->nvrWithoutLicense())
+    if (d->hasVideo && !base_type::resource()->hasFlags(Qn::still_image))
     {
-        result |= Qn::ScreenshotButton;
+        const auto requiredPermission = d->isPlayingLive()
+            ? Qn::ViewLivePermission
+            : Qn::ViewFootagePermission;
+
+        if (accessController()->hasPermissions(d->camera, requiredPermission))
+            result |= Qn::ScreenshotButton;
     }
 
     bool rgbImage = false;
@@ -2014,8 +2017,15 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isUnauthorized())
         return Qn::UnauthorizedOverlay;
 
-    if (d->nvrWithoutLicense())
-        return Qn::AnalogWithoutLicenseOverlay;
+    if (d->camera)
+    {
+        const Qn::Permission requiredPermission = d->isPlayingLive()
+            ? Qn::ViewLivePermission
+            : Qn::ViewFootagePermission;
+
+        if (!accessController()->hasPermissions(d->camera, requiredPermission))
+            return Qn::AnalogWithoutLicenseOverlay;
+    }
 
     if (d->isIoModule)
     {
