@@ -68,7 +68,9 @@ int QnUpdateRestHandler::executePost(
         }
     }
 
-    if (!verifyRelativePath(updateId))
+    // TODO: updateId is not a path, so verification must be a bit tougher.
+    // It may be verified to be a file name.
+    if (!verifySimpleRelativePath(updateId))
     {
         result.setError(QnRestResult::InvalidParameter, lit("updateId"));
         return nx_http::StatusCode::ok;
