@@ -69,7 +69,7 @@ private:
 
     // These fields are constant for now.
     // If required in the future they can be made changeable from public interface.
-    QModelIndex m_rootIndex;
+    QPersistentModelIndex m_rootIndex;
     int m_modelColumn = 0;
 
     QScrollBar* const m_scrollBar = nullptr;
