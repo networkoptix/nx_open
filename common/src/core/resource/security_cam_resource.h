@@ -331,6 +331,7 @@ signals:
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
+    void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
 

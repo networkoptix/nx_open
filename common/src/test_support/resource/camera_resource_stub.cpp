@@ -48,12 +48,14 @@ void CameraResourceStub::markCameraAsNvr()
 {
     m_licenseType = Qn::LC_Bridge;
     setProperty(Qn::DTS_PARAM_NAME, 1); //< to reset cached values;
+    emit initializedChanged(toSharedPointer());
 }
 
 void CameraResourceStub::markCameraAsVMax()
 {
     m_licenseType = Qn::LC_VMAX;
     setProperty(Qn::DTS_PARAM_NAME, 1); //< to reset cached values;
+    emit initializedChanged(toSharedPointer());
 }
 
 } // namespace nx

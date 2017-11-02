@@ -348,6 +348,8 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(
                 &QnLicenseUsageWatcher::licenseUsageChanged);
             connect(camera, &QnVirtualCameraResource::groupIdChanged, this,
                 &QnLicenseUsageWatcher::licenseUsageChanged);
+            connect(camera, &QnSecurityCamResource::licenseTypeChanged, this,
+                &QnLicenseUsageWatcher::licenseUsageChanged);
         };
 
     if (camera)

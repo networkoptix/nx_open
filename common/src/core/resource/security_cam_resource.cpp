@@ -577,6 +577,8 @@ void QnSecurityCamResource::at_initializedChanged()
 {
     if( !isInitialized() )  //e.g., camera has been moved to a different server
         stopInputPortMonitoringAsync();  //stopping input monitoring
+
+    emit licenseTypeChanged(toSharedPointer());
 }
 
 void QnSecurityCamResource::at_motionRegionChanged()
@@ -1194,8 +1196,6 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedIsIOModule.reset();
     m_cachedAnalyticsSupportedEvents.reset();
     m_cachedCameraMediaCapabilities.reset();
-
-    // License type depends on m_cachedIsDtsBased value.
     m_cachedLicenseType.reset();
 }
 

@@ -345,11 +345,14 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        if (camera->isDtsBased())
-        {
-            connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
-                &QnResourceAccessManager::updatePermissionsToResource);
-        }
+        connect(camera, &QnVirtualCameraResource::initializedChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+
+        connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
     }
 
     if (isUpdating())
