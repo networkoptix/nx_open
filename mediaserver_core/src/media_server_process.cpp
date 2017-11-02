@@ -2473,28 +2473,7 @@ void MediaServerProcess::run()
         &cloudManagerGroup);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
-    const auto restrictions = QnAuthHelper::instance()->restrictionList();
-    restrictions->allow(lit("."), nx_http::AuthMethod::noAuth); //< For "OPTIONS * RTSP/1.0"
-
-    const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
-    restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/camera_event.+"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/showLog.+"), nx_http::AuthMethod::urlQueryParam);
-    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/gettime"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getNonce"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/static/.+"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
-
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
-    // authentication is implemented.
-    // WARNING: This is severe vulnerability introduced in 3.0.
-    restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
+    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth );
@@ -3439,4 +3418,31 @@ int MediaServerProcess::main(int argc, char* argv[])
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const
 {
     return m_cmdLineArguments;
+}
+
+void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestrictionList* restrictions)
+{
+    // For "OPTIONS * RTSP/1.0"
+    restrictions->allow(lit("."), nx_http::AuthMethod::noAuth);
+
+    const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
+    restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx_http::AuthMethod::urlQueryParam);
+    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/gettime"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getNonce"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/static/.*"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
+    // authentication is implemented.
+    // WARNING: This is severe vulnerability introduced in 3.0.
+    restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"),
+        nx_http::AuthMethod::noAuth);
 }
