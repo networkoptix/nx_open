@@ -503,6 +503,42 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRemoveCameraAsEditor)
     ASSERT_FALSE(hasPermission(user, target, Qn::RemovePermission));
 }
 
+TEST_F(QnCachedResourceAccessManagerTest, checkViewCameraPermission)
+{
+    auto admin = addUser(Qn::GlobalAdminPermission);
+    auto viewer = addUser(Qn::GlobalViewerPermissionSet);
+    auto live = addUser(Qn::GlobalLiveViewerPermissionSet);
+    auto target = addCamera();
+
+    auto viewLivePermission = Qn::ReadPermission
+        | Qn::ViewContentPermission
+        | Qn::ViewLivePermission;
+    auto viewPermission = viewLivePermission | Qn::ViewFootagePermission;
+
+    ASSERT_TRUE(hasPermission(admin, target, viewPermission));
+    ASSERT_TRUE(hasPermission(viewer, target, viewPermission));
+    ASSERT_TRUE(hasPermission(live, target, viewLivePermission));
+    ASSERT_FALSE(hasPermission(live, target, Qn::ViewFootagePermission));
+}
+
+
+TEST_F(QnCachedResourceAccessManagerTest, checkExportCameraPermission)
+{
+    auto admin = addUser(Qn::GlobalAdminPermission);
+    auto viewer = addUser(Qn::GlobalViewerPermissionSet);
+    auto live = addUser(Qn::GlobalLiveViewerPermissionSet);
+    auto target = addCamera();
+
+    auto exportPermission = Qn::ReadPermission
+        | Qn::ViewContentPermission
+        | Qn::ViewFootagePermission
+        | Qn::ExportPermission;
+
+    ASSERT_TRUE(hasPermission(admin, target, exportPermission));
+    ASSERT_TRUE(hasPermission(viewer, target, exportPermission));
+    ASSERT_FALSE(hasPermission(live, target, exportPermission));
+}
+
 TEST_F(QnCachedResourceAccessManagerTest, checkUserRemoved)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
@@ -636,6 +672,60 @@ TEST_F(QnCachedResourceAccessManagerTest, checkShareLayoutToRole)
 
     // Make sure user got permissions
     ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+}
+
+/**
+* VMAXes without licences:
+* Viewing live: forbidden
+* Viewing footage: forbidden
+* Export video: allowed
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkVMaxWithoutLicense)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    // Camera is detected as VMax
+    camera->markCameraAsVMax();
+    ASSERT_TRUE(camera->licenseType() == Qn::LC_VMAX);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+
+    // License enabled
+    camera->setLicenseUsed(true);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+}
+
+/**
+* NVRs without licences:
+* Viewing live: allowed
+* Viewing footage: forbidden
+* Export video: forbidden
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkNvrWithoutLicense)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    // Camera is detected as NVR
+    camera->markCameraAsNvr();
+    ASSERT_TRUE(camera->licenseType() == Qn::LC_Bridge);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ExportPermission));
+
+    // License enabled
+    camera->setLicenseUsed(true);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 }
 
 /************************************************************************/
