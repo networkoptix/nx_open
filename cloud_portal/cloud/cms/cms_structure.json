@@ -57,6 +57,19 @@
       ]
     },
     {
+      "name": "Service unavailable page (503)",
+      "file_path": "static/503.html",
+      "description": "This page is visible if Cloud service is unavailable",
+      "url": "/503.html",
+      "translatable": false,
+      "values": [
+        ["%DOWNLOAD_LINK%", "http://www.networkoptix.com/live-demo#fulltrial", "Emergency link for downloading applications (in case if cloud is down)"],
+        ["static/images/503.png","","Image for page. Image goes above text on page", "Image"],
+        ["static/images/503@2x.png","","High res image for page. Image goes above text on page", "Image"],
+        ["%BLOCK_CONTENT%", "<h1>{{PRODUCT_NAME}} is under maintenance</h1><p>New better version will be online soon!</p><p>Your {{VMS_NAME}} system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>", "Message about 503 response", "HTML"]
+      ]
+    },
+    {
       "name": "Support page",
       "file_path": "static/lang_{{language}}/views/static/support.html",
       "url": "/content/support",
