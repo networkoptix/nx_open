@@ -707,6 +707,7 @@ TEST_F(QnDirectResourceAccessManagerTest, checkVMaxWithoutLicense)
     ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 
     // License enabled
+    camera->setLicenseUsed(true);
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
@@ -733,6 +734,7 @@ TEST_F(QnDirectResourceAccessManagerTest, checkNvrWithoutLicense)
     ASSERT_FALSE(hasPermission(user, camera, Qn::ExportPermission));
 
     // License enabled
+    camera->setLicenseUsed(true);
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
