@@ -16,4 +16,5 @@ ColorThemeBase
     property color midlight: colors.dark13
     property color button: colors.dark11
     property color highlight: colors.brand_core
+    property color highlightContrast: colors.brand_contrast
 }
