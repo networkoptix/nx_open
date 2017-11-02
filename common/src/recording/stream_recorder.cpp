@@ -321,7 +321,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
     {
         nonConstData->timestamp = std::max(
             nonConstData->timestamp,
-            m_startRecordingBound->count());
+            (decltype(nonConstData->timestamp))m_startRecordingBound->count());
     }
 
     if (m_endRecordingBound.is_initialized())
