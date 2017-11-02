@@ -16,14 +16,21 @@
 #include <rest/server/rest_connection_processor.h>
 
 namespace {
-    bool isResponseOK(const nx_http::HttpClient& client)
-    {
-        if (!client.response())
-            return false;
-        return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
-    }
 
-    const int requestTimeoutMs = 10000;
+bool isResponseOK(const nx_http::HttpClient& client)
+{
+    if (!client.response())
+        return false;
+    return client.response()->statusLine.statusCode == nx_http::StatusCode::ok;
+}
+
+const int requestTimeoutMs = 10000;
+
+} // namespace
+
+QnGetNonceRestHandler::QnGetNonceRestHandler(bool isUrlSupported):
+    m_isUrlSupported(isUrlSupported)
+{
 }
 
 int QnGetNonceRestHandler::executeGet(
@@ -32,7 +39,7 @@ int QnGetNonceRestHandler::executeGet(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    if (params.contains("url"))
+    if (m_isUrlSupported && params.contains("url"))
     {
         nx_http::HttpClient client;
         client.setResponseReadTimeoutMs(requestTimeoutMs);
