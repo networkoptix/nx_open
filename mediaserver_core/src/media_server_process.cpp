@@ -2907,7 +2907,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher(commonModule()));
 
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
-    QnMediaServerResourceSearchers searchers(commonModule());
+    auto resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
     auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
@@ -3150,6 +3150,7 @@ void MediaServerProcess::run()
     serverResourceProcessor.reset();
 
     mdnsListener.reset();
+    resourceSearchers.reset();
     upnpDeviceSearcher.reset();
 
     connectorThread->quit();
