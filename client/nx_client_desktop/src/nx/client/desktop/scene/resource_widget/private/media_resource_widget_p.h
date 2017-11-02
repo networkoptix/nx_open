@@ -35,6 +35,7 @@ public:
 
 public:
     explicit MediaResourceWidgetPrivate(const QnResourcePtr& resource, QObject* parent = nullptr);
+    virtual ~MediaResourceWidgetPrivate();
 
     QnResourceDisplayPtr display() const;
     void setDisplay(const QnResourceDisplayPtr& display);
