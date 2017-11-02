@@ -36,6 +36,7 @@ Button
     readonly property alias hovered: mouseTracker.containsMouse
 
     property bool flat: false //< TODO: #dklychkov Remove after updating Qt version.
+    property bool frameless: false
 
     leftPadding:
     {
@@ -94,7 +95,7 @@ Button
         {
             id: borderTop
 
-            visible: enabled && !control.flat && control.pressed
+            visible: enabled && !control.flat && !control.frameless && control.pressed
             x: 1
             height: 1
             width: parent.width - 2
@@ -105,7 +106,7 @@ Button
         {
             id: borderBottom
 
-            visible: enabled && !control.flat && !control.pressed
+            visible: enabled && !control.flat && !control.frameless && !control.pressed
             x: 1
             height: 1
             width: parent.width - 2
