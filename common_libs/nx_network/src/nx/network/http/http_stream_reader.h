@@ -15,11 +15,13 @@ namespace nx_http {
 
 /**
  * Parses stream of bytes as http messages.
- * Can handle multiple subsequent messages. Increases \a HttpStreamReader::currentMessageNumber() after successfully reading each message
+ * Can handle multiple subsequent messages. 
+ * Increases HttpStreamReader::currentMessageNumber() after successfully reading each message.
  * Supports chunked stream.
- * @note Thread safety: only message body buffer - related functionality is thread-safe (required by \a AsyncHttpClient class). All other methods are NOT thread-safe
- * @note Assumes that any message is followed by message body
- * @note If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes
+ * NOTE: Thread safety: only message body buffer - related functionality is thread-safe (required by AsyncHttpClient class). 
+ *   All other methods are NOT thread-safe.
+ * NOTE: Assumes that any message is followed by message body.
+ * NOTE: If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes
  *   infinite content-length (even when identity encoding is used)
  */
 class NX_NETWORK_API HttpStreamReader
