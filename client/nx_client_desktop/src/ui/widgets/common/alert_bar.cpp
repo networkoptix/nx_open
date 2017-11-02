@@ -9,11 +9,12 @@
 QnAlertBar::QnAlertBar(QWidget* parent):
     base_type(parent),
     m_label(new QLabel(this)),
-    m_reservedSpace(false)
+    m_layout(new QHBoxLayout(this))
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
     setPaletteColor(this, QPalette::Window, Qt::red); //< Sensible default.
+    m_label->setLayout(m_layout);
     m_label->setAutoFillBackground(true);
 
     m_label->setForegroundRole(QPalette::Text);
@@ -61,6 +62,11 @@ void QnAlertBar::setReservedSpace(bool reservedSpace)
 
     m_reservedSpace = reservedSpace;
     updateVisibility();
+}
+
+QHBoxLayout* QnAlertBar::getOverlayLayout()
+{
+    return m_layout;
 }
 
 void QnAlertBar::updateVisibility()

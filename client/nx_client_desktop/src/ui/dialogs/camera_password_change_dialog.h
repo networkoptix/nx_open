@@ -18,6 +18,7 @@ class QnCameraPasswordChangeDialog: public QnSessionAwareButtonBoxDialog
 public:
     QnCameraPasswordChangeDialog(
         const QnVirtualCameraResourceList& cameras,
+        bool hideSingleCameraList,
         QWidget* parent = nullptr);
 
     virtual ~QnCameraPasswordChangeDialog();

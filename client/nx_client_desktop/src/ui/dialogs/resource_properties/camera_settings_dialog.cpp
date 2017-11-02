@@ -20,6 +20,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_settings_widget.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/widgets/default_password_alert_bar.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
@@ -41,6 +42,7 @@ static const int kSizeOffset = 40;
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
+    m_defaultPasswordAlert(new QnDefaultPasswordAlertBar(this)),
     m_ignoreAccept(false)
 {
     setMinimumWidth(kMinimumWidth);
@@ -78,7 +80,14 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     auto separator = new QFrame(this);
     separator->setFrameStyle(QFrame::HLine | QFrame::Sunken);
 
+    connect(m_defaultPasswordAlert, &QnDefaultPasswordAlertBar::changeDefaultPasswordRequest,
+        this, &QnCameraSettingsDialog::handleChangeDefaultPasswordRequest);
+    connect(m_defaultPasswordAlert, &QnDefaultPasswordAlertBar::targetCamerasChanged,
+        this, &QnCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
+
+    layout->addWidget(m_defaultPasswordAlert);
     layout->addWidget(m_settingsWidget);
     layout->addWidget(separator);
     layout->addWidget(m_buttonBox);
@@ -116,6 +125,17 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog()
 {
+}
+
+void QnCameraSettingsDialog::handleChangeDefaultPasswordRequest()
+{
+    const auto parameters = action::Parameters(m_defaultPasswordAlert->targetCameras());
+    menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
+}
+
+void QnCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged()
+{
+    m_settingsWidget->setLockedMode(!m_defaultPasswordAlert->targetCameras().isEmpty());
 }
 
 void QnCameraSettingsDialog::retranslateUi()
@@ -275,6 +295,9 @@ bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
     }
 
     m_settingsWidget->setCameras(cameras);
+    m_defaultPasswordAlert->setCameras(cameras);
+    handleCamerasWithDefaultPasswordChanged();
+
     retranslateUi();
     return true;
 }

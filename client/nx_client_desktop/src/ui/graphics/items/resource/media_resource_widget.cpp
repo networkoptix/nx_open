@@ -486,11 +486,12 @@ void QnMediaResourceWidget::setupStatusOverlayHandlers()
         return;
 
     const auto changeCameraPassword =
-        [this](const QnVirtualCameraResourceList& cameras)
+        [this](const QnVirtualCameraResourceList& cameras, bool singleCamera)
         {
+            auto parameters = action::Parameters(cameras);
+            parameters.setArgument(Qn::HideSingleCameraList, singleCamera);
             menu()->trigger(
-                action::ChangeDefaultCameraPasswordAction,
-                action::Parameters(cameras));
+                action::ChangeDefaultCameraPasswordAction, parameters);
         };
 
     const auto controller = statusOverlayController();
@@ -512,7 +513,7 @@ void QnMediaResourceWidget::setupStatusOverlayHandlers()
                     processMoreLicensesRequest();
                     break;
                 case Qn::ResourceOverlayButton::SetPassword:
-                    changeCameraPassword(QnVirtualCameraResourceList() << m_camera);
+                    changeCameraPassword(QnVirtualCameraResourceList() << m_camera, true);
                 default:
                     break;
             }
@@ -522,7 +523,7 @@ void QnMediaResourceWidget::setupStatusOverlayHandlers()
         [this, changeCameraPassword]()
         {
             const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-            changeCameraPassword(passwordWatcher->camerasWithDefaultPassword());
+            changeCameraPassword(passwordWatcher->camerasWithDefaultPassword(), false);
         });
 }
 

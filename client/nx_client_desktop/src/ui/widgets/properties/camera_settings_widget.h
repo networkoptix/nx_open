@@ -31,6 +31,8 @@ public:
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
+    void setLockedMode(bool value);
+
     Qn::CameraSettingsTab currentTab() const;
     void setCurrentTab(Qn::CameraSettingsTab tab);
 

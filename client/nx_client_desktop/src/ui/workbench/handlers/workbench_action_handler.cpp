@@ -652,13 +652,16 @@ void ActionHandler::at_previousLayoutAction_triggered()
 
 void ActionHandler::at_changeDefaultCameraPassword_triggered()
 {
+    const auto parameters = menu()->currentParameters(sender());
     const auto camerasWithDefaultPassword =
-        menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+        parameters.resources().filtered<QnVirtualCameraResource>();
 
     if (camerasWithDefaultPassword.isEmpty())
         return;
 
-    QnCameraPasswordChangeDialog dialog(camerasWithDefaultPassword, context()->mainWindow());
+    const bool hideSingleCameraList = parameters.argument(Qn::HideSingleCameraList, false);
+    QnCameraPasswordChangeDialog dialog(
+        camerasWithDefaultPassword, hideSingleCameraList, context()->mainWindow());
     if (!dialog.exec())
         return;
 }

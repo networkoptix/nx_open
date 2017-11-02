@@ -40,15 +40,21 @@ Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraRes
 
 QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     const QnVirtualCameraResourceList& cameras,
+    bool hideSingleCameraList,
     QWidget* parent)
     :
     base_type(parent),
     ui(new Ui::CameraPasswordChangeDialog)
 {
     ui->setupUi(this);
-    if (cameras.size() > 1)
-        ui->resourcesWidget->setResources(cameras);
-    else
+    if (cameras.isEmpty())
+    {
+        NX_EXPECT(false, "Cameras list is empty");
+        return;
+    }
+
+    ui->resourcesWidget->setResources(cameras);
+    if (cameras.size() == 1 && hideSingleCameraList)
         ui->resourcesPanel->setVisible(false);
 
     ui->passwordEdit->setTitle(tr("New Password"));

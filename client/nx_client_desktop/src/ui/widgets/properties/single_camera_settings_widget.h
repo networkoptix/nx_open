@@ -58,6 +58,8 @@ public:
 
     Qn::MotionType selectedMotionType() const;
 
+    void setLockedMode(bool locked);
+
 signals:
     void hasChangesChanged();
 
@@ -126,4 +128,5 @@ private:
 
     QString m_recordingAlert;
     QString m_motionAlert;
+    bool m_lockedMode = false;
 };

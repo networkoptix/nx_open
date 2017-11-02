@@ -111,6 +111,22 @@ void QnCameraSettingsWidget::setCurrentTab(Mode mode, Qn::CameraSettingsTab tab)
     }
 }
 
+void QnCameraSettingsWidget::setLockedMode(bool value)
+{
+    switch (mode())
+    {
+        case SingleMode:
+            m_singleWidget->setLockedMode(value);
+            break;
+        case MultiMode:
+            m_multiWidget->setLockedMode(value);
+            break;
+        default:
+            break;
+    }
+
+}
+
 void QnCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab)
 {
     setCurrentTab(mode(), tab);
