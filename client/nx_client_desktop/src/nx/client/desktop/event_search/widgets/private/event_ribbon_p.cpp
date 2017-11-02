@@ -15,6 +15,7 @@
 #include <ui/style/helper.h>
 
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
+#include <nx/client/desktop/ui/actions/action.h>
 #include <nx/utils/log/assert.h>
 
 
@@ -221,6 +222,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
     tile->setToolTip(index.data(Qt::ToolTipRole).toString());
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
+    tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
 

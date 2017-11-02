@@ -53,12 +53,6 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::TimestampTextRole:
             return QVariant::fromValue(timestampText(event.timestamp));
 
-        case Qn::ActionIdRole:
-            return QVariant::fromValue(event.actionId);
-
-        case Qn::ActionParametersRole:
-            return QVariant::fromValue(event.actionParameters);
-
         case Qt::ToolTipRole:
             return QVariant::fromValue(event.toolTip);
 
@@ -76,6 +70,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
 
         case Qn::RemovableRole:
             return event.removable;
+
+        case Qn::CommandActionRole:
+            return qVariantFromValue(event.extraAction);
 
         default:
             return QVariant();

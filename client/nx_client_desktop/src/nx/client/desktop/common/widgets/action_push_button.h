@@ -5,6 +5,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 
+#include <nx/client/desktop/common/utils/command_action.h>
 #include <nx/utils/disconnect_helper.h>
 
 namespace nx {
@@ -18,17 +19,17 @@ class ActionPushButton: public QPushButton
 
 public:
     explicit ActionPushButton(QWidget* parent = nullptr);
-    explicit ActionPushButton(QAction* action, QWidget* parent = nullptr);
+    explicit ActionPushButton(const CommandActionPtr& action, QWidget* parent = nullptr);
     virtual ~ActionPushButton() override;
 
-    QAction* action() const;
-    void setAction(QAction* value);
+    CommandActionPtr action() const;
+    void setAction(const CommandActionPtr& value);
 
 private:
     void updateFromAction();
 
 private:
-    QPointer<QAction> m_action;
+    CommandActionPtr m_action;
     QScopedPointer<QnDisconnectHelper> m_actionConnections;
 };
 

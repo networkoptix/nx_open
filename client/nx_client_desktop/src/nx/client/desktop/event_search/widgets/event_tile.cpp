@@ -208,12 +208,12 @@ void EventTile::setImage(const QPixmap& value)
     ui->previewLabel->setHidden(value.isNull());
 }
 
-QAction* EventTile::action() const
+CommandActionPtr EventTile::action() const
 {
     return ui->actionButton->action();
 }
 
-void EventTile::setAction(QAction* value)
+void EventTile::setAction(const CommandActionPtr& value)
 {
     ui->actionButton->setAction(value);
 }

@@ -19,13 +19,25 @@ public:
     explicit Private(NotificationListModel* q);
     virtual ~Private() override;
 
+    using ExtraData = QPair<QnUuid /*ruleId*/, QnResourcePtr>;
+    static ExtraData extraData(const EventData& event);
+
+    void beforeRemove(const EventData& event);
+
 private:
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);
 
+    void setupAcknowledgeAction(EventData& eventData,
+        const QnVirtualCameraResourcePtr& camera,
+        const nx::vms::event::AbstractActionPtr& action);
+
+    QPixmap pixmapForAction(const vms::event::AbstractActionPtr& action) const;
+
 private:
     NotificationListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
+    QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QnUuid /*itemId*/>> m_uuidHashes;
 };
 
 } // namespace

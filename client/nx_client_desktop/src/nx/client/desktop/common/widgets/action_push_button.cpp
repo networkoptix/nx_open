@@ -9,7 +9,8 @@ ActionPushButton::ActionPushButton(QWidget* parent): base_type(parent)
     setHidden(true);
 }
 
-ActionPushButton::ActionPushButton(QAction* action, QWidget* parent): base_type(parent)
+ActionPushButton::ActionPushButton(const CommandActionPtr& action, QWidget* parent):
+    base_type(parent)
 {
     setAction(action);
 }
@@ -18,12 +19,12 @@ ActionPushButton::~ActionPushButton()
 {
 }
 
-QAction* ActionPushButton::action() const
+CommandActionPtr ActionPushButton::action() const
 {
     return m_action;
 }
 
-void ActionPushButton::setAction(QAction* value)
+void ActionPushButton::setAction(const CommandActionPtr& value)
 {
     if (m_action == value)
         return;
@@ -54,7 +55,7 @@ void ActionPushButton::setAction(QAction* value)
         [this]()
         {
             if (!isCheckable())
-                m_action->toggle();
+                m_action->trigger();
         });
 }
 

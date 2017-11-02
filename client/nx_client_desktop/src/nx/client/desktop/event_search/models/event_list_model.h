@@ -8,6 +8,7 @@
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/common/utils/command_action.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
@@ -36,6 +37,7 @@ public:
         int helpId = -1;
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;
+        CommandActionPtr extraAction;
         QVariant extraData;
     };
 
@@ -46,6 +48,11 @@ public:
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+    void defaultAction(const QnUuid& id);
+    void closeAction(const QnUuid& id);
+    void linkAction(const QnUuid& id, const QString& link);
+
+protected:
     bool addEvent(const EventData& event);
     bool updateEvent(const EventData& event);
     bool removeEvent(const QnUuid& id);
@@ -53,11 +60,6 @@ public:
 
     QModelIndex indexOf(const QnUuid& id) const;
 
-    void defaultAction(const QnUuid& id);
-    void closeAction(const QnUuid& id);
-    void linkAction(const QnUuid& id, const QString& link);
-
-protected:
     virtual QString timestampText(qint64 timestampMs) const;
 
     virtual void triggerDefaultAction(const EventData& event);

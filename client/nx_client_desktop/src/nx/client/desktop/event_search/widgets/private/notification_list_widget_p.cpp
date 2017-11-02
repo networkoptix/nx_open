@@ -63,9 +63,12 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     const auto handleActions =
         [this](EventRibbon* ribbon, EventListModel* model)
         {
-            connect(ribbon, &EventRibbon::clicked, model, &EventListModel::defaultAction);
-            connect(ribbon, &EventRibbon::closeRequested, model, &EventListModel::closeAction);
-            connect(ribbon, &EventRibbon::linkActivated, model, &EventListModel::linkAction);
+            connect(ribbon, &EventRibbon::clicked, model,
+                &EventListModel::defaultAction, Qt::QueuedConnection);
+            connect(ribbon, &EventRibbon::closeRequested, model,
+                &EventListModel::closeAction, Qt::QueuedConnection);
+            connect(ribbon, &EventRibbon::linkActivated, model,
+                &EventListModel::linkAction, Qt::QueuedConnection);
         };
 
     m_systemHealth->setModel(m_systemHealthModel);

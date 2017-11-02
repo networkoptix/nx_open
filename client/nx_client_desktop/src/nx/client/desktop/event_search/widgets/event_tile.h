@@ -5,6 +5,8 @@
 #include <QtWidgets/QWidget>
 
 #include <ui/customization/customized.h>
+
+#include <nx/client/desktop/common/utils/command_action.h>
 #include <nx/utils/disconnect_helper.h>
 #include <nx/utils/uuid.h>
 
@@ -66,8 +68,8 @@ public:
     QPixmap image() const;
     void setImage(const QPixmap& value);
 
-    QAction* action() const;
-    void setAction(QAction* value);
+    CommandActionPtr action() const;
+    void setAction(const CommandActionPtr& value);
 
 signals:
     void clicked();

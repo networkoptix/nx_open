@@ -75,8 +75,10 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     m_eventRibbon->setModel(sortModel);
 
-    connect(m_eventRibbon, &EventRibbon::clicked, m_model, &EventListModel::defaultAction);
-    connect(m_eventRibbon, &EventRibbon::linkActivated, m_model, &EventListModel::linkAction);
+    connect(m_eventRibbon, &EventRibbon::clicked, m_model,
+        &EventListModel::defaultAction, Qt::QueuedConnection);
+    connect(m_eventRibbon, &EventRibbon::linkActivated, m_model,
+        &EventListModel::linkAction, Qt::QueuedConnection);
 
     // Fetch-on-demand logic.
 
