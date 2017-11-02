@@ -68,7 +68,7 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
 void NotificationListModel::Private::beforeRemove(const EventData& event)
 {
     const auto extraData = Private::extraData(event);
-    m_uuidHashes[extraData.first].remove(extraData.second);
+    m_uuidHashes[extraData.first][extraData.second].remove(event.id);
 }
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
@@ -99,10 +99,13 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         const auto iter = m_uuidHashes.find(ruleId);
         if (iter != m_uuidHashes.end())
         {
-            for (const auto& id: *iter)
+            for (const auto& ids: *iter)
             {
-                if (q->indexOf(id).data(Qn::TimestampRole).value<qint64>() == timestampMs)
+                for (const auto& id: ids)
+                {
+                    if (q->indexOf(id).data(Qn::TimestampRole).value<qint64>() == timestampMs)
                     return;
+                }
             }
         }
 
@@ -117,7 +120,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         && params.reasonCode == vms::event::EventReason::licenseRemoved)
     {
         QStringList disabledCameras;
-        for (const QString& stringId : params.description.split(L';'))
+        for (const auto& stringId: params.description.split(L';'))
         {
             QnUuid id = QnUuid::fromStringSafe(stringId);
             NX_ASSERT(!id.isNull());
@@ -257,7 +260,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         return;
 
     if (!actionHasId)
-        m_uuidHashes[action->getRuleId()][resource] = eventData.id;
+        m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
 
     const bool isPlaySoundAction = action->actionType() == vms::event::playSoundAction;
     if (!isPlaySoundAction && eventData.removable)
@@ -281,12 +284,19 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
     if (iter == m_uuidHashes.end())
         return;
 
-    const auto& uuidHash = *iter;
+    auto& uuidHash = *iter;
+
+    const auto removeEvents =
+        [this](const QList<QnUuid>& ids)
+        {
+            for (const auto& id: ids)
+                q->removeEvent(id);
+        };
 
     if (action->actionType() == vms::event::playSoundAction)
     {
-        for (const auto& id: uuidHash.values()) //< Must iterate a copy of the list.
-            q->removeEvent(id);
+        for (const auto& ids: uuidHash.values()) //< Must iterate a copy of the list.
+            removeEvents(ids.toList());
 
         return;
     }
@@ -296,7 +306,7 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
         return;
 
     if (uuidHash.contains(resource))
-        q->removeEvent(uuidHash.value(resource));
+        removeEvents(uuidHash[resource].toList());
 }
 
 void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData,

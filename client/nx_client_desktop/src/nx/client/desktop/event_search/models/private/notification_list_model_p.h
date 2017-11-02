@@ -37,7 +37,7 @@ private:
 private:
     NotificationListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
-    QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QnUuid /*itemId*/>> m_uuidHashes;
+    QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
 };
 
 } // namespace

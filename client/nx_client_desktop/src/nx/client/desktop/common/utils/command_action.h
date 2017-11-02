@@ -15,6 +15,6 @@ using CommandActionPtr = QSharedPointer<CommandAction>;
 
 using CommandActionList = QList<CommandActionPtr>;
 
-} // namespace desktop 
+} // namespace desktop
 } // namespace client
 } // namespace nx
