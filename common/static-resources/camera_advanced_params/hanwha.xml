@@ -23,16 +23,16 @@
                     name="Source"
                     dataType="Enumeration"
                     range=""
-                    aux="support=Media/Limit/MaxAudioInput"/>
+                    aux="support=Media/MaxAudioInput"/>
             <param id="media/audioinput/EncodingType"
                     name="Codec"
                     dataType="Enumeration"
-                    aux="support=Media/Limit/MaxAudioInput;range=media/audioinput/set/EncodingType"/>
+                    aux="support=Media/MaxAudioInput;range=media/audioinput/set/EncodingType"/>
             <param id="media/audioinput/Bitrate"
                     name="Bitrate"
                     dataType="Enumeration"
                     range="16000,24000,32000,40000,64000"
-                    aux="support=Media/Limit/MaxAudioInput">
+                    aux="support=Media/MaxAudioInput">
                 <dependencies>
                     <dependencies-ranges>
                         <conditional-range id="g711Range" range="64000">
@@ -57,7 +57,7 @@
                     name="Gain"
                     dataType="Number"
                     range="1,10"
-                    aux="support=Media/Limit/MaxAudioInput"/>
+                    aux="support=Media/MaxAudioInput"/>
         </group>
 
         <group name="Streaming">
@@ -470,7 +470,7 @@
                         name="Mode"
                         dataType="Enumeration"
                         range="Off,Low,Medium,High"
-                        aux="support=Media/Support/WiseStream"/>
+                        aux="support=Media/WiseStream"/>
             </group>
         </group>
         <group name="Image">
@@ -882,38 +882,70 @@
         </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
-                        name="Simple Focus"
-                        dataType="Button"
-                        writeCmd="control"
-                        description="Fits the focus automatically"
-                        aux="support=Image/Support/SimpleFocus"/>
+                    name="Simple Focus"
+                    dataType="Button"
+                    writeCmd="control"
+                    description="Fits the focus automatically"
+                    aux="support=Image/SimpleFocus;shouldAffectAllChannels=true"/>
             <param id="image/focus/Mode=Reset"
-                        name="Reset Focus"
-                        dataType="Button"
-                        writeCmd="control"
-                        description="Restores the focus adjustment to the default flange back position"
-                        aux="support=Image/Support/ResetFocus"/>
+                    name="Initialize Focus"
+                    dataType="Button"
+                    writeCmd="control"
+                    description="Restores the focus adjustment to the default flange back position"
+                    aux="support=Image/ResetFocus;shouldAffectAllChannels=true"/>
+            <param id="image/focus/Mode=AutoFocus"
+                    name="Simple Focus"
+                    dataType="Button"
+                    writeCmd="control"
+                    description="Fits the focus automatically"
+                    aux="shouldAffectAllChannels=true">
+                <dependencies>
+                    <dependencies-show>
+                        <conditional-show>
+                            <condition
+                                watch="image/focus/Mode=SimpleFocus"
+                                condition="notPresent"/>
+                        </conditional-show>
+                    </dependencies-show>
+                </dependencies>
+            </param>
+            <param id="image/focus/Mode=LensInitialize"
+                    name="Initialize Focus"
+                    dataType="Button"
+                    writeCmd="control"
+                    description="Restores the focus adjustment to the default flange back position"
+                    aux="shouldAffectAllChannels=true">
+                <dependencies>
+                    <dependencies-show>
+                        <conditional-show>
+                            <condition
+                                watch="image/focus/Mode=Reset"
+                                condition="notPresent"/>
+                        </conditional-show>
+                    </dependencies-show>
+                </dependencies>
+            </param>
             <param id="system/factoryreset/ExcludeSettings=Network"
-                        name="Reset to Factory Defaults except Network Settings"
-                        dataType="Button"
-                        writeCmd="control"
-                        confirmation="Are you sure you want to reset all settings (except network) to default?"
-                        description="Resets all camera parameters to defaults except for network settings"
-                        aux="noChannel"/>
+                    name="Reset to Factory Defaults except Network Settings"
+                    dataType="Button"
+                    writeCmd="control"
+                    confirmation="Are you sure you want to reset all settings (except network) to default?"
+                    description="Resets all camera parameters to defaults except for network settings"
+                    aux="noChannel=true"/>
             <param id="system/factoryreset/ExcludeSettings=None"
-                        name="Reset to Factory Defaults"
-                        dataType="Button"
-                        writeCmd="control"
-                        confirmation="Are you sure you want to reset all settings (including network) to default?"
-                        description="Resets all camera parameters to defaults"
-                        aux="noChannel"/>
+                    name="Reset to Factory Defaults"
+                    dataType="Button"
+                    writeCmd="control"
+                    confirmation="Are you sure you want to reset all settings (including network) to default?"
+                    description="Resets all camera parameters to defaults"
+                    aux="noChannel=true"/>
             <param id="system/power/Type=Restart"
-                        name="Restart"
-                        dataType="Button"
-                        writeCmd="control"
-                        confirmation="Are you sure you want to restart the device?"
-                        description="Restarts the device"
-                        aux="noChannel"/>
+                    name="Restart"
+                    dataType="Button"
+                    writeCmd="control"
+                    confirmation="Are you sure you want to restart the device?"
+                    description="Restarts the device"
+                    aux="noChannel=true"/>
         </group>
     </parameters>
 </plugin>

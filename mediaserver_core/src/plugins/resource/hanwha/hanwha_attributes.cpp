@@ -23,7 +23,7 @@ HanwhaAttributes::HanwhaAttributes(
 {
     QXmlStreamReader reader(attributesXml);
     parseXml(reader, QString(), kNoChannel);
-    m_isValid = !reader.hasError() || 
+    m_isValid = !reader.hasError() ||
         reader.error() == QXmlStreamReader::PrematureEndOfDocumentError;
 }
 
@@ -86,7 +86,7 @@ boost::optional<bool> HanwhaAttributes::attribute<bool>(
     const QString& attributeName,
     int channel) const
 {
-    return toBool(findAttribute(group, attributeName, channel));   
+    return toBool(findAttribute(group, attributeName, channel));
 }
 
 template<>

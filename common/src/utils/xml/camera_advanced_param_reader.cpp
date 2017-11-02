@@ -386,13 +386,14 @@ bool QnCameraAdvacedParamsXmlParser::parseConditionString(
     if (conditionString.isEmpty())
         return false;
 
-    auto separatorPosition = conditionString.indexOf(lit("="));
-
-    if (separatorPosition == -1)
+    const auto split = conditionString.split(L'=');
+    if (split.isEmpty())
         return false;
 
-    auto condTypeStr = conditionString.left(separatorPosition);
-    auto condValueStr = conditionString.mid(separatorPosition + 1);
+    auto condTypeStr = split[0].trimmed();
+    auto condValueStr = split.size() > 1
+        ? split[1].trimmed()
+        : QString();
 
     condition.type = QnCameraAdvancedParameterCondition::fromStringToConditionType(condTypeStr);
 

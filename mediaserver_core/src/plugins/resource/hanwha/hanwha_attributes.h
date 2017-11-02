@@ -73,7 +73,7 @@ private:
 private:
     using GroupName = QString;
     using ChannelNumber = int;
-    using AttributeName = QString; 
+    using AttributeName = QString;
     using AttributeValue = QString;
     using Groups = std::map<GroupName, std::map<AttributeName, AttributeValue>>;
 

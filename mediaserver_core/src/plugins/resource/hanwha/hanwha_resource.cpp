@@ -619,14 +619,21 @@ int HanwhaResource::maxProfileCount() const
 
 CameraDiagnostics::Result HanwhaResource::initInternal()
 {
-    const auto result = init();
-    if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
-        setStatus(Qn::Unauthorized);
+    const auto result = initDevice();
+
+    if (!result)
+    {
+        const auto status = result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised
+            ? Qn::Unauthorized
+            : Qn::Offline;
+
+        setStatus(status);
+    }
 
     return result;
 }
 
-CameraDiagnostics::Result HanwhaResource::init()
+CameraDiagnostics::Result HanwhaResource::initDevice()
 {
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     saveParams();
@@ -746,7 +753,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (info->deviceType == kHanwhaNvrDeviceType)
     {
         m_isNvr = true;
-        //setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
         setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
     }
 
@@ -1819,7 +1825,30 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (!cgiParameter)
             continue;
 
-        supportedIds.insert(id);
+        bool supported = true;
+        auto supportAttribute = info->supportAttribute();
+
+        if (!supportAttribute.isEmpty())
+        {
+            supported = false;
+            if (!info->isChannelIndependent())
+                supportAttribute += lit("/%1").arg(getChannel());
+
+            const auto boolAttr = m_attributes.attribute<bool>(supportAttribute);
+            if (boolAttr.is_initialized())
+            {
+                supported = boolAttr.get();
+            }
+            else
+            {
+                const auto intAttr = m_attributes.attribute<int>(supportAttribute);
+                if (intAttr.is_initialized())
+                    supported = intAttr.get() > 0;
+            }
+        }
+
+        if (supported)
+            supportedIds.insert(id);
     }
 
     return allParameters.filtered(supportedIds);
@@ -2331,18 +2360,50 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
             parameterValues.push_back(requestedValue);
     }
 
-    std::map<QString, QString> requestParameters;
+    HanwhaRequestHelper::Parameters requestParameters;
     if (!parameterValues.isEmpty())
         requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
 
-    HanwhaRequestHelper helper(sharedContext());
-    const auto response = helper.doRequest(
-        info->cgi(),
-        info->submenu(),
-        info->updateAction(),
-        requestParameters);
+    auto makeRequest =
+        [&info, this](HanwhaRequestHelper::Parameters parameters, int channel)
+        {
+            if (channel != kHanwhaInvalidChannel)
+                parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-    return response.isSuccessful();
+            HanwhaRequestHelper helper(sharedContext());
+            const auto response = helper.doRequest(
+                info->cgi(),
+                info->submenu(),
+                info->updateAction(),
+                parameters);
+
+            return response.isSuccessful();
+        };
+
+    if (info->shouldAffectAllChannels())
+    {
+        const auto& systemInfo = sharedContext()->information();
+        if (!systemInfo)
+            return false;
+
+        bool result = true;
+        const auto channelCount = systemInfo->channelCount;
+        for (auto i = 0; i < channelCount; ++i)
+        {
+            result = makeRequest(requestParameters, i);
+            if (!result)
+                return false;
+        }
+
+        return result;
+    }
+    else if (!info->isChannelIndependent())
+    {
+        return makeRequest(requestParameters, getChannel());
+    }
+
+
+    return makeRequest(requestParameters, kHanwhaInvalidChannel);
 }
 
 bool HanwhaResource::executeServiceCommand(
