@@ -201,6 +201,7 @@ namespace ec2
             void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiVideowallDataList&);
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiWebPageDataList&);
             void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const ec2::ApiAccessRightsDataList&);
+            void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const ec2::ApiSystemMergeHistoryRecordList&);
         };
 
 
