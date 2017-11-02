@@ -8,8 +8,8 @@ namespace cloud {
 
 using MediatorUrlHandler = nx::utils::MoveOnlyFunc<void(
     nx_http::StatusCode::Value /*result code*/,
-    QUrl /*tcp url*/,
-    QUrl /*udp url*/)>;
+    nx::utils::Url /*tcp url*/,
+    nx::utils::Url /*udp url*/)>;
 
 class NX_NETWORK_API ConnectionMediatorUrlFetcher:
     public BasicCloudModuleUrlFetcher<MediatorUrlHandler>
@@ -36,8 +36,8 @@ protected:
 private:
     struct MediatorHostDescriptor
     {
-        QUrl tcpUrl;
-        QUrl udpUrl;
+        nx::utils::Url tcpUrl;
+        nx::utils::Url udpUrl;
     };
 
     boost::optional<MediatorHostDescriptor> m_mediatorHostDescriptor;

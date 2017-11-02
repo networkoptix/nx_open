@@ -50,13 +50,14 @@ namespace ec2 {
          * Implementation of AbstractECConnectionFactory::testConnectionAsync.
          */
         virtual int testConnectionAsync(
-            const QUrl& addr, impl::TestConnectionHandlerPtr handler) override;
+            const nx::utils::Url& addr,
+            impl::TestConnectionHandlerPtr handler) override;
 
         /**
          * Implementation of AbstractECConnectionFactory::connectAsync.
          */
         virtual int connectAsync(
-            const QUrl& addr,
+            const nx::utils::Url& addr,
             const ApiClientInfoData& clientInfo,
             impl::ConnectHandlerPtr handler) override;
 
@@ -96,14 +97,14 @@ private:
     Ec2DirectConnectionPtr m_directConnection;
     bool m_p2pMode = false;
 private:
-    int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
+    int establishDirectConnection(const nx::utils::Url& url, impl::ConnectHandlerPtr handler);
     int establishConnectionToRemoteServer(
-        const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo);
+        const nx::utils::Url& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo);
 
-    void tryConnectToOldEC(const QUrl& ecUrl, impl::ConnectHandlerPtr handler, int reqId);
+    void tryConnectToOldEC(const nx::utils::Url& ecUrl, impl::ConnectHandlerPtr handler, int reqId);
 
     template<class Handler>
-    void connectToOldEC(const QUrl& ecURL, Handler completionFunc);
+    void connectToOldEC(const nx::utils::Url& ecURL, Handler completionFunc);
 
     /**
      * Called on the client side after receiving connection response from a remote server.
@@ -112,7 +113,7 @@ private:
         int reqId,
         ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
-        const QUrl& ecUrl,
+        const nx::utils::Url& ecUrl,
         impl::ConnectHandlerPtr handler);
 
     /**
@@ -122,7 +123,7 @@ private:
         int reqId,
         ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
-        const QUrl& ecUrl,
+        const nx::utils::Url& ecUrl,
         impl::TestConnectionHandlerPtr handler);
 
     /**
@@ -133,8 +134,8 @@ private:
         QnConnectionInfo* const connectionInfo,
         nx_http::Response* response = nullptr);
 
-    int testDirectConnection(const QUrl& addr, impl::TestConnectionHandlerPtr handler);
-    int testRemoteConnection(const QUrl& addr, impl::TestConnectionHandlerPtr handler);
+    int testDirectConnection(const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler);
+    int testRemoteConnection(const nx::utils::Url& addr, impl::TestConnectionHandlerPtr handler);
     ErrorCode getSettings(nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData&);
 
     template<class InputDataType>

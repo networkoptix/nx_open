@@ -38,7 +38,7 @@ void ClientPool::setPoolSize(int value)
     m_maxPoolSize = value;
 }
 
-int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
+int ClientPool::doGet(const nx::utils::Url& url, nx_http::HttpHeaders headers)
 {
     Request request;
     request.method = Method::get;
@@ -48,7 +48,7 @@ int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
 }
 
 int ClientPool::doPost(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QByteArray& contentType,
     const QByteArray& msgBody,
     nx_http::HttpHeaders headers)
@@ -153,7 +153,7 @@ void ClientPool::cleanupDisconnectedUnsafe()
     }
 }
 
-ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
+ClientPool::HttpConnection* ClientPool::getUnusedConnection(const nx::utils::Url& url)
 {
     cleanupDisconnectedUnsafe();
 

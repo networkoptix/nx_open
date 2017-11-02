@@ -279,7 +279,7 @@ public:
     void setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme);
     QAuthenticator getAuth() const;
 
-    QUrl getUrl() const;
+    nx::utils::Url getUrl() const;
 
     void setProxyAddr(const QString& addr, int port);
 
@@ -394,7 +394,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
-    QUrl m_url;
+    nx::utils::Url m_url;
 
     QString m_SessionId;
     unsigned short m_ServerPort;

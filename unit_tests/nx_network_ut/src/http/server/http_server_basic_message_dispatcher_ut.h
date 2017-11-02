@@ -141,7 +141,7 @@ private:
         message.request->requestLine.method = method;
         message.request->requestLine.version = nx_http::http_1_1;
         message.request->requestLine.url =
-            QUrl(QString("http://127.0.0.1:7001%1").arg(QString::fromUtf8(path)));
+            nx::utils::Url(QString("http://127.0.0.1:7001%1").arg(QString::fromUtf8(path)));
         return message;
     }
 };

@@ -111,7 +111,7 @@ void QnDesktopCameraResourceSearcher::registerCamera(
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(
-    const QUrl& /*url*/,
+    const nx::utils::Url& /*url*/,
     const QAuthenticator& /*auth*/,
     bool /*doMultichannelCheck*/)
 {

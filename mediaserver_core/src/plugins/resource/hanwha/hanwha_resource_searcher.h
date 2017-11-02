@@ -33,7 +33,7 @@ public:
     virtual QnResourceList findResources(void) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 
@@ -55,7 +55,7 @@ private:
 
     template<typename T>
     void addMultichannelResources(QList<T>& result, const QAuthenticator& auth);
-    HanwhaResult<HanwhaInformation> cachedDeviceInfo(const QAuthenticator& auth, const QUrl& url);
+    HanwhaResult<HanwhaInformation> cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url);
 private:
     QMap<QString, std::shared_ptr<HanwhaSharedResourceContext>> m_sharedContext;
     struct SessionKeyData

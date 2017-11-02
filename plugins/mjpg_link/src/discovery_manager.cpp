@@ -13,8 +13,6 @@
 #include <cstdio>
 
 #include <QtCore/QCryptographicHash>
-#include <QtCore/QUrl>
-
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 
@@ -72,7 +70,7 @@ static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
 
 int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )
 {
-    QUrl url( QString::fromUtf8(address) );
+    nx::utils::Url url( QString::fromUtf8(address) );
     if( url.scheme() != HTTP_PROTO_NAME && url.scheme() != HTTPS_PROTO_NAME )
         return 0;
 
@@ -81,7 +79,7 @@ int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* 
         httpClient.setUserName( QLatin1String(login) );
     if( password )
         httpClient.setUserPassword( QLatin1String(password) );
-    if( !httpClient.doGet( QUrl(QLatin1String(address)) ) )
+    if( !httpClient.doGet( nx::utils::Url(QLatin1String(address)) ) )
         return 0;
 
     //checking content-type

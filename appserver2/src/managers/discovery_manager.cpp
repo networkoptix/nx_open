@@ -12,7 +12,7 @@ namespace ec2 {
 
 ApiDiscoveryData toApiDiscoveryData(
     const QnUuid &id,
-    const QUrl &url,
+    const nx::utils::Url &url,
     bool ignore)
 {
     ApiDiscoveryData params;
@@ -34,7 +34,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 
     // TODO: maybe it's better to move it out and use signal?..
     if (const auto manager = commonModule()->moduleDiscoveryManager())
-        manager->checkEndpoint(QUrl(transaction.params.url), transaction.params.id);
+        manager->checkEndpoint(nx::utils::Url(transaction.params.url), transaction.params.id);
 
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }
@@ -84,7 +84,10 @@ template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::~QnDiscoveryManager() {}
 
 template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler)
+int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
+    const QnUuid &id,
+    const nx::utils::Url& url,
+    impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
     ApiDiscoverPeerData params;
@@ -107,7 +110,7 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QnUuid &id, const
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
         const QnUuid &id,
-        const QUrl &url,
+        const nx::utils::Url &url,
         bool ignore,
         impl::SimpleHandlerPtr handler)
 {
@@ -127,10 +130,10 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(
-        const QnUuid &id,
-        const QUrl &url,
-        bool ignore,
-        impl::SimpleHandlerPtr handler)
+    const QnUuid &id,
+    const nx::utils::Url &url,
+    bool ignore,
+    impl::SimpleHandlerPtr handler)
 {
     const int reqId = generateRequestID();
     using namespace std::placeholders;

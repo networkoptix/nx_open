@@ -84,10 +84,10 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 QnMergeSystemsDialog::~QnMergeSystemsDialog() {}
 
 
-QUrl QnMergeSystemsDialog::url() const {
+nx::utils::Url QnMergeSystemsDialog::url() const {
     /* filter unnecessary information from the URL */
-    QUrl enteredUrl = QUrl::fromUserInput(ui->urlComboBox->currentText());
-    QUrl url;
+    nx::utils::Url enteredUrl = nx::utils::Url::fromUserInput(ui->urlComboBox->currentText());
+    nx::utils::Url url;
     url.setScheme(enteredUrl.scheme());
     url.setHost(enteredUrl.host());
     url.setPort(enteredUrl.port());
@@ -153,7 +153,7 @@ void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
 }
 
 void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
-    QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
+    nx::utils::Url url = nx::utils::Url::fromUserInput(ui->urlComboBox->currentText());
     if (url.port() == -1)
         url.setPort(DEFAULT_APPSERVER_PORT);
     ui->urlComboBox->setCurrentText(url.toString());
@@ -171,7 +171,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
 
     updateConfigurationBlock();
 
-    QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
+    nx::utils::Url url = nx::utils::Url::fromUserInput(ui->urlComboBox->currentText());
     QString login = ui->loginEdit->text();
     QString password = ui->passwordEdit->text();
 
@@ -317,7 +317,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
 
             if (auto connection = QnAppServerConnectionFactory::ec2Connection())
             {
-                QUrl url = connection->connectionInfo().ecUrl;
+                nx::utils::Url url = connection->connectionInfo().ecUrl;
                 url.setUserName(m_remoteOwnerCredentials.user());
                 url.setPassword(m_remoteOwnerCredentials.password());
                 connection->updateConnectionUrl(url);

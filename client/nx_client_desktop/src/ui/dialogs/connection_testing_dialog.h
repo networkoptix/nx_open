@@ -25,7 +25,7 @@ public:
     explicit QnConnectionTestingDialog(QWidget *parent = NULL);
     virtual ~QnConnectionTestingDialog();
 
-    void testConnection(const QUrl &url);
+    void testConnection(const nx::utils::Url &url);
 
 signals:
     void resourceChecked(bool success);

@@ -149,7 +149,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
 {
     //checking that camera is alive and on its place
     const QString& urlStr = getUrl();
-    QUrl url = QUrl(urlStr);
+    nx::utils::Url url = nx::utils::Url(urlStr);
     if( url.host().isEmpty() )
     {
         //url is just IP address?
@@ -303,7 +303,7 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     bool activate,
     unsigned int autoResetTimeoutMS)
 {
-    QUrl url;
+    nx::utils::Url url;
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
@@ -676,7 +676,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
 bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
-    QUrl url;
+    nx::utils::Url url;
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));

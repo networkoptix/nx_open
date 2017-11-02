@@ -15,7 +15,7 @@ namespace ec2
         const Ec2DirectConnectionFactory* connectionFactory,
         ServerQueryProcessorAccess *queryProcessor,
         const QnConnectionInfo& connectionInfo,
-        const QUrl& dbUrl)
+        const nx::utils::Url& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessorAccess>( connectionFactory, queryProcessor ),
         m_connectionInfo( connectionInfo ),
@@ -43,7 +43,7 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::updateConnectionUrl(const QUrl& /*url*/)
+    void Ec2DirectConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
     {
         NX_EXPECT(false, "Should never get here");
     }

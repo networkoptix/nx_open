@@ -172,12 +172,12 @@ void MessageBus::stop()
 
 // P2pMessageBus
 
-void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _url)
+void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Url &_url)
 {
     QnMutexLocker lock(&m_mutex);
     deleteRemoveUrlById(peer);
 
-    QUrl url(_url);
+    nx::utils::Url url(_url);
     if (peer == kCloudPeerId)
         url.setPath(ConnectionProcessor::kCloudPathPrefix + ConnectionProcessor::kUrlPath);
     else
@@ -1652,6 +1652,12 @@ QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
             result.insert(connection->remotePeer().id);
     }
     return result;
+}
+
+QSet<QnUuid> MessageBus::directlyConnectedServerPeers() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_connections.keys().toSet();
 }
 
 QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const

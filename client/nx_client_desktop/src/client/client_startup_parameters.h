@@ -3,6 +3,7 @@
 #include <utils/common/software_version.h>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 #include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters
@@ -17,12 +18,12 @@ struct QnStartupParameters
 
     static QnStartupParameters fromCommandLineArg(int argc, char **argv);
 
-    static QString createAuthenticationString(const QUrl& url,
+    static QString createAuthenticationString(const nx::utils::Url& url,
         const QnSoftwareVersion& version = QnSoftwareVersion());
 
-    static QUrl parseAuthenticationString(QString string);
+    static nx::utils::Url parseAuthenticationString(QString string);
 
-    QUrl parseAuthenticationString() const;
+    nx::utils::Url parseAuthenticationString() const;
 
     bool isDevMode() const;
 

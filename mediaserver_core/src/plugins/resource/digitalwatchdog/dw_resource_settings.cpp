@@ -250,7 +250,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
             continue;
         }
 
-        QUrl apiUrl = lit("http://%1:%2/cgi-bin/ne3exec.cgi/%3").arg(m_host).arg(kPravisHttpPort).arg(cameraAdvParam.readCmd);
+        nx::utils::Url apiUrl = lit("http://%1:%2/cgi-bin/ne3exec.cgi/%3").arg(m_host).arg(kPravisHttpPort).arg(cameraAdvParam.readCmd);
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 
@@ -336,7 +336,7 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
         command = command.replace("$", toInnerValue(cameraAdvParam, value));
         QString path = lit("cgi-bin/ne3exec.cgi/%1").arg(command);
 
-        QUrl apiUrl = lit("http://%1:%2/%3").arg(m_host).arg(kPravisHttpPort).arg(path);
+        nx::utils::Url apiUrl = lit("http://%1:%2/%3").arg(m_host).arg(kPravisHttpPort).arg(path);
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 

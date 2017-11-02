@@ -93,13 +93,13 @@ SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
     return m_delegate.lastSysErrorCode();
 }
 
-void AsyncHttpClient::doGet(const QUrl& url)
+void AsyncHttpClient::doGet(const nx::utils::Url& url)
 {
     m_delegate.doGet(url);
 }
 
 void AsyncHttpClient::doGet(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
@@ -139,7 +139,7 @@ private:
 } // namespace
 
 void AsyncHttpClient::doPost(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBodyBuffer,
     bool includeContentLength)
@@ -153,7 +153,7 @@ void AsyncHttpClient::doPost(
 }
 
 void AsyncHttpClient::doPost(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBody,
     bool includeContentLength,
@@ -164,7 +164,7 @@ void AsyncHttpClient::doPost(
 }
 
 void AsyncHttpClient::doPut(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBodyBuffer)
 {
@@ -176,7 +176,7 @@ void AsyncHttpClient::doPut(
 }
 
 void AsyncHttpClient::doPut(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const nx_http::StringType& contentType,
     nx_http::StringType messageBody,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
@@ -185,13 +185,13 @@ void AsyncHttpClient::doPut(
     doPut(url, contentType, std::move(messageBody));
 }
 
-void AsyncHttpClient::doDelete(const QUrl& url)
+void AsyncHttpClient::doDelete(const nx::utils::Url& url)
 {
     m_delegate.doDelete(url);
 }
 
 void AsyncHttpClient::doDelete(
-    const QUrl& url,
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void (AsyncHttpClientPtr)> completionHandler)
 {
     m_onDoneHandler = std::move(completionHandler);
@@ -199,14 +199,14 @@ void AsyncHttpClient::doDelete(
 }
 
 void AsyncHttpClient::doUpgrade(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const StringType& protocolToUpgradeTo)
 {
     m_delegate.doUpgrade(url, protocolToUpgradeTo, [](){});
 }
 
 void AsyncHttpClient::doUpgrade(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
 {
@@ -239,12 +239,12 @@ BufferType AsyncHttpClient::fetchMessageBodyBuffer()
     return m_delegate.fetchMessageBodyBuffer();
 }
 
-const QUrl& AsyncHttpClient::url() const
+const nx::utils::Url& AsyncHttpClient::url() const
 {
     return m_delegate.url();
 }
 
-const QUrl& AsyncHttpClient::contentLocationUrl() const
+const nx::utils::Url& AsyncHttpClient::contentLocationUrl() const
 {
     return m_delegate.contentLocationUrl();
 }
@@ -399,7 +399,7 @@ AsyncHttpClientPtr AsyncHttpClient::create()
     return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(new AsyncHttpClient()));
 }
 
-QString AsyncHttpClient::endpointWithProtocol(const QUrl& url)
+QString AsyncHttpClient::endpointWithProtocol(const nx::utils::Url& url)
 {
     return lm("%1://%2:%3")
         .arg(url.scheme())
@@ -468,7 +468,7 @@ const char* AsyncHttpClient::toString(State state)
 // Utilities.
 
 void downloadFileAsyncEx(
-    const QUrl& url,
+    const nx::utils::Url& url,
     std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
     nx_http::AsyncHttpClientPtr httpClientCaptured)
 {
@@ -514,7 +514,7 @@ void downloadFileAsyncEx(
 }
 
 void downloadFileAsync(
-    const QUrl& url,
+    const nx::utils::Url& url,
     std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders,
     AuthType authType,
@@ -532,7 +532,7 @@ void downloadFileAsync(
 }
 
 void downloadFileAsyncEx(
-    const QUrl& url,
+    const nx::utils::Url& url,
     std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
     const nx_http::HttpHeaders& extraHeaders,
     AuthType authType,
@@ -548,7 +548,7 @@ void downloadFileAsyncEx(
 }
 
 SystemError::ErrorCode downloadFileSync(
-    const QUrl& url,
+    const nx::utils::Url& url,
     int* const statusCode,
     nx_http::BufferType* const msgBody)
 {
@@ -576,7 +576,7 @@ SystemError::ErrorCode downloadFileSync(
 }
 
 void uploadDataAsync(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QByteArray& data,
     const QByteArray& contentType,
     const nx_http::HttpHeaders& extraHeaders,
@@ -621,7 +621,7 @@ void uploadDataAsync(
 }
 
 SystemError::ErrorCode uploadDataSync(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QByteArray& data,
     const QByteArray& contentType,
     const QString& user,

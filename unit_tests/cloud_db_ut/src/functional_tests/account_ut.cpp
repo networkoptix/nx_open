@@ -322,7 +322,7 @@ TEST_F(Account, bad_registration)
 
     //checking correct error message
     auto client = nx_http::AsyncHttpClient::create();
-    QUrl url;
+    nx::utils::Url url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
     url.setScheme("http");
@@ -368,7 +368,7 @@ TEST_F(Account, request_query_decode)
     account1.customization = nx::utils::AppInfo::customizationName().toStdString();
 
     nx_http::HttpClient httpClient;
-    QUrl url(
+    nx::utils::Url url(
         lm("http://127.0.0.1:%1/cdb/account/register?email=%2&fullName=%3&passwordHa1=%4&customization=%5")
         .arg(endpoint().port).arg(account1.email).arg(account1.fullName)
         .arg(account1.passwordHa1).arg(nx::utils::AppInfo::customizationName().toStdString()));
@@ -391,7 +391,7 @@ TEST_F(Account, request_query_decode)
     result = activateAccount(activationCode, &activatedAccountEmail);
     ASSERT_EQ(result, api::ResultCode::ok);
     ASSERT_EQ(
-        QUrl::fromPercentEncoding(account1.email.c_str()).toStdString(),
+        nx::utils::Url::fromPercentEncoding(account1.email.c_str()).toStdString(),
         activatedAccountEmail);
 
     result = getAccount(account1.email, account1Password, &account1);

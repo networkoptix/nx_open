@@ -8,6 +8,7 @@
 #include <nx/network/simple_http_client.h>
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/url.h>
 
 
 class QnDesktopCameraResourceSearcher:
@@ -25,7 +26,7 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url,
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck) override;
 

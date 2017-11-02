@@ -68,7 +68,7 @@ void QnMobileClientMessageProcessor::updateMainServerApiUrl(const QnMediaServerR
     if (!server)
         return;
 
-    QUrl url = commonModule()->currentUrl();
+    nx::utils::Url url = commonModule()->currentUrl();
     if (!url.isValid())
         return;
 

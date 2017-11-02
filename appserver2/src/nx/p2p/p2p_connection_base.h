@@ -53,7 +53,7 @@ public:
     ConnectionBase(
         const QnUuid& remoteId,
         const ApiPeerDataEx& localPeer,
-        const QUrl& remotePeerUrl,
+        const nx::utils::Url& remotePeerUrl,
         const std::chrono::seconds& keepAliveTimeout,
         std::unique_ptr<QObject> opaqueObject,
         std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
@@ -86,7 +86,7 @@ public:
 
     QObject* opaqueObject();
 
-    virtual QUrl remoteAddr() const override;
+    virtual utils::Url remoteAddr() const override;
     const nx::network::WebSocket* webSocket() const;
     void stopWhileInAioThread();
 signals:
@@ -130,7 +130,7 @@ private:
     std::atomic<State> m_state{State::Connecting};
 
     Direction m_direction;
-    QUrl m_remotePeerUrl;
+    nx::utils::Url m_remotePeerUrl;
 
     static SendCounters m_sendCounters;
 

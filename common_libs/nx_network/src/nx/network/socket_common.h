@@ -75,7 +75,9 @@ class NX_NETWORK_API HostAddress
 {
 public:
     HostAddress(const in_addr& addr);
-    HostAddress(const in6_addr& addr = in6addr_any);
+    HostAddress(
+        const in6_addr& addr = in6addr_any, 
+        boost::optional<uint32_t> scopeId = boost::none);
 
     HostAddress(const QString& addrStr);
     HostAddress(const char* addrStr);
@@ -96,25 +98,30 @@ public:
      */
     boost::optional<in_addr> ipV4() const;
 
+    using IpV6WithScope = std::pair<boost::optional<in6_addr>, boost::optional<uint32_t>>;
     /**
      * IP v6 if address is v6 or v4 converted to v6.
      */
-    boost::optional<in6_addr> ipV6() const;
+    IpV6WithScope ipV6() const;
+    boost::optional<uint32_t> scopeId() const;
 
     bool isLocal() const;
     bool isIpAddress() const;
+    bool isPureIpV6() const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
 
     static boost::optional<QString> ipToString(const in_addr& addr);
-    static boost::optional<QString> ipToString(const in6_addr& addr);
+    static boost::optional<QString> ipToString(
+        const in6_addr& addr, 
+        boost::optional<uint32_t> scopeId);
 
     static boost::optional<in_addr> ipV4from(const QString& ip);
-    static boost::optional<in6_addr> ipV6from(const QString& ip);
+    static IpV6WithScope ipV6from(const QString& ip);
 
     static boost::optional<in_addr> ipV4from(const in6_addr& addr);
-    static in6_addr ipV6from(const in_addr& addr);
+    static IpV6WithScope ipV6from(const in_addr& addr);
 
     void swap(HostAddress& other);
 
@@ -122,6 +129,7 @@ private:
     mutable boost::optional<QString> m_string;
     boost::optional<in_addr> m_ipV4;
     boost::optional<in6_addr> m_ipV6;
+    boost::optional<uint32_t> m_scopeId;
 };
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);

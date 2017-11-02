@@ -145,7 +145,7 @@ void MediatorFunctionalTest::registerCloudDataProvider(
     m_factoryFuncToRestore = 
         AbstractCloudDataProviderFactory::setFactoryFunc(
             [cloudDataProvider](
-                const boost::optional<QUrl>& /*cdbUrl*/,
+                const boost::optional<nx::utils::Url>& /*cdbUrl*/,
                 const std::string& /*user*/,
                 const std::string& /*password*/,
                 std::chrono::milliseconds /*updateInterval*/,
@@ -232,7 +232,7 @@ std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
     const auto urlStr =
         lm("http://%1%2").arg(httpEndpoint().toString())
         .arg(nx::hpm::http::GetListeningPeerListHandler::kHandlerPath);
-    if (!httpClient.doGet(QUrl(urlStr)))
+    if (!httpClient.doGet(nx::utils::Url(urlStr)))
         return std::make_tuple(
             nx_http::StatusCode::serviceUnavailable,
             data::ListeningPeers());

@@ -4,6 +4,7 @@
 #include <QtCore/QBitArray>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace vms {
@@ -38,7 +39,7 @@ public:
     QString name;
     qint64 size = -1;
     QByteArray md5;
-    QUrl url;
+    nx::utils::Url url;
     qint64 chunkSize = 0;
     Status status = Status::notFound;
     QBitArray downloadedChunks;

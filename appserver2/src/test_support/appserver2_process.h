@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <memory>
 
 #include <QtCore/QCoreApplication>
 
@@ -20,7 +21,6 @@
 
 namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
-//namespace nx {
 namespace ec2 {
 
 class AbstractECConnection;
@@ -32,7 +32,7 @@ class Appserver2Process:
 {
 public:
     Appserver2Process(int argc, char **argv);
-    virtual ~Appserver2Process();
+    virtual ~Appserver2Process() = default;
 
     virtual void pleaseStop() override;
 
@@ -63,12 +63,12 @@ private:
     void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
 };
 
-
-class Appserver2ProcessPublic: public QnStoppable
+class Appserver2ProcessPublic:
+    public QnStoppable
 {
 public:
     Appserver2ProcessPublic(int argc, char **argv);
-    virtual ~Appserver2ProcessPublic();
+    virtual ~Appserver2ProcessPublic() = default;
 
     virtual void pleaseStop() override;
 
@@ -81,9 +81,9 @@ public:
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
     QnCommonModule* commonModule() const;
+
 private:
-    Appserver2Process* m_impl;
+    std::unique_ptr<Appserver2Process> m_impl;
 };
 
-}   // namespace ec2
-//}   // namespace nx
+} // namespace ec2

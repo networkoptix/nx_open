@@ -54,7 +54,7 @@ struct BasicInstanceInformation
 {
     std::string type;
     std::string id;
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
 
     BasicInstanceInformation(std::string type):
         type(type)
@@ -90,7 +90,7 @@ class ModuleRegistrar:
 
 public:
     ModuleRegistrar(
-        const QUrl& baseUrl,
+        const nx::utils::Url& baseUrl,
         const std::string& moduleId)
         :
         m_baseUrl(baseUrl),
@@ -152,7 +152,7 @@ protected:
     }
 
 private:
-    QUrl m_baseUrl;
+    nx::utils::Url m_baseUrl;
     std::unique_ptr<nx_http::AsyncClient> m_webSocketConnector;
     std::unique_ptr<nx::network::WebSocket> m_webSocket;
     nx::Buffer m_sendBuffer;
@@ -233,7 +233,7 @@ class ModuleFinder:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    ModuleFinder(const QUrl& baseUrl);
+    ModuleFinder(const nx::utils::Url& baseUrl);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -274,7 +274,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const QUrl m_baseUrl;
+    const nx::utils::Url m_baseUrl;
     std::vector<std::unique_ptr<nx::network::aio::BasicPollable>> m_runningRequests;
 
     template<typename InstanceInformation>

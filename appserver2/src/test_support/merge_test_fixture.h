@@ -27,6 +27,7 @@ public:
 
     void whenMergeSystems();
 
+    void thenAllServersAreInterconnected();
     void thenAllServersSynchronizedData();
 
     QnRestResult::Error prevMergeResult() const;

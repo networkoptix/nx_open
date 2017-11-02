@@ -84,7 +84,7 @@ void EventConnection::start(
 
 void EventConnection::cdbEndpointResolved(
     nx_http::StatusCode::Value resCode,
-    QUrl url)
+    nx::utils::Url url)
 {
     if (resCode != nx_http::StatusCode::ok)
     {
@@ -118,7 +118,7 @@ void EventConnection::initiateConnection()
     }
 
     //connecting with Http client to cloud_db
-    QUrl url = m_cdbUrl;
+    nx::utils::Url url = m_cdbUrl;
     url.setPath(network::url::normalizePath(m_cdbUrl.path() + kSubscribeToSystemEventsPath));
     m_httpClient->setAuth(m_auth);
     m_httpClient->doGet(url);

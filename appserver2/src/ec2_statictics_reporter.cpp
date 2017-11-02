@@ -273,7 +273,7 @@ namespace ec2
 
         const QString configApi = settings->statisticsReportServerApi();
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
-        const QUrl url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
+        const nx::utils::Url url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 

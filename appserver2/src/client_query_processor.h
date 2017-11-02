@@ -30,14 +30,26 @@
 #include <common/common_module.h>
 
 namespace {
-    Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat)
-    {
-        Qn::SerializationFormat format = defaultFormat;
-        QString formatString = QUrlQuery(url).queryItemValue(lit("format"));
-        if (!formatString.isEmpty())
-            format = QnLexical::deserialized(formatString, defaultFormat);
-        return format;
-    }
+Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat)
+{
+    Qn::SerializationFormat format = defaultFormat;
+    QString formatString = QUrlQuery(url).queryItemValue(lit("format"));
+    if (!formatString.isEmpty())
+        format = QnLexical::deserialized(formatString, defaultFormat);
+    return format;
+}
+
+Qn::SerializationFormat serializationFormatFromUrl(
+    const nx::utils::Url& url,
+    Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat)
+{
+    Qn::SerializationFormat format = defaultFormat;
+    QString formatString = QUrlQuery(url.toQUrl()).queryItemValue(lit("format"));
+    if (!formatString.isEmpty())
+        format = QnLexical::deserialized(formatString, defaultFormat);
+    return format;
+}
+
 } // anonymous namespace
 
 namespace ec2
@@ -79,9 +91,9 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class InputData, class HandlerType>
-            void processUpdateAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
+            void processUpdateAsync( const nx::utils::Url& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
-            QUrl requestUrl( ecBaseUrl );
+            nx::utils::Url requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
@@ -122,9 +134,9 @@ namespace ec2
             TODO allow compiler guess template params
         */
         template<class InputData, class OutputData, class HandlerType>
-            void processQueryAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
+            void processQueryAsync( const nx::utils::Url& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
-            QUrl requestUrl( ecBaseUrl );
+            nx::utils::Url requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );

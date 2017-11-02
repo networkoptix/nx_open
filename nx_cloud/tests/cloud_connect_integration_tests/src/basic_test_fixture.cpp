@@ -200,14 +200,14 @@ void BasicTestFixture::stopServer()
     m_httpServer.reset();
 }
 
-QUrl BasicTestFixture::relayUrl(int relayNum) const
+nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());
 
     auto relayUrlString = lm("http://%1/")
         .arg(m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].toStdString()).toQString();
 
-    return QUrl(relayUrlString);
+    return nx::utils::Url(relayUrlString);
 }
 
 void BasicTestFixture::restartMediator()
@@ -381,7 +381,7 @@ void BasicTestFixture::startHttpServer()
 
     m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");
-    m_staticUrl = QUrl(lm("http://%1/static").arg(serverSocketCloudAddress()));
+    m_staticUrl = nx::utils::Url(lm("http://%1/static").arg(serverSocketCloudAddress()));
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
 

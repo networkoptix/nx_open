@@ -138,7 +138,7 @@ bool PortMapper::searchForMappers( const HostAddress& localAddress,
         if( service.serviceType != AsyncClient::WAN_IP )
             continue; // uninteresting
 
-        QUrl url;
+        nx::utils::Url url;
         url.setHost( devAddress.address.toString() );
         url.setPort( devAddress.port );
         url.setPath( service.controlUrl );
@@ -192,7 +192,7 @@ void PortMapper::onTimer( const quint64& /*timerID*/ )
 }
 
 void PortMapper::addNewDevice( const HostAddress& localAddress,
-                               const QUrl& url, const QString& serial )
+                               const nx::utils::Url& url, const QString& serial )
 {
     const auto itBool = m_devices.emplace( serial, Device() );
     if( !itBool.second )

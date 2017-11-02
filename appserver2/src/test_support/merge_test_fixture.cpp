@@ -61,6 +61,16 @@ void SystemMergeFixture::whenMergeSystems()
     m_prevResult = m_servers.back()->mergeTo(*m_servers.front());
 }
 
+void SystemMergeFixture::thenAllServersAreInterconnected()
+{
+    for (;;)
+    {
+        if (PeerWrapper::arePeersInterconnected(m_servers))
+            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
 void SystemMergeFixture::thenAllServersSynchronizedData()
 {
     for (;;)

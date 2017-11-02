@@ -43,11 +43,16 @@ public:
 
     SocketAddress endpoint() const;
 
+    QnUuid id() const;
+
     nx::hpm::api::SystemCredentials getCloudCredentials() const;
 
     std::unique_ptr<MediaServerClient> mediaServerClient() const;
 
     static bool areAllPeersHaveSameTransactionLog(
+        const std::vector<std::unique_ptr<PeerWrapper>>& peers);
+
+    static bool arePeersInterconnected(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);
 
 private:

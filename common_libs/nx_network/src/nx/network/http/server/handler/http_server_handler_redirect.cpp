@@ -10,7 +10,7 @@ namespace nx_http {
 namespace server {
 namespace handler {
 
-Redirect::Redirect(const QUrl& actualLocation):
+Redirect::Redirect(const nx::utils::Url& actualLocation):
     m_actualLocation(actualLocation)
 {
 }

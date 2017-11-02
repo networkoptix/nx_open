@@ -25,7 +25,7 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void OldEcConnection::updateConnectionUrl(const QUrl& /*url*/)
+    void OldEcConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
     {
         NX_EXPECT(false, "Should never get here");
     }
@@ -201,7 +201,7 @@ namespace ec2
         return reqID;
     }
 
-    void OldEcConnection::addRemotePeer(const QnUuid& /*id*/, const QUrl& /*url*/)
+    void OldEcConnection::addRemotePeer(const QnUuid& /*id*/, const nx::utils::Url & /*url*/)
     {
     }
 

@@ -39,7 +39,7 @@ int QnGetNonceRestHandler::executeGet(
         client.setSendTimeoutMs(requestTimeoutMs);
         client.setMessageBodyReadTimeoutMs(requestTimeoutMs);
 
-        QUrl requestUrl(params.value("url"));
+        nx::utils::Url requestUrl(params.value("url"));
         requestUrl.setPath(path);
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))

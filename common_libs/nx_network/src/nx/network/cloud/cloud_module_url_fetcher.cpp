@@ -18,7 +18,7 @@ CloudModuleUrlFetcher::CloudModuleUrlFetcher(const QString& moduleName):
         lit("Given bad cloud module name %1").arg(moduleName));
 }
 
-void CloudModuleUrlFetcher::setUrl(QUrl url)
+void CloudModuleUrlFetcher::setUrl(nx::utils::Url url)
 {
     QnMutexLocker lk(&m_mutex);
     m_url = std::move(url);
@@ -63,7 +63,7 @@ void CloudModuleUrlFetcher::invokeHandler(
     nx_http::StatusCode::Value statusCode)
 {
     NX_ASSERT(statusCode != nx_http::StatusCode::ok || static_cast<bool>(m_url));
-    handler(statusCode, m_url ? *m_url : QUrl());
+    handler(statusCode, m_url ? *m_url : nx::utils::Url());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ void CloudModuleUrlFetcher::ScopedOperation::get(
         auth,
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
             nx_http::StatusCode::Value statusCode,
-            QUrl result) mutable
+            nx::utils::Url result) mutable
         {
             if (auto lock = sharedGuard->lock())
                 handler(statusCode, result);

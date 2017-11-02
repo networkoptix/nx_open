@@ -56,7 +56,7 @@ TEST_F( HttpClientServerTest, SimpleTest )
     ASSERT_TRUE( testHttpServer()->bindAndListen() );
 
     nx_http::HttpClient client;
-    const QUrl url( lit("http://127.0.0.1:%1/test")
+    const nx::utils::Url url( lit("http://127.0.0.1:%1/test")
                     .arg( testHttpServer()->serverAddress().port) );
 
     ASSERT_TRUE( client.doGet( url ) );
@@ -118,7 +118,7 @@ TEST_F(HttpClientServerTest, FileDownload)
         "image/jpeg"));
     ASSERT_TRUE(testHttpServer()->bindAndListen());
 
-    const QUrl url(lit("http://127.0.0.1:%1/test.jpg")
+    const nx::utils::Url url(lit("http://127.0.0.1:%1/test.jpg")
         .arg(testHttpServer()->serverAddress().port));
     nx_http::HttpClient client;
     client.setMessageBodyReadTimeoutMs(3000);
@@ -162,7 +162,7 @@ TEST_F(HttpClientServerTest, KeepAlive)
         "image/jpeg"));
     ASSERT_TRUE(testHttpServer()->bindAndListen());
 
-    const QUrl url(lit("http://127.0.0.1:%1/test.jpg")
+    const nx::utils::Url url(lit("http://127.0.0.1:%1/test.jpg")
         .arg(testHttpServer()->serverAddress().port));
 
     nx_http::HttpClient client;
@@ -187,7 +187,7 @@ TEST_F(HttpClientServerTest, KeepAlive)
 
 TEST( HttpClientTest, DISABLED_KeepAlive2 )
 {
-    QUrl url( "http://192.168.0.1:7001/ec2/testConnection" );
+    nx::utils::Url url( "http://192.168.0.1:7001/ec2/testConnection" );
     url.setUserName( "admin" );
     url.setPassword( "123" );
     static const int TEST_RUNS = 2;
@@ -211,7 +211,7 @@ TEST( HttpClientTest, DISABLED_KeepAlive2 )
 
 TEST( HttpClientTest, DISABLED_KeepAlive3 )
 {
-    QUrl url( "http://192.168.0.194:7001/ec2/events?guid=%7Be7209f3e-9ebe-6ebb-3e99-e5acd61c228c%7D&runtime-guid=%7B83862a97-b7b8-4dbc-bb8f-64847f23e6d5%7D&system-identity-time=0" );
+    nx::utils::Url url( "http://192.168.0.194:7001/ec2/events?guid=%7Be7209f3e-9ebe-6ebb-3e99-e5acd61c228c%7D&runtime-guid=%7B83862a97-b7b8-4dbc-bb8f-64847f23e6d5%7D&system-identity-time=0" );
     url.setUserName( "admin" );
     url.setPassword( "123" );
     static const int TEST_RUNS = 2;
@@ -236,7 +236,7 @@ TEST( HttpClientTest, DISABLED_KeepAlive3 )
 
 TEST(HttpClientTest, DISABLED_mjpgRetrieval)
 {
-    QUrl url("http://192.168.0.92/mjpg/video.mjpg");
+    nx::utils::Url url("http://192.168.0.92/mjpg/video.mjpg");
     url.setUserName("root");
     url.setPassword("root");
     static const int TEST_RUNS = 100;
@@ -258,7 +258,7 @@ TEST(HttpClientTest, DISABLED_mjpgRetrieval)
 
 TEST(HttpClientTest, DISABLED_fileDownload2)
 {
-    const QUrl url("http://192.168.0.1/girls/Candice-Swanepoel-127.jpg");
+    const nx::utils::Url url("http://192.168.0.1/girls/Candice-Swanepoel-127.jpg");
     static const int THREADS = 10;
     static const std::chrono::seconds TEST_DURATION(15);
 

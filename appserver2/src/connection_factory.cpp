@@ -128,12 +128,13 @@ void Ec2DirectConnectionFactory::join()
 
 // Implementation of AbstractECConnectionFactory::testConnectionAsync
 int Ec2DirectConnectionFactory::testConnectionAsync(
-    const QUrl& addr, impl::TestConnectionHandlerPtr handler)
+    const nx::utils::Url &addr,
+    impl::TestConnectionHandlerPtr handler)
 {
-    QUrl url = addr;
+    nx::utils::Url url = addr;
     url.setUserName(url.userName().toLower());
 
-    QUrlQuery query(url);
+    QUrlQuery query(url.toQUrl());
     query.removeQueryItem(lit("format"));
     query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
     url.setQuery(query);
@@ -146,14 +147,16 @@ int Ec2DirectConnectionFactory::testConnectionAsync(
 
 // Implementation of AbstractECConnectionFactory::connectAsync
 int Ec2DirectConnectionFactory::connectAsync(
-    const QUrl& addr, const ApiClientInfoData& clientInfo, impl::ConnectHandlerPtr handler)
+    const nx::utils::Url& addr,
+    const ApiClientInfoData& clientInfo,
+    impl::ConnectHandlerPtr handler)
 {
-    QUrl url = addr;
+    nx::utils::Url url = addr;
     url.setUserName(url.userName().toLower());
 
     if (ApiPeerData::isMobileClient(qnStaticCommon->localPeerType()))
     {
-        QUrlQuery query(url);
+        QUrlQuery query(url.toQUrl());
         query.removeQueryItem(lit("format"));
         query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
         url.setQuery(query);
@@ -1609,7 +1612,7 @@ void Ec2DirectConnectionFactory::setConfParams(std::map<QString, QVariant> confP
 }
 
 int Ec2DirectConnectionFactory::establishDirectConnection(
-    const QUrl& url, impl::ConnectHandlerPtr handler)
+    const nx::utils::Url& url, impl::ConnectHandlerPtr handler)
 {
     const int reqId = generateRequestID();
 
@@ -1653,7 +1656,7 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
 }
 
 int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
-    const QUrl& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo)
+    const nx::utils::Url& addr, impl::ConnectHandlerPtr handler, const ApiClientInfoData& clientInfo)
 {
     const int reqId = generateRequestID();
 
@@ -1694,7 +1697,7 @@ int Ec2DirectConnectionFactory::establishConnectionToRemoteServer(
     return reqId;
 }
 
-void Ec2DirectConnectionFactory::tryConnectToOldEC(const QUrl& ecUrl,
+void Ec2DirectConnectionFactory::tryConnectToOldEC(const nx::utils::Url& ecUrl,
     impl::ConnectHandlerPtr handler, int reqId)
 {
     // Checking for old EC.
@@ -1757,9 +1760,9 @@ static bool parseOldECConnectionInfo(
 }
 
 template<class Handler>
-void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecUrl, Handler completionFunc)
+void Ec2DirectConnectionFactory::connectToOldEC(const nx::utils::Url& ecUrl, Handler completionFunc)
 {
-    QUrl httpsEcUrl = ecUrl; // < Old EC supports only https.
+    nx::utils::Url httpsEcUrl = ecUrl; // < Old EC supports only https.
     httpsEcUrl.setScheme(lit("https"));
 
     QAuthenticator auth;
@@ -1817,7 +1820,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
     int reqId,
     ErrorCode errorCode,
     const QnConnectionInfo& connectionInfo,
-    const QUrl& ecUrl,
+    const nx::utils::Url& ecUrl,
     impl::ConnectHandlerPtr handler)
 {
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
@@ -1868,7 +1871,7 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
     int reqId,
     ErrorCode errorCode,
     const QnConnectionInfo& connectionInfo,
-    const QUrl& ecUrl,
+    const nx::utils::Url& ecUrl,
     impl::TestConnectionHandlerPtr handler)
 {
     if (errorCode == ErrorCode::ok
@@ -1965,7 +1968,8 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
 }
 
 int Ec2DirectConnectionFactory::testDirectConnection(
-    const QUrl& addr, impl::TestConnectionHandlerPtr handler)
+    const nx::utils::Url& addr,
+    impl::TestConnectionHandlerPtr handler)
 {
     Q_UNUSED(addr);
 
@@ -1984,7 +1988,8 @@ int Ec2DirectConnectionFactory::testDirectConnection(
 }
 
 int Ec2DirectConnectionFactory::testRemoteConnection(
-    const QUrl& addr, impl::TestConnectionHandlerPtr handler)
+    const nx::utils::Url& addr,
+    impl::TestConnectionHandlerPtr handler)
 {
     const int reqId = generateRequestID();
 

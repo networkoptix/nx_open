@@ -10,8 +10,6 @@
 
 #include <QObject>
 #include <QString>
-#include <QUrl>
-
 #include <nx/network/http/asynchttpclient.h>
 
 #include "rdir_synchronization_operation.h"
@@ -64,9 +62,8 @@ namespace detail
         /*!
             \param localTargetDirPath Local directory to sync to
         */
-        ListDirectoryOperation(
-            int _id,
-            const QUrl& baseUrl,
+        ListDirectoryOperation(int _id,
+            const nx::utils::Url &baseUrl,
             const QString& _dirPath,
             const QString& localTargetDirPath,
             AbstractRDirSynchronizationEventHandler* _handler );
@@ -86,7 +83,7 @@ namespace detail
         nx_http::AsyncHttpClientPtr m_httpClient;
         int64_t m_totalsize;
         std::list<detail::RDirEntry> m_entries;
-        QUrl m_downloadUrl;
+        nx::utils::Url m_downloadUrl;
 
     private slots:
         void onResponseReceived( nx_http::AsyncHttpClientPtr );

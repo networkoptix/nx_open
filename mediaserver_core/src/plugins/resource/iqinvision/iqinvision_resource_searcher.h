@@ -16,7 +16,7 @@ public:
     virtual QString manufacture() const;
 
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+        const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
     static bool isIqeModel(const QString& model);
 

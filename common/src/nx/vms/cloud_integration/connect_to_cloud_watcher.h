@@ -8,6 +8,7 @@
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -22,7 +23,7 @@ class AbstractEc2CloudConnector
 public:
     virtual ~AbstractEc2CloudConnector() = default;
 
-    virtual void startDataSynchronization(const QUrl& cloudUrl) = 0;
+    virtual void startDataSynchronization(const nx::utils::Url& cloudUrl) = 0;
     virtual void stopDataSynchronization() = 0;
 };
 
@@ -40,20 +41,20 @@ public:
         AbstractEc2CloudConnector* ec2CloudConnector);
     virtual ~QnConnectToCloudWatcher();
 
-    void setCloudDbUrl(const QUrl& cloudDbUrl);
+    void setCloudDbUrl(const nx::utils::Url &cloudDbUrl);
 
 private slots:
     void at_updateConnection();
     void restartTimer();
-    void addCloudPeer(QUrl url);
+    void addCloudPeer(nx::utils::Url url);
 
 private:
     QnCommonModule* m_commonModule;
     AbstractEc2CloudConnector* m_ec2CloudConnector;
-    QUrl m_cloudUrl;
+    nx::utils::Url m_cloudUrl;
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudModuleUrlFetcher> m_cdbEndPointFetcher;
-    boost::optional<QUrl> m_cloudDbUrl;
+    boost::optional<nx::utils::Url> m_cloudDbUrl;
 };
 
 } // namespace cloud_integration

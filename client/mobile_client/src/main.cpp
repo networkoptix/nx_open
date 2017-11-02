@@ -214,9 +214,9 @@ int runUi(QtSingleGuiApplication* application)
                     break;
                 case InterClientMessage::Command::updateUrl:
                 {
-                    QUrl url(message.parameters);
+                    nx::utils::Url url(message.parameters);
                     if (url.isValid())
-                        qnSettings->startupParameters().url = QUrl(message.parameters);
+                        qnSettings->startupParameters().url = nx::utils::Url(message.parameters);
                     break;
                 }
             }

@@ -62,11 +62,11 @@ private:
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     network::RetryTimer m_reconnectTimer;
     State m_state;
-    QUrl m_cdbUrl;
+    nx::utils::Url m_cdbUrl;
 
     void cdbEndpointResolved(
         nx_http::StatusCode::Value resCode,
-        QUrl url);
+        nx::utils::Url url);
     void initiateConnection();
     void connectionAttemptHasFailed(api::ResultCode result);
     void retryToConnect();

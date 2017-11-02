@@ -59,16 +59,16 @@ public:
     // Synchronous requests return status
     QNetworkReply::NetworkError sendSyncRequest(
         nx_http::Method::ValueType method,
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QString &objectName,
         nx_http::HttpHeaders headers,
         const QnRequestParamList &params,
         QByteArray msgBody,
         QnHTTPRawResponse& response);
-    int sendSyncGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response);
-    int sendSyncGetRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QnHTTPRawResponse& response);
-    int sendSyncPostRequest(const QUrl& url, const QString &objectName, QByteArray msgBody, QnHTTPRawResponse& response);
-    int sendSyncPostRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QnHTTPRawResponse& response);
+    int sendSyncGetRequest(const nx::utils::Url& url, const QString &objectName, QnHTTPRawResponse& response);
+    int sendSyncGetRequest(const nx::utils::Url& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QnHTTPRawResponse& response);
+    int sendSyncPostRequest(const nx::utils::Url& url, const QString &objectName, QByteArray msgBody, QnHTTPRawResponse& response);
+    int sendSyncPostRequest(const nx::utils::Url& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QnHTTPRawResponse& response);
     QByteArray lastError() const;
 
     /** Asynchronous requests return request handle
@@ -79,7 +79,7 @@ public:
     */
     int sendAsyncRequest(
         nx_http::Method::ValueType method,
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QString &objectName,
         nx_http::HttpHeaders headers,
         const QnRequestParamList &params,
@@ -87,19 +87,19 @@ public:
         QObject *target,
         const char *slot,
         Qt::ConnectionType connectionType = Qt::AutoConnection);
-    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
-    int sendAsyncGetRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
-    int sendAsyncPostRequest(const QUrl& url, const QString &objectName, QByteArray msgBody, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
-    int sendAsyncPostRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
+    int sendAsyncGetRequest(const nx::utils::Url& url, const QString &objectName, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
+    int sendAsyncGetRequest(const nx::utils::Url& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
+    int sendAsyncPostRequest(const nx::utils::Url& url, const QString &objectName, QByteArray msgBody, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
+    int sendAsyncPostRequest(const nx::utils::Url& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QObject *target, const char *slot, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
 private:
-    QUrl createApiUrl(
-        const QUrl& baseUrl,
+    nx::utils::Url createApiUrl(
+        const nx::utils::Url& baseUrl,
         const QString &objectName,
         const QnRequestParamList &params = QnRequestParamList()) const;
     int sendAsyncRequest(
         nx_http::Method::ValueType method,
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QString &objectName,
         nx_http::HttpHeaders headers,
         const QnRequestParamList &params,

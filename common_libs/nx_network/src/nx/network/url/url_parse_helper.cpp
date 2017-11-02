@@ -19,7 +19,7 @@ quint16 getDefaultPortForScheme(const QString& scheme)
     return 0;
 }
 
-SocketAddress getEndpoint(const QUrl& url)
+SocketAddress getEndpoint(const nx::utils::Url& url)
 {
     return SocketAddress(
         url.host(),
