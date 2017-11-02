@@ -676,9 +676,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkShareLayoutToRole)
 
 /**
 * VMAXes without licences:
-* Viewing live: forbidden
-* Viewing footage: forbidden
-* Export video: allowed
+* Viewing live: temporary allowed
+* Viewing footage: temporary allowed
+* Export video: temporary allowed
 */
 TEST_F(QnCachedResourceAccessManagerTest, checkVMaxWithoutLicense)
 {
@@ -689,8 +689,10 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVMaxWithoutLicense)
     camera->markCameraAsVMax();
     ASSERT_TRUE(camera->licenseType() == Qn::LC_VMAX);
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
-    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewLivePermission));
-    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewFootagePermission));
+
+    // TODO: Forbid all for VMAX when discussed with management
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 
     // License enabled

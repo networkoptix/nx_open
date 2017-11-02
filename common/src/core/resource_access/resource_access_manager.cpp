@@ -493,10 +493,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
                 exportAllowed = false;
                 break;
             }
+
+            // TODO: Forbid all for VMAX when discussed with management
             case Qn::LC_VMAX:
             {
-                liveAllowed = false;
-                footageAllowed = false;
+                //liveAllowed = false;
+                //footageAllowed = false;
                 break;
             }
             default:
@@ -511,7 +513,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         result |= Qn::ViewFootagePermission;
 
     if (exportAllowed)
+    {
+        NX_EXPECT(footageAllowed, "Server API cannot allow export without footage access.");
         result |= Qn::ExportPermission;
+    }
 
     if (hasGlobalPermission(subject, Qn::GlobalUserInputPermission))
         result |= Qn::WritePtzPermission;
