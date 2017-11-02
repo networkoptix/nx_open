@@ -33,9 +33,9 @@ def test_with_different_cloud_hosts_must_not_be_able_to_merge(server_factory, cl
     one.setup_cloud_system(cloud_host)
     check_user_exists(one, is_cloud=True)
 
-    with pytest.raises(HttpError) as x_info:
+    with pytest.raises(ServerRestApiError) as x_info:
         one.merge_systems(two)
-    assert x_info.value.reason == 'INCOMPATIBLE'
+    assert x_info.value.error_string == 'INCOMPATIBLE'
 
     # after patching to new cloud host server should reset system and users
     one.stop_service()

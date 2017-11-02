@@ -122,9 +122,9 @@ def test_merge_cloud_with_local(server_factory, cloud_host, test_system_settings
     two = server_factory('two')
 
     # Merge systems (takeRemoteSettings = False) -> Error
-    with pytest.raises(HttpError) as x_info:
+    with pytest.raises(ServerRestApiError) as x_info:
         two.merge_systems(one)
-    assert x_info.value.reason == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
+    assert x_info.value.error_string == 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD'
 
     # Merge systems (takeRemoteSettings = true)
     two.merge_systems(one, take_remote_settings=True)
