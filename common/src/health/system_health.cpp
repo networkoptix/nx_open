@@ -1,5 +1,11 @@
 #include "system_health.h"
 
+bool QnSystemHealth::isRemoteArchiveMessage(MessageType message)
+{
+    return message >= QnSystemHealth::RemoteArchiveSyncStarted
+        && message <= QnSystemHealth::RemoteArchiveSyncError;
+}
+
 bool QnSystemHealth::isMessageVisible(MessageType message)
 {
     switch (message)

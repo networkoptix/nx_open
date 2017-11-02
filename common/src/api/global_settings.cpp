@@ -78,6 +78,13 @@ namespace
 
     const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
     const bool kHanwhaDeleteProfilesOnInitIfNeededDefault = false;
+
+    const QString kEnableEdgeRecording(lit("enableEdgeRecording"));
+    const bool kEnableEdgeRecordingDefault(true);
+
+    const QString kMaxRemoteArchiveSynchronizationThreads(
+        lit("maxRemoteArchiveSynchronizationThreads"));
+    const int kMaxRemoteArchiveSynchronizationThreadsDefault(-1);
 }
 
 using namespace nx::settings_names;
@@ -402,6 +409,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kHanwhaDeleteProfilesOnInitIfNeededDefault,
         this);
 
+    m_edgeRecordingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kEnableEdgeRecording,
+        kEnableEdgeRecordingDefault,
+        this);
+
+    m_maxRemoteArchiveSynchronizationThreads = new QnLexicalResourcePropertyAdaptor<int>(
+        kMaxRemoteArchiveSynchronizationThreads,
+        kMaxRemoteArchiveSynchronizationThreadsDefault,
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -456,6 +473,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_cloudConnectUdpHolePunchingEnabledAdaptor
         << m_cloudConnectRelayingEnabledAdaptor
         << m_hanwhaDeleteProfilesOnInitIfNeeded
+        << m_edgeRecordingEnabledAdaptor
+        << m_maxRemoteArchiveSynchronizationThreads
         ;
 
     return result;
@@ -1037,6 +1056,26 @@ bool QnGlobalSettings::hanwhaDeleteProfilesOnInitIfNeeded() const
 void QnGlobalSettings::setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles)
 {
     m_hanwhaDeleteProfilesOnInitIfNeeded->setValue(deleteProfiles);
+}
+
+bool QnGlobalSettings::isEdgeRecordingEnabled() const
+{
+    return m_edgeRecordingEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setEdgeRecordingEnabled(bool enabled)
+{
+    m_edgeRecordingEnabledAdaptor->setValue(enabled);
+}
+
+int QnGlobalSettings::maxRemoteArchiveSynchronizationThreads() const
+{
+    return m_maxRemoteArchiveSynchronizationThreads->value();
+}
+
+void QnGlobalSettings::setMaxRemoteArchiveSynchronizationThreads(int newValue)
+{
+    m_maxRemoteArchiveSynchronizationThreads->setValue(newValue);
 }
 
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const

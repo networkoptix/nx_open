@@ -393,10 +393,163 @@ TEST(QnTimePeriodsListTest, excludePeriodList)
         QnTimePeriodList sourceList;
         for (int i = 10; i < 150; i += 10)
             sourceList << QnTimePeriod(i, 5);
-        sourceList << QnTimePeriod(144, 6);
-        resultList << QnTimePeriod(145, 5);
+        sourceList << QnTimePeriod(146, 6);
+        resultList << QnTimePeriod(146, 6);
         sourceList.excludeTimePeriods(excludeList);
 
         ASSERT_EQ(resultList, sourceList);
+    }
+
+    {
+        QnTimePeriodList sourceList;
+        sourceList
+            << QnTimePeriod(1509017499000, 45000)
+            << QnTimePeriod(1509028348000, 1419000)
+            << QnTimePeriod(1509029767000, 11000)
+            << QnTimePeriod(1509029785000, 1216000)
+            << QnTimePeriod(1509031001000, 1387000)
+            << QnTimePeriod(1509032388000, 1198000)
+            << QnTimePeriod(1509033586000, 1486000)
+            << QnTimePeriod(1509035072000, 1243000)
+            << QnTimePeriod(1509036315000, 1198000)
+            << QnTimePeriod(1509037513000, 109000);
+
+        QnTimePeriodList excludeList;
+        excludeList
+            << QnTimePeriod(1509028349066, 8926)
+            << QnTimePeriod(1509029767717, 9266)
+            << QnTimePeriod(1509029785404, 9566)
+            << QnTimePeriod(1509031001416, 9566)
+            << QnTimePeriod(1509032388176, 9799)
+            << QnTimePeriod(1509033586423, 9566)
+            << QnTimePeriod(1509035072141, 9833)
+            << QnTimePeriod(1509036315450, 9533);
+
+        QnTimePeriodList resultList;
+        resultList
+            << QnTimePeriod(1509017499000, 45000)
+
+            << QnTimePeriod(1509028348000, 1066)
+            << QnTimePeriod(1509028357992, 1409008)
+
+            << QnTimePeriod(1509029767000, 717)
+            << QnTimePeriod(1509029776983, 1017)
+
+            << QnTimePeriod(1509029785000, 404)
+            << QnTimePeriod(1509029794970, 1206030)
+
+            << QnTimePeriod(1509031001000, 416)
+            << QnTimePeriod(1509031010982, 1377018)
+
+            << QnTimePeriod(1509032388000, 176)
+            << QnTimePeriod(1509032397975, 1188025)
+
+            << QnTimePeriod(1509033586000, 423)
+            << QnTimePeriod(1509033595989, 1476011)
+
+            << QnTimePeriod(1509035072000, 141)
+            << QnTimePeriod(1509035081974, 1233026)
+
+            << QnTimePeriod(1509036315000, 450)
+            << QnTimePeriod(1509036324983, 1188017)
+
+            << QnTimePeriod(1509037513000, 109000);
+
+        sourceList.excludeTimePeriods(excludeList);
+        ASSERT_EQ(resultList, sourceList);
+    }
+
+    {
+        QnTimePeriodList sourceList;
+        QnTimePeriodList resultList;
+        for (int i = 100; i < 200; i += 10)
+        {
+            sourceList << QnTimePeriod(i, 5);
+            resultList << QnTimePeriod(i, 5);
+        }
+
+        QnTimePeriodList leftExcludeList;
+        for (int i = 0; i < 100; i += 10)
+            leftExcludeList << QnTimePeriod(i, 5);
+
+        QnTimePeriodList rightExcludeList;
+        for (int i = 200; i < 300; i += 10)
+            rightExcludeList << QnTimePeriod(i, 5);
+
+        sourceList.excludeTimePeriods(QnTimePeriodList());
+        ASSERT_EQ(sourceList, resultList);
+
+        sourceList.excludeTimePeriods(leftExcludeList);
+        ASSERT_EQ(sourceList, resultList);
+
+        sourceList.excludeTimePeriods(rightExcludeList);
+        ASSERT_EQ(sourceList, resultList);
+    }
+
+    {
+        QnTimePeriodList sourceList;
+        QnTimePeriodList resultList;
+        for (int i = 0; i < 200; i += 10)
+        {
+            sourceList << QnTimePeriod(i, 5);
+
+            if (i < 50 || i > 150)
+                resultList << QnTimePeriod(i, 5);
+        }
+
+        QnTimePeriodList excludeList;
+        for (int i = 50; i <= 150; i += 10)
+            excludeList << QnTimePeriod(i, 5);
+
+        sourceList.excludeTimePeriods(excludeList);
+        ASSERT_EQ(sourceList, resultList);
+    }
+
+    {
+        QnTimePeriodList sourceList;
+        QnTimePeriodList sourceList2;
+        QnTimePeriodList resultList;
+        for (int i = 0; i < 200; i += 10)
+        {
+            sourceList << QnTimePeriod(i, 5);
+            sourceList2 << QnTimePeriod(i, 5);
+
+            if (i < 150)
+                resultList << QnTimePeriod(i, 5);
+        }
+
+        QnTimePeriodList excludeList;
+        excludeList << QnTimePeriod(150, 150);
+
+        QnTimePeriodList infiniteExcludeList;
+        infiniteExcludeList << QnTimePeriod(150, -1);
+
+        sourceList.excludeTimePeriods(infiniteExcludeList);
+        ASSERT_EQ(sourceList, resultList);
+
+        sourceList2.excludeTimePeriods(excludeList);
+        ASSERT_EQ(sourceList2, resultList);
+    }
+
+    {
+        QnTimePeriodList sourceList;
+        QnTimePeriodList resultList;
+        QnTimePeriodList excludeList;
+        for (int i = 0; i < 200; i += 10)
+        {
+            if (i < 100)
+            {
+                sourceList << QnTimePeriod(i, 8);
+                excludeList << QnTimePeriod(i + 1, 8);
+                resultList << QnTimePeriod(i, 1);
+            }
+            else
+            {
+                excludeList << QnTimePeriod(i, 8);
+            }
+        }
+
+        sourceList.excludeTimePeriods(excludeList);
+        ASSERT_EQ(sourceList, resultList);
     }
 }

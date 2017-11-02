@@ -123,7 +123,9 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
         createGroupWidgets(subGroup, item);
 }
 
-QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& name, const std::vector<QnCameraAdvancedParameter>& params)
+QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(
+    const QString& name,
+    const std::vector<QnCameraAdvancedParameter>& params)
 {
     auto page = new QWidget(m_contentsWidget);
     auto pageLayout = new QHBoxLayout(page);
@@ -218,6 +220,15 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                         dependency.conditions.cbegin(), dependency.conditions.cend(),
                         [this](const QnCameraAdvancedParameterCondition& condition)
                         {
+                            using ConditionType =
+                                QnCameraAdvancedParameterCondition::ConditionType;
+
+                            if (condition.type == ConditionType::Present)
+                                return m_paramWidgetsById.contains(condition.paramId);
+
+                            if (condition.type == ConditionType::NotPresent)
+                                return !m_paramWidgetsById.contains(condition.paramId);
+
                             auto widget = m_paramWidgetsById.value(condition.paramId);
                             return widget && condition.checkValue(widget->value());
                         });
@@ -279,6 +290,9 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                 runHandlerChains();
             }
         }
+
+        if (!watches.empty())
+            runHandlerChains();
     }
 
 	return page;

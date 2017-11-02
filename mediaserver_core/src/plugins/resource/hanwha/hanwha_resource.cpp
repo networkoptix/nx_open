@@ -25,6 +25,7 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
@@ -245,6 +246,14 @@ HanwhaResource::~HanwhaResource()
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 {
     return new HanwhaStreamReader(toSharedPointer(this));
+}
+
+nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveManager()
+{
+    if (!m_remoteArchiveManager)
+        m_remoteArchiveManager = std::make_unique<HanwhaRemoteArchiveManager>(this);
+
+    return m_remoteArchiveManager.get();
 }
 
 bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
@@ -571,6 +580,15 @@ QString HanwhaResource::sessionKey(
     return QString();
 }
 
+std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
+{
+    auto delegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
+    const auto overlappedId = sharedContext()->currentOverlappedId();
+    delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
+
+    return std::move(delegate);
+}
+
 bool HanwhaResource::isVideoSourceActive()
 {
     auto videoSources = sharedContext()->videoSources();
@@ -601,14 +619,21 @@ int HanwhaResource::maxProfileCount() const
 
 CameraDiagnostics::Result HanwhaResource::initInternal()
 {
-    const auto result = init();
-    if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
-        setStatus(Qn::Unauthorized);
+    const auto result = initDevice();
+
+    if (!result)
+    {
+        const auto status = result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised
+            ? Qn::Unauthorized
+            : Qn::Offline;
+
+        setStatus(status);
+    }
 
     return result;
 }
 
-CameraDiagnostics::Result HanwhaResource::init()
+CameraDiagnostics::Result HanwhaResource::initDevice()
 {
     setCameraCapability(Qn::SetUserPasswordCapability, true);
     saveParams();
@@ -638,6 +663,10 @@ CameraDiagnostics::Result HanwhaResource::init()
         return result;
 
     result = initTwoWayAudio();
+    if (!result)
+        return result;
+
+    result = initRemoteArchive();
     if (!result)
         return result;
 
@@ -724,7 +753,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (info->deviceType == kHanwhaNvrDeviceType)
     {
         m_isNvr = true;
-        //setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
         setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
     }
 
@@ -1078,7 +1106,13 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    setCameraCapability(Qn::RemoteArchiveCapability, false);
+    bool hasRemoteArchive = !isNvr();
+    const auto eventStatuses = sharedContext()->eventStatuses();
+    const auto isSdCardInserted = eventStatuses.value.parameter<bool>(lit("SystemEvent.SDInsert"));
+
+    hasRemoteArchive &= (isSdCardInserted.is_initialized() && isSdCardInserted.get());
+    setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1791,7 +1825,30 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (!cgiParameter)
             continue;
 
-        supportedIds.insert(id);
+        bool supported = true;
+        auto supportAttribute = info->supportAttribute();
+
+        if (!supportAttribute.isEmpty())
+        {
+            supported = false;
+            if (!info->isChannelIndependent())
+                supportAttribute += lit("/%1").arg(getChannel());
+
+            const auto boolAttr = m_attributes.attribute<bool>(supportAttribute);
+            if (boolAttr.is_initialized())
+            {
+                supported = boolAttr.get();
+            }
+            else
+            {
+                const auto intAttr = m_attributes.attribute<int>(supportAttribute);
+                if (intAttr.is_initialized())
+                    supported = intAttr.get() > 0;
+            }
+        }
+
+        if (supported)
+            supportedIds.insert(id);
     }
 
     return allParameters.filtered(supportedIds);
@@ -2303,18 +2360,50 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
             parameterValues.push_back(requestedValue);
     }
 
-    std::map<QString, QString> requestParameters;
+    HanwhaRequestHelper::Parameters requestParameters;
     if (!parameterValues.isEmpty())
         requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
 
-    HanwhaRequestHelper helper(sharedContext());
-    const auto response = helper.doRequest(
-        info->cgi(),
-        info->submenu(),
-        info->updateAction(),
-        requestParameters);
+    auto makeRequest =
+        [&info, this](HanwhaRequestHelper::Parameters parameters, int channel)
+        {
+            if (channel != kHanwhaInvalidChannel)
+                parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-    return response.isSuccessful();
+            HanwhaRequestHelper helper(sharedContext());
+            const auto response = helper.doRequest(
+                info->cgi(),
+                info->submenu(),
+                info->updateAction(),
+                parameters);
+
+            return response.isSuccessful();
+        };
+
+    if (info->shouldAffectAllChannels())
+    {
+        const auto& systemInfo = sharedContext()->information();
+        if (!systemInfo)
+            return false;
+
+        bool result = true;
+        const auto channelCount = systemInfo->channelCount;
+        for (auto i = 0; i < channelCount; ++i)
+        {
+            result = makeRequest(requestParameters, i);
+            if (!result)
+                return false;
+        }
+
+        return result;
+    }
+    else if (!info->isChannelIndependent())
+    {
+        return makeRequest(requestParameters, getChannel());
+    }
+
+
+    return makeRequest(requestParameters, kHanwhaInvalidChannel);
 }
 
 bool HanwhaResource::executeServiceCommand(
@@ -2446,6 +2535,7 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
         return new HanwhaArchiveDelegate(toSharedPointer());
+
     return nullptr;
 }
 
