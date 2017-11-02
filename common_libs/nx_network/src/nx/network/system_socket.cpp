@@ -1502,7 +1502,7 @@ UDPSocket::UDPSocket(int ipVersion):
         //error
     }
 
-    // Made with an assumption that SO_LINGER may cause ::close system call to block 
+    // Made with an assumption that SO_LINGER may cause ::close system call to block
     // on win32 with some network drivers when network inteface fails.
     struct linger lingerOptions;
     memset(&lingerOptions, 0, sizeof(lingerOptions));
