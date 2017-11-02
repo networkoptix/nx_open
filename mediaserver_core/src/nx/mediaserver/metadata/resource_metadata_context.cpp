@@ -8,12 +8,6 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-void ManagerDeletor(nx::sdk::metadata::AbstractMetadataManager* manager)
-{
-    manager->stopFetchingMetadata();
-    manager->releaseRef();
-}
-
 ResourceMetadataContext::ResourceMetadataContext()
 {
 }
@@ -45,14 +39,15 @@ void ResourceMetadataContext::clearManagers()
 }
 
 void ResourceMetadataContext::addManager(
-    nx::sdk::metadata::AbstractMetadataManager* manager,
-    nx::sdk::metadata::AbstractMetadataHandler* handler,
+    ManagerPtr manager,
+    HandlerPtr handler,
     const nx::api::AnalyticsDriverManifest& manifest)
 {
     QnMutexLocker lock(&m_mutex);
     ManagerContext context;
-    context.manager = ManagerPtr(manager, ManagerDeletor);
-    context.handler.reset(handler);
+    context.handler = std::move(handler);
+    context.manager = std::move(manager);
+    context.manager->setHandler(context.handler.get());
     context.manifest = manifest;
     m_managers.push_back(std::move(context));
 }
@@ -75,7 +70,7 @@ void ResourceMetadataContext::setMetadataDataReceptor(QnAbstractDataReceptor* re
     m_metadataReceptor = receptor;
 }
 
-const ManagerList& ResourceMetadataContext::managers() const
+ManagerList& ResourceMetadataContext::managers()
 {
     QnMutexLocker lock(&m_mutex);
     return m_managers;

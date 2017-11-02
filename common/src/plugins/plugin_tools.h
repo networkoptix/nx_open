@@ -38,10 +38,14 @@ namespace nxpt
                 m_ptr->addRef();
         }
 
-        ScopedRef(ScopedRef<T>&& data)
+        ScopedRef(ScopedRef<T>&& right)
         {
-            m_ptr = data.m_ptr;
-            data.m_ptr = 0;
+            m_ptr = right.release();
+        }
+        ScopedRef<T>& operator=(ScopedRef<T>&& right)
+        {
+            m_ptr = right.release();
+            return (*this);
         }
 
         ~ScopedRef()

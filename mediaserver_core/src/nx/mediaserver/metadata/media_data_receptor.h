@@ -11,14 +11,14 @@ class ResourceMetadataContext;
 class VideoDataReceptor: public QnAbstractDataReceptor
 {
 public:
-    VideoDataReceptor(const ResourceMetadataContext* context);
+    VideoDataReceptor(ResourceMetadataContext* context);
 
     virtual bool canAcceptData() const override { return true;  }
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
     void detachFromContext();
 private:
-    const ResourceMetadataContext* m_context;
+    ResourceMetadataContext* m_context;
     mutable QnMutex m_mutex;
 };
 using VideoDataReceptorPtr = QSharedPointer<VideoDataReceptor>;

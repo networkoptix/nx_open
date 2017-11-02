@@ -9,7 +9,7 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-VideoDataReceptor::VideoDataReceptor(const ResourceMetadataContext* context):
+VideoDataReceptor::VideoDataReceptor(ResourceMetadataContext* context):
     m_context(context)
 {
 }

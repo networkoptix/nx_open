@@ -125,28 +125,24 @@ void ManagerPool::createMetadataManagersForResourceUnsafe(const QnSecurityCamRes
 {
     for (auto& plugin: availablePlugins())
     {
-        auto manager = createMetadataManager(camera, plugin);
-        if (!manager)
+        auto managerObject = createMetadataManager(camera, plugin);
+        if (!managerObject)
             continue;
-
-        nxpt::ScopedRef<AbstractMetadataManager> managerGuard(manager, false);
+        nxpt::ScopedRef<AbstractMetadataManager> manager(managerObject, false);
 
         auto pluginManifest = addManifestToServer(plugin);
         if (!pluginManifest)
             continue;
 
-        auto deviceManifest = addManifestToCamera(camera, manager);
+        auto deviceManifest = addManifestToCamera(camera, manager.get());
         if (!deviceManifest)
             continue;
 
         auto& context = m_contexts[camera->getId()];
-        auto handler = createMetadataHandler(camera, pluginManifest->driverId);
-        manager->setHandler(handler);
-        context.addManager(manager, handler, *pluginManifest);
+        std::unique_ptr<EventHandler> handler(createMetadataHandler(camera, pluginManifest->driverId));
         if (manager->queryInterface(IID_ConsumingMetadataManager))
             handler->registerDataReceptor(&context);
-
-        managerGuard.release();
+        context.addManager(std::move(manager), std::move(handler), *pluginManifest);
     }
 }
 
@@ -362,8 +358,8 @@ QWeakPointer<QnAbstractDataReceptor> ManagerPool::registerDataProvider(QnAbstrac
 
 void ManagerPool::removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
 {
-    QnMutexLocker lock(&m_contextMutex);
     const auto& id = dataProvider->getResource()->getId();
+    QnMutexLocker lock(&m_contextMutex);
     auto itr = m_contexts.find(id);
     if (itr == m_contexts.end())
         return;

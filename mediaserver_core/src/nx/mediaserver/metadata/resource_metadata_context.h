@@ -20,6 +20,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include "resource_metadata_context.h"
+#include <plugins/plugin_tools.h>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -28,14 +29,13 @@ namespace mediaserver {
 namespace metadata {
 
 class VideoDataReceptor;
-using ManagerPtr = std::unique_ptr<
-    nx::sdk::metadata::AbstractMetadataManager,
-    std::function<void(nx::sdk::metadata::AbstractMetadataManager*)>>;
+using ManagerPtr = nxpt::ScopedRef<nx::sdk::metadata::AbstractMetadataManager>;
 using HandlerPtr = std::unique_ptr<nx::sdk::metadata::AbstractMetadataHandler>;
+
 struct ManagerContext
 {
-    ManagerPtr manager;
     HandlerPtr handler;
+    ManagerPtr manager;
     nx::api::AnalyticsDriverManifest manifest;
 };
 
@@ -51,15 +51,15 @@ public:
      * Register plugin manager. This function takes ownership for the manager and handler
      */
     void addManager(
-        nx::sdk::metadata::AbstractMetadataManager* manager,
-        nx::sdk::metadata::AbstractMetadataHandler* handler,
+        ManagerPtr manager,
+        HandlerPtr handler,
         const nx::api::AnalyticsDriverManifest& manifest);
     void clearManagers();
     void setDataProvider(const QnAbstractMediaStreamDataProvider* provider);
     void setVideoFrameDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor);
     void setMetadataDataReceptor(QnAbstractDataReceptor* receptor);
 
-    const ManagerList& managers() const;
+    ManagerList& managers();
     const QnAbstractMediaStreamDataProvider* dataProvider() const;
     QSharedPointer<VideoDataReceptor> videoFrameDataReceptor() const;
     QnAbstractDataReceptor* metadataDataReceptor() const;
