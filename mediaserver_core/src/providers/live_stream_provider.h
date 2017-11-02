@@ -35,13 +35,13 @@ class NaiveDetectionSmoother;
 } // namespace nx
 
 class QnLiveStreamProvider;
-class MetadataDataReceptor;
-using MetadataDataReceptorPtr = QSharedPointer<MetadataDataReceptor>;
 
 class QnLiveStreamProvider:
     public QnAbstractMediaStreamDataProvider
 {
 public:
+    class MetadataDataReceptor;
+
     QnLiveStreamProvider(const QnResourcePtr& res);
     virtual ~QnLiveStreamProvider();
 
@@ -87,8 +87,6 @@ public:
     void setOwner(QnSharedResourcePointer<QnAbstractVideoCamera> owner);
     virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const override;
     virtual void pleaseReopenStream() = 0;
-
-    void addMetadata(const QnAbstractCompressedMetadataPtr& metadata);
 protected:
     QnAbstractCompressedMetadataPtr getMetaData();
     virtual QnMetaDataV1Ptr getCameraMetadata();
@@ -142,10 +140,9 @@ private:
     QElapsedTimer m_resolutionCheckTimer;
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
-    QnSafeQueue<QnAbstractCompressedMetadataPtr> m_metadataQueue;
 
     QWeakPointer<QnAbstractDataReceptor> m_videoDataReceptor;
-    MetadataDataReceptorPtr m_metadataReceptor;
+    QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

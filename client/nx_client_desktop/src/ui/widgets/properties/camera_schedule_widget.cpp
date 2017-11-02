@@ -1445,11 +1445,11 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
 
         int decreaseAlways = 0;
         if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
-            decreaseAlways = QnLiveStreamParams::MIN_SECOND_STREAM_FPS;
+            decreaseAlways = QnLiveStreamParams::kMinSecondStreamFps;
 
         int decreaseIfMotionPlusLQ = 0;
         if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-            decreaseIfMotionPlusLQ = QnLiveStreamParams::MIN_SECOND_STREAM_FPS;
+            decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamFps;
 
         QnScheduleTaskList tasks;
         for (auto task: scheduleTasks())

@@ -44,11 +44,15 @@ public:
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
-    QWeakPointer<QnAbstractDataReceptor> registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
-    void removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider);
+    /**
+     * Return QnAbstractDataReceptor that will receive data from audio/video data provider.
+     */
+    QWeakPointer<QnAbstractDataReceptor> mediaDataReceptor(const QnUuid& id);
 
-    void registerDataReceptor(const QnResourcePtr& resource, QnAbstractDataReceptor* dataReceptor);
-    void removeDataReceptor(const QnResourcePtr& resource, QnAbstractDataReceptor* dataReceptor);
+    /**
+     * Register data receptor that will receive metadata packets.
+     */
+    void registerDataReceptor(const QnResourcePtr& resource, QWeakPointer<QnAbstractDataReceptor> metadaReceptor);
 
 public slots:
     void initExistingResources();

@@ -55,14 +55,12 @@ public:
         HandlerPtr handler,
         const nx::api::AnalyticsDriverManifest& manifest);
     void clearManagers();
-    void setDataProvider(const QnAbstractMediaStreamDataProvider* provider);
     void setVideoFrameDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor);
-    void setMetadataDataReceptor(QnAbstractDataReceptor* receptor);
+    void setMetadataDataReceptor(QWeakPointer<QnAbstractDataReceptor> receptor);
 
     ManagerList& managers();
-    const QnAbstractMediaStreamDataProvider* dataProvider() const;
     QSharedPointer<VideoDataReceptor> videoFrameDataReceptor() const;
-    QnAbstractDataReceptor* metadataDataReceptor() const;
+    QWeakPointer<QnAbstractDataReceptor> metadataDataReceptor() const;
 
     void setManagersInitialized(bool value);
     bool isManagerInitialized() const;
@@ -71,12 +69,10 @@ protected:
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
 private:
-    mutable QnMutex m_mutex;
     ManagerList m_managers;
 
-    const QnAbstractMediaStreamDataProvider* m_dataProvider = nullptr;
     QSharedPointer<VideoDataReceptor> m_videoFrameDataReceptor;
-    QnAbstractDataReceptor* m_metadataReceptor = nullptr;
+    QWeakPointer<QnAbstractDataReceptor> m_metadataReceptor;
     nx::api::AnalyticsDriverManifest m_pluginManifest;
     bool m_isManagerInitialized = false;
 };

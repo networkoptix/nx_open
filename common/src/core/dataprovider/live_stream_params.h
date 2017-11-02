@@ -2,8 +2,8 @@
 
 struct QnLiveStreamParams
 {
-    static const float FPS_NOT_INITIALIZED;
-    static const int MIN_SECOND_STREAM_FPS = 2;
+    static const float kFpsNotInitialized;
+    static const int kMinSecondStreamFps = 2;
 
     Qn::StreamQuality quality = Qn::QualityNotDefined;
     Qn::SecondStreamQuality secondaryQuality = Qn::SSQualityLow;
@@ -11,7 +11,7 @@ struct QnLiveStreamParams
     int bitrateKbps = 0;
 
     QnLiveStreamParams();
-    bool operator ==(const QnLiveStreamParams& rhs);
-    bool operator !=(const QnLiveStreamParams& rhs);
+    bool operator ==(const QnLiveStreamParams& rhs) const;
+    bool operator !=(const QnLiveStreamParams& rhs) const;
 };
 

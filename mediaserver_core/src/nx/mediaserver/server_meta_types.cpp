@@ -1,7 +1,7 @@
 #include "server_meta_types.h"
 
 namespace nx {
-namespace server {
+namespace mediaserver {
 
 void MetaTypes::initialize()
 {

@@ -1,15 +1,15 @@
 #include "live_stream_params.h"
 
-const float QnLiveStreamParams::FPS_NOT_INITIALIZED = -1.0;
+const float QnLiveStreamParams::kFpsNotInitialized = -1.0;
 
 QnLiveStreamParams::QnLiveStreamParams():
     quality(Qn::QualityNormal),
     secondaryQuality(Qn::SSQualityNotDefined),
-    fps(FPS_NOT_INITIALIZED)
+    fps(kFpsNotInitialized)
 {
 }
 
-bool QnLiveStreamParams::operator==(const QnLiveStreamParams& rhs)
+bool QnLiveStreamParams::operator==(const QnLiveStreamParams& rhs) const
 {
     return rhs.quality == quality
         && rhs.secondaryQuality == secondaryQuality
@@ -17,4 +17,7 @@ bool QnLiveStreamParams::operator==(const QnLiveStreamParams& rhs)
         && rhs.bitrateKbps == bitrateKbps;
 }
 
-bool QnLiveStreamParams::operator !=(const QnLiveStreamParams& rhs) { return !(*this == rhs); }
+bool QnLiveStreamParams::operator !=(const QnLiveStreamParams& rhs) const
+{
+    return !(*this == rhs);
+}

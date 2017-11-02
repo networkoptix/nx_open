@@ -345,50 +345,24 @@ bool ManagerPool::resourceInfoFromResource(
     return true;
 }
 
-QWeakPointer<QnAbstractDataReceptor> ManagerPool::registerDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
+QWeakPointer<QnAbstractDataReceptor> ManagerPool::mediaDataReceptor(const QnUuid& id)
 {
     QnMutexLocker lock(&m_contextMutex);
-    auto id = dataProvider->getResource()->getId();
     auto& context = m_contexts[id];
-    context.setDataProvider(dataProvider);
     auto dataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(&context));
     context.setVideoFrameDataReceptor(dataReceptor);
     return dataReceptor.toWeakRef();
 }
 
-void ManagerPool::removeDataProvider(QnAbstractMediaStreamDataProvider* dataProvider)
-{
-    const auto& id = dataProvider->getResource()->getId();
-    QnMutexLocker lock(&m_contextMutex);
-    auto itr = m_contexts.find(id);
-    if (itr == m_contexts.end())
-        return;
-    auto& context = itr->second;
-    context.setDataProvider(nullptr);
-    context.setVideoFrameDataReceptor(VideoDataReceptorPtr());
-}
-
 void ManagerPool::registerDataReceptor(
     const QnResourcePtr& resource,
-    QnAbstractDataReceptor* dataReceptor)
+    QWeakPointer<QnAbstractDataReceptor> metadaReceptor)
 {
     QnMutexLocker lock(&m_contextMutex);
     const auto& id = resource->getId();
 
     auto& context = m_contexts[id];
-    context.setMetadataDataReceptor(dataReceptor);
-}
-
-void ManagerPool::removeDataReceptor(
-    const QnResourcePtr& resource,
-    QnAbstractDataReceptor* dataReceptor)
-{
-    QnMutexLocker lock(&m_contextMutex);
-    auto itr = m_contexts.find(resource->getId());
-    if (itr == m_contexts.end())
-        return;
-    auto& context = itr->second;
-    context.setMetadataDataReceptor(nullptr);
+    context.setMetadataDataReceptor(metadaReceptor);
 }
 
 } // namespace metadata

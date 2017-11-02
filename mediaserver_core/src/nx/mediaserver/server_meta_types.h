@@ -1,7 +1,7 @@
 #pragma once
 
 namespace nx {
-namespace server {
+namespace mediaserver {
 
 /**
  * Convenience class for uniform initialization of metatypes in server module.
@@ -12,5 +12,5 @@ public:
     static void initialize();
 };
 
-} // namespace server
+} // namespace mediaserver
 } // namespace nx

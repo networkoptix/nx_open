@@ -47,7 +47,7 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
-#include <common/server_meta_types.h>
+#include <nx/mediaserver/server_meta_types.h>
 
 namespace {
 
@@ -83,7 +83,7 @@ QnMediaServerModule::QnMediaServerModule(
 {
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
-    nx::server::MetaTypes::initialize();
+    nx::mediaserver::MetaTypes::initialize();
 
     store(new QnStaticCommonModule(
         Qn::PT_Server,
