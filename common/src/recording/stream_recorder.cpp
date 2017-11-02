@@ -240,6 +240,7 @@ void QnStreamRecorder::close()
             qint64 fileDuration = m_startDateTime !=
                 qint64(AV_NOPTS_VALUE) ? m_endDateTime / 1000 - m_startDateTime / 1000 : 0; // bug was here! rounded sum is not same as rounded summand!
 
+            m_lastFileSize = fileSize;
             if (m_lastError.lastError != StreamRecorderError::fileCreate && !m_disableRegisterFile)
                 fileFinished(
                     fileDuration,
@@ -314,6 +315,19 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         m_needReopen = false;
         VERBOSE("EXIT: Reopening");
         close();
+    }
+
+    if (m_startRecordingBound.is_initialized())
+    {
+        nonConstData->timestamp = std::max(
+            nonConstData->timestamp,
+            m_startRecordingBound->count());
+    }
+
+    if (m_endRecordingBound.is_initialized())
+    {
+        if (nonConstData->timestamp > m_endRecordingBound->count())
+            return true;
     }
 
     QnConstAbstractMediaDataPtr md =
@@ -586,6 +600,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 qint64 QnStreamRecorder::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md)
 {
     return md->timestamp - m_startDateTime;
+}
+
+int64_t QnStreamRecorder::lastFileSize() const
+{
+    return m_lastFileSize;
 }
 
 void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
@@ -1219,6 +1238,14 @@ void QnStreamRecorder::setSaveMotionHandler(MotionHandler handler)
 void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
 {
     m_transcodeFilters = filters;
+}
+
+void QnStreamRecorder::setRecordingBounds(
+    const std::chrono::microseconds& startTime,
+    const std::chrono::microseconds& endTime)
+{
+    m_startRecordingBound = startTime;
+    m_endRecordingBound = endTime;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

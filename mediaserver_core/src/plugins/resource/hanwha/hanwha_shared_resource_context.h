@@ -105,10 +105,14 @@ public:
         bool generateNewOne = false);
 
     QnTimePeriodList chunks(int channelNumber) const;
+    QnTimePeriodList chunksSync(int channelNumber) const;
     qint64 chunksStartUsec(int channelNumber) const;
     qint64 chunksEndUsec(int channelNumber) const;
 
+    std::chrono::seconds timeZoneShift() const;
+
     // NOTE: function objects return HanwhaResult<T>.
+    HanwhaCachedData<int> currentOverlappedId;
     HanwhaCachedData<HanwhaInformation> information;
     HanwhaCachedData<HanwhaCgiParameters> cgiParamiters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
@@ -116,6 +120,7 @@ public:
     HanwhaCachedData<HanwhaResponse> videoProfiles;
 
 private:
+    HanwhaResult<int> loadOverlappedId();
     HanwhaResult<HanwhaInformation> loadInformation();
     HanwhaResult<HanwhaCgiParameters> loadCgiParamiters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();
@@ -136,6 +141,8 @@ private:
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
+
+    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
 
     mutable QnMutex m_servicesMutex;
 };

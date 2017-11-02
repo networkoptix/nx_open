@@ -41,6 +41,8 @@ if (android | ios) {
 
 include( optional_functionality.pri )
 
+#Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
+#DEFINES += USE_OWN_MUTEX ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
@@ -53,8 +55,6 @@ CONFIG(debug, debug|release) {
   !linux-clang {
     # Temporary fix for linux clang 3.6-3.7 that crashes with our mutex.
     DEFINES += USE_OWN_MUTEX
-    #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
-    #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
   }
   CONFIG += qml_debug
 }

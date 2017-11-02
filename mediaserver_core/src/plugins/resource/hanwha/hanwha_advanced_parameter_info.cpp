@@ -21,6 +21,7 @@ static const QString kGroupAux = lit("group");
 static const QString kGroupLeadAux = lit("groupLead");
 static const QString kGropupIncludeAux = lit("groupInclude");
 static const QString kStreamsToReopenAux = lit("streamsToReopen");
+static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -82,12 +83,6 @@ QString HanwhaAdavancedParameterInfo::rangeParameter() const
 {
     if (!m_rangeParameter.isEmpty())
         return m_rangeParameter;
-
-    qDebug() << "Range parameter: " << lit("%1/%2/%3/%4")
-        .arg(m_cgi)
-        .arg(m_submenu)
-        .arg(m_updateAction)
-        .arg(m_parameterName);
 
     return lit("%1/%2/%3/%4")
         .arg(m_cgi)
@@ -171,6 +166,11 @@ QString HanwhaAdavancedParameterInfo::parameterValue() const
     return m_parameterValue;
 }
 
+bool HanwhaAdavancedParameterInfo::shouldAffectAllChannels() const
+{
+    return m_shouldAffectAllChannels;
+}
+
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
@@ -210,25 +210,45 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
         const auto auxValue = split[1].trimmed();
 
         if (auxName == kSupportAux)
+        {
             m_supportAttribute = auxValue;
+        }
         else if (auxName == kRangeAux)
+        {
             m_rangeParameter = auxValue;
+        }
         else if (auxName == kSpecificAux)
+        {
             m_isSpecific = fromString<bool>(auxValue);
+        }
         else if (auxName == kNoChannelAux)
+        {
             m_channelIndependent = fromString<bool>(auxValue);
+        }
         else if (auxName == kProfileAux)
+        {
             m_profile = fromString<Qn::ConnectionRole>(auxValue);
+        }
         else if (auxName == kCodecAux)
+        {
             m_isCodecDependent = fromString<bool>(auxValue);
+        }
         else if (auxName == kResourceProperty)
+        {
             m_resourceProperty = auxValue;
+        }
         else if (auxName == kSortingAux)
+        {
             m_sorting = auxValue;
+        }
         else if (auxName == kGroupAux)
+        {
             m_group = auxValue;
+        }
         else if (auxName == kGropupIncludeAux)
+        {
             m_groupIncludeCondition = auxValue;
+        }
         else if (auxName == kGroupLeadAux)
         {
             m_group = auxValue;
@@ -244,6 +264,10 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
                 if (role != Qn::ConnectionRole::CR_Default)
                     m_streamsToReopen.insert(role);
             }
+        }
+        else if (auxName == kShouldAffectAllChannels)
+        {
+            m_shouldAffectAllChannels = fromString<bool>(auxValue);
         }
     }
 }

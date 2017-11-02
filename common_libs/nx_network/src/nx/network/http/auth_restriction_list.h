@@ -3,8 +3,10 @@
 #include <map>
 
 #include <QtCore/QString>
+#include <QtCore/QRegExp>
 
 #include <nx/network/http/http_types.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx_http {
 
@@ -62,10 +64,16 @@ public:
     void deny(const QString& pathMask, AuthMethod::Value method);
 
 private:
-    /** map<path mask, allowed auth bitmask>. */
-    std::map<QString, unsigned int> m_allowed;
-    /** map<path mask, denied auth bitmask>. */
-    std::map<QString, unsigned int> m_denied;
+    struct Rule
+    {
+        QRegExp expression;
+        unsigned int method;
+        Rule(const QString& expression, unsigned int method);
+    };
+
+    mutable QnMutex m_mutex;
+    std::map<QString, Rule> m_allowed;
+    std::map<QString, Rule> m_denied;
 };
 
 } // namespace nx_http

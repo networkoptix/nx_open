@@ -77,8 +77,10 @@ bool HanwhaMappedPresetManager::nativePresets(QnPtzPresetList* outNativePresets)
         lit("ptzconfig/preset"),
         {{kHanwhaChannelProperty, channel()}});
 
+    // We can get 602 Configuration not found error if there are no presets for device.
+    // It's not an actual error - it just means that the list of presets is empty.
     if (!response.isSuccessful())
-        return false;
+        return response.errorCode() == kHanwhaConfigurationNotFoundError;
 
     for (const auto& presetEntry : response.response())
     {
