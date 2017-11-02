@@ -242,11 +242,13 @@ void QnStreamRecorder::close()
 
             m_lastFileSize = fileSize;
             if (m_lastError.lastError != StreamRecorderError::fileCreate && !m_disableRegisterFile)
+            {
                 fileFinished(
                     fileDuration,
                     m_recordingContextVector[i].fileName,
                     m_mediaProvider,
                     fileSize);
+            }
         }
         else
         {

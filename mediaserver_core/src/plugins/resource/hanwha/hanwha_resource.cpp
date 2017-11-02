@@ -1107,10 +1107,14 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
     bool hasRemoteArchive = !isNvr();
-    const auto eventStatuses = sharedContext()->eventStatuses();
-    const auto isSdCardInserted = eventStatuses.value.parameter<bool>(lit("SystemEvent.SDInsert"));
 
-    hasRemoteArchive &= (isSdCardInserted.is_initialized() && isSdCardInserted.get());
+    HanwhaRequestHelper helper(sharedContext());
+    auto response = helper.view(lit("recording/storage"));
+    if (!response.isSuccessful())
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto storageEnabled = response.parameter<bool>(lit("Enable"));
+    hasRemoteArchive &= (storageEnabled != boost::none) && *storageEnabled;
     setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
 
     return CameraDiagnostics::NoErrorResult();

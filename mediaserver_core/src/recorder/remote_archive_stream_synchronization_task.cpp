@@ -253,7 +253,7 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
                     progress = 1.0;
                     NX_DEBUG(
                         this,
-                        lm("Wrong progress! Imported: %1, Total: %1")
+                        lm("Wrong progress! Imported: %1, Total: %2")
                             .args(m_importedDuration.count(), m_totalDuration.count()));
                 }
 
