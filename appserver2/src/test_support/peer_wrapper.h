@@ -43,11 +43,15 @@ public:
 
     SocketAddress endpoint() const;
 
+    ec2::AbstractECConnection* ecConnection();
+
     QnUuid id() const;
 
     nx::hpm::api::SystemCredentials getCloudCredentials() const;
 
     std::unique_ptr<MediaServerClient> mediaServerClient() const;
+
+    nx::utils::test::ModuleLauncher<Appserver2ProcessPublic>& process();
 
     static bool areAllPeersHaveSameTransactionLog(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);

@@ -128,6 +128,29 @@ struct CreateHashByIdHelper
     QnUuid operator ()(const Param &param) { return param.id; }
 };
 
+template<typename ClassType, typename FieldType>
+struct CreateHashFromCustomField
+{
+    using MemberPointer = FieldType ClassType::*;
+
+    MemberPointer memberPointer;
+
+    CreateHashFromCustomField(MemberPointer memberPointer): 
+        memberPointer(memberPointer) {}
+
+    QnUuid operator ()(const ClassType& param)
+    {
+        return guidFromArbitraryData(param.*memberPointer);
+    }
+};
+
+template<typename ClassType, typename FieldType>
+CreateHashFromCustomField<ClassType, FieldType> makeCreateHashFromCustomFieldHelper(
+    FieldType ClassType::*memberPointer)
+{
+    return CreateHashFromCustomField<ClassType, FieldType>(memberPointer);
+}
+
 struct CreateHashByUserIdHelper
 {
     template<typename Param>

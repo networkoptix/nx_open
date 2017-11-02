@@ -140,6 +140,11 @@ SocketAddress PeerWrapper::endpoint() const
     return m_process.moduleInstance()->endpoint();
 }
 
+ec2::AbstractECConnection* PeerWrapper::ecConnection()
+{
+    return m_process.moduleInstance()->ecConnection();
+}
+
 nx::hpm::api::SystemCredentials PeerWrapper::getCloudCredentials() const
 {
     return m_cloudCredentials;
@@ -148,6 +153,11 @@ nx::hpm::api::SystemCredentials PeerWrapper::getCloudCredentials() const
 std::unique_ptr<MediaServerClient> PeerWrapper::mediaServerClient() const
 {
     return prepareMediaServerClient();
+}
+
+nx::utils::test::ModuleLauncher<Appserver2ProcessPublic>& PeerWrapper::process()
+{
+    return m_process;
 }
 
 bool PeerWrapper::areAllPeersHaveSameTransactionLog(

@@ -147,6 +147,43 @@ int QnMiscManager<T>::getMiscParam(const QByteArray& paramName, impl::GetMiscPar
     return reqID;
 }
 
+template<class T>
+int QnMiscManager<T>::saveSystemMergeHistoryRecord(
+    const ApiSystemMergeHistoryRecord& data,
+    impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::saveSystemMergeHistoryRecord,
+        data,
+        [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+    return reqID;
+}
+
+template<class T>
+int QnMiscManager<T>::getSystemMergeHistory(
+    impl::GetSystemMergeHistoryHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+
+    auto queryDoneHandler =
+        [reqID, handler](
+            ErrorCode errorCode,
+            const ApiSystemMergeHistoryRecordList& outData)
+        {
+            if (errorCode == ErrorCode::ok)
+                handler->done(reqID, errorCode, std::move(outData));
+            else
+                handler->done(reqID, errorCode, ApiSystemMergeHistoryRecordList());
+        };
+    m_queryProcessor->getAccess(m_userAccessData)
+        .template processQueryAsync<QByteArray /*dummy*/, ApiSystemMergeHistoryRecordList, decltype(queryDoneHandler)>
+            (ApiCommand::getSystemMergeHistory, QByteArray(), queryDoneHandler);
+    return reqID;
+}
 
 template class QnMiscManager<ServerQueryProcessorAccess>;
 template class QnMiscManager<FixedUrlClientQueryProcessor>;

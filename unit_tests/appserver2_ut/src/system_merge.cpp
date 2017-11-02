@@ -24,18 +24,6 @@ class SystemMerge:
     public ::testing::Test,
     public SystemMergeFixture
 {
-public:
-    static void SetUpTestCase()
-    {
-        s_staticCommonModule = std::make_unique<QnStaticCommonModule>(
-            Qn::PeerType::PT_Server);
-    }
-
-    static void TearDownTestCase()
-    {
-        s_staticCommonModule.reset();
-    }
-
 protected:
     void givenTwoSingleServerSystems()
     {
@@ -46,12 +34,7 @@ protected:
     {
         ASSERT_EQ(QnRestResult::Error::NoError, prevMergeResult());
     }
-
-private:
-    static std::unique_ptr<QnStaticCommonModule> s_staticCommonModule;
 };
-
-std::unique_ptr<QnStaticCommonModule> SystemMerge::s_staticCommonModule;
 
 TEST_F(SystemMerge, two_systems_can_be_merged)
 {

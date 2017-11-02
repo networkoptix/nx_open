@@ -1380,6 +1380,28 @@ APPLY(10101, getMiscParam, ApiMiscData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* regular transaction type */ \
+APPLY(10200, saveSystemMergeHistoryRecord, ApiSystemMergeHistoryRecord, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       makeCreateHashFromCustomFieldHelper(&ApiSystemMergeHistoryRecord::mergedSystemLocalId), /* getHash*/ \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter read func */ \
+                       AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
 
