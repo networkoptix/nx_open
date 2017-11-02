@@ -18,25 +18,45 @@ Button
     property color hoveredColor: ColorTheme.lighter(color, 1)
     property color pressedColor: color
     property color checkedColor: ColorTheme.darker(color, 1)
+    property color textHoveredColor: textColor
+    property color textPressedColor: textColor
     property color focusIndicatorColor: ColorTheme.isLight(color)
         ? ColorTheme.transparent(ColorTheme.brightText, 0.7)
         : ColorTheme.transparent(ColorTheme.highlight, 0.5)
 
-    property real disabledOpacity: highlighted ? 0.2 : 0.3
-
     property string icon
     property string hoveredIcon
     property string pressedIcon
+    property int iconAlignment: Qt.AlignLeft
+
+    property real disabledOpacity: highlighted ? 0.2 : 0.3
+    property real iconSpacing: 0
+    property real minimumIconWidth: 32
 
     readonly property alias hovered: mouseTracker.containsMouse
 
     property bool flat: false //< TODO: #dklychkov Remove after updating Qt version.
 
     leftPadding:
-        text
-            ? (icon && text) ? 8 : 16
-            : 0
-    rightPadding: text ? 16 : 0
+    {
+        if (!text)
+            return 0
+
+        if (icon)
+            return iconAlignment === Qt.AlignRight ? 12 : 0
+
+        return 16
+    }
+    rightPadding:
+    {
+        if (!text)
+            return 0
+
+        if (icon)
+            return iconAlignment === Qt.AlignRight ? 0 : 12
+
+        return 16
+    }
     topPadding: 5
     bottomPadding: 5
 
@@ -94,49 +114,93 @@ Button
         }
     }
 
-    label: Row
+    label: Item
     {
-        x: image.visible && textLabel.visible
-            ? Math.min(
-                (control.width - width + leftPadding) / 2 - leftPadding,
-                control.width - control.rightPadding - width)
-            : (control.width - width) / 2
-        y: (control.height - height) / 2
+        x: control.leftPadding
+        y: control.topPadding
+        width: parent.availableWidth
+        height: parent.availableHeight
+
+        implicitHeight: Math.max(imageArea.implicitHeight, text.implicitHeight)
+        implicitWidth: (text.visible ? text.implicitWidth : 0)
+            + (imageArea.visible ? imageArea.implicitWidth + control.iconSpacing : 0)
 
         opacity: enabled ? 1.0 : control.disabledOpacity
 
-        spacing: (image.visible && textLabel.visible) ? Math.max(0, (32 - image.width) / 2) : 0
-        leftPadding: spacing
-
-        Image
+        Item
         {
-            id: image
+            id: imageArea
+
+            implicitWidth: Math.max(control.minimumIconWidth, image.implicitWidth)
+            implicitHeight: image.implicitHeight
 
             anchors.verticalCenter: parent.verticalCenter
+            x: (control.iconAlignment === Qt.AlignRight)
+                ? parent.width - width
+                : 0
 
-            visible: status === Image.Ready
+            visible: image.status === Image.Ready
 
-            source:
+            Image
             {
-                if (control.pressed)
-                    return control.pressedIcon || control.icon
+                id: image
 
-                if (control.hovered)
-                    return control.hoveredIcon || control.icon
+                anchors.centerIn: imageArea
 
-                return control.icon
+                source:
+                {
+                    if (control.pressed)
+                        return control.pressedIcon || control.icon
+
+                    if (control.hovered)
+                        return control.hoveredIcon || control.icon
+
+                    return control.icon
+                }
+
             }
         }
 
         Text
         {
-            id: textLabel
+            id: text
 
             anchors.verticalCenter: parent.verticalCenter
+            x:
+            {
+                var availableLeft = 0
+                var availableRight = parent.width
+
+                if (imageArea.visible)
+                {
+                    if (control.iconAlignment === Qt.AlignRight)
+                        availableRight -= imageArea.width + control.iconSpacing
+                    else
+                        availableLeft += imageArea.width + control.iconSpacing
+                }
+
+                return availableLeft + (availableRight - availableLeft - width) / 2
+            }
+            width: Math.min(
+                parent.width - (imageArea.visible ? imageArea.width + control.iconSpacing : 0),
+                implicitWidth)
+
             text: control.text
             font: control.font
-            color: control.textColor
             visible: text
+
+            elide: Text.ElideRight
+
+            color:
+            {
+                if (control.pressed)
+                    return control.textPressedColor
+
+                if (control.hovered)
+                    return control.textHoveredColor
+
+                return control.textColor
+            }
         }
     }
 
