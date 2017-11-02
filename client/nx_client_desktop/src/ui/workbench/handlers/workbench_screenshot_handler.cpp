@@ -10,6 +10,7 @@
 #include <QtWidgets/QComboBox>
 
 #include <camera/cam_display.h>
+#include <camera/resource_display.h>
 #include <camera/single_thumbnail_loader.h>
 
 #include <client/client_settings.h>

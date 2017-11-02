@@ -43,13 +43,15 @@ public:
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     QnTimePeriodList getChunks();
-    virtual Qn::LicenseType licenseType() const override;
+
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual CameraDiagnostics::Result initInternal() override;
     void setChunks(const QnTimePeriodList& chunks);
     QnPhysicalCameraResourcePtr getOtherResource(int channel);
+    virtual Qn::LicenseType calculateLicenseType() const override;
+
 private slots:
     void at_gotChunks(int channel, QnTimePeriodList chunks);
 private:
@@ -58,7 +60,7 @@ private:
     QnVMax480ChunkReader* m_chunkReader;
     QString m_chunkReaderKey;
     QnTimePeriodList m_chunks;
-    
+
     QnMutex m_mutexChunks;
     //QnWaitCondition m_chunksCond;
     bool m_chunksReady;

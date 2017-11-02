@@ -222,13 +222,17 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     const QnVirtualCameraResourceList& cameraList,
     qint64 msecSinceEpoch)
 {
-    if (cameraList.isEmpty())
-        return;
+    const auto requiredPermission = msecSinceEpoch < 0
+        ? Qn::ViewLivePermission
+        : Qn::ViewFootagePermission;
 
     QnMultiImageProvider::Providers providers;
     for (const auto& camera: cameraList)
     {
         NX_ASSERT(accessController()->hasPermissions(camera, Qn::ViewContentPermission));
+        if (accessController()->hasPermissions(camera, requiredPermission))
+            continue;
+
         std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(
             camera,
             msecSinceEpoch,
@@ -238,6 +242,9 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
 
         providers.push_back(std::move(provider));
     }
+
+    if (providers.empty())
+        return;
 
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
@@ -474,7 +481,7 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
             case vms::event::userDefinedEvent:
             {
                 auto sourceCameras = resourcePool()->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
-                sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewContentPermission);
+                sourceCameras = accessController()->filtered(sourceCameras, Qn::ViewFootagePermission);
                 if (!sourceCameras.isEmpty())
                 {
                     item->addActionButton(

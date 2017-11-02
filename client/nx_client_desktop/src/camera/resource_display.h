@@ -1,10 +1,11 @@
-#ifndef QN_UI_DISPLAY_H
-#define QN_UI_DISPLAY_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <core/resource/resource_consumer.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
+
+#include <nx/client/desktop/camera/camera_fwd.h>
 
 #include <utils/common/connective.h>
 
@@ -144,7 +145,3 @@ private:
 
     QPointer<nx::utils::Counter> m_counter;
 };
-
-typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
-
-#endif // QN_UI_DISPLAY_H

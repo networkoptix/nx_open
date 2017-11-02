@@ -348,6 +348,8 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(
                 &QnLicenseUsageWatcher::licenseUsageChanged);
             connect(camera, &QnVirtualCameraResource::groupIdChanged, this,
                 &QnLicenseUsageWatcher::licenseUsageChanged);
+            connect(camera, &QnSecurityCamResource::licenseTypeChanged, this,
+                &QnLicenseUsageWatcher::licenseUsageChanged);
         };
 
     if (camera)
@@ -449,9 +451,9 @@ bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourceP
 }
 
 bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr& camera,
-    bool cachedLicenceUsed)
+    bool cachedLicenseUsed)
 {
-    bool requiresLicense = cachedLicenceUsed;
+    bool requiresLicense = cachedLicenseUsed;
     requiresLicense &= !m_proposedToDisable.contains(camera);
     requiresLicense |= m_proposedToEnable.contains(camera);
     return requiresLicense && !isValid(camera->licenseType());
@@ -539,16 +541,16 @@ QnSingleCamLicenseStatusHelper::~QnSingleCamLicenseStatusHelper()
     m_helper->disconnect(this);
 }
 
-QnSingleCamLicenseStatusHelper::LicenseStatus QnSingleCamLicenseStatusHelper::status() const
+QnLicenseUsageStatus QnSingleCamLicenseStatusHelper::status() const
 {
     if (!m_camera)
-        return LicenseStatus::invalid;
+        return QnLicenseUsageStatus::invalid;
 
-    const bool isLicenceUsed = m_camera->isLicenseUsed();
-    if (m_helper->isOverflowForCamera(m_camera, isLicenceUsed))
-        return LicenseStatus::overflow;
+    const bool isLicenseUsed = m_camera->isLicenseUsed();
+    if (m_helper->isOverflowForCamera(m_camera, isLicenseUsed))
+        return QnLicenseUsageStatus::overflow;
 
-    return (isLicenceUsed ? LicenseStatus::used : LicenseStatus::notUsed);
+    return (isLicenseUsed ? QnLicenseUsageStatus::used : QnLicenseUsageStatus::notUsed);
 }
 
 

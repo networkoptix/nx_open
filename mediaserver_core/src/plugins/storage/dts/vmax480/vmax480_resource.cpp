@@ -39,18 +39,18 @@ int QnPlVmax480Resource::getMaxFps() const
     return 30;
 }
 
-QString QnPlVmax480Resource::getDriverName() const 
+QString QnPlVmax480Resource::getDriverName() const
 {
     return MANUFACTURE;
 }
 
-void QnPlVmax480Resource::setIframeDistance(int frames, int timems) 
+void QnPlVmax480Resource::setIframeDistance(int frames, int timems)
 {
     Q_UNUSED(frames)
     Q_UNUSED(timems)
 }
 
-void QnPlVmax480Resource::setHostAddress(const QString &ip) 
+void QnPlVmax480Resource::setHostAddress(const QString &ip)
 {
     QString oldHostAddr = getHostAddress();
 
@@ -106,7 +106,7 @@ int QnPlVmax480Resource::eventPort() const
         return 0;
 
     return lst[3].toInt();
-    
+
 }
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
@@ -122,8 +122,8 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
     return archiveReader;
 }
 
-QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate() 
-{ 
+QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
+{
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
@@ -189,7 +189,7 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
         m_endTime = endTimeUsec;
     }
 
-    if (recursive) 
+    if (recursive)
     {
         for (int i = 0; i < VMAX_MAX_CH; ++i)
         {
@@ -241,7 +241,7 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
     //m_chunksCond.wakeAll();
 }
 
-QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
+QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel)
 {
     Q_UNUSED(detailLevel)
     QnMutexLocker lock( &m_mutexChunks );
@@ -256,7 +256,7 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
     return m_chunks.intersected(period);
 }
 
-Qn::LicenseType QnPlVmax480Resource::licenseType() const
+Qn::LicenseType QnPlVmax480Resource::calculateLicenseType() const
 {
     return Qn::LC_VMAX;
 }

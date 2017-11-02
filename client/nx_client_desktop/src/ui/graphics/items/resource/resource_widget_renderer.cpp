@@ -204,6 +204,18 @@ Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sour
     return ctx.renderer->paint(sourceRect, targetRect);
 }
 
+Qn::RenderStatus QnResourceWidgetRenderer::discardFrame(int channel)
+{
+    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
+        return Qn::NothingRendered;
+
+    const auto& ctx = m_channelRenderers[static_cast<size_t>(channel)];
+    if (!ctx.renderer)
+        return Qn::NothingRendered;
+
+    return ctx.renderer->discardFrame();
+}
+
 void QnResourceWidgetRenderer::skip(int channel) {
     RenderingTools &ctx = m_channelRenderers[channel];
     if(!ctx.renderer)

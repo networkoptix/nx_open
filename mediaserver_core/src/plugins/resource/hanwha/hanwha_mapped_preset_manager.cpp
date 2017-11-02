@@ -190,7 +190,7 @@ QString HanwhaMappedPresetManager::freePresetNumber() const
 
     QnPtzPresetList presets;
     if (!nativePresets(&presets))
-        return false;
+        return QString();
 
     QSet<int> presetNumbers;
     for (const auto& preset: presets)

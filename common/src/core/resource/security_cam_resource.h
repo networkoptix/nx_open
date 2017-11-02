@@ -115,7 +115,7 @@ public:
     bool isEdge() const;
 
     /** Returns edge, analog or digital class */
-    virtual Qn::LicenseType licenseType() const;
+    Qn::LicenseType licenseType() const;
 
     /**
      * Returns true if all cameras in a same camera group should share 1 license
@@ -331,6 +331,7 @@ signals:
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
+    void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
 
@@ -397,6 +398,8 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
+
+    virtual Qn::LicenseType calculateLicenseType() const;
 protected:
 #ifdef ENABLE_DATA_PROVIDERS
     QnAudioTransmitterPtr m_audioTransmitter;
@@ -411,13 +414,13 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    mutable Qn::LicenseType m_cachedLicenseType;
+    CachedValue<Qn::LicenseType> m_cachedLicenseType;
     CachedValue<bool> m_cachedHasDualStreaming2;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
     CachedValue<Qn::MotionType> m_motionType;
-    mutable CachedValue<bool> m_cachedIsIOModule;
+    CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;

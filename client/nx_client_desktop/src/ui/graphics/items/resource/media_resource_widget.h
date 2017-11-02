@@ -24,18 +24,20 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
-#include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <nx/client/desktop/camera/camera_fwd.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
-#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
+
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 class EntropixImageEnhancer;
+class MediaResourceWidgetPrivate;
 
 namespace ui {
 namespace graphics {
@@ -50,6 +52,7 @@ class SoftwareTriggerButton;
 
 // TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
 using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
+using QnMediaResourceWidgetPrivate = nx::client::desktop::MediaResourceWidgetPrivate;
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -160,6 +163,8 @@ public:
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
 
+    bool isLicenseUsed() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -169,6 +174,7 @@ signals:
     void positionChanged(qint64 positionUtcMs);
     void motionSearchModeEnabled(bool enabled);
     void zoomWindowCreationModeEnabled(bool enabled);
+    void licenseStatusChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -234,7 +240,7 @@ private slots:
     void at_camDisplay_liveChanged();
     void processSettingsRequest();
     void processDiagnosticsRequest();
-    void processIoEnableRequest();
+    void processEnableLicenseRequest();
     void processMoreLicensesRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
@@ -261,7 +267,6 @@ private:
 
     qreal calculateVideoAspectRatio() const;
 
-    Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
     Q_SLOT void updateIconButton();
     Q_SLOT void updateRendererEnabled();
@@ -312,6 +317,7 @@ private:
     };
 
     void initRenderer();
+    void initDisplay();
     void initSoftwareTriggers();
     void initIoModuleOverlay();
     void initIconButton();
@@ -330,28 +336,10 @@ private:
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+    void getResourceStates();
 
 private:
-    struct ResourceStates
-    {
-        bool isRealTimeSource;  /// Shows if resource is real-time source
-        bool isOffline;         /// Shows if resource is offline. Not-real-time resource is alwasy online
-        bool isUnauthorized;    /// Shows if resource is unauthorized. Not-real-time resource is alwasy online
-        bool hasVideo;          /// Shows if resource has video
-    };
-
-    /// @brief Return resource states
-    ResourceStates getResourceStates() const;
-
-private:
-    /** Media resource. */
-    QnMediaResourcePtr m_resource;
-
-    /** Camera resource. */
-    QnVirtualCameraResourcePtr m_camera;
-
-    /** Display. */
-    QnResourceDisplayPtr m_display;
+    QScopedPointer<QnMediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
     QnResourceWidgetRenderer* m_renderer = nullptr;
@@ -395,8 +383,6 @@ private:
 
     QnIoModuleOverlayWidget* m_ioModuleOverlayWidget = nullptr;
     bool m_ioCouldBeShown = false;
-
-    QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseStatusHelper;
 
     qint64 m_posUtcMs;
 

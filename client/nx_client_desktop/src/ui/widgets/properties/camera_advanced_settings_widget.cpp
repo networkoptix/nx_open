@@ -213,7 +213,7 @@ void QnCameraAdvancedSettingsWidget::reloadData()
 
     if (m_page == Page::Web)
     {
-        Q_ASSERT(m_camera);
+        NX_ASSERT(m_camera);
         if (!m_camera)
             return;
 

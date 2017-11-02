@@ -336,6 +336,7 @@ protected:
     void synchronizeAllGeometries(bool animate);
     void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnResourceWidget *widget);
+    void synchronizePlaceholder(QnResourceWidget *widget);
     void synchronizeSceneBounds();
 
     void updateCurrentMarginFlags();
