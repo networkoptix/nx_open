@@ -2,9 +2,9 @@
 
 angular.module('cloudApp')
     .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
-    'account', '$q', 'system', '$poll', 'page', '$timeout',
+    'account', '$q', 'system', '$poll', 'page', '$timeout', 'notifyWatcher',
     function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
-    account, $q, system, $poll, page, $timeout) {
+    account, $q, system, $poll, page, $timeout, notifyWatcher) {
 
         var systemId = $routeParams.systemId;
 
@@ -93,6 +93,7 @@ angular.module('cloudApp')
                 // User is not owner. Deleting means he'll lose access to it
                 dialogs.confirm(L.system.confirmUnshareFromMe, L.system.confirmUnshareFromMeTitle, L.system.confirmUnshareFromMeAction, 'danger').
                     then(function(){
+                        notifyWatcher.notifySystemChanged($scope.system.info.name);
                         $scope.deletingSystem = process.init(function(){
                             return $scope.system.deleteFromCurrentAccount();
                         },{
