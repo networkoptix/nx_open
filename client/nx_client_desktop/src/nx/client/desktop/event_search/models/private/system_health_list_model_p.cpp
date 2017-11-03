@@ -71,6 +71,19 @@ void SystemHealthListModel::Private::beforeRemove(const EventData& event)
     m_uuidHashes[extraData.first].remove(extraData.second);
 }
 
+int SystemHealthListModel::Private::eventPriority(const EventData& event) const
+{
+    const auto extraData = Private::extraData(event);
+    switch (extraData.first)
+    {
+        case QnSystemHealth::CloudPromo:
+            return int(QnNotificationLevel::Value::LevelCount); //< The highest.
+
+        default:
+            return int(QnNotificationLevel::valueOf(extraData.first));
+    }
+}
+
 void SystemHealthListModel::Private::addSystemHealthEvent(
     QnSystemHealth::MessageType message,
     const QVariant& params)

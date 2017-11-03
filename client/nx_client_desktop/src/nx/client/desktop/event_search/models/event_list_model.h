@@ -59,12 +59,15 @@ protected:
     void clear();
 
     QModelIndex indexOf(const QnUuid& id) const;
+    EventData getEvent(const QModelIndex& index) const;
 
     virtual QString timestampText(qint64 timestampMs) const;
 
     virtual void triggerDefaultAction(const EventData& event);
     virtual void triggerCloseAction(const EventData& event);
     virtual void triggerLinkAction(const EventData& event, const QString& link);
+
+    virtual int eventPriority(const EventData& event) const;
 
     virtual void beforeRemove(const EventData& event);
 

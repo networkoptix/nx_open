@@ -24,8 +24,8 @@ public:
     Private(EventRibbon* q);
     virtual ~Private() override;
 
-    QAbstractItemModel* model() const;
-    void setModel(QAbstractItemModel* model);
+    QAbstractListModel* model() const;
+    void setModel(QAbstractListModel* model);
 
     int totalHeight() const;
 
@@ -64,13 +64,8 @@ private:
 
 private:
     EventRibbon* const q = nullptr;
-    QAbstractItemModel* m_model = nullptr;
+    QAbstractListModel* m_model = nullptr;
     QScopedPointer<QnDisconnectHelper> m_modelConnections;
-
-    // These fields are constant for now.
-    // If required in the future they can be made changeable from public interface.
-    QPersistentModelIndex m_rootIndex;
-    int m_modelColumn = 0;
 
     QScrollBar* const m_scrollBar = nullptr;
     QWidget* const m_viewport = nullptr;

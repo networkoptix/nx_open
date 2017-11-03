@@ -39,6 +39,11 @@ void SystemHealthListModel::beforeRemove(const EventData& event)
     d->beforeRemove(event);
 }
 
+int SystemHealthListModel::eventPriority(const EventData& event) const
+{
+    return d->eventPriority(event);
+}
+
 } // namespace
 } // namespace client
 } // namespace nx

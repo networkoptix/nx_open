@@ -74,6 +74,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::CommandActionRole:
             return qVariantFromValue(event.extraAction);
 
+        case Qn::PriorityRole:
+            return eventPriority(event);
+
         default:
             return QVariant();
     }
@@ -97,6 +100,13 @@ bool EventListModel::removeEvent(const QnUuid& id)
 QModelIndex EventListModel::indexOf(const QnUuid& id) const
 {
     return index(d->indexOf(id));
+}
+
+EventListModel::EventData EventListModel::getEvent(const QModelIndex& index) const
+{
+    return index.model() == this && index.isValid()
+        ? d->getEvent(index.row())
+        : EventData();
 }
 
 void EventListModel::clear()
@@ -147,6 +157,11 @@ void EventListModel::triggerCloseAction(const EventData& event)
 void EventListModel::triggerLinkAction(const EventData& event, const QString& link)
 {
     triggerDefaultAction(event);
+}
+
+int EventListModel::eventPriority(const EventData& /*event*/) const
+{
+    return 0;
 }
 
 void EventListModel::beforeRemove(const EventData& /*event*/)

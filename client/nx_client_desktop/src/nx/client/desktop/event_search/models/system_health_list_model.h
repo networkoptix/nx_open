@@ -23,6 +23,8 @@ protected:
 
     virtual void beforeRemove(const EventData& event) override;
 
+    virtual int eventPriority(const EventData& event) const override;
+
 private:
     class Private;
     QScopedPointer<Private> d;

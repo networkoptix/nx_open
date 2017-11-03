@@ -13,10 +13,13 @@
 #include <ui/common/custom_painted.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/models/sort_filter_list_model.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <nx/client/desktop/common/models/subset_list_model.h>
+#include <nx/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/event_search/models/system_health_list_model.h>
@@ -31,15 +34,30 @@
 
 namespace nx {
 namespace client {
-namespace desktop
+namespace desktop {
+
+namespace {
+
+class SystemHealthSortFilterModel: public QnSortFilterListModel
 {
+public:
+    using QnSortFilterListModel::QnSortFilterListModel;
+
+    bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight) const
+    {
+        return sourceLeft.data(Qn::PriorityRole).toInt()
+            > sourceRight.data(Qn::PriorityRole).toInt();
+    }
+};
+
+} // namespace
+
 
 NotificationListWidget::Private::Private(NotificationListWidget* q) :
     QObject(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_systemHealth(new EventRibbon(q)),
-    m_notifications(new EventRibbon(q)),
+    m_eventRibbon(new EventRibbon(q)),
     m_systemHealthModel(new SystemHealthListModel(this)),
     m_notificationsModel(new NotificationListModel(this))
 {
@@ -54,11 +72,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
     layout->addWidget(headerWidget);
-    layout->addWidget(m_systemHealth);
-    layout->addWidget(m_notifications);
+    layout->addWidget(m_eventRibbon);
 
-    m_systemHealth->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    m_notifications->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     const auto handleActions =
         [this](EventRibbon* ribbon, EventListModel* model)
@@ -71,11 +87,18 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
                 &EventListModel::linkAction, Qt::QueuedConnection);
         };
 
-    m_systemHealth->setModel(m_systemHealthModel);
-    m_notifications->setModel(m_notificationsModel);
+    auto sortModel = new SystemHealthSortFilterModel(this);
+    auto systemHealthListModel = new SubsetListModel(sortModel, 0, QModelIndex(), this);
+    sortModel->setSourceModel(m_systemHealthModel);
+    sortModel->setFilterRole(Qn::ResourceSearchStringRole);
+    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-    handleActions(m_systemHealth, m_systemHealthModel);
-    handleActions(m_notifications, m_notificationsModel);
+    m_eventRibbon->setModel(new ConcatenationListModel(
+        {systemHealthListModel, m_notificationsModel}, this));
+
+    // Each model will react only to ids of its own items.
+    handleActions(m_eventRibbon, m_systemHealthModel);
+    handleActions(m_eventRibbon, m_notificationsModel);
 }
 
 NotificationListWidget::Private::~Private()

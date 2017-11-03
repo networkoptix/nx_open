@@ -19,19 +19,19 @@ EventRibbon::~EventRibbon()
 {
 }
 
-QAbstractItemModel* EventRibbon::model() const
+QAbstractListModel* EventRibbon::model() const
 {
     return d->model();
+}
+
+void EventRibbon::setModel(QAbstractListModel* model)
+{
+    d->setModel(model);
 }
 
 QScrollBar* EventRibbon::scrollBar() const
 {
     return d->scrollBar();
-}
-
-void EventRibbon::setModel(QAbstractItemModel* model)
-{
-    d->setModel(model);
 }
 
 QSize EventRibbon::sizeHint() const

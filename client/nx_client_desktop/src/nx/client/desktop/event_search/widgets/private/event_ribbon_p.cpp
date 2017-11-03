@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <QtCore/QPointer>
-#include <QtCore/QAbstractItemModel>
+#include <QtCore/QAbstractListModel>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
@@ -89,12 +89,12 @@ EventRibbon::Private::~Private()
     m_modelConnections.reset();
 }
 
-QAbstractItemModel* EventRibbon::Private::model() const
+QAbstractListModel* EventRibbon::Private::model() const
 {
     return m_model;
 }
 
-void EventRibbon::Private::setModel(QAbstractItemModel* model)
+void EventRibbon::Private::setModel(QAbstractListModel* model)
 {
     if (m_model == model)
         return;
@@ -107,7 +107,7 @@ void EventRibbon::Private::setModel(QAbstractItemModel* model)
     if (!m_model)
         return;
 
-    insertNewTiles(0, m_model->rowCount(m_rootIndex));
+    insertNewTiles(0, m_model->rowCount());
 
     m_modelConnections.reset(new QnDisconnectHelper());
 
@@ -115,47 +115,26 @@ void EventRibbon::Private::setModel(QAbstractItemModel* model)
         [this]()
         {
             clear();
-            insertNewTiles(0, m_model->rowCount(m_rootIndex));
+            insertNewTiles(0, m_model->rowCount());
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsInserted, this,
-        [this](const QModelIndex& parent, int first, int last)
+        [this](const QModelIndex& /*parent*/, int first, int last)
         {
-            if (m_rootIndex.isValid() != parent.isValid())
-                return;
-
-            if (m_rootIndex.isValid() && m_rootIndex != parent)
-                return;
-
             insertNewTiles(first, last - first + 1);
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this,
-        [this](const QModelIndex& parent, int first, int last)
+        [this](const QModelIndex& /*parent*/, int first, int last)
         {
-            if (m_rootIndex.isValid() != parent.isValid())
-                return;
-
-            if (m_rootIndex.isValid() && m_rootIndex != parent)
-                return;
-
             removeTiles(first, last - first + 1);
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::dataChanged, this,
         [this](const QModelIndex& first, const QModelIndex& last)
         {
-            if (first.column() > m_modelColumn || last.column() < m_modelColumn)
-                return;
-
-            if (m_rootIndex.isValid() != first.parent().isValid())
-                return;
-
-            if (m_rootIndex.isValid() && m_rootIndex != first.parent())
-                return;
-
             for (int i = first.row(); i <= last.row(); ++i)
-                updateTile(m_tiles[i].widget, first.sibling(i, m_modelColumn));
+                updateTile(m_tiles[i].widget, first.sibling(i, 0));
         });
 
     *m_modelConnections << connect(m_model, &QAbstractListModel::rowsMoved, this,
@@ -163,7 +142,7 @@ void EventRibbon::Private::setModel(QAbstractItemModel* model)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "EventRibbon doesn't support model rows moving!");
             clear(); // Handle as full reset.
-            insertNewTiles(0, m_model->rowCount(m_rootIndex));
+            insertNewTiles(0, m_model->rowCount());
         });
 }
 
@@ -174,7 +153,7 @@ void EventRibbon::Private::insertNewTiles(int first, int count)
 
     for (int i = first; i < first + count; ++i)
     {
-        const auto index = m_model->index(i, m_modelColumn, m_rootIndex);
+        const auto index = m_model->index(i);
         auto tile = createTile(index);
         NX_EXPECT(tile);
         if (tile)

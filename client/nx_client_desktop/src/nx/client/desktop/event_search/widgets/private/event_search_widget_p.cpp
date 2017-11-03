@@ -11,6 +11,7 @@
 #include <ui/widgets/common/search_line_edit.h>
 #include <utils/common/event_processors.h>
 
+#include <nx/client/desktop/common/models/subset_list_model.h>
 #include <nx/client/desktop/event_search/models/unified_search_list_model.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 
@@ -69,11 +70,12 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     auto sortModel = new EventSortFilterModel(this);
     sortModel->setSourceModel(m_model);
     sortModel->setFilterRole(Qn::ResourceSearchStringRole);
+    sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
     connect(searchLineEdit, &QnSearchLineEdit::textChanged,
         sortModel, &EventSortFilterModel::setFilterWildcard);
 
-    m_eventRibbon->setModel(sortModel);
+    m_eventRibbon->setModel(new SubsetListModel(sortModel, 0, QModelIndex(), this));
 
     connect(m_eventRibbon, &EventRibbon::clicked, m_model,
         &EventListModel::defaultAction, Qt::QueuedConnection);

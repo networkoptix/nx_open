@@ -5,7 +5,7 @@
 
 #include <nx/utils/uuid.h>
 
-class QAbstractItemModel;
+class QAbstractListModel;
 class QScrollBar;
 
 namespace nx {
@@ -23,8 +23,8 @@ public:
     EventRibbon(QWidget* parent = nullptr);
     virtual ~EventRibbon() override;
 
-    QAbstractItemModel* model() const;
-    void setModel(QAbstractItemModel* model);
+    QAbstractListModel* model() const;
+    void setModel(QAbstractListModel* model); //< Use SubsetListModel to proxy non-list model.
 
     virtual QSize sizeHint() const override;
 

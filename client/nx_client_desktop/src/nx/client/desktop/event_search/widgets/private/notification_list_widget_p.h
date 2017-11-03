@@ -33,8 +33,7 @@ private:
 
 private:
     NotificationListWidget* q = nullptr;
-    EventRibbon* const m_systemHealth = nullptr;
-    EventRibbon* const m_notifications = nullptr;
+    EventRibbon* const m_eventRibbon = nullptr;
     EventListModel* m_systemHealthModel = nullptr;
     EventListModel* m_notificationsModel = nullptr;
 };
