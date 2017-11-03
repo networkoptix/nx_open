@@ -24,6 +24,16 @@ static const char kEndTimeParamName[] = "EndTime";
 static std::chrono::seconds kUpdateChunksDelay(60);
 static std::chrono::seconds kResendRequestIfFail(10);
 
+static const QString kDateTimeFormat = lit("yyyy-MM-dd hh:mm:ss");
+
+static QDateTime kMinDateTime = QDateTime::fromString(
+    lit("2000-01-01 00:00:00"),
+    kDateTimeFormat);
+
+static QDateTime kMaxDateTime = QDateTime::fromString(
+    lit("2038-01-01 00:00:00"),
+    kDateTimeFormat);
+
 HanwhaChunkLoader::HanwhaChunkLoader():
     m_httpClient(new nx_http::AsyncClient())
 {
@@ -146,8 +156,15 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         kUpdateChunksDelay).count();
 
-    auto startDateTime = toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, m_timeZoneShift);
-    auto endDateTime = QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1);
+    const bool isNvr = m_resourceContext->information()->deviceType == kHanwhaNvrDeviceType;
+    auto startDateTime = isNvr
+        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, m_timeZoneShift)
+        : kMinDateTime;
+
+    auto endDateTime = isNvr
+        ? QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1)
+        : kMaxDateTime;
+
     query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateTimeFormat));
     query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateTimeFormat));
 

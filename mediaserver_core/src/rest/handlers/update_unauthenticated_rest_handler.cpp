@@ -24,7 +24,9 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
     const auto updateId = params.value(lit("updateId"));
     const bool delayed = params.value(lit("delayed"), lit("false")) != lit("false");
 
-    if (updateId.isEmpty() || !verifyRelativePath(updateId))
+    // TODO: updateId is not a path, so verification must be a bit tougher.
+    // It may be verified to be a file name.
+    if (updateId.isEmpty() || !verifySimpleRelativePath(updateId))
     {
         result.setError(QnJsonRestResult::InvalidParameter, lit("updateId"));
         return nx_http::StatusCode::ok;

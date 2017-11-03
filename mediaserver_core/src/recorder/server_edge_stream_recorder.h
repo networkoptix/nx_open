@@ -19,7 +19,7 @@ class QnServerEdgeStreamRecorder: public QnServerStreamRecorder
             int timeZone,
             QString fileName,
             QnAbstractMediaStreamDataProvider* provider)
-            :
+        :
             isValid(true),
             startTimeMs(startTimeMs),
             timeZone(timeZone),

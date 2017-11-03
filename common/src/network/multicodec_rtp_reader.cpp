@@ -842,7 +842,13 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
     int rtpPacketSize,
     int channel)
 {
+    if (m_tracks.size() - 1 < channel)
+        return QnRtspStatistic();
+
     auto ioDevice = m_tracks[channel].ioDevice;
+    if (!ioDevice)
+        return QnRtspStatistic();
+
     auto rtcpStaticstics = ioDevice->getStatistic();
     const auto extensionNtpTime = parseOnvifNtpExtensionTime(
         (quint8*)m_demuxedData[channel]->data() + rtpBufferOffset,
