@@ -184,8 +184,9 @@ bool Param<int>::reload(const std::string* value, std::ostream* output)
     {
         // NOTE: std::stoi() is missing on Android.
         char* pEnd = nullptr;
+        errno = 0; //< Required before strtol().
         const long v = std::strtol(value->c_str(), &pEnd, /*base*/ 0);
-        if (v > INT_MAX || v < INT_MIN || errno == ERANGE || *pEnd != '\0')
+        if (v > INT_MAX || v < INT_MIN || errno != 0 || *pEnd != '\0')
             error = " [invalid value]";
         else
             *pValue = (int) v;
