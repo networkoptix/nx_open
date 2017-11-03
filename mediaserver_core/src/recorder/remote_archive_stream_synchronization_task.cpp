@@ -9,6 +9,7 @@
 #include <nx/mediaserver/event/event_connector.h>
 
 #include <utils/common/util.h>
+#include <utils/common/sleep.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -122,7 +123,10 @@ bool RemoteArchiveStreamSynchronizationTask::synchronizeArchive()
             break;
 
         if (timePeriod.durationMs >= kMinChunkDuration.count())
+        {
+            QnSleep::msleep(3000); //< Without that sleep Hanwha cameras fail and go offline.
             writeTimePeriodToArchive(timePeriod);
+        }
     }
 
     qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
@@ -253,7 +257,7 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
                     progress = 1.0;
                     NX_DEBUG(
                         this,
-                        lm("Wrong progress! Imported: %1, Total: %1")
+                        lm("Wrong progress! Imported: %1, Total: %2")
                             .args(m_importedDuration.count(), m_totalDuration.count()));
                 }
 

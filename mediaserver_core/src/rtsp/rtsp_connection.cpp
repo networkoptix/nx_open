@@ -333,13 +333,6 @@ void QnRtspConnectionProcessor::parseRequest()
     if (!d->mediaRes)
         return;
 
-    d->peerHasAccess = resourceAccessManager()->hasPermission(d->accessRights,
-        d->mediaRes.dynamicCast<QnResource>(),
-        requiredPermission(getStreamingMode()));
-
-    if (!d->peerHasAccess)
-        return;
-
     if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
         d->useProprietaryFormat = true;
     else {
@@ -409,6 +402,11 @@ void QnRtspConnectionProcessor::parseRequest()
         }
     }
     d->qualityFastSwitch = true;
+
+    d->peerHasAccess = resourceAccessManager()->hasPermission(d->accessRights,
+        d->mediaRes.dynamicCast<QnResource>(),
+        requiredPermission(getStreamingMode()));
+
     d->clientRequest.clear();
 }
 

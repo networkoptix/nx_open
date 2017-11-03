@@ -41,16 +41,15 @@ struct QnCameraAdvancedParameterCondition
 {
     enum class ConditionType
     {
-        Equal,
-        InRange,
-        NotInRange,
-        Present,
-        NotPresent,
-        Default,
-        Unknown
+        equal, //< Watched value strictly equals to condition value
+        inRange, //< Watched value is in condition value range
+        notInRange,
+        present, //< Watched value is present in parameter list
+        notPresent,
+        unknown
     };
 
-    ConditionType type = ConditionType::Unknown;
+    ConditionType type = ConditionType::unknown;
     QString paramId;
     QString value;
 
@@ -67,13 +66,13 @@ struct QnCameraAdvancedParameterDependency
 {
     enum class DependencyType
     {
-        Show,
-        Range,
-        Unknown
+        show,
+        range,
+        unknown
     };
 
     QString id;
-    DependencyType type = DependencyType::Unknown;
+    DependencyType type = DependencyType::unknown;
     QString range;
     QString internalRange;
     std::vector<QnCameraAdvancedParameterCondition> conditions;

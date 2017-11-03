@@ -49,6 +49,8 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Values);
 class NX_NETWORK_API AuthMethodRestrictionList
 {
 public:
+    static const unsigned int kDefaults;
+
     /**
      * @return Bit mask of auth methods (AuthMethod::Value enumeration).
      */

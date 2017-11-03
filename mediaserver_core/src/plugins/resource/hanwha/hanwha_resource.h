@@ -73,6 +73,9 @@ public:
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(
+        const QnAbstractStreamDataProvider* dataProvider) const override;
+
     QString sessionKey(HanwhaSessionType sessionType, bool generateNewOne = false);
 
     std::unique_ptr<QnAbstractArchiveDelegate> remoteArchiveDelegate();
@@ -233,6 +236,9 @@ private:
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
+    bool executeCommandInternal(
+        const HanwhaAdavancedParameterInfo& info,
+        const HanwhaRequestHelper::Parameters& parameters);
 
     void initMediaStreamCapabilities();
 

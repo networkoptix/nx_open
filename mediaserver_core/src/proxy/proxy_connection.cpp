@@ -247,10 +247,12 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
             originalUserName = user->getName().toUtf8();
         if (originalUserName.isEmpty())
             originalUserName = originalAuthHeader.digest->userid;
-
-        nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalUserName);
+        if (!originalUserName.isEmpty())
+        {
+            nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalUserName);
+            nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
+        }
         nx_http::insertOrReplaceHeader(&d->request.headers, authHeader);
-        nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
     }
 
     return true;
@@ -459,6 +461,9 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
         d->socket->close();
         return false;
     }
+
+    if (dstRoute.id.isNull() && d->accessRights.userId.isNull())
+        return false; //< Do not allow direct IP connect for unauthorized users.
 
     d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
     if (d->lastConnectedUrl.isEmpty())

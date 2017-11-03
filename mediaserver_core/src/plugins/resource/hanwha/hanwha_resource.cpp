@@ -1107,10 +1107,14 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
     bool hasRemoteArchive = !isNvr();
-    const auto eventStatuses = sharedContext()->eventStatuses();
-    const auto isSdCardInserted = eventStatuses.value.parameter<bool>(lit("SystemEvent.SDInsert"));
 
-    hasRemoteArchive &= (isSdCardInserted.is_initialized() && isSdCardInserted.get());
+    HanwhaRequestHelper helper(sharedContext());
+    auto response = helper.view(lit("recording/storage"));
+    if (!response.isSuccessful())
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto storageEnabled = response.parameter<bool>(lit("Enable"));
+    hasRemoteArchive &= (storageEnabled != boost::none) && *storageEnabled;
     setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
 
     return CameraDiagnostics::NoErrorResult();
@@ -1825,29 +1829,29 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (!cgiParameter)
             continue;
 
-        bool supported = true;
+        bool isSupported = true;
         auto supportAttribute = info->supportAttribute();
 
         if (!supportAttribute.isEmpty())
         {
-            supported = false;
+            isSupported = false;
             if (!info->isChannelIndependent())
                 supportAttribute += lit("/%1").arg(getChannel());
 
-            const auto boolAttr = m_attributes.attribute<bool>(supportAttribute);
-            if (boolAttr.is_initialized())
+            const auto boolAttribute = m_attributes.attribute<bool>(supportAttribute);
+            if (boolAttribute != boost::none)
             {
-                supported = boolAttr.get();
+                isSupported = boolAttribute.get();
             }
             else
             {
-                const auto intAttr = m_attributes.attribute<int>(supportAttribute);
-                if (intAttr.is_initialized())
-                    supported = intAttr.get() > 0;
+                const auto intAttribute = m_attributes.attribute<int>(supportAttribute);
+                if (intAttribute != boost::none)
+                    isSupported = intAttribute.get() > 0;
             }
         }
 
-        if (supported)
+        if (isSupported)
             supportedIds.insert(id);
     }
 
@@ -1941,7 +1945,7 @@ bool HanwhaResource::addBitrateRanges(
 
             QnCameraAdvancedParameterDependency dependency;
             dependency.id = QnUuid::createUuid().toString();
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("%1,%2").arg(minLimit).arg(maxLimit);
             return dependency;
         };
@@ -1961,7 +1965,7 @@ bool HanwhaResource::addFrameRateRanges(
         {
             QnCameraAdvancedParameterDependency dependency;
             dependency.id = QnUuid::createUuid().toString();
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("1,%2").arg(limits.maxFps);
             return dependency;
         };
@@ -1994,7 +1998,7 @@ bool HanwhaResource::addDependencies(
 
             const auto codecString = toHanwhaString(codec);
             QnCameraAdvancedParameterCondition codecCondition;
-            codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+            codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::equal;
             codecCondition.paramId = lit("%1media/videoprofile/EncodingType")
                 .arg(streamPrefix);
             codecCondition.value = codecString;
@@ -2002,7 +2006,7 @@ bool HanwhaResource::addDependencies(
             const auto resolutionString = toHanwhaString(resolution);
             QnCameraAdvancedParameterCondition resolutionCondition;
             resolutionCondition.type =
-                QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                QnCameraAdvancedParameterCondition::ConditionType::equal;
             resolutionCondition.paramId = lit("%1media/videoprofile/Resolution")
                 .arg(streamPrefix);
             resolutionCondition.value = resolutionString;
@@ -2022,7 +2026,7 @@ bool HanwhaResource::addDependencies(
             {
                 QnCameraAdvancedParameterCondition bitrateControlTypeCondition;
                 bitrateControlTypeCondition.type
-                    = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                    = QnCameraAdvancedParameterCondition::ConditionType::equal;
                 bitrateControlTypeCondition.paramId
                     = lit("%1media/videoprofile/%2.BitrateControlType")
                         .arg(streamPrefix)
@@ -2364,23 +2368,30 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
     if (!parameterValues.isEmpty())
         requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
 
+    return executeCommandInternal(*info, requestParameters);
+}
+
+bool HanwhaResource::executeCommandInternal(
+    const HanwhaAdavancedParameterInfo& info,
+    const HanwhaRequestHelper::Parameters& parameters)
+{
     auto makeRequest =
         [&info, this](HanwhaRequestHelper::Parameters parameters, int channel)
-        {
-            if (channel != kHanwhaInvalidChannel)
-                parameters[kHanwhaChannelProperty] = QString::number(channel);
+    {
+        if (channel != kHanwhaInvalidChannel)
+            parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-            HanwhaRequestHelper helper(sharedContext());
-            const auto response = helper.doRequest(
-                info->cgi(),
-                info->submenu(),
-                info->updateAction(),
-                parameters);
+        HanwhaRequestHelper helper(sharedContext());
+        const auto response = helper.doRequest(
+            info.cgi(),
+            info.submenu(),
+            info.updateAction(),
+            parameters);
 
-            return response.isSuccessful();
-        };
+        return response.isSuccessful();
+    };
 
-    if (info->shouldAffectAllChannels())
+    if (info.shouldAffectAllChannels())
     {
         const auto& systemInfo = sharedContext()->information();
         if (!systemInfo)
@@ -2390,20 +2401,19 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
         const auto channelCount = systemInfo->channelCount;
         for (auto i = 0; i < channelCount; ++i)
         {
-            result = makeRequest(requestParameters, i);
+            result = makeRequest(parameters, i);
             if (!result)
                 return false;
         }
 
         return result;
     }
-    else if (!info->isChannelIndependent())
+    else if (!info.isChannelIndependent())
     {
-        return makeRequest(requestParameters, getChannel());
+        return makeRequest(parameters, getChannel());
     }
 
-
-    return makeRequest(requestParameters, kHanwhaInvalidChannel);
+    return makeRequest(parameters, kHanwhaInvalidChannel);
 }
 
 bool HanwhaResource::executeServiceCommand(
@@ -2545,6 +2555,24 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
         return QnTimePeriodList();
 
     return sharedContext()->chunks(getChannel());
+}
+
+QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
+    const QnAbstractStreamDataProvider* dataProvider) const
+{
+    auto defaultLayout = QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    if (!isAudioEnabled())
+        return defaultLayout;
+
+    const auto reader = dynamic_cast<const HanwhaStreamReader*>(dataProvider);
+    if (!reader)
+        return defaultLayout;
+
+    const auto layout = reader->getDPAudioLayout();
+    if (layout)
+        return layout;
+
+    return defaultLayout;
 }
 
 bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString)

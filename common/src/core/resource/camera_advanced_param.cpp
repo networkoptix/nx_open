@@ -18,7 +18,6 @@ namespace {
 const QString kEqualConditionType = lit("value");
 const QString kInRangeConditionType = lit("valueIn");
 const QString kNotInRangeConditionType = lit("valueNotIn");
-const QString kDefaultConditionType = lit("default");
 const QString kPresenceConditionType = lit("present");
 const QString kLackOfPresenceConditionType = lit("notPresent");
 
@@ -358,20 +357,18 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
 {
     switch (type)
     {
-        case ConditionType::Equal:
+        case ConditionType::equal:
             return value == valueToCheck;
-        case ConditionType::InRange:
+        case ConditionType::inRange:
         {
             auto valuesList = value.split(L',');
             return valuesList.contains(valueToCheck);
         }
-        case ConditionType::NotInRange:
+        case ConditionType::notInRange:
         {
             auto valuesList = value.split(L',');
             return !valuesList.contains(valueToCheck);
         }
-        case ConditionType::Default:
-            return true;
         default:
         {
             NX_ASSERT(false, "We should never get here.");
@@ -383,20 +380,18 @@ bool QnCameraAdvancedParameterCondition::checkValue(const QString& valueToCheck)
 ConditionType QnCameraAdvancedParameterCondition::fromStringToConditionType(
     const QString& conditionTypeString)
 {
-    ConditionType conditionType = ConditionType::Unknown;
+    ConditionType conditionType = ConditionType::unknown;
 
     if (conditionTypeString == kEqualConditionType)
-        conditionType = ConditionType::Equal;
+        conditionType = ConditionType::equal;
     else if (conditionTypeString == kInRangeConditionType)
-        conditionType = ConditionType::InRange;
+        conditionType = ConditionType::inRange;
     else if (conditionTypeString == kNotInRangeConditionType)
-        conditionType = ConditionType::NotInRange;
-    else if (conditionTypeString == kDefaultConditionType)
-        conditionType = ConditionType::Default;
+        conditionType = ConditionType::notInRange;
     else if (conditionTypeString == kPresenceConditionType)
-        conditionType = ConditionType::Present;
+        conditionType = ConditionType::present;
     else if (conditionTypeString == kLackOfPresenceConditionType)
-        conditionType = ConditionType::NotPresent;
+        conditionType = ConditionType::notPresent;
 
     return conditionType;
 }
@@ -405,18 +400,16 @@ QString QnCameraAdvancedParameterCondition::fromConditionTypeToString(const Cond
 {
     switch (conditionType)
     {
-        case ConditionType::Equal:
+        case ConditionType::equal:
             return kEqualConditionType;
-        case ConditionType::InRange:
+        case ConditionType::inRange:
             return kInRangeConditionType;
-        case ConditionType::NotInRange:
+        case ConditionType::notInRange:
             return kNotInRangeConditionType;
-        case ConditionType::Present:
+        case ConditionType::present:
             return kPresenceConditionType;
-        case ConditionType::NotPresent:
+        case ConditionType::notPresent:
             return kLackOfPresenceConditionType;
-        case ConditionType::Default:
-            return kDefaultConditionType;
         default:
             return QString();
     }
@@ -424,11 +417,11 @@ QString QnCameraAdvancedParameterCondition::fromConditionTypeToString(const Cond
 
 DependencyType QnCameraAdvancedParameterDependency::fromStringToDependencyType(const QString& dependencyTypeString)
 {
-    DependencyType dependencyType = DependencyType::Unknown;
+    DependencyType dependencyType = DependencyType::unknown;
     if (dependencyTypeString == kShowDependencyType)
-        dependencyType = DependencyType::Show;
+        dependencyType = DependencyType::show;
     else if(dependencyTypeString == kRangeDependencyType)
-        dependencyType = DependencyType::Range;
+        dependencyType = DependencyType::range;
 
     return dependencyType;
 }
@@ -437,9 +430,9 @@ QString QnCameraAdvancedParameterDependency::fromDependencyTypeToString(const De
 {
     switch (dependencyType)
     {
-        case DependencyType::Show:
+        case DependencyType::show:
             return kShowDependencyType;
-        case DependencyType::Range:
+        case DependencyType::range:
             return kRangeDependencyType;
         default:
             return QString();
@@ -456,15 +449,16 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameter, DataType,
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterCondition, ConditionType,
-    (QnCameraAdvancedParameterCondition::ConditionType::Equal, "value")
-    (QnCameraAdvancedParameterCondition::ConditionType::InRange, "valueIn")
-    (QnCameraAdvancedParameterCondition::ConditionType::NotInRange, "valueNotIn")
-    (QnCameraAdvancedParameterCondition::ConditionType::Default, "default")
+    (QnCameraAdvancedParameterCondition::ConditionType::equal, "value")
+    (QnCameraAdvancedParameterCondition::ConditionType::inRange, "valueIn")
+    (QnCameraAdvancedParameterCondition::ConditionType::notInRange, "valueNotIn")
+    (QnCameraAdvancedParameterCondition::ConditionType::present, "present")
+    (QnCameraAdvancedParameterCondition::ConditionType::notPresent, "notPresent")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnCameraAdvancedParameterDependency, DependencyType,
-    (QnCameraAdvancedParameterDependency::DependencyType::Show, "Show")
-    (QnCameraAdvancedParameterDependency::DependencyType::Range, "Range")
+    (QnCameraAdvancedParameterDependency::DependencyType::show, "Show")
+    (QnCameraAdvancedParameterDependency::DependencyType::range, "Range")
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QnCameraAdvancedParameterTypes, (json), _Fields)

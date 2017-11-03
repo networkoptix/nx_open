@@ -22,7 +22,7 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::minutes kCacheDataTimeout(1);
 
-static const QString kMinOverlappedDateTime = lit("1970-01-01 00:00:00");
+static const QString kMinOverlappedDateTime = lit("2000-01-01 00:00:00");
 static const QString kMaxOverlappedDateTime = lit("2038-01-01 00:00:00");
 
 static const QUrl cleanUrl(QUrl url)

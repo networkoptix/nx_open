@@ -133,6 +133,7 @@ def test_merge_cloud_with_local(server_factory, cloud_host, test_system_settings
         two, **test_system_settings['systemSettings'])
 
 
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
 def test_merge_cloud_systems(server_factory, cloud_host):
     one = server_factory('one', setup_cloud_host=cloud_host)
     two = server_factory('two', setup_cloud_host=cloud_host)
