@@ -631,7 +631,7 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
     if (itr != m_manualCameraMap.end())
         m_manualCameraMap.erase(itr);
-    m_recentlyDeleted << resource->getUrl();
+    m_recentlyDeleted << resource->getUniqueId();
 }
 
 void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
