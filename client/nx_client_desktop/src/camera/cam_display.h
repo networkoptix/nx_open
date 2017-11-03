@@ -137,7 +137,7 @@ public slots:
 signals:
     void liveMode(bool value);
     void stillImageChanged();
-
+    void mediaStreamEvent(Qn::MediaStreamEvent mediaEvent);
 protected:
     void setSingleShotMode(bool single);
     virtual void setSpeed(float speed) override;

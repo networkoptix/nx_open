@@ -875,6 +875,12 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DisabledUserConnectionResult                /*< Disabled user*/
     };
 
+    enum class MediaStreamEvent
+    {
+        Unknown,
+        TooManyOpenedConnections
+    };
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -911,7 +917,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::FailoverPriority)
+    (Qn::FailoverPriority)(Qn::MediaStreamEvent)
     ,
     (metatype)(lexical)
 )

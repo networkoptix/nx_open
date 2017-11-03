@@ -1166,6 +1166,7 @@ void QnRtspConnectionProcessor::createDataProvider()
         }
         if (!archiveDelegate)
             archiveDelegate = new QnServerArchiveDelegate(); // default value
+        archiveDelegate->setClientId(authSession().id);
         archiveDelegate->setPlaybackMode(d->playbackMode);
         d->thumbnailsDP.reset(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr(), archiveDelegate));
         d->thumbnailsDP->setGroupId(QnUuid::createUuid().toString().toUtf8());

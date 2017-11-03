@@ -216,7 +216,7 @@ void HanwhaResourceSearcher::createResource(
     resource->setUrl(devInfo.presentationUrl);
     resource->setMAC(mac);
 
-    if (!auth.isNull()) 
+    if (!auth.isNull())
         resource->setDefaultAuth(auth);
 
     result << resource;

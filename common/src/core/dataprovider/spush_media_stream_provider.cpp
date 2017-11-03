@@ -8,11 +8,24 @@
 #include <nx/network/simple_http_client.h>
 
 #include <core/resource/camera_resource.h>
+#include <nx/fusion//model_functions.h>
 
 namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
 static const int kErrorDelayTimeoutMs = 100;
 } // namespace
+
+static QnAbstractMediaDataPtr createMetadataPacket()
+{
+    QnCompressedMetadataPtr rez(new QnCompressedMetadata(MetadataType::MediaStreamEvent));
+    rez->timestamp = AV_NOPTS_VALUE;
+    auto data = QnLexical::serialized(Qn::MediaStreamEvent::TooManyOpenedConnections).toUtf8();
+    rez->setData(data.data(), data.size());
+
+    QnSleep::msleep(50);
+    return rez;
+}
+
 
 CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
@@ -137,6 +150,14 @@ void CLServerPushStreamReader::run()
         {
             m_needReopen = false;
             closeStream();
+            continue;
+        }
+
+        if (m_openStreamResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+        {
+            const QnAbstractMediaDataPtr& data = createMetadataPacket();
+            if (dataCanBeAccepted())
+                putData(std::move(data));
             continue;
         }
 
