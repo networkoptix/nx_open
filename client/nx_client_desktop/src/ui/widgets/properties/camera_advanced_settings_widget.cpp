@@ -213,19 +213,21 @@ void QnCameraAdvancedSettingsWidget::reloadData()
 
     if (m_page == Page::Web)
     {
-        Q_ASSERT(m_camera);
+        NX_ASSERT(m_camera);
         if (!m_camera)
             return;
+
+        QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
+        auto urlPath = resourceData.value<QString>(lit("urlLocalePath"), QString());
+        while (urlPath.startsWith(lit("/")))
+            urlPath = urlPath.mid(1); //< VMS Gateway does not like several slashes at the beginning.
 
         // QUrl doesn't work if it isn't constructed from QString and uses credentials.
         // It stays invalid with error code 'AuthorityPresentAndPathIsRelative'
         //  --rvasilenko, Qt 5.2.1
         const auto currentServerUrl = commonModule()->currentUrl();
-        QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
-        QUrl targetUrl = QString(lit("http://%1:%2/%3"))
-            .arg(currentServerUrl.host())
-            .arg(currentServerUrl.port())
-            .arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
+        QUrl targetUrl(lm(lit("http://%1:%2/%3")).args(
+            currentServerUrl.host(), currentServerUrl.port(), urlPath));
 
         QAuthenticator auth = m_camera->getAuth();
         targetUrl.setUserName(auth.user());

@@ -6,7 +6,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
 #include <nx/utils/thread/mutex.h>
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>
@@ -1155,7 +1155,7 @@ void TimeSynchronizationManager::onDbManagerInitialized()
             m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - restoredTimeDelta;
             m_usedTimeSyncInfo.timePriorityKey = restoredPriorityKey;
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
-            // TODO: #ak The next line is doubtful. It may be needed in case if server was down 
+            // TODO: #ak The next line is doubtful. It may be needed in case if server was down
             // for a long time and time priority sequence has overflowed.
             m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
             NX_LOGX( lit("Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
@@ -1278,7 +1278,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
     const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
     const int synchronizedToLocalTimeOffset = getSyncTime() - curSysTime;
 
-    //local OS time has been changed. If system time is set 
+    //local OS time has been changed. If system time is set
     //by local host time then updating system time
     const bool isSystemTimeSynchronizedWithInternet =
         settings->isSynchronizingTimeWithInternet() &&
@@ -1288,7 +1288,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
         !isSystemTimeSynchronizedWithInternet;
 
-    const bool isSynchronizedToLocalTimeOffsetExceeded = 
+    const bool isSynchronizedToLocalTimeOffsetExceeded =
         qAbs(synchronizedToLocalTimeOffset) >
         duration_cast<milliseconds>(settings->maxDifferenceBetweenSynchronizedAndLocalTime()).count();
 
@@ -1312,7 +1312,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
             isTimeChanged = true;
         }
     }
-    
+
     if (!isTimeChanged &&
         m_connection &&
         isSynchronizedToLocalTimeOffsetExceeded)

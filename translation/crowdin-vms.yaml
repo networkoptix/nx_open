@@ -39,6 +39,7 @@ files:
   -
     source: '/webadmin/.tmp/language.json'
     translation: '/webadmin/translations/%locale_with_underscore%/language.json'
+    dest: '/webadmin/app/language.json'
   -
     source: '/webadmin/app/views/**/*.*'
     translation: '/webadmin/translations/%locale_with_underscore%/views/**/%original_file_name%'

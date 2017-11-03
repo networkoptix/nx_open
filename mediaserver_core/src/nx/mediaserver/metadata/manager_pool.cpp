@@ -208,8 +208,10 @@ bool ManagerPool::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
     if (!camera)
         return false;
 
-    if (camera->hasFlags(Qn::foreigner | Qn::desktop_camera))
-        return false;
+    const auto flags = camera->flags();
+    return !flags.testFlag(Qn::foreigner)
+        && !flags.testFlag(Qn::desktop_camera)
+
     return camera->getStatus() >= Qn::Online;
 }
 

@@ -509,6 +509,30 @@ TEST_F(QnLicenseUsageHelperTest, checkIoLicensesArmActivating)
     ASSERT_TRUE(m_helper->isValid());
 }
 
+TEST_F(QnLicenseUsageHelperTest, checkVmaxInitLicense)
+{
+    addLicenses(Qn::LC_VMAX, 1);
+    auto vmax = addCamera();
+
+    vmax->setLicenseUsed(true);
+    ASSERT_FALSE(m_helper->isValid());
+
+    vmax->markCameraAsVMax();
+    ASSERT_TRUE(m_helper->isValid());
+}
+
+TEST_F(QnLicenseUsageHelperTest, checkNvrInitLicense)
+{
+    addLicenses(Qn::LC_Bridge, 1);
+    auto nvr = addCamera();
+
+    nvr->setLicenseUsed(true);
+    ASSERT_FALSE(m_helper->isValid());
+
+    nvr->markCameraAsNvr();
+    ASSERT_TRUE(m_helper->isValid());
+}
+
 /** Check if license info is filled for every license type. */
 TEST_F(QnLicenseUsageHelperTest, validateLicenseInfo)
 {

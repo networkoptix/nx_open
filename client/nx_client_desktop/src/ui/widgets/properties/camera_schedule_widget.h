@@ -85,6 +85,8 @@ private:
     void updateMaxFpsValue(bool motionPlusLqToggled);
     void updateRecordingParamsAvailable();
 
+    void cameraResourceChanged();
+
     void updateColors();
 
     void at_gridWidget_cellActivated(const QPoint &cell);

@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <random>
+#include <chrono>
 
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
@@ -124,6 +125,12 @@ public:
 
     void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
 
+    int64_t lastFileSize() const;
+
+    void setRecordingBounds(
+        const std::chrono::microseconds& startTime,
+        const std::chrono::microseconds& endTime);
+
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -139,10 +146,22 @@ protected:
 
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
-    virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
+    virtual void fileFinished(
+        qint64 durationMs,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider *provider,
+        qint64 fileSize,
+        qint64 startTimeMs = AV_NOPTS_VALUE)
+    {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
     }
-    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
+    virtual void fileStarted(
+        qint64 startTimeMs,
+        int timeZone,
+        const QString& fileName,
+        QnAbstractMediaStreamDataProvider *provider,
+        bool sideRecorder = false)
+    {
         Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
     virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider*);
@@ -237,6 +256,10 @@ private:
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
     MotionHandler m_motionHandler;
+    int64_t m_lastFileSize = 0;
+
+    boost::optional<std::chrono::microseconds> m_startRecordingBound;
+    boost::optional<std::chrono::microseconds> m_endRecordingBound;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

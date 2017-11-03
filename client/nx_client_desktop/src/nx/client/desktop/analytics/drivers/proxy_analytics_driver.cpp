@@ -19,7 +19,7 @@ ProxyAnalyticsDriver::ProxyAnalyticsDriver(const QnResourcePtr& resource,
             const QnUuid& rectUuid,
             const QRectF& rect)
         {
-            if (resource != m_resource)
+            if (m_resource && resource != m_resource)
                 return;
 
             emit regionAddedOrChanged(rectUuid, rect);
@@ -30,7 +30,7 @@ ProxyAnalyticsDriver::ProxyAnalyticsDriver(const QnResourcePtr& resource,
         this,
         [this](const QnResourcePtr& resource, const QnUuid& rectUuid)
         {
-            if (resource != m_resource)
+            if (m_resource && resource != m_resource)
                 return;
 
             emit regionRemoved(rectUuid);

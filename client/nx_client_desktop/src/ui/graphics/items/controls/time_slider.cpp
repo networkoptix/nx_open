@@ -3309,7 +3309,8 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     if (autoShiftAreaWidth > 0 && m_dragIsClick && event->button() == Qt::LeftButton)
     {
         const auto pos = valueFromPosition(event->pos());
-        const auto distanceToCenter = (m_windowEnd - m_windowStart) / 2;
+        const auto offsetPercent = qBound(1, nx::client::desktop::ini().autoShiftOffsetPercent, 99);
+        const auto offsetDistance = (m_windowEnd - m_windowStart) * offsetPercent / 100;
 
         const auto allowedOffset = m_msecsPerPixel * autoShiftAreaWidth;
         const auto leftOffset = pos - m_windowStart;
@@ -3318,12 +3319,12 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         if (leftOffset <= allowedOffset)
         {
             // Shift window to the left (negative).
-            shiftWindow(leftOffset - distanceToCenter, true);
+            shiftWindow(leftOffset - offsetDistance, true);
         }
         else if (rightOffset <= allowedOffset)
         {
             // Shift window to the right (positive).
-            shiftWindow(distanceToCenter - rightOffset, true);
+            shiftWindow(offsetDistance - rightOffset, true);
         }
     }
 

@@ -160,6 +160,11 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     }
 }
 
+void QnServerStreamRecorder::setLastMediaTime(qint64 lastMediaTime)
+{
+    m_lastMediaTime = lastMediaTime;
+}
+
 void QnServerStreamRecorder::updateRebuildState()
 {
     QnMutexLocker lock( &m_queueSizeMutex );
@@ -348,7 +353,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 
 void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
 {
-    m_lastMediaTime = media->timestamp;
+    setLastMediaTime(media->timestamp);
 
     NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
     QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);
@@ -732,7 +737,12 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
     }
 }
 
-void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
+void QnServerStreamRecorder::fileFinished(
+    qint64 durationMs,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    qint64 fileSize,
+    qint64 startTimeMs)
 {
     if (m_truncateInterval != 0)
     {
@@ -740,19 +750,26 @@ void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& file
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
 
         qnBackupStorageMan->fileFinished(
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
     }
 };
 
-void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::fileStarted(
+    qint64 startTimeMs,
+    int timeZone,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    bool sideRecorder)
 {
     if (m_truncateInterval > 0)
     {
@@ -760,14 +777,16 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
 
         qnBackupStorageMan->fileStarted(
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
     }
 }

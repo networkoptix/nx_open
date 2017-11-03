@@ -121,7 +121,9 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
         return QDateTime(userDate);
 
     const auto server = commonModule()->currentServer();
-    const auto serverUtcOffsetMs = server->utcOffset();
+    const auto serverUtcOffsetMs = server
+        ? server->utcOffset()
+        : Qn::InvalidUtcOffset;
 
     static const QTime kMidnight(0, 0);
     return (serverUtcOffsetMs != Qn::InvalidUtcOffset)

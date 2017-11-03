@@ -93,6 +93,11 @@ public:
 
     virtual bool isRealTimeSource() const override;
     virtual void pleaseStop();
+
+    virtual void setEndOfPlaybackHandler(std::function<void()> handler) override;
+    virtual void setErrorHandler(
+        std::function<void(const QString& errorString)> handler) override;
+
 protected:
     virtual bool init();
 
@@ -172,7 +177,7 @@ private:
     bool m_isStillImage;
     double m_speed;
     double m_prevSpeed;
-	
+
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
     QnAbstractMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
@@ -192,6 +197,8 @@ private:
     QnAbstractMediaDataPtr getNextPacket();
     void channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime);
     void setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast);
+    std::function<void()> m_endOfPlaybackHandler;
+    std::function<void(const QString& errorString)> m_errorHandler;
 };
 
 #endif // ARCHIVE_STREAM_READER_H

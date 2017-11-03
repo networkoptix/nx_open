@@ -455,7 +455,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule);
         setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule);
 
-
         if (!dtsBased)
         {
             auto supported = m_camera->supportedMotionType();
@@ -473,19 +472,22 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
             QnVirtualCameraResourceList cameras;
             cameras.push_back(m_camera);
             ui->expertSettingsWidget->updateFromResources(cameras);
-
-            if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
-                    m_camera,
-                    -1,
-                    -1,
-                    kFisheyeThumbnailSize,
-                    QnThumbnailRequestData::JpgFormat,
-                    QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
-                    QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
-                    this);
-            ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
+
+        if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
+        {
+            m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
+                m_camera,
+                -1,
+                -1,
+                kFisheyeThumbnailSize,
+                QnThumbnailRequestData::JpgFormat,
+                QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
+                QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
+                this);
+        }
+
+        ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
     }
 
     /* After overrideMotionType is set. */

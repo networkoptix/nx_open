@@ -646,20 +646,6 @@ void ActionHandler::at_previousLayoutAction_triggered()
 
 void ActionHandler::at_openInLayoutAction_triggered()
 {
-    /**
-     * When we add widget (possibliy with animation) to the scene, whole scene may loose
-     * ability to handle hover events.
-     * TODO: #ynikitenkov. Investigate problem and get rid of this ugly workaround
-     */
-    const auto uglyMacOsHoverWorkaround = nx::utils::AppInfo::isMacOsX()
-        ? QnRaiiGuard::create(
-            []() { QCursor::setPos(QPoint(0, 0)); },
-            [this, mp = QCursor::pos()]()
-            {
-                executeDelayedParented([mp]() { QCursor::setPos(mp); }, 0, this);
-            })
-        : QnRaiiGuardPtr();
-
     const auto parameters = menu()->currentParameters(sender());
 
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
@@ -676,17 +662,29 @@ void ActionHandler::at_openInLayoutAction_triggered()
     QnResourceWidgetList widgets = parameters.widgets();
     if (!widgets.empty() && position.isNull() && layout->getItems().empty())
     {
+        static const auto kExtraItemRoles =
+            {Qn::ItemTimeRole, Qn::ItemPausedRole, Qn::ItemSpeedRole};
+
+        using ExtraItemDataHash = QHash<Qn::ItemDataRole, QVariant>;
+        QHash<QnUuid, ExtraItemDataHash> extraItemRoleValues;
+
         QHash<QnUuid, QnLayoutItemData> itemDataByUuid;
         for (auto widget: widgets)
         {
             QnLayoutItemData data = widget->item()->data();
+            const auto oldUuid = data.uuid;
+            data.uuid = QnUuid::createUuid();
             data.flags = Qn::PendingGeometryAdjustment;
-            itemDataByUuid[data.uuid] = data;
-        }
+            itemDataByUuid[oldUuid] = data;
 
-        /* Generate new UUIDs. */
-        for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
-            pos->uuid = QnUuid::createUuid();
+            for (const auto extraItemRole: kExtraItemRoles)
+            {
+                const auto value =
+                    qnResourceRuntimeDataManager->layoutItemData(oldUuid, extraItemRole);
+                if (value.isValid())
+                    extraItemRoleValues[data.uuid].insert(extraItemRole, value);
+            }
+        }
 
         /* Update cross-references. */
         for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
@@ -702,6 +700,10 @@ void ActionHandler::at_openInLayoutAction_triggered()
                 return;
 
             layout->addItem(data);
+
+            const auto values = extraItemRoleValues[data.uuid];
+            for (auto it = values.begin(); it != values.end(); ++it)
+                qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, it.key(), it.value());
         }
     }
     else
@@ -814,12 +816,27 @@ void ActionHandler::at_openInNewTabAction_triggered()
         workbench()->setCurrentLayout(wbLayout);
     }
 
-    const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
-    if (openable.empty())
-        return;
-    parameters.setResources(openable);
+    if (parameters.widgets().isEmpty())
+    {
+        // Called from resources tree view
+        const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+        if (openable.empty())
+            return;
 
-    menu()->trigger(action::OpenNewTabAction);
+        parameters.setResources(openable);
+        menu()->trigger(action::OpenNewTabAction);
+    }
+    else
+    {
+        // Called from the current layout
+        auto streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+        action::Parameters params;
+        params.setArgument(Qn::LayoutSyncStateRole, streamSynchronizer->state());
+
+        menu()->trigger(action::OpenNewTabAction, params);
+    }
+
     menu()->trigger(action::DropResourcesAction, parameters);
 }
 
@@ -1038,7 +1055,8 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     if (!resources.empty())
     {
-        parameters.setResources(resources);
+        if (parameters.widgets().isEmpty()) //< Triggered by resources tree view
+            parameters.setResources(resources);
         if (!menu()->triggerIfPossible(action::OpenInCurrentLayoutAction, parameters))
             menu()->triggerIfPossible(action::OpenInNewTabAction, parameters);
     }

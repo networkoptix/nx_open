@@ -75,6 +75,8 @@ public:
     void setBlurFactor(qreal value);
 
     Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
+    /** The same as paint but don't do actual painting. */
+    Qn::RenderStatus discardFrame();
 
     bool isLowQualityImage() const;
 

@@ -971,6 +971,9 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
     if (!widget)
         return InvisibleAction;
 
+    if (!widget->hasVideo())
+        return InvisibleAction;
+
     if (context->display()->zoomTargetWidget(widget))
         return InvisibleAction;
 

@@ -2,10 +2,12 @@
 
 #include <QtWidgets/QAction>
 
+#include <common/common_module.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/analytics/drivers/analytics_drivers_factory.h>
+#include <nx/client/desktop/layout_templates/layout_template_manager.h>
 
 namespace nx {
 namespace client {
@@ -50,6 +52,30 @@ QList<QAction*> AnalyticsActionFactory::newActions(const ui::action::Parameters&
             });
 
         result << action;
+    }
+
+    if (const auto templatesManager = commonModule()->findInstance<LayoutTemplateManager>())
+    {
+        for (const auto& layoutTemplate: templatesManager->templates())
+        {
+            if (layoutTemplate.type == LayoutTemplate::kAnalyticsLayoutType)
+            {
+                const auto action = new QAction(parent);
+                action->setText(layoutTemplate.name);
+                connect(action, &QAction::triggered, this,
+                    [this, parameters, layoutTemplate]
+                    {
+                        menu()->trigger(
+                            ui::action::StartAnalyticsAction,
+                            ui::action::Parameters(parameters)
+                                .withArgument(
+                                    Qn::LayoutTemplateRole,
+                                    QVariant::fromValue(layoutTemplate)));
+                    });
+
+                result << action;
+            }
+        }
     }
 
     return result;
