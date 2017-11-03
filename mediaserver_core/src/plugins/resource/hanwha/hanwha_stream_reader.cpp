@@ -69,10 +69,10 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
     if (m_hanwhaResource->isNvr())
     {
-        const QString sessionKey = m_hanwhaResource->sessionKey(m_sessionType, m_clientId);
-        if (sessionKey.isEmpty())
+        m_sessionGuard = m_hanwhaResource->session(m_sessionType, m_clientId);
+        if (m_sessionGuard.isNull())
             return CameraDiagnostics::TooManyOpenedConnectionsResult();
-        streamUrlString.append(lit("&session=%1").arg(sessionKey));
+        streamUrlString.append(lit("&session=%1").arg(m_sessionGuard.sessionKey()));
     }
 
     m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);

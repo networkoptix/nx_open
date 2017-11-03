@@ -127,14 +127,18 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
         m_chunkLoader->start(this);
 }
 
-QString HanwhaSharedResourceContext::sessionKey(
+std::shared_ptr<SessionData> HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
+    const QString& clientId,
     bool generateNewOne)
 {
     if (m_sharedId.isEmpty())
-        return QString();
+        return std::shared_ptr<SessionData>();
 
     QnMutexLocker lock(&m_sessionMutex);
+
+    cleanup();
+
     if (!m_sessionKeys.contains(sessionType))
     {
         HanwhaRequestHelper helper(shared_from_this());

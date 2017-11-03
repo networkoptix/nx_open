@@ -100,8 +100,16 @@ public:
 
     void startServices(bool hasVideoArchive);
 
-    QString sessionKey(
+    struct SessionData
+    {
+        QString clientId;
+        HanwhaSessionType sessionType;
+        std::weak_ptr<void> pointer;
+    };
+
+    std::shared_ptr<SessionData> session(
         HanwhaSessionType sessionType,
+        const QString& clientId,
         bool generateNewOne = false);
 
     QnTimePeriodList chunks(int channelNumber) const;
@@ -136,7 +144,7 @@ private:
     nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
 
     mutable QnMutex m_sessionMutex;
-    QMap<HanwhaSessionType, QString> m_sessionKeys;
+    QMap<std::weak_ptr<SessionData>, QString> m_sessionKeys;
 
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;

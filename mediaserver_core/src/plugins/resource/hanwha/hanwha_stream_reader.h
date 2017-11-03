@@ -61,6 +61,7 @@ private:
     int64_t m_startTimeUsec = 0;
     int64_t m_endTimeUsec = 0;
     int m_overlappedId = 0;
+    SessionGuard m_sessionGuard;
 };
 
 } // namespace plugins
