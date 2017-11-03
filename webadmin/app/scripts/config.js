@@ -87,6 +87,7 @@ var Config = {
         updateNotificationsEnabled: {label: 'Update notifications enabled', type: 'checkbox'},
         arecontRtspEnabled: {label: 'Arecont RTSP Enabled', type: 'checkbox'},
         backupNewCamerasByDefault: {label: 'Backup new cameras by default', type: 'checkbox'},
+        maxSceneItems: {label: 'Max cameras on the scene (0 - default)', type: 'number'},
         statisticsAllowed: {
             label: 'Send anonymous usage statistics and crash reports',
             type: 'checkbox',

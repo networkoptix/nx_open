@@ -1089,9 +1089,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item)
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay)
 {
-    int maxItems = m_lightMode.testFlag(Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
+    int maxItems = qnRuntime->maxSceneItems();
 
     if (m_widgets.size() >= maxItems)
     {
