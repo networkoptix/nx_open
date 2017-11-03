@@ -775,6 +775,12 @@ ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenc
     // Export selection
     if (m_centralItemRequired)
     {
+        const auto resource = parameters.resource();
+        if (!resource.dynamicCast<QnMediaResource>())
+            return InvisibleAction;
+
+        if (!context->accessController()->hasPermissions(resource, Qn::ExportPermission))
+            return DisabledAction;
 
         const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
 
@@ -782,7 +788,6 @@ ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenc
         if (containsAvailablePeriods && !context->workbench()->item(Qn::CentralRole))
             return DisabledAction;
 
-        QnResourcePtr resource = parameters.resource();
         if (containsAvailablePeriods && resource && resource->flags().testFlag(Qn::sync))
         {
             QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
@@ -793,8 +798,24 @@ ActionVisibility ExportCondition::check(const Parameters& parameters, QnWorkbenc
     // Export layout
     else
     {
+        const auto resources = ParameterTypes::resources(context->display()->widgets())
+            .filtered<QnMediaResource>();
+
+        if (resources.empty())
+            return InvisibleAction;
+
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
         if (!periods.intersects(period))
+            return DisabledAction;
+
+        const bool allowed = std::any_of(resources.cbegin(), resources.cend(),
+            [context](const QnMediaResourcePtr& resource)
+            {
+                return context->accessController()->hasPermissions(resource->toResourcePtr(),
+                    Qn::ExportPermission);
+            });
+
+        if (!allowed)
             return DisabledAction;
     }
     return EnabledAction;
