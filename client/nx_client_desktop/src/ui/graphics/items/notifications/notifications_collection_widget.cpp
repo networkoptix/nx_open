@@ -169,7 +169,8 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                     [defaultPasswordWatcher]()
                     {
                         return action::Parameters(
-                            defaultPasswordWatcher->camerasWithDefaultPassword());
+                            defaultPasswordWatcher->camerasWithDefaultPassword())
+                            .withArgument(Qn::ShowSingleCameraRole, true);
                     };
 
                 m_currentDefaultPasswordChangeWidget =

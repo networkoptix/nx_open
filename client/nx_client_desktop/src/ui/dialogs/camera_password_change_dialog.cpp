@@ -40,7 +40,7 @@ Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraRes
 
 QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     const QnVirtualCameraResourceList& cameras,
-    bool hideSingleCameraList,
+    bool showSingleCameraList,
     QWidget* parent)
     :
     base_type(parent),
@@ -54,13 +54,11 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     }
 
     ui->resourcesWidget->setResources(cameras);
-    if (cameras.size() == 1 && hideSingleCameraList)
+    if (cameras.size() == 1 && !showSingleCameraList)
         ui->resourcesPanel->setVisible(false);
 
     ui->passwordEdit->setTitle(tr("New Password"));
     ui->confirmPasswordEdit->setTitle(tr("Repeat Password"));
-
-    setResizeToContentsMode(Qt::Vertical);
 
     setupPasswordField(*ui->passwordEdit);
     setupPasswordField(*ui->confirmPasswordEdit);
@@ -73,9 +71,23 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->passwordEdit, ui->confirmPasswordEdit });
+
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnCameraPasswordChangeDialog::~QnCameraPasswordChangeDialog()
 {
 }
 
+QString QnCameraPasswordChangeDialog::password() const
+{
+    return ui->passwordEdit->isValid() && ui->confirmPasswordEdit->isValid()
+        ? ui->passwordEdit->text()
+        : QString();
+}
+
+void QnCameraPasswordChangeDialog::accept()
+{
+//    if (ui->passwordEdit->validate() && ui->confirmPasswordEdit->)
+  //      base_type::accept();
+}

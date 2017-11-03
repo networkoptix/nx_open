@@ -52,7 +52,7 @@ private:
     void updateReadOnly();
     void saveCameras(const QnVirtualCameraResourceList &cameras);
     void handleCamerasWithDefaultPasswordChanged();
-    void handleChangeDefaultPasswordRequest();
+    void handleChangeDefaultPasswordRequest(bool showSingleCamera);
 
 private:
     QnCameraSettingsWidget *m_settingsWidget;

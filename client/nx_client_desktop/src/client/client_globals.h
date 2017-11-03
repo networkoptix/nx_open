@@ -265,7 +265,7 @@ namespace Qn
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
-        HideSingleCameraList,                       /**< Used for default password dialog. */
+        ShowSingleCameraRole,                       /**< Used for default password dialog. */
         RoleCount
     };
 

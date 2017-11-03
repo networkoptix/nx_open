@@ -127,9 +127,10 @@ QnCameraSettingsDialog::~QnCameraSettingsDialog()
 {
 }
 
-void QnCameraSettingsDialog::handleChangeDefaultPasswordRequest()
+void QnCameraSettingsDialog::handleChangeDefaultPasswordRequest(bool showSingleCamera)
 {
-    const auto parameters = action::Parameters(m_defaultPasswordAlert->targetCameras());
+    const auto parameters = action::Parameters(m_defaultPasswordAlert->targetCameras())
+        .withArgument(Qn::ShowSingleCameraRole, showSingleCamera);
     menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
 }
 

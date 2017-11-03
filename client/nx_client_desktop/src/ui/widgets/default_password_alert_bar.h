@@ -25,7 +25,7 @@ private:
     void updateState();
 
 signals:
-    void changeDefaultPasswordRequest();
+    void changeDefaultPasswordRequest(bool showSingleCamera);
     void targetCamerasChanged();
 
 private:

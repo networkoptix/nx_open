@@ -15,10 +15,10 @@ QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
     m_setPasswordButton->setIcon(qnSkin->icon(lit("buttons/checkmark.png")));
     getOverlayLayout()->addWidget(m_setPasswordButton, 0, Qt::AlignRight);
 
-    connect(m_setPasswordButton, &QPushButton::clicked,
-        this, &QnDefaultPasswordAlertBar::changeDefaultPasswordRequest);
     connect(this, &QnDefaultPasswordAlertBar::targetCamerasChanged,
         this, &QnDefaultPasswordAlertBar::updateState);
+    connect(m_setPasswordButton, &QPushButton::clicked, this,
+        [this]() { emit changeDefaultPasswordRequest(m_multipleSourceCameras); });
 
     setCameras(QnVirtualCameraResourceList());
 }

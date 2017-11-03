@@ -18,10 +18,16 @@ class QnCameraPasswordChangeDialog: public QnSessionAwareButtonBoxDialog
 public:
     QnCameraPasswordChangeDialog(
         const QnVirtualCameraResourceList& cameras,
-        bool hideSingleCameraList,
+        bool showSingleCameraList,
         QWidget* parent = nullptr);
 
     virtual ~QnCameraPasswordChangeDialog();
+
+    QString password() const;
+
+ public:
+    virtual void accept() override;
+
 private:
     QScopedPointer<Ui::CameraPasswordChangeDialog> ui;
 };

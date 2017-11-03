@@ -659,9 +659,9 @@ void ActionHandler::at_changeDefaultCameraPassword_triggered()
     if (camerasWithDefaultPassword.isEmpty())
         return;
 
-    const bool hideSingleCameraList = parameters.argument(Qn::HideSingleCameraList, false);
+    const bool showSingleCameraList = parameters.argument(Qn::ShowSingleCameraRole, false);
     QnCameraPasswordChangeDialog dialog(
-        camerasWithDefaultPassword, hideSingleCameraList, context()->mainWindow());
+        camerasWithDefaultPassword, showSingleCameraList, context()->mainWindow());
     if (!dialog.exec())
         return;
 }
