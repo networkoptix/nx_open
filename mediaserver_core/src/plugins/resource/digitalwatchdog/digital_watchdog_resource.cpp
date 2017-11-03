@@ -105,12 +105,6 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
     return result;
 }
 
-QnAbstractStreamDataProvider *QnDigitalWatchdogResource::createLiveDataProvider()
-{
-    return new QnOnvifStreamReader(toSharedPointer(this));
-}
-
-
 void QnDigitalWatchdogResource::enableOnvifSecondStream()
 {
     // The camera most likely is going to reset after enabling dual streaming
