@@ -40,6 +40,10 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(const QnResourcePtr& reso
     }
 }
 
+MediaResourceWidgetPrivate::~MediaResourceWidgetPrivate()
+{
+}
+
 QnResourceDisplayPtr MediaResourceWidgetPrivate::display() const
 {
     return m_display;
