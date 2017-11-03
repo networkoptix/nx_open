@@ -175,15 +175,35 @@ void QnStorageDb::startVacuumAsync(Callback callback)
         return;
     }
 
-    if (m_vacuumThread.joinable())
-        m_vacuumThread.join();
+    try
+    {
+        if (m_vacuumThread.joinable())
+            m_vacuumThread.join();
+    }
+    catch (const std::exception& e)
+    {
+        NX_LOG(
+            lit("Failed to join vacuum thread: %1").arg(QString::fromStdString(e.what())),
+            cl_logERROR);
+    }
 
-    m_vacuumThread = nx::utils::thread([this, callback]
-                                 {
-                                     m_vacuumThreadRunning = true;
-                                     callback(vacuum());
-                                     m_vacuumThreadRunning = false;
-                                 });
+    try
+    {
+        m_vacuumThread = nx::utils::thread(
+            [this, callback]()
+            {
+                m_vacuumThreadRunning = true;
+                callback(vacuum());
+                m_vacuumThreadRunning = false;
+            });
+    }
+    catch (const std::exception& e)
+    {
+        NX_LOG(
+            lit("Failed to start vacuum thread: %1").arg(QString::fromStdString(e.what())),
+            cl_logERROR);
+        m_vacuumThread = nx::utils::thread();
+    }
 }
 
 bool QnStorageDb::addRecord(const QString& cameraUniqueId,
