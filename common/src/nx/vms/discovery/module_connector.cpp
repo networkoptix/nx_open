@@ -4,6 +4,8 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/url/url_builder.h>
 #include <rest/server/json_rest_result.h>
 
 #include <rest/server/json_rest_result.h>
@@ -12,7 +14,7 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const QUrl kUrl(lit(
+static const nx::utils::Url kUrl(lit(
     "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream"));
 
 std::chrono::seconds kDefaultDisconnectTimeout(10);
