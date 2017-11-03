@@ -335,6 +335,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar)
         connect(m_timeScrollBar, &QnTimeScrollBar::actionTriggered, this,
             [this](int action)
             {
+                // Flag is required to avoid unzoom when moving slider by clicking outside of it.
                 if (action != AbstractGraphicsSlider::SliderMove)
                     m_ignoreScrollBarDblClick = true;
             });
@@ -2360,6 +2361,8 @@ void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed()
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased()
 {
+    // Double-click on slider handle must always unzoom.
+    m_ignoreScrollBarDblClick = false;
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, m_lastAdjustTimelineToPosition);
 }
 
