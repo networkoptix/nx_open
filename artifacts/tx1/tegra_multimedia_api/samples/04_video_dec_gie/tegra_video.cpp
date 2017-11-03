@@ -1,13 +1,12 @@
 #include "tegra_video.h"
 
-#include "config.h"
+#include "tegra_video_ini.h"
 
-TegraVideo* TegraVideo::create(const Params& params)
+TegraVideo* TegraVideo::create()
 {
-    conf.reload();
-    conf.skipNextReload(); //< Each of the methods below calls conf.reload().
-    if (conf.disable)
-        return createStub(params);
+    ini().reload();
+    if (ini().disable)
+        return createStub();
     else
-        return createImpl(params);
+        return createImpl();
 }
