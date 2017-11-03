@@ -34,7 +34,7 @@ void VideoDataReceptor::putData(const QnAbstractDataPacketPtr& data)
             contextData.manager->queryInterface(IID_ConsumingMetadataManager), false);
         if (!manager)
             return;
-        auto video = dynamic_cast<QnCompressedVideoData*> (data.get());
+        const auto video = dynamic_cast<QnCompressedVideoData*>(data.get());
         if (video)
         {
             nxpt::ScopedRef<CommonCompressedVideoPacket> packet(new CommonCompressedVideoPacket());

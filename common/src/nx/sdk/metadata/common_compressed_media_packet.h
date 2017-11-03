@@ -17,11 +17,13 @@ template <class T>
 class CommonCompressedMediaPacket: public nxpt::CommonRefCounter<T>
 {
 public:
-    virtual const char* codec() const { return m_codec.c_str();  }
+    virtual const char* codec() const { return m_codec.c_str(); }
 
-    virtual const int dataSize() const {
+    virtual const int dataSize() const
+    {
         return m_data ? m_data->size() : m_externalDataSize;
     }
+
     virtual const char* data() const
     {
         if (m_data && !m_data->empty())
@@ -36,6 +38,7 @@ public:
         m_externalData = nullptr;
         m_externalDataSize = 0;
     }
+
     void setData(const char* data, int size)
     {
         m_externalData = data;
@@ -48,8 +51,9 @@ public:
 
     void setCodec(const std::string& value) { m_codec = value; }
     void setTimestampUsec(int64_t value) { m_timestampUsec = value; }
+
 private:
-    std::unique_ptr<std::vector<char>> m_data; //< Deep copy
+    std::unique_ptr<std::vector<char>> m_data; //< Deep copy.
     const char* m_externalData = nullptr;
     int m_externalDataSize = 0;
     std::string m_codec;

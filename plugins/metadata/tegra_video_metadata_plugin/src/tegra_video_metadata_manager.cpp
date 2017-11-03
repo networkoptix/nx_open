@@ -1,4 +1,4 @@
-#include "stub_metadata_manager.h"
+#include "tegra_video_metadata_manager.h"
 
 #include <iostream>
 #include <chrono>
@@ -27,13 +27,13 @@ static const nxpl::NX_GUID kObjectInTheAreaEventGuid =
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-StubMetadataManager::StubMetadataManager():
+TegraVideoMetadataManager::TegraVideoMetadataManager():
     m_eventTypeId(kLineCrossingEventGuid)
 {
     std::cout << "Creating metadata manager! " << (uintptr_t)this << std::endl;
 }
 
-void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
+void* TegraVideoMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
 {
     if (interfaceId == IID_MetadataManager)
     {
@@ -55,14 +55,14 @@ void* StubMetadataManager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-Error StubMetadataManager::setHandler(AbstractMetadataHandler* handler)
+Error TegraVideoMetadataManager::setHandler(AbstractMetadataHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_handler = handler;
     return Error::noError;
 }
 
-Error StubMetadataManager::startFetchingMetadata()
+Error TegraVideoMetadataManager::startFetchingMetadata()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -83,39 +83,41 @@ Error StubMetadataManager::startFetchingMetadata()
     return Error::noError;
 }
 
-nx::sdk::Error StubMetadataManager::putData(nx::sdk::metadata::AbstractDataPacket* dataPacket)
+nx::sdk::Error TegraVideoMetadataManager::putData(
+    nx::sdk::metadata::AbstractDataPacket* dataPacket)
 {
     m_handler->handleMetadata(Error::noError, cookSomeObjects(dataPacket));
     return Error::noError;
 }
 
-Error StubMetadataManager::stopFetchingMetadata()
+Error TegraVideoMetadataManager::stopFetchingMetadata()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return stopFetchingMetadataUnsafe();
 }
 
-const char* StubMetadataManager::capabilitiesManifest(Error* error) const
+const char* TegraVideoMetadataManager::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
-    return R"json(
+    return R"manifest(
         {
             "supportedEventTypes": [
                 "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
                 "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}"
             ]
         }
-    )json";
+    )manifest";
 }
 
-StubMetadataManager::~StubMetadataManager()
+TegraVideoMetadataManager::~TegraVideoMetadataManager()
 {
     stopFetchingMetadata();
     std::cout << "Destroying metadata manager!" << (uintptr_t)this;
 }
 
-Error StubMetadataManager::stopFetchingMetadataUnsafe()
+
+Error TegraVideoMetadataManager::stopFetchingMetadataUnsafe()
 {
     m_stopping = true; //< looks bad
     if (m_thread)
@@ -128,7 +130,7 @@ Error StubMetadataManager::stopFetchingMetadataUnsafe()
     return Error::noError;
 }
 
-AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
+AbstractMetadataPacket* TegraVideoMetadataManager::cookSomeEvents()
 {
     ++m_counter;
     if (m_counter > 1)
@@ -144,7 +146,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     auto detectedEvent = new CommonDetectedEvent();
     detectedEvent->setCaption("Line crossing (caption)");
     detectedEvent->setDescription("Line crossing (description)");
-    detectedEvent->setAuxilaryData(R"json({"auxilaryData": "someJson"})json");
+    detectedEvent->setAuxilaryData(R"json( {"auxilaryData": "someJson"} )json");
     detectedEvent->setIsActive(m_counter == 1);
     detectedEvent->setEventTypeId(m_eventTypeId);
 
@@ -154,7 +156,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeEvents()
     return eventPacket;
 }
 
-AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(
+AbstractMetadataPacket* TegraVideoMetadataManager::cookSomeObjects(
     nx::sdk::metadata::AbstractDataPacket* mediaPacket)
 {
     nxpt::ScopedRef<CommonCompressedVideoPacket> videoPacket =
@@ -183,7 +185,7 @@ AbstractMetadataPacket* StubMetadataManager::cookSomeObjects(
     return eventPacket;
 }
 
-int64_t StubMetadataManager::usSinceEpoch() const
+int64_t TegraVideoMetadataManager::usSinceEpoch() const
 {
     using namespace std::chrono;
     return duration_cast<microseconds>(
