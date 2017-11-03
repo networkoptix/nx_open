@@ -5,7 +5,7 @@
 class QnGetNonceRestHandler: public QnJsonRestHandler
 {
 public:
-    QnGetNonceRestHandler(bool isUrlSupported = false);
+    QnGetNonceRestHandler(bool isUrlSupported);
 
     virtual int executeGet(
         const QString &path,
