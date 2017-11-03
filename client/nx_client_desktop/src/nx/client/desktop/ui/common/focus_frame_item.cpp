@@ -101,91 +101,59 @@ void FocusFrameItem::registerQmlType()
 QSGNode* FocusFrameItem::updatePaintNode(
     QSGNode* node, QQuickItem::UpdatePaintNodeData* /*updatePaintNodeData*/)
 {
-    QSGGeometryNode* leftNode = nullptr;
-    QSGGeometryNode* rightNode = nullptr;
-    QSGGeometryNode* topNode = nullptr;
-    QSGGeometryNode* bottomNode = nullptr;
+    auto geometryNode = static_cast<QSGGeometryNode*>(node);
 
-    if (!node)
+    if (!geometryNode)
     {
-        node = new QSGNode();
+        geometryNode = new QSGGeometryNode();
+        geometryNode->setGeometry(
+            new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4 * 6));
+        geometryNode->geometry()->setDrawingMode(GL_TRIANGLES);
+        geometryNode->setFlag(QSGNode::OwnsGeometry);
+        geometryNode->setMaterial(d->material.data());
 
-        auto createGeometryNode =
-            [this, node]()
-            {
-                auto geometryNode = new QSGGeometryNode();
-                geometryNode->setGeometry(
-                    new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4));
-                geometryNode->setFlag(QSGNode::OwnsGeometry);
-                geometryNode->setMaterial(d->material.data());
-                node->appendChildNode(geometryNode);
-
-                return geometryNode;
-            };
-
-        leftNode = createGeometryNode();
-        rightNode = createGeometryNode();
-        topNode = createGeometryNode();
-        bottomNode = createGeometryNode();
+        node = geometryNode;
     }
-    else
-    {
-        leftNode = static_cast<QSGGeometryNode*>(node->childAtIndex(0));
-        rightNode = static_cast<QSGGeometryNode*>(node->childAtIndex(1));
-        topNode = static_cast<QSGGeometryNode*>(node->childAtIndex(2));
-        bottomNode = static_cast<QSGGeometryNode*>(node->childAtIndex(3));
-    }
-
-    auto setNodesDirtyState =
-        [leftNode, rightNode, topNode, bottomNode](QSGNode::DirtyStateBit bit)
-        {
-            leftNode->markDirty(bit);
-            rightNode->markDirty(bit);
-            topNode->markDirty(bit);
-            bottomNode->markDirty(bit);
-        };
 
     if (d->textureDirty)
     {
         d->updateDotTexture();
-        setNodesDirtyState(QSGNode::DirtyMaterial);
+        geometryNode->markDirty(QSGNode::DirtyMaterial);
     }
 
-    auto setRectToData =
-        [](QSGGeometry::TexturedPoint2D* data, const QRectF& rect)
+    auto addRectangle =
+        [](QSGGeometry::TexturedPoint2D*& data, const QRectF& rect)
         {
             const auto x = static_cast<float>(rect.x());
             const auto y = static_cast<float>(rect.y());
-            const auto w = static_cast<float>(rect.width());
-            const auto h = static_cast<float>(rect.height());
-            const auto twx = w / kTextureSize;
-            const auto thy = h / kTextureSize;
+            const auto r = static_cast<float>(rect.right());
+            const auto b = static_cast<float>(rect.bottom());
+            const auto twx = (r - x) / kTextureSize;
+            const auto thy = (b - y) / kTextureSize;
             // We use chessboard 2x2 texture to avoid sibling painted points of the frame.
             // Second texture column is used when frame edge has odd x or odd y and not both.
             const auto ts = ((qRound(rect.x()) + qRound(rect.y())) & 1) ? 0.5f : 0.0f;
 
             data[0].set(x, y, ts, 0);
-            data[1].set(x + w, y, twx + ts, 0);
-            data[2].set(x, y + h, ts, thy);
-            data[3].set(x + w, y + h, twx + ts, thy);
+            data[1].set(r, y, twx + ts, 0);
+            data[2].set(x, b, ts, thy);
+            data[3].set(r, y, twx + ts, 0);
+            data[4].set(x, b, ts, thy);
+            data[5].set(r, b, twx + ts, thy);
+
+            data += 6;
         };
+
+    auto data = geometryNode->geometry()->vertexDataAsTexturedPoint2D();
 
     // Rectangles are shifted by kDotSize to avoid painting corner dots multiple times.
     // This is important when the color is semi-transparent.
-    setRectToData(
-        leftNode->geometry()->vertexDataAsTexturedPoint2D(),
-        QRectF(0, 0, kDotSize, height()));
-    setRectToData(
-        rightNode->geometry()->vertexDataAsTexturedPoint2D(),
-        QRectF(width() - kDotSize, kDotSize, kDotSize, height() - kDotSize));
-    setRectToData(
-        topNode->geometry()->vertexDataAsTexturedPoint2D(),
-        QRectF(kDotSize, 0, width() - kDotSize, kDotSize));
-    setRectToData(
-        bottomNode->geometry()->vertexDataAsTexturedPoint2D(),
-        QRectF(kDotSize, height() - kDotSize, width() - 2 * kDotSize, kDotSize));
+    addRectangle(data, QRectF(0, 0, kDotSize, height()));
+    addRectangle(data, QRectF(width() - kDotSize, 0, kDotSize, height()));
+    addRectangle(data, QRectF(kDotSize, 0, width() - 2 * kDotSize, kDotSize));
+    addRectangle(data, QRectF(kDotSize, height() - kDotSize, width() - 2 * kDotSize, kDotSize));
 
-    setNodesDirtyState(QSGNode::DirtyGeometry);
+    geometryNode->markDirty(QSGNode::DirtyGeometry);
 
     return node;
 }
