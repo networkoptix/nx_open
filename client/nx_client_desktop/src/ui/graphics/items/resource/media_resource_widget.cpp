@@ -1529,7 +1529,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             if (nx::client::desktop::ini().enableAnalytics)
             {
                 qnMetadataAnalyticsController->gotMetadataPacket(
-                    m_resource->toResourcePtr(),
+                    d->resource,
                     std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
             }
         }

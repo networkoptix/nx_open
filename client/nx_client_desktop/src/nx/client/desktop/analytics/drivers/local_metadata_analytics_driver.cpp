@@ -2,7 +2,7 @@
 
 #include <QtCore/QFileInfo>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 
@@ -53,7 +53,7 @@ bool LocalMetadataAnalyticsDriver::loadTrack(const QnResourcePtr& resource)
 {
     QFile metadata(metadataFileName(resource->getUrl()));
     metadata.open(QIODevice::ReadOnly);
-    m_track = QJson::deserialized<std::vector<QnObjectDetectionMetadataTrack>>(metadata.readAll());
+    m_track = QJson::deserialized<std::vector<nx::common::metadata::DetectionMetadataPacket>>(metadata.readAll());
     metadata.close();
 
     return !m_track.empty();
@@ -61,11 +61,11 @@ bool LocalMetadataAnalyticsDriver::loadTrack(const QnResourcePtr& resource)
 
 QRectF LocalMetadataAnalyticsDriver::zoomRectFor(const QnUuid& regionId, qint64 timestampUs) const
 {
-    QnObjectDetectionMetadata metadata = findMetadata(timestampUs);
-    for (auto region: metadata.detectedObjects)
+    auto metadata = findMetadata(timestampUs);
+    for (auto region: metadata.objects)
     {
         if (region.objectId == regionId)
-            return region.boundingBox.toRectF();
+            return region.boundingBox;
     }
     return QRectF();
 }
@@ -80,27 +80,25 @@ bool LocalMetadataAnalyticsDriver::supportsAnalytics(const QnResourcePtr& resour
     return metadata.exists();
 }
 
-QnObjectDetectionMetadata LocalMetadataAnalyticsDriver::findMetadata(qint64 timestampUs) const
+nx::common::metadata::DetectionMetadataPacket LocalMetadataAnalyticsDriver::findMetadata(qint64 timestampUs) const
 {
     if (m_track.empty())
         return {};
 
-    const auto timestampMs = timestampUs / 1000;
-
-    auto currentFrame = std::lower_bound(m_track.cbegin(), m_track.cend(), timestampMs);
+    auto currentFrame = std::lower_bound(m_track.cbegin(), m_track.cend(), timestampUs);
     if (currentFrame == m_track.cend())
         --currentFrame;
 
-    if (currentFrame == m_track.cbegin() && timestampMs < *currentFrame)
+    if (currentFrame == m_track.cbegin() && timestampUs < currentFrame->timestampUsec)
         return {};
 
-    if (currentFrame != m_track.cbegin() && timestampMs < *currentFrame)
+    if (currentFrame != m_track.cbegin() && timestampUs < currentFrame->timestampUsec)
         --currentFrame;
 
-    NX_EXPECT(currentFrame->timestampMs <= timestampMs);
+    NX_EXPECT(currentFrame->timestampUsec <= timestampUs);
 
-    QnObjectDetectionMetadata metadata;
-    metadata.detectedObjects = currentFrame->objects;
+    nx::common::metadata::DetectionMetadataPacket metadata;
+    metadata.objects = currentFrame->objects;
     return metadata;
 }
 

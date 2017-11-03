@@ -23,11 +23,11 @@ public:
     static bool supportsAnalytics(const QnResourcePtr& resource);
 
 private:
-    QnObjectDetectionMetadata findMetadata(qint64 timestampUs) const;
+    nx::common::metadata::DetectionMetadataPacket findMetadata(qint64 timestampUs) const;
 
 private:
     const QnResourcePtr m_resource;
-    std::vector<QnObjectDetectionMetadataTrack> m_track;
+    std::vector<nx::common::metadata::DetectionMetadataPacket> m_track;
 };
 
 } // namespace desktop
