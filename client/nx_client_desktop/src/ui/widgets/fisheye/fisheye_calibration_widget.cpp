@@ -4,32 +4,22 @@
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
+#include <client/client_globals.h>
+
 #include <ui/fisheye/fisheye_calibrator.h>
 #include <ui/widgets/fisheye/fisheye_calibration_image_widget.h>
 
 #include <utils/image_provider.h>
 #include <nx/utils/math/fuzzy.h>
 
-namespace {
-
-    int kRefreshIntervalMs = 10000; /* Update image interval, in milliseconds */
-
-} // anonymous namespace
-
-
 QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnFisheyeCalibrationWidget),
     m_calibrator(new QnFisheyeCalibrator()),
-    m_lastError(QnFisheyeCalibrator::NoError),
-    m_inLoading(false)
+    m_lastError(QnFisheyeCalibrator::NoError)
 {
     ui->setupUi(this);
     ui->loadingWidget->setText(tr("Loading preview, please wait..."));
-
-    m_updateTimer = new QTimer(this);
-    m_updateTimer->setInterval(kRefreshIntervalMs);
-    connect(m_updateTimer,      &QTimer::timeout,                       this,               &QnFisheyeCalibrationWidget::updateImage);
 
     connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
     connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
@@ -67,31 +57,25 @@ QnImageProvider* QnFisheyeCalibrationWidget::imageProvider() const
 // TODO: #GDM change to QnCameraThumbnailManager
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider* provider)
 {
-    m_inLoading = false;
     if (m_imageProvider)
     {
         ui->imageWidget->disconnect(m_imageProvider);
         m_imageProvider->disconnect(this);
     }
 
-    m_updateTimer->stop();
     m_imageProvider = provider;
 
     if (!m_imageProvider)
         return;
 
-    connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,   &QnFisheyeCalibrationImageWidget::setImage);
-    connect(m_imageProvider, &QnImageProvider::imageChanged, this,              &QnFisheyeCalibrationWidget::updatePage);
+    connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,
+        &QnFisheyeCalibrationImageWidget::setImage);
+    connect(m_imageProvider, &QnImageProvider::statusChanged, this,
+        &QnFisheyeCalibrationWidget::updatePage);
+    connect(m_imageProvider, &QnImageProvider::imageChanged, this,
+        &QnFisheyeCalibrationWidget::updatePage);
 
-    m_updateTimer->start();
-
-    if (!m_imageProvider->image().isNull())
-    {
-        ui->imageWidget->setImage(provider->image());
-        updatePage();
-    }
-
-    updateImage();
+    updatePage();
 }
 
 QPointF QnFisheyeCalibrationWidget::center() const
@@ -129,8 +113,12 @@ void QnFisheyeCalibrationWidget::setRadius(qreal radius)
 
 void QnFisheyeCalibrationWidget::updatePage()
 {
-    m_inLoading = false;
-    bool imageLoaded = m_imageProvider && !m_imageProvider->image().isNull();
+    const bool imageLoaded = m_imageProvider &&
+        (m_imageProvider->status() == Qn::ThumbnailStatus::Loaded
+            || m_imageProvider->status() == Qn::ThumbnailStatus::Refreshing);
+
+    if (imageLoaded)
+        ui->imageWidget->setImage(m_imageProvider->image());
     ui->stackedWidget->setCurrentWidget(imageLoaded
         ? ui->imagePage
         : ui->loadingPage);
@@ -166,13 +154,4 @@ void QnFisheyeCalibrationWidget::autoCalibrate()
 {
     ui->imageWidget->beginSearchAnimation();
     m_calibrator->analyseFrameAsync(ui->imageWidget->image());
-}
-
-void QnFisheyeCalibrationWidget::updateImage()
-{
-    if (m_imageProvider && isVisible() && !m_inLoading)
-    {
-        m_inLoading = true;
-        m_imageProvider->loadAsync();
-    }
 }

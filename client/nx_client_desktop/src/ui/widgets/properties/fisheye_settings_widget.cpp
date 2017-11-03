@@ -178,8 +178,3 @@ void QnFisheyeSettingsWidget::submitToParams(QnMediaDewarpingParams& params)
     params.radius = ui->calibrateWidget->radius();
     params.hStretch = ui->calibrateWidget->horizontalStretch();
 }
-
-void QnFisheyeSettingsWidget::loadPreview()
-{
-    ui->calibrateWidget->updateImage();
-}

@@ -28,9 +28,13 @@ public:
 
     QnVirtualCameraResourcePtr selectedCamera() const;
     void selectCamera(const QnVirtualCameraResourcePtr& camera);
+    void refreshSelectedCamera();
 
     bool autoRotate() const;
     void setAutoRotate(bool value);
+
+    bool autoRefresh() const;
+    void setAutoRefresh(bool value);
 
     QSize thumbnailSize() const;
     void setThumbnailSize(const QSize& size);
