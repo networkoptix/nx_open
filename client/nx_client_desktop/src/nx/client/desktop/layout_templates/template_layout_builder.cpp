@@ -8,7 +8,7 @@
 #include <client/client_globals.h>
 #include <client_core/connection_context_aware.h>
 #include <core/resource/avi/filetypesupport.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
