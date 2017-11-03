@@ -39,8 +39,14 @@ int QnGetNonceRestHandler::executeGet(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    if (m_isUrlSupported && params.contains("url"))
+    if (params.contains("url"))
     {
+        if (!m_isUrlSupported)
+        {
+            result.setError(QnRestResult::InvalidParameter, "Paramiter url is forbidden");
+            return nx_http::StatusCode::forbidden;
+        }
+
         nx_http::HttpClient client;
         client.setResponseReadTimeoutMs(requestTimeoutMs);
         client.setSendTimeoutMs(requestTimeoutMs);

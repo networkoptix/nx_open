@@ -1819,7 +1819,7 @@ void MediaServerProcess::registerRestHandlers(
     reg(kGetTimePath, new QnTimeRestHandler());
     reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
-    reg("api/getNonce", new QnGetNonceRestHandler(/*isUrlSupported*/ true)); //< TODO: Remove url support.
+    reg("api/getNonce", new QnGetNonceRestHandler(/*isUrlSupported*/ false));
     reg("api/getRemoteNonce", new QnGetNonceRestHandler(/*isUrlSupported*/ true));
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
