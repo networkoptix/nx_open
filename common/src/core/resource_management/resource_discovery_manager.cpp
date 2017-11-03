@@ -598,29 +598,30 @@ void QnResourceDiscoveryManager::fillManualCamInfo(QnManualCameraInfoMap& camera
 
 int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMap& cameras)
 {
-    QnMutexLocker lock( &m_searchersListMutex );
+    QnMutexLocker lock(&m_searchersListMutex);
     int added = 0;
     for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
     {
-		bool resourceHasBeenAdded = false;
-        for (QnAbstractResourceSearcher* searcher: m_searchersList)
+        bool resourceHasBeenAdded = false;
+        for (QnAbstractResourceSearcher* searcher : m_searchersList)
         {
-            if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
+            const auto resType = itr.value().resType;
+            if (!resType || !searcher->isResourceTypeSupported(resType->getId()))
                 continue;
 
-                auto url = QUrl(itr.key());
-                if (url.path() == lit("/"))
-                    url.setPath(lit(""));
+            auto url = QUrl(itr.key());
+            if (url.path() == lit("/"))
+                url.setPath(lit(""));
 
-                QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(
-                    url.toString(QUrl::StripTrailingSlash), itr.value());
+            QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(
+                url.toString(QUrl::StripTrailingSlash), itr.value());
 
             inserted.value().searcher = searcher;
-			resourceHasBeenAdded = true;
+            resourceHasBeenAdded = true;
         }
 
-		if (resourceHasBeenAdded)
-			++added;
+        if (resourceHasBeenAdded)
+            ++added;
     }
 
     return added;

@@ -929,7 +929,7 @@ to view more bookmarks</translation>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Erro desconhecido.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1150,6 +1150,33 @@ to view more bookmarks</translation>
     <message>
       <source>These tours will become invalid.</source>
       <translation type="unfinished">These tours will become invalid.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation type="unfinished">Zoom In</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation type="unfinished">Zoom Out</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Focar Longe</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Focar Perto</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Foco Automático</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Alterar Modo Dewarping</translation>
     </message>
   </context>
   <context>
@@ -2185,7 +2212,7 @@ to view more bookmarks</translation>
     <name>QnCameraExpertSettingsWidget</name>
     <message>
       <source>Primary</source>
-      <translation type="unfinished">Primary</translation>
+      <translation>Primário</translation>
     </message>
     <message>
       <source>Secondary</source>
@@ -4158,7 +4185,7 @@ to %1</translation>
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>nenhum</translation>
     </message>
   </context>
   <context>
@@ -5943,15 +5970,15 @@ to %1</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>%n TB</numerusform>
-        <numerusform>%n TB</numerusform>
+      <translation>
+        <numerusform>%n Tb</numerusform>
+        <numerusform>%n Tb</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>Tb</translation>
     </message>
   </context>
   <context>
@@ -7433,7 +7460,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Parar Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>

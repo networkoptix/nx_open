@@ -1,143 +1,143 @@
 {
-  "language_name":"繁体中文",
-  "dialogs":{
-    "okButton":"確定",
-    "openLink":"前往此連結",
-    "openLinkWithTitle":"到 {{title}} 前往此連結"
-  },
-  "setup":{
-    "createAccount":"新建帳號",
-    "errorNoHDD":"此設備只能在有硬碟狀況下運作. <br>請關閉設備然後安裝硬碟.",
-    "errorNoNetwork":"此設備需要網路連接才能運作.<br>請將它連接到本地網路或網際網路"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"密碼長度必須至少為8個字元",
-    "requiredMessage":"只允許拉丁字母、 數字和符號.",
-    "weakMessage":"密碼應該包含不同類型的符號.",
-    "strongMessage":"理想的密碼!",
-    "commonMessage":"此密碼是常見的熱門密碼."
-  },
-  "settings":{
-    "tabs":{
-      "server":"伺服器",
-      "system":"系統",
-      "device":"裝置"
+    "language_name": "繁体中文",
+    "dialogs": {
+        "okButton": "確定",
+        "openLink": "前往此連結",
+        "openLinkWithTitle": "到 {{title}} 前往此連結"
     },
-    "confirmRestart":"是否重啟伺服器?",
-    "couldntCheckInternet":"無法檢查雲端連線",
-    "confirmRestoreDefault":"清除資料庫和設定? 此過程將花費一些時間. 之後會重新啟動伺服器.",
-    "confirmRestoreDefaultTitle":"恢復出廠預設值",
-    "unexpectedError":"失敗: 發生未知錯誤",
-    "connnetionError":"連線錯誤",
-    "wrongPassword":"密碼不正確.",
-    "error":"錯誤: ",
-    "restartNeeded":"變更已儲存. 是否重新啟動伺服器以套用新設定?",
-    "settingsSaved":"設定已儲存",
-    "confirmHardwareRestart":"重新啟動伺服器作業系統?",
-    "confirmRestoreSettings":"還原所有伺服器設置嗎? 錄影資料將繼續保存, 但網路設置將被重置.",
-    "confirmRestoreSettingsNotNetwork":"重置伺服器配置? 將保留錄影資料和網路設置.",
-    "unavailable":"不可用的",
-    "unsafePortConfirm":"使用小於1025的埠號不安全. 伺服器將可能無法被存取. 是否仍繼續?",
-    "confirmDisconnectFromCloud":"從 {{CLOUD_NAME}} 斷開系統",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> 所有雲帳號都將被刪除.</span><br><br>系統將可被本地管理者帳號存取.",
-    "confirmDisconnectFromCloudAction":"斷線",
-    "disconnectedFromCloudSuccess":"系統已成功從 {{CLOUD_NAME}} 斷開連接",
-    "confirmDisconnectFromSystem":"將伺服器從系統中脫離",
-    "confirmDisconnectFromSystemAction":"脫離",
-    "disconnectedFromSystemSuccess":"伺服器已成功地從系統脫離",
-    "connectedSuccess":"系統已成功連接",
-    "createLocalOwnerTitle":"新建本地管理員",
-    "confirmChangePassword":"變更管理員密碼 (注意! 這裡將變更您的最高權限管理員密碼!)",
-    "confirmChangePasswordTitle":"變更系統密碼? 這將影響某些伺服器上 admin 及 root 的密碼",
-    "confirmChangePasswordAction":"儲存新密碼",
-    "nx1ControlHint":"用戶端應用程式已啟動. 使用鍵盤/滑鼠或行動應用程式來控制它."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"資源檢視器",
-      "storage":"儲存裝置",
-      "log":"日誌"
-    }
-  },
-  "join":{
-    "systemIsUnreacheble":"系統無法存取或不存在.",
-    "incorrectCurrentPassword":"此密碼不正確.",
-    "incorrectRemotePassword":"帳號或密碼不正確.",
-    "incompatibleVersion":"系統無法存取, 不存在或為不相容的版本.",
-    "wrongUrl":"無法連接到指定的伺服器.",
-    "newSystemError":"無法合併系統. 尚未設置遠端系統.",
-    "safeMode":"無法合併系統. 遠端系統在安全模式下.",
-    "configError":"無法合併系統. 或許其中一個系統在安全模式下.",
-    "cloudError":"無法合併系統. 有系統連接到雲端. 必須先使它離線.",
-    "cloudBothError":"無法合併系統. 兩個系統都連接到雲端. 必須先使它離線.",
-    "cloudHostConflict":"無法合併系統. 因為伺服器建構在不同的雲端",
-    "licenceError":"警告! 您將要合併一個有 Starter license 的系統. 每個系統只能存在一個 Starter license, 所以第二個 Starter license 將被停用. 是否仍要合併?",
-    "connectionFailed":"連接失敗: ",
-    "unknownError":"未知的錯誤",
-    "mergeFailed":"合併失敗: ",
-    "mergeSucceed":"合併成功.",
-    "newSystemDisplayName":"新系統",
-    "incompatibleProtocol":"不相容的版本",
-    "incompatibleCloudHost":"雲端衝突",
-    "incompatibleCloudState":"雲端連接"
-  },
-  "login":{
-    "incorrectPassword":"帳號或密碼不正確"
-  },
-  "navigaion":{
-    "cannotGetUser":"伺服器故障: 無法取得此使用者資料"
-  },
-  "offlineDialog":{
-    "serverOffline":"伺服器已離線"
-  },
-  "restartDialog":{
-    "serverStarting":"伺服器正在啟動中",
-    "serverRestarting":"伺服器正在重新啟動!",
-    "serverOffline":"伺服器已離線"
-  },
-  "fileUpload":{
-    "started":"更新成功地開始. 這將需要幾分鐘時間",
-    "upToDate":"更新失敗. 此版本已安裝.",
-    "invalidFile":"更新失敗. 提供的檔案不是有效的更新檔案.",
-    "incompatibleSystem":"更新失敗. 提供的檔案被指向另一個系統.",
-    "extractionError":"更新失敗. 沒有足夠的空間來解壓縮檔案, 檢查可用的儲存空間.",
-    "installationError":"更新失敗. 無法執行安裝腳本.",
-    "selectFiles":"選擇檔案"
-  },
-  "advanced":{
-    "free":"可用",
-    "total":"合計",
-    "occupied":"被佔用",
-    "reserved":"保留"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web 介面"
-  },
-  "common":{
-    "systemOffline":"系統處於離線狀態",
-    "cameraLinks":{
-      "copyToClipboard":"複製到剪貼簿",
-      "highStream":"高解析串流",
-      "copyDefaultText":"複製",
-      "unknown":"未知",
-      "lowStream":"低解析串流",
-      "transcoding":"轉碼",
-      "copyActiveText":"已複製到剪貼簿"
+    "setup": {
+        "createAccount": "新建帳號",
+        "errorNoHDD": "此設備只能在有硬碟狀況下運作. <br>請關閉設備然後安裝硬碟.",
+        "errorNoNetwork": "此設備需要網路連接才能運作.<br>請將它連接到本地網路或網際網路"
     },
-    "searchCamPlaceholder":"搜尋",
-    "cameraStates":{
-      "noFormat":"此瀏覽器或設備不支援從此攝影機回放影像。",
-      "ieWin10":"請使用Microsoft Edge或Google Chrome瀏覽器。",
-      "iosVideoTooLarge":"iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
-      "unauthorized":"需要身份驗證",
-      "ubuntuNX":"此瀏覽器不支援從 ARM 伺服器播放影像。請改用 Chromium 瀏覽器。",
-      "ieNoWebm":"請安裝 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> 以支援 Internet Explorer.",
-      "flashOrWebmRequired":"要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
-      "noArmSupport":"此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
-      "error":"錯誤",
-      "offline":"離線",
-      "noData":"無資料",
-      "flashRequired":"要在 ARM 伺服器上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a>."
+    "passwordRequirements": {
+        "minLengthMessage": "密碼長度必須至少為8個字元",
+        "requiredMessage": "只允許拉丁字母、 數字和符號.",
+        "weakMessage": "密碼應該包含不同類型的符號.",
+        "strongMessage": "理想的密碼!",
+        "commonMessage": "此密碼是常見的熱門密碼."
+    },
+    "settings": {
+        "tabs": {
+            "server": "伺服器",
+            "system": "系統",
+            "device": "裝置"
+        },
+        "confirmRestart": "是否重啟伺服器?",
+        "couldntCheckInternet": "無法檢查雲端連線",
+        "confirmRestoreDefault": "清除資料庫和設定? 此過程將花費一些時間. 之後會重新啟動伺服器.",
+        "confirmRestoreDefaultTitle": "恢復出廠預設值",
+        "unexpectedError": "失敗: 發生未知錯誤",
+        "connnetionError": "連線錯誤",
+        "wrongPassword": "密碼不正確.",
+        "error": "錯誤: ",
+        "restartNeeded": "變更已儲存. 是否重新啟動伺服器以套用新設定?",
+        "settingsSaved": "設定已儲存",
+        "confirmHardwareRestart": "重新啟動伺服器作業系統?",
+        "confirmRestoreSettings": "還原所有伺服器設置嗎? 錄影資料將繼續保存, 但網路設置將被重置.",
+        "confirmRestoreSettingsNotNetwork": "重置伺服器配置? 將保留錄影資料和網路設置.",
+        "unavailable": "不可用的",
+        "unsafePortConfirm": "使用小於1025的埠號不安全. 伺服器將可能無法被存取. 是否仍繼續?",
+        "confirmDisconnectFromCloud": "從 {{CLOUD_NAME}} 斷開系統",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'> 所有雲帳號都將被刪除.</span><br><br>系統將可被本地管理者帳號存取.",
+        "confirmDisconnectFromCloudAction": "斷線",
+        "disconnectedFromCloudSuccess": "系統已成功從 {{CLOUD_NAME}} 斷開連接",
+        "confirmDisconnectFromSystem": "將伺服器從系統中脫離",
+        "confirmDisconnectFromSystemAction": "脫離",
+        "disconnectedFromSystemSuccess": "伺服器已成功地從系統脫離",
+        "connectedSuccess": "系統已成功連接",
+        "createLocalOwnerTitle": "新建本地管理員",
+        "confirmChangePassword": "變更管理員密碼 (注意! 這裡將變更您的最高權限管理員密碼!)",
+        "confirmChangePasswordTitle": "變更系統密碼? 這將影響某些伺服器上 admin 及 root 的密碼",
+        "confirmChangePasswordAction": "儲存新密碼",
+        "nx1ControlHint": "用戶端應用程式已啟動. 使用鍵盤/滑鼠或行動應用程式來控制它."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "資源檢視器",
+            "storage": "儲存裝置",
+            "log": "日誌"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "系統無法存取或不存在.",
+        "incorrectCurrentPassword": "此密碼不正確.",
+        "incorrectRemotePassword": "帳號或密碼不正確.",
+        "incompatibleVersion": "系統無法存取, 不存在或為不相容的版本.",
+        "wrongUrl": "無法連接到指定的伺服器.",
+        "newSystemError": "無法合併系統. 尚未設置遠端系統.",
+        "safeMode": "無法合併系統. 遠端系統在安全模式下.",
+        "configError": "無法合併系統. 或許其中一個系統在安全模式下.",
+        "cloudError": "無法合併系統. 有系統連接到雲端. 必須先使它離線.",
+        "cloudBothError": "無法合併系統. 兩個系統都連接到雲端. 必須先使它離線.",
+        "cloudHostConflict": "無法合併系統. 因為伺服器建構在不同的雲端",
+        "licenceError": "警告! 您將要合併一個有 Starter license 的系統. 每個系統只能存在一個 Starter license, 所以第二個 Starter license 將被停用. 是否仍要合併?",
+        "connectionFailed": "連接失敗: ",
+        "unknownError": "未知的錯誤",
+        "mergeFailed": "合併失敗: ",
+        "mergeSucceed": "合併成功.",
+        "newSystemDisplayName": "新系統",
+        "incompatibleProtocol": "不相容的版本",
+        "incompatibleCloudHost": "雲端衝突",
+        "incompatibleCloudState": "雲端連接"
+    },
+    "login": {
+        "incorrectPassword": "帳號或密碼不正確"
+    },
+    "navigaion": {
+        "cannotGetUser": "伺服器故障: 無法取得此使用者資料"
+    },
+    "offlineDialog": {
+        "serverOffline": "伺服器已離線"
+    },
+    "restartDialog": {
+        "serverStarting": "伺服器正在啟動中",
+        "serverRestarting": "伺服器正在重新啟動!",
+        "serverOffline": "伺服器已離線"
+    },
+    "fileUpload": {
+        "started": "更新成功地開始. 這將需要幾分鐘時間",
+        "upToDate": "更新失敗. 此版本已安裝.",
+        "invalidFile": "更新失敗. 提供的檔案不是有效的更新檔案.",
+        "incompatibleSystem": "更新失敗. 提供的檔案被指向另一個系統.",
+        "extractionError": "更新失敗. 沒有足夠的空間來解壓縮檔案, 檢查可用的儲存空間.",
+        "installationError": "更新失敗. 無法執行安裝腳本.",
+        "selectFiles": "選擇檔案"
+    },
+    "advanced": {
+        "free": "可用",
+        "total": "合計",
+        "occupied": "被佔用",
+        "reserved": "保留"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web 介面"
+    },
+    "common": {
+        "systemOffline": "系統處於離線狀態",
+        "cameraLinks": {
+            "copyToClipboard": "複製到剪貼簿",
+            "highStream": "高解析串流",
+            "copyDefaultText": "複製",
+            "unknown": "未知",
+            "lowStream": "低解析串流",
+            "transcoding": "轉碼",
+            "copyActiveText": "已複製到剪貼簿"
+        },
+        "searchCamPlaceholder": "搜尋",
+        "cameraStates": {
+            "noFormat": "此瀏覽器或設備不支援從此攝影機回放影像。",
+            "ieWin10": "請使用Microsoft Edge或Google Chrome瀏覽器。",
+            "iosVideoTooLarge": "iOS不支援大於 fullHD (2MP：1920x1080) 的影像。",
+            "unauthorized": "需要身份驗證",
+            "ubuntuNX": "此瀏覽器不支援從 ARM 伺服器播放影像。請改用 Chromium 瀏覽器。",
+            "ieNoWebm": "請安裝 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> 以支援 Internet Explorer.",
+            "flashOrWebmRequired": "要在 Internet Explorer 上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a> 或 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>.",
+            "noArmSupport": "此瀏覽器或設備不支援從 ARM 伺服器上回放影像。",
+            "error": "錯誤",
+            "offline": "離線",
+            "noData": "無資料",
+            "flashRequired": "要在 ARM 伺服器上播放影像, 請 <a href='https://get.adobe.com/flashplayer/' target='_blank'>安裝 Adobe Flash</a>."
+        }
     }
-  }
 }

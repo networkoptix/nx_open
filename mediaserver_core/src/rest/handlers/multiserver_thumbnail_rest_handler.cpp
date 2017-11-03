@@ -159,6 +159,48 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     return nx_http::StatusCode::ok;
 }
 
+struct DownloadResult
+{
+    SystemError::ErrorCode osStatus = SystemError::notImplemented;
+    nx_http::StatusCode::Value httpStatus = nx_http::StatusCode::internalServerError;
+    QByteArray body;
+};
+
+static DownloadResult downloadImage(
+    const QnMediaServerResourcePtr& server,
+    const QnThumbnailRequestData& request,
+    int ownerPort)
+{
+    NX_ASSERT(!request.isLocal, "Local request must be processed before");
+    QUrl apiUrl(server->getApiUrl());
+    apiUrl.setPath(L'/' + urlPath);
+
+    QnMultiserverRequestContext<QnThumbnailRequestData> context(request, ownerPort);
+    QnThumbnailRequestData modifiedRequest(request);
+    modifiedRequest.makeLocal();
+    apiUrl.setQuery(modifiedRequest.toUrlQuery());
+    // TODO: #rvasilenko implement raw format here
+
+    DownloadResult result;
+    auto requestCompletionFunc =
+        [&] (SystemError::ErrorCode osStatus, int httpStatus, nx_http::BufferType body)
+        {
+            result.osStatus = osStatus;
+            result.httpStatus = (nx_http::StatusCode::Value) httpStatus;
+            result.body = std::move(body);
+            context.executeGuarded([&context]() { context.requestProcessed(); });
+        };
+
+    runMultiserverDownloadRequest(server->commonModule()->router(),
+        apiUrl, server, requestCompletionFunc, &context);
+
+    context.waitForDone();
+    NX_DEBUG(typeid(QnMultiserverThumbnailRestHandler),
+        lm("Request to '%1' finithed (%2) http status %3").args(
+            apiUrl, SystemError::toString(result.osStatus), result.httpStatus));
+
+    return result;
+}
 
 int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     const QnMediaServerResourcePtr &server,
@@ -167,52 +209,28 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     QByteArray& contentType,
     int ownerPort ) const
 {
-    typedef QnMultiserverRequestContext<QnThumbnailRequestData> QnThumbnailRequestContext;
-
-    QnThumbnailRequestContext context(request, ownerPort);
-    NX_ASSERT(!request.isLocal, Q_FUNC_INFO, "Local request must be processed before");
-
-    QUrl apiUrl(server->getApiUrl());
-    apiUrl.setPath(L'/' + urlPath);
-
-    QnThumbnailRequestData modifiedRequest(request);
-    modifiedRequest.makeLocal();
-    apiUrl.setQuery(modifiedRequest.toUrlQuery());
-    // TODO: #rvasilenko implement raw format here
-
-    SystemError::ErrorCode remoteOsStatus = SystemError::notImplemented;
-    nx_http::StatusCode::Value remoteHttpStatus = nx_http::StatusCode::internalServerError;
-    QByteArray remoteResult;
-    auto requestCompletionFunc =
-        [&] (SystemError::ErrorCode osStatus, int httpStatus, nx_http::BufferType body)
-        {
-            remoteOsStatus = osStatus;
-            remoteHttpStatus = (nx_http::StatusCode::Value) httpStatus;
-            remoteResult = std::move(body);
-            context.executeGuarded([&context]() { context.requestProcessed(); });
-        };
-
-    runMultiserverDownloadRequest(server->commonModule()->router(), apiUrl, server, requestCompletionFunc, &context);
-    context.waitForDone();
-    NX_DEBUG(this, lm("Request to '%1' finithed (%2) http status %3").args(
-        apiUrl, SystemError::toString(remoteOsStatus), remoteHttpStatus));
-
-    if (remoteOsStatus != SystemError::noError)
+    const auto response = downloadImage(server, request, ownerPort);
+    if (response.osStatus != SystemError::noError)
     {
-        return makeError(
-            nx_http::StatusCode::internalServerError
-            , lit("Internal error: ") + SystemError::toString(remoteOsStatus)
-            , &result
-            , &contentType
-            , request.format
-            , request.extraFormatting);
+        return makeError(nx_http::StatusCode::internalServerError,
+            lit("Internal error: ") + SystemError::toString(response.osStatus),
+            &result, &contentType, request.format, request.extraFormatting);
     }
 
-    result = std::move(remoteResult);
-    if (remoteHttpStatus == nx_http::StatusCode::ok)
-        contentType = QByteArray("image/") + QnLexical::serialized(request.imageFormat).toUtf8();
-    else
-        contentType = QByteArray("application/json"); //< TODO: Provide content type from response.
+    if (response.httpStatus == nx_http::StatusCode::unauthorized)
+    {
+        return makeError(nx_http::StatusCode::internalServerError,
+            lit("Internal error: ") + nx_http::StatusCode::toString(response.httpStatus),
+            &result, &contentType, request.format, request.extraFormatting);
+    }
 
-    return remoteHttpStatus;
+    if (!response.body.isEmpty())
+    {
+        result = std::move(response.body);
+        contentType = (response.httpStatus == nx_http::StatusCode::ok)
+            ? QByteArray("image/") + QnLexical::serialized(request.imageFormat).toUtf8()
+            : QByteArray("application/json"); //< TODO: Provide content type from response.
+    }
+
+    return response.httpStatus;
 }
