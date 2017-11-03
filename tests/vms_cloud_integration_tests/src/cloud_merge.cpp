@@ -114,17 +114,13 @@ protected:
 
     void andMergeHistoryRecordIsAdded()
     {
-        auto mediaServerClent = m_systemMergeFixture.peer(0).mediaServerClient();
-        ::ec2::ApiSystemMergeHistoryRecordList systemMergeHistory;
-        ASSERT_EQ(
-            ::ec2::ErrorCode::ok,
-            mediaServerClent->ec2GetSystemMergeHistory(&systemMergeHistory));
-
-        ASSERT_EQ(1U, systemMergeHistory.size());
-        ASSERT_EQ(
-            m_systemCloudCredentials.back().systemId,
-            systemMergeHistory[0].mergedSystemCloudId);
-        // TODO: #ak Validating merge history record.
+        const ::ec2::ApiSystemMergeHistoryRecordList systemMergeHistory =
+            m_systemMergeFixture.waitUntilMergeHistoryIsAdded();
+        ASSERT_GE(systemMergeHistory.size(), 1U);
+        ASSERT_TRUE(
+            ::ec2::ApiSystemMergeHistoryRecord::verifyRecordSignature(
+                systemMergeHistory[0],
+                m_systemCloudCredentials.back().key));
     }
 
     void thenCloudCredentialsAreValid(

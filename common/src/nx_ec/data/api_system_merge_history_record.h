@@ -10,11 +10,22 @@ struct ApiSystemMergeHistoryRecord
     qint64 timestamp;
     nx::String mergedSystemLocalId;
     nx::String mergedSystemCloudId;
-    nx::String username;
-    /**
-     * base64(utc_timestamp_millis_decimal:MD5(cloud_system_id:utc_timestamp_millis_decimal:cloud_auth_key)).
-     */
+    QString username;
+    /** Calculated with ApiSystemMergeHistoryRecord::calculateSignature function. */
     nx::String signature;
+
+    static nx::String calculateSignature(
+        const nx::String& cloudSystemId,
+        qint64 timestamp,
+        const nx::String& cloudAuthKey);
+
+    static void signRecord(
+        ApiSystemMergeHistoryRecord* record,
+        const nx::String& mergedSystemCloudAuthKey);
+
+    static bool verifyRecordSignature(
+        const ApiSystemMergeHistoryRecord& record,
+        const nx::String& mergedSystemCloudAuthKey);
 };
 
 #define ApiSystemMergeHistoryRecord_Fields \

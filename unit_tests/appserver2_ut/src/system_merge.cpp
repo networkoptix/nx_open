@@ -34,6 +34,11 @@ protected:
     {
         ASSERT_EQ(QnRestResult::Error::NoError, prevMergeResult());
     }
+
+    void thenMergeHistoryRecordIsAdded()
+    {
+        waitUntilMergeHistoryIsAdded();
+    }
 };
 
 TEST_F(SystemMerge, two_systems_can_be_merged)
@@ -44,6 +49,13 @@ TEST_F(SystemMerge, two_systems_can_be_merged)
 
     thenMergeSucceeded();
     thenAllServersSynchronizedData();
+}
+
+TEST_F(SystemMerge, merge_history_record_is_added_during_merge)
+{
+    givenTwoSingleServerSystems();
+    whenMergeSystems();
+    thenMergeHistoryRecordIsAdded();
 }
 
 } // namespace test
