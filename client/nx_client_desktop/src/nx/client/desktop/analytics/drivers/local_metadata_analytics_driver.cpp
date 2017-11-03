@@ -85,7 +85,7 @@ nx::common::metadata::DetectionMetadataPacket LocalMetadataAnalyticsDriver::find
     if (m_track.empty())
         return {};
 
-    auto currentFrame = std::lower_bound(m_track.cbegin(), m_track.cend(), timestampUs);
+    auto currentFrame = std::lower_bound(m_track.cbegin(), m_track.cend(), std::chrono::microseconds(timestampUs));
     if (currentFrame == m_track.cend())
         --currentFrame;
 
