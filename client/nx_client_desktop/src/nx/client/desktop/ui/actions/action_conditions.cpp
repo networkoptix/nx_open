@@ -1166,7 +1166,14 @@ ActionVisibility ChangeResolutionCondition::check(const Parameters& parameters,
 
             QSet<QnUuid> result;
             for (const auto idx: layoutItems)
-                result.insert(idx.layout()->getItem(idx.uuid()).resource.id);
+            {
+                const auto item = idx.layout()->getItem(idx.uuid());
+                // Skip zoom windows.
+                if (!item.zoomTargetUuid.isNull())
+                    continue;
+
+                result.insert(item.resource.id);
+            }
             return result;
         }();
 
