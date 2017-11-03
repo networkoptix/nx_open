@@ -50,7 +50,8 @@ public:
     enum class Layout
     {
         Main,
-        Content
+        Content,
+        AfterMainLabel
     };
 
 public:

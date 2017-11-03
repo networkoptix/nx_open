@@ -199,6 +199,17 @@ protected slots:
     void at_changeDefaultCameraPassword_triggered();
 
 private:
+    void showSingleCameraErrorMessage(const QString& explanation = QString());
+    void showMultipleCamerasErrorMessage(
+        int totalCameras,
+        const QnVirtualCameraResourceList& camerasWithError,
+        const QString& explanation = QString());
+
+    void changeDefaultPasswords(
+        const QString& previousPassword,
+        const QnVirtualCameraResourceList& cameras,
+        bool showSingleCamera);
+
     void notifyAboutUpdate();
 
     void openFailoverPriorityDialog();

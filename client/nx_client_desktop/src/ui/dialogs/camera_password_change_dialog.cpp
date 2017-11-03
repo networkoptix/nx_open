@@ -40,6 +40,7 @@ Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraRes
 } // namespace
 
 QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
+    const QString& password,
     const QnVirtualCameraResourceList& cameras,
     bool showSingleCameraList,
     QWidget* parent)
@@ -69,6 +70,8 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     setupPasswordField(*ui->passwordEdit);
     setupPasswordField(*ui->confirmPasswordEdit);
 
+    ui->passwordEdit->setText(password);
+    ui->confirmPasswordEdit->setText(password);
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->passwordEdit, ui->confirmPasswordEdit });

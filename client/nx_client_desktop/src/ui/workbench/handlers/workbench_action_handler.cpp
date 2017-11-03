@@ -18,6 +18,7 @@
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
+#include <api/server_rest_connection.h>
 
 #include <nx/vms/event/action_parameters.h>
 
@@ -139,7 +140,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
-
 #include <nx/client/desktop/utils/server_image_cache.h>
 
 #include <utils/applauncher_utils.h>
@@ -650,6 +650,130 @@ void ActionHandler::at_previousLayoutAction_triggered()
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + total) % total);
 }
 
+void ActionHandler::showSingleCameraErrorMessage(const QString& explanation)
+{
+    static const auto kMessageText = tr("Failed to change password");
+    QnMessageBox::critical(context()->mainWindow(), kMessageText, explanation);
+}
+
+void ActionHandler::showMultipleCamerasErrorMessage(
+    int totalCameras,
+    const QnVirtualCameraResourceList& camerasWithError,
+    const QString& explanation)
+{
+    static const auto kMessageTemplate = tr("Failed to change passwords on %1 of %2 cameras");
+    static const auto kSimpleOptions = QnResourceListView::Options(
+        QnResourceListView::HideStatusOption
+        | QnResourceListView::ServerAsHealthMonitorOption
+        | QnResourceListView::SortAsInTreeOption);
+
+    QnSessionAwareMessageBox messageBox(context()->mainWindow());
+    messageBox.setIcon(QnMessageBoxIcon::Critical);
+    messageBox.setText(kMessageTemplate.arg(
+        QString::number(camerasWithError.size()), QString::number(totalCameras)));
+    if (!explanation.isEmpty())
+        messageBox.setInformativeText(explanation);
+    messageBox.addCustomWidget(
+        new QnResourceListView(camerasWithError, kSimpleOptions, &messageBox),
+        QnMessageBox::Layout::AfterMainLabel);
+
+    messageBox.setStandardButtons(QDialogButtonBox::Ok);
+    messageBox.exec();
+}
+
+void ActionHandler::changeDefaultPasswords(
+    const QString& previousPassword,
+    const QnVirtualCameraResourceList& cameras,
+    bool showSingleCamera)
+{
+    const auto server = commonModule()->currentServer();
+    const auto serverConnection = server ? server->restConnection() : rest::QnConnectionPtr();
+    if (!serverConnection)
+    {
+        NX_EXPECT(false, "No connection to server");
+        return;
+    }
+
+    QnCameraPasswordChangeDialog dialog(
+        previousPassword, cameras, showSingleCamera, context()->mainWindow());
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, QnRestResult>;
+    using PassswordChangeResultList = QList<PasswordChangeResult>;
+
+    QSharedPointer<PassswordChangeResultList> errorResultsStorage;
+
+    const auto password = dialog.password();
+    const auto guard = QPointer<ActionHandler>(this);
+    const auto completionGuard = QnRaiiGuard::createDestructible(
+        [this, guard, cameras, errorResultsStorage, password, showSingleCamera]()
+        {
+            if (!guard || errorResultsStorage->isEmpty())
+                return;
+
+            // Show error dialog and try one more time
+            const auto camerasWithError =
+                [errorResultsStorage]()
+                {
+                    QnVirtualCameraResourceList result;
+                    for (const auto errorResult: *errorResultsStorage)
+                        result.push_back(errorResult.first);
+                    return result;
+                }();
+
+            auto explanation =
+                [errorResultsStorage]()
+                {
+                    QnRestResult::Error error = errorResultsStorage->first().second.error;
+                    if (errorResultsStorage->size() != 1)
+                    {
+                        const bool hasAnotherError = std::any_of(
+                            errorResultsStorage->begin() + 1, errorResultsStorage->end(),
+                            [error](const PasswordChangeResult& result)
+                            {
+                                return error != result.second.error;
+                            });
+
+                        if (hasAnotherError)
+                            error = QnRestResult::NoError;
+                    }
+
+                    return error == QnRestResult::NoError
+                        ? QString() //< NoError means different or unspecified error
+                        : errorResultsStorage->first().second.errorString;
+                }();
+
+            if (cameras.size() > 1)
+                showMultipleCamerasErrorMessage(cameras.size(), camerasWithError, explanation);
+            else
+                showSingleCameraErrorMessage(explanation);
+
+            changeDefaultPasswords(password, camerasWithError, showSingleCamera);
+        });
+
+    for (const auto camera: cameras)
+    {
+        auto auth = camera->getDefaultAuth();
+        auth.setPassword(password);
+
+        const auto resultCallback =
+            [guard, completionGuard, camera, errorResultsStorage]
+                (bool success, rest::Handle /*handle*/, QnRestResult result)
+            {
+                if (!guard)
+                    return;
+
+                if (!success)
+                    errorResultsStorage->append(PasswordChangeResult(camera, QnRestResult()));
+                else if (result.error != QnRestResult::NoError)
+                    errorResultsStorage->append(PasswordChangeResult(camera, result));
+            };
+
+        qDebug() << serverConnection->changeCameraPassword(camera->getId(), auth, resultCallback);
+    }
+}
+
 void ActionHandler::at_changeDefaultCameraPassword_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
@@ -657,13 +781,13 @@ void ActionHandler::at_changeDefaultCameraPassword_triggered()
         parameters.resources().filtered<QnVirtualCameraResource>();
 
     if (camerasWithDefaultPassword.isEmpty())
+    {
+        NX_EXPECT(false, "No cameras with default password");
         return;
+    }
 
     const bool showSingleCameraList = parameters.argument(Qn::ShowSingleCameraRole, false);
-    QnCameraPasswordChangeDialog dialog(
-        camerasWithDefaultPassword, showSingleCameraList, context()->mainWindow());
-    if (!dialog.exec())
-        return;
+    changeDefaultPasswords(QString(), camerasWithDefaultPassword, showSingleCameraList);
 }
 
 void ActionHandler::at_openInLayoutAction_triggered()
