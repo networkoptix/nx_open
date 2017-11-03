@@ -107,8 +107,7 @@ QSGNode* FocusFrameItem::updatePaintNode(
     {
         geometryNode = new QSGGeometryNode();
         geometryNode->setGeometry(
-            new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4 * 6));
-        geometryNode->geometry()->setDrawingMode(GL_TRIANGLES);
+            new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4 * 2 + 2));
         geometryNode->setFlag(QSGNode::OwnsGeometry);
         geometryNode->setMaterial(d->material.data());
 
@@ -121,37 +120,35 @@ QSGNode* FocusFrameItem::updatePaintNode(
         geometryNode->markDirty(QSGNode::DirtyMaterial);
     }
 
-    auto addRectangle =
-        [](QSGGeometry::TexturedPoint2D*& data, const QRectF& rect)
-        {
-            const auto x = static_cast<float>(rect.x());
-            const auto y = static_cast<float>(rect.y());
-            const auto r = static_cast<float>(rect.right());
-            const auto b = static_cast<float>(rect.bottom());
-            const auto twx = (r - x) / kTextureSize;
-            const auto thy = (b - y) / kTextureSize;
-            // We use chessboard 2x2 texture to avoid sibling painted points of the frame.
-            // Second texture column is used when frame edge has odd x or odd y and not both.
-            const auto ts = ((qRound(rect.x()) + qRound(rect.y())) & 1) ? 0.5f : 0.0f;
-
-            data[0].set(x, y, ts, 0);
-            data[1].set(r, y, twx + ts, 0);
-            data[2].set(x, b, ts, thy);
-            data[3].set(r, y, twx + ts, 0);
-            data[4].set(x, b, ts, thy);
-            data[5].set(r, b, twx + ts, thy);
-
-            data += 6;
-        };
-
     auto data = geometryNode->geometry()->vertexDataAsTexturedPoint2D();
 
-    // Rectangles are shifted by kDotSize to avoid painting corner dots multiple times.
-    // This is important when the color is semi-transparent.
-    addRectangle(data, QRectF(0, 0, kDotSize, height()));
-    addRectangle(data, QRectF(width() - kDotSize, 0, kDotSize, height()));
-    addRectangle(data, QRectF(kDotSize, 0, width() - 2 * kDotSize, kDotSize));
-    addRectangle(data, QRectF(kDotSize, height() - kDotSize, width() - 2 * kDotSize, kDotSize));
+    auto addPoint =
+        [&data](const QPointF& point)
+        {
+            const auto x = static_cast<float>(point.x());
+            const auto y = static_cast<float>(point.y());
+
+            // We use chessboard 2x2 texture to avoid sibling painted points of the frame.
+            // Second texture column is used when frame edge has odd x or odd y and not both.
+            const auto ts = (point.toPoint().manhattanLength() & 1) ? 0.5f : 0.0f;
+
+            data->set(x, y, x / kTextureSize + ts, y / kTextureSize + ts);
+            ++data;
+        };
+
+    const auto outerRect = QRectF(0, 0, width(), height());
+    const auto innerRect = outerRect.adjusted(kDotSize, kDotSize, -kDotSize, -kDotSize);
+
+    addPoint(outerRect.topLeft());
+    addPoint(innerRect.topLeft());
+    addPoint(outerRect.topRight());
+    addPoint(innerRect.topRight());
+    addPoint(outerRect.bottomRight());
+    addPoint(innerRect.bottomRight());
+    addPoint(outerRect.bottomLeft());
+    addPoint(innerRect.bottomLeft());
+    addPoint(outerRect.topLeft());
+    addPoint(innerRect.topLeft());
 
     geometryNode->markDirty(QSGNode::DirtyGeometry);
 
