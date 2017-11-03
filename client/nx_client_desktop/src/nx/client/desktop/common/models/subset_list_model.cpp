@@ -110,9 +110,9 @@ void SubsetListModel::connectToModel(QAbstractItemModel* model)
         });
 
     *m_modelConnections << connect(model, &QAbstractItemModel::modelAboutToBeReset,
-        this, &SubsetListModel::modelAboutToBeReset);
+        this, &SubsetListModel::beginResetModel);
     *m_modelConnections << connect(model, &QAbstractItemModel::modelReset,
-        this, &SubsetListModel::modelReset);
+        this, &SubsetListModel::endResetModel);
 
     *m_modelConnections << connect(model, &QAbstractItemModel::headerDataChanged,
         this, &SubsetListModel::headerDataChanged);
