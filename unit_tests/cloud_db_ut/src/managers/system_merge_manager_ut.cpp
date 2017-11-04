@@ -287,14 +287,14 @@ TEST_F(SystemMergeManager, merge_history_record_with_invalid_signature_ignored)
     thenSlaveSystemMovedToState(api::SystemStatus::beingMerged);
 }
 
-TEST_F(SystemMergeManager, merge_history_record_ignored_if_system_is_in_unexpected_state)
+TEST_F(SystemMergeManager, merge_history_record_is_processed_even_if_system_is_in_unexpected_state)
 {
     givenSystemsBeingMerged();
 
     whenMoveSlaveSystemTo(api::SystemStatus::activated);
     whenMergeHistoryRecordIsDelivered();
 
-    thenSlaveSystemMovedToState(api::SystemStatus::activated);
+    thenSlaveSystemIsRemoved();
 }
 
 } // namespace test

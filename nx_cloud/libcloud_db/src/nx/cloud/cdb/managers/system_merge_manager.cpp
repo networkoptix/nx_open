@@ -78,19 +78,18 @@ void SystemMergeManager::processMergeHistoryRecord(
     if (resultCode != nx::utils::db::DBResult::ok)
         throw nx::utils::db::Exception(resultCode);
 
-    if (system.status != api::SystemStatus::beingMerged)
-    {
-        NX_WARNING(this, lm("Received merge history record for system %1 "
-            "that is in unexpected state %2. Ignoring...")
-            .args(system.id, QnLexical::serialized(system.status)));
-        return;
-    }
-
     if (!mergeHistoryRecord.verify(system.authKey.c_str()))
     {
         NX_WARNING(this, lm("Could not verify merge history record for system %1. Ignoring...")
             .args(system.id));
         return;
+    }
+
+    if (system.status != api::SystemStatus::beingMerged)
+    {
+        NX_DEBUG(this, lm("Received merge history record for system %1 "
+            "that is in unexpected state %2. Proceeding...")
+            .args(system.id, QnLexical::serialized(system.status)));
     }
 
     resultCode = m_systemManager->markSystemForDeletion(
