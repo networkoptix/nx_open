@@ -74,7 +74,7 @@ nx::utils::db::DBResult SystemDataObject::selectSystemSequence(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::markSystemAsDeleted(
+nx::utils::db::DBResult SystemDataObject::markSystemForDeletion(
     nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId)
 {

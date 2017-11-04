@@ -19,13 +19,14 @@ enum class DBResult
     ioError,
     notFound,
     /**
-     * Business logic decided to cancel operation and rollback transaction. 
+     * Business logic decided to cancel operation and rollback transaction.
      * This is not an error.
      */
-    cancelled, 
+    cancelled,
     retryLater,
     uniqueConstraintViolation,
-    connectionError
+    connectionError,
+    logicError
 };
 
 NX_UTILS_API const char* toString(DBResult value);
@@ -57,7 +58,7 @@ public:
     /** Connection is closed if not used for this interval. */
     std::chrono::seconds inactivityTimeout;
     /**
-     * If scheduled request has not received DB connection during this timeout 
+     * If scheduled request has not received DB connection during this timeout
      * it will be cancelled with DBResult::cancelled error code.
      * By default it is one minute.
      * @note Set to zero to disable this timeout.

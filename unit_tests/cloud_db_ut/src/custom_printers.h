@@ -16,11 +16,6 @@ namespace cdb {
 
 void PrintTo(VmsResultCode val, ::std::ostream* os);
 
-namespace api {
-
-void PrintTo(ResultCode val, ::std::ostream* os);
-
-} // namespace api
 } // namespace cdb
 } // namespace nx
 

@@ -119,12 +119,11 @@ MergeSystemData VmsGateway::prepareMergeRequestParameters(
     mergeSystemData.mergeOneServer = false;
     mergeSystemData.takeRemoteSettings = true;
     mergeSystemData.ignoreIncompatible = false;
-    // TODO getKey
-    // TODO postKey
+    // TODO: #ak Fill getKey and postKey
     mergeSystemData.url =
         nx::network::url::Builder().setScheme(nx_http::kSecureUrlSchemeName)
             .setHost(systemIdToMergeTo.c_str()).toString();
-    
+
     return mergeSystemData;
 }
 

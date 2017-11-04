@@ -8,6 +8,7 @@
 #include <nx/utils/counter.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
+#include <nx_ec/data/api_system_merge_history_record.h>
 
 #include "managers_types.h"
 #include "vms_gateway.h"
@@ -31,6 +32,10 @@ public:
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged,
         std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    virtual void processMergeHistoryRecord(
+        nx::utils::db::QueryContext* queryContext,
+        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) = 0;
 };
 
 class SystemMergeManager:
@@ -49,6 +54,10 @@ public:
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToBeMerged,
         std::function<void(api::ResultCode)> completionHandler) override;
+
+    virtual void processMergeHistoryRecord(
+        nx::utils::db::QueryContext* queryContext,
+        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) override;
 
 private:
     struct MergeRequestContext

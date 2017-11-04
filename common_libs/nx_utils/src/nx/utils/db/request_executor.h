@@ -8,6 +8,7 @@
 #include <QtSql/QSqlDatabase>
 
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/log/log.h>
 
 #include "db_statistics_collector.h"
 #include "types.h"
@@ -63,6 +64,12 @@ protected:
         catch (const Exception& e)
         {
             dbResult = e.dbResult();
+        }
+        catch (const std::exception& e)
+        {
+            // TODO: #ak Propagate exception further so that "execute query sync" function throws this exception.
+            NX_DEBUG(this, lm("Caught exception. %1").arg(e.what()));
+            dbResult = DBResult::logicError;
         }
         return dbResult;
     }

@@ -214,7 +214,7 @@ private:
         nx_http::RequestProcessedHandler completionHandler)
     {
         m_vmsApiRequests.push(std::move(request));
-        
+
         QnJsonRestResult response;
         response.error = QnRestResult::Error::NoError;
 
@@ -290,7 +290,7 @@ TEST_F(SystemMerge, merge_request_invokes_merge_request_to_slave_system)
 TEST_F(SystemMerge, fails_if_request_to_slave_system_fails)
 {
     givenTwoOnlineSystemsWithSameOwner();
-    
+
     whenSlaveSystemFailsEveryRequest();
     whenMergeSystems();
 

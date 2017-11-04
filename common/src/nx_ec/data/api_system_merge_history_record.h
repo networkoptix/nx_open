@@ -14,18 +14,13 @@ struct ApiSystemMergeHistoryRecord
     /** Calculated with ApiSystemMergeHistoryRecord::calculateSignature function. */
     nx::String signature;
 
+    void sign(const nx::String& mergedSystemCloudAuthKey);
+    bool verify(const nx::String& mergedSystemCloudAuthKey) const;
+
     static nx::String calculateSignature(
         const nx::String& cloudSystemId,
         qint64 timestamp,
         const nx::String& cloudAuthKey);
-
-    static void signRecord(
-        ApiSystemMergeHistoryRecord* record,
-        const nx::String& mergedSystemCloudAuthKey);
-
-    static bool verifyRecordSignature(
-        const ApiSystemMergeHistoryRecord& record,
-        const nx::String& mergedSystemCloudAuthKey);
 };
 
 #define ApiSystemMergeHistoryRecord_Fields \

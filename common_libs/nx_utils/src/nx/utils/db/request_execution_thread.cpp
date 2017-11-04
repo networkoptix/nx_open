@@ -60,7 +60,7 @@ void DbRequestExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()
 
 void DbRequestExecutionThread::start()
 {
-    m_queryExecutionThread = 
+    m_queryExecutionThread =
         nx::utils::thread(std::bind(&DbRequestExecutionThread::queryExecutionThreadMain, this));
 }
 
@@ -87,11 +87,11 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
 
     while (!m_terminated && m_state == ConnectionState::opened)
     {
-        boost::optional<std::unique_ptr<AbstractExecutor>> task = 
+        boost::optional<std::unique_ptr<AbstractExecutor>> task =
             queryExecutorQueue()->pop(kTaskWaitTimeout, m_queueReaderId);
         if (!task)
         {
-            if (std::chrono::steady_clock::now() - previousActivityTime >= 
+            if (std::chrono::steady_clock::now() - previousActivityTime >=
                 connectionOptions().inactivityTimeout)
             {
                 // Dropping connection by timeout.
@@ -139,7 +139,7 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
                 break;
             }
 
-            if (m_numberOfFailedRequestsInARow >= 
+            if (m_numberOfFailedRequestsInARow >=
                 connectionOptions().maxErrorsInARowBeforeClosingConnection)
             {
                 NX_LOGX(lm("Dropping DB connection due to %1 errors in a row. Db text %2")
@@ -166,6 +166,7 @@ bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)
         case DBResult::cancelled:
         case DBResult::retryLater:
         case DBResult::uniqueConstraintViolation:
+        case DBResult::logicError:
             return true;
 
         case DBResult::ioError:

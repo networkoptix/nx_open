@@ -30,7 +30,7 @@ public:
         TransactionLog* const transactionLog);
     virtual ~IncomingTransactionDispatcher();
 
-    /** 
+    /**
      * @note Method is non-blocking, result is delivered by invoking completionHandler.
      */
     void dispatchTransaction(

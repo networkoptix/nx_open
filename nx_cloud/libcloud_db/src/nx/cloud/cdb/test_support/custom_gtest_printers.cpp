@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <nx/cloud/cdb/client/data/account_data.h>
+#include <nx/cloud/cdb/client/data/system_data.h>
 #include <nx/cloud/cdb/client/data/types.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -9,7 +11,17 @@ namespace nx {
 namespace cdb {
 namespace api {
 
+void PrintTo(AccountStatus val, ::std::ostream* os)
+{
+    *os << QnLexical::serialized(val).toStdString();
+}
+
 void PrintTo(ResultCode val, ::std::ostream* os)
+{
+    *os << QnLexical::serialized(val).toStdString();
+}
+
+void PrintTo(SystemStatus val, ::std::ostream* os)
 {
     *os << QnLexical::serialized(val).toStdString();
 }

@@ -17,14 +17,6 @@ void PrintTo(VmsResultCode val, ::std::ostream* os)
     *os << QnLexical::serialized(val).toStdString();
 }
 
-namespace api {
-
-void PrintTo(ResultCode val, ::std::ostream* os)
-{
-    *os << QnLexical::serialized(val).toStdString();
-}
-
-} // namespace api
 } // namespace cdb
 } // namespace nx
 

@@ -1390,7 +1390,7 @@ APPLY(10200, saveSystemMergeHistoryRecord, ApiSystemMergeHistoryRecord, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
+                       CloudTransactionType()) /* regular transaction type */ \
 APPLY(10201, getSystemMergeHistory, ApiSystemMergeHistoryRecordList, \
                        true, /* persistent*/ \
                        false, /* system*/ \

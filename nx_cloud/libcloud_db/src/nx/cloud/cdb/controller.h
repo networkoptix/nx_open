@@ -55,11 +55,11 @@ public:
     MaintenanceManager& maintenanceManager();
 
     CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated();
-    
+
     CloudModuleUrlProvider& cloudModuleUrlProvider();
 
     AuthenticationManager& authenticationManager();
-    
+
     AuthorizationManager& authorizationManager();
 
 private:
@@ -87,6 +87,9 @@ private:
 
     void performDataMigrations();
     void generateUserAuthRecords(nx::utils::db::QueryContext* queryContext);
+
+    void initializeDataSynchronizationEngine();
+    void initializeSecurity();
 };
 
 } // namespace cdb

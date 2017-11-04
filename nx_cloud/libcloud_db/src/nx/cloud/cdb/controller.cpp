@@ -66,32 +66,11 @@ Controller::Controller(const conf::Settings& settings):
 {
     performDataMigrations();
 
-    m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
-        m_systemManager.systemMarkedAsDeletedSubscription());
+    initializeDataSynchronizationEngine();
+
     m_timerManager.start();
 
-    // TODO: #ak Move following to stree xml.
-    m_authRestrictionList = std::make_unique<nx_http::AuthMethodRestrictionList>();
-    m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kAccountRegisterPath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kAccountActivatePath, nx_http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(kAccountReactivatePath, nx_http::AuthMethod::noAuth);
-
-    std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
-    authDataProviders.push_back(&m_accountManager);
-    authDataProviders.push_back(&m_systemManager);
-    m_authenticationManager = std::make_unique<AuthenticationManager>(
-        std::move(authDataProviders),
-        *m_authRestrictionList,
-        m_streeManager);
-
-    m_authorizationManager = std::make_unique<AuthorizationManager>(
-        m_streeManager,
-        m_accountManager,
-        m_systemManager,
-        m_systemManager);
+    initializeSecurity();
 }
 
 Controller::~Controller()
@@ -200,6 +179,51 @@ void Controller::generateUserAuthRecords(nx::utils::db::QueryContext* queryConte
             sharing,
             nx::cdb::SharingType::sharingWithExistingAccount);
     }
+}
+
+void Controller::initializeSecurity()
+{
+    // TODO: #ak Move following to stree xml.
+    m_authRestrictionList = std::make_unique<nx_http::AuthMethodRestrictionList>();
+    m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountRegisterPath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountActivatePath, nx_http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountReactivatePath, nx_http::AuthMethod::noAuth);
+
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
+    authDataProviders.push_back(&m_accountManager);
+    authDataProviders.push_back(&m_systemManager);
+    m_authenticationManager = std::make_unique<AuthenticationManager>(
+        std::move(authDataProviders),
+        *m_authRestrictionList,
+        m_streeManager);
+
+    m_authorizationManager = std::make_unique<AuthorizationManager>(
+        m_streeManager,
+        m_accountManager,
+        m_systemManager,
+        m_systemManager);
+}
+
+void Controller::initializeDataSynchronizationEngine()
+{
+    m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
+        m_systemManager.systemMarkedAsDeletedSubscription());
+
+    m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
+        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, ::ec2::ApiSystemMergeHistoryRecord, int>(
+            [this](
+                nx::utils::db::QueryContext* queryContext,
+                const nx::String& /*systemId*/,
+                ::ec2::QnTransaction<::ec2::ApiSystemMergeHistoryRecord> data,
+                int*)
+            {
+                m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
+                return nx::utils::db::DBResult::ok;
+            },
+            [](nx::utils::db::QueryContext*, nx::utils::db::DBResult, int) {});
 }
 
 } // namespace cdb

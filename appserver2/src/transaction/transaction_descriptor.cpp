@@ -135,7 +135,7 @@ struct CreateHashFromCustomField
 
     MemberPointer memberPointer;
 
-    CreateHashFromCustomField(MemberPointer memberPointer): 
+    CreateHashFromCustomField(MemberPointer memberPointer):
         memberPointer(memberPointer) {}
 
     QnUuid operator ()(const ClassType& param)
@@ -1050,6 +1050,15 @@ struct RegularTransactionType
     ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
     {
         return TransactionType::Regular;
+    }
+};
+
+struct CloudTransactionType
+{
+    template<typename Param>
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
+    {
+        return TransactionType::Cloud;
     }
 };
 

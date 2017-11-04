@@ -20,7 +20,7 @@ protected:
         m_record.mergedSystemCloudId = nx::utils::random::generateName(7);
         m_record.username = nx::utils::random::generateName(7);
     }
-    
+
     void givenRandomSignedRecord()
     {
         givenRandomRecord();
@@ -34,17 +34,17 @@ protected:
 
     void thenRecordCanNoLongerBeVerified()
     {
-        ASSERT_FALSE(ApiSystemMergeHistoryRecord::verifyRecordSignature(m_record, m_authKey));
+        ASSERT_FALSE(m_record.verify(m_authKey));
     }
 
     void signRecord()
     {
-        ApiSystemMergeHistoryRecord::signRecord(&m_record, m_authKey);
+        m_record.sign(m_authKey);
     }
 
     void assertRecordSignatureCorrect()
     {
-        ASSERT_TRUE(ApiSystemMergeHistoryRecord::verifyRecordSignature(m_record, m_authKey));
+        ASSERT_TRUE(m_record.verify(m_authKey));
     }
 
 private:

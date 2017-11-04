@@ -510,7 +510,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
 
     // put current server info to a foreign system to allow authorization via server key
     {
-        QnMediaServerResourcePtr mServer = 
+        QnMediaServerResourcePtr mServer =
             m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
                 m_commonModule->moduleGUID());
         if (!mServer)
@@ -655,21 +655,15 @@ bool SystemMergeProcessor::addMergeHistoryRecord(const MergeSystemData& data)
 
     ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
     mergeHistoryRecord.timestamp = QDateTime::currentMSecsSinceEpoch();
-    mergeHistoryRecord.mergedSystemLocalId = 
+    mergeHistoryRecord.mergedSystemLocalId =
         mergedSystemModuleInformation.localSystemId.toSimpleByteArray();
     mergeHistoryRecord.username = m_authSession.userName;
     if (!mergedSystemModuleInformation.cloudSystemId.isEmpty())
     {
-        mergeHistoryRecord.mergedSystemCloudId = 
+        mergeHistoryRecord.mergedSystemCloudId =
             mergedSystemModuleInformation.cloudSystemId.toUtf8();
         if (mergedSystemModuleInformation.cloudSystemId == m_localModuleInformation.cloudSystemId)
-        {
-            mergeHistoryRecord.signature = 
-                ::ec2::ApiSystemMergeHistoryRecord::calculateSignature(
-                    m_localModuleInformation.cloudSystemId.toUtf8(),
-                    mergeHistoryRecord.timestamp,
-                    m_cloudAuthKey);
-        }
+            mergeHistoryRecord.sign(m_cloudAuthKey);
     }
 
     auto miscManager = m_commonModule->ec2Connection()->getMiscManager(Qn::kSystemAccess);

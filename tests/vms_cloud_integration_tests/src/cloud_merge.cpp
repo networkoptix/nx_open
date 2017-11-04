@@ -24,7 +24,7 @@ class CloudMerge:
 public:
     static void SetUpTestCase()
     {
-        s_staticCommonModule = 
+        s_staticCommonModule =
             std::make_unique<QnStaticCommonModule>(Qn::PeerType::PT_Server);
     }
 
@@ -37,7 +37,7 @@ protected:
     void givenTwoCloudSystemsWithTheSameOwner()
     {
         ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(2));
-       
+
         for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
         {
             ASSERT_TRUE(connectToCloud(m_systemMergeFixture.peer(i), m_cloudAccounts[0]));
@@ -101,12 +101,12 @@ protected:
     {
         ASSERT_EQ(QnRestResult::Error::NoError, m_systemMergeFixture.prevMergeResult());
     }
-    
+
     void andAllServersAreInterconnected()
     {
         m_systemMergeFixture.thenAllServersAreInterconnected();
     }
-    
+
     void andAllServersSynchronizedData()
     {
         m_systemMergeFixture.thenAllServersSynchronizedData();
@@ -117,10 +117,12 @@ protected:
         const ::ec2::ApiSystemMergeHistoryRecordList systemMergeHistory =
             m_systemMergeFixture.waitUntilMergeHistoryIsAdded();
         ASSERT_GE(systemMergeHistory.size(), 1U);
-        ASSERT_TRUE(
-            ::ec2::ApiSystemMergeHistoryRecord::verifyRecordSignature(
-                systemMergeHistory[0],
-                m_systemCloudCredentials.back().key));
+        ASSERT_TRUE(systemMergeHistory[0].verify(m_systemCloudCredentials.back().key));
+    }
+
+    void thenMergedSystemDisappearedFromCloud()
+    {
+        waitUntilAllCloudCredentialsAreNotValidExcept(m_systemCloudCredentials[0]);
     }
 
     void thenCloudCredentialsAreValid(
@@ -273,6 +275,13 @@ TEST_F(CloudMerge, cloud_systems_with_different_owners_cannot_be_merged)
     givenTwoCloudSystemsWithDifferentOwners();
     whenMergeSystems();
     thenMergeFails();
+}
+
+TEST_F(CloudMerge, merged_system_removed_in_cloud_after_merge)
+{
+    givenTwoCloudSystemsWithTheSameOwner();
+    whenMergeSystems();
+    thenMergedSystemDisappearedFromCloud();
 }
 
 } // namespace test
