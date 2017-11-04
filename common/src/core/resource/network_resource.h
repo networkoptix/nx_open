@@ -52,11 +52,6 @@ public:
     QAuthenticator getAuth() const;
     QAuthenticator getDefaultAuth() const;
 
-    /**
-     * Returns true if camera credential was auto detected by media server.
-     */
-    bool isDefaultAuth() const;
-
     // if reader will find out that authentication is required => setAuthenticated(false) must be called
     bool isAuthenticated() const;
     void setAuthenticated(bool auth);

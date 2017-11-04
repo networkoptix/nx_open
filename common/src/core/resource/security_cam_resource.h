@@ -317,6 +317,10 @@ public:
     virtual bool setCameraCredentialsSync(
         const QAuthenticator& auth, QString* outErrorString = nullptr);
 
+    /**
+     * Returns true if camera credential was auto detected by media server.
+     */
+    bool isDefaultAuth() const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
