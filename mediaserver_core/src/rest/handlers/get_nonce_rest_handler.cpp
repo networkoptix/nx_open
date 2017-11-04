@@ -28,20 +28,20 @@ const int requestTimeoutMs = 10000;
 
 } // namespace
 
-QnGetNonceRestHandler::QnGetNonceRestHandler(bool isUrlSupported):
-    m_isUrlSupported(isUrlSupported)
+QnGetNonceRestHandler::QnGetNonceRestHandler(const QString& remotePath):
+    m_remotePath(remotePath)
 {
 }
 
 int QnGetNonceRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
     if (params.contains("url"))
     {
-        if (!m_isUrlSupported)
+        if (m_remotePath.isEmpty())
         {
             result.setError(QnRestResult::InvalidParameter, "Paramiter url is forbidden");
             return nx_http::StatusCode::forbidden;
@@ -53,7 +53,7 @@ int QnGetNonceRestHandler::executeGet(
         client.setMessageBodyReadTimeoutMs(requestTimeoutMs);
 
         nx::utils::Url requestUrl(params.value("url"));
-        requestUrl.setPath(path);
+        requestUrl.setPath(m_remotePath);
 
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
