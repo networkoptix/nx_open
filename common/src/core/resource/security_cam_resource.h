@@ -116,7 +116,7 @@ public:
     bool isEdge() const;
 
     /** Returns edge, analog or digital class */
-    Qn::LicenseType licenseType() const;
+    virtual Qn::LicenseType licenseType() const;
 
     /**
      * Returns true if all cameras in a same camera group should share 1 license

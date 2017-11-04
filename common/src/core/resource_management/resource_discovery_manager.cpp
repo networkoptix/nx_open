@@ -664,7 +664,9 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
         {
             QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
             QAuthenticator auth = camera->getAuth();
-            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), auth, resType->getName()));
+            newManualCameras.insert(
+                camera->getUrl(),
+                QnManualCameraInfo(nx::utils::Url(camera->getUrl()), auth, resType->getName()));
         }
     }
     if (!newManualCameras.isEmpty())
