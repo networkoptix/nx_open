@@ -637,7 +637,13 @@ CameraDiagnostics::Result HanwhaResource::initInternal()
 CameraDiagnostics::Result HanwhaResource::initDevice()
 {
     setCameraCapability(Qn::SetUserPasswordCapability, true);
-    saveParams();
+    bool isDefaultPassword = false;
+    auto isDefaultPasswordGuard = makeScopeGuard(
+        [this, &isDefaultPassword]
+    {
+        setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
+        saveParams();
+    });
 
     const auto sharedContext = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
@@ -676,10 +682,12 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         return result;
 
     initMediaStreamCapabilities();
-    saveParams();
-
     const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
     sharedContext->startServices(hasVideoArchive);
+
+    // it's saved in isDefaultPasswordGuard
+    isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
+
     return result;
 }
 

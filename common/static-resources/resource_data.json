@@ -1850,7 +1850,7 @@
 
         },
         {
-            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "keys":["DW|DWC-PB6M4T"],
             "forcedOnvifParams":
             {
                 "videoEncoders":

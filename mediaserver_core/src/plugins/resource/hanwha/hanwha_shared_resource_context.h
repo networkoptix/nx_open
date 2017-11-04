@@ -19,6 +19,8 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+static const std::chrono::minutes kUpdateCacheTimeout(10);
+
 class HanwhaChunkLoader;
 
 struct HanwhaInformation
@@ -57,7 +59,7 @@ public:
     HanwhaResult<Value> operator()()
     {
         QnMutexLocker locker(&m_mutex);
-        if (m_timer.hasExpired(std::chrono::seconds(10))) //< TODO: Move out timeout.
+        if (m_timer.hasExpired(kUpdateCacheTimeout))
         {
             m_value = m_getter();
             m_timer.restart();

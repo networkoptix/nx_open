@@ -54,7 +54,8 @@ void HanwhaChunkLoader::start(HanwhaSharedResourceContext* resourceContext)
         if (m_state != State::Initial)
             return; //< Already started
 
-        if (auto information = resourceContext->information())
+        const auto information = resourceContext->information();
+        if (information)
         {
             m_maxChannels = information->channelCount;
         }
@@ -65,6 +66,7 @@ void HanwhaChunkLoader::start(HanwhaSharedResourceContext* resourceContext)
         }
 
         m_resourceContext = resourceContext;
+        m_isNvr = information->deviceType == kHanwhaNvrDeviceType;
         m_state = nextState(m_state);
         NX_DEBUG(this, lm("Started for %1 channels on %2").args(m_maxChannels, resourceContext->url()));
     }
@@ -156,12 +158,11 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         kUpdateChunksDelay).count();
 
-    const bool isNvr = m_resourceContext->information()->deviceType == kHanwhaNvrDeviceType;
-    auto startDateTime = isNvr
+    auto startDateTime = m_isNvr
         ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, m_timeZoneShift)
         : kMinDateTime;
 
-    auto endDateTime = isNvr
+    auto endDateTime = m_isNvr
         ? QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1)
         : kMaxDateTime;
 
@@ -172,7 +173,7 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     for (int i = 0; i < m_maxChannels; ++i)
         channelsParam << QString::number(i);
 
-    if (m_resourceContext->information()->deviceType == kHanwhaNvrDeviceType)
+    if (m_isNvr)
         query.addQueryItem("ChannelIdList", channelsParam.join(','));
 
     loadChunksUrl.setQuery(query);
@@ -264,6 +265,14 @@ void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
     {
         m_startTimeUsec = startTimeUsec;
         m_endTimeUsec = endTimeUsec;
+        const auto startTimeMs = m_startTimeUsec / 1000;
+
+        QnMutexLocker lock(&m_mutex);
+        for (auto& chunks: m_chunks)
+        {
+            while (!chunks.isEmpty() && chunks.first().endTimeMs() < startTimeMs)
+                chunks.pop_front();
+        }
     }
     else
     {
@@ -363,7 +372,10 @@ qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
     const qint64 endTimeMs = m_endTimeUsec / 1000;
     if (m_chunks.size() <= channelNumber || m_chunks[channelNumber].isEmpty())
         return AV_NOPTS_VALUE;
-    return m_chunks[channelNumber].front().startTimeMs * 1000;
+    auto result = m_chunks[channelNumber].front().startTimeMs * 1000;
+    if (m_startTimeUsec != AV_NOPTS_VALUE)
+        result = std::max(m_startTimeUsec, result);
+    return result;
 }
 
 qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
@@ -386,10 +398,7 @@ QnTimePeriodList HanwhaChunkLoader::chunksSync(int channelNumber) const
 {
     QnMutexLocker lock(&m_mutex);
 
-    const bool isCameraLoader =
-        m_resourceContext->information()->deviceType != kHanwhaNvrDeviceType;
-
-    while ((!m_chunksLoadedAtLeastOnce || (!m_timeRangeLoadedAtLeastOnce && !isCameraLoader))
+    while ((!m_chunksLoadedAtLeastOnce || (!m_timeRangeLoadedAtLeastOnce && m_isNvr))
         && !m_errorOccured)
     {
         m_wait.wait(&m_mutex);
@@ -407,7 +416,7 @@ QnTimePeriodList HanwhaChunkLoader::chunksUnsafe(int channelNumber) const
 
     QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
 
-    if (m_resourceContext->information()->deviceType == kHanwhaNvrDeviceType)
+    if (m_isNvr)
         return m_chunks[channelNumber].intersected(boundingPeriod);
 
     return m_chunks[channelNumber];
@@ -422,7 +431,7 @@ void HanwhaChunkLoader::setError()
 
 HanwhaChunkLoader::State HanwhaChunkLoader::nextState(State currentState) const
 {
-    if (m_resourceContext->information()->deviceType != kHanwhaNvrDeviceType)
+    if (!m_isNvr)
         return State::LoadingChunks;
 
     if (currentState == State::updateTimeRange)

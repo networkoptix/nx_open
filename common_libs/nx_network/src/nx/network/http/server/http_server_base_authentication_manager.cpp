@@ -1,6 +1,8 @@
 #include "http_server_base_authentication_manager.h"
 
 #include <nx/network/app_info.h>
+#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 
@@ -118,7 +120,12 @@ void BaseAuthenticationManager::reportSuccess(
 nx::String BaseAuthenticationManager::generateNonce()
 {
     // TODO: #ak Introduce external nonce provider.
-    return nx::utils::generateRandomName(7);
+
+    static const int nonceLength = 7;
+
+    return nx::utils::random::generateName(
+        nx::utils::random::CryptographicRandomDevice::instance(),
+        nonceLength);
 }
 
 nx::String BaseAuthenticationManager::realm()

@@ -42,7 +42,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ShareIpCapability                   = 0x020,
         AudioTransmitCapability             = 0x040,
         RemoteArchiveCapability             = 0x100,
-        SetUserPasswordCapability           = 0x200 //< Can change password on a camera.
+        SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
+        isDefaultPasswordCapability         = 0x400 //< Camera has default password now.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
