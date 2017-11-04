@@ -87,7 +87,7 @@ private:
     mutable std::atomic<bool> m_errorOccured{false};
     mutable QnWaitCondition m_wait;
 
-    bool m_isNvr;
+    bool m_isNvr = false;
 };
 
 } // namespace plugins
