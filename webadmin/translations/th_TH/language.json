@@ -1,143 +1,143 @@
 {
-  "language_name":"ภาษาไทย",
-  "dialogs":{
-    "okButton":"ตกลง",
-    "openLink":"ไปที่ลิงก์นี้",
-    "openLinkWithTitle":"ไปที่ {{title}} ไปที่ลิงก์นี้"
-  },
-  "setup":{
-    "createAccount":"สร้างบัญชี",
-    "errorNoHDD":"อุปกรณ์นี้มีวัตถุประสงค์เพื่อทำงานกับฮาร์ดดิสก์ที่ติดตั้ง <br>กรุณาปิดอุปกรณ์ และติดตั้งฮาร์ดดิสก์ไดรฟ์",
-    "errorNoNetwork":"อุปกรณ์นี้ต้องการการเชื่อมต่อเครือข่ายเพื่อใช้งานได้.<br>กรุณาเชื่อมต่อเครือข่ายกับอินเทอร์เน็ตในระบบเครือข่ายภายใน"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัว",
-    "requiredMessage":"อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น",
-    "weakMessage":"รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน",
-    "strongMessage":"รหัสผ่านที่แข็งแกร่ง!",
-    "commonMessage":"รหัสผ่านนี้อยู่ในรายการรหัสผ่านที่ได้รับความนิยมมากที่สุด"
-  },
-  "settings":{
-    "tabs":{
-      "server":"เซิร์ฟเวอร์",
-      "system":"ระบบ",
-      "device":"อุุปกรณ์"
+    "language_name": "ภาษาไทย",
+    "dialogs": {
+        "okButton": "ตกลง",
+        "openLink": "ไปที่ลิงก์นี้",
+        "openLinkWithTitle": "ไปที่ {{title}} ไปที่ลิงก์นี้"
     },
-    "confirmRestart":"รีสตาร์ทเซิร์ฟเวอร์หรือไม่?",
-    "couldntCheckInternet":"ไม่สามารถตรวจสอบการเชื่อมต่อกับระบบคลาวด์ได้",
-    "confirmRestoreDefault":"ล้างฐานข้อมูลและการตั้งค่า? ขั้นตอนนี้จะใช้เวลาสักพักและเซิร์ฟเวอร์จะเริ่มต้นใหม่หลังจากนั้น",
-    "confirmRestoreDefaultTitle":"เรียกคืนค่าเริ่มต้นจากโรงงาน",
-    "unexpectedError":"ล้มเหลว: มีข้อผิดพลาดที่ไม่คาดคิดเกิดขึ้น",
-    "connnetionError":"การเชื่อมต่อผิดพลาด",
-    "wrongPassword":"รหัสผ่านผิด.",
-    "error":"ข้อผิดพลาด: ",
-    "restartNeeded":"บันทึกการเปลี่ยนแปลงแล้ว รีสตาร์ทเซิร์ฟเวอร์เพื่อใช้การตั้งค่าใหม่หรือไม่?",
-    "settingsSaved":"การตั้งค่าที่บันทึกไว้",
-    "confirmHardwareRestart":"รีสตาร์ทระบบการทำงานของเซิร์ฟเวอร์หรือไม่?",
-    "confirmRestoreSettings":"คืนค่าการตั้งค่าเซิร์ฟเวอร์ทั้งหมด จะถูกบันทึกเก็บถาวร แต่จะถูกรีเซ็ตการตั้งค่าเครือข่าย",
-    "confirmRestoreSettingsNotNetwork":"ตั้งค่าการกำหนดค่าเซิร์ฟเวอร์ จะมีบันทึกการตั้งค่าการเก็บถาวรและเครือข่าย",
-    "unavailable":"ไม่มี",
-    "unsafePortConfirm":"ไม่ปลอดภัยที่จะใช้หมายเลขพอร์ตน้อยกว่า 1025 เซิร์ฟเวอร์อาจไม่สามารถเข้าถึงได้ ดำเนินการต่อ?",
-    "confirmDisconnectFromCloud":"ยกเลิกการเชื่อมต่อระบบจาก {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>ผู้ใช้ระบบคลาวด์ทั้งหมดจะถูกลบออก</span><br><br>ระบบสามารถเข้าถึงได้ผ่านเครือข่ายท้องถิ่นโดยใช้บัญชีผู้ดูแลระบบภายใน",
-    "confirmDisconnectFromCloudAction":"ตัดการเชื่อมต่อ",
-    "disconnectedFromCloudSuccess":"ระบบถูกตัดการเชื่อมต่อจาก {{CLOUD_NAME}} เรียบร้อยแล้ว",
-    "confirmDisconnectFromSystem":"แยกออกจากระบบเซิร์ฟเวอร์",
-    "confirmDisconnectFromSystemAction":"ถอดออก",
-    "disconnectedFromSystemSuccess":"เซิร์ฟเวอร์ถูกแยกออกจากระบบสำเร็จแล้ว",
-    "connectedSuccess":"เชื่อมต่อระบบเรียบร้อยแล้ว",
-    "createLocalOwnerTitle":"สร้างผู้ดูแลระบบภายใน",
-    "confirmChangePassword":"เปลี่ยนรหัสผ่านผู้ดูแลระบบ",
-    "confirmChangePasswordTitle":"ระบบเปลี่ยนรหัสผ่าน มันจะมีผลต่อผู้ใช้ 'ผู้ดูแลระบบ' และผ่านรากสำหรับเซิร์ฟเวอร์",
-    "confirmChangePasswordAction":"บันทึกรหัสผ่านใหม่",
-    "nx1ControlHint":"แอ็พพลิเคชันไคลเอ็นต์ได้เริ่มต้นแล้ว ใช้แป้นพิมพ์ / เมาส์หรือแอปพลิเคชันมือถือเพื่อควบคุม"
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"การตรวจสอบสุขภาพ",
-      "storage":"พื้นที่จัดเก็บ",
-      "log":"บันทึก"
-    }
-  },
-  "join":{
-    "systemIsUnreacheble":"ระบบไม่สามารถเข้าถึงได้หรือไม่มีอยู่",
-    "incorrectCurrentPassword":"รหัสผ่านปัจจุบันไม่ถูกต้อง.",
-    "incorrectRemotePassword":"รหัสผ่านหรือรหัสผ่านไม่ถูกต้อง",
-    "incompatibleVersion":"ระบบไม่สามารถเข้าถึงได้ไม่มีหรือไม่มีเวอร์ชันที่เข้ากันไม่ได้",
-    "wrongUrl":"ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ที่ระบุได้",
-    "newSystemError":"ไม่สามารถผสานระบบ ไม่ได้กำหนดค่าระบบจากระยะไกล",
-    "safeMode":"ไม่สามารถผสานระบบ ระบบระยะไกลอยู่ในเซฟโหมด",
-    "configError":"ไม่สามารถผสานระบบ บางทีระบบหนึ่งในเซฟโหมด",
-    "cloudError":"ไม่สามารถผสานระบบ ระบบขึ้นอยู่กับระบบคลาวด์ คุณต้องตัดการเชื่อมต่อก่อน",
-    "cloudBothError":"ไม่สามารถผสานระบบ ทั้งสองระบบมีการเชื่อมต่อไปที่ cloud คุณจำเป็นต้องตัดการเชื่อมต่อครั้งแรก",
-    "cloudHostConflict":"ไม่สามารถผสานระบบ เนื่องจากเซิร์ฟเวอร์อยู่กับโฮสต์เมฆแตกต่างกัน",
-    "licenceError":"คำเตือน! คุณกำลังจะผสานรวมสิทธิ์การใช้งานระบบกับ Starter อนุญาตได้หนึ่งใบต่อระบบดังนั้นใบอนุญาตที่สองจะถูกยกเลิกการใช้งาน รวมหรือไม่?",
-    "connectionFailed":"การเชื่อมต่อล้มเหลว: ",
-    "unknownError":"ข้อผิดพลาดที่ไม่รู้จัก",
-    "mergeFailed":"ผสานล้มเหลว: ",
-    "mergeSucceed":"ผสานสำเร็จ",
-    "newSystemDisplayName":"ระบบใหม่",
-    "incompatibleProtocol":"รุ่นที่เข้ากันไม่ได้",
-    "incompatibleCloudHost":"ความขัดแย้งของระบบคลาวด์",
-    "incompatibleCloudState":"การเชื่อมต่อระบบคลาวด์"
-  },
-  "login":{
-    "incorrectPassword":"เข้าสู่ระบบหรือรหัสผ่านไม่ถูกต้อง"
-  },
-  "navigaion":{
-    "cannotGetUser":"ล้มเหลวของเซิร์ฟเวอร์: ไม่สามารถเรียกข้อมูลผู้ใช้ปัจจุบัน"
-  },
-  "offlineDialog":{
-    "serverOffline":"เซิร์ฟเวอร์ออฟไลน์"
-  },
-  "restartDialog":{
-    "serverStarting":"เซิร์ฟเวอร์กำลังเริ่มต้น",
-    "serverRestarting":"เซิร์ฟเวอร์กำลังรีสตาร์ท",
-    "serverOffline":"เซิร์ฟเวอร์ออฟไลน์"
-  },
-  "fileUpload":{
-    "started":"ปรับปรุงเริ่มต้นเรียบร้อยแล้ว จะใช้เวลาหลายนาที",
-    "upToDate":"ปรับปรุงล้มเหลว รุ่นที่ระบุถูกติดตั้งแล้ว",
-    "invalidFile":"ปรับปรุงล้มเหลว ไม่ให้แฟ้มเก็บถาวรแบบปรับปรุงที่ถูกต้อง",
-    "incompatibleSystem":"ปรับปรุงล้มเหลว แฟ้มที่มีเฉพาะสำหรับระบบอื่น",
-    "extractionError":"ปรับปรุงล้มเหลว พื้นที่ไม่เพียงพอให้แยกเก็บ ตรวจสอบพื้นที่เก็บข้อมูล",
-    "installationError":"การปรับปรุงล้มเหลว ไม่สามารถเรียกใช้สคริปต์การติดตั้ง",
-    "selectFiles":"เลือกไฟล์"
-  },
-  "advanced":{
-    "free":"ฟรี",
-    "total":"ทั้งหมด",
-    "occupied":"ครอบครอง",
-    "reserved":"สงวนไว้แล้ว"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} เว็บอินเทอร์เฟซ"
-  },
-  "common":{
-    "systemOffline":"ระบบออฟไลน์",
-    "cameraLinks":{
-      "copyToClipboard":"คัดลอกไปยังคลิปบอร์ด",
-      "highStream":"สตรีมสูง",
-      "copyDefaultText":"สำเนา",
-      "unknown":"ม่รู้จัก",
-      "lowStream":"สตรีมต่ำ",
-      "transcoding":"การแปลงรหัส",
-      "copyActiveText":"คัดลอกไปยังคลิปบอร์ด"
+    "setup": {
+        "createAccount": "สร้างบัญชี",
+        "errorNoHDD": "อุปกรณ์นี้มีวัตถุประสงค์เพื่อทำงานกับฮาร์ดดิสก์ที่ติดตั้ง <br>กรุณาปิดอุปกรณ์ และติดตั้งฮาร์ดดิสก์ไดรฟ์",
+        "errorNoNetwork": "อุปกรณ์นี้ต้องการการเชื่อมต่อเครือข่ายเพื่อใช้งานได้.<br>กรุณาเชื่อมต่อเครือข่ายกับอินเทอร์เน็ตในระบบเครือข่ายภายใน"
     },
-    "searchCamPlaceholder":"ค้นหา",
-    "cameraStates":{
-      "noFormat":"เบราเซอร์หรืออุปกรณ์นี้ไม่รองรับการเล่นวิดีโอจากกล้องนี้",
-      "ieWin10":"โปรดใช้ Microsoft Edge หรือเบราว์เซอร์ Google Chrome",
-      "iosVideoTooLarge":"iOS ไม่สนับสนุนวิดีโอที่ใหญ่กว่า fullHD (2MP: 1920x1080)",
-      "unauthorized":"จำเป็นต้องระบุตัวตนผู้ใช้",
-      "ubuntuNX":"เบราว์เซอร์นี้ไม่สนับสนุนวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM โปรดใช้เบราว์เซอร์ Chromium แทน",
-      "ieNoWebm":"โปรดติดตั้ง <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับ Internet Explorer",
-      "flashOrWebmRequired":"โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> หรือ<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับเล่นวิดีโอใน Internet Explorer",
-      "noArmSupport":"เบราว์เซอร์หรืออุปกรณ์นี้ไม่สนับสนุนการเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM",
-      "error":"ข้อผิดพลาด",
-      "offline":"ออฟไลน์",
-      "noData":"ไม่มีข้อมูล",
-      "flashRequired":"โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> สำหรับเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM"
+    "passwordRequirements": {
+        "minLengthMessage": "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัว",
+        "requiredMessage": "อนุญาตเฉพาะตัวอักษรละตินตัวเลขและสัญลักษณ์บนแป้นพิมพ์เท่านั้น",
+        "weakMessage": "รหัสผ่านควรมีสัญลักษณ์ประเภทต่างๆกัน",
+        "strongMessage": "รหัสผ่านที่แข็งแกร่ง!",
+        "commonMessage": "รหัสผ่านนี้อยู่ในรายการรหัสผ่านที่ได้รับความนิยมมากที่สุด"
+    },
+    "settings": {
+        "tabs": {
+            "server": "เซิร์ฟเวอร์",
+            "system": "ระบบ",
+            "device": "อุุปกรณ์"
+        },
+        "confirmRestart": "รีสตาร์ทเซิร์ฟเวอร์หรือไม่?",
+        "couldntCheckInternet": "ไม่สามารถตรวจสอบการเชื่อมต่อกับระบบคลาวด์ได้",
+        "confirmRestoreDefault": "ล้างฐานข้อมูลและการตั้งค่า? ขั้นตอนนี้จะใช้เวลาสักพักและเซิร์ฟเวอร์จะเริ่มต้นใหม่หลังจากนั้น",
+        "confirmRestoreDefaultTitle": "เรียกคืนค่าเริ่มต้นจากโรงงาน",
+        "unexpectedError": "ล้มเหลว: มีข้อผิดพลาดที่ไม่คาดคิดเกิดขึ้น",
+        "connnetionError": "การเชื่อมต่อผิดพลาด",
+        "wrongPassword": "รหัสผ่านผิด.",
+        "error": "ข้อผิดพลาด: ",
+        "restartNeeded": "บันทึกการเปลี่ยนแปลงแล้ว รีสตาร์ทเซิร์ฟเวอร์เพื่อใช้การตั้งค่าใหม่หรือไม่?",
+        "settingsSaved": "การตั้งค่าที่บันทึกไว้",
+        "confirmHardwareRestart": "รีสตาร์ทระบบการทำงานของเซิร์ฟเวอร์หรือไม่?",
+        "confirmRestoreSettings": "คืนค่าการตั้งค่าเซิร์ฟเวอร์ทั้งหมด จะถูกบันทึกเก็บถาวร แต่จะถูกรีเซ็ตการตั้งค่าเครือข่าย",
+        "confirmRestoreSettingsNotNetwork": "ตั้งค่าการกำหนดค่าเซิร์ฟเวอร์ จะมีบันทึกการตั้งค่าการเก็บถาวรและเครือข่าย",
+        "unavailable": "ไม่มี",
+        "unsafePortConfirm": "ไม่ปลอดภัยที่จะใช้หมายเลขพอร์ตน้อยกว่า 1025 เซิร์ฟเวอร์อาจไม่สามารถเข้าถึงได้ ดำเนินการต่อ?",
+        "confirmDisconnectFromCloud": "ยกเลิกการเชื่อมต่อระบบจาก {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>ผู้ใช้ระบบคลาวด์ทั้งหมดจะถูกลบออก</span><br><br>ระบบสามารถเข้าถึงได้ผ่านเครือข่ายท้องถิ่นโดยใช้บัญชีผู้ดูแลระบบภายใน",
+        "confirmDisconnectFromCloudAction": "ตัดการเชื่อมต่อ",
+        "disconnectedFromCloudSuccess": "ระบบถูกตัดการเชื่อมต่อจาก {{CLOUD_NAME}} เรียบร้อยแล้ว",
+        "confirmDisconnectFromSystem": "แยกออกจากระบบเซิร์ฟเวอร์",
+        "confirmDisconnectFromSystemAction": "ถอดออก",
+        "disconnectedFromSystemSuccess": "เซิร์ฟเวอร์ถูกแยกออกจากระบบสำเร็จแล้ว",
+        "connectedSuccess": "เชื่อมต่อระบบเรียบร้อยแล้ว",
+        "createLocalOwnerTitle": "สร้างผู้ดูแลระบบภายใน",
+        "confirmChangePassword": "เปลี่ยนรหัสผ่านผู้ดูแลระบบ",
+        "confirmChangePasswordTitle": "ระบบเปลี่ยนรหัสผ่าน มันจะมีผลต่อผู้ใช้ 'ผู้ดูแลระบบ' และผ่านรากสำหรับเซิร์ฟเวอร์",
+        "confirmChangePasswordAction": "บันทึกรหัสผ่านใหม่",
+        "nx1ControlHint": "แอ็พพลิเคชันไคลเอ็นต์ได้เริ่มต้นแล้ว ใช้แป้นพิมพ์ / เมาส์หรือแอปพลิเคชันมือถือเพื่อควบคุม"
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "การตรวจสอบสุขภาพ",
+            "storage": "พื้นที่จัดเก็บ",
+            "log": "บันทึก"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "ระบบไม่สามารถเข้าถึงได้หรือไม่มีอยู่",
+        "incorrectCurrentPassword": "รหัสผ่านปัจจุบันไม่ถูกต้อง.",
+        "incorrectRemotePassword": "รหัสผ่านหรือรหัสผ่านไม่ถูกต้อง",
+        "incompatibleVersion": "ระบบไม่สามารถเข้าถึงได้ไม่มีหรือไม่มีเวอร์ชันที่เข้ากันไม่ได้",
+        "wrongUrl": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ที่ระบุได้",
+        "newSystemError": "ไม่สามารถผสานระบบ ไม่ได้กำหนดค่าระบบจากระยะไกล",
+        "safeMode": "ไม่สามารถผสานระบบ ระบบระยะไกลอยู่ในเซฟโหมด",
+        "configError": "ไม่สามารถผสานระบบ บางทีระบบหนึ่งในเซฟโหมด",
+        "cloudError": "ไม่สามารถผสานระบบ ระบบขึ้นอยู่กับระบบคลาวด์ คุณต้องตัดการเชื่อมต่อก่อน",
+        "cloudBothError": "ไม่สามารถผสานระบบ ทั้งสองระบบมีการเชื่อมต่อไปที่ cloud คุณจำเป็นต้องตัดการเชื่อมต่อครั้งแรก",
+        "cloudHostConflict": "ไม่สามารถผสานระบบ เนื่องจากเซิร์ฟเวอร์อยู่กับโฮสต์เมฆแตกต่างกัน",
+        "licenceError": "คำเตือน! คุณกำลังจะผสานรวมสิทธิ์การใช้งานระบบกับ Starter อนุญาตได้หนึ่งใบต่อระบบดังนั้นใบอนุญาตที่สองจะถูกยกเลิกการใช้งาน รวมหรือไม่?",
+        "connectionFailed": "การเชื่อมต่อล้มเหลว: ",
+        "unknownError": "ข้อผิดพลาดที่ไม่รู้จัก",
+        "mergeFailed": "ผสานล้มเหลว: ",
+        "mergeSucceed": "ผสานสำเร็จ",
+        "newSystemDisplayName": "ระบบใหม่",
+        "incompatibleProtocol": "รุ่นที่เข้ากันไม่ได้",
+        "incompatibleCloudHost": "ความขัดแย้งของระบบคลาวด์",
+        "incompatibleCloudState": "การเชื่อมต่อระบบคลาวด์"
+    },
+    "login": {
+        "incorrectPassword": "เข้าสู่ระบบหรือรหัสผ่านไม่ถูกต้อง"
+    },
+    "navigaion": {
+        "cannotGetUser": "ล้มเหลวของเซิร์ฟเวอร์: ไม่สามารถเรียกข้อมูลผู้ใช้ปัจจุบัน"
+    },
+    "offlineDialog": {
+        "serverOffline": "เซิร์ฟเวอร์ออฟไลน์"
+    },
+    "restartDialog": {
+        "serverStarting": "เซิร์ฟเวอร์กำลังเริ่มต้น",
+        "serverRestarting": "เซิร์ฟเวอร์กำลังรีสตาร์ท",
+        "serverOffline": "เซิร์ฟเวอร์ออฟไลน์"
+    },
+    "fileUpload": {
+        "started": "ปรับปรุงเริ่มต้นเรียบร้อยแล้ว จะใช้เวลาหลายนาที",
+        "upToDate": "ปรับปรุงล้มเหลว รุ่นที่ระบุถูกติดตั้งแล้ว",
+        "invalidFile": "ปรับปรุงล้มเหลว ไม่ให้แฟ้มเก็บถาวรแบบปรับปรุงที่ถูกต้อง",
+        "incompatibleSystem": "ปรับปรุงล้มเหลว แฟ้มที่มีเฉพาะสำหรับระบบอื่น",
+        "extractionError": "ปรับปรุงล้มเหลว พื้นที่ไม่เพียงพอให้แยกเก็บ ตรวจสอบพื้นที่เก็บข้อมูล",
+        "installationError": "การปรับปรุงล้มเหลว ไม่สามารถเรียกใช้สคริปต์การติดตั้ง",
+        "selectFiles": "เลือกไฟล์"
+    },
+    "advanced": {
+        "free": "ฟรี",
+        "total": "ทั้งหมด",
+        "occupied": "ครอบครอง",
+        "reserved": "สงวนไว้แล้ว"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} เว็บอินเทอร์เฟซ"
+    },
+    "common": {
+        "systemOffline": "ระบบออฟไลน์",
+        "cameraLinks": {
+            "copyToClipboard": "คัดลอกไปยังคลิปบอร์ด",
+            "highStream": "สตรีมสูง",
+            "copyDefaultText": "สำเนา",
+            "unknown": "ม่รู้จัก",
+            "lowStream": "สตรีมต่ำ",
+            "transcoding": "การแปลงรหัส",
+            "copyActiveText": "คัดลอกไปยังคลิปบอร์ด"
+        },
+        "searchCamPlaceholder": "ค้นหา",
+        "cameraStates": {
+            "noFormat": "เบราเซอร์หรืออุปกรณ์นี้ไม่รองรับการเล่นวิดีโอจากกล้องนี้",
+            "ieWin10": "โปรดใช้ Microsoft Edge หรือเบราว์เซอร์ Google Chrome",
+            "iosVideoTooLarge": "iOS ไม่สนับสนุนวิดีโอที่ใหญ่กว่า fullHD (2MP: 1920x1080)",
+            "unauthorized": "จำเป็นต้องระบุตัวตนผู้ใช้",
+            "ubuntuNX": "เบราว์เซอร์นี้ไม่สนับสนุนวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM โปรดใช้เบราว์เซอร์ Chromium แทน",
+            "ieNoWebm": "โปรดติดตั้ง <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับ Internet Explorer",
+            "flashOrWebmRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> หรือ<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> สำหรับเล่นวิดีโอใน Internet Explorer",
+            "noArmSupport": "เบราว์เซอร์หรืออุปกรณ์นี้ไม่สนับสนุนการเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM",
+            "error": "ข้อผิดพลาด",
+            "offline": "ออฟไลน์",
+            "noData": "ไม่มีข้อมูล",
+            "flashRequired": "โปรด <a href='https://get.adobe.com/flashplayer/' target='_blank'> ติดตั้ง Adobe Flash</a> สำหรับเล่นวิดีโอจากเซิร์ฟเวอร์ที่ใช้ ARM"
+        }
     }
-  }
 }

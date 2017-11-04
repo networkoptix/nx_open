@@ -1150,6 +1150,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Yakınlaştır</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Uzaklaştır</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Uzağa Odakla</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Yakına Odakla</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Otomatik Odaklama</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Eğrilik Modunu Değiştir</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
