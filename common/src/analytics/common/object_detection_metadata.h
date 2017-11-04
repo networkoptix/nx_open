@@ -18,8 +18,8 @@ struct Attribute
     QString name;
     QString value;
 };
-QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson)(metatype));
 #define Attribute_Fields (name)(value)
+QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson)(metatype));
 
 bool operator< (const Attribute& f, const Attribute& s);
 
@@ -29,8 +29,8 @@ struct DetectedObject
     QRectF boundingBox;
     std::vector<Attribute> labels;
 };
-QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson)(metatype));
 #define DetectedObject_Fields (objectId)(boundingBox)(labels)
+QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson)(metatype));
 
 struct DetectionMetadataPacket
 {
@@ -38,8 +38,8 @@ struct DetectionMetadataPacket
     qint64 durationUsec = 0;
     std::vector<DetectedObject> objects;
 };
-QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson)(metatype));
 #define DetectionMetadataPacket_Fields (timestampUsec)(durationUsec)(objects)
+QN_FUSION_DECLARE_FUNCTIONS(DetectionMetadataPacket, (json)(ubjson)(metatype));
 
 #define QN_OBJECT_DETECTION_TYPES \
     (Attribute)\
