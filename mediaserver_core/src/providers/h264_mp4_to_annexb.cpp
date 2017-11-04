@@ -6,6 +6,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <nx/network/socket_common.h>
 #include "nx/streaming/video_data_packet.h"
 
 
