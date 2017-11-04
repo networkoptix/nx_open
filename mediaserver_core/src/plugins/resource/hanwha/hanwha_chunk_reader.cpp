@@ -265,6 +265,14 @@ void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
     {
         m_startTimeUsec = startTimeUsec;
         m_endTimeUsec = endTimeUsec;
+        const auto startTimeMs = m_startTimeUsec / 1000;
+
+        QnMutexLocker lock(&m_mutex);
+        for (auto& chunks: m_chunks)
+        {
+            while (!chunks.isEmpty() && chunks.first().endTimeMs() < startTimeMs)
+                chunks.pop_front();
+        }
     }
     else
     {
@@ -364,7 +372,10 @@ qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
     const qint64 endTimeMs = m_endTimeUsec / 1000;
     if (m_chunks.size() <= channelNumber || m_chunks[channelNumber].isEmpty())
         return AV_NOPTS_VALUE;
-    return m_chunks[channelNumber].front().startTimeMs * 1000;
+    auto result = m_chunks[channelNumber].front().startTimeMs * 1000;
+    if (m_startTimeUsec != AV_NOPTS_VALUE)
+        result = std::max(m_startTimeUsec, result);
+    return result;
 }
 
 qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
@@ -420,7 +431,7 @@ void HanwhaChunkLoader::setError()
 
 HanwhaChunkLoader::State HanwhaChunkLoader::nextState(State currentState) const
 {
-    if (m_isNvr)
+    if (!m_isNvr)
         return State::LoadingChunks;
 
     if (currentState == State::updateTimeRange)
