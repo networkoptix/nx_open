@@ -134,11 +134,6 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     return getAuthInternal(value);
 }
 
-bool QnNetworkResource::isDefaultAuth() const
-{
-    return getAuth() == getDefaultAuth();
-}
-
 QAuthenticator QnNetworkResource::getAuth() const
 {
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
