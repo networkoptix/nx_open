@@ -5,7 +5,7 @@
 class QnGetNonceRestHandler: public QnJsonRestHandler
 {
 public:
-    QnGetNonceRestHandler(bool isUrlSupported);
+    QnGetNonceRestHandler(const QString& remotePath = {});
 
     virtual int executeGet(
         const QString &path,
@@ -14,5 +14,5 @@ public:
         const QnRestConnectionProcessor*) override;
 
 private:
-    bool m_isUrlSupported = false;
+    const QString m_remotePath;
 };
