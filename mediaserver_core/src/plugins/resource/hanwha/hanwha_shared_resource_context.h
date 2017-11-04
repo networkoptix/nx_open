@@ -83,6 +83,9 @@ private:
     HanwhaResult<Value> m_value;
 };
 
+using SessionGuard = QSharedPointer<char>;
+using SessionWeakGuard = QWeakPointer<char>;
+
 class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
@@ -102,14 +105,7 @@ public:
 
     void startServices(bool hasVideoArchive);
 
-    struct SessionData
-    {
-        QString clientId;
-        HanwhaSessionType sessionType;
-        std::weak_ptr<void> pointer;
-    };
-
-    std::shared_ptr<SessionData> session(
+    SessionGuard session(
         HanwhaSessionType sessionType,
         const QString& clientId,
         bool generateNewOne = false);
@@ -136,6 +132,7 @@ private:
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
+    void cleanupUnsafe();
 
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
@@ -146,7 +143,14 @@ private:
     nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
 
     mutable QnMutex m_sessionMutex;
-    QMap<std::weak_ptr<SessionData>, QString> m_sessionKeys;
+
+    struct SessionContext
+    {
+        QString sessionId;
+        QMap<QString, SessionWeakGuard> consumers; //< key - clientId, value - consumers
+    };
+
+    QMap<HanwhaSessionType, SessionContext> m_sessions;
 
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;

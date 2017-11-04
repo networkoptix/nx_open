@@ -14,6 +14,15 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+static std::array<int, (int) HanwhaSessionType::count> kMaxConsumersForType =
+{
+    0,  //< undefined
+    10, //< live
+    3,  //< archive
+    1,  //< preview
+    1  //< fileExport
+};
+
 namespace {
 
 // Limited by NPM-9080VQ, it can only be opening 3 stream at the same time, while it has 4.
@@ -127,33 +136,58 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
         m_chunkLoader->start(this);
 }
 
-std::shared_ptr<SessionData> HanwhaSharedResourceContext::session(
+void HanwhaSharedResourceContext::cleanupUnsafe()
+{
+    for (auto& context: m_sessions)
+    {
+        for (auto itr = context.consumers.begin(); itr != context.consumers.end();)
+        {
+            auto& weakGuard = itr.value();
+            if (weakGuard.toStrongRef() == nullptr)
+                itr = context.consumers.erase(itr);
+            else
+                ++itr;
+        }
+    }
+}
+
+SessionGuard HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
     const QString& clientId,
     bool generateNewOne)
 {
     if (m_sharedId.isEmpty())
-        return std::shared_ptr<SessionData>();
+        return SessionGuard();
 
     QnMutexLocker lock(&m_sessionMutex);
 
-    cleanup();
-
-    if (!m_sessionKeys.contains(sessionType))
+    cleanupUnsafe();
+    SessionContext& context = m_sessions[sessionType];
+    if (context.sessionId.isEmpty())
     {
         HanwhaRequestHelper helper(shared_from_this());
         helper.setIgnoreMutexAnalyzer(true);
         const auto response = helper.view(lit("media/sessionkey"));
         if (!response.isSuccessful())
-            return QString();
+            return SessionGuard();
 
         const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
         if (!sessionKey.is_initialized())
-            return QString();
+            return SessionGuard();
 
-        m_sessionKeys[sessionType] = *sessionKey;
+        context.sessionId = *sessionKey;
     }
-    return m_sessionKeys.value(sessionType);
+    auto weakGuard = context.consumers.value(clientId);
+    if (auto strongGuard = weakGuard.toStrongRef())
+        return strongGuard; //< Already exists.
+
+    // Create new one.
+    if (context.consumers.size() >= kMaxConsumersForType[(int) sessionType])
+        return SessionGuard();
+
+    SessionGuard strongGuard(new char());
+    context.consumers[clientId] = strongGuard.toWeakRef();
+    return strongGuard;
 }
 
 QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const
