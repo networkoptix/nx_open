@@ -292,7 +292,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
             NX_ASSERT(!aliveData.peer.instanceId.isNull());
 
             int delay = (aliveData.peer.id == commonModule()->moduleGUID())
-                ? 0 : nx::utils::random::number(
+                ? 0 : nx::utils::random::number<int>(
                 ALIVE_RESEND_TIMEOUT_MIN, ALIVE_RESEND_TIMEOUT_MAX);
 
             addDelayedAliveTran(std::move(tran), delay);
@@ -1062,7 +1062,8 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
             sendTransaction(tran);
         else
         {
-            int delay = nx::utils::random::number(ALIVE_RESEND_TIMEOUT_MIN, ALIVE_RESEND_TIMEOUT_MAX);
+            int delay = nx::utils::random::number<int>(
+                ALIVE_RESEND_TIMEOUT_MIN, ALIVE_RESEND_TIMEOUT_MAX);
             addDelayedAliveTran(std::move(tran), delay);
         }
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("sending peerAlive info. id=%1 type=%2 isAlive=%3").arg(peer.id.toString()).arg(peer.peerType).arg(isAlive), cl_logDEBUG1);

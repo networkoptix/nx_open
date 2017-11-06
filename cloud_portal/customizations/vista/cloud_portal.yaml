@@ -35,7 +35,6 @@ admins:
         - 'cloud-portal-admins@networkoptix.com'
 
 languages:
-    - en_US
     - en_GB
     - ru_RU
     - fr_FR

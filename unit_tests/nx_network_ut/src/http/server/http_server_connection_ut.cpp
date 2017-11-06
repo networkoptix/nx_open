@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/http/empty_message_body_source.h>
@@ -18,13 +20,27 @@ static const char* const kTestPath = "/HttpServerConnectionTest";
 class HttpServerConnection:
     public ::testing::Test
 {
-public:
-
 protected:
     void whenRespondWithEmptyMessageBody()
     {
         installRequestHandlerWithEmptyBody();
-        performRequest();
+        performRequest(kUrlSchemeName);
+    }
+
+    void whenIssuedRequestViaSsl()
+    {
+        performRequest(kSecureUrlSchemeName);
+    }
+
+    void whenIssuedRequestViaRawTcp()
+    {
+        performRequest(kUrlSchemeName);
+    }
+
+    void whenReceiveStrictTransportSecurityHeaderInResponse()
+    {
+        whenIssuedRequestViaSsl();
+        thenResponseContainsHeader(header::StrictTransportSecurity::NAME);
     }
 
     void thenOnResponseSentHandlerIsCalled()
@@ -32,9 +48,35 @@ protected:
         m_responseSentEvents.pop();
     }
 
+    void thenResponseContainsHeader(const nx::String& headerName)
+    {
+        ASSERT_TRUE(m_prevResponse->headers.find(headerName) != m_prevResponse->headers.end());
+    }
+
+    void thenResponseDoesNotContainHeader(const nx::String& headerName)
+    {
+        ASSERT_TRUE(m_prevResponse->headers.find(headerName) == m_prevResponse->headers.end());
+    }
+
+    void thenStrictTransportSecurityHeaderIsValid()
+    {
+        const auto strictTransportSecurityStr = getHeaderValue(
+            m_prevResponse->headers,
+            header::StrictTransportSecurity::NAME);
+        ASSERT_TRUE(m_prevStrictTransportSecurity.parse(strictTransportSecurityStr));
+    }
+    
+    void andStrictTransportSecurityMaxAgeIsNotLessThan(
+        std::chrono::seconds desiredMinimalAge)
+    {
+        ASSERT_GE(m_prevStrictTransportSecurity.maxAge, desiredMinimalAge);
+    }
+
 private:
     TestHttpServer m_httpServer;
     nx::utils::SyncQueue<int /*dummy*/> m_responseSentEvents;
+    boost::optional<Response> m_prevResponse;
+    header::StrictTransportSecurity m_prevStrictTransportSecurity;
 
     virtual void SetUp() override
     {
@@ -50,25 +92,25 @@ private:
             std::bind(&HttpServerConnection::provideEmptyMessageBody, this, _1, _2, _3, _4, _5));
     }
 
-    void performRequest()
+    void performRequest(const char* urlScheme)
     {
-        nx_http::HttpClient client;
+        HttpClient client;
         const auto url = nx::network::url::Builder()
-            .setScheme(nx_http::kUrlSchemeName).setEndpoint(m_httpServer.serverAddress())
-            .setPath(kTestPath);
+            .setScheme(urlScheme).setEndpoint(m_httpServer.serverAddress()).setPath(kTestPath);
         ASSERT_TRUE(client.doGet(url));
+        m_prevResponse = *client.response();
     }
 
     void provideEmptyMessageBody(
         nx_http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        Request /*request*/,
+        Response* const /*response*/,
+        RequestProcessedHandler completionHandler)
     {
         using namespace std::placeholders;
 
-        nx_http::RequestResult result(nx_http::StatusCode::ok);
+        RequestResult result(StatusCode::ok);
         result.connectionEvents.onResponseHasBeenSent =
             std::bind(&HttpServerConnection::onResponseSent, this, _1);
         result.dataSource = std::make_unique<EmptyMessageBodySource>(
@@ -83,12 +125,40 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
 TEST_F(
     HttpServerConnection,
     on_response_sent_handler_is_called_after_response_with_empty_body)
 {
     whenRespondWithEmptyMessageBody();
     thenOnResponseSentHandlerIsCalled();
+}
+
+TEST_F(
+    HttpServerConnection,
+    http_strict_transport_security_header_is_present_in_case_of_ssl_is_used)
+{
+    whenIssuedRequestViaSsl();
+    thenResponseContainsHeader(header::StrictTransportSecurity::NAME);
+}
+
+TEST_F(
+    HttpServerConnection,
+    http_strict_transport_security_header_is_absent_in_case_of_ssl_is_used)
+{
+    whenIssuedRequestViaRawTcp();
+    thenResponseDoesNotContainHeader(header::StrictTransportSecurity::NAME);
+}
+
+TEST_F(
+    HttpServerConnection,
+    http_strict_transport_security_header_is_valid)
+{
+    whenReceiveStrictTransportSecurityHeaderInResponse();
+
+    thenStrictTransportSecurityHeaderIsValid();
+    andStrictTransportSecurityMaxAgeIsNotLessThan(std::chrono::hours(24) * 365);
 }
 
 } // namespace test

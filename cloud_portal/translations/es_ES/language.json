@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Su cuenta se ha guardado",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"Enlace de activación",
     "passwordChangedSuccess":"Su cuenta se ha guardado",
     "changePassword":"Cambiar contraseña",
     "newPasswordLabel":"Nueva contraseña",
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"Reenviar enlace de activación",
     "resetPassword":"Restablecer contraseña",
     "setNewPassword":"Guardar contraseña",
     "setNewPasswordLabel":"Nueva contraseña"

@@ -1,8 +1,9 @@
 #include "reverse_connection_pool.h"
-#include "reverse_connection_holder.h"
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
+
+#include "reverse_connection_holder.h"
 
 namespace nx {
 namespace network {
@@ -19,7 +20,7 @@ static String getHostSuffix(const String& hostName)
 }
 
 ReverseConnectionPool::ReverseConnectionPool(
-    std::unique_ptr<MediatorConnection> mediatorConnection)
+    std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> mediatorConnection)
 :
     m_mediatorConnection(std::move(mediatorConnection)),
     m_acceptor(

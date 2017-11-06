@@ -117,6 +117,8 @@ class APIException(Exception):
             }, status=self.status_code)
 
     def log_level(self):
+        if isinstance(self.error_code, basestring):
+            return logging.ERROR
         return self.error_code.log_level()
 
 

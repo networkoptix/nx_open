@@ -49,7 +49,8 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             if (m_httpClient.failed() || !m_httpClient.response())
                 return handler(SystemError::connectionRefused);
 
-            if (m_httpClient.response()->statusLine.statusCode != 101)
+            if (m_httpClient.response()->statusLine.statusCode != 
+                    nx_http::StatusCode::switchingProtocols)
             {
                 NX_LOG(lm("Unexpected status: (%1) %2")
                     .arg(m_httpClient.response()->statusLine.statusCode)

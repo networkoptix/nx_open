@@ -24,17 +24,19 @@
             <td>{{streamName(stream)}}</td>
             <td>
                 <span ng-repeat="transport in stream.transports">
-                    <a class="text-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a> <span ng-if="stream.transports.length-1 != $index">/</span>
+                    <a class="text-uppercase" target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>
+                    <span ng-if="stream.transports.length-1 != $index">&nbsp;/&nbsp;</span>
                 </span>
             </td>
         </tr>
         <tr>
             <td>다운로드</td>
             <td>
-                다운로드:
-<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">High</a>&nbsp;
-<a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">Low</a>&nbsp;
-<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">미리 보기</a>
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">HIGH</a>
+                &nbsp;/&nbsp;
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">LOW</a>
+                &nbsp;/&nbsp;
+                <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">미리 보기</a>
             </td>
         </tr>
     </table>

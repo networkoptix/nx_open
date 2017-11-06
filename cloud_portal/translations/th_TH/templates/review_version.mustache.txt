@@ -1,6 +1,6 @@
-มีการแก้ไขใหม่สำหรับ {{message.product}}
+มีการแก้ไขใหม่สำหรับ {{ message.product }}
 
-คลิกที่ลิงก์เพื่อดูร่าง {{message.id}} สำหรับ {{message.product}}
+คลิกที่ลิงก์เพื่อดูร่าง {{ message.id }} สำหรับ {{ message.product }}
 
 ลิงก์ไปวิจารณ์: {{ config.portal_url }} / admin / cms / review_version{{ message.id }}
 

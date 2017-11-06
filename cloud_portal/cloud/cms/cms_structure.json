@@ -25,8 +25,8 @@
         ["{{LEGAL_COMPANY_COURT}}", "state and federal courts located in Los Angeles County, California", "Court to handle disputes (for EULA)"],
         ["static/images/logo.png", "", "Logo for branding. Height must be equal 64px", "Image", {"height": 64}],
         ["templates/email_logo.png", "",
-          "Logo for email. Height must be not more than 40px, width - not more than 100px",
-          "Image", {"height_le": 40, "width_le": 100}],
+          "Logo for email. Height must be at least 32px, width - not more than 200px",
+          "Image", {"height_ge": 32, "width_le": 200}],
         ["%MAIL_FROM_NAME%", "", "Reserved for future use"],
         ["%MAIL_FROM_EMAIL%", "", "Reserved for future use"]
       ]

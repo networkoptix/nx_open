@@ -1,7 +1,7 @@
 ระบบถูกแชร์กับคุณ
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}} ระบบที่ใช้ร่วมกัน {{message.system_name}} กับคุณ
+{{message.sharer_name}} ({{message.sharer_email}}) ระบบที่ใช้ร่วมกัน {{message.system_name}} กับคุณ
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}

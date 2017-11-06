@@ -222,4 +222,5 @@ var Config = {
     debug: {
         chunksOnTimeline: false, // timeline.js - draw debug events
     },
+    responseOk: 'ok'
 };
