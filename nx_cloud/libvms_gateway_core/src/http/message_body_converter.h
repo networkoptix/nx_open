@@ -4,8 +4,6 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/basic_factory.h>
 
-#include "../settings.h"
-
 namespace nx {
 namespace cloud {
 namespace gateway {
@@ -18,26 +16,20 @@ public:
     virtual nx_http::BufferType convert(nx_http::BufferType originalBody) = 0;
 };
 
-//-------------------------------------------------------------------------------------------------
-
-struct TargetHost
+class AbstractUrlRewriter
 {
-    nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
-    SocketAddress target;
-    conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
+public:
+    virtual ~AbstractUrlRewriter() = default;
 
-    TargetHost() {}
-
-    TargetHost(nx_http::StatusCode::Value status, SocketAddress target = {}):
-        status(status),
-        target(std::move(target))
-    {
-    }
+    virtual nx::utils::Url originalResourceUrlToProxyUrl(
+        const nx::utils::Url& originalResourceUrl,
+        const SocketAddress& proxyEndpoint,
+        const nx::String& targetHost) const = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
 
-using MessageBodyConverterFactoryFunction = 
+using MessageBodyConverterFactoryFunction =
     std::unique_ptr<AbstractMessageBodyConverter>(
         const nx::String& proxyHost,
         const nx::String& targetHost,
@@ -51,9 +43,16 @@ class MessageBodyConverterFactory:
 public:
     MessageBodyConverterFactory();
 
+    /**
+     * NOTE: Default implementation does not do anything.
+     */
+    void setUrlConverter(std::unique_ptr<AbstractUrlRewriter> urlConverter);
+
     static MessageBodyConverterFactory& instance();
 
 private:
+    std::unique_ptr<AbstractUrlRewriter> m_urlConverter;
+
     std::unique_ptr<AbstractMessageBodyConverter> defaultFactoryFunction(
         const nx::String& proxyHost,
         const nx::String& targetHost,

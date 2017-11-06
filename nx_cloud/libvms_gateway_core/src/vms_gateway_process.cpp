@@ -24,6 +24,7 @@
 #include "http/connect_handler.h"
 #include "http/http_api_path.h"
 #include "http/proxy_handler.h"
+#include "http/url_rewriter.h"
 #include "libvms_gateway_core_app_info.h"
 #include "stree/cdb_ns.h"
 
@@ -110,6 +111,8 @@ int VmsGatewayProcess::serviceMain(
             settings.listeningPeer(),
             &httpMessageDispatcher);
 
+        MessageBodyConverterFactory::instance().setUrlConverter(
+            std::make_unique<UrlRewriter>());
         registerApiHandlers(
             settings,
             m_runTimeOptions,
@@ -119,7 +122,7 @@ int VmsGatewayProcess::serviceMain(
         if (settings.http().sslSupport)
         {
             network::ssl::Engine::useOrCreateCertificate(
-                settings.http().sslCertPath, 
+                settings.http().sslCertPath,
                 nx::utils::AppInfo::productName().toUtf8(),
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
@@ -170,7 +173,7 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
 
     m_endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-            [](const nx::String& connectSessionId) 
+            [](const nx::String& connectSessionId)
                 -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
             {
                 return std::make_unique<CloudMediaServerEndpointVerificator>(

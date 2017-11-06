@@ -38,6 +38,16 @@ public:
         boost::optional<nx_http::Response> response) override;
 
 private:
+    struct TargetHost
+    {
+        nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
+        SocketAddress target;
+        conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
+
+        TargetHost() = default;
+        TargetHost(nx_http::StatusCode::Value status, SocketAddress target = {});
+    };
+
     const conf::Settings& m_settings;
     const conf::RunTimeOptions& m_runTimeOptions;
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;

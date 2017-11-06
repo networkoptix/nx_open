@@ -4,6 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <http/m3u_playlist_converter.h>
+#include <http/url_rewriter.h>
 
 namespace nx {
 namespace cloud {
@@ -39,6 +40,7 @@ public:
     M3uPlaylistConverter()
     {
         m_converter = std::make_unique<gateway::M3uPlaylistConverter>(
+            m_urlRewriter,
             kProxyHost,
             kServerHostName);
     }
@@ -55,6 +57,7 @@ protected:
     }
 
 private:
+    UrlRewriter m_urlRewriter;
     std::unique_ptr<gateway::M3uPlaylistConverter> m_converter;
     nx_http::BufferType m_resultingPlaylist;
 };

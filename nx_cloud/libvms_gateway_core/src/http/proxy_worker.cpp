@@ -101,7 +101,7 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
             lm("Proxy %1. Received unexpected request from target host %2. Closing connection...")
             .arg(m_proxyingId).arg(m_targetHostPipeline->socket()->getForeignAddress()));
 
-        // TODO: #ak Imply better status code.
+        // TODO: #ak Use better status code.
         m_responseSender->sendResponse(
             nx_http::StatusCode::serviceUnavailable,
             boost::none);
@@ -109,7 +109,7 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
     }
 
     const auto statusCode = message.response->statusLine.statusCode;
-    const auto contentType = 
+    const auto contentType =
         nx_http::getHeaderValue(message.response->headers, "Content-Type");
 
     NX_VERBOSE(this, lm("Proxy %1. Received response from target host %2. status %3, Content-Type %4")
@@ -153,7 +153,7 @@ std::unique_ptr<nx_http::AbstractMsgBodySource>
     const auto contentLengthIter = message.response->headers.find("Content-Length");
     if (contentLengthIter != message.response->headers.end())
         bodySource->setMessageBodyLimit(contentLengthIter->second.toULongLong());
-    
+
     m_targetHostPipeline.reset();
     return std::move(bodySource);
 }
