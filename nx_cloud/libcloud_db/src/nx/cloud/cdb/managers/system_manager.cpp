@@ -228,7 +228,7 @@ void SystemManager::unbindSystem(
             completionHandler = std::move(completionHandler)](
                 nx::utils::db::QueryContext* /*queryContext*/,
                 nx::utils::db::DBResult dbResult,
-                std::string systemId)
+                std::string /*systemId*/)
         {
             completionHandler(dbResultToApiResult(dbResult));
         });

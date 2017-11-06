@@ -26,7 +26,7 @@ enum class DBResult
     retryLater,
     uniqueConstraintViolation,
     connectionError,
-    logicError
+    logicError,
 };
 
 NX_UTILS_API const char* toString(DBResult value);
