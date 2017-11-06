@@ -76,9 +76,9 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    SessionGuard session(
+    SessionContextPtr session(
         HanwhaSessionType sessionType,
-        const QString& clientId,
+        const QnUuid& clientId,
         bool generateNewOne = false);
 
     std::unique_ptr<QnAbstractArchiveDelegate> remoteArchiveDelegate();

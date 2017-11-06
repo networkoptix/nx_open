@@ -1189,7 +1189,9 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (metadata->metadataType == MetadataType::MediaStreamEvent)
         {
             QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
-            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(data);
+            auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
+                QString::fromLatin1(data));
+
             emit mediaStreamEvent(mediaEvent);
         }
         else

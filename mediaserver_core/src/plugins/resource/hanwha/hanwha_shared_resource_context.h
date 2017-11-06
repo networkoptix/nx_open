@@ -83,8 +83,21 @@ private:
     HanwhaResult<Value> m_value;
 };
 
-using SessionGuard = QSharedPointer<char>;
-using SessionWeakGuard = QWeakPointer<char>;
+using ClientId = QnUuid;
+
+struct SessionContext
+{
+    SessionContext(const QString& sessionId, const QnUuid& clientId):
+        sessionId(sessionId),
+        clientId(clientId)
+    {};
+
+    QString sessionId;
+    ClientId clientId;
+};
+
+using SessionContextPtr = QSharedPointer<SessionContext>;
+using SessionContextWeakPtr = QWeakPointer<SessionContext>;
 
 class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
@@ -105,9 +118,9 @@ public:
 
     void startServices(bool hasVideoArchive);
 
-    SessionGuard session(
+    SessionContextPtr session(
         HanwhaSessionType sessionType,
-        const QString& clientId,
+        const QnUuid& clientId,
         bool generateNewOne = false);
 
     QnTimePeriodList chunks(int channelNumber) const;
@@ -132,6 +145,7 @@ private:
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
+
     void cleanupUnsafe();
 
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
@@ -144,13 +158,7 @@ private:
 
     mutable QnMutex m_sessionMutex;
 
-    struct SessionContext
-    {
-        QString sessionId;
-        QMap<QString, SessionWeakGuard> consumers; //< key - clientId, value - consumers
-    };
-
-    QMap<HanwhaSessionType, SessionContext> m_sessions;
+    QMap<HanwhaSessionType, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
 
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;

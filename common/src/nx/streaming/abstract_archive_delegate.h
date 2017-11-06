@@ -11,6 +11,7 @@
 #include <core/resource/motion_window.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <motion/abstract_motion_archive.h>
+#include <nx/utils/uuid.h>
 
 enum class PlaybackMode
 {
@@ -117,7 +118,7 @@ public:
     virtual int getSequence() const { return 0;  }
 
     virtual void setPlaybackMode(PlaybackMode value) {}
-    virtual void setClientId(const QString& id) { }
+    virtual void setClientId(const QnUuid& id) { }
 
     virtual void setEndOfPlaybackHandler(std::function<void()> handler)
     {

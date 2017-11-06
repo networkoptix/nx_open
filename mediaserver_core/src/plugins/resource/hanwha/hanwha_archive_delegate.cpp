@@ -218,7 +218,7 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
     }
 }
 
-void HanwhaArchiveDelegate::setClientId(const QString& id)
+void HanwhaArchiveDelegate::setClientId(const QnUuid& id)
 {
     m_streamReader->setClientId(id);
 }

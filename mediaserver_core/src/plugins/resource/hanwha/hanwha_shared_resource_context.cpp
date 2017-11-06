@@ -138,56 +138,55 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
 
 void HanwhaSharedResourceContext::cleanupUnsafe()
 {
-    for (auto& context: m_sessions)
+    for (const auto& sessionType: m_sessions.keys())
     {
-        for (auto itr = context.consumers.begin(); itr != context.consumers.end();)
+        auto& contextMap = m_sessions[sessionType];
+        for (auto itr = contextMap.begin(); itr != contextMap.end();)
         {
-            auto& weakGuard = itr.value();
-            if (weakGuard.toStrongRef() == nullptr)
-                itr = context.consumers.erase(itr);
+            if (itr.value().toStrongRef().isNull())
+                itr = contextMap.erase(itr);
             else
                 ++itr;
         }
     }
 }
 
-SessionGuard HanwhaSharedResourceContext::session(
+SessionContextPtr HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
-    const QString& clientId,
+    const QnUuid& clientId,
     bool generateNewOne)
 {
     if (m_sharedId.isEmpty())
-        return SessionGuard();
+        return SessionContextPtr();
 
     QnMutexLocker lock(&m_sessionMutex);
-
     cleanupUnsafe();
-    SessionContext& context = m_sessions[sessionType];
-    if (context.sessionId.isEmpty())
-    {
-        HanwhaRequestHelper helper(shared_from_this());
-        helper.setIgnoreMutexAnalyzer(true);
-        const auto response = helper.view(lit("media/sessionkey"));
-        if (!response.isSuccessful())
-            return SessionGuard();
 
-        const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
-        if (!sessionKey.is_initialized())
-            return SessionGuard();
+    auto& sessionsByClientId = m_sessions[sessionType];
+    const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
+        && sessionsByClientId.size() > kMaxConsumersForType[(int)sessionType];
 
-        context.sessionId = *sessionKey;
-    }
-    auto weakGuard = context.consumers.value(clientId);
-    if (auto strongGuard = weakGuard.toStrongRef())
-        return strongGuard; //< Already exists.
+    if (sessionLimitExceeded)
+        return SessionContextPtr();
 
-    // Create new one.
-    if (context.consumers.size() >= kMaxConsumersForType[(int) sessionType])
-        return SessionGuard();
+    auto strongSessionCtx = sessionsByClientId.value(clientId).toStrongRef();
+    if (strongSessionCtx)
+        return strongSessionCtx;
 
-    SessionGuard strongGuard(new char());
-    context.consumers[clientId] = strongGuard.toWeakRef();
-    return strongGuard;
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+    const auto response = helper.view(lit("media/sessionkey"));
+    if (!response.isSuccessful())
+        return SessionContextPtr();
+
+    const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
+    if (sessionKey == boost::none)
+        return SessionContextPtr();
+
+    strongSessionCtx = SessionContextPtr::create(*sessionKey, clientId);
+    sessionsByClientId[clientId] = strongSessionCtx.toWeakRef();
+
+    return strongSessionCtx;
 }
 
 QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const

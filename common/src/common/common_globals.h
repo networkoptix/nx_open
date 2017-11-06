@@ -19,7 +19,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction FailoverPriority
+    RebuildAction BackupAction FailoverPriority MediaStreamEvent
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -876,7 +876,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DisabledUserConnectionResult                /*< Disabled user*/
     };
 
-    enum class MediaStreamEvent
+    enum MediaStreamEvent
     {
         Unknown,
         TooManyOpenedConnections
