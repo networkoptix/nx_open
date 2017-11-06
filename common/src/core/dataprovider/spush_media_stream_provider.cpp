@@ -69,6 +69,20 @@ bool CLServerPushStreamReader::isCameraControlRequired() const
     return !isCameraControlDisabled() && needConfigureProvider();
 }
 
+bool CLServerPushStreamReader::processOpenStreamResult()
+{
+    if (m_openStreamResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+    {
+        const QnAbstractMediaDataPtr& data = createMetadataPacket();
+        if (dataCanBeAccepted())
+            putData(std::move(data));
+
+        return false;
+    }
+
+    return true;
+}
+
 CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bool isControlRequired)
 {
     onStreamReopen();
@@ -134,6 +148,7 @@ void CLServerPushStreamReader::run()
         if (!isStreamOpened())
         {
             openStream();
+            processOpenStreamResult();
             continue;
         }
         else if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME)
@@ -153,13 +168,8 @@ void CLServerPushStreamReader::run()
             continue;
         }
 
-        if (m_openStreamResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
-        {
-            const QnAbstractMediaDataPtr& data = createMetadataPacket();
-            if (dataCanBeAccepted())
-                putData(std::move(data));
+        if (!processOpenStreamResult())
             continue;
-        }
 
         const QnAbstractMediaDataPtr& data = getNextData();
         if (data==0)
