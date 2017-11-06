@@ -4,11 +4,11 @@
 
 #include "message_body_converter.h"
 
-namespace nx {
-namespace cloud {
-namespace gateway {
+namespace nx_http {
+namespace server {
+namespace proxy {
 
-class NX_VMS_GATEWAY_API M3uPlaylistConverter:
+class NX_NETWORK_API M3uPlaylistConverter:
     public AbstractMessageBodyConverter
 {
 public:
@@ -25,6 +25,6 @@ private:
     const nx::String m_targetHost;
 };
 
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace proxy
+} // namespace server
+} // namespace nx_http

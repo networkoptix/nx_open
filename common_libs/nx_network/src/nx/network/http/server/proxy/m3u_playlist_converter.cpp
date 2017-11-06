@@ -2,9 +2,9 @@
 
 #include <nx/network/m3u/m3u_playlist.h>
 
-namespace nx {
-namespace cloud {
-namespace gateway {
+namespace nx_http {
+namespace server {
+namespace proxy {
 
 M3uPlaylistConverter::M3uPlaylistConverter(
     const AbstractUrlRewriter& urlRewriter,
@@ -39,6 +39,6 @@ nx_http::BufferType M3uPlaylistConverter::convert(
     return playlist.toString();
 }
 
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace proxy
+} // namespace server
+} // namespace nx_http

@@ -1,15 +1,13 @@
 #include "message_body_converter.h"
 
-#include <memory>
-
 #include <nx/network/http/http_content_type.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "m3u_playlist_converter.h"
 
-namespace nx {
-namespace cloud {
-namespace gateway {
+namespace nx_http {
+namespace server {
+namespace proxy {
 
 namespace {
 
@@ -65,6 +63,6 @@ std::unique_ptr<AbstractMessageBodyConverter>
     return nullptr;
 }
 
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace proxy
+} // namespace server
+} // namespace nx_http

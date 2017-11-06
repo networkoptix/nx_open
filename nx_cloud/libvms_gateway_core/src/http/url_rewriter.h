@@ -1,13 +1,13 @@
 #pragma once
 
-#include "message_body_converter.h"
+#include <nx/network/http/server/proxy/message_body_converter.h>
 
 namespace nx {
 namespace cloud {
 namespace gateway {
 
 class NX_VMS_GATEWAY_API UrlRewriter:
-    public AbstractUrlRewriter
+    public nx_http::server::proxy::AbstractUrlRewriter
 {
 public:
     virtual nx::utils::Url originalResourceUrlToProxyUrl(

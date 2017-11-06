@@ -6,9 +6,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx {
-namespace cloud {
-namespace gateway {
+namespace nx_http {
+namespace server {
+namespace proxy {
 
 std::atomic<int> ProxyWorker::m_proxyingIdSequence(0);
 
@@ -52,7 +52,7 @@ ProxyWorker::ProxyWorker(
 }
 
 void ProxyWorker::bindToAioThread(
-    network::aio::AbstractAioThread* aioThread)
+    nx::network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
 
@@ -232,6 +232,6 @@ void ProxyWorker::updateMessageHeaders(nx_http::Response* response)
     response->headers.erase("Transfer-Encoding");
 }
 
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace proxy
+} // namespace server
+} // namespace nx_http

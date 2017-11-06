@@ -13,12 +13,12 @@
 
 #include "message_body_converter.h"
 
-namespace nx {
-namespace cloud {
-namespace gateway {
+namespace nx_http {
+namespace server {
+namespace proxy {
 
 // TODO: Review this interface.
-class AbstractResponseSender
+class NX_NETWORK_API AbstractResponseSender
 {
 public:
     virtual ~AbstractResponseSender() = default;
@@ -31,7 +31,7 @@ public:
 /**
  * Proxies HTTP request and corresponding response.
  */
-class NX_VMS_GATEWAY_API ProxyWorker:
+class NX_NETWORK_API ProxyWorker:
     public nx::network::aio::BasicPollable,
     public nx_http::StreamConnectionHolder
 {
@@ -44,7 +44,7 @@ public:
         AbstractResponseSender* responseSender,
         std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer);
 
-    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
@@ -79,6 +79,6 @@ private:
     void updateMessageHeaders(nx_http::Response* response);
 };
 
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace proxy
+} // namespace server
+} // namespace nx_http

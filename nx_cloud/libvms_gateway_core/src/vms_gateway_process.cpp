@@ -111,7 +111,7 @@ int VmsGatewayProcess::serviceMain(
             settings.listeningPeer(),
             &httpMessageDispatcher);
 
-        MessageBodyConverterFactory::instance().setUrlConverter(
+        nx_http::server::proxy::MessageBodyConverterFactory::instance().setUrlConverter(
             std::make_unique<UrlRewriter>());
         registerApiHandlers(
             settings,

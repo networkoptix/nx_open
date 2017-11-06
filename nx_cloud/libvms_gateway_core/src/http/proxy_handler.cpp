@@ -271,7 +271,7 @@ void ProxyHandler::onConnected(
         .args(targetAddress, connection->getForeignAddress(), connection->getForeignHostName(),
             m_request.requestLine.url, connection->getLocalAddress(), m_sslConnectionRequired));
 
-    m_requestProxyWorker = std::make_unique<ProxyWorker>(
+    m_requestProxyWorker = std::make_unique<nx_http::server::proxy::ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,

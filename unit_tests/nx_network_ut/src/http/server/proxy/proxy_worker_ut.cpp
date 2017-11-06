@@ -1,14 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/server/proxy/proxy_worker.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
 
-#include <http/proxy_worker.h>
-
-namespace nx {
-namespace cloud {
-namespace gateway {
+namespace nx_http {
+namespace server {
+namespace proxy {
 namespace test {
 
 static const char* const kStaticResourcePath = "/ProxyWorker/static";
@@ -50,13 +49,13 @@ protected:
 
         ASSERT_EQ(nx_http::StatusCode::noContent, m_proxiedResponse->statusLine.statusCode);
         ASSERT_TRUE(
-            m_proxiedResponse->headers.find("Content-Type") == 
+            m_proxiedResponse->headers.find("Content-Type") ==
             m_proxiedResponse->headers.end());
         ASSERT_EQ(nullptr, m_messageBodySource);
     }
 
 private:
-    std::unique_ptr<gateway::ProxyWorker> m_requestProxyWorker;
+    std::unique_ptr<proxy::ProxyWorker> m_requestProxyWorker;
     TestHttpServer m_httpServer;
     nx::Buffer m_staticResource;
     nx::utils::promise<void> m_messageBodyEndReported;
@@ -107,7 +106,7 @@ private:
             << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
 
-        m_requestProxyWorker = std::make_unique<gateway::ProxyWorker>(
+        m_requestProxyWorker = std::make_unique<proxy::ProxyWorker>(
             "not_used_in_streaming_mode",
             std::move(translatedRequest),
             this,
@@ -160,6 +159,6 @@ TEST_F(ProxyWorker, proxying_request_without_message_body)
 }
 
 } // namespace test
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace proxy
+} // namespace server
+} // namespace nx_http

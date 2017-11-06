@@ -1,14 +1,17 @@
 #pragma once
 
-#include <nx/network/http/http_types.h>
+#include <memory>
+
 #include <nx/network/socket_common.h>
 #include <nx/utils/basic_factory.h>
 
-namespace nx {
-namespace cloud {
-namespace gateway {
+#include "../../http_types.h"
 
-class AbstractMessageBodyConverter
+namespace nx_http {
+namespace server {
+namespace proxy {
+
+class NX_NETWORK_API AbstractMessageBodyConverter
 {
 public:
     virtual ~AbstractMessageBodyConverter() = default;
@@ -16,7 +19,7 @@ public:
     virtual nx_http::BufferType convert(nx_http::BufferType originalBody) = 0;
 };
 
-class AbstractUrlRewriter
+class NX_NETWORK_API AbstractUrlRewriter
 {
 public:
     virtual ~AbstractUrlRewriter() = default;
@@ -35,10 +38,10 @@ using MessageBodyConverterFactoryFunction =
         const nx::String& targetHost,
         const nx::String& contentType);
 
-class MessageBodyConverterFactory:
-    public utils::BasicFactory<MessageBodyConverterFactoryFunction>
+class NX_NETWORK_API MessageBodyConverterFactory:
+    public nx::utils::BasicFactory<MessageBodyConverterFactoryFunction>
 {
-    using base_type = utils::BasicFactory<MessageBodyConverterFactoryFunction>;
+    using base_type = nx::utils::BasicFactory<MessageBodyConverterFactoryFunction>;
 
 public:
     MessageBodyConverterFactory();
@@ -59,6 +62,6 @@ private:
         const nx::String& contentType);
 };
 
-} // namespace gateway
-} // namespace cloud
-} // namespace nx
+} // namespace proxy
+} // namespace server
+} // namespace nx_http
