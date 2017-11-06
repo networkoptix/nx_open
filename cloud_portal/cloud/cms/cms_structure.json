@@ -208,18 +208,43 @@
       ]
     },
     {
-      "name": "Service unavailable page (503)",
+      "name": "Cloud maintenance page (503)",
       "file_path": "static/503.html",
       "description": "This page is visible if Cloud service is unavailable",
       "url": "/503.html",
       "translatable": false,
       "values": [
         {
+          "label": "Content",
+          "name": "%CONTENT%",
+          "old_name": "%BLOCK_CONTENT%",
+          "value": "<h1>{{PRODUCT_NAME}} is under maintenance</h1><p>New better version will be online soon!</p><p>Your {{VMS_NAME}} system is still recording and<br> you can connect there using <a href=\"%DOWNLOAD_LINK%\">our apps</a></p>",
+          "description": "Message to show on Cloud maintenance page (503)"
+        },
+        {
           "label": "Download Link",
           "name": "%DOWNLOAD_LINK%",
           "old_name": "{{downloadLink}}",
           "value": "http://www.networkoptix.com/live-demo#fulltrial",
           "description": "Emergency link for downloading applications (in case if cloud is down)"
+        },
+        {
+          "label": "Service maintenance image",
+          "name": "static/images/503.png",
+          "type": "Image",
+          "description": "Image for page. Image goes above text on page",
+          "meta": {
+            "format": "png"
+          }
+        },
+        {
+          "label": "Service maintenance image",
+          "name": "static/images/503@2x.png",
+          "type": "Image",
+          "description": "High res image for page. Image goes above text on page",
+          "meta": {
+            "format": "png"
+          }
         }
       ]
     },

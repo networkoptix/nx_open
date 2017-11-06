@@ -20,9 +20,9 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in Nx Cloud</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-            Please activate your account by visiting this link.</p>
+            <h1>Regisztráció az Nx Cloud-ban megtörtént</h1>
+            <p>Az aktiváláshoz szükséges linket {{data.email}} címre elküldtük.<br>
+            Kérjük ennek segítségével aktiválja fiókját.</p>
         </div>
         <h1 ng-if="!data.email">Fiók nyugtásása</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>

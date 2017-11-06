@@ -205,10 +205,13 @@ table.webclient-window>tbody>tr>td{
 /* Cameras search */
 .cameras-search{
   height: 44px;
-  font-size: 13px;
   background-color: $additional_light2;
   color: $light16;
   position: relative;
+
+  &.active{
+    background-color: $light1 !important;
+  }
 
   &>*{
     background: transparent;
@@ -226,7 +229,7 @@ table.webclient-window>tbody>tr>td{
     float: right;
     display: inline-block;
     position: relative;
-    z-index: 1;
+    cursor: pointer;
 
     .clear-button{
       float: left;
@@ -245,10 +248,12 @@ table.webclient-window>tbody>tr>td{
     }
 
     .info-icon{
-      line-height: 54px;
+      line-height: 46px;
       float: right;
       width: 44px;
-      height: 44px;
+      height: 43px;
+      font-size: 16px;
+
       &:hover, &.active:hover{
         background-color: $additional_light3 !important;  
       }
@@ -271,15 +276,16 @@ table.webclient-window>tbody>tr>td{
     border: none;
     box-shadow: none;
     outline: none !important;
-    font-size: 16px;
+    font-size: 13px;
     border-bottom: 1px solid $light6;
     line-height: 44px;
+    color: black;
     
     &:hover{
       background-color: $light2;
     }
 
-    &.active,&:active,
+    &:active,
     &:focus{
       background-color: $light1;
     }
@@ -314,6 +320,7 @@ table.webclient-window>tbody>tr>td{
     height:40px;
     padding: 0 8px !important;
     line-height: 40px;
+    cursor: pointer;
 
     &:hover{
       background-color: $additional_light3 !important;
@@ -358,7 +365,6 @@ table.webclient-window>tbody>tr>td{
 
   &-preview .camera-status{
     position: absolute;
-    z-index: 1;
     top: 4px;
     left: 4px;
     width: 8px;
@@ -400,6 +406,7 @@ table.webclient-window>tbody>tr>td{
     font-weight: 500 !important;
     color: $dark9 !important;
     line-height: 34px;
+    cursor: pointer;
   }
 
   small{
@@ -472,7 +479,7 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
-    z-index: 110;
+    z-index: 2; /* Keeps camera details panel above video and preloader */
 
     & table{
       font-size: 12px;
@@ -596,7 +603,7 @@ table.webclient-window>tbody>tr>td{
     height: 48px;
     top:0;
     left: 0;
-    z-index: 110;
+    z-index: 2; /* Keeps the video title and settings above video and preloader */
   }
 
   .stick-to-bottom{
@@ -623,6 +630,7 @@ table.webclient-window>tbody>tr>td{
 .hide-excess-text {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .video-name{
@@ -635,6 +643,68 @@ table.webclient-window>tbody>tr>td{
   width: 24px;
   margin: 6px;
   line-height: 20px;
+  cursor: pointer;
+}
+
+.fullscreen-notification{
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+
+  padding: 0 16px;
+  height: 40px;
+  line-height: 40px;
+  background-color: $dark7;
+  opacity: 0.9;
+
+  font-weight: 600;
+  color: $light4;
+  z-index: 1; /* Used to bring the notification above the player. */
+
+  -webkit-animation-delay: 5s;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+
+  animation-delay: 5s;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+@keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+.fade-out {
+  -webkit-animation-name: fadeOut;
+  animation-name: fadeOut;
+}
+
+.fullscreen-hoverarea{
+  &{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 10%;
+    width: 10%;
+    z-index: 1;  /* Used to bring the close-fullscreen button above the player. */
+    margin: 10px;
+  }
+  &:hover .close-fullscreen-icon {
+    display: block;
+  }
+}
+
+.close-fullscreen-icon{
+  position: absolute;
+  right: 0;
+  display: none;
 }
 
 .video-settings{
@@ -716,15 +786,11 @@ table.webclient-window>tbody>tr>td{
 
 .video-title{
   &{
-    margin-left: 6px;
+    margin-left: 4px;
   }
   &-buffer{
     width:40px;
     display: inline-block;
-  }
-
-  & .glyphicon-arrow-left{
-    color: $light1;
   }
 }
 
@@ -737,6 +803,11 @@ table.webclient-window>tbody>tr>td{
   left: 50%;
   transform: translate(-50%, -50%);
   opacity:0.5;
+}
+
+.blur-preview{
+  opacity: 0.3 !important;
+  filter:blur(5px);
 }
 
 /* Special hack for loading invisible flash objects */
@@ -761,7 +832,7 @@ table.webclient-window>tbody>tr>td{
 
 .drop-back{
   position: absolute !important;
-  z-index: -1;
+  z-index: -1; /* Used for loading the flash player. */
 }
 
 .rotate90 {
@@ -819,9 +890,11 @@ table.webclient-window>tbody>tr>td{
 }
 
 .visible-xs.back-button{
+  text-align: center;
   vertical-align: top;
   margin-left: 4px;
-  margin-top: -2px;
+  margin-top: -1px;
+  width: 40px;
   display: none !important;
 }
 
@@ -831,7 +904,7 @@ table.webclient-window>tbody>tr>td{
   }
 
   .cameras-panel-wrapper{
-    z-index: 200;
+    z-index: 3; /* Keeps the cameras-panel above the video player and preloads for mobile. */
     position: absolute;
     width: 100% !important;
   }

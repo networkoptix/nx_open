@@ -267,6 +267,10 @@ angular.module('nxCommon')
                         mouseOverElements = null;
                         return;
                     }
+                    if(event.touches){
+                        event.pageX = event.touches[0].pageX;
+                        event.pageY = event.touches[0].pageY;
+                    }
 
                     if($(event.target).is('canvas') && event.offsetX){
                         mouseXOverTimeline = event.offsetX;
@@ -276,6 +280,7 @@ angular.module('nxCommon')
                     mouseYOverTimeline = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);
+                    scope.mouseOverScroll = mouseOverElements.leftButton || mouseOverElements.rightButton;
 
                 }
 
@@ -385,6 +390,15 @@ angular.module('nxCommon')
 
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
                         scrollbarClickOrHold();
+                        return;
+                    }
+
+                    if(mouseOverElements.leftMarker || mouseOverElements.rightMarker){
+                        var sM = scope.scaleManager;
+                        var date = sM.playedPosition;
+                        var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart)/2;
+                        var relativeSizeOfTimeLine = (sM.end - sM.visibleEnd) - (sM.start - sM.visibleStart);
+                        timelineActions.animateScroll(relativePositionOfDate/relativeSizeOfTimeLine, true);
                     }
                 }
                 function viewportClick(event){
@@ -455,6 +469,10 @@ angular.module('nxCommon')
                 viewport.click(viewportClick);
                 viewport.mousewheel(viewportMouseWheel);
 
+                //For touch screens
+                viewport.on('touchstart', viewportMouseDown);
+                viewport.on('touchmove', viewportMouseMove);
+                viewport.on('touchstop', viewportMouseLeave);
 
                 // Actual browser events handling
 
@@ -492,6 +510,7 @@ angular.module('nxCommon')
                     });
                 }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
+                    scope.emptyArchive = true;
                     if(scope.recordsProvider) {
                         scope.loading = true;
                         initRecordsProvider();

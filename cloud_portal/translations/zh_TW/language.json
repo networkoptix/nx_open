@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"您的帳號已成功儲存",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"啟動連結已發送",
     "passwordChangedSuccess":"您的帳號已成功儲存",
     "changePassword":"變更密碼",
     "newPasswordLabel":"新密碼",
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"重新發送啟動連結",
     "resetPassword":"重置密碼",
     "setNewPassword":"儲存密碼",
     "setNewPasswordLabel":"新密碼"

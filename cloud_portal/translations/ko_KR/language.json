@@ -5,7 +5,7 @@
   "dialogs":{
     "okButton":"Ok",
     "cancelButton":"취소",
-    "loginTitle":"{{PRODUCT_NAME}}에 로그인",
+    "loginTitle":"{{PRODUCT_NAME}} 에 로그인",
     "loginButton":"로그인",
     "logoutAuthorisedTitle":"이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton":"계속",
@@ -28,7 +28,7 @@
     "restorePassword":"패스워드 재설정",
     "restorePasswordSuccess":"패스워드 저장됨-",
     "restorePasswordCode":"패스워드 재설정",
-    "view":"카메라 보기 -",
+    "view":"카메라 보기 - ",
     "debug":"디버그",
     "login":"로그인 -",
     "download":"{{VMS_NAME}} 다운로드",
@@ -101,7 +101,7 @@
     }
   },
   "errorCodes":{
-    "ok":"OK",
+    "ok":"ok",
     "cantSendActivationPrefix":"확인 이메일을 보낼 수 없습니다.",
     "cantDisconnectSystemPrefix":"시스템을 삭제할 수 없습니다.",
     "cantUnshareWithMeSystemPrefix":"시스템을 삭제할 수 없습니다.",
@@ -156,11 +156,11 @@
     "mySystemSearch":"IMeMyMine",
     "unavailable":"시스템에 연결할 수 없습니다.",
     "offline":"시스템이 오프라인 상태입니다.",
-    "openClient":"{{VMS_NAME}}에서 열기",
+    "openClient":"{{VMS_NAME}} 에서 열기",
     "confirmRenameTitle":"시스템 이름",
     "confirmRenameAction":"저장",
     "successRename":"시스템 이름 저장",
-    "confirmDisconnectTitle":"{{PRODUCT_NAME}}에서 시스템 연결을 끊으시겠습니까?",
+    "confirmDisconnectTitle":"{{PRODUCT_NAME}} 에서 시스템 연결을 끊으시겠습니까?",
     "confirmDisconnectAction":"연결 끊기",
     "confirmUnshareFromMe":"이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
     "confirmUnshareFromMeTitle":"시스템 연결을 끊으시겠습니까?",
@@ -168,20 +168,20 @@
     "confirmUnshare":"이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
     "confirmUnshareTitle":"사용자 삭제?",
     "confirmUnshareAction":"삭제",
-    "successDisconnected":"시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다.",
-    "successDeleted":"시스템 {{systemName}}이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
-    "permissionsRemoved":"권한이 {{email}}에서 제거 되었습니다."
+    "successDisconnected":"시스템이 성공적으로 {{PRODUCT_NAME}} 에서 분리 되었습니다.",
+    "successDeleted":"시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
+    "permissionsRemoved":"권한이 {{email}} 에서 제거 되었습니다."
   },
   "account":{
     "accountSavedSuccess":"계정이 성공적으로 저장되었습니다.",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"활성화 링크 전송",
     "passwordChangedSuccess":"계정이 성공적으로 저장되었습니다.",
     "changePassword":"패스워드 변경",
     "newPasswordLabel":"새 패스워드",
     "saveChanges":"저장"
   },
   "downloads":{
-    "noClientDetectedTitle":"시스템이 성공적으로 {{PRODUCT_NAME}}에서 분리 되었습니다",
+    "noClientDetectedTitle":"시스템이 성공적으로 {{VMS_NAME}} 에서 분리 되었습니다",
     "action":"{{VMS_NAME}} 다운로드",
     "mobile":{
       "ios":{
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"활성화 링크 재전송",
     "resetPassword":"패스워드 재설정",
     "setNewPassword":"패스워드 저장",
     "setNewPasswordLabel":"새 패스워드"

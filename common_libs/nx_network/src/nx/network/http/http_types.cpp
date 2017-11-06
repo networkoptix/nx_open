@@ -1638,9 +1638,43 @@ void Server::readProductComment(Server::Product* product, QnByteArrayConstRef* i
         inputStr->pop_front(); //< Removing ")"
 }
 
+//-------------------------------------------------------------------------------------------------
+
+const StringType StrictTransportSecurity::NAME("Strict-Transport-Security");
+
+bool StrictTransportSecurity::operator==(const StrictTransportSecurity& rhs) const
+{
+    return maxAge == rhs.maxAge
+        && includeSubDomains == rhs.includeSubDomains
+        && preload == rhs.preload;
+}
+
+bool StrictTransportSecurity::parse(const nx_http::StringType& strValue)
+{
+    const auto nameValueDictionary = nx::utils::parseNameValuePairs(strValue, ';');
+    const auto maxAgeIter = nameValueDictionary.find("max-age");
+    if (maxAgeIter == nameValueDictionary.end())
+        return false;
+    maxAge = std::chrono::seconds(maxAgeIter->toInt());
+    includeSubDomains = nameValueDictionary.contains("includeSubDomains");
+    preload = nameValueDictionary.contains("preload");
+    // Ignoring unknown attributes.
+    return true;
+}
+
+StringType StrictTransportSecurity::toString() const
+{
+    StringType result = lm("max-age=%1").arg(maxAge.count()).toUtf8();
+    if (includeSubDomains)
+        result += ";includeSubDomains";
+    if (preload)
+        result += ";preload";
+    return result;
+}
+
 } // namespace header
 
-  //-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 ChunkHeader::ChunkHeader():
     chunkSize(0)

@@ -69,7 +69,7 @@ bool QnTcpListener::authenticate(
     if (!rez)
     {
         nx_http::insertOrReplaceHeader(&response.headers,
-            std::make_pair("WWW-Authenticate", "Basic realm=\"Secure Area\""));
+            nx_http::HttpHeader("WWW-Authenticate", "Basic realm=\"Secure Area\""));
     }
     return rez;
 }

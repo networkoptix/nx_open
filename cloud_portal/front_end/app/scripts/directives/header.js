@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('header',['dialogs', 'cloudApi', 'account', '$location', '$route', '$poll',
-    function (dialogs, cloudApi, account, $location, $route, $poll) {
+    .directive('header',['dialogs', 'cloudApi', 'account', '$location', '$route', '$poll', 'notifyWatcher',
+    function (dialogs, cloudApi, account, $location, $route, $poll, notifyWatcher) {
         return {
             restrict: 'E',
             templateUrl: Config.viewsDir + 'components/header.html',
@@ -19,6 +19,21 @@ angular.module('cloudApp')
                 scope.logout = function(){
                     account.logout();
                 };
+
+                scope.$watch(function(){return notifyWatcher.systemToRemove;}, function(systemToRemove){
+                    if(!systemToRemove){
+                        return;
+                    }
+                    var pos = _.findIndex(scope.systems,function(system){
+                        return system.name == systemToRemove;
+                    });
+                    if(pos < 0){
+                        return;
+                    }
+                    scope.systems.splice(pos,1);
+                    updateSystemsHelper();
+                    notifyWatcher.removeSystem(null);
+                }, true);
 
                 function isActive(val){
                     var currentPath = $location.path();
@@ -44,12 +59,16 @@ angular.module('cloudApp')
                         scope.activeSystem = scope.systems[0];
                     }
                 }
+
+                function updateSystemsHelper(){
+                    scope.singleSystem = scope.systems.length == 1;
+                    scope.systemCounter = scope.systems.length;
+                    updateActiveSystem();
+                }
                 function updateSystems(){
                     return cloudApi.systems().then(function(result){
                         scope.systems = cloudApi.sortSystems(result.data);
-                        scope.singleSystem = scope.systems.length == 1;
-                        scope.systemCounter = scope.systems.length;
-                        updateActiveSystem();
+                        updateSystemsHelper();
                     });
                 }
                 function delayedUpdateSystems(){

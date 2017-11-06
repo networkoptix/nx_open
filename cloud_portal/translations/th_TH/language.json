@@ -28,12 +28,12 @@
     "restorePassword":"กำหนดรหัสผ่านใหม่ -",
     "restorePasswordSuccess":"บันทึกรหัสผ่านแล้ว -",
     "restorePasswordCode":"กำหนดรหัสผ่านใหม่ -",
-    "view":"ดูกล้อง -",
+    "view":"ดูกล้อง - ",
     "debug":"การ​แก้ไข​จุด​บกพร่อง",
     "login":"ลงชื่อเข้าสู่ระบบ -",
     "download":"ดาวน์โหลด {{VMS_NAME}}",
-    "downloadPlatform":"ดาวน์โหลด {{VMS_NAME}} สำหรับ",
-    "pageNotFound":"ไม่พบหน้านี้\n"
+    "downloadPlatform":"ดาวน์โหลด {{VMS_NAME}} สำหรับ ",
+    "pageNotFound":"ไม่พบหน้านี้"
   },
   "systemStatuses":{
     "notActivated":"ยังไม่ถูกเปิดใช้งาน",
@@ -131,57 +131,57 @@
     "oldPasswordMistmatch":"ต้องระบุรหัสผ่านปัจจุบัน",
     "passwordMismatch":"รหัสผ่านผิด",
     "cantEditYourself":"ไม่อนุญาตให้เปลี่ยนสิทธิ์ของตัวเอง",
-    "cantEditAdmin":"This user has administrator permissions",
-    "cantOpenClient":"{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection":"Connection to {{systemName}} lost",
-    "thisSystem":"the system"
+    "cantEditAdmin":"ผู้ใช้มีสิทธิ์ของผู้ดูแลระบบ",
+    "cantOpenClient":"ไม่พบแอ็พพลิเคชัน {{VMS_NAME}} <a href=\"/download\">Download</a>",
+    "lostConnection":"การเชื่อมต่อกับ {{systemName}} สูญหาย",
+    "thisSystem":"ระบบ"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Password must contain at least 8 characters",
-    "requiredMessage":"Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
-    "weakMessage":"Use numbers, upper and lower case letters and special characters to make your password stronger",
-    "strongMessage":"Strong password!",
-    "commonMessage":"This password is in top most popular passwords in the world"
+    "minLengthMessage":"รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
+    "requiredMessage":"ใช้อักษรละตินตัวเลขและสัญลักษณ์แป้นพิมพ์เท่านั้นหลีกเลี่ยงช่องว่างด้านบนและด้านหลัง",
+    "weakMessage":"ใช้ตัวเลขตัวพิมพ์ใหญ่และตัวพิมพ์เล็กและตัวอักษรพิเศษเพื่อทำให้รหัสผ่านของคุณแข็งแกร่งขึ้น",
+    "strongMessage":"รหัสผ่านที่แข็งแกร่ง!",
+    "commonMessage":"รหัสผ่านนี้อยู่ในรหัสผ่านที่ได้รับความนิยมมากที่สุดในโลก"
   },
   "sharing":{
-    "confirmOwner":"If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
-    "shareTitle":"Share",
-    "shareConfirmButton":"Share",
-    "editShareTitle":"Edit Permissions",
+    "confirmOwner":"หากคุณเปลี่ยนเจ้าของระบบคุณจะยกเลิกการเป็นเจ้าของจากบัญชีปัจจุบัน การกระทำนี้ไม่สามารถย้อนกลับได้ คุณแน่ใจไหม?",
+    "shareTitle":"แชร์",
+    "shareConfirmButton":"แชร์",
+    "editShareTitle":"แก้ไขสิทธิ์",
     "editShareConfirmButton":"บันทึก",
-    "permissionsSaved":"New permissions saved"
+    "permissionsSaved":"อนุญาตสิทธิ์ใหม่แล้ว"
   },
   "system":{
     "yourSystem":"ระบบของคุณ",
     "mySystemSearch":"IMeMyMine",
-    "unavailable":"System is unreachable",
-    "offline":"System is offline",
-    "openClient":"Open in {{VMS_NAME}}",
+    "unavailable":"ระบบไม่สามารถเข้าถึงได้",
+    "offline":"ระบบออฟไลน์",
+    "openClient":"เปิดใน {{VMS_NAME}}",
     "confirmRenameTitle":"ชื่อระบบ",
     "confirmRenameAction":"บันทึก",
-    "successRename":"System name saved",
-    "confirmDisconnectTitle":"Disconnect System from {{PRODUCT_NAME}}?",
+    "successRename":"ระบบเปลี่ยนชื่อ",
+    "confirmDisconnectTitle":"ตัดการเชื่อมต่อระบบจาก {{PRODUCT_NAME}} หรือไม่?",
     "confirmDisconnectAction":"ตัดการเชื่อมต่อ",
-    "confirmUnshareFromMe":"You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
-    "confirmUnshareFromMeTitle":"Disconnect System?",
+    "confirmUnshareFromMe":"คุณกำลังจะยกเลิกการเชื่อมต่อระบบนี้จากบัญชีของคุณ คุณจะไม่สามารถเข้าถึงระบบนี้ได้อีกต่อไป คุณแน่ใจไหม?",
+    "confirmUnshareFromMeTitle":"ยกเลิกการเชื่อมต่อระบบหรือไม่?",
     "confirmUnshareFromMeAction":"ตัดการเชื่อมต่อ",
-    "confirmUnshare":"This user will not be able to access System. Are you sure?",
-    "confirmUnshareTitle":"Delete user?",
+    "confirmUnshare":"ผู้ใช้รายนี้จะไม่สามารถเข้าใช้งานระบบได้ คุณแน่ใจไหม?",
+    "confirmUnshareTitle":"ลบผู้ใช้หรือไม่?",
     "confirmUnshareAction":"ลบ",
-    "successDisconnected":"System is successfully disconnected from {{PRODUCT_NAME}}",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+    "successDisconnected":"ระบบถูกตัดการเชื่อมต่อเรียบร้อยแล้วจาก {{PRODUCT_NAME}}",
+    "successDeleted":"ระบบ {{systemName}} จะถูกลบออกจากบัญชีของคุณเรียบร้อยแล้ว",
+    "permissionsRemoved":"สิทธิ์ถูกนำออกจาก {{email}}"
   },
   "account":{
-    "accountSavedSuccess":"Your account is successfully saved",
-    "activationLinkSent":"Activation Link Sent",
-    "passwordChangedSuccess":"Your account is successfully saved",
+    "accountSavedSuccess":"บันทึกบัญชีของคุณเรียบร้อยแล้ว",
+    "activationLinkSent":"ส่งการเปิดใช้งานแล้ว",
+    "passwordChangedSuccess":"บันทึกบัญชีของคุณเรียบร้อยแล้ว",
     "changePassword":"เปลี่ยนรหัสผ่าน",
     "newPasswordLabel":"สร้างรหัสผ่านใหม่",
     "saveChanges":"บันทึก"
   },
   "downloads":{
-    "noClientDetectedTitle":"Install {{VMS_NAME}} to view your System",
+    "noClientDetectedTitle":"ติดตั้ง {{VMS_NAME}} เพื่อดูระบบของคุณ",
     "action":"ดาวน์โหลด {{VMS_NAME}}",
     "mobile":{
       "ios":{
@@ -193,7 +193,7 @@
     },
     "groups":{
       "windows":{
-        "label":"Windows",
+        "label":"วินโดวส์",
         "supported":"7, 8, 8.1, 10, Server 2008, Server 2012"
       },
       "mac":{
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"ส่งการเชื่อมโยงการเปิดใช้งานอีกครั้ง",
     "resetPassword":"รีเซ็ตรหัสผ่าน",
     "setNewPassword":"บันทึกรหัสผ่าน",
     "setNewPasswordLabel":"สร้างรหัสผ่านใหม่"
