@@ -1,13 +1,19 @@
 <div class="videowindow">
+    <div ng-if="isFullscreen && enableFullscreenNotification" class="fullscreen-notification fade-out">
+        <span>Press ESC to exit fullscreen</span>
+    </div>
+    <div ng-if="isFullscreen" class="fullscreen-hoverarea">
+        <span class="video-icon close-fullscreen-icon" ng-click="closeFullscreen()">
+            <span class="glyphicon glyphicon-close-fullscreen"></span>
+        </span>
+    </div>
     <camera-view-informer flags="videoFlags" preloader="loading && !debugMode" preview="preview"></camera-view-informer>
 
     <div class="videoplayer" id="{{playerId}}" ng-if="flashls" ng-class="[loading ? 'drop-back' : '', getRotation()]"
     										   ng-init="initFlash()" ng-bind-html="flashPlayer">
     </div>
 
-    <div class="videoplayer" ng-if="native" ng-class="[loading ? 'invisible' : '', getRotation()]">
-    </div>
-
-    <video class="videoplayer" ng-if="jsHls" ng-class="[loading ? 'invisible' : '', getRotation()]">
+    <video class="videoplayer" ng-if="native || jsHls"
+           ng-class="[loading ? 'invisible' : '', getRotation()]" playsinline muted>
     </video>
 </div>

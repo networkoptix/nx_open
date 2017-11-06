@@ -1,5 +1,5 @@
 {
-  "language_name":"LANGUAGE_NAME",
+  "language_name":"Belgisch-Nederlands",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
@@ -174,7 +174,7 @@
   },
   "account":{
     "accountSavedSuccess":"Uw account is succesvol opgeslagen",
-    "activationLinkSent":"Activation Link Sent",
+    "activationLinkSent":"Activatielink verzonden",
     "passwordChangedSuccess":"Uw account is succesvol opgeslagen",
     "changePassword":"Wijzig wachtwoord",
     "newPasswordLabel":"Nieuw wachtwoord",
@@ -221,7 +221,7 @@
     }
   },
   "activeActions":{
-    "sendConfirm":"Resend activation link",
+    "sendConfirm":"Activatielink opnieuw verzenden",
     "resetPassword":"Reset wachtwoord",
     "setNewPassword":"Wachtwoord opslaan",
     "setNewPasswordLabel":"Nieuw wachtwoord"

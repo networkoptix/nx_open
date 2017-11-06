@@ -101,7 +101,7 @@ def read_data(data, short_name, context, cms_structure, product_name):
     if short_name.endswith('DS_Store'):
         return
     meta = OrderedDict(format=extension)
-    structure_type = 'File'
+    structure_type = 'file'
     if extension in IMAGES_EXTENSIONS:
         meta = image_meta(data, extension)
         structure_type = 'image'

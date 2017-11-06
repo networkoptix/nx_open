@@ -42,10 +42,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
-        var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
-        var nativeResolutions = ['Auto', 'High', 'Low'];
-        var onlyHiResolution =  ['Auto', 'High'];
-        var onlyLoResolution =  ['Auto', 'Low'];
+        var transcodingResolutions = [L.common.resolution.auto, '1080p', '720p', '640p', '320p', '240p'];
 
         var mimeTypes = {
             'hls': 'application/x-mpegURL',
@@ -137,14 +134,14 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
             if(!$scope.activeCamera){
                 $scope.activeResolution = 'Auto';
-                $scope.availableResolutions = ['Auto'];
+                $scope.availableResolutions = [L.common.resolution.auto];
             }
             //1. Does browser and server support webm?
             if($scope.player != 'webm'){
                 $scope.iOSVideoTooLarge = false;
 
                 //1. collect resolutions with hls
-                var streams = ['Auto'];
+                var streams = [L.common.resolution.auto];
                 if($scope.activeCamera) {
                     var availableFormats = _.filter($scope.activeCamera.mediaStreams, function (stream) {
                         return stream.transports.indexOf('hls') > 0;
@@ -154,11 +151,11 @@ angular.module('nxCommon').controller('ViewCtrl',
                     for (var i = 0; i < availableFormats.length; i++) {
                         if (availableFormats[i].encoderIndex == 0) {
                             if (!( window.jscd.os === 'iOS' && checkiOSResolution($scope.activeCamera) )) {
-                                streams.push('High');
+                                streams.push(L.common.resolution.high);
                             }
                         }
                         if (availableFormats[i].encoderIndex == 1) {
-                            streams.push('Low');
+                            streams.push(L.common.resolution.low);
                         }
                     }
                 }

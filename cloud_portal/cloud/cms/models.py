@@ -287,6 +287,10 @@ class DataRecord(models.Model):
     def short_description(self):
         return truncatechars(self.value, 100)
 
+    @property
+    def context(self):
+        return self.data_structure.context
+
     def save(self, *args, **kwargs):
         if not self.data_structure.translatable:
             self.language = None

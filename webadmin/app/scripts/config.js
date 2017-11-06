@@ -130,7 +130,9 @@ var Config = {
         updateArchiveStateTimeout: 60*1000, // If camera hs no archive - try to update it every minute
         flashChromelessPath: "components/flashlsChromeless.swf",
         flashChromelessDebugPath: "components/flashlsChromeless_debug.swf",
-        staticResources: "web_common/"
+        staticResources: "web_common/",
+        maxCrashCount: 2,
+        nativeTimeout: 60 * 1000 //60s
     },
     debugEvents: {
         events: [

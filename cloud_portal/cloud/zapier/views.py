@@ -1,22 +1,19 @@
-import django, requests, json, base64
+import django, json, base64, urllib
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
-from api.helpers.exceptions import handle_exceptions, api_success, APINotAuthorisedException
-
-from requests.auth import HTTPDigestAuth
 from django.utils.http import urlencode
 
-from rest_hooks.signals import raw_hook_event
+from api.helpers.exceptions import handle_exceptions, api_success, APINotAuthorisedException
+from api.controllers import cloud_api, cloud_gateway
 
 from models import *
 from cloud import settings
-import urllib
 from html_sanitizer import Sanitizer
 sanitizer = Sanitizer()
 
-#Correct urls
 CLOUD_DB_URL = settings.CLOUD_CONNECT['url']
 CLOUD_INSTANCE_URL = settings.conf['cloud_portal']['url']
 
@@ -42,7 +39,6 @@ def increment_rule(rule):
 
 
 def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
-
     if rule_type == "Generic Event":
         action_params = json.dumps({"additionalResources": ["{00000000-0000-0000-0000-100000000000}",
                                                 "{00000000-0000-0000-0000-100000000001}"],
@@ -129,11 +125,7 @@ def make_rule(rule_type, email, password, system_id, caption="", description="",
     else:
         return
 
-    url = "{}/gateway/{}/ec2/saveEventRule".format(CLOUD_INSTANCE_URL, system_id)
-
-    r = requests.post(url, json=data, auth=HTTPDigestAuth(email, password))
-    if r.status_code != 200:
-        return Response({'message': "There was an error making the rule"}, status=r.status_code)
+    cloud_gateway.post(system_id, "ec2/saveEventRule", data, email, password)
 
 
 def make_or_increment_rule(action, email, system_id, caption, password=None,
@@ -171,14 +163,7 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
 @handle_exceptions
 def get_systems(request):
     user, email, password = authenticate(request)
-    request = CLOUD_DB_URL + "/system/get"
-    r = requests.get(request, params={"customization": settings.CUSTOMIZATION}, auth=HTTPDigestAuth(email, password))
-
-    if r.status_code != 200:
-        Response({'message': "Error getting systems for user"}, status=r.status_code)
-
-    data = r.json()
-
+    data = cloud_api.System.list(email, password)
     zap_list = {'systems': []}
 
     for system in data['systems']:
@@ -205,15 +190,8 @@ def zapier_send_generic_event(request):
     make_or_increment_rule('Generic Event', email, system_id, caption,
                            password=password, description=description, source=source)
 
-    url = "{}/gateway/{}/api/createEvent?{}"\
-        .format(CLOUD_INSTANCE_URL, system_id, urllib.urlencode(query_params).replace('+', '%20'))
-
-    r = requests.get(url, data=None, auth=HTTPDigestAuth(email, password))
-
-    if r.status_code != 200:
-        Response({'message': "Error sending generic event to system"}, status=r.status_code)
-
-    return r.json()
+    url = "api/createEvent?{}".format(urllib.urlencode(query_params).replace('+', "%20"))
+    return cloud_gateway.get(system_id, url, email, password)
 
 
 @api_view(['GET'])

@@ -91,7 +91,11 @@ def downloads(request):
             latest_release = updates_record['current_release']
         if not latest_release:  # Hack for new customizations
             logger.error('No official release for customization: ' + customization + '. Ask Boris to fix that.')
-            latest_release = '3.1'
+            latest_release = '3.0'
+        if latest_release not in updates_record['releases']:
+            logger.error('No 3.0 release for customization: ' + customization + '. Ask Boris to fix that')
+            return Response(None)
+
         latest_version = updates_record['releases'][latest_release]
 
         build_number = latest_version.split('.')[-1]

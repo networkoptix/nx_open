@@ -2,9 +2,9 @@ import base64
 import json
 import codecs
 import os
+import re
 from zipfile import ZipFile
-from cloud import settings
-from ..models import Product, Context, DataStructure, Customization, DataRecord, customization_cache
+from ..models import Product, Context, DataStructure, Customization, DataRecord
 
 
 def find_or_add_product(name):
@@ -78,6 +78,8 @@ def update_from_object(cms_structure):
                 meta = None
                 advanced = False
                 optional = False
+                label = None
+                value = None
                 if len(record) == 3:
                     label, name, value = record
                 if len(record) == 4:
@@ -97,7 +99,7 @@ def update_from_object(cms_structure):
 
             data_structure.order = order
             order += 1
-            data_structure.lable = label
+            data_structure.label = label
             data_structure.advanced = advanced
             data_structure.optional = optional
             if description:
@@ -146,7 +148,8 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
     for name in zip_file.namelist():
         # log_messages.append(('info', 'Processing %s' % name))
-        if name.startswith('__') or name.endswith('structure.json'):  # Ignore trash in archive from MACs or **structure.json files
+        if name.startswith('__') or name.endswith('structure.json'):
+            # Ignore trash in archive from MACs or **structure.json files
             log_messages.append(('info', 'Ignored: %s' % name))
             continue
 
@@ -163,20 +166,82 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                 log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
             continue
 
-        # now we have name
+        # try to find relevant context
+        context = Context.objects.filter(file_path=short_name)
+        if context.exists():
+            try:
+                file_content = zip_file.read(name).decode("utf-8")
+            except UnicodeDecodeError:
+                log_messages.append(('error', 'Ignored: %s (file is not UTF-encoded)' % name))
+                continue
 
-        # try to find relevant context and update its template
-        if update_structure:
-            context = Context.objects.filter(file_path=short_name)
-            if context.exists():
-                context = context.first()
-                try:
-                    context.template = zip_file.read(name).decode("utf-8")
+            context = context.first()
+            if update_structure:
+                if context.template != file_content:
+                    context.template = file_content
                     context.save()
                     log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
-                except UnicodeDecodeError:
-                    log_messages.append(('error', 'Ignored: %s (file is not UTF-encoded)' % name))
-                continue
+            if update_content:
+                customization = Customization.objects.filter(name=customization_name)
+                if not customization.exists():
+                    log_messages.append(
+                        ('warning', 'Ignored %s (customization %s not found)' % (name, customization_name)))
+                    continue
+
+                customization = customization.first()
+
+                # try to parse datastructures from the file using template
+                if not context.template:  # no template - nothing we can do
+                    log_messages.append(('error', 'Ignored: %s (context has to template)' % name))
+                    continue
+                # here we have context.template and file_content - which are relatively close.
+                # Ideally, the only difference is specific data values
+
+                for structure in context.datastructure_set.all():
+                    if structure.type in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
+                        continue
+
+                    # find a line in template which has structure.name in it
+                    template_line = next((line for line in context.template.split("\n") if structure.name in line),
+                                         None)
+                    if not template_line:
+                        log_messages.append(('warning', 'No line in template %s for data structure %s' %
+                                             (short_name, structure.name)))
+                        continue
+
+                    replace_str = '(.*?)' if structure.type != structure.DATA_TYPES.html else '([.\s\S]*)'
+                    # create regex using this line
+                    template_line = re.escape(template_line)
+                    escape_name = re.escape(structure.name)
+                    template_line = template_line.replace(escape_name, replace_str)
+
+                    if structure.type != structure.DATA_TYPES.html:
+                        template_line += "$"
+
+                    # try to parse file_content with regex
+                    result = re.search(template_line, file_content)
+                    if not result:
+                        log_messages.append(('warning', 'No line in file %s for data structure %s' %
+                                             (name, structure.name)))
+                        continue
+
+                    # if there is a value - compare it with latest draft
+                    value = result.group(1)
+                    current_value = structure.find_actual_value(customization)
+                    if value == current_value:
+                        log_messages.append(('warning', 'value %s not changed %s for data structure %s' %
+                                             (value, name, structure.name)))
+                        continue
+
+                    # save if needed
+                    record = DataRecord(data_structure=structure,
+                                        customization=customization,
+                                        value=value,
+                                        created_by=user)
+                    record.save()
+                    log_messages.append(('success', 'Updated value for data structure %s using %s' %
+                                         (structure.label, name)))
+            continue
 
         # try to find relevant data structure and update its default (maybe)
         structure = DataStructure.objects.filter(name=short_name)
@@ -196,21 +261,22 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
         if update_structure:
             # if set_defaults or data structure has no default value - save it
-            structure.default = data64
-            log_messages.append(('success', 'Updated default for data structure %s using %s' % (structure.label, name)))
-            structure.save()
+            if structure.default != data64:
+                structure.default = data64
+                log_messages.append(('success', 'Updated default for data structure %s using %s' %
+                                     (structure.label, name)))
+                structure.save()
 
         if update_content:
             customization = Customization.objects.filter(name=customization_name)
             if not customization.exists():
-                log_messages.append(('warning', 'Ignored %s (customization %s not found)' % (name,customization_name)))
+                log_messages.append(('warning', 'Ignored %s (customization %s not found)' % (name, customization_name)))
                 continue
             customization = customization.first()
             # get latest value
             latest_value = structure.find_actual_value(customization)
             # check if file was changed
             if latest_value == data64:
-                log_messages.append(('info', 'Ignored %s (content not changed)' % name))
                 continue
 
             # add new dataRecrod

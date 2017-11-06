@@ -1,4 +1,4 @@
-FROM nginx:1.11.10
+FROM nginx:1.12.2
 MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf

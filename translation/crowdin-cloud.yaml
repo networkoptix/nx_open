@@ -18,6 +18,10 @@ files:
     source: '/cloud_portal/cloud/notifications/static/templates/*.json'
     translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
   -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.template'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
+    ignore: ['/cloud_portal/cloud/notifications/static/templates/container.mustache.template']
+  -
     source: '/cloud_portal/cloud/notifications/static/templates/*.html'
     translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
   -
@@ -29,3 +33,8 @@ files:
   -
     source: '/webadmin/app/web_common/views/**/*.*'
     translation: '/cloud_portal/translations/%locale_with_underscore%/web_common/views/**/%original_file_name%'
+  -
+    source: '/cloud_portal/cloud/notifications/static/templates/container.mustache.template'
+    dest: '/cloud_portal/cloud/notifications/static/templates/container.mustache.template.html'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/container.mustache.template'
+    type: 'html'

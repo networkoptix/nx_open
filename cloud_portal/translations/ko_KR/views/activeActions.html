@@ -12,9 +12,9 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in Nx Cloud</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-            Please activate your account by visiting this link.</p>
+            <h1>귀하는 Nx클라우드에 등록 되셨습니다.</h1>
+            <p>우리는 다음과 같이 활성화 링크를 보내드렸습니다. {{data.email}}.<br>
+            상기 링크를 방문 하셔서 활성화 하시기 바랍니다.</p>
         </div>
         <h1 ng-if="!data.email">계정을 확인 하십시요</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>

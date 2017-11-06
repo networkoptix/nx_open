@@ -20,9 +20,9 @@
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in Nx Cloud</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-            Please activate your account by visiting this link.</p>
+            <h1>Nx Cloud a kayıt yapıldı</h1>
+            <p>{{data.email}} adresine bir aktivasyon linki gönderdik<br>
+            Lütfen bu bağlantıya tıklayıp hesabınızı etkinleştirin.</p>
         </div>
         <h1 ng-if="!data.email">Hesabını onayla</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -57,7 +57,7 @@
     </div>
 
     <div ng-if="restoring">
-        <h1>Parolayı sıfırla -</h1>
+        <h1>Parolayı sıfırla</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-4 control-label">E-posta</label>
