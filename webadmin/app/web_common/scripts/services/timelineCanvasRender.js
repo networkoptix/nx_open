@@ -872,6 +872,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         var mouseInRightButton = mouseOverRightScrollButton && isScrolling;
         var mouseInLeftButton = mouseOverLeftScrollButton && isScrolling;
+        var currentTimeOffScreen = timeMarkerOffScreen(self.scaleManager.playedPosition);
         
         if(context) {
             if (canScrollLeft) {
@@ -889,7 +890,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             leftButton : mouseOverLeftScrollButton,
             rightButton: mouseOverRightScrollButton,
             rightBorder: mouseNearRightBorder,
-            leftBorder: mouseNearLeftBorder
+            leftBorder: mouseNearLeftBorder,
+            maxRightGoCenter: mouseNearRightBorder && ! canScrollRight && currentTimeOffScreen,
+            maxLeftGoCenter: mouseNearLeftBorder && !canScrollLeft && currentTimeOffScreen
         }
     }
 
