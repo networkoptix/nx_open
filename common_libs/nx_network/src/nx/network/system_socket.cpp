@@ -409,7 +409,7 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     }
 
     int on = 1;
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof(on)))
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, (const char*)&on, sizeof(on)))
         return false;
 
     if (m_ipVersion == AF_INET6

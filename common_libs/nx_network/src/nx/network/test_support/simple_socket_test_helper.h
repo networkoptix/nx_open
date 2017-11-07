@@ -785,13 +785,8 @@ void socketErrorHandling(
 
     SystemError::setLastErrorCode(SystemError::noError);
 
-#if defined (_WIN32)
     ASSERT_TRUE(client->bind(server->getLocalAddress()));
     ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
-#else
-    ASSERT_FALSE(client->bind(server->getLocalAddress()));
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::addrInUse);
-#endif
 
     // Sounds wierd but linux ::listen sometimes returns true...
     //
