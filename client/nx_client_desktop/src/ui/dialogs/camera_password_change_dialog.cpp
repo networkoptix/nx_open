@@ -70,8 +70,23 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     setupPasswordField(*ui->passwordEdit);
     setupPasswordField(*ui->confirmPasswordEdit);
 
+    const auto updateHint =
+        [this]()
+        {
+            static const auto kHintText = tr("Password should be at least 8 symbols long and "
+                   "contain different types of characters.");
+
+            const bool showHint = ui->passwordEdit->text().isEmpty()
+                && ui->confirmPasswordEdit->text().isEmpty();
+            ui->confirmPasswordEdit->setCustomHint(showHint ? kHintText : QString());
+        };
+
+    connect(ui->passwordEdit, &QnInputField::textChanged, this, updateHint);
+    connect(ui->confirmPasswordEdit, &QnInputField::textChanged, this, updateHint);
     ui->passwordEdit->setText(password);
     ui->confirmPasswordEdit->setText(password);
+    updateHint();
+
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->passwordEdit, ui->confirmPasswordEdit });
