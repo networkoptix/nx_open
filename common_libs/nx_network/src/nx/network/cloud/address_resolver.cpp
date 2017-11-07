@@ -315,7 +315,7 @@ std::deque<AddressEntry> AddressResolver::resolveSync(
     int ipVersion)
 {
     utils::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
-    auto handler = 
+    auto handler =
         [&](SystemError::ErrorCode code, std::deque<AddressEntry> entries)
         {
             promise.set_value({code, std::move(entries)});
@@ -487,15 +487,12 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
     if (domain.indexOf(lit(".")) != -1)
         return; // only top level domains might be fast resolved
 
-    const bool hasFound = iterateSubdomains(
+    iterateSubdomains(
         domain, [&](HaInfoIterator other)
         {
             info->second.fixedEntries = other->second.fixedEntries;
             return true; // just resolve to first avaliable
         });
-
-    if (!hasFound)
-        info->second.fixedEntries.clear();
 }
 
 void AddressResolver::dnsResolve(
