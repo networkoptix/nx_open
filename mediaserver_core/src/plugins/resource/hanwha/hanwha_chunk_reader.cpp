@@ -108,7 +108,10 @@ void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
     // otherwise we have to load all periods constantly and clean them up by timeout.
     const auto loadChunksUrl = buildUrl(
         lit("recording/searchrecordingperiod/view"),
-        {{lit("Type"), lit("All")}});
+        {
+            {lit("Type"), lit("All")},
+            {lit("ResultsInUTC"), m_isUtcEnabled ? kHanwhaTrue : kHanwhaFalse}
+        });
 
     m_httpClient->setOnDone([this](){onHttpClientDone();});
     m_httpClient->setOnSomeMessageBodyAvailable(nullptr);
@@ -145,8 +148,12 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         kUpdateChunksDelay).count();
 
+    const auto timeZoneShift = m_isUtcEnabled
+        ? std::chrono::seconds::zero()
+        : m_timeZoneShift;
+
     auto startDateTime = hasBounds()
-        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, m_timeZoneShift)
+        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, timeZoneShift)
         : kMinDateTime;
 
     auto endDateTime = hasBounds()
