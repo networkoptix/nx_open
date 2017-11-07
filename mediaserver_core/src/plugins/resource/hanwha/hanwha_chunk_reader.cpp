@@ -150,7 +150,7 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
 
     const auto timeZoneShift = m_isUtcEnabled
         ? std::chrono::seconds::zero()
-        : m_timeZoneShift;
+        : std::chrono::seconds(m_timeZoneShift);
 
     auto startDateTime = hasBounds()
         ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, timeZoneShift)
@@ -166,10 +166,11 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
         m_endTimeUsec = AV_NOPTS_VALUE;
     }
 
+    using P = std::pair<QString, QString>;
     std::map<QString, QString> parameters = {
-        {lit("Type"), lit("All")},
-        {lit("FromDate"), convertDateToString(startDateTime)},
-        {lit("ToDate"), convertDateToString(endDateTime)}
+        P(lit("Type"), lit("All")),
+        P(lit("FromDate"), convertDateToString(startDateTime)),
+        P(lit("ToDate"), convertDateToString(endDateTime))
     };
 
     if (m_isNvr)
