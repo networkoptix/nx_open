@@ -702,7 +702,8 @@ void ActionHandler::changeDefaultPasswords(
     using PasswordChangeResult = QPair<QnVirtualCameraResourcePtr, QnRestResult>;
     using PassswordChangeResultList = QList<PasswordChangeResult>;
 
-    QSharedPointer<PassswordChangeResultList> errorResultsStorage;
+    const auto errorResultsStorage = QSharedPointer<PassswordChangeResultList>(
+        new PassswordChangeResultList());
 
     const auto password = dialog.password();
     const auto guard = QPointer<ActionHandler>(this);
@@ -770,7 +771,8 @@ void ActionHandler::changeDefaultPasswords(
                     errorResultsStorage->append(PasswordChangeResult(camera, result));
             };
 
-        qDebug() << serverConnection->changeCameraPassword(camera->getId(), auth, resultCallback);
+        serverConnection->changeCameraPassword(
+            camera->getId(), auth, resultCallback, QThread::currentThread());
     }
 }
 
