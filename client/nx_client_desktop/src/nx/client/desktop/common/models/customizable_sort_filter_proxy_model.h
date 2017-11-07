@@ -7,7 +7,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 class CustomizableSortFilterProxyModel: public QSortFilterProxyModel
 {
@@ -47,7 +46,6 @@ private:
     AcceptPredicate m_filterAcceptsColumn;
 };
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

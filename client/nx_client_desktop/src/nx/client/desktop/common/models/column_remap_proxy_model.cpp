@@ -5,7 +5,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 ColumnRemapProxyModel::ColumnRemapProxyModel(
     const QVector<int>& sourceColumns,
@@ -105,7 +104,6 @@ void ColumnRemapProxyModel::setSourceModel(QAbstractItemModel* sourceModel)
     }
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

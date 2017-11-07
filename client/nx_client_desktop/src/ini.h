@@ -15,6 +15,7 @@ struct Ini: public nx::kit::IniConfig
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
     NX_INI_FLAG(0, universalExportDialog, "Use universal export dialog instead of old export dialogs.");
+    NX_INI_FLAG(0, unifiedEventPanel, "Use unified event panel instead of old notifications panel.");
     NX_INI_INT(0, autoShiftAreaWidth, "Auto-shift timeline to center when clicked %n pixels near borders.");
     NX_INI_INT(20, autoShiftOffsetPercent, "Auto-shift timeline value in percents.");
     NX_INI_FLAG(1, enableAnalytics, "Enable analytics engine");

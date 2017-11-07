@@ -269,6 +269,14 @@ namespace Qn
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
+        TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */
+        TimestampTextRole,                          /**< Role for timestamp text (QString). */
+        DescriptionTextRole,                        /**< Role for generic description text (QString). */
+        RemovableRole,                              /**< An item is removable (bool). */
+        CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
+        ResourceListRole,                           /**< Resource list (QnResourceList). */
+        PreviewTimeRole,                            /**< Role for camera preview time in milliseconds since epoch (qint64). */
+
         RoleCount
     };
 

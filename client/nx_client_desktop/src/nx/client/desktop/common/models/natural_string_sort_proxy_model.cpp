@@ -5,7 +5,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
 
 NaturalStringSortProxyModel::NaturalStringSortProxyModel(QObject* parent):
     base_type(parent)
@@ -20,7 +19,6 @@ NaturalStringSortProxyModel::NaturalStringSortProxyModel(QObject* parent):
         });
 }
 
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

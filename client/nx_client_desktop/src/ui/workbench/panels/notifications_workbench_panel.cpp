@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QAction>
 
+#include <ini.h>
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -20,6 +21,7 @@
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
+#include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/skin.h>
@@ -29,6 +31,8 @@
 #include <ui/workbench/panels/buttons.h>
 
 #include <utils/common/scoped_value_rollback.h>
+
+#include <nx/client/desktop/event_search/widgets/event_panel.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -65,6 +69,25 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     setHelpTopic(item, Qn::MainWindow_Notifications_Help);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &NotificationsWorkbenchPanel::updateControlsGeometry);
+
+    if (nx::client::desktop::ini().unifiedEventPanel)
+    {
+        item->setVisible(false);
+        m_eventPanel.reset(new nx::client::desktop::EventPanel(context()));
+
+        // TODO: #vkutin Get rid of proxying.
+        auto eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
+
+        connect(item, &QGraphicsWidget::geometryChanged, this,
+            [this, eventPanelContainer]()
+            {
+                eventPanelContainer->setGeometry(item->geometry());
+            });
+
+        // TODO: #vkutin Test which mode is faster.
+        //eventPanelContainer->setCacheMode(QGraphicsItem::NoCache);
+        eventPanelContainer->setWidget(m_eventPanel.data());
+    }
 
     action(action::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     pinButton->setFocusProxy(item);
@@ -253,7 +276,11 @@ void NotificationsWorkbenchPanel::updateControlsGeometry()
         qMin(parentWidgetRect.right(), paintGeometry.left()),
         (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height()) / 2
     ));
-    pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
+
+    if (nx::client::desktop::ini().unifiedEventPanel)
+        pinButton->setPos(headerGeometry.topRight() + QPointF(1.0 - pinButton->size().width(), 1.0));
+    else
+        pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
 
     emit geometryChanged();
 }

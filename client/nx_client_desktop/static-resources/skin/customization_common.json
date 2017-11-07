@@ -867,6 +867,14 @@
         "itemBackgroundColor": "dark5"
     },
 
+    "nx::client::desktop::EventTile": {
+        "palette": {
+            "default": {
+                "window": "dark9"
+            }
+        }
+    },
+
     "QnHudOverlayWidget": {
         "palette": {
             "default": {
@@ -892,7 +900,14 @@
             "emailSettings": "#cbcbcb",
             "chartColor": "brand_d3"
         }
-    }
+    },
 
+    "nx::client::desktop::EventPanel": {
+        "palette": {
+            "default": {
+                "window": "dark6"
+            }
+        }
+    }
 }
 

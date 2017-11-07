@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include <ui/workbench/panels/abstract_workbench_panel.h>
 
 class QnControlBackgroundWidget;
@@ -9,6 +11,8 @@ class QnBlinkingImageButtonWidget;
 class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
+
+namespace nx { namespace client { namespace desktop { class EventPanel; }}}
 
 namespace NxUi {
 
@@ -53,6 +57,8 @@ private:
 private:
     void at_showingProcessor_hoverEntered();
 
+    void updateEventPanel();
+
 private:
     bool m_ignoreClickEvent;
     bool m_visible;
@@ -70,6 +76,9 @@ private:
 
     /** Animator group for panel's opacity. */
     AnimatorGroup* m_opacityAnimatorGroup;
+
+    // New event panel.
+    QScopedPointer<nx::client::desktop::EventPanel> m_eventPanel;
 };
 
 } //namespace NxUi
