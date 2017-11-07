@@ -340,6 +340,7 @@ namespace Qn
         ServerOfflineOverlay,
         ServerUnauthorizedOverlay,
         IoModuleDisabledOverlay,
+        TooManyOpenedConnectionsOverlay,
 
         OverlayCount
     };

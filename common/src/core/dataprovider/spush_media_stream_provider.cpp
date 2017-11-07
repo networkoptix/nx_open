@@ -8,11 +8,25 @@
 #include <nx/network/simple_http_client.h>
 
 #include <core/resource/camera_resource.h>
+#include <nx/fusion//model_functions.h>
 
 namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
 static const int kErrorDelayTimeoutMs = 100;
 } // namespace
+
+static QnAbstractMediaDataPtr createMetadataPacket()
+{
+    QnCompressedMetadataPtr rez(new QnCompressedMetadata(MetadataType::MediaStreamEvent));
+    rez->timestamp = DATETIME_NOW;
+    rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+    auto data = QnLexical::serialized(Qn::MediaStreamEvent::TooManyOpenedConnections).toUtf8();
+    rez->setData(data.data(), data.size());
+
+    QnSleep::msleep(50);
+    return rez;
+}
+
 
 CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
@@ -54,6 +68,20 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStream()
 bool CLServerPushStreamReader::isCameraControlRequired() const
 {
     return !isCameraControlDisabled() && needConfigureProvider();
+}
+
+bool CLServerPushStreamReader::processOpenStreamResult()
+{
+    if (m_openStreamResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+    {
+        const QnAbstractMediaDataPtr& data = createMetadataPacket();
+        if (dataCanBeAccepted())
+            putData(std::move(data));
+
+        return false;
+    }
+
+    return true;
 }
 
 CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bool isControlRequired)
@@ -121,6 +149,7 @@ void CLServerPushStreamReader::run()
         if (!isStreamOpened())
         {
             openStream();
+            processOpenStreamResult();
             continue;
         }
         else if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME)
@@ -139,6 +168,9 @@ void CLServerPushStreamReader::run()
             closeStream();
             continue;
         }
+
+        if (!processOpenStreamResult())
+            continue;
 
         const QnAbstractMediaDataPtr& data = getNextData();
         if (data==0)
