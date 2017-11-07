@@ -154,22 +154,43 @@ QString HanwhaSharedResourceContext::sessionKey(
 
 QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const
 {
-    return m_chunkLoader->chunks(channelNumber);
+    QnMutexLocker lock(&m_servicesMutex);
+    if (m_chunkLoader)
+        return m_chunkLoader->chunks(channelNumber);
+
+    return QnTimePeriodList();
 }
 
 QnTimePeriodList HanwhaSharedResourceContext::chunksSync(int channelNumber) const
 {
-    return m_chunkLoader->chunksSync(channelNumber);
+    decltype(m_chunkLoader) chunkLoaderCopy;
+    {
+        QnMutexLocker lock(&m_servicesMutex);
+        chunkLoaderCopy = m_chunkLoader;
+    }
+
+    if (chunkLoaderCopy)
+        return chunkLoaderCopy->chunksSync(channelNumber);
+
+    return QnTimePeriodList();
 }
 
 qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
 {
-    return m_chunkLoader->startTimeUsec(channelNumber);
+    QnMutexLocker lock(&m_servicesMutex);
+    if (m_chunkLoader)
+        return m_chunkLoader->startTimeUsec(channelNumber);
+
+    return AV_NOPTS_VALUE;
 }
 
 qint64 HanwhaSharedResourceContext::chunksEndUsec(int channelNumber) const
 {
-    return m_chunkLoader->endTimeUsec(channelNumber);
+    QnMutexLocker lock(&m_servicesMutex);
+    if (m_chunkLoader)
+        return m_chunkLoader->endTimeUsec(channelNumber);
+
+    return AV_NOPTS_VALUE;
 }
 
 HanwhaResult<int> HanwhaSharedResourceContext::loadOverlappedId()
