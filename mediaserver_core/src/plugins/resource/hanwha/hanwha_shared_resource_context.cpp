@@ -14,13 +14,22 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+static std::array<int, (int) HanwhaSessionType::count> kMaxConsumersForType =
+{
+    0,  //< undefined
+    10, //< live
+    3,  //< archive
+    1,  //< preview
+    1  //< fileExport
+};
+
 namespace {
 
 // Limited by NPM-9080VQ, it can only be opening 3 stream at the same time, while it has 4.
 static const int kMaxConcurrentRequestNumber = 3;
 
 static const std::chrono::seconds kCacheUrlTimeout(10);
-static const std::chrono::minutes kCacheDataTimeout(1);
+static const std::chrono::seconds kCacheDataTimeout(30);
 
 static const QString kMinOverlappedDateTime = lit("2000-01-01 00:00:00");
 static const QString kMaxOverlappedDateTime = lit("2038-01-01 00:00:00");
@@ -127,49 +136,98 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive)
         m_chunkLoader->start(this);
 }
 
-QString HanwhaSharedResourceContext::sessionKey(
+void HanwhaSharedResourceContext::cleanupUnsafe()
+{
+    for (const auto& sessionType: m_sessions.keys())
+    {
+        auto& contextMap = m_sessions[sessionType];
+        for (auto itr = contextMap.begin(); itr != contextMap.end();)
+        {
+            if (itr.value().toStrongRef().isNull())
+                itr = contextMap.erase(itr);
+            else
+                ++itr;
+        }
+    }
+}
+
+SessionContextPtr HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
+    const QnUuid& clientId,
     bool generateNewOne)
 {
     if (m_sharedId.isEmpty())
-        return QString();
+        return SessionContextPtr();
 
     QnMutexLocker lock(&m_sessionMutex);
-    if (!m_sessionKeys.contains(sessionType))
-    {
-        HanwhaRequestHelper helper(shared_from_this());
-        helper.setIgnoreMutexAnalyzer(true);
-        const auto response = helper.view(lit("media/sessionkey"));
-        if (!response.isSuccessful())
-            return QString();
+    cleanupUnsafe();
 
-        const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
-        if (!sessionKey.is_initialized())
-            return QString();
+    auto& sessionsByClientId = m_sessions[sessionType];
+    const bool sessionLimitExceeded = !sessionsByClientId.contains(clientId)
+        && sessionsByClientId.size() >= kMaxConsumersForType[(int)sessionType];
 
-        m_sessionKeys[sessionType] = *sessionKey;
-    }
-    return m_sessionKeys.value(sessionType);
+    if (sessionLimitExceeded)
+        return SessionContextPtr();
+
+    auto strongSessionCtx = sessionsByClientId.value(clientId).toStrongRef();
+    if (strongSessionCtx)
+        return strongSessionCtx;
+
+    HanwhaRequestHelper helper(shared_from_this());
+    helper.setIgnoreMutexAnalyzer(true);
+    const auto response = helper.view(lit("media/sessionkey"));
+    if (!response.isSuccessful())
+        return SessionContextPtr();
+
+    const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
+    if (sessionKey == boost::none)
+        return SessionContextPtr();
+
+    strongSessionCtx = SessionContextPtr::create(*sessionKey, clientId);
+    sessionsByClientId[clientId] = strongSessionCtx.toWeakRef();
+
+    return strongSessionCtx;
 }
 
 QnTimePeriodList HanwhaSharedResourceContext::chunks(int channelNumber) const
 {
-    return m_chunkLoader->chunks(channelNumber);
+    QnMutexLocker lock(&m_servicesMutex);
+    if (m_chunkLoader)
+        return m_chunkLoader->chunks(channelNumber);
+
+    return QnTimePeriodList();
 }
 
 QnTimePeriodList HanwhaSharedResourceContext::chunksSync(int channelNumber) const
 {
-    return m_chunkLoader->chunksSync(channelNumber);
+    decltype(m_chunkLoader) chunkLoaderCopy;
+    {
+        QnMutexLocker lock(&m_servicesMutex);
+        chunkLoaderCopy = m_chunkLoader;
+    }
+
+    if (chunkLoaderCopy)
+        return chunkLoaderCopy->chunksSync(channelNumber);
+
+    return QnTimePeriodList();
 }
 
 qint64 HanwhaSharedResourceContext::chunksStartUsec(int channelNumber) const
 {
-    return m_chunkLoader->startTimeUsec(channelNumber);
+    QnMutexLocker lock(&m_servicesMutex);
+    if (m_chunkLoader)
+        return m_chunkLoader->startTimeUsec(channelNumber);
+
+    return AV_NOPTS_VALUE;
 }
 
 qint64 HanwhaSharedResourceContext::chunksEndUsec(int channelNumber) const
 {
-    return m_chunkLoader->endTimeUsec(channelNumber);
+    QnMutexLocker lock(&m_servicesMutex);
+    if (m_chunkLoader)
+        return m_chunkLoader->endTimeUsec(channelNumber);
+
+    return AV_NOPTS_VALUE;
 }
 
 HanwhaResult<int> HanwhaSharedResourceContext::loadOverlappedId()

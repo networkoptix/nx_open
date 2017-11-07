@@ -19,7 +19,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-    RebuildAction BackupAction FailoverPriority
+    RebuildAction BackupAction FailoverPriority MediaStreamEvent
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -876,6 +876,12 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DisabledUserConnectionResult                /*< Disabled user*/
     };
 
+    enum MediaStreamEvent
+    {
+        NoEvent,
+        TooManyOpenedConnections
+    };
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -912,7 +918,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-    (Qn::FailoverPriority)
+    (Qn::FailoverPriority)(Qn::MediaStreamEvent)
     ,
     (metatype)(lexical)
 )
