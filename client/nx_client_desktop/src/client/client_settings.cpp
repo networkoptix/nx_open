@@ -391,8 +391,9 @@ void QnClientSettings::migrateKnownServerConnections()
     auto migratedKnownUrls = qnClientCoreSettings->knownServerUrls();
     const auto& knownConnections = qnClientCoreSettings->knownServerConnections();
 
-    for (const auto url: knownUrls)
+    for (const auto qUrl: knownUrls)
     {
+        const auto url = nx::utils::Url::fromQUrl(qUrl);
         if (std::any_of(
                 knownConnections.begin(), knownConnections.end(),
                 [&url](const QnClientCoreSettings::KnownServerConnection& connection)
@@ -413,7 +414,7 @@ void QnClientSettings::migrateKnownServerConnections()
     }
 
     qnClientCoreSettings->setKnownServerUrls(migratedKnownUrls);
-    setKnownServerUrls(QList<nx::utils::Url>());
+    setValue(KNOWN_SERVER_URLS, qVariantFromValue(QList<QUrl>()));
 }
 
 void QnClientSettings::load()
