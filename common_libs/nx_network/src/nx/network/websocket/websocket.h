@@ -50,6 +50,10 @@ public:
 
     virtual void readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler) override;
+
+    /**
+     * Cancels all IO operations. Socket is not operational after this function is called.
+     */
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 

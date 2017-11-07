@@ -1,4 +1,4 @@
-#include "hanwha_metadata_plugin.h"
+﻿#include "hanwha_metadata_plugin.h"
 #include "hanwha_metadata_manager.h"
 #include "hanwha_common.h"
 #include "hanwha_attributes_parser.h"
@@ -10,6 +10,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
+#include <plugins/resource/hanwha/hanwha_request_helper.h>
 #include <nx/api/analytics/device_manifest.h>
 #include <nx/fusion/model_functions.h>
 
@@ -33,7 +34,19 @@ const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
 
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
+using namespace nx::mediaserver_core::plugins;
 
+HanwhaMetadataPlugin::SharedResources::SharedResources(
+    const QString& sharedId,
+    const Hanwha::DriverManifest& driverManifest,
+    const nx::utils::Url& url,
+    const QAuthenticator& auth)
+    :
+    monitor(std::make_unique<HanwhaMetadataMonitor>(driverManifest, url, auth)),
+    sharedContext(std::make_shared<HanwhaSharedResourceContext>(sharedId))
+{
+    sharedContext->setRecourceAccess(url, auth);
+}
 
 HanwhaMetadataPlugin::HanwhaMetadataPlugin()
 {
@@ -103,26 +116,22 @@ AbstractMetadataManager* HanwhaMetadataPlugin::managerForResource(
 {
     *outError = Error::noError;
 
-    auto vendor = QString(resourceInfo.vendor).toLower();
-    
+    const auto vendor = QString(resourceInfo.vendor).toLower();
+
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto url = QUrl(QString(resourceInfo.url));
+    auto sharedRes = sharedResources(resourceInfo);
+    ++sharedRes->managerCounter;
 
-    QAuthenticator auth;
-    auth.setUser(resourceInfo.login);
-    auth.setPassword(resourceInfo.password);
-
-    auto supportedEvents = fetchSupportedEvents(url, auth);
+    auto supportedEvents = fetchSupportedEvents(resourceInfo);
     if (!supportedEvents)
         return nullptr;
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
     deviceManifest.supportedEventTypes = *supportedEvents;
 
-    auto manager = new HanwhaMetadataManager();
-
+    auto manager = new HanwhaMetadataManager(this);
     manager->setResourceInfo(resourceInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
@@ -145,42 +154,27 @@ const char* HanwhaMetadataPlugin::capabilitiesManifest(Error* error) const
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::fetchSupportedEvents(
-    const QUrl& url,
-    const QAuthenticator& auth)
+    const ResourceInfo& resourceInfo)
 {
     using namespace nx::mediaserver_core::plugins;
 
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(auth.user());
-    httpClient.setUserPassword(auth.password());
-    httpClient.setSendTimeoutMs(kAttributesTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kAttributesTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kAttributesTimeout.count());
+    auto sharedRes = sharedResources(resourceInfo);
 
-    if (!httpClient.doGet(buildAttributesUrl(url)))
+    const auto cgiParameters = sharedRes->sharedContext->cgiParamiters();
+    if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
         return boost::none;
 
-    nx::Buffer buffer;
-    while (!httpClient.eof())
-        buffer.append(httpClient.fetchMessageBodyBuffer());
+    const auto eventStatuses = sharedRes->sharedContext->eventStatuses();
+    if (!eventStatuses || !eventStatuses->isSuccessful())
+        return boost::none;
 
-    auto statusCode = (nx_http::StatusCode::Value)httpClient.response()->statusLine.statusCode;
-    HanwhaCgiParameters parameters(buffer, statusCode);
-
-    return eventsFromParameters(parameters);
-}
-
-QUrl HanwhaMetadataPlugin::buildAttributesUrl(const QUrl& resourceUrl) const
-{
-    auto url = resourceUrl;
-    url.setPath(kAttributesPath);
-    url.setQuery(QUrlQuery());
-
-    return url;
+    return eventsFromParameters(cgiParameters.value, eventStatuses.value, resourceInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
-    const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters)
+    const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
+    const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
+    int channel)
 {
     if (!parameters.isValid())
         return boost::none;
@@ -194,7 +188,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     QList<QnUuid> result;
 
     auto supportedEvents = supportedEventsParameter->possibleValues();
-    for (const auto& eventName : supportedEvents)
+    for (const auto& eventName: supportedEvents)
     {
         bool gotValidParameter = false;
 
@@ -202,67 +196,21 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
         if (!guid.isNull())
             result.push_back(guid);
 
-        if (eventName == kVideoAnalytics)
+        if (eventName == kVideoAnalytics || eventName == kAudioAnalytics)
         {
-            auto supportedAreaAnalyticsParameter = parameters.parameter(
-                "eventsources/videoanalysis/set/DefinedArea.#.Mode");
-
-            gotValidParameter = supportedAreaAnalyticsParameter.is_initialized()
-                && supportedAreaAnalyticsParameter->isValid();
-
-            if (gotValidParameter)
+            const auto parameters = eventStatuses.response();
+            for (const auto& entry : parameters)
             {
-                auto supportedAreaAnalytics = 
-                    supportedAreaAnalyticsParameter->possibleValues();
+                const auto& fullEventName = entry.first;
+                const bool isAnalyticsEvent = fullEventName.startsWith(
+                    lit("Channel.%1.%2.")
+                        .arg(channel)
+                        .arg(eventName));
 
-                for (const auto& videoAnalytics: supportedAreaAnalytics)
+                if (isAnalyticsEvent)
                 {
                     guid = m_driverManifest.eventTypeByInternalName(
-                        lit("%1.%2")
-                            .arg(kVideoAnalytics)
-                            .arg(videoAnalytics));
-
-                    if (!guid.isNull())
-                        result.push_back(guid);
-                }
-            }
-
-            auto supportedLineAnalyticsParameter = parameters.parameter(
-                "eventsources/videoanalysis/set/Line.#.Mode");
-
-            gotValidParameter = supportedLineAnalyticsParameter.is_initialized()
-                && supportedLineAnalyticsParameter->isValid();
-
-            if (gotValidParameter)
-            {
-                guid = m_driverManifest.eventTypeByInternalName(
-                    lit("%1.%2")
-                    .arg(kVideoAnalytics)
-                    .arg(lit("Passing")));
-
-                if (!guid.isNull())
-                    result.push_back(guid);
-            }
-            
-        }
-
-        if (eventName == kAudioAnalytics)
-        {
-            auto supportedAudioTypesParameter = parameters.parameter(
-                "eventsources/audioanalysis/set/SoundType");
-
-            gotValidParameter = supportedAudioTypesParameter.is_initialized()
-                && supportedAudioTypesParameter->isValid();
-
-            if (gotValidParameter)
-            {
-                auto supportedAudioTypes = supportedAudioTypesParameter->possibleValues();
-                for (const auto& audioAnalytics : supportedAudioTypes)
-                {
-                    guid = m_driverManifest.eventTypeByInternalName(
-                        lit("%1.%2")
-                            .arg(kAudioAnalytics)
-                            .arg(audioAnalytics));
+                        eventName + (".") + fullEventName.split(L'.').last());
 
                     if (!guid.isNull())
                         result.push_back(guid);
@@ -277,6 +225,85 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
 const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const
 {
     return m_driverManifest;
+}
+
+HanwhaMetadataMonitor* HanwhaMetadataPlugin::monitor(
+    const QString& sharedId,
+    const nx::utils::Url& url,
+    const QAuthenticator& auth)
+{
+    std::shared_ptr<SharedResources> monitorCounter;
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto sharedResourcesItr = m_sharedResources.find(sharedId);
+        if (sharedResourcesItr == m_sharedResources.cend())
+        {
+            sharedResourcesItr = m_sharedResources.insert(
+                sharedId,
+                std::make_shared<SharedResources>(
+                    sharedId,
+                    driverManifest(),
+                    url,
+                    auth));
+        }
+
+        monitorCounter = sharedResourcesItr.value();
+        ++monitorCounter->monitorUsageCounter;
+    }
+
+    return monitorCounter->monitor.get();
+}
+
+void HanwhaMetadataPlugin::managerStoppedToUseMonitor(const QString& sharedId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto sharedResources = m_sharedResources.value(sharedId);
+    if (!sharedResources)
+        return;
+
+    if (sharedResources->monitorUsageCounter)
+        --sharedResources->monitorUsageCounter;
+
+    if (sharedResources->monitorUsageCounter <= 0)
+        m_sharedResources[sharedId]->monitor->stopMonitoring();
+}
+
+void HanwhaMetadataPlugin::managerIsAboutToBeDestroyed(const QString& sharedId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto sharedResources = m_sharedResources.value(sharedId);
+    if (!sharedResources)
+        return;
+
+    --sharedResources->managerCounter;
+    NX_ASSERT(sharedResources->managerCounter >= 0);
+    if (sharedResources->managerCounter <= 0)
+        m_sharedResources.remove(sharedId);
+}
+
+std::shared_ptr<HanwhaMetadataPlugin::SharedResources> HanwhaMetadataPlugin::sharedResources(
+    const nx::sdk::ResourceInfo& resourceInfo)
+{
+    const nx::utils::Url url(resourceInfo.url);
+
+    QAuthenticator auth;
+    auth.setUser(resourceInfo.login);
+    auth.setPassword(resourceInfo.password);
+
+    QnMutexLocker lock(&m_mutex);
+    auto sharedResourcesItr = m_sharedResources.find(resourceInfo.sharedId);
+    if (sharedResourcesItr == m_sharedResources.cend())
+    {
+        sharedResourcesItr = m_sharedResources.insert(
+            resourceInfo.sharedId,
+            std::make_shared<SharedResources>(
+                resourceInfo.sharedId,
+                driverManifest(),
+                url,
+                auth));
+    }
+
+    return sharedResourcesItr.value();
 }
 
 } // namespace plugins

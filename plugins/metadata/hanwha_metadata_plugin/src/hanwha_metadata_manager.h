@@ -8,6 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <hanwha_metadata_monitor.h>
+#include <hanwha_metadata_plugin.h>
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/metadata/abstract_metadata_manager.h>
@@ -23,14 +24,14 @@ class HanwhaMetadataManager:
 {
     Q_OBJECT;
 public:
-    HanwhaMetadataManager();
+    HanwhaMetadataManager(HanwhaMetadataPlugin* plugin);
 
     virtual ~HanwhaMetadataManager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual nx::sdk::Error startFetchingMetadata(
-        nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+    virtual nx::sdk::Error setHandler(nx::sdk::metadata::AbstractMetadataHandler* handler) override;
+    virtual nx::sdk::Error startFetchingMetadata() override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -40,18 +41,23 @@ public:
     void setDeviceManifest(const QByteArray& manifest);
     void setDriverManifest(const Hanwha::DriverManifest& manifest);
 
+    void setMonitor(HanwhaMetadataMonitor* monitor);
+
 private:
     Hanwha::DriverManifest m_driverManifest;
     QByteArray m_deviceManifest;
 
-    QUrl m_url;
+    nx::utils::Url m_url;
     QString m_model;
     QString m_firmware;
     QAuthenticator m_auth;
+    QString m_uniqueId;
+    QString m_sharedId;
+    int m_channel;
 
-    std::unique_ptr<HanwhaMetadataMonitor> m_monitor;
+    HanwhaMetadataPlugin* m_plugin = nullptr;
+    HanwhaMetadataMonitor* m_monitor = nullptr;
     nx::sdk::metadata::AbstractMetadataHandler* m_handler = nullptr;
-    
 };
 
 } // namespace plugins

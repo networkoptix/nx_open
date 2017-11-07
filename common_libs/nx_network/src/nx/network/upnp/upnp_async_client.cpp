@@ -156,7 +156,7 @@ QString AsyncClient::Message::toString() const
             .arg( paramList.join( lit(", ") ) );
 }
 
-void AsyncClient::doUpnp( const QUrl& url, const Message& message,
+void AsyncClient::doUpnp( const nx::utils::Url& url, const Message& message,
                           std::function< void( const Message& )> callback )
 {
     const auto service = toUpnpUrn( message.service, lit("service") );
@@ -237,7 +237,7 @@ static const QString DESCRIPTION    = lit("NewPortMappingDescription");
 static const QString DURATION       = lit("NewLeaseDuration");
 
 void AsyncClient::externalIp(
-    const QUrl& url, std::function< void( const HostAddress& ) > callback )
+    const nx::utils::Url& url, std::function< void( const HostAddress& ) > callback )
 {
     AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP, {} };
     doUpnp( url, request, [callback]( const Message& response ) {
@@ -246,7 +246,7 @@ void AsyncClient::externalIp(
 }
 
 void AsyncClient::addMapping(
-        const QUrl& url, const HostAddress& internalIp, quint16 internalPort,
+        const nx::utils::Url& url, const HostAddress& internalIp, quint16 internalPort,
         quint16 externalPort, Protocol protocol, const QString& description,
         quint64 duration, std::function< void( bool ) > callback )
 {
@@ -268,7 +268,7 @@ void AsyncClient::addMapping(
 }
 
 void AsyncClient::deleteMapping(
-        const QUrl& url, quint16 externalPort, Protocol protocol,
+        const nx::utils::Url& url, quint16 externalPort, Protocol protocol,
         std::function< void( bool ) > callback )
 {
     AsyncClient::Message request;
@@ -304,7 +304,7 @@ QString AsyncClient::MappingInfo::toString() const
 }
 
 void AsyncClient::getMapping(
-        const QUrl& url, quint32 index,
+        const nx::utils::Url& url, quint32 index,
         std::function< void( MappingInfo ) > callback )
 {
     AsyncClient::Message request;
@@ -327,7 +327,7 @@ void AsyncClient::getMapping(
 }
 
 void AsyncClient::getMapping(
-        const QUrl& url, quint16 externalPort, Protocol protocol,
+        const nx::utils::Url& url, quint16 externalPort, Protocol protocol,
         std::function< void( MappingInfo ) > callback )
 {
     AsyncClient::Message request;
@@ -352,7 +352,7 @@ void AsyncClient::getMapping(
 }
 
 void fetchMappingsRecursive(
-        AsyncClient* client, const QUrl& url,
+        AsyncClient* client, const nx::utils::Url& url,
         const std::function< void( AsyncClient::MappingList ) >& callback,
         std::shared_ptr< AsyncClient::MappingList > collected,
         AsyncClient::MappingInfo newMap )
@@ -373,7 +373,7 @@ void fetchMappingsRecursive(
 }
 
 void AsyncClient::getAllMappings(
-        const QUrl& url, std::function< void( MappingList ) > callback )
+        const nx::utils::Url& url, std::function< void( MappingList ) > callback )
 {
     auto mappings = std::make_shared< std::vector< MappingInfo > >();
     return getMapping( url, 0,

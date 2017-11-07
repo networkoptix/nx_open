@@ -20,6 +20,7 @@
 #include <nx/utils/collection.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 #include "collection_fwd.h"
 #include "ubjson.h"
@@ -255,6 +256,22 @@ bool deserialize(QnUbjsonReader<T> *stream, QUrl *target) {
     if(!QnUbjson::deserialize(stream, &tmp))
         return false;
     *target = QUrl(tmp);
+    return true;
+}
+
+template <class Output>
+void serialize(const nx::utils::Url& value, QnUbjsonWriter<Output> *stream)
+{
+    QnUbjson::serialize(value.toString(), stream);
+}
+
+template <class T>
+bool deserialize(QnUbjsonReader<T> *stream, nx::utils::Url *target)
+{
+    QString tmp;
+    if(!QnUbjson::deserialize(stream, &tmp))
+        return false;
+    *target = nx::utils::Url(tmp);
     return true;
 }
 

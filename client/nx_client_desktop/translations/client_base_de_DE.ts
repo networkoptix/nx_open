@@ -960,7 +960,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-ID vom Server mit dieser Lizenz stimmt nicht mit der Hardware-ID überein auf der die Lizenz aktiviert wurde.</translation>
+      <translation>Hardware-Id vom Server mit dieser Lizenz stimmt nicht mit der Hardware-Id überein auf der die Lizenz aktiviert wurde.</translation>
     </message>
   </context>
   <context>
@@ -1037,25 +1037,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Die Datei &quot;%1&quot; wird von einem anderen Prozess verwendet.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Die Datei &quot;%1&quot; kann nicht beschrieben werden. Bitte versuchen Sie einen anderen Namen.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>Dateiname sollte nicht die folgenden reservierten Zeichen enthalten: %1</numerusform>
+        <numerusform>Dateiname sollte nicht die folgenden reservierten Zeichen enthalten: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Der Dateiname &quot;%1&quot; ist vom Betriebssystem reserviert. Bitte versuchen Sie einen anderen Namen.</translation>
     </message>
   </context>
   <context>
@@ -1701,7 +1699,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 of %n devices</source>
       <translation>
-        <numerusform>%1 von %n Geräten</numerusform>
+        <numerusform>%1 von %n Gerät</numerusform>
         <numerusform>%1 von %n Geräten</numerusform>
       </translation>
     </message>
@@ -2667,11 +2665,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Email oder Passwort ungültig</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>Konto ist nicht aktiviert. Bitte überprüfen Sie Ihre E-Mail und folgen Sie den Anweisungen</translation>
     </message>
   </context>
   <context>
@@ -3736,7 +3734,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Gebunden an Hardware-ID</translation>
+      <translation>Gebunden an Hardware-Id</translation>
     </message>
   </context>
   <context>
@@ -4012,11 +4010,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 verbunden</translation>
+      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-Id %1 verbunden</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 auf %2 verbunden</translation>
+      <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-Id %1 auf %2 verbunden</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4047,11 +4045,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
+      <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-Id an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Senden Sie den Lizenzschlüssel und die Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
+      <translation>Senden Sie den Lizenzschlüssel und die Hardware-Id an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
   </context>
   <context>
@@ -4321,6 +4319,10 @@ to %1</source>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>drücken und halten</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Nach Zeitplan deaktiviert</translation>
     </message>
   </context>
   <context>
@@ -4623,7 +4625,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>Die Benachrichtigung wird angezeigt, bis einer der Benutzer ein Lesezeichen mit Ereignisbeschreibung erstellt</translation>
     </message>
   </context>
   <context>
@@ -7212,14 +7214,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>Passwort eingeben...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Administratorpasswort</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>Systeme werden bald zusammengefasst</translation>
     </message>
@@ -7240,10 +7234,6 @@ to %1</source>
       <translation>Die Gesamtanzahl der Lizenzen wird verringert</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Das Passwort darf nicht leer sein.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Cloudsysteme können nicht zusammengeführt werden</translation>
     </message>
@@ -7258,6 +7248,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Der Server wird in Kürze mit dem System verbunden werden</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Passwort eingeben...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Administratorpasswort</translation>
     </message>
   </context>
   <context>
@@ -7810,11 +7808,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Tour stoppen</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Tour starten</translation>
     </message>
   </context>
   <context>
@@ -8079,8 +8077,8 @@ to %1</source>
       <translation>Verwenden Sie Pfeiltasten, um Layouts zu wechseln. Das Demoband kann durch drücken von ESC beendet werden.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Anhalten der Tour durch Drücken einer beliebigen Taste.</translation>
     </message>
   </context>
   <context>

@@ -9,7 +9,7 @@
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include "core/dataprovider/live_stream_provider.h"
+#include "providers/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include <core/resource/server_backup_schedule.h>
@@ -18,7 +18,7 @@
 #include "utils/math/math.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include "providers/spush_media_stream_provider.h"
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/vms/event/events/reasoned_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
@@ -158,6 +158,11 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         addQueueSizeUnsafe(media->dataSize());
         QnStreamRecorder::putData(nonConstData);
     }
+}
+
+void QnServerStreamRecorder::setLastMediaTime(qint64 lastMediaTime)
+{
+    m_lastMediaTime = lastMediaTime;
 }
 
 void QnServerStreamRecorder::updateRebuildState()
@@ -316,7 +321,7 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (m_catalog == QnServer::HiQualityCatalog) 
+        if (m_catalog == QnServer::HiQualityCatalog)
         {
             QnLiveStreamParams params;
             if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never && !camera->isScheduleDisabled())
@@ -348,7 +353,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 
 void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
 {
-    m_lastMediaTime = media->timestamp;
+    setLastMediaTime(media->timestamp);
 
     NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
     QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);
@@ -732,7 +737,12 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
     }
 }
 
-void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
+void QnServerStreamRecorder::fileFinished(
+    qint64 durationMs,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    qint64 fileSize,
+    qint64 startTimeMs)
 {
     if (m_truncateInterval != 0)
     {
@@ -740,19 +750,26 @@ void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& file
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
 
         qnBackupStorageMan->fileFinished(
             durationMs,
             fileName,
             provider,
-            fileSize
+            fileSize,
+            startTimeMs
         );
     }
 };
 
-void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::fileStarted(
+    qint64 startTimeMs,
+    int timeZone,
+    const QString& fileName,
+    QnAbstractMediaStreamDataProvider* provider,
+    bool sideRecorder)
 {
     if (m_truncateInterval > 0)
     {
@@ -760,14 +777,16 @@ void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
 
         qnBackupStorageMan->fileStarted(
             startTimeMs,
             timeZone,
             fileName,
-            provider
+            provider,
+            sideRecorder
         );
     }
 }

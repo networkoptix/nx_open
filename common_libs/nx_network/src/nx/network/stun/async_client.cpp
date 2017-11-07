@@ -45,7 +45,7 @@ void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 }
 
 void AsyncClient::connect(
-    const QUrl& url,
+    const nx::utils::Url& url,
     ConnectHandler completionHandler)
 {
     if (url.scheme() != nx::stun::kUrlSchemeName && url.scheme() != nx::stun::kSecureUrlSchemeName)

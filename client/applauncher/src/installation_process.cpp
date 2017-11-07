@@ -70,7 +70,7 @@ bool InstallationProcess::start( const QString& mirrorListUrl )
     m_fileSizeByEntry.clear();
     m_state = State::downloadMirrorList;
     m_status = applauncher::api::InstallationStatus::inProgress;
-    m_httpClient->doGet(QUrl(mirrorListUrl));
+    m_httpClient->doGet(nx::utils::Url(mirrorListUrl));
     return true;
 }
 
@@ -293,12 +293,12 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     NX_LOG( QString::fromLatin1("Searching mirrors.xml with following input data: %1").arg(inputData.toString(m_rns)), cl_logDEBUG2 );
     m_currentTree->get( inputData, &result );
 
-    std::forward_list<QUrl> mirrorList;
+    std::forward_list<nx::utils::Url> mirrorList;
     {
         QString urlStr;
         for (auto it = result.begin(); !it->atEnd(); it->next())
             if (it->resID() == ProductParameters::mirrorUrl)
-                mirrorList.push_front(QUrl(it->value().toString()));
+                mirrorList.push_front(nx::utils::Url(it->value().toString()));
     }
 
     if( mirrorList.empty() )

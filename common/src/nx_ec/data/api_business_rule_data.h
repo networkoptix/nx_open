@@ -22,7 +22,7 @@ namespace ec2
         std::vector<QnUuid> actionResourceIds;
         QnLatin1Array actionParams;
 
-        qint32 aggregationPeriod; // msecs
+        qint32 aggregationPeriod; //< Seconds.
         bool disabled;
         QString comment;
         QString schedule;

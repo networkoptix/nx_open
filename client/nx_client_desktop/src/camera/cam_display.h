@@ -236,7 +236,7 @@ protected:
     int m_executingJump;
     int m_skipPrevJumpSignal;
     int m_processedPackets;
-    std::map<qint64, QnAbstractCompressedMetadataPtr> m_lastMetadata[CL_MAX_CHANNELS];
+    std::map<qint64, FrameMetadata> m_lastMetadata[CL_MAX_CHANNELS];
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     int m_emptyPacketCounter;
     bool m_isStillImage;

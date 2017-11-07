@@ -81,7 +81,7 @@ bool QnPlIqResourceSearcher::isIqeModel(const QString& model)
 }
 
 QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
-    const QUrl& url, const QAuthenticator& /*auth*/, bool isSearchAction)
+    const nx::utils::Url& url, const QAuthenticator& /*auth*/, bool isSearchAction)
 {
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.

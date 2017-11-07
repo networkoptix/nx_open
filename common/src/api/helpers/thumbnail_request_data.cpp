@@ -25,6 +25,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData, ThumbnailForma
     (QnThumbnailRequestData::RawFormat, "raw")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData, AspectRatio,
+    (QnThumbnailRequestData::AutoAspectRatio, "auto")
+    (QnThumbnailRequestData::SourceAspectRatio, "source")
+)
+
 namespace {
 
 static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
@@ -37,6 +42,7 @@ static const QString kDeprecatedWidthParam = lit("widht");
 static const QString kWidthParam = lit("width");
 static const QString kImageFormatParam = lit("imageFormat");
 static const QString kRoundMethodParam = lit("method");
+static const QString kAspectRatioParam = lit("aspectRatio");
 
 static const QString kLatestTimeValue = lit("latest");
 
@@ -49,7 +55,8 @@ QnThumbnailRequestData::QnThumbnailRequestData():
     rotation(kDefaultRotation),
     size(),
     imageFormat(JpgFormat),
-    roundMethod(KeyFrameAfterMethod) //< round after is better then before by default for most situations
+    roundMethod(KeyFrameAfterMethod), //< round after is better then before by default for most situations
+    aspectRatio(AutoAspectRatio)
 {
 }
 
@@ -86,9 +93,11 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     else
         size.setWidth(QnLexical::deserialized<int>(params.value(kDeprecatedWidthParam), size.width()));
     imageFormat = QnLexical::deserialized<ThumbnailFormat>(
-        params.value(kImageFormatParam), imageFormat);
+        params.value(kImageFormatParam), /*defaultValue*/ imageFormat);
     roundMethod = QnLexical::deserialized<RoundMethod>(
-        params.value(kRoundMethodParam), roundMethod);
+        params.value(kRoundMethodParam), /*defaultValue*/ roundMethod);
+    aspectRatio = QnLexical::deserialized<AspectRatio>(
+        params.value(kAspectRatioParam), /*defaultValue*/ aspectRatio);
 }
 
 QnRequestParamList QnThumbnailRequestData::toParams() const
@@ -106,24 +115,24 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
     result.insert(kWidthParam, QnLexical::serialized(size.width()));
     result.insert(kImageFormatParam, QnLexical::serialized(imageFormat));
     result.insert(kRoundMethodParam, QnLexical::serialized(roundMethod));
+    result.insert(kAspectRatioParam, QnLexical::serialized(aspectRatio));
     return result;
 }
 
-bool QnThumbnailRequestData::isValid() const
+boost::optional<QString> QnThumbnailRequestData::getError() const
 {
     if (!camera)
-        return false;
+        return lit("No camera avaliable");
 
     // Check invalid time.
     if (msecSinceEpoch < 0 && msecSinceEpoch != kLatestThumbnail)
-        return false;
+        return lit("Invalid time");
 
     if (size.height() > 0 && size.height() < kMinimumSize)
-        return false;
+        return lit("Invalid height");
 
-    // Width cannot be specified without specifying height.
     if (size.width() > 0 && (size.width() < kMinimumSize || size.height() < 0))
-        return false;
+        return lit("Width cannot be specified without specifying height");
 
-    return true;
+    return boost::none;
 }

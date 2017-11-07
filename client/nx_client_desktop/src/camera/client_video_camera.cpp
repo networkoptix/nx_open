@@ -13,8 +13,8 @@
 #include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
 
 #include <recording/time_period.h>
-#include <plugins/resource/avi/thumbnails_stream_reader.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/thumbnails_stream_reader.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 
 QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
@@ -142,7 +142,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     StreamRecorderRole role,
     qint64 serverTimeZoneMs,
     qint64 timelapseFrameStepMs,
-    const QnLegacyTranscodingSettings& transcodeParams)
+    const nx::core::transcoding::FilterChain& filters)
 {
     qint64 timelapseFrameStepUs = timelapseFrameStepMs * 1000;
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
@@ -226,10 +226,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             sender()->deleteLater();
         });
 
-        const auto filterChain = QnImageFilterHelper::createFilterChain(transcodeParams,
-            QSize());
-
-        m_exportRecorder->setTranscodeFilters(filterChain);
+        m_exportRecorder->setTranscodeFilters(filters);
 
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);

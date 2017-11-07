@@ -33,29 +33,34 @@ public:
         const String& hostName);
     virtual ~ReverseConnectionHolder() override;
 
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void stopWhileInAioThread() override;
-
     ReverseConnectionHolder(const ReverseConnectionHolder&) = delete;
     ReverseConnectionHolder(ReverseConnectionHolder&&) = delete;
     ReverseConnectionHolder& operator=(const ReverseConnectionHolder&) = delete;
     ReverseConnectionHolder& operator=(ReverseConnectionHolder&&) = delete;
 
-    /** @note Can only be called from bould AIO thread. */
-    void saveSocket(std::unique_ptr<AbstractStreamSocket> socket);
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void stopWhileInAioThread() override;
 
     virtual size_t socketCount() const override;
-    virtual void takeSocket(std::chrono::milliseconds timeout, Handler handler) override;
+        virtual void takeSocket(std::chrono::milliseconds timeout, Handler handler) override;
+
+    /**
+     * NOTE: Can only be called from object's AIO thread.
+     */
+    void saveSocket(std::unique_ptr<AbstractStreamSocket> socket);
+    bool isActive() const;
+
+    static void setConnectionlessHolderExpirationTimeout(std::chrono::milliseconds value);
 
 private:
     void startCleanupTimer(std::chrono::milliseconds timeLeft);
     void monitorSocket(std::list<std::unique_ptr<AbstractStreamSocket>>::iterator it);
-
     const String m_hostName;
     std::atomic<size_t> m_socketCount;
     std::list<std::unique_ptr<AbstractStreamSocket>> m_sockets;
     std::multimap<std::chrono::steady_clock::time_point, Handler> m_handlers;
     std::unique_ptr<aio::Timer> m_timer;
+    std::chrono::steady_clock::time_point m_prevConnectionTime;
 };
 
 } // namespace tcp

@@ -95,7 +95,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Gebeurtenissenlog...</translation>
+      <translation>Logboek...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
@@ -183,11 +183,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Nieuwe lay-out...</translation>
+      <translation>Nieuwe schermindeling...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Nieuwe lay-out...</translation>
+      <translation>Open schermindeling...</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -211,11 +211,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Huidige lay-out opslaan</translation>
+      <translation>Huidige schermindeling opslaan</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Bewaar huidige lay-out als...</translation>
+      <translation>Huidige schermindeling opslaan als...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
@@ -398,7 +398,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Openen in alarm lay-out</translation>
+      <translation>Toon op alarm scherm</translation>
     </message>
     <message>
       <source>Open in New Window</source>
@@ -454,11 +454,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Layout opslaan</translation>
+      <translation>Schermindeling opslaan</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Sla de layout op als...</translation>
+      <translation>Sla de schermindeling op als...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
@@ -554,11 +554,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Verwijderen uit de lay-out</translation>
+      <translation>Verwijderen uit de schermindeling</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Lay-out delen beëindigen</translation>
+      <translation>Delen van de schermindeling beëindigen</translation>
     </message>
     <message>
       <source>Edit...</source>
@@ -574,7 +574,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Lay-out instellen als achtergrond</translation>
+      <translation>Schermindeling instellen als achtergrond</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -582,11 +582,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>Gebruikersrollen...</translation>
+      <translation>Gebruikersprofielen...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>Rolinstellingen...</translation>
+      <translation>Profielinstellingen...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -666,7 +666,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Lay-out instellingen...</translation>
+      <translation>Schermindeling instellingen...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
@@ -1037,25 +1037,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Bestand &quot;%1&quot; wordt gebruikt door een ander proces.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Bestand &quot;%1&quot; kan niet worden weggeschreven. Probeer een andere naam.</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>De bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer een andere naam.</translation>
     </message>
   </context>
   <context>
@@ -1109,7 +1107,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde lay-outs</translation>
+      <translation>Gedeelde schermindelingen</translation>
     </message>
     <message>
       <source>All</source>
@@ -1271,11 +1269,11 @@ to view more bookmarks</source>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Door het geven van toegang tot sommige lay-outs, geeft u ook toegang tot alle camera's in deze lay-out. Daarmee krijgt de gebruiker toegang tot extra camera's op deze lay-outs.</translation>
+      <translation>Door het geven van toegang tot sommige schermindelingen, geeft u ook toegang tot alle camera's in deze schermindeling. Daarmee krijgt de gebruiker toegang tot extra camera's op deze schermindeling.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's &amp; apparaten</translation>
+      <translation>Alle camera's en apparaten</translation>
     </message>
   </context>
   <context>
@@ -1414,7 +1412,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>Audit trail afspelen</translation>
+      <translation>Systeemrapportage afspelen</translation>
     </message>
   </context>
   <context>
@@ -1572,7 +1570,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation>Gevulde cirkel markering betekent dat het archief nog steeds beschikbaar is</translation>
+      <translation>Wanneer de cirkel gevuld is, dan is het archief nog raad te plegen</translation>
     </message>
   </context>
   <context>
@@ -1873,7 +1871,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Geen event regels</translation>
+      <translation>Geen gebeurtenisregels</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2111,11 +2109,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Id</source>
-      <translation>I/O Module ID</translation>
+      <translation>I/O Module Id</translation>
     </message>
     <message>
       <source>Camera Id</source>
-      <translation>Camera ID</translation>
+      <translation>Camera Id</translation>
     </message>
   </context>
   <context>
@@ -2503,11 +2501,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation>Toon op lay-out</translation>
+      <translation>Toon op de schermindeling</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Gebeurtenissenlog...</translation>
+      <translation>Logboek...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
@@ -2614,7 +2612,7 @@ to view more bookmarks</source>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation>Verbinding maken met uw systemen overal met al uw apparaten</translation>
+      <translation>U kunt nu verbinding maken met uw systemen waar u maar wilt en met al uw apparaten</translation>
     </message>
     <message>
       <source>Known limitations</source>
@@ -2667,11 +2665,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Incorrecte email of wachtwoord</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>Account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
     </message>
   </context>
   <context>
@@ -2762,11 +2760,11 @@ to %1</source>
     </message>
     <message>
       <source>Connection details that you have entered are incorrect, please try again.</source>
-      <translation>De verbindingsgegevens die u hebt ingevoerd, zijn niet correct, probeer het opnieuw.</translation>
+      <translation>De gegevens die u heeft ingevoerd om verbinding te maken zijn niet correct, probeer het opnieuw.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your VMS administrator.</source>
-      <translation>Als deze fout blijft terugkeren, neem dan contact op met uw VMS beheerder.</translation>
+      <translation>Als deze melding blijft terugkeren, neem dan contact op met uw VMS beheerder.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -2897,7 +2895,7 @@ to %1</source>
     </message>
     <message>
       <source>Connection to Server could not be established.</source>
-      <translation>Verbinding met de server kon niet worden vastgesteld.</translation>
+      <translation>Het is niet gelukt om verbinding te maken met de server.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
@@ -3154,15 +3152,15 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Logboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Logboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Logboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Logboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message>
@@ -3190,7 +3188,7 @@ to %1</source>
     </message>
     <message>
       <source>Event</source>
-      <translation>Event</translation>
+      <translation>Gebeurtenis</translation>
     </message>
     <message>
       <source>Source</source>
@@ -3374,7 +3372,7 @@ to %1</source>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation>Open gebeurtenissenlogboek</translation>
+      <translation>Open logboek</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
@@ -3386,11 +3384,11 @@ to %1</source>
     </message>
     <message>
       <source>Event Log</source>
-      <translation>Gebeurtenissenlog</translation>
+      <translation>Logboek</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Audit logboek</translation>
+      <translation>Systeemrapportage</translation>
     </message>
     <message>
       <source>Health Monitoring</source>
@@ -3414,11 +3412,11 @@ to %1</source>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation>Open Audit Trail Log</translation>
+      <translation>Open systeemrapportage</translation>
     </message>
     <message>
       <source>Monitor All Servers on a Single Layout</source>
-      <translation>Monitor alle servers op een enkele layout</translation>
+      <translation>Monitor alle servers op een enkele schermindeling</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -3521,7 +3519,7 @@ to %1</source>
     </message>
     <message>
       <source>Id</source>
-      <translation>ID</translation>
+      <translation>Id</translation>
     </message>
   </context>
   <context>
@@ -3736,7 +3734,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware ID</translation>
+      <translation>Gelieerd aan Hardware Id</translation>
     </message>
   </context>
   <context>
@@ -3821,7 +3819,7 @@ to %1</source>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation>Activeer alstublieft uw (proef)licentie.</translation>
+      <translation>Activeer alstublieft uw (proef) licentie.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
@@ -4012,11 +4010,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware ID %1</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -4047,11 +4045,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware Id aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <translation>Stuurt u alstublieft een e-mail met de licentiecode en het bovenstaande Hardware Id aan %1 en u ontvangt zo spoedig mogelijk een ​​activatiebestand waarmee u de licenties kunt valideren.</translation>
     </message>
   </context>
   <context>
@@ -4101,11 +4099,11 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Uiterlijk aanpassen</translation>
+      <translation>Persoonlijke instellingen</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Scherm Opname</translation>
+      <translation>Schermopname</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -4240,11 +4238,11 @@ to %1</source>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>Rekken</translation>
+      <translation>Uitrekken</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation>Passend</translation>
+      <translation>Passend maken</translation>
     </message>
     <message>
       <source>Crop</source>
@@ -4321,6 +4319,10 @@ to %1</source>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>houd ingedrukt</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Uitgeschakeld volgens schema</translation>
     </message>
   </context>
   <context>
@@ -4580,7 +4582,7 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>Dit is ook nodig om PTZ presets en tours te maken/bewerken.</translation>
+      <translation>Vink deze aan om PTZ presets en tours te kunnen maken en/of aan te passen.</translation>
     </message>
     <message>
       <source>Control video walls</source>
@@ -4588,7 +4590,7 @@ to %1</source>
     </message>
     <message>
       <source>View event log</source>
-      <translation>Bekijk gebeurtenissenlogboek</translation>
+      <translation>Bekijk logboek</translation>
     </message>
     <message>
       <source>View archive</source>
@@ -4623,7 +4625,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>De notificatie wordt weergegeven totdat een van de gebruikers, een bladwijzer aanmaken met gebeurtenisbeschrijving</translation>
     </message>
   </context>
   <context>
@@ -4817,7 +4819,7 @@ to %1</source>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Prestaties</translation>
+      <translation>Vloeiend</translation>
     </message>
     <message>
       <source>Native</source>
@@ -4986,7 +4988,7 @@ to %1</source>
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
       <translation>
-        <numerusform>%n van %1 geselecteerde rollen hebben geen toestemming voor %2</numerusform>
+        <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
         <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
       </translation>
     </message>
@@ -5085,19 +5087,19 @@ to %1</source>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Schermindelingen</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's &amp; apparaten</translation>
+      <translation>Alle camera's en apparaten</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation>Alle gedeelde layouts</translation>
+      <translation>Alle gedeelde schermindelingen</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde lay-outs</translation>
+      <translation>Gedeelde schermindelingen</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -5459,11 +5461,11 @@ to %1</source>
     </message>
     <message>
       <source>Latest Available Update</source>
-      <translation>Laatste beschikbare update</translation>
+      <translation>Laatst beschikbare versie</translation>
     </message>
     <message>
       <source>Download the Latest Version Update File</source>
-      <translation>Download het nieuwste versie-updatebestand</translation>
+      <translation>Download het updatebestand voor de laatste</translation>
     </message>
     <message>
       <source>Selected Version</source>
@@ -5543,11 +5545,11 @@ to %1</source>
     </message>
     <message>
       <source>Specific Build...</source>
-      <translation>Specifieke build...</translation>
+      <translation>Specifieke versie...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>Update voor specifieke build</translation>
+      <translation>Update voor specifieke versie</translation>
     </message>
     <message>
       <source>Update System</source>
@@ -5758,11 +5760,11 @@ to %1</source>
     </message>
     <message>
       <source>System Signature</source>
-      <translation>Systeem Handtekening</translation>
+      <translation>Systeem handtekening</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>Ondersteuning Handtekening</translation>
+      <translation>Ondersteuning handtekening</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5980,7 +5982,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot start backup while archive index rebuild is in progress.</source>
-      <translation>Kan geen back-up starten tijdens het herstellenvan de archiefindex.</translation>
+      <translation>Kan geen back-up starten tijdens het herstellen van de archiefindex.</translation>
     </message>
     <message>
       <source>Backup is in progress...</source>
@@ -6305,7 +6307,7 @@ to %1</source>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Bekijk %1 &amp;mdash; en verbind met uw systeem vanaf elke locatie!</translation>
+      <translation>Bekijk %1 &amp;mdash; en u kunt verbinding maken met uw systemen waar u maar wilt en met al uw apparaten!</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6413,11 +6415,11 @@ to %1</source>
     <name>QnTimeServerSelectionWidget</name>
     <message>
       <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>Systeemtijd is gesynchroniseerd met het internet en is onafhankelijk van lokale servertijden.</translation>
+      <translation>De systeemtijd is gesynchroniseerd met het internet en is onafhankelijk van lokale servertijden.</translation>
     </message>
     <message>
       <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>Systeemtijd is gesynchroniseerd met lokale tijd van de geselecteerde server en is onafhankelijk van andere servers.</translation>
+      <translation>De systeemtijd is gesynchroniseerd met lokale tijd van de geselecteerde server en is onafhankelijk van andere servers.</translation>
     </message>
     <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
@@ -6437,7 +6439,7 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>uu:mm</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>h ap</source>
@@ -6457,37 +6459,37 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>jjjj</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dD MMMM jjjj uu: mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM jjjj uu:mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM jjjj u ap</translation>
+      <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM jjjj</translation>
+      <translation>dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM, jjjj</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>jjjj</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>h:mm ap</source>
@@ -6497,7 +6499,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM jjjj u: mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6636,7 +6638,7 @@ to %1</source>
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
   </context>
   <context>
@@ -6697,7 +6699,7 @@ to %1</source>
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message>
       <source>Email</source>
@@ -6708,18 +6710,18 @@ to %1</source>
     <name>QnUserRoleSettingsWidget</name>
     <message>
       <source>Role name cannot be empty.</source>
-      <translation>Rolnaam kan niet leeg zijn.</translation>
+      <translation>Profielnaam mag niet leeg zijn.</translation>
     </message>
     <message>
       <source>Role with same name already exists.</source>
-      <translation>Rol met dezelfde naam bestaat al.</translation>
+      <translation>Er bestaat als een profiel met dezelfde naam.</translation>
     </message>
   </context>
   <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation>Geen enkele gebruikers heeft deze rol</translation>
+      <translation>Geen enkele gebruiker heeft dit profiel</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
@@ -6731,7 +6733,7 @@ to %1</source>
     </message>
     <message>
       <source>Assign a new role</source>
-      <translation>Een nieuwe rol toewijzen</translation>
+      <translation>Een nieuw profiel toewijzen</translation>
     </message>
     <message>
       <source>Delete such users</source>
@@ -6740,8 +6742,8 @@ to %1</source>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
       <translation>
-        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met deze rol</numerusform>
-        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met deze rol</numerusform>
+        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met dit profiel</numerusform>
+        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met dit profiel</numerusform>
       </translation>
     </message>
   </context>
@@ -6749,7 +6751,7 @@ to %1</source>
     <name>QnUserRolesDialog</name>
     <message>
       <source>Role Info</source>
-      <translation>Rol info</translation>
+      <translation>Profielinformatie</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -6757,19 +6759,19 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation>Camera's &amp;&amp; apparaten</translation>
+      <translation>Camera's en apparaten</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Schermindelingen</translation>
     </message>
     <message>
       <source>New Role</source>
-      <translation>Nieuwe rol</translation>
+      <translation>Nieuwe profiel</translation>
     </message>
     <message>
       <source>New Role %1</source>
-      <translation>Nieuwe rol %1</translation>
+      <translation>Nieuwe profiel %1</translation>
     </message>
   </context>
   <context>
@@ -6784,11 +6786,11 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation>Camera's &amp;&amp; apparaten</translation>
+      <translation>Camera's en apparaten</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Layouts</translation>
+      <translation>Schermindelingen</translation>
     </message>
     <message>
       <source>Send Invite</source>
@@ -7050,7 +7052,7 @@ to %1</source>
     </message>
     <message>
       <source>Exporting Layout</source>
-      <translation>Layout exporteren</translation>
+      <translation>Schermindeling exporteren</translation>
     </message>
     <message>
       <source>Export Video As...</source>
@@ -7070,7 +7072,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Layout As...</source>
-      <translation>Exporteer de layout als...</translation>
+      <translation>Exporteer de schermindeling als...</translation>
     </message>
     <message>
       <source>%1 Media File (*.nov)</source>
@@ -7106,7 +7108,7 @@ to %1</source>
     </message>
     <message>
       <source>Save local layout as...</source>
-      <translation>Sla lokale lay-out op als...</translation>
+      <translation>Sla lokale schermindeling op als...</translation>
     </message>
     <message>
       <source>Make file read-only.</source>
@@ -7142,7 +7144,7 @@ to %1</source>
     </message>
     <message>
       <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>Om de video-downscaling te voorkomen, worden *.nov of *.exe formaten aanbevolen voor deze camera.</translation>
+      <translation>Om de video-downscaling te voorkomen, worden NOV of EXE formaten aanbevolen voor deze camera.</translation>
     </message>
     <message>
       <source>Export with transcoding?</source>
@@ -7154,11 +7156,11 @@ to %1</source>
     </message>
     <message>
       <source>EXE format not recommended</source>
-      <translation>*.exe formaat niet aanbevolen</translation>
+      <translation>EXE formaat niet aanbevolen</translation>
     </message>
     <message>
       <source>Export to EXE anyway?</source>
-      <translation>Toch exporteren naar *.exe?</translation>
+      <translation>Toch exporteren naar EXE?</translation>
     </message>
     <message>
       <source>Failed to export Multi-Video</source>
@@ -7170,7 +7172,7 @@ to %1</source>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation>Verwijder alle lokale bestanden uit de layout en probeer het opnieuw.</translation>
+      <translation>Verwijder alle lokale bestanden uit de schermindeling en probeer het opnieuw.</translation>
     </message>
     <message>
       <source>Export</source>
@@ -7202,23 +7204,15 @@ to %1</source>
     </message>
     <message>
       <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Voor het exporteren van een niet-continue opname *.mkv of een ander formaat wordt aanbevolen.</translation>
+      <translation>Voor het exporteren van een niet-continue opname MKV of een ander formaat wordt aanbevolen.</translation>
     </message>
     <message>
       <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>*.exe bestanden boven 4 GB kunnen niet worden geopend met dubbelklikken door een beperking in Windows.</translation>
+      <translation>EXE bestanden boven 4 GB kunnen niet worden geopend met dubbelklikken door een beperking in Windows.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>Voer wachtwoord in...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Administrator wachtwoord</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>Systemen zullen spoedig zijn samengevoegd</translation>
@@ -7240,10 +7234,6 @@ to %1</source>
       <translation>Totaal aantal licenties zal afnemen</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Wachtwoord mag niet leeg zijn.</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Cloud systemen kunnen niet worden samengevoegd</translation>
     </message>
@@ -7258,6 +7248,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Server wordt spoedig op het systeem aangesloten</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Voer wachtwoord in...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Admin wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -7516,7 +7514,7 @@ to %1</source>
     <name>Resources</name>
     <message>
       <source>There is another layout with the same name</source>
-      <translation>Er is een andere layout met dezelfde naam</translation>
+      <translation>Er is een andere schermindeling met dezelfde naam</translation>
     </message>
     <message>
       <source>You do not have permission to overwrite it.</source>
@@ -7524,11 +7522,11 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
-      <translation>Bestaande layout overschrijven?</translation>
+      <translation>Bestaande schermindeling overschrijven?</translation>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
-      <translation>Er is een andere layout met dezelfde naam.</translation>
+      <translation>Er is een andere schermindeling met dezelfde naam.</translation>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
@@ -7544,8 +7542,8 @@ to %1</source>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
       <translation>
-        <numerusform>Alle gebruikers met deze rol krijgen toegang tot %n apparaten:</numerusform>
-        <numerusform>Alle gebruikers met deze rol krijgen toegang tot %n apparaten:</numerusform>
+        <numerusform>Alle gebruikers met dit profiel krijgen toegang tot %n apparaten:</numerusform>
+        <numerusform>Alle gebruikers met dit profiel krijgen toegang tot %n apparaten:</numerusform>
       </translation>
     </message>
     <message>
@@ -7555,8 +7553,8 @@ to %1</source>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>Alle gebruikers met deze rol hebben nog toegang tot %n verwijderde bronnen:</numerusform>
-        <numerusform>Alle gebruikers met deze rol hebben nog toegang tot %n verwijderde bronnen:</numerusform>
+        <numerusform>Alle gebruikers met dit profiel hebben nog toegang tot %n verwijderde bronnen:</numerusform>
+        <numerusform>Alle gebruikers met dit profiel hebben nog toegang tot %n verwijderde bronnen:</numerusform>
       </translation>
     </message>
     <message>
@@ -7565,7 +7563,7 @@ to %1</source>
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>Deze lay-out wordt gedeeld met andere gebruikers, dus u wijzigt het ook voor hen.</translation>
+      <translation>Deze schermindeling wordt gedeeld met andere gebruikers, dus u wijzigt de schermindeling ook voor hen.</translation>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
@@ -7584,22 +7582,22 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
       <translation>
-        <numerusform>Verwijder %n gedeelde layouts?</numerusform>
+        <numerusform>Verwijder %n gedeelde schermindelingen?</numerusform>
         <numerusform>Verwijder %n gedeelde layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
       <translation>
-        <numerusform>Deze %n layouts worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
-        <numerusform>Deze %n layouts worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
+        <numerusform>Deze %n schermindelingen worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
+        <numerusform>Deze %n schermindelingen worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
       <translation>
-        <numerusform>Verwijder %n items uit layout?</numerusform>
-        <numerusform>Verwijder %n items uit layout?</numerusform>
+        <numerusform>Verwijder %n items uit de schermindeling?</numerusform>
+        <numerusform>Verwijder %n items uit de schermindeling?</numerusform>
       </translation>
     </message>
     <message>
@@ -7769,7 +7767,7 @@ to %1</source>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>Sleep de layout of de camera om deze toe te voegen aan de showreel</translation>
+      <translation>Sleep de schermindeling of de camera in het vak om deze toe te voegen aan de showreel</translation>
     </message>
   </context>
   <context>
@@ -7810,11 +7808,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Stop Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Start Tour</translation>
     </message>
   </context>
   <context>
@@ -7921,8 +7919,8 @@ to %1</source>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Verplaats ze toch?</numerusform>
-        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Verplaats ze toch?</numerusform>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Toch verplaatsen?</numerusform>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Toch verplaatsen?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7938,7 +7936,7 @@ to %1</source>
     </message>
     <message>
       <source>Layout is locked and cannot be changed.</source>
-      <translation>Layout is vergrendeld en kan niet worden gewijzigd.</translation>
+      <translation>De schermindeling is vergrendeld en kan niet worden gewijzigd.</translation>
     </message>
     <message>
       <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
@@ -8076,11 +8074,11 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>Gebruik de toetsenbordpijlen om layouts te veranderen. Druk op Esc om de showreel te verlaten.</translation>
+      <translation>Gebruik de toetsenbordpijlen om te wisselen van schermindeling. Druk op Esc om de showreel te verlaten.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Druk op een willekeurige toets om de tour te stoppen.</translation>
     </message>
   </context>
   <context>
@@ -8102,7 +8100,7 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Delete layout tour %1?</source>
-      <translation>Layout tour %1 verwijderen?</translation>
+      <translation>Schermindeling tour %1 verwijderen?</translation>
     </message>
     <message>
       <source>Showreel</source>
@@ -8117,23 +8115,23 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation>Layout opslaan als</translation>
+      <translation>Schermindeling opslaan als</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>Voer layout naam in:</translation>
+      <translation>Voer de naam voor de schermindeling in:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation>Nieuwe layout</translation>
+      <translation>Nieuwe schermindeling</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>Voer de naam van de layout in om deze aan te maken:</translation>
+      <translation>Voer de naam van de schermindeling in om deze aan te maken:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation>Nieuwe layout %1</translation>
+      <translation>Nieuwe schermindeling %1</translation>
     </message>
   </context>
 </TS>

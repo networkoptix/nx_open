@@ -17,9 +17,7 @@ Controller::Controller(const conf::Settings& settings):
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
-    m_tempPasswordManager(
-        settings,
-        &m_dbInstanceController.queryExecutor()),
+    m_tempPasswordManager(&m_dbInstanceController.queryExecutor()),
     m_accountManager(
         settings,
         m_streeManager,
@@ -44,7 +42,7 @@ Controller::Controller(const conf::Settings& settings):
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SyncronizationEngine),
-    m_vmsGateway(settings),
+    m_vmsGateway(settings, m_accountManager),
     m_systemMergeManager(
         &m_systemManager,
         *m_systemHealthInfoProvider,

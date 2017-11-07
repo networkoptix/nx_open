@@ -111,7 +111,7 @@ class ProductSettingsForm(forms.Form):
         widget=forms.RadioSelect,
         required=True,
         choices=(
-            ('generate_json', 'Generate structure template based on archive (Ignores other options)'),
+            ('generate_json', 'Generate structure template based on archive'),
             ('update_structure',
              'Update CMS structure and default values based on archive with structure.json and customization template'),
             ('update_content', 'Upload customized content files for current customization')

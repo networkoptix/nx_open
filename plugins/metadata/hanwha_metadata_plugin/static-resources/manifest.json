@@ -20,6 +20,19 @@
             "flags": "stateDependent"
         },
         {
+            "eventTypeId": "{95F33B59-0CA8-4CB2-9248-1F5E616483F7}",
+            "eventName": {
+                "value": "Fog detection",
+                "localization": {
+                }
+            },
+            "internalName": "FogDetection",
+            "description": "Fog %1",
+            "positiveState": "has been detected",
+            "negativeState": "is not detected",
+            "flags": "stateDependent"
+        },
+        {
             "eventTypeId": "{67EDDD6A-A31F-41C4-91B6-B6298FE257A1}",
             "eventName": {
                 "value": "Virtual line crossing",
@@ -72,7 +85,7 @@
         {
             "eventTypeId": "{42D4994A-A267-4C39-98AA-CBC4D41CA42B}",
             "eventName": {
-                "value": "Intrusion in the area",
+                "value": "Intrusion",
                 "localization": {
                 }
             },
@@ -128,7 +141,7 @@
                 "localization": {
                 }
             },
-            "internalName": "AlarmInput.",
+            "internalName": "AlarmInput.,NetworkAlarmInput",
             "description": "Dry contact input has been %1",
             "positiveState": "activated",
             "negativeState": "deactivated",
@@ -203,7 +216,7 @@
         {
             "eventTypeId": "{1B541CB7-E377-4818-8801-323281530E7B}",
             "eventName": {
-                "value": "Loitering detected",
+                "value": "Loitering",
                 "localization": {
                 }
             },

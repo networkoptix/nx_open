@@ -73,7 +73,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         httpClient.addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, m_camera->getParentId().toByteArray());
         httpClient.addAdditionalHeader("Connection", "Keep-Alive");
 
-        QUrl url;
+        nx::utils::Url url;
         url.setScheme("http");
         url.setHost(route.addr.address.toString());
         url.setPort(route.addr.port);

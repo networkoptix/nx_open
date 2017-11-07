@@ -8,16 +8,23 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/http_mod_manager.h>
 
+namespace nx {
+namespace vms {
+namespace cloud_integration {
+
 class CloudConnectionManager;
 
-class QnUniversalTcpListener
-:
+} // namespace cloud_integration
+} // namespace vms
+} // namespace nx
+
+class QnUniversalTcpListener:
     public QnHttpConnectionListener
 {
 public:
     QnUniversalTcpListener(
         QnCommonModule* commonModule,
-        const CloudConnectionManager& cloudConnectionManager,
+        const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
         const QHostAddress& address,
         int port,
         int maxConnections,
@@ -40,7 +47,7 @@ protected:
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket) override;
 
 private:
-    const CloudConnectionManager& m_cloudConnectionManager;
+    const nx::vms::cloud_integration::CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     QnMutex m_mutex;
@@ -62,6 +69,8 @@ private:
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
     void updateCloudConnectState(QnMutexLockerBase* const lk);
 
-    bool addServerSocketToMultipleSocket(const SocketAddress& localAddress,
-        nx::network::MultipleServerSocket* multipleServerSocket, int ipVersion);
+    AbstractStreamServerSocket* addServerSocketToMultipleSocket(
+        const SocketAddress& localAddress,
+        nx::network::MultipleServerSocket* multipleServerSocket,
+        int ipVersion);
 };

@@ -5,9 +5,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QListView>
 
-// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-#include <core/dataprovider/live_stream_provider.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
@@ -51,6 +48,19 @@ using namespace nx::client::desktop::ui;
 namespace {
 
 static constexpr qreal kKbpsInMbps = 1000.0;
+
+qreal getBitrateForQuality(
+    const QnVirtualCameraResourcePtr& camera,
+    Qn::StreamQuality quality,
+    int fps,
+    int decimals)
+{
+    const auto resolution = camera->defaultStream().getResolution();
+    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps)
+        / kKbpsInMbps;
+    const auto roundingStep = std::pow(0.1, decimals);
+    return qRound(bitrateMbps, roundingStep);
+}
 
 void setLayoutEnabled(QLayout* layout, bool enabled)
 {
@@ -574,13 +584,19 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     if (m_cameras == cameras)
         return;
 
-    for (const auto& camera : m_cameras)
-        disconnect(camera, &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons);
+    for (const auto& camera: m_cameras)
+    {
+        disconnect(camera, &QnSecurityCamResource::resourceChanged,
+            this, &QnCameraScheduleWidget::cameraResourceChanged);
+    }
 
     m_cameras = cameras;
 
-    for (const auto& camera : m_cameras)
-        connect(camera, &QnSecurityCamResource::resourceChanged, this, &QnCameraScheduleWidget::updateMotionButtons, Qt::QueuedConnection);
+    for (const auto& camera: m_cameras)
+    {
+        connect(camera, &QnSecurityCamResource::resourceChanged,
+            this, &QnCameraScheduleWidget::cameraResourceChanged, Qt::QueuedConnection);
+    }
 }
 
 void QnCameraScheduleWidget::updateFromResources()
@@ -663,7 +679,8 @@ void QnCameraScheduleWidget::updateFromResources()
     if (currentMaxFps > 0)
         setFps(currentMaxFps);
     else if (!m_cameras.isEmpty())
-        setFps(m_cameras.first()->getMaxFps() / 2);
+        setFps(m_cameras.first()->getMaxFps());
+    syncBitrateWithFps();
 
     updateScheduleEnabled();
     updateMinDays();
@@ -881,14 +898,14 @@ qreal QnCameraScheduleWidget::bitrateForQuality(Qn::StreamQuality quality) const
     if (!m_advancedSettingsSupported)
         return 0.0;
 
-    NX_ASSERT(m_cameras.size() == 1, Q_FUNC_INFO);
-    const auto camera = m_cameras.front();
-    const auto resolution = camera->defaultStream().getResolution();
-    const auto fps = ui->fpsSpinBox->value();
-    const auto bitrateMbps = camera->suggestBitrateForQualityKbps(quality, resolution, fps) / kKbpsInMbps;
+    if (m_cameras.size() != 1)
+    {
+        NX_ASSERT(false, Q_FUNC_INFO);
+        return 0.0;
+    }
 
-    const auto roundingStep = std::pow(0.1, ui->bitrateSpinBox->decimals());
-    return qRound(bitrateMbps, roundingStep);
+    return getBitrateForQuality(m_cameras.front(), quality,
+        ui->fpsSpinBox->value(), ui->bitrateSpinBox->decimals());
 }
 
 void QnCameraScheduleWidget::updateMotionAvailable()
@@ -1121,6 +1138,7 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     bool enabled = !ui->noRecordButton->isChecked();
     ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
+    ui->advancedSettingsWidget->setEnabled(enabled && m_recordingParamsAvailable);
     updateRecordSpinboxes();
 
     if (!(m_readOnly && pickedFromGrid))
@@ -1219,6 +1237,12 @@ void QnCameraScheduleWidget::updateRecordSpinboxes()
 {
     ui->recordBeforeSpinBox->setEnabled(m_motionAvailable);
     ui->recordAfterSpinBox->setEnabled(m_motionAvailable);
+}
+
+void QnCameraScheduleWidget::cameraResourceChanged()
+{
+    updateMaxFPS();
+    updateMotionButtons();
 }
 
 void QnCameraScheduleWidget::updateMotionButtons()
@@ -1407,6 +1431,12 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
 
 void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
 {
+    if (m_cameras.size() > 1)
+    {
+        NX_EXPECT(false, Q_FUNC_INFO);
+        return;
+    }
+
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
     bool motionUsed = recordingEnabled && hasMotionOnGrid();
     bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
@@ -1427,45 +1457,65 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
 
     const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
 
-    auto applyChanges = [this, copyArchiveLength, recordingEnabled](const QnVirtualCameraResourcePtr &camera)
-    {
-        if (copyArchiveLength)
+    auto applyChanges =
+        [this, sourceCamera = m_cameras.front(), copyArchiveLength, recordingEnabled]
+            (const QnVirtualCameraResourcePtr &camera)
         {
-            int maxDays = maxRecordedDays();
-            if (maxDays != kRecordedDaysDontChange)
-                camera->setMaxDays(maxDays);
-            int minDays = minRecordedDays();
-            if (minDays != kRecordedDaysDontChange)
-                camera->setMinDays(minDays);
-        }
+            if (copyArchiveLength)
+            {
+                int maxDays = maxRecordedDays();
+                if (maxDays != kRecordedDaysDontChange)
+                    camera->setMaxDays(maxDays);
+                int minDays = minRecordedDays();
+                if (minDays != kRecordedDaysDontChange)
+                    camera->setMinDays(minDays);
+            }
 
-        camera->setScheduleDisabled(!recordingEnabled);
-        int maxFps = camera->getMaxFps();
+            camera->setScheduleDisabled(!recordingEnabled);
+            int maxFps = camera->getMaxFps();
 
-        // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-        // or just use camera->reservedSecondStreamFps();
+            // TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+            // or just use camera->reservedSecondStreamFps();
 
-        int decreaseAlways = 0;
-        if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
-            decreaseAlways = MIN_SECOND_STREAM_FPS;
+            int decreaseAlways = 0;
+            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
+                decreaseAlways = QnLiveStreamParams::kMinSecondStreamFps;
 
-        int decreaseIfMotionPlusLQ = 0;
-        if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-            decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
+            int decreaseIfMotionPlusLQ = 0;
+            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
+                decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamFps;
 
-        QnScheduleTaskList tasks;
-        for (auto task: scheduleTasks())
-        {
-            if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
-                task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
-            else
-                task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
-            tasks.append(task);
-        }
-        updateRecordThresholds(tasks);
+            QnScheduleTaskList tasks;
+            for (auto task: scheduleTasks())
+            {
+                if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
+                    task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
+                else
+                    task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
 
-        camera->setScheduleTasks(tasks);
-    };
+                if (const auto bitrate = task.getBitrateKbps()) // Try to calculate new custom bitrate
+                {
+                    if (!camera->cameraMediaCapability().isNull())
+                    {
+                        // Target camera supports custom bitrate
+                        const auto normalBitrate = getBitrateForQuality(sourceCamera,
+                            task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                        const auto bitrateAspect = (bitrate - normalBitrate) / normalBitrate;
+
+                        const auto targetNormalBitrate = getBitrateForQuality(camera,
+                            task.getStreamQuality(), task.getFps(), ui->bitrateSpinBox->decimals());
+                        const auto targetBitrate = targetNormalBitrate * bitrateAspect;
+                        task.setBitrateKbps(targetBitrate);
+                    }
+                    else
+                        task.setBitrateKbps(0);
+                }
+                tasks.append(task);
+            }
+            updateRecordThresholds(tasks);
+
+            camera->setScheduleTasks(tasks);
+        };
 
     auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
         dialog->selectedResources());

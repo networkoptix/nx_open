@@ -11,27 +11,58 @@
 
 #include <nx/fusion/model_functions.h>
 
-QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePtr &camera,
-                                                 qint64 msecSinceEpoch,
-                                                 int rotation,
-                                                 const QSize &size,
-                                                 QnThumbnailRequestData::ThumbnailFormat format,
-                                                 QObject *parent):
-    base_type(parent),
-    m_request(),
-    m_status(Qn::ThumbnailStatus::Invalid)
+namespace {
+
+QnThumbnailRequestData makeRequestData(
+    const QnVirtualCameraResourcePtr& camera,
+    qint64 msecSinceEpoch,
+    int rotation,
+    const QSize& size,
+    QnThumbnailRequestData::ThumbnailFormat format,
+    QnThumbnailRequestData::AspectRatio aspectRatio,
+    QnThumbnailRequestData::RoundMethod roundMethod)
+{
+    QnThumbnailRequestData data;
+    data.camera = camera;
+    data.msecSinceEpoch = msecSinceEpoch;
+    data.rotation = rotation;
+    data.size = size;
+    data.imageFormat = format;
+    data.format = Qn::SerializationFormat::UbjsonFormat;
+    data.aspectRatio = aspectRatio;
+    data.roundMethod = roundMethod;
+    return data;
+}
+
+} // namespace
+
+QnSingleThumbnailLoader::QnSingleThumbnailLoader(
+    const QnVirtualCameraResourcePtr& camera,
+    qint64 msecSinceEpoch,
+    int rotation,
+    const QSize& size,
+    ThumbnailFormat format,
+    AspectRatio aspectRatio,
+    RoundMethod roundMethod,
+    QObject* parent)
+    :
+    QnSingleThumbnailLoader(
+        makeRequestData(camera, msecSinceEpoch, rotation, size, format, aspectRatio, roundMethod),
+        parent)
 {
     NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
     NX_ASSERT(commonModule()->currentServer(), Q_FUNC_INFO, "We must be connected here");
+}
 
-    m_request.camera = camera;
-    m_request.msecSinceEpoch = msecSinceEpoch;
-    m_request.rotation = rotation;
-    m_request.size = size;
-    m_request.imageFormat = format;
-    m_request.format = Qn::SerializationFormat::UbjsonFormat;
-
-    if (!camera || !camera->hasVideo(nullptr))
+QnSingleThumbnailLoader::QnSingleThumbnailLoader(
+    const QnThumbnailRequestData& data,
+    QObject* parent)
+    :
+    base_type(parent),
+    m_request(data),
+    m_status(Qn::ThumbnailStatus::Invalid)
+{
+    if (!data.camera || !data.camera->hasVideo(nullptr))
     {
         setStatus(Qn::ThumbnailStatus::NoData);
         return;
@@ -39,11 +70,11 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
 
     /* Making connection through event loop to handle data from another thread. */
     connect(this, &QnSingleThumbnailLoader::imageLoaded, this,
-        [this, format](const QByteArray &data)
+        [this](const QByteArray &data)
         {
             if (!data.isEmpty())
             {
-                QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(format).toUtf8();
+                const auto imageFormat = QnLexical::serialized(m_request.imageFormat).toUtf8();
                 m_image.loadFromData(data, imageFormat);
             }
             else
@@ -54,7 +85,6 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
             emit imageChanged(m_image);
             emit sizeHintChanged(sizeHint());
         }, Qt::QueuedConnection);
-
 }
 
 QnThumbnailRequestData QnSingleThumbnailLoader::requestData() const

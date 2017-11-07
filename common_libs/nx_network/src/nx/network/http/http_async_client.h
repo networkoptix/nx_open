@@ -12,6 +12,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/url.h>
 
 #include "abstract_msg_body_source.h"
 #include "auth_cache.h"
@@ -23,7 +24,6 @@ enum class AuthType
 {
     authBasicAndDigest,
     authDigest,
-    authDigestWithPasswordHash,
     authBasic,
 };
 
@@ -135,7 +135,7 @@ public:
      * @return true, if socket is created and async connect is started. false otherwise.
      *   To get error description use SystemError::getLastOSErrorCode().
      */
-    void doGet(const QUrl& url);
+    void doGet(const nx::utils::Url& url);
     /**
      * This overload is same as:
      * @code{.cpp}
@@ -144,44 +144,43 @@ public:
      * @endcode
      */
     void doGet(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     /**
      * Start POST request to url.
      * @return true, if socket is created and async connect is started. false otherwise
      */
-    void doPost(const QUrl& url);
+    void doPost(const nx::utils::Url &url);
     void doPost(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doPut(const QUrl& url);
+    void doPut(const nx::utils::Url& url);
     void doPut(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doDelete(const QUrl& url);
+    void doDelete(const nx::utils::Url& url);
     void doDelete(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doUpgrade(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doUpgrade(
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx_http::Method::ValueType method,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
+    void doRequest(nx_http::Method::ValueType method,
+        const nx::utils::Url &url);
     void doRequest(
         nx_http::Method::ValueType method,
-        const QUrl& url);
-    void doRequest(
-        nx_http::Method::ValueType method,
-        const QUrl& url,
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     const nx_http::Request& request() const;
@@ -203,8 +202,8 @@ public:
      * @note This method is thread-safe and can be called in any thread.
      */
     BufferType fetchMessageBodyBuffer();
-    const QUrl& url() const;
-    const QUrl& contentLocationUrl() const;
+    const nx::utils::Url& url() const;
+    const nx::utils::Url& contentLocationUrl() const;
     /**
      * Number of bytes read (including http request line and headers)
      *  via single HTTP request.
@@ -216,11 +215,17 @@ public:
     void setSubsequentReconnectTries(int reconnectTries);
     void setTotalReconnectTries(int reconnectTries);
     void setUserAgent(const QString& userAgent);
+
     void setUserName(const QString& userName);
     void setUserPassword(const QString& userPassword);
+    void setUserAuthToken(const AuthToken& userToken);
+    void setUserCredentials(const Credentials& userCredentials);
     void setProxyUserName(const QString& userName);
     void setProxyUserPassword(const QString& userPassword);
+    void setProxyUserAuthToken(const AuthToken& proxyUserToken);
+    void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
+
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     /** If set to \a true client will not try to add Authorization header to the first request. false by default. */
@@ -263,7 +268,7 @@ public:
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
 
-    static QString endpointWithProtocol(const QUrl& url);
+    static QString endpointWithProtocol(const nx::utils::Url& url);
 
 private:
     enum class Result
@@ -283,16 +288,14 @@ private:
     bool m_connectionClosed;
     BufferType m_requestBuffer;
     size_t m_requestBytesSent;
-    QUrl m_requestUrl;
-    QUrl m_contentLocationUrl;
+    nx::utils::Url m_requestUrl;
+    nx::utils::Url m_contentLocationUrl;
     HttpStreamReader m_httpStreamReader;
     BufferType m_responseBuffer;
     BufferType m_receivedBytesLeft;
     QString m_userAgent;
-    QString m_userName;
-    QString m_userPassword;
-    QString m_proxyUserName;
-    QString m_proxyUserPassword;
+    Credentials m_user;
+    Credentials m_proxyUser;
     boost::optional<SocketAddress> m_proxyEndpoint;
     bool m_authorizationTried;
     bool m_proxyAuthorizationTried;

@@ -1,2 +1,3 @@
 add_subdirectory(stub_metadata_plugin)
+add_subdirectory(tegra_video_metadata_plugin)
 add_subdirectory(hanwha_metadata_plugin)

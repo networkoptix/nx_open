@@ -139,13 +139,29 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(bool allowItfWithoutAddress)
 
 namespace {
 
-/** Qt on linux returns ipv6 address with "%enp0s3" suffix. */
-static QString fixIpv6AddressString(const QString& ipv6Str)
+static QString ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
+    const QString& ipv6AddrString,
+    const QString& ifaceName,
+    int ifaceIndex)
 {
-    int unexpectedSuffixPos = ipv6Str.indexOf('%');
-    if (unexpectedSuffixPos == -1)
-        return ipv6Str;
-    return ipv6Str.mid(0, unexpectedSuffixPos);
+    int scopeIdDelimPos = ipv6AddrString.indexOf('%');
+    if (scopeIdDelimPos == -1)
+        return ipv6AddrString;
+
+    NX_ASSERT(scopeIdDelimPos != 0 && scopeIdDelimPos != ipv6AddrString.length() - 1);
+    if (scopeIdDelimPos == 0 || scopeIdDelimPos == ipv6AddrString.length() - 1)
+        return QString();
+
+    QString scopeIdTail = ipv6AddrString.mid(scopeIdDelimPos + 1);
+    QString scopeIdFromIndex = QString::number(ifaceIndex);
+    if (scopeIdTail == scopeIdFromIndex)
+        return ipv6AddrString;
+
+    NX_ASSERT(ifaceName == scopeIdTail);
+    if (ifaceName != scopeIdTail)
+        return QString();
+
+    return ipv6AddrString.left(scopeIdDelimPos + 1) + scopeIdFromIndex;
 }
 
 } // namespace
@@ -177,7 +193,13 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
                 result << HostAddress(address.ip().toString());
 
             if (isIpV6 && (filter.testFlag(AddressFilter::ipV6)))
-                result << HostAddress(fixIpv6AddressString(address.ip().toString()));
+            {
+                QString addrString = ipv6AddrStringWithIfaceNameToAddrStringWithIfaceId(
+                    address.ip().toString(),
+                    iface.name(),
+                    iface.index());
+                result << HostAddress(addrString);
+            }
         }
     }
 

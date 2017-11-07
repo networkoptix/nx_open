@@ -97,7 +97,7 @@ protected:
 
     void startServer();
     void stopServer();
-    QUrl relayUrl(int relayNum = 0) const;
+    nx::utils::Url relayUrl(int relayNum = 0) const;
     void restartMediator();
 
     void assertConnectionCanBeEstablished();
@@ -140,7 +140,7 @@ private:
     hpm::api::SystemCredentials m_cloudSystemCredentials;
     std::unique_ptr<TestHttpServer> m_httpServer;
     TestHttpServer m_cloudModulesXmlProvider;
-    QUrl m_staticUrl;
+    nx::utils::Url m_staticUrl;
     std::list<std::unique_ptr<nx_http::AsyncClient>> m_httpClients;
     std::atomic<int> m_unfinishedRequestsLeft;
     boost::optional<nx::String> m_remotePeerName;

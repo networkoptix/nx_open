@@ -1037,23 +1037,22 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>ファイル&quot;%1&quot; は書き込めません。別の名前をお試しください</translation>
     </message>
     <message numerus="yes">
       <source>Filename should not contain the following reserved characters:
 %1</source>
-      <translation type="unfinished">
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
+      <translation>
+        <numerusform>ファイル名には次の予約文字を含めることはできません：%1</numerusform>
       </translation>
     </message>
     <message>
       <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">Filename &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>ファイル名&quot;%1&quot; は、オペレーティングシステムによって予約されています。別の名前をお試しください</translation>
     </message>
   </context>
   <context>
@@ -2638,11 +2637,11 @@ to %1</source>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
     <message>
       <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation type="unfinished">Account isn&apos;t activated. Please check your email and follow provided instructions</translation>
+      <translation>アカウントisn&apos;tが有効化されました。あなたのメールアドレスを確認して、指示に従ってください</translation>
     </message>
   </context>
   <context>
@@ -3739,7 +3738,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;サーバーが見つかりません></translation>
+      <translation>サーバーが見つかりません</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -4249,7 +4248,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1（ツアー&quot;%2&quot; が有効）</translation>
+      <translation>%1(ツアー&quot;%2&quot; が有効)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4265,12 +4264,16 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>トリガ%1（%2）の呼び出しに失敗しました</translation>
+      <translation>トリガ%1(%2)の呼び出しに失敗しました</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>押したまま</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>スケジュールで無効</translation>
     </message>
   </context>
   <context>
@@ -4572,7 +4575,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>通知はユーザーがイベントの説明を記述するまで表示され続けます</translation>
     </message>
   </context>
   <context>
@@ -7138,14 +7141,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-      <source>Enter Password...</source>
-      <translation>パスワード入力...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>アドミニストレーターパスワード</translation>
-    </message>
-    <message>
       <source>Systems will be merged shortly</source>
       <translation>システムをすぐに統合されます</translation>
     </message>
@@ -7166,10 +7161,6 @@ to %1</source>
       <translation>ライセンスの合計数が減少します</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>パスワードは空白にできません</translation>
-    </message>
-    <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>クラウド システムを統合することはできません</translation>
     </message>
@@ -7184,6 +7175,14 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>サーバーはすぐにシステムに接続されます</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>パスワード入力...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>管理者のパスワード</translation>
     </message>
   </context>
   <context>
@@ -7713,11 +7712,11 @@ to %1</source>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>ツアー停止</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>ツアー開始</translation>
     </message>
   </context>
   <context>
@@ -7975,8 +7974,8 @@ to %1</source>
       <translation>キーボードの矢印キーでレイアウトの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. Press any key to stop the tour.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. Press any key to stop the tour.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>何かのキーでツアー停止.</translation>
     </message>
   </context>
   <context>

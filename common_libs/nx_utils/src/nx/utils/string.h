@@ -22,39 +22,6 @@ std::string stringFormat(const std::string& format, Args... args)
     return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside.
 }
 
-enum MetricPrefix
-{
-    NoPrefix,
-    KiloPrefix,
-    MegaPrefix,
-    GigaPrefix,
-    TeraPrefix,
-    PetaPrefix,
-    ExaPrefix,
-    ZettaPrefix,
-    YottaPrefix,
-
-    PrefixCount
-};
-
-/**
-* \param size                          File size to format. Can be negative.
-* \param precision                     Maximal number of decimal digits after comma.
-* \param prefixThreshold               // TODO: #rvasilenko what is prefixThreshold? Why 1 is default, and usually passed 10?
-* \param minPrefix
-* \param maxPrefix
-* \param useBinaryPrefixes
-* \param pattern                       Pattern to use for result construction.
-*                                      <tt>%1</tt> will be replaced with size in resulting units, and <tt>%2</tt> with unit name.
-*/
-NX_UTILS_API QString formatFileSize(qint64 size,
-                                    int precision = 1,
-                                    int prefixThreshold = 1,
-                                    MetricPrefix minPrefix = NoPrefix,
-                                    MetricPrefix maxPrefix = YottaPrefix,
-                                    bool useBinaryPrefixes = true,
-                                    const QString &pattern = QLatin1String("%1 %2"));
-
 /**
 * \param string                        String to perform replacement on.
 * \param symbols                       Symbols that are to be replaced.

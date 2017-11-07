@@ -62,7 +62,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_recActionCnt(0),
     m_statusFlags(Qn::CSF_NoFlags),
     m_manuallyAdded(false),
-	m_cachedLicenseType(Qn::LC_Count),
+    m_cachedLicenseType([this] { return calculateLicenseType(); }, &m_mutex),
     m_cachedHasDualStreaming2(
         [this]()->bool{ return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse; },
         &m_mutex ),
@@ -142,7 +142,7 @@ bool QnSecurityCamResource::removeProperty(const QString& key)
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
-    return hasParam(lit("groupplay"));
+    return hasParam(Qn::kGroupPlayParamName);
 }
 
 const QnResource* QnSecurityCamResource::toResource() const {
@@ -195,7 +195,7 @@ void QnSecurityCamResource::updateInternal(const QnResourcePtr &other, Qn::Notif
     }
 }
 
-int QnSecurityCamResource::getMaxFps() const 
+int QnSecurityCamResource::getMaxFps() const
 {
     const auto capabilities = cameraMediaCapability();
     if (!capabilities.isNull())
@@ -299,6 +299,38 @@ bool QnSecurityCamResource::isInputPortMonitored() const {
     return false;
 }
 
+Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
+{
+    if (isIOModule())
+        return Qn::LC_IO;
+
+    const QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
+
+    if (resType && resType->getManufacture() == lit("VMAX"))
+        return Qn::LC_VMAX;
+
+    if (isDtsBased())
+        return Qn::LC_Bridge;
+
+    if (resType && resType->getManufacture() == lit("NetworkOptix"))
+        return Qn::LC_Free;
+
+    /**
+     * AnalogEncoder should have priority over Analog type because of analog type is deprecated
+     * (DW-CP04 has both analog and analogEncoder params)
+     */
+    if (isAnalogEncoder())
+        return Qn::LC_AnalogEncoder;
+
+    if (isAnalog())
+        return Qn::LC_Analog;
+
+    if (isEdge())
+        return Qn::LC_Edge;
+
+    return Qn::LC_Professional;
+}
+
 void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory) {
     m_dpFactory = dpFactory;
 }
@@ -386,7 +418,7 @@ nx::media::CameraMediaCapability QnSecurityCamResource::cameraMediaCapability() 
     return m_cachedCameraMediaCapabilities.get();
 }
 
-bool QnSecurityCamResource::hasDualStreaming() const 
+bool QnSecurityCamResource::hasDualStreaming() const
 {
     const auto capabilities = cameraMediaCapability();
     if (!capabilities.isNull())
@@ -449,28 +481,8 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
 {
-    if (m_cachedLicenseType == Qn::LC_Count)
-    {
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-
-        if (isIOModule())
-            m_cachedLicenseType = Qn::LC_IO;
-        else if (resType && resType->getManufacture() == lit("VMAX"))
-            m_cachedLicenseType =  Qn::LC_VMAX;
-        else if (resType && resType->getManufacture() == lit("NetworkOptix"))
-            m_cachedLicenseType = Qn::LC_Free;
-        else if (isAnalogEncoder())
-            m_cachedLicenseType =  Qn::LC_AnalogEncoder; // AnalogEncoder should have priority over Analog type because of analog type is deprecated (DW-CP04 has both analog and analogEncoder params)
-        else if (isAnalog())
-            m_cachedLicenseType = Qn::LC_Analog;
-        else if (isEdge())
-            m_cachedLicenseType =  Qn::LC_Edge;
-        else
-            m_cachedLicenseType = Qn::LC_Professional;
-    }
-    return m_cachedLicenseType;
+    return m_cachedLicenseType.get();
 }
-
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QString sval = getProperty(Qn::STREAM_FPS_SHARING_PARAM_NAME);
@@ -565,6 +577,8 @@ void QnSecurityCamResource::at_initializedChanged()
 {
     if( !isInitialized() )  //e.g., camera has been moved to a different server
         stopInputPortMonitoringAsync();  //stopping input monitoring
+
+    emit licenseTypeChanged(toSharedPointer());
 }
 
 void QnSecurityCamResource::at_motionRegionChanged()
@@ -605,7 +619,7 @@ bool QnSecurityCamResource::hasTwoWayAudio() const
     return getCameraCapabilities().testFlag(Qn::AudioTransmitCapability);
 }
 
-bool QnSecurityCamResource::isAudioSupported() const 
+bool QnSecurityCamResource::isAudioSupported() const
 {
     const auto capabilities = cameraMediaCapability();
     if (!capabilities.isNull())
@@ -775,7 +789,19 @@ void QnSecurityCamResource::setGroupId(const QString& value) {
 
 }
 
-QString QnSecurityCamResource::getModel() const {
+QString QnSecurityCamResource::getSharedId() const
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_groupId.isEmpty())
+            return m_groupId;
+    }
+
+    return getUniqueId();
+}
+
+QString QnSecurityCamResource::getModel() const
+{
     SAFE(return m_model)
 }
 
@@ -944,12 +970,19 @@ bool QnSecurityCamResource::isAudioEnabled() const
     return (*userAttributesLock)->audioEnabled;
 }
 
-bool QnSecurityCamResource::isManuallyAdded() const {
+bool QnSecurityCamResource::isManuallyAdded() const
+{
     return m_manuallyAdded;
 }
 
-void QnSecurityCamResource::setManuallyAdded(bool value) {
+void QnSecurityCamResource::setManuallyAdded(bool value)
+{
     m_manuallyAdded = value;
+}
+
+bool QnSecurityCamResource::isDefaultAuth() const
+{
+    return hasCameraCapabilities(Qn::isDefaultPasswordCapability);
 }
 
 Qn::CameraBackupQualities QnSecurityCamResource::getBackupQualities() const
@@ -1170,6 +1203,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedIsIOModule.reset();
     m_cachedAnalyticsSupportedEvents.reset();
     m_cachedCameraMediaCapabilities.reset();
+    m_cachedLicenseType.reset();
 }
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
@@ -1305,3 +1339,10 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
     return (int)result;
 }
 
+bool QnSecurityCamResource::setCameraCredentialsSync(
+    const QAuthenticator& auth, QString* outErrorString)
+{
+    if (outErrorString)
+        *outErrorString = tr("Operation is not permitted.");
+    return false;
+}

@@ -14,9 +14,10 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <camera/client_video_camera.h>
-
+#include <camera/resource_display.h>
 #include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -24,8 +25,8 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/fusion/model_functions.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <platform/environment.h>
 
@@ -284,7 +285,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
         if (!periods.isEmpty())
             durationMs = periods.duration();
-        Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
+        NX_ASSERT(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
 
@@ -481,8 +482,9 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
                     const int bigValue = std::numeric_limits<int>::max();
                     NX_ASSERT(resolution.isValid());
 
-                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters,
-                        resolution, QSize(bigValue, bigValue));
+                    auto filterChain = QnImageFilterHelper::createFilterChain(imageParameters);
+                    filterChain.prepare(imageParameters.resource, resolution,
+                        QSize(bigValue, bigValue));
                     if (filterChain.isDownscaleRequired(resolution))
                     {
                         transcodeWarnShown = true;
@@ -680,7 +682,10 @@ void WorkbenchExportHandler::exportTimeSelection(const ui::action::Parameters& p
         ? widget->item()->data()
         : createDefaultLayoutItemData(mediaResource);
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+    const auto period = bookmark.isNull()
+        ? parameters.argument<QnTimePeriod>(Qn::TimePeriodRole)
+        : QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);
 
     exportTimeSelectionInternal(mediaResource, dataProvider, itemData, period, timelapseFrameStepMs);
 }
@@ -930,7 +935,7 @@ void WorkbenchExportHandler::at_exportRapidReviewAction_triggered()
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
         if (!periods.isEmpty())
             durationMs = periods.duration();
-        Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
+        NX_ASSERT(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
     if (durationMs < ui::dialogs::ExportRapidReview::kMinimalSourcePeriodLength)

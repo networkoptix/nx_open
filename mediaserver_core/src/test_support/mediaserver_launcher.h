@@ -63,7 +63,7 @@ public:
     /**
      * Return media server API url
      */
-    QUrl apiUrl() const;
+    nx::utils::Url apiUrl() const;
 signals:
     void started();
 private:

@@ -99,7 +99,7 @@ namespace detail
         QnDbManager(QnCommonModule* commonModule);
         virtual ~QnDbManager();
 
-        bool init(const QUrl& dbUrl);
+        bool init(const nx::utils::Url& dbUrl);
         bool isInitialized() const;
 
         template <class T>
@@ -743,6 +743,7 @@ public:
     QnDbManagerAccess(detail::QnDbManager* dbManager, const Qn::UserAccessData &userAccessData);
 
     Qn::UserAccessData userAccessData() const { return m_userAccessData; }
+    void setUserAccessData(Qn::UserAccessData value) { m_userAccessData = value; }
     detail::QnDbManager* db() const { return m_dbManager; }
 
     ApiObjectType getObjectType(const QnUuid& objectId);
@@ -827,7 +828,13 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
+        {
+            NX_LOG(lit("User %1 has not permission to execute transaction %2")
+                .arg(m_userAccessData.userId.toString())
+                .arg(toString(tran.command)),
+                cl_logWARNING);
             return ErrorCode::forbidden;
+        }
         return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 

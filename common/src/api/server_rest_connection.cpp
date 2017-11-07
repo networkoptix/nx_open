@@ -84,10 +84,14 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
 
-rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread /*= 0*/)
+rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
+    const QnUuid& cameraId,
+    bool start,
+    GetCallback callback,
+    QThread* targetThread /*= 0*/)
 {
     QnRequestParamList params;
-    params.insert(lit("clientId"),      commonModule()->moduleGUID().toString());
+    params.insert(lit("clientId"), sourceId);
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
@@ -313,7 +317,7 @@ Handle ServerConnection::downloadFileChunk(
 
 Handle ServerConnection::downloadFileChunkFromInternet(
     const QString& fileName,
-    const QUrl& url,
+    const nx::utils::Url& url,
     int chunkIndex,
     int chunkSize,
     Result<QByteArray>::type callback,
@@ -429,6 +433,24 @@ Handle ServerConnection::getEvents(QnEventLogRequestData request,
     return executeGet(lit("/api/getEvents"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::changeCameraPassword(
+    const QnUuid& id,
+    const QAuthenticator& auth,
+    Result<QnRestResult>::type callback,
+    QThread* targetThread)
+{
+    CameraPasswordData data;
+    data.cameraId = id.toString();
+    data.user = auth.user();
+    data.password = auth.password();
+    return executePost(
+        lit("/api/changeCameraPassword"),
+        QnRequestParamList(),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(std::move(data)),
+        callback,
+        targetThread);
+}
 
 // --------------------------- private implementation -------------------------------------
 
@@ -750,7 +772,7 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
         auto nearestServer = commonModule()->currentServer();
         if (!nearestServer)
             return nx_http::ClientPool::Request();
-        QUrl nearestUrl(server->getApiUrl());
+        nx::utils::Url nearestUrl(server->getApiUrl());
         if (nearestServer->getId() == commonModule()->moduleGUID())
             request.url.setHost(lit("127.0.0.1"));
         else

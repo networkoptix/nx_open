@@ -257,9 +257,9 @@ void VmsGatewayProcess::registerApiHandlers(
 
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
             nx_http::kAnyPath,
-            [&settings, &runTimeOptions]() -> std::unique_ptr<ConnectHandler>
+            [&settings]() -> std::unique_ptr<ConnectHandler>
             {
-                return std::make_unique<ConnectHandler>(settings, runTimeOptions);
+                return std::make_unique<ConnectHandler>(settings);
             },
             nx_http::StringType("CONNECT"));
     }

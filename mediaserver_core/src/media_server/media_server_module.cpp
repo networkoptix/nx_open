@@ -23,7 +23,6 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include "master_server_status_watcher.h"
 #include "settings.h"
 
 #include <utils/common/delayed.h>
@@ -41,12 +40,14 @@
 #include <nx/mediaserver/license_watcher.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
+#include <nx/mediaserver/resource/shared_context_pool.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <plugins/plugin_manager.h>
+#include <nx/mediaserver/server_meta_types.h>
 
 namespace {
 
@@ -82,6 +83,7 @@ QnMediaServerModule::QnMediaServerModule(
 {
     Q_INIT_RESOURCE(mediaserver_core);
     Q_INIT_RESOURCE(appserver2);
+    nx::mediaserver::MetaTypes::initialize();
 
     store(new QnStaticCommonModule(
         Qn::PT_Server,
@@ -118,9 +120,6 @@ QnMediaServerModule::QnMediaServerModule(
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
-    store(new QnMasterServerStatusWatcher(
-        commonModule(),
-        m_settings->delayBeforeSettingMasterFlag()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
     m_licenseWatcher = store(new nx::mediaserver::LicenseWatcher(commonModule()));
 
@@ -176,6 +175,8 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
     m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
     m_metadataManagerPoolThread->start();
+
+    m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -238,4 +239,9 @@ nx::mediaserver::metadata::ManagerPool* QnMediaServerModule::metadataManagerPool
 nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWatcher() const
 {
     return m_metadataRuleWatcher;
+}
+
+nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
+{
+    return m_sharedContextPool;
 }

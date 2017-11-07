@@ -6,8 +6,8 @@
 
 #include <decoders/video/ffmpeg_video_decoder.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 
 #include <utils/media/frame_info.h>
 

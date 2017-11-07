@@ -52,7 +52,7 @@ public:
         const nx::String& sessionId,
         OpenRelayConnectionHandler handler) = 0;
 
-    virtual QUrl url() const = 0;
+    virtual nx::utils::Url url() const = 0;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const = 0;
 };
@@ -64,9 +64,9 @@ class NX_NETWORK_API ClientFactory
 {
 public:
     using CustomFactoryFunc = 
-        nx::utils::MoveOnlyFunc<std::unique_ptr<Client>(const QUrl&)>;
+        nx::utils::MoveOnlyFunc<std::unique_ptr<Client>(const nx::utils::Url&)>;
 
-    static std::unique_ptr<Client> create(const QUrl& baseUrl);
+    static std::unique_ptr<Client> create(const nx::utils::Url& baseUrl);
 
     static CustomFactoryFunc setCustomFactoryFunc(CustomFactoryFunc newFactoryFunc);
 };
@@ -80,7 +80,7 @@ class NX_NETWORK_API ClientImpl:
     using base_type = Client;
 
 public:
-    ClientImpl(const QUrl& baseUrl);
+    ClientImpl(const nx::utils::Url& baseUrl);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
@@ -97,12 +97,12 @@ public:
         const nx::String& sessionId,
         OpenRelayConnectionHandler handler) override;
 
-    virtual QUrl url() const override;
+    virtual nx::utils::Url url() const override;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 
 private:
-    const QUrl m_baseUrl;
+    const nx::utils::Url m_baseUrl;
     SystemError::ErrorCode m_prevSysErrorCode;
     nx_http::AuthInfo m_authInfo;
     std::list<std::unique_ptr<network::aio::BasicPollable>> m_activeRequests;

@@ -24,7 +24,7 @@ HanwhaMappedPresetManager::HanwhaMappedPresetManager(const QnResourcePtr& resour
 
 bool HanwhaMappedPresetManager::createNativePreset(const QnPtzPreset& nxPreset, QString *outNativePresetId)
 {
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto presetNumber = freePresetNumber();
     if (presetNumber.isEmpty())
         return false;
@@ -54,7 +54,7 @@ bool HanwhaMappedPresetManager::removeNativePreset(const QString nativePresetId)
 
     const auto presetName = presetNameFromId(nativePresetId);
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.remove(
         lit("ptzconfig/preset"),
         {
@@ -72,20 +72,22 @@ bool HanwhaMappedPresetManager::nativePresets(QnPtzPresetList* outNativePresets)
     if (!outNativePresets)
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.view(
         lit("ptzconfig/preset"),
         {{kHanwhaChannelProperty, channel()}});
 
+    // We can get 602 Configuration not found error if there are no presets for device.
+    // It's not an actual error - it just means that the list of presets is empty.
     if (!response.isSuccessful())
-        return false;
+        return response.errorCode() == kHanwhaConfigurationNotFoundError;
 
     for (const auto& presetEntry : response.response())
     {
         const auto split = presetEntry.first.split(L'.');
         if (split.size() != 5)
             continue;
-        
+
         const auto& presetId = makePresetId(
             split[3] /*prestNumber*/,
             presetEntry.second /*presetName*/);
@@ -103,10 +105,13 @@ bool HanwhaMappedPresetManager::activateNativePreset(const QString& nativePreset
     if (number.isEmpty())
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.control(
         lit("ptzcontrol/preset"),
-        {{kHanwhaPresetNumberProperty, number}});
+        {
+            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
+            {kHanwhaPresetNumberProperty, number}
+        });
 
     return response.isSuccessful();
 }
@@ -123,7 +128,7 @@ bool HanwhaMappedPresetManager::normalizeNativePreset(
     if (newPresetName.isEmpty())
         return false;
 
-    HanwhaRequestHelper helper(m_hanwhaResource);
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
     const auto response = helper.update(
         lit("ptzconfig/preset"),
         {
@@ -185,12 +190,12 @@ QString HanwhaMappedPresetManager::freePresetNumber() const
 
     QnPtzPresetList presets;
     if (!nativePresets(&presets))
-        return false;
+        return QString();
 
     QSet<int> presetNumbers;
     for (const auto& preset: presets)
         presetNumbers.insert(presetNumberFromId(preset.id).toInt());
-    
+
     const int limit = m_maxPresetNumber > 0
         ? m_maxPresetNumber
         : kHanwhaDefaultMaxPresetNumber;

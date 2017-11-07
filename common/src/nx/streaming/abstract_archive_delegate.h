@@ -12,6 +12,15 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <motion/abstract_motion_archive.h>
 
+enum class PlaybackMode
+{
+    Default,
+    Live,
+    Archive,
+    ThumbNails,
+    Export,
+    Edge
+};
 
 class QnAbstractArchiveDelegate: public QObject
 {
@@ -67,7 +76,7 @@ public:
     virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
 
     // this call inform delegate that reverse mode on/off
-    virtual void onReverseMode(qint64 displayTime, bool value) { Q_UNUSED(displayTime); Q_UNUSED(value); }
+    virtual void setSpeed(qint64 /*displayTime*/, double /*value*/) { }
 
     // for optimization. Inform delegate to pause after sending 1 frame
     virtual void setSingleshotMode(bool value) { Q_UNUSED(value); }
@@ -88,7 +97,7 @@ public:
     virtual void beforeSeek(qint64 time) { Q_UNUSED(time); }
 
     /** This function calls from reader */
-    virtual void beforeChangeReverseMode(bool reverseMode) { Q_UNUSED(reverseMode); }
+    virtual void beforeChangeSpeed(double /*speed*/) {}
 
     /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) { Q_UNUSED(startTime); Q_UNUSED(endTime); Q_UNUSED(frameStep); }
@@ -106,8 +115,23 @@ public:
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); };
 
     virtual int getSequence() const { return 0;  }
+
+    virtual void setPlaybackMode(PlaybackMode value) {}
+
+    virtual void setEndOfPlaybackHandler(std::function<void()> handler)
+    {
+        m_endOfPlaybackHandler = handler;
+    };
+
+    virtual void setErrorHandler(std::function<void(const QString& errorString)> handler)
+    {
+        m_errorHandler = handler;
+    };
+
 protected:
     Flags m_flags;
+    std::function<void()> m_endOfPlaybackHandler;
+    std::function<void(const QString& errorString)> m_errorHandler;
 };
 
 typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;

@@ -1,10 +1,10 @@
 #include "reverse_connection_pool.h"
-#include "reverse_connection_holder.h"
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 
 #include "../outgoing_tunnel_pool.h"
+#include "reverse_connection_holder.h"
 
 namespace nx {
 namespace network {
@@ -22,7 +22,7 @@ static String getHostSuffix(const String& hostName)
 
 ReverseConnectionPool::ReverseConnectionPool(
     aio::AIOService* aioService,
-    std::unique_ptr<MediatorConnection> mediatorConnection)
+    std::unique_ptr<hpm::api::AbstractMediatorClientTcpConnection> mediatorConnection)
 :
     base_type(aioService, nullptr),
     m_mediatorConnection(std::move(mediatorConnection)),
@@ -118,10 +118,11 @@ std::shared_ptr<ReverseConnectionSource>
             return nullptr;
         }
 
-        if (const auto connections = hostIterator->second->socketCount())
+        // TODO: #ak Not active objects MUST be removed, not stored forever.
+        if (hostIterator->second->isActive())
         {
-            NX_LOGX(lm("Return holder for %1 with %2 connections(s)")
-                .args(hostName, connections), cl_logDEBUG1);
+            NX_LOGX(lm("Return holder for %1 with %2 connection(s)")
+                .args(hostName, hostIterator->second->socketCount()), cl_logDEBUG1);
             return hostIterator->second;
         }
 

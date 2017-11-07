@@ -8,7 +8,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <core/dataprovider/abstract_ondemand_data_provider.h>
+#include <providers/abstract_ondemand_data_provider.h>
 #include <camera/camera_pool.h>
 #include <transcoding/transcoder.h>
 

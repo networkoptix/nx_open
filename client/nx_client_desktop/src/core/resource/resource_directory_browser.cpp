@@ -20,7 +20,7 @@
 
 #include "plugins/resource/avi/avi_dvd_resource.h"
 #include "plugins/resource/avi/avi_bluray_resource.h"
-#include "plugins/resource/avi/filetypesupport.h"
+#include "core/resource/avi/filetypesupport.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -30,13 +30,18 @@
 
 #include <client/client_globals.h>
 
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/workaround/layout_proto.h>
 
-
 namespace {
-    const int maxResourceCount = 1024;
+
+const int maxResourceCount = 1024;
+
+QString fixSeparators(const QString& filePath)
+{
+    return QDir::fromNativeSeparators(filePath);
+}
 
 }
 
@@ -143,8 +148,11 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
+    const QString layoutUrl = fixSeparators(filename);
+    NX_ASSERT(layoutUrl == filename);
+
     QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule());
-    layoutStorage.setUrl(filename);
+    layoutStorage.setUrl(layoutUrl);
     QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
     if (!layoutFile)
         return QnLayoutResourcePtr();
@@ -176,7 +184,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         fromApiToResource(item, orderedItems.last());
     }
 
-    QnUuid layoutId = guidFromArbitraryData(filename);
+    QnUuid layoutId = guidFromArbitraryData(layoutUrl);
     if (resourcePool)
     {
         auto existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
@@ -227,9 +235,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     }
 
     layout->setParentId(QnUuid());
-    layout->setName(QFileInfo(filename).fileName());
+    layout->setName(QFileInfo(layoutUrl).fileName());
     layout->addFlags(Qn::exported_layout);
-    layout->setUrl(filename);
+    layout->setUrl(layoutUrl);
 
     QnLayoutItemDataMap updatedItems;
 
@@ -248,10 +256,10 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         NX_ASSERT(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
         if (!path.endsWith(lit(".mkv")))
             path += lit(".mkv");
-        item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(filename, path);
+        item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(layoutUrl, path);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource(qnClientCoreModule->commonModule()));
-        storage->setUrl(filename);
+        storage->setUrl(layoutUrl);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.uniqueId));
         aviResource->addFlags(Qn::exported_media);
@@ -319,41 +327,47 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
 QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename,
     QnResourcePool* resourcePool)
 {
+    const QString path = fixSeparators(filename);
+    NX_ASSERT(path == filename);
+
     if (resourcePool)
     {
-        if (const auto& existing = resourcePool->getResourceByUrl(filename))
+        if (const auto& existing = resourcePool->getResourceByUrl(path))
             return existing;
     }
 
-    QFile file(filename);
+    QFile file(path);
     if (!file.exists())
         return QnResourcePtr();
 
-    return createArchiveResource(filename, resourcePool);
+    return createArchiveResource(path, resourcePool);
 }
 
 QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& filename,
     QnResourcePool* resourcePool)
 {
-    if (QnAviDvdResource::isAcceptedUrl(filename))
-        return QnResourcePtr(new QnAviDvdResource(filename));
+    const QString path = fixSeparators(filename);
+    NX_ASSERT(path == filename);
 
-    if (QnAviBlurayResource::isAcceptedUrl(filename))
-        return QnResourcePtr(new QnAviBlurayResource(filename));
+    if (QnAviDvdResource::isAcceptedUrl(path))
+        return QnResourcePtr(new QnAviDvdResource(path));
 
-    if (FileTypeSupport::isMovieFileExt(filename))
-        return QnResourcePtr(new QnAviResource(filename));
+    if (QnAviBlurayResource::isAcceptedUrl(path))
+        return QnResourcePtr(new QnAviBlurayResource(path));
 
-    if (FileTypeSupport::isImageFileExt(filename))
+    if (FileTypeSupport::isMovieFileExt(path))
+        return QnResourcePtr(new QnAviResource(path));
+
+    if (FileTypeSupport::isImageFileExt(path))
     {
-        QnResourcePtr rez = QnResourcePtr(new QnAviResource(filename));
+        QnResourcePtr rez = QnResourcePtr(new QnAviResource(path));
         rez->addFlags(Qn::still_image);
         rez->removeFlags(Qn::video | Qn::audio);
         return rez;
     }
 
-    if (FileTypeSupport::isLayoutFileExt(filename))
-        return layoutFromFile(filename, resourcePool);
+    if (FileTypeSupport::isLayoutFileExt(path))
+        return layoutFromFile(path, resourcePool);
 
     return QnResourcePtr();
 }

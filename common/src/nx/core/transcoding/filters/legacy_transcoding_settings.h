@@ -18,18 +18,14 @@ struct LegacyTranscodingSettings
 {
     QnMediaResourcePtr resource;
 
-    //QnConstResourceVideoLayoutPtr layout;
     qreal forcedAspectRatio = 0.0;
     int rotation = 0;
     QRectF zoomWindow;
-    //QnMediaDewarpingParams mediaDewarpingParams;
     QnItemDewarpingParams itemDewarpingParams;
     ImageCorrectionParams contrastParams;
     QnTimeStampParams timestampParams;
-    //AVCodecID codec = AV_CODEC_ID_NONE;
 
     bool isEmpty() const;
-
 };
 
 } // namespace transcoding

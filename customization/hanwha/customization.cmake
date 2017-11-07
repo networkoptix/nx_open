@@ -2,9 +2,9 @@ set(defaultSkin "dark_orange")
 set(parent.customization "digitalwatchdog")
 
 # Components Namings
-set(display.product.name "WAVE")
+set(display.product.name "Wisenet WAVE")
 set(display.mobile.name "WAVE Mobile")
-set(product.name "WAVE")
+set(product.name "Wisenet WAVE")
 set(product.name.short "hanwha")
 set(product.appName "wave")
 set(company.name "Hanwha")
@@ -85,4 +85,5 @@ set(additionalTranslations
     nl_NL
     pl_PL
     vi_VN
+    th_TH
 )

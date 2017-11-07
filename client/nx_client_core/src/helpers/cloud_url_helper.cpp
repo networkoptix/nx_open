@@ -26,37 +26,37 @@ QnCloudUrlHelper::QnCloudUrlHelper(
 {
 }
 
-QUrl QnCloudUrlHelper::mainUrl() const
+nx::utils::Url QnCloudUrlHelper::mainUrl() const
 {
     return makeUrl();
 }
 
-QUrl QnCloudUrlHelper::aboutUrl() const
+nx::utils::Url QnCloudUrlHelper::aboutUrl() const
 {
     return makeUrl(lit("/content/about"), false);
 }
 
-QUrl QnCloudUrlHelper::accountManagementUrl() const
+nx::utils::Url QnCloudUrlHelper::accountManagementUrl() const
 {
     return makeUrl(lit("/account"));
 }
 
-QUrl QnCloudUrlHelper::createAccountUrl() const
+nx::utils::Url QnCloudUrlHelper::createAccountUrl() const
 {
     return makeUrl(lit("/register"), false);
 }
 
-QUrl QnCloudUrlHelper::restorePasswordUrl() const
+nx::utils::Url QnCloudUrlHelper::restorePasswordUrl() const
 {
     return makeUrl(lit("/restore_password"), false);
 }
 
-QUrl QnCloudUrlHelper::faqUrl() const
+nx::utils::Url QnCloudUrlHelper::faqUrl() const
 {
     return makeUrl(lit("/content/faq"), false);
 }
 
-QUrl QnCloudUrlHelper::viewSystemUrl() const
+nx::utils::Url QnCloudUrlHelper::viewSystemUrl() const
 {
     const auto systemId = qnClientCoreModule->commonModule()->globalSettings()->cloudSystemId();
     if (systemId.isEmpty())
@@ -65,7 +65,7 @@ QUrl QnCloudUrlHelper::viewSystemUrl() const
     return makeUrl(lit("/systems/%1/view").arg(systemId));
 }
 
-QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
+nx::utils::Url QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 {
     SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl());
 
@@ -77,7 +77,7 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 
     uri.setReferral(m_source, m_context);
 
-    QUrl result = uri.toUrl();
+    nx::utils::Url result = uri.toUrl();
     result.setPath(path);
     NX_DEBUG(typeid(QnCloudUrlHelper), result.toString());
     return result;

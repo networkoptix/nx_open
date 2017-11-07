@@ -37,83 +37,6 @@
 #include <database/db_manager.h>
 
 namespace ec2 {
-namespace access_helpers {
-
-namespace detail {
-std::vector<QString> getRestrictedKeysByMode(Mode mode)
-{
-    using namespace nx::settings_names;
-
-    switch (mode)
-    {
-        case Mode::read:
-            return {
-                kNamePassword,
-                ldapAdminPassword,
-                kNameCloudAuthKey,
-                Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-                Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME
-            };
-        case Mode::write:
-            return {
-                kNameCloudSystemId,
-                kNameCloudAuthKey,
-                kCloudHostName,
-                kNameLocalSystemId
-            };
-    }
-
-    return std::vector<QString>();
-}
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue)
-{
-    auto in_ = [] (const std::vector<QString>& vec, const QString& value)
-    {
-        return std::any_of(vec.cbegin(), vec.cend(), [&value](const QString& s) { return s == value; });
-    };
-
-    if (in_(detail::getRestrictedKeysByMode(mode), keyValue->first) && accessData != Qn::kSystemAccess)
-        return false;
-
-    return true;
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key)
-{
-    QString dummy = lit("dummy");
-
-    KeyValueFilterType kv(key, &dummy);
-    return kvSystemOnlyFilter(mode, accessData, &kv);
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value)
-{
-    KeyValueFilterType kv(key, value);
-    return kvSystemOnlyFilter(mode, accessData, &kv);
-}
-
-void applyValueFilters(
-    Mode mode,
-    const Qn::UserAccessData& accessData,
-    KeyValueFilterType* keyValue,
-    const FilterFunctorListType& filterList,
-    bool* allowed)
-{
-    if (allowed)
-        *allowed = true;
-
-    for (auto filter : filterList)
-    {
-        bool isAllowed = filter(mode, accessData, keyValue);
-
-        if (allowed && !isAllowed)
-            *allowed = false;
-    }
-}
-
-}
 
 namespace detail {
 
@@ -557,20 +480,19 @@ struct ModifyResourceAccess
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
-        if (isRemove)
-            return commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
-
         bool result = false;
-        if (!target)
+        if (isRemove)
+            result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
+        else if (!target)
             result = commonModule->resourceAccessManager()->canCreateResource(userResource, param);
         else
             result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
-            NX_LOG(lit("Modify resource access returned false for transaction %1. User resource isNull: %2. Target resource isNull %3")
-                .arg(getTransactionDescriptorByParam<Param>()->getName())
-                .arg(!(bool)userResource)
-                .arg(!(bool)target),
+            NX_LOG(lit("%1 resource access returned false. User resource: %3. Target resource: %4")
+                .arg(isRemove ? "Remove" : "Modify")
+                .arg(userResource ? userResource->getId().toString() : QString())
+                .arg(target ? target->getId().toString() : QString()),
                 cl_logWARNING);
 
         return result;

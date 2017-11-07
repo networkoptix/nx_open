@@ -96,7 +96,12 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = 0);
 
-    Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
+    Handle twoWayAudioCommand(
+        const QString& sourceId,
+        const QnUuid& cameraId,
+        bool start,
+        GetCallback callback,
+        QThread* targetThread = nullptr);
 
     Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
             nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
@@ -163,9 +168,8 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 
-    Handle downloadFileChunkFromInternet(
-        const QString& fileName,
-        const QUrl& url,
+    Handle downloadFileChunkFromInternet(const QString& fileName,
+        const nx::utils::Url &url,
         int chunkIndex,
         int chunkSize,
         Result<QByteArray>::type callback,
@@ -196,6 +200,18 @@ public:
 
     Handle getEvents(QnEventLogRequestData request,
         Result<EventLogData>::type callback,
+        QThread *targetThread = nullptr);
+
+    /**
+     * Change user's password on a camera. This method doesn't create new user.
+     * Only cameras with capability Qn::SetUserPasswordCapability support it.
+     * @param id camera id
+     * @param auth user name and new password. User name should exists on camera.
+     */
+    Handle changeCameraPassword(
+        const QnUuid& id,
+        const QAuthenticator& auth,
+        Result<QnRestResult>::type callback,
         QThread *targetThread = nullptr);
 
     /**

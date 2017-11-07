@@ -4,31 +4,36 @@
 
 #include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_OBJECT_DETECTION_TYPES, (json)(ubjson), _Fields)
+namespace nx {
+namespace common {
+namespace metadata {
 
-bool operator< (const QnObjectFeature& f, const QnObjectFeature& s)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    QN_OBJECT_DETECTION_TYPES,
+    (json)(ubjson),
+    _Fields,
+    (brief, true))
+
+bool operator< (const Attribute& f, const Attribute& s)
 {
-    return std::tie(f.keyword, f.value) < std::tie(s.keyword, s.value);
+    return std::tie(f.name, f.value) < std::tie(s.name, s.value);
 }
 
-QnCompressedMetadataPtr QnObjectDetectionMetadata::serialize() const
+bool operator<(const DetectionMetadataPacket& first, const DetectionMetadataPacket& other)
 {
-    QnCompressedMetadataPtr compressed = std::make_shared<QnCompressedMetadata>(MetadataType::ObjectDetection);
-
-    auto serialized = QnUbjson::serialized(*this);
-    compressed->setData(serialized.data(), serialized.size());
-
-    return compressed;
+    return first.timestampUsec < other.timestampUsec;
 }
 
-bool QnObjectDetectionMetadata::deserialize(const QnConstCompressedMetadataPtr& data)
+bool operator<(std::chrono::microseconds first, const DetectionMetadataPacket& second)
 {
-    bool success = false;
-
-    *this = QnUbjson::deserialized<QnObjectDetectionMetadata>(
-        QByteArray(data->data(), data->dataSize()),
-        QnObjectDetectionMetadata(),
-        &success);
-
-    return success;
+    return first.count() < second.timestampUsec;
 }
+
+bool operator<(const DetectionMetadataPacket& first, std::chrono::microseconds second)
+{
+    return first.timestampUsec < second.count();
+}
+
+} // namespace metadata
+} // namespace common
+} // namespace nx

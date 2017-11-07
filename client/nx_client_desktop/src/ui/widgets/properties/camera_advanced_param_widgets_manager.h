@@ -12,7 +12,10 @@ class QnAbstractCameraAdvancedParamWidget;
 class QnCameraAdvancedParamWidgetsManager: public QObject {
 	Q_OBJECT
 public:
-	explicit QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent = NULL);
+	explicit QnCameraAdvancedParamWidgetsManager(
+        QTreeWidget* groupWidget,
+        QStackedWidget* contentsWidget,
+        QObject* parent = NULL);
 
 	void displayParams(const QnCameraAdvancedParams &params);
 	void loadValues(const QnCameraAdvancedParamValueList &params);
@@ -28,6 +31,22 @@ private:
 
 	void createGroupWidgets(const QnCameraAdvancedParamGroup &group, QTreeWidgetItem* parentItem = NULL);
 	QWidget* createContentsPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
+    QWidget* createWidgetsForPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
+    void setUpDependenciesForPage(const std::vector<QnCameraAdvancedParameter> &params);
+
+    using DependencyHandler = std::function<bool()>;
+    using HandlerChains = std::map<
+        QnCameraAdvancedParameterDependency::DependencyType,
+        std::vector<std::function<bool()>>>;
+
+    using HandlerChainLauncher = std::function<void()>;
+
+    DependencyHandler makeDependencyHandler(
+        const QnCameraAdvancedParameterDependency& dependency,
+        const QnCameraAdvancedParameter& parameter) const;
+
+    HandlerChainLauncher makeHandlerChainLauncher(const HandlerChains& handlerChains) const;
+
     void setLabelText(
         QLabel* label,
         const QnCameraAdvancedParameter& parameter,

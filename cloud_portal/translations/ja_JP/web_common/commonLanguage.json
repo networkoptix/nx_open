@@ -3,7 +3,7 @@
     "highStream":"高解像度ストリーム",
     "lowStream":"低解像度ストリーム",
     "transcoding":"トランスコーディング",
-    "unknown":"未知の値",
+    "unknown":"不明",
     "copyToClipboard":"クリップボードにコピー",
     "copyDefaultText":"コピー",
     "copyActiveText":"クリップボードにコピーしました"
@@ -12,7 +12,7 @@
   "cameraStates":{
     "offline":"オフライン",
     "error":"エラー",
-    "unauthorized":"認証が必要です",
+    "unauthorized":"認証が必要",
     "noData":"データがありません",
     "iosVideoTooLarge":"iOSはfullHD（2MP：1920x1080）より大きいビデオをサポートしていません",
     "flashRequired":"ARMベースのサーバーからビデオを再生するには、<a href='https://get.adobe.com/flashplayer/' target='_blank'> Adob​​e Flash</a>をインストールしてください",

@@ -8,6 +8,7 @@
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace stun {
@@ -42,7 +43,7 @@ public:
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     virtual void connect(
-        const QUrl& url,
+        const nx::utils::Url& url,
         ConnectHandler completionHandler = nullptr) override;
 
     virtual bool setIndicationHandler(

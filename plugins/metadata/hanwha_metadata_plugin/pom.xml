@@ -3,12 +3,12 @@
     <parent>
         <artifactId>metadata_plugins</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>3.1.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.1.1-SNAPSHOT</version>
     <artifactId>hanwha_metadata_plugin</artifactId>
     <packaging>pom</packaging>
     <name>Nx Witness Hanwha Metadata Plugin</name>
@@ -17,8 +17,10 @@
         <guid>${hanwha_metadata_plugin.guid}</guid>
         <product.title>${hanwha_metadata_plugin.name}</product.title>
 
-        <qt.libs>core network gui</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lmediaserver_core</global.libs>
+        <qt.libs>core network gui sql</qt.libs>
+        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lmediaserver_core -lnx_kit</global.libs>
+        <windows.oslibs>-lws2_32 -lSecur32</windows.oslibs>
+        <rdep.packages>ffmpeg openssl</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

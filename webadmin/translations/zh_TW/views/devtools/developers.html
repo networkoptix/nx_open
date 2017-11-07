@@ -3,7 +3,7 @@
     <div ng-if="developersFeedbackForm">
         <h2>開發者工具</h2>
         <p>
-            您是否樂於開發與整合呢? 請讓我們知道.
+            有好建議改善我們的開發者工具或是想與我們對話嗎?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">給予回饋意見</a></p>
     </div>
@@ -11,9 +11,9 @@
     <div>
         <h3>通用事件生成器</h3>
         <p>
-            通用事件是一種讓第三方系統觸發 VMS 動作的特殊事件。
-            要建立 Generic Event 來整合系統需要向伺服器發出HTTP請求（使用Server API）。
-            Actions for Generic Events can be configured using Events Rules dialog in desktop client application.
+            通用事件是將事件從第三方系統發送到系統的方法，
+            可用於在事件規則引擎中觸發系統動作。
+            通用事件生成器是一個幫助建立HTTP通用事件的工具。
         </p>
         <p><a href="#/developers/events">通用事件生成器</a></p>
     </div>
@@ -23,10 +23,10 @@
             伺服器 API 提供一套標準的 API 供第三方廠商呼叫. 讓開發者可取用所有在 Client 上能操作的系統功能: 調閱/管理系統資源 (伺服器, 攝影機, 使用者, 權限), 從系統中索取即時影像或錄影資料, 生成事件, 建立規則, 操控 PTZ 攝影機以及更多功能.
         </p>
         <p>
-            <a href="#/developers/api"><b>API 測試工具（新）</b></a>
-            - 帶有工具的互動式文件以測試 API 呼叫 <br>
+            <a href="#/developers/api"><b>API 測試工具 (新)</b></a>
+            - API 測試工具互動文件<br>
             <a href="#/developers/changelog">API 更新日誌</a>
-            - API 重大變更的清單<br>
+            - API 重大更新列表<br>
             <a id="api-doc" href="api.xml" target="_blank">API 文件</a>
         </p>
 
@@ -34,7 +34,7 @@
     <div>
         <h3>攝影機詳細資訊面板</h3>
         <p>
-            用於顯示攝影機附加資訊的web client特殊面板:
+            顯示附加開發人員 - 在 Web 管理界面的攝影機友善訊息.
         </p>
         <ul>
             <li>攝影機 ID</li>
@@ -42,7 +42,8 @@
             <li>從瀏覽器直接匯出影像</li>
         </ul>
         <p>
-            若要開啟攝影機詳細資訊面板 - 開啟 <a href="#/view">web client</a>，選擇攝影機，設置圖示（齒輪），然後選擇 "攝影機細節"
+            要開啟攝影機詳細訊息面板 - 到 Web 管理界面, 選擇 <a href="#/view">瀏覽</a>, 
+            選擇攝影機, 點擊設定圖示(齒輪), 然後選擇“攝影機詳細訊息”
         </p>
         <p><a href="#/view/?cameraLinks">開啟攝影機詳細資訊面板</a></p>
     </div>

@@ -36,33 +36,32 @@
 
                     <div>
                         <h3>サーバーをリセット</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            The server will be detached from the current system. Video archive will remain intact.</p>
+                        <p>この操作は、このサーバーをデフォルトに戻します(データベースのクリアと構成のリセット)
+                            サーバーは現在のシステムから切り離されます ビデオのアーカイブはそのまま残ります</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">出荷時のデフォルトに戻す</button></p>
                     </div>
                     <div>
-                        <h3>Detach server from the system</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Detach from the system</button></p>
+                        <h3>システムからサーバーを切離す</h3>
+                        <p>これにより、データベース、ローカルユーザー、および構成を保持しているサーバーがシステムから切り離されます。ビデオのアーカイブはそのまま残されます <b>クラウドユーザーは削除されます </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">システムからサーバーを切離す</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>再起動</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">サーバー再起動</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">再起動</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>Adminパスワードの変更</h3>
+                            <p>ローカルシステム(クラウドに接続されていない) のユーザー"admin"のパスワードとリカバリー(root) パスワードが変更されます<br>　　
+それ以外は回復パスワードのみを変更</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">Change password</button>
+                                        ng-click="changePassword()">パスワードの変更</button>
                             </div>
                         </form>
                     </div>

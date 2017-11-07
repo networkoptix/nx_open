@@ -10,6 +10,7 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/utils/cryptographic_random_device.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
@@ -28,10 +29,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
-    const conf::Settings& settings,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
 :
-    m_settings(settings),
     m_dbManager(dbManager)
 {
     if (fillCache() != nx::utils::db::DBResult::ok)
@@ -220,10 +219,17 @@ boost::optional<TemporaryAccountCredentialsEx>
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    std::string password(nx::utils::random::number<size_t>(10, 20), 'a');
+    std::string password(
+        nx::utils::random::number(
+            nx::utils::random::CryptographicRandomDevice::instance(), 10U, 20U),
+        'a');
     std::generate(
         password.begin(), password.end(),
-        []() { return nx::utils::random::number<int>('a', 'z'); });
+        [this]()
+        {
+            return nx::utils::random::number(
+                nx::utils::random::CryptographicRandomDevice::instance(), (int)'a', (int)'z');
+        });
     return password;
 }
 

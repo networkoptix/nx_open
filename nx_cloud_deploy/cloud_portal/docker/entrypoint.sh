@@ -70,6 +70,9 @@ do
         celery)
             write_my_cnf
             rm -f /tmp/*.pid
+
+            python manage.py filldata all
+
             exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         *)

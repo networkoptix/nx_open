@@ -322,7 +322,7 @@ QnModuleInformation QnSystemDescriptionAggregator::getServer(const QnUuid& serve
     return QnModuleInformation();
 }
 
-QUrl QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const
+nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const
 {
     for (const auto systemDescription : m_systems)
     {

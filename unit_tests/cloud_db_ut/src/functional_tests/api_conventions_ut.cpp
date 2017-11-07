@@ -34,7 +34,7 @@ TEST_F(ApiConventions, general)
     {
         //missing required parameter
         nx_http::HttpClient httpClient;
-        QUrl url(lit("http://%1:%2/cdb/system/bind?name=esadfwer").arg(endpoint().address.toString()).arg(endpoint().port));
+        nx::utils::Url url(lit("http://%1:%2/cdb/system/bind?name=esadfwer").arg(endpoint().address.toString()).arg(endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(httpClient.doGet(url));
@@ -57,7 +57,7 @@ TEST_F(ApiConventions, general)
     {
         //operation forbidden for account in this state
         nx_http::HttpClient httpClient;
-        QUrl url(lit("http://%1:%2/cdb/system/bind?name=esadfwer&customization=%3").
+        nx::utils::Url url(lit("http://%1:%2/cdb/system/bind?name=esadfwer&customization=%3").
             arg(endpoint().address.toString()).arg(endpoint().port).arg(nx::utils::AppInfo::customizationName()));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
@@ -93,7 +93,7 @@ TEST_F(ApiConventions, using_post_method)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     auto client = nx_http::AsyncHttpClient::create();
-    QUrl url;
+    nx::utils::Url url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
     url.setScheme("http");
@@ -120,7 +120,7 @@ TEST_F(ApiConventions, json_in_unauthorized_response)
     for (int i = 0; i < 2; ++i)
     {
         nx_http::HttpClient client;
-        QUrl url;
+        nx::utils::Url url;
         url.setHost(endpoint().address.toString());
         url.setPort(endpoint().port);
         url.setScheme("http");
@@ -165,7 +165,7 @@ TEST_F(ApiConventions, api_conventions_ok)
     nx_http::HttpClient client;
     for (int i = 0; i < 200; ++i)
     {
-        QUrl url;
+        nx::utils::Url url;
         url.setHost(endpoint().address.toString());
         url.setPort(endpoint().port);
         url.setScheme("http");
@@ -218,7 +218,7 @@ TEST_F(ApiConventions, json_in_ok_response)
     nx::cdb::api::serializeToUrlQuery(update, &urlQuery);
 
     nx_http::HttpClient client;
-    QUrl url;
+    nx::utils::Url url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
     url.setScheme("http");

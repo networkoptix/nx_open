@@ -189,7 +189,7 @@ void QnSearchTask::doSearch()
     m_callback(results, this);
 }
 
-QUrl QnSearchTask::url()
+nx::utils::Url QnSearchTask::url()
 {
     return m_url;
 }

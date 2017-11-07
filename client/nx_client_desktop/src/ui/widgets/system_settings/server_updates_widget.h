@@ -98,7 +98,7 @@ private:
     bool m_checking = false;
     QnCheckForUpdateResult m_lastUpdateCheckResult;
 
-    QUrl m_releaseNotesUrl;
+    nx::utils::Url m_releaseNotesUrl;
 
     QTimer* m_longUpdateWarningTimer = nullptr;
 

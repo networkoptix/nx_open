@@ -43,7 +43,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-ReverseConnection::ReverseConnection(const QUrl& relayUrl):
+ReverseConnection::ReverseConnection(const nx::utils::Url& relayUrl):
     m_relayClient(api::ClientFactory::create(relayUrl)),
     m_peerName(relayUrl.userName().toUtf8())
 {
@@ -155,7 +155,7 @@ void ReverseConnection::relayNotificationReceived(
 
 //-------------------------------------------------------------------------------------------------
 
-ConnectionAcceptor::ConnectionAcceptor(const QUrl& relayUrl):
+ConnectionAcceptor::ConnectionAcceptor(const nx::utils::Url& relayUrl):
     m_relayUrl(relayUrl),
     m_acceptor(std::bind(&ConnectionAcceptor::reverseConnectionFactoryFunc, this))
 {
@@ -246,7 +246,7 @@ ConnectionAcceptorFactory& ConnectionAcceptorFactory::instance()
 }
 
 std::unique_ptr<AbstractConnectionAcceptor> ConnectionAcceptorFactory::defaultFactoryFunc(
-    const QUrl& relayUrl)
+    const nx::utils::Url& relayUrl)
 {
     return std::make_unique<ConnectionAcceptor>(relayUrl);
 }

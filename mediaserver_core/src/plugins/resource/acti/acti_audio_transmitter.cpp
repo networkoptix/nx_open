@@ -116,9 +116,9 @@ bool ActiAudioTransmitter::isReadyForTransmission(
     return true;
 }
 
-QUrl ActiAudioTransmitter::transmissionUrl() const
+nx::utils::Url ActiAudioTransmitter::transmissionUrl() const
 {
-    QUrl url(m_resource->getUrl());
+    nx::utils::Url url(m_resource->getUrl());
     url.setPath(kEncoderCgiPath);
     url.setQuery(kEncoderCgiQuery);
 

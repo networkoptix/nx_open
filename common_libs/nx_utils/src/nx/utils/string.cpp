@@ -12,47 +12,6 @@
 namespace nx {
 namespace utils {
 
-QString formatFileSize(qint64 size, int precision, int prefixThreshold, MetricPrefix minPrefix, MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString &pattern)
-{
-    static const std::array<QString, PrefixCount> metricSuffixes{{"B", "kB",  "MB",  "GB",  "TB",  "PB",  "EB",  "ZB",  "YB"}};
-    static const std::array<QString, PrefixCount> binarySuffixes{{"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"}};
-
-    QString number, suffix;
-    if (size == 0)
-    {
-        number = "0";
-        suffix = metricSuffixes[0];
-    }
-    else
-    {
-        double absSize = std::abs(static_cast<double>(size));
-        int power = static_cast<int>(std::log(absSize / prefixThreshold) / std::log(1000.0));
-        int unit = qBound(static_cast<int>(minPrefix), power, qMin(static_cast<int>(maxPrefix), PrefixCount - 1));
-
-        suffix = (useBinaryPrefixes ? binarySuffixes : metricSuffixes)[unit];
-        number = (size < 0 ? QLatin1String("-") : QString()) + QString::number(absSize / std::pow(useBinaryPrefixes ? 1024.0 : 1000.0, unit), 'f', precision);
-
-        /* Chop trailing zeros. */
-        for (int i = number.size() - 1; ; i--)
-        {
-            QChar c = number[i];
-            if (c == L'.')
-            {
-                number.chop(number.size() - i);
-                break;
-            }
-            if (c != L'0')
-            {
-                number.chop(number.size() - i - 1);
-                break;
-            }
-        }
-
-    }
-
-    return pattern.arg(number).arg(suffix);
-}
-
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement)
 {
     if (!symbols)
@@ -75,7 +34,6 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
 
     return result;
 }
-
 
 qint64 parseDateTime(const QString& dateTimeStr)
 {
@@ -433,20 +391,7 @@ QString elideString(const QString &source, int maxLength, const QString &tail)
 
 QByteArray generateRandomName(int length)
 {
-    static const char kAlphaAndDigits[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    static const size_t kDigitsCount = 10;
-    static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
-
-    if (!length)
-        return QByteArray();
-
-    QByteArray str;
-    str.resize(length);
-    str[0] = kAlphaAndDigits[nx::utils::random::number() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
-    for (int i = 1; i < length; ++i)
-        str[i] = kAlphaAndDigits[nx::utils::random::number() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
-
-    return str;
+    return random::generateName(length);
 }
 
 static const double kByteSuffixLimit = 1024;

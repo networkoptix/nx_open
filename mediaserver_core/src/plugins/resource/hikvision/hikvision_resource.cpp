@@ -12,6 +12,8 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <onvif/soapMediaBindingProxy.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -124,7 +126,7 @@ CameraDiagnostics::Result HikvisionResource::fetchChannelCapabilities(
     Qn::ConnectionRole role,
     ChannelCapabilities* outCapabilities)
 {
-    auto url = QUrl(getUrl());
+    auto url = nx::utils::Url(getUrl());
     url.setPath(kCapabilitiesRequestPathTemplate.arg(
         buildChannelNumber(role, getChannel())));
 
@@ -154,7 +156,7 @@ CameraDiagnostics::Result HikvisionResource::initialize2WayAudio()
 {
     auto httpClient = getHttpClient();
 
-    QUrl requestUrl(getUrl());
+    nx::utils::Url requestUrl(getUrl());
     requestUrl.setPath(lit("/ISAPI/System/TwoWayAudio/channels"));
     requestUrl.setHost(getHostAddress());
     requestUrl.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
@@ -222,6 +224,37 @@ boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
         return boost::none;
 
     return itr->second;
+}
+
+bool HikvisionResource::findDefaultPtzProfileToken()
+{
+    std::unique_ptr<MediaSoapWrapper> soapWrapper(new MediaSoapWrapper(
+        getMediaUrl().toStdString(),
+        getAuth().user(),
+        getAuth().password(),
+        getTimeDrift()));
+
+    ProfilesReq request;
+    ProfilesResp response;
+    int soapRes = soapWrapper->getProfiles(request, response);
+    if (soapRes != SOAP_OK)
+    {
+        NX_WARNING(this, lm("Can't read profile list from device %1").arg(getMediaUrl()));
+        return false;
+    }
+
+    for (const auto& profile : response.Profiles)
+    {
+        if (!profile || !profile->PTZConfiguration)
+            continue;
+        QString ptzConfiguration = QString::fromStdString(profile->PTZConfiguration->token);
+        if (ptzConfiguration == getPtzConfigurationToken())
+        {
+            setPtzProfileToken(QString::fromStdString(profile->token));
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace plugins

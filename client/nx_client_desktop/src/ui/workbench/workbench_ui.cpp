@@ -121,7 +121,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     QGraphicsLayout::setInstantInvalidatePropagation(true);
 
     /* Install and configure instruments. */
-    m_fpsCountingInstrument = new FpsCountingInstrument(1000, this);
+
+    // In profiler mode calculate fps 10 times more precisely.
+    const int kFpsUpdatePeriod = qnRuntime->isProfilerMode() ? 10000 : 1000;
+    m_fpsCountingInstrument = new FpsCountingInstrument(kFpsUpdatePeriod, this);
+
     m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
 
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
@@ -129,16 +133,23 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped, this, &QnWorkbenchUi::at_activityStopped);
     connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed, this, &QnWorkbenchUi::at_activityStarted);
-    connect(m_fpsCountingInstrument, &FpsCountingInstrument::fpsChanged, this, [this](qreal fps)
-    {
-#ifdef QN_SHOW_FPS_MS
-        QString fmt = lit("%1 (%2ms)");
-        m_fpsItem->setText(fmt.arg(QString::number(fps, 'g', 4)).arg(QString::number(1000 / fps, 'g', 4)));
-#else
-        m_fpsItem->setText(QString::number(fps, 'g', 4));
-#endif
-        m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
-    });
+    connect(m_fpsCountingInstrument, &FpsCountingInstrument::fpsChanged, this,
+        [this](qreal fps, qint64 frameTimeMs)
+        {
+            if (qnRuntime->isProfilerMode())
+            {
+                QString fmt = lit("%1 (%2ms)");
+                m_fpsItem->setText(fmt
+                    .arg(QString::number(fps, 'g', 4))
+                    .arg(frameTimeMs));
+            }
+            else
+            {
+                m_fpsItem->setText(QString::number(fps, 'g', 4));
+            }
+
+            m_fpsItem->resize(m_fpsItem->effectiveSizeHint(Qt::PreferredSize));
+        });
 
     /* Create controls. */
     createControlsWidget();
@@ -599,7 +610,7 @@ void QnWorkbenchUi::initGraphicsMessageBoxHolder()
     auto overlayWidget = new QnUiElementsWidget();
     overlayWidget->setAcceptedMouseButtons(0);
     display()->scene()->addItem(overlayWidget);
-    display()->setLayer(overlayWidget, Qn::MessageBoxLayer);
+    display()->setLayer(overlayWidget, QnWorkbenchDisplay::MessageBoxLayer);
 
     QGraphicsLinearLayout* messageBoxVLayout = new QGraphicsLinearLayout(Qt::Vertical);
     messageBoxVLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -737,7 +748,10 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             if (!alreadyZoomed)
                 m_unzoomedOpenedPanels = openedPanels();
-            setOpenedPanels(NoPanel, true);
+            const auto panels = newWidget->options().testFlag(QnResourceWidget::DisplayMotion)
+                ? TimelinePanel
+                : NoPanel;
+            setOpenedPanels(panels, true);
         }
         else
         {
@@ -833,7 +847,7 @@ void QnWorkbenchUi::createControlsWidget()
     m_controlsWidget = new QnUiElementsWidget();
     m_controlsWidget->setAcceptedMouseButtons(0);
     display()->scene()->addItem(m_controlsWidget);
-    display()->setLayer(m_controlsWidget, Qn::UiLayer);
+    display()->setLayer(m_controlsWidget, QnWorkbenchDisplay::UiLayer);
 
     installEventHandler(m_controlsWidget, QEvent::WindowDeactivate, this,
         [this]() { display()->scene()->setActiveWindow(m_controlsWidget); });
@@ -1443,13 +1457,15 @@ void QnWorkbenchUi::createFpsWidget()
     m_fpsItem = new QnProxyLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
     m_fpsItem->setAcceptHoverEvents(false);
+    m_fpsItem->setText(lit("...."));
+    updateFpsGeometry();
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
-    display()->setLayer(m_fpsItem, Qn::MessageBoxLayer);
+    display()->setLayer(m_fpsItem, QnWorkbenchDisplay::MessageBoxLayer);
 
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);
-    setFpsVisible(false);
+    setFpsVisible(qnRuntime->isProfilerMode());
 }
 
 #pragma endregion Fps widget methods

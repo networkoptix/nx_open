@@ -12,7 +12,7 @@
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
-#include "core/dataprovider/live_stream_provider.h"
+#include <providers/live_stream_provider.h>
 
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
@@ -85,7 +85,7 @@ QString OnvifResourceSearcher::manufacture() const
     return QnPlOnvifResource::MANUFACTURE;
 }
 
-int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
+int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
 {
     typedef GSoapAsyncCallWrapper <
         DeviceSoapWrapper,
@@ -137,9 +137,9 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
     return result > 0 ? result : kDefaultOnvifPort;
 }
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const nx::utils::Url& _url, const QAuthenticator& auth, bool isSearchAction)
 {
-    QUrl url(_url);
+    nx::utils::Url url(_url);
 
     if( !url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
@@ -150,7 +150,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, cons
     return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
     if (shouldStop())
         return QList<QnResourcePtr>();

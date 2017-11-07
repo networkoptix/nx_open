@@ -10,6 +10,7 @@
 #include <QtWidgets/QComboBox>
 
 #include <camera/cam_display.h>
+#include <camera/resource_display.h>
 #include <camera/single_thumbnail_loader.h>
 
 #include <client/client_settings.h>
@@ -23,9 +24,6 @@
 
 #include <platform/environment.h>
 
-#include <transcoding/filters/contrast_image_filter.h>
-#include <transcoding/filters/fisheye_image_filter.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -35,7 +33,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
-#include <ui/workbench/workbench_context.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -43,9 +40,7 @@
 #include <nx/utils/string.h>
 #include <utils/common/warnings.h>
 
-#include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
-#include "transcoding/filters/abstract_image_filter.h"
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 using namespace nx::client::desktop::ui;
@@ -503,7 +498,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QImage result = image;
 
     if (!result.isNull()) {
-        // TODO: #GDM looks like total mess
+        // TODO: #GDM #3.2 looks like total mess
         parameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
             ? QDateTime::currentMSecsSinceEpoch()
             : parameters.displayTimeMsec;
@@ -516,21 +511,20 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.timestampParams = parameters.timestampParams;
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
-        QList<QnAbstractImageFilterPtr> filters = QnImageFilterHelper::createFilterChain(
-            transcodeParams,
-            result.size());
+        auto filters = QnImageFilterHelper::createFilterChain(
+            transcodeParams);
 
-        if (!filters.isEmpty()) {
+        // Thumbnail from loader is already merged for panoramic cameras.
+        const QSize noDownscale(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+        filters.prepareForImage(parameters.resource, result.size(), noDownscale);
+
+        if (!filters.isEmpty())
+        {
             QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
             // TODO: #GDM how is this supposed to work with latestScreenshotTime?
             frame->pts = parameters.utcTimestampMsec * 1000;
-            for(auto filter: filters)
-            {
-                frame = filter->updateImage(frame);
-                if (!frame)
-                    break;
-            }
-            result = (bool)frame ? frame->toImage() : QImage();
+            frame = filters.apply(frame);
+            result = frame ? frame->toImage() : QImage();
         }
     }
 

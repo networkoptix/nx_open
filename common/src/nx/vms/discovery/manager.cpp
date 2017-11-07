@@ -121,7 +121,7 @@ void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
         });
 }
 
-void Manager::checkEndpoint(const QUrl& url, QnUuid expectedId)
+void Manager::checkEndpoint(const nx::utils::Url& url, QnUuid expectedId)
 {
     checkEndpoint(SocketAddress(url.host(), (uint16_t) url.port()), std::move(expectedId));
 }

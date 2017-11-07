@@ -13,7 +13,7 @@ class NX_NETWORK_API LineSplitter
 {
 public:
     LineSplitter();
-    ~LineSplitter();
+    virtual ~LineSplitter() = default;
 
     /**
      * If source buffer data contains whole line then reference to data is returned, 

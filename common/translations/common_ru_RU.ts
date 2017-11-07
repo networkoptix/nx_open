@@ -84,12 +84,12 @@
     </message>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Новая система</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation type="unfinished">The discovered System %1 is incompatible with the current System.</translation>
+      <translation>Обнаружкнная система %1 несовместима с текущей.</translation>
     </message>
   </context>
   <context>
@@ -255,18 +255,6 @@
       <translation>Убедитесь, что порт %1 доступен (например, проброшен).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
     </message>
@@ -313,6 +301,18 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Камера была восстановлена ​​из архива. Удалите камеру и добавьте ее снова, чтобы просмотреть видео в реальном времени.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства (ошибка "%1").</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры (ошибка "%1").</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках I/O модуля (ошибка "%1").</translation>
     </message>
   </context>
   <context>
@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Возобновляемые лицензии</translation>
     </message>
   </context>
   <context>
@@ -687,7 +687,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <translation>Возобновляемая лицензия</translation>
     </message>
   </context>
   <context>
@@ -1014,7 +1014,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Только видео с камер</translation>
+      <translation>Только видео в реальном времени</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1034,7 +1034,7 @@
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>Может смотреть живое видео со всех камер.</translation>
+      <translation>Может смотреть видео в реальном времени со всех камер.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
@@ -1275,11 +1275,11 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
+      <translation>Проблема с лицензией на сервере &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
+      <translation>Сервер &quot;%1&quot; завершил резервное копирование архива</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1413,7 +1413,7 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Диск %1 переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
+      <translation>Диск &quot;%1&quot; переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
@@ -1533,7 +1533,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>Подтверждить</translation>
+      <translation>Подтвердить</translation>
     </message>
   </context>
   <context>

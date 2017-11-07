@@ -3,6 +3,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 
+#include <ini.h>
+
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
@@ -10,7 +12,7 @@
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
-#include <analytics/metadata_analytics_controller.h>
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 
 #include "core/resource/camera_resource.h"
@@ -253,32 +255,28 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
     }
 }
 
-QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality)
+QImage QnCamDisplay::getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams,
+    bool anyQuality)
 {
-    nx::core::transcoding::FilterChain filters;
+    auto filters = QnImageFilterHelper::createFilterChain(imageProcessingParams);
     CLVideoDecoderOutputPtr frame;
-    bool filtersReady = false;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         if (m_display[i])
         {
             frame = m_display[i]->getScreenshot(anyQuality);
-            if (frame)
+            if (!frame)
+                continue;
+
+            if (!filters.isTranscodingRequired(imageProcessingParams.resource))
+                return frame->toImage();
+
+            if (!filters.isReady())
             {
-                if (!filtersReady)
-                {
-                    filtersReady = true;
-                    filters = QnImageFilterHelper::createFilterChain(imageProcessingParams,
-                        QSize(frame->width, frame->height));
-                }
-                frame = filters.apply(frame);
-                for(auto filter: filters)
-                {
-                    frame = filter->updateImage(frame);
-                    if (!frame)
-                        break;
-                }
+                filters.prepare(imageProcessingParams.resource,
+                    QSize(frame->width, frame->height));
             }
+            frame = filters.apply(frame);
         }
     }
     return frame ? frame->toImage() : QImage();
@@ -1151,6 +1149,10 @@ void QnCamDisplay::clearMetaDataInfo()
 
 void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
 {
+    const auto& ini = nx::client::desktop::ini();
+    if (ini.enableAnalytics && ini.externalMetadata)
+        qnMetadataAnalyticsController->gotFrame(m_resource->toResourcePtr(), video->timestamp);
+
     auto & queue = m_lastMetadata[video->channelNumber];
     if (queue.empty())
         return;
@@ -1158,13 +1160,19 @@ void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
     if (itr != queue.begin())
         --itr;
 
-    const QnAbstractCompressedMetadataPtr& metadata = itr->second;
-    if (metadata->containTime(video->timestamp))
+    auto& metadataList = itr->second;
+    for (auto itrMetadata = metadataList.begin(); itrMetadata != metadataList.end();)
     {
-        video->motion = metadata;
-        qnMetadataAnalyticsController->gotMetadataPacket(
-            m_resource.dynamicCast<QnVirtualCameraResource>(),
-            std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
+        auto& metadata = *itrMetadata;
+        if (metadata->containTime(video->timestamp))
+        {
+            video->metadata << metadata;
+            itrMetadata = metadataList.erase(itrMetadata);
+        }
+        else
+        {
+            ++itrMetadata;
+        }
     }
     queue.erase(queue.begin(), itr);
 }
@@ -1179,9 +1187,10 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     QnAbstractCompressedMetadataPtr metadata =
         std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
 
-    if (metadata) {
+    if (metadata)
+    {
         int ch = metadata->channelNumber;
-        m_lastMetadata[ch][metadata->timestamp] = metadata;
+        m_lastMetadata[ch][metadata->timestamp] << metadata;
         if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
             m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
         return true;

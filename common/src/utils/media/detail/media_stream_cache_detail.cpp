@@ -32,13 +32,13 @@ MediaStreamCache::MediaStreamCache(
     m_inactivityTimer.restart();
 }
 
-//!Implementation of QnAbstractDataReceptor::canAcceptData
+//!Implementation of QnAbstractMediaDataReceptor::canAcceptData
 bool MediaStreamCache::canAcceptData() const
 {
     return true;
 }
 
-//!Implementation of QnAbstractDataReceptor::putData
+//!Implementation of QnAbstractMediaDataReceptor::putData
 void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     std::vector<std::function<void()>> eventsToDeliver;

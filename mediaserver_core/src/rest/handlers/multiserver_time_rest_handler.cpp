@@ -21,11 +21,11 @@ static void loadRemoteDataAsync(
     QnCommonModule* commonModule,
     ApiMultiserverServerDateTimeDataList& outputData,
     const QnMediaServerResourcePtr& server,
-    QnTimeRequestContext* ctx,
+    QnTimeRequestContext* context,
     const QString& urlPath)
 {
     auto requestCompletionFunc =
-        [ctx, &outputData, server]
+        [context, &outputData, server]
         (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
         {
             bool success = false;
@@ -44,28 +44,28 @@ static void loadRemoteDataAsync(
                 remoteData.timeZoneOffsetMs = timeData.timeZoneOffset;
                 remoteData.timeZoneId = timeData.timezoneId;
             }
-            ctx->executeGuarded(
-                [ctx, success, &remoteData, &outputData]()
+            context->executeGuarded(
+                [context, success, &remoteData, &outputData]()
                 {
                     if (success)
                         outputData.push_back(std::move(remoteData));
-                    ctx->requestProcessed();
+                    context->requestProcessed();
                 });
         };
 
-    QUrl apiUrl(server->getApiUrl());
+    nx::utils::Url apiUrl(server->getApiUrl());
     apiUrl.setPath(urlPath);
     apiUrl.setQuery("local"); //< Use device (OS) time.
 
     auto router = commonModule->router();
-    runMultiserverDownloadRequest(router, apiUrl, server, requestCompletionFunc, ctx);
+    runMultiserverDownloadRequest(router, apiUrl, server, requestCompletionFunc, context);
 }
 
 } // namespace
 
 QnMultiserverTimeRestHandler::QnMultiserverTimeRestHandler(const QString& getTimeApiMethodPath):
     QnFusionRestHandler(),
-    m_urlPath(getTimeApiMethodPath)
+    m_getTimeApiMethodPath(getTimeApiMethodPath)
 {
 }
 
@@ -78,13 +78,16 @@ int QnMultiserverTimeRestHandler::executeGet(
 {
     ApiMultiserverServerDateTimeDataList outputData;
     const auto ownerPort = owner->owner()->getPort();
-    QnTimeRequestContext ctx(DummyType(), ownerPort);
+    QnTimeRequestContext context(DummyType(), ownerPort);
 
     auto onlineServers = owner->commonModule()->resourcePool()->getAllServers(Qn::Online);
     for (const auto& server: onlineServers)
-        loadRemoteDataAsync(owner->commonModule(), outputData, server, &ctx, m_urlPath);
+    {
+        loadRemoteDataAsync(
+            owner->commonModule(), outputData, server, &context, m_getTimeApiMethodPath);
+    }
 
-    ctx.waitForDone();
+    context.waitForDone();
     QnRestResult restResult;
     QnFusionRestHandlerDetail::serializeRestReply(
         outputData, params, result, contentType, restResult);

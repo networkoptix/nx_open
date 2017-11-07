@@ -377,7 +377,9 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
             emit guard->cloudPasswordValidated((errorCode == ec2::ErrorCode::ok), password);
         };
 
+    // Current url may be authorized using temporary credentials, so update both username and pass.
     auto url = commonModule()->currentUrl();
+    url.setUserName(context()->user()->getName());
     url.setPassword(password);
     lockUi(true);
     qnClientCoreModule->connectionFactory()->testConnection(url, this, handler);

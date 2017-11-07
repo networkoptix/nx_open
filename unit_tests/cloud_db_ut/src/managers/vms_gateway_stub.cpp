@@ -10,18 +10,25 @@ VmsGatewayStub::~VmsGatewayStub()
 }
 
 void VmsGatewayStub::merge(
+    const std::string& username,
     const std::string& targetSystemId,
-    nx::utils::MoveOnlyFunc<void()> completionHandler)
+    const std::string& /*idOfSystemToMergeTo*/,
+    VmsRequestCompletionHandler completionHandler)
 {
+    RequestContext requestContext;
+    requestContext.params.username = username;
+    requestContext.params.targetSystemId = targetSystemId;
+    requestContext.completionHandler = std::move(completionHandler);
+
     m_pollable.post(
-        [this, targetSystemId, completionHandler = std::move(completionHandler)]() mutable
+        [this, requestContext = std::move(requestContext)]() mutable
         {
-            m_systemsRequested.insert(targetSystemId);
+            m_systemsRequested.insert(requestContext.params.targetSystemId);
 
             if (m_paused)
-                m_queuedRequests.push(std::move(completionHandler));
+                m_queuedRequests.push(std::move(requestContext));
             else
-                completionHandler();
+                reportRequestResult(std::move(requestContext));
         });
 }
 
@@ -38,15 +45,36 @@ void VmsGatewayStub::resume()
             m_paused = false;
             while (!m_queuedRequests.empty())
             {
-                m_queuedRequests.front()();
+                auto requestContext = std::move(m_queuedRequests.front());
                 m_queuedRequests.pop();
+                reportRequestResult(std::move(requestContext));
             }
         });
 }
 
-bool VmsGatewayStub::performedRequestToSystem(const std::string& id) const
+MergeRequestParameters VmsGatewayStub::popRequest()
 {
-    return m_systemsRequested.find(id) != m_systemsRequested.end();
+    return m_performedRequestsQueue.pop();
+}
+
+void VmsGatewayStub::failEveryRequestToSystem(const std::string& id)
+{
+    m_malfunctioningSystems.insert(id);
+}
+
+void VmsGatewayStub::reportRequestResult(RequestContext requestContext)
+{
+    VmsRequestResult vmsRequestResult;
+
+    vmsRequestResult.resultCode = 
+        m_malfunctioningSystems.find(requestContext.params.targetSystemId) 
+            == m_malfunctioningSystems.end()
+        ? VmsResultCode::ok
+        : VmsResultCode::networkError;
+
+    m_performedRequestsQueue.push(requestContext.params);
+
+    requestContext.completionHandler(std::move(vmsRequestResult));
 }
 
 } // namespace test

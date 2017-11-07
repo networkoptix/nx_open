@@ -1,5 +1,6 @@
 #if defined(ENABLE_HANWHA)
 
+#include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_utils.h"
 
@@ -9,6 +10,7 @@
 
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/http_client.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -26,15 +28,10 @@ const QString kAction = lit("action");
 
 } // namespace
 
-HanwhaRequestHelper::HanwhaRequestHelper(const QnSecurityCamResourcePtr& resource):
-    m_auth(resource->getAuth()),
-    m_url(resource->getUrl())
-{
-}
-
-HanwhaRequestHelper::HanwhaRequestHelper(const QAuthenticator& auth, const QString& url):
-    m_auth(auth),
-    m_url(url)
+HanwhaRequestHelper::HanwhaRequestHelper(
+    const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext)
+:
+    m_resourceContext(resourceContext)
 {
 }
 
@@ -44,8 +41,7 @@ HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesP
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(attributesPath);
 
-    qDebug() << "URL" << url;
-    if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
+    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
         return HanwhaAttributes(statusCode);
 
     return HanwhaAttributes(buffer, statusCode);
@@ -57,7 +53,7 @@ HanwhaCgiParameters HanwhaRequestHelper::fetchCgiParameters(const QString& cgiPa
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
     auto url = buildAttributesUrl(cgiParametersPath);
 
-    if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
+    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
         return HanwhaCgiParameters(statusCode);
 
     return HanwhaCgiParameters(buffer, statusCode);
@@ -72,12 +68,12 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
 {
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
-    
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
-    if (!doRequestInternal(url, m_auth, &buffer, &statusCode))
-        return HanwhaResponse(statusCode);
 
-    return HanwhaResponse(buffer, statusCode, groupBy);
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
+    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
+        return HanwhaResponse(statusCode, url.toString(QUrl::RemoveUserInfo));
+
+    return HanwhaResponse(buffer, statusCode, url.toString(QUrl::RemoveUserInfo), groupBy);
 }
 
 HanwhaResponse HanwhaRequestHelper::view(
@@ -113,44 +109,55 @@ HanwhaResponse HanwhaRequestHelper::control(const QString& path, const Parameter
     return splitAndDoRequest(lit("control"), path, parameters);
 }
 
+HanwhaResponse HanwhaRequestHelper::check(const QString& path, const Parameters& parameters)
+{
+    return splitAndDoRequest(lit("check"), path, parameters);
+}
+
 void HanwhaRequestHelper::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
 {
     m_ignoreMutexAnalyzer = ignoreMutexAnalyzer;
 }
 
-QUrl HanwhaRequestHelper::buildRequestUrl(
+utils::Url HanwhaRequestHelper::buildRequestUrl(
+    nx::utils::Url deviceUrl,
+    const QString& cgi,
+    const QString& submenu,
+    const QString& action,
+    std::map<QString, QString> parameters)
+{
+    QUrlQuery query;
+
+    deviceUrl.setPath(kPathTemplate.arg(cgi));
+    query.addQueryItem(kSubmenu, submenu);
+    query.addQueryItem(kAction, action);
+
+    for (const auto& parameter : parameters)
+        query.addQueryItem(parameter.first, parameter.second);
+
+    deviceUrl.setQuery(query);
+    return deviceUrl;
+}
+
+nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
     std::map<QString, QString> parameters) const
 {
-    QUrl url(m_url);
-    QUrlQuery query;
-
-    url.setPath(kPathTemplate.arg(cgi));
-    query.addQueryItem(kSubmenu, submenu);
-    query.addQueryItem(kAction, action);
-
-    for (const auto& parameter: parameters)
-        query.addQueryItem(parameter.first, parameter.second);
-    
-    url.setQuery(query);
-
-    return url;
+    return buildRequestUrl(m_resourceContext->url(), cgi, submenu, action, std::move(parameters));
 }
 
-QUrl HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const
+nx::utils::Url HanwhaRequestHelper::buildAttributesUrl(const QString& attributesPath) const
 {
-    QUrl url(m_url);
+    nx::utils::Url url(m_resourceContext->url());
     url.setQuery(QUrlQuery());
-
     url.setPath(kAttributesPathTemplate.arg(attributesPath));
-
     return url;
 }
 
 bool HanwhaRequestHelper::doRequestInternal(
-    const QUrl& url,
+    const utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
     nx_http::StatusCode::Value* outStatusCode)
@@ -168,13 +175,24 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
     httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
 
-    if (!httpClient.doGet(url))
-        return false;
+    auto realUrl = m_bypass
+        ? makeBypassUrl(url)
+        : url;
 
+    QnSemaphoreLocker lock(m_resourceContext->requestSemaphore());
+    if (!httpClient.doGet(realUrl))
+    {
+        NX_VERBOSE(m_resourceContext.get(), lm("%1 has failed").args(realUrl));
+        return false;
+    }
+
+    m_resourceContext->setLastSucessfulUrl(httpClient.contentLocationUrl());
     while (!httpClient.eof())
         outBuffer->append(httpClient.fetchMessageBodyBuffer());
 
-    *outStatusCode = (nx_http::StatusCode::Value)httpClient.response()->statusLine.statusCode;
+    *outStatusCode = (nx_http::StatusCode::Value) httpClient.response()->statusLine.statusCode;
+    NX_VERBOSE(m_resourceContext.get(), lm("%1 result %2").args(
+        httpClient.contentLocationUrl(), httpClient.response()->statusLine.statusCode));
 
     return true;
 }
@@ -187,9 +205,36 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
 {
     auto split = path.split(L'/');
     if (split.size() != 2)
-        return HanwhaResponse(nx_http::StatusCode::undefined);
+    {
+        QString parameterString;
+        for (const auto& parameter: parameters)
+            parameterString += parameter.first + lit("=") + parameter.second + lit("&");
+
+        QString urlString = lit("Path: %1, Action: %2, Parameters: %3")
+            .arg(path)
+            .arg(action)
+            .arg(parameterString);
+
+        return HanwhaResponse(nx_http::StatusCode::undefined, urlString);
+    }
 
     return doRequest(split[0], split[1], action, parameters, groupBy);
+}
+
+nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) const
+{
+    nx::utils::Url bypassUrl(url);
+    bypassUrl.setPath(lit("/stw-cgi/bypass.cgi"));
+
+    QUrlQuery bypassQuery;
+    bypassQuery.addQueryItem(lit("msubmenu"), lit("bypass"));
+    bypassQuery.addQueryItem(lit("action"), lit("control"));
+    bypassQuery.addQueryItem(lit("Channel"), m_channel);
+    bypassQuery.addQueryItem(lit("BypassURI"), url.path() + lit("?") + url.query());
+
+    bypassUrl.setQuery(bypassQuery);
+
+    return bypassUrl;
 }
 
 } // namespace plugins

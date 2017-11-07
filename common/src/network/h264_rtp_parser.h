@@ -35,14 +35,13 @@ private:
     bool m_builtinSpsFound;
     bool m_builtinPpsFound;
     bool m_keyDataExists;
-    bool m_idrFound;
+    int m_idrCounter;
     bool m_frameExists;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
 
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
-    bool m_previousPacketHasMarkerBit;
     std::vector<quint8> m_nextFrameChunksBuffer;
     quint32 m_lastRtpTime;
 private:

@@ -11,7 +11,6 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kMinimumFontSize = 10;
 static constexpr int kMaximumFontSize = 400;
 
 } // namespace
@@ -30,7 +29,8 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
     ui->formatComboBox->addItem(lit("ISO 8601"), Qt::ISODate);
     ui->formatComboBox->addItem(lit("RFC 2822"), Qt::RFC2822Date);
 
-    ui->fontSizeSpinBox->setRange(kMinimumFontSize, kMaximumFontSize);
+    ui->fontSizeSpinBox->setRange(ExportTimestampOverlayPersistentSettings::minimumFontSize(),
+        kMaximumFontSize);
     updateControls();
 
     connect(ui->fontSizeSpinBox, QnSpinboxIntValueChanged,
@@ -73,6 +73,17 @@ void TimestampOverlaySettingsWidget::setData(const ExportTimestampOverlayPersist
     m_data = data;
     updateControls();
     emit dataChanged(m_data);
+}
+
+bool TimestampOverlaySettingsWidget::formatEnabled() const
+{
+    return !ui->formatComboBox->isHidden();
+}
+
+void TimestampOverlaySettingsWidget::setFormatEnabled(bool value)
+{
+    ui->formatLabel->setVisible(value);
+    ui->formatComboBox->setVisible(value);
 }
 
 } // namespace desktop

@@ -95,7 +95,7 @@
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation>Максимальная длина живая буфера живого видео</translation>
+      <translation>Максимальный размер буфера живого видео</translation>
     </message>
     <message>
       <location/>
@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>На дисплее Intel HD Graphics могут возникнуть проблемы, если включено размытие. Мы настоятельно рекомендуем оставить опцию как есть.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Отключить размытие</translation>
     </message>
   </context>
   <context>
@@ -171,7 +171,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>Просмотр живого видео</translation>
+      <translation>Просмотр видео в реальном времени</translation>
     </message>
     <message>
       <location/>
@@ -419,7 +419,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>На</translation>
     </message>
   </context>
   <context>
@@ -709,17 +709,17 @@
     <message>
       <location/>
       <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>Управление PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>Отключить собственные настройки, вместо этого использовать системные</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Предупреждение. Собственные пресеты камеры не будут доступны.</translation>
     </message>
   </context>
   <context>
@@ -727,7 +727,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <translation>Id тревожного входа</translation>
     </message>
   </context>
   <context>
@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <translation>Id тревожного выхода:</translation>
     </message>
   </context>
   <context>
@@ -1393,7 +1393,7 @@
     <message>
       <location/>
       <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <translation>Привязано к аппаратному Id:</translation>
     </message>
   </context>
   <context>
@@ -1492,7 +1492,7 @@
     <message>
       <location/>
       <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <translation>Аппаратный Id</translation>
     </message>
   </context>
   <context>
@@ -1688,7 +1688,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Воспроизвести для пользователей</translation>
     </message>
   </context>
   <context>
@@ -1706,7 +1706,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Требовать подтверждение</translation>
     </message>
   </context>
   <context>
@@ -2271,7 +2271,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Воспроизвести для пользователей</translation>
     </message>
   </context>
   <context>
@@ -2611,7 +2611,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Доступно для</translation>
     </message>
     <message>
       <location/>
@@ -2621,7 +2621,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Значок</translation>
     </message>
   </context>
   <context>
@@ -2736,22 +2736,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Роли</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Показать всех пользователей</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Выбрать пользователей</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>По вашему запросу нет результатов.</translation>
     </message>
   </context>
   <context>
@@ -2787,7 +2787,7 @@
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Синхронизировать время с Интернетом</translation>
     </message>
   </context>
   <context>

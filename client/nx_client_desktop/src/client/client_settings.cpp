@@ -72,7 +72,7 @@ QnConnectionData readConnectionData(QSettings *settings)
 
 void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
 {
-    QUrl url = connection.url;
+    nx::utils::Url url = connection.url;
 
     QString password;
     if (!url.password().isEmpty())
@@ -391,8 +391,9 @@ void QnClientSettings::migrateKnownServerConnections()
     auto migratedKnownUrls = qnClientCoreSettings->knownServerUrls();
     const auto& knownConnections = qnClientCoreSettings->knownServerConnections();
 
-    for (const auto url: knownUrls)
+    for (const auto qUrl: knownUrls)
     {
+        const auto url = nx::utils::Url::fromQUrl(qUrl);
         if (std::any_of(
                 knownConnections.begin(), knownConnections.end(),
                 [&url](const QnClientCoreSettings::KnownServerConnection& connection)
@@ -401,7 +402,7 @@ void QnClientSettings::migrateKnownServerConnections()
                 })
             || std::any_of(
                 migratedKnownUrls.begin(), migratedKnownUrls.end(),
-                [&url](const QUrl& other)
+                [&url](const nx::utils::Url& other)
                 {
                     return nx::utils::url::addressesEqual(url, other);
                 }))

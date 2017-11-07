@@ -43,8 +43,8 @@ bool ConnectionMediatorUrlFetcher::analyzeXmlSearchResult(
         searchResult.get(CloudInstanceSelectionAttributeNameset::hpmUdpUrl, &foundUdpUrlStr))
     {
         m_mediatorHostDescriptor = MediatorHostDescriptor();
-        m_mediatorHostDescriptor->tcpUrl = QUrl(foundTcpUrlStr);
-        m_mediatorHostDescriptor->udpUrl = QUrl(foundUdpUrlStr);
+        m_mediatorHostDescriptor->tcpUrl = nx::utils::Url(foundTcpUrlStr);
+        m_mediatorHostDescriptor->udpUrl = nx::utils::Url(foundUdpUrlStr);
         return true;
     }
 
@@ -69,8 +69,8 @@ void ConnectionMediatorUrlFetcher::invokeHandler(
     NX_ASSERT(statusCode != nx_http::StatusCode::ok || static_cast<bool>(m_mediatorHostDescriptor));
     handler(
         statusCode,
-        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->tcpUrl : QUrl(),
-        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->udpUrl : QUrl());
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->tcpUrl : nx::utils::Url(),
+        m_mediatorHostDescriptor ? m_mediatorHostDescriptor->udpUrl : nx::utils::Url());
 }
 
 } // namespace cloud

@@ -11,7 +11,7 @@
 
 #include <api/app_server_connection.h>
 #include <nx/mediaserver/event/event_connector.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/abstract_storage_resource.h>
@@ -20,7 +20,6 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resource_searcher.h>
 #include <core/resource_management/data_only_camera_resource.h>
-#include <plugins/storage/dts/abstract_dts_searcher.h>
 #include <plugins/resource/desktop_camera/desktop_camera_resource.h>
 #include <common/common_module.h>
 #include <media_server/settings.h>

@@ -125,8 +125,7 @@ QString QnAdamResourceSearcher::getAdamModuleFirmware(nx::modbus::QnModbusClient
     return QString::fromLatin1(response).trimmed();
 }
 
-QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
-    const QUrl &url,
+QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url &url,
     const QAuthenticator &auth,
     bool doMultichannelCheck)
 {
@@ -166,7 +165,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(
 
     modbusClient.disconnect();
 
-    QUrl modbusUrl(url);
+    nx::utils::Url modbusUrl(url);
     modbusUrl.setScheme(lit("http"));
     modbusUrl.setPort(url.port(nx::modbus::kDefaultModbusPort));
     resource->setVendor(lit("Advantech"));
@@ -262,7 +261,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
             }
             else
             {
-                QUrl url;
+                nx::utils::Url url;
                 url.setScheme(lit("http"));
                 url.setHost(remoteEndpoint.address.toString());
                 url.setPort(nx::modbus::kDefaultModbusPort);

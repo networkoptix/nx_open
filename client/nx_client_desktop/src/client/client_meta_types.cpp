@@ -24,6 +24,7 @@
 #include <utils/ping_utility.h>
 #include <nx/client/desktop/utils/server_file_cache.h>
 #include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
+#include <nx/client/desktop/layout_templates/layout_template.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
@@ -124,6 +125,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<rest::QnConnectionPtr>();
 
     qRegisterMetaType<nx::client::desktop::ExportMediaPersistentSettings>();
+
+    qRegisterMetaType<LayoutTemplate>();
 
     QMetaType::registerComparators<QnUuid>();
 

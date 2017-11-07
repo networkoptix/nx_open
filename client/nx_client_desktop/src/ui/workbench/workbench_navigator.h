@@ -108,6 +108,9 @@ public:
     /** Any of the syncable widgets on the layout is recording. */
     bool isRecording() const;
 
+    /** Sync is forcedly enabled. */
+    bool syncIsForced() const;
+
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     QnSpeedRange speedRange() const;
@@ -145,6 +148,7 @@ signals:
     void speedRangeChanged();
     void positionChanged();
     void bookmarksModeEnabledChanged();
+    void syncIsForcedChanged();
     void timelineRelevancyChanged(bool isRelevant);
 
 protected:
@@ -198,6 +202,7 @@ protected slots:
     void updateSpeed();
     void updateSpeedRange();
     void updateTimelineRelevancy();
+    void updateSyncIsForced();
 
     void updateLocalOffset();
 
@@ -212,9 +217,7 @@ protected slots:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
     void at_widget_motionSelectionChanged(QnMediaResourceWidget *widget);
-    void at_widget_motionSelectionChanged();
     void at_widget_optionsChanged(QnResourceWidget *widget);
-    void at_widget_optionsChanged();
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
@@ -326,6 +329,9 @@ private:
     std::array<std::unique_ptr<QnThreadedChunksMergeTool>, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnSecurityCamResourcePtr> m_updateHistoryQueue;
+
+    /** Sync is forced for the current set of widgets. */
+    bool m_syncIsForced = false;
 
     /** At least one of the synced widgets has archive. */
     bool m_hasArchive;

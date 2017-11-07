@@ -21,15 +21,22 @@ public:
     virtual bool canAcceptData() const = 0;
     //!
     /*!
-        \note Can ignore data for some reasons (e.g., some internal buffer size is exceeded). 
+        \note Can ignore data for some reasons (e.g., some internal buffer size is exceeded).
             Data provider should use \a canAcceptData method to find out whether it is possible
     */
     virtual void putData( const QnAbstractDataPacketPtr& data ) = 0;
+};
+using QnAbstractDataReceptorPtr = QSharedPointer<QnAbstractDataReceptor>;
 
-    /*!
-        \note DataReceptor is required that provider should be fully configured
-    */
+
+class QnAbstractMediaDataReceptor: public QnAbstractDataReceptor
+{
+public:
+    /**
+     * DataReceptor is required that provider should be fully configured
+     */
     virtual bool needConfigureProvider() const { return true; }
 };
+using QnAbstractMediaDataReceptorPtr = QSharedPointer<QnAbstractMediaDataReceptor>;
 
 #endif  //ABSTRACT_DATA_RECEPTOR_H

@@ -28,6 +28,9 @@ ExportProcessError convertError(StreamRecorderError value)
         case StreamRecorderError::fileWrite:
             return ExportProcessError::fileAccess;
 
+        case StreamRecorderError::dataNotFound:
+            return ExportProcessError::dataNotFound;
+
         default:
             break;
     }

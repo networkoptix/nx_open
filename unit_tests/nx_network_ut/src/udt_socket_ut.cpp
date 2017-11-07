@@ -55,7 +55,7 @@ public:
     void setUdtSocketFunctions()
     {
         setCreateStreamSocketFunc(
-            [](bool /*sslRequired*/, NatTraversalSupport)
+            [](bool /*sslRequired*/, NatTraversalSupport, boost::optional<int> /*ipVersion*/)
                 -> std::unique_ptr<AbstractStreamSocket>
             {
                 return std::make_unique<UdtStreamSocket>(AF_INET);

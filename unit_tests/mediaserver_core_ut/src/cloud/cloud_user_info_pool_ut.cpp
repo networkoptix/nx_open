@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
-#include <network/auth/cloud_user_info_pool.h>
-#include <network/auth/cdb_nonce_fetcher.h>
+
 #include <nx/network/http/auth_tools.h>
 
+#include <nx/vms/cloud_integration/cloud_user_info_pool.h>
+#include <nx/vms/cloud_integration/cdb_nonce_fetcher.h>
 
 namespace test  {
 
@@ -13,26 +14,18 @@ static const nx::Buffer kWrongPassword = "wrong_password";
 static const nx::Buffer kTestUri = "/uri";
 static const nx::Buffer kTestMethod = "GET";
 
-
-class TestCdbNonceFetcher : public ::CdbNonceFetcher
-{
-public:
-    static nx::Buffer generateNonceTrailer()
-    {
-        return CdbNonceFetcher::generateNonceTrailer([]() { return 1; });
-    }
-};
-
-class TestCloudUserInfoPool : public ::CloudUserInfoPool
+class TestCloudUserInfoPool:
+    public nx::vms::cloud_integration::CloudUserInfoPool
 {
 public:
     using CloudUserInfoPool::CloudUserInfoPool;
 };
 
-class TestSupplier: public AbstractCloudUserInfoPoolSupplier
+class TestSupplier:
+    public nx::vms::cloud_integration::AbstractCloudUserInfoPoolSupplier
 {
 public:
-    virtual void setPool(AbstractCloudUserInfoPool* pool)
+    virtual void setPool(nx::vms::cloud_integration::AbstractCloudUserInfoPool* pool)
     {
         m_pool = pool;
     }
@@ -48,7 +41,7 @@ public:
     }
 
 private:
-    AbstractCloudUserInfoPool* m_pool;
+    nx::vms::cloud_integration::AbstractCloudUserInfoPool* m_pool;
 };
 
 class CloudUserInfoPool: public ::testing::Test
@@ -56,7 +49,7 @@ class CloudUserInfoPool: public ::testing::Test
 protected:
     CloudUserInfoPool():
         supplier(new TestSupplier),
-        userInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(supplier))
+        userInfoPool(std::unique_ptr<nx::vms::cloud_integration::AbstractCloudUserInfoPoolSupplier>(supplier))
     {}
 
     nx_http::header::Authorization generateAuthHeader(
@@ -66,7 +59,7 @@ protected:
     {
         nx_http::header::WWWAuthenticate authServerHeader;
         authServerHeader.authScheme = nx_http::header::AuthScheme::digest;
-        authServerHeader.params["nonce"] = cloudNonce + TestCdbNonceFetcher::generateNonceTrailer();
+        authServerHeader.params["nonce"] = cloudNonce + nx::vms::cloud_integration::CdbNonceFetcher::generateNonceTrailer();
         authServerHeader.params["realm"] = kTestRealm;
         authServerHeader.params["algorithm"] = kTestAlgorithm;
 
@@ -251,5 +244,4 @@ TEST_F(CloudUserInfoPool, IncorrectPassword)
     thenBothUsersCanNotAuthenticateWithWrongPasswords();
 }
 
-}
-
+} // namespace test

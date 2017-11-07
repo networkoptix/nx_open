@@ -8,6 +8,14 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
+static std::chrono::milliseconds s_connectionLessHolderExpirationTimeout = std::chrono::seconds(31);
+
+void ReverseConnectionHolder::setConnectionlessHolderExpirationTimeout(
+    std::chrono::milliseconds value)
+{
+    s_connectionLessHolderExpirationTimeout = value;
+}
+
 ReverseConnectionHolder::ReverseConnectionHolder(
     aio::AbstractAioThread* aioThread,
     const String& hostName)
@@ -15,7 +23,8 @@ ReverseConnectionHolder::ReverseConnectionHolder(
     aio::BasicPollable(aioThread),
     m_hostName(hostName),
     m_socketCount(0),
-    m_timer(std::make_unique<aio::Timer>())
+    m_timer(std::make_unique<aio::Timer>()),
+    m_prevConnectionTime(std::chrono::steady_clock::now())
 {
     m_timer->bindToAioThread(aioThread);
 }
@@ -62,6 +71,16 @@ void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> s
 
     (*it)->bindToAioThread(getAioThread());
     monitorSocket(it);
+
+    m_prevConnectionTime = std::chrono::steady_clock::now();
+}
+
+bool ReverseConnectionHolder::isActive() const
+{
+    const auto expirationTime = m_prevConnectionTime + s_connectionLessHolderExpirationTimeout;
+    return 
+        m_socketCount > 0 ||
+        (std::chrono::steady_clock::now() < expirationTime);
 }
 
 size_t ReverseConnectionHolder::socketCount() const
@@ -102,6 +121,9 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
                     startCleanupTimer(timeLeft);
 
                 m_handlers.emplace(expirationTime, std::move(handler));
+
+                NX_LOGX(lm("Added pending receiver for connection to %1. Totally %2 receives pending")
+                    .args(m_hostName, m_handlers.size()), cl_logDEBUG1);
             }
         });
 }

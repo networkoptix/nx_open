@@ -26,7 +26,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_history.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
 
@@ -406,7 +406,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    QUrl url(action->getParams().url);
+    nx::utils::Url url(action->getParams().url);
 
     if (action->getParams().text.isEmpty())
     {

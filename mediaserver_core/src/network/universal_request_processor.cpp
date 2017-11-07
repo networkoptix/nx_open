@@ -17,10 +17,13 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 
+namespace {
+
 static const int AUTH_TIMEOUT = 60 * 1000;
-//static const int AUTHORIZED_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
 
+
+} // namespace
 
 QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 {
@@ -75,7 +78,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     bool logReported = false;
     if (d->needAuth)
     {
-        QUrl url = getDecodedUrl();
+        nx::utils::Url url = getDecodedUrl();
         // set variable to true if standard proxy_unauthorized should be used
         const bool isProxy = needStandardProxy(d->owner->commonModule(), d->request);
         QElapsedTimer t;
@@ -89,7 +92,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
                 nx_http::HttpHeader( Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(authResult).toUtf8() ) );
 
             int retryThreshold = 0;
-            if (authResult == Qn::Auth_WrongDigest)
+            if (usedMethod == nx_http::AuthMethod::httpDigest)
                 retryThreshold = MAX_AUTH_RETRY_COUNT;
             else if (d->authenticatedOnce)
                 retryThreshold = 2; // Allow two more try if password just changed (QT client need it because of password cache)

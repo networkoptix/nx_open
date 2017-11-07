@@ -28,17 +28,19 @@ public:
 
     HanwhaMetadataMonitor(
         const Hanwha::DriverManifest& manifest,
-        const QUrl& resourceUrl, 
+        const nx::utils::Url& resourceUrl,
         const QAuthenticator& auth);
     virtual ~HanwhaMetadataMonitor();
 
     void startMonitoring();
     void stopMonitoring();
 
-    void setHandler(const Handler& handler);
+    void addHandler(const QString& handlerId, const Handler& handler);
+    void removeHandler(const QString& handlerId);
+    void clearHandlers();
 
 private:
-    QUrl buildMonitoringUrl(const QUrl& url) const;
+    nx::utils::Url buildMonitoringUrl(const nx::utils::Url& url) const;
     void initMonitorUnsafe();
 
 private:
@@ -49,11 +51,11 @@ private:
 private:
     const Hanwha::DriverManifest& m_manifest;
     mutable QnMutex m_mutex;
-    const QUrl m_url;
+    const nx::utils::Url m_url;
     const QAuthenticator m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;
     MultipartContentParserPtr m_contentParser;
-    Handler m_handler;
+    QMap<QString, Handler> m_handlers;
     bool m_started = false;
 };
 

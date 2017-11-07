@@ -101,7 +101,8 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1, false),
     LicenseTypeInfo(Qn::LC_Start,           "starter",       0, /*allowedToShareChannel*/ true),
     LicenseTypeInfo(Qn::LC_Free,            "free",          1, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Invalid,         "",              1, false)
+    LicenseTypeInfo(Qn::LC_Bridge,          "bridge",        0, false),
+    LicenseTypeInfo(Qn::LC_Invalid,         "",              1, false),
 };
 } // anonymous namespace
 
@@ -111,8 +112,8 @@ LicenseTypeInfo::LicenseTypeInfo() :
 {}
 
 LicenseTypeInfo::LicenseTypeInfo(
-    Qn::LicenseType licenseType, 
-    const QnLatin1Array& className, 
+    Qn::LicenseType licenseType,
+    const QnLatin1Array& className,
     bool allowedForARM,
     bool allowedToShareChannel)
     :
@@ -134,7 +135,7 @@ QnLicense::QnLicense(const QByteArray& licenseBlock):
 }
 
 QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
-{ 
+{
     QList<QByteArray> params;
     params << QByteArray("NAME=").append(value.name);
     params << QByteArray("SERIAL=").append(value.key);
@@ -207,6 +208,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_IO:             return tr("I/O Module");
     case Qn::LC_Start:          return tr("Start");
     case Qn::LC_Free:           return tr("Free");
+    case Qn::LC_Bridge:         return tr("Bridge");
     case Qn::LC_Invalid:        return tr("Invalid");
     default:
         break;
@@ -230,6 +232,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_IO:             return tr("I/O Module Licenses");
     case Qn::LC_Start:          return tr("Start Licenses");
     case Qn::LC_Free:           return tr("Free license");
+    case Qn::LC_Bridge:         return tr("Bridge Licenses");
     case Qn::LC_Invalid:        return tr("Invalid Licenses");
     default:
         break;

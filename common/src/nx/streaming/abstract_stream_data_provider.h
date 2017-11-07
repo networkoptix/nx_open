@@ -6,35 +6,16 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <core/resource/resource_media_layout.h>
 #include <utils/common/from_this_to_shared.h>
+#include <core/dataprovider/abstract_video_camera.h>
 
 class QnAbstractStreamDataProvider;
-class QnLiveStreamProvider;
 class QnResource;
-class QnAbstractDataReceptor;
+class QnAbstractMediaDataReceptor;
 
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10)
 
 struct AVCodecContext;
-
-class QnAbstractVideoCamera:
-    public QnFromThisToShared<QnAbstractVideoCamera>
-{
-public:
-    virtual ~QnAbstractVideoCamera() = default;
-
-    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() = 0;
-    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() = 0;
-
-    /**
-     * Mark some camera activity (RTSP client connection for example).
-     */
-    virtual void inUse(void* user) = 0;
-    /**
-     * Unmark some camera activity (RTSP client connection for example).
-     */
-    virtual void notInUse(void* user) = 0;
-};
 
 class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
 {
@@ -46,8 +27,8 @@ public:
     virtual bool dataCanBeAccepted() const;
 
     int processorsCount() const;
-    void addDataProcessor(QnAbstractDataReceptor* dp);
-    void removeDataProcessor(QnAbstractDataReceptor* dp);
+    void addDataProcessor(QnAbstractMediaDataReceptor* dp);
+    void removeDataProcessor(QnAbstractMediaDataReceptor* dp);
 
     virtual bool isReverseMode() const { return false;}
 
@@ -77,7 +58,7 @@ protected:
     void beforeDisconnectFromResource();
 
 protected:
-    QList<QnAbstractDataReceptor*> m_dataprocessors;
+    QList<QnAbstractMediaDataReceptor*> m_dataprocessors;
     mutable QnMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
     Qn::ConnectionRole m_role;

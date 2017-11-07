@@ -776,12 +776,15 @@ void socketErrorHandling(
     auto server = serverMaker();
 
     SystemError::setLastErrorCode(SystemError::noError);
-    ASSERT_TRUE(client->bind(SocketAddress::anyAddress))
+    ASSERT_TRUE(server->bind(SocketAddress::anyAddress))
         << SystemError::getLastOSErrorText().toStdString();
     ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 
+    ASSERT_EQ(true, server->listen());
+    ASSERT_EQ(SystemError::noError, SystemError::getLastOSErrorCode());
+
     SystemError::setLastErrorCode(SystemError::noError);
-    ASSERT_FALSE(server->bind(client->getLocalAddress()));
+    ASSERT_FALSE(client->bind(server->getLocalAddress()));
     ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::addrInUse);
 
     // Sounds wierd but linux ::listen sometimes returns true...

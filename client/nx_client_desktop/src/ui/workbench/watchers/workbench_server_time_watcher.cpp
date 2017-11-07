@@ -11,7 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <utils/common/synctime.h>
 #include <core/resource/fake_media_server.h>
@@ -95,7 +95,9 @@ qint64 QnWorkbenchServerTimeWatcher::displayOffset(const QnMediaResourcePtr &res
 QDateTime QnWorkbenchServerTimeWatcher::serverTime(const QnMediaServerResourcePtr& server,
     qint64 msecsSinceEpoch)
 {
-    const auto utcOffsetMs = server->utcOffset();
+    const auto utcOffsetMs = server
+        ? server->utcOffset()
+        : Qn::InvalidUtcOffset;
 
     QDateTime result;
     if (utcOffsetMs != Qn::InvalidUtcOffset)

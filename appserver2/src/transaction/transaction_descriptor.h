@@ -19,6 +19,7 @@
 #include <core/resource_access/user_access_data.h>
 
 #include "transaction.h"
+#include "nx_ec/access_helpers.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_camera_data.h"
@@ -80,35 +81,6 @@ enum class RemotePeerAccess
     Forbidden,
     Partial
 };
-
-namespace access_helpers {
-
-enum class Mode
-{
-    read,
-    write
-};
-
-using KeyValueFilterType        =   std::pair<const QString&, QString*>;
-using FilterFunctorType         =   std::function<bool(Mode mode, const Qn::UserAccessData&, KeyValueFilterType*)>;
-using FilterFunctorListType     =   std::vector<FilterFunctorType>;
-
-namespace detail {
-std::vector<QString> getRestrictedKeysByMode(Mode mode);
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue);
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value);
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key);
-
-void applyValueFilters(
-    Mode mode,
-    const Qn::UserAccessData& accessData,
-    KeyValueFilterType* keyValue,
-    const FilterFunctorListType& filterList,
-    bool* allowed = nullptr);
-
-} // namespace access_helpers
 
 namespace detail {
 

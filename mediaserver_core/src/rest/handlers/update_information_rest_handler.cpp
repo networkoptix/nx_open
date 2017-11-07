@@ -20,10 +20,10 @@
 namespace {
 
 template<typename ContextType>
-QUrl getServerApiUrl(
+nx::utils::Url getServerApiUrl(
     const QString& path, const QnMediaServerResourcePtr& server, ContextType context)
 {
-    QUrl result(server->getApiUrl());
+    nx::utils::Url result(server->getApiUrl());
     result.setPath(path);
 
     auto modifiedRequest = context->request();
@@ -92,7 +92,7 @@ void requestRemotePeers(
                 context->executeGuarded(updateOutputDataCallback);
             };
 
-        const QUrl apiUrl = getServerApiUrl(path, server, context);
+        const nx::utils::Url apiUrl = getServerApiUrl(path, server, context);
         runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc, context);
         context->waitForDone();
     }

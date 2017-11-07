@@ -5,7 +5,7 @@
 #include <limits>
 #include <array>
 
-#include <client/client_runtime_settings.h>
+#include <ini.h>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
@@ -1727,7 +1727,7 @@ void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
     bool visible = canBeVisible && m_tooltipVisible;
 
     if (visible)
-        showToolTip(animated);
+        showToolTip(false); //< Always show tooltip immediately.
     else
         hideToolTip(animated);
 }
@@ -3304,6 +3304,29 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     }
 
     dragProcessor()->mouseReleaseEvent(this, event);
+
+    const auto autoShiftAreaWidth = nx::client::desktop::ini().autoShiftAreaWidth;
+    if (autoShiftAreaWidth > 0 && m_dragIsClick && event->button() == Qt::LeftButton)
+    {
+        const auto pos = valueFromPosition(event->pos());
+        const auto offsetPercent = qBound(1, nx::client::desktop::ini().autoShiftOffsetPercent, 99);
+        const auto offsetDistance = (m_windowEnd - m_windowStart) * offsetPercent / 100;
+
+        const auto allowedOffset = m_msecsPerPixel * autoShiftAreaWidth;
+        const auto leftOffset = pos - m_windowStart;
+        const auto rightOffset = m_windowEnd - pos;
+
+        if (leftOffset <= allowedOffset)
+        {
+            // Shift window to the left (negative).
+            shiftWindow(leftOffset - offsetDistance, true);
+        }
+        else if (rightOffset <= allowedOffset)
+        {
+            // Shift window to the right (positive).
+            shiftWindow(offsetDistance - rightOffset, true);
+        }
+    }
 
     if (m_options.testFlag(LeftButtonSelection) && m_options.testFlag(ClearSelectionOnClick)
         && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)

@@ -96,7 +96,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     }
     else
     {
-        QUrl url;
+        nx::utils::Url url;
         if (const auto& connection = m_bus->commonModule()->ec2Connection())
             url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());
@@ -105,10 +105,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
-            {
-                httpClient->setUserPassword(adminUser->getDigest());
-                httpClient->setAuthType(nx_http::AuthType::authDigestWithPasswordHash);
-            }
+                httpClient->setUserAuthToken(nx_http::Ha1AuthToken(adminUser->getDigest()));
         }
         else
         {

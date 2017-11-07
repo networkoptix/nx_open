@@ -46,7 +46,7 @@ protected:
 
     virtual void onWebSocketAccepted(std::unique_ptr<nx::network::WebSocket> connection);
 
-    QUrl getUrl() const;
+    utils::Url getUrl() const;
     TestHttpServer& httpServer();
     void stopHttpServer();
 

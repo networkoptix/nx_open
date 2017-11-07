@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <plugin
 	name="Axis"
-	version="1" 
+	version="1"
 	unique_id="A6CC59F4-A1EE-4BB9-921D-971F4254B4A5">
 	<parameters>
 		<group name="Imaging">
@@ -58,7 +58,7 @@
 					dataType="Enumeration"
 					range="Enabled,Disabled"
                     internalRange="yes,no"
-					readCmd="param.cgi"/>                
+					readCmd="param.cgi"/>
 				<param id="root.ImageSource.I0.Sensor.ExposurePriority"
 					name="Exposure Priority"
 					dataType="Enumeration"
@@ -128,15 +128,15 @@
                     internalRange="8000,16000"
                     readCmd="param.cgi">
                     <dependencies>
-                        
+
                         <dependencies-ranges>
                             <conditional-range range="8" internalRange="8000" id="pcmRange">
-                                <condition 
+                                <condition
                                     watch="root.AudioSource.A0.AudioEncoding"
-                                    condition="valueIn=G711 ulaw,G726"/>    
+                                    condition="valueIn=G711 ulaw,G726"/>
                             </conditional-range>
                             <conditional-range range="8,16" internalRange="8000,16000" id="aacRange">
-                                <condition 
+                                <condition
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=AAC"/>
                             </conditional-range>
@@ -150,15 +150,15 @@
                     internalRange="12000,16000,24000,32000,48000,64000"
                     readCmd="param.cgi">
                     <dependencies>
-                        
+
                         <dependencies-ranges>
                             <conditional-range range="64" id="g711Range">
-                                <condition 
+                                <condition
                                     watch="root.AudioSource.A0.AudioEncoding"
-                                    condition="value=G711 ulaw"/>    
+                                    condition="value=G711 ulaw"/>
                             </conditional-range>
                             <conditional-range range="24,32" id="g726Range">
-                                <condition 
+                                <condition
                                     watch="root.AudioSource.A0.AudioEncoding"
                                     condition="value=G726"/>
                             </conditional-range>
@@ -210,7 +210,7 @@
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
-                                    <condition 
+                                    <condition
                                         watch="root.Network.Interface.I0.Link.IPv4Enabled"
                                         condition="value=Yes"/>
                                 </conditional-show>
@@ -225,7 +225,7 @@
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
-                                    <condition 
+                                    <condition
                                         watch="root.Network.Interface.I0.Link.IPv4Enabled"
                                         condition="value=Yes"/>
                                     <condition
@@ -239,11 +239,11 @@
                         name="Subnet Mask"
                         dataType="String"
                         readCmd="param.cgi">
-                        
+
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
-                                    <condition 
+                                    <condition
                                         watch="root.Network.Interface.I0.Link.IPv4Enabled"
                                         condition="value=Yes"/>
                                     <condition
@@ -252,16 +252,16 @@
                                 </conditional-show>
                             </dependencies-show>
                         </dependencies>
-                    </param>                                
+                    </param>
                     <param id="root.Network.Interface.I0.Manual.DefaultRouter"
                         name="DefaultGateway"
                         dataType="String"
-                        readCmd="param.cgi">                                
-                        
+                        readCmd="param.cgi">
+
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
-                                    <condition 
+                                    <condition
                                         watch="root.Network.Interface.I0.Link.IPv4Enabled"
                                         condition="value=Yes"/>
                                     <condition
@@ -270,7 +270,7 @@
                                 </conditional-show>
                             </dependencies-show>
                         </dependencies>
-                    </param>    
+                    </param>
                     <param id="root.Network.Interface.I1.Link.IPv4Enabled"
                         name="Enable IPv4 (Wireless)"
                         dataType="Enumeration"
@@ -283,7 +283,7 @@
                         range="DHCP,Static"
                         internalRange="dhcp,none"
                         readCmd="param.cgi">
-                        
+
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
@@ -316,7 +316,7 @@
                         name="Subnet Mask (Wireless)"
                         dataType="String"
                         readCmd="param.cgi">
-                        
+
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
@@ -329,12 +329,12 @@
                                 </conditional-show>
                             </dependencies-show>
                         </dependencies>
-                    </param>                                
+                    </param>
                     <param id="root.Network.Interface.I1.Manual.DefaultRouter"
                         name="DefaultGateway (Wireless)"
                         dataType="String"
                         readCmd="param.cgi">
-                        
+
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
@@ -404,7 +404,7 @@
                     <param id="root.Network.UPnP.FriendlyName"
                         name="Friendly Name"
                         dataType="String">
-                        
+
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
@@ -425,7 +425,7 @@
                     <param id="root.Network.Bonjour.FriendlyName"
                         name="Friendly Name"
                         dataType="String">
-                        
+
                         <dependencies>
                             <dependencies-show>
                                 <conditional-show>
@@ -473,20 +473,23 @@
 		<group name="Maintenance">
 			<param 	id="Reboot"
 				dataType="Button"
-				name="Reboot" 
+				name="Reboot"
 				description="This operation reboots the device."
+                confirmation="Are you sure you want to reboot the device?"
 				readCmd="restart.cgi"
                 writeCmd=""/>
 			<param 	id="FactoryDefault"
 				dataType="Button"
 				name="Soft Reset"
 				description="Reset settings to factory default except IP settings"
+                confirmation="Are you sure you want to reset all settings (except network) to default?"
 				readCmd="factorydefault.cgi"
                 writeCmd=""/>
 			<param 	id="HardFactoryDefault"
 				dataType="Button"
 				name="Hard Reset"
 				description="Reset settings to factory default (includes IP settings)"
+                confirmation="Are you sure you want to reset all settings (including network) to default?"
 				readCmd="hardfactorydefault.cgi"
                 writeCmd=""/>
 		</group>

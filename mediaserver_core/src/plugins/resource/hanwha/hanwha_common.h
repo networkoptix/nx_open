@@ -46,8 +46,9 @@ enum class HanwhaSessionType
 {
     undefined,
     live,
-    playback,
-    backup
+    archive,
+    preview,
+    fileExport
 };
 
 //TODO: #dmishin consider using Fusion instead of custom methods.
@@ -60,9 +61,12 @@ static const int kHanwhaInvalidGovLength = -1;
 static const int kHanwhaInvalidFps = -1;
 static const int kHanwhaInvalidBitrate = -1;
 static const int kHanwhaInvalidChannel = -1;
+static const int kHanwhaDefaultOverlappedId = 0;
 static const int kHanwhaMaxSecondaryStreamArea = 1024 * 768;
 static const int kHanwhaDefaultMaxPresetNumber = 1000;
 static const int kHanwhaProfileNameMaxLength = 12;
+
+static const QString kHanwhaDateTimeFormat("yyyy-MM-dd hh:mm:ss");
 
 const QString kHanwhaPrimaryNxProfileSuffix = lit("Primary");
 const QString kHanwhaSecondaryNxProfileSuffix = lit("Secondary");
@@ -180,6 +184,8 @@ static const QString kHanwhaFormatAttribute = lit("format");
 static const QString kHanwhaMaxLengthAttribute = lit("maxlen");
 
 static const int kHanwhaConfigurationNotFoundError = 612;
+
+static const QString kHanwhaNvrDeviceType = lit("NVR");
 
 } // namespace plugins
 } // namespace mediaserver_core

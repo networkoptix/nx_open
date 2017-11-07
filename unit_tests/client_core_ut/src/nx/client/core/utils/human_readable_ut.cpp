@@ -13,15 +13,10 @@ namespace {
 
 static const milliseconds kExampleTime = minutes(1) + seconds(15);
 static const QString kSeparator(L' ');
-static const auto kFormat = HumanReadable::Seconds | HumanReadable::Minutes;
+static const QString kDecimalSeparator(L'.');
+static const auto kTimeFormat = HumanReadable::Seconds | HumanReadable::Minutes;
 
 } // namespace
-
-
-TEST(HumanReadableTest, timeSpanNoUnit)
-{
-    ASSERT_TRUE(HumanReadable::timeSpan(kExampleTime, HumanReadable::NoUnit).isEmpty());
-}
 
 TEST(HumanReadableTest, timeSpan)
 {
@@ -37,7 +32,7 @@ TEST(HumanReadableTest, timeSpanNegative)
 TEST(HumanReadableTest, shortTimeSpan)
 {
     ASSERT_EQ("1m 15s", HumanReadable::timeSpan(kExampleTime,
-        kFormat,
+        kTimeFormat,
         HumanReadable::SuffixFormat::Short,
         kSeparator)
         .toStdString());
@@ -47,7 +42,7 @@ TEST(HumanReadableTest, shortTimeSpan)
 TEST(HumanReadableTest, longTimeSpan)
 {
     ASSERT_EQ("1 min 15 sec", HumanReadable::timeSpan(kExampleTime,
-        kFormat,
+        kTimeFormat,
         HumanReadable::SuffixFormat::Long,
         kSeparator)
         .toStdString());
@@ -57,7 +52,7 @@ TEST(HumanReadableTest, shortTimeSpanNegative)
 {
     const auto negativeMs = milliseconds(-1 * kExampleTime.count());
     ASSERT_EQ("-1m 15s", HumanReadable::timeSpan(negativeMs,
-        kFormat,
+        kTimeFormat,
         HumanReadable::SuffixFormat::Short,
         kSeparator)
         .toStdString());
@@ -68,11 +63,48 @@ TEST(HumanReadableTest, smallTimeSpanNegative)
     /* Check if small negative value correctly rounded to non-signed zero */
     const auto negativeMs = milliseconds(-1);
     ASSERT_EQ("0s", HumanReadable::timeSpan(negativeMs,
-        kFormat,
+        kTimeFormat,
         HumanReadable::SuffixFormat::Short,
         kSeparator)
         .toStdString());
 }
+
+TEST(HumanReadableTest, digitalVolumeSizeFixed)
+{
+    const auto size = 1315333734400;
+    ASSERT_EQ("1 TB 201 GB", HumanReadable::digitalSize(size,
+        HumanReadable::VolumeSize,
+        HumanReadable::DigitalSizeMultiplier::Binary,
+        HumanReadable::SuffixFormat::Long,
+        kSeparator,
+        /*suppressSecondUnitLimit*/ 200)
+        .toStdString());
+}
+
+TEST(HumanReadableTest, digitalVolumeSizeFixedOverflow)
+{
+    const auto size = 1315333734400;
+    ASSERT_EQ("1315333734400 Bytes", HumanReadable::digitalSize(size,
+        HumanReadable::Bytes,
+        HumanReadable::DigitalSizeMultiplier::Binary,
+        HumanReadable::SuffixFormat::Full,
+        kSeparator,
+        /*suppressSecondUnitLimit*/ 200)
+        .toStdString());
+}
+
+TEST(HumanReadableTest, digitalVolumeSizePrecise)
+{
+    const auto size = 1315333734400;
+    ASSERT_EQ("1.2 TB", HumanReadable::digitalSizePrecise(size,
+        HumanReadable::VolumeSize,
+        HumanReadable::DigitalSizeMultiplier::Binary,
+        HumanReadable::SuffixFormat::Long,
+        kDecimalSeparator,
+        /*precision*/ 1)
+        .toStdString());
+}
+
 
 
 } // namespace core

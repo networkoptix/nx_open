@@ -85,6 +85,8 @@ boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str);
 
 boost::optional<QSize> toQSize(const boost::optional<QString>& str);
 
+boost::optional<QSize> toQDateTime(const boost::optional<QString>& str);
+
 HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
 
 template<typename T>
@@ -152,6 +154,8 @@ QString toHanwhaString(AVCodecID codecId);
 
 QString toHanwhaString(const QSize& value);
 
+QString toHanwhaString(const QDateTime& value);
+
 QString toHanwhaString(Qn::BitrateControl codecId);
 
 QString toHanwhaString(Qn::EncodingPriority encodingPriority);
@@ -171,6 +175,10 @@ QString toHanwhaString(HanwhaClientType entropyCoding);
 bool areaComparator(const QString& lhs, const QString& rhs);
 
 bool ratioComparator(const QString& lhs, const QString& rhs);
+
+qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift);
+
+QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::seconds timeZoneShift);
 
 } // namespace plugins
 } // namespace mediaserver_core

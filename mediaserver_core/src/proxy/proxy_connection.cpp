@@ -33,6 +33,7 @@
 #include <nx/network/aio/unified_pollset.h>
 
 #include <utils/common/app_info.h>
+#include <core/resource/user_resource.h>
 
 class QnTcpListener;
 
@@ -129,7 +130,7 @@ static bool isLocalAddress(const QString& addr)
 }
 #endif
 
-QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, const QUrl& url)
+QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, const nx::utils::Url &url)
 {
     Q_D(QnProxyConnectionProcessor);
     auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
@@ -240,9 +241,18 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
         }
 
         nx_http::HttpHeader authHeader(authHeaderName, digestAuthorizationHeader.serialized());
-        nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalAuthHeader.digest->userid);
+        QByteArray originalUserName;
+        auto resPool = commonModule()->resourcePool();
+        if (auto user = resPool->getResourceById<QnUserResource>(d->accessRights.userId))
+            originalUserName = user->getName().toUtf8();
+        if (originalUserName.isEmpty())
+            originalUserName = originalAuthHeader.digest->userid;
+        if (!originalUserName.isEmpty())
+        {
+            nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalUserName);
+            nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
+        }
         nx_http::insertOrReplaceHeader(&d->request.headers, authHeader);
-        nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
     }
 
     return true;
@@ -260,7 +270,7 @@ void QnProxyConnectionProcessor::cleanupProxyInfo(nx_http::Request* request)
         QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
 }
 
-bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute)
+bool QnProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute)
 {
     Q_D(QnProxyConnectionProcessor);
 
@@ -270,7 +280,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     }
     else
 	{
-        QUrl url = d->request.requestLine.url;
+        nx::utils::Url url = d->request.requestLine.url;
         QString host = url.host();
         QString urlPath = QString('/') + QnTcpListener::normalizedPath(url.path());
 
@@ -305,7 +315,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             QStringList hostAndPort = host.split(':');
             int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
 
-            dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+            dstUrl = nx::utils::Url(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
         }
         else {
             QString scheme = url.scheme();
@@ -313,7 +323,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
                 scheme = lit("http");
 
             int defaultPort = getDefaultPortByProtocol(scheme);
-            dstUrl = QUrl(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
+            dstUrl = nx::utils::Url(lit("%1://%2:%3").arg(scheme).arg(url.host()).arg(url.port(defaultPort)));
         }
 
         if (urlPath.isEmpty())
@@ -355,7 +365,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
         }
         else if (QnUniversalRequestProcessor::needStandardProxy(commonModule(), d->request))
         {
-            QUrl url = d->request.requestLine.url;
+            nx::utils::Url url = d->request.requestLine.url;
             int defaultPort = getDefaultPortByProtocol(url.scheme());
             dstRoute.addr = SocketAddress(url.host(), url.port(defaultPort));
         }
@@ -444,13 +454,16 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
     d->dstSocket.clear();
 
     // update source request
-    QUrl dstUrl;
+    nx::utils::Url dstUrl;
     QnRoute dstRoute;
     if (!updateClientRequest(dstUrl, dstRoute))
     {
         d->socket->close();
         return false;
     }
+
+    if (dstRoute.id.isNull() && d->accessRights.userId.isNull())
+        return false; //< Do not allow direct IP connect for unauthorized users.
 
     d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
     if (d->lastConnectedUrl.isEmpty())
@@ -547,7 +560,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                 parseRequest();
                 QString path = d->request.requestLine.url.path();
                 // parse next request and change dst if required
-                QUrl dstUrl;
+                nx::utils::Url dstUrl;
                 QnRoute dstRoute;
                 updateClientRequest(dstUrl, dstRoute);
                 bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");

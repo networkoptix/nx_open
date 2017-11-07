@@ -11,15 +11,9 @@ class QnImageFilterHelper
 public:
     /**
      * Create filters for source image processing
-     *
-     * \param srcResolution             Source video size
-     * \param srcResolution             Source video size
-     * \returns                         Filter chain to process video
      */
     static nx::core::transcoding::FilterChain createFilterChain(
-        const nx::core::transcoding::LegacyTranscodingSettings& settings,
-        const QSize& srcResolution,
-        const QSize& resolutionLimit = nx::core::transcoding::FilterChain::kDefaultResolutionLimit);
+        const nx::core::transcoding::LegacyTranscodingSettings& settings);
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -36,12 +36,12 @@ DataSourceContextPtr DataSourceCache::take(const StreamingChunkCacheKey& key)
     // Searching reader in cache.
     for (auto it = m_cachedDataProviders.begin(); it != m_cachedDataProviders.end(); )
     {
-        const bool isTranscoderSuitable = 
+        const bool isTranscoderSuitable =
             it->first.live() == key.live() &&
             it->first.mediaStreamParamsEqualTo(key) &&
             it->first.streamingSessionId() == key.streamingSessionId() &&
             !key.streamingSessionId().isEmpty();
-        const bool mediaDataProviderSuitable = 
+        const bool mediaDataProviderSuitable =
             it->first.live() == key.live() &&
             it->second.first->mediaDataProvider->currentPos() == key.startTimestamp();
 

@@ -9,9 +9,7 @@
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
-    const nx::core::transcoding::LegacyTranscodingSettings& legacy,
-    const QSize& srcResolution,
-    const QSize& resolutionLimit)
+    const nx::core::transcoding::LegacyTranscodingSettings& legacy)
 {
     nx::core::transcoding::Settings settings;
     if (!qFuzzyIsNull(legacy.forcedAspectRatio))
@@ -22,12 +20,10 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     settings.zoomWindow = legacy.zoomWindow;
 
     nx::core::transcoding::FilterChain result(settings);
-    result.prepare(legacy.resource, srcResolution, resolutionLimit);
-
     if (legacy.timestampParams.enabled)
     {
-        result << QnAbstractImageFilterPtr(new QnTimeImageFilter(
-            legacy.resource->getVideoLayout(), legacy.timestampParams));
+        result.addLegacyFilter(QnAbstractImageFilterPtr(new QnTimeImageFilter(
+            legacy.resource->getVideoLayout(), legacy.timestampParams)));
     }
 
     return result;

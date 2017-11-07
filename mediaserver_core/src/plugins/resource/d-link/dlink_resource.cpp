@@ -154,7 +154,7 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
 {
     QAuthenticator auth = getAuth();
 
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );

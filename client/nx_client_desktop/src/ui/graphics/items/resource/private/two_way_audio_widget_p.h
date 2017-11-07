@@ -12,12 +12,13 @@
 
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/common/connective.h>
+#include <utils/license_usage_helper.h>
 
 class QnTwoWayAudioWidget;
 class QnImageButtonWidget;
 class GraphicsLabel;
 class VariantAnimator;
-class QnSingleCamLicenceStatusHelper;
+class QnSingleCamLicenseStatusHelper;
 
 typedef decltype(QnSpectrumData::data) VisualizerData;
 
@@ -32,7 +33,7 @@ public:
     QnTwoWayAudioWidgetColors colors;
 
 public:
-    QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner);
+    QnTwoWayAudioWidgetPrivate(const QString& sourceId, QnTwoWayAudioWidget* owner);
     virtual ~QnTwoWayAudioWidgetPrivate();
 
     void updateCamera(const QnVirtualCameraResourcePtr& camera);
@@ -64,6 +65,7 @@ private:
     Q_DECLARE_PUBLIC(QnTwoWayAudioWidget)
     QnTwoWayAudioWidget *q_ptr;
 
+    const QString m_sourceId;
     bool m_started;
     HintState m_state;
 
@@ -77,5 +79,5 @@ private:
     qint64 m_paintTimeStamp;
 
     QnVirtualCameraResourcePtr m_camera;
-    QScopedPointer<QnSingleCamLicenceStatusHelper> m_licenseHelper;
+    QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseHelper;
 };

@@ -16,9 +16,9 @@
 #include <nx/utils/log/log.h>
 #include <utils/math/math.h>
 #include "recorder/file_deletor.h"
-#include "plugins/resource/avi/avi_archive_delegate.h"
+#include "core/resource/avi/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
-#include "plugins/resource/avi/avi_resource.h"
+#include "core/resource/avi/avi_resource.h"
 #include "nx/streaming/archive_stream_reader.h"
 #include <QtCore/QDebug>
 #include "recording_manager.h"
@@ -603,7 +603,7 @@ QnServer::ChunksCatalog DeviceFileCatalog::getRole() const
     return m_catalog; // it is a const data
 }
 
-void DeviceFileCatalog::addRecord(const Chunk& chunk)
+void DeviceFileCatalog::addRecord(const Chunk& chunk, bool sideRecorder)
 {
     NX_ASSERT(chunk.durationMs < 1000 * 1000);
 
@@ -619,7 +619,9 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
         m_chunks.push_back( chunk );
         itr = m_chunks.begin() + (m_chunks.size()-1);
     }
-    m_recordingChunkTime = chunk.startTimeMs;
+
+    if (!sideRecorder)
+        m_recordingChunkTime = chunk.startTimeMs;
 }
 
 void DeviceFileCatalog::removeRecord(int idx)
@@ -666,13 +668,21 @@ qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
     return 0;
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration)
+DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(
+    int durationMs,
+    qint64 fileSize,
+    bool indexWithDuration,
+    qint64 startTimeMs)
 {
     NX_ASSERT(durationMs < 1000 * 1000);
     QnMutexLocker lock( &m_mutex );
     //m_chunks.last().durationMs = durationMs;
-    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), m_recordingChunkTime);
-    if (itr != m_chunks.end() && itr->startTimeMs == m_recordingChunkTime)
+    const auto timeToFind = startTimeMs == AV_NOPTS_VALUE
+        ? m_recordingChunkTime
+        : startTimeMs;
+
+    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), timeToFind);
+    if (itr != m_chunks.end() && itr->startTimeMs == timeToFind)
     {
         DeviceFileCatalog::Chunk& chunk = *itr;
         chunk.durationMs = durationMs;
@@ -703,7 +713,8 @@ QVector<DeviceFileCatalog::Chunk> DeviceFileCatalog::deleteRecordsBefore(int idx
 {
     int count = idx;
     QVector<Chunk> result;
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < count && !m_chunks.empty(); ++i)
+    {
         Chunk deletedChunk = deleteFirstRecord();
         if (deletedChunk.startTimeMs)
             result << deletedChunk;

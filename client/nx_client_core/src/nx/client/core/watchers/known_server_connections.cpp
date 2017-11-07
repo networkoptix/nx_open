@@ -144,7 +144,7 @@ void KnownServerConnections::Private::at_moduleFound(
     auto urls = qnClientCoreSettings->knownServerUrls();
 
     auto it = std::find_if(urls.begin(), urls.end(),
-        [&moduleData](const QUrl& url)
+        [&moduleData](const nx::utils::Url& url)
         {
             return moduleData.endpoint == nx::network::url::getEndpoint(url);
         });

@@ -10,7 +10,7 @@ namespace {
     const int defaultTimeoutMs = 10 * 1000;
 }
 
-QnLicenseList remoteLicenses(const QUrl &url, const QAuthenticator &auth, int *status) {
+QnLicenseList remoteLicenses(const nx::utils::Url &url, const QAuthenticator &auth, int *status) {
     QnLicenseList result;
 
     CLSimpleHTTPClient client(url, defaultTimeoutMs, auth);
