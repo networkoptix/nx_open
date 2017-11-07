@@ -646,27 +646,27 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         //  Generic resource permissions.
 
         // No access.
-        NoPermissions = 0x0000,
+        NoPermissions = 0,
 
         // Generic read access. Having this permission doesn't necessary mean that all
         // information is readable. See resource-specific permissions below. By default this means
         // that this resource will be available in server api replies (e.g. FullInfo)
-        ReadPermission = 0x0001,
+        ReadPermission = 1 << 0,
 
         // Generic write access. Having this permission doesn't necessary mean that all
         // information is writable. See resource-specific permissions below. Actual only on the
         // client side. By default this means we can modify the resource somehow.
-        WritePermission = 0x0002,
+        WritePermission = 1 << 1,
 
         // Generic save access. Resource can be saved to the server database. Actual both on the
         // client and the server side.
-        SavePermission = 0x0004,
+        SavePermission = 1 << 2,
 
         // Generic delete permission. Resource can be deleted from the server database.
-        RemovePermission = 0x0008,
+        RemovePermission = 1 << 3,
 
         // Permission to edit resource's name.
-        WriteNamePermission = 0x0010,
+        WriteNamePermission = 1 << 4,
 
         // Alias for common set of generic permissions.
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
@@ -678,7 +678,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
          * Generic permission to view actual resource content. Actually that means we can open
          * widget with this resource's content on the scene. For servers: health monitor access.
          */
-        ViewContentPermission = 0x0020,
+        ViewContentPermission = 1 << 5,
 
         //-----------------------------------------------------------------------------------------
 
@@ -705,10 +705,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         // Layout-specific permissions.
 
          // Permission to add or remove items from a layout.
-        AddRemoveItemsPermission = 0x0040,
+        AddRemoveItemsPermission = 1 << 6,
 
         // Permission to setup layout background or set locked flag.
-        EditLayoutSettingsPermission = 0x0080,
+        EditLayoutSettingsPermission = 1 << 7,
 
         // Permission set to modify without saving.
         ModifyLayoutPermission = ReadPermission | WritePermission | AddRemoveItemsPermission,
@@ -724,16 +724,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         // User-specific permissions.
 
         // Permission to edit associated password.
-        WritePasswordPermission = 0x0200,
+        WritePasswordPermission = 1 << 8,
 
         // Permission to edit access rights.
-        WriteAccessRightsPermission = 0x0400,
+        WriteAccessRightsPermission = 1 << 9,
 
         // Permission to edit user's email.
-        WriteEmailPermission = 0x0800,
+        WriteEmailPermission = 1 << 10,
 
         // Permission to edit user's full name.
-        WriteFullNamePermission = 0x1000,
+        WriteFullNamePermission = 1 << 11,
 
         // Full set of permissions which can be available for the user resource.
         FullUserPermissions = FullGenericPermissions
@@ -748,16 +748,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         // Media-specific permissions.
 
         // Permission to view camera's live stream.
-        ViewLivePermission = 0x2000,
+        ViewLivePermission = 1 << 12,
 
         // Permission to view camera's footage.
-        ViewFootagePermission = 0x4000,
+        ViewFootagePermission = 1 << 12,
 
         // Permission to export video parts.
-        ExportPermission = 0x8000,
+        ExportPermission = 1 << 14,
 
         // Permission to use camera's PTZ controls.
-        WritePtzPermission = 0x10000,
+        WritePtzPermission = 1 << 15,
 
         //-----------------------------------------------------------------------------------------
 
