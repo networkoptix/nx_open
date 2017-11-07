@@ -65,7 +65,7 @@ std::string generateCloudNonceBase(const std::string& systemId)
 {
     //{random_3_bytes}base64({ timestamp }MD5(systemId:timestamp:secret_key))
 
-    const uint32_t timestamp = 
+    const uint32_t timestamp =
         std::chrono::duration_cast<std::chrono::seconds>(
             nx::utils::timeSinceEpoch()).count();
     const uint32_t timestampInNetworkByteOrder = htonl(timestamp);
@@ -84,11 +84,11 @@ std::string generateCloudNonceBase(const std::string& systemId)
     md5Hash.resize(MD5_DIGEST_LENGTH);
     calcNonceHash(systemId, timestamp, md5Hash.data());
 
-    const auto timestampInNetworkByteOrderBuf = 
+    const auto timestampInNetworkByteOrderBuf =
         QByteArray::fromRawData(
             reinterpret_cast<const char*>(&timestampInNetworkByteOrder),
             sizeof(timestampInNetworkByteOrder));
-    QByteArray nonce = 
+    QByteArray nonce =
         QByteArray(randomBytes)
         + (timestampInNetworkByteOrderBuf + md5Hash).toBase64();
 
@@ -128,13 +128,10 @@ bool isValidCloudNonceBase(
         return false;
 
     return nonceHash == calcNonceHash(systemId, timestamp);
-} 
+}
 
 std::string generateNonce(const std::string& cloudNonce)
 {
-    // If request is authenticated with account permissions, returning full nonce.
-    // TODO: #ak Some refactor in mediaserver and here is required to remove this condition at all.
-    //nonce = ;
     std::string nonce;
     nonce.resize(cloudNonce.size() + kNonceTrailerLength);
     memcpy(&nonce[0], cloudNonce.data(), cloudNonce.size());
@@ -152,6 +149,18 @@ std::string generateNonce(const std::string& cloudNonce)
     }
 
     return nonce;
+}
+
+bool isNonceValidForSystem(
+    const std::string& nonce,
+    const std::string& systemId)
+{
+    if (nonce.size() <= kNonceTrailerLength)
+        return false;
+
+    return isValidCloudNonceBase(
+        nonce.substr(0, nonce.size() - kNonceTrailerLength),
+        systemId);
 }
 
 } // namespace api

@@ -84,11 +84,8 @@ private:
         const std::string& targetSystemId,
         VmsRequestCompletionHandler completionHandler);
 
-    bool addAuthentication(
-        const std::string& username,
-        MediaServerClient* clientPtr);
-
     MergeSystemData prepareMergeRequestParameters(
+        const nx_http::Credentials& userCredentials,
         const std::string& systemIdToMergeTo);
 
     void reportRequestResult(

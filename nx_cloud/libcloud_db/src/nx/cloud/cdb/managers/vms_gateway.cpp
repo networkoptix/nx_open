@@ -5,6 +5,10 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
+#include <nx/cloud/cdb/api/cloud_nonce.h>
+
+#include <api/auth_util.h>
+
 #include "../settings.h"
 
 namespace nx {
@@ -69,14 +73,24 @@ void VmsGateway::merge(
     requestContext.targetSystemId = targetSystemId;
     auto clientPtr = requestContext.client.get();
 
-    if (!addAuthentication(username, clientPtr))
+    auto account = m_accountManager.findAccountByUserName(username);
+    if (!account)
+    {
+        NX_VERBOSE(this, lm("Could not find account %1").args(username));
         return reportInvalidConfiguration(targetSystemId, std::move(completionHandler));
+    }
+    const nx_http::Credentials userCredentials(
+        account->email.c_str(),
+        nx_http::Ha1AuthToken(account->passwordHa1.c_str()));
+
+    clientPtr->setUserCredentials(userCredentials);
 
     requestContext.completionHandler = std::move(completionHandler);
 
     QnMutexLocker lock(&m_mutex);
     m_activeRequests.emplace(clientPtr, std::move(requestContext));
-    MergeSystemData mergeRequest = prepareMergeRequestParameters(systemIdToMergeTo);
+    MergeSystemData mergeRequest =
+        prepareMergeRequestParameters(userCredentials, systemIdToMergeTo);
     clientPtr->mergeSystems(
         mergeRequest,
         std::bind(&VmsGateway::reportRequestResult, this, clientPtr, _1));
@@ -97,31 +111,25 @@ void VmsGateway::reportInvalidConfiguration(
         });
 }
 
-bool VmsGateway::addAuthentication(
-    const std::string& username,
-    MediaServerClient* clientPtr)
-{
-    auto account = m_accountManager.findAccountByUserName(username);
-    if (!account)
-    {
-        NX_VERBOSE(this, lm("Could not find account %1").args(username));
-        return false;
-    }
-    clientPtr->setUserCredentials(nx_http::Credentials(
-        account->email.c_str(),
-        nx_http::Ha1AuthToken(account->passwordHa1.c_str())));
-
-    return true;
-}
-
 MergeSystemData VmsGateway::prepareMergeRequestParameters(
+    const nx_http::Credentials& userCredentials,
     const std::string& systemIdToMergeTo)
 {
     MergeSystemData mergeSystemData;
     mergeSystemData.mergeOneServer = false;
     mergeSystemData.takeRemoteSettings = true;
     mergeSystemData.ignoreIncompatible = false;
-    // TODO: #ak Fill getKey and postKey
+
+    AuthKey authKey;
+    authKey.username = userCredentials.username.toUtf8();
+    authKey.nonce = api::generateNonce(api::generateCloudNonceBase(systemIdToMergeTo)).c_str();
+
+    authKey.calcResponse(userCredentials.authToken, nx_http::Method::get, "/api/mergeSystems");
+    mergeSystemData.getKey = authKey.toString();
+
+    authKey.calcResponse(userCredentials.authToken, nx_http::Method::post, "/api/mergeSystems");
+    mergeSystemData.postKey = authKey.toString();
+
     mergeSystemData.url =
         nx::network::url::Builder().setScheme(nx_http::kSecureUrlSchemeName)
             .setHost(systemIdToMergeTo.c_str()).toString();

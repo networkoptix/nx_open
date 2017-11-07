@@ -69,7 +69,7 @@ bool PeerWrapper::configureAsLocalSystem()
 {
     auto mediaServerClient = prepareMediaServerClient();
 
-    const QString password = nx::utils::generateRandomName(7);
+    const auto password = nx::utils::generateRandomName(7);
 
     SetupLocalSystemData request;
     request.systemName = nx::utils::generateRandomName(7);
@@ -115,9 +115,23 @@ QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
     mergeSystemData.takeRemoteSettings = true;
     mergeSystemData.mergeOneServer = false;
     mergeSystemData.ignoreIncompatible = false;
-    const auto nonce = nx::utils::generateRandomName(7);
-    mergeSystemData.getKey = buildAuthKey("/api/mergeSystems", m_ownerCredentials, nonce);
-    mergeSystemData.postKey = buildAuthKey("/api/mergeSystems", m_ownerCredentials, nonce);
+
+    AuthKey authKey;
+    authKey.username = m_ownerCredentials.username.toUtf8();
+    authKey.nonce = nx::utils::generateRandomName(7);
+
+    authKey.calcResponse(
+        m_ownerCredentials.authToken,
+        nx_http::Method::get,
+        "/api/mergeSystems");
+    mergeSystemData.getKey = authKey.toString();
+
+    authKey.calcResponse(
+        m_ownerCredentials.authToken,
+        nx_http::Method::post,
+        "/api/mergeSystems");
+    mergeSystemData.postKey = authKey.toString();
+
     mergeSystemData.url = nx::network::url::Builder()
         .setScheme(nx_http::kUrlSchemeName)
         .setEndpoint(remotePeer.endpoint()).toString();

@@ -12,6 +12,9 @@
 #include <nx/cloud/cdb/managers/vms_gateway.h>
 #include <nx/cloud/cdb/settings.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
+
+#include <api/auth_util.h>
 
 #include "account_manager_stub.h"
 
@@ -65,8 +68,14 @@ protected:
         ASSERT_FALSE(mergeRequestData.mergeOneServer);
         ASSERT_TRUE(mergeRequestData.takeRemoteSettings);
         ASSERT_FALSE(mergeRequestData.ignoreIncompatible);
-        assertAuthKeyIsValid(mergeRequestData.getKey.toUtf8());
-        assertAuthKeyIsValid(mergeRequestData.postKey.toUtf8());
+        assertAuthKeyIsValid(
+            mergeRequestData.getKey.toUtf8(),
+            nx_http::Method::get,
+            "/api/mergeSystems");
+        assertAuthKeyIsValid(
+            mergeRequestData.postKey.toUtf8(),
+            nx_http::Method::post,
+            "/api/mergeSystems");
         QUrl remoteSystemUrl(mergeRequestData.url);
         ASSERT_EQ(nx_http::kSecureUrlSchemeName, remoteSystemUrl.scheme());
         ASSERT_EQ(m_idOfSystemToMergeTo, remoteSystemUrl.host().toStdString());
@@ -172,8 +181,20 @@ private:
         m_forcedHttpResponseStatus = httpStatusCode;
     }
 
-    void assertAuthKeyIsValid(const nx::String& /*authKey*/)
+    void assertAuthKeyIsValid(
+        const nx::String& authKeyStr,
+        nx_http::Method::ValueType httpMethod,
+        const nx::String& apiRequest)
     {
+        AuthKey authKey;
+        ASSERT_TRUE(authKey.parse(authKeyStr));
+        ASSERT_EQ(m_ownerAccount.email, authKey.username.toStdString());
+        ASSERT_TRUE(api::isNonceValidForSystem(
+            authKey.nonce.toStdString(), m_idOfSystemToMergeTo));
+        ASSERT_TRUE(authKey.verify(
+            nx_http::PasswordAuthToken(m_ownerAccount.password.c_str()),
+            httpMethod,
+            apiRequest));
     }
 };
 
