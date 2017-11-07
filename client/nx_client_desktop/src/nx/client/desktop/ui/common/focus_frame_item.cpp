@@ -1,6 +1,7 @@
 #include "focus_frame_item.h"
 
-#include <QtGui/QPainter>
+#include <cmath>
+
 #include <QtGui/QImage>
 #include <QtQuick/QQuickWindow>
 #include <QtQuick/QSGTextureMaterial>
@@ -12,12 +13,11 @@ namespace desktop {
 
 namespace {
 
-static constexpr int kDotSize = 1;
-static constexpr int kTextureSize = kDotSize * 2;
+static constexpr int kTextureSize = 2;
 
 } // namespace
 
-class FocusFrameItem::Private
+class FocusFrameItem::Private: public QObject
 {
     FocusFrameItem* const q = nullptr;
 
@@ -25,7 +25,8 @@ public:
     Private(FocusFrameItem* parent);
 
 public:
-    QColor color;
+    QColor color = Qt::black;
+    int frameWidth = 1;
     bool textureDirty = true;
     QScopedPointer<QSGTextureMaterial> material;
 
@@ -45,12 +46,10 @@ void FocusFrameItem::Private::updateDotTexture()
         return;
 
     QImage image(kTextureSize, kTextureSize, QImage::Format_RGBA8888);
-    image.fill(Qt::transparent);
-
-    QPainter painter(&image);
-    painter.fillRect(0, 0, kDotSize, kDotSize, color);
-    painter.fillRect(kDotSize, kDotSize, kDotSize, kDotSize, color);
-    painter.end();
+    image.setPixelColor(0, 0, color);
+    image.setPixelColor(1, 1, color);
+    image.setPixelColor(0, 1, Qt::transparent);
+    image.setPixelColor(1, 0, Qt::transparent);
 
     const auto texture = window->createTextureFromImage(image);
 
@@ -93,6 +92,22 @@ void FocusFrameItem::setColor(const QColor& color)
     update();
 }
 
+int FocusFrameItem::frameWidth() const
+{
+    return d->frameWidth;
+}
+
+void FocusFrameItem::setFrameWidth(int frameWidth)
+{
+    if (d->frameWidth == frameWidth)
+        return;
+
+    d->frameWidth = frameWidth;
+    emit frameWidthChanged();
+
+    update();
+}
+
 void FocusFrameItem::registerQmlType()
 {
     qmlRegisterType<FocusFrameItem>("nx.client.desktop", 1, 0, "FocusFrame");
@@ -121,18 +136,22 @@ QSGNode* FocusFrameItem::updatePaintNode(
         geometryNode->markDirty(QSGNode::DirtyMaterial);
     }
 
+    const auto fw = d->frameWidth;
+
     auto addRectangle =
-        [](QSGGeometry::TexturedPoint2D*& data, const QRectF& rect)
+        [fw](QSGGeometry::TexturedPoint2D*& data, const QRectF& rect)
         {
             const auto x = static_cast<float>(rect.x());
             const auto y = static_cast<float>(rect.y());
-            const auto r = static_cast<float>(rect.right());
-            const auto b = static_cast<float>(rect.bottom());
-            const auto twx = (r - x) / kTextureSize;
-            const auto thy = (b - y) / kTextureSize;
+            const auto w = static_cast<float>(std::round(rect.width() / fw) * fw);
+            const auto h = static_cast<float>(std::round(rect.height() / fw) * fw);
+            const auto r = x + w;
+            const auto b = y + h;
+            const auto twx = w / kTextureSize / fw;
+            const auto thy = h / kTextureSize / fw;
             // We use chessboard 2x2 texture to avoid sibling painted points of the frame.
             // Second texture column is used when frame edge has odd x or odd y and not both.
-            const auto ts = ((qRound(rect.x()) + qRound(rect.y())) & 1) ? 0.5f : 0.0f;
+            const auto ts = ((qRound(rect.x() / fw) + qRound(rect.y() / fw)) & 1) ? 0.5f : 0.0f;
 
             data[0].set(x, y, ts, 0);
             data[1].set(r, y, twx + ts, 0);
@@ -144,14 +163,16 @@ QSGNode* FocusFrameItem::updatePaintNode(
             data += 6;
         };
 
+    const auto w = width();
+    const auto h = height();
     auto data = geometryNode->geometry()->vertexDataAsTexturedPoint2D();
 
-    // Rectangles are shifted by kDotSize to avoid painting corner dots multiple times.
+    // Rectangles are shifted by dotSize to avoid painting corner dots multiple times.
     // This is important when the color is semi-transparent.
-    addRectangle(data, QRectF(0, 0, kDotSize, height()));
-    addRectangle(data, QRectF(width() - kDotSize, 0, kDotSize, height()));
-    addRectangle(data, QRectF(kDotSize, 0, width() - 2 * kDotSize, kDotSize));
-    addRectangle(data, QRectF(kDotSize, height() - kDotSize, width() - 2 * kDotSize, kDotSize));
+    addRectangle(data, QRectF(0, 0, w - fw, fw));
+    addRectangle(data, QRectF(w - fw, 0, fw, h - fw));
+    addRectangle(data, QRectF(fw, h - fw, w - fw, fw));
+    addRectangle(data, QRectF(0, fw, fw, h - fw));
 
     geometryNode->markDirty(QSGNode::DirtyGeometry);
 
