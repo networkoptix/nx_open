@@ -357,7 +357,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
         });
 
     // TODO: #ynikitenkov change icon to aapropriate
-    item->addActionButton(qnSkin->icon("events/sound.png"), actionId);
+    item->addActionButton(qnSkin->icon("events/alert.png"), actionId);
 
     m_list->addItem(item, !closeable);
     return item;
