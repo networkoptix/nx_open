@@ -139,13 +139,13 @@ def test_merge_cloud_systems(server_factory, cloud_host):
     two = server_factory('two', setup_cloud_host=cloud_host)
 
     # Merge 2 cloud systems (takeRemoteSettings = False) -> Error
-    with pytest.raises(ServerRestApiError) as x_info:
+    with pytest.raises(HttpError) as x_info:
         two.merge_systems(one)
-    assert x_info.value.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
 
-    with pytest.raises(ServerRestApiError) as x_info:
+    with pytest.raises(HttpError) as x_info:
         two.merge_systems(one, take_remote_settings=True)
-    assert x_info.value.error_string == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
+    assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
 
     # Test default (admin) user disabled
     check_admin_disabled(one)
