@@ -137,8 +137,10 @@
           "type": "Image",
           "meta": {
             "format": "png",
-            "height_le": 40,
-            "width_le": 100
+            "height_ge": 32,
+            "height_le": 64,
+            "width_ge": 32,
+            "width_le": 200
           }
         }
       ]
