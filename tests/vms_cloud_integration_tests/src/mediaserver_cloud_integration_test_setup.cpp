@@ -125,7 +125,7 @@ std::unique_ptr<MediaServerClient> MediaServerCloudIntegrationTest::prepareMedia
     return mediaServerClient;
 }
 
-std::unique_ptr<MediaServerClient> 
+std::unique_ptr<MediaServerClient>
     MediaServerCloudIntegrationTest::prepareMediaServerClientFromCloudOwner()
 {
     auto mediaServerClient = std::make_unique<MediaServerClient>(
@@ -142,7 +142,7 @@ void MediaServerCloudIntegrationTest::configureSystemAsLocal()
 {
     auto mediaServerClient = prepareMediaServerClient();
 
-    const QString password = nx::utils::generateRandomName(7);
+    const auto password = nx::utils::generateRandomName(7);
 
     SetupLocalSystemData request;
     request.systemName = nx::utils::generateRandomName(7);
@@ -186,7 +186,7 @@ void MediaServerCloudIntegrationTest::changeCloudOwnerAccountPassword()
 
     m_ownerAccount.password = newPassword;
     if (m_ownerCredentials.first.toStdString() == m_ownerAccount.email)
-        m_ownerCredentials.second = QString::fromStdString(m_ownerAccount.password);
+        m_ownerCredentials.second = m_ownerAccount.password.c_str();
 }
 
 void MediaServerCloudIntegrationTest::switchToDefaultCredentials()
@@ -224,7 +224,7 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
 
 ::ec2::ApiUserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
 {
-    const auto userEmail = 
+    const auto userEmail =
         nx::cdb::test::BusinessDataGenerator::generateRandomEmailAddress();
     ::ec2::ApiUserData userData;
     userData.id = guidFromArbitraryData(userEmail);

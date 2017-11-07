@@ -367,7 +367,7 @@ void AsyncClient::setUserName(const QString& userName)
 void AsyncClient::setUserPassword(const QString& userPassword)
 {
     AuthToken authToken;
-    authToken.setPassword(userPassword);
+    authToken.setPassword(userPassword.toUtf8());
     setUserAuthToken(authToken);
 }
 
@@ -389,7 +389,7 @@ void AsyncClient::setProxyUserName(const QString& userName)
 void AsyncClient::setProxyUserPassword(const QString& userPassword)
 {
     AuthToken authToken;
-    authToken.setPassword(userPassword);
+    authToken.setPassword(userPassword.toUtf8());
     setProxyUserAuthToken(authToken);
 }
 
@@ -1102,7 +1102,7 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
         m_contentLocationUrl.setUserName(m_user.username);
 
     if (!m_contentLocationUrl.password().isEmpty())
-        m_user.authToken.setPassword(m_contentLocationUrl.password());
+        m_user.authToken.setPassword(m_contentLocationUrl.password().toUtf8());
     else
         m_contentLocationUrl.setPassword(m_user.authToken.value);
 
@@ -1164,7 +1164,7 @@ void AsyncClient::prepareRequestHeaders(bool useHttp11, const nx_http::StringTyp
         }
     }
 
-    // It is not correct just to replace headers because there 
+    // It is not correct just to replace headers because there
     // could be multiple headers with same name in m_additionalHeaders.
     for (const auto& header: m_additionalHeaders)
         m_request.headers.erase(header.first);
@@ -1200,8 +1200,8 @@ void AsyncClient::addAppropriateAuthenticationInformation()
         if (m_authType == AuthType::authBasic && m_user.authToken.type == AuthTokenType::password)
         {
             header::BasicAuthorization basicAuthorization(
-                m_user.username.toLatin1(),
-                m_user.authToken.value.toLatin1());
+                m_user.username.toUtf8(),
+                m_user.authToken.value);
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(
@@ -1309,7 +1309,7 @@ bool AsyncClient::resendRequestWithAuthorization(
         isProxy ? StringType("Proxy-Authorization") : header::Authorization::NAME;
     const auto credentials = isProxy ? m_proxyUser : m_user;
 
-    // If response contains WWW-Authenticate with Digest authentication, 
+    // If response contains WWW-Authenticate with Digest authentication,
     // generating "Authorization: Digest" header and adding it to custom headers.
     NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
         response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
@@ -1324,8 +1324,8 @@ bool AsyncClient::resendRequestWithAuthorization(
         (credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty()))
     {
         header::BasicAuthorization basicAuthorization(
-            credentials.username.toLatin1(),
-            credentials.authToken.value.toLatin1());
+            credentials.username.toUtf8(),
+            credentials.authToken.value);
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
             nx_http::HttpHeader(
@@ -1400,9 +1400,9 @@ void AsyncClient::doSomeCustomLogic(
     const auto newRealmDigest = calcHa1(
         m_user.username.toUtf8(),
         realmIter->second,
-        m_user.authToken.value.toUtf8());
+        m_user.authToken.value);
     const auto cryptSha512Hash = linuxCryptSha512(
-        m_user.authToken.value.toUtf8(),
+        m_user.authToken.value,
         generateSalt(LINUX_CRYPT_SALT_LENGTH));
 
     nx_http::insertOrReplaceHeader(

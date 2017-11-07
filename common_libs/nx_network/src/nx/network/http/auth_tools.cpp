@@ -6,13 +6,13 @@
 
 namespace nx_http {
 
-void AuthToken::setPassword(const QString& password)
+void AuthToken::setPassword(const nx::String& password)
 {
     type = AuthTokenType::password;
     value = password;
 }
 
-void AuthToken::setHa1(const QString& ha1)
+void AuthToken::setHa1(const nx::String& ha1)
 {
     type = AuthTokenType::ha1;
     value = ha1;
@@ -23,12 +23,12 @@ bool AuthToken::empty() const
     return type == AuthTokenType::none || value.isEmpty();
 }
 
-PasswordAuthToken::PasswordAuthToken(const QString& password)
+PasswordAuthToken::PasswordAuthToken(const nx::String& password)
 {
     setPassword(password);
 }
 
-Ha1AuthToken::Ha1AuthToken(const QString& ha1)
+Ha1AuthToken::Ha1AuthToken(const nx::String& ha1)
 {
     setHa1(ha1);
 }
@@ -52,9 +52,9 @@ static void extractValues(
     boost::optional<BufferType>* predefinedHa1)
 {
     if (authToken.type == AuthTokenType::password)
-        *userPassword = authToken.value.toUtf8();
+        *userPassword = authToken.value;
     else if (authToken.type == AuthTokenType::ha1)
-        *predefinedHa1 = authToken.value.toUtf8();
+        *predefinedHa1 = authToken.value;
 }
 
 } // namespace
@@ -69,7 +69,7 @@ bool addAuthorization(
     {
         header::BasicAuthorization basicAuthorization(
             credentials.username.toUtf8(),
-            credentials.authToken.value.toUtf8());
+            credentials.authToken.value);
         nx_http::insertOrReplaceHeader(
             &request->headers,
             nx_http::HttpHeader(
