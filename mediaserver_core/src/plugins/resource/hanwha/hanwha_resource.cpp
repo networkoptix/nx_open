@@ -570,14 +570,15 @@ bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::event::EventType 
         || eventType == nx::vms::event::EventType::cameraInputEvent;
 }
 
-QString HanwhaResource::sessionKey(
+SessionContextPtr HanwhaResource::session(
     HanwhaSessionType sessionType,
+    const QnUuid& clientId,
     bool generateNewOne)
 {
     if (const auto context = sharedContext())
-        return m_sharedContext->sessionKey(sessionType, generateNewOne);
+        return m_sharedContext->session(sessionType, clientId, generateNewOne);
 
-    return QString();
+    return SessionContextPtr();
 }
 
 std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()

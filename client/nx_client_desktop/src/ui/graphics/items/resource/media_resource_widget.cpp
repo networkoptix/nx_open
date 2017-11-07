@@ -2043,6 +2043,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
+    if (d->display()->camDisplay()->lastMediaEvent() == Qn::MediaStreamEvent::TooManyOpenedConnections)
+    {
+        // Too many opened connections
+        return Qn::TooManyOpenedConnectionsOverlay;
+    }
+
     if (d->display()->camDisplay()->isEOFReached())
     {
         // No need to check status: offline and unauthorized are checked first.

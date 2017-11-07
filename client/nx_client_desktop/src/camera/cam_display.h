@@ -122,6 +122,7 @@ public:
 
     QnMediaResourcePtr resource() const;
 
+    Qn::MediaStreamEvent lastMediaEvent() const;
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -137,7 +138,6 @@ public slots:
 signals:
     void liveMode(bool value);
     void stillImageChanged();
-
 protected:
     void setSingleShotMode(bool single);
     virtual void setSpeed(float speed) override;
@@ -270,6 +270,7 @@ protected:
     int m_liveBufferSize;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
+    Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
 };
 
 #endif //QN_CAM_DISPLAY_H

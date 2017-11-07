@@ -67,6 +67,7 @@ enum Value
     cameraInitializationInProgress,
     cameraPluginError,
     liveVideoIsNotSupportedError,
+    tooManyOpenedConnections,
     unknown
 };
 
@@ -333,6 +334,16 @@ public:
         const QString& errorMessage)
         :
         Result(ErrorCode::cameraPluginError, errorMessage)
+    {
+    }
+};
+
+class TooManyOpenedConnectionsResult: public Result
+{
+public:
+    TooManyOpenedConnectionsResult()
+        :
+        Result(ErrorCode::tooManyOpenedConnections)
     {
     }
 };
