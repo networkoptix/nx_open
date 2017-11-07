@@ -395,8 +395,8 @@ angular.module('nxCommon')
 
                     //scrolls timeline to current time
                     if(mouseOverElements.leftMarker || mouseOverElements.rightMarker
-                                                    || mouseOverElements.maxRightGoCenter
-                                                    || mouseOverElements.maxLeftGoCenter){
+                                                    || mouseOverElements.rightEdgeScrollCenter
+                                                    || mouseOverElements.leftEdgeScrollCenter){
                         var sM = scope.scaleManager;
                         var date = sM.playedPosition;
                         var relativePositionOfDate = date - sM.start - (sM.visibleEnd - sM.visibleStart)/2;

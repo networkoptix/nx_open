@@ -886,13 +886,18 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 }
             }
         }
+        /*
+            rightEdgeScrollCenter and leftEdgeScrollCenter are used when the visible timeline is all the way on
+            the right or left of the actual timeline and the timeMarker is not within the visible timeline.
+        */
+
         return {
             leftButton : mouseOverLeftScrollButton,
             rightButton: mouseOverRightScrollButton,
             rightBorder: mouseNearRightBorder,
             leftBorder: mouseNearLeftBorder,
-            maxRightGoCenter: mouseNearRightBorder && ! canScrollRight && currentTimeOffScreen,
-            maxLeftGoCenter: mouseNearLeftBorder && !canScrollLeft && currentTimeOffScreen
+            rightEdgeScrollCenter: mouseNearRightBorder && ! canScrollRight && currentTimeOffScreen,
+            leftEdgeScrollCenter: mouseNearLeftBorder && !canScrollLeft && currentTimeOffScreen
         }
     }
 
