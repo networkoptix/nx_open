@@ -12,7 +12,7 @@ QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
     m_setPasswordButton(new QPushButton(this))
 {
     m_setPasswordButton->setFlat(true);
-    m_setPasswordButton->setIcon(qnSkin->icon(lit("buttons/checkmark.png")));
+    m_setPasswordButton->setIcon(qnSkin->icon(lit("buttons/password.png")));
     getOverlayLayout()->addWidget(m_setPasswordButton, 0, Qt::AlignRight);
 
     connect(this, &QnDefaultPasswordAlertBar::targetCamerasChanged,

@@ -175,7 +175,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
 
                 m_currentDefaultPasswordChangeWidget =
                     addCustomPopup(action::ChangeDefaultCameraPasswordAction, parametersGetter,
-                        QnNotificationLevel::Value::ImportantNotification, false);
+                        QnNotificationLevel::Value::CriticalNotification, false);
             }
             else
             {
@@ -356,6 +356,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
             executeDelayedParented(triggerAction, kDefaultDelay, this);
         });
 
+    // TODO: #ynikitenkov change icon to aapropriate
     item->addActionButton(qnSkin->icon("events/sound.png"), actionId);
 
     m_list->addItem(item, !closeable);
