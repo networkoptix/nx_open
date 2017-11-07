@@ -49,17 +49,19 @@ int QnChangeCameraPasswordRestHandler::executePost(
         return nx_http::StatusCode::ok;
     }
 
+    if (camera->getParentId() != owner->commonModule()->moduleGUID())
+    {
+        result.setError(QnJsonRestResult::Forbidden, lit("This server is not a resource owner."));
+        return nx_http::StatusCode::forbidden;
+    }
+
     QAuthenticator auth;
     auth.setUser(data.user);
     auth.setPassword(data.password);
     QString errorString;
-    if (!camera->setCameraCredentialsSync(auth, &errorString))
-    {
-        result.setError(
-            QnJsonRestResult::CantProcessRequest,
-            errorString);
+    if (camera->setCameraCredentialsSync(auth, &errorString))
         return nx_http::StatusCode::ok;
-    }
 
+    result.setError(QnJsonRestResult::CantProcessRequest, errorString);
     return nx_http::StatusCode::ok;
 }

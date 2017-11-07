@@ -441,17 +441,25 @@ Handle ServerConnection::changeCameraPassword(
     Result<QnRestResult>::type callback,
     QThread* targetThread)
 {
+    const auto camera = resourcePool()->getResourceById(id);
+    if (!camera || camera->getParentId().isNull())
+        return Handle();
+
     CameraPasswordData data;
     data.cameraId = id.toString();
     data.user = auth.user();
     data.password = auth.password();
-    return executePost(
-        lit("/api/changeCameraPassword"),
-        QnRequestParamList(),
-        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        QJson::serialized(std::move(data)),
-        callback,
-        targetThread);
+
+    nx_http::ClientPool::Request request;
+    request.method = nx_http::Method::post;
+    request.url = lit("/api/changeCameraPassword");
+    request.contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+    request.messageBody = QJson::serialized(std::move(data));
+    request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray());
+
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    trace(handle, request.url.toString());
+    return handle;
 }
 
 // --------------------------- private implementation -------------------------------------
