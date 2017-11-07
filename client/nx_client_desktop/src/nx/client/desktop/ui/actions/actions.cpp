@@ -759,7 +759,6 @@ void initialize(Manager* manager, Action* root)
     factory(ExportTimeSelectionAction)
         .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Selected Area..."))
-        .requiredTargetPermissions(Qn::ExportPermission)
         .condition((ConditionWrapper(new ExportCondition(true))
             || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
@@ -767,14 +766,12 @@ void initialize(Manager* manager, Action* root)
     factory(ExportLayoutAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget)
         .text(ContextMenu::tr("Export Multi-Video..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
         .condition(ConditionWrapper(new ExportCondition(false))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));
 
     factory(ExportRapidReviewAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
+        .flags(Slider | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Rapid Review..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
         .condition((ConditionWrapper(new ExportCondition(true))
             || condition::hasArgument(Qn::CameraBookmarkRole))
             && !condition::isTrue(nx::client::desktop::ini().universalExportDialog));

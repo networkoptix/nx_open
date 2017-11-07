@@ -1926,7 +1926,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
             ? Qn::ViewLivePermission
             : Qn::ViewFootagePermission;
 
-        if (accessController()->hasPermissions(d->camera, requiredPermission))
+        if (accessController()->hasPermissions(d->resource, requiredPermission))
             result |= Qn::ScreenshotButton;
     }
 

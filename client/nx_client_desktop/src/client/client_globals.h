@@ -176,7 +176,6 @@ namespace Qn
 
         /* Context-based. */
         CurrentLayoutResourceRole,
-        CurrentLayoutMediaItemsRole,
 
         /**
           * Special layout roles
