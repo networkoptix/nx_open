@@ -970,12 +970,19 @@ bool QnSecurityCamResource::isAudioEnabled() const
     return (*userAttributesLock)->audioEnabled;
 }
 
-bool QnSecurityCamResource::isManuallyAdded() const {
+bool QnSecurityCamResource::isManuallyAdded() const
+{
     return m_manuallyAdded;
 }
 
-void QnSecurityCamResource::setManuallyAdded(bool value) {
+void QnSecurityCamResource::setManuallyAdded(bool value)
+{
     m_manuallyAdded = value;
+}
+
+bool QnSecurityCamResource::isDefaultAuth() const
+{
+    return hasCameraCapabilities(Qn::isDefaultPasswordCapability);
 }
 
 Qn::CameraBackupQualities QnSecurityCamResource::getBackupQualities() const
