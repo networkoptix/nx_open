@@ -172,7 +172,7 @@ private:
         m_forcedHttpResponseStatus = httpStatusCode;
     }
 
-    void assertAuthKeyIsValid(const nx::String& authKey)
+    void assertAuthKeyIsValid(const nx::String& /*authKey*/)
     {
     }
 };
