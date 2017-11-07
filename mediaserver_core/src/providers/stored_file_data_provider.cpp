@@ -4,7 +4,7 @@
 #include <core/resource/local_audio_file_resource.h>
 #include <core/resource/resource.h>
 #include <nx/utils/random.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/sleep.h>
 
 namespace {

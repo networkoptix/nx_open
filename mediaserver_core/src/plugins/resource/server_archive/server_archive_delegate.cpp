@@ -13,7 +13,7 @@
 #include "motion/motion_helper.h"
 #include "utils/common/sleep.h"
 #include "core/resource/network_resource.h"
-#include "plugins/resource/avi/avi_resource.h"
+#include "core/resource/avi/avi_resource.h"
 
 namespace {
 

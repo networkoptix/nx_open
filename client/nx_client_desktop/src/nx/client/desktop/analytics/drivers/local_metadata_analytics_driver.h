@@ -14,14 +14,20 @@ class LocalMetadataAnalyticsDriver: public ProxyAnalyticsDriver
     using base_type = ProxyAnalyticsDriver;
 
 public:
+    explicit LocalMetadataAnalyticsDriver(QObject* parent = nullptr);
     explicit LocalMetadataAnalyticsDriver(const QnResourcePtr& resource, QObject* parent = nullptr);
+
+    bool loadTrack(const QnResourcePtr& resource);
+    QRectF zoomRectFor(const QnUuid& regionId, qint64 timestampUs) const;
 
     static bool supportsAnalytics(const QnResourcePtr& resource);
 
 private:
+    nx::common::metadata::DetectionMetadataPacket findMetadata(qint64 timestampUs) const;
+
+private:
     const QnResourcePtr m_resource;
-    std::vector<QnObjectDetectionMetadataTrack> m_track;
-    std::vector<QnObjectDetectionMetadataTrack>::const_iterator m_currentFrame;
+    std::vector<nx::common::metadata::DetectionMetadataPacket> m_track;
 };
 
 } // namespace desktop

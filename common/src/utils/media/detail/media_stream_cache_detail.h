@@ -32,9 +32,9 @@ public:
         unsigned int desiredCacheSizeMillis,
         unsigned int maxCacheSizeMillis);
 
-    //!Implementation of QnAbstractDataReceptor::canAcceptData
+    //!Implementation of QnAbstractMediaDataReceptor::canAcceptData
     bool canAcceptData() const;
-    //!Implementation of QnAbstractDataReceptor::putData
+    //!Implementation of QnAbstractMediaDataReceptor::putData
     void putData( const QnAbstractDataPacketPtr& data );
 
     void clear();

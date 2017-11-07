@@ -105,10 +105,10 @@
 #include "health/system_health.h"
 #include <utils/common/credentials.h>
 #include <utils/common/encoded_credentials.h>
-#include <core/dataprovider/stream_mixer.h>
 #include <core/resource/resource_data_structures.h>
 
 #include <core/resource/camera_advanced_param.h>
+#include <core/dataprovider/stream_mixer_data.h>
 
 namespace {
     bool qn_commonMetaTypes_initialized = false;
@@ -282,10 +282,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnLdapUser>();
     qRegisterMetaType<QnLdapUsers>();
-    qRegisterMetaType<QnChannelMapping>();
-    qRegisterMetaType<QList<QnChannelMapping>>();
-    qRegisterMetaType<QnResourceChannelMapping>();
-    qRegisterMetaType<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<Qn::ConnectionResult>();
 
@@ -373,8 +369,6 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<nx::common::utils::Credentials>();
     QnJsonSerializer::registerSerializer<QList<nx::common::utils::Credentials>>();
     QnJsonSerializer::registerSerializer<QnEncodedCredentials>();
-    QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
-    QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();
     QnJsonSerializer::registerSerializer<QnBitrateList>();
     QnJsonSerializer::registerSerializer<TwoWayAudioParams>();
@@ -382,6 +376,14 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
+
+    qRegisterMetaType<QnChannelMapping>();
+    qRegisterMetaType<QList<QnChannelMapping>>();
+    qRegisterMetaType<QnResourceChannelMapping>();
+    qRegisterMetaType<QList<QnResourceChannelMapping>>();
+
+    QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
+    QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
 
     qn_commonMetaTypes_initialized = true;
 }

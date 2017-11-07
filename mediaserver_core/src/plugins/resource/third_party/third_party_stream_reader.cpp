@@ -260,7 +260,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         {
             QString mediaUrlStr(mediaUrlBuf);
             m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
-        }   
+        }
 
         return CameraDiagnostics::NoErrorResult();
     }
@@ -300,7 +300,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                 m_resource,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
         }
-        else 
+        else
         {
             return CameraDiagnostics::UnknownErrorResult();
         }
@@ -439,11 +439,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
                     QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
-                    if( videoData && videoData->motion )
+                    if( videoData && !videoData->metadata.isEmpty() )
                     {
                         m_savedMediaPacket = rez;
-                        rez = std::move(videoData->motion);
-                        videoData->motion.reset();
+                        rez = videoData->metadata.first();
+                        videoData->metadata.pop_front();
                     }
                     else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
@@ -611,7 +611,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
                         motion->timestamp = srcVideoPacket->timestamp();
                         motion->channelNumber = packet->channelNumber();
                         motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                        videoPacket->motion = motion;
+                        videoPacket->metadata << motion;
                     }
                     srcMotionData->releaseRef();
                 }

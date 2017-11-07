@@ -2,7 +2,7 @@
 
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <recording/time_period_list.h>
-#include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <core/resource/avi/thumbnails_archive_delegate.h>
 
 #if defined(ENABLE_HANWHA)
 
@@ -35,11 +35,17 @@ public:
     virtual void beforeSeek(qint64 time) override;
 
     virtual void setPlaybackMode(PlaybackMode value) override;
+
+    void setRateControlEnabled(bool enabled);
+    void setOverlappedId(int overlappedId);
+
+
 private:
     bool isForwardDirection() const;
 private:
     std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
+    bool m_rateControlEnabled = true;
     qint64 m_endTimeUsec = AV_NOPTS_VALUE;
     qint64 m_currentPositionUsec = AV_NOPTS_VALUE;
     PlaybackMode m_playbackMode = PlaybackMode::Archive;

@@ -406,40 +406,77 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period)
 
 void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
 {
-    if (empty() || periodList.isEmpty())
-        return;
-
-    const_iterator srcItr = begin();
-    const_iterator dstItr = periodList.begin();
+    auto srcItr = cbegin();
+    auto subtrahendItr = periodList.cbegin();
     QnTimePeriodList result;
-    QnTimePeriod subtractPeriod = *dstItr;
 
     while (srcItr != end())
     {
-        while (srcItr != end() && srcItr->startTimeMs < subtractPeriod.startTimeMs)
-            result << *srcItr++;
-        if (!result.isEmpty())
-            result.last().truncate(subtractPeriod.startTimeMs);
-
-        while (srcItr != end() && srcItr->endTimeMs() <= subtractPeriod.endTimeMs())
-            srcItr++;
-        if (srcItr != end())
+        if (subtrahendItr == periodList.cend())
         {
-            result << *srcItr++;
-            result.last().truncateFront(subtractPeriod.endTimeMs());
+            result << *srcItr;
+            ++srcItr;
+            continue;
         }
 
-        if (dstItr != periodList.end() - 1)
+        if (srcItr->isContainedIn(*subtrahendItr))
         {
-            subtractPeriod = *(++dstItr);
-            if (!result.isEmpty())
+            ++srcItr;
+            continue;
+        }
+
+        if (subtrahendItr->endTimeMs() <= srcItr->startTimeMs)
+        {
+            ++subtrahendItr;
+            continue;
+        }
+
+        auto current = *srcItr;
+        while (subtrahendItr != periodList.cend())
+        {
+            if (current.isLeftIntersection(*subtrahendItr))
             {
-                result.last().truncate(subtractPeriod.startTimeMs);
-                if (result.last().isEmpty())
-                    result.pop_back();
+                current = current.truncatedFront(subtrahendItr->endTimeMs());
+                ++subtrahendItr;
+
+                if (subtrahendItr == periodList.cend())
+                    result << current;
+
+                continue;
             }
+
+            if (current.isRightIntersection(*subtrahendItr))
+            {
+                result << current.truncated(subtrahendItr->startTimeMs);
+                break;
+            }
+
+            if (current.contains(*subtrahendItr))
+            {
+                result << QnTimePeriod::fromInterval(
+                    current.startTimeMs,
+                    subtrahendItr->startTimeMs);
+
+                current = QnTimePeriod::fromInterval(
+                    subtrahendItr->endTimeMs(),
+                    current.endTimeMs());
+
+                ++subtrahendItr;
+
+                if (subtrahendItr == periodList.cend())
+                    result << current;
+
+                continue;
+            }
+
+            result << current;
+            break;
         }
+
+        // We should be here only if current source chunk is fully processed.
+        ++srcItr;
     }
+
     *this = result;
 }
 

@@ -194,6 +194,7 @@ void QnCameraSettingsDialog::at_settingsWidget_modeChanged()
 {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
+    m_settingsWidget->setExportScheduleButtonEnabled(!m_settingsWidget->hasDbChanges());
     m_okButton->setEnabled(isValidMode && !commonModule()->isReadOnly());
     m_openButton->setVisible(isValidMode);
     m_diagnoseButton->setVisible(isValidMode);

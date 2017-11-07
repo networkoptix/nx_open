@@ -14,7 +14,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
-#include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <core/resource/avi/thumbnails_archive_delegate.h>
 
 
 namespace nx_hls

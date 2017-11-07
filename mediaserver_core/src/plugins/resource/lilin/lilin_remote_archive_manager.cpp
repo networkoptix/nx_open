@@ -32,23 +32,17 @@ static const QString kDeleteOkResponse("del OK");
 static const QString kDateTimeFormat("yyyyMMddhhmmss");
 static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
 
-} // namespace 
+} // namespace
 
 using namespace nx::core::resource;
 
 LilinRemoteArchiveManager::LilinRemoteArchiveManager(LilinResource* resource):
     m_resource(resource)
 {
-
-}
-
-LilinRemoteArchiveManager::~LilinRemoteArchiveManager()
-{
-
 }
 
 bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
-    std::vector<RemoteArchiveEntry>* outArchiveEntries, 
+    std::vector<RemoteArchiveEntry>* outArchiveEntries,
     int64_t startTimeMs,
     int64_t endTimeMs)
 {
@@ -91,6 +85,12 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
     return true;
 }
 
+void LilinRemoteArchiveManager::setOnAvailabaleEntriesUpdatedCallback(
+    std::function<void(const std::vector<RemoteArchiveEntry>&)> /*callback*/)
+{
+    // Do nothing.
+}
+
 bool LilinRemoteArchiveManager::fetchArchiveEntry(const QString& entryId, BufferType* outBuffer)
 {
     auto response = doRequest(kChunkDownloadTemplate.arg(entryId), true);
@@ -130,7 +130,9 @@ std::unique_ptr<nx_http::HttpClient> LilinRemoteArchiveManager::initHttpClient()
     return httpClient;
 }
 
-boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(const QString& requestPath, bool expectOnlyBody /*= false*/)
+boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(
+    const QString& requestPath,
+    bool expectOnlyBody /*= false*/)
 {
     auto httpClient = initHttpClient();
 
@@ -209,7 +211,7 @@ bool LilinRemoteArchiveManager::fetchFileList(const QString& directory, std::vec
 
         // Filter files that are being recorded at the moment
         auto entryExtension = QString::fromLatin1(split[1]);
-        if (entryExtension.endsWith("_ing")) 
+        if (entryExtension.endsWith("_ing"))
             continue;
 
         outFileLists->push_back(QString::fromLatin1(split[0]));
@@ -226,6 +228,16 @@ boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dat
         return boost::none;
 
     return dateTime.toMSecsSinceEpoch();
+}
+
+RemoteArchiveCapabilities LilinRemoteArchiveManager::capabilities() const
+{
+    return RemoteArchiveCapability::RemoveChunkCapability;
+}
+
+std::unique_ptr<QnAbstractArchiveDelegate> LilinRemoteArchiveManager::archiveDelegate()
+{
+    return nullptr;
 }
 
 } // namespace plugins

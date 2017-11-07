@@ -89,9 +89,17 @@ void UdpMulticastFinder::updateInterfaces()
         if (insert.second)
         {
             insert.first->second = makeSocket({ip});
-            joinMulticastGroup(ip);
-            if (!m_ownModuleInformation.isEmpty())
-                sendModuleInformation(insert.first);
+            if (insert.first->second)
+            {
+                joinMulticastGroup(ip);
+                if (!m_ownModuleInformation.isEmpty())
+                    sendModuleInformation(insert.first);
+            }
+            else
+            {
+                //< Will be fixed in next updateInterfaces().
+                m_senders.erase(insert.first);
+            }
         }
     }
 

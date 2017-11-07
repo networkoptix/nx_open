@@ -53,25 +53,14 @@
 #include "out_rgb.h"
 #endif
 
-#define OUTPUT_PREFIX "[video_dec_gie_main] "
-#include <nx/utils/debug_utils.h>
-#include "config.h"
+#include <nx/kit/debug.h>
+
+#include "tegra_video_ini.h"
+#include "video_dec_gie_ini.h"
 
 #include "main_tv.h"
 
 namespace {
-
-#if 0 // car detection
-
-static const int kNetWidth = 960;
-static const int kNetHeight = 540;
-
-#else // pedestrian detection
-
-static const int kNetWidth = 1024;
-static const int kNetHeight = 512;
-
-#endif
 
 class Lock
 {
@@ -195,11 +184,11 @@ initConv(context_t * ctx)
         return false;
     }
 
-    const int x = conf.cropRectX >= 0 ? conf.cropRectX : 0;
-    const int y = conf.cropRectY >= 0 ? conf.cropRectY : 0;
-    const int w = conf.cropRectW >= 0 ? conf.cropRectW : ctx->dec_width;
-    const int h = conf.cropRectH >= 0 ? conf.cropRectH : ctx->dec_height;
-    PRINT << "setCropRect(" << x << ", " << y << ", " << w << ", " << h << ")";
+    const int x = ini().cropRectX >= 0 ? ini().cropRectX : 0;
+    const int y = ini().cropRectY >= 0 ? ini().cropRectY : 0;
+    const int w = ini().cropRectW >= 0 ? ini().cropRectW : ctx->dec_width;
+    const int h = ini().cropRectH >= 0 ? ini().cropRectH : ctx->dec_height;
+    NX_PRINT << "setCropRect(" << x << ", " << y << ", " << w << ", " << h << ")";
     ret = ctx->conv->setCropRect(x, y, w, h);
     if (ret < 0)
     {
@@ -350,8 +339,8 @@ resChange(context_t * ctx)
 
     if (ctx->conv)
     {
-        ret = initConv(ctx);
-        TEST_ERROR(ret == false, "initConv failed", error);
+        bool result = initConv(ctx);
+        TEST_ERROR(result == false, "initConv failed", error);
     }
 
     // Capture plane STREAMON
@@ -617,7 +606,7 @@ gieThread(void *arg)
         return NULL;
     }
 
-    double inferenceFps = conf.maxInferenceFps;
+    double inferenceFps = ini().maxInferenceFps;
     std::chrono::milliseconds minTimeToNextInference(0);
     if (inferenceFps != -1)
     {
@@ -673,7 +662,7 @@ gieThread(void *arg)
 
             if (timeElapsedSinceLastInference < minTimeToNextInference)
             {
-                PRINT << "Dropping frame without inference! "
+                NX_OUTPUT << "Dropping frame without inference! "
                     << timeElapsedSinceLastInference.count() << " "
                     << minTimeToNextInference.count();
 
@@ -681,22 +670,20 @@ gieThread(void *arg)
                 if (!ctx->m_ptsQueue.empty())
                     ctx->m_ptsQueue.pop();
                 else
-                    PRINT << "<<<<<<<<<<<<<<<<<<<<<<<<<<<< Some strange error: there is a frame, but pts queue is empty";
+                    NX_OUTPUT << "####### Some strange error: there is a frame, but pts queue is empty";
 
 
                 pthread_mutex_unlock(&ctx->gie_lock);
 
                 // It's a hack, actually I don't know how it works at all. If this lines are not here
-                // then we hang in pushCompressedFrame
+                // then we hang in pushCompressedFrame.
                 if (ctx->conv->capture_plane.qBuffer(gie_buffer.v4l2_buf, NULL) < 0)
-                {
-                    cout<<"conv queue buffer error"<<endl;
-                }
+                    NX_OUTPUT << "conv queue buffer error";
                 continue;
             }
 
             ctx->m_lastInferenceTime = now;
-            PRINT << "Using this frame for inference! "
+            NX_OUTPUT << "Using this frame for inference! "
                 << timeElapsedSinceLastInference.count() << " "
                 << minTimeToNextInference.count();
         }
@@ -794,8 +781,8 @@ gieThread(void *arg)
 
             if (ctx->m_framesProcessed)
             {
-                PRINT << "############################### FRAME RATE IS: "
-                      <<  ctx->m_framesProcessed / (double)totalTimeElapsedSeconds;
+                NX_OUTPUT << "####### FRAME RATE IS: "
+                    <<  ctx->m_framesProcessed / (double) totalTimeElapsedSeconds;
             }
 
             pthread_mutex_unlock(&ctx->gie_lock);
@@ -909,8 +896,8 @@ static void
 setDefaults(context_t * ctx)
 {
     memset(ctx, 0, sizeof(context_t));
-    ctx->deployfile = conf.deployFile;
-    ctx->modelfile = conf.modelFile;
+    ctx->deployfile = exeIni().deployFile;
+    ctx->modelfile = exeIni().modelFile;
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
@@ -1190,7 +1177,10 @@ mainNx(int argc, char *argv[])
     const char *const filename = argv[1];
 
     Detector detector(/*id*/ "0");
-    detector.startInference(conf.modelFile, conf.deployFile, conf.cacheFile);
+    const int result = detector.startInference(
+        exeIni().modelFile, exeIni().deployFile, exeIni().cacheFile);
+    if (result != 0)
+        return result;
 
     std::cout << "Inference has been started" << std::endl;
     ifstream in_file;
@@ -1321,7 +1311,7 @@ int Detector::startInference(
 #endif
 
 cleanup:
-    return 0;
+    return -error;
 
 #if 0
 
@@ -1416,37 +1406,37 @@ cleanup:
 
 bool Detector::stopSync()
 {
-    OUTPUT << "Detector::stopSync() BEGIN";
+    NX_OUTPUT << "Detector::stopSync() BEGIN";
 
     bool error = false;
     m_ctx.got_eos = true;
     if (m_ctx.dec_capture_loop)
     {
-        OUTPUT << "Detector::stopSync(): Joining thread dec_capture_loop...";
+        NX_OUTPUT << "Detector::stopSync(): Joining thread dec_capture_loop...";
         pthread_join(m_ctx.dec_capture_loop, NULL);
-        OUTPUT << "Detector::stopSync(): Joined thread dec_capture_loop";
+        NX_OUTPUT << "Detector::stopSync(): Joined thread dec_capture_loop";
     }
 
     if (m_ctx.gie_stop == 0)
     {
-        OUTPUT << "Detector::stopSync(): Joining thread gie_thread_handle...";
+        NX_OUTPUT << "Detector::stopSync(): Joining thread gie_thread_handle...";
         m_ctx.gie_stop = 1;
         pthread_cond_broadcast(&m_ctx.gie_cond);
         pthread_join(m_ctx.gie_thread_handle, NULL);
-        OUTPUT << "Detector::stopSync(): Joined thread gie_thread_handle";
+        NX_OUTPUT << "Detector::stopSync(): Joined thread gie_thread_handle";
     }
 
     // Send EOS to converter
     if (m_ctx.conv)
     {
         if (sendEOStoConverter(&m_ctx) < 0)
-            PRINT << "Error while queueing EOS buffer on converter output";
+            NX_PRINT << "Error while queueing EOS buffer on converter output";
         m_ctx.conv->capture_plane.waitForDQThread(-1);
     }
 
     if (m_ctx.dec && m_ctx.dec->isInError())
     {
-        PRINT << "Decoder is in error state";
+        NX_PRINT << "Decoder is in error state";
         error = true;
     }
     if (m_ctx.got_error)
@@ -1467,17 +1457,17 @@ bool Detector::stopSync()
         free(m_ctx.in_file_path);
 
     delete m_ctx.gie_buf_queue;
-    OUTPUT << "Detector::stopSync(): destroyGieContext() BEGIN";
+    NX_OUTPUT << "Detector::stopSync(): destroyGieContext() BEGIN";
     m_ctx.gie_ctx->destroyGieContext();
-    OUTPUT << "Detector::stopSync(): destroyGieContext() END";
+    NX_OUTPUT << "Detector::stopSync(): destroyGieContext() END";
     delete m_ctx.gie_ctx;
 
     if (error)
-        PRINT << "App run failed";
+        NX_PRINT << "App run failed";
     else
-        PRINT << "App run was successful";
+        NX_PRINT << "App run was successful";
 
-    OUTPUT << "Detector::stopSync() END -> " << error;
+    NX_OUTPUT << "Detector::stopSync() END -> " << error;
     return error;
 }
 
@@ -1592,7 +1582,7 @@ std::vector<cv::Rect> Detector::getRectangles(int64_t* outPts)
 
     if (!m_ctx.m_ptsQueue.empty())
     {
-        PRINT << "POPPING FROM m_ptsQueue " << m_ctx.m_ptsQueue.size();
+        NX_PRINT << "POPPING FROM m_ptsQueue " << m_ctx.m_ptsQueue.size();
         *outPts = m_ctx.m_ptsQueue.front();
         m_ctx.m_ptsQueue.pop();
     }
@@ -1600,21 +1590,11 @@ std::vector<cv::Rect> Detector::getRectangles(int64_t* outPts)
     return rects;
 }
 
-int Detector::getNetWidth() const
-{
-    return kNetWidth;
-}
-
-int Detector::getNetHeight() const
-{
-    return kNetHeight;
-}
-
 int Detector::fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer)
 {
     if (!buffer)
     {
-        PRINT << "ERROR: Detector::fillBuffer(dataSize: " << dataSize << ", buffer: null)";
+        NX_PRINT << "ERROR: Detector::fillBuffer(dataSize: " << dataSize << ", buffer: null)";
         return 0;
     }
 

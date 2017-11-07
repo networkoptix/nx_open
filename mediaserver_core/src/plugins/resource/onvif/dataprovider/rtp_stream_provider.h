@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
 
 class QnRtpStreamReader: public CLServerPushStreamReader

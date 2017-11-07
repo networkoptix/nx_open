@@ -263,6 +263,9 @@ public:
 
     SelectionState selectionState() const;
 
+    QPixmap placeholderPixmap() const;
+    void setPlaceholderPixmap(const QPixmap& pixmap);
+
     using base_type::mapRectToScene;
 
 signals:
@@ -277,6 +280,7 @@ signals:
     void rotationStopRequested();
     void displayInfoChanged();
     void selectionStateChanged(SelectionState state);
+    void placeholderPixmapChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -346,8 +350,6 @@ protected:
     float defaultAspectRatio() const;
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
-
-
 
 private:
     void setupHud();
@@ -427,6 +429,8 @@ private:
     qint64 m_lastNewFrameTimeMSec;
 
     SelectionState m_selectionState;
+
+    QPixmap m_placeholderPixmap;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

@@ -22,8 +22,8 @@
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <plugins/storage/file_storage/layout_storage_resource.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -35,6 +35,7 @@
 #include <client_core/client_core_module.h>
 
 #include <nx/utils/app_info.h>
+#include <nx/client/desktop/export/tools/export_manager.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -262,7 +263,10 @@ bool ExportLayoutTool::exportMetadata(const ExportLayoutTool::ItemInfoList &item
     return true;
 }
 
-bool ExportLayoutTool::start() {
+bool ExportLayoutTool::start()
+{
+    m_exportedAnyData = false;
+
     if (!prepareStorage())
         return false;
 
@@ -300,17 +304,29 @@ QString ExportLayoutTool::errorMessage() const {
     return m_errorMessage;
 }
 
-bool ExportLayoutTool::exportNextCamera() {
+bool ExportLayoutTool::exportNextCamera()
+{
     if (m_stopped)
         return false;
 
-    if (m_resources.isEmpty()) {
+    if (m_resources.isEmpty())
+    {
+        if (m_exportedAnyData)
+        {
+            finishExport(true);
+        }
+        else
+        {
+            m_errorMessage = QnStreamRecorder::errorString(StreamRecorderError::dataNotFound);
+            finishExport(false);
+        }
+
         finishExport(true);
         return false;
-    } else {
-        m_offset++;
-        return exportMediaResource(m_resources.dequeue());
     }
+
+    m_offset++;
+    return exportMediaResource(m_resources.dequeue());
 }
 
 void ExportLayoutTool::finishExport(bool success)
@@ -427,9 +443,16 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource) {
 }
 
 void ExportLayoutTool::at_camera_exportFinished(const StreamRecorderErrorStruct& status,
-    const QString& filename)
+    const QString& /*filename*/)
 {
-    Q_UNUSED(filename)
+    if (status.lastError == StreamRecorderError::dataNotFound)
+    {
+        exportNextCamera();
+        return;
+    }
+
+    m_exportedAnyData = true;
+
     if (status.lastError != StreamRecorderError::noError)
     {
         m_errorMessage = QnStreamRecorder::errorString(status.lastError);

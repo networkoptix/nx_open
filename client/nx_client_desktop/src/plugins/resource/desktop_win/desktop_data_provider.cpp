@@ -30,6 +30,7 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <nx/streaming/video_data_packet.h>
 
 namespace {
 

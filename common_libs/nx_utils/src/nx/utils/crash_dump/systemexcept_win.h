@@ -19,7 +19,7 @@ public:
     static void installThreadSpecificUnhandledExceptionHandler();
     //!
     /*!
-        \param isFull If \a true then in case of process crash all process memory dumped. 
+        \param isFull If \a true then in case of process crash all process memory dumped.
             If \a false, only call stack for each thread is dumped.
             By default, \a false
     */

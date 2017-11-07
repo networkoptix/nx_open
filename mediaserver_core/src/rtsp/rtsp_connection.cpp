@@ -36,10 +36,10 @@ extern "C"
 #include <utils/common/util.h>
 #include <rtsp/rtsp_data_consumer.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
-#include <plugins/resource/avi/thumbnails_stream_reader.h>
+#include <core/resource/avi/thumbnails_stream_reader.h>
 #include <rtsp/rtsp_encoder.h>
 #include <rtsp/rtsp_h264_encoder.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
@@ -58,7 +58,7 @@ extern "C"
 #include <nx/utils/random.h>
 #include <nx/fusion/serialization/lexical_enum.h>
 #include <media_server/media_server_module.h>
-#include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <core/resource/avi/thumbnails_archive_delegate.h>
 
 class QnTcpListener;
 
@@ -93,7 +93,22 @@ namespace {
         return paramValue;
     }
 
+Qn::Permission requiredPermission(PlaybackMode mode)
+{
+    switch(mode)
+    {
+        case PlaybackMode::Archive:
+        case PlaybackMode::ThumbNails:
+            return Qn::ViewFootagePermission;
+        case PlaybackMode::Export:
+            return Qn::ExportPermission;
+        default:
+            break;
+    }
+    return Qn::ViewContentPermission;
 }
+
+} // namespace
 
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
 {
@@ -313,11 +328,10 @@ void QnRtspConnectionProcessor::parseRequest()
             return;
 
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
-
-        d->peerHasAccess = resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission);
-        if (!d->peerHasAccess)
-            return;
     }
+
+    if (!d->mediaRes)
+        return;
 
     if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
         d->useProprietaryFormat = true;
@@ -342,12 +356,6 @@ void QnRtspConnectionProcessor::parseRequest()
         processRangeHeader();
     else
         d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
-
-    if (getStreamingMode() != PlaybackMode::Live)
-        d->peerHasAccess = resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
-
-    if (!d->peerHasAccess)
-        return;
 
     d->transcodeParams.resolution = QSize();
     QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers).split('/')[0];
@@ -394,6 +402,11 @@ void QnRtspConnectionProcessor::parseRequest()
         }
     }
     d->qualityFastSwitch = true;
+
+    d->peerHasAccess = resourceAccessManager()->hasPermission(d->accessRights,
+        d->mediaRes.dynamicCast<QnResource>(),
+        requiredPermission(getStreamingMode()));
+
     d->clientRequest.clear();
 }
 
@@ -1384,7 +1397,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->setLiveQuality(d->quality);
         d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
     }
-    else if ((d->playbackMode == PlaybackMode::Archive || d->playbackMode == PlaybackMode::Export) 
+    else if ((d->playbackMode == PlaybackMode::Archive || d->playbackMode == PlaybackMode::Export)
               && d->archiveDP)
     {
         d->archiveDP->addDataProcessor(d->dataProcessor);

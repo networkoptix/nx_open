@@ -33,7 +33,7 @@
 
 #include <network/cloud_url_validator.h>
 
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period.h>
 
@@ -969,6 +969,9 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
 
     auto widget = dynamic_cast<QnMediaResourceWidget*>(widgets[0]);
     if (!widget)
+        return InvisibleAction;
+
+    if (!widget->hasVideo())
         return InvisibleAction;
 
     if (context->display()->zoomTargetWidget(widget))

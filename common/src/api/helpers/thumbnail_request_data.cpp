@@ -119,21 +119,20 @@ QnRequestParamList QnThumbnailRequestData::toParams() const
     return result;
 }
 
-bool QnThumbnailRequestData::isValid() const
+boost::optional<QString> QnThumbnailRequestData::getError() const
 {
     if (!camera)
-        return false;
+        return lit("No camera avaliable");
 
     // Check invalid time.
     if (msecSinceEpoch < 0 && msecSinceEpoch != kLatestThumbnail)
-        return false;
+        return lit("Invalid time");
 
     if (size.height() > 0 && size.height() < kMinimumSize)
-        return false;
+        return lit("Invalid height");
 
-    // Width cannot be specified without specifying height.
     if (size.width() > 0 && (size.width() < kMinimumSize || size.height() < 0))
-        return false;
+        return lit("Width cannot be specified without specifying height");
 
-    return true;
+    return boost::none;
 }

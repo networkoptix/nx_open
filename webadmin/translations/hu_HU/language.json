@@ -1,143 +1,143 @@
 {
-  "language_name":"Magyar",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"Látogassa meg ezt a linket",
-    "openLinkWithTitle":"Látogassa meg ezt a linket - {{title}}"
-  },
-  "setup":{
-    "createAccount":"fiók létrehozása",
-    "errorNoHDD":"Ezen eszköz beépített merevlemezekkel történő működésre lett kifejlesztve.<br>\nKapcsolja ki a készüléket és telepítse a merevlemezt.",
-    "errorNoNetwork":"A készülék működéséhez Internetkapcsolat szükséges. <br>\nKérjük csatlakoztassa a rendszerét az Internetre"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"A jelszónak legalább 8 karakterből kell állnia",
-    "requiredMessage":"A jelszó csak latin betűkből, számokból és szimbólumokból állhat",
-    "weakMessage":"A jelszónak különböző típusú szimbólumokat kell tartalmaznia",
-    "strongMessage":"Erős jelszó!",
-    "commonMessage":"A jelszó a leggyakrabban használt jelszavak egyike"
-  },
-  "settings":{
-    "tabs":{
-      "server":"Szerver",
-      "system":"Rendszer",
-      "device":"Eszköz"
+    "language_name": "Magyar",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "Látogassa meg ezt a linket",
+        "openLinkWithTitle": "Látogassa meg ezt a linket - {{title}}"
     },
-    "confirmRestart":"Szerver újraindítása?",
-    "couldntCheckInternet":"Felhő-kapcsolat nem ellenőrizhető",
-    "confirmRestoreDefault":"Törli az adatbázist és beállításokat? Ez a folyamat eltart egy ideig, és utána a szerver újraindul.",
-    "confirmRestoreDefaultTitle":"Gyári beállítások visszaállítása",
-    "unexpectedError":"Nem sikerült: váratlan hiba történt",
-    "connnetionError":"Kapcsoltai hiba",
-    "wrongPassword":"Hibás jelszó.",
-    "error":"Hiba: ",
-    "restartNeeded":"Módosítások elmentve. Újraindítja a szervert az új beállítások érvényesítéséhez?",
-    "settingsSaved":"Beállítások mentve",
-    "confirmHardwareRestart":"Újraindítja a szerver operációs rendszert?",
-    "confirmRestoreSettings":"Visszaállítja az összes szerver beállítást? Rögzített videók megmaradnak, de a hálózati beállítások alapállapotba állnak.",
-    "confirmRestoreSettingsNotNetwork":"Alapállapotba állítja a szerver beállításokat? Rögzített videók és hálózati beállítások megmaradnak.",
-    "unavailable":"Nem elérhető",
-    "unsafePortConfirm":"A nem biztonságos a 1025 alatti portszám használata. A szerver lehet, hogy nem lesz hozzáférhető. Ennek ellenére folytatja?",
-    "confirmDisconnectFromCloud":"{{CLOUD_NAME}} kapcsolat megszűnt",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Minden felhasználó törölve lesz.</span><br><br>A rendszer a helyi hálózatból a helyi adminisztrátor fiókkal lesz elérhető.",
-    "confirmDisconnectFromCloudAction":"Szétkapcsolás",
-    "disconnectedFromCloudSuccess":"A {{CLOUD_NAME}} rendszer sikeresen lekapcsolódott",
-    "confirmDisconnectFromSystem":"Szerver leválasztása a jelenlegi rendszerről",
-    "confirmDisconnectFromSystemAction":"Leválasztás",
-    "disconnectedFromSystemSuccess":"A szerver leválasztása a rendszerről sikeresen megtörtént",
-    "connectedSuccess":"Rendszer sikeresen csatlakoztatva",
-    "createLocalOwnerTitle":"Helyi adminisztrátor létrehozása",
-    "confirmChangePassword":"Admin jelszó módosítása",
-    "confirmChangePasswordTitle":"Megváltoztatja a renszerjelszót? Ez hatással lesz az 'admin', és a root jelszavakra egyes szervereken",
-    "confirmChangePasswordAction":"Új jelszó mentése",
-    "nx1ControlHint":"Kliens alkalmazás elindult. Billentyűzet/egér vagy mobil alkalmazás segítségével vezérelhető."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Állapotfigyelés",
-      "storage":"Tároló",
-      "log":"Napló"
-    }
-  },
-  "join":{
-    "systemIsUnreacheble":"Rendszer nem létezik, vagy nem elérhető.",
-    "incorrectCurrentPassword":"Hibás jelenlegi jelszó.",
-    "incorrectRemotePassword":"Felhasználónév vagy a jelszó hibás.",
-    "incompatibleVersion":"Rendszer nem elérhető, nem létezik, vagy nem kompatibilis verzió.",
-    "wrongUrl":"Nem lehet csatlakozni a megadott szerverhez.",
-    "newSystemError":"A rendszerek nem egyesíthetők. Távoli rendszer nincs beállítva.",
-    "safeMode":"A rendszerek nem egyesíthetők. Távoli rendszer csökkentett módban fut.",
-    "configError":"A rendszerek nem egyesíthetők. Valamelyik rendszer csökkentett módban futhat.",
-    "cloudError":"A rendszerek nem egyesíthetők. Valamelyik rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
-    "cloudBothError":"A rendszerek nem egyesíthetők. Mindkét rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
-    "cloudHostConflict":"A rendszerek nem egyesíthetők, mert mert más felhőszolgáltatót használnak",
-    "licenceError":"Figyelem! Starter licenccet használó rendszerek összevonására készül. Rendszerenként egy Starter licenc engedélyezett, így a második licenc deaktiválva lesz. Folytatja?",
-    "connectionFailed":"Csatlakozás sikertelen: ",
-    "unknownError":"Ismeretlen hiba",
-    "mergeFailed":"Egyesítés nem sikerült: ",
-    "mergeSucceed":"Sikeres egyesítés.",
-    "newSystemDisplayName":"Új rendszer",
-    "incompatibleProtocol":"nem kompatibilis verzió",
-    "incompatibleCloudHost":"felhő ütközés",
-    "incompatibleCloudState":"felhő csatlakoztatva"
-  },
-  "login":{
-    "incorrectPassword":"Felhasználónév vagy a jelszó hibás"
-  },
-  "navigaion":{
-    "cannotGetUser":"Szerver hiba: nem olvashatók az aktuális felhasználó adatok"
-  },
-  "offlineDialog":{
-    "serverOffline":"a szerver offine"
-  },
-  "restartDialog":{
-    "serverStarting":"a szerver indul",
-    "serverRestarting":"a szerver újraindul",
-    "serverOffline":"a szerver offine"
-  },
-  "fileUpload":{
-    "started":"A frissítés sikeresen elindult. Ez néhány percig tarthat",
-    "upToDate":"Frissítés sikertelen. A megadott verzió már telepítve van.",
-    "invalidFile":"Frissítés sikertelen. A megadott fájl nem egy érvényes frissítő fájl.",
-    "incompatibleSystem":"Frissítés sikertelen. A megadott fájl egy másik rendszerre mutat.",
-    "extractionError":"Frissítés sikertelen. Nincs elegendő hely a kicsomagoláshoz, szabadítson fel lemezterületet.",
-    "installationError":"Frissítés sikertelen. A telepítő nem indítható el.",
-    "selectFiles":"Fájlok kiválasztása"
-  },
-  "advanced":{
-    "free":"Szabad",
-    "total":"Teljes",
-    "occupied":"Elfoglalt",
-    "reserved":"Fenntartott"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interfész"
-  },
-  "common":{
-    "systemOffline":"A rendszer offline",
-    "cameraLinks":{
-      "copyToClipboard":"másolás vágólapra",
-      "highStream":"Elsődleges stream",
-      "copyDefaultText":"másolás",
-      "unknown":"Ismeretlen",
-      "lowStream":"Másodlagos stream",
-      "transcoding":"Transzkódolás",
-      "copyActiveText":"vágólapra másolva"
+    "setup": {
+        "createAccount": "fiók létrehozása",
+        "errorNoHDD": "Ezen eszköz beépített merevlemezekkel történő működésre lett kifejlesztve.<br>\nKapcsolja ki a készüléket és telepítse a merevlemezt.",
+        "errorNoNetwork": "A készülék működéséhez Internetkapcsolat szükséges. <br>\nKérjük csatlakoztassa a rendszerét az Internetre"
     },
-    "searchCamPlaceholder":"keresés",
-    "cameraStates":{
-      "noFormat":"Ez a böngésző vagy eszköz nem támogatja erről a kameráról történő videofájl lejátszást.",
-      "ieWin10":"Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
-      "iosVideoTooLarge":"Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
-      "unauthorized":"Hitelesítés szükséges",
-      "ubuntuNX":"Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt.",
-      "ieNoWebm":"Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
-      "flashOrWebmRequired":"Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
-      "noArmSupport":"Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
-      "error":"Hiba",
-      "offline":"Offline",
-      "noData":"Nincs adat",
-      "flashRequired":"Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videó ARM-alapú szerverről történő lejátszásához."
+    "passwordRequirements": {
+        "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",
+        "requiredMessage": "A jelszó csak latin betűkből, számokból és szimbólumokból állhat",
+        "weakMessage": "A jelszónak különböző típusú szimbólumokat kell tartalmaznia",
+        "strongMessage": "Erős jelszó!",
+        "commonMessage": "A jelszó a leggyakrabban használt jelszavak egyike"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Szerver",
+            "system": "Rendszer",
+            "device": "Eszköz"
+        },
+        "confirmRestart": "Szerver újraindítása?",
+        "couldntCheckInternet": "Felhő-kapcsolat nem ellenőrizhető",
+        "confirmRestoreDefault": "Törli az adatbázist és beállításokat? Ez a folyamat eltart egy ideig, és utána a szerver újraindul.",
+        "confirmRestoreDefaultTitle": "Gyári beállítások visszaállítása",
+        "unexpectedError": "Nem sikerült: váratlan hiba történt",
+        "connnetionError": "Kapcsoltai hiba",
+        "wrongPassword": "Hibás jelszó.",
+        "error": "Hiba: ",
+        "restartNeeded": "Módosítások elmentve. Újraindítja a szervert az új beállítások érvényesítéséhez?",
+        "settingsSaved": "Beállítások mentve",
+        "confirmHardwareRestart": "Újraindítja a szerver operációs rendszert?",
+        "confirmRestoreSettings": "Visszaállítja az összes szerver beállítást? Rögzített videók megmaradnak, de a hálózati beállítások alapállapotba állnak.",
+        "confirmRestoreSettingsNotNetwork": "Alapállapotba állítja a szerver beállításokat? Rögzített videók és hálózati beállítások megmaradnak.",
+        "unavailable": "Nem elérhető",
+        "unsafePortConfirm": "A nem biztonságos a 1025 alatti portszám használata. A szerver lehet, hogy nem lesz hozzáférhető. Ennek ellenére folytatja?",
+        "confirmDisconnectFromCloud": "{{CLOUD_NAME}} kapcsolat megszűnt",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Minden felhasználó törölve lesz.</span><br><br>A rendszer a helyi hálózatból a helyi adminisztrátor fiókkal lesz elérhető.",
+        "confirmDisconnectFromCloudAction": "Szétkapcsolás",
+        "disconnectedFromCloudSuccess": "A {{CLOUD_NAME}} rendszer sikeresen lekapcsolódott",
+        "confirmDisconnectFromSystem": "Szerver leválasztása a jelenlegi rendszerről",
+        "confirmDisconnectFromSystemAction": "Leválasztás",
+        "disconnectedFromSystemSuccess": "A szerver leválasztása a rendszerről sikeresen megtörtént",
+        "connectedSuccess": "Rendszer sikeresen csatlakoztatva",
+        "createLocalOwnerTitle": "Helyi adminisztrátor létrehozása",
+        "confirmChangePassword": "Admin jelszó módosítása",
+        "confirmChangePasswordTitle": "Megváltoztatja a renszerjelszót? Ez hatással lesz az 'admin', és a root jelszavakra egyes szervereken",
+        "confirmChangePasswordAction": "Új jelszó mentése",
+        "nx1ControlHint": "Kliens alkalmazás elindult. Billentyűzet/egér vagy mobil alkalmazás segítségével vezérelhető."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Állapotfigyelés",
+            "storage": "Tároló",
+            "log": "Napló"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "Rendszer nem létezik, vagy nem elérhető.",
+        "incorrectCurrentPassword": "Hibás jelenlegi jelszó.",
+        "incorrectRemotePassword": "Felhasználónév vagy a jelszó hibás.",
+        "incompatibleVersion": "Rendszer nem elérhető, nem létezik, vagy nem kompatibilis verzió.",
+        "wrongUrl": "Nem lehet csatlakozni a megadott szerverhez.",
+        "newSystemError": "A rendszerek nem egyesíthetők. Távoli rendszer nincs beállítva.",
+        "safeMode": "A rendszerek nem egyesíthetők. Távoli rendszer csökkentett módban fut.",
+        "configError": "A rendszerek nem egyesíthetők. Valamelyik rendszer csökkentett módban futhat.",
+        "cloudError": "A rendszerek nem egyesíthetők. Valamelyik rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
+        "cloudBothError": "A rendszerek nem egyesíthetők. Mindkét rendszer felhőre csatlakozik. Szüntesse meg a felhőkapcsolatot.",
+        "cloudHostConflict": "A rendszerek nem egyesíthetők, mert mert más felhőszolgáltatót használnak",
+        "licenceError": "Figyelem! Starter licenccet használó rendszerek összevonására készül. Rendszerenként egy Starter licenc engedélyezett, így a második licenc deaktiválva lesz. Folytatja?",
+        "connectionFailed": "Csatlakozás sikertelen: ",
+        "unknownError": "Ismeretlen hiba",
+        "mergeFailed": "Egyesítés nem sikerült: ",
+        "mergeSucceed": "Sikeres egyesítés.",
+        "newSystemDisplayName": "Új rendszer",
+        "incompatibleProtocol": "nem kompatibilis verzió",
+        "incompatibleCloudHost": "felhő ütközés",
+        "incompatibleCloudState": "felhő csatlakoztatva"
+    },
+    "login": {
+        "incorrectPassword": "Felhasználónév vagy a jelszó hibás"
+    },
+    "navigaion": {
+        "cannotGetUser": "Szerver hiba: nem olvashatók az aktuális felhasználó adatok"
+    },
+    "offlineDialog": {
+        "serverOffline": "a szerver offine"
+    },
+    "restartDialog": {
+        "serverStarting": "a szerver indul",
+        "serverRestarting": "a szerver újraindul",
+        "serverOffline": "a szerver offine"
+    },
+    "fileUpload": {
+        "started": "A frissítés sikeresen elindult. Ez néhány percig tarthat",
+        "upToDate": "Frissítés sikertelen. A megadott verzió már telepítve van.",
+        "invalidFile": "Frissítés sikertelen. A megadott fájl nem egy érvényes frissítő fájl.",
+        "incompatibleSystem": "Frissítés sikertelen. A megadott fájl egy másik rendszerre mutat.",
+        "extractionError": "Frissítés sikertelen. Nincs elegendő hely a kicsomagoláshoz, szabadítson fel lemezterületet.",
+        "installationError": "Frissítés sikertelen. A telepítő nem indítható el.",
+        "selectFiles": "Fájlok kiválasztása"
+    },
+    "advanced": {
+        "free": "Szabad",
+        "total": "Teljes",
+        "occupied": "Elfoglalt",
+        "reserved": "Fenntartott"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web interfész"
+    },
+    "common": {
+        "systemOffline": "A rendszer offline",
+        "cameraLinks": {
+            "copyToClipboard": "másolás vágólapra",
+            "highStream": "Elsődleges stream",
+            "copyDefaultText": "másolás",
+            "unknown": "Ismeretlen",
+            "lowStream": "Másodlagos stream",
+            "transcoding": "Transzkódolás",
+            "copyActiveText": "vágólapra másolva"
+        },
+        "searchCamPlaceholder": "keresés",
+        "cameraStates": {
+            "noFormat": "Ez a böngésző vagy eszköz nem támogatja erről a kameráról történő videofájl lejátszást.",
+            "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
+            "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+            "unauthorized": "Hitelesítés szükséges",
+            "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt.",
+            "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+            "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
+            "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
+            "error": "Hiba",
+            "offline": "Offline",
+            "noData": "Nincs adat",
+            "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videó ARM-alapú szerverről történő lejátszásához."
+        }
     }
-  }
 }

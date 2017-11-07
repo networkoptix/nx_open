@@ -147,6 +147,7 @@ upgradeVms()
         installDebs fonts-takao-mincho
         installDebs fonts-baekmuk
         installDebs fonts-arphic-ukai
+        installDebs fonts-thai-tlwg
 
         touch "/dev/cedar_dev"
         chmod 777 "/dev/disp"

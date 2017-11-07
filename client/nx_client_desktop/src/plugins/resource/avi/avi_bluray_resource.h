@@ -1,7 +1,7 @@
 #ifndef QN_AVI_BLURAY_RESOURCE_H
 #define QN_AVI_BLURAY_RESOURCE_H
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 class QnAviBlurayResource : public QnAviResource
 {

@@ -2,8 +2,8 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <core/dataprovider/stream_mixer.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/stream_mixer.h>
+#include <providers/spush_media_stream_provider.h>
 
 namespace nx {
 namespace plugins {

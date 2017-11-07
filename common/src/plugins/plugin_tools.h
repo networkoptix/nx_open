@@ -38,6 +38,16 @@ namespace nxpt
                 m_ptr->addRef();
         }
 
+        ScopedRef(ScopedRef<T>&& right)
+        {
+            m_ptr = right.release();
+        }
+        ScopedRef<T>& operator=(ScopedRef<T>&& right)
+        {
+            m_ptr = right.release();
+            return (*this);
+        }
+
         ~ScopedRef()
         {
             reset();
@@ -255,7 +265,7 @@ namespace nxpt
         CommonRefManager* m_refCountingDelegate;
     };
 
-    
+
     template <typename T>
     class CommonRefCounter: public T
     {
@@ -365,7 +375,7 @@ namespace nxpt
         }
     };
 
-    
+
 
 } // namespace nxpt
 
@@ -389,7 +399,7 @@ struct hash<nxpl::NX_GUID>
 
         for (auto i = 0; i < sizeof(guid.bytes); ++i)
             h = (h + (324723947 + guid.bytes[i])) ^ 93485734985;
-        
+
         return h;
     }
 };

@@ -1153,6 +1153,33 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Zoom In</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Zoom Out</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Focus Far</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Focus Near</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Auto Focus</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Change Dewarping Mode</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -4302,7 +4329,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Disabled by schedule</translation>
     </message>
   </context>
   <context>
@@ -7231,11 +7258,11 @@ to %1</translation>
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Enter password...</translation>
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Administrator password</translation>
     </message>
   </context>
   <context>

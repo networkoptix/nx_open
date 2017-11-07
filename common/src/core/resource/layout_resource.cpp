@@ -9,8 +9,8 @@
 #include <core/resource_access/resource_access_filter.h>
 
 #include <utils/common/warnings.h>
-#include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "plugins/resource/avi/avi_resource.h"
+#include <core/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     base_type(commonModule),

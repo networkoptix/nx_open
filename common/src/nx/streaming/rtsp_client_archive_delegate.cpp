@@ -773,10 +773,10 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
         return;
 
     m_position = displayTime;
-    m_rtspSession->setScale(value);
 
     bool oldReverseMode = m_rtspSession->getScale() < 0;
     bool newReverseMode = value < 0;
+    m_rtspSession->setScale(value);
 
     bool needSendRequest = !m_opened || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
     if (!needSendRequest)
