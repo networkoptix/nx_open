@@ -293,6 +293,8 @@ namespace Qn
         DescriptionTextRole,                        /**< Role for generic description text (QString). */
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
+        ResourceListRole,                           /**< Resource list (QnResourceList). */
+        PreviewTimeRole,                            /**< Role for camera preview time in milliseconds since epoch (qint64). */
 
         RoleCount
     };

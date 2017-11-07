@@ -53,7 +53,7 @@ EventTile::EventTile(const QnUuid& id, QWidget* parent):
 
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
-    ui->previewLabel->setHidden(true);
+    ui->previewWidget->setHidden(true);
 
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
@@ -194,18 +194,15 @@ void EventTile::setIcon(const QPixmap& value)
     // Icon label is always visible. It keeps column width fixed.
 }
 
-QPixmap EventTile::image() const
+QnImageProvider* EventTile::preview() const
 {
-    if (const auto pixmapPtr = ui->previewLabel->pixmap())
-        return *pixmapPtr;
-
-    return QPixmap();
+    return ui->previewWidget->imageProvider();
 }
 
-void EventTile::setImage(const QPixmap& value)
+void EventTile::setPreview(QnImageProvider* value)
 {
-    ui->previewLabel->setPixmap(value);
-    ui->previewLabel->setHidden(value.isNull());
+    ui->previewWidget->setImageProvider(value);
+    ui->previewWidget->setHidden(!value);
 }
 
 CommandActionPtr EventTile::action() const

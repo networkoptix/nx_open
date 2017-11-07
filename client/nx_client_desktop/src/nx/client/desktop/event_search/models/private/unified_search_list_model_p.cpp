@@ -217,9 +217,11 @@ void UnifiedSearchListModel::Private::addOrUpdateBookmark(const QnCameraBookmark
     data.id = bookmark.guid;
     data.title = bookmark.name;
     data.description = bookmark.description;
-    data.timestamp = bookmark.startTimeMs;
+    data.timestampMs = bookmark.startTimeMs;
     data.icon = qnSkin->pixmap(lit("buttons/bookmark.png"));
     data.helpId = Qn::Bookmarks_Usage_Help;
+    data.previewCamera = m_camera;
+    data.previewTimeMs = bookmark.startTimeMs;
     //data.titleColor;
     //data.actionId =
     //data.actionParameters =
@@ -247,10 +249,17 @@ void UnifiedSearchListModel::Private::addCameraEvent(const nx::vms::event::Actio
     data.id = id;
     data.title = m_helper->eventName(event.eventParams.eventType);
     data.description = m_helper->eventDetails(event.eventParams).join(lit("<br>"));
-    data.timestamp = eventTimeMs;
+    data.timestampMs = eventTimeMs;
     data.icon = eventPixmap(event.eventParams);
     data.titleColor = eventColor(event.eventParams.eventType);
-    //data.helpId = Qn::Bookmarks_Usage_Help;
+
+    if (eventRequiresPreview(event.eventParams.eventType))
+    {
+        data.previewCamera = m_camera;
+        data.previewTimeMs = eventTimeMs;
+    }
+
+    //data.helpId =
     //data.actionId =
     //data.actionParameters =
 
@@ -356,6 +365,21 @@ QColor UnifiedSearchListModel::Private::eventColor(nx::vms::event::EventType eve
         //case nx::vms::event::EventType::licenseIssueEvent: //< TODO: normal or warning?
         default:
             return QColor();
+    }
+}
+
+bool UnifiedSearchListModel::Private::eventRequiresPreview(vms::event::EventType type)
+{
+    switch (type)
+    {
+        case vms::event::cameraMotionEvent:
+        case vms::event::analyticsSdkEvent:
+        case vms::event::cameraInputEvent:
+        case vms::event::userDefinedEvent:
+            return true;
+
+        default:
+            return false;
     }
 }
 

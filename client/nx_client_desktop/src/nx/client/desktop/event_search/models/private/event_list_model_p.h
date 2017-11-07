@@ -4,6 +4,8 @@
 
 #include <QtCore/QList>
 
+#include <core/resource/resource_fwd.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -39,6 +41,9 @@ public:
     void defaultAction(const QnUuid& id);
     void closeAction(const QnUuid& id);
     void linkAction(const QnUuid& id, const QString& link);
+
+    QnVirtualCameraResourcePtr previewCamera(const EventData& event) const;
+    QnVirtualCameraResourceList accessibleCameras(const EventData& event) const;
 
 private:
     struct EventDescriptor

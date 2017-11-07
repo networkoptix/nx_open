@@ -4,6 +4,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtGui/QPixmap>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
@@ -30,11 +31,14 @@ public:
         QString title;
         QString description;
         QString toolTip;
-        qint64 timestamp = 0;
+        qint64 timestampMs = 0;
         QPixmap icon;
         QColor titleColor;
         bool removable = false;
         int helpId = -1;
+        QnVirtualCameraResourcePtr previewCamera;
+        QnVirtualCameraResourceList cameras;
+        qint64 previewTimeMs = 0; //< The latest thumbnail is used if previewTimeMs <= 0.
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;
         CommandActionPtr extraAction;

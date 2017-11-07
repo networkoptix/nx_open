@@ -140,7 +140,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.title = title;
     eventData.toolTip = tooltip.join(lit("<br>"));
     eventData.helpId = QnBusiness::eventHelpId(params.eventType);
-    eventData.timestamp = timestampMs;
+    eventData.timestampMs = timestampMs;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
     eventData.icon = pixmapForAction(action);
@@ -169,8 +169,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     {
         eventData.actionId = action::OpenInAlarmLayoutAction;
         eventData.actionParameters = alarmCameras;
-
-        //loadThumbnailForItem(item, alarmCameras.mid(0, kMaxThumbnailCount));
+        eventData.previewCamera = camera;
+        eventData.cameras = alarmCameras;
     }
     else
     {
@@ -184,7 +184,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 eventData.actionId = action::OpenInNewTabAction;
                 eventData.actionParameters = action::Parameters(camera)
                     .withArgument(Qn::ItemTimeRole, timestampMs);
-                //loadThumbnailForItem(item, camera, timestampMs);
+                eventData.previewCamera = camera;
+                eventData.previewTimeMs = timestampMs;
                 setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
@@ -194,7 +195,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 NX_ASSERT(hasViewPermission);
                 eventData.actionId = action::OpenInNewTabAction;
                 eventData.actionParameters = camera;
-                //loadThumbnailForItem(item, camera);
+                eventData.previewCamera = camera;
                 setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
@@ -205,7 +206,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 NX_ASSERT(hasViewPermission);
                 eventData.actionId = action::CameraSettingsAction;
                 eventData.actionParameters = camera;
-                //loadThumbnailForItem(item, camera);
+                eventData.previewCamera = camera;
                 setupAcknowledgeAction(eventData, camera, action);
                 break;
             }
@@ -244,8 +245,10 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                     eventData.actionId = action::OpenInNewTabAction;
                     eventData.actionParameters = action::Parameters(sourceCameras)
                         .withArgument(Qn::ItemTimeRole, timestampMs);
-
-                    //loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
+                    if (sourceCameras.size() == 1)
+                        eventData.previewCamera = sourceCameras[0];
+                    eventData.cameras = sourceCameras;
+                    eventData.previewTimeMs = timestampMs;
                     setupAcknowledgeAction(eventData, sourceCameras.first(), action);
                 }
                 break;

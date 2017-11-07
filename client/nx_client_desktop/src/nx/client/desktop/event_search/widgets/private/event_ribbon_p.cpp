@@ -8,8 +8,11 @@
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
+#include <camera/single_thumbnail_loader.h>
 #include <client/client_globals.h>
+#include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
+#include <utils/multi_image_provider.h>
 #include <ui/common/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>
@@ -17,7 +20,6 @@
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/utils/log/assert.h>
-
 
 namespace nx {
 namespace client {
@@ -29,6 +31,9 @@ static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
 
 static constexpr int kOutside = -10000;
+
+static constexpr int kDefaultThumbnailSize = 224;
+static constexpr int kMultiThumbnailSpacing = 1;
 
 QSize minimumWidgetSize(QWidget* widget)
 {
@@ -69,10 +74,10 @@ EventRibbon::Private::Private(EventRibbon* q):
     installEventHandler(m_scrollBar, {QEvent::Show, QEvent::Hide}, this, updateViewportMargins);
     updateViewportMargins();
 
-    installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize}, this,
+    installEventHandler(m_viewport, {QEvent::Show, QEvent::Resize, QEvent::LayoutRequest}, this,
         [this](QObject* /*watched*/, QEvent* event)
         {
-            if (m_currentWidth != m_viewport->width() || event->type() == QEvent::Show)
+            if (m_currentWidth != m_viewport->width() || event->type() != QEvent::Resize)
             {
                 m_currentWidth = m_viewport->width();
                 updateAllPositions();
@@ -209,7 +214,25 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     if (color.isValid())
         tile->setTitleColor(color);
 
-    // TODO: #vkutin Preview?
+    if (tile->preview())
+        return; //< Don't ever update existing previews.
+
+    const auto camera = index.data(Qn::ResourceRole).value<QnResourcePtr>()
+        .dynamicCast<QnVirtualCameraResource>();
+
+    if (!camera)
+        return;
+
+    const auto previewTimeMs = index.data(Qn::PreviewTimeRole).value<qint64>();
+    tile->setPreview(new QnSingleThumbnailLoader(
+        camera,
+        previewTimeMs > 0 ? previewTimeMs : QnThumbnailRequestData::kLatestThumbnail,
+        QnThumbnailRequestData::kDefaultRotation,
+        QSize(kDefaultThumbnailSize, 0),
+        QnThumbnailRequestData::JpgFormat,
+        tile));
+
+    tile->preview()->loadAsync();
 }
 
 void EventRibbon::Private::insertTile(int index, EventTile* tileWidget)

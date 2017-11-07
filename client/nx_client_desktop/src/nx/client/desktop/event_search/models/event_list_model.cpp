@@ -3,6 +3,7 @@
 
 #include <QtCore/QDateTime>
 
+#include <core/resource/camera_resource.h>
 #include <utils/common/synctime.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -48,10 +49,13 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(event.id);
 
         case Qn::TimestampRole:
-            return QVariant::fromValue(event.timestamp);
+            return QVariant::fromValue(event.timestampMs);
+
+        case Qn::PreviewTimeRole:
+            return QVariant::fromValue(event.previewTimeMs);
 
         case Qn::TimestampTextRole:
-            return QVariant::fromValue(timestampText(event.timestamp));
+            return QVariant::fromValue(timestampText(event.timestampMs));
 
         case Qt::ToolTipRole:
             return QVariant::fromValue(event.toolTip);
@@ -68,11 +72,17 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::ResourceSearchStringRole:
             return lit("%1 %2").arg(event.title).arg(event.description);
 
+        case Qn::ResourceRole:
+            return QVariant::fromValue<QnResourcePtr>(d->previewCamera(event));
+
+        case Qn::ResourceListRole:
+            return QVariant::fromValue<QnResourceList>(d->accessibleCameras(event));
+
         case Qn::RemovableRole:
             return event.removable;
 
         case Qn::CommandActionRole:
-            return qVariantFromValue(event.extraAction);
+            return QVariant::fromValue(event.extraAction);
 
         case Qn::PriorityRole:
             return eventPriority(event);

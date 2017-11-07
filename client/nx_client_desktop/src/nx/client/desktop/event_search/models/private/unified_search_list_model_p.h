@@ -50,6 +50,7 @@ private:
 
     static QPixmap eventPixmap(const nx::vms::event::EventParameters& event);
     static QColor eventColor(nx::vms::event::EventType eventType);
+    static bool eventRequiresPreview(vms::event::EventType type);
 
 private:
     UnifiedSearchListModel* const q = nullptr;

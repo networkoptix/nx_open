@@ -12,6 +12,7 @@
 
 class QModelIndex;
 class QPushButton;
+class QnImageProvider;
 
 namespace Ui { class EventTile; }
 
@@ -29,7 +30,6 @@ class EventTile: public Customized<QWidget>
     Q_PROPERTY(QString description READ description WRITE setDescription)
     Q_PROPERTY(QString timestamp READ timestamp WRITE setTimestamp)
     Q_PROPERTY(QPixmap icon READ icon WRITE setIcon)
-    Q_PROPERTY(QPixmap image READ image WRITE setImage)
 
     using base_type = Customized<QWidget>;
 
@@ -65,8 +65,8 @@ public:
     QPixmap icon() const;
     void setIcon(const QPixmap& value);
 
-    QPixmap image() const;
-    void setImage(const QPixmap& value);
+    QnImageProvider* preview() const;
+    void setPreview(QnImageProvider* value);
 
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);

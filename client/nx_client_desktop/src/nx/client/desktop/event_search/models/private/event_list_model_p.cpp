@@ -2,6 +2,9 @@
 
 #include <QtGui/QDesktopServices>
 
+#include <core/resource/camera_resource.h>
+#include <ui/workbench/workbench_access_controller.h>
+
 #include <nx/utils/log/assert.h>
 
 namespace nx {
@@ -134,6 +137,33 @@ void EventListModel::Private::linkAction(const QnUuid& id, const QString& link)
         return;
 
     q->triggerLinkAction(m_events[index].data, link);
+}
+
+QnVirtualCameraResourcePtr EventListModel::Private::previewCamera(const EventData& event) const
+{
+    if (event.previewCamera.isNull()
+        || !q->accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+        || !q->accessController()->hasPermissions(event.previewCamera, Qn::ViewContentPermission))
+    {
+        return QnVirtualCameraResourcePtr();
+    }
+
+    return event.previewCamera;
+}
+
+QnVirtualCameraResourceList EventListModel::Private::accessibleCameras(const EventData& event) const
+{
+    if (event.cameras.empty()
+        || !q->accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission))
+    {
+        return QnVirtualCameraResourceList();
+    }
+
+    return event.cameras.filtered(
+        [this](const QnVirtualCameraResourcePtr& camera) -> bool
+        {
+            return q->accessController()->hasPermissions(camera, Qn::ViewContentPermission);
+        });
 }
 
 } // namespace
