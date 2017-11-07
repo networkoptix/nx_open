@@ -872,7 +872,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         var mouseInRightButton = mouseOverRightScrollButton && isScrolling;
         var mouseInLeftButton = mouseOverLeftScrollButton && isScrolling;
-        var currentTimeOffScreen = timeMarkerOffScreen(self.scaleManager.playedPosition);
         
         if(context) {
             if (canScrollLeft) {
@@ -886,18 +885,12 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 }
             }
         }
-        /*
-            rightEdgeScrollCenter and leftEdgeScrollCenter are used when the visible timeline is all the way on
-            the right or left of the actual timeline and the timeMarker is not within the visible timeline.
-        */
 
         return {
             leftButton : mouseOverLeftScrollButton,
             rightButton: mouseOverRightScrollButton,
             rightBorder: mouseNearRightBorder,
-            leftBorder: mouseNearLeftBorder,
-            rightEdgeScrollCenter: mouseNearRightBorder && ! canScrollRight && currentTimeOffScreen,
-            leftEdgeScrollCenter: mouseNearLeftBorder && !canScrollLeft && currentTimeOffScreen
+            leftBorder: mouseNearLeftBorder
         }
     }
 
