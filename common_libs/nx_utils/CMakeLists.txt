@@ -41,3 +41,7 @@ if(MACOSX)
     mark_as_advanced(Foundation_LIBRARY)
     target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY} z)
 endif()
+
+if(targetDevice STREQUAL "tx1")
+    target_link_libraries(nx_utils PRIVATE z)
+endif()
