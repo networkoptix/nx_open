@@ -751,7 +751,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ViewLivePermission = 1 << 12,
 
         // Permission to view camera's footage.
-        ViewFootagePermission = 1 << 12,
+        ViewFootagePermission = 1 << 13,
 
         // Permission to export video parts.
         ExportPermission = 1 << 14,
