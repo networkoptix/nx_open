@@ -104,11 +104,11 @@ angular.module('webadminApp')
             return errorToShow;
         }
         function normalizeUrl(url){
-            if(url.indexOf("//")<0){
-                url = "http://" + url;
-            }
             if(url.indexOf(":")<0){
                 url = url + ":7001";
+            }
+            if(url.indexOf("//")<0){
+                url = "http://" + url;
             }
             return url;
         }
