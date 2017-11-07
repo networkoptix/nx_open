@@ -9,6 +9,7 @@
 #include "hanwha_resource_searcher.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_archive_delegate.h"
+#include "hanwha_chunk_reader.h"
 
 #include <QtCore/QMap>
 
@@ -24,13 +25,15 @@
 #include <nx/vms/event/events/events.h>
 #include <nx/sdk/metadata/abstract_metadata_plugin.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/camera_advanced_param.h>
 
+#include <api/global_settings.h>
+
 #include <media_server/media_server_module.h>
-#include "hanwha_chunk_reader.h"
 
 namespace nx {
 namespace mediaserver_core {
@@ -63,17 +66,18 @@ struct PtzDescriptor
     PtzOperation operation = PtzOperation::add;
 };
 
-static const std::map<QString, PtzDescriptor> kHanwhaPtzCapabilityAttributes =
+static const std::map<QString, PtzDescriptor> kHanwhaCameraPtzCapabilities =
 {
-    {lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability)},
-    {lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability)},
-    {lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability)},
-    {lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
-    {lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
-    {lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
+    {lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability)},
+    {lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability)},
+    {lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability)},
     {lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability)},
     {lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
-    {lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
+    {lit("AreaZoom"), PtzDescriptor(
+        Ptz::Capability::ViewportPtzCapability |
+        Ptz::Capability::AbsolutePanCapability |
+        Ptz::Capability::AbsoluteTiltCapability |
+        Ptz::Capability::AbsoluteZoomCapability) },
     {lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability)},
     {
         lit("DigitalPTZ"),
@@ -86,6 +90,28 @@ static const std::map<QString, PtzDescriptor> kHanwhaPtzCapabilityAttributes =
     }
 };
 
+static const std::map<QString, PtzDescriptor> kHanwhaNvrPtzCapabilities =
+{
+    { lit("Absolute.Pan"), PtzDescriptor(Ptz::Capability::AbsolutePanCapability) },
+    { lit("Absolute.Tilt"), PtzDescriptor(Ptz::Capability::AbsoluteTiltCapability) },
+    { lit("Absolute.Zoom"), PtzDescriptor(Ptz::Capability::AbsoluteZoomCapability) },
+    { lit("Continuous.Pan"), PtzDescriptor(Ptz::Capability::ContinuousPanCapability) },
+    { lit("Continuous.Tilt"), PtzDescriptor(Ptz::Capability::ContinuousTiltCapability) },
+    { lit("Continuous.Zoom"), PtzDescriptor(Ptz::Capability::ContinuousZoomCapability) },
+    { lit("Continuous.Focus"), PtzDescriptor(Ptz::Capability::ContinuousFocusCapability) },
+    { lit("Preset"), PtzDescriptor(Ptz::Capability::NativePresetsPtzCapability) },
+    { lit("AreaZoom"), PtzDescriptor(Ptz::Capability::ViewportPtzCapability) },
+    { lit("Home"), PtzDescriptor(Ptz::Capability::HomePtzCapability) },
+    {
+        lit("DigitalPTZ"),
+        PtzDescriptor(
+            Ptz::Capability::ContinuousZoomCapability |
+            Ptz::Capability::ContinuousTiltCapability |
+            Ptz::Capability::ContinuousPanCapability,
+            PtzOperation::remove
+        )
+    }
+};
 
 static const QString kAdvancedParametersTemplateFile = lit(":/camera_advanced_params/hanwha.xml");
 
@@ -220,6 +246,14 @@ HanwhaResource::~HanwhaResource()
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 {
     return new HanwhaStreamReader(toSharedPointer(this));
+}
+
+nx::core::resource::AbstractRemoteArchiveManager* HanwhaResource::remoteArchiveManager()
+{
+    if (!m_remoteArchiveManager)
+        m_remoteArchiveManager = std::make_unique<HanwhaRemoteArchiveManager>(this);
+
+    return m_remoteArchiveManager.get();
 }
 
 bool HanwhaResource::getParamPhysical(const QString &id, QString &value)
@@ -404,8 +438,6 @@ bool HanwhaResource::setParamsPhysical(
             *info,
             value.value);
     }
-    if (reopenPrimaryStream || reopenSecondaryStream)
-        initMediaStreamCapabilities();
     saveParams();
 
     bool success = true;
@@ -440,7 +472,12 @@ bool HanwhaResource::setParamsPhysical(
     if (success)
         result = values;
 
-    reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+    if (reopenPrimaryStream || reopenSecondaryStream)
+    {
+        initMediaStreamCapabilities();
+        saveParams();
+        reopenStreams(reopenPrimaryStream, reopenSecondaryStream);
+    }
 
     return success;
 }
@@ -533,14 +570,24 @@ bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::event::EventType 
         || eventType == nx::vms::event::EventType::cameraInputEvent;
 }
 
-QString HanwhaResource::sessionKey(
+SessionContextPtr HanwhaResource::session(
     HanwhaSessionType sessionType,
+    const QnUuid& clientId,
     bool generateNewOne)
 {
     if (const auto context = sharedContext())
-        return m_sharedContext->sessionKey(sessionType, generateNewOne);
+        return m_sharedContext->session(sessionType, clientId, generateNewOne);
 
-    return QString();
+    return SessionContextPtr();
+}
+
+std::unique_ptr<QnAbstractArchiveDelegate> HanwhaResource::remoteArchiveDelegate()
+{
+    auto delegate = std::make_unique<HanwhaArchiveDelegate>(toSharedPointer(this));
+    const auto overlappedId = sharedContext()->currentOverlappedId();
+    delegate->setOverlappedId(overlappedId ? overlappedId.value : kHanwhaDefaultOverlappedId);
+
+    return std::move(delegate);
 }
 
 bool HanwhaResource::isVideoSourceActive()
@@ -573,15 +620,31 @@ int HanwhaResource::maxProfileCount() const
 
 CameraDiagnostics::Result HanwhaResource::initInternal()
 {
-    const auto result = init();
-    if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
-        setStatus(Qn::Unauthorized);
+    const auto result = initDevice();
+
+    if (!result)
+    {
+        const auto status = result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised
+            ? Qn::Unauthorized
+            : Qn::Offline;
+
+        setStatus(status);
+    }
 
     return result;
 }
 
-CameraDiagnostics::Result HanwhaResource::init()
+CameraDiagnostics::Result HanwhaResource::initDevice()
 {
+    setCameraCapability(Qn::SetUserPasswordCapability, true);
+    bool isDefaultPassword = false;
+    auto isDefaultPasswordGuard = makeScopeGuard(
+        [this, &isDefaultPassword]
+    {
+        setCameraCapability(Qn::isDefaultPasswordCapability, isDefaultPassword);
+        saveParams();
+    });
+
     const auto sharedContext = qnServerModule->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(toSharedPointer(this));
     {
@@ -610,15 +673,21 @@ CameraDiagnostics::Result HanwhaResource::init()
     if (!result)
         return result;
 
+    result = initRemoteArchive();
+    if (!result)
+        return result;
+
     result = initAdvancedParameters();
     if (!result)
         return result;
 
     initMediaStreamCapabilities();
-    setCameraCapability(Qn::SetUserPasswordCapability, true);
-    saveParams();
+    const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
+    sharedContext->startServices(hasVideoArchive);
 
-    sharedContext->startServices();
+    // it's saved in isDefaultPasswordGuard
+    isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
+
     return result;
 }
 
@@ -693,7 +762,6 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (info->deviceType == kHanwhaNvrDeviceType)
     {
         m_isNvr = true;
-        //setProperty(Qn::kGroupPlayParamName, lit("1")); //< Sync archive playback only
         setProperty(Qn::DTS_PARAM_NAME, lit("1")); //< Use external archive, don't record.
     }
 
@@ -899,7 +967,11 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     removeProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME);
 
     m_ptzCapabilities = Ptz::NoPtzCapabilities;
-    for (const auto& attributeToCheck: kHanwhaPtzCapabilityAttributes)
+
+    const auto& ptzCapabilities = isNvr() ?
+        kHanwhaNvrPtzCapabilities : kHanwhaCameraPtzCapabilities;
+
+    for (const auto& attributeToCheck: ptzCapabilities)
     {
         const auto& name = lit("PTZSupport/%1/%2")
             .arg(attributeToCheck.first)
@@ -1043,7 +1115,17 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    setCameraCapability(Qn::RemoteArchiveCapability, false);
+    bool hasRemoteArchive = !isNvr();
+
+    HanwhaRequestHelper helper(sharedContext());
+    auto response = helper.view(lit("recording/storage"));
+    if (!response.isSuccessful())
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto storageEnabled = response.parameter<bool>(lit("Enable"));
+    hasRemoteArchive &= (storageEnabled != boost::none) && *storageEnabled;
+    setCameraCapability(Qn::RemoteArchiveCapability, hasRemoteArchive);
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1064,6 +1146,24 @@ CameraDiagnostics::Result HanwhaResource::createNxProfiles()
 
     if (!result)
         return result;
+
+    if (!qnGlobalSettings->hanwhaDeleteProfilesOnInitIfNeeded())
+    {
+        int amountOfProfilesNeeded = 0;
+        if (nxPrimaryProfileNumber == kHanwhaInvalidProfile)
+            ++amountOfProfilesNeeded;
+
+        if (nxSecondaryProfileNumber == kHanwhaInvalidProfile)
+            ++amountOfProfilesNeeded;
+
+        if (amountOfProfilesNeeded + totalProfileNumber > m_maxProfileCount)
+        {
+            return CameraDiagnostics::CameraInvalidParams(
+                lit("- can not create profiles. Please delete %1 profile%2 on the camera web page")
+                    .arg(amountOfProfilesNeeded)
+                    .arg(amountOfProfilesNeeded > 1 ? lit("s") : QString()));
+        }
+    }
 
     if (nxPrimaryProfileNumber == kHanwhaInvalidProfile)
     {
@@ -1738,7 +1838,30 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (!cgiParameter)
             continue;
 
-        supportedIds.insert(id);
+        bool isSupported = true;
+        auto supportAttribute = info->supportAttribute();
+
+        if (!supportAttribute.isEmpty())
+        {
+            isSupported = false;
+            if (!info->isChannelIndependent())
+                supportAttribute += lit("/%1").arg(getChannel());
+
+            const auto boolAttribute = m_attributes.attribute<bool>(supportAttribute);
+            if (boolAttribute != boost::none)
+            {
+                isSupported = boolAttribute.get();
+            }
+            else
+            {
+                const auto intAttribute = m_attributes.attribute<int>(supportAttribute);
+                if (intAttribute != boost::none)
+                    isSupported = intAttribute.get() > 0;
+            }
+        }
+
+        if (isSupported)
+            supportedIds.insert(id);
     }
 
     return allParameters.filtered(supportedIds);
@@ -1831,7 +1954,7 @@ bool HanwhaResource::addBitrateRanges(
 
             QnCameraAdvancedParameterDependency dependency;
             dependency.id = QnUuid::createUuid().toString();
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("%1,%2").arg(minLimit).arg(maxLimit);
             return dependency;
         };
@@ -1851,7 +1974,7 @@ bool HanwhaResource::addFrameRateRanges(
         {
             QnCameraAdvancedParameterDependency dependency;
             dependency.id = QnUuid::createUuid().toString();
-            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
             dependency.range = lit("1,%2").arg(limits.maxFps);
             return dependency;
         };
@@ -1884,7 +2007,7 @@ bool HanwhaResource::addDependencies(
 
             const auto codecString = toHanwhaString(codec);
             QnCameraAdvancedParameterCondition codecCondition;
-            codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+            codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::equal;
             codecCondition.paramId = lit("%1media/videoprofile/EncodingType")
                 .arg(streamPrefix);
             codecCondition.value = codecString;
@@ -1892,7 +2015,7 @@ bool HanwhaResource::addDependencies(
             const auto resolutionString = toHanwhaString(resolution);
             QnCameraAdvancedParameterCondition resolutionCondition;
             resolutionCondition.type =
-                QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                QnCameraAdvancedParameterCondition::ConditionType::equal;
             resolutionCondition.paramId = lit("%1media/videoprofile/Resolution")
                 .arg(streamPrefix);
             resolutionCondition.value = resolutionString;
@@ -1912,7 +2035,7 @@ bool HanwhaResource::addDependencies(
             {
                 QnCameraAdvancedParameterCondition bitrateControlTypeCondition;
                 bitrateControlTypeCondition.type
-                    = QnCameraAdvancedParameterCondition::ConditionType::Equal;
+                    = QnCameraAdvancedParameterCondition::ConditionType::equal;
                 bitrateControlTypeCondition.paramId
                     = lit("%1media/videoprofile/%2.BitrateControlType")
                         .arg(streamPrefix)
@@ -2019,14 +2142,18 @@ void HanwhaResource::reopenStreams(bool reopenPrimary, bool reopenSecondary)
     if (!camera)
         return;
 
-    auto providerHi = camera->getPrimaryReader();
-    auto providerLow = camera->getSecondaryReader();
+    static const auto reopen =
+        [](const QnLiveStreamProviderPtr& stream)
+        {
+            if (stream && stream->isRunning())
+                stream->pleaseReopenStream();
+        };
 
-    if (providerHi && providerHi->isRunning())
-        providerHi->pleaseReopenStream();
+    if (reopenPrimary)
+        reopen(camera->getPrimaryReader());
 
-    if (providerLow && providerLow->isRunning())
-        providerLow->pleaseReopenStream();
+    if (reopenSecondary)
+        reopen(camera->getSecondaryReader());
 }
 
 int HanwhaResource::suggestBitrate(
@@ -2246,18 +2373,56 @@ bool HanwhaResource::executeCommand(const QnCameraAdvancedParamValue& command)
             parameterValues.push_back(requestedValue);
     }
 
-    std::map<QString, QString> requestParameters;
+    HanwhaRequestHelper::Parameters requestParameters;
     if (!parameterValues.isEmpty())
         requestParameters.emplace(info->parameterName(), parameterValues.join(L','));
 
-    HanwhaRequestHelper helper(sharedContext());
-    const auto response = helper.doRequest(
-        info->cgi(),
-        info->submenu(),
-        info->updateAction(),
-        requestParameters);
+    return executeCommandInternal(*info, requestParameters);
+}
 
-    return response.isSuccessful();
+bool HanwhaResource::executeCommandInternal(
+    const HanwhaAdavancedParameterInfo& info,
+    const HanwhaRequestHelper::Parameters& parameters)
+{
+    auto makeRequest =
+        [&info, this](HanwhaRequestHelper::Parameters parameters, int channel)
+    {
+        if (channel != kHanwhaInvalidChannel)
+            parameters[kHanwhaChannelProperty] = QString::number(channel);
+
+        HanwhaRequestHelper helper(sharedContext());
+        const auto response = helper.doRequest(
+            info.cgi(),
+            info.submenu(),
+            info.updateAction(),
+            parameters);
+
+        return response.isSuccessful();
+    };
+
+    if (info.shouldAffectAllChannels())
+    {
+        const auto& systemInfo = sharedContext()->information();
+        if (!systemInfo)
+            return false;
+
+        bool result = true;
+        const auto channelCount = systemInfo->channelCount;
+        for (auto i = 0; i < channelCount; ++i)
+        {
+            result = makeRequest(parameters, i);
+            if (!result)
+                return false;
+        }
+
+        return result;
+    }
+    else if (!info.isChannelIndependent())
+    {
+        return makeRequest(parameters, getChannel());
+    }
+
+    return makeRequest(parameters, kHanwhaInvalidChannel);
 }
 
 bool HanwhaResource::executeServiceCommand(
@@ -2388,7 +2553,8 @@ std::shared_ptr<HanwhaSharedResourceContext> HanwhaResource::sharedContext() con
 QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
 {
     if (isNvr())
-        return new HanwhaNvrArchiveDelegate(toSharedPointer());
+        return new HanwhaArchiveDelegate(toSharedPointer());
+
     return nullptr;
 }
 
@@ -2397,7 +2563,25 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 en
     if (!isNvr())
         return QnTimePeriodList();
 
-    return sharedContext()->chunkLoader()->chunks(getChannel());
+    return sharedContext()->chunks(getChannel());
+}
+
+QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
+    const QnAbstractStreamDataProvider* dataProvider) const
+{
+    auto defaultLayout = QnPhysicalCameraResource::getAudioLayout(dataProvider);
+    if (!isAudioEnabled())
+        return defaultLayout;
+
+    const auto reader = dynamic_cast<const HanwhaStreamReader*>(dataProvider);
+    if (!reader)
+        return defaultLayout;
+
+    const auto layout = reader->getDPAudioLayout();
+    if (layout)
+        return layout;
+
+    return defaultLayout;
 }
 
 bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString)

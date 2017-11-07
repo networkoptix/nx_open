@@ -1,143 +1,143 @@
 {
-  "language_name":"日本語",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"このリンクをご覧ください",
-    "openLinkWithTitle":"{{title}} このリンクをご覧ください"
-  },
-  "setup":{
-    "createAccount":"アカウントを作成",
-    "errorNoHDD":"このデバイスは、インストールされているハード ディスク ドライブで動作するものです<br>デバイスをオフにして、ハード ディスク ドライブを取り付けます",
-    "errorNoNetwork":"このデバイスにはネットワーク接続が必要です<br>ローカルネットワークやインターネットに接続してください"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"パスワードは8文字以上必要です",
-    "requiredMessage":"ラテン文字、数字、およびキーボードの記号のみが許可されます",
-    "weakMessage":"パスワードは異なる種類のシンボルを含める必要があります",
-    "strongMessage":"強力なパスワード!",
-    "commonMessage":"このパスワードは最も人気のあるパスワードのリストです"
-  },
-  "settings":{
-    "tabs":{
-      "server":"サーバー",
-      "system":"システム",
-      "device":"デバイス"
+    "language_name": "日本語",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "このリンクをご覧ください",
+        "openLinkWithTitle": "{{title}} このリンクをご覧ください"
     },
-    "confirmRestart":"サーバーを再起動しますか？",
-    "couldntCheckInternet":"クラウド接続を確認できませんでした",
-    "confirmRestoreDefault":"設定データベースをクリアする　 このプロセスには時間を要し、その後サーバーが再起動します",
-    "confirmRestoreDefaultTitle":"出荷時のデフォルトに戻す",
-    "unexpectedError":"失敗: 予期しないエラーが発生しました",
-    "connnetionError":"接続エラー",
-    "wrongPassword":"間違ったパスワード",
-    "error":"エラー: ",
-    "restartNeeded":"変更内容を保存します　新しい設定を適用するサーバーを再起動しますか？",
-    "settingsSaved":"設定が保存されました",
-    "confirmHardwareRestart":"サーバー オペレーション システムを再起動しますか？",
-    "confirmRestoreSettings":"すべてのサーバー設定を復元しますか?　アーカイブは保存されますが、ネットワーク設定がリセットされます",
-    "confirmRestoreSettingsNotNetwork":"サーバーの構成をリセットしますか？ アーカイブとネットワーク設定は保存されます",
-    "unavailable":"利用できません",
-    "unsafePortConfirm":"1025以下のポート番号は安全ではありません　サーバーはアクセスできない可能性があります　続行しますか？",
-    "confirmDisconnectFromCloud":"{{CLOUD_NAME}} からシステムを切断します",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'> クラウドのすべてのユーザーが削除されます</span><br><br>システムはローカル管理者アカウントとローカル ネットワーク経由でアクセスされます",
-    "confirmDisconnectFromCloudAction":"切断",
-    "disconnectedFromCloudSuccess":"システムが{{CLOUD_NAME}} から正常に切断されました",
-    "confirmDisconnectFromSystem":"システムからサーバーを切離す",
-    "confirmDisconnectFromSystemAction":"切離す",
-    "disconnectedFromSystemSuccess":"サーバーがシステムから正常に切離されました",
-    "connectedSuccess":"システムが正常に接続されています",
-    "createLocalOwnerTitle":"ローカルの管理者を登録",
-    "confirmChangePassword":"Adminパスワードの変更",
-    "confirmChangePasswordTitle":"システム パスワードを変更しますか? 一部のサーバー ユーザー 'admin' と root のパスワードに影響します",
-    "confirmChangePasswordAction":"新しいパスワードを保存",
-    "nx1ControlHint":"クライアント アプリケーションが開始されました　キーボード/マウス、またはモバイル アプリケーションを使用して制御します"
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"ヘルスモニタ",
-      "storage":"ストレージ",
-      "log":"ログ"
-    }
-  },
-  "join":{
-    "systemIsUnreacheble":"システムに到達できないか存在しません",
-    "incorrectCurrentPassword":"現在のパスワードが正しくありません",
-    "incorrectRemotePassword":"ログインまたはパスワードが正しくありません",
-    "incompatibleVersion":"システム到達可能ではない、存在しないか、互換性のないバージョンです",
-    "wrongUrl":"サーバーに接続できませんでした",
-    "newSystemError":"システムを統合できません　リモート システムが構成されていません",
-    "safeMode":"システムを統合できません　リモート システムはセーフモードです",
-    "configError":"システムを統合できません　システムはセーフモードです",
-    "cloudError":"システムを統合できません　依存のシステムがクラウドに接続されています　最初にそれを切断する必要があります",
-    "cloudBothError":"システムを統合できません　依存のシステムがクラウドに接続されています　最初にそれを切断する必要があります",
-    "cloudHostConflict":"異なるクラウドのホストとサーバーが組み込まれているため、システムを統合できません",
-    "licenceError":"警告! スターター ライセンス システムを統合しようとしています　 1 つのスターター ライセンスのみが許可されていて2 番目のライセンスは無効になります　統合しますか？",
-    "connectionFailed":"接続失敗: ",
-    "unknownError":"未知のエラー",
-    "mergeFailed":"統合に失敗: ",
-    "mergeSucceed":"統合成功",
-    "newSystemDisplayName":"新規システム",
-    "incompatibleProtocol":"互換性のないバージョン",
-    "incompatibleCloudHost":"クラウドの競合",
-    "incompatibleCloudState":"クラウド接続"
-  },
-  "login":{
-    "incorrectPassword":"ログインまたはパスワードが正しくありません"
-  },
-  "navigaion":{
-    "cannotGetUser":"サーバー エラー: 現在のユーザー データを取得できません"
-  },
-  "offlineDialog":{
-    "serverOffline":"サーバーオフライン"
-  },
-  "restartDialog":{
-    "serverStarting":"サーバーを開始します",
-    "serverRestarting":"サーバーを開始します",
-    "serverOffline":"サーバーオフライン"
-  },
-  "fileUpload":{
-    "started":"更新プログラムが正常に開始されました　それは数分かかります",
-    "upToDate":"更新に失敗しました　指定されたバージョンが既にインストールされています",
-    "invalidFile":"更新に失敗しました　指定されたファイルは、有効な更新のアーカイブではありません",
-    "incompatibleSystem":"更新に失敗しました　提供されているファイルは、別のシステムのターゲットです",
-    "extractionError":"更新に失敗しました　アーカイブを抽出する十分な領域が使用可能なストレージを確認してください",
-    "installationError":"更新に失敗しました　インストール スクリプトを実行することはできません",
-    "selectFiles":"ファイルを選択"
-  },
-  "advanced":{
-    "free":"無料",
-    "total":"合計",
-    "occupied":"使用中",
-    "reserved":"予約済み"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web インターフェイス"
-  },
-  "common":{
-    "systemOffline":"システムはオフライン",
-    "cameraLinks":{
-      "copyToClipboard":"クリップボードにコピー",
-      "highStream":"高解像度ストリーム",
-      "copyDefaultText":"コピー",
-      "unknown":"未知の値",
-      "lowStream":"低解像度ストリーム",
-      "transcoding":"トランスコーディング",
-      "copyActiveText":"クリップボードにコピーしました"
+    "setup": {
+        "createAccount": "アカウントを作成",
+        "errorNoHDD": "このデバイスは、インストールされているハード ディスク ドライブで動作するものです<br>デバイスをオフにして、ハード ディスク ドライブを取り付けます",
+        "errorNoNetwork": "このデバイスにはネットワーク接続が必要です<br>ローカルネットワークやインターネットに接続してください"
     },
-    "searchCamPlaceholder":"検索",
-    "cameraStates":{
-      "noFormat":"このブラウザまたはデバイスは、このカメラからのビデオ再生をサポートしていません",
-      "ieWin10":"Microsoft EdgeまたはGoogle Chromeブラウザを使用してください",
-      "iosVideoTooLarge":"iOSはfullHD(2MP：1920x1080)より大きいビデオをサポートしていません",
-      "unauthorized":"認証が必要",
-      "ubuntuNX":"このブラウザは、ARMベースのサーバーのビデオをサポートしていません。代わりにChromiumブラウザを使用してください",
-      "ieNoWebm":"ビデオを再生することはできません<br>\nIeに <a href=\"https://tools.google.com/dlpage/webmmf/\" target=\"_blank\">WebM codec</a>をインストールして下さい",
-      "flashOrWebmRequired":"ビデオを再生することはできません<br>\nIeで再生するには<a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
-      "noArmSupport":"このブラウザまたはデバイスは、ARMベースのサーバーからのビデオ再生をサポートしていません",
-      "error":"エラー",
-      "offline":"オフライン",
-      "noData":"データがありません",
-      "flashRequired":"ARMベースのサーバーからビデオを再生するには、<a href='https://get.adobe.com/flashplayer/' target='_blank'> Adob​​e Flash</a>をインストールしてください"
+    "passwordRequirements": {
+        "minLengthMessage": "パスワードは8文字以上必要です",
+        "requiredMessage": "ラテン文字、数字、およびキーボードの記号のみが許可されます",
+        "weakMessage": "パスワードは異なる種類のシンボルを含める必要があります",
+        "strongMessage": "強力なパスワード!",
+        "commonMessage": "このパスワードは最も人気のあるパスワードのリストです"
+    },
+    "settings": {
+        "tabs": {
+            "server": "サーバー",
+            "system": "システム",
+            "device": "デバイス"
+        },
+        "confirmRestart": "サーバーを再起動しますか？",
+        "couldntCheckInternet": "クラウド接続を確認できませんでした",
+        "confirmRestoreDefault": "設定データベースをクリアする　 このプロセスには時間を要し、その後サーバーが再起動します",
+        "confirmRestoreDefaultTitle": "出荷時のデフォルトに戻す",
+        "unexpectedError": "失敗: 予期しないエラーが発生しました",
+        "connnetionError": "接続エラー",
+        "wrongPassword": "間違ったパスワード",
+        "error": "エラー: ",
+        "restartNeeded": "変更内容を保存します　新しい設定を適用するサーバーを再起動しますか？",
+        "settingsSaved": "設定が保存されました",
+        "confirmHardwareRestart": "サーバー オペレーション システムを再起動しますか？",
+        "confirmRestoreSettings": "すべてのサーバー設定を復元しますか?　アーカイブは保存されますが、ネットワーク設定がリセットされます",
+        "confirmRestoreSettingsNotNetwork": "サーバーの構成をリセットしますか？ アーカイブとネットワーク設定は保存されます",
+        "unavailable": "利用できません",
+        "unsafePortConfirm": "1025以下のポート番号は安全ではありません　サーバーはアクセスできない可能性があります　続行しますか？",
+        "confirmDisconnectFromCloud": "{{CLOUD_NAME}} からシステムを切断します",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'> クラウドのすべてのユーザーが削除されます</span><br><br>システムはローカル管理者アカウントとローカル ネットワーク経由でアクセスされます",
+        "confirmDisconnectFromCloudAction": "切断",
+        "disconnectedFromCloudSuccess": "システムが{{CLOUD_NAME}} から正常に切断されました",
+        "confirmDisconnectFromSystem": "システムからサーバーを切離す",
+        "confirmDisconnectFromSystemAction": "切離す",
+        "disconnectedFromSystemSuccess": "サーバーがシステムから正常に切離されました",
+        "connectedSuccess": "システムが正常に接続されています",
+        "createLocalOwnerTitle": "ローカルの管理者を登録",
+        "confirmChangePassword": "Adminパスワードの変更",
+        "confirmChangePasswordTitle": "システム パスワードを変更しますか? 一部のサーバー ユーザー 'admin' と root のパスワードに影響します",
+        "confirmChangePasswordAction": "新しいパスワードを保存",
+        "nx1ControlHint": "クライアント アプリケーションが開始されました　キーボード/マウス、またはモバイル アプリケーションを使用して制御します"
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "ヘルスモニタ",
+            "storage": "ストレージ",
+            "log": "ログ"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "システムに到達できないか存在しません",
+        "incorrectCurrentPassword": "現在のパスワードが正しくありません",
+        "incorrectRemotePassword": "ログインまたはパスワードが正しくありません",
+        "incompatibleVersion": "システム到達可能ではない、存在しないか、互換性のないバージョンです",
+        "wrongUrl": "サーバーに接続できませんでした",
+        "newSystemError": "システムを統合できません　リモート システムが構成されていません",
+        "safeMode": "システムを統合できません　リモート システムはセーフモードです",
+        "configError": "システムを統合できません　システムはセーフモードです",
+        "cloudError": "システムを統合できません　依存のシステムがクラウドに接続されています　最初にそれを切断する必要があります",
+        "cloudBothError": "システムを統合できません　依存のシステムがクラウドに接続されています　最初にそれを切断する必要があります",
+        "cloudHostConflict": "異なるクラウドのホストとサーバーが組み込まれているため、システムを統合できません",
+        "licenceError": "警告! スターター ライセンス システムを統合しようとしています　 1 つのスターター ライセンスのみが許可されていて2 番目のライセンスは無効になります　統合しますか？",
+        "connectionFailed": "接続失敗: ",
+        "unknownError": "未知のエラー",
+        "mergeFailed": "統合に失敗: ",
+        "mergeSucceed": "統合成功",
+        "newSystemDisplayName": "新規システム",
+        "incompatibleProtocol": "互換性のないバージョン",
+        "incompatibleCloudHost": "クラウドの競合",
+        "incompatibleCloudState": "クラウド接続"
+    },
+    "login": {
+        "incorrectPassword": "ログインまたはパスワードが正しくありません"
+    },
+    "navigaion": {
+        "cannotGetUser": "サーバー エラー: 現在のユーザー データを取得できません"
+    },
+    "offlineDialog": {
+        "serverOffline": "サーバーオフライン"
+    },
+    "restartDialog": {
+        "serverStarting": "サーバーを開始します",
+        "serverRestarting": "サーバーを開始します",
+        "serverOffline": "サーバーオフライン"
+    },
+    "fileUpload": {
+        "started": "更新プログラムが正常に開始されました　それは数分かかります",
+        "upToDate": "更新に失敗しました　指定されたバージョンが既にインストールされています",
+        "invalidFile": "更新に失敗しました　指定されたファイルは、有効な更新のアーカイブではありません",
+        "incompatibleSystem": "更新に失敗しました　提供されているファイルは、別のシステムのターゲットです",
+        "extractionError": "更新に失敗しました　アーカイブを抽出する十分な領域が使用可能なストレージを確認してください",
+        "installationError": "更新に失敗しました　インストール スクリプトを実行することはできません",
+        "selectFiles": "ファイルを選択"
+    },
+    "advanced": {
+        "free": "無料",
+        "total": "合計",
+        "occupied": "使用中",
+        "reserved": "予約済み"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web インターフェイス"
+    },
+    "common": {
+        "systemOffline": "システムはオフライン",
+        "cameraLinks": {
+            "copyToClipboard": "クリップボードにコピー",
+            "highStream": "高解像度ストリーム",
+            "copyDefaultText": "コピー",
+            "unknown": "未知の値",
+            "lowStream": "低解像度ストリーム",
+            "transcoding": "トランスコーディング",
+            "copyActiveText": "クリップボードにコピーしました"
+        },
+        "searchCamPlaceholder": "検索",
+        "cameraStates": {
+            "noFormat": "このブラウザまたはデバイスは、このカメラからのビデオ再生をサポートしていません",
+            "ieWin10": "Microsoft EdgeまたはGoogle Chromeブラウザを使用してください",
+            "iosVideoTooLarge": "iOSはfullHD(2M：1920x1080) より大きいビデオをサポートしていません",
+            "unauthorized": "認証が必要",
+            "ubuntuNX": "このブラウザは、ARMベースのサーバーのビデオをサポートしていません。代わりにChromiumブラウザを使用してください",
+            "ieNoWebm": "ビデオを再生することはできません <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
+            "flashOrWebmRequired": "ビデオを再生することはできません <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> または <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>をインストールして下さい",
+            "noArmSupport": "このブラウザまたはデバイスは、ARMベースのサーバーからのビデオ再生をサポートしていません",
+            "error": "エラー",
+            "offline": "オフライン",
+            "noData": "データがありません",
+            "flashRequired": "ARMベースのサーバーからビデオを再生するには、<a href='https://get.adobe.com/flashplayer/' target='_blank'> Adob​​e Flash</a>をインストールしてください"
+        }
     }
-  }
 }

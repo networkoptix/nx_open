@@ -5,19 +5,22 @@
 #include <QtCore/QMap>
 #include <QtCore/QElapsedTimer>
 
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/semaphore.h>
 #include <nx/mediaserver/resource/abstract_shared_resource_context.h>
 #include <nx/mediaserver/server_module_aware.h>
-
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/semaphore.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
-#include <nx/utils/elapsed_timer.h>
+#include <recording/time_period_list.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
+
+static const std::chrono::minutes kUpdateCacheTimeout(10);
+static const std::chrono::seconds kUnsuccessfulUpdateCacheTimeout(10);
 
 class HanwhaChunkLoader;
 
@@ -57,7 +60,11 @@ public:
     HanwhaResult<Value> operator()()
     {
         QnMutexLocker locker(&m_mutex);
-        if (m_timer.hasExpired(std::chrono::seconds(10))) //< TODO: Move out timeout.
+        const bool needUpdate =
+            (!m_value && m_timer.hasExpired(kUnsuccessfulUpdateCacheTimeout))
+            || (m_value && m_timer.hasExpired(kUpdateCacheTimeout));
+
+        if (needUpdate)
         {
             m_value = m_getter();
             m_timer.restart();
@@ -81,6 +88,22 @@ private:
     HanwhaResult<Value> m_value;
 };
 
+using ClientId = QnUuid;
+
+struct SessionContext
+{
+    SessionContext(const QString& sessionId, const QnUuid& clientId):
+        sessionId(sessionId),
+        clientId(clientId)
+    {};
+
+    QString sessionId;
+    ClientId clientId;
+};
+
+using SessionContextPtr = QSharedPointer<SessionContext>;
+using SessionContextWeakPtr = QWeakPointer<SessionContext>;
+
 class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
@@ -98,15 +121,22 @@ public:
     QAuthenticator authenticator() const;
     QnSemaphore* requestSemaphore();
 
-    void startServices();
+    void startServices(bool hasVideoArchive);
 
-    QString sessionKey(
+    SessionContextPtr session(
         HanwhaSessionType sessionType,
+        const QnUuid& clientId,
         bool generateNewOne = false);
 
-    std::shared_ptr<HanwhaChunkLoader> chunkLoader() const;
+    QnTimePeriodList chunks(int channelNumber) const;
+    QnTimePeriodList chunksSync(int channelNumber) const;
+    qint64 chunksStartUsec(int channelNumber) const;
+    qint64 chunksEndUsec(int channelNumber) const;
+
+    std::chrono::seconds timeZoneShift() const;
 
     // NOTE: function objects return HanwhaResult<T>.
+    HanwhaCachedData<int> currentOverlappedId;
     HanwhaCachedData<HanwhaInformation> information;
     HanwhaCachedData<HanwhaCgiParameters> cgiParamiters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
@@ -114,11 +144,14 @@ public:
     HanwhaCachedData<HanwhaResponse> videoProfiles;
 
 private:
+    HanwhaResult<int> loadOverlappedId();
     HanwhaResult<HanwhaInformation> loadInformation();
     HanwhaResult<HanwhaCgiParameters> loadCgiParamiters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
+
+    void cleanupUnsafe();
 
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
@@ -129,11 +162,14 @@ private:
     nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
 
     mutable QnMutex m_sessionMutex;
-    QMap<HanwhaSessionType, QString> m_sessionKeys;
+
+    QMap<HanwhaSessionType, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
 
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
+
+    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
 
     mutable QnMutex m_servicesMutex;
 };

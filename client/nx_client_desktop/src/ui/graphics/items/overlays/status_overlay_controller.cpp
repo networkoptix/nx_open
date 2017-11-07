@@ -258,6 +258,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
             result[toInt(Qn::ServerOfflineOverlay)] = tr("SERVER UNAVAILABLE");
             result[toInt(Qn::ServerUnauthorizedOverlay)] = tr("NO ACCESS");
             result[toInt(Qn::IoModuleDisabledOverlay)] = tr("DEVICE DISABLED");
+            result[toInt(Qn::TooManyOpenedConnectionsOverlay)] = tr("TOO MANY CONNECTIONS")
             result[toInt(Qn::PasswordRequiredOverlay)] = tr("PASSWORD REQUIRED");
             return result;
         }();
@@ -309,7 +310,7 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
         : QnVirtualCameraResourcePtr());
     IntStringHash result;
     result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
-    result.insert(toInt(Qn::ResourceOverlayButton::IoEnable), tr("Enable"));
+    result.insert(toInt(Qn::ResourceOverlayButton::EnableLicense), tr("Enable"));
     result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
     result.insert(toInt(Qn::ResourceOverlayButton::SetPassword), tr("Set For This Camera"));
 

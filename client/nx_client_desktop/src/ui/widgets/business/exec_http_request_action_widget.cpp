@@ -31,7 +31,7 @@ QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(QWidget *parent) :
     ui->comboBoxContentType->addItem(lit("application/json"));
     ui->comboBoxContentType->addItem(lit("application/xml"));
 
-    Q_ASSERT(ui->comboBoxContentType->itemText(kAutoContentItemIndex) == tr("Auto"));
+    NX_ASSERT(ui->comboBoxContentType->itemText(kAutoContentItemIndex) == tr("Auto"));
 }
 
 QnExecHttpRequestActionWidget::~QnExecHttpRequestActionWidget()

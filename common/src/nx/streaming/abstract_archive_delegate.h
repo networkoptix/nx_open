@@ -11,6 +11,7 @@
 #include <core/resource/motion_window.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <motion/abstract_motion_archive.h>
+#include <nx/utils/uuid.h>
 
 enum class PlaybackMode
 {
@@ -18,7 +19,8 @@ enum class PlaybackMode
     Live,
     Archive,
     ThumbNails,
-    Export
+    Export,
+    Edge
 };
 
 class QnAbstractArchiveDelegate: public QObject
@@ -116,8 +118,22 @@ public:
     virtual int getSequence() const { return 0;  }
 
     virtual void setPlaybackMode(PlaybackMode value) {}
+    virtual void setClientId(const QnUuid& id) { }
+
+    virtual void setEndOfPlaybackHandler(std::function<void()> handler)
+    {
+        m_endOfPlaybackHandler = handler;
+    };
+
+    virtual void setErrorHandler(std::function<void(const QString& errorString)> handler)
+    {
+        m_errorHandler = handler;
+    };
+
 protected:
     Flags m_flags;
+    std::function<void()> m_endOfPlaybackHandler;
+    std::function<void(const QString& errorString)> m_errorHandler;
 };
 
 typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;

@@ -92,5 +92,5 @@ void QnFakeMediaServerResource::setAuthenticator(const QAuthenticator& authentic
 
 void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)
 {
-    Q_ASSERT("This function should be not used for fake media servers");
+    NX_ASSERT(false, "This function should be not used for fake media servers");
 }

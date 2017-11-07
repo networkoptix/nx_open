@@ -95,7 +95,7 @@
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation>Максимальная длина живая буфера живого видео</translation>
+      <translation>Максимальный размер буфера живого видео</translation>
     </message>
     <message>
       <location/>
@@ -171,7 +171,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>Просмотр живого видео</translation>
+      <translation>Просмотр видео в реальном времени</translation>
     </message>
     <message>
       <location/>

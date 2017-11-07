@@ -14,6 +14,14 @@ static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlic
 
 struct LicenseCompatibility;
 
+enum class QnLicenseUsageStatus
+{
+    invalid,
+    notUsed,
+    overflow,
+    used
+};
+
 class QnLicenseUsageWatcher: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
@@ -163,7 +171,7 @@ public:
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
-    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed);
+    bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenseUsed);
 
 signals:
     void licenseUsageChanged();
@@ -178,33 +186,24 @@ private:
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
 
-class QnSingleCamLicenceStatusHelper: public Connective<QObject>
+class QnSingleCamLicenseStatusHelper: public Connective<QObject>
 {
     Q_OBJECT
+    using base_type = Connective<QObject>;
 
 public:
-    enum CameraLicenseStatus
-    {
-        InvalidSource
-        , LicenseNotUsed
-        , LicenseOverflow
-        , LicenseUsed
-    };
+    explicit QnSingleCamLicenseStatusHelper(const QnVirtualCameraResourcePtr &camera,
+        QObject* parent = nullptr);
+    virtual ~QnSingleCamLicenseStatusHelper();
 
-    QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera);
-
-    virtual ~QnSingleCamLicenceStatusHelper();
-
-    CameraLicenseStatus status();
+    QnLicenseUsageStatus status() const;
 
 signals:
-    void licenceStatusChanged();
+    void licenseStatusChanged();
 
 private:
-    typedef QScopedPointer<QnCamLicenseUsageHelper> QnCamLicenseUsageHelperPtr;
-
     const QnVirtualCameraResourcePtr m_camera;
-    QnCamLicenseUsageHelperPtr m_helper;
+    QScopedPointer<QnCamLicenseUsageHelper> m_helper;
 };
 
 class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher

@@ -12,6 +12,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 
+#include <camera/resource_display.h>
+
 #include <nx/client/desktop/radass/radass_types.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 #include <nx/client/desktop/radass/radass_resource_manager.h>

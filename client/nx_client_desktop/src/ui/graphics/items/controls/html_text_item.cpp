@@ -1,5 +1,7 @@
 #include "html_text_item.h"
 
+#include <QtCore/QPointer>
+
 #include <QtGui/QAbstractTextDocumentLayout>
 #include <QtGui/QTextDocument>
 #include <QtGui/QPainter>
@@ -72,7 +74,6 @@ public:
 
     void updatePixmap();
 };
-
 
 QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &options
     , QnHtmlTextItem *parent)

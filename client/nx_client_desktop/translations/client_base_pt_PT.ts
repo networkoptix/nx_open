@@ -535,7 +535,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Rotate to...</source>
-      <translation>Rodar a ...</translation>
+      <translation>Rodar a...</translation>
     </message>
     <message>
       <source>0 degrees</source>
@@ -929,7 +929,7 @@ to view more bookmarks</translation>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Erro desconhecido.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1150,6 +1150,33 @@ to view more bookmarks</translation>
     <message>
       <source>These tours will become invalid.</source>
       <translation type="unfinished">These tours will become invalid.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation type="unfinished">Zoom In</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation type="unfinished">Zoom Out</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Focar Longe</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Focar Perto</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Foco Automático</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Alterar Modo Dewarping</translation>
     </message>
   </context>
   <context>
@@ -1464,8 +1491,8 @@ to view more bookmarks</translation>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n Acção</numerusform>
-        <numerusform>%n Acções</numerusform>
+        <numerusform>%n acção</numerusform>
+        <numerusform>%n acções</numerusform>
       </translation>
     </message>
     <message>
@@ -1937,11 +1964,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Server went offline - search aborted.</source>
-      <translation>Servidor foi desconectado -  pesquisa cancelada.</translation>
+      <translation>Servidor foi desconectado - pesquisa cancelada.</translation>
     </message>
     <message>
       <source>Server has been removed - search aborted.</source>
-      <translation>Servidor foi removido -  pesquisa cancelada.</translation>
+      <translation>Servidor foi removido - pesquisa cancelada.</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
@@ -2185,7 +2212,7 @@ to view more bookmarks</translation>
     <name>QnCameraExpertSettingsWidget</name>
     <message>
       <source>Primary</source>
-      <translation type="unfinished">Primary</translation>
+      <translation>Primário</translation>
     </message>
     <message>
       <source>Secondary</source>
@@ -2295,7 +2322,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2568,7 +2595,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation>Password  actual inválida.</translation>
+      <translation>Password actual inválida.</translation>
     </message>
   </context>
   <context>
@@ -3139,8 +3166,8 @@ to %1</translation>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Log de Eventos para %1  %n evento encontrado</numerusform>
-        <numerusform>Log de Eventos para %1  %n eventos encontrados</numerusform>
+        <numerusform>Log de Eventos para %1 - %n evento encontrado</numerusform>
+        <numerusform>Log de Eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message>
@@ -3753,7 +3780,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;Servidor não encontrado></translation>
+      <translation>Servidor não encontrado</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -3863,7 +3890,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Erro de rede.</translation>
+      <translation>Erro de rede</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -4134,7 +4161,7 @@ to %1</translation>
     </message>
     <message>
       <source>Auto-Discovered Servers</source>
-      <translation>Servidor Descobertos Autom.</translation>
+      <translation>Servidor Descobertos Autom</translation>
     </message>
     <message>
       <source>* Last used connection *</source>
@@ -4150,7 +4177,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Apagar Ligações</translation>
+      <translation>Apagar Ligações?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4158,7 +4185,7 @@ to %1</translation>
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>nenhum</translation>
     </message>
   </context>
   <context>
@@ -4414,7 +4441,7 @@ to %1</translation>
     <name>QnNavigationItem</name>
     <message>
       <source>Speed Down</source>
-      <translation>Diminuir Vel.</translation>
+      <translation>Diminuir Vel</translation>
     </message>
     <message>
       <source>Previous Frame</source>
@@ -4422,7 +4449,7 @@ to %1</translation>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation>Aumentar Vel.</translation>
+      <translation>Aumentar Vel</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -4494,7 +4521,7 @@ to %1</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation>Introduza  novo título:</translation>
+      <translation>Introduza novo título:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
@@ -4882,7 +4909,7 @@ to %1</translation>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;Câmaras de outros servidores e câmaras removidas></translation>
+      <translation>Câmaras de outros servidores e câmaras removidas</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -5826,7 +5853,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Erro de rede.</translation>
+      <translation>Erro de rede</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -5943,15 +5970,15 @@ to %1</translation>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>%n TB</numerusform>
-        <numerusform>%n TB</numerusform>
+      <translation>
+        <numerusform>%n Tb</numerusform>
+        <numerusform>%n Tb</numerusform>
       </translation>
     </message>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>Tb</translation>
     </message>
   </context>
   <context>
@@ -5994,7 +6021,7 @@ to %1</translation>
     </message>
     <message>
       <source>%1 before now</source>
-      <translation>(%1 antes de agora)</translation>
+      <translation>%1 antes de agora</translation>
     </message>
     <message>
       <source>Realtime backup is active...</source>
@@ -6501,7 +6528,7 @@ to %1</translation>
     </message>
     <message>
       <source>Input device is not selected</source>
-      <translation>O dispositivo de entrada não está seleccionado.</translation>
+      <translation>O dispositivo de entrada não está seleccionado</translation>
     </message>
     <message>
       <source>Streaming is not ready yet</source>
@@ -6509,7 +6536,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Erro de rede.</translation>
+      <translation>Erro de rede</translation>
     </message>
   </context>
   <context>
@@ -6869,7 +6896,7 @@ to %1</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Email inválido</translation>
+      <translation>Email inválido.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -6956,7 +6983,7 @@ to %1</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation>Página da Web:</translation>
+      <translation>Página da Web</translation>
     </message>
   </context>
   <context>
@@ -7024,11 +7051,11 @@ to %1</translation>
     <name>QnWorkbenchExportHandler</name>
     <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Ficheiro  executável %1 (x64) (*.exe)</translation>
+      <translation>Ficheiro executável %1 (x64) (*.exe)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Ficheiro  executável %1 (x86) (*.exe)</translation>
+      <translation>Ficheiro executável %1 (x86) (*.exe)</translation>
     </message>
     <message>
       <source>Exporting Layout</source>
@@ -7433,7 +7460,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Parar Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7441,7 +7468,7 @@ to %1</translation>
     </message>
     <message>
       <source>Stop</source>
-      <translation>pausa</translation>
+      <translation>Pausa</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>

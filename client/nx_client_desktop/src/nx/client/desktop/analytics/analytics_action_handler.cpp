@@ -12,6 +12,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/analytics/drivers/analytics_drivers_factory.h>
 #include <nx/client/desktop/analytics/workbench_analytics_controller.h>
+#include <nx/client/desktop/layout_templates/layout_template.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
@@ -49,12 +50,21 @@ void AnalyticsActionHandler::startAnalytics()
     if (!driver)
         return;
 
+    const auto& layoutTemplate =
+        parameters.argument(Qn::LayoutTemplateRole).value<LayoutTemplate>();
+
     int size = parameters.argument(Qn::IntRole).toInt();
 
     auto existing = std::find_if(m_controllers.cbegin(), m_controllers.cend(),
-        [resource, size](const ControllerPtr& controller)
+        [resource, size, templateName = layoutTemplate.name](const ControllerPtr& controller)
         {
-            return controller->matrixSize() == size && controller->resource() == resource;
+            if (controller->resource() != resource)
+                return false;
+
+            if (!templateName.isEmpty())
+                return controller->layoutTemplate().name == templateName;
+
+            return controller->matrixSize() == size;
         });
 
     if (existing != m_controllers.cend())
@@ -67,8 +77,11 @@ void AnalyticsActionHandler::startAnalytics()
         return;
     }
 
-    const ControllerPtr controller(new WorkbenchAnalyticsController(size, resource, driver));
-    m_controllers.push_back(controller);
+    const ControllerPtr controller(layoutTemplate.isValid()
+        ? new WorkbenchAnalyticsController(layoutTemplate, resource, driver)
+        : new WorkbenchAnalyticsController(size, resource, driver));
+
+    m_controllers.append(controller);
     menu()->trigger(ui::action::OpenInNewTabAction, controller->layout());
 }
 

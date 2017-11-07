@@ -171,7 +171,8 @@ public:
 enum class MetadataType
 {
     Motion,
-    ObjectDetection
+    ObjectDetection,
+    MediaStreamEvent
 };
 
 // TODO: #dmishin get rid of implementations and members in this class

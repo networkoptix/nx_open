@@ -87,9 +87,6 @@ namespace nx_hls
         size_t m_bytesSent;
         static size_t m_minPlaylistSizeToStartStreaming;
 
-        /** Prepare path for m3u, e.g. add proxying if needed. */
-        void prepareUrlPath(QUrl* url);
-
         //!
         /*!
             In case of success, adds Content-Type, Content-Length headers to \a response

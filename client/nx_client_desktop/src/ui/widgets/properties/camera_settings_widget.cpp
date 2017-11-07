@@ -264,7 +264,7 @@ void QnCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled)
             m_singleWidget->setExportScheduleButtonEnabled(enabled);
             break;
         case MultiMode:
-            m_multiWidget->setExportScheduleButtonEnabled(enabled);
+            m_multiWidget->setExportScheduleButtonEnabled(false);
             break;
         default:
             break;

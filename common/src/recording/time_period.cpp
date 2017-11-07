@@ -54,6 +54,15 @@ QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs) :
     durationMs(durationMs)
 {}
 
+QnTimePeriod::QnTimePeriod(
+    const std::chrono::milliseconds& startTime,
+    const std::chrono::milliseconds& duration)
+    :
+    startTimeMs(startTime.count()),
+    durationMs(duration.count())
+{
+}
+
 QnTimePeriod QnTimePeriod::fromInterval(qint64 startTimeMs
     , qint64 endTimeMs)
 {
@@ -78,6 +87,25 @@ qint64 QnTimePeriod::endTimeMs() const
         return DATETIME_NOW;
 
     return startTimeMs + durationMs;
+}
+
+bool QnTimePeriod::isLeftIntersection(const QnTimePeriod& other) const
+{
+    return other.startTimeMs < startTimeMs
+        && other.endTimeMs() > startTimeMs
+        && other.endTimeMs() < endTimeMs();
+}
+
+bool QnTimePeriod::isRightIntersection(const QnTimePeriod& other) const
+{
+    return other.startTimeMs > startTimeMs
+        && other.startTimeMs < endTimeMs()
+        && other.endTimeMs() > endTimeMs();
+}
+
+bool QnTimePeriod::isContainedIn(const QnTimePeriod& other) const
+{
+    return startTimeMs >= other.startTimeMs && endTimeMs() <= other.endTimeMs();
 }
 
 bool QnTimePeriod::contains(const QnTimePeriod &timePeriod) const
@@ -215,6 +243,30 @@ void QnTimePeriod::truncateFront(qint64 timeMs)
             durationMs = endTimeMs() - timeMs;
         startTimeMs = timeMs;
     }
+}
+
+QnTimePeriod QnTimePeriod::truncated(qint64 timeMs) const
+{
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        return QnTimePeriod::fromInterval(
+            startTimeMs,
+            timeMs > endTimeMs() ? endTimeMs() : timeMs);
+    }
+
+    return *this;
+}
+
+QnTimePeriod QnTimePeriod::truncatedFront(qint64 timeMs) const
+{
+    if (qBetween(startTimeMs, timeMs, endTimeMs()))
+    {
+        return QnTimePeriod::fromInterval(
+            timeMs < startTimeMs ?
+            startTimeMs : timeMs, endTimeMs());
+    }
+
+    return *this;
 }
 
 bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)

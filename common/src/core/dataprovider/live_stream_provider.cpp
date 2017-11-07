@@ -422,7 +422,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
         bool needAnalyzeFrame = !nx::analytics::ini().useKeyFramesOnly
             || videoData->flags & QnAbstractMediaData::MediaFlags_AVKey;
 
-        if (nx::analytics::ini().enableMotionDetection)
+        if (needAnalyzeFrame && nx::analytics::ini().enableMotionDetection)
         {
             static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()
                 * SECONDARY_STREAM_MAX_RESOLUTION.height();
@@ -430,7 +430,7 @@ void QnLiveStreamProvider::onGotVideoFrame(
             needAnalyzeFrame &= !m_forcedMotionStream.isEmpty()
                 || videoData->width * videoData->height <= maxSquare;
 
-            if (m_motionEstimation[channel].analizeFrame(videoData))
+            if (needAnalyzeFrame && m_motionEstimation[channel].analizeFrame(videoData))
             {
                 updateStreamResolution(
                     channel,

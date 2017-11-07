@@ -480,7 +480,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>pausa</translation>
+      <translation>Pausa</translation>
     </message>
     <message>
       <location/>
@@ -510,7 +510,7 @@
     <message>
       <location/>
       <source>Device Address</source>
-      <translation>Endereço de Dispositivo:</translation>
+      <translation>Endereço de Dispositivo</translation>
     </message>
     <message>
       <location/>
@@ -530,7 +530,7 @@
     <message>
       <location/>
       <source>Discovery Port</source>
-      <translation>Porta de Pes&amp;quisa:</translation>
+      <translation>Porta de Pes&amp;quisa</translation>
     </message>
     <message>
       <location/>
@@ -856,7 +856,7 @@
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation>Aplicar alterações antes de copiar agenda</translation>
+      <translation>Aplicar alterações antes de copiar agenda.</translation>
     </message>
     <message>
       <location/>
@@ -1117,7 +1117,7 @@
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation>Pausar o video autom.</translation>
+      <translation>Pausar o video autom</translation>
     </message>
     <message>
       <location/>
@@ -1477,7 +1477,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Chave da Licença:</translation>
+      <translation>Chave da Licença</translation>
     </message>
     <message>
       <location/>
@@ -1487,7 +1487,7 @@
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation>Ficheiro Chave de Activação:</translation>
+      <translation>Ficheiro Chave de Activação</translation>
     </message>
     <message>
       <location/>
@@ -1584,17 +1584,17 @@
     <message>
       <location/>
       <source>Language</source>
-      <translation>Idioma:</translation>
+      <translation>Idioma</translation>
     </message>
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>Modo Horas:</translation>
+      <translation>Modo Horas</translation>
     </message>
     <message>
       <location/>
       <source>Image</source>
-      <translation>Imagem:</translation>
+      <translation>Imagem</translation>
     </message>
     <message>
       <location/>
@@ -1604,7 +1604,7 @@
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>Intensidade:</translation>
+      <translation>Intensidade</translation>
     </message>
     <message>
       <location/>
@@ -2215,12 +2215,12 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>Resolução:</translation>
+      <translation>Resolução</translation>
     </message>
     <message>
       <location/>
       <source>Recording Quality</source>
-      <translation>Qualidade Gravação:</translation>
+      <translation>Qualidade Gravação</translation>
     </message>
     <message>
       <location/>
@@ -2312,7 +2312,7 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>Endereço IP:</translation>
+      <translation>Endereço IP</translation>
     </message>
     <message>
       <location/>
@@ -2464,12 +2464,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Fabricante:</translation>
+      <translation>Fabricante</translation>
     </message>
     <message>
       <location/>
@@ -2489,22 +2489,22 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>Endereço IP:</translation>
+      <translation>Endereço IP</translation>
     </message>
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>Página da Web:</translation>
+      <translation>Página da Web</translation>
     </message>
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation>Endereço MAC:</translation>
+      <translation>Endereço MAC</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation>Sensibilidade:</translation>
+      <translation>Sensibilidade</translation>
     </message>
     <message>
       <location/>
@@ -2859,7 +2859,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>Web Page</source>
-      <translation>Página da Web:</translation>
+      <translation>Página da Web</translation>
     </message>
   </context>
   <context>

@@ -40,14 +40,13 @@ public:
 
     void autoCalibrate();
 
-    void updatePage();
-    void updateImage();
-
 signals:
     void autoCalibrationFinished();
     void dataChanged();
 
 private:
+    void updatePage();
+
     void at_calibrator_finished(int errorCode);
     void at_image_animationFinished();
 
@@ -55,8 +54,6 @@ private:
     QScopedPointer<Ui::QnFisheyeCalibrationWidget> ui;
     QScopedPointer<QnFisheyeCalibrator> m_calibrator;
     QPointer<QnImageProvider> m_imageProvider;
-    QTimer* m_updateTimer;
 
     int m_lastError;
-    bool m_inLoading;
 };

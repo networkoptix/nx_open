@@ -1,143 +1,143 @@
 {
-  "language_name":"Tiếng Việt",
-  "dialogs":{
-    "okButton":"Ok",
-    "openLink":"Truy cập liên kết này",
-    "openLinkWithTitle":"Để {{title}} truy cập liên kết này"
-  },
-  "setup":{
-    "createAccount":"tạo tài khoản",
-    "errorNoHDD":"Thiết bị này thiết kế để làm việc với ổ đĩa cứng đã được cài đặt.<br>Vui lòng tắt thiết bị và cài đặt một ổ đĩa cứng.",
-    "errorNoNetwork":"Thiết bị này cần có kết nối mạng để hoạt động.<br>Vui lòng kết nối với mạng nội bộ của Internet"
-  },
-  "passwordRequirements":{
-    "minLengthMessage":"Mật khẩu phải có ít nhất 8 ký tự",
-    "requiredMessage":"Chỉ cho phép chữ cái, số và ký tự bàn phím",
-    "weakMessage":"Mật khẩu phải chứa các loại ký tự khác nhau",
-    "strongMessage":"Mật khẩu mạnh!",
-    "commonMessage":"Mật khẩu này nằm trong danh sách các mật khẩu phổ biến nhất"
-  },
-  "settings":{
-    "tabs":{
-      "server":"Máy chủ",
-      "system":"Hệ thống",
-      "device":"Thiết bị"
+    "language_name": "Tiếng Việt",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "Truy cập liên kết này",
+        "openLinkWithTitle": "Để {{title}} truy cập liên kết này"
     },
-    "confirmRestart":"Khởi động lại máy chủ?",
-    "couldntCheckInternet":"Không thể kiểm tra kết nối đám mây",
-    "confirmRestoreDefault":"Xóa cơ sở dữ liệu và cài đặt? Quá trình này sẽ mất một thời gian và máy chủ sẽ được khởi động lại sau đó.",
-    "confirmRestoreDefaultTitle":"Khôi phục mặc định của nhà sản xuât",
-    "unexpectedError":"Không thành công: đã xảy ra lỗi không mong muốn",
-    "connnetionError":"Lôi kêt nôi",
-    "wrongPassword":"Sai mật khẩu.",
-    "error":"Lỗi: ",
-    "restartNeeded":"Đã lưu thay đổi. Khởi động lại máy chủ để áp dụng các cài đặt mới?",
-    "settingsSaved":"Đã lưu cài đặt",
-    "confirmHardwareRestart":"Khởi động lại máy chủ hoạt động hệ thống?",
-    "confirmRestoreSettings":"Khôi phục tất cả các cài đặt máy chủ? Lưu trữ sẽ được lưu, nhưng cài đặt mạng sẽ được đặt lại.",
-    "confirmRestoreSettingsNotNetwork":"Đặt lại cấu hình máy chủ? Cài đặt lưu trữ và mạng sẽ được lưu.",
-    "unavailable":"Không khả dụng",
-    "unsafePortConfirm":"Không an toàn khi sử dụng số cổng dưới 1025. Máy chủ có thể không truy cập được. Bạn vẫn muốn tiếp tục?",
-    "confirmDisconnectFromCloud":"Ngắt kết nối Hệ thống từ {{CLOUD_NAME}}",
-    "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Tất cả người dùng đám mây sẽ bị xóa.</span><br><br>Hệ thống có thể truy cập qua mạng nội bộ bằng tài khoản quản trị viên cục bộ.",
-    "confirmDisconnectFromCloudAction":"Ngắt kết nối",
-    "disconnectedFromCloudSuccess":"Hệ thống đã bị ngắt kết nối khỏi {{CLOUD_NAME}} thành công",
-    "confirmDisconnectFromSystem":"Tách máy chủ khỏi hệ thống hiện tại",
-    "confirmDisconnectFromSystemAction":"Tách",
-    "disconnectedFromSystemSuccess":"Máy chủ đã được tách rời khỏi hệ thống thành công",
-    "connectedSuccess":"Hệ thống ngắt nối thành công",
-    "createLocalOwnerTitle":"Tạo tài khoản quản trị local",
-    "confirmChangePassword":"Thay đổi mật khẩu",
-    "confirmChangePasswordTitle":"Thay đổi mật khẩu hệ thống? Nó sẽ ảnh hưởng đến người dùng 'admin' và mật khẩu root cho một số máy chủ",
-    "confirmChangePasswordAction":"Lưu mật khẩu mới",
-    "nx1ControlHint":"Ứng dụng trên máy đã được bắt đầu. Sử dụng bàn phím / chuột hoặc ứng dụng di động để điều khiển nó."
-  },
-  "info":{
-    "tabs":{
-      "healthMonitoring":"Theo dõi tài nguyên hệ thống",
-      "storage":"Lưu trữ",
-      "log":"Bản ghi"
-    }
-  },
-  "join":{
-    "systemIsUnreacheble":"Hệ thống không thể truy cập được hoặc không tồn tại.",
-    "incorrectCurrentPassword":"Mật khẩu không chính xác.",
-    "incorrectRemotePassword":"Email hoặc mật khẩu không chính xác.",
-    "incompatibleVersion":"Hệ thống không thể truy cập được, không tồn tại hoặc có phiên bản không tương thích.",
-    "wrongUrl":"Không thể kết nối đến máy chủ.",
-    "newSystemError":"Không thể kết hợp hệ thống. Không cấu hình được từ xa.",
-    "safeMode":"Không thể kết hợp hệ thống. Điều khiển hệ thống từ xa ở chế độ an toàn.",
-    "configError":"Không thể kết hợp hệ thống. Có lẽ một trong hệ đang trong chế độ an toàn.",
-    "cloudError":"Không thể kết hợp hệ thống. Phụ thuộc hệ thống được kết nối với điện toán. Bạn cần phải ngắt kết nối nó đầu tiên.",
-    "cloudBothError":"Không thể kết hợp hệ thống. Phụ thuộc hệ thống được kết nối với điện toán. Bạn cần phải ngắt kết nối nó đầu tiên.",
-    "cloudHostConflict":"Không thể hợp nhất các hệ thống vì các máy chủ được kết với các máy chủ đám mây khác",
-    "licenceError":"Cảnh báo! Bạn sắp hợp hệ thống với bản quyền đăng ký. Chỉ cho phép một bản quyền Starter cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa. Hợp nhất bằng mọi cách?",
-    "connectionFailed":"Kết nối thất bại: ",
-    "unknownError":"lỗi không xác định",
-    "mergeFailed":"Hợp nhất không thành công: ",
-    "mergeSucceed":"Hợp nhất thành công.",
-    "newSystemDisplayName":"Hệ thống mới",
-    "incompatibleProtocol":"phiên bản không tương thích",
-    "incompatibleCloudHost":"xung đột đám mây",
-    "incompatibleCloudState":"kết nối điện toán đám mây"
-  },
-  "login":{
-    "incorrectPassword":"Email hoặc mật khẩu không chính xác"
-  },
-  "navigaion":{
-    "cannotGetUser":"Lỗi máy chủ: không thể truy xuất dữ liệu người dùng hiện tại"
-  },
-  "offlineDialog":{
-    "serverOffline":"máy chủ offline"
-  },
-  "restartDialog":{
-    "serverStarting":"máy chủ đang bắt đầu",
-    "serverRestarting":"máy chủ đang khởi động lại",
-    "serverOffline":"máy chủ offline"
-  },
-  "fileUpload":{
-    "started":"Đã cập nhật thành công. Sẽ mất vài phút",
-    "upToDate":"Cập nhật không thành công. Phiên bản cập nhật đã được cài đặt.",
-    "invalidFile":"Cập nhật không thành công. Tệp đã chọn không phải là tệp cập nhật hợp lệ.",
-    "incompatibleSystem":"Cập nhật không thành công. Tập tin đã chọn được sử dụng cho một hệ thống khác.",
-    "extractionError":"Cập nhật không thành công. Không đủ dung lượng để trích xuất lưu trữ, kiểm tra bộ nhớ có sẵn.",
-    "installationError":"Đang cập nhật không thành công. Không thể thực hiện tập lệnh cài đặt.",
-    "selectFiles":"Chọn tập tin"
-  },
-  "advanced":{
-    "free":"Còn trống",
-    "total":"Tổng cộng",
-    "occupied":"Sử dụng",
-    "reserved":"Dự trữ"
-  },
-  "pageTitles":{
-    "default":"{{PRODUCT_NAME}} giao diện web"
-  },
-  "common":{
-    "systemOffline":"Hệ thống offline",
-    "cameraLinks":{
-      "copyToClipboard":"chép vào bảng nháp",
-      "highStream":"Luồng tốc độ cao",
-      "copyDefaultText":"sao chép",
-      "unknown":"Không biết",
-      "lowStream":"Luồng tốc độ thấp",
-      "transcoding":"Đang chuyển mã",
-      "copyActiveText":"sao chép vào clipboard"
+    "setup": {
+        "createAccount": "tạo tài khoản",
+        "errorNoHDD": "Thiết bị này thiết kế để làm việc với ổ đĩa cứng đã được cài đặt.<br>Vui lòng tắt thiết bị và cài đặt một ổ đĩa cứng.",
+        "errorNoNetwork": "Thiết bị này cần có kết nối mạng để hoạt động.<br>Vui lòng kết nối với mạng nội bộ của Internet"
     },
-    "searchCamPlaceholder":"tìm kiếm",
-    "cameraStates":{
-      "noFormat":"Trình duyệt hoặc thiết bị này không hỗ trợ phát lại video từ camera này.",
-      "ieWin10":"Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
-      "iosVideoTooLarge":"ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
-      "unauthorized":"Yêu cầu xác thực",
-      "ubuntuNX":"Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế.",
-      "ieNoWebm":"Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
-      "flashOrWebmRequired":"Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
-      "noArmSupport":"Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
-      "error":"Lỗi",
-      "offline":"Ẩn",
-      "noData":"Không có dữ liệu",
-      "flashRequired":"Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video từ máy chủ ARM."
+    "passwordRequirements": {
+        "minLengthMessage": "Mật khẩu phải có ít nhất 8 ký tự",
+        "requiredMessage": "Chỉ cho phép chữ cái, số và ký tự bàn phím",
+        "weakMessage": "Mật khẩu phải chứa các loại ký tự khác nhau",
+        "strongMessage": "Mật khẩu mạnh!",
+        "commonMessage": "Mật khẩu này nằm trong danh sách các mật khẩu phổ biến nhất"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Máy chủ",
+            "system": "Hệ thống",
+            "device": "Thiết bị"
+        },
+        "confirmRestart": "Khởi động lại máy chủ?",
+        "couldntCheckInternet": "Không thể kiểm tra kết nối đám mây",
+        "confirmRestoreDefault": "Xóa cơ sở dữ liệu và cài đặt? Quá trình này sẽ mất một thời gian và máy chủ sẽ được khởi động lại sau đó.",
+        "confirmRestoreDefaultTitle": "Khôi phục mặc định của nhà sản xuât",
+        "unexpectedError": "Không thành công: đã xảy ra lỗi không mong muốn",
+        "connnetionError": "Lôi kêt nôi",
+        "wrongPassword": "Sai mật khẩu.",
+        "error": "Lỗi: ",
+        "restartNeeded": "Đã lưu thay đổi. Khởi động lại máy chủ để áp dụng các cài đặt mới?",
+        "settingsSaved": "Đã lưu cài đặt",
+        "confirmHardwareRestart": "Khởi động lại máy chủ hoạt động hệ thống?",
+        "confirmRestoreSettings": "Khôi phục tất cả các cài đặt máy chủ? Lưu trữ sẽ được lưu, nhưng cài đặt mạng sẽ được đặt lại.",
+        "confirmRestoreSettingsNotNetwork": "Đặt lại cấu hình máy chủ? Cài đặt lưu trữ và mạng sẽ được lưu.",
+        "unavailable": "Không khả dụng",
+        "unsafePortConfirm": "Không an toàn khi sử dụng số cổng dưới 1025. Máy chủ có thể không truy cập được. Bạn vẫn muốn tiếp tục?",
+        "confirmDisconnectFromCloud": "Ngắt kết nối Hệ thống từ {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tất cả người dùng đám mây sẽ bị xóa.</span><br><br>Hệ thống có thể truy cập qua mạng nội bộ bằng tài khoản quản trị viên cục bộ.",
+        "confirmDisconnectFromCloudAction": "Ngắt kết nối",
+        "disconnectedFromCloudSuccess": "Hệ thống đã bị ngắt kết nối khỏi {{CLOUD_NAME}} thành công",
+        "confirmDisconnectFromSystem": "Tách máy chủ khỏi hệ thống hiện tại",
+        "confirmDisconnectFromSystemAction": "Tách",
+        "disconnectedFromSystemSuccess": "Máy chủ đã được tách rời khỏi hệ thống thành công",
+        "connectedSuccess": "Hệ thống ngắt nối thành công",
+        "createLocalOwnerTitle": "Tạo tài khoản quản trị local",
+        "confirmChangePassword": "Thay đổi mật khẩu",
+        "confirmChangePasswordTitle": "Thay đổi mật khẩu hệ thống? Nó sẽ ảnh hưởng đến người dùng 'admin' và mật khẩu root cho một số máy chủ",
+        "confirmChangePasswordAction": "Lưu mật khẩu mới",
+        "nx1ControlHint": "Ứng dụng trên máy đã được bắt đầu. Sử dụng bàn phím / chuột hoặc ứng dụng di động để điều khiển nó."
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Theo dõi tài nguyên hệ thống",
+            "storage": "Lưu trữ",
+            "log": "Bản ghi"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "Hệ thống không thể truy cập được hoặc không tồn tại.",
+        "incorrectCurrentPassword": "Mật khẩu không chính xác.",
+        "incorrectRemotePassword": "Email hoặc mật khẩu không chính xác.",
+        "incompatibleVersion": "Hệ thống không thể truy cập được, không tồn tại hoặc có phiên bản không tương thích.",
+        "wrongUrl": "Không thể kết nối đến máy chủ.",
+        "newSystemError": "Không thể kết hợp hệ thống. Không cấu hình được từ xa.",
+        "safeMode": "Không thể kết hợp hệ thống. Điều khiển hệ thống từ xa ở chế độ an toàn.",
+        "configError": "Không thể kết hợp hệ thống. Có lẽ một trong hệ đang trong chế độ an toàn.",
+        "cloudError": "Không thể kết hợp hệ thống. Phụ thuộc hệ thống được kết nối với điện toán. Bạn cần phải ngắt kết nối nó đầu tiên.",
+        "cloudBothError": "Không thể kết hợp hệ thống. Phụ thuộc hệ thống được kết nối với điện toán. Bạn cần phải ngắt kết nối nó đầu tiên.",
+        "cloudHostConflict": "Không thể hợp nhất các hệ thống vì các máy chủ được kết với các máy chủ đám mây khác",
+        "licenceError": "Cảnh báo! Bạn sắp hợp hệ thống với bản quyền đăng ký. Chỉ cho phép một bản quyền Starter cho mỗi Hệ thống, do đó giấy phép thứ hai sẽ bị vô hiệu hóa. Hợp nhất bằng mọi cách?",
+        "connectionFailed": "Kết nối thất bại: ",
+        "unknownError": "Lỗi không xác định",
+        "mergeFailed": "Hợp nhất không thành công: ",
+        "mergeSucceed": "Hợp nhất thành công.",
+        "newSystemDisplayName": "Hệ thống mới",
+        "incompatibleProtocol": "phiên bản không tương thích",
+        "incompatibleCloudHost": "xung đột đám mây",
+        "incompatibleCloudState": "kết nối điện toán đám mây"
+    },
+    "login": {
+        "incorrectPassword": "Email hoặc mật khẩu không chính xác"
+    },
+    "navigaion": {
+        "cannotGetUser": "Lỗi máy chủ: không thể truy xuất dữ liệu người dùng hiện tại"
+    },
+    "offlineDialog": {
+        "serverOffline": "máy chủ offline"
+    },
+    "restartDialog": {
+        "serverStarting": "máy chủ đang bắt đầu",
+        "serverRestarting": "máy chủ đang khởi động lại",
+        "serverOffline": "máy chủ offline"
+    },
+    "fileUpload": {
+        "started": "Đã cập nhật thành công. Sẽ mất vài phút",
+        "upToDate": "Cập nhật không thành công. Phiên bản cập nhật đã được cài đặt.",
+        "invalidFile": "Cập nhật không thành công. Tệp đã chọn không phải là tệp cập nhật hợp lệ.",
+        "incompatibleSystem": "Cập nhật không thành công. Tập tin đã chọn được sử dụng cho một hệ thống khác.",
+        "extractionError": "Cập nhật không thành công. Không đủ dung lượng để trích xuất lưu trữ, kiểm tra bộ nhớ có sẵn.",
+        "installationError": "Đang cập nhật không thành công. Không thể thực hiện tập lệnh cài đặt.",
+        "selectFiles": "Chọn tập tin"
+    },
+    "advanced": {
+        "free": "Còn trống",
+        "total": "Tổng cộng",
+        "occupied": "Sử dụng",
+        "reserved": "Dự trữ"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} giao diện web"
+    },
+    "common": {
+        "systemOffline": "Hệ thống offline",
+        "cameraLinks": {
+            "copyToClipboard": "chép vào bảng nháp",
+            "highStream": "Luồng tốc độ cao",
+            "copyDefaultText": "sao chép",
+            "unknown": "Không biết",
+            "lowStream": "Luồng tốc độ thấp",
+            "transcoding": "Đang chuyển mã",
+            "copyActiveText": "sao chép vào clipboard"
+        },
+        "searchCamPlaceholder": "tìm kiếm",
+        "cameraStates": {
+            "noFormat": "Trình duyệt hoặc thiết bị này không hỗ trợ phát lại video từ camera này.",
+            "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
+            "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
+            "unauthorized": "Yêu cầu xác thực",
+            "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế.",
+            "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
+            "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
+            "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
+            "error": "Lỗi",
+            "offline": "Ẩn",
+            "noData": "Không có dữ liệu",
+            "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video từ máy chủ ARM."
+        }
     }
-  }
 }

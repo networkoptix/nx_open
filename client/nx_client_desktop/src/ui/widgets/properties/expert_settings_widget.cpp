@@ -104,7 +104,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxDisableNativePtzPresets, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
 
-    connect(ui->secondStreamDisableCheckBox, &QCheckBox::toggled,
+    connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
         this, &QnCameraExpertSettingsWidget::at_secondStreamQualityChanged);
     connect(ui->secondStreamQualityComboBox, QnComboboxCurrentIndexChanged,
         this, &QnCameraExpertSettingsWidget::at_secondStreamQualityChanged);
@@ -276,12 +276,13 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     if (m_hasDualStreaming)
     {
-        ui->secondStreamQualityComboBox->setVisible(m_qualityEditable);
-
         CheckboxUtils::setupTristateCheckbox(
             ui->secondStreamDisableCheckBox,
             sameSecondStreamDisabledState,
             secondStreamMode.disabled);
+
+        ui->secondStreamQualityWidget->setVisible(m_qualityEditable
+            && sameSecondStreamDisabledState && !secondStreamMode.disabled);
 
         static_cast<QListView*>(ui->secondStreamQualityComboBox->view())->setRowHidden(
             kIndexDontChange,
@@ -538,7 +539,7 @@ void QnCameraExpertSettingsWidget::at_secondStreamQualityChanged()
     const auto quality = selectedSecondStreamQuality();
     ui->lowQualityWarningLabel->setVisible(quality == Qn::SSQualityLow);
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
-    ui->secondStreamQualityWidget->setHidden(quality == Qn::SSQualityDontUse);
+    ui->secondStreamQualityWidget->setVisible(quality != Qn::SSQualityDontUse && m_qualityEditable);
     ui->secondStreamGroupBox->layout()->activate();
     ui->leftWidget->layout()->activate();
 

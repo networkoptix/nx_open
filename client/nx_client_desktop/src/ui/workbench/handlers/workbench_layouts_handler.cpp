@@ -47,7 +47,7 @@
 #include <ui/workbench/handlers/workbench_videowall_handler.h>  // TODO: #GDM dependencies
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
-
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 
 #include <nx/utils/string.h>
@@ -312,6 +312,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
                     return;
 
                 saveLayout(layout);
+                return;
             }
 
             /* Check if we have rights to overwrite the layout */
@@ -1035,9 +1036,17 @@ void LayoutsHandler::at_openNewTabAction_triggered()
 {
     QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
 
-    layout->setName(generateUniqueLayoutName(resourcePool(), context()->user(), tr("New Layout"), tr("New Layout %1")));
+    const auto parameters = menu()->currentParameters(sender());
 
+    if (parameters.hasArgument(Qn::LayoutSyncStateRole))
+    {
+        const auto syncState = parameters.argument(Qn::LayoutSyncStateRole);
+        layout->setData(Qn::LayoutSyncStateRole, syncState);
+    }
+
+    layout->setName(generateUniqueLayoutName(resourcePool(), context()->user(), tr("New Layout"), tr("New Layout %1")));
     workbench()->addLayout(layout);
+
     workbench()->setCurrentLayout(layout);
 }
 

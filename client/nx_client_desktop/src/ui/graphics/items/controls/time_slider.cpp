@@ -181,6 +181,12 @@ namespace
 
     const int kNoThumbnailsFontPixelSize = 16;
 
+    // Timeline border area width in pixels where single click will auto-scroll the timeline
+    static constexpr int kAutoShiftAreaWidth = 40;
+
+    // Auto-scroll will move the timeline such way, so cursor will be 120 pixels away from border.
+    static constexpr int kAutoShiftOffsetWidth = 120;
+
     QTime msecsToTime(qint64 msecs)
     {
         return QTime(0, 0, 0, 0).addMSecs(msecs);
@@ -3305,25 +3311,24 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
     dragProcessor()->mouseReleaseEvent(this, event);
 
-    const auto autoShiftAreaWidth = nx::client::desktop::ini().autoShiftAreaWidth;
-    if (autoShiftAreaWidth > 0 && m_dragIsClick && event->button() == Qt::LeftButton)
+    if (m_dragIsClick && event->button() == Qt::LeftButton)
     {
         const auto pos = valueFromPosition(event->pos());
-        const auto distanceToCenter = (m_windowEnd - m_windowStart) / 2;
 
-        const auto allowedOffset = m_msecsPerPixel * autoShiftAreaWidth;
+        const auto allowedOffset = m_msecsPerPixel * kAutoShiftAreaWidth;
+        const auto targetOffset = m_msecsPerPixel * kAutoShiftOffsetWidth;
         const auto leftOffset = pos - m_windowStart;
         const auto rightOffset = m_windowEnd - pos;
 
         if (leftOffset <= allowedOffset)
         {
             // Shift window to the left (negative).
-            shiftWindow(leftOffset - distanceToCenter, true);
+            shiftWindow(leftOffset - targetOffset, true);
         }
         else if (rightOffset <= allowedOffset)
         {
             // Shift window to the right (positive).
-            shiftWindow(distanceToCenter - rightOffset, true);
+            shiftWindow(targetOffset - rightOffset, true);
         }
     }
 

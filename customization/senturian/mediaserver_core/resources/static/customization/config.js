@@ -6,7 +6,6 @@ Config.helpLinks.push({
     target: "new" // new|frame
 });
 
-
 Config.helpLinks.push({
     urls: [
         {
@@ -15,7 +14,7 @@ Config.helpLinks.push({
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=jp.co.systemk.skvms",
+            url: "https://play.google.com/store/apps/details?id=com.senturiansolutions.sentry",
             class:'googleplay',
             button: "Android Client"
         }

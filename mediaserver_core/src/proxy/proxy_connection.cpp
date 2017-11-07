@@ -33,6 +33,7 @@
 #include <nx/network/aio/unified_pollset.h>
 
 #include <utils/common/app_info.h>
+#include <core/resource/user_resource.h>
 
 class QnTcpListener;
 
@@ -240,9 +241,18 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
         }
 
         nx_http::HttpHeader authHeader(authHeaderName, digestAuthorizationHeader.serialized());
-        nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalAuthHeader.digest->userid);
+        QByteArray originalUserName;
+        auto resPool = commonModule()->resourcePool();
+        if (auto user = resPool->getResourceById<QnUserResource>(d->accessRights.userId))
+            originalUserName = user->getName().toUtf8();
+        if (originalUserName.isEmpty())
+            originalUserName = originalAuthHeader.digest->userid;
+        if (!originalUserName.isEmpty())
+        {
+            nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalUserName);
+            nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
+        }
         nx_http::insertOrReplaceHeader(&d->request.headers, authHeader);
-        nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
     }
 
     return true;
@@ -451,6 +461,9 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
         d->socket->close();
         return false;
     }
+
+    if (dstRoute.id.isNull() && d->accessRights.userId.isNull())
+        return false; //< Do not allow direct IP connect for unauthorized users.
 
     d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
     if (d->lastConnectedUrl.isEmpty())

@@ -1149,6 +1149,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Phóng to</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Thu nhỏ</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Tập trung xa</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Tập trung gần</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Tự động lấy nét</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Thay đổi chế độ dewarping</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -5941,7 +5968,7 @@ to %1</source>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>Lịch trìnhh sao lưu dự kiến kế tiếp &lt; b &gt;%1 &lt;/b &gt;</translation>
+      <translation>Lịch trìnhh sao lưu dự kiến kế tiếp &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>

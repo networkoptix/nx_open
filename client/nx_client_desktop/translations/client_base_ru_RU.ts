@@ -1152,6 +1152,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+      <source>Zoom In</source>
+      <translation>Приблизить</translation>
+    </message>
+    <message>
+      <source>Zoom Out</source>
+      <translation>Отдалить</translation>
+    </message>
+    <message>
+      <source>Focus Far</source>
+      <translation>Отдалить фокус</translation>
+    </message>
+    <message>
+      <source>Focus Near</source>
+      <translation>Приблизить фокус</translation>
+    </message>
+    <message>
+      <source>Auto Focus</source>
+      <translation>Автофокусировка</translation>
+    </message>
+    <message>
+      <source>Change Dewarping Mode</source>
+      <translation>Изменить режим развёртки</translation>
+    </message>
+  </context>
+  <context>
     <name>QObject</name>
     <message>
       <source>Parameter 1 is null.</source>
@@ -1416,7 +1443,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>Просмотр живого видео</translation>
+      <translation>Просмотр видео в реальном времени</translation>
     </message>
     <message>
       <source>Watching archive</source>
@@ -3388,7 +3415,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>Открыть  закладки</translation>
+      <translation>Открыть закладки</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -6701,7 +6728,7 @@ to %1</source>
     </message>
     <message>
       <source>View live video</source>
-      <translation>Просмотр живого видео</translation>
+      <translation>Просмотр видео в реальном времени</translation>
     </message>
     <message>
       <source>Use PTZ controls</source>
@@ -7953,7 +7980,7 @@ to %1</source>
     <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
     <message>
       <source>Go to Live</source>
-      <translation>Перейти к просмотру живого видео</translation>
+      <translation>Перейти к просмотру видео в реальном времени</translation>
     </message>
   </context>
   <context>

@@ -1,6 +1,7 @@
 #if defined(ENABLE_HANWHA)
 
 #include <QtCore/QDateTime>
+#include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/timer_manager.h>
@@ -10,30 +11,28 @@
 #include "hanwha_chunk_reader.h"
 #include "hanwha_request_helper.h"
 #include "hanwha_shared_resource_context.h"
+#include "hanwha_utils.h"
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
 static const int kMaxAllowedChannelNumber = 64;
-static const QString kHanwhaDateFormat("yyyy-MM-dd hh:mm:ss");
-static const  char kStartTimeParamName[] = "StartTime";
-static const  char kEndTimeParamName[] = "EndTime";
+static const char kStartTimeParamName[] = "StartTime";
+static const char kEndTimeParamName[] = "EndTime";
 
 static std::chrono::seconds kUpdateChunksDelay(60);
 static std::chrono::seconds kResendRequestIfFail(10);
 
-qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift)
-{
-    auto dateTime = QDateTime::fromString(value, kHanwhaDateFormat);
-    dateTime.setOffsetFromUtc(timeZoneShift.count());
-    return std::max(0LL, dateTime.toMSecsSinceEpoch());
-}
+static const QString kDateTimeFormat = lit("yyyy-MM-dd hh:mm:ss");
 
-QDateTime toHanwhaDateTime(qint64 value, std::chrono::seconds timeZoneShift)
-{
-    return QDateTime::fromMSecsSinceEpoch(value, Qt::OffsetFromUTC, timeZoneShift.count());
-}
+static QDateTime kMinDateTime = QDateTime::fromString(
+    lit("2000-01-01 00:00:00"),
+    kDateTimeFormat);
+
+static QDateTime kMaxDateTime = QDateTime::fromString(
+    lit("2038-01-01 00:00:00"),
+    kDateTimeFormat);
 
 HanwhaChunkLoader::HanwhaChunkLoader():
     m_httpClient(new nx_http::AsyncClient())
@@ -55,13 +54,20 @@ void HanwhaChunkLoader::start(HanwhaSharedResourceContext* resourceContext)
         if (m_state != State::Initial)
             return; //< Already started
 
-        if (auto information = resourceContext->information())
+        const auto information = resourceContext->information();
+        if (information)
+        {
             m_maxChannels = information->channelCount;
+        }
         else
-            return; //< Unable to start wothout channel number.
+        {
+            NX_DEBUG(this, lit("Unable to fetch channel number"));
+            return; //< Unable to start without channel number.
+        }
 
         m_resourceContext = resourceContext;
-        m_state = State::updateTimeRange;
+        m_isNvr = information->deviceType == kHanwhaNvrDeviceType;
+        m_state = nextState(m_state);
         NX_DEBUG(this, lm("Started for %1 channels on %2").args(m_maxChannels, resourceContext->url()));
     }
 
@@ -101,6 +107,8 @@ void HanwhaChunkLoader::sendUpdateTimeRangeRequest()
     auto loadChunksUrl = m_resourceContext->url();
     loadChunksUrl.setPath("/stw-cgi/recording.cgi");
 
+    // TODO: Check for 'attributes/Recording/Support/SearchPeriod' and use only if it's supported,
+    // otherwise we have to load all periods constantly and clean them up by timeout.
     QUrlQuery query;
     query.addQueryItem("msubmenu", "searchrecordingperiod");
     query.addQueryItem("action", "view");
@@ -147,14 +155,27 @@ void HanwhaChunkLoader::sendLoadChunksRequest()
     query.addQueryItem("action", "view");
     query.addQueryItem("Type", "All");
 
-    auto startDateTime = toHanwhaDateTime(latestChunkTimeMs(), m_timeZoneShift);
-    auto endDateTime = QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1);
-    query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateFormat));
-    query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateFormat));
+    auto updateLagMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        kUpdateChunksDelay).count();
+
+    auto startDateTime = m_isNvr
+        ? toHanwhaDateTime(latestChunkTimeMs() - updateLagMs, m_timeZoneShift)
+        : kMinDateTime;
+
+    auto endDateTime = m_isNvr
+        ? QDateTime::fromMSecsSinceEpoch(std::numeric_limits<int>::max() * 1000ll).addDays(-1)
+        : kMaxDateTime;
+
+    query.addQueryItem("FromDate", startDateTime.toString(kHanwhaDateTimeFormat));
+    query.addQueryItem("ToDate", endDateTime.toString(kHanwhaDateTimeFormat));
+
     QStringList channelsParam;
     for (int i = 0; i < m_maxChannels; ++i)
         channelsParam << QString::number(i);
-    query.addQueryItem("ChannelIdList", channelsParam.join(','));
+
+    if (m_isNvr)
+        query.addQueryItem("ChannelIdList", channelsParam.join(','));
+
     loadChunksUrl.setQuery(query);
     m_lastParsedStartTimeMs = AV_NOPTS_VALUE;
     m_httpClient->setOnSomeMessageBodyAvailable(
@@ -173,6 +194,9 @@ void HanwhaChunkLoader::onHttpClientDone()
     {
         NX_WARNING(this, lm("Http request %1 failed with error %2")
             .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
+
+        setError();
+        m_wait.wakeAll();
         startTimerForNextRequest(kResendRequestIfFail);
         return;
     }
@@ -181,6 +205,9 @@ void HanwhaChunkLoader::onHttpClientDone()
     {
         NX_WARNING(this, lm("Http request %1 failed with status code %2")
             .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
+
+        setError();
+        m_wait.wakeAll();
         startTimerForNextRequest(kResendRequestIfFail);
         return;
     }
@@ -189,14 +216,19 @@ void HanwhaChunkLoader::onHttpClientDone()
         .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()));
     if (m_state == State::LoadingChunks)
     {
-        m_state = State::updateTimeRange;
+        m_errorOccured = false;
+        m_chunksLoadedAtLeastOnce = true;
+        m_state = nextState(m_state);
+        m_wait.wakeAll();
         startTimerForNextRequest(kUpdateChunksDelay); //< Send next request after delay
     }
     else if (m_state == State::updateTimeRange)
     {
         parseTimeRangeData(m_httpClient->fetchMessageBodyBuffer());
-
-        m_state = State::LoadingChunks;
+        m_timeRangeLoadedAtLeastOnce = true;
+        m_errorOccured = false;
+        m_state = nextState(m_state);
+        m_wait.wakeAll();
         sendRequest(); //< Send next request immediately
     }
 }
@@ -205,6 +237,7 @@ void HanwhaChunkLoader::startTimerForNextRequest(const std::chrono::milliseconds
 {
     if (m_terminated)
         return;
+
     m_nextRequestTimerId = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&HanwhaChunkLoader::sendRequest, this),
         delay);
@@ -232,6 +265,14 @@ void HanwhaChunkLoader::parseTimeRangeData(const QByteArray& data)
     {
         m_startTimeUsec = startTimeUsec;
         m_endTimeUsec = endTimeUsec;
+        const auto startTimeMs = m_startTimeUsec / 1000;
+
+        QnMutexLocker lock(&m_mutex);
+        for (auto& chunks: m_chunks)
+        {
+            while (!chunks.isEmpty() && chunks.first().endTimeMs() < startTimeMs)
+                chunks.pop_front();
+        }
     }
     else
     {
@@ -259,12 +300,17 @@ void HanwhaChunkLoader::onGotChunkData()
     NX_VERBOSE(this, lm("%1 got %2 lines of chunk data")
         .args(m_httpClient->contentLocationUrl(), lines.size()));
 
-    QnMutexLocker lock(&m_mutex);
-    for (const auto& line : lines)
-        parseChunkData(line.trimmed());
+    {
+        QnMutexLocker lock(&m_mutex);
+        const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
+        for (const auto& line: lines)
+            parseChunkData(line.trimmed(), currentTimeMs);
+    }
+
+    emit gotChunks();
 }
 
-bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
+bool HanwhaChunkLoader::parseChunkData(const QByteArray& line, qint64 currentTimeMs)
 {
     int channelNumberPos = line.indexOf('.') + 1;
     if (channelNumberPos == 0)
@@ -275,9 +321,11 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
 
     if (channelNumber > kMaxAllowedChannelNumber)
     {
-        NX_WARNING(this, lm("Ignore line %1 due to too big channel number %2 provided.").arg(line).arg(channelNumber));
+        NX_WARNING(this, lm("Ignore line %1 due to too big channel number %2 provided")
+            .args(line, channelNumber));
         return false;
     }
+
     if (m_chunks.size() <= channelNumber)
         m_chunks.resize(channelNumber + 1);
 
@@ -294,6 +342,12 @@ bool HanwhaChunkLoader::parseChunkData(const QByteArray& line)
     else if (fieldName == kEndTimeParamName)
     {
         auto endTimeMs = hanwhaDateTimeToMsec(fieldValue, m_timeZoneShift);
+        if (m_lastParsedStartTimeMs > currentTimeMs)
+        {
+            NX_DEBUG(this, lm("Ignore period [%1, %2] from future on channel %3")
+                .args(m_lastParsedStartTimeMs, endTimeMs, channelNumber));
+            return false;
+        }
 
         QnTimePeriod timePeriod(m_lastParsedStartTimeMs, endTimeMs - m_lastParsedStartTimeMs);
         if (m_startTimeUsec == AV_NOPTS_VALUE || chunks.isEmpty())
@@ -318,7 +372,10 @@ qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
     const qint64 endTimeMs = m_endTimeUsec / 1000;
     if (m_chunks.size() <= channelNumber || m_chunks[channelNumber].isEmpty())
         return AV_NOPTS_VALUE;
-    return m_chunks[channelNumber].front().startTimeMs * 1000;
+    auto result = m_chunks[channelNumber].front().startTimeMs * 1000;
+    if (m_startTimeUsec != AV_NOPTS_VALUE)
+        result = std::max(m_startTimeUsec, result);
+    return result;
 }
 
 qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
@@ -334,17 +391,63 @@ qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
 QnTimePeriodList HanwhaChunkLoader::chunks(int channelNumber) const
 {
     QnMutexLocker lock(&m_mutex);
+    return chunksUnsafe(channelNumber);
+}
+
+QnTimePeriodList HanwhaChunkLoader::chunksSync(int channelNumber) const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    while ((!m_chunksLoadedAtLeastOnce || (!m_timeRangeLoadedAtLeastOnce && m_isNvr))
+        && !m_errorOccured)
+    {
+        m_wait.wait(&m_mutex);
+    }
+
+    return chunksUnsafe(channelNumber);
+}
+
+QnTimePeriodList HanwhaChunkLoader::chunksUnsafe(int channelNumber) const
+{
     const qint64 startTimeMs = m_startTimeUsec / 1000;
     const qint64 endTimeMs = m_endTimeUsec / 1000;
     if (m_chunks.size() <= channelNumber)
         return QnTimePeriodList();
+
     QnTimePeriod boundingPeriod(startTimeMs, endTimeMs - startTimeMs);
-    return m_chunks[channelNumber].intersected(boundingPeriod);
+
+    if (m_isNvr)
+        return m_chunks[channelNumber].intersected(boundingPeriod);
+
+    return m_chunks[channelNumber];
+}
+
+void HanwhaChunkLoader::setError()
+{
+    m_errorOccured = true;
+    m_chunksLoadedAtLeastOnce = false;
+    m_timeRangeLoadedAtLeastOnce = false;
+}
+
+HanwhaChunkLoader::State HanwhaChunkLoader::nextState(State currentState) const
+{
+    if (!m_isNvr)
+        return State::LoadingChunks;
+
+    if (currentState == State::updateTimeRange)
+        return State::LoadingChunks;
+
+    return State::updateTimeRange;
 }
 
 void HanwhaChunkLoader::setTimeZoneShift(std::chrono::seconds timeZoneShift)
 {
     m_timeZoneShift = timeZoneShift;
+}
+
+std::chrono::seconds HanwhaChunkLoader::timeZoneShift() const
+{
+    return m_timeZoneShift;
 }
 
 } // namespace plugins
