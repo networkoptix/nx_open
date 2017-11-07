@@ -27,6 +27,8 @@ QnAlertBar::QnAlertBar(QWidget* parent):
         style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding,
         style::Metrics::kDefaultTopLevelMargin, style::Metrics::kStandardPadding);
 
+    m_label->setAttribute(Qt::WA_LayoutOnEntireRect);
+
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_label);

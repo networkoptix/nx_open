@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <ui/style/skin.h>
+#include <ui/style/helper.h>
 #include <ui/workbench/workbench_access_controller.h>
 
 QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
@@ -13,6 +14,8 @@ QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
 {
     m_setPasswordButton->setFlat(true);
     m_setPasswordButton->setIcon(qnSkin->icon(lit("buttons/password.png")));
+
+    getOverlayLayout()->setContentsMargins(0, 0, style::Metrics::kDefaultTopLevelMargin, 0);
     getOverlayLayout()->addWidget(m_setPasswordButton, 0, Qt::AlignRight);
 
     connect(this, &QnDefaultPasswordAlertBar::targetCamerasChanged,
