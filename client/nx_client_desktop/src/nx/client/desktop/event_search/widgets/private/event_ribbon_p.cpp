@@ -229,8 +229,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         previewTimeMs > 0 ? previewTimeMs : QnThumbnailRequestData::kLatestThumbnail,
         QnThumbnailRequestData::kDefaultRotation,
         QSize(kDefaultThumbnailSize, 0),
-        QnThumbnailRequestData::JpgFormat,
-        tile));
+        QnThumbnailRequestData::JpgFormat));
 
     tile->preview()->loadAsync();
 }

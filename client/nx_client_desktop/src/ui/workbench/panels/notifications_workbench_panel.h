@@ -3,6 +3,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <ui/workbench/panels/abstract_workbench_panel.h>
+#include <nx/client/desktop/event_search/widgets/event_panel.h>
 
 class QnControlBackgroundWidget;
 class QnNotificationsCollectionWidget;
@@ -11,8 +12,6 @@ class QnBlinkingImageButtonWidget;
 class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
-
-namespace nx { namespace client { namespace desktop { class EventPanel; }}}
 
 namespace NxUi {
 

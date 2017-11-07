@@ -56,11 +56,12 @@ public:
     void closeAction(const QnUuid& id);
     void linkAction(const QnUuid& id, const QString& link);
 
+    void clear();
+
 protected:
     bool addEvent(const EventData& event);
     bool updateEvent(const EventData& event);
     bool removeEvent(const QnUuid& id);
-    void clear();
 
     QModelIndex indexOf(const QnUuid& id) const;
     EventData getEvent(const QModelIndex& index) const;

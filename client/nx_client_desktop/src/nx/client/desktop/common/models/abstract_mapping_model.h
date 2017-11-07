@@ -205,14 +205,14 @@ void AbstractMappingModel<Base>::revert()
 template<class Base>
 bool AbstractMappingModel<Base>::canFetchMore(const QModelIndex& parent) const
 {
-    return sourceModel() ? sourceModel()->canFetchMore(mapToSource(parent)) : false;
+    return sourceModel() ? sourceModel()->canFetchMore(this->mapToSource(parent)) : false;
 }
 
 template<class Base>
 void AbstractMappingModel<Base>::fetchMore(const QModelIndex& parent)
 {
     if (sourceModel())
-        sourceModel()->fetchMore(mapToSource(parent));
+        sourceModel()->fetchMore(this->mapToSource(parent));
 }
 
 template<class Base>
@@ -230,7 +230,7 @@ QMimeData* AbstractMappingModel<Base>::mimeData(const QModelIndexList& indices) 
     QModelIndexList mappedIndices;
     mappedIndices.reserve(indices.count());
     for (const auto& index: indices)
-        mappedIndices << mapToSource(index);
+        mappedIndices << this->mapToSource(index);
 
     return sourceModel()->mimeData(mappedIndices);
 }
@@ -288,17 +288,17 @@ void AbstractMappingModel<Base>::mapDropCoordinatesToSource(int row, int column,
 
     if (row == -1 && column == -1)
     {
-        sourceParent = mapToSource(parent);
+        sourceParent = this->mapToSource(parent);
     }
-    else if (row == rowCount(parent))
+    else if (row == this->rowCount(parent))
     {
-        sourceParent = mapToSource(parent);
+        sourceParent = this->mapToSource(parent);
         sourceRow = sourceModel()->rowCount(sourceParent);
     }
     else
     {
-        const auto proxyIndex = index(row, column, parent);
-        const auto sourceIndex = mapToSource(proxyIndex);
+        const auto proxyIndex = this->index(row, column, parent);
+        const auto sourceIndex = this->mapToSource(proxyIndex);
         sourceRow = sourceIndex.row();
         sourceColumn = sourceIndex.column();
         sourceParent = sourceIndex.parent();
