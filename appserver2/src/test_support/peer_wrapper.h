@@ -67,11 +67,6 @@ private:
     nx::hpm::api::SystemCredentials m_cloudCredentials;
 
     std::unique_ptr<MediaServerClientEx> prepareMediaServerClient() const;
-
-    QString buildAuthKey(
-        const nx::String& url,
-        const nx_http::Credentials& credentials,
-        const nx::String& nonce);
 };
 
 } // namespace test

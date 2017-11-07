@@ -38,12 +38,17 @@ HostAddress::HostAddress(const in6_addr& addr, boost::optional<uint32_t> scopeId
 }
 
 HostAddress::HostAddress(const QString& addrStr):
-    m_string( addrStr )
+    m_string(addrStr)
 {
 }
 
 HostAddress::HostAddress(const char* addrStr):
     HostAddress(QString::fromLatin1(addrStr))
+{
+}
+
+HostAddress::HostAddress(const std::string& addrStr):
+    HostAddress(addrStr.c_str())
 {
 }
 
@@ -266,8 +271,8 @@ HostAddress::IpV6WithScope HostAddress::ipV6from(const QString& ip)
     if (inet_pton(AF_INET6, ipString.toLatin1().data(), &addr6))
     {
         result.first = addr6;
-        result.second = scopeId == std::numeric_limits<uint32_t>::max() 
-            ? boost::none 
+        result.second = scopeId == std::numeric_limits<uint32_t>::max()
+            ? boost::none
             : boost::optional<uint32_t>(scopeId);
         return result;
     }

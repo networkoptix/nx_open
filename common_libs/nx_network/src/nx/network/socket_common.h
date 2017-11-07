@@ -13,6 +13,7 @@
     #include <arpa/inet.h>
 #endif
 
+#include <string>
 #include <stdint.h>
 
 #include <QtCore/QtEndian>
@@ -68,7 +69,7 @@ NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysError
 
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
- * @note Not using QHostAddress because QHostAddress can trigger dns name 
+ * @note Not using QHostAddress because QHostAddress can trigger dns name
  * lookup which depends on Qt sockets which we do not want to use.
  */
 class NX_NETWORK_API HostAddress
@@ -76,11 +77,12 @@ class NX_NETWORK_API HostAddress
 public:
     HostAddress(const in_addr& addr);
     HostAddress(
-        const in6_addr& addr = in6addr_any, 
+        const in6_addr& addr = in6addr_any,
         boost::optional<uint32_t> scopeId = boost::none);
 
     HostAddress(const QString& addrStr);
     HostAddress(const char* addrStr);
+    HostAddress(const std::string& addrStr);
 
     ~HostAddress();
 
@@ -114,7 +116,7 @@ public:
 
     static boost::optional<QString> ipToString(const in_addr& addr);
     static boost::optional<QString> ipToString(
-        const in6_addr& addr, 
+        const in6_addr& addr,
         boost::optional<uint32_t> scopeId);
 
     static boost::optional<in_addr> ipV4from(const QString& ip);

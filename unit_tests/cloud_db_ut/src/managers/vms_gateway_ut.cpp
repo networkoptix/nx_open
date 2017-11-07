@@ -59,14 +59,14 @@ protected:
 
     void andMergeRequestParametersAreExpected()
     {
-        const auto mergeRequestData = 
+        const auto mergeRequestData =
             QJson::deserialized<MergeSystemData>(m_prevReceivedVmsApiRequest->messageBody);
 
         ASSERT_FALSE(mergeRequestData.mergeOneServer);
         ASSERT_TRUE(mergeRequestData.takeRemoteSettings);
         ASSERT_FALSE(mergeRequestData.ignoreIncompatible);
-        // TODO getKey
-        // TODO postKey
+        assertAuthKeyIsValid(mergeRequestData.getKey.toUtf8());
+        assertAuthKeyIsValid(mergeRequestData.postKey.toUtf8());
         QUrl remoteSystemUrl(mergeRequestData.url);
         ASSERT_EQ(nx_http::kSecureUrlSchemeName, remoteSystemUrl.scheme());
         ASSERT_EQ(m_idOfSystemToMergeTo, remoteSystemUrl.host().toStdString());
@@ -171,12 +171,16 @@ private:
     {
         m_forcedHttpResponseStatus = httpStatusCode;
     }
+
+    void assertAuthKeyIsValid(const nx::String& authKey)
+    {
+    }
 };
 
 TEST_F(VmsGateway, invokes_merge_request)
 {
     whenIssueMergeRequest();
-    
+
     thenMergeRequestIsReceivedByServer();
     thenMergeRequestSucceeded();
 }
@@ -194,7 +198,7 @@ TEST_F(VmsGateway, vms_merge_request_is_authenticated)
 TEST_F(VmsGateway, merge_request_parameteres_are_correct)
 {
     whenIssueMergeRequest();
- 
+
     thenMergeRequestIsReceivedByServer();
     andMergeRequestParametersAreExpected();
 }

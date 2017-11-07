@@ -1,5 +1,7 @@
 #include "peer_wrapper.h"
 
+#include <api/auth_util.h>
+
 #include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
@@ -7,7 +9,7 @@ namespace test {
 
 //namespace {
 
-// TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient. 
+// TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient.
 // Though, it requires some refactoring: moving ec2::ApiTransactionDataList out of appserver2.
 class MediaServerClientEx:
     public MediaServerClient
@@ -201,14 +203,14 @@ bool PeerWrapper::arePeersInterconnected(
     const std::vector<std::unique_ptr<PeerWrapper>>& peers)
 {
     // For now just checking that each peer is connected to every other.
-    
+
     std::vector<QnUuid> peerIds;
     for (const auto& peer: peers)
         peerIds.push_back(peer->id());
 
     for (const auto& peer: peers)
     {
-        const auto connectedPeers = 
+        const auto connectedPeers =
             peer->m_process.moduleInstance()->impl()->commonModule()->
                 ec2Connection()->messageBus()->directlyConnectedServerPeers();
 
@@ -216,7 +218,7 @@ bool PeerWrapper::arePeersInterconnected(
         {
             if (peerId == peer->id())
                 continue;
-            if (std::find(connectedPeers.begin(), connectedPeers.end(), peerId) == 
+            if (std::find(connectedPeers.begin(), connectedPeers.end(), peerId) ==
                     connectedPeers.end())
             {
                 return false;
@@ -235,20 +237,6 @@ std::unique_ptr<MediaServerClientEx> PeerWrapper::prepareMediaServerClient() con
     mediaServerClient->setUserCredentials(m_ownerCredentials);
     mediaServerClient->setRequestTimeout(std::chrono::minutes(1));
     return mediaServerClient;
-}
-
-QString PeerWrapper::buildAuthKey(
-    const nx::String& url,
-    const nx_http::Credentials& credentials,
-    const nx::String& nonce)
-{
-    const auto ha1 = nx_http::calcHa1(
-        credentials.username,
-        nx::network::AppInfo::realm(),
-        credentials.authToken.value);
-    const auto ha2 = nx_http::calcHa2(nx_http::Method::get, url);
-    const auto response = nx_http::calcResponse(ha1, nonce, ha2);
-    return lm("%1:%2:%3").args(credentials.username, nonce, response).toUtf8().toBase64();
 }
 
 } // namespace test
