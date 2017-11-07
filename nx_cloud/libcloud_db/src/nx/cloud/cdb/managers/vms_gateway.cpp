@@ -63,7 +63,9 @@ void VmsGateway::merge(
         .args(targetSystemId, username, baseRequestUrl));
 
     RequestContext requestContext;
-    requestContext.client = std::make_unique<MediaServerClient>(nx::utils::Url(baseRequestUrl.c_str()));
+    requestContext.client =
+        std::make_unique<MediaServerClient>(nx::utils::Url(baseRequestUrl.c_str()));
+    requestContext.client->setRequestTimeout(m_settings.vmsGateway().requestTimeout);
     requestContext.targetSystemId = targetSystemId;
     auto clientPtr = requestContext.client.get();
 
