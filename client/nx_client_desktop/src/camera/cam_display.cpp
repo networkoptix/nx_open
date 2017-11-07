@@ -1192,7 +1192,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
                 QString::fromLatin1(data));
 
-            emit mediaStreamEvent(mediaEvent);
+            m_lastMediaEvent = mediaEvent;
         }
         else
         {
@@ -2022,6 +2022,11 @@ qint64 QnCamDisplay::initialLiveBufferMkSecs()
 qint64 QnCamDisplay::maximumLiveBufferMkSecs()
 {
     return qnSettings->maximumLiveBufferMSecs() * 1000ll;
+}
+
+Qn::MediaStreamEvent QnCamDisplay::lastMediaEvent() const
+{
+    return m_lastMediaEvent;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

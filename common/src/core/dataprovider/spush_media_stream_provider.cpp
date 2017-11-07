@@ -18,7 +18,8 @@ static const int kErrorDelayTimeoutMs = 100;
 static QnAbstractMediaDataPtr createMetadataPacket()
 {
     QnCompressedMetadataPtr rez(new QnCompressedMetadata(MetadataType::MediaStreamEvent));
-    rez->timestamp = AV_NOPTS_VALUE;
+    rez->timestamp = DATETIME_NOW;
+    rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
     auto data = QnLexical::serialized(Qn::MediaStreamEvent::TooManyOpenedConnections).toUtf8();
     rez->setData(data.data(), data.size());
 

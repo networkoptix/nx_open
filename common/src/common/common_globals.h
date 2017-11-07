@@ -878,7 +878,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     enum MediaStreamEvent
     {
-        Unknown,
+        NoEvent,
         TooManyOpenedConnections
     };
 

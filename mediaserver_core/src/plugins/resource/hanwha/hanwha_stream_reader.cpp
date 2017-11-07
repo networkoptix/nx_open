@@ -69,7 +69,10 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
 
     if (m_hanwhaResource->isNvr())
     {
-        m_sessionContext = m_hanwhaResource->session(m_sessionType, m_clientId);
+        QnUuid clientId;
+        if (m_sessionType != HanwhaSessionType::live)
+            clientId = m_clientId;
+        m_sessionContext = m_hanwhaResource->session(m_sessionType, clientId);
         if (m_sessionContext.isNull())
             return CameraDiagnostics::TooManyOpenedConnectionsResult();
 
