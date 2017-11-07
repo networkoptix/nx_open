@@ -218,6 +218,12 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(action::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
+    connect(qnGlobalSettings, &QnGlobalSettings::maxSceneItemsChanged, this,
+        [this]
+        {
+            qnRuntime->setMaxSceneItemsOverride(qnGlobalSettings->maxSceneItemsOverride());
+        });
+
     // local settings
     connect(action(action::PreferencesGeneralTabAction), &QAction::triggered, this,
         [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
