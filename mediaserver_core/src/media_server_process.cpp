@@ -2199,7 +2199,6 @@ void MediaServerProcess::run()
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
 
-    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
     std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
         new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
@@ -2298,27 +2297,7 @@ void MediaServerProcess::run()
         authHelper.get(), &QnAuthHelper::emptyDigestDetected,
         this, &MediaServerProcess::at_emptyDigestDetected);
 
-    //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
-    authHelper->restrictionList()->allow(lit("?"), nx_http::AuthMethod::noAuth);
-
-    authHelper->restrictionList()->allow(lit("*/api/ping"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/camera_event*"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/showLog*"), nx_http::AuthMethod::urlQueryParam);   //allowed by default for now
-    authHelper->restrictionList()->allow(lit("*/api/moduleInformation"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/gettime"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/getTimeZones"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/getNonce"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/cookieLogin"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/cookieLogout"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/static/*"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
-    authHelper->restrictionList()->allow(lit("*/api/startLiteClient"), nx_http::AuthMethod::noAuth);
-    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
-    authHelper->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), nx_http::AuthMethod::noAuth);
-
-    //by following delegating hls authentication to target server
-    authHelper->restrictionList()->allow(lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth);
+    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
 
     MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
 
