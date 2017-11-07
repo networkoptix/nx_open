@@ -61,10 +61,10 @@ public:
         {
         }
 
-        AuthorizationCacheItem(AuthorizationCacheItem&& right) = default;
-        AuthorizationCacheItem(const AuthorizationCacheItem& right) = default;
-        AuthorizationCacheItem& operator=(const AuthorizationCacheItem&) = default;
-        AuthorizationCacheItem& operator=(AuthorizationCacheItem&&) = default;
+        AuthorizationCacheItem(AuthorizationCacheItem&& /*right*/) = default;
+        AuthorizationCacheItem(const AuthorizationCacheItem& /*right*/) = default;
+        AuthorizationCacheItem& operator=(const AuthorizationCacheItem& /*right*/) = default;
+        AuthorizationCacheItem& operator=(AuthorizationCacheItem&& /*right*/) = default;
     };
 
     AuthInfoCache() = default;
