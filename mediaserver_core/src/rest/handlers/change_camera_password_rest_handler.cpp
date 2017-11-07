@@ -59,9 +59,18 @@ int QnChangeCameraPasswordRestHandler::executePost(
     auth.setUser(data.user);
     auth.setPassword(data.password);
     QString errorString;
-    if (camera->setCameraCredentialsSync(auth, &errorString))
+    if (!camera->setCameraCredentialsSync(auth, &errorString))
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, errorString);
         return nx_http::StatusCode::ok;
+    }
 
-    result.setError(QnJsonRestResult::CantProcessRequest, errorString);
+    camera->setAuth(auth);
+    if (!camera->saveParams())
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, "Internal server error");
+        return nx_http::StatusCode::ok;
+    }
+
     return nx_http::StatusCode::ok;
 }
