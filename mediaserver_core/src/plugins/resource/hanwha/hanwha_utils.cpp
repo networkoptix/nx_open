@@ -489,7 +489,7 @@ bool ratioComparator(const QString& lhs, const QString& rhs)
 qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::seconds timeZoneShift)
 {
     QDateTime dateTime;
-    const bool isUtcTime = value.endsWith(L'Z');
+    const bool isUtcTime = value.trimmed().endsWith(L'Z');
 
     if (!isUtcTime)
     {
