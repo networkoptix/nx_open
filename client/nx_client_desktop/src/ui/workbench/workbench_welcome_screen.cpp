@@ -459,7 +459,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
         {
             setConnectingToSystem(systemId);
 
-            QUrl url = serverUrl;
+            auto url = nx::utils::Url::fromQUrl(serverUrl);
             if (!credentials.password.isEmpty())
                 url.setPassword(credentials.password.value());
             if (!credentials.user.isEmpty())

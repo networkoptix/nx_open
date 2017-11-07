@@ -414,7 +414,7 @@ void QnClientSettings::migrateKnownServerConnections()
     }
 
     qnClientCoreSettings->setKnownServerUrls(migratedKnownUrls);
-    setValue(KNOWN_SERVER_URLS, qVariantFromValue(QList<QUrl>()));
+    setKnownServerUrls(QList<QUrl>());
 }
 
 void QnClientSettings::load()
