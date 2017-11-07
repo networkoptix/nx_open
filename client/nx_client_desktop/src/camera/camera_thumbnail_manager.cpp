@@ -100,6 +100,23 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
     emit imageChanged(data.thumbnail);
 }
 
+void QnCameraThumbnailManager::refreshSelectedCamera()
+{
+    if (!m_selectedCamera)
+        return;
+
+    ThumbnailData& data = m_thumbnailByCamera[m_selectedCamera];
+    auto info = m_thumbnailByCamera.value(m_selectedCamera);
+
+    if (!isUpdateRequired(m_selectedCamera, info.status))
+        return;
+
+    info.loadingHandle = loadThumbnailForCamera(m_selectedCamera);
+    info.status = info.loadingHandle != kInvalidHandle
+        ? Qn::ThumbnailStatus::Refreshing
+        : Qn::ThumbnailStatus::NoData;
+}
+
 bool QnCameraThumbnailManager::autoRotate() const
 {
     return m_autoRotate;
@@ -112,6 +129,22 @@ void QnCameraThumbnailManager::setAutoRotate(bool value)
 
     m_autoRotate = value;
     forceRefreshThumbnails();
+}
+
+bool QnCameraThumbnailManager::autoRefresh() const
+{
+    return m_refreshingTimer->isActive();
+}
+
+void QnCameraThumbnailManager::setAutoRefresh(bool value)
+{
+    if (autoRefresh() == value)
+        return;
+
+    if (value)
+        m_refreshingTimer->start();
+    else
+        m_refreshingTimer->stop();
 }
 
 QSize QnCameraThumbnailManager::thumbnailSize() const

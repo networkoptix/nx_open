@@ -8,7 +8,6 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QDesktopServices>
 
-#include <camera/single_thumbnail_loader.h>
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
 
@@ -66,12 +65,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::SingleCameraSettingsWidget),
-    m_cameraSupportsMotion(false),
-    m_hasDbChanges(false),
-    m_hasMotionControlsChanges(false),
-    m_readOnly(false),
-    m_updating(false),
-    m_motionWidget(NULL),
+    m_cameraThumbnailManager(new QnCameraThumbnailManager()),
     m_sensitivityButtons(new QButtonGroup(this))
 {
     ui->setupUi(this);
@@ -79,6 +73,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
     ui->cameraScheduleWidget->initializeContext(this);
     ui->motionDetectionCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->motionDetectionCheckBox->setForegroundRole(QPalette::ButtonText);
+
+    m_cameraThumbnailManager->setAutoRotate(true);
+    m_cameraThumbnailManager->setThumbnailSize(kFisheyeThumbnailSize);
 
     for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
     {
@@ -476,20 +473,10 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
             ui->expertSettingsWidget->updateFromResources(cameras);
         }
 
-        if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-        {
-            m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
-                m_camera,
-                -1,
-                -1,
-                kFisheyeThumbnailSize,
-                QnThumbnailRequestData::JpgFormat,
-                QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
-                QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
-                this);
-        }
-
-        ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
+        m_cameraThumbnailManager->selectCamera(m_camera);
+        m_cameraThumbnailManager->refreshSelectedCamera();
+        ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(),
+            m_cameraThumbnailManager.data());
     }
 
     /* After overrideMotionType is set. */
@@ -1017,7 +1004,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
 
         case Qn::FisheyeCameraSettingsTab:
         {
-            ui->fisheyeSettingsWidget->loadPreview();
+            m_cameraThumbnailManager->refreshSelectedCamera();
             break;
         }
 

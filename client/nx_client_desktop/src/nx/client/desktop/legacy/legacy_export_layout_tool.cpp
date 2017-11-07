@@ -311,17 +311,9 @@ bool ExportLayoutTool::exportNextCamera()
 
     if (m_resources.isEmpty())
     {
-        if (m_exportedAnyData)
-        {
-            finishExport(true);
-        }
-        else
-        {
+        if (!m_exportedAnyData)
             m_errorMessage = QnStreamRecorder::errorString(StreamRecorderError::dataNotFound);
-            finishExport(false);
-        }
-
-        finishExport(true);
+        finishExport(m_exportedAnyData);
         return false;
     }
 
