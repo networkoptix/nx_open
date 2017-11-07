@@ -99,12 +99,7 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 
     auto result = m_streamReader->getNextData();
     if (!result)
-    {
-        if (m_errorHandler)
-            m_errorHandler(lit("Can not fetch data from stream"));
-
         return result;
-    }
 
     m_currentPositionUsec = result->timestamp;
     if (!isForwardDirection())

@@ -319,17 +319,22 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
         close();
     }
 
-    if (m_startRecordingBound.is_initialized())
+    if (m_startRecordingBound != boost::none)
     {
         nonConstData->timestamp = std::max(
             nonConstData->timestamp,
             (decltype(nonConstData->timestamp))m_startRecordingBound->count());
     }
 
-    if (m_endRecordingBound.is_initialized())
+    if (m_endRecordingBound != boost::none)
     {
         if (nonConstData->timestamp > m_endRecordingBound->count())
+        {
+            if (m_endOfRecordingHandler)
+                m_endOfRecordingHandler();
+
             return true;
+        }
     }
 
     QnConstAbstractMediaDataPtr md =
@@ -1248,6 +1253,11 @@ void QnStreamRecorder::setRecordingBounds(
 {
     m_startRecordingBound = startTime;
     m_endRecordingBound = endTime;
+}
+
+void QnStreamRecorder::setEndOfRecordingHandler(std::function<void()> endOfRecordingHandler)
+{
+    m_endOfRecordingHandler = endOfRecordingHandler;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

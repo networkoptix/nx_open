@@ -86,6 +86,8 @@ private:
     std::atomic<bool> m_timeRangeLoadedAtLeastOnce{false};
     mutable std::atomic<bool> m_errorOccured{false};
     mutable QnWaitCondition m_wait;
+
+    bool m_isNvr = false;
 };
 
 } // namespace plugins
