@@ -228,9 +228,8 @@ angular.module('nxCommon')
                     jumpToPosition(date);
                     mouseX *= pixelAspectRatio;
 
-                    console.log(scope.scaleManager.zoom(), scope.scaleManager.fullZoomOutValue());
-                    if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue() &&
-                        (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
+                    if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue()
+                            && (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
                         centerCurrentTime();
                     }
                 }
