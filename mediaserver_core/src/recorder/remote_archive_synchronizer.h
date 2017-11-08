@@ -2,93 +2,41 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
+#include <QtCore/QThreadPool>
 
 #include <set>
 #include <map>
 #include <vector>
 #include <atomic>
 
-#include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <recorder/abstract_remote_archive_synchronization_task.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <core/resource/resource_media_layout.h>
 #include <server/server_globals.h>
 #include <nx/utils/concurrent.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace mediaserver_core {
 namespace recorder {
 
-class SynchronizationTask
-{
-    using AbstractRemoteArchiveManager = nx::core::resource::AbstractRemoteArchiveManager;
-    using RemoteArchiveEntry = nx::core::resource::RemoteArchiveEntry;
-    using BufferType = QByteArray;
-
-public:
-    SynchronizationTask(QnCommonModule* commonModule);
-    void setResource(const QnSecurityCamResourcePtr& resource);
-    void setDoneHandler(std::function<void()> handler);
-    void cancel();
-
-    bool execute();
-
-private:
-    bool synchronizeArchive(const QnSecurityCamResourcePtr& resource);
-
-    std::vector<RemoteArchiveEntry> filterEntries(
-        const QnSecurityCamResourcePtr& resource,
-        const std::vector<RemoteArchiveEntry>& allEntries);
-
-    bool copyEntryToArchive(
-        const QnSecurityCamResourcePtr& resource,
-        const RemoteArchiveEntry& entry);
-
-    bool writeEntry(
-        const QnSecurityCamResourcePtr& resource,
-        const RemoteArchiveEntry& entry,
-        BufferType* buffer,
-        int64_t* outRealDurationMs = nullptr);
-
-    bool convertAndWriteBuffer(
-        const QnSecurityCamResourcePtr& resource,
-        BufferType* buffer,
-        const QString& fileName,
-        int64_t startTimeMs,
-        const QnResourceAudioLayoutPtr& audioLayout,
-        bool needMotion,
-        int64_t* outRealDurationMs);
-
-    QnServer::ChunksCatalog chunksCatalogByResolution(const QSize& resolution) const;
-
-    bool isMotionDetectionNeeded(
-        const QnSecurityCamResourcePtr& resource,
-        QnServer::ChunksCatalog catalog) const;
-
-private:
-    QnCommonModule* m_commonModule;
-    QnSecurityCamResourcePtr m_resource;
-    std::atomic<bool> m_canceled;
-    std::function<void()> m_doneHandler;
-    int m_totalChunksToSynchronize;
-    int m_currentNumberOfSynchronizedChunks;
-};
-
 struct SynchronizationTaskContext
 {
-    std::shared_ptr<SynchronizationTask> task;
+    std::shared_ptr<AbstractRemoteArchiveSynchronizationTask> task;
     nx::utils::concurrent::Future<void> result;
 };
 
 
-class RemoteArchiveSynchronizer: 
+class RemoteArchiveSynchronizer:
     public QObject,
-    public QnCommonModuleAware
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    RemoteArchiveSynchronizer(QObject* parent);
+    RemoteArchiveSynchronizer(QnMediaServerModule* serverModule);
     virtual ~RemoteArchiveSynchronizer();
 
 public slots:
@@ -97,6 +45,7 @@ public slots:
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
 
 private:
+    int maxSynchronizationThreads() const;
     void makeAndRunTaskUnsafe(const QnSecurityCamResourcePtr& resoource);
 
     void removeTaskFromAwaited(const QnUuid& resource);
@@ -107,6 +56,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
+    QThreadPool m_threadPool;
     std::set<QnUuid> m_delayedTasks;
     std::map<QnUuid, SynchronizationTaskContext> m_syncTasks;
     std::atomic<bool> m_terminated;

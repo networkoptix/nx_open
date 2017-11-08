@@ -32,6 +32,9 @@ public:
     {
     }
 
+    /**
+     * @return 0 on success, or non-zero error code after logging an error message.
+     */
     int startInference(
         const std::string& modelFileName,
         const std::string& deployFileName,

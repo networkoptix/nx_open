@@ -16,6 +16,7 @@
 #include <utils/common/warnings.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 
 #include "workbench_item.h"
 #include "workbench_grid_walker.h"
@@ -264,8 +265,12 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
 
     if (item->isPinned())
     {
-        m_itemMap.fill(item->geometry(), item);
-        NX_DEBUG(kItemMapTag, lm("Add item to cell %1").arg(item->geometry()));
+        const auto options = item->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
+        if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
+        {
+            m_itemMap.fill(item->geometry(), item);
+            NX_DEBUG(kItemMapTag, lm("Add item to cell %1").arg(item->geometry()));
+        }
     }
     m_rectSet.insert(item->geometry());
     m_itemsByResource[item->resource()].insert(item);
@@ -290,8 +295,12 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
     /* Update internal data structures. */
     if (item->isPinned())
     {
-        m_itemMap.clear(item->geometry());
-        NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
+        const auto options = item->data<QnResourceWidget::Options>(Qn::ItemWidgetOptions);
+        if (!options.testFlag(QnResourceWidget::InvisibleWidgetOption))
+        {
+            m_itemMap.clear(item->geometry());
+            NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
+        }
     }
     m_rectSet.remove(item->geometry());
     m_itemsByResource[item->resource()].remove(item);

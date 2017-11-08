@@ -66,8 +66,8 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
-#include <plugins/storage/file_storage/qtfile_storage_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/qtfile_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
@@ -84,6 +84,8 @@
 #include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
+#include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
+#include <nx/client/desktop/layout_templates/layout_template_manager.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -343,6 +345,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
 
+    commonModule->store(new ResourceWidgetPixmapCache());
+
     // Must be called before QnCloudStatusWatcher but after setModuleGUID() call.
     initLocalInfo(startupParams);
 
@@ -367,6 +371,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
+
+    commonModule->store(new LayoutTemplateManager());
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }

@@ -5,15 +5,15 @@
 #include <QtCore/QMap>
 #include <QtCore/QElapsedTimer>
 
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/semaphore.h>
 #include <nx/mediaserver/resource/abstract_shared_resource_context.h>
 #include <nx/mediaserver/server_module_aware.h>
-
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/semaphore.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
-#include <nx/utils/elapsed_timer.h>
+#include <recording/time_period_list.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -98,15 +98,21 @@ public:
     QAuthenticator authenticator() const;
     QnSemaphore* requestSemaphore();
 
-    void startServices();
+    void startServices(bool hasVideoArchive);
 
     QString sessionKey(
         HanwhaSessionType sessionType,
         bool generateNewOne = false);
 
-    std::shared_ptr<HanwhaChunkLoader> chunkLoader() const;
+    QnTimePeriodList chunks(int channelNumber) const;
+    QnTimePeriodList chunksSync(int channelNumber) const;
+    qint64 chunksStartUsec(int channelNumber) const;
+    qint64 chunksEndUsec(int channelNumber) const;
+
+    std::chrono::seconds timeZoneShift() const;
 
     // NOTE: function objects return HanwhaResult<T>.
+    HanwhaCachedData<int> currentOverlappedId;
     HanwhaCachedData<HanwhaInformation> information;
     HanwhaCachedData<HanwhaCgiParameters> cgiParamiters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
@@ -114,6 +120,7 @@ public:
     HanwhaCachedData<HanwhaResponse> videoProfiles;
 
 private:
+    HanwhaResult<int> loadOverlappedId();
     HanwhaResult<HanwhaInformation> loadInformation();
     HanwhaResult<HanwhaCgiParameters> loadCgiParamiters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();
@@ -134,6 +141,8 @@ private:
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
+
+    std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
 
     mutable QnMutex m_servicesMutex;
 };

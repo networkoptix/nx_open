@@ -47,23 +47,23 @@ const char* StubMetadataPlugin::name() const
     return "Stub metadata plugin";
 }
 
-void StubMetadataPlugin::setSettings(const nxpl::Setting* settings, int count)
+void StubMetadataPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
     // Do nothing.
 }
 
-void StubMetadataPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+void StubMetadataPlugin::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
 {
     // Do nothing.
 }
 
-void StubMetadataPlugin::setLocale(const char* locale)
+void StubMetadataPlugin::setLocale(const char* /*locale*/)
 {
     // Do nothing.
 }
 
 AbstractMetadataManager* StubMetadataPlugin::managerForResource(
-    const ResourceInfo& resourceInfo,
+    const ResourceInfo& /*resourceInfo*/,
     Error* outError)
 {
     *outError = Error::noError;
@@ -75,8 +75,8 @@ AbstractMetadataManager* StubMetadataPlugin::managerForResource(
 }
 
 AbstractSerializer* StubMetadataPlugin::serializerForType(
-    const nxpl::NX_GUID& typeGuid,
-    Error* outError)
+    const nxpl::NX_GUID& /*typeGuid*/,
+    Error* /*outError*/)
 {
     return nullptr;
 }
@@ -85,7 +85,7 @@ const char* StubMetadataPlugin::capabilitiesManifest(Error* error) const
 {
     *error = Error::noError;
 
-    return R"manifest(
+    return R"json(
     {
         "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
         "driverName": {
@@ -113,9 +113,10 @@ const char* StubMetadataPlugin::capabilitiesManifest(Error* error) const
                     }
                 }
             }
-        ]
+        ],
+        "capabilities": "needDeepCopyForMediaFrame"
     }
-    )manifest";
+    )json";
 }
 
 } // namespace plugins

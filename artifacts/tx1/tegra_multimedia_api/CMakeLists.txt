@@ -5,160 +5,39 @@ project(tegra_video)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNX_UTILS_API= -DTEGRA_VIDEO_API=")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNX_KIT_API= -DTEGRA_VIDEO_API=")
+
+set(NX_KIT_DIR "../../../open/artifacts/nx_kit/src")
+set(NX_KIT_SRC_DIR "${NX_KIT_DIR}/nx/kit")
 
 include_directories(
     .
     include
     samples/common/algorithm/gie
     samples/common/algorithm/cuda
+    ../../../open/artifacts/nx_kit/src
 )
 
 set(SOURCE_FILES
-    nx/utils/debug_utils.h
-    nx/utils/debug_utils.cpp
-    nx/utils/flag_config.h
-    nx/utils/flag_config.cpp
-    nx/utils/string.h
+    ${NX_KIT_SRC_DIR}/debug.h
+    ${NX_KIT_SRC_DIR}/debug.cpp
+    ${NX_KIT_SRC_DIR}/ini_config.h
+    ${NX_KIT_SRC_DIR}/ini_config.cpp
     samples/04_video_dec_gie/video_dec_gie.h
     samples/04_video_dec_gie/video_dec_gie_csvparser.cpp
     samples/04_video_dec_gie/video_dec_gie_main.cpp
     samples/04_video_dec_gie/video_dec_gie_main.h
+    samples/04_video_dec_gie/video_dec_gie_ini.h
+    samples/04_video_dec_gie/tegra_video_ini.h
     samples/04_video_dec_gie/tegra_video.h
     samples/04_video_dec_gie/tegra_video.cpp
-    samples/04_video_dec_gie/config.h
-    samples/04_video_dec_gie/config.cpp
     samples/04_video_dec_gie/tegra_video_impl.cpp
     samples/04_video_dec_gie/tegra_video_stub.cpp
+    samples/04_video_dec_gie/net_dimensions.h
+    samples/04_video_dec_gie/net_dimensions.cpp
+    samples/04_video_dec_gie/net_dimensions_ut.cpp
     samples/04_video_dec_gie/main_tv.h
     samples/04_video_dec_gie/main_tv.cpp
-    argus/apps/camera/common/ConditionVariable.cpp
-    argus/apps/camera/common/ConditionVariable.h
-    argus/apps/camera/common/Mutex.cpp
-    argus/apps/camera/common/Mutex.h
-    argus/apps/camera/common/ScopedGuard.h
-    argus/apps/camera/common/Util.cpp
-    argus/apps/camera/common/Util.h
-    argus/apps/camera/common/VideoPipeline.cpp
-    argus/apps/camera/common/VideoPipeline.h
-    argus/apps/camera/modules/tasks/Gallery.cpp
-    argus/apps/camera/modules/tasks/Gallery.h
-    argus/apps/camera/modules/tasks/MultiExposure.cpp
-    argus/apps/camera/modules/tasks/MultiExposure.h
-    argus/apps/camera/modules/tasks/MultiSession.cpp
-    argus/apps/camera/modules/tasks/MultiSession.h
-    argus/apps/camera/modules/tasks/StillCapture.cpp
-    argus/apps/camera/modules/tasks/StillCapture.h
-    argus/apps/camera/modules/tasks/VideoRecord.cpp
-    argus/apps/camera/modules/tasks/VideoRecord.h
-    argus/apps/camera/modules/Dispatcher.cpp
-    argus/apps/camera/modules/Dispatcher.h
-    argus/apps/camera/modules/EventThread.cpp
-    argus/apps/camera/modules/EventThread.h
-    argus/apps/camera/modules/ITask.h
-    argus/apps/camera/modules/PerfTracker.cpp
-    argus/apps/camera/modules/PerfTracker.h
-    argus/apps/camera/modules/XMLConfig.cpp
-    argus/apps/camera/modules/XMLConfig.h
-    argus/apps/camera/renderer/Composer.cpp
-    argus/apps/camera/renderer/Composer.h
-    argus/apps/camera/renderer/Renderer.cpp
-    argus/apps/camera/renderer/Renderer.h
-    argus/apps/camera/renderer/StreamConsumer.cpp
-    argus/apps/camera/renderer/StreamConsumer.h
-    argus/apps/camera/ui/camera/Main.cpp
-    argus/apps/camera/ui/capture/AppModuleCapture.cpp
-    argus/apps/camera/ui/capture/AppModuleCapture.h
-    argus/apps/camera/ui/common/App.cpp
-    argus/apps/camera/ui/common/App.h
-    argus/apps/camera/ui/common/AppModuleGeneric.cpp
-    argus/apps/camera/ui/common/AppModuleGeneric.h
-    argus/apps/camera/ui/common/IAppModule.h
-    argus/apps/camera/ui/common/Options.cpp
-    argus/apps/camera/ui/common/Options.h
-    argus/apps/camera/ui/gallery/AppModuleGallery.cpp
-    argus/apps/camera/ui/gallery/AppModuleGallery.h
-    argus/apps/camera/ui/multiExposure/AppModuleMultiExposure.cpp
-    argus/apps/camera/ui/multiExposure/AppModuleMultiExposure.h
-    argus/apps/camera/ui/multiSession/AppModuleMultiSession.cpp
-    argus/apps/camera/ui/multiSession/AppModuleMultiSession.h
-    argus/apps/camera/ui/video/AppModuleVideo.cpp
-    argus/apps/camera/ui/video/AppModuleVideo.h
-    argus/include/Argus/Ext/BayerAverageMap.h
-    argus/include/Argus/Ext/BayerSharpnessMap.h
-    argus/include/Argus/Ext/DebugCaptureMetadata.h
-    argus/include/Argus/Ext/DebugCaptureSession.h
-    argus/include/Argus/Ext/DeFog.h
-    argus/include/Argus/Ext/FaceDetect.h
-    argus/include/Argus/Ext/SensorPrivateMetadata.h
-    argus/include/Argus/Argus.h
-    argus/include/Argus/CameraDevice.h
-    argus/include/Argus/CameraProvider.h
-    argus/include/Argus/CaptureMetadata.h
-    argus/include/Argus/CaptureSession.h
-    argus/include/Argus/Event.h
-    argus/include/Argus/EventProvider.h
-    argus/include/Argus/EventQueue.h
-    argus/include/Argus/Request.h
-    argus/include/Argus/Settings.h
-    argus/include/Argus/Stream.h
-    argus/include/Argus/Types.h
-    argus/include/Argus/UUID.h
-    argus/include/EGLStream/NV/ImageNativeBuffer.h
-    argus/include/EGLStream/ArgusCaptureMetadata.h
-    argus/include/EGLStream/EGLStream.h
-    argus/include/EGLStream/Frame.h
-    argus/include/EGLStream/FrameConsumer.h
-    argus/include/EGLStream/Image.h
-    argus/include/EGLStream/MetadataContainer.h
-    argus/samples/bayerAverageMap/main.cpp
-    argus/samples/cudaHistogram/histogram.h
-    argus/samples/cudaHistogram/main.cpp
-    argus/samples/denoise/main.cpp
-    argus/samples/facedetect/main.cpp
-    argus/samples/gstVideoEncode/main.cpp
-    argus/samples/multiSensor/main.cpp
-    argus/samples/multiStream/main.cpp
-    argus/samples/oneShot/main.cpp
-    argus/samples/openglBox/utils/MathUtils.cpp
-    argus/samples/openglBox/utils/MathUtils.h
-    argus/samples/openglBox/main.cpp
-    argus/samples/syncSensor/KLDistance.h
-    argus/samples/syncSensor/main.cpp
-    argus/samples/userAutoExposure/main.cpp
-    argus/samples/userAutoWhiteBalance/main.cpp
-    argus/samples/utils/glx/Window.cpp
-    argus/samples/utils/glx/Window.h
-    argus/samples/utils/gtk/GuiElement.cpp
-    argus/samples/utils/gtk/GuiElement.h
-    argus/samples/utils/gtk/Window.cpp
-    argus/samples/utils/gtk/Window.h
-    argus/samples/utils/Courier16x24.h
-    argus/samples/utils/CUDAHelper.cpp
-    argus/samples/utils/CUDAHelper.h
-    argus/samples/utils/EGLGlobal.cpp
-    argus/samples/utils/EGLGlobal.h
-    argus/samples/utils/Error.h
-    argus/samples/utils/GLContext.cpp
-    argus/samples/utils/GLContext.h
-    argus/samples/utils/InitOnce.h
-    argus/samples/utils/IObserver.h
-    argus/samples/utils/JPEGConsumer.cpp
-    argus/samples/utils/JPEGConsumer.h
-    argus/samples/utils/Observed.cpp
-    argus/samples/utils/Observed.h
-    argus/samples/utils/Ordered.h
-    argus/samples/utils/PreviewConsumer.cpp
-    argus/samples/utils/PreviewConsumer.h
-    argus/samples/utils/Thread.cpp
-    argus/samples/utils/Thread.h
-    argus/samples/utils/UniquePointer.h
-    argus/samples/utils/Validator.h
-    argus/samples/utils/Value.h
-    argus/samples/utils/Window.h
-    argus/samples/utils/WindowBase.cpp
-    argus/samples/utils/WindowBase.h
-    argus/samples/yuvJpeg/main.cpp
     include/Argus/Ext/BayerAverageMap.h
     include/Argus/Ext/BayerSharpnessMap.h
     include/Argus/Ext/DebugCaptureMetadata.h
@@ -247,7 +126,6 @@ set(SOURCE_FILES
     samples/common/classes/NvVideoConverter.cpp
     samples/common/classes/NvVideoDecoder.cpp
     samples/common/classes/NvVideoEncoder.cpp
-    tools/ConvertCaffeToGieModel/ConvertCaffeToGieModel_main.cpp
-    tools/ConvertCaffeToGieModel/gieModel.h)
+)
 
 add_executable(tegra_video ${SOURCE_FILES})

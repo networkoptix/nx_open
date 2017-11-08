@@ -10,7 +10,7 @@
 
 extern "C"
 {
-    // For const AV_NOPTS_VALUE.
+// For const AV_NOPTS_VALUE.
 #include <libavutil/avutil.h>
 }
 
@@ -41,13 +41,22 @@ public:
     qint64 startTimeUsec(int channelNumber) const;
     qint64 endTimeUsec(int channelNumber) const;
     QnTimePeriodList chunks(int channelNumber) const;
+    QnTimePeriodList chunksSync(int channelNumber) const;
 
     void setTimeZoneShift(std::chrono::seconds timeZoneShift);
+    std::chrono::seconds timeZoneShift() const;
+
+signals:
+    void gotChunks();
 
 private:
+    QnTimePeriodList chunksUnsafe(int channelNumber) const;
+    void setError();
+    State nextState(State currentState) const;
+
     void onHttpClientDone();
     void onGotChunkData();
-    bool parseChunkData(const QByteArray& data);
+    bool parseChunkData(const QByteArray& data, qint64 currentTimeMs);
 
     void sendLoadChunksRequest();
     void sendUpdateTimeRangeRequest();
@@ -72,6 +81,11 @@ private:
 
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds(0)};
     std::atomic<bool> m_terminated{false};
+
+    std::atomic<bool> m_chunksLoadedAtLeastOnce{false};
+    std::atomic<bool> m_timeRangeLoadedAtLeastOnce{false};
+    mutable std::atomic<bool> m_errorOccured{false};
+    mutable QnWaitCondition m_wait;
 };
 
 } // namespace plugins

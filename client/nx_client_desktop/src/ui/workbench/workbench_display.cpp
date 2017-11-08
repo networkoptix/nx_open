@@ -611,7 +611,6 @@ void QnWorkbenchDisplay::initSceneView()
         m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
         m_scene->addItem(gridBackgroundItem());
         setLayer(gridBackgroundItem(), QnWorkbenchDisplay::EMappingLayer);
-        gridBackgroundItem()->setOpacity(0.0);
         gridBackgroundItem()->setMapper(workbench()->mapper());
     }
 
@@ -1092,9 +1091,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item)
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay)
 {
-    int maxItems = m_lightMode.testFlag(Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
+    int maxItems = qnRuntime->maxSceneItems();
 
     if (m_widgets.size() >= maxItems)
     {
@@ -1149,6 +1146,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (widgetsForResource.size() == 1)
         emit resourceAdded(widget->resource());
 
+    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    if (options)
+        widget->setOptions(widget->options() | options);
+
     synchronize(widget, false);
     bringToFront(widget);
 
@@ -1161,10 +1162,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if (frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
-
-    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
-    if (options)
-        widget->setOptions(widget->options() | options);
 
     emit widgetAdded(widget);
 
@@ -1604,6 +1601,7 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate)
     synchronizeZoomRect(widget);
     synchronizeGeometry(widget, animate);
     synchronizeLayer(widget);
+    synchronizePlaceholder(widget);
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate)
@@ -1695,6 +1693,11 @@ void QnWorkbenchDisplay::synchronizeLayer(QnWorkbenchItem *item)
 void QnWorkbenchDisplay::synchronizeLayer(QnResourceWidget *widget)
 {
     setLayer(widget, synchronizedLayer(widget));
+}
+
+void QnWorkbenchDisplay::synchronizePlaceholder(QnResourceWidget* widget)
+{
+    widget->setPlaceholderPixmap(widget->item()->data(Qn::ItemPlaceholderRole).value<QPixmap>());
 }
 
 void QnWorkbenchDisplay::synchronizeSceneBounds()
@@ -2179,8 +2182,21 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
 
 void QnWorkbenchDisplay::at_item_dataChanged(Qn::ItemDataRole role)
 {
-    if (role == Qn::ItemFlipRole)
-        synchronizeGeometry(static_cast<QnWorkbenchItem *>(sender()), false);
+    const auto item = static_cast<QnWorkbenchItem*>(sender());
+
+    switch (role)
+    {
+        case Qn::ItemFlipRole:
+            synchronizeGeometry(item, false);
+            break;
+
+        case Qn::ItemPlaceholderRole:
+            synchronizePlaceholder(widget(item));
+            break;
+
+        default:
+            break;
+    }
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged()
@@ -2382,7 +2398,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
     }
     else
     {
-        Q_ASSERT_X(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
+        NX_ASSERT(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
             Q_FUNC_INFO, "Invalid action type");
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))

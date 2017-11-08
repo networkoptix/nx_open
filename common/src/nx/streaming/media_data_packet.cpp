@@ -553,3 +553,8 @@ bool QnCompressedMetadata::setData(const char* data, std::size_t dataSize)
 {
     return m_data.write(data, dataSize) != 0;
 }
+
+bool QnCompressedMetadata::setData(const QByteArray& data)
+{
+    return m_data.write(data.data(), data.size());
+}

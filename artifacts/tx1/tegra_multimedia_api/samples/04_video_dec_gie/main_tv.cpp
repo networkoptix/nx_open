@@ -11,27 +11,17 @@
 
 #include "tegra_video.h"
 
-#include "config.h"
+#include "video_dec_gie_ini.h"
+#include "tegra_video_ini.h"
 
-#include <nx/utils/string.h>
-
-#define OUTPUT_PREFIX "[video_dec_gie main_tv] "
-#include <nx/utils/debug_utils.h>
+#define NX_PRINT_PREFIX "[video_dec_gie main_tv] "
+#include <nx/kit/debug.h>
 
 namespace {
 
 using nx::kit::debug::format;
 
-static constexpr int kChunkSize = 4000000; //< ATTENTION: Should aссomodate any frame.
-
-#define NX_CRITICAL_CHECK(COND) do \
-{ \
-    if (!(COND)) \
-    { \
-        PRINT << "INTERNAL ERROR: " << __FILE__ << ":" << __LINE__ << ": !(" << #COND << ")"; \
-        std::abort(); \
-    } \
-} while (0)
+static constexpr int kChunkSize = 4000000; //< ATTENTION: Should aссommodate any frame.
 
 #define NX_CRITICAL(COND) \
     [&]() \
@@ -39,7 +29,8 @@ static constexpr int kChunkSize = 4000000; //< ATTENTION: Should aссomodate an
         const auto& cond = (COND); \
         if (!cond) \
         { \
-            PRINT << "INTERNAL ERROR: " << __FILE__ << ":" << __LINE__ << ": !(" << #COND << ")"; \
+            NX_PRINT << "INTERNAL ERROR: " << __FILE__ << ":" << __LINE__ \
+                << ": !(" << #COND << ")"; \
             std::abort(); \
         } \
         return cond; \
@@ -55,7 +46,7 @@ static int loadFile(const std::string& filename, uint8_t* buf, int maxSize,
     file.open(filename, std::ios::in | std::ios::binary);
     if (!file.is_open())
     {
-        OUTPUT << logPrefix << "Unable to open file: " << filename;
+        NX_OUTPUT << logPrefix << "Unable to open file: " << filename;
         return EOF;
     }
 
@@ -64,25 +55,25 @@ static int loadFile(const std::string& filename, uint8_t* buf, int maxSize,
     file.read((char*) buf, maxSize);
     if (file.bad())
     {
-        PRINT << logPrefix << "ERROR: Unable to read file: " << filename;
+        NX_PRINT << logPrefix << "ERROR: Unable to read file: " << filename;
         return 0;
     }
 
     dataSize = (int) file.gcount();
     if (dataSize <= 0)
     {
-        PRINT << logPrefix << "ERROR: file.read() <= 0 for file: " << filename;
+        NX_PRINT << logPrefix << "ERROR: file.read() <= 0 for file: " << filename;
         return 0;
     }
 
     if (!file.eof())
     {
-        PRINT << logPrefix << "ERROR: Frame file [" << filename << "] is larger than the buffer ("
+        NX_PRINT << logPrefix << "ERROR: Frame file [" << filename << "] is larger than the buffer ("
             << maxSize << " bytes)";
         return 0;
     }
 
-    OUTPUT << logPrefix << "Substituted frame from file: " << filename;
+    NX_OUTPUT << logPrefix << "Substituted frame from file: " << filename;
     return dataSize;
 }
 
@@ -111,7 +102,8 @@ public:
     {
         auto paramsWithId = params;
         paramsWithId.id = id.c_str();
-        m_tegraVideo.reset(TegraVideo::create(paramsWithId));
+        m_tegraVideo.reset(TegraVideo::create());
+        m_tegraVideo->start(paramsWithId);
     }
 
     bool execute()
@@ -123,7 +115,7 @@ public:
             m_videoFile.open(m_videoFilename, std::ios::in | std::ios::binary);
             if (!m_videoFile.is_open())
             {
-                PRINT << "Executor #" << m_id << ": Can't open video file " << m_videoFilename;
+                NX_PRINT << "Executor #" << m_id << ": Can't open video file " << m_videoFilename;
                 return false;
             }
         }
@@ -133,7 +125,7 @@ public:
             const int dataSize = fillNextBuf();
             if (dataSize == EOF)
             {
-                PRINT << "Executor #" << m_id << ": End of the video.";
+                NX_PRINT << "Executor #" << m_id << ": End of the video.";
                 return true;
             }
             if (dataSize <= 0)
@@ -158,7 +150,7 @@ private:
 
             if (m_videoFile.bad())
             {
-                PRINT << "Executor #" << m_id << ": ERROR: Unable to read file.";
+                NX_PRINT << "Executor #" << m_id << ": ERROR: Unable to read file.";
                 return 0;
             }
 
@@ -189,7 +181,7 @@ private:
 
         if (!m_tegraVideo->pushCompressedFrame(&compressedFrame))
         {
-            PRINT << "Executor #" << m_id << ": ERROR: pushCompressedFrame(dataSize: "
+            NX_PRINT << "Executor #" << m_id << ": ERROR: pushCompressedFrame(dataSize: "
                 << compressedFrame.dataSize << ", ptsUs: " << compressedFrame.ptsUs
                 << ") -> false";
             return false;
@@ -202,10 +194,10 @@ private:
         while (m_tegraVideo->pullRectsForFrame(
             tegraVideoRects, kMaxRects, &rectsCount, &ptsUs))
         {
-            OUTPUT << "Executor #" << m_id << ": pullRectsForFrame() -> {rects.size: "
+            NX_OUTPUT << "Executor #" << m_id << ": pullRectsForFrame() -> {rects.size: "
                 << rectsCount << ", ptsUs: " << ptsUs << "}";
         }
-        OUTPUT << "Executor #" << m_id << ": pullRectsForFrame() -> false";
+        NX_OUTPUT << "Executor #" << m_id << ": pullRectsForFrame() -> false";
         return true;
     }
 
@@ -233,39 +225,44 @@ static void* executorThread(void* arg)
 
 } // namespace
 
-// TODO: Remove TEGRA_VIDEO_API
-int TEGRA_VIDEO_API mainTv(int argc, char** argv)
+int mainTv(int argc, char** argv)
 {
-    OUTPUT << "mainTv()";
+    NX_OUTPUT << "mainTv()";
 
     TegraVideo::Params params;
-    params.modelFile = conf.modelFile;
-    params.deployFile = conf.deployFile;
-    params.cacheFile = conf.cacheFile;
+    params.modelFile = exeIni().modelFile;
+    params.deployFile = exeIni().deployFile;
+    params.cacheFile = exeIni().cacheFile;
+    params.netWidth = exeIni().netWidth;
+    params.netHeight = exeIni().netHeight;
 
     const char* videoFilename = "";
-    if (conf.substituteFramesFilePrefix[0] == '\0')
+    if (exeIni().substituteFramesFilePrefix[0] == '\0')
     {
         if (argc != 2)
         {
-            PRINT << "ERROR: File not specified.";
+            NX_PRINT << "ERROR: File not specified.";
             return 1;
         }
         videoFilename = argv[1];
     }
 
-    if (conf.tegraVideoCount < 1)
+    if (exeIni().tegraVideoCount < 1)
     {
-        PRINT << "ERROR: .ini tegraVideoCount should be 1 or more.";
+        NX_PRINT << "ERROR: .ini tegraVideoCount should be 1 or more.";
         return 1;
     }
 
     std::vector<std::unique_ptr<TegraVideoExecutor>> executors;
     std::vector<pthread_t> threads;
-    for (int i = 0; i < conf.tegraVideoCount; ++i)
+    for (int i = 0; i < exeIni().tegraVideoCount; ++i)
     {
         executors.emplace_back(new TegraVideoExecutor(
-            format("%d", i), videoFilename, conf.substituteFramesFilePrefix, kChunkSize, params));
+            format("%d", i),
+            videoFilename,
+            exeIni().substituteFramesFilePrefix,
+            kChunkSize,
+            params));
 
         threads.emplace_back(0);
 
@@ -279,7 +276,7 @@ int TEGRA_VIDEO_API mainTv(int argc, char** argv)
         void* result;
         if (const auto errorCode = pthread_join(thread, &result))
         {
-            PRINT << "ERROR: pthread_join() failed for thread #" << thread << ".";
+            NX_PRINT << "ERROR: pthread_join() failed for thread #" << thread << ".";
         }
         else
         {

@@ -44,11 +44,11 @@ public:
         const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) override;
 
+    static QAuthenticator getDefaultAuth();
 private:
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,
         const QnMacAddress& mac,
-        const QAuthenticator& auth,
         QnResourceList& result );
 
     bool isHanwhaCamera(const nx_upnp::DeviceInfo& devInfo) const;
@@ -72,7 +72,7 @@ private:
 
     // TODO: #dmishin make different session keys for different session types
     // There is only one session key per group now.
-    
+
     mutable QMap<QString, SessionKeyPtr> m_sessionKeys;
     //mutable QMap<QString, QString> m_sessionKeys;
     //mutable QMap<QString, bool> m_groupLocks;

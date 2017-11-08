@@ -20,7 +20,7 @@
 
 #include "plugins/resource/avi/avi_dvd_resource.h"
 #include "plugins/resource/avi/avi_bluray_resource.h"
-#include "plugins/resource/avi/filetypesupport.h"
+#include "core/resource/avi/filetypesupport.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -30,7 +30,7 @@
 
 #include <client/client_globals.h>
 
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/workaround/layout_proto.h>
 

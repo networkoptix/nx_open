@@ -37,7 +37,7 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
 
     void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     QnRequestParamList toParams() const;
-    bool isValid() const;
+    boost::optional<QString> getError() const;
 
     /** Check if value is "special" - DATETIME_NOW or negative. */
     static bool isSpecialTimeValue(qint64 value);

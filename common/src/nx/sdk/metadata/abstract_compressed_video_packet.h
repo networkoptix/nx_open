@@ -1,7 +1,7 @@
 #pragma once
 
 #include <plugins/plugin_api.h>
-#include <plugins/metadata/abstract_compressed_media_packet.h>
+#include "abstract_compressed_media_packet.h"
 
 namespace nx {
 namespace sdk {
@@ -20,6 +20,7 @@ static const nxpl::NX_GUID IID_CompressedVideoPacket
  */
 class AbstractCompressedVideoPacket: public AbstractCompressedMediaPacket
 {
+    using base_type = AbstractCompressedMediaPacket;
 public:
     /**
      * @return width of video frame in pixels.

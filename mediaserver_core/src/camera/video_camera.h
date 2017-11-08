@@ -12,7 +12,7 @@
 
 #include <api/helpers/thumbnail_request_data.h>
 #include <core/resource/resource_consumer.h>
-#include <core/dataprovider/live_stream_provider.h>
+#include <providers/live_stream_provider.h>
 #include <server/server_globals.h>
 #include <streaming/hls/hls_live_playlist_manager.h>
 
@@ -21,7 +21,7 @@ class MediaStreamCache;
 class MSSettings;
 
 /**
- * TODO: #ak Have to introduce this class since QnAbstractVideoCamera 
+ * TODO: #ak Have to introduce this class since QnAbstractVideoCamera
  * is in common and thus cannot dependend on mediaserver's types.
  * TODO: #ak QnAbstractMediaServerVideoCamera is better be nx::vms::mediaserver::AbstractVideoCamera.
  */
@@ -34,6 +34,9 @@ public:
     virtual QnLiveStreamProviderPtr getLiveReader(
         QnServer::ChunksCatalog catalog,
         bool ensureInitialized = true) = 0;
+
+    virtual QnLiveStreamProviderPtr getPrimaryReader() = 0;
+    virtual QnLiveStreamProviderPtr getSecondaryReader() = 0;
 
     virtual int copyLastGop(
         bool primaryLiveStream,

@@ -14,7 +14,7 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <camera/client_video_camera.h>
-
+#include <camera/resource_display.h>
 #include <camera/camera_data_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -25,8 +25,8 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/fusion/model_functions.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <platform/environment.h>
 
@@ -285,7 +285,7 @@ void WorkbenchExportHandler::exportTimeSelectionInternal(
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
         if (!periods.isEmpty())
             durationMs = periods.duration();
-        Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
+        NX_ASSERT(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
 
@@ -935,7 +935,7 @@ void WorkbenchExportHandler::at_exportRapidReviewAction_triggered()
         QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
         if (!periods.isEmpty())
             durationMs = periods.duration();
-        Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
+        NX_ASSERT(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
     if (durationMs < ui::dialogs::ExportRapidReview::kMinimalSourcePeriodLength)

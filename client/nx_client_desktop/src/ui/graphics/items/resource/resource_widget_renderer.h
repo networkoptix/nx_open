@@ -66,6 +66,7 @@ public:
     void setBlurFactor(qreal value);
 
     Qn::RenderStatus paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity);
+    Qn::RenderStatus discardFrame(int channel);
     void skip(int channel); // TODO: #Elric replace with setEnabled
 
     virtual qint64 getTimestampOfNextFrameToRender(int channel) const override;
@@ -77,7 +78,7 @@ public:
     qint64 isLowQualityImage(int channel) const;
     bool isHardwareDecoderUsed(int channel) const;
 
-    QnAbstractCompressedMetadataPtr lastFrameMetadata(int channel) const;
+    FrameMetadata lastFrameMetadata(int channel) const;
 
     QSize sourceSize() const;
 

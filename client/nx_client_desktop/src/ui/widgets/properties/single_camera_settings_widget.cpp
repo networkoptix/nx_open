@@ -12,8 +12,6 @@
 #include <camera/camera_thumbnail_manager.h>
 #include <camera/fps_calculator.h>
 
-// TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-#include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -457,7 +455,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule);
         setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule);
 
-
         if (!dtsBased)
         {
             auto supported = m_camera->supportedMotionType();
@@ -475,19 +472,22 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
             QnVirtualCameraResourceList cameras;
             cameras.push_back(m_camera);
             ui->expertSettingsWidget->updateFromResources(cameras);
-
-            if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
-                    m_camera,
-                    -1,
-                    -1,
-                    kFisheyeThumbnailSize,
-                    QnThumbnailRequestData::JpgFormat,
-                    QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
-                    QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
-                    this);
-            ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
+
+        if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
+        {
+            m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
+                m_camera,
+                -1,
+                -1,
+                kFisheyeThumbnailSize,
+                QnThumbnailRequestData::JpgFormat,
+                QnThumbnailRequestData::AspectRatio::AutoAspectRatio,
+                QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod,
+                this);
+        }
+
+        ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
     }
 
     /* After overrideMotionType is set. */
@@ -938,7 +938,7 @@ void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString)
 {
     QUrl url(urlString);
 
-    const bool removeCredentials = m_camera 
+    const bool removeCredentials = m_camera
         && !m_camera->getProperty(kRemoveCredentialsFromWebPageUrl).isEmpty();
 
     if (!m_readOnly && !removeCredentials)

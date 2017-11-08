@@ -1,7 +1,7 @@
 #pragma once
 #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <motion/motion_estimation.h>
 
 namespace nx {

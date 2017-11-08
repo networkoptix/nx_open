@@ -43,11 +43,18 @@ public:
 
     /**
      * @brief startFetchingMetadata starts fetching metadata from the resource.
-     * @param handler metadata fetched by plugin should be passed to this handler.
+     * @return noError in case of success, other value otherwise.
+     */
+    virtual Error startFetchingMetadata() = 0;
+
+    /**
+     * @brief startFetchingMetadata starts fetching metadata from the resource.
+     * @param handler to process event metadata and object metadata fetched by plugin.
+     * Plugin will fetch events metadata after startFetchingMetadata call.
      * Errors are also should reported via this handler.
      * @return noError in case of success, other value otherwise.
      */
-    virtual Error startFetchingMetadata(AbstractMetadataHandler* handler) = 0;
+    virtual Error setHandler(AbstractMetadataHandler* handler) = 0;
 
     /**
      * @brief stopFetchingMetadata stops fetching metadata from the resource synchronously
@@ -58,7 +65,7 @@ public:
     /**
      * @brief provides null terminated UTF8 string containing json manifest
      * according to nx_metadata_plugin_manifest.schema.json.
-     * @return pointer to c-style string which MUST be valid till manager object exists 
+     * @return pointer to c-style string which MUST be valid till manager object exists
      */
     virtual const char* capabilitiesManifest(Error* error) const = 0;
 };

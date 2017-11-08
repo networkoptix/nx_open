@@ -3,8 +3,8 @@
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
 
 #include <motion/motion_detection.h>
 

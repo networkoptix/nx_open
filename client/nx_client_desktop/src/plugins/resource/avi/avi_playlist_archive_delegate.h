@@ -4,7 +4,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 
 
 class QnAVIPlaylistArchiveDelegate : public QnAviArchiveDelegate

@@ -5,7 +5,7 @@
 #include <QtGui/QRegion>
 
 #include "core/resource/resource_fwd.h"
-#include "plugins/resource/avi/avi_archive_delegate.h"
+#include "core/resource/avi/avi_archive_delegate.h"
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 #include "utils/media/sse_helper.h"

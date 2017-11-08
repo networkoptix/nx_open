@@ -178,10 +178,7 @@ bool HanwhaResourceSearcher::processPacket(
 
     decltype(m_foundUpnpResources) foundUpnpResources;
 
-    QAuthenticator defaultAuth;
-    defaultAuth.setUser(kHanwhaDefaultUser);
-    defaultAuth.setPassword(kHanwhaDefaultPassword);
-    createResource(devInfo, cameraMac, defaultAuth, foundUpnpResources);
+    createResource(devInfo, cameraMac, foundUpnpResources);
 
     QnMutexLocker lock(&m_mutex);
     m_alreadFoundMacAddresses.insert(cameraMac.toString());
@@ -193,7 +190,6 @@ bool HanwhaResourceSearcher::processPacket(
 void HanwhaResourceSearcher::createResource(
     const nx_upnp::DeviceInfo& devInfo,
     const QnMacAddress& mac,
-    const QAuthenticator& auth,
     QnResourceList& result)
 {
     auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
@@ -216,8 +212,7 @@ void HanwhaResourceSearcher::createResource(
     resource->setUrl(devInfo.presentationUrl);
     resource->setMAC(mac);
 
-    if (!auth.isNull()) 
-        resource->setDefaultAuth(auth);
+    resource->setDefaultAuth(getDefaultAuth());
 
     result << resource;
 
@@ -225,7 +220,7 @@ void HanwhaResourceSearcher::createResource(
     auto rpRes = resPool->getNetResourceByPhysicalId(
         resource->getUniqueId()).dynamicCast<HanwhaResource>();
 
-    addMultichannelResources(result, rpRes ? rpRes->getAuth() : auth);
+    addMultichannelResources(result, rpRes ? rpRes->getAuth() : getDefaultAuth());
 }
 
 template <typename T>
@@ -255,8 +250,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
             resource->setModel(firstResource->getName());
             resource->setMAC(firstResource->getMAC());
 
-            if (!auth.isNull())
-                resource->setDefaultAuth(auth);
+            resource->setDefaultAuth(getDefaultAuth());
 
             resource->setUrl(firstResource->getUrl());
             resource->updateToChannel(i);
@@ -264,6 +258,14 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
             result.push_back(resource);
         }
     }
+}
+
+QAuthenticator HanwhaResourceSearcher::getDefaultAuth()
+{
+    QAuthenticator defaultAuth;
+    defaultAuth.setUser(kHanwhaDefaultUser);
+    defaultAuth.setPassword(kHanwhaDefaultPassword);
+    return defaultAuth;
 }
 
 } // namespace plugins

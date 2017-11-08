@@ -174,6 +174,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
 
         ctx.waitForDone();
     }
+
     return outputData;
 }
 

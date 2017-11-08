@@ -1,9 +1,12 @@
 #include "module_connector.h"
 
-#include <nx/network/cloud/address_resolver.h>
+#include <rest/server/json_rest_result.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/url/url_builder.h>
+#include <rest/server/json_rest_result.h>
 
 #include <rest/server/json_rest_result.h>
 
@@ -11,8 +14,8 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const auto kUrl =
-    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream");
+static const nx::utils::Url kUrl(lit(
+    "http://localhost/api/moduleInformation?showAddresses=false&keepConnectionOpen&updateStream"));
 
 std::chrono::seconds kDefaultDisconnectTimeout(10);
 static const network::RetryPolicy kDefaultRetryPolicy(
@@ -154,7 +157,7 @@ void ModuleConnector::InformationReader::start(const SocketAddress& endpoint)
 
     QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, handler);
     QObject::connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, handler);
-    m_httpClient->doGet(kUrl.arg(endpoint.toString()));
+    m_httpClient->doGet(nx::network::url::Builder(kUrl).setEndpoint(endpoint));
 }
 
 static inline boost::optional<nx::Buffer> takeJsonObject(nx::Buffer* buffer)
@@ -371,6 +374,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
             continue;
 
         ++endpointsInProgress;
+        NX_ASSERT(!endpoint.toString().isEmpty());
         connectToEndpoint(endpoint, endpointsGroup);
     }
 

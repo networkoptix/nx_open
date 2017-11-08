@@ -1911,7 +1911,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     connectionInfo->ecsGuid = commonModule()->moduleGUID().toString();
     connectionInfo->cloudSystemId = commonModule()->globalSettings()->cloudSystemId();
     connectionInfo->localSystemId = commonModule()->globalSettings()->localSystemId();
-    #if defined(__arm__)
+    #if defined(__arm__) || defined(__aarch64__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;

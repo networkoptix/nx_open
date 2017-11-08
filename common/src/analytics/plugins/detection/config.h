@@ -31,7 +31,7 @@ struct IniConfig: public nx::kit::IniConfig
     NX_INI_STRING(NX_ANALYTICS_PATH "/pednet.caffemodel", modelFile, "");
     NX_INI_STRING(NX_VAR_PATH "/var/cuda_engine.cache", cacheFile, "");
 
-    NX_INI_FLAG(0, enableDetectionPlugin, "");
+    NX_INI_FLAG(1, enableDetectionPlugin, "");
     NX_INI_FLAG(1, enableMotionDetection, "");
 
     // Rectangles filtering parameters

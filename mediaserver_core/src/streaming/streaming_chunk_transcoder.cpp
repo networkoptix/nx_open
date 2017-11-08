@@ -6,7 +6,7 @@
 #include <nx/utils/timer_manager.h>
 
 #include <api/helpers/camera_id_helper.h>
-#include <core/dataprovider/h264_mp4_to_annexb.h>
+#include <providers/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <recording/time_period.h>
@@ -110,7 +110,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     chunk->openForModification();
 
-    DataSourceContextPtr dataSourceCtx = 
+    DataSourceContextPtr dataSourceCtx =
         prepareDataSourceContext(cameraResource, camera, transcodeParams);
     if (!dataSourceCtx)
     {
@@ -124,7 +124,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
             .arg(transcodeParams.startTimestamp()).arg(transcodeParams.duration()),
             cl_logDEBUG1);
 
-        const quint64 cacheEndTimestamp = 
+        const quint64 cacheEndTimestamp =
             camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
         if (transcodeParams.alias().isEmpty() &&
             transcodeParams.startTimestamp() > cacheEndTimestamp &&
@@ -132,7 +132,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         {
             // Chunk is in the future not futher than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS.
             // Scheduling transcoding on data availability.
-            std::pair<std::map<int, TranscodeContext>::iterator, bool> p = 
+            std::pair<std::map<int, TranscodeContext>::iterator, bool> p =
                 m_scheduledTranscodings.emplace(newTranscodingId, TranscodeContext());
             NX_ASSERT(p.second);
 
@@ -188,7 +188,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
         AbstractOnDemandDataProviderPtr mediaDataProvider;
         if (transcodeParams.live())
         {
-            dataSourceCtx->videoCameraLocker = 
+            dataSourceCtx->videoCameraLocker =
                 videoCameraPool()->getVideoCameraLockerByResourceId(cameraResource->getId());
             if (!dataSourceCtx->videoCameraLocker)
             {
@@ -208,7 +208,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
 
         if (!mediaDataProvider)
             return nullptr;
-        
+
         dataSourceCtx->mediaDataProvider = AbstractOnDemandDataProviderPtr(
             new H264Mp4ToAnnexB(mediaDataProvider));
     }
@@ -245,11 +245,11 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createLiveMediaDataPro
         .arg(transcodeParams.startTimestamp())
         .arg(transcodeParams.duration()), cl_logDEBUG2);
 
-    const quint64 cacheStartTimestamp = 
+    const quint64 cacheStartTimestamp =
         camera->liveCache(transcodeParams.streamQuality())->startTimestamp();
-    const quint64 cacheEndTimestamp = 
+    const quint64 cacheEndTimestamp =
         camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
-    const quint64 actualStartTimestamp = 
+    const quint64 actualStartTimestamp =
         std::max<>(cacheStartTimestamp, transcodeParams.startTimestamp());
     auto mediaDataProvider = AbstractOnDemandDataProviderPtr(
         new LiveMediaCacheReader(
@@ -293,7 +293,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
         return nullptr;
     }
 
-    QnAbstractArchiveStreamReader* archiveReader = 
+    QnAbstractArchiveStreamReader* archiveReader =
         dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
     if (!archiveReader || !archiveReader->open())
     {
@@ -460,7 +460,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         else
         {
             NX_ASSERT(false);
-            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream. 
+            videoResolution = QSize(1280, 720); //< TODO/hls: #ak get resolution of resource video stream.
                                                 //< This resolution is ignored when TM_DirectStreamCopy is used.
         }
     }

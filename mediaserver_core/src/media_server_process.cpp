@@ -101,7 +101,7 @@
 
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <plugins/resource/flir/flir_io_executor.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
@@ -111,7 +111,7 @@
 #include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
-#include <plugins/storage/file_storage/db_storage_resource.h>
+#include <core/storage/file_storage/db_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 
 #include <recorder/file_deletor.h>
@@ -1565,6 +1565,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
     reg("api/getNonce", new QnGetNonceRestHandler());
+    reg("api/getRemoteNonce", new QnGetNonceRestHandler(lit("/api/getNonce")));
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
@@ -1708,7 +1709,7 @@ bool MediaServerProcess::initTcpListener(
     // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
     // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
-    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/*"), nx_http::AuthMethod::http);
+    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/.+"), nx_http::AuthMethod::http);
 
     nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values) (
         nx_http::AuthMethod::cookie |
@@ -2198,6 +2199,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
 
+    configureApiRestrictions(QnAuthHelper::instance()->restrictionList());
     std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
         new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
@@ -2233,7 +2235,7 @@ void MediaServerProcess::run()
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
 
     auto remoteArchiveSynchronizer =
-        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(commonModule());
+        std::make_unique<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(qnServerModule);
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
@@ -2658,7 +2660,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher(commonModule()));
 
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
-    QnMediaServerResourceSearchers searchers(commonModule());
+    auto resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
     auto flirExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
@@ -2914,6 +2916,7 @@ void MediaServerProcess::run()
     serverResourceProcessor.reset();
 
     mdnsListener.reset();
+    resourceSearchers.reset();
     upnpDeviceSearcher.reset();
 
     connectorThread->quit();
@@ -3190,4 +3193,31 @@ int MediaServerProcess::main(int argc, char* argv[])
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const
 {
     return m_cmdLineArguments;
+}
+
+void MediaServerProcess::configureApiRestrictions(nx_http::AuthMethodRestrictionList* restrictions)
+{
+    // For "OPTIONS * RTSP/1.0"
+    restrictions->allow(lit("."), nx_http::AuthMethod::noAuth);
+
+    const auto webPrefix = lit("(/web)?(/proxy/[^/]*(/[^/]*)?)?");
+    restrictions->allow(webPrefix + lit("/api/ping"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/showLog.*"), nx_http::AuthMethod::urlQueryParam);
+    restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/gettime"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getNonce"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/cookieLogout"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/getCurrentUser"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/static/.*"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(lit("/crossdomain.xml"), nx_http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + lit("/api/startLiteClient"), nx_http::AuthMethod::noAuth);
+
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud
+    // authentication is implemented.
+    // WARNING: This is severe vulnerability introduced in 3.0.
+    restrictions->allow(webPrefix + lit("/api/installUpdateUnauthenticated"),
+        nx_http::AuthMethod::noAuth);
 }

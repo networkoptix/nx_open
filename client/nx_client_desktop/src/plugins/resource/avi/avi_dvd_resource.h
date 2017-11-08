@@ -1,7 +1,7 @@
 #ifndef QN_AVI_DVD_RESOURCE_H
 #define QN_AVI_DVD_RESOURCE_H
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 class QnAviDvdResource : public QnAviResource
 {
