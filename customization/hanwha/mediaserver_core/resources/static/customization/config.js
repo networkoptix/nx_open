@@ -1,26 +1,29 @@
-
 Config.helpLinks.push({
     url: "https://support.hanwhasecurity.com/hc/en-us/sections/115003342347",
     title: "Knowledgebase",
-    target: "new" // new|frame
+    target: "new",
+    button: "read"
 });
 
 Config.helpLinks.push({
     url: "mailto:support@hanwhasecurity.com",
     title: "North America Support",
-    target: "new" // new|frame
+    target: "new",
+    button: "support@hanwhasecurity.com"
 });
 
 Config.helpLinks.push({
     url: "mailto:eucctv.help@hanwha.com",
     title: "Europe Support",
-    target: "new" // new|frame
+    target: "new",
+    button: "eucctv.help@hanwha.com"
 });
 
 Config.helpLinks.push({
     url: "http://tools.wavevms.com/calculator/",
     title: "System calculator",
-    target: "new" // new|frame
+    target: "new" ,
+    button: "http://tools.wavevms.com/calculator/"
 });
 
 Config.helpLinks.push({
