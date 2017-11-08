@@ -1498,42 +1498,56 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (options().testFlag(InvisibleWidgetOption))
         return;
 
+    QnMetaDataV1Ptr motionMetadata;
+
     const auto metadataList = m_renderer->lastFrameMetadata(channel);
     for (const auto& metadata: metadataList)
     {
-        if (options().testFlag(DisplayMotion))
+        if (!metadata)
+            continue;
+
+        switch (metadata->dataType)
         {
-            ensureMotionSelectionCache();
+            case QnAbstractMediaData::DataType::META_V1:
+                motionMetadata = std::dynamic_pointer_cast<QnMetaDataV1>(metadata);
+                break;
 
-            if (metadata && metadata->dataType == QnAbstractMediaData::DataType::META_V1)
+            case QnAbstractMediaData::DataType::GENERIC_METADATA:
             {
-                paintMotionGrid(
-                    painter,
-                    channel,
-                    rect,
-                    std::dynamic_pointer_cast<QnMetaDataV1>(metadata));
+                if (nx::client::desktop::ini().enableAnalytics)
+                {
+                    qnMetadataAnalyticsController->gotMetadataPacket(
+                        d->resource,
+                        std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
+                }
+                break;
             }
 
-            paintMotionSensitivity(painter, channel, rect);
-
-            /* Motion selection. */
-            if (!m_motionSelection[channel].isEmpty())
-            {
-                QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
-                paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
-            }
-        }
-
-        if (metadata && metadata->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
-        {
-            if (nx::client::desktop::ini().enableAnalytics)
-            {
-                qnMetadataAnalyticsController->gotMetadataPacket(
-                    d->resource,
-                    std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
-            }
+            default:
+                break;
         }
     }
+
+    if (options().testFlag(DisplayMotion))
+    {
+        ensureMotionSelectionCache();
+
+        paintMotionGrid(
+            painter,
+            channel,
+            rect,
+            motionMetadata);
+
+        paintMotionSensitivity(painter, channel, rect);
+
+        /* Motion selection. */
+        if (!m_motionSelection[channel].isEmpty())
+        {
+            QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
+            paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
+        }
+    }
+
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
 }
