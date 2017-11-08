@@ -2,8 +2,8 @@
 
 angular.module('cloudApp')
     .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process',
-                                'account', '$routeParams', 'systemsProvider',
-    function ($scope, cloudApi, $location, urlProtocol, process, account, $routeParams, systemsProvider) {
+                                'account', '$routeParams', 'systemsProvider', 'dialogs',
+    function ($scope, cloudApi, $location, urlProtocol, process, account, $routeParams, systemsProvider, dialogs) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
