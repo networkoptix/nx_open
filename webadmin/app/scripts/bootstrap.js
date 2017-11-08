@@ -69,8 +69,8 @@ function setLanguage(lang){
                 dataType: 'json',
                 success: function (response) {
                     L = response;// Fill global L variable
-                    Config.viewsDir = 'lang_' + L.defaultLanguage + '/views/';
-                    Config.viewsDirCommon =  'lang_' + L.defaultLanguage + '/web_common/views/';
+                    Config.viewsDir = 'lang_' + Config.defaultLanguage + '/views/';
+                    Config.viewsDirCommon =  'lang_' + Config.defaultLanguage + '/web_common/views/';
                     angular.bootstrap(document, ['webadminApp']);
                 },
                 error:function(){
