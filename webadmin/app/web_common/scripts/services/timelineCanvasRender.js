@@ -846,6 +846,19 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                      timelineConfig.scrollBarTopPadding * self.canvas.height;
         var scrollCoordinate = (date - self.scaleManager.start)/(self.scaleManager.end - self.scaleManager.start) * self.canvas.width;
 
+        var scrollSlider = self.scaleManager.scrollSlider();
+        var scrollBarStart = scrollSlider.start * self.pixelAspectRatio;
+        var scrollBarEnd = (scrollSlider.start + scrollSlider.width) * self.pixelAspectRatio;
+
+        if(timeMarkerOffScreen(date) && scrollBarStart <= scrollCoordinate
+                                     && scrollCoordinate <= scrollBarEnd){
+            if(self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio) < 0){
+                scrollCoordinate = scrollBarStart - timelineConfig.scrollMarkerOffset  * self.pixelAspectRatio;
+            }
+            else{
+                scrollCoordinate = scrollBarEnd + timelineConfig.scrollMarkerOffset * self.pixelAspectRatio;
+            }
+        }
         context.beginPath();
         context.moveTo(0.5 + scrollCoordinate, bottom);
         context.lineTo(0.5 + scrollCoordinate, self.canvas.height);
