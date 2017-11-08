@@ -167,7 +167,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
                 cleanUpItem(m_currentDefaultPasswordChangeWidget);
                 m_currentDefaultPasswordChangeWidget = nullptr;
             }
-            if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+            else if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             {
                 NX_EXPECT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
                 const auto parametersGetter =
