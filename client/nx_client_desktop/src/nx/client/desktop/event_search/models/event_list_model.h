@@ -49,7 +49,7 @@ public:
     explicit EventListModel(QObject* parent = nullptr);
     virtual ~EventListModel() override;
 
-    virtual int rowCount(const QModelIndex& parent) const override;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     void defaultAction(const QnUuid& id);
@@ -58,8 +58,20 @@ public:
 
     void clear();
 
+    virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
+    virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
+
+signals:
+    void fetchFinished(QPrivateSignal);
+
 protected:
-    bool addEvent(const EventData& event);
+    enum class Position
+    {
+        front,
+        back
+    };
+
+    bool addEvent(const EventData& event, Position where = Position::front);
     bool updateEvent(const EventData& event);
     bool removeEvent(const QnUuid& id);
 
@@ -75,6 +87,8 @@ protected:
     virtual int eventPriority(const EventData& event) const;
 
     virtual void beforeRemove(const EventData& event);
+
+    void finishFetch(); //< Just emits fetchFinished signal.
 
 private:
     class Private;

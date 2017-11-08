@@ -25,7 +25,12 @@ void UnifiedSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camera)
     d->setCamera(camera);
 }
 
-void UnifiedSearchListModel::fetchMore()
+bool UnifiedSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
+{
+    return d->canFetchMore();
+}
+
+void UnifiedSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 {
     d->fetchMore();
 }

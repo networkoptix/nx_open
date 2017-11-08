@@ -2158,6 +2158,11 @@ QnCachingCameraDataLoaderPtr QnWorkbenchNavigator::loaderByWidget(const QnMediaR
     return m_cameraDataManager->loader(widget->resource(), createIfNotExists);
 }
 
+QnCameraDataManager* QnWorkbenchNavigator::cameraDataManager() const
+{
+    return m_cameraDataManager;
+}
+
 void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs)
 {
     if (m_currentMediaWidget && m_currentMediaWidget->resource() == resource)

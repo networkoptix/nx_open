@@ -1,13 +1,19 @@
 #include "event_panel_p.h"
 
 #include <QtGui/QPainter>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
 #include <ui/style/custom_style.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
-#include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
 #include <nx/client/desktop/event_search/widgets/event_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
 
 namespace nx {
 namespace client {
@@ -18,7 +24,9 @@ EventPanel::Private::Private(EventPanel* q):
     q(q),
     m_tabs(new QTabWidget(q)),
     m_systemTab(new NotificationListWidget(m_tabs)),
-    m_cameraTab(new EventSearchWidget(m_tabs))
+    m_cameraTab(new QStackedWidget(m_tabs)),
+    m_eventsWidget(new EventSearchWidget(m_cameraTab)),
+    m_motionWidget(new MotionSearchWidget(m_cameraTab))
 {
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
@@ -32,6 +40,11 @@ EventPanel::Private::Private(EventPanel* q):
     q->setAttribute(Qt::WA_TranslucentBackground);
 
     m_cameraTab->setHidden(true);
+    m_cameraTab->addWidget(m_eventsWidget);
+    m_cameraTab->addWidget(m_motionWidget);
+
+    connect(q->context()->display(), &QnWorkbenchDisplay::widgetChanged,
+        this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
 }
 
 EventPanel::Private::~Private()
@@ -40,7 +53,7 @@ EventPanel::Private::~Private()
 
 QnVirtualCameraResourcePtr EventPanel::Private::camera() const
 {
-    return m_cameraTab->camera();
+    return m_eventsWidget->camera();
 }
 
 void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
@@ -48,7 +61,8 @@ void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
     if (this->camera() == camera)
         return;
 
-    m_cameraTab->setCamera(camera);
+    m_eventsWidget->setCamera(camera);
+    m_motionWidget->setCamera(camera);
 
     const auto index = m_tabs->indexOf(m_cameraTab);
     if (camera)
@@ -72,6 +86,37 @@ void EventPanel::Private::paintBackground()
 
     QPainter painter(q);
     painter.fillRect(q->rect(), q->palette().background());
+}
+
+void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
+{
+    if (role != Qn::CentralRole)
+        return;
+
+    m_mediaWidgetConnections.reset();
+
+    m_currentMediaWidget = qobject_cast<QnMediaResourceWidget*>(
+        this->q->context()->display()->widget(Qn::CentralRole));
+
+    const auto camera = m_currentMediaWidget
+        ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>()
+        : QnVirtualCameraResourcePtr();
+
+    setCamera(camera);
+
+    if (!camera)
+        return;
+
+    m_mediaWidgetConnections.reset(new QnDisconnectHelper());
+    *m_mediaWidgetConnections << connect(
+        m_currentMediaWidget, &QnMediaResourceWidget::motionSearchModeEnabled, this,
+        [this](bool enabled)
+        {
+            if (enabled)
+                m_cameraTab->setCurrentWidget(m_motionWidget);
+            else
+                m_cameraTab->setCurrentWidget(m_eventsWidget);
+        });
 }
 
 } // namespace

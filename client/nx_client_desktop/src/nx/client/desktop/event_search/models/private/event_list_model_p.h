@@ -23,8 +23,8 @@ public:
 
     void clear();
 
-    // Events can be added only in front of the list.
-    bool addEvent(const EventData& data);
+    bool addFront(const EventData& data);
+    bool addBack(const EventData& data);
 
     // Events can be removed from any place of the list.
     bool removeEvent(const QnUuid& id);
@@ -63,7 +63,8 @@ private:
     EventListModel* const q = nullptr;
     QList<EventDescriptor> m_events;
     QHash<QnUuid, qint64> m_sequentialNumberById;
-    qint64 m_nextSequentialNumber = 0;
+    qint64 m_nextFrontNumber = 0;
+    qint64 m_nextBackNumber = -1;
 };
 
 } // namespace

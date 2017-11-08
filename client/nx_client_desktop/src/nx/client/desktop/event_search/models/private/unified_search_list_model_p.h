@@ -34,6 +34,7 @@ public:
 
     void clear();
 
+    bool canFetchMore() const;
     void fetchMore();
 
 private:

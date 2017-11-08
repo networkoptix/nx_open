@@ -5,6 +5,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <utils/common/synctime.h>
+#include <utils/common/delayed.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
@@ -92,9 +93,11 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
     }
 }
 
-bool EventListModel::addEvent(const EventData& event)
+bool EventListModel::addEvent(const EventData& event, Position where)
 {
-    return d->addEvent(event);
+    return where == Position::front
+        ? d->addFront(event)
+        : d->addBack(event);
 }
 
 bool EventListModel::updateEvent(const EventData& event)
@@ -176,6 +179,20 @@ int EventListModel::eventPriority(const EventData& /*event*/) const
 
 void EventListModel::beforeRemove(const EventData& /*event*/)
 {
+}
+
+bool EventListModel::canFetchMore(const QModelIndex& /*parent*/) const
+{
+    return false;
+}
+
+void EventListModel::fetchMore(const QModelIndex& /*parent*/)
+{
+}
+
+void EventListModel::finishFetch()
+{
+    executeDelayedParented([this]() { emit fetchFinished(QPrivateSignal()); }, 0, this);
 }
 
 } // namespace

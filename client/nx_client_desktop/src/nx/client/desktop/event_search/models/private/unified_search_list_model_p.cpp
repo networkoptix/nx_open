@@ -60,6 +60,12 @@ UnifiedSearchListModel::Private::~Private()
 {
 }
 
+bool UnifiedSearchListModel::Private::canFetchMore() const
+{
+    // TODO: #vkutin Hopefully in the future it won't be always true.
+    return true;
+}
+
 void UnifiedSearchListModel::Private::fetchMore()
 {
     if (!m_camera || !m_fetchInProgress.isNull())
@@ -72,14 +78,10 @@ void UnifiedSearchListModel::Private::fetchMore()
     m_startTimeMs = endTimeMs - std::chrono::milliseconds(kDefaultEventsPeriod).count();
 
     auto finishHandler = QnRaiiGuard::createDestructible(
-        [guardedThis = QPointer<Private>(this)]()
+        [q = QPointer<UnifiedSearchListModel>(q)]()
         {
-            executeDelayed(
-                [guardedThis]()
-                {
-                    if (guardedThis)
-                        emit guardedThis->q->fetchMoreFinished();
-                });
+            if (q)
+                q->finishFetch();
         });
 
     m_fetchInProgress = finishHandler;
