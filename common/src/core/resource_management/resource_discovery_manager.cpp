@@ -608,12 +608,12 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
             if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
                 continue;
 
-                auto url = nx::utils::Url(itr.key());
-                if (url.path() == lit("/"))
-                    url.setPath(lit(""));
+            auto url = nx::utils::Url(itr.key());
+            if (url.path() == lit("/"))
+                url.setPath(lit(""));
 
-                QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(
-                    url.toString(QUrl::StripTrailingSlash), itr.value());
+            QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(
+                url.toString(QUrl::StripTrailingSlash), itr.value());
 
             inserted.value().searcher = searcher;
 			resourceHasBeenAdded = true;
