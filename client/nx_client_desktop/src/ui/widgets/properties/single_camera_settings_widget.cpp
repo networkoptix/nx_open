@@ -342,6 +342,15 @@ bool QnSingleCameraSettingsWidget::hasChanges() const
     return hasDbChanges() || hasAdvancedCameraChanges();
 }
 
+void QnSingleCameraSettingsWidget::setLockedMode(bool locked)
+{
+    if (m_lockedMode == locked)
+        return;
+
+    m_lockedMode = locked;
+    updateFromResource();
+}
+
 Qn::MotionType QnSingleCameraSettingsWidget::selectedMotionType() const
 {
     if (!m_camera)
@@ -402,6 +411,7 @@ void QnSingleCameraSettingsWidget::submitToResource()
 
 void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 {
+    ui->tabWidget->widget(Qn::GeneralSettingsTab)->setEnabled(!m_lockedMode);
     QScopedValueRollback<bool> updateRollback(m_updating, true);
 
     QnVirtualCameraResourceList cameras;
@@ -449,11 +459,14 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
 
         const bool dtsBased = m_camera->isDtsBased();
         const bool isIoModule = m_camera->isIOModule();
-        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo));
-        setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo);
-        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly());
-        setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule);
-        setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule);
+
+        setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !m_lockedMode);
+        setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo) && !m_lockedMode);
+        setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo && !m_lockedMode);
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly() && !m_lockedMode);
+        setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule && !m_lockedMode);
+        setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule && !m_lockedMode);
+
 
         if (!dtsBased)
         {

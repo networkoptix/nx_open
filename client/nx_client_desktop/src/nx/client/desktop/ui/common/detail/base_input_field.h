@@ -21,7 +21,6 @@ class BaseInputField : public Connective<QWidget>
 
     Q_PROPERTY(bool isValid READ isValid NOTIFY isValidChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged USER true)
-    Q_PROPERTY(QString hint READ hint WRITE setHint)
     Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
@@ -43,8 +42,7 @@ public:
     QString title() const;
     void setTitle(const QString& value);
 
-    QString hint() const;
-    void setHint(const QString& value);
+    void setCustomHint(const QString& hint);
 
     QString text() const;
     void setText(const QString& value);

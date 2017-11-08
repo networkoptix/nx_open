@@ -206,6 +206,8 @@ public:
 
     bool isGroupPlayOnly() const;
 
+    bool needsToChangeDefaultPassword() const;
+
     //!Implementation of QnMediaResource::toResource
     virtual const QnResource* toResource() const override;
     //!Implementation of QnMediaResource::toResource
@@ -328,6 +330,7 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
+    void needsToChangeDefaultPasswordChanged();
     void scheduleDisabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);

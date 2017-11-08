@@ -18,6 +18,7 @@ enum class PasswordStrength
 
 /** Function to analyze password strength. */
 NX_UTILS_API PasswordStrength passwordStrength(const QString& password);
+NX_UTILS_API PasswordStrength cameraPasswordStrength(const QString& password);
 
 } // namespace utils
 } // namespace nx

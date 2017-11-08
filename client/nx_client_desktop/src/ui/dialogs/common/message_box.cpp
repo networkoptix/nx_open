@@ -606,6 +606,13 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
                 stretch,
                 alignment
             );
+        case QnMessageBox::Layout::AfterMainLabel:
+            ui->verticalLayout->insertWidget(
+                ui->verticalLayout->indexOf(ui->mainLabel) + 1,
+                widget,
+                stretch,
+                alignment);
+
         default:
             break;
     }
