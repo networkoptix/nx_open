@@ -258,7 +258,7 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
             result[toInt(Qn::ServerOfflineOverlay)] = tr("SERVER UNAVAILABLE");
             result[toInt(Qn::ServerUnauthorizedOverlay)] = tr("NO ACCESS");
             result[toInt(Qn::IoModuleDisabledOverlay)] = tr("DEVICE DISABLED");
-            result[toInt(Qn::TooManyOpenedConnectionsOverlay)] = tr("TOO MANY CONNECTIONS")
+            result[toInt(Qn::TooManyOpenedConnectionsOverlay)] = tr("TOO MANY CONNECTIONS");
             result[toInt(Qn::PasswordRequiredOverlay)] = tr("PASSWORD REQUIRED");
             return result;
         }();

@@ -260,7 +260,9 @@ private slots:
     void clearEntropixEnhancedImage();
 
 private:
-    void setupStatusOverlayHandlers();
+    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleDewarpingParamsChanged();
+
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
     void createPtzController();

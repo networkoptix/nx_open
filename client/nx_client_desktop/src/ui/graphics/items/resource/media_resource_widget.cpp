@@ -94,7 +94,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
 #include <utils/common/warnings.h>
@@ -110,8 +109,9 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 using namespace nx;
-using namespace nx::client::desktop;
-using namespace nx::client::desktop::ui;
+using namespace client::desktop::ui;
+
+using DefaultPasswordCamerasWatcher = nx::client::desktop::DefaultPasswordCamerasWatcher;
 
 namespace {
 
@@ -367,31 +367,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     initIconButton();
     initStatusOverlayController();
 
-    if (m_camera)
-    {
-        QTimer *timer = new QTimer(this);
-
-        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateIconButton);
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(),
-            &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera, &QnResource::statusChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-
-        if (m_camera->hasFlags(Qn::io_module))
-        {
-            connect(m_camera, &QnResource::statusChanged, this,
-                [this]
-                {
-                    updateIoModuleVisibility(animationAllowed());
-                });
-        }
-
-        connect(m_camera, &QnSecurityCamResource::scheduleTasksChanged, this,
-            &QnMediaResourceWidget::updateIconButton);
-        timer->start(1000 * 60); /* Update icon button every minute. */
-    }
-
     connect(base_type::resource(), &QnResource::resourceChanged, this,
         &QnMediaResourceWidget::updateButtonsVisibility); // TODO: #GDM #Common get rid of resourceChanged
 
@@ -429,11 +404,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(this, &QnMediaResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::clearEntropixEnhancedImage);
 
-    const auto passwordWatcher = context->instance<DefaultPasswordCamerasWatcher>();
-    connect(passwordWatcher, &DefaultPasswordCamerasWatcher::camerasWithDefaultPasswordChanged,
-        this, &QnMediaResourceWidget::updateCustomOverlayButton);
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this, &QnMediaResourceWidget::handleItemDataChanged);
 
-    setupStatusOverlayHandlers();
+    const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
+        Qn::WritePermission);
+    setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -450,50 +426,74 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     m_binaryMotionMask.clear();
 }
 
-void QnMediaResourceWidget::setupStatusOverlayHandlers()
+void QnMediaResourceWidget::handleItemDataChanged(
+    const QnUuid& id,
+    Qn::ItemDataRole role,
+    const QVariant& data)
 {
-    if (!m_camera)
+    if (id != m_itemId)
         return;
 
-    const auto changeCameraPassword =
-        [this](const QnVirtualCameraResourceList& cameras, bool showSingleCamera)
+    switch(role)
+    {
+        case Qn::ItemPausedRole:
         {
-            auto parameters = action::Parameters(cameras);
-            parameters.setArgument(Qn::ShowSingleCameraRole, showSingleCamera);
-            menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
-        };
+            const bool shouldPause = data.toBool();
+            if (shouldPause == display()->isPaused())
+                return;
 
-    const auto controller = statusOverlayController();
-    connect(controller, &QnStatusOverlayController::buttonClicked, this,
-        [this, changeCameraPassword](Qn::ResourceOverlayButton button)
+            if (shouldPause)
+                display()->pause();
+            else
+                display()->play();
+            break;
+        }
+        case Qn::ItemTimeRole:
         {
-            switch (button)
+            if (const auto reader = display()->archiveReader())
             {
-                case Qn::ResourceOverlayButton::Diagnostics:
-                    processDiagnosticsRequest();
-                    break;
-                case Qn::ResourceOverlayButton::IoEnable:
-                    processIoEnableRequest();
-                    break;
-                case Qn::ResourceOverlayButton::Settings:
-                    processSettingsRequest();
-                    break;
-                case Qn::ResourceOverlayButton::MoreLicenses:
-                    processMoreLicensesRequest();
-                    break;
-                case Qn::ResourceOverlayButton::SetPassword:
-                    changeCameraPassword(QnVirtualCameraResourceList() << m_camera, false);
-                default:
-                    break;
-            }
-        });
+                const auto timestampUSec = data.toLongLong();
+                const auto timestampMs = timestampUSec == DATETIME_NOW
+                    ? DATETIME_NOW
+                    : timestampUSec * 1000;
 
-    connect(controller, &QnStatusOverlayController::customButtonClicked, this,
-        [this, changeCameraPassword]()
-        {
-            const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-            changeCameraPassword(passwordWatcher->camerasWithDefaultPassword(), true);
-        });
+                reader->jumpTo(timestampMs, 0);
+            }
+            break;
+        }
+        case Qn::ItemSpeedRole:
+                display()->archiveReader()->setSpeed(data.toDouble());
+            break;
+        default:
+            break;
+    }
+}
+
+void QnMediaResourceWidget::handleDewarpingParamsChanged()
+{
+    updateFisheye();
+    updateButtonsVisibility();
+    emit dewarpingParamsChanged();
+}
+
+void QnMediaResourceWidget::initRenderer()
+{
+    // TODO: #Elric
+    // Strictly speaking, this is a hack.
+    // We shouldn't be using OpenGL context in class constructor.
+    QGraphicsView *view = QnWorkbenchContextAware::display()->view();
+    const auto viewport = qobject_cast<const QGLWidget*>(view ? view->viewport() : nullptr);
+    m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
+    connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
+        &QnMediaResourceWidget::updateAspectRatio);
+}
+
+void QnMediaResourceWidget::initDisplay()
+{
+    const auto zoomTargetWidget = dynamic_cast<QnMediaResourceWidget *>(this->zoomTargetWidget());
+    setDisplay(zoomTargetWidget
+        ? zoomTargetWidget->display()
+        : QnResourceDisplayPtr(new QnResourceDisplay(d->resource, this)));
 }
 
 void QnMediaResourceWidget::initSoftwareTriggers()
@@ -574,33 +574,62 @@ void QnMediaResourceWidget::initIconButton()
 
 void QnMediaResourceWidget::initStatusOverlayController()
 {
-    if (d->camera)
-    {
-        const auto controller = statusOverlayController();
-        connect(controller, &QnStatusOverlayController::buttonClicked, this,
-            [this](Qn::ResourceOverlayButton button)
-            {
-                switch (button)
-                {
-                    case Qn::ResourceOverlayButton::Diagnostics:
-                        processDiagnosticsRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::EnableLicense:
-                        processEnableLicenseRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::Settings:
-                        processSettingsRequest();
-                        break;
-                    case Qn::ResourceOverlayButton::MoreLicenses:
-                        processMoreLicensesRequest();
-                        break;
-                    default:
-                        break;
-                }
-            });
-    }
+    if (!d->camera)
+         return;
+
+     const auto changeCameraPassword =
+         [this](const QnVirtualCameraResourceList& cameras, bool showSingleCamera)
+         {
+             auto parameters = action::Parameters(cameras);
+             parameters.setArgument(Qn::ShowSingleCameraRole, showSingleCamera);
+             menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
+         };
+
+     const auto controller = statusOverlayController();
+     connect(controller, &QnStatusOverlayController::buttonClicked, this,
+         [this, changeCameraPassword](Qn::ResourceOverlayButton button)
+         {
+             switch (button)
+             {
+                 case Qn::ResourceOverlayButton::Diagnostics:
+                     processDiagnosticsRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::EnableLicense:
+                     processEnableLicenseRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::Settings:
+                     processSettingsRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::MoreLicenses:
+                     processMoreLicensesRequest();
+                     break;
+                 case Qn::ResourceOverlayButton::SetPassword:
+                     changeCameraPassword(QnVirtualCameraResourceList() << d->camera, false);
+                 default:
+                     break;
+             }
+         });
+
+     connect(controller, &QnStatusOverlayController::customButtonClicked, this,
+         [this, changeCameraPassword]()
+         {
+             const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+             changeCameraPassword(passwordWatcher->camerasWithDefaultPassword(), true);
+         });
 }
 
+QString QnMediaResourceWidget::overlayCustomButtonText(
+    Qn::ResourceStatusOverlay statusOverlay) const
+{
+    if (statusOverlay != Qn::PasswordRequiredOverlay)
+        return QString();
+
+    const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
+    return  camerasCount > 1
+        ? tr("Set For All %n Cameras", nullptr, camerasCount)
+        : QString();
+}
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
 {
     if (!rule)
@@ -2026,11 +2055,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             ? Qn::ViewLivePermission
             : Qn::ViewFootagePermission;
 
-        if (states.isDefaultPassword)
-            return Qn::PasswordRequiredOverlay;
-
-        if (states.isUnauthorized)
-            return Qn::UnauthorizedOverlay;
+        if (!accessController()->hasPermissions(d->camera, requiredPermission))
+            return Qn::AnalogWithoutLicenseOverlay;
     }
 
     if (d->isIoModule)
@@ -2107,10 +2133,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     if (!d->camera || !d->camera->resourcePool())
         return Qn::ResourceOverlayButton::Empty;
 
-    if (statusOverlay == Qn::PasswordRequiredOverlay)
-        return Qn::ResourceOverlayButton::SetPassword;
-
-    const bool canChangeSettings = accessController()->hasPermissions(m_camera,
+    const bool canChangeSettings = accessController()->hasPermissions(d->camera,
         Qn::SavePermission | Qn::WritePermission);
 
     switch (statusOverlay)
@@ -2154,19 +2177,6 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
     }
 
     return base_type::calculateOverlayButton(statusOverlay);
-}
-
-QString QnMediaResourceWidget::overlayCustomButtonText(
-    Qn::ResourceStatusOverlay statusOverlay) const
-{
-    if (statusOverlay != Qn::PasswordRequiredOverlay)
-        return QString();
-
-    const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
-    const auto camerasCount = watcher ? watcher->camerasWithDefaultPassword().size() : 0;
-    return  camerasCount > 1
-        ? tr("Set For All %n Cameras", nullptr, camerasCount)
-        : QString();
 }
 
 void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key)
@@ -2383,26 +2393,6 @@ void QnMediaResourceWidget::updateCustomAspectRatio()
         return;
 
     d->display()->camDisplay()->setOverridenAspectRatio(d->mediaResource->customAspectRatio());
-}
-
-QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates() const
-{
-    const auto camDisplay = (m_display ? m_display->camDisplay() : nullptr);
-    const auto resource = (m_display ? m_display->resource() : QnResourcePtr());
-
-    ResourceStates result;
-    result.isRealTimeSource = (camDisplay ? camDisplay->isRealTimeSource() : false);
-    result.isOffline = (result.isRealTimeSource && (!resource || (resource->getStatus() == Qn::Offline)));
-    result.isUnauthorized = (result.isRealTimeSource && (resource && (resource->getStatus() == Qn::Unauthorized)));
-    result.hasVideo = hasVideo();
-
-    result.isDefaultPassword =
-        [camera = resource.dynamicCast<QnSecurityCamResource>()]()
-        {
-            return camera && camera->needsToChangeDefaultPassword();
-        }();
-
-    return result;
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
