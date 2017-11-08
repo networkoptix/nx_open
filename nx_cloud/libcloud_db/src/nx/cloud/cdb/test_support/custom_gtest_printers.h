@@ -6,8 +6,13 @@
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
 
+#include "../managers/vms_gateway.h"
+
 namespace nx {
 namespace cdb {
+
+void PrintTo(VmsResultCode val, ::std::ostream* os);
+
 namespace api {
 
 void PrintTo(AccountStatus val, ::std::ostream* os);

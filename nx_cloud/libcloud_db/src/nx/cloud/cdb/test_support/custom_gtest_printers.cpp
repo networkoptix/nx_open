@@ -9,6 +9,12 @@
 
 namespace nx {
 namespace cdb {
+
+void PrintTo(VmsResultCode val, ::std::ostream* os)
+{
+    *os << QnLexical::serialized(val).toStdString();
+}
+
 namespace api {
 
 void PrintTo(AccountStatus val, ::std::ostream* os)
