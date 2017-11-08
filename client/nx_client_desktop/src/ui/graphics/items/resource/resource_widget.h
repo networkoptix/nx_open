@@ -313,7 +313,11 @@ protected:
 
     virtual Qn::ResourceOverlayButton calculateOverlayButton(
         Qn::ResourceStatusOverlay statusOverlay) const;
+    virtual QString overlayCustomButtonText(
+        Qn::ResourceStatusOverlay statusOverlay) const;
+
     void updateOverlayButton();
+    void updateCustomOverlayButton();
 
     virtual QString calculateTitleText() const;
     Q_SLOT void updateTitleText();
@@ -352,6 +356,8 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
 private:
+    void setupOverlayButtonsHandlers();
+
     void setupHud();
     void setupSelectionOverlay();
     void createButtons();

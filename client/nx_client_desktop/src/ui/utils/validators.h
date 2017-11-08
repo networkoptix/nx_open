@@ -30,6 +30,9 @@ TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage);
 TextValidateFunction defaultPasswordValidator(bool allowEmpty, const QString& emptyPasswordMessage = QString());
 TextValidateFunction defaultConfirmationValidator(TextAccessorFunction primaryText, const QString& errorMessage);
 
+using ValidatorsList = QList<TextValidateFunction>;
+TextValidateFunction validatorsConcatenator(const ValidatorsList& validators);
+
 using UserValidator = std::function<bool (const QnUserResourcePtr&)>;
 using RoleValidator = std::function<QValidator::State (const QnUuid&)>;
 

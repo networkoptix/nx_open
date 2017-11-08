@@ -650,11 +650,12 @@ Handle ServerConnection::executeRequest(
                 if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
                 {
                     const auto format = Qn::serializationFormatFromHttpContentType(contentType);
+                    auto result = parseMessageBody<ResultType>(format, msgBody, &success);
                     invoke(callback,
                         targetThread,
                         success,
                         id,
-                        parseMessageBody<ResultType>(format, msgBody, &success),
+                        std::move(result),
                         serverId,
                         timer);
                 }

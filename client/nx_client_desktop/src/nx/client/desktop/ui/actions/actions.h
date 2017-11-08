@@ -1134,6 +1134,8 @@ enum IDType
     */
     WebPageSettingsAction,
 
+    ChangeDefaultCameraPasswordAction,
+
     ActionCount,
 
     NoAction = -1
