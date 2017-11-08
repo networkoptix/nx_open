@@ -39,7 +39,7 @@
 
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/notifications/notification_widget.h>
-#include <ui/graphics/items/notifications/notification_list_widget.h>
+#include <ui/graphics/items/notifications/legacy_notification_list_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/business_help.h>

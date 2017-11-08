@@ -1,4 +1,4 @@
-#include "notification_list_widget.h"
+#include "legacy_notification_list_widget.h"
 
 #include <limits>
 

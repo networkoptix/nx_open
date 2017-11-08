@@ -1,5 +1,4 @@
-#ifndef NOTIFICATION_LIST_WIDGET_H
-#define NOTIFICATION_LIST_WIDGET_H
+#pragma once
 
 #include <QtCore/QLinkedList>
 
@@ -113,5 +112,3 @@ private:
     QRectF m_tooltipsEnclosingRect;
     QnNotificationLevel::Value m_itemNotificationLevel;
 };
-
-#endif // NOTIFICATION_LIST_WIDGET_H
