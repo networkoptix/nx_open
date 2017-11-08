@@ -44,5 +44,9 @@ angular.module('cloudApp')
                     hasMatch(system.name, search) ||
                     hasMatch(system.ownerFullName, search) ||
                     hasMatch(system.ownerAccountEmail, search);
-        }
+        };
+
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
+        });
     }]);

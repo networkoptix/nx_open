@@ -177,6 +177,7 @@ angular.module('cloudApp')
 
         $scope.$on('$destroy', function( event ) {
             cancelSubscription();
+            dialogs.dismissNotifications();
         });
 
 

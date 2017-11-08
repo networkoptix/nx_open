@@ -32,4 +32,8 @@ angular.module('cloudApp')
         $scope.disconnect = function(){
             $scope.deletingSystem.run();
         }
+
+        $scope.$on('$destroy', function(){
+            dialogs.dismissNotifications();
+        });
     }]);
