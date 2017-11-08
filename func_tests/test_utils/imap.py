@@ -9,7 +9,7 @@ from .utils import datetime_utc_now
 log = logging.getLogger(__name__)
 
 
-ACTIVATION_EMAIL_SUBJECT = 'Confirm your account'
+ACTIVATION_EMAIL_SUBJECT = 'Activate your account'
 
 
 class IMAPConnection(object):
@@ -36,6 +36,7 @@ class IMAPConnection(object):
     # gmail drops '+xxx' part from emails when we load or search for 'To' headers,
     # so we have to search for subject and load all rfc822 headers to check for it
     def search_for_activation_emails(self, cloud_email):
+        self._call('select')  # google wants this to refresh search base
         for uid, message in self._search('HEADER', 'Subject', ACTIVATION_EMAIL_SUBJECT):
             if message['To'] == cloud_email:
                 yield Message(self, uid)
@@ -122,7 +123,7 @@ class Message(object):
             if part.get_content_type() == 'text/plain':
                 payload = part.get_payload(decode=True)
                 # mo = re.search(r'https?://{}/activate/(\w+)'.format(cloud_host), payload)
-                # Sctivation domain may not match account cloud host. Strange, yes.
+                # Activation domain may not match account cloud host. Strange, yes.
                 mo = re.search(r'https?://\S+/activate/(\w+)', payload)
                 if mo:
                     return mo.group(1)
