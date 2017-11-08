@@ -180,9 +180,15 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withTests)
-    # Prevent overriding the parent project's compiler/linker settings on Windows.
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(_build_shared_libs ${BUILD_SHARED_LIBS})
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
     add_subdirectory(${CMAKE_SOURCE_DIR}/artifacts/googletest)
+
+    unset(BUILD_SHARED_LIBS CACHE)
+    set(BUILD_SHARED_LIBS ${_build_shared_libs})
+    unset(_build_shared_libs)
+
     add_library(GTest INTERFACE)
     target_link_libraries(GTest INTERFACE gtest gtest_main)
     add_library(GMock INTERFACE)
