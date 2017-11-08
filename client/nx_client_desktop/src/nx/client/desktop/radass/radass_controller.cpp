@@ -339,7 +339,7 @@ struct RadassController::Private
 
         if (isForcedLqDisplay(display))
         {
-            NX_VERBOSE(this) "Forced switch to LQ" << *consumer;
+            NX_VERBOSE(this) << "Forced switch to LQ" << *consumer;
             gotoLowQuality(consumer, LqReason::FF);
         }
         else if (isForcedHqDisplay(display))
