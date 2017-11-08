@@ -134,15 +134,18 @@ def test_merge_cloud_with_local(server_factory, cloud_account, test_system_setti
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/71467018/Merge+systems+test#Mergesystemstest-test_merge_cloud_systems
-def test_merge_cloud_systems(server_factory, cloud_account):
-    one = server_factory('one', setup_cloud_account=cloud_account)
-    two = server_factory('two', setup_cloud_account=cloud_account)
+def test_merge_cloud_systems(server_factory, cloud_account_factory):
+    cloud_account_1 = cloud_account_factory()
+    cloud_account_2 = cloud_account_factory()
+    one = server_factory('one', setup_cloud_account=cloud_account_1)
+    two = server_factory('two', setup_cloud_account=cloud_account_2)
 
-    # Merge 2 cloud systems (takeRemoteSettings = False) -> Error
+    # Merge 2 cloud systems one way
     with pytest.raises(HttpError) as x_info:
-        two.merge_systems(one)
+        two.merge_systems(one, take_remote_settings=False)
     assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
 
+    # Merge 2 cloud systems the other way
     with pytest.raises(HttpError) as x_info:
         two.merge_systems(one, take_remote_settings=True)
     assert x_info.value.reason == 'BOTH_SYSTEM_BOUND_TO_CLOUD'
