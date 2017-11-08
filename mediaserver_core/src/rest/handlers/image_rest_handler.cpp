@@ -151,9 +151,17 @@ int QnImageRestHandler::executeGet(
         return CODE_INVALID_PARAMETER;
     }
 
+    auto requiredPermission =
+        (time == 0 || time == (qint64) AV_NOPTS_VALUE)
+            ? Qn::Permission::ViewLivePermission
+            : Qn::Permission::ViewFootagePermission;
+
     if (!owner->commonModule()->resourceAccessManager()->hasPermission(
-        owner->accessRights(), camera, Qn::Permission::ReadPermission))
+        owner->accessRights(), camera, requiredPermission))
     {
+        result.append("<root>\n");
+        result.append(lit("No required permission"));
+        result.append("</root>\n");
         return nx_http::StatusCode::forbidden;
     }
 
