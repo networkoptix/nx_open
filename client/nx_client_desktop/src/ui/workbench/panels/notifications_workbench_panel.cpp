@@ -153,6 +153,10 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     updateControlsGeometry();
 }
 
+NotificationsWorkbenchPanel::~NotificationsWorkbenchPanel()
+{
+}
+
 bool NotificationsWorkbenchPanel::isPinned() const
 {
     return action(action::PinNotificationsAction)->isChecked();

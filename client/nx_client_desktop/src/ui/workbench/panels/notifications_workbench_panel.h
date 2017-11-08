@@ -3,7 +3,6 @@
 #include <QtCore/QScopedPointer>
 
 #include <ui/workbench/panels/abstract_workbench_panel.h>
-#include <nx/client/desktop/event_search/widgets/event_panel.h>
 
 class QnControlBackgroundWidget;
 class QnNotificationsCollectionWidget;
@@ -13,18 +12,22 @@ class HoverFocusProcessor;
 class AnimatorGroup;
 class VariantAnimator;
 
+namespace nx { namespace client { namespace desktop { class EventPanel; }}}
+
 namespace NxUi {
 
 class NotificationsWorkbenchPanel: public AbstractWorkbenchPanel
 {
+    Q_OBJECT
     using base_type = AbstractWorkbenchPanel;
 
-    Q_OBJECT
 public:
     NotificationsWorkbenchPanel(
         const QnPaneSettings& settings,
         QGraphicsWidget* parentWidget,
         QObject* parent = nullptr);
+
+    virtual ~NotificationsWorkbenchPanel() override;
 
     QnControlBackgroundWidget* backgroundItem;
     QnNotificationsCollectionWidget* item;
