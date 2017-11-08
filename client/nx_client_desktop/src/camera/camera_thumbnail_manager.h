@@ -62,7 +62,13 @@ private:
 private:
     rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera);
 
-    bool isUpdateRequired(const QnVirtualCameraResourcePtr& camera, Qn::ThumbnailStatus status) const;
+    bool isRequestAvailable(const QnVirtualCameraResourcePtr& camera) const;
+
+    bool isUpdating(Qn::ThumbnailStatus status) const;
+
+    bool isUpdateRequired(const QnVirtualCameraResourcePtr& camera,
+        Qn::ThumbnailStatus status) const;
+
     void forceRefreshThumbnails();
 
     QPixmap scaledPixmap(const QPixmap& pixmap) const;
