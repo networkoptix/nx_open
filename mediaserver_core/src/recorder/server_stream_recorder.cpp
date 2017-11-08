@@ -30,11 +30,50 @@
 #include <utils/common/buffered_file.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <media_server/media_server_module.h>
+#include <nx/utils/cryptographic_hash.h>
+
 
 namespace {
 static const int kMotionPrebufferSize = 8;
 static const double kHighDataLimit = 0.7;
 static const double kLowDataLimit = 0.3;
+
+// IntegrityHashHelper -----------------------------------------------------------------------------
+class IntegrityHashHelper
+{
+public:
+    static QByteArray generateIntegrityHash(const QByteArray& value);
+    static bool checkIntegrity(const QByteArray& initialValue, const QByteArray& hashedValue);
+private:
+    static const QByteArray kIntegrityHashSalt;
+
+    static QByteArray hashWithSalt(const QByteArray& value);
+};
+
+const QByteArray IntegrityHashHelper::kIntegrityHashSalt = "408422e1-1b4c-498c-b45a-43ef7723c6e5";
+
+QByteArray IntegrityHashHelper::generateIntegrityHash(const QByteArray& value)
+{
+    return hashWithSalt(value);
+}
+
+bool IntegrityHashHelper::checkIntegrity(
+    const QByteArray& initialValue,
+    const QByteArray& hashedValue)
+{
+    return hashWithSalt(initialValue) == hashedValue;
+}
+
+QByteArray IntegrityHashHelper::hashWithSalt(const QByteArray& value)
+{
+    nx::utils::QnCryptographicHash hashGenerator(nx::utils::QnCryptographicHash::Md5);
+    hashGenerator.addData(value);
+    hashGenerator.addData(kIntegrityHashSalt);
+
+    return hashGenerator.result();
+}
+// -------------------------------------------------------------------------------------------------
+
 } // namespace
 
 std::atomic<qint64> QnServerStreamRecorder::m_totalQueueSize;
@@ -401,6 +440,14 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
         return;
     m_lastMotionState = value;
     emit motionDetected(getResource(), m_lastMotionState, timestamp, metaData);
+}
+
+void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metadata) const
+{
+    NX_ASSERT(m_startDateTime > 0);
+    metadata->version = QnAviArchiveMetadata::kIntegrityCheckVersion;
+    metadata->integrityHash =
+        IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTime));
 }
 
 bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)

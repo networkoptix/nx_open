@@ -20,7 +20,9 @@ public:
 
     //virtual void setSendMotion(bool value) override;
 
-    virtual bool open(const QnResourcePtr &resource);
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) override;
     bool isOpened() const;
     virtual void close();
     virtual qint64 startTime() const;

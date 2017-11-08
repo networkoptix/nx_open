@@ -121,7 +121,9 @@ void QnServerArchiveDelegate::setCatalogs() const
                                            QnServer::LowQualityCatalog);
 }
 
-bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
+bool QnServerArchiveDelegate::open(
+    const QnResourcePtr &resource,
+    AbstractMetaDataIntegrityCheckerPtr /*metaDataIntegrityChecker*/)
 {
     QnMutexLocker lk( &m_mutex );
 

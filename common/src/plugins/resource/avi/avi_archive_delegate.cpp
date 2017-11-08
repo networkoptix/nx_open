@@ -297,7 +297,9 @@ bool QnAviArchiveDelegate::reopen()
     return true;
 }
 
-bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
+bool QnAviArchiveDelegate::open(
+    const QnResourcePtr &resource,
+    AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker)
 {
     QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
@@ -341,7 +343,13 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
             return false;
         }
 
-        initMetadata();
+        if (!initMetadata(std::move(metaDataIntegrityChecker)))
+        {
+            close();
+            m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
+            return false;
+        }
+
         getVideoLayout();
     }
     m_resource->setStatus(Qn::Online);
@@ -536,16 +544,18 @@ void QnAviArchiveDelegate::initLayoutStreams()
     }
 }
 
-void QnAviArchiveDelegate::initMetadata()
+bool QnAviArchiveDelegate::initMetadata(AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker)
 {
     auto aviRes = m_resource.dynamicCast<QnAviResource>();
     if (aviRes && aviRes->hasAviMetadata())
     {
         m_metadata = aviRes->aviMetadata();
-        return;
+        return true;
     }
 
     m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
+    if (metaDataIntegrityChecker && !metaDataIntegrityChecker->check(m_metadata))
+        return false;
 
     if (aviRes)
     {
@@ -553,6 +563,8 @@ void QnAviArchiveDelegate::initMetadata()
         if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
             aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
     }
+
+    return true;
 }
 
 qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)

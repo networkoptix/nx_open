@@ -36,7 +36,9 @@ HanwhaArchiveDelegate::~HanwhaArchiveDelegate()
     m_streamReader.reset();
 }
 
-bool HanwhaArchiveDelegate::open(const QnResourcePtr &resource)
+bool HanwhaArchiveDelegate::open(
+    const QnResourcePtr &/*resource*/,
+    AbstractMetaDataIntegrityCheckerPtr /*metaDataIntegrityChecker*/)
 {
     m_streamReader->setRateControlEnabled(m_rateControlEnabled);
     const auto result = (bool) m_streamReader->openStreamInternal(false, QnLiveStreamParams());

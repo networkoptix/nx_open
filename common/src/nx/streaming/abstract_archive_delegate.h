@@ -1,6 +1,7 @@
 #ifndef ABSTRACT_ARCHIVE_DELEGATE_H
 #define ABSTRACT_ARCHIVE_DELEGATE_H
 
+#include <memory>
 #include <QtGui/QRegion>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
@@ -22,6 +23,18 @@ enum class PlaybackMode
     Export,
     Edge
 };
+
+// AbstractMetaDataIntegrityChecker ----------------------------------------------------------------
+class QnAviArchiveMetadata;
+
+class AbstractMetaDataIntegrityChecker
+{
+public:
+    virtual bool check(const QnAviArchiveMetadata& metadata) = 0;
+};
+
+using AbstractMetaDataIntegrityCheckerPtr = std::unique_ptr<AbstractMetaDataIntegrityChecker>;
+// -------------------------------------------------------------------------------------------------
 
 class QnAbstractArchiveDelegate: public QObject
 {
@@ -59,7 +72,9 @@ public:
     QnAbstractArchiveDelegate(): m_flags(0) {}
     virtual ~QnAbstractArchiveDelegate() {}
 
-    virtual bool open(const QnResourcePtr &resource) = 0;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) = 0;
     virtual void close() = 0;
     virtual qint64 startTime() const = 0;
     virtual qint64 endTime() const = 0;

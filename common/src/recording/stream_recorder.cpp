@@ -813,6 +813,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             context.fileFormat = QnAviArchiveMetadata::Format::avi;
         else if (fileExt == lit("mp4"))
             context.fileFormat = QnAviArchiveMetadata::Format::mp4;
+
+        updateContainerMetadata(&context.metadata);
         context.metadata.saveToFile(context.formatCtx, context.fileFormat);
 
         context.formatCtx->start_time = mediaData->timestamp;

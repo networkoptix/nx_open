@@ -16,7 +16,9 @@ void QnNovArchiveDelegate::setSpeed(qint64 /*displayTime*/, double value)
     m_reverseMode = value < 0;
 }
 
-bool QnNovArchiveDelegate::open(const QnResourcePtr &resource)
+bool QnNovArchiveDelegate::open(
+    const QnResourcePtr &resource,
+    AbstractMetaDataIntegrityCheckerPtr /*metaDataIntegrityChecker*/)
 {
     m_skipFramesBeforeTime = AV_NOPTS_VALUE;
 

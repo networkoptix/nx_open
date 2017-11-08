@@ -36,7 +36,9 @@ public:
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
-    virtual bool open(const QnResourcePtr &resource);
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) override;
     virtual void close();
     virtual qint64 startTime() const;
     virtual void setStartTimeUs(qint64 startTimeUs);
@@ -69,7 +71,7 @@ protected:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     void initLayoutStreams();
-    void initMetadata();
+    bool initMetadata(AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker);
     AVFormatContext* getFormatContext();
 
 private:

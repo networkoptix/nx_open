@@ -15,7 +15,9 @@ public:
     QnAVIPlaylistArchiveDelegate();
     virtual ~QnAVIPlaylistArchiveDelegate();
 
-    virtual bool open(const QnResourcePtr& resource) override;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) override;
     virtual void close() override;
     virtual qint64 seek(qint64 time, bool findIFrame) override;
     virtual qint64 endTime() const override;

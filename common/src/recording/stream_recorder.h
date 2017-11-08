@@ -178,6 +178,7 @@ protected:
         AVIOContext** context);
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
     virtual bool isUtcOffsetAllowed() const { return true; }
+    virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const {}
 
 private:
     struct StreamRecorderContext
