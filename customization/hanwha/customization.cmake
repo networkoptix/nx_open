@@ -18,13 +18,13 @@ set(defaultWebPages "{\"Home Page\": \"https://www.hanwhasecurity.com\"}")
 # Support section
 set(companyUrl "https://www.hanwhasecurity.com/")
 set(productUrl "https://www.hanwhasecurity.com/wave")
-set(supportUrl "https://hanwha.cloud-demo.hdw.mx/content/support")
+set(supportUrl "https://wavevms.com/content/support")
 set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail 
+set(licenseEmail
     "<table>
-        <tr><td><a href=\"mailto:WAVElicense@hanwha.com\">WAVElicense@hanwha.com</a></td><td>- if you are in USA</td></tr>
-        <tr><td><a href=\"mailto:WAVElicense2@hanwha.com\">WAVElicense2@hanwha.com</a></td><td>- if you are somwhere else</td></tr>
+        <tr><td><a href=\"mailto:WAVElicense@hanwha.com\">support@hanwhasecurity.com</a></td><td>- if you are in USA</td></tr>
+        <tr><td><a href=\"mailto:WAVElicense2@hanwha.com\">eucctv.help@hanwha.com</a></td><td>- if you are somwhere else</td></tr>
     </table>")
 
 set(installer.name "wave")
