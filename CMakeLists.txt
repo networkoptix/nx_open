@@ -183,6 +183,9 @@ if(withTests)
     set(_build_shared_libs ${BUILD_SHARED_LIBS})
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
+    # Prevent overriding the parent project's compiler/linker settings on Windows.
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
     add_subdirectory(${CMAKE_SOURCE_DIR}/artifacts/googletest)
 
     unset(BUILD_SHARED_LIBS CACHE)
