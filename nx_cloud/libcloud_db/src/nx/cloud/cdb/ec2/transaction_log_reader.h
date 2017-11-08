@@ -41,6 +41,7 @@ public:
     // TODO: #ak following method MUST be asynchronous
     ::ec2::QnTranState getCurrentState() const;
     nx::String systemId() const;
+
 private:
     TransactionLog* const m_transactionLog;
     const nx::String m_systemId;

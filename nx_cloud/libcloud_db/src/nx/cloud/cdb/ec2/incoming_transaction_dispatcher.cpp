@@ -61,7 +61,7 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
     TransactionProcessedHandler handler)
 {
     QnAbstractTransaction transactionHeader(m_moduleGuid);
-    auto dataSource = 
+    auto dataSource =
         std::make_unique<TransactionUbjsonDataSource>(std::move(serializedTransaction));
     if (!TransactionDeserializer::deserialize(
             &dataSource->stream,

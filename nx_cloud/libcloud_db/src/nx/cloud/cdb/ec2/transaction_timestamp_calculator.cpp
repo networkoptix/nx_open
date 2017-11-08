@@ -13,7 +13,7 @@ TransactionTimestampCalculator::TransactionTimestampCalculator(
     m_baseTime(0)
 {
     if (!m_currentTimeSinceEpochFunc)
-        m_currentTimeSinceEpochFunc = 
+        m_currentTimeSinceEpochFunc =
             []()
             {
                 return std::chrono::duration_cast<std::chrono::milliseconds>(

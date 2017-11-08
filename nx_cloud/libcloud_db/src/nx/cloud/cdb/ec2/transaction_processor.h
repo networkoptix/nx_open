@@ -14,9 +14,7 @@
 #include "transaction_log.h"
 #include "transaction_transport_header.h"
 
-namespace ec2 {
-class QnAbstractTransaction;
-} // namespace ec2
+namespace ec2 { class QnAbstractTransaction; }
 
 namespace nx {
 namespace cdb {

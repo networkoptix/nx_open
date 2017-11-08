@@ -48,12 +48,13 @@ public:
 
     virtual bool setIndicationHandler(
         int method, IndicationHandler handler, void* client = nullptr) override;
-    
+
     virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = nullptr) override;
     virtual void sendRequest(Message request, RequestHandler handler, void* client = nullptr) override;
+    // TODO: #ak This method does not seem to belong here. Remove it.
     virtual bool addConnectionTimer(
         std::chrono::milliseconds period, TimerHandler handler, void* client) override;
-    
+
     virtual SocketAddress localAddress() const override;
     virtual SocketAddress remoteAddress() const override;
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
@@ -82,7 +83,10 @@ private:
     void processMessage(Message message );
 
     typedef std::map<void*, std::unique_ptr<network::aio::Timer>> ConnectionTimers;
-    void startTimer(ConnectionTimers::iterator timer, std::chrono::milliseconds period, TimerHandler handler);
+    void startTimer(
+        ConnectionTimers::iterator timer,
+        std::chrono::milliseconds period,
+        TimerHandler handler);
 
     virtual void stopWhileInAioThread() override;
 

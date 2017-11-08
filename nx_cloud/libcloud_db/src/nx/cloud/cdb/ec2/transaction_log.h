@@ -41,10 +41,10 @@ class AbstractOutgoingTransactionDispatcher;
 QString toString(const ::ec2::QnAbstractTransaction& tran);
 
 /**
- * Supports multiple transactions related to a single system at the same time. 
- * In this case transactions will reported to AbstractOutgoingTransactionDispatcher 
+ * Supports multiple transactions related to a single system at the same time.
+ * In this case transactions will reported to AbstractOutgoingTransactionDispatcher
  * in ascending sequence order.
- * 
+ *
  * @note Calls with the same nx::utils::db::QueryContext object MUST happen within single thread.
  */
 class TransactionLog
@@ -65,9 +65,9 @@ public:
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
-    /** 
+    /**
      * Begins SQL DB transaction and passes that to dbOperationsFunc.
-     * @note nx::utils::db::DBResult::retryLater can be reported to onDbUpdateCompleted if 
+     * @note nx::utils::db::DBResult::retryLater can be reported to onDbUpdateCompleted if
      *      there are already too many requests for transaction
      * @note In case of error dbUpdateFunc can be skipped
      */
@@ -84,8 +84,8 @@ public:
         const nx::String& systemId,
         quint64 newValue);
 
-    /** 
-     * If transaction is not needed (it can be late or something), 
+    /**
+     * If transaction is not needed (it can be late or something),
      *      db::DBResult::cancelled is returned.
      */
     template<typename TransactionDataType>
@@ -148,7 +148,7 @@ public:
         TransactionLogContext* vmsTransactionLogData = nullptr;
 
         QnMutexLocker lock(&m_mutex);
-        DbTransactionContext& dbTranContext = 
+        DbTransactionContext& dbTranContext =
             getDbTransactionContext(lock, queryContext, systemId);
         vmsTransactionLogData = getTransactionLogContext(lock, systemId);
         lock.unlock();
@@ -198,7 +198,7 @@ public:
     {
         int transactionSequence = 0;
         ::ec2::Timestamp transactionTimestamp;
-        std::tie(transactionSequence, transactionTimestamp) = 
+        std::tie(transactionSequence, transactionTimestamp) =
             generateNewTransactionAttributes(queryContext, systemId);
 
         // Generating transaction.
@@ -221,10 +221,10 @@ public:
      * Asynchronously reads requested transactions from Db.
      * @param to State (transaction source id, sequence) to read up to. Boundary is inclusive
      * @param completionHandler is called within unspecified DB connection thread.
-     * In case of high load request can be cancelled internaly. 
+     * In case of high load request can be cancelled internaly.
      * In this case api::ResultCode::retryLater will be reported
-     * @note If there more transactions then maxTransactionsToReturn then 
-     *      api::ResultCode::partialContent result code will be reported 
+     * @note If there more transactions then maxTransactionsToReturn then
+     *      api::ResultCode::partialContent result code will be reported
      *      to the completionHandler.
      */
     void readTransactions(

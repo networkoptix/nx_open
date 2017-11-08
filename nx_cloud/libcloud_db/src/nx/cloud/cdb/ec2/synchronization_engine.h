@@ -28,7 +28,7 @@ public:
 
     TransactionLog& transactionLog();
     const TransactionLog& transactionLog() const;
-    
+
     IncomingTransactionDispatcher& incomingTransactionDispatcher();
     const IncomingTransactionDispatcher& incomingTransactionDispatcher() const;
 
