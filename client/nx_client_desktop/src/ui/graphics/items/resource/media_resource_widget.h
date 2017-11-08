@@ -191,6 +191,8 @@ protected:
 
     virtual Qn::ResourceOverlayButton calculateOverlayButton(
         Qn::ResourceStatusOverlay statusOverlay) const override;
+    virtual QString overlayCustomButtonText(
+        Qn::ResourceStatusOverlay statusOverlay) const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;

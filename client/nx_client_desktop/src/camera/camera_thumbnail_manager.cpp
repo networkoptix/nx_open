@@ -74,20 +74,8 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
     }
 
     ThumbnailData& data = m_thumbnailByCamera[camera];
-    if (data.status == Qn::ThumbnailStatus::Invalid
-        || data.status == Qn::ThumbnailStatus::Refreshing)
-    {
-        data.loadingHandle = loadThumbnailForCamera(camera);
-        if (data.loadingHandle != kInvalidHandle)
-        {
-            if (data.status != Qn::ThumbnailStatus::Refreshing)
-                data.status = Qn::ThumbnailStatus::Loading;
-        }
-        else
-        {
-            data.status = Qn::ThumbnailStatus::NoData;
-        }
-    }
+    if (data.status == Qn::ThumbnailStatus::Invalid || data.status == Qn::ThumbnailStatus::NoData)
+        refreshSelectedCamera();
 
     executeDelayedParented(
         [this, cameraId = camera->getId(), thumbnail = QPixmap::fromImage(data.thumbnail)]
@@ -105,14 +93,16 @@ void QnCameraThumbnailManager::refreshSelectedCamera()
     if (!m_selectedCamera)
         return;
 
-    ThumbnailData& data = m_thumbnailByCamera[m_selectedCamera];
-    auto info = m_thumbnailByCamera.value(m_selectedCamera);
-
-    if (!isUpdateRequired(m_selectedCamera, info.status))
+    if (!isRequestAvailable(m_selectedCamera))
         return;
 
-    info.loadingHandle = loadThumbnailForCamera(m_selectedCamera);
-    info.status = info.loadingHandle != kInvalidHandle
+    ThumbnailData& data = m_thumbnailByCamera[m_selectedCamera];
+
+    if (isUpdating(data.status))
+        return;
+
+    data.loadingHandle = loadThumbnailForCamera(m_selectedCamera);
+    data.status = data.loadingHandle != kInvalidHandle
         ? Qn::ThumbnailStatus::Refreshing
         : Qn::ThumbnailStatus::NoData;
 }
@@ -341,6 +331,19 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
         }, QThread::currentThread());
 }
 
+bool QnCameraThumbnailManager::isRequestAvailable(const QnVirtualCameraResourcePtr& camera) const
+{
+    switch (camera->getStatus())
+    {
+        case Qn::Online:
+        case Qn::Recording:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
 void QnCameraThumbnailManager::doLoadAsync()
 {
     NX_ASSERT(false);
@@ -375,13 +378,18 @@ void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr& r
         selectCamera(QnVirtualCameraResourcePtr());
 }
 
+bool QnCameraThumbnailManager::isUpdating(Qn::ThumbnailStatus status) const
+{
+    return status == Qn::ThumbnailStatus::Loading || status == Qn::ThumbnailStatus::Refreshing;
+}
+
 bool QnCameraThumbnailManager::isUpdateRequired(const QnVirtualCameraResourcePtr& camera,
     Qn::ThumbnailStatus status) const
 {
     switch (camera->getStatus())
     {
         case Qn::Recording:
-            return (status != Qn::ThumbnailStatus::Loading) && (status != Qn::ThumbnailStatus::Refreshing);
+            return !isUpdating(status);
 
         case Qn::Online:
             return (status == Qn::ThumbnailStatus::NoData);
