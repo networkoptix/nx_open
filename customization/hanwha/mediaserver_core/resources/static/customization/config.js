@@ -1,6 +1,19 @@
+
+Config.helpLinks.push({
+    url: "https://support.hanwhasecurity.com/hc/en-us/sections/115003342347",
+    title: "Knowledgebase",
+    target: "new" // new|frame
+});
+
 Config.helpLinks.push({
     url: "mailto:support@hanwhasecurity.com",
-    title: "Support",
+    title: "North America Support",
+    target: "new" // new|frame
+});
+
+Config.helpLinks.push({
+    url: "mailto:eucctv.help@hanwha.com",
+    title: "Europe Support",
     target: "new" // new|frame
 });
 
