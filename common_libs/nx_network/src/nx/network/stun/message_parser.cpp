@@ -418,6 +418,7 @@ int MessageParser::parseAttributeValue(MessageParserBuffer& buffer)
 
 int MessageParser::parseAttributeFingerprintType(MessageParserBuffer& buffer)
 {
+    m_state = ATTRIBUTE_TYPE;
     int ret = parseAttributeType(buffer);
     m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
     return ret;
@@ -425,8 +426,9 @@ int MessageParser::parseAttributeFingerprintType(MessageParserBuffer& buffer)
 
 int MessageParser::parseAttributeFingerprintLength(MessageParserBuffer& buffer)
 {
+    m_state = ATTRIBUTE_LENGTH;
     int ret = parseAttributeLength(buffer);
-    m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_LENGTH;
+    m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_VALUE;
     return ret;
 }
 
@@ -477,7 +479,7 @@ int MessageParser::parseEndMessageIntegrity(MessageParserBuffer& buffer)
     if (m_leftMessageLength != 0)
     {
         m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE;
-        return IN_PROGRESS;
+        return SECTION_FINISH;
     }
     else
     {
