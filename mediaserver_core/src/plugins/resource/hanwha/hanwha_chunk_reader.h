@@ -26,9 +26,9 @@ class HanwhaChunkLoader: public QObject
 
     enum class State
     {
-        Initial,
+        initial,
         updateTimeRange,
-        LoadingChunks
+        loadingChunks
     };
 
 public:
@@ -45,6 +45,13 @@ public:
 
     void setTimeZoneShift(std::chrono::seconds timeZoneShift);
     std::chrono::seconds timeZoneShift() const;
+
+    void setEnableUtcTime(bool enableUtcTime);
+    void setEnableSearchRecordingPeriodRetieval(bool enableRetrieval);
+
+    QString convertDateToString(const QDateTime& dateTime) const;
+
+    bool hasBounds() const;
 
 signals:
     void gotChunks();
@@ -64,11 +71,15 @@ private:
     void sendRequest();
     void parseTimeRangeData(const QByteArray& data);
     qint64 latestChunkTimeMs() const;
+    QUrl buildUrl(const QString& path, std::map<QString, QString> parameters) const;
+    void prepareHttpClient();
+
 private:
     std::unique_ptr<nx_http::AsyncClient> m_httpClient;
-    State m_state = State::Initial;
+    State m_state = State::initial;
     QByteArray m_unfinishedLine;
     std::vector<QnTimePeriodList> m_chunks;
+    std::vector<QnTimePeriodList> m_newChunks;
     qint64 m_nextRequestTimerId = 0;
 
     qint64 m_startTimeUsec = AV_NOPTS_VALUE;
@@ -88,6 +99,9 @@ private:
     mutable QnWaitCondition m_wait;
 
     bool m_isNvr = false;
+    bool m_hasSearchRecordingPeriodSubmenu = false;
+    bool m_isSearchRecordingPeriodRetrievalEnabled = true;
+    bool m_isUtcEnabled = true;
 };
 
 } // namespace plugins

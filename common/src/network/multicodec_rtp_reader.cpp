@@ -287,10 +287,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             break; // error
 
         QnRtspClient::TrackType format = m_RtpSession.getTrackTypeByRtpChannelNum(rtpChannelNum);
-        int channelNum = m_RtpSession.getChannelNum(rtpChannelNum);
-        auto parser = m_tracks[channelNum].parser;
-        QnRtspIoDevice* ioDevice = m_tracks[channelNum].ioDevice;
-        if (m_tracks.size() < channelNum || !parser)
+        int trackNum = m_RtpSession.getChannelNum(rtpChannelNum);
+        auto parser = m_tracks[trackNum].parser;
+        QnRtspIoDevice* ioDevice = m_tracks[trackNum].ioDevice;
+        if (m_tracks.size() < trackNum || !parser)
             continue;
 
         int rtpBufferOffset = m_demuxedData[rtpChannelNum]->size() - readed;
@@ -300,7 +300,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             const auto offset = rtpBufferOffset + kInterleavedRtpOverTcpPrefixLength;
             const auto length = readed - kInterleavedRtpOverTcpPrefixLength;
 
-            const auto rtcpStaticstics = rtspStatistics(offset, length, rtpChannelNum);
+            const auto rtcpStaticstics = rtspStatistics(offset, length, trackNum, rtpChannelNum);
 
             if (!parser->processData(
                 (quint8*)m_demuxedData[rtpChannelNum]->data(),
@@ -401,6 +401,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                 const auto statistics = rtspStatistics(
                     rtpBuffer - bufferBase,
                     bytesRead,
+                    rtpChannelNum,
                     rtpChannelNum);
 
                 if (!track.parser->processData(
@@ -840,18 +841,19 @@ boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpE
 QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
     int rtpBufferOffset,
     int rtpPacketSize,
-    int channel)
+    int track,
+    int rtpChannel)
 {
-    if (m_tracks.size() - 1 < channel)
+    if (m_tracks.size() - 1 < track)
         return QnRtspStatistic();
 
-    auto ioDevice = m_tracks[channel].ioDevice;
+    auto ioDevice = m_tracks[track].ioDevice;
     if (!ioDevice)
         return QnRtspStatistic();
 
     auto rtcpStaticstics = ioDevice->getStatistic();
     const auto extensionNtpTime = parseOnvifNtpExtensionTime(
-        (quint8*)m_demuxedData[channel]->data() + rtpBufferOffset,
+        (quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset,
         rtpPacketSize);
 
     if (extensionNtpTime.is_initialized())

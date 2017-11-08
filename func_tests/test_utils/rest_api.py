@@ -34,7 +34,7 @@ class HttpError(RuntimeError):
          self.reason = reason
          self.json = json
 
-        
+
 class ServerRestApiError(RuntimeError):
 
     def __init__(self, server_name, url, error, error_string):
