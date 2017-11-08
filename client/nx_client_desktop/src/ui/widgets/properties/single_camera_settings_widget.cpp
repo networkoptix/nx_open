@@ -76,6 +76,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent) :
 
     m_cameraThumbnailManager->setAutoRotate(true);
     m_cameraThumbnailManager->setThumbnailSize(kFisheyeThumbnailSize);
+    m_cameraThumbnailManager->setAutoRefresh(false);
 
     for (int i = 0; i < QnMotionRegion::kSensitivityLevelCount; ++i)
     {
