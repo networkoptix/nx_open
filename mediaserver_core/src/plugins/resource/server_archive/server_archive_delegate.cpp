@@ -123,10 +123,11 @@ void QnServerArchiveDelegate::setCatalogs() const
 
 bool QnServerArchiveDelegate::open(
     const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityCheckerPtr /*metaDataIntegrityChecker*/)
+    AbstractMetaDataIntegrityChecker *metaDataIntegrityChecker)
 {
     QnMutexLocker lk( &m_mutex );
 
+    m_metaDataIntegrityChecker = std::move(metaDataIntegrityChecker);
     if (m_opened)
         return true;
     m_resource = resource;

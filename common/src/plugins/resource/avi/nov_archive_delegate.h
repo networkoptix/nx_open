@@ -19,7 +19,7 @@ public:
     virtual qint64 seek (qint64 time, bool findIFrame) override;
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) override;
+        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) override;
     virtual void setSpeed(qint64 displayTime, double value) override;
 private:
     QnTimePeriodList m_chunks;

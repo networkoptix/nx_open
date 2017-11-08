@@ -20,7 +20,7 @@ public:
 
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) override;
+        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) override;
     virtual void close();
     virtual void beforeClose();
     virtual qint64 startTime() const;

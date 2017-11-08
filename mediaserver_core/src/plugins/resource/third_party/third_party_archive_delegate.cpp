@@ -41,9 +41,8 @@ ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
     m_archiveReader->releaseRef();
 }
 
-bool ThirdPartyArchiveDelegate::open(
-    const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityCheckerPtr /*metaDataIntegrityChecker*/)
+bool ThirdPartyArchiveDelegate::open(const QnResourcePtr &resource,
+    AbstractMetaDataIntegrityChecker * /*metaDataIntegrityChecker*/)
 {
     if( m_resource != resource )
         return false;

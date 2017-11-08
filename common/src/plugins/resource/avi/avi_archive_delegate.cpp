@@ -297,9 +297,8 @@ bool QnAviArchiveDelegate::reopen()
     return true;
 }
 
-bool QnAviArchiveDelegate::open(
-    const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker)
+bool QnAviArchiveDelegate::open(const QnResourcePtr &resource,
+    AbstractMetaDataIntegrityChecker *metaDataIntegrityChecker)
 {
     QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
@@ -544,7 +543,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
     }
 }
 
-bool QnAviArchiveDelegate::initMetadata(AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker)
+bool QnAviArchiveDelegate::initMetadata(AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker)
 {
     auto aviRes = m_resource.dynamicCast<QnAviResource>();
     if (aviRes && aviRes->hasAviMetadata())

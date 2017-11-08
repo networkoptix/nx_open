@@ -22,7 +22,7 @@ public:
 
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) override;
+        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) override;
     bool isOpened() const;
     virtual void close();
     virtual qint64 startTime() const;
@@ -95,6 +95,8 @@ private:
     QnServer::ChunksCatalog m_lastChunkQuality;
     QnServer::StoragePool m_currentChunkStoragePool;
     QnServer::StoragePool m_newQualityChunkStoragePool;
+
+    AbstractMetaDataIntegrityChecker* m_metaDataIntegrityChecker;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

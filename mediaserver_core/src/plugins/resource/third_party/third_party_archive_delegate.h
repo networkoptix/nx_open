@@ -25,7 +25,7 @@ public:
     //!Implementation of QnAbstractArchiveDelegate::open
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) override;
+        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) override;
     //!Implementation of QnAbstractArchiveDelegate::close
     virtual void close() override;
     //!Implementation of QnAbstractArchiveDelegate::startTime

@@ -30,9 +30,8 @@ QnAVIPlaylistArchiveDelegate::~QnAVIPlaylistArchiveDelegate()
         av_free(m_ioBuffer);
 }
 
-bool QnAVIPlaylistArchiveDelegate::open(
-        const QnResourcePtr& resource,
-        AbstractMetaDataIntegrityCheckerPtr /*metaDataIntegrityChecker*/)
+bool QnAVIPlaylistArchiveDelegate::open(const QnResourcePtr& resource,
+        AbstractMetaDataIntegrityChecker * /*metaDataIntegrityChecker*/)
 {
     m_resource = resource;
     return true;

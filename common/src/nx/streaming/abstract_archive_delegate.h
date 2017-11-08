@@ -32,8 +32,6 @@ class AbstractMetaDataIntegrityChecker
 public:
     virtual bool check(const QnAviArchiveMetadata& metadata) = 0;
 };
-
-using AbstractMetaDataIntegrityCheckerPtr = std::unique_ptr<AbstractMetaDataIntegrityChecker>;
 // -------------------------------------------------------------------------------------------------
 
 class QnAbstractArchiveDelegate: public QObject
@@ -74,7 +72,7 @@ public:
 
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker = nullptr) = 0;
+        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) = 0;
     virtual void close() = 0;
     virtual qint64 startTime() const = 0;
     virtual qint64 endTime() const = 0;

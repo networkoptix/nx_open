@@ -24,9 +24,8 @@ void QnThumbnailsArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
     m_baseDelegate->setRange(startTime, endTime, frameStep);
 }
 
-bool QnThumbnailsArchiveDelegate::open(
-    const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityCheckerPtr /*metaDataIntegrityChecker*/)
+bool QnThumbnailsArchiveDelegate::open(const QnResourcePtr &resource,
+    AbstractMetaDataIntegrityChecker * /*metaDataIntegrityChecker*/)
 
 {
     m_lastMediaTime = 0;

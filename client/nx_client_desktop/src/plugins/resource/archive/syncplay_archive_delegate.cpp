@@ -21,9 +21,8 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
     delete m_ownerDelegate;
 }
 
-bool QnSyncPlayArchiveDelegate::open(
-    const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityCheckerPtr metaDataIntegrityChecker)
+bool QnSyncPlayArchiveDelegate::open(const QnResourcePtr &resource,
+    AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker)
 {
     return m_ownerDelegate->open(resource, std::move(metaDataIntegrityChecker));
 }
