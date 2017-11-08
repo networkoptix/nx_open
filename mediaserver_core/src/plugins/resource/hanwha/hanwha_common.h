@@ -48,7 +48,8 @@ enum class HanwhaSessionType
     live,
     archive,
     preview,
-    fileExport
+    fileExport,
+    count
 };
 
 //TODO: #dmishin consider using Fusion instead of custom methods.

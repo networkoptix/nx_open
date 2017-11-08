@@ -203,6 +203,12 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     const Parameters& parameters,
     const QString& groupBy)
 {
+    if (!m_resourceContext)
+    {
+        return HanwhaResponse(nx_http::StatusCode::serviceUnavailable,
+            lit("Resource is not initilized, try different server"));
+    }
+
     auto split = path.split(L'/');
     if (split.size() != 2)
     {

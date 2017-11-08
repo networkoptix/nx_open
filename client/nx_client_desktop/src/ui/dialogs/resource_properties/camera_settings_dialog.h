@@ -13,6 +13,7 @@
 class QAbstractButton;
 
 class QnCameraSettingsWidget;
+class QnDefaultPasswordAlertBar;
 
 class QnCameraSettingsDialog: public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
@@ -50,12 +51,14 @@ private slots:
 private:
     void updateReadOnly();
     void saveCameras(const QnVirtualCameraResourceList &cameras);
+    void handleCamerasWithDefaultPasswordChanged();
+    void handleChangeDefaultPasswordRequest(bool showSingleCamera);
 
 private:
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;
-
+    QnDefaultPasswordAlertBar* m_defaultPasswordAlert;
     bool m_ignoreAccept;
 };
 

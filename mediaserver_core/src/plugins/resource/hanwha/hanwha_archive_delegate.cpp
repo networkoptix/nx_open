@@ -99,12 +99,7 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 
     auto result = m_streamReader->getNextData();
     if (!result)
-    {
-        if (m_errorHandler)
-            m_errorHandler(lit("Can not fetch data from stream"));
-
         return result;
-    }
 
     m_currentPositionUsec = result->timestamp;
     if (!isForwardDirection())
@@ -216,6 +211,11 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
         default:
             break;
     }
+}
+
+void HanwhaArchiveDelegate::setClientId(const QnUuid& id)
+{
+    m_streamReader->setClientId(id);
 }
 
 void HanwhaArchiveDelegate::beforeSeek(qint64 time)

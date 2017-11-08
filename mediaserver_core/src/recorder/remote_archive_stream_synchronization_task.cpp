@@ -193,17 +193,7 @@ void RemoteArchiveStreamSynchronizationTask::resetArchiveReaderUnsafe(
     m_archiveReader->setArchiveDelegate(archiveDelegate.release());
     m_archiveReader->setPlaybackRange(QnTimePeriod(startTime, endTime - startTime));
     m_archiveReader->setRole(Qn::CR_Archive);
-
     m_archiveReader->addDataProcessor(m_recorder.get());
-    m_archiveReader->setEndOfPlaybackHandler(
-        [this]()
-        {
-            m_archiveReader->pleaseStop();
-
-            NX_ASSERT(m_recorder);
-            if (m_recorder)
-                m_recorder->pleaseStop();
-        });
 
     m_archiveReader->setErrorHandler(
         [this, startTime, endTime](const QString& errorString)
@@ -265,6 +255,16 @@ void RemoteArchiveStreamSynchronizationTask::resetRecorderUnsafe(
                     m_resource,
                     progress);
             }
+        });
+
+    m_recorder->setEndOfRecordingHandler(
+        [this]()
+        {
+            NX_VERBOSE(this, lit("Stopping recording from recorder. Got out of bounds packet."));
+            if (m_archiveReader)
+                m_archiveReader->pleaseStop();
+
+            m_recorder->pleaseStop();
         });
 }
 

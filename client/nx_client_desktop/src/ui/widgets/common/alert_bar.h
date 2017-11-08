@@ -3,6 +3,7 @@
 #include <QtWidgets/QWidget>
 
 class QLabel;
+class QHBoxLayout;
 
 class QnAlertBar: public QWidget
 {
@@ -25,12 +26,15 @@ public:
     bool reservedSpace() const;
     void setReservedSpace(bool reservedSpace);
 
+    QHBoxLayout* getOverlayLayout();
+
 private:
     void updateVisibility();
 
 private:
-    QLabel* m_label;
-    bool m_reservedSpace;
+    QLabel* m_label = nullptr;
+    QHBoxLayout* m_layout = nullptr;
+    bool m_reservedSpace = false;
 };
 
 /* This class is a helper for the easy customization option. */

@@ -18,8 +18,8 @@ class SingleCameraSettingsWidget;
 
 class QVBoxLayout;
 class QnCameraMotionMaskWidget;
-class QnImageProvider;
 class CameraAdvancedSettingsWebPage;
+class QnCameraThumbnailManager;
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware
 {
@@ -57,6 +57,8 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
 
     Qn::MotionType selectedMotionType() const;
+
+    void setLockedMode(bool locked);
 
 signals:
     void hasChangesChanged();
@@ -104,26 +106,21 @@ private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-
+    QScopedPointer<QnCameraThumbnailManager> m_cameraThumbnailManager;
     QnVirtualCameraResourcePtr m_camera;
-    bool m_cameraSupportsMotion;
 
-    bool m_hasDbChanges;
-
+    bool m_cameraSupportsMotion = false;
+    bool m_hasDbChanges = false;
     /** Indicates that the user changed motion sensitivity controls but not applied them */
-    bool m_hasMotionControlsChanges;
+    bool m_hasMotionControlsChanges = false;
+    bool m_readOnly = false;
+    bool m_updating = false;
 
-    bool m_readOnly;
-
-    bool m_updating;
-
-    QnCameraMotionMaskWidget *m_motionWidget;
-    QVBoxLayout *m_motionLayout;
-
-    QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
-
+    QnCameraMotionMaskWidget* m_motionWidget = nullptr;
+    QVBoxLayout* m_motionLayout = nullptr;
     QButtonGroup* m_sensitivityButtons;
 
     QString m_recordingAlert;
     QString m_motionAlert;
+    bool m_lockedMode = false;
 };

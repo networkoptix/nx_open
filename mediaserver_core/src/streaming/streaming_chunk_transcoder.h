@@ -115,7 +115,8 @@ private:
         const StreamingChunkCacheKey& transcodeParams);
     AbstractOnDemandDataProviderPtr createArchiveReader(
         QnSecurityCamResourcePtr cameraResource,
-        const StreamingChunkCacheKey& transcodeParams);
+        const StreamingChunkCacheKey& transcodeParams,
+        const QnUuid& clientId);
 
     bool startTranscoding(
         int transcodingID,

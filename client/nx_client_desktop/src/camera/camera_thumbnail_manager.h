@@ -28,9 +28,13 @@ public:
 
     QnVirtualCameraResourcePtr selectedCamera() const;
     void selectCamera(const QnVirtualCameraResourcePtr& camera);
+    void refreshSelectedCamera();
 
     bool autoRotate() const;
     void setAutoRotate(bool value);
+
+    bool autoRefresh() const;
+    void setAutoRefresh(bool value);
 
     QSize thumbnailSize() const;
     void setThumbnailSize(const QSize& size);
@@ -58,7 +62,13 @@ private:
 private:
     rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera);
 
-    bool isUpdateRequired(const QnVirtualCameraResourcePtr& camera, Qn::ThumbnailStatus status) const;
+    bool isRequestAvailable(const QnVirtualCameraResourcePtr& camera) const;
+
+    bool isUpdating(Qn::ThumbnailStatus status) const;
+
+    bool isUpdateRequired(const QnVirtualCameraResourcePtr& camera,
+        Qn::ThumbnailStatus status) const;
+
     void forceRefreshThumbnails();
 
     QPixmap scaledPixmap(const QPixmap& pixmap) const;

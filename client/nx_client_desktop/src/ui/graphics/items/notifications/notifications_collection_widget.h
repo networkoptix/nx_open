@@ -16,6 +16,7 @@
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <nx/client/desktop/ui/actions/actions.h>
 
 class QGraphicsLinearLayout;
 class QnNotificationListWidget;
@@ -64,6 +65,12 @@ private:
         const QnVirtualCameraResourcePtr& camera,
         const nx::vms::event::AbstractActionPtr& action);
 
+    using ParametersGetter = std::function<nx::client::desktop::ui::action::Parameters ()>;
+    QnNotificationWidget* addCustomPopup(
+        nx::client::desktop::ui::action::IDType actionId,
+        const ParametersGetter& parametersGetter,
+        QnNotificationLevel::Value notificationLevel,
+        bool closeable);
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
     void hideEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
 
@@ -103,6 +110,7 @@ private:
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
     QHash<QnUuid, QnNotificationWidget*> m_customPopupItems;
+    QnNotificationWidget* m_currentDefaultPasswordChangeWidget = nullptr;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

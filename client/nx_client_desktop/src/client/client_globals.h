@@ -205,9 +205,10 @@ namespace Qn
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
+
         LayoutTemplateRole,                         /**< Role for layout template. Used in StartAnalyticsAction. */
 
-        StoreSessionRole,                           /**< Role for flag that shows if session on successful connection should be stored.
+        StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
                                                          Used in action::ConnectAction. */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                         Used in action::ConnectAction. */
@@ -268,6 +269,8 @@ namespace Qn
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
+
+		ShowSingleCameraRole,                       /**< Used for default password dialog. */
 
         TimestampRole,                              /**< Role for timestamp in milliseconds since epoch (qint64). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
@@ -349,6 +352,8 @@ namespace Qn
         ServerOfflineOverlay,
         ServerUnauthorizedOverlay,
         IoModuleDisabledOverlay,
+        TooManyOpenedConnectionsOverlay,
+        PasswordRequiredOverlay,
 
         OverlayCount
     };
@@ -360,6 +365,7 @@ namespace Qn
         EnableLicense,
         MoreLicenses,
         Settings,
+        SetPassword
     };
 
     /**

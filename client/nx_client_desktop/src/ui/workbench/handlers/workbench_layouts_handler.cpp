@@ -312,6 +312,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
                     return;
 
                 saveLayout(layout);
+                return;
             }
 
             /* Check if we have rights to overwrite the layout */

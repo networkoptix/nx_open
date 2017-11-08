@@ -4,6 +4,8 @@
 #include <QtWidgets/QLineEdit>
 
 #include <ui/utils/validators.h>
+#include <ui/utils/password_information.h>
+#include <nx/utils/password_analyzer.h>
 #include <utils/common/connective.h>
 
 #include <nx/client/desktop/ui/common/detail/base_input_field.h>
@@ -42,7 +44,11 @@ public:
 
     const QnPasswordStrengthIndicator* passwordIndicator() const;
     bool passwordIndicatorEnabled() const;
-    void setPasswordIndicatorEnabled(bool enabled, bool hideForEmptyInput = true, bool showImmediately = false);
+    void setPasswordIndicatorEnabled(
+        bool enabled,
+        bool hideForEmptyInput = true,
+        bool showImmediately = false,
+        QnPasswordInformation::AnalyzeFunction analyzeFunction = nx::utils::passwordStrength);
 
 signals:
     void editingFinished();

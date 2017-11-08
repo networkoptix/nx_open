@@ -19,6 +19,9 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+static const std::chrono::minutes kUpdateCacheTimeout(10);
+static const std::chrono::seconds kUnsuccessfulUpdateCacheTimeout(10);
+
 class HanwhaChunkLoader;
 
 struct HanwhaInformation
@@ -57,7 +60,11 @@ public:
     HanwhaResult<Value> operator()()
     {
         QnMutexLocker locker(&m_mutex);
-        if (m_timer.hasExpired(std::chrono::seconds(10))) //< TODO: Move out timeout.
+        const bool needUpdate =
+            (!m_value && m_timer.hasExpired(kUnsuccessfulUpdateCacheTimeout))
+            || (m_value && m_timer.hasExpired(kUpdateCacheTimeout));
+
+        if (needUpdate)
         {
             m_value = m_getter();
             m_timer.restart();
@@ -81,6 +88,22 @@ private:
     HanwhaResult<Value> m_value;
 };
 
+using ClientId = QnUuid;
+
+struct SessionContext
+{
+    SessionContext(const QString& sessionId, const QnUuid& clientId):
+        sessionId(sessionId),
+        clientId(clientId)
+    {};
+
+    QString sessionId;
+    ClientId clientId;
+};
+
+using SessionContextPtr = QSharedPointer<SessionContext>;
+using SessionContextWeakPtr = QWeakPointer<SessionContext>;
+
 class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
@@ -100,8 +123,9 @@ public:
 
     void startServices(bool hasVideoArchive);
 
-    QString sessionKey(
+    SessionContextPtr session(
         HanwhaSessionType sessionType,
+        const QnUuid& clientId,
         bool generateNewOne = false);
 
     QnTimePeriodList chunks(int channelNumber) const;
@@ -127,6 +151,8 @@ private:
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
 
+    void cleanupUnsafe();
+
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
     mutable QnMutex m_dataMutex;
@@ -136,7 +162,8 @@ private:
     nx::utils::ElapsedTimer m_lastSuccessfulUrlTimer;
 
     mutable QnMutex m_sessionMutex;
-    QMap<HanwhaSessionType, QString> m_sessionKeys;
+
+    QMap<HanwhaSessionType, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
 
     QnSemaphore m_requestSemaphore;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;

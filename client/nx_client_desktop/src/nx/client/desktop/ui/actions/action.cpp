@@ -286,15 +286,6 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
                 if (QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource())
                     resources.push_back(layout);
             }
-            else if (key == Qn::CurrentLayoutMediaItemsRole)
-            {
-                const QnResourceList& resList = ParameterTypes::resources(context()->display()->widgets());
-                for (const QnResourcePtr& res : resList)
-                {
-                    if (res.dynamicCast<QnMediaResource>())
-                        resources.push_back(res);
-                }
-            }
 
             if (resources.isEmpty() && required > 0)
                 return InvisibleAction;

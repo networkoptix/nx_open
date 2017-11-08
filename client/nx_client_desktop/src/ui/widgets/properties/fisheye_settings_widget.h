@@ -24,8 +24,6 @@ public:
     void updateFromParams(const QnMediaDewarpingParams& params, QnImageProvider* imageProvider);
     void submitToParams(QnMediaDewarpingParams& params);
 
-    void loadPreview();
-
 signals:
     void dataChanged();
 

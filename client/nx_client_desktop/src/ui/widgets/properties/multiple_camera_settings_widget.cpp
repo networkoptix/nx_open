@@ -296,8 +296,13 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             });
 
         ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
-        setTabEnabledSafe(Qn::RecordingSettingsTab, !isDtsBased && recordingSupported);
-        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
+
+        setTabEnabledSafe(Qn::IOPortsSettingsTab, !m_lockedMode);
+        setTabEnabledSafe(Qn::MotionSettingsTab, !m_lockedMode);
+        setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !m_lockedMode);
+        setTabEnabledSafe(Qn::AdvancedCameraSettingsTab, !m_lockedMode);
+        setTabEnabledSafe(Qn::RecordingSettingsTab, !isDtsBased && recordingSupported && !m_lockedMode);
+        setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo && !m_lockedMode);
         CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
 
         {
@@ -340,6 +345,8 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
 
     setHasDbChanges(false);
     m_hasScheduleControlsChanges = false;
+
+    ui->tabWidget->widget(Qn::GeneralSettingsTab)->setEnabled(!m_lockedMode);
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const
@@ -359,6 +366,15 @@ void QnMultipleCameraSettingsWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->cameraScheduleWidget, readOnly);
     setReadOnly(ui->imageControlWidget, readOnly);
     m_readOnly = readOnly;
+}
+
+void QnMultipleCameraSettingsWidget::setLockedMode(bool locked)
+{
+    if (m_lockedMode == locked)
+        return;
+
+    m_lockedMode = locked;
+    updateFromResources();
 }
 
 void QnMultipleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled)

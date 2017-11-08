@@ -61,6 +61,12 @@ bool isForcedHqDisplay(QnCamDisplay* display)
     return display->isFullScreen() || display->isZoomWindow() || display->isFisheyeEnabled();
 }
 
+bool isForcedLqDisplay(QnCamDisplay* display)
+{
+    const auto speed = display->getSpeed();
+    return speed > 1 + kSpeedValueEpsilon || speed < 0;
+}
+
 // Omit cameras without dual streaming.
 bool isSupportedDisplay(QnCamDisplay* display)
 {
@@ -96,12 +102,6 @@ bool itemQualityCanBeRaised(QnCamDisplay* display)
 bool itemQualityCanBeLowered(QnCamDisplay* display)
 {
     return !isForcedHqDisplay(display);
-}
-
-bool isFFSpeed(QnCamDisplay* display)
-{
-    const auto speed = display->getSpeed();
-    return speed > 1 + kSpeedValueEpsilon || speed < 0;
 }
 
 enum class LqReason
@@ -337,7 +337,12 @@ struct RadassController::Private
         const auto reader = display->getArchiveReader();
         NX_VERBOSE(this) << "optimizeConsumerQuality" << *consumer;
 
-        if (isForcedHqDisplay(display) && !isFFSpeed(display))
+        if (isForcedLqDisplay(display))
+        {
+            NX_VERBOSE(this) "Forced switch to LQ" << *consumer;
+            gotoLowQuality(consumer, LqReason::FF);
+        }
+        else if (isForcedHqDisplay(display))
         {
             NX_VERBOSE(this) << "Forced switch to HQ" << *consumer;
             gotoHighQuality(consumer);
@@ -425,7 +430,7 @@ struct RadassController::Private
         auto display = consumer->display;
         auto reader = display->getArchiveReader();
 
-        if (isFFSpeed(display))
+        if (isForcedLqDisplay(display))
         {
             // For high speed mode change same item to LQ (do not try to find least item).
             gotoLowQuality(consumer, LqReason::FF, display->getSpeed());
@@ -471,7 +476,7 @@ struct RadassController::Private
         }
 
         // Do not return to HQ in FF mode because of retry counter is not increased for FF.
-        if (isFFSpeed(display))
+        if (isForcedLqDisplay(display))
             return;
 
         // Some item stuck after HQ switching. Do not switch to HQ any more.
@@ -531,7 +536,7 @@ struct RadassController::Private
 
         // Do not rearrange items if any item is in FF/REW mode right now.
         if (std::any_of(consumers.cbegin(), consumers.cend(),
-            [](const ConsumerInfo& consumer) { return isFFSpeed(consumer.display); }))
+            [](const ConsumerInfo& consumer) { return isForcedLqDisplay(consumer.display); }))
         {
             return;
         }
@@ -623,18 +628,30 @@ void RadassController::onTimer()
         switch (consumer->mode)
         {
             case RadassMode::High:
+            {
                 d->gotoHighQuality(consumer);
                 break;
+            }
             case RadassMode::Low:
-                if (!isForcedHqDisplay(consumer->display))
+            {
+                if (isForcedLqDisplay(consumer->display))
+                    d->gotoLowQuality(consumer, LqReason::FF);
+                else if (isForcedHqDisplay(consumer->display))
+                    d->gotoHighQuality(consumer);
+                else
                     d->gotoLowQuality(consumer, LqReason::None);
                 break;
+            }
             case RadassMode::Custom:
+            {
                 // Skip unsupported cameras.
                 break;
+            }
             case RadassMode::Auto:
+            {
                 d->optimizeConsumerQuality(consumer);
                 break;
+            }
             default:
                 break;
         }
