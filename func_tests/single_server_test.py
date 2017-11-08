@@ -8,7 +8,7 @@ import logging
 from test_utils.utils import log_list
 from test_utils.server import TimePeriod
 import server_api_data_generators as generator
-from test_utils.server_rest_api import HttpError
+from test_utils.rest_api import HttpError
 from requests.auth import HTTPDigestAuth
 
 log = logging.getLogger(__name__)
