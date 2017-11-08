@@ -1037,10 +1037,16 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         return CameraDiagnostics::NoErrorResult();
 
     auto possibleValues = autoFocusParameter->possibleValues();
-    if (possibleValues.contains(lit("AutoFocus")))
+    m_focusMode = QString();
+    for (const auto& mode: {lit("SimpleFocus"), lit("AutoFocus")})
     {
-        m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
-        m_ptzTraits.push_back(Ptz::ManualAutoFocusPtzTrait);
+        if (possibleValues.contains(mode))
+        {
+            m_ptzCapabilities |= Ptz::AuxilaryPtzCapability;
+            m_ptzTraits.push_back(Ptz::ManualAutoFocusPtzTrait);
+            m_focusMode = mode;
+            break;
+        }
     }
 
     auto maxPresetParameter = m_attributes.attribute<int>(
@@ -2525,6 +2531,11 @@ bool HanwhaResource::setRelayOutputStateInternal(const QString& outputId, bool a
 bool HanwhaResource::isNvr() const
 {
     return m_isNvr;
+}
+
+QString HanwhaResource::focusMode() const
+{
+    return m_focusMode;
 }
 
 QString HanwhaResource::nxProfileName(Qn::ConnectionRole role) const
