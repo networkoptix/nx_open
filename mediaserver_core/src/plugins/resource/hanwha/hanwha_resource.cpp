@@ -517,10 +517,13 @@ bool HanwhaResource::setRelayOutputState(
             setRelayOutputStateInternal(outputId, state);
         };
 
-    m_timerHolder.addTimer(
-        outputId,
-        resetHandler,
-        std::chrono::milliseconds(autoResetTimeoutMs));
+    if (autoResetTimeoutMs > 0)
+    {
+        m_timerHolder.addTimer(
+            outputId,
+            resetHandler,
+            std::chrono::milliseconds(autoResetTimeoutMs));
+    }
 
     return setRelayOutputStateInternal(outputId, activate);
 }
@@ -2386,19 +2389,19 @@ bool HanwhaResource::executeCommandInternal(
 {
     auto makeRequest =
         [&info, this](HanwhaRequestHelper::Parameters parameters, int channel)
-    {
-        if (channel != kHanwhaInvalidChannel)
-            parameters[kHanwhaChannelProperty] = QString::number(channel);
+        {
+            if (channel != kHanwhaInvalidChannel)
+                parameters[kHanwhaChannelProperty] = QString::number(channel);
 
-        HanwhaRequestHelper helper(sharedContext());
-        const auto response = helper.doRequest(
-            info.cgi(),
-            info.submenu(),
-            info.updateAction(),
-            parameters);
+            HanwhaRequestHelper helper(sharedContext());
+            const auto response = helper.doRequest(
+                info.cgi(),
+                info.submenu(),
+                info.updateAction(),
+                parameters);
 
-        return response.isSuccessful();
-    };
+            return response.isSuccessful();
+        };
 
     if (info.shouldAffectAllChannels())
     {
