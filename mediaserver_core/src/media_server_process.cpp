@@ -3138,6 +3138,8 @@ void MediaServerProcess::run()
 
     hlsSessionPool.reset();
 
+    // Remove all stream recorders.
+    remoteArchiveSynchronizer.reset();
     recordingManager.reset();
 
     mserverResourceSearcher.reset();
@@ -3164,7 +3166,6 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
-    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
