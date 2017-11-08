@@ -61,6 +61,7 @@ void AnalyticsActionHandler::startAnalytics()
             if (controller->resource() != resource)
                 return false;
 
+
             if (!templateName.isEmpty())
                 return controller->layoutTemplate().name == templateName;
 

@@ -70,6 +70,7 @@ private:
         nx::client::desktop::ui::action::IDType actionId,
         const ParametersGetter& parametersGetter,
         QnNotificationLevel::Value notificationLevel,
+        const QString& buttonText,
         bool closeable);
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
     void hideEventAction(const nx::vms::event::AbstractActionPtr& businessAction);

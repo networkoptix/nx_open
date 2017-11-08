@@ -162,7 +162,12 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     const auto updateDefaultCameraPasswordNotification =
         [this, defaultPasswordWatcher]()
         {
-            if (defaultPasswordWatcher->notificationIsVisible())
+            if (!defaultPasswordWatcher->notificationIsVisible())
+            {
+                cleanUpItem(m_currentDefaultPasswordChangeWidget);
+                m_currentDefaultPasswordChangeWidget = nullptr;
+            }
+            if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             {
                 NX_EXPECT(!m_currentDefaultPasswordChangeWidget, "Can't show this popup twice!");
                 const auto parametersGetter =
@@ -175,17 +180,15 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
 
                 m_currentDefaultPasswordChangeWidget =
                     addCustomPopup(action::ChangeDefaultCameraPasswordAction, parametersGetter,
-                        QnNotificationLevel::Value::CriticalNotification, false);
-            }
-            else
-            {
-                cleanUpItem(m_currentDefaultPasswordChangeWidget);
-                m_currentDefaultPasswordChangeWidget = nullptr;
+                        QnNotificationLevel::Value::ImportantNotification,
+                        tr("Set Passwords"), false);
             }
         };
 
     updateDefaultCameraPasswordNotification();
     connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::notificationIsVisibleChanged,
+        this, updateDefaultCameraPasswordNotification);
+    connect(context, &QnWorkbenchContext::userChanged,
         this, updateDefaultCameraPasswordNotification);
 }
 
@@ -335,6 +338,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
     action::IDType actionId,
     const ParametersGetter& parametersGetter,
     QnNotificationLevel::Value notificationLevel,
+    const QString& buttonText,
     bool closeable)
 {
     if (m_list->itemCount() >= kMaxNotificationItems)
@@ -349,19 +353,19 @@ QnNotificationWidget* QnNotificationsCollectionWidget::addCustomPopup(
     item->setTooltipText(action->toolTip());
     item->setNotificationLevel(notificationLevel);
     item->setCloseButtonAvailable(closeable);
-    item->addTextButton(action->icon(), tr("Set Passwords"),
-        [this, parametersGetter, actionId]()
-        {
-            const auto triggerAction =
-                [this, actionId, parametersGetter]
-                {
-                    const auto parameters = parametersGetter();
-                    menu()->trigger(actionId, parameters);
-                };
 
-            // Action will trigger additional event loop, which will cause problems here.
-            executeDelayedParented(triggerAction, kDefaultDelay, this);
-        });
+    if (!buttonText.isEmpty())
+    {
+        item->addTextButton(action->icon(), buttonText,
+            [this, actionId, parameters = parametersGetter()]()
+            {
+                const auto triggerAction =
+                    [this, actionId, parameters] { menu()->trigger(actionId, parameters); };
+
+                // Action will trigger additional event loop, which will cause problems here.
+                executeDelayedParented(triggerAction, kDefaultDelay, this);
+            });
+    }
 
     item->addActionButton(qnSkin->icon("events/alert.png"), actionId);
 
