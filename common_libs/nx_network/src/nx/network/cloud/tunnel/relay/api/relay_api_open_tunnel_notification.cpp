@@ -47,7 +47,7 @@ bool OpenTunnelNotification::parse(const nx_http::Message& message)
 {
     if (message.type != nx_http::MessageType::request)
         return false;
-    
+
     auto path = message.request->requestLine.url.path().toUtf8();
     if (!path.startsWith(nx::cloud::relay::api::kRelayClientPathPrefix))
         return false;

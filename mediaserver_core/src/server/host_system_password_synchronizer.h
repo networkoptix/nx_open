@@ -10,7 +10,7 @@
 
 /**
  * Sets host system password to admin password if appropriate.
- * Currently, password is changed only on NX1/bananapi and only if OS is installed on HDD drive.
+ * Currently, password is changed only on NX1/bananapi and only if OS is installed on HDD.
  */
 class HostSystemPasswordSynchronizer:
     public QObject,
