@@ -72,6 +72,9 @@ protected:
             m_beginListeningResponse.keepAliveOptions = KeepAliveOptions();
             m_beginListeningResponse.keepAliveOptions->inactivityPeriodBeforeFirstProbe =
                 std::chrono::seconds(3);
+            m_beginListeningResponse.keepAliveOptions->probeSendPeriod = 
+                std::chrono::seconds(3);
+            m_beginListeningResponse.keepAliveOptions->probeCount = 3;
         }
     }
 
