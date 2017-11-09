@@ -19,12 +19,12 @@ constexpr static const std::chrono::seconds
 
 constexpr static const size_t kUdpTunnelKeepAliveRetriesDefault = 3;
 
-constexpr static const std::chrono::seconds 
+constexpr static const std::chrono::seconds
     kDefaultTunnelInactivityTimeout = std::chrono::minutes(8);
 
 // Nat traversal methods default start delays.
 
-constexpr static const std::chrono::milliseconds 
+constexpr static const std::chrono::milliseconds
     kUdpHolePunchingStartDelayDefault = std::chrono::milliseconds::zero();
 
 constexpr static const std::chrono::milliseconds
@@ -43,7 +43,7 @@ public:
     std::chrono::milliseconds rendezvousConnectTimeout;
     std::chrono::milliseconds udpTunnelKeepAliveInterval;
     /**
-     * UDP tunnel should be considered inactive if no keep-alive messages have been 
+     * UDP tunnel should be considered inactive if no keep-alive messages have been
      *   received during rendezvousConnectTimeout*udpTunnelKeepAliveRetries period.
      */
     int udpTunnelKeepAliveRetries;

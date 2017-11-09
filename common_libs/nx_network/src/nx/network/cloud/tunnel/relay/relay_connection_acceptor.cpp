@@ -217,7 +217,7 @@ void ConnectionAcceptor::stopWhileInAioThread()
     m_acceptor.pleaseStopSync();
 }
 
-std::unique_ptr<detail::ReverseConnection> 
+std::unique_ptr<detail::ReverseConnection>
     ConnectionAcceptor::reverseConnectionFactoryFunc()
 {
     return std::make_unique<detail::ReverseConnection>(m_relayUrl);

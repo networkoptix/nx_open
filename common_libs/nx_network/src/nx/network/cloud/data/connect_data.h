@@ -56,7 +56,7 @@ public:
     /** Optional for backward compatibility. */
     boost::optional<nx::String> trafficRelayUrl;
     /**
-     * May differ from ConnectRequest::destinationHostName 
+     * May differ from ConnectRequest::destinationHostName
      * if connect by domain name (e.g., cloud system id) has been requested.
      */
     nx::String destinationHostFullName;

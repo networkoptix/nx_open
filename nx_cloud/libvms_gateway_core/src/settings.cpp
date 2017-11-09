@@ -193,7 +193,7 @@ void Settings::loadSettings()
     m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
 
     //tcp
-    m_tcp.recvTimeout = 
+    m_tcp.recvTimeout =
         nx::utils::parseTimerDuration(
             settings().value(kTcpRecvTimeout).toString(),
             kDefaultTcpRecvTimeout);
@@ -203,7 +203,7 @@ void Settings::loadSettings()
             kDefaultTcpSendTimeout);
 
     //http
-    m_http.proxyTargetPort = 
+    m_http.proxyTargetPort =
         settings().value(kHttpProxyTargetPort, kDefaultHttpProxyTargetPort).toInt();
     m_http.connectSupport =
         settings().value(
@@ -231,7 +231,7 @@ void Settings::loadSettings()
         settings().value(
             kAllowIpTarget,
             kDefaultAllowIpTarget).toString() == "true";
-    m_cloudConnect.fetchPublicIpUrl = 
+    m_cloudConnect.fetchPublicIpUrl =
         settings().value(
             kFetchPublicIpUrl,
             kDefaultFetchPublicIpUrl).toString();
@@ -250,7 +250,7 @@ void Settings::loadSettings()
         std::chrono::duration_cast<std::chrono::seconds>(
             nx::utils::parseTimerDuration(
                 settings().value(
-                    tcp_reverse::kStartTimeout).toString(), 
+                    tcp_reverse::kStartTimeout).toString(),
                     tcp_reverse::kDefaultStartTimeout));
 
     auto preferedSslMode = settings().value(kPreferedSslMode, kDefaultPreferedSslMode).toString();

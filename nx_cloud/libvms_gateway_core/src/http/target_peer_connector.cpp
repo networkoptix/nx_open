@@ -43,7 +43,7 @@ void TargetPeerConnector::connectAsync(ConnectHandler handler)
                     *m_timeout,
                     std::bind(&TargetPeerConnector::interruptByTimeout, this));
             }
-        
+
             m_completionHandler = std::move(handler);
 
             if (m_listeningPeerPool)
