@@ -846,6 +846,11 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                      timelineConfig.scrollBarTopPadding * self.canvas.height;
         var scrollCoordinate = (date - self.scaleManager.start)/(self.scaleManager.end - self.scaleManager.start) * self.canvas.width;
 
+        /* If the marker is off screen and within the scrollbar's area it should be moved
+           to the edge of the scrollbar that it is closest to.
+           When inside of the if statement we check if the marker is before the visible area
+           and set to the beginning otherwise set it to the end of the scrollbar.
+        */
         var scrollSlider = self.scaleManager.scrollSlider();
         var scrollBarStart = scrollSlider.start * self.pixelAspectRatio;
         var scrollBarEnd = (scrollSlider.start + scrollSlider.width) * self.pixelAspectRatio;
