@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CameraSettingsGeneralTabWidget</class>
+ <widget class="QWidget" name="CameraSettingsGeneralTabWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>748</width>
+    <height>1017</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="nx::client::desktop::CameraInfoWidget" name="cameraInfoWidget" native="true"/>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="generalGridLayout" columnstretch="1,1">
+     <property name="topMargin">
+      <number>12</number>
+     </property>
+     <property name="horizontalSpacing">
+      <number>24</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>20</number>
+     </property>
+     <item row="0" column="1">
+      <widget class="QGroupBox" name="audioGroupBox">
+       <property name="title">
+        <string>Audio</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+       <layout class="QVBoxLayout" name="audioVerticalLayout">
+        <item>
+         <widget class="QCheckBox" name="enableAudioCheckBox">
+          <property name="text">
+           <string>Enable Audio</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="nx::client::desktop::ImageControlWidget" name="imageControlWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="authenticationGroupBox">
+       <property name="title">
+        <string>Authentication</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+       <layout class="QFormLayout" name="authenticationFormLayout">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="loginLabel">
+          <property name="text">
+           <string>Login</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="loginEdit"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="passwordLabel">
+          <property name="text">
+           <string>Password</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="passwordEdit">
+          <property name="echoMode">
+           <enum>QLineEdit::PasswordEchoOnEdit</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QnAlertBar" name="alertBar" native="true">
+     <property name="text" stdset="0">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnAlertBar</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/alert_bar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ImageControlWidget</class>
+   <extends>QWidget</extends>
+   <header>image_control_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::CameraInfoWidget</class>
+   <extends>QWidget</extends>
+   <header>camera_info_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+</ui>
