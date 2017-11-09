@@ -30,7 +30,7 @@ angular.module('cloudApp')
             $location.path('/systems/' + system.id);
         };
         $scope.getSystemOwnerName = function(system){
-            return cloudApi.getSystemOwnerName(system);
+            return systemsProvider.getSystemOwnerName(system);
         };
 
         $scope.search = {value:''};

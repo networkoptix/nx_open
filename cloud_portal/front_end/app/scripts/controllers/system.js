@@ -75,10 +75,8 @@ angular.module('cloudApp')
         }
 
         function reloadSystems(){
-            cloudApi.systems('clearCache').then(function(){
-                systemsProvider.forceUpdateSystems();
-               $location.path('/systems');
-            });
+            systemsProvider.forceUpdateSystems();
+            $location.path('/systems');
         }
 
         $scope.disconnect = function(){
@@ -157,6 +155,7 @@ angular.module('cloudApp')
 
         $scope.$watch('system.info.name',function(value){
             page.title(value + ' -');
+            systemsProvider.forceUpdateSystems();
         });
 
         function normalizePermissionString(permissions){
