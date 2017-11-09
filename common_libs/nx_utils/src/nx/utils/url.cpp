@@ -219,12 +219,12 @@ Url Url::fromQUrl(const QUrl& url)
 
 Url Url::fromUserInput(const QString& userInput)
 {
-    return Url(userInput);
+    return Url(QUrl::fromUserInput(userInput));
 }
 
 Url Url::fromUserInput(
-    const QString &userInput, 
-    const QString &workingDirectory, 
+    const QString &userInput,
+    const QString &workingDirectory,
     QUrl::UserInputResolutionOptions options)
 {
     return Url(QUrl::fromUserInput(userInput, workingDirectory, options));
