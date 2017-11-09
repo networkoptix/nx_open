@@ -37,7 +37,8 @@ namespace std {
     }
 #endif
 
-#if defined(__GNUC__) && ATOMIC_INT_LOCK_FREE < 2 //< see bits/exception_ptr.h
+#if defined(__GNUC__) && ATOMIC_INT_LOCK_FREE < 2 \
+    && !__GNUC_PREREQ(7,0) //< see bits/exception_ptr.h
     typedef std::shared_ptr<exception> exception_ptr;
 
     template <typename E>
