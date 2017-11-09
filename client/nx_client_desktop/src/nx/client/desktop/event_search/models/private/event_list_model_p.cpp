@@ -96,7 +96,7 @@ const EventListModel::EventData& EventListModel::Private::getEvent(int index) co
     if (index < 0 || index >= m_events.count())
     {
         NX_ASSERT(false, Q_FUNC_INFO, "Index is out of range");
-        static const EventData dummy;
+        static EventData dummy;
         return dummy;
     }
 
