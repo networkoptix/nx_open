@@ -51,6 +51,8 @@ set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(CMAKE_DEBUG_POSTFIX "" CACHE INTERNAL "" FORCE)
+
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
     ${PROJECT_SOURCE_DIR}/cmake)
