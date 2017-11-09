@@ -10,7 +10,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/fake_media_server.h>
 
-#include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
 
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
@@ -62,7 +62,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (cameras.isEmpty())
         return;
 
-    QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
+    QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
     dialogConstructor.disableAutoFocus();
 
     if (!m_cameraSettingsDialog->setCameras(cameras))

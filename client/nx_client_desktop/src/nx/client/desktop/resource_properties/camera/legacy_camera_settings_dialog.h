@@ -17,15 +17,15 @@ namespace desktop {
 
 class CameraSettingsWidget;
 
-class CameraSettingsDialog: public QnSessionAwareButtonBoxDialog
+class LegacyCameraSettingsDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
 
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    CameraSettingsDialog(QWidget *parent = NULL);
-    virtual ~CameraSettingsDialog();
+    LegacyCameraSettingsDialog(QWidget *parent = NULL);
+    virtual ~LegacyCameraSettingsDialog();
 
     virtual bool tryClose(bool force) override;
 

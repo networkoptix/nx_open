@@ -1,4 +1,4 @@
-#include "camera_settings_dialog.h"
+#include "legacy_camera_settings_dialog.h"
 
 #include <QtGui/QWindow>
 #include <QtGui/QScreen>
@@ -42,7 +42,7 @@ namespace desktop {
 
 using namespace ui;
 
-CameraSettingsDialog::CameraSettingsDialog(QWidget *parent):
+LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
     base_type(parent),
     m_defaultPasswordAlert(new QnDefaultPasswordAlertBar(this)),
     m_ignoreAccept(false)
@@ -83,9 +83,9 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent):
     separator->setFrameStyle(QFrame::HLine | QFrame::Sunken);
 
     connect(m_defaultPasswordAlert, &QnDefaultPasswordAlertBar::changeDefaultPasswordRequest,
-        this, &CameraSettingsDialog::handleChangeDefaultPasswordRequest);
+        this, &LegacyCameraSettingsDialog::handleChangeDefaultPasswordRequest);
     connect(m_defaultPasswordAlert, &QnDefaultPasswordAlertBar::targetCamerasChanged,
-        this, &CameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
+        this, &LegacyCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -94,16 +94,16 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent):
     layout->addWidget(separator);
     layout->addWidget(m_buttonBox);
 
-    connect(m_settingsWidget, &CameraSettingsWidget::hasChangesChanged, this, &CameraSettingsDialog::at_settingsWidget_hasChangesChanged);
-    connect(m_settingsWidget, &CameraSettingsWidget::modeChanged, this, &CameraSettingsDialog::at_settingsWidget_modeChanged);
+    connect(m_settingsWidget, &CameraSettingsWidget::hasChangesChanged, this, &LegacyCameraSettingsDialog::at_settingsWidget_hasChangesChanged);
+    connect(m_settingsWidget, &CameraSettingsWidget::modeChanged, this, &LegacyCameraSettingsDialog::at_settingsWidget_modeChanged);
 
-    connect(m_openButton, &QPushButton::clicked, this, &CameraSettingsDialog::at_openButton_clicked);
-    connect(m_diagnoseButton, &QPushButton::clicked, this, &CameraSettingsDialog::at_diagnoseButton_clicked);
-    connect(m_rulesButton, &QPushButton::clicked, this, &CameraSettingsDialog::at_rulesButton_clicked);
+    connect(m_openButton, &QPushButton::clicked, this, &LegacyCameraSettingsDialog::at_openButton_clicked);
+    connect(m_diagnoseButton, &QPushButton::clicked, this, &LegacyCameraSettingsDialog::at_diagnoseButton_clicked);
+    connect(m_rulesButton, &QPushButton::clicked, this, &LegacyCameraSettingsDialog::at_rulesButton_clicked);
 
-    connect(m_settingsWidget, &CameraSettingsWidget::resourcesChanged, this, &CameraSettingsDialog::updateReadOnly);
+    connect(m_settingsWidget, &CameraSettingsWidget::resourcesChanged, this, &LegacyCameraSettingsDialog::updateReadOnly);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this, &CameraSettingsDialog::updateReadOnly);
+    connect(context(), &QnWorkbenchContext::userChanged, this, &LegacyCameraSettingsDialog::updateReadOnly);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
@@ -125,23 +125,23 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget *parent):
     retranslateUi();
 }
 
-CameraSettingsDialog::~CameraSettingsDialog()
+LegacyCameraSettingsDialog::~LegacyCameraSettingsDialog()
 {
 }
 
-void CameraSettingsDialog::handleChangeDefaultPasswordRequest(bool showSingleCamera)
+void LegacyCameraSettingsDialog::handleChangeDefaultPasswordRequest(bool showSingleCamera)
 {
     const auto parameters = action::Parameters(m_defaultPasswordAlert->targetCameras())
         .withArgument(Qn::ShowSingleCameraRole, showSingleCamera);
     menu()->trigger(action::ChangeDefaultCameraPasswordAction, parameters);
 }
 
-void CameraSettingsDialog::handleCamerasWithDefaultPasswordChanged()
+void LegacyCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged()
 {
     m_settingsWidget->setLockedMode(!m_defaultPasswordAlert->targetCameras().isEmpty());
 }
 
-void CameraSettingsDialog::retranslateUi()
+void LegacyCameraSettingsDialog::retranslateUi()
 {
     base_type::retranslateUi();
 
@@ -175,7 +175,7 @@ void CameraSettingsDialog::retranslateUi()
 }
 
 
-bool CameraSettingsDialog::tryClose(bool force)
+bool LegacyCameraSettingsDialog::tryClose(bool force)
 {
     auto result = setCameras(QnVirtualCameraResourceList(), force);
     result |= force;
@@ -186,7 +186,7 @@ bool CameraSettingsDialog::tryClose(bool force)
 }
 
 
-void CameraSettingsDialog::accept()
+void LegacyCameraSettingsDialog::accept()
 {
     if (m_ignoreAccept)
     {
@@ -196,7 +196,7 @@ void CameraSettingsDialog::accept()
     base_type::accept();
 }
 
-void CameraSettingsDialog::reject()
+void LegacyCameraSettingsDialog::reject()
 {
     m_settingsWidget->reject();
     base_type::reject();
@@ -206,14 +206,14 @@ void CameraSettingsDialog::reject()
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void CameraSettingsDialog::at_settingsWidget_hasChangesChanged()
+void LegacyCameraSettingsDialog::at_settingsWidget_hasChangesChanged()
 {
     bool hasChanges = m_settingsWidget->hasDbChanges();
     m_applyButton->setEnabled(hasChanges && !commonModule()->isReadOnly());
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
-void CameraSettingsDialog::at_settingsWidget_modeChanged()
+void LegacyCameraSettingsDialog::at_settingsWidget_modeChanged()
 {
     CameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == CameraSettingsWidget::SingleMode || mode == CameraSettingsWidget::MultiMode);
@@ -224,7 +224,7 @@ void CameraSettingsDialog::at_settingsWidget_modeChanged()
     m_rulesButton->setVisible(mode == CameraSettingsWidget::SingleMode);  // TODO: #GDM implement
 }
 
-void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
+void LegacyCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
 {
     switch (button)
     {
@@ -240,23 +240,23 @@ void CameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton but
     }
 }
 
-void CameraSettingsDialog::at_diagnoseButton_clicked()
+void LegacyCameraSettingsDialog::at_diagnoseButton_clicked()
 {
     menu()->trigger(action::CameraIssuesAction, m_settingsWidget->cameras());
 }
 
-void CameraSettingsDialog::at_rulesButton_clicked()
+void LegacyCameraSettingsDialog::at_rulesButton_clicked()
 {
     menu()->trigger(action::CameraBusinessRulesAction, m_settingsWidget->cameras());
 }
 
-void CameraSettingsDialog::updateReadOnly()
+void LegacyCameraSettingsDialog::updateReadOnly()
 {
     Qn::Permissions permissions = accessController()->combinedPermissions(m_settingsWidget->cameras());
     m_settingsWidget->setReadOnly(!permissions.testFlag(Qn::WritePermission));
 }
 
-bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
+bool LegacyCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
 {
     bool askConfirmation =
         !force
@@ -306,17 +306,17 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     return true;
 }
 
-CameraSettingsTab CameraSettingsDialog::currentTab() const
+CameraSettingsTab LegacyCameraSettingsDialog::currentTab() const
 {
     return m_settingsWidget->currentTab();
 }
 
-void CameraSettingsDialog::setCurrentTab(CameraSettingsTab tab)
+void LegacyCameraSettingsDialog::setCurrentTab(CameraSettingsTab tab)
 {
     m_settingsWidget->setCurrentTab(tab);
 }
 
-void CameraSettingsDialog::submitToResources()
+void LegacyCameraSettingsDialog::submitToResources()
 {
     bool hasDbChanges = m_settingsWidget->hasDbChanges();
 
@@ -345,12 +345,12 @@ void CameraSettingsDialog::submitToResources()
     saveCameras(cameras);
 }
 
-void CameraSettingsDialog::updateFromResources()
+void LegacyCameraSettingsDialog::updateFromResources()
 {
     m_settingsWidget->updateFromResources();
 }
 
-void CameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras)
+void LegacyCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras)
 {
     if (cameras.isEmpty())
         return;
@@ -377,7 +377,7 @@ void CameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &camera
     qnResourcesChangesManager->saveCamerasBatch(cameras, applyChanges, callback);
 }
 
-void CameraSettingsDialog::at_openButton_clicked()
+void LegacyCameraSettingsDialog::at_openButton_clicked()
 {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
     menu()->trigger(ui::action::OpenInNewTabAction, cameras);
