@@ -78,7 +78,6 @@ var TimelineConfig = {
     scrollBarColor: [145,167,178],  //$light12
     scrollBarHighlightColor: [165,183,192],  //$light10
     scrollBarHighlightColorActive: [155,175,185],  //$light11
-    scrollMarkerOffset: 2,
 
 
     //Scroll bar marks

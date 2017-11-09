@@ -850,14 +850,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var scrollBarStart = scrollSlider.start * self.pixelAspectRatio;
         var scrollBarEnd = (scrollSlider.start + scrollSlider.width) * self.pixelAspectRatio;
 
-        if(timeMarkerOffScreen(date) && scrollBarStart <= scrollCoordinate
-                                     && scrollCoordinate <= scrollBarEnd){
-            if(self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio) < 0){
-                scrollCoordinate = scrollBarStart - timelineConfig.scrollMarkerOffset  * self.pixelAspectRatio;
-            }
-            else{
-                scrollCoordinate = scrollBarEnd + timelineConfig.scrollMarkerOffset * self.pixelAspectRatio;
-            }
+        if(timeMarkerOffScreen(date) && scrollBarStart <= scrollCoordinate && scrollCoordinate <= scrollBarEnd){
+            var beforeTimeline = self.scaleManager.dateToScreenCoordinate(date, self.pixelAspectRatio) < 0;
+            scrollCoordinate = beforeTimeline ? scrollBarStart : scrollBarEnd;
         }
         context.beginPath();
         context.moveTo(0.5 + scrollCoordinate, bottom);
