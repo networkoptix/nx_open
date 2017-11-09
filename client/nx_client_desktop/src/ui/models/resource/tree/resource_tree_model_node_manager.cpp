@@ -44,6 +44,8 @@ void QnResourceTreeModelNodeManager::primaryNodeAdded(QnResourceTreeModelNode* n
     if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
         connect(camera, &QnVirtualCameraResource::statusFlagsChanged, node, chainUpdate);
+        connect(camera, &QnVirtualCameraResource::capabilitiesChanged, node,
+            [node]() { chainCall(node, &QnResourceTreeModelNode::updateResourceStatus); });
     }
 }
 
