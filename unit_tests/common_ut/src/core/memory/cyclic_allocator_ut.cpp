@@ -2,7 +2,7 @@
 #include <utils/memory/cyclic_allocator.h>
 #include <utils/memory/system_allocator.h>
 #include <utils/common/byte_array.h>
-#include <utils/common/long_runnable.h>
+
 #include <memory>
 #include <deque>
 #include <vector>
@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cctype>
+#include <nx/utils/thread/long_runnable.h>
 
 namespace nx {
 namespace utils {

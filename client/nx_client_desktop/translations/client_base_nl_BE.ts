@@ -706,11 +706,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Change Cell Aspect Ratio...</source>
-      <translation>Aanpassen van de aspect ratio van de cellen...</translation>
+      <translation>Aanpassen van de aspect ratio van de cameo's...</translation>
     </message>
     <message>
       <source>Change Cell Spacing...</source>
-      <translation>Ruimte tussen cellen wijzigen...</translation>
+      <translation>Ruimte tussen cameo's wijzigen...</translation>
     </message>
     <message>
       <source>None</source>
