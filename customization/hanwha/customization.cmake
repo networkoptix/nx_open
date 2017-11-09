@@ -23,8 +23,8 @@ set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail
     "<table>
-        <tr><td><a href=\"mailto:WAVElicense@hanwha.com\">support@hanwhasecurity.com</a></td><td>- if you are in USA</td></tr>
-        <tr><td><a href=\"mailto:WAVElicense2@hanwha.com\">eucctv.help@hanwha.com</a></td><td>- if you are somwhere else</td></tr>
+        <tr><td>US-<a href=\"mailto:WAVElicense@hanwha.com\">support@hanwhasecurity.com</a></td><td></td></tr>
+        <tr><td>Europe-<a href=\"mailto:WAVElicense2@hanwha.com\">eucctv.help@hanwha.com</a></td><td></td></tr>
     </table>")
 
 set(installer.name "wave")
