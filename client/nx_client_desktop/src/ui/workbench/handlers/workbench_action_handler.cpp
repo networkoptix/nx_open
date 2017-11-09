@@ -95,7 +95,6 @@
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
-#include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
@@ -108,7 +107,8 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
-#include <ui/widgets/properties/camera_settings_tab.h>
+#include <nx/client/desktop/resource_properties/media_file/media_file_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -1769,19 +1769,21 @@ void ActionHandler::at_mediaFileSettingsAction_triggered() {
     if (!media)
         return;
 
-    QScopedPointer<QnMediaFileSettingsDialog> dialog;
+    QScopedPointer<MediaFileSettingsDialog> dialog;
     if (resource->hasFlags(Qn::remote))
-        dialog.reset(new QnSessionAware<QnMediaFileSettingsDialog>(mainWindow()));
+        dialog.reset(new QnSessionAware<MediaFileSettingsDialog>(mainWindow()));
     else
-        dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
+        dialog.reset(new MediaFileSettingsDialog(mainWindow()));
 
     dialog->updateFromResource(media);
-    if (dialog->exec()) {
+    if (dialog->exec())
+    {
         dialog->submitToResource(media);
     }
-    else {
-        QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
-        if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
+    else
+    {
+        auto centralWidget = display()->widget(Qn::CentralRole);
+        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget))
             mediaWidget->setDewarpingParams(media->getDewarpingParams());
     }
 }

@@ -10,7 +10,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/fake_media_server.h>
 
-#include <ui/dialogs/resource_properties/camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
+
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
@@ -21,7 +22,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
+using namespace ui;
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
@@ -60,7 +62,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (cameras.isEmpty())
         return;
 
-    QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
+    QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
     dialogConstructor.disableAutoFocus();
 
     if (!m_cameraSettingsDialog->setCameras(cameras))
@@ -71,7 +73,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (parameters.hasArgument(Qn::FocusTabRole))
     {
         auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-        m_cameraSettingsDialog->setCurrentTab(static_cast<Qn::CameraSettingsTab>(tab));
+        m_cameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
     }
 }
 

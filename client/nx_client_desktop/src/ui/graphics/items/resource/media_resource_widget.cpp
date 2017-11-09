@@ -61,6 +61,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_tab.h>
 
 #include <ui/common/recording_status_helper.h>
 #include <ui/common/geometry.h>
@@ -86,7 +87,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
-#include <ui/widgets/properties/camera_settings_tab.h>
+
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -111,9 +112,8 @@
 #include <core/resource_management/resource_runtime_data.h>
 
 using namespace nx;
-using namespace client::desktop::ui;
-
-using DefaultPasswordCamerasWatcher = nx::client::desktop::DefaultPasswordCamerasWatcher;
+using namespace client::desktop;
+using namespace ui;
 
 namespace {
 
@@ -2482,9 +2482,9 @@ void QnMediaResourceWidget::processSettingsRequest()
     if (!d->camera)
         return;
 
-    int selectedTab = Qn::GeneralSettingsTab;
+    //TODO: #GDM Check if may be provided without static cast.
     menu()->trigger(action::CameraSettingsAction, action::Parameters(d->camera)
-        .withArgument(Qn::FocusTabRole, selectedTab));
+        .withArgument(Qn::FocusTabRole, int(CameraSettingsTab::general)));
 }
 
 void QnMediaResourceWidget::processMoreLicensesRequest()
