@@ -130,6 +130,11 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
+if(targetDevice STREQUAL "bpi")
+    set_property(TARGET Qt5::Gui APPEND PROPERTY
+        INTERFACE_LINK_LIBRARIES EGL GLESv2 UMP)
+endif()
+
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
         COMPONENTS
