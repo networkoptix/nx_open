@@ -50,6 +50,7 @@ void ListeningPeerManager::beginListening(
     api::BeginListeningResponse response;
     response.preemptiveConnectionCount =
         m_settings.recommendedPreemptiveConnectionCount;
+    response.keepAliveOptions = m_settings.tcpKeepAlive;
 
     nx_http::ConnectionEvents connectionEvents;
     connectionEvents.onResponseHasBeenSent =
