@@ -3,8 +3,11 @@
 #include <chrono>
 #include <string>
 
+#include <boost/optional.hpp>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/abstract_socket.h>
 
 namespace nx {
 namespace cloud {
@@ -18,9 +21,14 @@ struct BeginListeningRequest
 
 #define BeginListeningRequest_Fields (peerName)
 
-struct BeginListeningResponse
+struct NX_NETWORK_API BeginListeningResponse
 {
-    int preemptiveConnectionCount = 0;
+    int preemptiveConnectionCount;
+    boost::optional<KeepAliveOptions> keepAliveOptions;
+
+    BeginListeningResponse();
+
+    bool operator==(const BeginListeningResponse& right) const;
 };
 
 NX_NETWORK_API bool serializeToHeaders(
@@ -30,13 +38,6 @@ NX_NETWORK_API bool serializeToHeaders(
 NX_NETWORK_API bool deserializeFromHeaders(
     const nx_http::HttpHeaders& from,
     BeginListeningResponse* what);
-
-inline bool operator==(
-    const BeginListeningResponse& left,
-    const BeginListeningResponse& right)
-{
-    return left.preemptiveConnectionCount == right.preemptiveConnectionCount;
-}
 
 #define BeginListeningResponse_Fields (preemptiveConnectionCount)
 
