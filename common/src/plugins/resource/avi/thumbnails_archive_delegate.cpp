@@ -25,7 +25,7 @@ void QnThumbnailsArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
 }
 
 bool QnThumbnailsArchiveDelegate::open(const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityChecker * /*metaDataIntegrityChecker*/)
+    AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
 
 {
     m_lastMediaTime = 0;
@@ -37,7 +37,7 @@ bool QnThumbnailsArchiveDelegate::open(const QnResourcePtr &resource,
             m_channelCount = videoLayout->channelCount();
     }
 
-    bool rez = m_baseDelegate->open(resource);
+    bool rez = m_baseDelegate->open(resource, nullptr);
     if (rez)
         m_currentPos = m_rangeStart;
     else

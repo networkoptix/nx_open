@@ -289,7 +289,7 @@ bool QnAviArchiveDelegate::reopen()
     auto storage = m_storage;
     close();
     m_storage = storage;
-    if (!open(m_resource))
+    if (!open(m_resource, m_archiveIntegrityWatcher))
         return false;
     if (!findStreams())
         return false;
@@ -297,11 +297,13 @@ bool QnAviArchiveDelegate::reopen()
     return true;
 }
 
-bool QnAviArchiveDelegate::open(const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityChecker *metaDataIntegrityChecker)
+bool QnAviArchiveDelegate::open(
+    const QnResourcePtr &resource,
+    AbstractArchiveIntegrityWatcher *archiveIntegrityWatcher)
 {
     QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
+    m_archiveIntegrityWatcher = archiveIntegrityWatcher;
     m_resource = resource;
     if (m_formatContext == nullptr)
     {
@@ -342,7 +344,7 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource,
             return false;
         }
 
-        if (!initMetadata(std::move(metaDataIntegrityChecker)))
+        if (!initMetadata())
         {
             close();
             m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
@@ -543,7 +545,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
     }
 }
 
-bool QnAviArchiveDelegate::initMetadata(AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker)
+bool QnAviArchiveDelegate::initMetadata()
 {
     auto aviRes = m_resource.dynamicCast<QnAviResource>();
     if (aviRes && aviRes->hasAviMetadata())
@@ -553,7 +555,7 @@ bool QnAviArchiveDelegate::initMetadata(AbstractMetaDataIntegrityChecker* metaDa
     }
 
     m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
-    if (metaDataIntegrityChecker && !metaDataIntegrityChecker->check(m_metadata))
+    if (m_archiveIntegrityWatcher && !m_archiveIntegrityWatcher->fileRequested(m_metadata, m_resource->getUrl()))
         return false;
 
     if (aviRes)

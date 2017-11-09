@@ -44,6 +44,8 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("Remote archive synchronization is in progress");
         case QnSystemHealth::RemoteArchiveSyncError:
             return tr("Error occured during remote archive synchronization");
+        case QnSystemHealth::ArchiveIntegrityFailed:
+            return tr("Archive integrity problem detected");
         default:
             break;
     }
@@ -126,6 +128,9 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::StoragesNotConfigured:
             messageParts << tr("Storage is not configured on the following Server:") << resourceName;
+            break;
+        case QnSystemHealth::ArchiveIntegrityFailed:
+            messageParts << resourceName;
             break;
         case QnSystemHealth::NoLicenses:
             messageParts << tr("You have no licenses.") << tr("You cannot record video from cameras.");

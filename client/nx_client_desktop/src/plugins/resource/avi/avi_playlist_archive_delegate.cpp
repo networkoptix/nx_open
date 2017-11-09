@@ -31,7 +31,7 @@ QnAVIPlaylistArchiveDelegate::~QnAVIPlaylistArchiveDelegate()
 }
 
 bool QnAVIPlaylistArchiveDelegate::open(const QnResourcePtr& resource,
-        AbstractMetaDataIntegrityChecker * /*metaDataIntegrityChecker*/)
+        AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
 {
     m_resource = resource;
     return true;

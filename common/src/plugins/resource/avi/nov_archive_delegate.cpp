@@ -17,7 +17,7 @@ void QnNovArchiveDelegate::setSpeed(qint64 /*displayTime*/, double value)
 }
 
 bool QnNovArchiveDelegate::open(const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityChecker * /*metaDataIntegrityChecker*/)
+    AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
 {
     m_skipFramesBeforeTime = AV_NOPTS_VALUE;
 
@@ -26,7 +26,7 @@ bool QnNovArchiveDelegate::open(const QnResourcePtr &resource,
     if (layoutFile)
         m_chunks = layoutFile->getTimePeriods(resource);
 
-    return QnAviArchiveDelegate::open(resource);
+    return QnAviArchiveDelegate::open(resource, nullptr);
 }
 
 qint64 QnNovArchiveDelegate::seek(qint64 time, bool findIFrame)

@@ -194,7 +194,7 @@ qint64 QnArchiveStreamReader::currentTime() const
 QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
-        m_delegate->open(m_resource);
+        m_delegate->open(m_resource, m_archiveIntegrityWatcher);
     return m_delegate->getVideoLayout();
 }
 
@@ -202,7 +202,7 @@ bool QnArchiveStreamReader::hasVideo() const
 {
     if (!m_hasVideo.is_initialized()) {
         if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineHasVideo)) {
-            m_delegate->open(m_resource);
+            m_delegate->open(m_resource, m_archiveIntegrityWatcher);
         }
         m_hasVideo = m_delegate->hasVideo();
     }
@@ -212,7 +212,7 @@ bool QnArchiveStreamReader::hasVideo() const
 QnConstResourceAudioLayoutPtr QnArchiveStreamReader::getDPAudioLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))
-        m_delegate->open(m_resource);
+        m_delegate->open(m_resource, m_archiveIntegrityWatcher);
     return m_delegate->getAudioLayout();
 }
 
@@ -275,7 +275,7 @@ bool QnArchiveStreamReader::init()
         }
     }
 
-    bool opened = m_delegate->open(m_resource);
+    bool opened = m_delegate->open(m_resource, m_archiveIntegrityWatcher);
 
     if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
         emit jumpOccured(requiredJumpTime, m_delegate->getSequence());
@@ -963,7 +963,7 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
         // some local files can't correctly jump to 0
         m_delegate->close();
         init();
-        m_delegate->open(m_resource);
+        m_delegate->open(m_resource, m_archiveIntegrityWatcher);
     }
 
     m_exactJumpToSpecifiedFrame = false;

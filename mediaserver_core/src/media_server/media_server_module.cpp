@@ -33,6 +33,7 @@
 #include <core/ptz/server_ptz_controller_pool.h>
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
+#include <recorder/archive_integrity_watcher.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/event/event_message_bus.h>
@@ -179,6 +180,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_metadataManagerPoolThread->start();
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
+    m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -256,4 +258,9 @@ nx::mediaserver::metadata::EventRuleWatcher* QnMediaServerModule::metadataRuleWa
 nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
 {
     return m_sharedContextPool;
+}
+
+AbstractArchiveIntegrityWatcher* QnMediaServerModule::archiveIntegrityWatcher() const
+{
+    return m_archiveIntegrityWatcher;
 }

@@ -14,6 +14,8 @@
 #include <motion/abstract_motion_archive.h>
 #include <nx/utils/uuid.h>
 
+#include "abstract_archive_integrity_watcher.h"
+
 enum class PlaybackMode
 {
     Default,
@@ -23,16 +25,6 @@ enum class PlaybackMode
     Export,
     Edge
 };
-
-// AbstractMetaDataIntegrityChecker ----------------------------------------------------------------
-class QnAviArchiveMetadata;
-
-class AbstractMetaDataIntegrityChecker
-{
-public:
-    virtual bool check(const QnAviArchiveMetadata& metadata) = 0;
-};
-// -------------------------------------------------------------------------------------------------
 
 class QnAbstractArchiveDelegate: public QObject
 {
@@ -72,7 +64,7 @@ public:
 
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) = 0;
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) = 0;
     virtual void close() = 0;
     virtual qint64 startTime() const = 0;
     virtual qint64 endTime() const = 0;

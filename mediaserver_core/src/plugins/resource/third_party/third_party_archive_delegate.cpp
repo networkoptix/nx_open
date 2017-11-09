@@ -42,7 +42,7 @@ ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
 }
 
 bool ThirdPartyArchiveDelegate::open(const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityChecker * /*metaDataIntegrityChecker*/)
+    AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
 {
     if( m_resource != resource )
         return false;

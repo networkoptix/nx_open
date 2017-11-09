@@ -287,7 +287,7 @@ bool FileTranscoder::openFiles()
 
     QnResourcePtr res( new DummyResource() );
     res->setUrl( m_srcFilePath );
-    if( !mediaFileReader->open( res ) )
+    if( !mediaFileReader->open( res , nullptr) )
         return false;
 
     if( !m_dest->open( QIODevice::WriteOnly ) )

@@ -12,7 +12,7 @@ public:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) override;
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close() override;
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;

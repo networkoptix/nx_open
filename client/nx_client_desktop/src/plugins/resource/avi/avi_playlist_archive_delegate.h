@@ -17,7 +17,7 @@ public:
 
     virtual bool open(
         const QnResourcePtr &resource,
-        AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker = nullptr) override;
+        AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close() override;
     virtual qint64 seek(qint64 time, bool findIFrame) override;
     virtual qint64 endTime() const override;

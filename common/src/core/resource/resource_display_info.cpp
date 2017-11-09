@@ -6,6 +6,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/storage_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
 #include <core/resource_management/user_roles_manager.h>
@@ -157,6 +158,9 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
             if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>())
                 m_name = camera->getUserDefinedName();
         }
+
+        if (QnStorageResourcePtr storage = m_resource.dynamicCast<QnStorageResource>())
+            m_name = storage->getUrl();
     }
 
     if (detailLevel == Qn::RI_NameOnly)

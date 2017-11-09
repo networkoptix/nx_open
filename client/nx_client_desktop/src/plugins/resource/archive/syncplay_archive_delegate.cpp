@@ -22,9 +22,9 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
 }
 
 bool QnSyncPlayArchiveDelegate::open(const QnResourcePtr &resource,
-    AbstractMetaDataIntegrityChecker* metaDataIntegrityChecker)
+    AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher)
 {
-    return m_ownerDelegate->open(resource, std::move(metaDataIntegrityChecker));
+    return m_ownerDelegate->open(resource, std::move(archiveIntegrityWatcher));
 }
 
 void QnSyncPlayArchiveDelegate::close()
