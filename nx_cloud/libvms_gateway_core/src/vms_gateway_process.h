@@ -17,10 +17,12 @@
 
 namespace nx {
 namespace cloud {
+
+namespace relaying { class RelayEngine; }
+
 namespace gateway {
 
 class AuthorizationManager;
-class RelayEngine;
 
 class NX_VMS_GATEWAY_API VmsGatewayProcess:
     public nx::utils::Service
@@ -33,6 +35,9 @@ public:
 
     const std::vector<SocketAddress>& httpEndpoints() const;
 
+    relaying::RelayEngine& relayEngine();
+    const relaying::RelayEngine& relayEngine() const;
+
     void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
 
 protected:
@@ -43,6 +48,7 @@ private:
     conf::RunTimeOptions m_runTimeOptions;
     std::vector<SocketAddress> m_httpEndpoints;
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
+    relaying::RelayEngine* m_relayEngine = nullptr;
 
     void initializeCloudConnect(const conf::Settings& settings);
 

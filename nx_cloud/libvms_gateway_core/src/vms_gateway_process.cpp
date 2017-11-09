@@ -59,6 +59,16 @@ const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
     return m_httpEndpoints;
 }
 
+relaying::RelayEngine& VmsGatewayProcess::relayEngine()
+{
+    return *m_relayEngine;
+}
+
+const relaying::RelayEngine& VmsGatewayProcess::relayEngine() const
+{
+    return *m_relayEngine;
+}
+
 void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool enabled)
 {
     m_runTimeOptions.enforceSsl(targetAddress, enabled);
@@ -110,6 +120,7 @@ int VmsGatewayProcess::serviceMain(
         relaying::RelayEngine relayEngine(
             settings.listeningPeer(),
             &httpMessageDispatcher);
+        m_relayEngine = &relayEngine;
 
         nx_http::server::proxy::MessageBodyConverterFactory::instance().setUrlConverter(
             std::make_unique<UrlRewriter>());
