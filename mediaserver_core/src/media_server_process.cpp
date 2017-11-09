@@ -1723,8 +1723,8 @@ void MediaServerProcess::at_timer()
         return;
 
     // TODO: #2.4 #GDM This timer make two totally different functions. Split it.
-    qnServerModule->runTimeSettings()->setValue(
-        "lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qnServerModule->setLastRunningTime(
+        std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()));
 
     const auto& resPool = commonModule()->resourcePool();
     QnResourcePtr mServer = resPool->getResourceById(commonModule()->moduleGUID());
@@ -2475,7 +2475,8 @@ void MediaServerProcess::run()
     commonModule()->createMessageProcessor<QnServerMessageProcessor>();
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
-    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
+    auto auditManager = std::make_unique<QnMServerAuditManager>(
+        qnServerModule->lastRunningTime(), commonModule());
 
     TimeBasedNonceProvider timeBasedNonceProvider;
     CloudManagerGroup cloudManagerGroup(commonModule(), &timeBasedNonceProvider);
@@ -3030,7 +3031,7 @@ void MediaServerProcess::run()
                 SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
         });
 
-    m_firstRunningTime = qnServerModule->runTimeSettings()->value("lastRunningTime").toLongLong();
+    m_firstRunningTime = qnServerModule->lastRunningTime().count();
 
     m_crashReporter.reset(new ec2::CrashReporter(commonModule()));
 
@@ -3137,6 +3138,8 @@ void MediaServerProcess::run()
 
     hlsSessionPool.reset();
 
+    // Remove all stream recorders.
+    remoteArchiveSynchronizer.reset();
     recordingManager.reset();
 
     mserverResourceSearcher.reset();
@@ -3163,7 +3166,6 @@ void MediaServerProcess::run()
     eventRuleProcessor.reset();
 
     motionHelper.reset();
-    remoteArchiveSynchronizer.reset();
 
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
@@ -3183,7 +3185,7 @@ void MediaServerProcess::run()
 
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();
-    qnServerModule->runTimeSettings()->setValue("lastRunningTime", 0);
+    qnServerModule->setLastRunningTime(std::chrono::milliseconds::zero());
 
     authHelper.reset();
     //fileDeletor.reset();

@@ -95,6 +95,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
 {
+    m_device->disconnect(this);
+    disconnect();
     stop();
 }
 

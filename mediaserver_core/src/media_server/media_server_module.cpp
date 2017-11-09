@@ -50,6 +50,8 @@
 
 namespace {
 
+const auto kLastRunningTime = lit("lastRunningTime");
+
 void installTranslations()
 {
     static const QString kDefaultPath(":/translations/common_en_US.qm");
@@ -214,6 +216,16 @@ MSSettings* QnMediaServerModule::settings() const
 QSettings* QnMediaServerModule::runTimeSettings() const
 {
     return m_settings->runTimeSettings();
+}
+
+std::chrono::milliseconds QnMediaServerModule::lastRunningTime() const
+{
+    return std::chrono::milliseconds(runTimeSettings()->value(kLastRunningTime).toLongLong());
+}
+
+void QnMediaServerModule::setLastRunningTime(std::chrono::milliseconds value) const
+{
+    runTimeSettings()->setValue(kLastRunningTime, (qlonglong) value.count());
 }
 
 nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
