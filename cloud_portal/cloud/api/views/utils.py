@@ -120,8 +120,11 @@ def downloads(request):
             customization = 'default'
         updates_record = updates_json[customization]
         latest_release = None
-        if 'current_release' in updates_record:
+        if 'download_version' in updates_record:
+            latest_release = updates_record['download_version']
+        elif 'current_release' in updates_record:
             latest_release = updates_record['current_release']
+
         if not latest_release:  # Hack for new customizations
             logger.error('No official release for customization: ' + customization + '. Ask Boris to fix that.')
             latest_release = '3.0'
