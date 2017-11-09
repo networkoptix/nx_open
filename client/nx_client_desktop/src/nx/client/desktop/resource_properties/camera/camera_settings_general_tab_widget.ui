@@ -7,12 +7,43 @@
     <x>0</x>
     <y>0</y>
     <width>748</width>
-    <height>1017</height>
+    <height>525</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QnAlertBar" name="topAlertBar" native="true">
+     <property name="text" stdset="0">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="nx::client::desktop::CameraInfoWidget" name="cameraInfoWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QGridLayout" name="generalGridLayout" columnstretch="1,1">
@@ -117,13 +148,6 @@
      </property>
     </spacer>
    </item>
-   <item>
-    <widget class="QnAlertBar" name="alertBar" native="true">
-     <property name="text" stdset="0">
-      <string>TextLabel</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -135,14 +159,25 @@
   <customwidget>
    <class>nx::client::desktop::ImageControlWidget</class>
    <extends>QWidget</extends>
-   <header>image_control_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/image_control_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnLicensesProposeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/licensing/licenses_propose_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::CameraInfoWidget</class>
    <extends>QWidget</extends>
-   <header>camera_info_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/camera_info_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>loginEdit</tabstop>
+  <tabstop>passwordEdit</tabstop>
+  <tabstop>enableAudioCheckBox</tabstop>
+ </tabstops>
 </ui>

@@ -637,25 +637,25 @@
   <customwidget>
    <class>nx::client::desktop::CameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>expert_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/expert_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::ImageControlWidget</class>
    <extends>QWidget</extends>
-   <header>image_control_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/image_control_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::IoPortSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>ioport_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/ioport_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::CameraAdvancedSettingsWidget</class>
    <extends>QWidget</extends>
-   <header>camera_advanced_settings_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/camera_advanced_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -667,7 +667,7 @@
   <customwidget>
    <class>nx::client::desktop::CameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header>camera_schedule_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

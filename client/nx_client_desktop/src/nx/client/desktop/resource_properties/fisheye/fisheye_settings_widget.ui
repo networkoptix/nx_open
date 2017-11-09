@@ -572,7 +572,7 @@
   <customwidget>
    <class>nx::client::desktop::FisheyeCalibrationWidget</class>
    <extends>QWidget</extends>
-   <header>fisheye_calibration_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/fisheye/fisheye_calibration_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

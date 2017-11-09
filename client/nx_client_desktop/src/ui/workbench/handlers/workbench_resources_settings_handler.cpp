@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QAction>
 
+#include <ini.h>
+
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <core/resource/camera_resource.h>
@@ -11,6 +13,7 @@
 #include <core/resource/fake_media_server.h>
 
 #include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 
 #include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
@@ -27,10 +30,7 @@ using namespace ui;
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_cameraSettingsDialog(),
-    m_serverSettingsDialog(),
-    m_userSettingsDialog()
+    QnWorkbenchContextAware(parent)
 {
     connect(action(action::CameraSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
@@ -50,9 +50,11 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
-     delete m_cameraSettingsDialog.data();
-     delete m_serverSettingsDialog.data();
-     delete m_userSettingsDialog.data();
+    // TODO: #GDM Refactor this.
+    delete m_legacyCameraSettingsDialog.data();
+    delete m_cameraSettingsDialog.data();
+    delete m_serverSettingsDialog.data();
+    delete m_userSettingsDialog.data();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
@@ -62,18 +64,37 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
     if (cameras.isEmpty())
         return;
 
-    QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
-    dialogConstructor.disableAutoFocus();
-
-    if (!m_cameraSettingsDialog->setCameras(cameras))
-        return;
-
-    m_cameraSettingsDialog->updateFromResources();
-
-    if (parameters.hasArgument(Qn::FocusTabRole))
+    if (ini().redesignedCameraSettingsDialog)
     {
-        auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-        m_cameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
+        QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
+            m_cameraSettingsDialog, mainWindow());
+        dialogConstructor.disableAutoFocus();
+
+        if (!m_cameraSettingsDialog->setCameras(cameras))
+            return;
+
+        if (parameters.hasArgument(Qn::FocusTabRole))
+        {
+            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+            m_cameraSettingsDialog->setCurrentPage(tab);
+        }
+    }
+    else
+    {
+        QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
+            m_legacyCameraSettingsDialog, mainWindow());
+        dialogConstructor.disableAutoFocus();
+
+        if (!m_legacyCameraSettingsDialog->setCameras(cameras))
+            return;
+
+        m_legacyCameraSettingsDialog->updateFromResources();
+
+        if (parameters.hasArgument(Qn::FocusTabRole))
+        {
+            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+            m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
+        }
     }
 }
 

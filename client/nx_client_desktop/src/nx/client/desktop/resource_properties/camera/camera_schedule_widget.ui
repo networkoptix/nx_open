@@ -1002,7 +1002,7 @@
   <customwidget>
    <class>QnScheduleGridWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/properties/schedule_grid_widget.h</header>
+   <header location="global">ui/widgets/properties/schedule_grid_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

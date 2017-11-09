@@ -138,7 +138,7 @@
   <customwidget>
    <class>nx::client::desktop::CameraAdvancedParamsWidget</class>
    <extends>QWidget</extends>
-   <header>camera_advanced_params_widget.h</header>
+   <header location="global">nx/client/desktop/resource_properties/camera/camera_advanced_params_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
